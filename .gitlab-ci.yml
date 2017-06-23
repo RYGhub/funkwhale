@@ -1,0 +1,22 @@
+image: docker:latest
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+# variables:
+#   DOCKER_DRIVER: overlay
+#
+# services:
+# - docker:dind
+#
+#
+# # build:
+# #   stage: build
+# #   script:
+# #   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+# #   - docker build -t funkwhale/front .
+# #   - docker push
+# #
+# #   tags:
+# #     - dind
+# #   only:
+# #     - master

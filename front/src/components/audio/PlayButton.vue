@@ -1,0 +1,67 @@
+<template>
+  <div :class="['ui', {'tiny': discrete}, 'buttons']">
+    <button title="Add to current queue" @click="add" :class="['ui', {'mini': discrete}, 'button']">
+      <i class="ui play icon"></i>
+      <template v-if="!discrete"><slot>Play</slot></template>
+    </button>
+    <div v-if="!discrete" class="ui floating dropdown icon button">
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <div class="item"@click="add"><i class="plus icon"></i> Add to queue</div>
+        <div class="item"@click="addNext()"><i class="step forward icon"></i> Play next</div>
+        <div class="item"@click="addNext(true)"><i class="arrow down icon"></i> Play now</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import logger from '@/logging'
+import queue from '@/audio/queue'
+import jQuery from 'jquery'
+
+export default {
+  props: {
+    // we can either have a single or multiple tracks to play when clicked
+    tracks: {type: Array, required: false},
+    track: {type: Object, required: false},
+    discrete: {type: Boolean, default: false}
+  },
+  created () {
+    if (!this.track & !this.tracks) {
+      logger.default.error('You have to provide either a track or tracks property')
+    }
+  },
+  mounted () {
+    if (!this.discrete) {
+      jQuery(this.$el).find('.ui.dropdown').dropdown()
+    }
+  },
+  methods: {
+    add () {
+      if (this.track) {
+        queue.append(this.track)
+      } else {
+        queue.appendMany(this.tracks)
+      }
+    },
+    addNext (next) {
+      if (this.track) {
+        queue.append(this.track, queue.currentIndex + 1)
+      } else {
+        queue.appendMany(this.tracks, queue.currentIndex + 1)
+      }
+      if (next) {
+        queue.next()
+      }
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+i {
+  cursor: pointer;
+}
+</style>

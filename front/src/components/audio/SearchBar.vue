@@ -1,0 +1,101 @@
+<template>
+  <div class="ui fluid category search">
+    <slot></slot>
+    <div class="ui icon input">
+      <input class="prompt" placeholder="Search for artists, albums, tracks..." type="text">
+      <i class="search icon"></i>
+    </div>
+    <div class="results"></div>
+  </div>
+</template>
+
+<script>
+import jQuery from 'jquery'
+import config from '@/config'
+import auth from '@/auth'
+import router from '@/router'
+
+const SEARCH_URL = config.API_URL + 'search?query={query}'
+
+export default {
+  mounted () {
+    jQuery(this.$el).search({
+      type: 'category',
+      minCharacters: 3,
+      onSelect (result, response) {
+        router.push(result.routerUrl)
+      },
+      apiSettings: {
+        beforeXHR: function (xhrObject) {
+          xhrObject.setRequestHeader('Authorization', auth.getAuthHeader())
+          return xhrObject
+        },
+        onResponse: function (initialResponse) {
+          var results = {}
+          let categories = [
+            {
+              code: 'artists',
+              route: 'browse.artist',
+              name: 'Artist',
+              getTitle (r) {
+                return r.name
+              },
+              getDescription (r) {
+                return ''
+              }
+            },
+            {
+              code: 'albums',
+              route: 'browse.album',
+              name: 'Album',
+              getTitle (r) {
+                return r.title
+              },
+              getDescription (r) {
+                return ''
+              }
+            },
+            {
+              code: 'tracks',
+              route: 'browse.track',
+              name: 'Track',
+              getTitle (r) {
+                return r.title
+              },
+              getDescription (r) {
+                return ''
+              }
+            }
+          ]
+          categories.forEach(category => {
+            results[category.code] = {
+              name: category.name,
+              results: []
+            }
+            initialResponse[category.code].forEach(result => {
+              results[category.code].results.push({
+                title: category.getTitle(result),
+                id: result.id,
+                routerUrl: {
+                  name: category.route,
+                  params: {
+                    id: result.id
+                  }
+                },
+                description: category.getDescription(result)
+              })
+            })
+          })
+          return {results: results}
+        },
+        url: SEARCH_URL
+      }
+    })
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+
+</style>

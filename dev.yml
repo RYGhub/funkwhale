@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+
+  front:
+    build:
+      dockerfile: docker/Dockerfile.dev
+      context: ./front
+    env_file: .env.dev
+    environment:
+      - "HOST=0.0.0.0"
+    ports:
+      - "8080:8080"
+    volumes:
+      - './front:/app'
+      - /app/node_modules
+
+  postgres:
+    env_file: .env.dev
+    image: postgres
+
+  redis:
+    env_file: .env.dev
+    image: redis:3.0
+
+  celeryworker:
+    env_file: .env.dev
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile.local
+    links:
+     - postgres
+     - redis
+    command: python manage.py celery worker
+    environment:
+        - C_FORCE_ROOT=true
+    volumes:
+      - ./api:/app
+
+  api:
+    env_file: .env.dev
+    build:
+      context: ./api
+      dockerfile: docker/Dockerfile.local
+    command: python /app/manage.py runserver 0.0.0.0:12081
+    volumes:
+      - ./api:/app
+    ports:
+      - "12081"
+    links:
+      - postgres
+      - redis
+      - celeryworker
+
+  nginx:
+    env_file: .env.dev
+    build: ./api/compose/nginx
+    links:
+      - api
+    volumes:
+      - ./api/funkwhale_api/media:/staticfiles/media
+    ports:
+      - "0.0.0.0:6001:80"

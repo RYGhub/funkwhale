@@ -1,0 +1,13 @@
+FROM node:6-alpine
+
+EXPOSE 8080
+
+RUN mkdir /app
+WORKDIR /app
+ADD package.json .
+
+RUN npm install
+
+ADD . .
+
+RUN npm run build

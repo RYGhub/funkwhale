@@ -1,0 +1,9 @@
+test:
+  dockerfile: docker/Dockerfile.test
+  build: .
+  command: python manage.py test
+  volumes:
+    - .:/app
+  environment:
+    - DJANGO_SETTINGS_MODULE=config.settings.test
+    - API_AUTHENTICATION_REQUIRED=False
