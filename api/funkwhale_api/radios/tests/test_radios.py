@@ -74,12 +74,11 @@ class TestRadios(TestCase):
 
     def test_can_use_radio_session_to_filter_choices(self):
         tracks = mommy.make('music.Track', _quantity=30)
-
         radio = radios.RandomRadio()
         session = radio.start_session(self.user)
 
         for i in range(30):
-            radio.pick()
+            p = radio.pick()
 
         # ensure 30 differents tracks have been suggested
         tracks_id = [session_track.track.pk for session_track in session.session_tracks.all()]

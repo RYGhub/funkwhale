@@ -50,7 +50,7 @@ class SessionRadio(SimpleRadio):
 
     def filter_from_session(self, queryset):
         already_played = self.session.session_tracks.all().values_list('track', flat=True)
-        queryset = queryset.exclude(pk__in=already_played)
+        queryset = queryset.exclude(pk__in=list(already_played))
         return queryset
 
     def pick(self, **kwargs):

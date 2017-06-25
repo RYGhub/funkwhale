@@ -32,3 +32,4 @@ CELERY_ALWAYS_EAGER = True
 ########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings
+API_AUTHENTICATION_REQUIRED = False
