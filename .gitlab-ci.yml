@@ -1,5 +1,3 @@
-image: docker:latest
-
 stages:
   - build
   - test
@@ -18,11 +16,10 @@ test_api:
 
 build_front:
   stage: build
-  before_script:
-    - docker-compose -f dev.yml run front rm dist/*
-    - docker-compose -f dev.yml build front
+  image: node:6-alpine
   script:
-    - docker-compose -f dev.yml run front npm run build
+    - npm install
+    - npm run build
   artifacts:
     paths:
       - front/dist
@@ -30,7 +27,8 @@ build_front:
     - master
     - develop
   tags:
-    - dind
+    - docker
+
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
 # variables:
