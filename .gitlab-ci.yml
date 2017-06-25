@@ -1,5 +1,28 @@
 image: docker:latest
 
+steps:
+  - test
+  - build
+
+test_api:
+  stage: test
+  script:
+    - ./api/runtests
+
+  tags:
+    - dind
+
+build_front:
+  stage: build
+  script:
+    - docker-compose -f dev.yml front rm dist/*
+    - docker-compose -f dev.yml front npm run build
+  artifacts:
+    paths:
+      - front/dist
+
+  tags:
+    - dind
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
 # variables:
