@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+
+  postgres:
+    restart: unless-stopped
+    env_file: .env
+    image: postgres:9.4
+
+  redis:
+    restart: unless-stopped
+    env_file: .env
+    image: redis:3
+    volumes:
+      - ./data:/data
+
+  celeryworker:
+    restart: unless-stopped
+    image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
+    env_file: .env
+    command: python manage.py celery worker
+    links:
+      - postgres
+      - redis
+    environment:
+      - C_FORCE_ROOT=true
+    volumes:
+    - ./api/media:/app/funkwhale_api/media
+
+  celerybeat:
+    restart: unless-stopped
+    image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
+    env_file: .env
+    command: celery -A funkwhale_api.taskapp beat -l INFO
+    links:
+      - postgres
+      - redis
+
+  api:
+    restart: unless-stopped
+    image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
+    env_file: .env
+    command: ./compose/django/gunicorn.sh
+    volumes:
+      - ./data/media:/app/funkwhale_api/media
+      - ./data/static:/app/staticfiles
+    ports:
+      - "${FUNKWHALE_API_IP:-127.0.0.1}:${FUNKWHALE_API_PORT:-5000}:5000"
+    links:
+      - postgres
+      - redis
