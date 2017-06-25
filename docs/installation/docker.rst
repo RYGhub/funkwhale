@@ -47,3 +47,8 @@ Then launch the whole thing:
     docker-compose up -d
 
 Now, you just need to setup the :ref:`frontend files <frontend-setup>`, and configure your :ref:`reverse-proxy <reverse-proxy-setup>`. Don't worry, it's quite easy.
+
+About music acquisition
+-----------------------
+
+If you want to :doc:`import music located on the server </importing-music>`, you can put it in the ``data/music`` directory and it will become readable by the importer.

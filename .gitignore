@@ -67,6 +67,7 @@ mailhog
 *.sqlite3
 
 # Api
+demo/music
 api/music
 api/media
 api/staticfiles
