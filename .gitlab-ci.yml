@@ -1,23 +1,28 @@
 image: docker:latest
 
 stages:
-  - test
   - build
+  - test
 
 test_api:
   stage: test
-  script:
+  before_script:
     - docker-compose -f api/test.yml build
+  script:
     - docker-compose -f api/test.yml run test
+  after_script:
+    - docker-compose -f api/test.yml run rm -rf api/funkwhale_api/media/*
 
   tags:
     - dind
 
 build_front:
   stage: build
+  before_script:
+    - docker-compose -f dev.yml run front rm dist/*
+    - docker-compose -f dev.yml build front
   script:
-    - docker-compose -f dev.yml front rm dist/*
-    - docker-compose -f dev.yml front npm run build
+    - docker-compose -f dev.yml run front npm run build
   artifacts:
     paths:
       - front/dist
