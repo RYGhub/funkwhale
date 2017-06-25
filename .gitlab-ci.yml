@@ -1,6 +1,6 @@
 stages:
-  - build
   - test
+  - build
 
 test_api:
   stage: test
@@ -9,7 +9,7 @@ test_api:
   script:
     - docker-compose -f api/test.yml run test
   after_script:
-    - docker-compose -f api/test.yml run rm -rf api/funkwhale_api/media/*
+    - docker-compose -f api/test.yml run test rm -rf api/funkwhale_api/media/*
 
   tags:
     - dind
@@ -36,6 +36,7 @@ build_front:
     - develop
   tags:
     - docker
+
 
 # When using dind, it's wise to use the overlayfs driver for
 # improved performance.
