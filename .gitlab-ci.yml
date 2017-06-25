@@ -7,7 +7,8 @@ stages:
 test_api:
   stage: test
   script:
-    - ./api/runtests
+    - docker-compose -f api/test.yml build
+    - docker-compose -f api/test.yml run test
 
   tags:
     - dind

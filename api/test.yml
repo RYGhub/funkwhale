@@ -1,7 +1,7 @@
 test:
   dockerfile: docker/Dockerfile.test
   build: .
-  command: python manage.py test
+  entrypoint: python manage.py test
   volumes:
     - .:/app
   environment:
