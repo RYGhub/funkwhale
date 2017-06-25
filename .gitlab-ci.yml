@@ -19,12 +19,19 @@ build_front:
   image: node:6-alpine
   before_script:
     - cd front
+
   script:
     - npm install
     - npm run build
-  artifacts:
+    - mv dist /dist
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
     paths:
-      - front/dist
+      - front/node_modules
+  artifacts:
+    name: "front_${CI_COMMIT_REF_NAME}"
+    paths:
+      - /dist
   only:
     - master
     - develop
