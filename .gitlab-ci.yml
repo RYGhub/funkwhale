@@ -31,7 +31,7 @@ build_front:
   artifacts:
     name: "front_${CI_COMMIT_REF_NAME}"
     paths:
-      - /dist
+      - front/dist/
   only:
     - master
     - develop
