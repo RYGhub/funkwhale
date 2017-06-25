@@ -1,9 +1,5 @@
-stages:
-  - test
-  - build
 
 test_api:
-  stage: test
   before_script:
     - docker-compose -f api/test.yml build
   script:
@@ -15,7 +11,6 @@ test_api:
     - dind
 
 build_front:
-  stage: build
   image: node:6-alpine
   before_script:
     - cd front
@@ -39,7 +34,6 @@ build_front:
 
 
 pages:
-  stage: test
   image: alpine
   before_script:
     - cd docs
