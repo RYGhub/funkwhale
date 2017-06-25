@@ -23,7 +23,6 @@ build_front:
   script:
     - npm install
     - npm run build
-    - mv dist /dist
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
