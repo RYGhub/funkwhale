@@ -3,12 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to funkwhale's documentation!
+Funkwhale's documentation
 =====================================
+
+Funkwhale is a self-hosted, modern free and open-source music server, heavily inspired by Grooveshark.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+
+   features
+   installation/index
 
 
 
