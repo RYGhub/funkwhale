@@ -82,3 +82,4 @@ front/yarn-error.log*
 front/test/unit/coverage
 front/test/e2e/reports
 front/selenium-debug.log
+docs/_build
