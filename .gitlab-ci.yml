@@ -9,7 +9,7 @@ test_api:
   script:
     - docker-compose -f api/test.yml run test
   after_script:
-    - docker-compose -f api/test.yml run test rm -rf funkwhale_api/media/*
+    - docker-compose -f api/test.yml run test rm -rf funkwhale_api/media/
 
   tags:
     - dind
