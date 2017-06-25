@@ -7,9 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE  1
 COPY ./requirements.apt /requirements.apt
 COPY ./install_os_dependencies.sh /install_os_dependencies.sh
 RUN bash install_os_dependencies.sh install
-RUN apt-get install py3clean
-RUN mkdir /requirements
 
+RUN mkdir /requirements
 COPY ./requirements/base.txt /requirements
 RUN pip install -r /requirements/base.txt
 COPY ./requirements/local.txt /requirements
