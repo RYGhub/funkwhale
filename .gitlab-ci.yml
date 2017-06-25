@@ -54,3 +54,5 @@ pages:
       - public
   only:
     - master
+  tags:
+    - docker
