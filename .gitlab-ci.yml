@@ -17,6 +17,8 @@ test_api:
 build_front:
   stage: build
   image: node:6-alpine
+  before_script:
+    - cd front
   script:
     - npm install
     - npm run build
