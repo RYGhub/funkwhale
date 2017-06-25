@@ -1,6 +1,6 @@
 image: docker:latest
 
-steps:
+stages:
   - test
   - build
 
@@ -20,7 +20,9 @@ build_front:
   artifacts:
     paths:
       - front/dist
-
+  only:
+    - master
+    - develop
   tags:
     - dind
 # When using dind, it's wise to use the overlayfs driver for
