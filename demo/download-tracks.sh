@@ -5,7 +5,6 @@ set -e
 echo "This will download tracks from zip archives listed in $1"
 
 LIST_CONTENT=$(cat $1)
-echo "$LIST_CONTENT"
 mkdir -p data/music
 cd data/music
 

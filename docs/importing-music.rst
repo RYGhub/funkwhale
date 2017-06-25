@@ -12,7 +12,7 @@ least an ``artist``, ``album`` and ``title`` tag, you can import those tracks as
 
 .. code-block:: bash
 
-    docker-compose --rm run api python manage.py import_files "/music/**/*.ogg" --recursive --noinput
+    docker-compose run --rm api python manage.py import_files "/music/**/*.ogg" --recursive --noinput
 
 .. note::
 
