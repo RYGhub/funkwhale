@@ -1,13 +1,19 @@
-FROM funkwhale/apibase
+FROM python:3.5
 
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE  1
 
 # Requirements have to be pulled and installed here, otherwise caching won't work
 COPY ./requirements.apt /requirements.apt
 COPY ./install_os_dependencies.sh /install_os_dependencies.sh
 RUN bash install_os_dependencies.sh install
-COPY ./requirements /requirements
+
+RUN mkdir /requirements
+COPY ./requirements/base.txt /requirements
+RUN pip install -r /requirements/base.txt
+COPY ./requirements/local.txt /requirements
 RUN pip install -r /requirements/local.txt
+COPY ./requirements/test.txt /requirements
 RUN pip install -r /requirements/test.txt
 
 WORKDIR /app

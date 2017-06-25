@@ -52,12 +52,12 @@ services:
       - redis
       - celeryworker
 
-  nginx:
-    env_file: .env.dev
-    build: ./api/compose/nginx
-    links:
-      - api
-    volumes:
-      - ./api/funkwhale_api/media:/staticfiles/media
-    ports:
-      - "0.0.0.0:6001:80"
+  # nginx:
+  #   env_file: .env.dev
+  #   build: ./api/compose/nginx
+  #   links:
+  #     - api
+  #   volumes:
+  #     - ./api/funkwhale_api/media:/staticfiles/media
+  #   ports:
+  #     - "0.0.0.0:6001:80"
