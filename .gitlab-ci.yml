@@ -1,3 +1,10 @@
+variables:
+  IMAGE_NAME: funkwhale/funkwhale
+  IMAGE: $IMAGE_NAME:$CI_BUILD_REF
+  IMAGE_LATEST: $IMAGE_NAME:latest
+
+
+
 stages:
   - test
   - build
@@ -58,16 +65,29 @@ pages:
   tags:
     - docker
 
-docker_image:
+docker_develop:
   stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - cd api
   script:
-    - docker build -t funkwhale/funkwhale:$CI_COMMIT_REF_NAME .
-    - docker push funkwhale/funkwhale:$CI_COMMIT_REF_NAME
+    - docker build -t $IMAGE .
+    - docker push $IMAGE
   only:
     - develop
+  tags:
+    - dind
+
+docker_release:
+  stage: deploy
+  before_script:
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - cd api
+  script:
+    - docker build -t $IMAGE -t $IMAGE_LATEST .
+    - docker push $IMAGE
+    - docker push $IMAGE_LATEST
+  only:
     - master
   tags:
     - dind
