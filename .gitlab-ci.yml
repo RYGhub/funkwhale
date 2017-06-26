@@ -1,6 +1,6 @@
 variables:
   IMAGE_NAME: funkwhale/funkwhale
-  IMAGE: $IMAGE_NAME:$CI_BUILD_REF
+  IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
   IMAGE_LATEST: $IMAGE_NAME:latest
 
 
