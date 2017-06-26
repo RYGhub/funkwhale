@@ -1,8 +1,6 @@
 test:
   dockerfile: docker/Dockerfile.test
   build: .
-  command: python manage.py test
+  command: pytest
   volumes:
     - .:/app
-  environment:
-    - DJANGO_SETTINGS_MODULE=config.settings.test

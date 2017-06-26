@@ -9,8 +9,7 @@ test_api:
     - cd api
     - pip install -r requirements/test.txt
   script:
-    - export DJANGO_SETTINGS_MODULE=config.settings.test
-    - python manage.py test
+    - pytest
 
   tags:
     - docker
