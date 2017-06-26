@@ -14,9 +14,9 @@ router.register(r'import-batches', views.ImportBatchViewSet, 'import-batches')
 router.register(r'submit', views.SubmitViewSet, 'submit')
 router.register(r'playlists', playlists_views.PlaylistViewSet, 'playlists')
 router.register(r'playlist-tracks', playlists_views.PlaylistTrackViewSet, 'playlist-tracks')
-urlpatterns = router.urls
+v1_patterns = router.urls
 
-urlpatterns += [
+v1_patterns += [
     url(r'^providers/', include('funkwhale_api.providers.urls', namespace='providers')),
     url(r'^favorites/', include('funkwhale_api.favorites.urls', namespace='favorites')),
     url(r'^search$', views.Search.as_view(), name='search'),
@@ -25,4 +25,8 @@ urlpatterns += [
     url(r'^users/', include('funkwhale_api.users.api_urls', namespace='users')),
     url(r'^token/', jwt_views.obtain_jwt_token),
     url(r'^token/refresh/', jwt_views.refresh_jwt_token),
+]
+
+urlpatterns = [
+    url(r'^v1/', include(v1_patterns, namespace='v1'))
 ]

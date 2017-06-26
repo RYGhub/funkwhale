@@ -59,7 +59,7 @@ Is it me you're looking for?"""
             work=None,
             mbid='07ca77cf-f513-4e9c-b190-d7e24bbad448')
 
-        url = reverse('api:tracks-lyrics', kwargs={'pk': track.pk})
+        url = reverse('api:v1:tracks-lyrics', kwargs={'pk': track.pk})
         user = User.objects.create_user(
             username='test', email='test@test.com', password='test')
         self.client.login(username=user.username, password='test')

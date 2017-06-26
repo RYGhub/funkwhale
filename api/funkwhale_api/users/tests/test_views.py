@@ -42,7 +42,7 @@ class UserTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_can_fetch_data_from_api(self):
-        url = self.reverse('api:users:users-me')
+        url = self.reverse('api:v1:users:users-me')
         response = self.client.get(url)
         # login required
         self.assertEqual(response.status_code, 401)
