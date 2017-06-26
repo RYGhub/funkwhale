@@ -6,12 +6,6 @@ django-environ==0.4.0
 django-secure==1.0.1
 whitenoise==2.0.6
 
-
-# Forms
-django-braces==1.8.1
-# django-crispy-forms==1.5.2
-# django-floppyforms==1.5.2
-
 # Models
 django-model-utils==2.3.1
 
@@ -26,10 +20,6 @@ django-allauth==0.24.1
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.1
 
-# Unicode slugification
-unicode-slugify==0.1.3
-django-autoslug==1.9.3
-
 # Time zones support
 pytz==2015.7
 
@@ -42,21 +32,21 @@ celery==3.1.19
 
 
 # Your custom requirements go here
-django-cors-headers
-musicbrainzngs
+django-cors-headers==2.1.0
+musicbrainzngs==0.6
 youtube_dl>=2015.12.21
-djangorestframework
-djangorestframework-jwt
-django-celery
-django-mptt
-google-api-python-client
-arrow
-django-taggit
-persisting_theory
-django-versatileimagefield
-django-cachalot
-django-rest-auth
-beautifulsoup4
-markdown
-ipython
-mutagen
+djangorestframework==3.6.3
+djangorestframework-jwt==1.11.0
+django-celery==3.2.1
+django-mptt==0.8.7
+google-api-python-client==1.6.2
+arrow==0.10.0
+django-taggit==0.22.1
+persisting-theory==0.2.1
+django-versatileimagefield==1.7.1
+django-cachalot==1.5.0
+django-rest-auth==0.9.1
+beautifulsoup4==4.6.0
+Markdown==2.6.8
+ipython==6.1.0
+mutagen==1.38
