@@ -61,7 +61,7 @@ pages:
 docker_image:
   stage: test
   before_script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - cd api
   script:
     - docker build -t funkwhale/funkwhale:$CI_COMMIT_REF_NAME .
