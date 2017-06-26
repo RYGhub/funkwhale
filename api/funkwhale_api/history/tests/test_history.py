@@ -23,7 +23,7 @@ class TestHistory(TestCase):
 
     def test_anonymous_user_can_create_listening_via_api(self):
         track = mommy.make('music.Track')
-        url = self.reverse('api:history:listenings-list')
+        url = self.reverse('api:v1:history:listenings-list')
         response = self.client.post(url, {
             'track': track.pk,
         })
@@ -38,7 +38,7 @@ class TestHistory(TestCase):
 
         self.client.login(username=self.user.username, password='test')
 
-        url = self.reverse('api:history:listenings-list')
+        url = self.reverse('api:v1:history:listenings-list')
         response = self.client.post(url, {
             'track': track.pk,
         })

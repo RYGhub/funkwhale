@@ -38,7 +38,7 @@ class TestPlayLists(TestCase):
 
     def test_can_create_playlist_via_api(self):
         self.client.login(username=self.user.username, password='test')
-        url = reverse('api:playlists-list')
+        url = reverse('api:v1:playlists-list')
         data = {
             'name': 'test',
         }
@@ -54,7 +54,7 @@ class TestPlayLists(TestCase):
 
         self.client.login(username=self.user.username, password='test')
 
-        url = reverse('api:playlist-tracks-list')
+        url = reverse('api:v1:playlist-tracks-list')
         data = {
             'playlist': playlist.pk,
             'track': tracks[0].pk

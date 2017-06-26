@@ -4,7 +4,7 @@ class Config {
     if (!this.BACKEND_URL.endsWith('/')) {
       this.BACKEND_URL += '/'
     }
-    this.API_URL = this.BACKEND_URL + 'api/'
+    this.API_URL = this.BACKEND_URL + 'api/v1/'
   }
 }
 

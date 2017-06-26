@@ -26,7 +26,7 @@ class TestAPI(TestCase):
     def test_can_get_search_results_from_funkwhale(self, *mocks):
         query = '8 bit adventure'
         expected = json.dumps(client.search(query))
-        url = self.reverse('api:providers:youtube:search')
+        url = self.reverse('api:v1:providers:youtube:search')
         response = self.client.get(url + '?query={0}'.format(query))
 
         self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
@@ -67,7 +67,7 @@ class TestAPI(TestCase):
         }
 
         expected = json.dumps(client.search_multiple(queries))
-        url = self.reverse('api:providers:youtube:searchs')
+        url = self.reverse('api:v1:providers:youtube:searchs')
         response = self.client.post(
             url, json.dumps(queries), content_type='application/json')
 
