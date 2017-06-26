@@ -9,41 +9,34 @@ from funkwhale_api.music import models, metadata
 @celery.app.task(name='audiofile.from_path')
 def from_path(path):
     data = metadata.Metadata(path)
-
     artist = models.Artist.objects.get_or_create(
         name__iexact=data.get('artist'),
-        defaults={'name': data.get('artist')},
+        defaults={
+            'name': data.get('artist'),
+            'mbid': data.get('musicbrainz_artistid', None),
+
+        },
     )[0]
 
-    release_date = None
-    try:
-        year, month, day = data.get('date', None).split('-')
-        release_date = datetime.date(
-            int(year), int(month), int(day)
-        )
-    except (ValueError, TypeError):
-        pass
-
+    release_date = data.get('date', default=None)
     album = models.Album.objects.get_or_create(
         title__iexact=data.get('album'),
         artist=artist,
         defaults={
             'title': data.get('album'),
             'release_date': release_date,
+            'mbid': data.get('musicbrainz_albumid', None),
         },
     )[0]
 
-    position = None
-    try:
-        position = int(data.get('tracknumber', None))
-    except ValueError:
-        pass
+    position = data.get('track_number', default=None)
     track = models.Track.objects.get_or_create(
         title__iexact=data.get('title'),
         album=album,
         defaults={
             'title': data.get('title'),
             'position': position,
+            'mbid': data.get('musicbrainz_recordingid', None),
         },
     )[0]
 
