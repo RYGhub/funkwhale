@@ -59,7 +59,7 @@ pages:
     - docker
 
 docker_image:
-  stage: test
+  stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - cd api
