@@ -314,7 +314,7 @@ class Track(APIModelMixin):
         return work
 
     def get_lyrics_url(self):
-        return reverse('api:tracks-lyrics', kwargs={'pk': self.pk})
+        return reverse('api:v1:tracks-lyrics', kwargs={'pk': self.pk})
 
     @property
     def full_name(self):

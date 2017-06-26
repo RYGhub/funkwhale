@@ -20,7 +20,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
     def test_can_submit_youtube_url_for_track_import(self, *mocks):
         mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
         video_id = 'tPEE9ZwTmy0'
-        url = reverse('api:submit-single')
+        url = reverse('api:v1:submit-single')
         user = User.objects.create_superuser(username='test', email='test@test.com', password='test')
         self.client.login(username=user.username, password='test')
         response = self.client.post(url, {'import_url': 'https://www.youtube.com/watch?v={0}'.format(video_id), 'mbid': mbid})
@@ -33,7 +33,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
         user = User.objects.create_superuser(username='test', email='test@test.com', password='test')
         mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
         video_id = 'tPEE9ZwTmy0'
-        url = reverse('api:submit-single')
+        url = reverse('api:v1:submit-single')
         self.client.login(username=user.username, password='test')
         with self.settings(CELERY_ALWAYS_EAGER=False):
             response = self.client.post(url, {'import_url': 'https://www.youtube.com/watch?v={0}'.format(video_id), 'mbid': mbid})
@@ -69,7 +69,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
                 },
             ]
         }
-        url = reverse('api:submit-album')
+        url = reverse('api:v1:submit-album')
         self.client.login(username=user.username, password='test')
         with self.settings(CELERY_ALWAYS_EAGER=False):
             response = self.client.post(url, json.dumps(payload), content_type="application/json")
@@ -123,7 +123,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
                 }
             ]
         }
-        url = reverse('api:submit-artist')
+        url = reverse('api:v1:submit-artist')
         self.client.login(username=user.username, password='test')
         with self.settings(CELERY_ALWAYS_EAGER=False):
             response = self.client.post(url, json.dumps(payload), content_type="application/json")
@@ -159,7 +159,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
         batch = models.ImportBatch.objects.create(submitted_by=user1)
         job = models.ImportJob.objects.create(batch=batch, mbid=mbid, source=source)
 
-        url = reverse('api:import-batches-list')
+        url = reverse('api:v1:import-batches-list')
 
         self.client.login(username=user2.username, password='test')
         response2 = self.client.get(url)
@@ -175,7 +175,7 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
         artist2 = models.Artist.objects.create(name='Test2')
         query = 'test1'
         expected = '[{0}]'.format(json.dumps(serializers.ArtistSerializerNested(artist1).data))
-        url = self.reverse('api:artists-search')
+        url = self.reverse('api:v1:artists-search')
         response = self.client.get(url + '?query={0}'.format(query))
 
         self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
@@ -187,17 +187,17 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
         track2 = models.Track.objects.create(artist=artist2, title="test_track2")
         query = 'test track 1'
         expected = '[{0}]'.format(json.dumps(serializers.TrackSerializerNested(track1).data))
-        url = self.reverse('api:tracks-search')
+        url = self.reverse('api:v1:tracks-search')
         response = self.client.get(url + '?query={0}'.format(query))
 
         self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
 
     def test_can_restrict_api_views_to_authenticated_users(self):
         urls = [
-            ('api:tags-list', 'get'),
-            ('api:tracks-list', 'get'),
-            ('api:artists-list', 'get'),
-            ('api:albums-list', 'get'),
+            ('api:v1:tags-list', 'get'),
+            ('api:v1:tracks-list', 'get'),
+            ('api:v1:artists-list', 'get'),
+            ('api:v1:albums-list', 'get'),
         ]
 
         for route_name, method in urls:

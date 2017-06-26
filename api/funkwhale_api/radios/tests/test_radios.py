@@ -94,7 +94,7 @@ class TestRadios(TestCase):
         self.assertEqual(radio.session, restarted_radio.session)
 
     def test_can_get_start_radio_from_api(self):
-        url = reverse('api:radios:sessions-list')
+        url = reverse('api:v1:radios:sessions-list')
         response = self.client.post(url, {'radio_type': 'random'})
         session = models.RadioSession.objects.latest('id')
         self.assertEqual(session.radio_type, 'random')
@@ -107,7 +107,7 @@ class TestRadios(TestCase):
         self.assertEqual(session.user, self.user)
 
     def test_can_start_radio_for_anonymous_user(self):
-        url = reverse('api:radios:sessions-list')
+        url = reverse('api:v1:radios:sessions-list')
         response = self.client.post(url, {'radio_type': 'random'})
         session = models.RadioSession.objects.latest('id')
 
@@ -118,11 +118,11 @@ class TestRadios(TestCase):
         tracks = mommy.make('music.Track', _quantity=1)
 
         self.client.login(username=self.user.username, password='test')
-        url = reverse('api:radios:sessions-list')
+        url = reverse('api:v1:radios:sessions-list')
         response = self.client.post(url, {'radio_type': 'random'})
         session = models.RadioSession.objects.latest('id')
 
-        url = reverse('api:radios:tracks-list')
+        url = reverse('api:v1:radios:tracks-list')
         response = self.client.post(url, {'session': session.pk})
         data = json.loads(response.content.decode('utf-8'))
 
@@ -173,7 +173,7 @@ class TestRadios(TestCase):
 
     def test_can_start_artist_radio_from_api(self):
         artist = mommy.make('music.Artist')
-        url = reverse('api:radios:sessions-list')
+        url = reverse('api:v1:radios:sessions-list')
 
         response = self.client.post(url, {'radio_type': 'artist', 'related_object_id': artist.id})
         session = models.RadioSession.objects.latest('id')

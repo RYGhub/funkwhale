@@ -24,7 +24,7 @@ class TestFavorites(TestCase):
     def test_user_can_get_his_favorites(self):
         favorite = TrackFavorite.add(self.track, self.user)
 
-        url = reverse('api:favorites:tracks-list')
+        url = reverse('api:v1:favorites:tracks-list')
         self.client.login(username=self.user.username, password='test')
 
         response = self.client.get(url)
@@ -41,7 +41,7 @@ class TestFavorites(TestCase):
         self.assertEqual(expected, parsed_json['results'])
 
     def test_user_can_add_favorite_via_api(self):
-        url = reverse('api:favorites:tracks-list')
+        url = reverse('api:v1:favorites:tracks-list')
         self.client.login(username=self.user.username, password='test')
         response = self.client.post(url, {'track': self.track.pk})
 
@@ -60,7 +60,7 @@ class TestFavorites(TestCase):
     def test_user_can_remove_favorite_via_api(self):
         favorite = TrackFavorite.add(self.track, self.user)
 
-        url = reverse('api:favorites:tracks-detail', kwargs={'pk': favorite.pk})
+        url = reverse('api:v1:favorites:tracks-detail', kwargs={'pk': favorite.pk})
         self.client.login(username=self.user.username, password='test')
         response = self.client.delete(url, {'track': self.track.pk})
         self.assertEqual(response.status_code, 204)
@@ -69,7 +69,7 @@ class TestFavorites(TestCase):
     def test_user_can_remove_favorite_via_api_using_track_id(self):
         favorite = TrackFavorite.add(self.track, self.user)
 
-        url = reverse('api:favorites:tracks-remove')
+        url = reverse('api:v1:favorites:tracks-remove')
         self.client.login(username=self.user.username, password='test')
         response = self.client.delete(
             url, json.dumps({'track': self.track.pk}),
@@ -83,7 +83,7 @@ class TestFavorites(TestCase):
 
     def test_can_restrict_api_views_to_authenticated_users(self):
         urls = [
-            ('api:favorites:tracks-list', 'get'),
+            ('api:v1:favorites:tracks-list', 'get'),
         ]
 
         for route_name, method in urls:
@@ -103,7 +103,7 @@ class TestFavorites(TestCase):
     def test_can_filter_tracks_by_favorites(self):
         favorite = TrackFavorite.add(self.track, self.user)
 
-        url = reverse('api:tracks-list')
+        url = reverse('api:v1:tracks-list')
         self.client.login(username=self.user.username, password='test')
 
         response = self.client.get(url, data={'favorites': True})

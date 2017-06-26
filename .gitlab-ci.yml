@@ -1,18 +1,26 @@
+variables:
+  IMAGE_NAME: funkwhale/funkwhale
+  IMAGE: $IMAGE_NAME:$CI_BUILD_REF
+  IMAGE_LATEST: $IMAGE_NAME:latest
+
+
+
 stages:
   - test
   - build
+  - deploy
 
 test_api:
   stage: test
+  image: funkwhale/funkwhale:base
   before_script:
-    - docker-compose -f api/test.yml build
+    - cd api
+    - pip install -r requirements/test.txt
   script:
-    - docker-compose -f api/test.yml run test
-  after_script:
-    - docker-compose -f api/test.yml run test rm -rf funkwhale_api/media/
+    - pytest
 
   tags:
-    - dind
+    - docker
 
 build_front:
   stage: build
@@ -53,6 +61,33 @@ pages:
     paths:
       - public
   only:
-    - master
+    - develop
   tags:
     - docker
+
+docker_develop:
+  stage: deploy
+  before_script:
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - cd api
+  script:
+    - docker build -t $IMAGE .
+    - docker push $IMAGE
+  only:
+    - develop
+  tags:
+    - dind
+
+docker_release:
+  stage: deploy
+  before_script:
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - cd api
+  script:
+    - docker build -t $IMAGE -t $IMAGE_LATEST .
+    - docker push $IMAGE
+    - docker push $IMAGE_LATEST
+  only:
+    - master
+  tags:
+    - dind
