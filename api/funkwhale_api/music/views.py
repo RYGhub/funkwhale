@@ -121,13 +121,14 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.all().order_by('name')
     serializer_class = serializers.TagSerializer
     permission_classes = [ConditionalAuthentication]
 
 
 class Search(views.APIView):
     max_results = 3
+
     def get(self, request, *args, **kwargs):
         query = request.GET['query']
         results = {

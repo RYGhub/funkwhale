@@ -2,6 +2,8 @@ from rest_framework import routers
 from django.conf.urls import include, url
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
+from rest_framework_jwt import views as jwt_views
+
 
 router = routers.SimpleRouter()
 router.register(r'tags', views.TagViewSet, 'tags')
@@ -21,6 +23,6 @@ urlpatterns += [
     url(r'^radios/', include('funkwhale_api.radios.urls', namespace='radios')),
     url(r'^history/', include('funkwhale_api.history.urls', namespace='history')),
     url(r'^users/', include('funkwhale_api.users.api_urls', namespace='users')),
-    url(r'^token/', 'rest_framework_jwt.views.obtain_jwt_token'),
-    url(r'^token/refresh/', 'rest_framework_jwt.views.refresh_jwt_token'),
+    url(r'^token/', jwt_views.obtain_jwt_token),
+    url(r'^token/refresh/', jwt_views.refresh_jwt_token),
 ]
