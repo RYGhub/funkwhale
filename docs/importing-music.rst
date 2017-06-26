@@ -14,14 +14,18 @@ least an ``artist``, ``album`` and ``title`` tag, you can import those tracks as
 
     docker-compose run --rm api python manage.py import_files "/music/**/*.ogg" --recursive --noinput
 
+For the best results, we recommand tagging your music collection through
+`Picard <http://picard.musicbrainz.org/>`_ in order to have the best quality metadata.
+
 .. note::
 
     This command is idempotent, meaning you can run it multiple times on the same
     files and already imported files will simply be skipped.
 
-.. warning::
+.. note::
 
-    At the moment, only ogg files are supported. MP3 support will be implemented soon.
+    At the moment, only OGG/Vorbis and MP3 files with ID3 tags are supported
+
 
 Getting demo tracks
 ^^^^^^^^^^^^^^^^^^^

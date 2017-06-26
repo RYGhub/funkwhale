@@ -1,34 +1,130 @@
 import mutagen
+import arrow
 
 NODEFAULT = object()
 
-class Metadata(object):
-    ALIASES = {
-        'release': 'musicbrainz_albumid',
-        'artist': 'musicbrainz_artistid',
-        'recording': 'musicbrainz_trackid',
+
+class TagNotFound(KeyError):
+    pass
+
+
+def get_id3_tag(f, k):
+    # First we try to grab the standard key
+    try:
+        return f.tags[k].text[0]
+    except KeyError:
+        pass
+    # then we fallback on parsing non standard tags
+    all_tags = f.tags.getall('TXXX')
+    try:
+        matches = [
+            t
+            for t in all_tags
+            if t.desc.lower() == k.lower()
+        ]
+        return matches[0].text[0]
+    except (KeyError, IndexError):
+        raise TagNotFound(k)
+
+
+def get_mp3_recording_id(f, k):
+    try:
+        return [
+            t
+            for t in f.tags.getall('UFID')
+            if 'musicbrainz.org' in t.owner
+        ][0].data.decode('utf-8')
+    except IndexError:
+        raise TagNotFound(k)
+
+CONF = {
+    'OggVorbis': {
+        'getter': lambda f, k: f[k][0],
+        'fields': {
+            'track_number': {
+                'field': 'TRACKNUMBER',
+                'to_application': int
+            },
+            'title': {
+                'field': 'title'
+            },
+            'artist': {
+                'field': 'artist'
+            },
+            'album': {
+                'field': 'album'
+            },
+            'date': {
+                'field': 'date',
+                'to_application': lambda v: arrow.get(v).date()
+            },
+            'musicbrainz_albumid': {
+                'field': 'musicbrainz_albumid'
+            },
+            'musicbrainz_artistid': {
+                'field': 'musicbrainz_artistid'
+            },
+            'musicbrainz_recordingid': {
+                'field': 'musicbrainz_trackid'
+            },
+        }
+    },
+    'MP3': {
+        'getter': get_id3_tag,
+        'fields': {
+            'track_number': {
+                'field': 'TPOS',
+                'to_application': lambda v: int(v.split('/')[0])
+            },
+            'title': {
+                'field': 'TIT2'
+            },
+            'artist': {
+                'field': 'TPE1'
+            },
+            'album': {
+                'field': 'TALB'
+            },
+            'date': {
+                'field': 'TDRC',
+                'to_application': lambda v: arrow.get(str(v)).date()
+            },
+            'musicbrainz_albumid': {
+                'field': 'MusicBrainz Album Id'
+            },
+            'musicbrainz_artistid': {
+                'field': 'MusicBrainz Artist Id'
+            },
+            'musicbrainz_recordingid': {
+                'field': 'UFID',
+                'getter': get_mp3_recording_id,
+            },
+        }
     }
+}
+
+
+class Metadata(object):
 
     def __init__(self, path):
         self._file = mutagen.File(path)
+        self._conf = CONF[self.get_file_type(self._file)]
 
-    def get(self, key, default=NODEFAULT, single=True):
+    def get_file_type(self, f):
+        return f.__class__.__name__
+
+    def get(self, key, default=NODEFAULT):
+        field_conf = self._conf['fields'][key]
+        real_key = field_conf['field']
         try:
-            v = self._file[key]
+            getter = field_conf.get('getter', self._conf['getter'])
+            v = getter(self._file, real_key)
         except KeyError:
             if default == NODEFAULT:
-                raise
+                raise TagNotFound(real_key)
             return default
 
-        # Some tags are returned as lists of string
-        if single:
-            return v[0]
+        converter = field_conf.get('to_application')
+        if converter:
+            v = converter(v)
         return v
-
-    def __getattr__(self, key):
-        try:
-            alias = self.ALIASES[key]
-        except KeyError:
-            raise ValueError('Invalid alias {}'.format(key))
-
-        return self.get(alias, single=True)
