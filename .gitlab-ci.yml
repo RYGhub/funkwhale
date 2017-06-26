@@ -40,6 +40,7 @@ build_front:
     paths:
       - front/dist/
   only:
+    - tags
     - master
     - develop
   tags:
@@ -88,6 +89,6 @@ docker_release:
     - docker push $IMAGE
     - docker push $IMAGE_LATEST
   only:
-    - master
+    - tags
   tags:
     - dind
