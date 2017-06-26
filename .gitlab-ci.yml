@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - deploy
 
 test_api:
   stage: test
@@ -56,3 +57,17 @@ pages:
     - develop
   tags:
     - docker
+
+docker_image:
+  stage: test
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - cd api
+  script:
+    - docker build -t funkwhale/funkwhale:$CI_COMMIT_REF_NAME .
+    - docker push funkwhale/funkwhale:$CI_COMMIT_REF_NAME
+  only:
+    - develop
+    - master
+  tags:
+    - dind
