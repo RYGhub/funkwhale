@@ -92,6 +92,24 @@ class Queue {
     }
     cache.set('volume', newValue)
   }
+
+  reorder (oldIndex, newIndex) {
+    // called when the user uses drag / drop to reorder
+    // tracks in queue
+    if (oldIndex === this.currentIndex) {
+      this.currentIndex = newIndex
+      return
+    }
+    if (oldIndex < this.currentIndex && newIndex >= this.currentIndex) {
+      // item before was moved after
+      this.currentIndex -= 1
+    }
+    if (oldIndex > this.currentIndex && newIndex <= this.currentIndex) {
+      // item after was moved before
+      this.currentIndex += 1
+    }
+  }
+
   append (track, index) {
     this.previousQueue = null
     index = index || this.tracks.length
