@@ -46,6 +46,7 @@ services:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media
       - ./data/static:/app/staticfiles
+      - ./front/dist:/frontend
     ports:
       - "${FUNKWHALE_API_IP:-127.0.0.1}:${FUNKWHALE_API_PORT:-5000}:5000"
     links:
