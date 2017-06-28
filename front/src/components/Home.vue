@@ -60,7 +60,7 @@
         <h2 class="ui header">
           Clean library
         </h2>
-        <p>Funkwhale takes care of fealing your music.</p>
+        <p>Funkwhale takes care of handling your music.</p>
         <div class="ui list">
           <div class="item">
             <i class="download icon"></i>
