@@ -8,6 +8,7 @@ from rest_framework_jwt import views as jwt_views
 router = routers.SimpleRouter()
 router.register(r'tags', views.TagViewSet, 'tags')
 router.register(r'tracks', views.TrackViewSet, 'tracks')
+router.register(r'trackfiles', views.TrackFileViewSet, 'trackfiles')
 router.register(r'artists', views.ArtistViewSet, 'artists')
 router.register(r'albums', views.AlbumViewSet, 'albums')
 router.register(r'import-batches', views.ImportBatchViewSet, 'import-batches')
