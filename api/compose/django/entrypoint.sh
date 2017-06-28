@@ -9,10 +9,15 @@ export REDIS_URL=redis://redis:6379/0
 # the official postgres image uses 'postgres' as default user if not set explictly.
 if [ -z "$POSTGRES_ENV_POSTGRES_USER" ]; then
     export POSTGRES_ENV_POSTGRES_USER=postgres
-fi 
+fi
 
 export DATABASE_URL=postgres://$POSTGRES_ENV_POSTGRES_USER:$POSTGRES_ENV_POSTGRES_PASSWORD@postgres:5432/$POSTGRES_ENV_POSTGRES_USER
 
 export CELERY_BROKER_URL=$REDIS_URL
 
+# we copy the frontend files, if any so we can serve them from the outside
+if [ -d "frontend" ]; then
+  mkdir -p /frontend
+  cp -r frontend/* /frontend/
+fi
 exec "$@"
