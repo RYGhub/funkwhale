@@ -10,6 +10,8 @@ from funkwhale_api.music import serializers
 from funkwhale_api.users.models import User
 
 from . import data as api_data
+from . import factories
+
 
 class TestAPI(TMPDirTestCaseMixin, TestCase):
 
@@ -214,3 +216,26 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
             with self.settings(API_AUTHENTICATION_REQUIRED=False):
                 response = getattr(self.client, method)(url)
             self.assertEqual(response.status_code, 200)
+
+    def test_track_file_url_is_restricted_to_authenticated_users(self):
+        f = factories.TrackFileFactory()
+        self.assertNotEqual(f.audio_file, None)
+        url = f.path
+
+        with self.settings(API_AUTHENTICATION_REQUIRED=True):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 401)
+
+        user = User.objects.create_superuser(
+            username='test', email='test@test.com', password='test')
+        self.client.login(username=user.username, password='test')
+        with self.settings(API_AUTHENTICATION_REQUIRED=True):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            response['X-Accel-Redirect'],
+            '/_protected{}'.format(f.audio_file.url)
+        )

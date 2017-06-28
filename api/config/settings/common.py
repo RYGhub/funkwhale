@@ -217,7 +217,6 @@ STATICFILES_FINDERS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = str(APPS_DIR('media'))
 
-USE_SAMPLE_TRACK = env.bool("USE_SAMPLE_TRACK", False)
 
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
@@ -261,7 +260,6 @@ BROKER_URL = env("CELERY_BROKER_URL", default='django://')
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
-SESSION_SAVE_EVERY_REQUEST = True
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_DEFAULT_RATE_LIMIT = 1
 CELERYD_TASK_TIME_LIMIT = 300
@@ -305,3 +303,13 @@ FUNKWHALE_PROVIDERS = {
     }
 }
 ATOMIC_REQUESTS = False
+
+# Wether we should check user permission before serving audio files (meaning
+# return an obfuscated url)
+# This require a special configuration on the reverse proxy side
+# See https://wellfire.co/learn/nginx-django-x-accel-redirects/ for example
+PROTECT_AUDIO_FILES = env.bool('PROTECT_AUDIO_FILES', default=True)
+
+# Which path will be used to process the internal redirection
+# **DO NOT** put a slash at the end
+PROTECT_FILES_PATH = env('PROTECT_FILES_PATH', default='/_protected')
