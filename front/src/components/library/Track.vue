@@ -12,10 +12,10 @@
               {{ track.title }}
               <div class="sub header">
                 From album
-                <router-link :to="{name: 'browse.album', params: {id: track.album.id }}">
+                <router-link :to="{name: 'library.album', params: {id: track.album.id }}">
                   {{ track.album.title }}
                 </router-link>
-                by <router-link :to="{name: 'browse.artist', params: {id: track.artist.id }}">
+                by <router-link :to="{name: 'library.artist', params: {id: track.artist.id }}">
                   {{ track.artist.name }}
                 </router-link>
               </div>

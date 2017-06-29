@@ -20,17 +20,17 @@
           <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
         </td>
         <td colspan="6">
-            <router-link class="track" :to="{name: 'browse.track', params: {id: track.id }}">
+            <router-link class="track" :to="{name: 'library.track', params: {id: track.id }}">
               {{ track.title }}
             </router-link>
         </td>
         <td colspan="6">
-          <router-link class="artist discrete link" :to="{name: 'browse.artist', params: {id: track.artist.id }}">
+          <router-link class="artist discrete link" :to="{name: 'library.artist', params: {id: track.artist.id }}">
             {{ track.artist.name }}
           </router-link>
         </td>
         <td colspan="6">
-          <router-link class="album discrete link" :to="{name: 'browse.album', params: {id: track.album.id }}">
+          <router-link class="album discrete link" :to="{name: 'library.album', params: {id: track.album.id }}">
             {{ track.album.title }}
           </router-link>
         </td>
