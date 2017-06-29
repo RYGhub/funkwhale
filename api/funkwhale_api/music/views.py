@@ -1,5 +1,7 @@
 import os
 import json
+import unicodedata
+import urllib
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
@@ -137,8 +139,10 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=404)
 
         response = Response()
-        response["Content-Disposition"] = "attachment; filename={0}".format(
-            f.audio_file.name)
+        filename = "filename*=UTF-8''{}{}".format(
+            urllib.parse.quote(f.track.full_name),
+            os.path.splitext(f.audio_file.name)[-1])
+        response["Content-Disposition"] = "attachment; {}".format(filename)
         response['X-Accel-Redirect'] = "{}{}".format(
             settings.PROTECT_FILES_PATH,
             f.audio_file.url)

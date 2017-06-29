@@ -5,6 +5,8 @@ import Audio from '@/audio'
 import backend from '@/audio/backend'
 import radios from '@/radios'
 import Vue from 'vue'
+import url from '@/utils/url'
+import auth from '@/auth'
 
 class Queue {
   constructor (options = {}) {
@@ -181,7 +183,17 @@ class Queue {
     if (!file) {
       return this.next()
     }
-    this.audio = new Audio(backend.absoluteUrl(file.path), {
+    let path = backend.absoluteUrl(file.path)
+
+    if (auth.user.authenticated) {
+      // we need to send the token directly in url
+      // so authentication can be checked by the backend
+      // because for audio files we cannot use the regular Authentication
+      // header
+      path = url.updateQueryString(path, 'jwt', auth.getAuthToken())
+    }
+
+    this.audio = new Audio(path, {
       preload: true,
       autoplay: true,
       rate: 1,

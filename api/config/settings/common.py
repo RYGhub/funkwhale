@@ -288,6 +288,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 25,
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',

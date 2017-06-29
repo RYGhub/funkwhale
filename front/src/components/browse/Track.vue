@@ -61,6 +61,8 @@
 
 <script>
 
+import auth from '@/auth'
+import url from '@/utils/url'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
@@ -121,7 +123,11 @@ export default {
     },
     downloadUrl () {
       if (this.track.files.length > 0) {
-        return backend.absoluteUrl(this.track.files[0].path)
+        let u = backend.absoluteUrl(this.track.files[0].path)
+        if (auth.user.authenticated) {
+          u = url.updateQueryString(u, 'jwt', auth.getAuthToken())
+        }
+        return u
       }
     },
     lyricsSearchUrl () {

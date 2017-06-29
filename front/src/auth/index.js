@@ -50,7 +50,7 @@ export default {
 
   checkAuth () {
     logger.default.info('Checking authentication...')
-    var jwt = cache.get('token')
+    var jwt = this.getAuthToken()
     var username = cache.get('username')
     if (jwt) {
       this.user.authenticated = true
@@ -63,9 +63,13 @@ export default {
     }
   },
 
+  getAuthToken () {
+    return cache.get('token')
+  },
+
   // The object to be passed as a header for authenticated requests
   getAuthHeader () {
-    return 'JWT ' + cache.get('token')
+    return 'JWT ' + this.getAuthToken()
   },
 
   fetchProfile () {
