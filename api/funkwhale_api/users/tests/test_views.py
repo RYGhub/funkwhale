@@ -47,7 +47,13 @@ class UserTestCase(TestCase):
         # login required
         self.assertEqual(response.status_code, 401)
 
-        user = UserFactory(is_staff=True, perms=['music.add_importbatch'])
+        user = UserFactory(
+            is_staff=True,
+            perms=[
+                'music.add_importbatch',
+                'dynamic_preferences.change_globalpreferencemodel',
+            ]
+        )
         self.assertTrue(user.has_perm('music.add_importbatch'))
         self.login(user)
 
@@ -63,3 +69,5 @@ class UserTestCase(TestCase):
         self.assertEqual(payload['name'], user.name)
         self.assertEqual(
             payload['permissions']['import.launch']['status'], True)
+        self.assertEqual(
+            payload['permissions']['settings.change']['status'], True)

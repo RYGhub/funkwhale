@@ -4,11 +4,15 @@ import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Profile from '@/components/auth/Profile'
 import Logout from '@/components/auth/Logout'
-import Browse from '@/components/browse/Browse'
-import BrowseHome from '@/components/browse/Home'
-import BrowseArtist from '@/components/browse/Artist'
-import BrowseAlbum from '@/components/browse/Album'
-import BrowseTrack from '@/components/browse/Track'
+import Library from '@/components/library/Library'
+import LibraryHome from '@/components/library/Home'
+import LibraryArtist from '@/components/library/Artist'
+import LibraryAlbum from '@/components/library/Album'
+import LibraryTrack from '@/components/library/Track'
+import LibraryImport from '@/components/library/import/Main'
+import BatchList from '@/components/library/import/BatchList'
+import BatchDetail from '@/components/library/import/BatchDetail'
+
 import Favorites from '@/components/favorites/List'
 
 Vue.use(Router)
@@ -43,13 +47,27 @@ export default new Router({
       component: Favorites
     },
     {
-      path: '/browse',
-      component: Browse,
+      path: '/library',
+      component: Library,
       children: [
-        { path: '', component: BrowseHome },
-        { path: 'artist/:id', name: 'browse.artist', component: BrowseArtist, props: true },
-        { path: 'album/:id', name: 'browse.album', component: BrowseAlbum, props: true },
-        { path: 'track/:id', name: 'browse.track', component: BrowseTrack, props: true }
+        { path: '', component: LibraryHome },
+        { path: 'artist/:id', name: 'library.artist', component: LibraryArtist, props: true },
+        { path: 'album/:id', name: 'library.album', component: LibraryAlbum, props: true },
+        { path: 'track/:id', name: 'library.track', component: LibraryTrack, props: true },
+        {
+          path: 'import/launch',
+          name: 'library.import.launch',
+          component: LibraryImport,
+          props: (route) => ({ mbType: route.query.type, mbId: route.query.id })
+        },
+        {
+          path: 'import/batches',
+          name: 'library.import.batches',
+          component: BatchList,
+          children: [
+          ]
+        },
+        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
       ]
     }
 

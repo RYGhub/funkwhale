@@ -1,12 +1,5 @@
 import logger from '@/logging'
-
-const pad = (val) => {
-  val = Math.floor(val)
-  if (val < 10) {
-    return '0' + val
-  }
-  return val + ''
-}
+import time from '@/utils/time'
 
 const Cov = {
   on (el, type, func) {
@@ -108,7 +101,7 @@ class Audio {
     })
     this.state.duration = Math.round(this.$Audio.duration * 100) / 100
     this.state.loaded = Math.round(10000 * this.$Audio.buffered.end(0) / this.$Audio.duration) / 100
-    this.state.durationTimerFormat = this.timeParse(this.state.duration)
+    this.state.durationTimerFormat = time.parse(this.state.duration)
   }
 
   updatePlayState (e) {
@@ -116,9 +109,9 @@ class Audio {
     this.state.duration = Math.round(this.$Audio.duration * 100) / 100
     this.state.progress = Math.round(10000 * this.state.currentTime / this.state.duration) / 100
 
-    this.state.durationTimerFormat = this.timeParse(this.state.duration)
-    this.state.currentTimeFormat = this.timeParse(this.state.currentTime)
-    this.state.lastTimeFormat = this.timeParse(this.state.duration - this.state.currentTime)
+    this.state.durationTimerFormat = time.parse(this.state.duration)
+    this.state.currentTimeFormat = time.parse(this.state.currentTime)
+    this.state.lastTimeFormat = time.parse(this.state.duration - this.state.currentTime)
 
     this.hook.playState.forEach(func => {
       func(this.state)
@@ -181,14 +174,6 @@ class Audio {
     }
     this.$Audio.currentTime = time
   }
-
-  timeParse (sec) {
-    let min = 0
-    min = Math.floor(sec / 60)
-    sec = sec - min * 60
-    return pad(min) + ':' + pad(sec)
-  }
-
 }
 
 export default Audio

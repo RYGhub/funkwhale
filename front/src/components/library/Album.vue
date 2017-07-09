@@ -12,7 +12,7 @@
               {{ album.title }}
               <div class="sub header">
                 Album containing {{ album.tracks.length }} tracks,
-                by <router-link :to="{name: 'browse.artist', params: {id: album.artist.id }}">
+                by <router-link :to="{name: 'library.artist', params: {id: album.artist.id }}">
                   {{ album.artist.name }}
                 </router-link>
               </div>

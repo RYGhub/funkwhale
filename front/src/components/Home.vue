@@ -6,7 +6,7 @@
             Welcome on funkwhale
         </h1>
         <p>We think listening music should be simple.</p>
-        <router-link class="ui icon teal button" to="/browse">
+        <router-link class="ui icon teal button" to="/library">
           Get me to the library
           <i class="right arrow icon"></i>
         </router-link>
@@ -90,9 +90,9 @@
         <p>Funkwhale is dead simple to use.</p>
         <div class="ui list">
           <div class="item">
-            <i class="browser icon"></i>
+            <i class="libraryr icon"></i>
             <div class="content">
-              No add-ons, no plugins : you only need a web browser
+              No add-ons, no plugins : you only need a web libraryr
             </div>
           </div>
           <div class="item">

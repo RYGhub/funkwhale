@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = (
     'rest_auth',
     'rest_auth.registration',
     'mptt',
+    'dynamic_preferences',
 )
 
 # Apps specific for this project go here.
@@ -65,6 +66,7 @@ LOCAL_APPS = (
     'funkwhale_api.history',
     'funkwhale_api.playlists',
     'funkwhale_api.providers.audiofile',
+    'funkwhale_api.providers.youtube',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -298,11 +300,6 @@ REST_FRAMEWORK = {
     )
 }
 
-FUNKWHALE_PROVIDERS = {
-    'youtube': {
-        'api_key': env('YOUTUBE_API_KEY', default='REPLACE_ME')
-    }
-}
 ATOMIC_REQUESTS = False
 
 # Wether we should check user permission before serving audio files (meaning
@@ -314,3 +311,13 @@ PROTECT_AUDIO_FILES = env.bool('PROTECT_AUDIO_FILES', default=True)
 # Which path will be used to process the internal redirection
 # **DO NOT** put a slash at the end
 PROTECT_FILES_PATH = env('PROTECT_FILES_PATH', default='/_protected')
+
+
+# use this setting to tweak for how long you want to cache
+# musicbrainz results. (value is in seconds)
+MUSICBRAINZ_CACHE_DURATION = env.int(
+    'MUSICBRAINZ_CACHE_DURATION',
+    default=300
+)
+
+CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=True)
