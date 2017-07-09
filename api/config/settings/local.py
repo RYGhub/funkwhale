@@ -28,14 +28,6 @@ EMAIL_PORT = 1025
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
                     default='django.core.mail.backends.console.EmailBackend')
 
-# CACHING
-# ------------------------------------------------------------------------------
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': ''
-    }
-}
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
