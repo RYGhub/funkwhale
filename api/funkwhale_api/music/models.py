@@ -8,7 +8,6 @@ import markdown
 
 from django.conf import settings
 from django.db import models
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.urlresolvers import reverse
@@ -354,9 +353,11 @@ class TrackFile(models.Model):
 
     @property
     def path(self):
-        if settings.USE_SAMPLE_TRACK:
-            return static('music/sample1.ogg')
+        if settings.PROTECT_AUDIO_FILES:
+            return reverse(
+                'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
         return self.audio_file.url
+
 
 class ImportBatch(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)

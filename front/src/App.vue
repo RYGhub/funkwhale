@@ -2,6 +2,26 @@
   <div id="app">
     <sidebar></sidebar>
     <router-view></router-view>
+    <div class="ui divider"></div>
+    <div id="footer" class="ui vertical footer segment">
+      <div class="ui container">
+        <div class="ui stackable equal height stackable grid">
+          <div class="three wide column">
+            <h4 class="ui header">Links</h4>
+            <div class="ui link list">
+              <a href="https://funkwhale.audio" class="item" target="_blank">Official website</a>
+              <a href="https://docs.funkwhale.audio" class="item" target="_blank">Documentation</a>
+              <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">Source code</a>
+              <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">Issue tracker</a>
+            </div>
+          </div>
+          <div class="ten wide column">
+            <h4 class="ui header">About funkwhale</h4>
+            <p>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,12 +47,16 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.main.pusher {
+.main.pusher, .footer {
   margin-left: 350px !important;
   transform: none !important;
+}
+.main-pusher {
   padding: 1.5rem 0;
 }
-
+#footer {
+  padding: 1.5rem;
+}
 .ui.stripe.segment {
   padding: 4em;
 }

@@ -19,8 +19,11 @@ class User(AbstractUser):
     relevant_permissions = {
         # internal_codename : {external_codename}
         'music.add_importbatch': {
-            'external_codename': 'import.launch'
-        }
+            'external_codename': 'import.launch',
+        },
+        'dynamic_preferences.change_globalpreferencemodel': {
+            'external_codename': 'settings.change',
+        },
     }
 
     def __str__(self):

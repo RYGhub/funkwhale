@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+import musicbrainzngs
 
 from funkwhale_api.common.permissions import ConditionalAuthentication
 
@@ -44,7 +45,7 @@ class ReleaseBrowse(APIView):
     def get(self, request, *args, **kwargs):
         result = api.releases.browse(
             release_group=kwargs['release_group_uuid'],
-            includes=['recordings'])
+            includes=['recordings', 'artist-credits'])
         return Response(result)
 
 
@@ -54,17 +55,18 @@ class SearchViewSet(viewsets.ViewSet):
     @list_route(methods=['get'])
     def recordings(self, request, *args, **kwargs):
         query = request.GET['query']
-        results = api.recordings.search(query, artist=query)
+        results = api.recordings.search(query)
         return Response(results)
 
     @list_route(methods=['get'])
     def releases(self, request, *args, **kwargs):
         query = request.GET['query']
-        results = api.releases.search(query, artist=query)
+        results = api.releases.search(query)
         return Response(results)
 
     @list_route(methods=['get'])
     def artists(self, request, *args, **kwargs):
         query = request.GET['query']
         results = api.artists.search(query)
+        # results = musicbrainzngs.search_artists(query)
         return Response(results)

@@ -1,8 +1,11 @@
 import os
 import json
+import unicodedata
+import urllib
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
+from django.conf import settings
 from rest_framework import viewsets, views
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
@@ -51,6 +54,7 @@ class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     search_fields = ['name']
     ordering_fields = ('creation_date',)
 
+
 class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all()
@@ -63,12 +67,14 @@ class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     search_fields = ['title']
     ordering_fields = ('creation_date',)
 
+
 class ImportBatchViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.ImportBatch.objects.all().order_by('-creation_date')
     serializer_class = serializers.ImportBatchSerializer
 
     def get_queryset(self):
         return super().get_queryset().filter(submitted_by=self.request.user)
+
 
 class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     """
@@ -118,6 +124,29 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
             return Response({'error': 'unavailable lyrics'}, status=404)
         serializer = serializers.LyricsSerializer(lyrics)
         return Response(serializer.data)
+
+
+class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = (models.TrackFile.objects.all().order_by('-id'))
+    serializer_class = serializers.TrackFileSerializer
+    permission_classes = [ConditionalAuthentication]
+
+    @detail_route(methods=['get'])
+    def serve(self, request, *args, **kwargs):
+        try:
+            f = models.TrackFile.objects.get(pk=kwargs['pk'])
+        except models.TrackFile.DoesNotExist:
+            return Response(status=404)
+
+        response = Response()
+        filename = "filename*=UTF-8''{}{}".format(
+            urllib.parse.quote(f.track.full_name),
+            os.path.splitext(f.audio_file.name)[-1])
+        response["Content-Disposition"] = "attachment; {}".format(filename)
+        response['X-Accel-Redirect'] = "{}{}".format(
+            settings.PROTECT_FILES_PATH,
+            f.audio_file.url)
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

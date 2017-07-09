@@ -13,7 +13,7 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" data-tab="browse">Browse</a>
+      <a class="active item" data-tab="library">Browse</a>
       <a class="item" data-tab="queue">
         Queue &nbsp;
          <template v-if="queue.tracks.length === 0">
@@ -26,12 +26,12 @@
     </div>
   </div>
   <div class="tabs">
-    <div class="ui bottom attached active tab" data-tab="browse">
+    <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical fluid menu">
         <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'profile', params: {username: auth.user.username}}"><i class="user icon"></i> Logged in as {{ auth.user.username }}</router-link>
         <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
-        <router-link class="item" :to="{path: '/browse'}"><i class="sound icon"> </i>Browse library</router-link>
+        <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
         <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
       </div>
     </div>
@@ -50,27 +50,27 @@
     </div>
     <div class="ui bottom attached tab" data-tab="queue">
       <table class="ui compact inverted very basic fixed single line table">
-        <tbody>
-          <tr @click="queue.play(index)" v-for="(track, index) in queue.tracks" :class="[{'active': index === queue.currentIndex}]">
-            <td class="right aligned">{{ index + 1}}</td>
-            <td class="center aligned">
-              <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
-              <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
-            </td>
-            <td colspan="4">
-              <strong>{{ track.title }}</strong><br />
-              {{ track.artist.name }}
-            </td>
-            <td>
-              <template v-if="favoriteTracks.objects[track.id]">
-                <i @click.stop="queue.cleanTrack(index)" class="pink heart icon"></i>
-              </template
-            </td>
-            <td>
-              <i @click.stop="queue.cleanTrack(index)" class="circular trash icon"></i>
-            </td>
-          </tr>
-        </tbody>
+        <draggable v-model="queue.tracks" element="tbody" @update="reorder">
+          <tr @click="queue.play(index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
+              <td class="right aligned">{{ index + 1}}</td>
+              <td class="center aligned">
+                  <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
+                  <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
+              </td>
+              <td colspan="4">
+                  <strong>{{ track.title }}</strong><br />
+                  {{ track.artist.name }}
+              </td>
+              <td>
+                <template v-if="favoriteTracks.objects[track.id]">
+                  <i @click.stop="queue.cleanTrack(index)" class="pink heart icon"></i>
+                  </template
+              </td>
+              <td>
+                  <i @click.stop="queue.cleanTrack(index)" class="circular trash icon"></i>
+              </td>
+            </tr>
+          </draggable>
       </table>
       <div v-if="radios.running" class="ui black message">
 
@@ -98,6 +98,7 @@ import SearchBar from '@/components/audio/SearchBar'
 import auth from '@/auth'
 import queue from '@/audio/queue'
 import backend from '@/audio/backend'
+import draggable from 'vuedraggable'
 import radios from '@/radios'
 
 import $ from 'jquery'
@@ -107,7 +108,8 @@ export default {
   components: {
     Player,
     SearchBar,
-    Logo
+    Logo,
+    draggable
   },
   data () {
     return {
@@ -120,6 +122,11 @@ export default {
   },
   mounted () {
     $(this.$el).find('.menu .item').tab()
+  },
+  methods: {
+    reorder (e) {
+      this.queue.reorder(e.oldIndex, e.newIndex)
+    }
   }
 }
 </script>

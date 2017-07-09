@@ -50,3 +50,9 @@ beautifulsoup4==4.6.0
 Markdown==2.6.8
 ipython==6.1.0
 mutagen==1.38
+
+
+# Until this is merged
+git+https://github.com/EliotBerriot/PyMemoize.git@django
+
+django-dynamic-preferences>=1.2,<1.3

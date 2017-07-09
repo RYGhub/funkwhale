@@ -6,10 +6,10 @@
           <img v-else src="../../../assets/audio/default-cover.png">
         </div>
         <div class="header">
-          <router-link class="discrete link" :to="{name: 'browse.album', params: {id: album.id }}">{{ album.title }}</router-link>
+          <router-link class="discrete link" :to="{name: 'library.album', params: {id: album.id }}">{{ album.title }}</router-link>
         </div>
         <div class="meta">
-          By <router-link :to="{name: 'browse.artist', params: {id: album.artist.id }}">
+          By <router-link :to="{name: 'library.artist', params: {id: album.artist.id }}">
             {{ album.artist.name }}
           </router-link>
         </div>
@@ -21,7 +21,7 @@
                   <play-button class="basic icon" :track="track" :discrete="true"></play-button>
                 </td>
                 <td colspan="6">
-                  <router-link class="track discrete link" :to="{name: 'browse.track', params: {id: track.id }}">
+                  <router-link class="track discrete link" :to="{name: 'library.track', params: {id: track.id }}">
                     {{ track.title }}
                   </router-link>
                 </td>

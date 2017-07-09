@@ -1,7 +1,9 @@
 <template>
-  <div class="main browse pusher">
+  <div class="main library pusher">
     <div class="ui secondary pointing menu">
-      <router-link class="ui item" to="/browse">Browse</router-link>
+      <router-link class="ui item" to="/library" exact>Browse</router-link>
+      <router-link v-if="auth.user.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>Import</router-link>
+      <router-link v-if="auth.user.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches</router-link>
     </div>
     <router-view></router-view>
   </div>
@@ -9,18 +11,25 @@
 
 <script>
 
+import auth from '@/auth'
+
 export default {
-  name: 'browse'
+  name: 'library',
+  data: function () {
+    return {
+      auth
+    }
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-.browse.pusher > .ui.secondary.menu {
+.library.pusher > .ui.secondary.menu {
   margin: 0 2.5rem;
 }
 
-.browse {
+.library {
   .ui.segment.head {
     background-size: cover;
     background-position: center;

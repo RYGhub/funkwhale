@@ -37,13 +37,26 @@ def get_mp3_recording_id(f, k):
     except IndexError:
         raise TagNotFound(k)
 
+
+def convert_track_number(v):
+    try:
+        return int(v)
+    except ValueError:
+        # maybe the position is of the form "1/4"
+        pass
+
+    try:
+        return int(v.split('/')[0])
+    except (ValueError, AttributeError, IndexError):
+        pass
+
 CONF = {
     'OggVorbis': {
         'getter': lambda f, k: f[k][0],
         'fields': {
             'track_number': {
                 'field': 'TRACKNUMBER',
-                'to_application': int
+                'to_application': convert_track_number
             },
             'title': {
                 'field': 'title'
@@ -74,7 +87,7 @@ CONF = {
         'fields': {
             'track_number': {
                 'field': 'TPOS',
-                'to_application': lambda v: int(v.split('/')[0])
+                'to_application': convert_track_number
             },
             'title': {
                 'field': 'TIT2'

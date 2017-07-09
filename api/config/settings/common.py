@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = (
     'rest_auth',
     'rest_auth.registration',
     'mptt',
+    'dynamic_preferences',
 )
 
 # Apps specific for this project go here.
@@ -65,6 +66,7 @@ LOCAL_APPS = (
     'funkwhale_api.history',
     'funkwhale_api.playlists',
     'funkwhale_api.providers.audiofile',
+    'funkwhale_api.providers.youtube',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -217,7 +219,6 @@ STATICFILES_FINDERS = (
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
 MEDIA_ROOT = str(APPS_DIR('media'))
 
-USE_SAMPLE_TRACK = env.bool("USE_SAMPLE_TRACK", False)
 
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
@@ -261,7 +262,6 @@ BROKER_URL = env("CELERY_BROKER_URL", default='django://')
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
-SESSION_SAVE_EVERY_REQUEST = True
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_DEFAULT_RATE_LIMIT = 1
 CELERYD_TASK_TIME_LIMIT = 300
@@ -290,6 +290,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 25,
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -299,9 +300,24 @@ REST_FRAMEWORK = {
     )
 }
 
-FUNKWHALE_PROVIDERS = {
-    'youtube': {
-        'api_key': env('YOUTUBE_API_KEY', default='REPLACE_ME')
-    }
-}
 ATOMIC_REQUESTS = False
+
+# Wether we should check user permission before serving audio files (meaning
+# return an obfuscated url)
+# This require a special configuration on the reverse proxy side
+# See https://wellfire.co/learn/nginx-django-x-accel-redirects/ for example
+PROTECT_AUDIO_FILES = env.bool('PROTECT_AUDIO_FILES', default=True)
+
+# Which path will be used to process the internal redirection
+# **DO NOT** put a slash at the end
+PROTECT_FILES_PATH = env('PROTECT_FILES_PATH', default='/_protected')
+
+
+# use this setting to tweak for how long you want to cache
+# musicbrainz results. (value is in seconds)
+MUSICBRAINZ_CACHE_DURATION = env.int(
+    'MUSICBRAINZ_CACHE_DURATION',
+    default=300
+)
+
+CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=True)

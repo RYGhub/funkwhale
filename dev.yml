@@ -27,7 +27,7 @@ services:
     env_file: .env.dev
     build:
       context: ./api
-      dockerfile: docker/Dockerfile.local
+      dockerfile: docker/Dockerfile.test
     links:
      - postgres
      - redis
@@ -53,12 +53,14 @@ services:
       - redis
       - celeryworker
 
-  # nginx:
-  #   env_file: .env.dev
-  #   build: ./api/compose/nginx
-  #   links:
-  #     - api
-  #   volumes:
-  #     - ./api/funkwhale_api/media:/staticfiles/media
-  #   ports:
-  #     - "0.0.0.0:6001:80"
+  nginx:
+    env_file: .env.dev
+    image: nginx
+    links:
+      - api
+      - front
+    volumes:
+      - ./docker/nginx/conf.dev:/etc/nginx/nginx.conf
+      - ./api/funkwhale_api/media:/protected/media
+    ports:
+      - "0.0.0.0:6001:80"

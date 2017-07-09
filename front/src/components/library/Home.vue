@@ -34,7 +34,7 @@ import RadioCard from '@/components/radios/Card'
 const ARTISTS_URL = config.API_URL + 'artists/'
 
 export default {
-  name: 'browse',
+  name: 'library',
   components: {
     Search,
     ArtistCard,

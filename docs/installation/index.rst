@@ -26,6 +26,11 @@ Available installation methods
 Frontend setup
 ---------------
 
+.. note::
+
+    You do not need to do this if you are deploying using Docker, as frontend files
+    are already included in the funkwhale docker image.
+
 Files for the web frontend are purely static and can simply be downloaded, unzipped and served from any webserver:
 
 .. code-block:: bash

@@ -1,9 +1,15 @@
 import musicbrainzngs
+import memoize.djangocache
 
 from django.conf import settings
 from funkwhale_api import __version__
+
 _api = musicbrainzngs
 _api.set_useragent('funkwhale', str(__version__), 'contact@eliotberriot.com')
+
+
+store = memoize.djangocache.Cache('default')
+memo = memoize.Memoizer(store, namespace='memoize:musicbrainz')
 
 
 def clean_artist_search(query, **kwargs):
@@ -17,30 +23,55 @@ class API(object):
     _api = _api
 
     class artists(object):
-        search = clean_artist_search
-        get = _api.get_artist_by_id
+        search = memo(
+            clean_artist_search, max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        get = memo(
+            _api.get_artist_by_id,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
 
     class images(object):
-        get_front = _api.get_image_front
+        get_front = memo(
+            _api.get_image_front,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
 
     class recordings(object):
-        search = _api.search_recordings
-        get = _api.get_recording_by_id
+        search = memo(
+            _api.search_recordings,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        get = memo(
+            _api.get_recording_by_id,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
 
     class works(object):
-        search = _api.search_works
-        get = _api.get_work_by_id
+        search = memo(
+            _api.search_works,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        get = memo(
+            _api.get_work_by_id,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
 
     class releases(object):
-        search = _api.search_releases
-        get = _api.get_release_by_id
-        browse = _api.browse_releases
+        search = memo(
+            _api.search_releases,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        get = memo(
+            _api.get_release_by_id,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        browse = memo(
+            _api.browse_releases,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
         # get_image_front = _api.get_image_front
 
     class release_groups(object):
-        search = _api.search_release_groups
-        get = _api.get_release_group_by_id
-        browse = _api.browse_release_groups
+        search = memo(
+            _api.search_release_groups,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        get = memo(
+            _api.get_release_group_by_id,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
+        browse = memo(
+            _api.browse_release_groups,
+            max_age=settings.MUSICBRAINZ_CACHE_DURATION)
         # get_image_front = _api.get_image_front
 
 api = API()

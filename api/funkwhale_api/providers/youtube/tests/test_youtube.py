@@ -8,7 +8,7 @@ from funkwhale_api.providers.youtube.client import client
 from . import data as api_data
 
 class TestAPI(TestCase):
-
+    maxDiff = None
     @unittest.mock.patch(
         'funkwhale_api.providers.youtube.client._do_search',
         return_value=api_data.search['8 bit adventure'])
@@ -25,11 +25,23 @@ class TestAPI(TestCase):
         return_value=api_data.search['8 bit adventure'])
     def test_can_get_search_results_from_funkwhale(self, *mocks):
         query = '8 bit adventure'
-        expected = json.dumps(client.search(query))
         url = self.reverse('api:v1:providers:youtube:search')
         response = self.client.get(url + '?query={0}'.format(query))
+        # we should cast the youtube result to something more generic
+        expected = {
+            "id": "0HxZn6CzOIo",
+            "url": "https://www.youtube.com/watch?v=0HxZn6CzOIo",
+            "type": "youtube#video",
+            "description": "Make sure to apply adhesive evenly before use. GET IT HERE: http://adhesivewombat.bandcamp.com/album/marsupial-madness Facebook: ...",
+            "channelId": "UCps63j3krzAG4OyXeEyuhFw",
+            "title": "AdhesiveWombat - 8 Bit Adventure",
+            "channelTitle": "AdhesiveWombat",
+            "publishedAt": "2012-08-22T18:41:03.000Z",
+            "cover": "https://i.ytimg.com/vi/0HxZn6CzOIo/hqdefault.jpg"
+        }
 
-        self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8'))[0], expected)
 
     @unittest.mock.patch(
         'funkwhale_api.providers.youtube.client._do_search',
@@ -66,9 +78,22 @@ class TestAPI(TestCase):
             'q': '8 bit adventure',
         }
 
-        expected = json.dumps(client.search_multiple(queries))
+        expected = {
+            "id": "0HxZn6CzOIo",
+            "url": "https://www.youtube.com/watch?v=0HxZn6CzOIo",
+            "type": "youtube#video",
+            "description": "Make sure to apply adhesive evenly before use. GET IT HERE: http://adhesivewombat.bandcamp.com/album/marsupial-madness Facebook: ...",
+            "channelId": "UCps63j3krzAG4OyXeEyuhFw",
+            "title": "AdhesiveWombat - 8 Bit Adventure",
+            "channelTitle": "AdhesiveWombat",
+            "publishedAt": "2012-08-22T18:41:03.000Z",
+            "cover": "https://i.ytimg.com/vi/0HxZn6CzOIo/hqdefault.jpg"
+        }
+
         url = self.reverse('api:v1:providers:youtube:searchs')
         response = self.client.post(
             url, json.dumps(queries), content_type='application/json')
 
-        self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
+        self.assertEqual(
+            expected,
+            json.loads(response.content.decode('utf-8'))['1'][0])

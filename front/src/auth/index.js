@@ -10,14 +10,13 @@ const LOGIN_URL = config.API_URL + 'token/'
 const USER_PROFILE_URL = config.API_URL + 'users/users/me/'
 // const SIGNUP_URL = API_URL + 'users/'
 
-export default {
-
-  // User object will let us check authentication status
-  user: {
-    authenticated: false,
-    username: '',
-    profile: null
-  },
+let userData = {
+  authenticated: false,
+  username: '',
+  availablePermissions: {},
+  profile: {}
+}
+let auth = {
 
   // Send a request to the login URL and save the returned JWT
   login (context, creds, redirect, onError) {
@@ -50,7 +49,7 @@ export default {
 
   checkAuth () {
     logger.default.info('Checking authentication...')
-    var jwt = cache.get('token')
+    var jwt = this.getAuthToken()
     var username = cache.get('username')
     if (jwt) {
       this.user.authenticated = true
@@ -63,9 +62,13 @@ export default {
     }
   },
 
+  getAuthToken () {
+    return cache.get('token')
+  },
+
   // The object to be passed as a header for authenticated requests
   getAuthHeader () {
-    return 'JWT ' + cache.get('token')
+    return 'JWT ' + this.getAuthToken()
   },
 
   fetchProfile () {
@@ -83,7 +86,14 @@ export default {
     let self = this
     this.fetchProfile().then(data => {
       Vue.set(self.user, 'profile', data)
+      Object.keys(data.permissions).forEach(function (key) {
+        // this makes it easier to check for permissions in templates
+        Vue.set(self.user.availablePermissions, key, data.permissions[String(key)].status)
+      })
     })
     favoriteTracks.fetch()
   }
 }
+
+Vue.set(auth, 'user', userData)
+export default auth

@@ -12,10 +12,10 @@
               {{ track.title }}
               <div class="sub header">
                 From album
-                <router-link :to="{name: 'browse.album', params: {id: track.album.id }}">
+                <router-link :to="{name: 'library.album', params: {id: track.album.id }}">
                   {{ track.album.title }}
                 </router-link>
-                by <router-link :to="{name: 'browse.artist', params: {id: track.artist.id }}">
+                by <router-link :to="{name: 'library.artist', params: {id: track.artist.id }}">
                   {{ track.artist.name }}
                 </router-link>
               </div>
@@ -61,6 +61,8 @@
 
 <script>
 
+import auth from '@/auth'
+import url from '@/utils/url'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
@@ -121,7 +123,11 @@ export default {
     },
     downloadUrl () {
       if (this.track.files.length > 0) {
-        return backend.absoluteUrl(this.track.files[0].path)
+        let u = backend.absoluteUrl(this.track.files[0].path)
+        if (auth.user.authenticated) {
+          u = url.updateQueryString(u, 'jwt', auth.getAuthToken())
+        }
+        return u
       }
     },
     lyricsSearchUrl () {

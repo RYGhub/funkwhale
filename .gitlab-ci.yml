@@ -70,6 +70,7 @@ docker_develop:
   stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - cp -r front/dist api/frontend
     - cd api
   script:
     - docker build -t $IMAGE .
@@ -83,6 +84,7 @@ docker_release:
   stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - cp -r front/dist api/frontend
     - cd api
   script:
     - docker build -t $IMAGE -t $IMAGE_LATEST .
