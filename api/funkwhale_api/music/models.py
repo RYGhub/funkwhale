@@ -27,6 +27,7 @@ class APIModelMixin(models.Model):
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now)
     import_hooks = []
+
     class Meta:
         abstract = True
         ordering = ['-creation_date']
@@ -291,6 +292,9 @@ class Track(APIModelMixin):
     ]
     tags = TaggableManager()
 
+    class Meta:
+        ordering = ['album', 'position']
+
     def __str__(self):
         return self.title
 
@@ -386,6 +390,8 @@ class ImportJob(models.Model):
     )
     status = models.CharField(choices=STATUS_CHOICES, default='pending', max_length=30)
 
+    class Meta:
+        ordering = ('id', )
     @celery.app.task(name='ImportJob.run', filter=celery.task_method)
     def run(self, replace=False):
         try:

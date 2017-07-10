@@ -20,9 +20,12 @@
           <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
         </td>
         <td colspan="6">
-            <router-link class="track" :to="{name: 'library.track', params: {id: track.id }}">
-              {{ track.title }}
-            </router-link>
+          <router-link class="track" :to="{name: 'library.track', params: {id: track.id }}">
+            <template v-if="displayPosition && track.position">
+              {{ track.position }}.
+            </template>
+            {{ track.title }}
+          </router-link>
         </td>
         <td colspan="6">
           <router-link class="artist discrete link" :to="{name: 'library.artist', params: {id: track.artist.id }}">
@@ -46,7 +49,10 @@ import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import PlayButton from '@/components/audio/PlayButton'
 
 export default {
-  props: ['tracks'],
+  props: {
+    tracks: {type: Array, required: true},
+    displayPosition: {type: Boolean, default: false}
+  },
   components: {
     TrackFavoriteIcon,
     PlayButton

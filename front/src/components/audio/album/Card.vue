@@ -22,6 +22,9 @@
                 </td>
                 <td colspan="6">
                   <router-link class="track discrete link" :to="{name: 'library.track', params: {id: track.id }}">
+                    <template v-if="track.position">
+                      {{ track.position }}.
+                    </template>
                     {{ track.title }}
                   </router-link>
                 </td>

@@ -62,7 +62,15 @@ class TrackSerializer(LyricsMixin):
     tags = TagSerializer(many=True, read_only=True)
     class Meta:
         model = models.Track
-        fields = ('id', 'mbid', 'title', 'artist', 'files', 'tags', 'lyrics')
+        fields = (
+            'id',
+            'mbid',
+            'title',
+            'artist',
+            'files',
+            'tags',
+            'position',
+            'lyrics')
 
 class TrackSerializerNested(LyricsMixin):
     artist = ArtistSerializer()
