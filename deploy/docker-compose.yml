@@ -28,7 +28,7 @@ services:
       - C_FORCE_ROOT=true
     volumes:
       - ./data/music:/music:ro
-      - ./api/media:/app/funkwhale_api/media
+      - ./data/media:/app/funkwhale_api/media
 
   celerybeat:
     restart: unless-stopped
