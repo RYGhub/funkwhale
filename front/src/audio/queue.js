@@ -123,6 +123,7 @@ class Queue {
       this.tracks.splice(index, 0, track)
     }
     if (this.ended) {
+      logger.default.debug('Playing appended track')
       this.play(this.currentIndex + 1)
     }
     this.cache()
@@ -152,19 +153,31 @@ class Queue {
 
   clean () {
     this.stop()
+    radios.stop()
     this.tracks = []
     this.currentIndex = -1
     this.currentTrack = null
+    // so we replay automatically on next track append
+    this.ended = true
   }
 
   cleanTrack (index) {
-    if (index === this.currentIndex) {
+    // are we removing current playin track
+    let current = index === this.currentIndex
+    if (current) {
       this.stop()
     }
     if (index < this.currentIndex) {
       this.currentIndex -= 1
     }
     this.tracks.splice(index, 1)
+    if (current) {
+      // we play next track, which now have the same index
+      this.play(index)
+    }
+    if (this.currentIndex === this.tracks.length - 1) {
+      this.populateFromRadio()
+    }
   }
 
   stop () {
@@ -172,12 +185,17 @@ class Queue {
     this.audio.destroyed()
   }
   play (index) {
-    if (this.audio.destroyed) {
-      logger.default.debug('Destroying previous audio...')
-      this.audio.destroyed()
+    let self = this
+    let currentIndex = index
+    let currentTrack = this.tracks[index]
+    if (!currentTrack) {
+      logger.default.debug('No track at index', index)
+      return
     }
-    this.currentIndex = index
-    this.currentTrack = this.tracks[index]
+
+    this.currentIndex = currentIndex
+    this.currentTrack = currentTrack
+
     this.ended = false
     let file = this.currentTrack.files[0]
     if (!file) {
@@ -193,13 +211,28 @@ class Queue {
       path = url.updateQueryString(path, 'jwt', auth.getAuthToken())
     }
 
-    this.audio = new Audio(path, {
+    if (this.audio.destroyed) {
+      logger.default.debug('Destroying previous audio...', index - 1)
+      this.audio.destroyed()
+    }
+    let audio = new Audio(path, {
       preload: true,
       autoplay: true,
       rate: 1,
       loop: false,
       volume: this.state.volume,
       onEnded: this.handleAudioEnded.bind(this)
+    })
+    this.audio = audio
+    audio.updateHook('playState', function (e) {
+      // in some situations, we may have a race condition, for example
+      // if the user spams the next / previous buttons, with multiple audios
+      // playing at the same time. To avoid that, we ensure the audio
+      // still matches de queue current audio
+      if (audio !== self.audio) {
+        logger.default.debug('Destroying duplicate audio')
+        audio.destroyed()
+      }
     })
     if (this.currentIndex === this.tracks.length - 1) {
       this.populateFromRadio()
