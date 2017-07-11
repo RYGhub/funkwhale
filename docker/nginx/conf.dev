@@ -28,7 +28,7 @@ http {
     #gzip  on;
 
     server {
-        listen 80;
+        listen 6001;
         charset     utf-8;
 
         location /_protected/media {
@@ -40,6 +40,8 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host   $host:$server_port;
+            proxy_set_header X-Forwarded-Port   $server_port;
             proxy_redirect off;
             proxy_pass   http://api:12081/;
         }

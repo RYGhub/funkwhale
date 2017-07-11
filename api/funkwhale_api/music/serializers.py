@@ -31,11 +31,20 @@ class ImportBatchSerializer(serializers.ModelSerializer):
         model = models.ImportBatch
         fields = ('id', 'jobs', 'status', 'creation_date')
 
+
 class TrackFileSerializer(serializers.ModelSerializer):
+    path = serializers.SerializerMethodField()
+
     class Meta:
         model = models.TrackFile
         fields = ('id', 'path', 'duration', 'source', 'filename')
 
+    def get_path(self, o):
+        request = self.context.get('request')
+        url = o.path
+        if request:
+            url = request.build_absolute_uri(url)
+        return url
 
 class SimpleAlbumSerializer(serializers.ModelSerializer):
 
