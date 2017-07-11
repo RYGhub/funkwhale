@@ -362,6 +362,12 @@ class TrackFile(models.Model):
                 'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
         return self.audio_file.url
 
+    @property
+    def filename(self):
+        return '{}{}'.format(
+            self.track.full_name,
+            os.path.splitext(self.audio_file.name)[-1])
+
 
 class ImportBatch(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)

@@ -34,7 +34,7 @@ class ImportBatchSerializer(serializers.ModelSerializer):
 class TrackFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TrackFile
-        fields = ('id', 'path', 'duration', 'source')
+        fields = ('id', 'path', 'duration', 'source', 'filename')
 
 
 class SimpleAlbumSerializer(serializers.ModelSerializer):

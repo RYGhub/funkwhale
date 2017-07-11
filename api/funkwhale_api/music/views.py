@@ -139,9 +139,8 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=404)
 
         response = Response()
-        filename = "filename*=UTF-8''{}{}".format(
-            urllib.parse.quote(f.track.full_name),
-            os.path.splitext(f.audio_file.name)[-1])
+        filename = "filename*=UTF-8''{}".format(
+            urllib.parse.quote(f.filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)
         response['X-Accel-Redirect'] = "{}{}".format(
             settings.PROTECT_FILES_PATH,
