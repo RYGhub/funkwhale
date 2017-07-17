@@ -1,6 +1,6 @@
 import glob
 from django.core.management.base import BaseCommand, CommandError
-from funkwhale_api.providers.audiofile import importer
+from funkwhale_api.providers.audiofile import tasks
 
 
 class Command(BaseCommand):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         for path in matching:
             self.stdout.write(message.format(path))
             try:
-                importer.from_path(path)
+                tasks.from_path(path)
             except Exception as e:
                 self.stdout.write('Error: {}'.format(e))
 

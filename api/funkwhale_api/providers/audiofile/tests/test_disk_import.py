@@ -3,7 +3,7 @@ import datetime
 import unittest
 from test_plus.test import TestCase
 
-from funkwhale_api.providers.audiofile import importer
+from funkwhale_api.providers.audiofile import tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +27,7 @@ class TestAudioFile(TestCase):
             return_value='OggVorbis',
         )
         with m1, m2:
-            track_file = importer.from_path(
+            track_file = tasks.from_path(
                 os.path.join(DATA_DIR, 'dummy_file.ogg'))
 
         self.assertEqual(

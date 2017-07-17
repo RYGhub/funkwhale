@@ -34,6 +34,8 @@ services:
     command: python manage.py celery worker
     environment:
         - C_FORCE_ROOT=true
+        - "DATABASE_URL=postgresql://postgres@postgres/postgres"
+        - "CACHE_URL=redis://redis:6379/0"
     volumes:
       - ./api:/app
       - ./data/music:/music
@@ -46,12 +48,14 @@ services:
     volumes:
       - ./api:/app
       - ./data/music:/music
+    environment:
+      - "DATABASE_URL=postgresql://postgres@postgres/postgres"
+      - "CACHE_URL=redis://redis:6379/0"
     ports:
       - "12081:12081"
     links:
       - postgres
       - redis
-      - celeryworker
 
   nginx:
     env_file: .env.dev
