@@ -124,9 +124,9 @@ class Audio {
   }
 
   play () {
-    logger.default.info('Playing track')
     if (this.state.startLoad) {
       if (!this.state.playing && this.$Audio.readyState >= 2) {
+        logger.default.info('Playing track')
         this.$Audio.play()
         this.state.paused = false
         this.state.playing = true

@@ -55,4 +55,4 @@ mutagen==1.38
 # Until this is merged
 git+https://github.com/EliotBerriot/PyMemoize.git@django
 
-django-dynamic-preferences>=1.2,<1.3
+django-dynamic-preferences>=1.3,<1.4

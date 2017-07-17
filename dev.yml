@@ -63,4 +63,4 @@ services:
       - ./docker/nginx/conf.dev:/etc/nginx/nginx.conf
       - ./api/funkwhale_api/media:/protected/media
     ports:
-      - "0.0.0.0:6001:80"
+      - "0.0.0.0:6001:6001"

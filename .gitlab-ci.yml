@@ -80,6 +80,21 @@ docker_develop:
   tags:
     - dind
 
+build_api:
+  # Simply publish a zip containing api/ directory
+  stage: deploy
+  image: busybox
+  artifacts:
+    name: "api_${CI_COMMIT_REF_NAME}"
+    paths:
+      - api
+  script: echo Done!
+  only:
+    - tags
+    - master
+    - develop
+
+
 docker_release:
   stage: deploy
   before_script:

@@ -24,7 +24,7 @@
         </div>
       </div>
     </div>
-    <div class="progress-area">
+    <div class="progress-area" v-if="queue.currentTrack">
       <div class="ui grid">
         <div class="left floated four wide column">
           <p class="timer start" @click="queue.audio.setTime(0)">{{queue.audio.state.currentTimeFormat}}</p>

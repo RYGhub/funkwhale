@@ -34,7 +34,7 @@
       </div>
       <div class="ui vertical stripe segment">
         <h2>Tracks</h2>
-        <track-table v-if="album" :tracks="album.tracks"></track-table>
+        <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
     </template>
   </div>

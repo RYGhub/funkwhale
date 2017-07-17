@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.2.1
+-----
+
+2017-07-17
+
+* Now return media files with absolute URL
+* Now display CLI instructions to download a set of tracks
+* Fixed #33: sort by track position in album in API by default, also reuse that information on frontend side
+* More robust audio player and queue in various situations:
+* upgrade to latest dynamic_preferences and use redis as cache even locally
+
+
 0.2
 -------
 
