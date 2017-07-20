@@ -29,7 +29,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
-        matching = glob.glob(options['path'], recursive=options['recursive'])
+
+        # Recursive is supported only on Python 3.5+, so we pass the option
+        # only if it's True to avoid breaking on older versions of Python
+        glob_kwargs = {}
+        if options['recursive']:
+            glob_kwargs['recursive'] = True
+        try:
+            matching = glob.glob(options['path'], **glob_kwargs)
+        except TypeError:
+            raise Exception('You need Python 3.5 to use the --recursive flag')
+
         self.stdout.write('This will import {} files matching this pattern: {}'.format(
             len(matching), options['path']))
 
