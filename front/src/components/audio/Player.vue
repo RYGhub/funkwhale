@@ -56,10 +56,20 @@
         <i title="Clear your queue" @click="queue.clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" :disabled="queue.tracks.length === 0"></i>
       </div>
     </div>
+    <GlobalEvents
+      @keydown.space.prevent="pauseOrPlay"
+      @keydown.ctrl.left.prevent="queue.previous"
+      @keydown.ctrl.right.prevent="queue.next"
+      @keydown.ctrl.down.prevent="queue.incrementVolume(-0.1)"
+      @keydown.ctrl.up.prevent="queue.incrementVolume(0.1)"
+      />
+
   </div>
 </template>
 
 <script>
+import GlobalEvents from 'vue-global-events'
+
 import queue from '@/audio/queue'
 import Track from '@/audio/track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
@@ -68,7 +78,8 @@ import radios from '@/radios'
 export default {
   name: 'player',
   components: {
-    TrackFavoriteIcon
+    TrackFavoriteIcon,
+    GlobalEvents
   },
   data () {
     return {

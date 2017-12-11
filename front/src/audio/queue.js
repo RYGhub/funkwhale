@@ -86,6 +86,8 @@ class Queue {
     cache.remove('queue')
   }
   setVolume (newValue) {
+    newValue = Math.min(newValue, 1)
+    newValue = Math.max(newValue, 0)
     this.state.volume = newValue
     if (this.audio.setVolume) {
       this.audio.setVolume(newValue)
@@ -94,7 +96,9 @@ class Queue {
     }
     cache.set('volume', newValue)
   }
-
+  incrementVolume (value) {
+    this.setVolume(this.state.volume + value)
+  }
   reorder (oldIndex, newIndex) {
     // called when the user uses drag / drop to reorder
     // tracks in queue
