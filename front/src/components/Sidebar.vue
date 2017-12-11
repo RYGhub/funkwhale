@@ -87,10 +87,15 @@
   <div class="ui inverted segment player-wrapper">
     <player></player>
   </div>
+  <GlobalEvents
+    @keydown.r.stop="queue.restore"
+    />
 </div>
 </template>
 
 <script>
+import GlobalEvents from 'vue-global-events'
+
 import Player from '@/components/audio/Player'
 import favoriteTracks from '@/favorites/tracks'
 import Logo from '@/components/Logo'
@@ -109,7 +114,8 @@ export default {
     Player,
     SearchBar,
     Logo,
-    draggable
+    draggable,
+    GlobalEvents
   },
   data () {
     return {
