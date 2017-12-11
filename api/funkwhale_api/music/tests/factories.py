@@ -1,4 +1,7 @@
 import factory
+import os
+
+SAMPLES_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 class ArtistFactory(factory.django.DjangoModelFactory):
@@ -33,7 +36,8 @@ class TrackFactory(factory.django.DjangoModelFactory):
 
 class TrackFileFactory(factory.django.DjangoModelFactory):
     track = factory.SubFactory(TrackFactory)
-    audio_file = factory.django.FileField()
+    audio_file = factory.django.FileField(
+        from_path=os.path.join(SAMPLES_PATH, 'test.ogg'))
 
     class Meta:
         model = 'music.TrackFile'
