@@ -2,7 +2,7 @@
   <div class="ui card">
     <div class="content">
         <div class="header">
-          <router-link class="discrete link" :to="{name: 'library.artist', params: {id: artist.id }}">
+          <router-link class="discrete link" :to="{name: 'library.artists.detail', params: {id: artist.id }}">
             {{ artist.name }}
           </router-link>
         </div>
@@ -15,7 +15,7 @@
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">
-                  <router-link class="discrete link":to="{name: 'library.album', params: {id: album.id }}">
+                  <router-link class="discrete link":to="{name: 'library.albums.detail', params: {id: album.id }}">
                     <strong>{{ album.title }}</strong>
                   </router-link><br />
                   {{ album.tracks.length }} tracks

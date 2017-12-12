@@ -182,6 +182,21 @@ class TestAPI(TMPDirTestCaseMixin, TestCase):
 
         self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
 
+    def test_can_search_artist_by_name_start(self):
+        artist1 = factories.ArtistFactory(name='alpha')
+        artist2 = factories.ArtistFactory(name='beta')
+        results = {
+            'next': None,
+            'previous': None,
+            'count': 1,
+            'results': [serializers.ArtistSerializerNested(artist1).data]
+        }
+        expected = json.dumps(results)
+        url = self.reverse('api:v1:artists-list')
+        response = self.client.get(url, {'name__startswith': 'a'})
+
+        self.assertJSONEqual(expected, json.loads(response.content.decode('utf-8')))
+
     def test_can_search_tracks(self):
         artist1 = models.Artist.objects.create(name='Test1')
         artist2 = models.Artist.objects.create(name='Test2')

@@ -21,7 +21,9 @@ from taggit.models import Tag
 from . import models
 from . import serializers
 from . import importers
+from . import filters
 from . import utils
+
 
 class SearchMixin(object):
     search_fields = []
@@ -52,7 +54,8 @@ class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ArtistSerializerNested
     permission_classes = [ConditionalAuthentication]
     search_fields = ['name']
-    ordering_fields = ('creation_date',)
+    ordering_fields = ('creation_date', 'name')
+    filter_class = filters.ArtistFilter
 
 
 class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
