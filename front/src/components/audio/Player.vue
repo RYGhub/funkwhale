@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import GlobalEvents from 'vue-global-events'
+import GlobalEvents from '@/components/utils/global-events'
 
 import queue from '@/audio/queue'
 import Track from '@/audio/track'

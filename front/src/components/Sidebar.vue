@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import GlobalEvents from 'vue-global-events'
+import GlobalEvents from '@/components/utils/global-events'
 
 import Player from '@/components/audio/Player'
 import favoriteTracks from '@/favorites/tracks'
