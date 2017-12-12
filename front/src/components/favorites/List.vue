@@ -17,6 +17,7 @@
         <pagination
           @page-changed="selectPage"
           :current="page"
+          :paginate-by="paginateBy"
           :total="results.count"
           ></pagination>
       </div>
@@ -48,6 +49,7 @@ export default {
       nextLink: null,
       previousLink: null,
       page: 1,
+      paginateBy: 25,
       favoriteTracks
     }
   },
@@ -60,7 +62,8 @@ export default {
       this.isLoading = true
       let params = {
         favorites: 'true',
-        page: this.page
+        page: this.page,
+        page_size: this.paginateBy
       }
       logger.default.time('Loading user favorites')
       this.$http.get(url, {params: params}).then((response) => {
