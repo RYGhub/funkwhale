@@ -51,9 +51,9 @@ export default new Router({
       component: Library,
       children: [
         { path: '', component: LibraryHome },
-        { path: 'artist/:id', name: 'library.artist', component: LibraryArtist, props: true },
-        { path: 'album/:id', name: 'library.album', component: LibraryAlbum, props: true },
-        { path: 'track/:id', name: 'library.track', component: LibraryTrack, props: true },
+        { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
+        { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
+        { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },
         {
           path: 'import/launch',
           name: 'library.import.launch',

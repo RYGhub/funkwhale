@@ -7,14 +7,14 @@
           <img v-else src="../../assets/audio/default-cover.png">
         </div>
         <div class="middle aligned content">
-          <router-link class="small header discrete link track" :to="{name: 'library.track', params: {id: queue.currentTrack.id }}">
+          <router-link class="small header discrete link track" :to="{name: 'library.tracks.detail', params: {id: queue.currentTrack.id }}">
             {{ queue.currentTrack.title }}
           </router-link>
           <div class="meta">
-            <router-link class="artist" :to="{name: 'library.artist', params: {id: queue.currentTrack.artist.id }}">
+            <router-link class="artist" :to="{name: 'library.artists.detail', params: {id: queue.currentTrack.artist.id }}">
               {{ queue.currentTrack.artist.name }}
             </router-link> /
-            <router-link class="album" :to="{name: 'library.album', params: {id: queue.currentTrack.album.id }}">
+            <router-link class="album" :to="{name: 'library.albums.detail', params: {id: queue.currentTrack.album.id }}">
               {{ queue.currentTrack.album.title }}
             </router-link>
           </div>
