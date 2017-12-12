@@ -15,6 +15,7 @@
       <track-table v-if="results" :tracks="results.results"></track-table>
       <div class="ui center aligned basic segment">
         <pagination
+          v-if="results && results.count > 0"
           @page-changed="selectPage"
           :current="page"
           :total="results.count"
