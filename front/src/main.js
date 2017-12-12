@@ -10,6 +10,7 @@ import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
 import auth from './auth'
+import VueLazyload from 'vue-lazyload'
 
 window.$ = window.jQuery = require('jquery')
 
@@ -19,6 +20,7 @@ window.$ = window.jQuery = require('jquery')
 require('semantic-ui-css/semantic.js')
 
 Vue.use(VueResource)
+Vue.use(VueLazyload)
 Vue.config.productionTip = false
 
 Vue.http.interceptors.push(function (request, next) {
