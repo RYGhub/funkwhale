@@ -16,7 +16,7 @@
           <play-button class="basic icon" :discrete="true" :track="track"></play-button>
         </td>
         <td>
-          <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
+          <img class="ui mini image" v-if="track.album.cover" v-lazy="backend.absoluteUrl(track.album.cover)">
           <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
         </td>
         <td colspan="6">
