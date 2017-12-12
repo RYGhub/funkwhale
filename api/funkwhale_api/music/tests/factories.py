@@ -5,7 +5,7 @@ SAMPLES_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 class ArtistFactory(factory.django.DjangoModelFactory):
-    name = factory.Sequence(lambda n: 'artist-{0}'.format(n))
+    name = factory.Faker('name')
     mbid = factory.Faker('uuid4')
 
     class Meta:
@@ -13,7 +13,7 @@ class ArtistFactory(factory.django.DjangoModelFactory):
 
 
 class AlbumFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: 'album-{0}'.format(n))
+    title = factory.Faker('sentence', nb_words=3)
     mbid = factory.Faker('uuid4')
     release_date = factory.Faker('date')
     cover = factory.django.ImageField()
@@ -24,7 +24,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
 
 
 class TrackFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: 'track-{0}'.format(n))
+    title = factory.Faker('sentence', nb_words=3)
     mbid = factory.Faker('uuid4')
     album = factory.SubFactory(AlbumFactory)
     artist = factory.SelfAttribute('album.artist')

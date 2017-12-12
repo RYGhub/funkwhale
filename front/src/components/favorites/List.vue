@@ -12,11 +12,14 @@
 
     </div>
     <div class="ui vertical stripe segment">
-      <button class="ui left floated labeled icon button" @click="fetchFavorites(previousLink)" :disabled="!previousLink"><i class="left arrow icon"></i> Previous</button>
-      <button class="ui right floated right labeled icon button" @click="fetchFavorites(nextLink)" :disabled="!nextLink">Next <i class="right arrow icon"></i></button>
-      <div class="ui hidden clearing divider"></div>
-      <div class="ui hidden clearing divider"></div>
       <track-table v-if="results" :tracks="results.results"></track-table>
+      <div class="ui center aligned basic segment">
+        <pagination
+          @page-changed="selectPage"
+          :current="page"
+          :total="results.count"
+          ></pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -28,13 +31,15 @@ import config from '@/config'
 import favoriteTracks from '@/favorites/tracks'
 import TrackTable from '@/components/audio/track/Table'
 import RadioButton from '@/components/radios/Button'
+import Pagination from '@/components/Pagination'
 
 const FAVORITES_URL = config.API_URL + 'tracks/'
 
 export default {
   components: {
     TrackTable,
-    RadioButton
+    RadioButton,
+    Pagination
   },
   data () {
     return {
@@ -42,6 +47,7 @@ export default {
       isLoading: false,
       nextLink: null,
       previousLink: null,
+      page: 1,
       favoriteTracks
     }
   },
@@ -53,7 +59,8 @@ export default {
       var self = this
       this.isLoading = true
       let params = {
-        favorites: 'true'
+        favorites: 'true',
+        page: this.page
       }
       logger.default.time('Loading user favorites')
       this.$http.get(url, {params: params}).then((response) => {
@@ -68,6 +75,14 @@ export default {
         logger.default.timeEnd('Loading user favorites')
         self.isLoading = false
       })
+    },
+    selectPage: function (page) {
+      this.page = page
+    }
+  },
+  watch: {
+    page: function () {
+      this.fetchFavorites(FAVORITES_URL)
     }
   }
 }
