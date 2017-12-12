@@ -7,6 +7,7 @@ import Logout from '@/components/auth/Logout'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
 import LibraryArtist from '@/components/library/Artist'
+import LibraryArtists from '@/components/library/Artists'
 import LibraryAlbum from '@/components/library/Album'
 import LibraryTrack from '@/components/library/Track'
 import LibraryImport from '@/components/library/import/Main'
@@ -51,6 +52,7 @@ export default new Router({
       component: Library,
       children: [
         { path: '', component: LibraryHome },
+        { path: 'artists/', name: 'library.artists.browse', component: LibraryArtists },
         { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
         { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
         { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },

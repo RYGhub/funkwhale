@@ -54,6 +54,7 @@ THIRD_PARTY_APPS = (
     'rest_auth.registration',
     'mptt',
     'dynamic_preferences',
+    'django_filters',
 )
 
 # Apps specific for this project go here.
@@ -298,7 +299,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'funkwhale_api.common.pagination.FunkwhalePagination',
     'PAGE_SIZE': 25,
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
