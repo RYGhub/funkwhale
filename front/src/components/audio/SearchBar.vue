@@ -35,7 +35,7 @@ export default {
           let categories = [
             {
               code: 'artists',
-              route: 'library.artist',
+              route: 'library.artists.detail',
               name: 'Artist',
               getTitle (r) {
                 return r.name
@@ -46,7 +46,7 @@ export default {
             },
             {
               code: 'albums',
-              route: 'library.album',
+              route: 'library.albums.detail',
               name: 'Album',
               getTitle (r) {
                 return r.title
@@ -57,7 +57,7 @@ export default {
             },
             {
               code: 'tracks',
-              route: 'library.track',
+              route: 'library.tracks.detail',
               name: 'Track',
               getTitle (r) {
                 return r.title

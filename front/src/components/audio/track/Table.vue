@@ -16,11 +16,11 @@
           <play-button class="basic icon" :discrete="true" :track="track"></play-button>
         </td>
         <td>
-          <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
+          <img class="ui mini image" v-if="track.album.cover" v-lazy="backend.absoluteUrl(track.album.cover)">
           <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
         </td>
         <td colspan="6">
-          <router-link class="track" :to="{name: 'library.track', params: {id: track.id }}">
+          <router-link class="track" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
             <template v-if="displayPosition && track.position">
               {{ track.position }}.
             </template>
@@ -28,12 +28,12 @@
           </router-link>
         </td>
         <td colspan="6">
-          <router-link class="artist discrete link" :to="{name: 'library.artist', params: {id: track.artist.id }}">
+          <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
             {{ track.artist.name }}
           </router-link>
         </td>
         <td colspan="6">
-          <router-link class="album discrete link" :to="{name: 'library.album', params: {id: track.album.id }}">
+          <router-link class="album discrete link" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
             {{ track.album.title }}
           </router-link>
         </td>

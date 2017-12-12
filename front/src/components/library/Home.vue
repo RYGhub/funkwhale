@@ -8,7 +8,7 @@
         <div class="column">
           <h2 class="ui header">Latest artists</h2>
           <div :class="['ui', {'active': isLoadingArtists}, 'inline', 'loader']"></div>
-          <div v-if="artists.length > 0" v-for="artist in artists.slice(0, 3)" :key="artist" class="ui cards">
+          <div v-if="artists.length > 0" v-for="artist in artists.slice(0, 3)" :key="artist.id" class="ui cards">
             <artist-card :artist="artist"></artist-card>
           </div>
         </div>
