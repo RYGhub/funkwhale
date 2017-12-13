@@ -21,9 +21,7 @@ Changelog
 * [feature] can now import artist and releases from youtube and musicbrainz.
   This requires a YouTube API key for the search
 * [breaking] we now check for user permission before serving audio files, which requires
-a specific configuration block in your reverse proxy configuration:
-
-.. code-block::
+  a specific configuration block in your reverse proxy configuration::
 
     location /_protected/media {
         internal;

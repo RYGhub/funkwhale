@@ -4,3 +4,5 @@ test:
   command: pytest
   volumes:
     - .:/app
+  environment:
+    - "DATABASE_URL=sqlite://"

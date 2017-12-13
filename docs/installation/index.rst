@@ -18,7 +18,10 @@ Available installation methods
 .. toctree::
    :maxdepth: 1
 
+   external_dependencies
+   debian
    docker
+   systemd
 
 
 .. _frontend-setup:
@@ -33,10 +36,10 @@ Frontend setup
 
 Files for the web frontend are purely static and can simply be downloaded, unzipped and served from any webserver:
 
-.. code-block:: bash
+.. parsed-literal::
 
     cd /srv/funkwhale
-    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/master/download?job=build_front"
+    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/|version|/download?job=build_front"
     unzip front.zip
 
 .. _reverse-proxy-setup:
@@ -58,8 +61,8 @@ Ensure you have a recent version of nginx on your server. On debian-like system,
 
 Then, download our sample virtualhost file:
 
-.. code-block:: bash
+.. parsed-literal::
 
-    curl -L -o /etc/nginx/sites-enabled/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/master/deploy/nginx.conf"
+    curl -L -o /etc/nginx/sites-enabled/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
 
 Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``. If everything is fine, you can restart your nginx server with ``service nginx restart``.

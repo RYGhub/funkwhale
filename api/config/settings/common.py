@@ -124,7 +124,7 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db("DATABASE_URL", default="postgresql://postgres@postgres/postgres"),
+    'default': env.db("DATABASE_URL"),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 #
@@ -199,7 +199,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = str(ROOT_DIR('staticfiles'))
+STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR('staticfiles')))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = env("STATIC_URL", default='/staticfiles/')
@@ -218,12 +218,10 @@ STATICFILES_FINDERS = (
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR('media'))
-
-
+MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR('media')))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = env("MEDIA_URL", default='/media/')
 
 # URL Configuration
 # ------------------------------------------------------------------------------
@@ -253,26 +251,24 @@ LOGIN_URL = 'account_login'
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
-########## CELERY
-INSTALLED_APPS += ('funkwhale_api.taskapp.celery.CeleryConfig',)
-# if you are not using the django database broker (e.g. rabbitmq, redis, memcached), you can remove the next line.
-INSTALLED_APPS += ('kombu.transport.django',)
-BROKER_URL = env("CELERY_BROKER_URL", default='django://')
-########## END CELERY
-
-
+CACHE_DEFAULT = "redis://127.0.0.1:6379/0"
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "{0}/{1}".format(env.cache_url('REDIS_URL', default="redis://127.0.0.1:6379"), 0),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
-                                        # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        }
-    }
+    "default": env.cache_url('CACHE_URL', default=CACHE_DEFAULT)
 }
 
+CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
+CACHES["default"]["OPTIONS"] = {
+    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
+                                # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+}
+
+
+########## CELERY
+INSTALLED_APPS += ('funkwhale_api.taskapp.celery.CeleryConfig',)
+BROKER_URL = env(
+    "CELERY_BROKER_URL", default=env('CACHE_URL', default=CACHE_DEFAULT))
+########## END CELERY
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 # Your common stuff: Below this line define 3rd party library settings
@@ -336,3 +332,7 @@ MUSICBRAINZ_CACHE_DURATION = env.int(
 )
 
 CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=True)
+
+
+# Custom Admin URL, use {% url 'admin:index' %}
+ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')

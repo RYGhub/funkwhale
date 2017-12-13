@@ -1,0 +1,3 @@
+[Unit]
+Description=Funkwhale
+Wants=funkwhale-server.service funkwhale-worker.service

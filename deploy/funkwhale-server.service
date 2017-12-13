@@ -1,0 +1,14 @@
+[Unit]
+Description=Funkwhale application server
+After=redis.service postgresql.service
+PartOf=funkwhale.target
+
+[Service]
+User=funkwhale
+# adapt this depending on the path of your funkwhale installation
+WorkingDirectory=/srv/funkwhale/api
+EnvironmentFile=/srv/funkwhale/config/.env
+ExecStart=/srv/funkwhale/virtualenv/bin/gunicorn config.wsgi:application -b ${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}
+
+[Install]
+WantedBy=multi-user.target

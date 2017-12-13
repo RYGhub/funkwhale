@@ -7,17 +7,17 @@ First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ 
 
 Download the sample docker-compose file:
 
-.. code-block:: bash
+.. parsed-literal::
 
     mkdir -p /srv/funkwhale
     cd /srv/funkwhale
-    curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/master/deploy/docker-compose.yml"
+    curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
 
 Create your env file:
 
-.. code-block:: bash
+.. parsed-literal::
 
-    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
+    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
 
 Ensure to edit it to match your needs (this file is heavily commented)
 
