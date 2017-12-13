@@ -5,4 +5,10 @@ Changelog
 0.2.4 (unreleased)
 ------------------
 
-Models: now store relese group mbid on Album model (#7)
+Features:
+
+- Models: now store relese group mbid on Album model (#7)
+
+Bugfixes:
+
+- Library: fixen broken "play all albums" button on artist cards in Artist browsing view (#43)
