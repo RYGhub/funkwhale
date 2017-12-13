@@ -30,6 +30,7 @@
 <script>
 
 import config from '@/config'
+import backend from '@/audio/backend'
 import logger from '@/logging'
 import ArtistCard from '@/components/audio/artist/Card'
 import Pagination from '@/components/Pagination'
@@ -66,6 +67,13 @@ export default {
       logger.default.debug('Fetching artists')
       this.$http.get(url, {params: params}).then((response) => {
         self.result = response.data
+        self.result.results.map((artist) => {
+          var albums = JSON.parse(JSON.stringify(artist.albums)).map((album) => {
+            return backend.Album.clean(album)
+          })
+          artist.albums = albums
+          return artist
+        })
         self.isLoading = false
       })
     },
