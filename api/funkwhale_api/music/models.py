@@ -110,13 +110,14 @@ class Album(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(Artist, related_name='albums')
     release_date = models.DateField(null=True)
+    release_group_id = models.UUIDField(null=True, blank=True)
     cover = VersatileImageField(upload_to='albums/covers/%Y/%m/%d', null=True, blank=True)
     TYPE_CHOICES = (
         ('album', 'Album'),
     )
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default='album')
 
-    api_includes = ['artist-credits', 'recordings', 'media']
+    api_includes = ['artist-credits', 'recordings', 'media', 'release-groups']
     api = musicbrainz.api.releases
     musicbrainz_model = 'release'
     musicbrainz_mapping = {
@@ -126,6 +127,10 @@ class Album(APIModelMixin):
         'position': {
             'musicbrainz_field_name': 'release-list',
             'converter': lambda v: int(v[0]['medium-list'][0]['position']),
+        },
+        'release_group_id': {
+            'musicbrainz_field_name': 'release-group',
+            'converter': lambda v: v['id'],
         },
         'title': {
             'musicbrainz_field_name': 'title',
