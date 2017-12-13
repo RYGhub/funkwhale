@@ -18,6 +18,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     release_date = factory.Faker('date')
     cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
+    release_group_id = factory.Faker('uuid4')
 
     class Meta:
         model = 'music.Album'

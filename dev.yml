@@ -33,9 +33,12 @@ services:
      - redis
     command: python manage.py celery worker
     environment:
-        - C_FORCE_ROOT=true
-        - "DATABASE_URL=postgresql://postgres@postgres/postgres"
-        - "CACHE_URL=redis://redis:6379/0"
+      - "DJANGO_ALLOWED_HOSTS=localhost"
+      - "DJANGO_SETTINGS_MODULE=config.settings.local"
+      - "DJANGO_SECRET_KEY=dev"
+      - C_FORCE_ROOT=true
+      - "DATABASE_URL=postgresql://postgres@postgres/postgres"
+      - "CACHE_URL=redis://redis:6379/0"
     volumes:
       - ./api:/app
       - ./data/music:/music
@@ -49,6 +52,9 @@ services:
       - ./api:/app
       - ./data/music:/music
     environment:
+      - "DJANGO_ALLOWED_HOSTS=localhost"
+      - "DJANGO_SETTINGS_MODULE=config.settings.local"
+      - "DJANGO_SECRET_KEY=dev"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
     ports:
