@@ -22,6 +22,9 @@ CACHES = {
         'LOCATION': ''
     }
 }
+INSTALLED_APPS += ('kombu.transport.django',)
+BROKER_URL = 'django://'
+
 # TESTING
 # ------------------------------------------------------------------------------
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'

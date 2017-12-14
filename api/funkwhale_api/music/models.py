@@ -110,13 +110,14 @@ class Album(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(Artist, related_name='albums')
     release_date = models.DateField(null=True)
+    release_group_id = models.UUIDField(null=True, blank=True)
     cover = VersatileImageField(upload_to='albums/covers/%Y/%m/%d', null=True, blank=True)
     TYPE_CHOICES = (
         ('album', 'Album'),
     )
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default='album')
 
-    api_includes = ['artist-credits', 'recordings', 'media']
+    api_includes = ['artist-credits', 'recordings', 'media', 'release-groups']
     api = musicbrainz.api.releases
     musicbrainz_model = 'release'
     musicbrainz_mapping = {
@@ -126,6 +127,10 @@ class Album(APIModelMixin):
         'position': {
             'musicbrainz_field_name': 'release-list',
             'converter': lambda v: int(v[0]['medium-list'][0]['position']),
+        },
+        'release_group_id': {
+            'musicbrainz_field_name': 'release-group',
+            'converter': lambda v: v['id'],
         },
         'title': {
             'musicbrainz_field_name': 'title',
@@ -388,6 +393,8 @@ class ImportBatch(models.Model):
 
 class ImportJob(models.Model):
     batch = models.ForeignKey(ImportBatch, related_name='jobs')
+    track_file = models.ForeignKey(
+        TrackFile, related_name='jobs', null=True, blank=True)
     source = models.URLField()
     mbid = models.UUIDField(editable=False)
     STATUS_CHOICES = (
@@ -408,10 +415,12 @@ class ImportJob(models.Model):
             elif track.files.count() > 0:
                 return
 
-            track_file = track_file or TrackFile(track=track, source=self.source)
+            track_file = track_file or TrackFile(
+                track=track, source=self.source)
             track_file.download_file()
             track_file.save()
             self.status = 'finished'
+            self.track_file = track_file
             self.save()
             return track.pk
 

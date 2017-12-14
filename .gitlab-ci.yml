@@ -18,6 +18,8 @@ test_api:
     - pip install -r requirements/test.txt
   script:
     - pytest
+  variables:
+    DATABASE_URL: "sqlite://"
 
   tags:
     - docker

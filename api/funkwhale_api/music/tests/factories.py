@@ -1,6 +1,8 @@
 import factory
 import os
 
+from funkwhale_api.users.tests.factories import UserFactory
+
 SAMPLES_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -18,6 +20,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     release_date = factory.Faker('date')
     cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
+    release_group_id = factory.Faker('uuid4')
 
     class Meta:
         model = 'music.Album'
@@ -41,3 +44,18 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'music.TrackFile'
+
+
+class ImportBatchFactory(factory.django.DjangoModelFactory):
+    submitted_by = factory.SubFactory(UserFactory)
+
+    class Meta:
+        model = 'music.ImportBatch'
+
+
+class ImportJobFactory(factory.django.DjangoModelFactory):
+    batch = factory.SubFactory(ImportBatchFactory)
+    source = factory.Faker('url')
+
+    class Meta:
+        model = 'music.ImportJob'
