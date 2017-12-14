@@ -39,3 +39,13 @@ def test_import_album_stores_release_group(db):
 
     assert album.release_group_id == album_data['release-group']['id']
     assert album.artist == artist
+
+
+def test_import_job_is_bound_to_track_file(db, mocker):
+    track = factories.TrackFactory()
+    job = factories.ImportJobFactory(mbid=track.mbid)
+
+    mocker.patch('funkwhale_api.music.models.TrackFile.download_file')
+    job.run()
+    job.refresh_from_db()
+    assert job.track_file.track == track

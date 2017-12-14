@@ -8,6 +8,7 @@ Changelog
 Features:
 
 - Models: now store relese group mbid on Album model (#7)
+- Models: now bind import job to track files (#44)
 
 Bugfixes:
 

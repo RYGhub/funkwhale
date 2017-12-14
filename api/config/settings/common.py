@@ -336,3 +336,4 @@ CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=True)
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')
+CSRF_USE_SESSIONS = True
