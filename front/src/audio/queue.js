@@ -116,7 +116,7 @@ class Queue {
     }
   }
 
-  append (track, index) {
+  append (track, index, skipPlay) {
     this.previousQueue = null
     index = index || this.tracks.length
     if (index > this.tracks.length - 1) {
@@ -126,20 +126,32 @@ class Queue {
       // we insert the track at given position
       this.tracks.splice(index, 0, track)
     }
-    if (this.ended) {
-      logger.default.debug('Playing appended track')
-      this.play(this.currentIndex + 1)
+    if (!skipPlay) {
+      this.resumeQueue()
     }
     this.cache()
   }
 
   appendMany (tracks, index) {
+    logger.default.info('Appending many tracks to the queue', tracks.map(e => { return e.title }))
     let self = this
-    index = index || this.tracks.length - 1
+    if (this.tracks.length === 0) {
+      index = 0
+    } else {
+      index = index || this.tracks.length
+    }
+    console.log('INDEEEEEX', index)
     tracks.forEach((t) => {
-      self.append(t, index)
+      self.append(t, index, true)
       index += 1
     })
+    this.resumeQueue()
+  }
+
+  resumeQueue () {
+    if (this.ended | this.errored) {
+      this.next()
+    }
   }
 
   populateFromRadio () {
@@ -185,15 +197,24 @@ class Queue {
   }
 
   stop () {
-    this.audio.pause()
-    this.audio.destroyed()
+    if (this.audio.pause) {
+      this.audio.pause()
+    }
+    if (this.audio.destroyed) {
+      this.audio.destroyed()
+    }
   }
   play (index) {
     let self = this
     let currentIndex = index
     let currentTrack = this.tracks[index]
+
+    if (this.audio.destroyed) {
+      logger.default.debug('Destroying previous audio...', index - 1)
+      this.audio.destroyed()
+    }
+
     if (!currentTrack) {
-      logger.default.debug('No track at index', index)
       return
     }
 
@@ -201,12 +222,13 @@ class Queue {
     this.currentTrack = currentTrack
 
     this.ended = false
+    this.errored = false
     let file = this.currentTrack.files[0]
     if (!file) {
+      this.errored = true
       return this.next()
     }
     let path = backend.absoluteUrl(file.path)
-
     if (auth.user.authenticated) {
       // we need to send the token directly in url
       // so authentication can be checked by the backend
@@ -215,10 +237,6 @@ class Queue {
       path = url.updateQueryString(path, 'jwt', auth.getAuthToken())
     }
 
-    if (this.audio.destroyed) {
-      logger.default.debug('Destroying previous audio...', index - 1)
-      this.audio.destroyed()
-    }
     let audio = new Audio(path, {
       preload: true,
       autoplay: true,
@@ -271,6 +289,7 @@ class Queue {
 
   next () {
     if (this.currentIndex < this.tracks.length - 1) {
+      logger.default.debug('Playing next track')
       this.play(this.currentIndex + 1)
     }
   }
