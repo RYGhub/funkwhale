@@ -9,10 +9,12 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'name', 'slug')
 
+
 class SimpleArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Artist
         fields = ('id', 'mbid', 'name')
+
 
 class ArtistSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
@@ -20,24 +22,13 @@ class ArtistSerializer(serializers.ModelSerializer):
         model = models.Artist
         fields = ('id', 'mbid', 'name', 'tags')
 
-class ImportJobSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ImportJob
-        fields = ('id', 'mbid', 'source', 'status')
-
-class ImportBatchSerializer(serializers.ModelSerializer):
-    jobs = ImportJobSerializer(many=True, read_only=True)
-    class Meta:
-        model = models.ImportBatch
-        fields = ('id', 'jobs', 'status', 'creation_date')
-
 
 class TrackFileSerializer(serializers.ModelSerializer):
     path = serializers.SerializerMethodField()
 
     class Meta:
         model = models.TrackFile
-        fields = ('id', 'path', 'duration', 'source', 'filename')
+        fields = ('id', 'path', 'duration', 'source', 'filename', 'track')
 
     def get_path(self, o):
         request = self.context.get('request')
@@ -46,11 +37,13 @@ class TrackFileSerializer(serializers.ModelSerializer):
             url = request.build_absolute_uri(url)
         return url
 
+
 class SimpleAlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Album
         fields = ('id', 'mbid', 'title', 'release_date', 'cover')
+
 
 class AlbumSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
@@ -81,6 +74,7 @@ class TrackSerializer(LyricsMixin):
             'position',
             'lyrics')
 
+
 class TrackSerializerNested(LyricsMixin):
     artist = ArtistSerializer()
     files = TrackFileSerializer(many=True, read_only=True)
@@ -90,6 +84,7 @@ class TrackSerializerNested(LyricsMixin):
         model = models.Track
         fields = ('id', 'mbid', 'title', 'artist', 'files', 'album', 'tags', 'lyrics')
 
+
 class AlbumSerializerNested(serializers.ModelSerializer):
     tracks = TrackSerializer(many=True, read_only=True)
     artist = SimpleArtistSerializer()
@@ -98,6 +93,7 @@ class AlbumSerializerNested(serializers.ModelSerializer):
     class Meta:
         model = models.Album
         fields = ('id', 'mbid', 'title', 'cover', 'artist', 'release_date', 'tracks', 'tags')
+
 
 class ArtistSerializerNested(serializers.ModelSerializer):
     albums = AlbumSerializerNested(many=True, read_only=True)
@@ -111,3 +107,17 @@ class LyricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Lyrics
         fields = ('id', 'work', 'content', 'content_rendered')
+
+
+class ImportJobSerializer(serializers.ModelSerializer):
+    track_file = TrackFileSerializer(read_only=True)
+    class Meta:
+        model = models.ImportJob
+        fields = ('id', 'mbid', 'source', 'status', 'track_file')
+
+
+class ImportBatchSerializer(serializers.ModelSerializer):
+    jobs = ImportJobSerializer(many=True, read_only=True)
+    class Meta:
+        model = models.ImportBatch
+        fields = ('id', 'jobs', 'status', 'creation_date')

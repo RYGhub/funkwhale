@@ -23,6 +23,7 @@
             <th>Recording MusicBrainz ID</th>
             <th>Source</th>
             <th>Status</th>
+            <th>Track</th>
           </tr>
         </thead>
         <tbody>
@@ -37,6 +38,9 @@
             <td>
               <span
                 :class="['ui', {'yellow': job.status === 'pending'}, {'green': job.status === 'finished'}, 'label']">{{ job.status }}</span>
+            </td>
+            <td>
+              <router-link v-if="job.track_file" :to="{name: 'library.tracks.detail', params: {id: job.track_file.track }}">{{ job.track_file.track }}</router-link>
             </td>
           </tr>
         </tbody>

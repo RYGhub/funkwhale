@@ -72,7 +72,10 @@ class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class ImportBatchViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.ImportBatch.objects.all().order_by('-creation_date')
+    queryset = (
+        models.ImportBatch.objects.all()
+                          .prefetch_related('jobs__track_file')
+                          .order_by('-creation_date'))
     serializer_class = serializers.ImportBatchSerializer
 
     def get_queryset(self):

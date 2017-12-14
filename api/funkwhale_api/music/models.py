@@ -393,6 +393,8 @@ class ImportBatch(models.Model):
 
 class ImportJob(models.Model):
     batch = models.ForeignKey(ImportBatch, related_name='jobs')
+    track_file = models.ForeignKey(
+        TrackFile, related_name='jobs', null=True, blank=True)
     source = models.URLField()
     mbid = models.UUIDField(editable=False)
     STATUS_CHOICES = (
@@ -413,10 +415,12 @@ class ImportJob(models.Model):
             elif track.files.count() > 0:
                 return
 
-            track_file = track_file or TrackFile(track=track, source=self.source)
+            track_file = track_file or TrackFile(
+                track=track, source=self.source)
             track_file.download_file()
             track_file.save()
             self.status = 'finished'
+            self.track_file = track_file
             self.save()
             return track.pk
 
