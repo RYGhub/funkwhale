@@ -140,7 +140,6 @@ class Queue {
     } else {
       index = index || this.tracks.length
     }
-    console.log('INDEEEEEX', index)
     tracks.forEach((t) => {
       self.append(t, index, true)
       index += 1
@@ -243,7 +242,11 @@ class Queue {
       rate: 1,
       loop: false,
       volume: this.state.volume,
-      onEnded: this.handleAudioEnded.bind(this)
+      onEnded: this.handleAudioEnded.bind(this),
+      onError: function (src) {
+        self.errored = true
+        self.next()
+      }
     })
     this.audio = audio
     audio.updateHook('playState', function (e) {
