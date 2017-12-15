@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import PageNotFound from '@/components/PageNotFound'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Profile from '@/components/auth/Profile'
@@ -72,7 +73,7 @@ export default new Router({
         },
         { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
       ]
-    }
-
+    },
+    { path: '*', component: PageNotFound }
   ]
 })
