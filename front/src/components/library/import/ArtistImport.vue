@@ -12,6 +12,10 @@
             <label>{{ t }}</label>
           </div>
         </div>
+        <div class="field">
+          <label>Query template</label>
+          <input v-model="customQueryTemplate" />
+        </div>
       </div>
     </form>
     <template
@@ -22,6 +26,7 @@
         :backends="backends"
         :defaultEnabled="false"
         :default-backend-id="defaultBackendId"
+        :query-template="customQueryTemplate"
         @import-data-changed="recordReleaseData"
         @enabled="recordReleaseEnabled"
       ></release-import>

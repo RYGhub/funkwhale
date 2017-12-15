@@ -20,6 +20,7 @@
         :release-metadata="metadata"
         :backends="backends"
         :default-backend-id="defaultBackendId"
+        :query-template="customQueryTemplate"
         @import-data-changed="recordTrackData"
         @enabled="recordTrackEnabled"
       ></track-import>
