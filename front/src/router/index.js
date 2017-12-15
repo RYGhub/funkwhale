@@ -30,7 +30,8 @@ export default new Router({
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: Login,
+      props: (route) => ({ next: route.query.next || '/library' })
     },
     {
       path: '/logout',
