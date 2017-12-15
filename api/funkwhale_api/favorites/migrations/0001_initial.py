@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('track', models.ForeignKey(related_name='track_favorites', to='music.Track')),
-                ('user', models.ForeignKey(related_name='track_favorites', to=settings.AUTH_USER_MODEL)),
+                ('track', models.ForeignKey(related_name='track_favorites', to='music.Track', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(related_name='track_favorites', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-creation_date',),

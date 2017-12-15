@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50)),
                 ('is_public', models.BooleanField(default=False)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='playlists')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='playlists', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -33,9 +33,9 @@ class Migration(migrations.Migration):
                 ('rght', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('position', models.PositiveIntegerField(db_index=True, editable=False)),
-                ('playlist', models.ForeignKey(to='playlists.Playlist', related_name='playlist_tracks')),
-                ('previous', mptt.fields.TreeOneToOneField(null=True, to='playlists.PlaylistTrack', related_name='next', blank=True)),
-                ('track', models.ForeignKey(to='music.Track', related_name='playlist_tracks')),
+                ('playlist', models.ForeignKey(to='playlists.Playlist', related_name='playlist_tracks', on_delete=models.CASCADE)),
+                ('previous', mptt.fields.TreeOneToOneField(null=True, to='playlists.PlaylistTrack', related_name='next', blank=True, on_delete=models.CASCADE)),
+                ('track', models.ForeignKey(to='music.Track', related_name='playlist_tracks', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-playlist', 'position'),

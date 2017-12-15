@@ -108,7 +108,8 @@ def import_tracks(instance, cleaned_data, raw_data):
 
 class Album(APIModelMixin):
     title = models.CharField(max_length=255)
-    artist = models.ForeignKey(Artist, related_name='albums')
+    artist = models.ForeignKey(
+        Artist, related_name='albums', on_delete=models.CASCADE)
     release_date = models.DateField(null=True)
     release_group_id = models.UUIDField(null=True, blank=True)
     cover = VersatileImageField(upload_to='albums/covers/%Y/%m/%d', null=True, blank=True)
@@ -245,7 +246,12 @@ class Work(APIModelMixin):
 
 
 class Lyrics(models.Model):
-    work = models.ForeignKey(Work, related_name='lyrics', null=True, blank=True)
+    work = models.ForeignKey(
+        Work,
+        related_name='lyrics',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     url = models.URLField(unique=True)
     content = models.TextField(null=True, blank=True)
 
@@ -268,10 +274,21 @@ class Lyrics(models.Model):
 
 class Track(APIModelMixin):
     title = models.CharField(max_length=255)
-    artist = models.ForeignKey(Artist, related_name='tracks')
+    artist = models.ForeignKey(
+        Artist, related_name='tracks', on_delete=models.CASCADE)
     position = models.PositiveIntegerField(null=True, blank=True)
-    album = models.ForeignKey(Album, related_name='tracks', null=True, blank=True)
-    work = models.ForeignKey(Work, related_name='tracks', null=True, blank=True)
+    album = models.ForeignKey(
+        Album,
+        related_name='tracks',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
+    work = models.ForeignKey(
+        Work,
+        related_name='tracks',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
 
     musicbrainz_model = 'recording'
     api = musicbrainz.api.recordings
@@ -340,7 +357,8 @@ class Track(APIModelMixin):
 
 
 class TrackFile(models.Model):
-    track = models.ForeignKey(Track, related_name='files')
+    track = models.ForeignKey(
+        Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
     source = models.URLField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
@@ -376,7 +394,8 @@ class TrackFile(models.Model):
 
 class ImportBatch(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
-    submitted_by = models.ForeignKey('users.User', related_name='imports')
+    submitted_by = models.ForeignKey(
+        'users.User', related_name='imports', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-creation_date']
@@ -392,9 +411,14 @@ class ImportBatch(models.Model):
         return 'finished'
 
 class ImportJob(models.Model):
-    batch = models.ForeignKey(ImportBatch, related_name='jobs')
+    batch = models.ForeignKey(
+        ImportBatch, related_name='jobs', on_delete=models.CASCADE)
     track_file = models.ForeignKey(
-        TrackFile, related_name='jobs', null=True, blank=True)
+        TrackFile,
+        related_name='jobs',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     source = models.URLField()
     mbid = models.UUIDField(editable=False)
     STATUS_CHOICES = (

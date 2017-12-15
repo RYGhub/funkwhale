@@ -5,8 +5,10 @@ from funkwhale_api.music.models import Track
 
 class TrackFavorite(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey('users.User', related_name='track_favorites')
-    track = models.ForeignKey(Track, related_name='track_favorites')
+    user = models.ForeignKey(
+        'users.User', related_name='track_favorites', on_delete=models.CASCADE)
+    track = models.ForeignKey(
+        Track, related_name='track_favorites', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('track', 'user')

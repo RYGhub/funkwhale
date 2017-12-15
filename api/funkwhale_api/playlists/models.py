@@ -7,7 +7,8 @@ from mptt.models import MPTTModel, TreeOneToOneField
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    user = models.ForeignKey('users.User', related_name="playlists")
+    user = models.ForeignKey(
+        'users.User', related_name="playlists", on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -21,9 +22,18 @@ class Playlist(models.Model):
 
 
 class PlaylistTrack(MPTTModel):
-    track = models.ForeignKey('music.Track', related_name='playlist_tracks')
-    previous = TreeOneToOneField('self', blank=True, null=True, related_name='next')
-    playlist = models.ForeignKey(Playlist, related_name='playlist_tracks')
+    track = models.ForeignKey(
+        'music.Track',
+        related_name='playlist_tracks',
+        on_delete=models.CASCADE)
+    previous = TreeOneToOneField(
+        'self',
+        blank=True,
+        null=True,
+        related_name='next',
+        on_delete=models.CASCADE)
+    playlist = models.ForeignKey(
+        Playlist, related_name='playlist_tracks', on_delete=models.CASCADE)
 
     class MPTTMeta:
         level_attr = 'position'

@@ -39,11 +39,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lyrics',
             name='work',
-            field=models.ForeignKey(related_name='lyrics', to='music.Work', blank=True, null=True),
+            field=models.ForeignKey(related_name='lyrics', to='music.Work', blank=True, null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='track',
             name='work',
-            field=models.ForeignKey(related_name='tracks', to='music.Work', blank=True, null=True),
+            field=models.ForeignKey(related_name='tracks', to='music.Work', blank=True, null=True, on_delete=models.CASCADE),
         ),
     ]
