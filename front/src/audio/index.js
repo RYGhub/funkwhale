@@ -26,6 +26,7 @@ class Audio {
     if (options.onEnded) {
       this.onEnded = options.onEnded
     }
+    this.onError = options.onError
 
     this.state = {
       preload: preload,
@@ -60,8 +61,12 @@ class Audio {
   init (src, options = {}) {
     if (!src) throw Error('src must be required')
     this.state.startLoad = true
-    if (this.state.tried === this.state.try) {
+    if (this.state.tried >= this.state.try) {
       this.state.failed = true
+      logger.default.error('Cannot fetch audio', src)
+      if (this.onError) {
+        this.onError(src)
+      }
       return
     }
     this.$Audio = new window.Audio(src)
