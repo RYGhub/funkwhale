@@ -43,6 +43,9 @@ import auth from '@/auth'
 
 export default {
   name: 'login',
+  props: {
+    next: {type: String}
+  },
   data () {
     return {
       // We need to initialize the component with any
@@ -69,7 +72,7 @@ export default {
       }
       // We need to pass the component's this context
       // to properly make use of http in the auth service
-      auth.login(this, credentials, {path: '/library'}, function (response) {
+      auth.login(this, credentials, {path: this.next}, function (response) {
         // error callback
         if (response.status === 400) {
           self.error = 'invalid_credentials'
