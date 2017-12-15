@@ -59,3 +59,30 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'music.ImportJob'
+
+
+class WorkFactory(factory.django.DjangoModelFactory):
+    mbid = factory.Faker('uuid4')
+    language = 'eng'
+    nature = 'song'
+    title = factory.Faker('sentence', nb_words=3)
+
+    class Meta:
+        model = 'music.Work'
+
+
+class LyricsFactory(factory.django.DjangoModelFactory):
+    work = factory.SubFactory(WorkFactory)
+    url = factory.Faker('url')
+    content = factory.Faker('paragraphs', nb=4)
+
+    class Meta:
+        model = 'music.Lyrics'
+
+
+class TagFactory(factory.django.DjangoModelFactory):
+    name = factory.SelfAttribute('slug')
+    slug = factory.Faker('slug')
+
+    class Meta:
+        model = 'taggit.Tag'

@@ -4,8 +4,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from model_mommy import mommy
-
+from funkwhale_api.music.tests import factories
 from funkwhale_api.users.models import User
 from funkwhale_api.playlists import models
 from funkwhale_api.playlists.serializers import PlaylistSerializer
@@ -18,7 +17,7 @@ class TestPlayLists(TestCase):
         self.user = User.objects.create_user(username='test', email='test@test.com', password='test')
 
     def test_can_create_playlist(self):
-        tracks = list(mommy.make('music.Track', _quantity=5))
+        tracks = factories.TrackFactory.create_batch(size=5)
         playlist = models.Playlist.objects.create(user=self.user, name="test")
 
         previous = None
@@ -49,7 +48,7 @@ class TestPlayLists(TestCase):
         self.assertEqual(playlist.name, 'test')
 
     def test_can_add_playlist_track_via_api(self):
-        tracks = list(mommy.make('music.Track', _quantity=5))
+        tracks = factories.TrackFactory.create_batch(size=5)
         playlist = models.Playlist.objects.create(user=self.user, name="test")
 
         self.client.login(username=self.user.username, password='test')

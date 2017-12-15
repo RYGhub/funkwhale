@@ -2,24 +2,25 @@ import json
 import unittest
 from test_plus.test import TestCase
 from django.core.urlresolvers import reverse
-from model_mommy import mommy
 
 from funkwhale_api.music import models
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
 from funkwhale_api.users.models import User
+from funkwhale_api.music import lyrics as lyrics_utils
 
 from .mocking import lyricswiki
+from . import factories
 from . import data as api_data
-from funkwhale_api.music import lyrics as lyrics_utils
+
+
 
 class TestLyrics(TestCase):
 
     @unittest.mock.patch('funkwhale_api.music.lyrics._get_html',
                          return_value=lyricswiki.content)
     def test_works_import_lyrics_if_any(self, *mocks):
-        lyrics = mommy.make(
-            models.Lyrics,
+        lyrics = factories.LyricsFactory(
             url='http://lyrics.wikia.com/System_Of_A_Down:Chop_Suey!')
 
         lyrics.fetch_content()
@@ -42,7 +43,7 @@ Is it me you're looking for?
         content = """Hello
 Is it me you're looking for?"""
 
-        l = mommy.make(models.Lyrics, content=content)
+        l = factories.LyricsFactory(content=content)
 
         expected = "<p>Hello<br />Is it me you're looking for?</p>"
         self.assertHTMLEqual(expected, l.content_rendered)
@@ -54,8 +55,7 @@ Is it me you're looking for?"""
     @unittest.mock.patch('funkwhale_api.music.lyrics._get_html',
                          return_value=lyricswiki.content)
     def test_works_import_lyrics_if_any(self, *mocks):
-        track = mommy.make(
-            models.Track,
+        track = factories.TrackFactory(
             work=None,
             mbid='07ca77cf-f513-4e9c-b190-d7e24bbad448')
 
