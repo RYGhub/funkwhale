@@ -92,13 +92,7 @@ export default Vue.extend({
     releaseMetadata: {type: Object, required: true}
   },
   data () {
-    let queryParts = [
-      this.releaseMetadata['artist-credit'][0]['artist']['name'],
-      this.releaseMetadata['title'],
-      this.metadata['recording']['title']
-    ]
     return {
-      query: queryParts.join(' '),
       isLoading: false,
       results: [],
       currentResultIndex: 0,
@@ -151,6 +145,18 @@ export default Vue.extend({
         mbid: this.metadata.recording.id,
         source: this.importedUrl
       }
+    },
+    query () {
+      let queryMapping = [
+        ['artist', this.releaseMetadata['artist-credit'][0]['artist']['name']],
+        ['album', this.releaseMetadata['title']],
+        ['title', this.metadata['recording']['title']]
+      ]
+      let query = this.customQueryTemplate
+      queryMapping.forEach(e => {
+        query = query.split('$' + e[0]).join(e[1])
+      })
+      return query
     }
   },
   watch: {
