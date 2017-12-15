@@ -25,22 +25,32 @@ v1_patterns = router.urls
 
 v1_patterns += [
     url(r'^providers/',
-        include('funkwhale_api.providers.urls', namespace='providers')),
+        include(
+            ('funkwhale_api.providers.urls', 'providers'),
+            namespace='providers')),
     url(r'^favorites/',
-        include('funkwhale_api.favorites.urls', namespace='favorites')),
+        include(
+            ('funkwhale_api.favorites.urls', 'favorites'),
+            namespace='favorites')),
     url(r'^search$',
         views.Search.as_view(), name='search'),
     url(r'^radios/',
-        include('funkwhale_api.radios.urls', namespace='radios')),
+        include(
+            ('funkwhale_api.radios.urls', 'radios'),
+            namespace='radios')),
     url(r'^history/',
-        include('funkwhale_api.history.urls', namespace='history')),
+        include(
+            ('funkwhale_api.history.urls', 'history'),
+            namespace='history')),
     url(r'^users/',
-        include('funkwhale_api.users.api_urls', namespace='users')),
+        include(
+            ('funkwhale_api.users.api_urls', 'users'),
+            namespace='users')),
     url(r'^token/',
         jwt_views.obtain_jwt_token),
     url(r'^token/refresh/', jwt_views.refresh_jwt_token),
 ]
 
 urlpatterns = [
-    url(r'^v1/', include(v1_patterns, namespace='v1'))
+    url(r'^v1/', include((v1_patterns, 'v1'), namespace='v1'))
 ]
