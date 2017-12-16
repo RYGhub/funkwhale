@@ -1,8 +1,6 @@
 # Test dependencies go here.
--r local.txt
 
-
-flake8==2.5.0
+flake8
 pytest
 pytest-django
 pytest-mock
