@@ -2,9 +2,14 @@ Changelog
 =========
 
 
-0.2.6 (Unreleased)
+0.2.7 (Unreleased)
 ------------------
 
+
+0.2.6 (2017-12-15)
+------------------
+
+- Fixed broken Dockerfile
 
 
 0.2.5 (2017-12-15)
