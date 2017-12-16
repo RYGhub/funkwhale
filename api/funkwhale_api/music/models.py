@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files import File
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField

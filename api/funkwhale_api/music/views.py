@@ -2,7 +2,7 @@ import os
 import json
 import unicodedata
 import urllib
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
 from django.conf import settings

@@ -1,7 +1,7 @@
 import random
 import json
 from test_plus.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 
 
