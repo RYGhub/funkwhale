@@ -1,6 +1,6 @@
 import json
 from test_plus.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from funkwhale_api.music.models import Track, Artist
 from funkwhale_api.favorites.models import TrackFavorite

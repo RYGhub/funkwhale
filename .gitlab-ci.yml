@@ -13,14 +13,22 @@ stages:
 test_api:
   stage: test
   image: funkwhale/funkwhale:base
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+    DATABASE_URL: "sqlite://"
   before_script:
+    - python3 -m venv --copies virtualenv
+    - source virtualenv/bin/activate
     - cd api
+    - pip install -r requirements/base.txt
+    - pip install -r requirements/local.txt
     - pip install -r requirements/test.txt
   script:
     - pytest
-  variables:
-    DATABASE_URL: "sqlite://"
-
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/pip-cache"
   tags:
     - docker
 

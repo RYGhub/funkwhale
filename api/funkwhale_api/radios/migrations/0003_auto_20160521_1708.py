@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='radiosession',
             name='related_object_content_type',
-            field=models.ForeignKey(null=True, to='contenttypes.ContentType', blank=True),
+            field=models.ForeignKey(null=True, to='contenttypes.ContentType', blank=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='radiosession',

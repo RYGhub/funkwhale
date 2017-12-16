@@ -1,16 +1,18 @@
 import random
 import json
 from test_plus.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 
-from model_mommy import mommy
 
 from funkwhale_api.radios import radios
 from funkwhale_api.radios import models
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.users.models import User
 from funkwhale_api.music.models import Artist
+from funkwhale_api.music.tests import factories
+from funkwhale_api.history.tests.factories import ListeningFactory
+
 
 class TestRadios(TestCase):
 
@@ -55,7 +57,7 @@ class TestRadios(TestCase):
         self.assertTrue(picks[2] > picks[1])
 
     def test_can_get_choices_for_favorites_radio(self):
-        tracks = mommy.make('music.Track', _quantity=100)
+        tracks = factories.TrackFactory.create_batch(size=100)
 
         for i in range(20):
             TrackFavorite.add(track=random.choice(tracks), user=self.user)
@@ -73,7 +75,7 @@ class TestRadios(TestCase):
             self.assertIn(pick, choices)
 
     def test_can_use_radio_session_to_filter_choices(self):
-        tracks = mommy.make('music.Track', _quantity=30)
+        tracks = factories.TrackFactory.create_batch(size=30)
         radio = radios.RandomRadio()
         session = radio.start_session(self.user)
 
@@ -85,7 +87,7 @@ class TestRadios(TestCase):
         self.assertEqual(len(set(tracks_id)), 30)
 
     def test_can_restore_radio_from_previous_session(self):
-        tracks = mommy.make('music.Track', _quantity=30)
+        tracks = factories.TrackFactory.create_batch(size=30)
 
         radio = radios.RandomRadio()
         session = radio.start_session(self.user)
@@ -115,7 +117,7 @@ class TestRadios(TestCase):
         self.assertIsNotNone(session.session_key)
 
     def test_can_get_track_for_session_from_api(self):
-        tracks = mommy.make('music.Track', _quantity=1)
+        tracks = factories.TrackFactory.create_batch(size=1)
 
         self.client.login(username=self.user.username, password='test')
         url = reverse('api:v1:radios:sessions-list')
@@ -129,7 +131,7 @@ class TestRadios(TestCase):
         self.assertEqual(data['track']['id'], tracks[0].id)
         self.assertEqual(data['position'], 1)
 
-        next_track = mommy.make('music.Track')
+        next_track = factories.TrackFactory()
         response = self.client.post(url, {'session': session.pk})
         data = json.loads(response.content.decode('utf-8'))
 
@@ -148,9 +150,10 @@ class TestRadios(TestCase):
             radio.start_session(self.user, related_object=self.user)
 
     def test_can_start_artist_radio(self):
-        artist = mommy.make('music.Artist')
-        wrong_tracks = mommy.make('music.Track', _quantity=30)
-        good_tracks = mommy.make('music.Track', artist=artist, _quantity=5)
+        artist = factories.ArtistFactory()
+        wrong_tracks = factories.TrackFactory.create_batch(size=30)
+        good_tracks = factories.TrackFactory.create_batch(
+            artist=artist, size=5)
 
         radio = radios.ArtistRadio()
         session = radio.start_session(self.user, related_object=artist)
@@ -159,9 +162,9 @@ class TestRadios(TestCase):
             self.assertIn(radio.pick(), good_tracks)
 
     def test_can_start_tag_radio(self):
-        tag = mommy.make('taggit.Tag')
-        wrong_tracks = mommy.make('music.Track', _quantity=30)
-        good_tracks = mommy.make('music.Track', _quantity=5)
+        tag = factories.TagFactory()
+        wrong_tracks = factories.TrackFactory.create_batch(size=30)
+        good_tracks = factories.TrackFactory.create_batch(size=5)
         for track in good_tracks:
             track.tags.add(tag)
 
@@ -172,7 +175,7 @@ class TestRadios(TestCase):
             self.assertIn(radio.pick(), good_tracks)
 
     def test_can_start_artist_radio_from_api(self):
-        artist = mommy.make('music.Artist')
+        artist = factories.ArtistFactory()
         url = reverse('api:v1:radios:sessions-list')
 
         response = self.client.post(url, {'radio_type': 'artist', 'related_object_id': artist.id})
@@ -181,10 +184,10 @@ class TestRadios(TestCase):
         self.assertEqual(session.related_object, artist)
 
     def test_can_start_less_listened_radio(self):
-        history = mommy.make('history.Listening', _quantity=5, user=self.user)
+        history = ListeningFactory.create_batch(size=5, user=self.user)
         wrong_tracks = [h.track for h in history]
 
-        good_tracks = mommy.make('music.Track', _quantity=30)
+        good_tracks = factories.TrackFactory.create_batch(size=30)
 
         radio = radios.LessListenedRadio()
         session = radio.start_session(self.user)

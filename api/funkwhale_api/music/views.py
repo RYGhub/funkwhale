@@ -2,7 +2,7 @@ import os
 import json
 import unicodedata
 import urllib
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
 from django.conf import settings
@@ -102,7 +102,7 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
         queryset = super().get_queryset()
         filter_favorites = self.request.GET.get('favorites', None)
         user = self.request.user
-        if user.is_authenticated() and filter_favorites == 'true':
+        if user.is_authenticated and filter_favorites == 'true':
             queryset = queryset.filter(track_favorites__user=user)
 
         return queryset

@@ -10,9 +10,9 @@ from django.views import defaults as default_views
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, include(admin.site.urls)),
+    url(settings.ADMIN_URL, admin.site.urls),
 
-    url(r'^api/', include("config.api_urls", namespace="api")),
+    url(r'^api/', include(("config.api_urls", 'api'), namespace="api")),
     url(r'^api/auth/', include('rest_auth.urls')),
     url(r'^api/auth/registration/', include('funkwhale_api.users.rest_auth_urls')),
     url(r'^accounts/', include('allauth.urls')),
