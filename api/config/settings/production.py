@@ -36,7 +36,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #
 #
 # # Make sure djangosecure.middleware.SecurityMiddleware is listed first
-# MIDDLEWARE_CLASSES = SECURITY_MIDDLEWARE + MIDDLEWARE_CLASSES
+# MIDDLEWARE = SECURITY_MIDDLEWARE + MIDDLEWARE
 #
 # # set this to 60 seconds and then to 518400 when you can prove it works
 # SECURE_HSTS_SECONDS = 60
@@ -55,6 +55,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
+
 # END SITE CONFIGURATION
 
 INSTALLED_APPS += ("gunicorn", )

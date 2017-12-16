@@ -22,8 +22,8 @@ CACHES = {
         'LOCATION': ''
     }
 }
-INSTALLED_APPS += ('kombu.transport.django',)
-BROKER_URL = 'django://'
+
+BROKER_URL = 'memory://'
 
 # TESTING
 # ------------------------------------------------------------------------------

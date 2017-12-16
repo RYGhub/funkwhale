@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('radio_type', models.CharField(max_length=50)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', models.ForeignKey(related_name='radio_sessions', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('user', models.ForeignKey(related_name='radio_sessions', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -28,8 +28,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('position', models.IntegerField(default=1)),
-                ('session', models.ForeignKey(to='radios.RadioSession', related_name='session_tracks')),
-                ('track', models.ForeignKey(to='music.Track', related_name='radio_session_tracks')),
+                ('session', models.ForeignKey(to='radios.RadioSession', related_name='session_tracks', on_delete=models.CASCADE)),
+                ('track', models.ForeignKey(to='music.Track', related_name='radio_session_tracks', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('session', 'position'),

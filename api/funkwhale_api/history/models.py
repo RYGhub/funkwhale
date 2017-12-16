@@ -7,8 +7,14 @@ from funkwhale_api.music.models import Track
 
 class Listening(models.Model):
     end_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
-    track = models.ForeignKey(Track, related_name="listenings")
-    user = models.ForeignKey('users.User', related_name="listenings", null=True, blank=True)
+    track = models.ForeignKey(
+        Track, related_name="listenings", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        'users.User',
+        related_name="listenings",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     session_key = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:

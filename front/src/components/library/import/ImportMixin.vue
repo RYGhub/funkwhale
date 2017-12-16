@@ -13,10 +13,12 @@ export default {
     metadata: {type: Object, required: true},
     defaultEnabled: {type: Boolean, default: true},
     backends: {type: Array},
-    defaultBackendId: {type: String}
+    defaultBackendId: {type: String},
+    queryTemplate: {type: String, default: '$artist $title'}
   },
   data () {
     return {
+      customQueryTemplate: this.queryTemplate,
       currentBackendId: this.defaultBackendId,
       isImporting: false,
       enabled: this.defaultEnabled
@@ -56,6 +58,9 @@ export default {
       return this.backends.filter(b => {
         return b.id === self.currentBackendId
       })[0]
+    },
+    realQueryTemplate () {
+
     }
   },
   watch: {
@@ -70,6 +75,14 @@ export default {
     },
     enabled (newValue) {
       this.$emit('enabled', this.importData, newValue)
+    },
+    queryTemplate (newValue, oldValue) {
+      // we inherit from the prop template unless the component changed
+      // the value
+      if (oldValue === this.customQueryTemplate) {
+        // no changed from prop, we keep the sync
+        this.customQueryTemplate = newValue
+      }
     }
   }
 }

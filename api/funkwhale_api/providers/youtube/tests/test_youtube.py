@@ -2,7 +2,7 @@ import json
 from collections import OrderedDict
 import unittest
 from test_plus.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from funkwhale_api.providers.youtube.client import client
 
 from . import data as api_data

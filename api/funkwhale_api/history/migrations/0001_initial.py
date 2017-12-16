@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('end_date', models.DateTimeField(null=True, blank=True, default=django.utils.timezone.now)),
                 ('session_key', models.CharField(null=True, blank=True, max_length=100)),
-                ('track', models.ForeignKey(related_name='listenings', to='music.Track')),
-                ('user', models.ForeignKey(blank=True, null=True, related_name='listenings', to=settings.AUTH_USER_MODEL)),
+                ('track', models.ForeignKey(related_name='listenings', to='music.Track', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(blank=True, null=True, related_name='listenings', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-end_date',),

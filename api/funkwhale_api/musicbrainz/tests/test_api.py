@@ -1,7 +1,7 @@
 import json
 import unittest
 from test_plus.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from funkwhale_api.musicbrainz import api
 from . import data as api_data

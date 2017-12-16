@@ -2,13 +2,11 @@ from test_plus.test import TestCase
 import unittest.mock
 from funkwhale_api.music import models
 import datetime
-from model_mommy import mommy
+
+from . import factories
 from . import data as api_data
 from .cover import binary_data
 
-def prettyprint(d):
-    import json
-    print(json.dumps(d, sort_keys=True, indent=4))
 
 class TestMusic(TestCase):
 
@@ -79,9 +77,9 @@ class TestMusic(TestCase):
         self.assertEqual(track, track2)
 
     def test_album_tags_deduced_from_tracks_tags(self):
-        tag = mommy.make('taggit.Tag')
-        album = mommy.make('music.Album')
-        tracks = mommy.make('music.Track', album=album, _quantity=5)
+        tag = factories.TagFactory()
+        album = factories.AlbumFactory()
+        tracks = factories.TrackFactory.create_batch(album=album, size=5)
 
         for track in tracks:
             track.tags.add(tag)
@@ -92,10 +90,10 @@ class TestMusic(TestCase):
             self.assertIn(tag, album.tags)
 
     def test_artist_tags_deduced_from_album_tags(self):
-        tag = mommy.make('taggit.Tag')
-        artist = mommy.make('music.Artist')
-        album = mommy.make('music.Album', artist=artist)
-        tracks = mommy.make('music.Track', album=album, _quantity=5)
+        tag = factories.TagFactory()
+        artist = factories.ArtistFactory()
+        album = factories.AlbumFactory(artist=artist)
+        tracks = factories.TrackFactory.create_batch(album=album, size=5)
 
         for track in tracks:
             track.tags.add(tag)
@@ -108,7 +106,7 @@ class TestMusic(TestCase):
     @unittest.mock.patch('funkwhale_api.musicbrainz.api.images.get_front', return_value=binary_data)
     def test_can_download_image_file_for_album(self, *mocks):
         # client._api.get_image_front('55ea4f82-b42b-423e-a0e5-290ccdf443ed')
-        album = mommy.make('music.Album', mbid='55ea4f82-b42b-423e-a0e5-290ccdf443ed')
+        album = factories.AlbumFactory(mbid='55ea4f82-b42b-423e-a0e5-290ccdf443ed')
         album.get_image()
         album.save()
 
