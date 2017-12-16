@@ -8,9 +8,9 @@ COPY ./requirements.apt /requirements.apt
 RUN apt-get update -qq && grep "^[^#;]" requirements.apt | xargs apt-get install -y
 
 
-COPY ./requirements/base.txt /requirements
+COPY ./requirements/base.txt /requirements/base.txt
 RUN pip install -r /requirements/base.txt
-COPY ./requirements/production.txt /requirements
+COPY ./requirements/production.txt /requirements/production.txt
 RUN pip install -r /requirements/production.txt
 
 COPY . /app

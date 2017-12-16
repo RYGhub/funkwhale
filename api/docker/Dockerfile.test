@@ -9,11 +9,11 @@ COPY ./install_os_dependencies.sh /install_os_dependencies.sh
 RUN bash install_os_dependencies.sh install
 
 RUN mkdir /requirements
-COPY ./requirements/base.txt /requirements
+COPY ./requirements/base.txt /requirements/base.txt
 RUN pip install -r /requirements/base.txt
-COPY ./requirements/local.txt /requirements
+COPY ./requirements/local.txt /requirements/local.txt
 RUN pip install -r /requirements/local.txt
-COPY ./requirements/test.txt /requirements
+COPY ./requirements/test.txt /requirements/test.txt
 RUN pip install -r /requirements/test.txt
 
 WORKDIR /app
