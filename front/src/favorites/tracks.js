@@ -33,6 +33,10 @@ export default {
       })
     }
   },
+  toggle (id) {
+    let isFavorite = this.objects[id]
+    this.set(id, !isFavorite)
+  },
   fetch (url) {
     // will fetch favorites by batches from API to have them locally
     var self = this

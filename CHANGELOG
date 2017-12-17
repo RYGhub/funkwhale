@@ -5,6 +5,10 @@ Changelog
 0.2.7 (Unreleased)
 ------------------
 
+- Shortcuts: can now use the ``f`` shortcut to toggle the currently playing track
+  as a favorite (#53)
+- Shortcuts: avoid collisions between shortcuts by using the exact modifier (#53)
+
 
 0.2.6 (2017-12-15)
 ------------------
