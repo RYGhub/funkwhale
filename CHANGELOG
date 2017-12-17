@@ -10,6 +10,8 @@ Changelog
 - Shortcuts: avoid collisions between shortcuts by using the exact modifier (#53)
 - Player: Added looping controls and shortcuts (#52)
 - Player: Added shuffling controls and shortcuts (#52)
+- Favorites: can now modify the ordering of track list (#50)
+- Library: can now search/reorder results on artist browsing view (#50)
 
 
 0.2.6 (2017-12-15)
