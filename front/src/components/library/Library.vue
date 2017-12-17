@@ -8,7 +8,7 @@
         <router-link v-if="auth.user.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches</router-link>
       </div>
     </div>
-    <router-view></router-view>
+    <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
 

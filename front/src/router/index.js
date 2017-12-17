@@ -54,7 +54,17 @@ export default new Router({
       component: Library,
       children: [
         { path: '', component: LibraryHome },
-        { path: 'artists/', name: 'library.artists.browse', component: LibraryArtists },
+        {
+          path: 'artists/',
+          name: 'library.artists.browse',
+          component: LibraryArtists,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
         { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
         { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
         { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },

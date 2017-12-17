@@ -31,3 +31,9 @@ if settings.DEBUG:
         url(r'^404/$', default_views.page_not_found),
         url(r'^500/$', default_views.server_error),
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
+        urlpatterns += [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ]
