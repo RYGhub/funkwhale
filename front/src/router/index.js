@@ -50,7 +50,8 @@ export default new Router({
       component: Favorites,
       props: (route) => ({
         defaultOrdering: route.query.ordering,
-        defaultPage: route.query.page
+        defaultPage: route.query.page,
+        defaultPaginateBy: route.query.paginateBy
       })
     },
     {

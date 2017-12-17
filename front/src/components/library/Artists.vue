@@ -103,7 +103,7 @@ export default {
     $('.ui.dropdown').dropdown()
   },
   methods: {
-    updateQueryString: function () {
+    updateQueryString: _.debounce(function () {
       this.$router.replace({
         query: {
           query: this.query,
@@ -112,7 +112,7 @@ export default {
           ordering: this.getOrderingAsString()
         }
       })
-    },
+    }, 500),
     fetchData: _.debounce(function () {
       var self = this
       this.isLoading = true
