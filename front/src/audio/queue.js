@@ -17,6 +17,7 @@ class Queue {
     this.currentTrack = null
     this.ended = true
     this.state = {
+      looping: 0, // 0 -> no, 1 -> on  track, 2 -> on queue
       volume: cache.get('volume', 0.5)
     }
     this.audio = {
@@ -267,12 +268,22 @@ class Queue {
 
   handleAudioEnded (e) {
     this.recordListen(this.currentTrack)
+    if (this.state.looping === 1) {
+      // we loop on the same track
+      logger.default.info('Looping on the same track')
+      return this.play(this.currentIndex)
+    }
     if (this.currentIndex < this.tracks.length - 1) {
       logger.default.info('Audio track ended, playing next one')
-      this.next()
+      return this.next()
     } else {
       logger.default.info('We reached the end of the queue')
-      this.ended = true
+      if (this.state.looping === 2) {
+        logger.default.info('Going back to the beginning of the queue')
+        return this.play(0)
+      } else {
+        this.ended = true
+      }
     }
   }
 
@@ -294,6 +305,14 @@ class Queue {
     if (this.currentIndex < this.tracks.length - 1) {
       logger.default.debug('Playing next track')
       this.play(this.currentIndex + 1)
+    }
+  }
+
+  toggleLooping () {
+    if (this.state.looping > 1) {
+      this.state.looping = 0
+    } else {
+      this.state.looping += 1
     }
   }
 

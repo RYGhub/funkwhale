@@ -39,21 +39,71 @@
       </div>
     </div>
 
-    <div class="controls ui grid">
-      <div class="volume-control four wide center aligned column">
-        <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
+    <div class="two wide column controls ui grid">
+      <div
+        @click="queue.previous()"
+        title="Previous track"
+        class="two wide column control"
+        :disabled="!hasPrevious">
+          <i :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
+      </div>
+      <div
+        v-if="!queue.audio.state.playing"
+        @click="pauseOrPlay"
+        title="Play track"
+        class="two wide column control">
+          <i :class="['ui', 'play', {'disabled': !queue.currentTrack}, 'big', 'icon']"></i>
+      </div>
+      <div
+        v-else
+        @click="pauseOrPlay"
+        title="Pause track"
+        class="two wide column control">
+          <i :class="['ui', 'pause', {'disabled': !queue.currentTrack}, 'big', 'icon']"></i>
+      </div>
+      <div
+        @click="queue.next()"
+        title="Next track"
+        class="two wide column control"
+        :disabled="!hasNext">
+          <i :class="['ui', {'disabled': !hasPrevious}, 'step', 'forward', 'big', 'icon']" ></i>
+      </div>
+      <div class="two wide column control volume-control">
         <i title="Unmute" @click="queue.setVolume(1)" v-if="currentVolume === 0" class="volume off secondary icon"></i>
         <i title="Mute" @click="queue.setVolume(0)" v-else-if="currentVolume < 0.5" class="volume down secondary icon"></i>
         <i title="Mute" @click="queue.setVolume(0)" v-else class="volume up secondary icon"></i>
+        <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
       </div>
-      <div class="eight wide center aligned column">
-        <i title="Previous track" @click="queue.previous()" :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" :disabled="!hasPrevious"></i>
-        <i title="Play track" v-if="!queue.audio.state.playing" :class="['ui', 'play', {'disabled': !queue.currentTrack}, 'big', 'icon']" @click="pauseOrPlay"></i>
-        <i title="Pause track" v-else :class="['ui', 'pause', {'disabled': !queue.currentTrack}, 'big', 'icon']" @click="pauseOrPlay"></i>
-        <i title="Next track" @click="queue.next()" :class="['ui', 'step', 'forward', {'disabled': !hasNext}, 'big', 'icon']" :disabled="!hasNext"></i>
+      <div class="two wide column control looping">
+        <i
+          title="Looping disabled. Click to switch to single-track looping."
+          v-if="queue.state.looping === 0"
+          @click="queue.state.looping = 1"
+          :disabled="!queue.currentTrack"
+          :class="['ui', {'disabled': !queue.currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
+        <i
+          title="Looping on a single track. Click to switch to whole queue looping."
+          v-if="queue.state.looping === 1"
+          @click="queue.state.looping = 2"
+          :disabled="!queue.currentTrack"
+          class="repeat secondary icon">
+          <span class="ui circular tiny orange label">1</span>
+        </i>
+        <i
+          title="Looping on whole queue. Click to disable looping."
+          v-if="queue.state.looping === 2"
+          @click="queue.state.looping = 0"
+          :disabled="!queue.currentTrack"
+          class="repeat orange secondary icon">
+        </i>
       </div>
-      <div class="four wide center aligned column">
-        <i title="Clear your queue" @click="queue.clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" :disabled="queue.tracks.length === 0"></i>
+      <div class="three wide column"></div>
+      <div
+        @click="queue.clean()"
+        :disabled="queue.tracks.length === 0"
+        title="Clear your queue"
+        class="two wide column control">
+        <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
       </div>
     </div>
     <GlobalEvents
@@ -63,6 +113,7 @@
       @keydown.ctrl.down.prevent.exact="queue.incrementVolume(-0.1)"
       @keydown.ctrl.up.prevent.exact="queue.incrementVolume(0.1)"
       @keydown.f.prevent.exact="favoriteTracks.toggle(queue.currentTrack.id)"
+      @keydown.l.prevent.exact="queue.toggleLooping"
       />
 
   </div>
@@ -187,14 +238,32 @@ export default {
 .volume-control {
   position: relative;
   .icon {
-    margin: 0;
+    // margin: 0;
   }
   [type="range"] {
-    max-width: 75%;
+    max-width: 100%;
     position: absolute;
     bottom: 5px;
     left: 10%;
     cursor: pointer;
+    display: none;
+  }
+  &:hover {
+    [type="range"] {
+      display: block;
+    }
+  }
+}
+
+.looping.control {
+  i {
+    position: relative;
+  }
+  .label {
+    position: absolute;
+    font-size: 0.7rem;
+    bottom: -0.7rem;
+    right: -0.7rem;
   }
 }
 .ui.feed.icon {
