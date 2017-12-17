@@ -47,7 +47,11 @@ export default new Router({
     },
     {
       path: '/favorites',
-      component: Favorites
+      component: Favorites,
+      props: (route) => ({
+        defaultOrdering: route.query.ordering,
+        defaultPage: route.query.page
+      })
     },
     {
       path: '/library',

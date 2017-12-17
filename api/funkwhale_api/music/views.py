@@ -95,7 +95,12 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.TrackSerializerNested
     permission_classes = [ConditionalAuthentication]
     search_fields = ['title', 'artist__name']
-    ordering_fields = ('creation_date',)
+    ordering_fields = (
+        'creation_date',
+        'title',
+        'album__title',
+        'artist__name',
+    )
 
     def get_queryset(self):
         queryset = super().get_queryset()

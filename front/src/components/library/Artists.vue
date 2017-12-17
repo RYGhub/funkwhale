@@ -63,30 +63,31 @@ import $ from 'jquery'
 import config from '@/config'
 import backend from '@/audio/backend'
 import logger from '@/logging'
+
+import OrderingMixin from '@/components/mixins/Ordering'
+import PaginationMixin from '@/components/mixins/Pagination'
 import ArtistCard from '@/components/audio/artist/Card'
 import Pagination from '@/components/Pagination'
 
 const FETCH_URL = config.API_URL + 'artists/'
 
 export default {
+  mixins: [OrderingMixin, PaginationMixin],
   props: {
-    defaultOrdering: {type: String, required: false, default: '-creation_date'},
-    defaultQuery: {type: String, required: false, default: ''},
-    defaultPage: {required: false, default: 1},
-    defaultPaginateBy: {required: false, default: 12}
+    defaultQuery: {type: String, required: false, default: ''}
   },
   components: {
     ArtistCard,
     Pagination
   },
   data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering)
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      paginateBy: parseInt(this.defaultPaginateBy),
+      paginateBy: parseInt(this.defaultPaginateBy || 12),
       orderingDirection: defaultOrdering.direction,
       ordering: defaultOrdering.field,
       orderingOptions: [
@@ -102,27 +103,13 @@ export default {
     $('.ui.dropdown').dropdown()
   },
   methods: {
-    getOrderingFromString (s) {
-      let parts = s.split('-')
-      if (parts.length > 1) {
-        return {
-          direction: '-',
-          field: parts.slice(1).join('-')
-        }
-      } else {
-        return {
-          direction: '',
-          field: s
-        }
-      }
-    },
     updateQueryString: function () {
       this.$router.replace({
         query: {
           query: this.query,
           page: this.page,
           paginateBy: this.paginateBy,
-          ordering: [this.orderingDirection, this.ordering].join('')
+          ordering: this.getOrderingAsString()
         }
       })
     },
@@ -134,7 +121,7 @@ export default {
         page: this.page,
         page_size: this.paginateBy,
         name__icontains: this.query,
-        ordering: [this.orderingDirection, this.ordering].join('')
+        ordering: this.getOrderingAsString()
       }
       logger.default.debug('Fetching artists')
       this.$http.get(url, {params: params}).then((response) => {
