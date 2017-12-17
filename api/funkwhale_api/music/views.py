@@ -47,16 +47,15 @@ class TagViewSetMixin(object):
 class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Artist.objects.all()
-                             .order_by('name')
                              .prefetch_related(
                                 'albums__tracks__files',
+                                'albums__tracks__artist',
                                 'albums__tracks__tags'))
     serializer_class = serializers.ArtistSerializerNested
     permission_classes = [ConditionalAuthentication]
     search_fields = ['name']
-    ordering_fields = ('creation_date', 'name')
     filter_class = filters.ArtistFilter
-
+    ordering_fields = ('id', 'name', 'creation_date')
 
 class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
@@ -96,7 +95,12 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.TrackSerializerNested
     permission_classes = [ConditionalAuthentication]
     search_fields = ['title', 'artist__name']
-    ordering_fields = ('creation_date',)
+    ordering_fields = (
+        'creation_date',
+        'title',
+        'album__title',
+        'artist__name',
+    )
 
     def get_queryset(self):
         queryset = super().get_queryset()

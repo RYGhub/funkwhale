@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <sidebar></sidebar>
-    <router-view></router-view>
+    <router-view :key="$route.fullPath"></router-view>
     <div class="ui divider"></div>
     <div id="footer" class="ui vertical footer segment">
       <div class="ui container">
