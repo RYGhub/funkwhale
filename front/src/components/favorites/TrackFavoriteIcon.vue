@@ -1,4 +1,4 @@
-<template>
+ <template>
   <button @click="favoriteTracks.set(track.id, !isFavorite)" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'button']">
     <i class="heart icon"></i>
     <template v-if="isFavorite">
@@ -22,11 +22,6 @@ export default {
   data () {
     return {
       favoriteTracks
-    }
-  },
-  methods: {
-    toggleFavorite () {
-      this.isFavorite = !this.isFavorite
     }
   },
   computed: {

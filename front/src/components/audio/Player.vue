@@ -57,11 +57,12 @@
       </div>
     </div>
     <GlobalEvents
-      @keydown.space.prevent="pauseOrPlay"
-      @keydown.ctrl.left.prevent="queue.previous"
-      @keydown.ctrl.right.prevent="queue.next"
-      @keydown.ctrl.down.prevent="queue.incrementVolume(-0.1)"
-      @keydown.ctrl.up.prevent="queue.incrementVolume(0.1)"
+      @keydown.space.prevent.exact="pauseOrPlay"
+      @keydown.ctrl.left.prevent.exact="queue.previous"
+      @keydown.ctrl.right.prevent.exact="queue.next"
+      @keydown.ctrl.down.prevent.exact="queue.incrementVolume(-0.1)"
+      @keydown.ctrl.up.prevent.exact="queue.incrementVolume(0.1)"
+      @keydown.f.prevent.exact="favoriteTracks.toggle(queue.currentTrack.id)"
       />
 
   </div>
@@ -70,10 +71,11 @@
 <script>
 import GlobalEvents from '@/components/utils/global-events'
 
+import favoriteTracks from '@/favorites/tracks'
 import queue from '@/audio/queue'
+import radios from '@/radios'
 import Track from '@/audio/track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
-import radios from '@/radios'
 
 export default {
   name: 'player',
@@ -86,6 +88,7 @@ export default {
       sliderVolume: this.currentVolume,
       queue: queue,
       Track: Track,
+      favoriteTracks,
       radios
     }
   },
