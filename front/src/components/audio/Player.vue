@@ -97,7 +97,14 @@
           class="repeat orange secondary icon">
         </i>
       </div>
-      <div class="three wide column"></div>
+      <div
+        @click="queue.shuffle()"
+        :disabled="queue.tracks.length === 0"
+        title="Shuffle your queue"
+        class="two wide column control">
+        <i :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+      </div>
+      <div class="one wide column"></div>
       <div
         @click="queue.clean()"
         :disabled="queue.tracks.length === 0"
@@ -114,6 +121,7 @@
       @keydown.ctrl.up.prevent.exact="queue.incrementVolume(0.1)"
       @keydown.f.prevent.exact="favoriteTracks.toggle(queue.currentTrack.id)"
       @keydown.l.prevent.exact="queue.toggleLooping"
+      @keydown.s.prevent.exact="queue.shuffle"
       />
 
   </div>

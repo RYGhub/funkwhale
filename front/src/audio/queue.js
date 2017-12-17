@@ -1,10 +1,12 @@
+import Vue from 'vue'
+import _ from 'lodash'
+
 import logger from '@/logging'
 import cache from '@/cache'
 import config from '@/config'
 import Audio from '@/audio'
 import backend from '@/audio/backend'
 import radios from '@/radios'
-import Vue from 'vue'
 import url from '@/utils/url'
 import auth from '@/auth'
 
@@ -314,6 +316,13 @@ class Queue {
     } else {
       this.state.looping += 1
     }
+  }
+
+  shuffle () {
+    let tracks = this.tracks
+    let shuffled = _.shuffle(tracks)
+    this.clean()
+    this.appendMany(shuffled)
   }
 
 }
