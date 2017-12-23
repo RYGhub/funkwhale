@@ -1,5 +1,5 @@
  <template>
-  <button @click="favoriteTracks.set(track.id, !isFavorite)" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'button']">
+  <button @click="$store.dispatch('favorites/set', {id: track.id, value: !isFavorite})" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'button']">
     <i class="heart icon"></i>
     <template v-if="isFavorite">
       In favorites
@@ -8,23 +8,23 @@
       Add to favorites
     </template>
   </button>
-  <i v-else @click="favoriteTracks.set(track.id, !isFavorite)" :class="['favorite-icon', 'heart', {'pink': isFavorite}, {'favorited': isFavorite}, 'link', 'icon']" :title="title"></i>
+  <i v-else @click="$store.dispatch('favorites/set', {id: track.id, value: !isFavorite})" :class="['favorite-icon', 'heart', {'pink': isFavorite}, {'favorited': isFavorite}, 'link', 'icon']" :title="title"></i>
 </template>
 
 <script>
-import favoriteTracks from '@/favorites/tracks'
+import {mapState} from 'vuex'
 
 export default {
   props: {
     track: {type: Object},
     button: {type: Boolean, default: false}
   },
-  data () {
-    return {
-      favoriteTracks
-    }
-  },
   computed: {
+    ...mapState({
+      favorites: state => {
+        return state.favorites.tracks
+      }
+    }),
     title () {
       if (this.isFavorite) {
         return 'Remove from favorites'
@@ -33,7 +33,7 @@ export default {
       }
     },
     isFavorite () {
-      return favoriteTracks.objects[this.track.id]
+      return this.$store.getters['favorites/isFavorite'](this.track.id)
     }
   }
 

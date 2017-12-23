@@ -34,6 +34,9 @@ export default {
     },
     token: (state, value) => {
       state.token = value
+    },
+    permission: (state, {key, status}) => {
+      state.availablePermissions[key] = status
     }
   },
   actions: {
@@ -77,17 +80,16 @@ export default {
         commit('authenticated', false)
       }
     },
-    fetchProfile ({commit, state}) {
+    fetchProfile ({commit, dispatch, state}) {
       let resource = Vue.resource(USER_PROFILE_URL)
       return resource.get({}).then((response) => {
         logger.default.info('Successfully fetched user profile')
         let data = response.data
         commit('profile', data)
-        // favoriteTracks.fetch()
-        console.log('AFTER')
+        dispatch('favorites/fetch', null, {root: true})
         Object.keys(data.permissions).forEach(function (key) {
           // this makes it easier to check for permissions in templates
-          state.availablePermissions[key] = data.permissions[String(key)].status
+          commit('permission', {key, status: data.permissions[String(key)].status})
         })
         return response.data
       }, (response) => {
