@@ -15,7 +15,6 @@
 <script>
 import {mapState} from 'vuex'
 import backend from '@/audio/backend'
-import auth from '@/auth'
 import url from '@/utils/url'
 
 // import logger from '@/logging'
@@ -40,12 +39,12 @@ export default {
         return null
       }
       let path = backend.absoluteUrl(file.path)
-      if (auth.user.authenticated) {
+      if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url
         // so authentication can be checked by the backend
         // because for audio files we cannot use the regular Authentication
         // header
-        path = url.updateQueryString(path, 'jwt', auth.getAuthToken())
+        path = url.updateQueryString(path, 'jwt', this.$store.state.auth.token)
       }
       return path
     }

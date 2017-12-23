@@ -9,7 +9,6 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueResource from 'vue-resource'
-import auth from './auth'
 import VueLazyload from 'vue-lazyload'
 import store from './store'
 
@@ -26,8 +25,8 @@ Vue.config.productionTip = false
 
 Vue.http.interceptors.push(function (request, next) {
   // modify headers
-  if (auth.user.authenticated) {
-    request.headers.set('Authorization', auth.getAuthHeader())
+  if (store.state.auth.authenticated) {
+    request.headers.set('Authorization', store.getters['auth/header'])
   }
   next(function (response) {
     // redirect to login form when we get unauthorized response from server
@@ -38,7 +37,7 @@ Vue.http.interceptors.push(function (request, next) {
   })
 })
 
-auth.checkAuth()
+store.dispatch('auth/check')
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

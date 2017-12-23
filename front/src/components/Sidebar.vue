@@ -28,8 +28,8 @@
   <div class="tabs">
     <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical fluid menu">
-        <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'profile', params: {username: auth.user.username}}"><i class="user icon"></i> Logged in as {{ auth.user.username }}</router-link>
-        <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i> Logged in as {{ $store.state.auth.username }}</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
         <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
         <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
@@ -97,7 +97,6 @@ import Player from '@/components/audio/Player'
 import favoriteTracks from '@/favorites/tracks'
 import Logo from '@/components/Logo'
 import SearchBar from '@/components/audio/SearchBar'
-import auth from '@/auth'
 import backend from '@/audio/backend'
 import draggable from 'vuedraggable'
 
@@ -113,7 +112,6 @@ export default {
   },
   data () {
     return {
-      auth: auth,
       backend: backend,
       favoriteTracks
     }
