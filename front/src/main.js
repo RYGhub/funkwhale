@@ -11,6 +11,7 @@ import router from './router'
 import VueResource from 'vue-resource'
 import auth from './auth'
 import VueLazyload from 'vue-lazyload'
+import store from './store'
 
 window.$ = window.jQuery = require('jquery')
 
@@ -42,6 +43,7 @@ auth.checkAuth()
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 })

@@ -17,7 +17,6 @@
 
 <script>
 import logger from '@/logging'
-import queue from '@/audio/queue'
 import jQuery from 'jquery'
 
 export default {
@@ -40,19 +39,19 @@ export default {
   methods: {
     add () {
       if (this.track) {
-        queue.append(this.track)
+        this.$store.dispatch('queue/append', {track: this.track})
       } else {
-        queue.appendMany(this.tracks)
+        this.$store.dispatch('queue/appendMany', {tracks: this.tracks})
       }
     },
     addNext (next) {
       if (this.track) {
-        queue.append(this.track, queue.currentIndex + 1)
+        this.$store.dispatch('queue/append', {track: this.track, index: this.$store.state.queue.currentIndex + 1})
       } else {
-        queue.appendMany(this.tracks, queue.currentIndex + 1)
+        this.$store.dispatch('queue/appendMany', {tracks: this.tracks, index: this.$store.state.queue.currentIndex + 1})
       }
       if (next) {
-        queue.next()
+        this.$store.dispatch('queue/next')
       }
     }
   }
