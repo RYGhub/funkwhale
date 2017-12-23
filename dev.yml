@@ -13,7 +13,6 @@ services:
       - "8080:8080"
     volumes:
       - './front:/app'
-      - /app/node_modules
 
   postgres:
     env_file: .env.dev
