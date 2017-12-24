@@ -119,7 +119,6 @@ export default {
         self.results = response.data
         self.nextLink = response.data.next
         self.previousLink = response.data.previous
-        self.$store.commit('favorites/count', response.data.count)
         self.results.results.forEach((track) => {
           self.$store.commit('favorites/track', {id: track.id, value: true})
         })

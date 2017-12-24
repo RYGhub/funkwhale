@@ -18,6 +18,7 @@ const SEARCH_URL = config.API_URL + 'search?query={query}'
 
 export default {
   mounted () {
+    let self = this
     jQuery(this.$el).search({
       type: 'category',
       minCharacters: 3,
@@ -26,7 +27,7 @@ export default {
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
-          xhrObject.setRequestHeader('Authorization', this.$store.getters['auth/header'])
+          xhrObject.setRequestHeader('Authorization', self.$store.getters['auth/header'])
           return xhrObject
         },
         onResponse: function (initialResponse) {

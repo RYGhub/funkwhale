@@ -62,7 +62,7 @@
                   {{ track.artist.name }}
               </td>
               <td>
-                <template v-if="favoriteTracks.objects[track.id]">
+                <template v-if="$store.getters['favorites/isFavorite'](track.id)">
                   <i class="pink heart icon"></i>
                 </template
               </td>
@@ -94,7 +94,6 @@
 import {mapState, mapActions} from 'vuex'
 
 import Player from '@/components/audio/Player'
-import favoriteTracks from '@/favorites/tracks'
 import Logo from '@/components/Logo'
 import SearchBar from '@/components/audio/SearchBar'
 import backend from '@/audio/backend'
@@ -112,8 +111,7 @@ export default {
   },
   data () {
     return {
-      backend: backend,
-      favoriteTracks
+      backend: backend
     }
   },
   mounted () {

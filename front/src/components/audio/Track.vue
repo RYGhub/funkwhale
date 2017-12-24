@@ -22,7 +22,9 @@ import url from '@/utils/url'
 export default {
   props: {
     track: {type: Object},
-    isCurrent: {type: Boolean, default: false}
+    isCurrent: {type: Boolean, default: false},
+    startTime: {type: Number, default: 0},
+    autoplay: {type: Boolean, default: false}
   },
   computed: {
     ...mapState({
@@ -57,8 +59,11 @@ export default {
 
     },
     loaded: function () {
-      this.$store.commit('player/duration', this.$refs.audio.duration)
-      if (this.isCurrent) {
+      if (this.isCurrent && this.autoplay) {
+        this.$store.commit('player/duration', this.$refs.audio.duration)
+        if (this.startTime) {
+          this.setCurrentTime(this.startTime)
+        }
         this.$store.commit('player/playing', true)
         this.$refs.audio.play()
       }
@@ -72,8 +77,9 @@ export default {
       if (this.looping === 1) {
         this.setCurrentTime(0)
         this.$refs.audio.play()
+      } else {
+        this.$store.dispatch('player/trackEnded', this.track)
       }
-      this.$store.dispatch('player/trackEnded', this.track)
     },
     setCurrentTime (t) {
       if (t < 0 | t > this.duration) {
