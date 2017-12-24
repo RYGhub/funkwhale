@@ -5,6 +5,8 @@
       v-if="currentTrack"
       :key="(currentIndex, currentTrack.id)"
       :is-current="true"
+      :start-time="$store.state.player.currentTime"
+      :autoplay="$store.state.player.playing"
       :track="currentTrack">
     </audio-track>
 
@@ -127,7 +129,7 @@
       @keydown.ctrl.right.prevent.exact="next"
       @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
       @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
-      @keydown.f.prevent.exact="favoriteTracks.toggle(currentTrack.id)"
+      @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
       @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
       @keydown.s.prevent.exact="shuffle"
       />

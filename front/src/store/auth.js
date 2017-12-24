@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import config from '@/config'
 import logger from '@/logging'
-import cache from '@/cache'
 import router from '@/router'
 
 const LOGIN_URL = config.API_URL + 'token/'
@@ -45,9 +44,7 @@ export default {
       return resource.save({}, credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
         commit('token', response.data.token)
-        cache.set('token', response.data.token)
         commit('username', credentials.username)
-        cache.set('username', credentials.username)
         commit('authenticated', true)
         dispatch('fetchProfile')
         // Redirect to a specified route
@@ -58,7 +55,6 @@ export default {
       })
     },
     logout ({commit}) {
-      cache.clear()
       commit('authenticated', false)
       commit('profile', null)
       logger.default.info('Log out, goodbye!')
@@ -66,8 +62,8 @@ export default {
     },
     check ({commit, dispatch, state}) {
       logger.default.info('Checking authentication...')
-      var jwt = cache.get('token')
-      var username = cache.get('username')
+      var jwt = state.token
+      var username = state.username
       if (jwt) {
         commit('authenticated', true)
         commit('username', username)

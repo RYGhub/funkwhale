@@ -111,11 +111,6 @@ export default {
       }
     },
     next ({state, dispatch, commit, rootState}) {
-      if (rootState.player.looping === 1) {
-        // we loop on the same track, this is handled directly on the track
-        // component, so we do nothing.
-        return logger.default.info('Looping on the same track')
-      }
       if (rootState.player.looping === 2 && state.currentIndex >= state.tracks.length - 1) {
         logger.default.info('Going back to the beginning of the queue')
         return dispatch('currentIndex', 0)
@@ -130,6 +125,8 @@ export default {
     },
     currentIndex ({commit, state, rootState, dispatch}, index) {
       commit('ended', false)
+      commit('player/currentTime', 0, {root: true})
+      commit('player/playing', true, {root: true})
       commit('player/errored', false, {root: true})
       commit('currentIndex', index)
       if (state.tracks.length - index <= 2 && rootState.radios.running) {

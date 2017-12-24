@@ -62,7 +62,7 @@
                   {{ track.artist.name }}
               </td>
               <td>
-                <template v-if="favoriteTracks.objects[track.id]">
+                <template v-if="$store.getters['favorites/isFavorite'](track.id)">
                   <i class="pink heart icon"></i>
                 </template
               </td>
