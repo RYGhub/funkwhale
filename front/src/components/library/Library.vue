@@ -23,6 +23,10 @@ export default {
 <style lang="scss">
 .library.pusher > .ui.secondary.menu {
   margin: 0 2.5rem;
+  .item {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
 }
 
 .library {
