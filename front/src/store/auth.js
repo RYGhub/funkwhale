@@ -3,7 +3,6 @@ import config from '@/config'
 import logger from '@/logging'
 import cache from '@/cache'
 import router from '@/router'
-// import favoriteTracks from '@/favorites/tracks'
 
 const LOGIN_URL = config.API_URL + 'token/'
 const USER_PROFILE_URL = config.API_URL + 'users/users/me/'

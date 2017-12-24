@@ -139,7 +139,6 @@
 import {mapState, mapGetters, mapActions} from 'vuex'
 import GlobalEvents from '@/components/utils/global-events'
 
-import favoriteTracks from '@/favorites/tracks'
 import Track from '@/audio/track'
 import AudioTrack from '@/components/audio/Track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
@@ -154,8 +153,7 @@ export default {
   data () {
     return {
       sliderVolume: this.volume,
-      Track: Track,
-      favoriteTracks
+      Track: Track
     }
   },
   mounted () {

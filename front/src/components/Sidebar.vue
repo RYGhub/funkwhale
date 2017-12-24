@@ -94,7 +94,6 @@
 import {mapState, mapActions} from 'vuex'
 
 import Player from '@/components/audio/Player'
-import favoriteTracks from '@/favorites/tracks'
 import Logo from '@/components/Logo'
 import SearchBar from '@/components/audio/SearchBar'
 import backend from '@/audio/backend'
@@ -112,8 +111,7 @@ export default {
   },
   data () {
     return {
-      backend: backend,
-      favoriteTracks
+      backend: backend
     }
   },
   mounted () {
