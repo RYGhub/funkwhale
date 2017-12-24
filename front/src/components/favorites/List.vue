@@ -6,7 +6,7 @@
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
         <i class="circular inverted heart pink icon"></i>
-        {{ favoriteTracks.count }} favorites
+        {{ $store.state.favorites.count }} favorites
       </h2>
       <radio-button type="favorites"></radio-button>
     </div>
@@ -55,10 +55,8 @@
 
 <script>
 import $ from 'jquery'
-import Vue from 'vue'
 import logger from '@/logging'
 import config from '@/config'
-import favoriteTracks from '@/favorites/tracks'
 import TrackTable from '@/components/audio/track/Table'
 import RadioButton from '@/components/radios/Button'
 import Pagination from '@/components/Pagination'
@@ -80,7 +78,6 @@ export default {
       isLoading: false,
       nextLink: null,
       previousLink: null,
-      favoriteTracks,
       page: parseInt(this.defaultPage),
       paginateBy: parseInt(this.defaultPaginateBy || 25),
       orderingDirection: defaultOrdering.direction,
@@ -122,10 +119,9 @@ export default {
         self.results = response.data
         self.nextLink = response.data.next
         self.previousLink = response.data.previous
-        Vue.set(favoriteTracks, 'count', response.data.count)
-        favoriteTracks.count = response.data.count
+        self.$store.commit('favorites/count', response.data.count)
         self.results.results.forEach((track) => {
-          Vue.set(favoriteTracks.objects, track.id, true)
+          self.$store.commit('favorites/track', {id: track.id, value: true})
         })
         logger.default.timeEnd('Loading user favorites')
         self.isLoading = false

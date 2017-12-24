@@ -4,8 +4,8 @@
       <router-link class="ui item" to="/library" exact>Browse</router-link>
       <router-link class="ui item" to="/library/artists" exact>Artists</router-link>
       <div class="ui secondary right menu">
-        <router-link v-if="auth.user.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>Import</router-link>
-        <router-link v-if="auth.user.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches</router-link>
+        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>Import</router-link>
+        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches</router-link>
       </div>
     </div>
     <router-view :key="$route.fullPath"></router-view>
@@ -14,15 +14,8 @@
 
 <script>
 
-import auth from '@/auth'
-
 export default {
-  name: 'library',
-  data: function () {
-    return {
-      auth
-    }
-  }
+  name: 'library'
 }
 </script>
 

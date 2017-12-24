@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import queue from '@/audio/queue'
 import backend from '@/audio/backend'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import PlayButton from '@/components/audio/PlayButton'
@@ -68,7 +67,6 @@ export default {
   data () {
     return {
       backend: backend,
-      queue: queue,
       initialTracks: 4,
       showAllTracks: false
     }

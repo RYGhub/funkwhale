@@ -23,7 +23,6 @@
 <script>
 import jQuery from 'jquery'
 import config from '@/config'
-import auth from '@/auth'
 
 export default {
   props: {
@@ -66,7 +65,7 @@ export default {
         },
         apiSettings: {
           beforeXHR: function (xhrObject, s) {
-            xhrObject.setRequestHeader('Authorization', auth.getAuthHeader())
+            xhrObject.setRequestHeader('Authorization', this.$store.getters['auth/header'])
             return xhrObject
           },
           onResponse: function (initialResponse) {

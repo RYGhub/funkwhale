@@ -39,12 +39,11 @@
 </template>
 
 <script>
-import auth from '@/auth'
 
 export default {
   name: 'login',
   props: {
-    next: {type: String}
+    next: {type: String, default: '/'}
   },
   data () {
     return {
@@ -72,14 +71,17 @@ export default {
       }
       // We need to pass the component's this context
       // to properly make use of http in the auth service
-      auth.login(this, credentials, {path: this.next}, function (response) {
-        // error callback
-        if (response.status === 400) {
-          self.error = 'invalid_credentials'
-        } else {
-          self.error = 'unknown_error'
+      this.$store.dispatch('auth/login', {
+        credentials,
+        next: this.next,
+        onError: response => {
+          if (response.status === 400) {
+            self.error = 'invalid_credentials'
+          } else {
+            self.error = 'unknown_error'
+          }
         }
-      }).then((response) => {
+      }).then(e => {
         self.isLoading = false
       })
     }

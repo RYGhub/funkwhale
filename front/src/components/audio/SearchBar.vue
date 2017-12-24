@@ -12,7 +12,6 @@
 <script>
 import jQuery from 'jquery'
 import config from '@/config'
-import auth from '@/auth'
 import router from '@/router'
 
 const SEARCH_URL = config.API_URL + 'search?query={query}'
@@ -27,7 +26,7 @@ export default {
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
-          xhrObject.setRequestHeader('Authorization', auth.getAuthHeader())
+          xhrObject.setRequestHeader('Authorization', this.$store.getters['auth/header'])
           return xhrObject
         },
         onResponse: function (initialResponse) {

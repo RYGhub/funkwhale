@@ -61,7 +61,6 @@
 
 <script>
 
-import auth from '@/auth'
 import url from '@/utils/url'
 import logger from '@/logging'
 import backend from '@/audio/backend'
@@ -124,8 +123,8 @@ export default {
     downloadUrl () {
       if (this.track.files.length > 0) {
         let u = backend.absoluteUrl(this.track.files[0].path)
-        if (auth.user.authenticated) {
-          u = url.updateQueryString(u, 'jwt', auth.getAuthToken())
+        if (this.$store.state.auth.authenticated) {
+          u = url.updateQueryString(u, 'jwt', this.$store.state.auth.token)
         }
         return u
       }
