@@ -22,6 +22,7 @@ from . import models
 from . import serializers
 from . import importers
 from . import filters
+from . import tasks
 from . import utils
 
 
@@ -129,7 +130,8 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
         lyrics = work.fetch_lyrics()
         try:
             if not lyrics.content:
-                lyrics.fetch_content()
+                tasks.fetch_content(lyrics_id=lyrics.pk)
+                lyrics.refresh_from_db()
         except AttributeError:
             return Response({'error': 'unavailable lyrics'}, status=404)
         serializer = serializers.LyricsSerializer(lyrics)
@@ -244,7 +246,7 @@ class SubmitViewSet(viewsets.ViewSet):
             pass
         batch = models.ImportBatch.objects.create(submitted_by=request.user)
         job = models.ImportJob.objects.create(mbid=request.POST['mbid'], batch=batch, source=request.POST['import_url'])
-        job.run.delay()
+        tasks.import_job_run.delay(import_job_id=job.pk)
         serializer = serializers.ImportBatchSerializer(batch)
         return Response(serializer.data)
 
@@ -272,7 +274,7 @@ class SubmitViewSet(viewsets.ViewSet):
                 models.TrackFile.objects.get(track__mbid=row['mbid'])
             except models.TrackFile.DoesNotExist:
                 job = models.ImportJob.objects.create(mbid=row['mbid'], batch=batch, source=row['source'])
-                job.run.delay()
+                tasks.import_job_run.delay(import_job_id=job.pk)
         serializer = serializers.ImportBatchSerializer(batch)
         return serializer.data, batch
 

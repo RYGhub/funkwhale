@@ -15,11 +15,9 @@ from django.utils import timezone
 from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField
 
-from funkwhale_api.taskapp import celery
 from funkwhale_api import downloader
 from funkwhale_api import musicbrainz
 from . import importers
-from . import lyrics as lyrics_utils
 
 
 class APIModelMixin(models.Model):
@@ -255,14 +253,6 @@ class Lyrics(models.Model):
     url = models.URLField(unique=True)
     content = models.TextField(null=True, blank=True)
 
-    @celery.app.task(name='Lyrics.fetch_content', filter=celery.task_method)
-    def fetch_content(self):
-        html = lyrics_utils._get_html(self.url)
-        content = lyrics_utils.extract_content(html)
-        cleaned_content = lyrics_utils.clean_content(content)
-        self.content = cleaned_content
-        self.save()
-
     @property
     def content_rendered(self):
         return markdown.markdown(
@@ -362,6 +352,7 @@ class TrackFile(models.Model):
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
     source = models.URLField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
+    acoustid_track_id = models.UUIDField(null=True, blank=True)
 
     def download_file(self):
         # import the track file, since there is not any
@@ -429,26 +420,3 @@ class ImportJob(models.Model):
 
     class Meta:
         ordering = ('id', )
-    @celery.app.task(name='ImportJob.run', filter=celery.task_method)
-    def run(self, replace=False):
-        try:
-            track, created = Track.get_or_create_from_api(mbid=self.mbid)
-            track_file = None
-            if replace:
-                track_file = track.files.first()
-            elif track.files.count() > 0:
-                return
-
-            track_file = track_file or TrackFile(
-                track=track, source=self.source)
-            track_file.download_file()
-            track_file.save()
-            self.status = 'finished'
-            self.track_file = track_file
-            self.save()
-            return track.pk
-
-        except Exception as exc:
-            if not settings.DEBUG:
-                raise ImportJob.run.retry(args=[self], exc=exc, countdown=30, max_retries=3)
-            raise

@@ -7,3 +7,4 @@ libpq-dev
 postgresql-client
 libav-tools
 python3-dev
+curl

@@ -34,11 +34,11 @@ def test_can_submit_youtube_url_for_track_import(mocker, superuser_client):
     assert track.album.title == 'Marsupial Madness'
 
 
-def test_import_creates_an_import_with_correct_data(superuser_client, settings):
+def test_import_creates_an_import_with_correct_data(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
     video_id = 'tPEE9ZwTmy0'
     url = reverse('api:v1:submit-single')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url,
         {'import_url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
@@ -54,7 +54,8 @@ def test_import_creates_an_import_with_correct_data(superuser_client, settings):
     assert job.source == 'https://www.youtube.com/watch?v={0}'.format(video_id)
 
 
-def test_can_import_whole_album(mocker, superuser_client, settings):
+def test_can_import_whole_album(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=api_data.artists['get']['soad'])
@@ -82,7 +83,6 @@ def test_can_import_whole_album(mocker, superuser_client, settings):
         ]
     }
     url = reverse('api:v1:submit-album')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url, json.dumps(payload), content_type="application/json")
 
@@ -109,7 +109,8 @@ def test_can_import_whole_album(mocker, superuser_client, settings):
         assert job.source == row['source']
 
 
-def test_can_import_whole_artist(mocker, superuser_client, settings):
+def test_can_import_whole_artist(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=api_data.artists['get']['soad'])
@@ -142,7 +143,6 @@ def test_can_import_whole_artist(mocker, superuser_client, settings):
         ]
     }
     url = reverse('api:v1:submit-artist')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url, json.dumps(payload), content_type="application/json")
 
