@@ -49,7 +49,7 @@ mutagen>=1.39,<1.40
 
 # Until this is merged
 #django-taggit>=0.22,<0.23
-git+https://github.com/jdufresne/django-taggit.git@e8f7f216f04c9781bebc84363ab24d575f948ede
+git+https://github.com/alex/django-taggit.git@95776ac66948ed7ba7c12e35c1170551e3be66a5
 # Until this is merged
 git+https://github.com/EliotBerriot/PyMemoize.git@django
 # Until this is merged

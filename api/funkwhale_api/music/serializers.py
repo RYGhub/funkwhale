@@ -13,14 +13,14 @@ class TagSerializer(serializers.ModelSerializer):
 class SimpleArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Artist
-        fields = ('id', 'mbid', 'name')
+        fields = ('id', 'mbid', 'name', 'creation_date')
 
 
 class ArtistSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     class Meta:
         model = models.Artist
-        fields = ('id', 'mbid', 'name', 'tags')
+        fields = ('id', 'mbid', 'name', 'tags', 'creation_date')
 
 
 class TrackFileSerializer(serializers.ModelSerializer):

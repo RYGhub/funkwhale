@@ -3,55 +3,45 @@
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <template v-if="profile">
+    <template v-if="$store.state.auth.profile">
       <div :class="['ui', 'head', 'vertical', 'center', 'aligned', 'stripe', 'segment']">
         <h2 class="ui center aligned icon header">
           <i class="circular inverted user green icon"></i>
           <div class="content">
-            {{ profile.username }}
+            {{ $store.state.auth.profile.username }}
             <div class="sub header">Registered since {{ signupDate }}</div>
           </div>
         </h2>
         <div class="ui basic green label">this is you!</div>
-        <div v-if="profile.is_staff" class="ui yellow label">
+        <div v-if="$store.state.auth.profile.is_staff" class="ui yellow label">
           <i class="star icon"></i>
           Staff member
         </div>
+        <router-link class="ui tiny basic button" :to="{path: '/settings'}">
+          <i class="setting icon"> </i>Settings...
+        </router-link>
+
       </div>
     </template>
   </div>
 </template>
 
 <script>
-import auth from '@/auth'
-var dateFormat = require('dateformat')
+const dateFormat = require('dateformat')
 
 export default {
   name: 'login',
   props: ['username'],
-  data () {
-    return {
-      profile: null
-    }
-  },
   created () {
-    this.fetchProfile()
-  },
-  methods: {
-    fetchProfile () {
-      let self = this
-      auth.fetchProfile().then(data => {
-        self.profile = data
-      })
-    }
+    this.$store.dispatch('auth/fetchProfile')
   },
   computed: {
     signupDate () {
-      let d = new Date(this.profile.date_joined)
+      let d = new Date(this.$store.state.auth.profile.date_joined)
       return dateFormat(d, 'longDate')
     },
     isLoading () {
-      return !this.profile
+      return !this.$store.state.auth.profile
     }
   }
 }

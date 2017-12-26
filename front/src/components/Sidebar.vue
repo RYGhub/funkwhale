@@ -28,8 +28,8 @@
   <div class="tabs">
     <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical fluid menu">
-        <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'profile', params: {username: auth.user.username}}"><i class="user icon"></i> Logged in as {{ auth.user.username }}</router-link>
-        <router-link class="item" v-if="auth.user.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i> Logged in as {{ $store.state.auth.username }}</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
         <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
         <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
@@ -51,7 +51,7 @@
     <div class="ui bottom attached tab" data-tab="queue">
       <table class="ui compact inverted very basic fixed single line table">
         <draggable v-model="queue.tracks" element="tbody" @update="reorder">
-          <tr @click="queue.play(index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
+          <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>
               <td class="center aligned">
                   <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
@@ -62,24 +62,24 @@
                   {{ track.artist.name }}
               </td>
               <td>
-                <template v-if="favoriteTracks.objects[track.id]">
-                  <i @click.stop="queue.cleanTrack(index)" class="pink heart icon"></i>
-                  </template
+                <template v-if="$store.getters['favorites/isFavorite'](track.id)">
+                  <i class="pink heart icon"></i>
+                </template
               </td>
               <td>
-                  <i @click.stop="queue.cleanTrack(index)" class="circular trash icon"></i>
+                  <i @click.stop="cleanTrack(index)" class="circular trash icon"></i>
               </td>
             </tr>
           </draggable>
       </table>
-      <div v-if="radios.running" class="ui black message">
+      <div v-if="$store.state.radios.running" class="ui black message">
 
         <div class="content">
           <div class="header">
             <i class="feed icon"></i> You have a radio playing
           </div>
           <p>New tracks will be appended here automatically.</p>
-          <div @click="radios.stop()" class="ui basic inverted red button">Stop radio</div>
+          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button">Stop radio</div>
         </div>
       </div>
     </div>
@@ -87,24 +87,17 @@
   <div class="ui inverted segment player-wrapper">
     <player></player>
   </div>
-  <GlobalEvents
-    @keydown.r.stop="queue.restore"
-    />
 </div>
 </template>
 
 <script>
-import GlobalEvents from '@/components/utils/global-events'
+import {mapState, mapActions} from 'vuex'
 
 import Player from '@/components/audio/Player'
-import favoriteTracks from '@/favorites/tracks'
 import Logo from '@/components/Logo'
 import SearchBar from '@/components/audio/SearchBar'
-import auth from '@/auth'
-import queue from '@/audio/queue'
 import backend from '@/audio/backend'
 import draggable from 'vuedraggable'
-import radios from '@/radios'
 
 import $ from 'jquery'
 
@@ -114,24 +107,27 @@ export default {
     Player,
     SearchBar,
     Logo,
-    draggable,
-    GlobalEvents
+    draggable
   },
   data () {
     return {
-      auth: auth,
-      backend: backend,
-      queue: queue,
-      radios,
-      favoriteTracks
+      backend: backend
     }
   },
   mounted () {
     $(this.$el).find('.menu .item').tab()
   },
+  computed: {
+    ...mapState({
+      queue: state => state.queue
+    })
+  },
   methods: {
-    reorder (e) {
-      this.queue.reorder(e.oldIndex, e.newIndex)
+    ...mapActions({
+      cleanTrack: 'queue/cleanTrack'
+    }),
+    reorder: function (oldValue, newValue) {
+      this.$store.commit('queue/reorder', {oldValue, newValue})
     }
   }
 }

@@ -4,6 +4,7 @@ import PageNotFound from '@/components/PageNotFound'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Profile from '@/components/auth/Profile'
+import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
@@ -40,6 +41,11 @@ export default new Router({
       component: Logout
     },
     {
+      path: '/settings',
+      name: 'settings',
+      component: Settings
+    },
+    {
       path: '/@:username',
       name: 'profile',
       component: Profile,
@@ -47,14 +53,29 @@ export default new Router({
     },
     {
       path: '/favorites',
-      component: Favorites
+      component: Favorites,
+      props: (route) => ({
+        defaultOrdering: route.query.ordering,
+        defaultPage: route.query.page,
+        defaultPaginateBy: route.query.paginateBy
+      })
     },
     {
       path: '/library',
       component: Library,
       children: [
         { path: '', component: LibraryHome },
-        { path: 'artists/', name: 'library.artists.browse', component: LibraryArtists },
+        {
+          path: 'artists/',
+          name: 'library.artists.browse',
+          component: LibraryArtists,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
         { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
         { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
         { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },

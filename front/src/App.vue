@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <sidebar></sidebar>
-    <router-view></router-view>
-    <div class="ui divider"></div>
+    <router-view :key="$route.fullPath"></router-view>
+    <div class="ui fitted divider"></div>
     <div id="footer" class="ui vertical footer segment">
       <div class="ui container">
         <div class="ui stackable equal height stackable grid">
@@ -55,7 +55,7 @@ export default {
   padding: 1.5rem 0;
 }
 #footer {
-  padding: 1.5rem;
+  padding: 4em;
 }
 .ui.stripe.segment {
   padding: 4em;

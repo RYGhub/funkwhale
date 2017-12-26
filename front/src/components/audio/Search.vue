@@ -30,7 +30,6 @@
 
 <script>
 import logger from '@/logging'
-import queue from '@/audio/queue'
 import backend from '@/audio/backend'
 import AlbumCard from '@/components/audio/album/Card'
 import ArtistCard from '@/components/audio/artist/Card'
@@ -54,8 +53,7 @@ export default {
         artists: []
       },
       backend: backend,
-      isLoading: false,
-      queue: queue
+      isLoading: false
     }
   },
   mounted () {

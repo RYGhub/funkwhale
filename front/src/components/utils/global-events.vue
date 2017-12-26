@@ -27,7 +27,7 @@ export default {
       let wrapper = function (event) {
         // we check here the event is not triggered from an input
         // to avoid collisions
-        if (!$(event.target).is(':input, [contenteditable]')) {
+        if (!$(event.target).is('.field, :input, [contenteditable]')) {
           handler(event)
         }
       }

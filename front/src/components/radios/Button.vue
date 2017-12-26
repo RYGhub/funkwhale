@@ -9,33 +9,28 @@
 
 <script>
 
-import radios from '@/radios'
-
 export default {
   props: {
     type: {type: String, required: true},
     objectId: {type: Number, default: null}
   },
-  data () {
-    return {
-      radios
-    }
-  },
   methods: {
     toggleRadio () {
       if (this.running) {
-        radios.stop()
+        this.$store.dispatch('radios/stop')
       } else {
-        radios.start(this.type, this.objectId)
+        this.$store.dispatch('radios/start', {type: this.type, objectId: this.objectId})
       }
     }
   },
   computed: {
     running () {
-      if (!radios.running) {
+      let state = this.$store.state.radios
+      let current = state.current
+      if (!state.running) {
         return false
       } else {
-        return radios.current.type === this.type & radios.current.objectId === this.objectId
+        return current.type === this.type & current.objectId === this.objectId
       }
     }
   }

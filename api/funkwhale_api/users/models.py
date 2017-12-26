@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 from django.db import models
@@ -15,6 +17,8 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
 
+    # updated on logout or password change, to invalidate JWT
+    secret_key = models.UUIDField(default=uuid.uuid4, null=True)
     # permissions that are used for API access and that worth serializing
     relevant_permissions = {
         # internal_codename : {external_codename}
@@ -31,3 +35,11 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})
+
+    def update_secret_key(self):
+        self.secret_key = uuid.uuid4()
+        return self.secret_key
+
+    def set_password(self, raw_password):
+        super().set_password(raw_password)
+        self.update_secret_key()

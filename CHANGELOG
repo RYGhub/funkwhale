@@ -5,6 +5,26 @@ Changelog
 0.2.7 (Unreleased)
 ------------------
 
+- Shortcuts: can now use the ``f`` shortcut to toggle the currently playing track
+  as a favorite (#53)
+- Shortcuts: avoid collisions between shortcuts by using the exact modifier (#53)
+- Player: Added looping controls and shortcuts (#52)
+- Player: Added shuffling controls and shortcuts (#52)
+- Favorites: can now modify the ordering of track list (#50)
+- Library: can now search/reorder results on artist browsing view (#50)
+- Upgraded celery to 4.1, added endpoint logic for fingerprinting audio files
+- Fixed #56: invalidate tokens on password change, also added change password form
+- Fixed #57: now refresh jwt token on page refresh
+- removed ugly dividers in batch import list
+- Fixed a few padding issues
+- Now persist/restore queue/radio/player state automatically
+- Removed old broken imports
+- Now force tests paths
+- Fixed #54: Now use pytest everywhere \o/
+- Now use vuex to manage state for favorites
+- Now use vuex to manage state for authentication
+- Now use vuex to manage state for player/queue/radios
+
 
 0.2.6 (2017-12-15)
 ------------------

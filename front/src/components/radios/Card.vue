@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import radios from '@/radios'
 import RadioButton from './Button'
 
 export default {
@@ -25,7 +24,7 @@ export default {
   },
   computed: {
     radio () {
-      return radios.types[this.type]
+      return this.$store.getters['radios/types'][this.type]
     }
   }
 }

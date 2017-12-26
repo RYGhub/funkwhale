@@ -8,5 +8,5 @@ class ArtistFilter(django_filters.FilterSet):
     class Meta:
         model = models.Artist
         fields = {
-            'name': ['exact', 'iexact', 'startswith']
+            'name': ['exact', 'iexact', 'startswith', 'icontains']
         }
