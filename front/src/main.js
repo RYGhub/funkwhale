@@ -31,6 +31,7 @@ Vue.http.interceptors.push(function (request, next) {
   next(function (response) {
     // redirect to login form when we get unauthorized response from server
     if (response.status === 401) {
+      store.commit('auth/authenticated', false)
       logger.default.warn('Received 401 response from API, redirecting to login form')
       router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
     }

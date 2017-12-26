@@ -280,8 +280,9 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=30),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'JWT_GET_USER_SECRET_KEY': lambda user: user.secret_key
 }
-
+OLD_PASSWORD_FIELD_ENABLED = True
 ACCOUNT_ADAPTER = 'funkwhale_api.users.adapters.FunkwhaleAccountAdapter'
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = (

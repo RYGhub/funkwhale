@@ -29,13 +29,24 @@ export default {
     },
     authenticated: (state, value) => {
       state.authenticated = value
+      if (value === false) {
+        state.username = null
+        state.token = null
+        state.tokenData = null
+        state.profile = null
+        state.availablePermissions = {}
+      }
     },
     username: (state, value) => {
       state.username = value
     },
     token: (state, value) => {
       state.token = value
-      state.tokenData = jwtDecode(value)
+      if (value) {
+        state.tokenData = jwtDecode(value)
+      } else {
+        state.tokenData = {}
+      }
     },
     permission: (state, {key, status}) => {
       state.availablePermissions[key] = status
@@ -60,7 +71,6 @@ export default {
     },
     logout ({commit}) {
       commit('authenticated', false)
-      commit('profile', null)
       logger.default.info('Log out, goodbye!')
       router.push({name: 'index'})
     },
