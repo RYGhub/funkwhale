@@ -62,3 +62,38 @@ def test_can_fetch_data_from_api(client, factories):
     assert payload['name'] == user.name
     assert payload['permissions']['import.launch']['status']
     assert payload['permissions']['settings.change']['status']
+
+
+def test_can_get_token_via_api(client, factories):
+    user = factories['users.User']()
+    url = reverse('api:v1:token')
+    payload = {
+        'username': user.username,
+        'password': 'test'
+    }
+
+    response = client.post(url, payload)
+    assert response.status_code == 200
+    assert '"token":' in response.content.decode('utf-8')
+
+
+def test_can_refresh_token_via_api(client, factories):
+    # first, we get a token
+    user = factories['users.User']()
+    url = reverse('api:v1:token')
+    payload = {
+        'username': user.username,
+        'password': 'test'
+    }
+
+    response = client.post(url, payload)
+    assert response.status_code == 200
+
+    token = json.loads(response.content.decode('utf-8'))['token']
+    url = reverse('api:v1:token_refresh')
+    response = client.post(url,{'token': token})
+
+    assert response.status_code == 200
+    assert '"token":' in response.content.decode('utf-8')
+    # a different token should be returned
+    assert token in response.content.decode('utf-8')

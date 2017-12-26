@@ -1,9 +1,11 @@
 import Vue from 'vue'
+import jwtDecode from 'jwt-decode'
 import config from '@/config'
 import logger from '@/logging'
 import router from '@/router'
 
 const LOGIN_URL = config.API_URL + 'token/'
+const REFRESH_TOKEN_URL = config.API_URL + 'token/refresh/'
 const USER_PROFILE_URL = config.API_URL + 'users/users/me/'
 
 export default {
@@ -13,7 +15,8 @@ export default {
     username: '',
     availablePermissions: {},
     profile: null,
-    token: ''
+    token: '',
+    tokenData: {}
   },
   getters: {
     header: state => {
@@ -32,6 +35,7 @@ export default {
     },
     token: (state, value) => {
       state.token = value
+      state.tokenData = jwtDecode(value)
     },
     permission: (state, {key, status}) => {
       state.availablePermissions[key] = status
@@ -70,6 +74,7 @@ export default {
         commit('token', jwt)
         logger.default.info('Logged back in as ' + username)
         dispatch('fetchProfile')
+        dispatch('refreshToken')
       } else {
         logger.default.info('Anonymous user')
         commit('authenticated', false)
@@ -89,6 +94,15 @@ export default {
         return response.data
       }, (response) => {
         logger.default.info('Error while fetching user profile')
+      })
+    },
+    refreshToken ({commit, dispatch, state}) {
+      let resource = Vue.resource(REFRESH_TOKEN_URL)
+      return resource.save({}, {token: state.token}).then(response => {
+        logger.default.info('Refreshed auth token')
+        commit('token', response.data.token)
+      }, response => {
+        logger.default.error('Error while refreshing token', response.data)
       })
     }
   }
