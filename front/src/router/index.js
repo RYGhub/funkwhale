@@ -4,6 +4,7 @@ import PageNotFound from '@/components/PageNotFound'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Profile from '@/components/auth/Profile'
+import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
@@ -38,6 +39,11 @@ export default new Router({
       path: '/logout',
       name: 'logout',
       component: Logout
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: Settings
     },
     {
       path: '/@:username',

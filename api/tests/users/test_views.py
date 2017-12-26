@@ -97,3 +97,22 @@ def test_can_refresh_token_via_api(client, factories):
     assert '"token":' in response.content.decode('utf-8')
     # a different token should be returned
     assert token in response.content.decode('utf-8')
+
+
+def test_changing_password_updates_secret_key(logged_in_client):
+    user = logged_in_client.user
+    password = user.password
+    secret_key = user.secret_key
+    payload = {
+        'old_password': 'test',
+        'new_password1': 'new',
+        'new_password2': 'new',
+    }
+    url = reverse('change_password')
+
+    response = logged_in_client.post(url, payload)
+
+    user.refresh_from_db()
+
+    assert user.secret_key != secret_key
+    assert user.password != password

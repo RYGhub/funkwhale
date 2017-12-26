@@ -17,6 +17,10 @@
           <i class="star icon"></i>
           Staff member
         </div>
+        <router-link class="ui tiny basic button" :to="{path: '/settings'}">
+          <i class="setting icon"> </i>Settings...
+        </router-link>
+
       </div>
     </template>
   </div>
