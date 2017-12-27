@@ -2,6 +2,7 @@ from django.core.files.base import ContentFile
 
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
+from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
 
 from django.conf import settings
 from . import models

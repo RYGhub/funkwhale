@@ -30,7 +30,7 @@ http {
     server {
         listen 6001;
         charset     utf-8;
-
+        client_max_body_size 20M;
         location /_protected/media {
             internal;
             alias   /protected/media;

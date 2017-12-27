@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
 from django.conf import settings
-from rest_framework import viewsets, views
+from rest_framework import viewsets, views, mixins
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -15,7 +15,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from funkwhale_api.musicbrainz import api
-from funkwhale_api.common.permissions import ConditionalAuthentication
+from funkwhale_api.common.permissions import (
+    ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
 
 from . import models
@@ -71,15 +72,44 @@ class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     ordering_fields = ('creation_date',)
 
 
-class ImportBatchViewSet(viewsets.ReadOnlyModelViewSet):
+class ImportBatchViewSet(
+        mixins.CreateModelMixin,
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet):
     queryset = (
         models.ImportBatch.objects.all()
                           .prefetch_related('jobs__track_file')
                           .order_by('-creation_date'))
     serializer_class = serializers.ImportBatchSerializer
+    permission_classes = (permissions.DjangoModelPermissions, )
 
     def get_queryset(self):
         return super().get_queryset().filter(submitted_by=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(submitted_by=self.request.user)
+
+
+class ImportJobPermission(HasModelPermission):
+    # not a typo, perms on import job is proxied to import batch
+    model = models.ImportBatch
+
+
+class ImportJobViewSet(
+        mixins.CreateModelMixin,
+        viewsets.GenericViewSet):
+    queryset = (models.ImportJob.objects.all())
+    serializer_class = serializers.ImportJobSerializer
+    permission_classes = (ImportJobPermission, )
+
+    def get_queryset(self):
+        return super().get_queryset().filter(batch__submitted_by=self.request.user)
+
+    def perform_create(self, serializer):
+        source = 'file://' + serializer.validated_data['audio_file'].name
+        serializer.save(source=source)
+        tasks.import_job_run.delay(import_job_id=serializer.instance.pk)
 
 
 class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):

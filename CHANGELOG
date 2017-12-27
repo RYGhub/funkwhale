@@ -2,7 +2,15 @@ Changelog
 =========
 
 
-0.2.7 (Unreleased)
+0.3 (Unreleased)
+------------------
+
+- Revamped all import logic, everything is more tested and consistend
+- Can now use Acoustid in file imports to automatically grab metadata from musicbrainz
+- Brand new file import wizard
+
+
+0.2.7
 ------------------
 
 - Shortcuts: can now use the ``f`` shortcut to toggle the currently playing track

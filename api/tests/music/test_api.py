@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 from django.urls import reverse
 
@@ -7,6 +8,8 @@ from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
 
 from . import data as api_data
+
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_submit_youtube_url_for_track_import(mocker, superuser_client):
@@ -187,6 +190,48 @@ def test_user_can_query_api_for_his_own_batches(client, factories):
     results = json.loads(response1.content.decode('utf-8'))
     assert results['count'] == 1
     assert results['results'][0]['jobs'][0]['mbid'] == job.mbid
+
+
+def test_user_can_create_an_empty_batch(client, factories):
+    user = factories['users.SuperUser']()
+    url = reverse('api:v1:import-batches-list')
+    client.login(username=user.username, password='test')
+    response = client.post(url)
+
+    assert response.status_code == 201
+
+    batch = user.imports.latest('id')
+
+    assert batch.submitted_by == user
+    assert batch.source == 'api'
+
+
+def test_user_can_create_import_job_with_file(client, factories, mocker):
+    path = os.path.join(DATA_DIR, 'test.ogg')
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    user = factories['users.SuperUser']()
+    batch = factories['music.ImportBatch'](submitted_by=user)
+    url = reverse('api:v1:import-jobs-list')
+    client.login(username=user.username, password='test')
+    with open(path, 'rb') as f:
+        content = f.read()
+        f.seek(0)
+        response = client.post(url, {
+            'batch': batch.pk,
+            'audio_file': f,
+            'source': 'file://'
+        }, format='multipart')
+
+    assert response.status_code == 201
+
+    job = batch.jobs.latest('id')
+
+    assert job.status == 'pending'
+    assert job.source.startswith('file://')
+    assert 'test.ogg' in job.source
+    assert job.audio_file.read() == content
+
+    m.assert_called_once_with(import_job_id=job.pk)
 
 
 def test_can_search_artist(factories, client):

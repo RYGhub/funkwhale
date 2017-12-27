@@ -405,8 +405,11 @@ class ImportBatch(models.Model):
     @property
     def status(self):
         pending = any([job.status == 'pending' for job in self.jobs.all()])
+        errored = any([job.status == 'errored' for job in self.jobs.all()])
         if pending:
             return 'pending'
+        if errored:
+            return 'errored'
         return 'finished'
 
 class ImportJob(models.Model):
@@ -418,7 +421,7 @@ class ImportJob(models.Model):
         null=True,
         blank=True,
         on_delete=models.CASCADE)
-    source = models.URLField()
+    source = models.CharField(max_length=500)
     mbid = models.UUIDField(editable=False, null=True, blank=True)
     STATUS_CHOICES = (
         ('pending', 'Pending'),
