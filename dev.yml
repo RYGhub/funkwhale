@@ -30,7 +30,7 @@ services:
     links:
      - postgres
      - redis
-    command: celery -A funkwhale_api.taskapp worker
+    command: celery -A funkwhale_api.taskapp worker -l debug
     environment:
       - "DJANGO_ALLOWED_HOSTS=localhost"
       - "DJANGO_SETTINGS_MODULE=config.settings.local"

@@ -8,7 +8,7 @@ from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.music import models, metadata
 
 
-def import_metadata_without_musicbrainz(path):
+def import_track_data_from_path(path):
     data = metadata.Metadata(path)
     artist = models.Artist.objects.get_or_create(
         name__iexact=data.get('artist'),
@@ -53,7 +53,7 @@ def from_path(path):
         result = client.get_best_match(path)
         acoustid_track_id = result['id']
     except acoustid.WebServiceError:
-        track = import_metadata_without_musicbrainz(path)
+        track = import_track_data_from_path(path)
     except (TypeError, KeyError):
         track = import_metadata_without_musicbrainz(path)
     else:

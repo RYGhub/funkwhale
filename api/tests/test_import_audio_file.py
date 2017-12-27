@@ -1,8 +1,10 @@
+import pytest
 import acoustid
 import datetime
 import os
+from django.core.management import call_command
+from django.core.management.base import CommandError
 
-from .music import data as api_data
 from funkwhale_api.providers.audiofile import tasks
 
 DATA_DIR = os.path.join(
@@ -11,35 +13,7 @@ DATA_DIR = os.path.join(
 )
 
 
-def test_import_file_with_acoustid(db, mocker, preferences):
-    mbid = api_data.tracks['get']['8bitadventures']['recording']['id']
-    payload = {
-        'results': [{
-            'id': 'e475bf79-c1ce-4441-bed7-1e33f226c0a2',
-            'recordings': [{'id': mbid}],
-            'score': 0.86
-        }]
-    }
-    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
-    m = mocker.patch('acoustid.match', return_value=payload)
-    mocker.patch(
-        'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['adhesive_wombat'])
-    mocker.patch(
-        'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get']['marsupial'])
-    mocker.patch(
-        'funkwhale_api.musicbrainz.api.recordings.get',
-        return_value=api_data.tracks['get']['8bitadventures'])
-    track_file = tasks.from_path(path)
-    result = payload['results'][0]
-
-    assert track_file.acoustid_track_id == result['id']
-    assert track_file.track.mbid == result['recordings'][0]['id']
-    m.assert_called_once_with('', path, parse=False)
-
-
-def test_can_import_single_audio_file_without_acoustid(db, mocker):
+def test_can_create_track_from_file_metadata(db, mocker):
     mocker.patch('acoustid.match', side_effect=acoustid.WebServiceError('test'))
     metadata = {
         'artist': ['Test artist'],
@@ -56,8 +30,8 @@ def test_can_import_single_audio_file_without_acoustid(db, mocker):
         'funkwhale_api.music.metadata.Metadata.get_file_type',
         return_value='OggVorbis',
     )
-    track_file = tasks.from_path(os.path.join(DATA_DIR, 'dummy_file.ogg'))
-    track = track_file.track
+    track = tasks.import_track_data_from_path(
+        os.path.join(DATA_DIR, 'dummy_file.ogg'))
 
     assert track.title == metadata['title'][0]
     assert track.mbid == metadata['musicbrainz_trackid'][0]
@@ -67,3 +41,37 @@ def test_can_import_single_audio_file_without_acoustid(db, mocker):
     assert track.album.release_date == datetime.date(2012, 8, 15)
     assert track.artist.name == metadata['artist'][0]
     assert track.artist.mbid == metadata['musicbrainz_artistid'][0]
+
+
+def test_management_command_requires_a_valid_username(factories, mocker):
+    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
+    user = factories['users.User'](username='me')
+    mocker.patch('funkwhale_api.providers.audiofile.management.commands.import_files.Command.do_import')  # NOQA
+    with pytest.raises(CommandError):
+        call_command('import_files', path, username='not_me', interactive=False)
+    call_command('import_files', path, username='me', interactive=False)
+
+
+def test_import_files_creates_a_batch_and_job(factories, mocker):
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    user = factories['users.User'](username='me')
+    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
+    call_command(
+        'import_files',
+        path,
+        username='me',
+        async=True,
+        interactive=False)
+
+    batch = user.imports.latest('id')
+    assert batch.source == 'shell'
+    assert batch.jobs.count() == 1
+
+    job = batch.jobs.first()
+
+    assert job.status == 'pending'
+    with open(path, 'rb') as f:
+        assert job.audio_file.read() == f.read()
+
+    assert job.source == 'file://' + path
+    m.assert_called_once_with(import_job_id=job.pk)

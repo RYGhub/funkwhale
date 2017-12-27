@@ -384,9 +384,17 @@ class TrackFile(models.Model):
 
 
 class ImportBatch(models.Model):
+    IMPORT_BATCH_SOURCES = [
+        ('api', 'api'),
+        ('shell', 'shell')
+    ]
+    source = models.CharField(
+        max_length=30, default='api', choices=IMPORT_BATCH_SOURCES)
     creation_date = models.DateTimeField(default=timezone.now)
     submitted_by = models.ForeignKey(
-        'users.User', related_name='imports', on_delete=models.CASCADE)
+        'users.User',
+        related_name='imports',
+        on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-creation_date']
@@ -411,12 +419,16 @@ class ImportJob(models.Model):
         blank=True,
         on_delete=models.CASCADE)
     source = models.URLField()
-    mbid = models.UUIDField(editable=False)
+    mbid = models.UUIDField(editable=False, null=True, blank=True)
     STATUS_CHOICES = (
         ('pending', 'Pending'),
-        ('finished', 'finished'),
+        ('finished', 'Finished'),
+        ('errored', 'Errored'),
+        ('skipped', 'Skipped'),
     )
     status = models.CharField(choices=STATUS_CHOICES, default='pending', max_length=30)
+    audio_file = models.FileField(
+        upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ('id', )
