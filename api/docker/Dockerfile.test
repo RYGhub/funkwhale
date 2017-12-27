@@ -7,6 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE  1
 COPY ./requirements.apt /requirements.apt
 COPY ./install_os_dependencies.sh /install_os_dependencies.sh
 RUN bash install_os_dependencies.sh install
+RUN curl -L https://github.com/acoustid/chromaprint/releases/download/v1.4.2/chromaprint-fpcalc-1.4.2-linux-x86_64.tar.gz | tar -xz -C /usr/local/bin --strip 1
 
 RUN mkdir /requirements
 COPY ./requirements/base.txt /requirements/base.txt

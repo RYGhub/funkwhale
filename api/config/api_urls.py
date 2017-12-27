@@ -15,6 +15,7 @@ router.register(r'trackfiles', views.TrackFileViewSet, 'trackfiles')
 router.register(r'artists', views.ArtistViewSet, 'artists')
 router.register(r'albums', views.AlbumViewSet, 'albums')
 router.register(r'import-batches', views.ImportBatchViewSet, 'import-batches')
+router.register(r'import-jobs', views.ImportJobViewSet, 'import-jobs')
 router.register(r'submit', views.SubmitViewSet, 'submit')
 router.register(r'playlists', playlists_views.PlaylistViewSet, 'playlists')
 router.register(

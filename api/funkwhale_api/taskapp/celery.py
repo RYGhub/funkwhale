@@ -1,10 +1,12 @@
 
 from __future__ import absolute_import
 import os
+import functools
+
 from celery import Celery
 from django.apps import AppConfig
 from django.conf import settings
-from celery.contrib.methods import task_method
+
 
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
@@ -21,12 +23,20 @@ class CeleryConfig(AppConfig):
     def ready(self):
         # Using a string here means the worker will not have to
         # pickle the object when using Windows.
-        app.config_from_object('django.conf:settings')
+        app.config_from_object('django.conf:settings', namespace='CELERY')
         app.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
 
 
-
-
-@app.task(bind=True)
-def debug_task(self):
-    print('Request: {0!r}'.format(self.request))  # pragma: no cover
+def require_instance(model_or_qs, parameter_name):
+    def decorator(function):
+        @functools.wraps(function)
+        def inner(*args, **kwargs):
+            pk = kwargs.pop('_'.join([parameter_name, 'id']))
+            try:
+                instance = model_or_qs.get(pk=pk)
+            except AttributeError:
+                instance = model_or_qs.objects.get(pk=pk)
+            kwargs[parameter_name] = instance
+            return function(*args, **kwargs)
+        return inner
+    return decorator

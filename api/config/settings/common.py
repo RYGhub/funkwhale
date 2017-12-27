@@ -47,7 +47,6 @@ THIRD_PARTY_APPS = (
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'djcelery',
     'taggit',
     'cachalot',
     'rest_auth',
@@ -68,6 +67,7 @@ LOCAL_APPS = (
     'funkwhale_api.playlists',
     'funkwhale_api.providers.audiofile',
     'funkwhale_api.providers.youtube',
+    'funkwhale_api.providers.acoustid',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -266,14 +266,14 @@ CACHES["default"]["OPTIONS"] = {
 
 ########## CELERY
 INSTALLED_APPS += ('funkwhale_api.taskapp.celery.CeleryConfig',)
-BROKER_URL = env(
+CELERY_BROKER_URL = env(
     "CELERY_BROKER_URL", default=env('CACHE_URL', default=CACHE_DEFAULT))
 ########## END CELERY
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 # Your common stuff: Below this line define 3rd party library settings
-CELERY_DEFAULT_RATE_LIMIT = 1
-CELERYD_TASK_TIME_LIMIT = 300
+CELERY_TASK_DEFAULT_RATE_LIMIT = 1
+CELERY_TASK_TIME_LIMIT = 300
 import datetime
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,

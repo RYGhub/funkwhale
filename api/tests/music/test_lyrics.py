@@ -4,6 +4,7 @@ from django.urls import reverse
 from funkwhale_api.music import models
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
+from funkwhale_api.music import tasks
 from funkwhale_api.music import lyrics as lyrics_utils
 
 from .mocking import lyricswiki
@@ -18,7 +19,8 @@ def test_works_import_lyrics_if_any(mocker, factories):
     lyrics = factories['music.Lyrics'](
         url='http://lyrics.wikia.com/System_Of_A_Down:Chop_Suey!')
 
-    lyrics.fetch_content()
+    tasks.fetch_content(lyrics_id=lyrics.pk)
+    lyrics.refresh_from_db()
     self.assertIn(
         'Grab a brush and put on a little makeup',
         lyrics.content,

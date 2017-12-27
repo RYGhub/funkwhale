@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 from django.urls import reverse
 
@@ -7,6 +8,8 @@ from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
 
 from . import data as api_data
+
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_submit_youtube_url_for_track_import(mocker, superuser_client):
@@ -34,11 +37,11 @@ def test_can_submit_youtube_url_for_track_import(mocker, superuser_client):
     assert track.album.title == 'Marsupial Madness'
 
 
-def test_import_creates_an_import_with_correct_data(superuser_client, settings):
+def test_import_creates_an_import_with_correct_data(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
     video_id = 'tPEE9ZwTmy0'
     url = reverse('api:v1:submit-single')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url,
         {'import_url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
@@ -54,7 +57,8 @@ def test_import_creates_an_import_with_correct_data(superuser_client, settings):
     assert job.source == 'https://www.youtube.com/watch?v={0}'.format(video_id)
 
 
-def test_can_import_whole_album(mocker, superuser_client, settings):
+def test_can_import_whole_album(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=api_data.artists['get']['soad'])
@@ -82,7 +86,6 @@ def test_can_import_whole_album(mocker, superuser_client, settings):
         ]
     }
     url = reverse('api:v1:submit-album')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url, json.dumps(payload), content_type="application/json")
 
@@ -109,7 +112,8 @@ def test_can_import_whole_album(mocker, superuser_client, settings):
         assert job.source == row['source']
 
 
-def test_can_import_whole_artist(mocker, superuser_client, settings):
+def test_can_import_whole_artist(mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=api_data.artists['get']['soad'])
@@ -142,7 +146,6 @@ def test_can_import_whole_artist(mocker, superuser_client, settings):
         ]
     }
     url = reverse('api:v1:submit-artist')
-    settings.CELERY_ALWAYS_EAGER = False
     response = superuser_client.post(
         url, json.dumps(payload), content_type="application/json")
 
@@ -187,6 +190,48 @@ def test_user_can_query_api_for_his_own_batches(client, factories):
     results = json.loads(response1.content.decode('utf-8'))
     assert results['count'] == 1
     assert results['results'][0]['jobs'][0]['mbid'] == job.mbid
+
+
+def test_user_can_create_an_empty_batch(client, factories):
+    user = factories['users.SuperUser']()
+    url = reverse('api:v1:import-batches-list')
+    client.login(username=user.username, password='test')
+    response = client.post(url)
+
+    assert response.status_code == 201
+
+    batch = user.imports.latest('id')
+
+    assert batch.submitted_by == user
+    assert batch.source == 'api'
+
+
+def test_user_can_create_import_job_with_file(client, factories, mocker):
+    path = os.path.join(DATA_DIR, 'test.ogg')
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    user = factories['users.SuperUser']()
+    batch = factories['music.ImportBatch'](submitted_by=user)
+    url = reverse('api:v1:import-jobs-list')
+    client.login(username=user.username, password='test')
+    with open(path, 'rb') as f:
+        content = f.read()
+        f.seek(0)
+        response = client.post(url, {
+            'batch': batch.pk,
+            'audio_file': f,
+            'source': 'file://'
+        }, format='multipart')
+
+    assert response.status_code == 201
+
+    job = batch.jobs.latest('id')
+
+    assert job.status == 'pending'
+    assert job.source.startswith('file://')
+    assert 'test.ogg' in job.source
+    assert job.audio_file.read() == content
+
+    m.assert_called_once_with(import_job_id=job.pk)
 
 
 def test_can_search_artist(factories, client):

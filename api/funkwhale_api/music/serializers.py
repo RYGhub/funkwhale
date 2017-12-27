@@ -113,7 +113,8 @@ class ImportJobSerializer(serializers.ModelSerializer):
     track_file = TrackFileSerializer(read_only=True)
     class Meta:
         model = models.ImportJob
-        fields = ('id', 'mbid', 'source', 'status', 'track_file')
+        fields = ('id', 'mbid', 'batch', 'source', 'status', 'track_file', 'audio_file')
+        read_only_fields = ('status', 'track_file')
 
 
 class ImportBatchSerializer(serializers.ModelSerializer):
@@ -121,3 +122,4 @@ class ImportBatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ImportBatch
         fields = ('id', 'jobs', 'status', 'creation_date')
+        read_only_fields = ('creation_date',)

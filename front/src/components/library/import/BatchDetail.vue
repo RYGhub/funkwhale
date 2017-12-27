@@ -8,6 +8,7 @@
         ['ui',
         {'active': batch.status === 'pending'},
         {'warning': batch.status === 'pending'},
+        {'error': batch.status === 'errored'},
         {'success': batch.status === 'finished'},
         'progress']">
         <div class="bar" :style="progressBarStyle">
@@ -37,7 +38,7 @@
             </td>
             <td>
               <span
-                :class="['ui', {'yellow': job.status === 'pending'}, {'green': job.status === 'finished'}, 'label']">{{ job.status }}</span>
+                :class="['ui', {'yellow': job.status === 'pending'}, {'red': job.status === 'errored'}, {'green': job.status === 'finished'}, 'label']">{{ job.status }}</span>
             </td>
             <td>
               <router-link v-if="job.track_file" :to="{name: 'library.tracks.detail', params: {id: job.track_file.track }}">{{ job.track_file.track }}</router-link>
@@ -89,7 +90,7 @@ export default {
   computed: {
     progress () {
       return this.batch.jobs.filter(j => {
-        return j.status === 'finished'
+        return j.status !== 'pending'
       }).length * 100 / this.batch.jobs.length
     },
     progressBarStyle () {
