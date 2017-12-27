@@ -32,7 +32,7 @@
             <td>{{ result.jobs.length }}</td>
             <td>
               <span
-                :class="['ui', {'yellow': result.status === 'pending'}, {'green': result.status === 'finished'}, 'label']">{{ result.status }}</span>
+                :class="['ui', {'yellow': result.status === 'pending'}, {'red': result.status === 'errored'}, {'green': result.status === 'finished'}, 'label']">{{ result.status }}</span>
               </td>
             </tr>
           </tbody>

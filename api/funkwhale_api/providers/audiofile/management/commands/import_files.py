@@ -1,6 +1,10 @@
 import glob
+import os
+
+from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
-from funkwhale_api.providers.audiofile import tasks
+from funkwhale_api.music import tasks
+from funkwhale_api.users.models import User
 
 
 class Command(BaseCommand):
@@ -14,6 +18,11 @@ class Command(BaseCommand):
             dest='recursive',
             default=False,
             help='Will match the pattern recursively (including subdirectories)',
+        )
+        parser.add_argument(
+            '--username',
+            dest='username',
+            help='The username of the user you want to be bound to the import',
         )
         parser.add_argument(
             '--async',
@@ -46,6 +55,20 @@ class Command(BaseCommand):
         if not matching:
             raise CommandError('No file matching pattern, aborting')
 
+        user = None
+        if options['username']:
+            try:
+                user = User.objects.get(username=options['username'])
+            except User.DoesNotExist:
+                raise CommandError('Invalid username')
+        else:
+            # we bind the import to the first registered superuser
+            try:
+                user = User.objects.filter(is_superuser=True).order_by('pk').first()
+                assert user is not None
+            except AssertionError:
+                raise CommandError(
+                    'No superuser available, please provide a --username')
         if options['interactive']:
             message = (
                 'Are you sure you want to do this?\n\n'
@@ -54,18 +77,35 @@ class Command(BaseCommand):
             if input(''.join(message)) != 'yes':
                 raise CommandError("Import cancelled.")
 
-        message = 'Importing {}...'
-        if options['async']:
-            message = 'Launching import for {}...'
-
-        for path in matching:
-            self.stdout.write(message.format(path))
-            try:
-                tasks.from_path(path)
-            except Exception as e:
-                self.stdout.write('Error: {}'.format(e))
+        batch = self.do_import(matching, user=user, options=options)
 
         message = 'Successfully imported {} tracks'
         if options['async']:
             message = 'Successfully launched import for {} tracks'
         self.stdout.write(message.format(len(matching)))
+        self.stdout.write(
+            "For details, please refer to import batch #".format(batch.pk))
+
+    def do_import(self, matching, user, options):
+        message = 'Importing {}...'
+        if options['async']:
+            message = 'Launching import for {}...'
+
+        # we create an import batch binded to the user
+        batch = user.imports.create(source='shell')
+        async = options['async']
+        handler = tasks.import_job_run.delay if async else tasks.import_job_run
+        for path in matching:
+            job = batch.jobs.create(
+                source='file://' + path,
+            )
+            name = os.path.basename(path)
+            with open(path, 'rb') as f:
+                job.audio_file.save(name, File(f))
+
+            job.save()
+            try:
+                handler(import_job_id=job.pk)
+            except Exception as e:
+                self.stdout.write('Error: {}'.format(e))
+        return batch

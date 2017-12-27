@@ -1,6 +1,10 @@
 import tempfile
 import shutil
 import pytest
+from django.core.cache import cache as django_cache
+from dynamic_preferences.registries import global_preferences_registry
+
+from funkwhale_api.taskapp import celery
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -11,10 +15,21 @@ def factories_autodiscover():
     factories.registry.autodiscover(app_names)
 
 
+@pytest.fixture(autouse=True)
+def cache():
+    yield django_cache
+    django_cache.clear()
+
+
 @pytest.fixture
 def factories(db):
     from funkwhale_api import factories
     yield factories.registry
+
+
+@pytest.fixture
+def preferences(db):
+    yield global_preferences_registry.manager()
 
 
 @pytest.fixture

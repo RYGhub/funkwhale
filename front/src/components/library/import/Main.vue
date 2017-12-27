@@ -39,8 +39,8 @@
               </div>
             </div>
             <div class="field">
-              <div class="ui disabled radio checkbox">
-                <input type="radio" id="upload" value="upload" v-model="currentSource" disabled>
+              <div class="ui radio checkbox">
+                <input type="radio" id="upload" value="upload" v-model="currentSource">
                 <label for="upload">File upload</label>
               </div>
             </div>
@@ -84,8 +84,14 @@
           </div>
         </div>
         <div v-if="currentStep === 2">
+          <file-upload
+            ref="import"
+            v-if="currentSource == 'upload'"
+            ></file-upload>
+
           <component
             ref="import"
+            v-if="currentSource == 'external'"
             :metadata="metadata"
             :is="importComponent"
             :backends="backends"
@@ -119,6 +125,7 @@ import MetadataSearch from '@/components/metadata/Search'
 import ReleaseCard from '@/components/metadata/ReleaseCard'
 import ArtistCard from '@/components/metadata/ArtistCard'
 import ReleaseImport from './ReleaseImport'
+import FileUpload from './FileUpload'
 import ArtistImport from './ArtistImport'
 
 import router from '@/router'
@@ -130,7 +137,8 @@ export default {
     ArtistCard,
     ReleaseCard,
     ArtistImport,
-    ReleaseImport
+    ReleaseImport,
+    FileUpload
   },
   props: {
     mbType: {type: String, required: false},
@@ -142,7 +150,7 @@ export default {
       currentType: this.mbType || 'artist',
       currentId: this.mbId,
       currentStep: 0,
-      currentSource: this.source || 'external',
+      currentSource: '',
       metadata: {},
       isImporting: false,
       importData: {

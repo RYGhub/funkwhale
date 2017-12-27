@@ -72,6 +72,14 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
         model = 'music.ImportJob'
 
 
+@registry.register(name='music.FileImportJob')
+class FileImportJobFactory(ImportJobFactory):
+    source = 'file://'
+    mbid = None
+    audio_file = factory.django.FileField(
+        from_path=os.path.join(SAMPLES_PATH, 'test.ogg'))
+
+
 @registry.register
 class WorkFactory(factory.django.DjangoModelFactory):
     mbid = factory.Faker('uuid4')

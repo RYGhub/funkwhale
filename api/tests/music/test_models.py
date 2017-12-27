@@ -2,6 +2,7 @@ import pytest
 
 from funkwhale_api.music import models
 from funkwhale_api.music import importers
+from funkwhale_api.music import tasks
 
 
 def test_can_store_release_group_id_on_album(factories):
@@ -44,6 +45,6 @@ def test_import_job_is_bound_to_track_file(factories, mocker):
     job = factories['music.ImportJob'](mbid=track.mbid)
 
     mocker.patch('funkwhale_api.music.models.TrackFile.download_file')
-    job.run()
+    tasks.import_job_run(import_job_id=job.pk)
     job.refresh_from_db()
     assert job.track_file.track == track

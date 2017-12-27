@@ -24,7 +24,7 @@ django-redis>=4.5,<4.6
 redis>=2.10,<2.11
 
 
-celery>=3.1,<3.2
+celery>=4.1,<4.2
 
 
 # Your custom requirements go here
@@ -33,7 +33,6 @@ musicbrainzngs==0.6
 youtube_dl>=2017.12.14
 djangorestframework>=3.7,<3.8
 djangorestframework-jwt>=1.11,<1.12
-django-celery>=3.2,<3.3
 django-mptt>=0.9,<0.10
 google-api-python-client>=1.6,<1.7
 arrow>=0.12,<0.13
@@ -57,3 +56,4 @@ git+https://github.com/EliotBerriot/PyMemoize.git@django
 git+https://github.com/EliotBerriot/django-cachalot.git@django-2
 
 django-dynamic-preferences>=1.5,<1.6
+pyacoustid>=1.1.5,<1.2
