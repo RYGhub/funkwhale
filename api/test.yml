@@ -1,8 +1,15 @@
-test:
-  dockerfile: docker/Dockerfile.test
-  build: .
-  command: pytest
-  volumes:
-    - .:/app
-  environment:
-    - "DATABASE_URL=sqlite://"
+version: '2'
+services:
+  test:
+    build:
+      dockerfile: docker/Dockerfile.test
+      context: .
+    command: pytest
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    environment:
+      - "DATABASE_URL=postgresql://postgres@postgres/postgres"
+  postgres:
+    image: postgres

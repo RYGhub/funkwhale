@@ -11,11 +11,14 @@ stages:
   - deploy
 
 test_api:
+  services:
+    - postgres:9.4
   stage: test
   image: funkwhale/funkwhale:base
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
-    DATABASE_URL: "sqlite://"
+    DATABASE_URL: "postgresql://postgres@postgres/postgres"
+
   before_script:
     - python3 -m venv --copies virtualenv
     - source virtualenv/bin/activate

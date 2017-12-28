@@ -1,11 +1,5 @@
 from .common import *  # noqa
 SECRET_KEY = env("DJANGO_SECRET_KEY", default='test')
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }
-}
 
 # Mail settings
 # ------------------------------------------------------------------------------
