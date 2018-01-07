@@ -112,8 +112,9 @@ export default {
         selector.push('.autocomplete')
         settings.fields = f.autocomplete_fields
         settings.minCharacters = 1
+        let backendUrl = config.BACKEND_URL || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port
         settings.apiSettings = {
-          url: config.BACKEND_URL + f.autocomplete + '?' + f.autocomplete_qs,
+          url: backendUrl + f.autocomplete + '?' + f.autocomplete_qs,
           beforeXHR: function (xhrObject) {
             xhrObject.setRequestHeader('Authorization', self.$store.getters['auth/header'])
             return xhrObject
