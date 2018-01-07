@@ -11,7 +11,8 @@
 
 export default {
   props: {
-    type: {type: String, required: true},
+    customRadioId: {required: false},
+    type: {type: String, required: false},
     objectId: {type: Number, default: null}
   },
   methods: {
@@ -19,7 +20,7 @@ export default {
       if (this.running) {
         this.$store.dispatch('radios/stop')
       } else {
-        this.$store.dispatch('radios/start', {type: this.type, objectId: this.objectId})
+        this.$store.dispatch('radios/start', {type: this.type, objectId: this.objectId, customRadioId: this.customRadioId})
       }
     }
   },
