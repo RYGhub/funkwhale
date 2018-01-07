@@ -1,10 +1,33 @@
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 from funkwhale_api.music.models import Track
+
+from . import filters
+
+
+class Radio(models.Model):
+    CONFIG_VERSION = 0
+    user = models.ForeignKey(
+        'users.User',
+        related_name='radios',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    is_public = models.BooleanField(default=False)
+    version = models.PositiveIntegerField(default=0)
+    config = JSONField()
+
+    def get_candidates(self):
+        return filters.run(self.config)
+
 
 class RadioSession(models.Model):
     user = models.ForeignKey(
@@ -15,6 +38,12 @@ class RadioSession(models.Model):
         on_delete=models.CASCADE)
     session_key = models.CharField(max_length=100, null=True, blank=True)
     radio_type = models.CharField(max_length=50)
+    custom_radio = models.ForeignKey(
+        Radio,
+        related_name='sessions',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
     related_object_content_type = models.ForeignKey(
         ContentType,
@@ -50,6 +79,7 @@ class RadioSession(models.Model):
         from .registries import registry
         from . import radios
         return registry[self.radio_type](session=self)
+
 
 class RadioSessionTrack(models.Model):
     session = models.ForeignKey(
