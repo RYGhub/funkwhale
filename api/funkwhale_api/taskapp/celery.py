@@ -27,11 +27,12 @@ class CeleryConfig(AppConfig):
         app.autodiscover_tasks(lambda: settings.INSTALLED_APPS, force=True)
 
 
-def require_instance(model_or_qs, parameter_name):
+def require_instance(model_or_qs, parameter_name, id_kwarg_name=None):
     def decorator(function):
         @functools.wraps(function)
         def inner(*args, **kwargs):
-            pk = kwargs.pop('_'.join([parameter_name, 'id']))
+            kw = id_kwarg_name or '_'.join([parameter_name, 'id'])
+            pk = kwargs.pop(kw)
             try:
                 instance = model_or_qs.get(pk=pk)
             except AttributeError:

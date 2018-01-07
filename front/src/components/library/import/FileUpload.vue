@@ -93,18 +93,15 @@ export default {
     inputFile (newFile, oldFile) {
       if (newFile && !oldFile) {
         // add
-        console.log('add', newFile)
         if (!this.batch) {
           this.createBatch()
         }
       }
       if (newFile && oldFile) {
         // update
-        console.log('update', newFile)
       }
       if (!newFile && oldFile) {
         // remove
-        console.log('remove', oldFile)
       }
     },
     createBatch () {

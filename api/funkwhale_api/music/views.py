@@ -116,13 +116,7 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
-    queryset = (models.Track.objects.all()
-                                    .select_related()
-                                    .select_related('album__artist')
-                                    .prefetch_related(
-                                        'tags',
-                                        'files',
-                                        'artist__albums__tracks__tags'))
+    queryset = (models.Track.objects.all().for_nested_serialization())
     serializer_class = serializers.TrackSerializerNested
     permission_classes = [ConditionalAuthentication]
     search_fields = ['title', 'artist__name']

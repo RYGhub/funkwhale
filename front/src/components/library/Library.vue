@@ -3,6 +3,7 @@
     <div class="ui secondary pointing menu">
       <router-link class="ui item" to="/library" exact>Browse</router-link>
       <router-link class="ui item" to="/library/artists" exact>Artists</router-link>
+      <router-link class="ui item" to="/library/radios" exact>Radios</router-link>
       <div class="ui secondary right menu">
         <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>Import</router-link>
         <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches</router-link>
