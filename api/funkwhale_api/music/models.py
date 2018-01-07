@@ -262,6 +262,16 @@ class Lyrics(models.Model):
             extensions=['markdown.extensions.nl2br'])
 
 
+class TrackQuerySet(models.QuerySet):
+    def for_nested_serialization(self):
+        return (self.select_related()
+                    .select_related('album__artist')
+                    .prefetch_related(
+                        'tags',
+                        'files',
+                        'artist__albums__tracks__tags'))
+
+
 class Track(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(
@@ -302,6 +312,7 @@ class Track(APIModelMixin):
     import_hooks = [
         import_tags
     ]
+    objects = TrackQuerySet.as_manager()
     tags = TaggableManager()
 
     class Meta:

@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 
 from funkwhale_api.radios import radios
 from funkwhale_api.radios import models
+from funkwhale_api.radios import serializers
 from funkwhale_api.favorites.models import TrackFavorite
 
 
@@ -50,9 +51,9 @@ def test_can_pick_by_weight():
 
 
 def test_can_get_choices_for_favorites_radio(factories):
-    tracks = factories['music.Track'].create_batch(100)
+    tracks = factories['music.Track'].create_batch(10)
     user = factories['users.User']()
-    for i in range(20):
+    for i in range(5):
         TrackFavorite.add(track=random.choice(tracks), user=user)
 
     radio = radios.FavoritesRadio()
@@ -63,9 +64,52 @@ def test_can_get_choices_for_favorites_radio(factories):
     for favorite in user.track_favorites.all():
         assert favorite.track in choices
 
-    for i in range(20):
+    for i in range(5):
         pick = radio.pick(user=user)
         assert pick in choices
+
+
+def test_can_get_choices_for_custom_radio(factories):
+    artist = factories['music.Artist']()
+    tracks = factories['music.Track'].create_batch(5, artist=artist)
+    wrong_tracks = factories['music.Track'].create_batch(5)
+    session = factories['radios.CustomRadioSession'](
+        custom_radio__config=[{'type': 'artist', 'ids': [artist.pk]}]
+    )
+    choices = session.radio.get_choices()
+
+    expected = [t.pk for t in tracks]
+    assert list(choices.values_list('id', flat=True)) == expected
+
+
+def test_cannot_start_custom_radio_if_not_owner_or_not_public(factories):
+    user = factories['users.User']()
+    artist = factories['music.Artist']()
+    radio = factories['radios.Radio'](
+        config=[{'type': 'artist', 'ids': [artist.pk]}]
+    )
+    serializer = serializers.RadioSessionSerializer(
+        data={
+            'radio_type': 'custom', 'custom_radio': radio.pk, 'user': user.pk}
+    )
+    message = "You don't have access to this radio"
+    assert not serializer.is_valid()
+    assert message in serializer.errors['non_field_errors']
+
+
+def test_can_start_custom_radio_from_api(logged_in_client, factories):
+    artist = factories['music.Artist']()
+    radio = factories['radios.Radio'](
+        config=[{'type': 'artist', 'ids': [artist.pk]}],
+        user=logged_in_client.user
+    )
+    url = reverse('api:v1:radios:sessions-list')
+    response = logged_in_client.post(
+        url, {'radio_type': 'custom', 'custom_radio': radio.pk})
+    assert response.status_code == 201
+    session = radio.sessions.latest('id')
+    assert session.radio_type == 'custom'
+    assert session.user == logged_in_client.user
 
 
 def test_can_use_radio_session_to_filter_choices(factories):
