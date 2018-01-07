@@ -2,8 +2,16 @@ Changelog
 =========
 
 
-0.3.3 (Unreleased)
+0.3.4 (Unreleased)
 ------------------
+
+
+
+
+0.3.4 (2018-01-07)
+------------------
+
+- Users can now create their own dynamic radios (#51)
 
 
 0.3.2

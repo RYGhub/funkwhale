@@ -1,10 +1,14 @@
 import random
+from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from taggit.models import Tag
 from funkwhale_api.users.models import User
 from funkwhale_api.music.models import Track, Artist
+
+from . import filters
 from . import models
 from .registries import registry
+
 
 class SimpleRadio(object):
 
@@ -50,7 +54,7 @@ class SessionRadio(SimpleRadio):
 
     def filter_from_session(self, queryset):
         already_played = self.session.session_tracks.all().values_list('track', flat=True)
-        queryset = queryset.exclude(pk__in=list(already_played))
+        queryset = queryset.exclude(pk__in=already_played)
         return queryset
 
     def pick(self, **kwargs):
@@ -63,6 +67,10 @@ class SessionRadio(SimpleRadio):
             for choice in picked_choices:
                 self.session.add(choice)
         return picked_choices
+
+    def validate_session(self, data, **context):
+        return data
+
 
 @registry.register(name='random')
 class RandomRadio(SessionRadio):
@@ -81,6 +89,37 @@ class FavoritesRadio(SessionRadio):
     def get_queryset(self, **kwargs):
         track_ids = kwargs['user'].track_favorites.all().values_list('track', flat=True)
         return Track.objects.filter(pk__in=track_ids)
+
+
+@registry.register(name='custom')
+class CustomRadio(SessionRadio):
+
+    def get_queryset_kwargs(self):
+        kwargs = super().get_queryset_kwargs()
+        kwargs['user'] = self.session.user
+        kwargs['custom_radio'] = self.session.custom_radio
+        return kwargs
+
+    def get_queryset(self, **kwargs):
+        return filters.run(kwargs['custom_radio'].config)
+
+    def validate_session(self, data, **context):
+        data = super().validate_session(data, **context)
+        try:
+            user = data['user']
+        except KeyError:
+            user = context['user']
+        try:
+            assert (
+                data['custom_radio'].user == user or
+                data['custom_radio'].is_public)
+        except KeyError:
+            raise serializers.ValidationError(
+                'You must provide a custom radio')
+        except AssertionError:
+            raise serializers.ValidationError(
+                "You don't have access to this radio")
+        return data
 
 
 class RelatedObjectRadio(SessionRadio):

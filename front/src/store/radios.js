@@ -38,15 +38,16 @@ export default {
     }
   },
   actions: {
-    start ({commit, dispatch}, {type, objectId}) {
+    start ({commit, dispatch}, {type, objectId, customRadioId}) {
       let resource = Vue.resource(CREATE_RADIO_URL)
       var params = {
         radio_type: type,
-        related_object_id: objectId
+        related_object_id: objectId,
+        custom_radio: customRadioId
       }
       resource.save({}, params).then((response) => {
         logger.default.info('Successfully started radio ', type)
-        commit('current', {type, objectId, session: response.data.id})
+        commit('current', {type, objectId, session: response.data.id, customRadioId})
         commit('running', true)
         dispatch('populateQueue')
       }, (response) => {
