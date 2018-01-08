@@ -3,9 +3,7 @@ version: '2'
 services:
 
   front:
-    build:
-      dockerfile: docker/Dockerfile.dev
-      context: ./front
+    build: front
     env_file: .env.dev
     environment:
       - "HOST=0.0.0.0"
