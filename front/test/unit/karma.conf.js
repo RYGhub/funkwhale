@@ -21,7 +21,7 @@ module.exports = function (config) {
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
     },
-    captureTimeout: 5000,
+    captureTimeout: 15000,
     retryLimit: 1,
     webpack: webpackConfig,
     webpackMiddleware: {

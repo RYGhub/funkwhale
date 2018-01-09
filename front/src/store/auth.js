@@ -44,6 +44,7 @@ export default {
       state.token = value
       if (value) {
         state.tokenData = jwtDecode(value)
+        console.log(state.tokenData)
       } else {
         state.tokenData = {}
       }

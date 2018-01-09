@@ -61,8 +61,8 @@ export default {
     }
   },
   actions: {
-    incrementVolume (context, value) {
-      context.commit('volume', context.state.volume + value)
+    incrementVolume ({commit, state}, value) {
+      commit('volume', state.volume + value)
     },
     stop (context) {
     },
