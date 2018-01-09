@@ -1,10 +1,10 @@
-FROM node:6
+FROM node:9
 
 EXPOSE 8080
 WORKDIR /app/
 ADD package.json .
-RUN npm install --only=production
-RUN npm install --only=dev
+RUN yarn install --only=production
+RUN yarn install --only=dev
 VOLUME ["/app/node_modules"]
 COPY . .
 
