@@ -57,10 +57,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import _ from 'lodash'
 import $ from 'jquery'
 
-import config from '@/config'
 import backend from '@/audio/backend'
 import logger from '@/logging'
 
@@ -69,7 +69,7 @@ import PaginationMixin from '@/components/mixins/Pagination'
 import ArtistCard from '@/components/audio/artist/Card'
 import Pagination from '@/components/Pagination'
 
-const FETCH_URL = config.API_URL + 'artists/'
+const FETCH_URL = 'artists/'
 
 export default {
   mixins: [OrderingMixin, PaginationMixin],
@@ -124,7 +124,7 @@ export default {
         ordering: this.getOrderingAsString()
       }
       logger.default.debug('Fetching artists')
-      this.$http.get(url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.result = response.data
         self.result.results.map((artist) => {
           var albums = JSON.parse(JSON.stringify(artist.albums)).map((album) => {

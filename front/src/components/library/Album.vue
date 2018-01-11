@@ -41,14 +41,13 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackTable from '@/components/audio/track/Table'
-import config from '@/config'
 
-const FETCH_URL = config.API_URL + 'albums/'
+const FETCH_URL = 'albums/'
 
 export default {
   props: ['id'],
@@ -71,7 +70,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL + this.id + '/'
       logger.default.debug('Fetching album "' + this.id + '"')
-      this.$http.get(url).then((response) => {
+      axios.get(url).then((response) => {
         self.album = backend.Album.clean(response.data)
         self.isLoading = false
       })

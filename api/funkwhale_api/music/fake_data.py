@@ -4,7 +4,7 @@ Populates the database with fake data
 import random
 
 from funkwhale_api.music import models
-from funkwhale_api.music.tests import factories
+from funkwhale_api.music import factories
 
 
 def create_data(count=25):
@@ -19,4 +19,4 @@ def create_data(count=25):
 
 
 if __name__ == '__main__':
-    main()
+    create_data()

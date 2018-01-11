@@ -37,8 +37,8 @@
 
 <script>
 import Vue from 'vue'
+import axios from 'axios'
 import logger from '@/logging'
-import config from '@/config'
 
 import ImportMixin from './ImportMixin'
 import ReleaseImport from './ReleaseImport'
@@ -92,9 +92,8 @@ export default Vue.extend({
     fetchReleaseGroupsData () {
       let self = this
       this.releaseGroups.forEach(group => {
-        let url = config.API_URL + 'providers/musicbrainz/releases/browse/' + group.id + '/'
-        let resource = Vue.resource(url)
-        resource.get({}).then((response) => {
+        let url = 'providers/musicbrainz/releases/browse/' + group.id + '/'
+        return axios.get(url).then((response) => {
           logger.default.info('successfully fetched release group', group.id)
           let release = response.data['release-list'].filter(r => {
             return r.status === 'Official'

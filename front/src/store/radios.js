@@ -1,9 +1,5 @@
-import Vue from 'vue'
-import config from '@/config'
+import axios from 'axios'
 import logger from '@/logging'
-
-const CREATE_RADIO_URL = config.API_URL + 'radios/sessions/'
-const GET_TRACK_URL = config.API_URL + 'radios/tracks/'
 
 export default {
   namespaced: true,
@@ -39,13 +35,12 @@ export default {
   },
   actions: {
     start ({commit, dispatch}, {type, objectId, customRadioId}) {
-      let resource = Vue.resource(CREATE_RADIO_URL)
       var params = {
         radio_type: type,
         related_object_id: objectId,
         custom_radio: customRadioId
       }
-      resource.save({}, params).then((response) => {
+      return axios.post('radios/sessions/', params).then((response) => {
         logger.default.info('Successfully started radio ', type)
         commit('current', {type, objectId, session: response.data.id, customRadioId})
         commit('running', true)
@@ -62,12 +57,10 @@ export default {
       if (!state.running) {
         return
       }
-      let resource = Vue.resource(GET_TRACK_URL)
       var params = {
         session: state.current.session
       }
-      let promise = resource.save({}, params)
-      promise.then((response) => {
+      return axios.post('radios/tracks/', params).then((response) => {
         logger.default.info('Adding track to queue from radio')
         dispatch('queue/append', {track: response.data.track}, {root: true})
       }, (response) => {

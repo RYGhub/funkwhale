@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import config from '@/config'
+import axios from 'axios'
 import logger from '@/logging'
 import time from '@/utils/time'
 
@@ -70,9 +69,7 @@ export default {
       commit('playing', !state.playing)
     },
     trackListened ({commit}, track) {
-      let url = config.API_URL + 'history/listenings/'
-      let resource = Vue.resource(url)
-      resource.save({}, {'track': track.id}).then((response) => {}, (response) => {
+      return axios.post('history/listenings/', {'track': track.id}).then((response) => {}, (response) => {
         logger.default.error('Could not record track in history')
       })
     },
