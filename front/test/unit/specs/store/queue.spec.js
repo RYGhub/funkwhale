@@ -1,9 +1,21 @@
+var sinon = require('sinon')
 import _ from 'lodash'
 
 import store from '@/store/queue'
 import { testAction } from '../../utils'
 
 describe('store/queue', () => {
+  var sandbox
+
+  beforeEach(function () {
+    // Create a sandbox for the test
+    sandbox = sinon.sandbox.create()
+  })
+
+  afterEach(function () {
+    // Restore all the things made through the sandbox
+    sandbox.restore()
+  })
   describe('mutations', () => {
     it('currentIndex', () => {
       const state = {}
@@ -302,7 +314,7 @@ describe('store/queue', () => {
       }, done)
     })
     it('shuffle', (done) => {
-      let _shuffle = sinon.stub(_, 'shuffle')
+      let _shuffle = sandbox.stub(_, 'shuffle')
       let tracks = [1, 2, 3]
       let shuffledTracks = [2, 3, 1]
       _shuffle.returns(shuffledTracks)

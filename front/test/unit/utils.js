@@ -33,7 +33,6 @@ export const testAction = ({action, payload, params, expectedMutations, expected
   // mock dispatch
   const dispatch = (type, payload, options) => {
     const a = expectedActions[actionsCount]
-
     try {
       expect(a.type).to.equal(type)
       if (payload) {
@@ -52,17 +51,23 @@ export const testAction = ({action, payload, params, expectedMutations, expected
     }
   }
 
+  let end = function () {
+    // check if no mutations should have been dispatched
+    if (expectedMutations.length === 0) {
+      expect(mutationsCount).to.equal(0)
+    }
+    if (expectedActions.length === 0) {
+      expect(actionsCount).to.equal(0)
+    }
+    if (isOver()) {
+      done()
+    }
+  }
   // call the action with mocked store and arguments
-  action({ commit, dispatch, ...params }, payload)
-
-  // check if no mutations should have been dispatched
-  if (expectedMutations.length === 0) {
-    expect(mutationsCount).to.equal(0)
-  }
-  if (expectedActions.length === 0) {
-    expect(actionsCount).to.equal(0)
-  }
-  if (isOver()) {
-    done()
+  let promise = action({ commit, dispatch, ...params }, payload)
+  if (promise) {
+    promise.then(end)
+  } else {
+    end()
   }
 }
