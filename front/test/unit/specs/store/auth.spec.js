@@ -1,8 +1,21 @@
+var sinon = require('sinon')
+import moxios from 'moxios'
 import store from '@/store/auth'
 
 import { testAction } from '../../utils'
 
 describe('store/auth', () => {
+  var sandbox
+
+  beforeEach(function () {
+    sandbox = sinon.sandbox.create()
+    moxios.install()
+  })
+  afterEach(function () {
+    sandbox.restore()
+    moxios.uninstall()
+  })
+
   describe('mutations', () => {
     it('profile', () => {
       const state = {}
@@ -101,6 +114,85 @@ describe('store/auth', () => {
         expectedActions: [
           { type: 'fetchProfile' },
           { type: 'refreshToken' }
+        ]
+      }, done)
+    })
+    it('login success', (done) => {
+      moxios.stubRequest('token/', {
+        status: 200,
+        response: {
+          token: 'test'
+        }
+      })
+      const credentials = {
+        username: 'bob'
+      }
+      testAction({
+        action: store.actions.login,
+        payload: {credentials: credentials},
+        expectedMutations: [
+          { type: 'token', payload: 'test' },
+          { type: 'username', payload: 'bob' },
+          { type: 'authenticated', payload: true }
+        ],
+        expectedActions: [
+          { type: 'fetchProfile' }
+        ]
+      }, done)
+    })
+    it('login error', (done) => {
+      moxios.stubRequest('token/', {
+        status: 500,
+        response: {
+          token: 'test'
+        }
+      })
+      const credentials = {
+        username: 'bob'
+      }
+      let spy = sandbox.spy()
+      testAction({
+        action: store.actions.login,
+        payload: {credentials: credentials, onError: spy}
+      }, () => {
+        expect(spy.calledOnce).to.equal(true)
+        done()
+      })
+    })
+    it('fetchProfile', (done) => {
+      const profile = {
+        username: 'bob',
+        permissions: {
+          admin: {
+            status: true
+          }
+        }
+      }
+      moxios.stubRequest('users/users/me/', {
+        status: 200,
+        response: profile
+      })
+      testAction({
+        action: store.actions.fetchProfile,
+        expectedMutations: [
+          { type: 'profile', payload: profile },
+          { type: 'permission', payload: {key: 'admin', status: true} }
+        ],
+        expectedActions: [
+          { type: 'favorites/fetch', payload: null, options: {root: true} }
+        ]
+      }, done)
+    })
+    it('refreshToken', (done) => {
+      moxios.stubRequest('token/refresh/', {
+        status: 200,
+        response: {token: 'newtoken'}
+      })
+      testAction({
+        action: store.actions.refreshToken,
+        params: {state: {token: 'oldtoken'}},
+        expectedMutations: [
+          { type: 'token', payload: 'newtoken' }
         ]
       }, done)
     })

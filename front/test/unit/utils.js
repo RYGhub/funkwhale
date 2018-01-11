@@ -66,8 +66,8 @@ export const testAction = ({action, payload, params, expectedMutations, expected
   // call the action with mocked store and arguments
   let promise = action({ commit, dispatch, ...params }, payload)
   if (promise) {
-    promise.then(end)
+    return promise.then(end)
   } else {
-    end()
+    return end()
   }
 }

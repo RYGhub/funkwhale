@@ -39,7 +39,6 @@ export default {
       state.token = value
       if (value) {
         state.tokenData = jwtDecode(value)
-        console.log(state.tokenData)
       } else {
         state.tokenData = {}
       }
@@ -50,7 +49,7 @@ export default {
   },
   actions: {
     // Send a request to the login URL and save the returned JWT
-    login ({commit, dispatch, state}, {next, credentials, onError}) {
+    login ({commit, dispatch}, {next, credentials, onError}) {
       return axios.post('token/', credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
         commit('token', response.data.token)
