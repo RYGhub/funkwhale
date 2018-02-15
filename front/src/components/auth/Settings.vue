@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import axios from 'axios'
 import config from '@/config'
 import logger from '@/logging'
 
@@ -61,8 +61,8 @@ export default {
         new_password1: this.new_password,
         new_password2: this.new_password
       }
-      let resource = Vue.resource(config.BACKEND_URL + 'api/auth/registration/change-password/')
-      return resource.save({}, credentials).then(response => {
+      let url = config.BACKEND_URL + 'api/auth/registration/change-password/'
+      return axios.post(url, credentials).then(response => {
         logger.default.info('Password successfully changed')
         self.$router.push('/profile/me')
       }, response => {

@@ -70,9 +70,9 @@
 </template>
 
 <script>
+import axios from 'axios'
 import Vue from 'vue'
 import time from '@/utils/time'
-import config from '@/config'
 import logger from '@/logging'
 import ImportMixin from './ImportMixin'
 
@@ -117,10 +117,8 @@ export default Vue.extend({
     search () {
       let self = this
       this.isLoading = true
-      let url = config.API_URL + 'providers/' + this.currentBackendId + '/search/'
-      let resource = Vue.resource(url)
-
-      resource.get({query: this.query}).then((response) => {
+      let url = 'providers/' + this.currentBackendId + '/search/'
+      axios.get(url, {params: {query: this.query}}).then((response) => {
         logger.default.debug('searching', self.query, 'on', self.currentBackendId)
         self.results = response.data
         self.isLoading = false

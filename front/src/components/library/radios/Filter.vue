@@ -62,6 +62,7 @@
   </tr>
 </template>
 <script>
+import axios from 'axios'
 import config from '@/config'
 import $ from 'jquery'
 import _ from 'lodash'
@@ -132,11 +133,11 @@ export default {
   methods: {
     fetchCandidates: function () {
       let self = this
-      let url = config.API_URL + 'radios/radios/validate/'
+      let url = 'radios/radios/validate/'
       let final = _.clone(this.config)
       final.type = this.filter.type
       final = {'filters': [final]}
-      this.$http.post(url, final).then((response) => {
+      axios.post(url, final).then((response) => {
         self.checkResult = response.data.filters[0]
       })
     }

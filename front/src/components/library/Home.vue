@@ -24,14 +24,14 @@
 </template>
 
 <script>
+import axios from 'axios'
 import Search from '@/components/audio/Search'
 import backend from '@/audio/backend'
 import logger from '@/logging'
 import ArtistCard from '@/components/audio/artist/Card'
-import config from '@/config'
 import RadioCard from '@/components/radios/Card'
 
-const ARTISTS_URL = config.API_URL + 'artists/'
+const ARTISTS_URL = 'artists/'
 
 export default {
   name: 'library',
@@ -58,7 +58,7 @@ export default {
       }
       let url = ARTISTS_URL
       logger.default.time('Loading latest artists')
-      this.$http.get(url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.artists = response.data.results
         self.artists.map((artist) => {
           var albums = JSON.parse(JSON.stringify(artist.albums)).map((album) => {

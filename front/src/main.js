@@ -8,9 +8,10 @@ logger.default.debug('Environment variables:', process.env)
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import VueResource from 'vue-resource'
+import axios from 'axios'
 import VueLazyload from 'vue-lazyload'
 import store from './store'
+import config from './config'
 
 window.$ = window.jQuery = require('jquery')
 
@@ -19,25 +20,33 @@ window.$ = window.jQuery = require('jquery')
 // require('./semantic/semantic.css')
 require('semantic-ui-css/semantic.js')
 
-Vue.use(VueResource)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 
-Vue.http.interceptors.push(function (request, next) {
-  // modify headers
+axios.defaults.baseURL = config.API_URL
+axios.interceptors.request.use(function (config) {
+  // Do something before request is sent
   if (store.state.auth.authenticated) {
-    request.headers.set('Authorization', store.getters['auth/header'])
+    config.headers['Authorization'] = store.getters['auth/header']
   }
-  next(function (response) {
-    // redirect to login form when we get unauthorized response from server
-    if (response.status === 401) {
-      store.commit('auth/authenticated', false)
-      logger.default.warn('Received 401 response from API, redirecting to login form')
-      router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
-    }
-  })
+  return config
+}, function (error) {
+  // Do something with request error
+  return Promise.reject(error)
 })
 
+// Add a response interceptor
+axios.interceptors.response.use(function (response) {
+  if (response.status === 401) {
+    store.commit('auth/authenticated', false)
+    logger.default.warn('Received 401 response from API, redirecting to login form')
+    router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
+  }
+  return response
+}, function (error) {
+  // Do something with response error
+  return Promise.reject(error)
+})
 store.dispatch('auth/check')
 /* eslint-disable no-new */
 new Vue({

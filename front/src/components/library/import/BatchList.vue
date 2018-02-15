@@ -42,10 +42,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import logger from '@/logging'
-import config from '@/config'
 
-const BATCHES_URL = config.API_URL + 'import-batches/'
+const BATCHES_URL = 'import-batches/'
 
 export default {
   components: {},
@@ -65,7 +65,7 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.time('Loading import batches')
-      this.$http.get(url, {}).then((response) => {
+      axios.get(url, {}).then((response) => {
         self.results = response.data.results
         self.nextLink = response.data.next
         self.previousLink = response.data.previous

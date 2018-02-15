@@ -62,10 +62,9 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import axios from 'axios'
 import logger from '@/logging'
 import FileUploadWidget from './FileUploadWidget'
-import config from '@/config'
 
 export default {
   components: {
@@ -74,7 +73,7 @@ export default {
   data () {
     return {
       files: [],
-      uploadUrl: config.API_URL + 'import-jobs/',
+      uploadUrl: 'import-jobs/',
       batch: null
     }
   },
@@ -106,9 +105,7 @@ export default {
     },
     createBatch () {
       let self = this
-      let url = config.API_URL + 'import-batches/'
-      let resource = Vue.resource(url)
-      resource.save({}, {}).then((response) => {
+      return axios.post('import-batches/', {}).then((response) => {
         self.batch = response.data
       }, (response) => {
         logger.default.error('error while launching creating batch')

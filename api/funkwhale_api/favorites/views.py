@@ -43,7 +43,7 @@ class TrackFavoriteViewSet(mixins.CreateModelMixin,
         favorite = models.TrackFavorite.add(track=track, user=self.request.user)
         return favorite
 
-    @list_route(methods=['delete'])
+    @list_route(methods=['delete', 'post'])
     def remove(self, request, *args, **kwargs):
         try:
             pk = int(request.data['track'])

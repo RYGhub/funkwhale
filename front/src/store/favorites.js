@@ -1,9 +1,5 @@
-import Vue from 'vue'
-import config from '@/config'
+import axios from 'axios'
 import logger from '@/logging'
-
-const REMOVE_URL = config.API_URL + 'favorites/tracks/remove/'
-const FAVORITES_URL = config.API_URL + 'favorites/tracks/'
 
 export default {
   namespaced: true,
@@ -35,16 +31,14 @@ export default {
     set ({commit, state}, {id, value}) {
       commit('track', {id, value})
       if (value) {
-        let resource = Vue.resource(FAVORITES_URL)
-        resource.save({}, {'track': id}).then((response) => {
+        return axios.post('favorites/tracks/', {'track': id}).then((response) => {
           logger.default.info('Successfully added track to favorites')
         }, (response) => {
           logger.default.info('Error while adding track to favorites')
           commit('track', {id, value: !value})
         })
       } else {
-        let resource = Vue.resource(REMOVE_URL)
-        resource.delete({}, {'track': id}).then((response) => {
+        return axios.post('favorites/tracks/remove/', {'track': id}).then((response) => {
           logger.default.info('Successfully removed track from favorites')
         }, (response) => {
           logger.default.info('Error while removing track from favorites')
@@ -57,9 +51,8 @@ export default {
     },
     fetch ({dispatch, state, commit}, url) {
       // will fetch favorites by batches from API to have them locally
-      url = url || FAVORITES_URL
-      let resource = Vue.resource(url)
-      resource.get().then((response) => {
+      url = url || 'favorites/tracks/'
+      return axios.get(url).then((response) => {
         logger.default.info('Fetched a batch of ' + response.data.results.length + ' favorites')
         response.data.results.forEach(result => {
           commit('track', {id: result.track, value: true})

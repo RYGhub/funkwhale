@@ -54,15 +54,15 @@
 </template>
 
 <script>
+import axios from 'axios'
 import $ from 'jquery'
 import logger from '@/logging'
-import config from '@/config'
 import TrackTable from '@/components/audio/track/Table'
 import RadioButton from '@/components/radios/Button'
 import Pagination from '@/components/Pagination'
 import OrderingMixin from '@/components/mixins/Ordering'
 import PaginationMixin from '@/components/mixins/Pagination'
-const FAVORITES_URL = config.API_URL + 'tracks/'
+const FAVORITES_URL = 'tracks/'
 
 export default {
   mixins: [OrderingMixin, PaginationMixin],
@@ -115,7 +115,7 @@ export default {
         ordering: this.getOrderingAsString()
       }
       logger.default.time('Loading user favorites')
-      this.$http.get(url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.results = response.data
         self.nextLink = response.data.next
         self.previousLink = response.data.previous

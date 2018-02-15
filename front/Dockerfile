@@ -1,13 +1,11 @@
-FROM node:6-alpine
+FROM node:9
 
 EXPOSE 8080
-
-RUN mkdir /app
-WORKDIR /app
+WORKDIR /app/
 ADD package.json .
+RUN yarn install --only=production
+RUN yarn install --only=dev
+VOLUME ["/app/node_modules"]
+COPY . .
 
-RUN npm install
-
-ADD . .
-
-RUN npm run build
+CMD ["npm", "run", "dev"]
