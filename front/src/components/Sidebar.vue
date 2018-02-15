@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="ui bottom attached tab" data-tab="queue">
-      <table class="ui compact inverted very basic fixed single line table">
+      <table class="ui compact inverted very basic fixed single line unstackable table">
         <draggable v-model="queue.tracks" element="tbody" @update="reorder">
           <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>

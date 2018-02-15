@@ -17,7 +17,7 @@
         <div v-if="batch.status === 'pending'" class="label">Importing {{ batch.jobs.length }} tracks...</div>
         <div v-if="batch.status === 'finished'" class="label">Imported {{ batch.jobs.length }} tracks!</div>
       </div>
-      <table class="ui table">
+      <table class="ui unstackable table">
         <thead>
           <tr>
             <th>Job ID</th>

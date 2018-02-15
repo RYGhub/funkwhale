@@ -1,5 +1,5 @@
 <template>
-  <table class="ui compact very basic fixed single line table">
+  <table class="ui compact very basic fixed single line unstackable table">
     <thead>
       <tr>
         <th></th>
