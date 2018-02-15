@@ -43,6 +43,11 @@ export default {
 @import 'style/vendor/media';
 
 
+html, body {
+  @include media("<desktop") {
+    font-size: 200%;
+  }
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
