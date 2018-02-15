@@ -40,6 +40,7 @@ export default {
 // and we end up with CSS rules not applied,
 // see https://github.com/webpack/webpack/issues/215
 @import 'semantic/semantic.css';
+@import 'style/vendor/media';
 
 
 #app {
@@ -56,11 +57,11 @@ export default {
 .main-pusher {
   padding: 1.5rem 0;
 }
-#footer {
-  padding: 4em;
-}
-.ui.stripe.segment {
-  padding: 4em;
+.ui.stripe.segment, #footer {
+  padding: 2em;
+  @include media(">tablet") {
+    padding: 4em;
+  }
 }
 
 .ui.small.text.container {
