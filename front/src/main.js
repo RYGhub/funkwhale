@@ -12,6 +12,9 @@ import axios from 'axios'
 import VueLazyload from 'vue-lazyload'
 import store from './store'
 import config from './config'
+import { sync } from 'vuex-router-sync'
+
+sync(store, router)
 
 window.$ = window.jQuery = require('jquery')
 

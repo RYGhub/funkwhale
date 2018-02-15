@@ -12,7 +12,7 @@
         :disabled="!nextLink">Next <i class="right arrow icon"></i></button>
       <div class="ui hidden clearing divider"></div>
       <div class="ui hidden clearing divider"></div>
-      <table v-if="results.length > 0" class="ui table">
+      <table v-if="results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
             <th>ID</th>

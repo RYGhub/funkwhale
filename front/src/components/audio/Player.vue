@@ -10,7 +10,7 @@
       :track="currentTrack">
     </audio-track>
 
-    <div v-if="currentTrack" class="track-area ui items">
+    <div v-if="currentTrack" class="track-area ui unstackable items">
       <div class="ui inverted item">
         <div class="ui tiny image">
           <img v-if="currentTrack.album.cover" :src="Track.getCover(currentTrack)">
