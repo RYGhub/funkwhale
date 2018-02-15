@@ -37,13 +37,13 @@ axios.interceptors.request.use(function (config) {
 
 // Add a response interceptor
 axios.interceptors.response.use(function (response) {
-  if (response.status === 401) {
+  return response
+}, function (error) {
+  if (error.response.status === 401) {
     store.commit('auth/authenticated', false)
     logger.default.warn('Received 401 response from API, redirecting to login form')
     router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
   }
-  return response
-}, function (error) {
   // Do something with response error
   return Promise.reject(error)
 })
