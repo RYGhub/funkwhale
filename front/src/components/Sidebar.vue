@@ -1,13 +1,17 @@
 <template>
-<div class="ui vertical left visible wide sidebar">
+<div :class="['ui', 'vertical', 'left', 'visible', 'wide', {'collapsed': isCollapsed}, 'sidebar',]">
   <div class="ui inverted segment header-wrapper">
-    <search-bar>
+    <search-bar @search="isCollapsed = false">
       <router-link :title="'Funkwhale'" :to="{name: 'index'}">
         <i class="logo bordered inverted orange big icon">
           <logo class="logo"></logo>
         </i>
       </router-link>
-
+      <span
+        slot="after"
+        @click="isCollapsed = !isCollapsed"
+        :class="['ui', 'basic', 'big', {'inverted': isCollapsed}, 'orange', 'icon', 'collapse', 'button']">
+          <i class="sidebar icon"></i></span>
     </search-bar>
   </div>
 
@@ -111,7 +115,8 @@ export default {
   },
   data () {
     return {
-      backend: backend
+      backend: backend,
+      isCollapsed: true
     }
   },
   mounted () {
@@ -119,7 +124,8 @@ export default {
   },
   computed: {
     ...mapState({
-      queue: state => state.queue
+      queue: state => state.queue,
+      url: state => state.route.path
     })
   },
   methods: {
@@ -129,19 +135,41 @@ export default {
     reorder: function (oldValue, newValue) {
       this.$store.commit('queue/reorder', {oldValue, newValue})
     }
+  },
+  watch: {
+    url: function () {
+      this.isCollapsed = true
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import '../style/vendor/media';
 
 $sidebar-color: #1B1C1D;
 
 .sidebar {
-  display:flex;
-  flex-direction:column;
-  justify-content: space-between;
+  @include media(">tablet") {
+    display:flex;
+    flex-direction:column;
+    justify-content: space-between;
+  }
+  @include media(">desktop") {
+    .collapse.button {
+      display: none;
+    }
+  }
+  @include media("<desktop") {
+    position: static !important;
+    width: 100% !important;
+    &.collapsed {
+      .menu-area, .player-wrapper, .tabs {
+        display: none;
+      }
+    }
+  }
 
   > div {
     margin: 0;
@@ -160,7 +188,12 @@ $sidebar-color: #1B1C1D;
 }
 .tabs {
   overflow-y: auto;
-  height: 0px;
+  @include media(">tablet") {
+    height: 0px;
+  }
+  @include media("<desktop") {
+    max-height: 400px;
+  }
 }
 .tab[data-tab="queue"] {
   tr {
@@ -174,7 +207,6 @@ $sidebar-color: #1B1C1D;
 
 .ui.inverted.segment.header-wrapper {
   padding: 0;
-  padding-bottom: 1rem;
 }
 .tabs {
   flex: 1;
@@ -191,9 +223,14 @@ $sidebar-color: #1B1C1D;
 }
 
 .ui.search {
-  display: inline-block;
+  display: block;
   > a {
     margin-right: 1.5rem;
+  }
+  .collapse.button {
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+    float: right;
   }
 }
 </style>

@@ -48,7 +48,9 @@ export default {
   -moz-osx-font-smoothing: grayscale;
 }
 .main.pusher, .footer {
-  margin-left: 350px !important;
+  @include media(">desktop") {
+    margin-left: 350px !important;
+  }
   transform: none !important;
 }
 .main-pusher {

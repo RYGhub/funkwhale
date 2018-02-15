@@ -6,6 +6,7 @@
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
+    <slot name="after"></slot>
   </div>
 </template>
 
@@ -24,6 +25,9 @@ export default {
       minCharacters: 3,
       onSelect (result, response) {
         router.push(result.routerUrl)
+      },
+      onSearchQuery (query) {
+        self.$emit('search')
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
