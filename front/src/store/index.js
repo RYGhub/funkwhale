@@ -37,27 +37,11 @@ export default new Vuex.Store({
       key: 'player',
       paths: [
         'player.looping',
-        'player.playing',
         'player.volume',
         'player.duration',
         'player.errored'],
       filter: (mutation) => {
         return mutation.type.startsWith('player/') && mutation.type !== 'player/currentTime'
-      }
-    }),
-    createPersistedState({
-      key: 'progress',
-      paths: ['player.currentTime'],
-      filter: (mutation) => {
-        let delay = 10
-        return mutation.type === 'player/currentTime' && parseInt(mutation.payload) % delay === 0
-      },
-      reducer: (state) => {
-        return {
-          player: {
-            currentTime: state.player.currentTime
-          }
-        }
       }
     }),
     createPersistedState({
