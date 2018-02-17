@@ -4,6 +4,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 import favorites from './favorites'
 import auth from './auth'
+import instance from './instance'
 import queue from './queue'
 import radios from './radios'
 import player from './player'
@@ -14,6 +15,7 @@ export default new Vuex.Store({
   modules: {
     auth,
     favorites,
+    instance,
     queue,
     radios,
     player

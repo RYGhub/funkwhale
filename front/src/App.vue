@@ -31,6 +31,9 @@ import Sidebar from '@/components/Sidebar'
 export default {
   name: 'app',
   components: { Sidebar }
+  created () {
+    this.$store.dispatch('instance/fetchSettings')
+  }
 }
 </script>
 
