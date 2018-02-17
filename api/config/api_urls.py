@@ -1,5 +1,6 @@
 from rest_framework import routers
 from django.conf.urls import include, url
+from funkwhale_api.instance import views as instance_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from rest_framework_jwt import views as jwt_views
@@ -25,6 +26,10 @@ router.register(
 v1_patterns = router.urls
 
 v1_patterns += [
+    url(r'^instance/',
+        include(
+            ('funkwhale_api.instance.urls', 'instance'),
+            namespace='instance')),
     url(r'^providers/',
         include(
             ('funkwhale_api.providers.urls', 'providers'),

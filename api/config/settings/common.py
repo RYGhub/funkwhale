@@ -60,6 +60,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'funkwhale_api.users',  # custom users app
     # Your stuff: custom apps go here
+    'funkwhale_api.instance',
     'funkwhale_api.music',
     'funkwhale_api.favorites',
     'funkwhale_api.radios',

@@ -3,6 +3,7 @@ import shutil
 import pytest
 from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
+from rest_framework.test import APIClient
 
 from funkwhale_api.taskapp import celery
 
@@ -29,7 +30,9 @@ def factories(db):
 
 @pytest.fixture
 def preferences(db):
-    yield global_preferences_registry.manager()
+    manager = global_preferences_registry.manager()
+    manager.all()
+    yield manager
 
 
 @pytest.fixture
@@ -46,6 +49,11 @@ def logged_in_client(db, factories, client):
     setattr(client, 'user', user)
     yield client
     delattr(client, 'user')
+
+
+@pytest.fixture
+def api_client(client):
+    return APIClient()
 
 
 @pytest.fixture
