@@ -59,13 +59,15 @@ export default {
 
     },
     loaded: function () {
-      if (this.isCurrent && this.autoplay) {
+      if (this.isCurrent) {
         this.$store.commit('player/duration', this.$refs.audio.duration)
         if (this.startTime) {
           this.setCurrentTime(this.startTime)
         }
-        this.$store.commit('player/playing', true)
-        this.$refs.audio.play()
+        if (this.autoplay) {
+          this.$store.commit('player/playing', true)
+          this.$refs.audio.play()
+        }
       }
     },
     updateProgress: function () {

@@ -7,6 +7,7 @@ Changelog
 
 - Front: added some unittests for the store (#55)
 - Front: fixed broken login redirection when 401
+- Front: Removed autoplay on page reload
 
 
 0.3.5 (2018-01-07)
