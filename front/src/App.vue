@@ -22,15 +22,26 @@
         </div>
       </div>
     </div>
+    <raven
+      v-if="$store.state.instance.settings.raven.front_enabled.value"
+      :dsn="$store.state.instance.settings.raven.front_dsn.value">
+    </raven>
   </div>
 </template>
 
 <script>
 import Sidebar from '@/components/Sidebar'
+import Raven from '@/components/Raven'
 
 export default {
   name: 'app',
-  components: { Sidebar }
+  components: {
+    Sidebar,
+    Raven
+  },
+  created () {
+    this.$store.dispatch('instance/fetchSettings')
+  }
 }
 </script>
 
