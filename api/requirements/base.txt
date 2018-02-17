@@ -56,3 +56,4 @@ git+https://github.com/EliotBerriot/django-cachalot.git@django-2
 
 django-dynamic-preferences>=1.5,<1.6
 pyacoustid>=1.1.5,<1.2
+raven>=6.5,<7
