@@ -72,7 +72,7 @@ api/music
 api/media
 api/staticfiles
 api/static
-
+api/.pytest_cache
 
 # Front
 front/node_modules/
