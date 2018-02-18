@@ -5,6 +5,7 @@ Changelog
 0.5 (Unreleased)
 ----------------
 
+- Front: Now reset player colors when track has no cover (#46)
 
 0.4 (2018-02-18)
 ----------------
