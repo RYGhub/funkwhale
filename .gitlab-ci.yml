@@ -20,6 +20,7 @@ test_api:
     paths:
       - "$PIP_CACHE_DIR"
   variables:
+    DJANGO_ALLOWED_HOSTS: "localhost"
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
 
   before_script:
