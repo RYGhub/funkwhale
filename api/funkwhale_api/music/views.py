@@ -1,11 +1,16 @@
+import ffmpeg
 import os
 import json
+import subprocess
 import unicodedata
 import urllib
+
 from django.urls import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
 from django.conf import settings
+from django.http import StreamingHttpResponse
+
 from rest_framework import viewsets, views, mixins
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
@@ -19,6 +24,7 @@ from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
 
+from . import forms
 from . import models
 from . import serializers
 from . import importers
@@ -181,6 +187,40 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
         response['X-Accel-Redirect'] = "{}{}".format(
             settings.PROTECT_FILES_PATH,
             f.audio_file.url)
+        return response
+
+    @list_route(methods=['get'])
+    def viewable(self, request, *args, **kwargs):
+        return Response({}, status=200)
+
+    @list_route(methods=['get'])
+    def transcode(self, request, *args, **kwargs):
+        form = forms.TranscodeForm(request.GET)
+        if not form.is_valid():
+            return Response(form.errors, status=400)
+
+        f = form.cleaned_data['track_file']
+        output_kwargs = {
+            'format': form.cleaned_data['to']
+        }
+        args = (ffmpeg
+            .input(f.audio_file.path)
+            .output('pipe:', **output_kwargs)
+            .get_args()
+        )
+        # we use a generator here so the view return immediatly and send
+        # file chunk to the browser, instead of blocking a few seconds
+        def _transcode():
+            p = subprocess.Popen(
+                ['ffmpeg'] + args,
+                stdout=subprocess.PIPE)
+            for line in p.stdout:
+                yield line
+
+        response = StreamingHttpResponse(
+            _transcode(), status=200,
+            content_type=form.cleaned_data['to'])
+
         return response
 
 
