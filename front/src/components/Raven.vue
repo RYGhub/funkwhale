@@ -22,7 +22,6 @@ export default {
       Raven.uninstall()
       logger.default.info('Installing raven...')
       Raven.config(this.dsn).addPlugin(RavenVue, Vue).install()
-      console.log({}.test.test)
     }
   },
   watch: {
