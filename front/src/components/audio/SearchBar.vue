@@ -1,7 +1,6 @@
 <template>
   <div class="ui fluid category search">
-    <slot></slot>
-    <div class="ui icon input">
+    <slot></slot><div class="ui icon input">
       <input class="prompt" placeholder="Search for artists, albums, tracks..." type="text">
       <i class="search icon"></i>
     </div>

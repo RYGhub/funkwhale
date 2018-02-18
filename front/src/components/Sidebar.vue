@@ -6,8 +6,7 @@
         <i class="logo bordered inverted orange big icon">
           <logo class="logo"></logo>
         </i>
-      </router-link>
-      <span
+      </router-link><span
         slot="after"
         @click="isCollapsed = !isCollapsed"
         :class="['ui', 'basic', 'big', {'inverted': isCollapsed}, 'orange', 'icon', 'collapse', 'button']">
@@ -224,9 +223,6 @@ $sidebar-color: #1B1C1D;
 
 .ui.search {
   display: block;
-  > a {
-    margin-right: 1.5rem;
-  }
   .collapse.button {
     margin-right: 0.5rem;
     margin-top: 0.5rem;
