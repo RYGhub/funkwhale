@@ -28,7 +28,14 @@ class TrackFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.TrackFile
-        fields = ('id', 'path', 'duration', 'source', 'filename', 'track')
+        fields = (
+            'id',
+            'path',
+            'duration',
+            'source',
+            'filename',
+            'mimetype',
+            'track')
 
     def get_path(self, o):
         url = o.path

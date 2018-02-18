@@ -18,6 +18,7 @@ from versatileimagefield.fields import VersatileImageField
 from funkwhale_api import downloader
 from funkwhale_api import musicbrainz
 from . import importers
+from . import utils
 
 
 class APIModelMixin(models.Model):
@@ -364,6 +365,7 @@ class TrackFile(models.Model):
     source = models.URLField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
+    mimetype = models.CharField(null=True, blank=True, max_length=200)
 
     def download_file(self):
         # import the track file, since there is not any
@@ -393,6 +395,10 @@ class TrackFile(models.Model):
             self.track.full_name,
             os.path.splitext(self.audio_file.name)[-1])
 
+    def save(self, **kwargs):
+        if not self.mimetype and self.audio_file:
+            self.mimetype = utils.guess_mimetype(self.audio_file)
+        return super().save(**kwargs)
 
 class ImportBatch(models.Model):
     IMPORT_BATCH_SOURCES = [
