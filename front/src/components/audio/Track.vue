@@ -1,21 +1,20 @@
 <template>
   <audio
     ref="audio"
-    :src="url"
     @error="errored"
-    @progress="updateLoad"
     @loadeddata="loaded"
+    @durationchange="updateDuration"
     @timeupdate="updateProgress"
     @ended="ended"
     preload>
-
+    <source v-for="src in srcs" :src="src.url" :type="src.type">
   </audio>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import backend from '@/audio/backend'
 import url from '@/utils/url'
+import formats from '@/audio/formats'
 
 // import logger from '@/logging'
 
@@ -34,31 +33,43 @@ export default {
       volume: state => state.player.volume,
       looping: state => state.player.looping
     }),
-    url: function () {
+    srcs: function () {
       let file = this.track.files[0]
       if (!file) {
         this.$store.dispatch('player/trackErrored')
-        return null
+        return []
       }
-      let path = backend.absoluteUrl(file.path)
+      let sources = [
+        {type: file.mimetype, url: file.path}
+      ]
+      formats.formats.forEach(f => {
+        if (f !== file.mimetype) {
+          let format = formats.formatsMap[f]
+          let url = `/api/v1/trackfiles/transcode/?track_file=${file.id}&to=${format}`
+          sources.push({type: f, url: url})
+        }
+      })
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url
         // so authentication can be checked by the backend
         // because for audio files we cannot use the regular Authentication
         // header
-        path = url.updateQueryString(path, 'jwt', this.$store.state.auth.token)
+        sources.forEach(e => {
+          e.url = url.updateQueryString(e.url, 'jwt', this.$store.state.auth.token)
+        })
       }
-      return path
+      return sources
     }
   },
   methods: {
     errored: function () {
       this.$store.dispatch('player/trackErrored')
     },
-    updateLoad: function () {
-
+    updateDuration: function (e) {
+      this.$store.commit('player/duration', this.$refs.audio.duration)
     },
     loaded: function () {
+      this.$refs.audio.volume = this.volume
       if (this.isCurrent) {
         this.$store.commit('player/duration', this.$refs.audio.duration)
         if (this.startTime) {
