@@ -5,6 +5,7 @@ libjpeg-dev
 zlib1g-dev
 libpq-dev
 postgresql-client
-libav-tools
+libmagic-dev
+ffmpeg
 python3-dev
 curl
