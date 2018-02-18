@@ -1,145 +1,147 @@
 <template>
-  <div class="player">
-    <audio-track
-      ref="currentAudio"
-      v-if="currentTrack"
-      :key="(currentIndex, currentTrack.id)"
-      :is-current="true"
-      :start-time="$store.state.player.currentTime"
-      :autoplay="$store.state.player.playing"
-      :track="currentTrack">
-    </audio-track>
+  <div class="ui inverted segment player-wrapper" :style="style">
+    <div class="player">
+      <audio-track
+        ref="currentAudio"
+        v-if="currentTrack"
+        :key="(currentIndex, currentTrack.id)"
+        :is-current="true"
+        :start-time="$store.state.player.currentTime"
+        :autoplay="$store.state.player.playing"
+        :track="currentTrack">
+      </audio-track>
 
-    <div v-if="currentTrack" class="track-area ui unstackable items">
-      <div class="ui inverted item">
-        <div class="ui tiny image">
-          <img v-if="currentTrack.album.cover" :src="Track.getCover(currentTrack)">
-          <img v-else src="../../assets/audio/default-cover.png">
-        </div>
-        <div class="middle aligned content">
-          <router-link class="small header discrete link track" :to="{name: 'library.tracks.detail', params: {id: currentTrack.id }}">
-            {{ currentTrack.title }}
-          </router-link>
-          <div class="meta">
-            <router-link class="artist" :to="{name: 'library.artists.detail', params: {id: currentTrack.artist.id }}">
-              {{ currentTrack.artist.name }}
-            </router-link> /
-            <router-link class="album" :to="{name: 'library.albums.detail', params: {id: currentTrack.album.id }}">
-              {{ currentTrack.album.title }}
+      <div v-if="currentTrack" class="track-area ui unstackable items">
+        <div class="ui inverted item">
+          <div class="ui tiny image">
+            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover" :src="Track.getCover(currentTrack)">
+            <img v-else src="../../assets/audio/default-cover.png">
+          </div>
+          <div class="middle aligned content">
+            <router-link class="small header discrete link track" :to="{name: 'library.tracks.detail', params: {id: currentTrack.id }}">
+              {{ currentTrack.title }}
             </router-link>
+            <div class="meta">
+              <router-link class="artist" :to="{name: 'library.artists.detail', params: {id: currentTrack.artist.id }}">
+                {{ currentTrack.artist.name }}
+              </router-link> /
+              <router-link class="album" :to="{name: 'library.albums.detail', params: {id: currentTrack.album.id }}">
+                {{ currentTrack.album.title }}
+              </router-link>
+            </div>
+            <div class="description">
+              <track-favorite-icon :track="currentTrack"></track-favorite-icon>
+            </div>
           </div>
-          <div class="description">
-            <track-favorite-icon :track="currentTrack"></track-favorite-icon>
+        </div>
+      </div>
+      <div class="progress-area" v-if="currentTrack">
+        <div class="ui grid">
+          <div class="left floated four wide column">
+            <p class="timer start" @click="updateProgress(0)">{{currentTimeFormatted}}</p>
+          </div>
+
+          <div class="right floated four wide column">
+            <p class="timer total">{{durationFormatted}}</p>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="progress-area" v-if="currentTrack">
-      <div class="ui grid">
-        <div class="left floated four wide column">
-          <p class="timer start" @click="updateProgress(0)">{{currentTimeFormatted}}</p>
-        </div>
-
-        <div class="right floated four wide column">
-          <p class="timer total">{{durationFormatted}}</p>
+        <div ref="progress" class="ui small orange inverted progress" @click="touchProgress">
+          <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
-      <div ref="progress" class="ui small orange inverted progress" @click="touchProgress">
-        <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
-      </div>
-    </div>
 
-    <div class="two wide column controls ui grid">
-      <div
-        @click="previous"
-        title="Previous track"
-        class="two wide column control"
-        :disabled="!hasPrevious">
-          <i :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
+      <div class="two wide column controls ui grid">
+        <div
+          @click="previous"
+          title="Previous track"
+          class="two wide column control"
+          :disabled="!hasPrevious">
+            <i :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
+        </div>
+        <div
+          v-if="!playing"
+          @click="togglePlay"
+          title="Play track"
+          class="two wide column control">
+            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+        </div>
+        <div
+          v-else
+          @click="togglePlay"
+          title="Pause track"
+          class="two wide column control">
+            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+        </div>
+        <div
+          @click="next"
+          title="Next track"
+          class="two wide column control"
+          :disabled="!hasNext">
+            <i :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
+        </div>
+        <div class="two wide column control volume-control">
+          <i title="Unmute" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
+          <i title="Mute" @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
+          <i title="Mute" @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
+          <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
+        </div>
+        <div class="two wide column control looping">
+          <i
+            title="Looping disabled. Click to switch to single-track looping."
+            v-if="looping === 0"
+            @click="$store.commit('player/looping', 1)"
+            :disabled="!currentTrack"
+            :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
+          <i
+            title="Looping on a single track. Click to switch to whole queue looping."
+            v-if="looping === 1"
+            @click="$store.commit('player/looping', 2)"
+            :disabled="!currentTrack"
+            class="repeat secondary icon">
+            <span class="ui circular tiny orange label">1</span>
+          </i>
+          <i
+            title="Looping on whole queue. Click to disable looping."
+            v-if="looping === 2"
+            @click="$store.commit('player/looping', 0)"
+            :disabled="!currentTrack"
+            class="repeat orange secondary icon">
+          </i>
+        </div>
+        <div
+          @click="shuffle()"
+          :disabled="queue.tracks.length === 0"
+          title="Shuffle your queue"
+          class="two wide column control">
+          <i :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </div>
+        <div class="one wide column"></div>
+        <div
+          @click="clean()"
+          :disabled="queue.tracks.length === 0"
+          title="Clear your queue"
+          class="two wide column control">
+          <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </div>
       </div>
-      <div
-        v-if="!playing"
-        @click="togglePlay"
-        title="Play track"
-        class="two wide column control">
-          <i :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
-      </div>
-      <div
-        v-else
-        @click="togglePlay"
-        title="Pause track"
-        class="two wide column control">
-          <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
-      </div>
-      <div
-        @click="next"
-        title="Next track"
-        class="two wide column control"
-        :disabled="!hasNext">
-          <i :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
-      </div>
-      <div class="two wide column control volume-control">
-        <i title="Unmute" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
-        <i title="Mute" @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
-        <i title="Mute" @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
-        <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
-      </div>
-      <div class="two wide column control looping">
-        <i
-          title="Looping disabled. Click to switch to single-track looping."
-          v-if="looping === 0"
-          @click="$store.commit('player/looping', 1)"
-          :disabled="!currentTrack"
-          :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
-        <i
-          title="Looping on a single track. Click to switch to whole queue looping."
-          v-if="looping === 1"
-          @click="$store.commit('player/looping', 2)"
-          :disabled="!currentTrack"
-          class="repeat secondary icon">
-          <span class="ui circular tiny orange label">1</span>
-        </i>
-        <i
-          title="Looping on whole queue. Click to disable looping."
-          v-if="looping === 2"
-          @click="$store.commit('player/looping', 0)"
-          :disabled="!currentTrack"
-          class="repeat orange secondary icon">
-        </i>
-      </div>
-      <div
-        @click="shuffle()"
-        :disabled="queue.tracks.length === 0"
-        title="Shuffle your queue"
-        class="two wide column control">
-        <i :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-      </div>
-      <div class="one wide column"></div>
-      <div
-        @click="clean()"
-        :disabled="queue.tracks.length === 0"
-        title="Clear your queue"
-        class="two wide column control">
-        <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-      </div>
+      <GlobalEvents
+        @keydown.space.prevent.exact="togglePlay"
+        @keydown.ctrl.left.prevent.exact="previous"
+        @keydown.ctrl.right.prevent.exact="next"
+        @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
+        @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
+        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
+        @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
+        @keydown.s.prevent.exact="shuffle"
+        />
     </div>
-    <GlobalEvents
-      @keydown.space.prevent.exact="togglePlay"
-      @keydown.ctrl.left.prevent.exact="previous"
-      @keydown.ctrl.right.prevent.exact="next"
-      @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
-      @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
-      @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
-      @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
-      @keydown.s.prevent.exact="shuffle"
-      />
-
   </div>
 </template>
 
 <script>
 import {mapState, mapGetters, mapActions} from 'vuex'
 import GlobalEvents from '@/components/utils/global-events'
+import ColorThief from '@/vendor/color-thief'
 
 import Track from '@/audio/track'
 import AudioTrack from '@/components/audio/Track'
@@ -153,9 +155,12 @@ export default {
     AudioTrack
   },
   data () {
+    let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
     return {
       sliderVolume: this.volume,
-      Track: Track
+      Track: Track,
+      defaultAmbiantColors: defaultAmbiantColors,
+      ambiantColors: defaultAmbiantColors
     }
   },
   mounted () {
@@ -177,6 +182,14 @@ export default {
       let target = this.$refs.progress
       time = e.layerX / target.offsetWidth * this.duration
       this.$refs.currentAudio.setCurrentTime(time)
+    },
+    updateBackground () {
+      if (!this.currentTrack.album.cover) {
+        this.ambiantColors = this.defaultAmbiantColors
+        return
+      }
+      let image = this.$refs.cover
+      this.ambiantColors = ColorThief.prototype.getPalette(image, 4).slice(0, 4)
     }
   },
   computed: {
@@ -195,9 +208,34 @@ export default {
       durationFormatted: 'player/durationFormatted',
       currentTimeFormatted: 'player/currentTimeFormatted',
       progress: 'player/progress'
-    })
+    }),
+    style: function () {
+      let style = {
+        'background': this.ambiantGradiant
+      }
+      return style
+    },
+    ambiantGradiant: function () {
+      let indexConf = [
+        {orientation: 330, percent: 100, opacity: 0.7},
+        {orientation: 240, percent: 90, opacity: 0.7},
+        {orientation: 150, percent: 80, opacity: 0.7},
+        {orientation: 60, percent: 70, opacity: 0.7}
+      ]
+      let gradients = this.ambiantColors.map((e, i) => {
+        let [r, g, b] = e
+        let conf = indexConf[i]
+        return `linear-gradient(${conf.orientation}deg, rgba(${r}, ${g}, ${b}, ${conf.opacity}) 10%, rgba(255, 255, 255, 0) ${conf.percent}%)`
+      }).join(', ')
+      return gradients
+    }
   },
   watch: {
+    currentTrack (newValue) {
+      if (!newValue) {
+        this.ambiantColors = this.defaultAmbiantColors
+      }
+    },
     volume (newValue) {
       this.sliderVolume = newValue
     },

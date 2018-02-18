@@ -87,9 +87,7 @@
       </div>
     </div>
   </div>
-  <div class="ui inverted segment player-wrapper">
-    <player></player>
-  </div>
+  <player></player>
 </div>
 </template>
 
@@ -150,6 +148,7 @@ export default {
 $sidebar-color: #1B1C1D;
 
 .sidebar {
+	background: $sidebar-color;
   @include media(">tablet") {
     display:flex;
     flex-direction:column;
@@ -209,11 +208,6 @@ $sidebar-color: #1B1C1D;
 }
 .tabs {
   flex: 1;
-}
-
-.player-wrapper {
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  background-color: rgb(46, 46, 46) !important;
 }
 
 .logo {
