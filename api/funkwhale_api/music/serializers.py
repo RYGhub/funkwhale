@@ -31,10 +31,7 @@ class TrackFileSerializer(serializers.ModelSerializer):
         fields = ('id', 'path', 'duration', 'source', 'filename', 'track')
 
     def get_path(self, o):
-        request = self.context.get('request')
         url = o.path
-        if request:
-            url = request.build_absolute_uri(url)
         return url
 
 

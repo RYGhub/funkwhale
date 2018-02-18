@@ -6,8 +6,7 @@
         <i class="logo bordered inverted orange big icon">
           <logo class="logo"></logo>
         </i>
-      </router-link>
-      <span
+      </router-link><span
         slot="after"
         @click="isCollapsed = !isCollapsed"
         :class="['ui', 'basic', 'big', {'inverted': isCollapsed}, 'orange', 'icon', 'collapse', 'button']">
@@ -88,9 +87,7 @@
       </div>
     </div>
   </div>
-  <div class="ui inverted segment player-wrapper">
-    <player></player>
-  </div>
+  <player></player>
 </div>
 </template>
 
@@ -151,6 +148,7 @@ export default {
 $sidebar-color: #1B1C1D;
 
 .sidebar {
+	background: $sidebar-color;
   @include media(">tablet") {
     display:flex;
     flex-direction:column;
@@ -212,11 +210,6 @@ $sidebar-color: #1B1C1D;
   flex: 1;
 }
 
-.player-wrapper {
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  background-color: rgb(46, 46, 46) !important;
-}
-
 .logo {
   cursor: pointer;
   display: inline-block;
@@ -224,9 +217,6 @@ $sidebar-color: #1B1C1D;
 
 .ui.search {
   display: block;
-  > a {
-    margin-right: 1.5rem;
-  }
   .collapse.button {
     margin-right: 0.5rem;
     margin-top: 0.5rem;

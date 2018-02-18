@@ -23,6 +23,10 @@ try:
     env.read_env(ROOT_DIR.file('.env'))
 except FileNotFoundError:
     pass
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+
+
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
