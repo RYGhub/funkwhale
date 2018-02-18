@@ -1,12 +1,7 @@
-import Vue from 'vue'
+import axios from 'axios'
 import jwtDecode from 'jwt-decode'
-import config from '@/config'
 import logger from '@/logging'
 import router from '@/router'
-
-const LOGIN_URL = config.API_URL + 'token/'
-const REFRESH_TOKEN_URL = config.API_URL + 'token/refresh/'
-const USER_PROFILE_URL = config.API_URL + 'users/users/me/'
 
 export default {
   namespaced: true,
@@ -54,9 +49,8 @@ export default {
   },
   actions: {
     // Send a request to the login URL and save the returned JWT
-    login ({commit, dispatch, state}, {next, credentials, onError}) {
-      let resource = Vue.resource(LOGIN_URL)
-      return resource.save({}, credentials).then(response => {
+    login ({commit, dispatch}, {next, credentials, onError}) {
+      return axios.post('token/', credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
         commit('token', response.data.token)
         commit('username', credentials.username)
@@ -91,8 +85,7 @@ export default {
       }
     },
     fetchProfile ({commit, dispatch, state}) {
-      let resource = Vue.resource(USER_PROFILE_URL)
-      return resource.get({}).then((response) => {
+      return axios.get('users/users/me/').then((response) => {
         logger.default.info('Successfully fetched user profile')
         let data = response.data
         commit('profile', data)
@@ -107,8 +100,7 @@ export default {
       })
     },
     refreshToken ({commit, dispatch, state}) {
-      let resource = Vue.resource(REFRESH_TOKEN_URL)
-      return resource.save({}, {token: state.token}).then(response => {
+      return axios.post('token/refresh/', {token: state.token}).then(response => {
         logger.default.info('Refreshed auth token')
         commit('token', response.data.token)
       }, response => {

@@ -22,8 +22,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
+@import '../../style/vendor/media';
+
 .library.pusher > .ui.secondary.menu {
-  margin: 0 2.5rem;
+  @include media(">tablet") {
+    margin: 0 2.5rem;
+  }
   .item {
     padding-top: 1.5em;
     padding-bottom: 1.5em;
@@ -37,7 +41,10 @@ export default {
     padding: 0;
     .segment-content {
       margin: 0 auto;
-      padding: 4em;
+      padding: 2em;
+      @include media(">tablet") {
+        padding: 4em;
+      }
     }
     &.with-background {
       .header {

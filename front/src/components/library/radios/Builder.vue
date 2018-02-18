@@ -67,7 +67,7 @@
   </div>
 </template>
 <script>
-import config from '@/config'
+import axios from 'axios'
 import $ from 'jquery'
 import _ from 'lodash'
 import BuilderFilter from './Filter'
@@ -107,8 +107,8 @@ export default {
   methods: {
     fetchFilters: function () {
       let self = this
-      let url = config.API_URL + 'radios/radios/filters/'
-      return this.$http.get(url).then((response) => {
+      let url = 'radios/radios/filters/'
+      return axios.get(url).then((response) => {
         self.availableFilters = response.data
       })
     },
@@ -130,8 +130,8 @@ export default {
     },
     fetch: function () {
       let self = this
-      let url = config.API_URL + 'radios/radios/' + this.id + '/'
-      this.$http.get(url).then((response) => {
+      let url = 'radios/radios/' + this.id + '/'
+      axios.get(url).then((response) => {
         self.filters = response.data.config.map(f => {
           return {
             config: f,
@@ -145,7 +145,7 @@ export default {
     },
     fetchCandidates: function () {
       let self = this
-      let url = config.API_URL + 'radios/radios/validate/'
+      let url = 'radios/radios/validate/'
       let final = this.filters.map(f => {
         let c = _.clone(f.config)
         c.type = f.filter.type
@@ -156,7 +156,7 @@ export default {
           {'type': 'group', filters: final}
         ]
       }
-      this.$http.post(url, final).then((response) => {
+      axios.post(url, final).then((response) => {
         self.checkResult = response.data.filters[0]
       })
     },
@@ -173,12 +173,12 @@ export default {
         'config': final
       }
       if (this.id) {
-        let url = config.API_URL + 'radios/radios/' + this.id + '/'
-        this.$http.put(url, final).then((response) => {
+        let url = 'radios/radios/' + this.id + '/'
+        axios.put(url, final).then((response) => {
         })
       } else {
-        let url = config.API_URL + 'radios/radios/'
-        this.$http.post(url, final).then((response) => {
+        let url = 'radios/radios/'
+        axios.post(url, final).then((response) => {
           self.$router.push({
             name: 'library.radios.edit',
             params: {

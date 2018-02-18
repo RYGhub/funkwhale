@@ -17,7 +17,7 @@
         <div v-if="batch.status === 'pending'" class="label">Importing {{ batch.jobs.length }} tracks...</div>
         <div v-if="batch.status === 'finished'" class="label">Imported {{ batch.jobs.length }} tracks!</div>
       </div>
-      <table class="ui table">
+      <table class="ui unstackable table">
         <thead>
           <tr>
             <th>Job ID</th>
@@ -52,11 +52,10 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import logger from '@/logging'
-import config from '@/config'
 
-const FETCH_URL = config.API_URL + 'import-batches/'
+const FETCH_URL = 'import-batches/'
 
 export default {
   props: ['id'],
@@ -75,7 +74,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL + this.id + '/'
       logger.default.debug('Fetching batch "' + this.id + '"')
-      this.$http.get(url).then((response) => {
+      axios.get(url).then((response) => {
         self.batch = response.data
         self.isLoading = false
         if (self.batch.status === 'pending') {

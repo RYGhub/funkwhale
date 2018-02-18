@@ -3,9 +3,8 @@
 </template>
 
 <script>
+import axios from 'axios'
 import logger from '@/logging'
-import config from '@/config'
-import Vue from 'vue'
 import router from '@/router'
 
 export default {
@@ -31,10 +30,9 @@ export default {
     launchImport () {
       let self = this
       this.isImporting = true
-      let url = config.API_URL + 'submit/' + self.importType + '/'
+      let url = 'submit/' + self.importType + '/'
       let payload = self.importData
-      let resource = Vue.resource(url)
-      resource.save({}, payload).then((response) => {
+      axios.post(url, payload).then((response) => {
         logger.default.info('launched import for', self.type, self.metadata.id)
         self.isImporting = false
         router.push({

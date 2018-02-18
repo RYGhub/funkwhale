@@ -1,11 +1,11 @@
 <template>
   <div class="ui fluid category search">
-    <slot></slot>
-    <div class="ui icon input">
+    <slot></slot><div class="ui icon input">
       <input class="prompt" placeholder="Search for artists, albums, tracks..." type="text">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
+    <slot name="after"></slot>
   </div>
 </template>
 
@@ -24,6 +24,9 @@ export default {
       minCharacters: 3,
       onSelect (result, response) {
         router.push(result.routerUrl)
+      },
+      onSearchQuery (query) {
+        self.$emit('search')
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {

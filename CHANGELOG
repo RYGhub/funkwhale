@@ -2,8 +2,23 @@ Changelog
 =========
 
 
-0.3.5 (Unreleased)
-------------------
+0.5 (Unreleased)
+----------------
+
+
+0.4 (2018-02-18)
+----------------
+
+- Front: ambiant colors in player based on current track cover (#59)
+- Front: simplified front dev setup thanks to webpack proxy (#59)
+- Front: added some unittests for the store (#55)
+- Front: fixed broken login redirection when 401
+- Front: Removed autoplay on page reload
+- API: Added a /instance/settings endpoint
+- Front: load /instance/settings on page load
+- Added settings to report JS and Python error to a Sentry instance
+  This is disabled by default, but feel free to enable it if you want
+  to help us by sending your error reports :) (#8)
 
 
 0.3.5 (2018-01-07)

@@ -12,6 +12,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import environ
+from funkwhale_api import __version__
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path('funkwhale_api')
@@ -22,6 +23,10 @@ try:
     env.read_env(ROOT_DIR.file('.env'))
 except FileNotFoundError:
     pass
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+
+
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
@@ -56,10 +61,28 @@ THIRD_PARTY_APPS = (
     'django_filters',
 )
 
+
+# Sentry
+RAVEN_ENABLED = env.bool("RAVEN_ENABLED", default=False)
+RAVEN_DSN = env("RAVEN_DSN", default='')
+
+if RAVEN_ENABLED:
+    RAVEN_CONFIG = {
+        'dsn': RAVEN_DSN,
+        # If you are using git, you can also automatically configure the
+        # release based on the git info.
+        'release': __version__,
+    }
+    THIRD_PARTY_APPS += (
+        'raven.contrib.django.raven_compat',
+    )
+
+
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'funkwhale_api.users',  # custom users app
     # Your stuff: custom apps go here
+    'funkwhale_api.instance',
     'funkwhale_api.music',
     'funkwhale_api.favorites',
     'funkwhale_api.radios',
@@ -71,6 +94,7 @@ LOCAL_APPS = (
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION

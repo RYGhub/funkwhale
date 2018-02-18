@@ -12,7 +12,7 @@
         :disabled="!nextLink">Next <i class="right arrow icon"></i></button>
       <div class="ui hidden clearing divider"></div>
       <div class="ui hidden clearing divider"></div>
-      <table v-if="results.length > 0" class="ui table">
+      <table v-if="results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
             <th>ID</th>
@@ -42,10 +42,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import logger from '@/logging'
-import config from '@/config'
 
-const BATCHES_URL = config.API_URL + 'import-batches/'
+const BATCHES_URL = 'import-batches/'
 
 export default {
   components: {},
@@ -65,7 +65,7 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.time('Loading import batches')
-      this.$http.get(url, {}).then((response) => {
+      axios.get(url, {}).then((response) => {
         self.results = response.data.results
         self.nextLink = response.data.next
         self.previousLink = response.data.previous

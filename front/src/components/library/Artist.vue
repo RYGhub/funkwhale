@@ -41,15 +41,14 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import AlbumCard from '@/components/audio/album/Card'
 import RadioButton from '@/components/radios/Button'
 import PlayButton from '@/components/audio/PlayButton'
-import config from '@/config'
 
-const FETCH_URL = config.API_URL + 'artists/'
+const FETCH_URL = 'artists/'
 
 export default {
   props: ['id'],
@@ -74,7 +73,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL + this.id + '/'
       logger.default.debug('Fetching artist "' + this.id + '"')
-      this.$http.get(url).then((response) => {
+      axios.get(url).then((response) => {
         self.artist = response.data
         self.albums = JSON.parse(JSON.stringify(self.artist.albums)).map((album) => {
           return backend.Album.clean(album)

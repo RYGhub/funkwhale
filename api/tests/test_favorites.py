@@ -58,11 +58,14 @@ def test_user_can_remove_favorite_via_api(logged_in_client, factories, client):
     assert response.status_code == 204
     assert TrackFavorite.objects.count() == 0
 
-def test_user_can_remove_favorite_via_api_using_track_id(factories, logged_in_client):
+
+@pytest.mark.parametrize('method', ['delete', 'post'])
+def test_user_can_remove_favorite_via_api_using_track_id(
+        method, factories, logged_in_client):
     favorite = factories['favorites.TrackFavorite'](user=logged_in_client.user)
 
     url = reverse('api:v1:favorites:tracks-remove')
-    response = logged_in_client.delete(
+    response = getattr(logged_in_client, method)(
         url, json.dumps({'track': favorite.track.pk}),
         content_type='application/json'
     )

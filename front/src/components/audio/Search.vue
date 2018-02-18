@@ -29,13 +29,11 @@
 </template>
 
 <script>
+import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import AlbumCard from '@/components/audio/album/Card'
 import ArtistCard from '@/components/audio/artist/Card'
-import config from '@/config'
-
-const SEARCH_URL = config.API_URL + 'search'
 
 export default {
   components: {
@@ -73,17 +71,8 @@ export default {
       let params = {
         query: this.query
       }
-      this.$http.get(SEARCH_URL, {
-        params: params,
-        before (request) {
-          // abort previous request, if exists
-          if (this.previousRequest) {
-            this.previousRequest.abort()
-          }
-
-          // set previous request on Vue instance
-          this.previousRequest = request
-        }
+      axios.get('search', {
+        params: params
       }).then((response) => {
         self.results = self.castResults(response.data)
         self.isLoading = false

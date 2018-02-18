@@ -3,10 +3,8 @@
 </template>
 
 <script>
+import axios from 'axios'
 import logger from '@/logging'
-
-import config from '@/config'
-import Vue from 'vue'
 
 export default {
   props: {
@@ -25,9 +23,8 @@ export default {
     fetchData () {
       let self = this
       this.isLoading = true
-      let url = config.API_URL + 'providers/musicbrainz/' + this.type + 's/' + this.mbId + '/'
-      let resource = Vue.resource(url)
-      resource.get({}).then((response) => {
+      let url = 'providers/musicbrainz/' + this.type + 's/' + this.mbId + '/'
+      axios.get(url).then((response) => {
         logger.default.info('successfully fetched', self.type, self.mbId)
         self.data = response.data[self.type]
         this.$emit('metadata-changed', self.data)

@@ -3,9 +3,7 @@ version: '2'
 services:
 
   front:
-    build:
-      dockerfile: docker/Dockerfile.dev
-      context: ./front
+    build: front
     env_file: .env.dev
     environment:
       - "HOST=0.0.0.0"
@@ -51,13 +49,11 @@ services:
       - ./api:/app
       - ./data/music:/music
     environment:
-      - "DJANGO_ALLOWED_HOSTS=localhost"
+      - "DJANGO_ALLOWED_HOSTS=localhost,nginx"
       - "DJANGO_SETTINGS_MODULE=config.settings.local"
       - "DJANGO_SECRET_KEY=dev"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-    ports:
-      - "12081:12081"
     links:
       - postgres
       - redis

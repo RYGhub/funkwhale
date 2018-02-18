@@ -59,10 +59,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import _ from 'lodash'
 import $ from 'jquery'
 
-import config from '@/config'
 import logger from '@/logging'
 
 import OrderingMixin from '@/components/mixins/Ordering'
@@ -70,7 +70,7 @@ import PaginationMixin from '@/components/mixins/Pagination'
 import RadioCard from '@/components/radios/Card'
 import Pagination from '@/components/Pagination'
 
-const FETCH_URL = config.API_URL + 'radios/radios/'
+const FETCH_URL = 'radios/radios/'
 
 export default {
   mixins: [OrderingMixin, PaginationMixin],
@@ -125,7 +125,7 @@ export default {
         ordering: this.getOrderingAsString()
       }
       logger.default.debug('Fetching radios')
-      this.$http.get(url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       })

@@ -2,7 +2,7 @@ variables:
   IMAGE_NAME: funkwhale/funkwhale
   IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
   IMAGE_LATEST: $IMAGE_NAME:latest
-
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
 
 
 stages:
@@ -14,40 +14,62 @@ test_api:
   services:
     - postgres:9.4
   stage: test
-  image: funkwhale/funkwhale:base
+  image: funkwhale/funkwhale:latest
+  cache:
+    key: "$CI_PROJECT_ID/pip_cache"
+    paths:
+      - "$PIP_CACHE_DIR"
   variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+    DJANGO_ALLOWED_HOSTS: "localhost"
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
 
   before_script:
-    - python3 -m venv --copies virtualenv
-    - source virtualenv/bin/activate
     - cd api
     - pip install -r requirements/base.txt
     - pip install -r requirements/local.txt
     - pip install -r requirements/test.txt
   script:
     - pytest
-  cache:
-    key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - "$CI_PROJECT_DIR/pip-cache"
   tags:
     - docker
 
-build_front:
-  stage: build
-  image: node:6-alpine
+
+test_front:
+  stage: test
+  image: node:9
   before_script:
     - cd front
 
   script:
-    - npm install
-    - npm run build
+    - yarn install
+    - yarn run unit
   cache:
-    key: "$CI_COMMIT_REF_NAME"
+    key: "$CI_PROJECT_ID/front_dependencies"
     paths:
       - front/node_modules
+      - front/yarn.lock
+  artifacts:
+    name: "front_${CI_COMMIT_REF_NAME}"
+    paths:
+      - front/dist/
+  tags:
+    - docker
+
+
+build_front:
+  stage: build
+  image: node:9
+  before_script:
+    - cd front
+
+  script:
+    - yarn install
+    - yarn run build
+  cache:
+    key: "$CI_PROJECT_ID/front_dependencies"
+    paths:
+      - front/node_modules
+      - front/yarn.lock
   artifacts:
     name: "front_${CI_COMMIT_REF_NAME}"
     paths:

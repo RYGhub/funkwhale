@@ -55,33 +55,32 @@ export default {
     }
   },
   actions: {
-    append (context, {track, index, skipPlay}) {
-      index = index || context.state.tracks.length
-      if (index > context.state.tracks.length - 1) {
+    append ({commit, state, dispatch}, {track, index, skipPlay}) {
+      index = index || state.tracks.length
+      if (index > state.tracks.length - 1) {
         // we simply push to the end
-        context.commit('insert', {track, index: context.state.tracks.length})
+        commit('insert', {track, index: state.tracks.length})
       } else {
         // we insert the track at given position
-        context.commit('insert', {track, index})
+        commit('insert', {track, index})
       }
       if (!skipPlay) {
-        context.dispatch('resume')
+        dispatch('resume')
       }
-      // this.cache()
     },
 
-    appendMany (context, {tracks, index}) {
+    appendMany ({state, dispatch}, {tracks, index}) {
       logger.default.info('Appending many tracks to the queue', tracks.map(e => { return e.title }))
-      if (context.state.tracks.length === 0) {
+      if (state.tracks.length === 0) {
         index = 0
       } else {
-        index = index || context.state.tracks.length
+        index = index || state.tracks.length
       }
       tracks.forEach((t) => {
-        context.dispatch('append', {track: t, index: index, skipPlay: true})
+        dispatch('append', {track: t, index: index, skipPlay: true})
         index += 1
       })
-      context.dispatch('resume')
+      dispatch('resume')
     },
 
     cleanTrack ({state, dispatch, commit}, index) {
@@ -100,14 +99,14 @@ export default {
       }
     },
 
-    resume (context) {
-      if (context.state.ended | context.rootState.player.errored) {
-        context.dispatch('next')
+    resume ({state, dispatch, rootState}) {
+      if (state.ended | rootState.player.errored) {
+        dispatch('next')
       }
     },
-    previous (context) {
-      if (context.state.currentIndex > 0) {
-        context.dispatch('currentIndex', context.state.currentIndex - 1)
+    previous ({state, dispatch}) {
+      if (state.currentIndex > 0) {
+        dispatch('currentIndex', state.currentIndex - 1)
       }
     },
     next ({state, dispatch, commit, rootState}) {

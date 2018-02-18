@@ -60,15 +60,14 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import url from '@/utils/url'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
-import config from '@/config'
 
-const FETCH_URL = config.API_URL + 'tracks/'
+const FETCH_URL = 'tracks/'
 
 export default {
   props: ['id'],
@@ -94,7 +93,7 @@ export default {
       this.isLoadingTrack = true
       let url = FETCH_URL + this.id + '/'
       logger.default.debug('Fetching track "' + this.id + '"')
-      this.$http.get(url).then((response) => {
+      axios.get(url).then((response) => {
         self.track = response.data
         self.isLoadingTrack = false
       })
@@ -104,7 +103,7 @@ export default {
       this.isLoadingLyrics = true
       let url = FETCH_URL + this.id + '/lyrics/'
       logger.default.debug('Fetching lyrics for track "' + this.id + '"')
-      this.$http.get(url).then((response) => {
+      axios.get(url).then((response) => {
         self.lyrics = response.data
         self.isLoadingLyrics = false
       }, (response) => {

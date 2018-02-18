@@ -14,7 +14,7 @@
           </router-link>
         </div>
         <div class="description" v-if="mode === 'rich'">
-          <table class="ui very basic fixed single line compact table">
+          <table class="ui very basic fixed single line compact unstackable table">
             <tbody>
               <tr v-for="track in tracks">
                 <td>

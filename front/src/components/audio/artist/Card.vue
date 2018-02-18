@@ -7,7 +7,7 @@
           </router-link>
         </div>
         <div class="description">
-          <table class="ui compact very basic fixed single line table">
+          <table class="ui compact very basic fixed single line unstackable table">
             <tbody>
               <tr v-for="album in albums">
                 <td>
