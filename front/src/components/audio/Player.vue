@@ -232,7 +232,7 @@ export default {
   },
   watch: {
     currentTrack (newValue) {
-      if (!newValue) {
+      if (!newValue || !newValue.album.cover) {
         this.ambiantColors = this.defaultAmbiantColors
       }
     },
