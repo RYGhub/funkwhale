@@ -1,8 +1,11 @@
+import os
 import pytest
 
 from funkwhale_api.music import models
 from funkwhale_api.music import importers
 from funkwhale_api.music import tasks
+
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_store_release_group_id_on_album(factories):
@@ -48,3 +51,15 @@ def test_import_job_is_bound_to_track_file(factories, mocker):
     tasks.import_job_run(import_job_id=job.pk)
     job.refresh_from_db()
     assert job.track_file.track == track
+
+@pytest.mark.parametrize('extention,mimetype', [
+    ('ogg', 'audio/ogg'),
+    ('mp3', 'audio/mpeg'),
+])
+def test_audio_track_mime_type(extention, mimetype, factories):
+
+    name = '.'.join(['test', extention])
+    path = os.path.join(DATA_DIR, name)
+    tf = factories['music.TrackFile'](audio_file__from_path=path)
+
+    assert tf.mimetype == mimetype
