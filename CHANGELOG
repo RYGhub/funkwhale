@@ -6,6 +6,20 @@ Changelog
 ----------------
 
 - Front: Now reset player colors when track has no cover (#46)
+- Front: play button now disabled for unplayable tracks
+
+Transcoding:
+
+Basic transcoding is now available to/from the following formats : ogg and mp3.
+
+*This is still an alpha feature at the moment, please report any bug.*
+
+This relies internally on FFMPEG and can put some load on your server.
+It's definitely recommended you setup some caching for the transcoded files
+at your webserver level. Check the the exemple nginx file at deploy/nginx.conf
+for an implementation.
+
+On the frontend, usage of transcoding should be transparent in the player.
 
 0.4 (2018-02-18)
 ----------------
