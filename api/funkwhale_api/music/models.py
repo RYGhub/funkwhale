@@ -461,3 +461,8 @@ class ImportJob(models.Model):
 
     class Meta:
         ordering = ('id', )
+
+
+@receiver(post_save, sender=ImportJob)
+def update_batch_status(sender, instance, **kwargs):
+    instance.batch.update_status()
