@@ -466,3 +466,26 @@ class ImportJob(models.Model):
 @receiver(post_save, sender=ImportJob)
 def update_batch_status(sender, instance, **kwargs):
     instance.batch.update_status()
+
+
+@receiver(post_save, sender=ImportBatch)
+def update_request_status(sender, instance, created, **kwargs):
+    update_fields = kwargs.get('update_fields', []) or []
+    if not instance.import_request:
+        return
+
+    if not created and not 'status' in update_fields:
+        return
+
+    r_status = instance.import_request.status
+    status = instance.status
+
+    if status == 'pending' and r_status == 'pending':
+        # let's mark the request as accepted since we started an import
+        instance.import_request.status = 'accepted'
+        return instance.import_request.save(update_fields=['status'])
+
+    if status == 'finished' and r_status == 'accepted':
+        # let's mark the request as imported since the import is over
+        instance.import_request.status = 'imported'
+        return instance.import_request.save(update_fields=['status'])
