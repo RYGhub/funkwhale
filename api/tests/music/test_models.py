@@ -52,6 +52,20 @@ def test_import_job_is_bound_to_track_file(factories, mocker):
     job.refresh_from_db()
     assert job.track_file.track == track
 
+
+@pytest.mark.parametrize('status', ['pending', 'errored', 'finished'])
+def test_saving_job_updates_batch_status(status,factories, mocker):
+    batch = factories['music.ImportBatch']()
+
+    assert batch.status == 'pending'
+
+    job = factories['music.ImportJob'](batch=batch, status=status)
+
+    batch.refresh_from_db()
+
+    assert batch.status == status
+
+
 @pytest.mark.parametrize('extention,mimetype', [
     ('ogg', 'audio/ogg'),
     ('mp3', 'audio/mpeg'),

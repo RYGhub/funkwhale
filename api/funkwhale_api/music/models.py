@@ -10,8 +10,11 @@ from django.conf import settings
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files import File
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+
 from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField
 
@@ -400,6 +403,14 @@ class TrackFile(models.Model):
             self.mimetype = utils.guess_mimetype(self.audio_file)
         return super().save(**kwargs)
 
+
+IMPORT_STATUS_CHOICES = (
+    ('pending', 'Pending'),
+    ('finished', 'Finished'),
+    ('errored', 'Errored'),
+    ('skipped', 'Skipped'),
+)
+
 class ImportBatch(models.Model):
     IMPORT_BATCH_SOURCES = [
         ('api', 'api'),
@@ -412,22 +423,24 @@ class ImportBatch(models.Model):
         'users.User',
         related_name='imports',
         on_delete=models.CASCADE)
-
+    status = models.CharField(
+        choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
+    import_request = models.ForeignKey(
+        'requests.ImportRequest',
+        related_name='import_batches',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE)
     class Meta:
         ordering = ['-creation_date']
 
     def __str__(self):
         return str(self.pk)
 
-    @property
-    def status(self):
-        pending = any([job.status == 'pending' for job in self.jobs.all()])
-        errored = any([job.status == 'errored' for job in self.jobs.all()])
-        if pending:
-            return 'pending'
-        if errored:
-            return 'errored'
-        return 'finished'
+    def update_status(self):
+        self.status = utils.compute_status(self.jobs.all())
+        self.save(update_fields=['status'])
+
 
 class ImportJob(models.Model):
     batch = models.ForeignKey(
@@ -440,13 +453,9 @@ class ImportJob(models.Model):
         on_delete=models.CASCADE)
     source = models.CharField(max_length=500)
     mbid = models.UUIDField(editable=False, null=True, blank=True)
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('finished', 'Finished'),
-        ('errored', 'Errored'),
-        ('skipped', 'Skipped'),
-    )
-    status = models.CharField(choices=STATUS_CHOICES, default='pending', max_length=30)
+
+    status = models.CharField(
+        choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
     audio_file = models.FileField(
         upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
 
