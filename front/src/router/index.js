@@ -98,7 +98,10 @@ export default new Router({
           path: 'import/launch',
           name: 'library.import.launch',
           component: LibraryImport,
-          props: (route) => ({ mbType: route.query.type, mbId: route.query.id })
+          props: (route) => ({
+            source: route.query.source,
+            mbType: route.query.type,
+            mbId: route.query.id })
         },
         {
           path: 'import/batches',

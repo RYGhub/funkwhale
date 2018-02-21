@@ -150,7 +150,7 @@ export default {
       currentType: this.mbType || 'artist',
       currentId: this.mbId,
       currentStep: 0,
-      currentSource: '',
+      currentSource: this.source,
       metadata: {},
       isImporting: false,
       importData: {
