@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
+from funkwhale_api.users.serializers import UserBasicSerializer
+
 from . import models
 
 
 class ImportRequestSerializer(serializers.ModelSerializer):
+    user = UserBasicSerializer(read_only=True)
 
     class Meta:
         model = models.ImportRequest

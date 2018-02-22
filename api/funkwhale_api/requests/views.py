@@ -17,7 +17,7 @@ class ImportRequestViewSet(
         viewsets.GenericViewSet):
 
     serializer_class = serializers.ImportRequestSerializer
-    queryset = models.ImportRequest.objects.all()
+    queryset = models.ImportRequest.objects.all().select_related()
     search_fields = ['artist_name', 'album_name', 'comment']
 
     def perform_create(self, serializer):
