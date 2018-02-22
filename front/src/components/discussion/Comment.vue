@@ -3,7 +3,7 @@
     <div class="content">
       <a class="author">{{ user.username }}</a>
       <div class="metadata">
-        <div class="date">{{ date | ago }}</div>
+        <div class="date"><human-date :date="date"></human-date></div>
       </div>
       <div class="text" v-html="comment"></div>
       </div>
