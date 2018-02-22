@@ -19,6 +19,7 @@ from musicbrainzngs import ResponseError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
@@ -314,14 +315,28 @@ class SubmitViewSet(viewsets.ViewSet):
         serializer = serializers.ImportBatchSerializer(batch)
         return Response(serializer.data)
 
+    def get_import_request(self, data):
+        try:
+            raw = data['importRequest']
+        except KeyError:
+            return
+
+        pk = int(raw)
+        try:
+            return ImportRequest.objects.get(pk=pk)
+        except ImportRequest.DoesNotExist:
+            pass
+
     @list_route(methods=['post'])
     @transaction.non_atomic_requests
     def album(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
-        import_data, batch = self._import_album(data, request, batch=None)
+        import_request = self.get_import_request(data)
+        import_data, batch = self._import_album(
+            data, request, batch=None, import_request=import_request)
         return Response(import_data)
 
-    def _import_album(self, data, request, batch=None):
+    def _import_album(self, data, request, batch=None, import_request=None):
         # we import the whole album here to prevent race conditions that occurs
         # when using get_or_create_from_api in tasks
         album_data = api.releases.get(id=data['releaseId'], includes=models.Album.api_includes)['release']
@@ -332,7 +347,9 @@ class SubmitViewSet(viewsets.ViewSet):
         except ResponseError:
             pass
         if not batch:
-            batch = models.ImportBatch.objects.create(submitted_by=request.user)
+            batch = models.ImportBatch.objects.create(
+                submitted_by=request.user,
+                import_request=import_request)
         for row in data['tracks']:
             try:
                 models.TrackFile.objects.get(track__mbid=row['mbid'])
@@ -346,6 +363,7 @@ class SubmitViewSet(viewsets.ViewSet):
     @transaction.non_atomic_requests
     def artist(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
+        import_request = self.get_import_request(data)
         artist_data = api.artists.get(id=data['artistId'])['artist']
         cleaned_data = models.Artist.clean_musicbrainz_data(artist_data)
         artist = importers.load(models.Artist, cleaned_data, artist_data, import_hooks=[])
@@ -353,7 +371,8 @@ class SubmitViewSet(viewsets.ViewSet):
         import_data = []
         batch = None
         for row in data['albums']:
-            row_data, batch = self._import_album(row, request, batch=batch)
+            row_data, batch = self._import_album(
+                row, request, batch=batch, import_request=import_request)
             import_data.append(row_data)
 
         return Response(import_data[0])
