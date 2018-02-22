@@ -28,4 +28,10 @@ export function ago (date) {
 
 Vue.filter('ago', ago)
 
+export function capitalize (str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+Vue.filter('capitalize', capitalize)
+
 export default {}

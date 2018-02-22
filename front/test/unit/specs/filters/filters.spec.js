@@ -1,4 +1,4 @@
-import {truncate, markdown, ago} from '@/filters'
+import {truncate, markdown, ago, capitalize} from '@/filters'
 
 describe('filters', () => {
   describe('truncate', () => {
@@ -30,6 +30,13 @@ describe('filters', () => {
       const input = new Date()
       let output = ago(input)
       expect(output).to.equal('a few seconds ago')
+    })
+  })
+  describe('capitalize', () => {
+    it('works', () => {
+      const input = 'hello world'
+      let output = capitalize(input)
+      expect(output).to.equal('Hello world')
     })
   })
 })
