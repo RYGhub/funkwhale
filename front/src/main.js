@@ -13,6 +13,7 @@ import VueLazyload from 'vue-lazyload'
 import store from './store'
 import config from './config'
 import { sync } from 'vuex-router-sync'
+import filters from '@/filters' // eslint-disable-line
 
 sync(store, router)
 
