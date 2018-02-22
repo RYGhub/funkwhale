@@ -17,6 +17,7 @@ import LibraryRadios from '@/components/library/Radios'
 import RadioBuilder from '@/components/library/radios/Builder'
 import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
+import RequestsList from '@/components/requests/RequestsList'
 
 import Favorites from '@/components/favorites/List'
 
@@ -100,6 +101,7 @@ export default new Router({
           component: LibraryImport,
           props: (route) => ({
             source: route.query.source,
+            request: route.query.request,
             mbType: route.query.type,
             mbId: route.query.id })
         },
@@ -110,7 +112,21 @@ export default new Router({
           children: [
           ]
         },
-        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
+        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true },
+        {
+          path: 'requests/',
+          name: 'library.requests',
+          component: RequestsList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page,
+            defaultStatus: route.query.status || 'pending'
+          }),
+          children: [
+          ]
+        }
       ]
     },
     { path: '*', component: PageNotFound }
