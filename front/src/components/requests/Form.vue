@@ -4,16 +4,16 @@
       <p>Something's missing in the library? Let us know what you would like to listen!</p>
       <div class="required field">
         <label>Artist name</label>
-        <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required>
+        <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required maxlength="200">
       </div>
       <div class="field">
         <label>Albums</label>
         <p>Leave this field empty if you're requesting the whole discography.</p>
-        <input v-model="currentAlbums" placeholder="The White Album, Thriller…">
+        <input v-model="currentAlbums" placeholder="The White Album, Thriller…" maxlength="2000">
       </div>
       <div class="field">
         <label>Comment</label>
-        <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed"></textarea>
+        <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed" maxlength="2000"></textarea>
       </div>
       <button class="ui submit button" type="submit">Submit</button>
     </form>
@@ -29,8 +29,10 @@
         <div v-for="request in requests" class="item">
           <div class="content">
             <div class="header">{{ request.artist_name }}</div>
-            <div v-if="request.albums" class="description">{{ truncate(request.albums, 50) }}</div>
-            <div v-if="request.comment" class="description">{{ truncate(request.comment, 50) }}</div>
+            <div v-if="request.albums" class="description">
+              {{ request.albums|truncate }}</div>
+            <div v-if="request.comment" class="description">
+              {{ request.comment|truncate }}</div>
           </div>
         </div>
       </div>
