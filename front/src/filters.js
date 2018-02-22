@@ -28,6 +28,13 @@ export function ago (date) {
 
 Vue.filter('ago', ago)
 
+export function momentFormat (date, format) {
+  format = format || 'lll'
+  return moment(date).format(format)
+}
+
+Vue.filter('moment', momentFormat)
+
 export function capitalize (str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
