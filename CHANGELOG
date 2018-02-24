@@ -12,6 +12,11 @@ Changelog
 - Front: Fixed broken redirection on login
 - Front: Fixed broken error handling on settings and login form
 
+About page:
+
+There is a brand new about page on instances (/about), and instance
+owner can now provide a name, a short and a long description for their instance via the admin (/api/admin/dynamic_preferences/globalpreferencemodel/).
+
 Transcoding:
 
 Basic transcoding is now available to/from the following formats : ogg and mp3.

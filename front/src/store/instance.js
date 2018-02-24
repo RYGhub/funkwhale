@@ -6,6 +6,17 @@ export default {
   namespaced: true,
   state: {
     settings: {
+      instance: {
+        name: {
+          value: ''
+        },
+        short_description: {
+          value: ''
+        },
+        long_description: {
+          value: ''
+        }
+      },
       users: {
         registration_enabled: {
           value: true
@@ -40,7 +51,7 @@ export default {
         })
         commit('settings', sections)
         if (payload && payload.callback) {
-          callback()
+          payload.callback()
         }
       }, response => {
         logger.default.error('Error while fetching settings', response.data)
