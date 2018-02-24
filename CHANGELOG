@@ -4,6 +4,7 @@ Changelog
 0.6 (Unreleased)
 ----------------
 
+- Front: Fixed broken ajax call on radio builder (#69)
 
 0.5 (2018-02-24)
 ----------------
