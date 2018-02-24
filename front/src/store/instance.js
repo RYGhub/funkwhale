@@ -28,7 +28,7 @@ export default {
   },
   actions: {
     // Send a request to the login URL and save the returned JWT
-    fetchSettings ({commit}, {callback}) {
+    fetchSettings ({commit}, payload) {
       return axios.get('instance/settings/').then(response => {
         logger.default.info('Successfully fetched instance settings')
         let sections = {}
@@ -39,7 +39,7 @@ export default {
           sections[e.section][e.name] = e
         })
         commit('settings', sections)
-        if (callback) {
+        if (payload && payload.callback) {
           callback()
         }
       }, response => {
