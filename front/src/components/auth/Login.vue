@@ -73,9 +73,9 @@ export default {
       // to properly make use of http in the auth service
       this.$store.dispatch('auth/login', {
         credentials,
-        next: this.next,
-        onError: response => {
-          if (response.status === 400) {
+        next: '/library',
+        onError: error => {
+          if (error.response.status === 400) {
             self.error = 'invalid_credentials'
           } else {
             self.error = 'unknown_error'

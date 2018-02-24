@@ -37,7 +37,6 @@
 
 <script>
 import axios from 'axios'
-import config from '@/config'
 import logger from '@/logging'
 
 export default {
@@ -61,12 +60,16 @@ export default {
         new_password1: this.new_password,
         new_password2: this.new_password
       }
-      let url = config.BACKEND_URL + 'api/auth/registration/change-password/'
+      let url = 'auth/registration/change-password/'
       return axios.post(url, credentials).then(response => {
         logger.default.info('Password successfully changed')
-        self.$router.push('/profile/me')
-      }, response => {
-        if (response.status === 400) {
+        self.$router.push({
+          name: 'profile',
+          params: {
+            username: self.$store.state.auth.username
+          }})
+      }, error => {
+        if (error.response.status === 400) {
           self.error = 'invalid_credentials'
         } else {
           self.error = 'unknown_error'
