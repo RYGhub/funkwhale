@@ -1,15 +1,10 @@
 from allauth.account.adapter import DefaultAccountAdapter
 
-from django.conf import settings
+from dynamic_preferences.registries import global_preferences_registry
 
 
 class FunkwhaleAccountAdapter(DefaultAccountAdapter):
 
     def is_open_for_signup(self, request):
-
-        if settings.REGISTRATION_MODE == "disabled":
-            return False
-        if settings.REGISTRATION_MODE == "public":
-            return True
-
-        return False
+        manager = global_preferences_registry.manager()
+        return manager['users__registration_enabled']
