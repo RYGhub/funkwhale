@@ -4,7 +4,7 @@
       <search :autofocus="true"></search>
     </div>
     <div class="ui vertical stripe segment">
-      <div class="ui stackable two column grid">
+      <div class="ui stackable three column grid">
         <div class="column">
           <h2 class="ui header">Latest artists</h2>
           <div :class="['ui', {'active': isLoadingArtists}, 'inline', 'loader']"></div>
@@ -18,6 +18,10 @@
           <radio-card :type="'random'"></radio-card>
           <radio-card :type="'less-listened'"></radio-card>
         </div>
+        <div class="column">
+          <h2 class="ui header">Music requests</h2>
+          <request-form></request-form>
+        </div>
       </div>
     </div>
   </div>
@@ -30,6 +34,7 @@ import backend from '@/audio/backend'
 import logger from '@/logging'
 import ArtistCard from '@/components/audio/artist/Card'
 import RadioCard from '@/components/radios/Card'
+import RequestForm from '@/components/requests/Form'
 
 const ARTISTS_URL = 'artists/'
 
@@ -38,7 +43,8 @@ export default {
   components: {
     Search,
     ArtistCard,
-    RadioCard
+    RadioCard,
+    RequestForm
   },
   data () {
     return {

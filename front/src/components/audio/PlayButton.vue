@@ -1,6 +1,6 @@
 <template>
   <div :class="['ui', {'tiny': discrete}, 'buttons']">
-    <button title="Add to current queue" @click="add" :class="['ui', {'mini': discrete}, 'button']">
+    <button title="Add to current queue" @click="add" :class="['ui', {'mini': discrete}, {disabled: playableTracks.length === 0}, 'button']">
       <i class="ui play icon"></i>
       <template v-if="!discrete"><slot>Play</slot></template>
     </button>
@@ -36,20 +36,25 @@ export default {
       jQuery(this.$el).find('.ui.dropdown').dropdown()
     }
   },
+  computed: {
+    playableTracks () {
+      let tracks
+      if (this.track) {
+        tracks = [this.track]
+      } else {
+        tracks = this.tracks
+      }
+      return tracks.filter(e => {
+        return e.files.length > 0
+      })
+    }
+  },
   methods: {
     add () {
-      if (this.track) {
-        this.$store.dispatch('queue/append', {track: this.track})
-      } else {
-        this.$store.dispatch('queue/appendMany', {tracks: this.tracks})
-      }
+      this.$store.dispatch('queue/appendMany', {tracks: this.playableTracks})
     },
     addNext (next) {
-      if (this.track) {
-        this.$store.dispatch('queue/append', {track: this.track, index: this.$store.state.queue.currentIndex + 1})
-      } else {
-        this.$store.dispatch('queue/appendMany', {tracks: this.tracks, index: this.$store.state.queue.currentIndex + 1})
-      }
+      this.$store.dispatch('queue/appendMany', {tracks: this.playableTracks, index: this.$store.state.queue.currentIndex + 1})
       if (next) {
         this.$store.dispatch('queue/next')
       }

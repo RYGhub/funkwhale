@@ -6,6 +6,10 @@
             Welcome on funkwhale
         </h1>
         <p>We think listening music should be simple.</p>
+        <router-link class="ui icon button" to="/about">
+          <i class="info icon"></i>
+          Learn more about this instance
+        </router-link>
         <router-link class="ui icon teal button" to="/library">
           Get me to the library
           <i class="right arrow icon"></i>

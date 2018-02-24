@@ -50,7 +50,12 @@ export default {
   },
   getters: {
     durationFormatted: state => {
-      return time.parse(Math.round(state.duration))
+      let duration = parseInt(state.duration)
+      if (duration % 1 !== 0) {
+        return time.parse(0)
+      }
+      duration = Math.round(state.duration)
+      return time.parse(duration)
     },
     currentTimeFormatted: state => {
       return time.parse(Math.round(state.currentTime))

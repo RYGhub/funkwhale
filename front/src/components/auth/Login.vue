@@ -12,13 +12,13 @@
             </ul>
           </div>
           <div class="field">
-            <label>Username</label>
+            <label>Username or email</label>
             <input
             ref="username"
             required
             type="text"
             autofocus
-            placeholder="Enter your username"
+            placeholder="Enter your username or email"
             v-model="credentials.username"
             >
           </div>
@@ -32,6 +32,9 @@
             >
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Login</button>
+          <router-link class="ui right floated basic button" :to="{path: '/signup'}">
+            Create an account
+          </router-link>
         </form>
       </div>
     </div>
@@ -73,9 +76,9 @@ export default {
       // to properly make use of http in the auth service
       this.$store.dispatch('auth/login', {
         credentials,
-        next: this.next,
-        onError: response => {
-          if (response.status === 400) {
+        next: '/library',
+        onError: error => {
+          if (error.response.status === 400) {
             self.error = 'invalid_credentials'
           } else {
             self.error = 'unknown_error'

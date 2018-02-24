@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
+import About from '@/components/About'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
+import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
 import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
@@ -17,6 +19,7 @@ import LibraryRadios from '@/components/library/Radios'
 import RadioBuilder from '@/components/library/radios/Builder'
 import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
+import RequestsList from '@/components/requests/RequestsList'
 
 import Favorites from '@/components/favorites/List'
 
@@ -32,10 +35,20 @@ export default new Router({
       component: Home
     },
     {
+      path: '/about',
+      name: 'about',
+      component: About
+    },
+    {
       path: '/login',
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: Signup
     },
     {
       path: '/logout',
@@ -98,7 +111,11 @@ export default new Router({
           path: 'import/launch',
           name: 'library.import.launch',
           component: LibraryImport,
-          props: (route) => ({ mbType: route.query.type, mbId: route.query.id })
+          props: (route) => ({
+            source: route.query.source,
+            request: route.query.request,
+            mbType: route.query.type,
+            mbId: route.query.id })
         },
         {
           path: 'import/batches',
@@ -107,7 +124,21 @@ export default new Router({
           children: [
           ]
         },
-        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
+        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true },
+        {
+          path: 'requests/',
+          name: 'library.requests',
+          component: RequestsList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page,
+            defaultStatus: route.query.status || 'pending'
+          }),
+          children: [
+          ]
+        }
       ]
     },
     { path: '*', component: PageNotFound }

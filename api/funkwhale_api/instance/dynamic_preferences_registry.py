@@ -1,8 +1,41 @@
+from django.forms import widgets
+
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
 raven = types.Section('raven')
+instance = types.Section('instance')
 
+
+@global_preferences_registry.register
+class InstanceName(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = 'name'
+    default = ''
+    help_text = 'Instance public name'
+    verbose_name = 'The public name of your instance'
+
+
+@global_preferences_registry.register
+class InstanceShortDescription(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = 'short_description'
+    default = ''
+    verbose_name = 'Instance succinct description'
+
+
+@global_preferences_registry.register
+class InstanceLongDescription(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = 'long_description'
+    default = ''
+    help_text = 'Instance long description (markdown allowed)'
+    field_kwargs = {
+        'widget': widgets.Textarea
+    }
 
 @global_preferences_registry.register
 class RavenDSN(types.StringPreference):

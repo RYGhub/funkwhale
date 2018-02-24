@@ -13,8 +13,8 @@ urlpatterns = [
     url(settings.ADMIN_URL, admin.site.urls),
 
     url(r'^api/', include(("config.api_urls", 'api'), namespace="api")),
-    url(r'^api/auth/', include('rest_auth.urls')),
-    url(r'^api/auth/registration/', include('funkwhale_api.users.rest_auth_urls')),
+    url(r'^api/v1/auth/', include('rest_auth.urls')),
+    url(r'^api/v1/auth/registration/', include('funkwhale_api.users.rest_auth_urls')),
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here

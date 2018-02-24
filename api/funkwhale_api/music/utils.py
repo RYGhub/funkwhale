@@ -1,6 +1,8 @@
+import magic
 import re
 
 from django.db.models import Q
+
 
 def normalize_query(query_string,
                     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
@@ -14,6 +16,7 @@ def normalize_query(query_string,
 
     '''
     return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+
 
 def get_query(query_string, search_fields):
     ''' Returns a query, that is a combination of Q objects. That combination
@@ -35,3 +38,18 @@ def get_query(query_string, search_fields):
         else:
             query = query & or_query
     return query
+
+
+def guess_mimetype(f):
+    b = min(100000, f.size)
+    return magic.from_buffer(f.read(b), mime=True)
+
+
+def compute_status(jobs):
+    errored = any([job.status == 'errored' for job in jobs])
+    if errored:
+        return 'errored'
+    pending = any([job.status == 'pending' for job in jobs])
+    if pending:
+        return 'pending'
+    return 'finished'

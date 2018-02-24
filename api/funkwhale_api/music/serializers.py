@@ -28,7 +28,14 @@ class TrackFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.TrackFile
-        fields = ('id', 'path', 'duration', 'source', 'filename', 'track')
+        fields = (
+            'id',
+            'path',
+            'duration',
+            'source',
+            'filename',
+            'mimetype',
+            'track')
 
     def get_path(self, o):
         url = o.path
@@ -118,5 +125,5 @@ class ImportBatchSerializer(serializers.ModelSerializer):
     jobs = ImportJobSerializer(many=True, read_only=True)
     class Meta:
         model = models.ImportBatch
-        fields = ('id', 'jobs', 'status', 'creation_date')
+        fields = ('id', 'jobs', 'status', 'creation_date', 'import_request')
         read_only_fields = ('creation_date',)

@@ -80,10 +80,12 @@ if RAVEN_ENABLED:
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
+    'funkwhale_api.common',
     'funkwhale_api.users',  # custom users app
     # Your stuff: custom apps go here
     'funkwhale_api.instance',
     'funkwhale_api.music',
+    'funkwhale_api.requests',
     'funkwhale_api.favorites',
     'funkwhale_api.radios',
     'funkwhale_api.history',
@@ -262,7 +264,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Some really nice defaults
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
@@ -315,7 +317,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 # )
 CORS_ALLOW_CREDENTIALS = True
 API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
-REGISTRATION_MODE = env('REGISTRATION_MODE', default='disabled')
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

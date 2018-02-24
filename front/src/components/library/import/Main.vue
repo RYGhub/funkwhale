@@ -92,6 +92,7 @@
           <component
             ref="import"
             v-if="currentSource == 'external'"
+            :request="currentRequest"
             :metadata="metadata"
             :is="importComponent"
             :backends="backends"
@@ -113,7 +114,10 @@
         </div>
       </div>
     </div>
-    <div class="ui vertical stripe segment">
+    <div class="ui vertical stripe segment" v-if="currentRequest">
+      <h3 class="ui header">Music request</h3>
+      <p>This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled.</p>
+      <request-card :request="currentRequest" :import-action="false"></request-card>
 
     </div>
   </div>
@@ -121,6 +125,7 @@
 
 <script>
 
+import RequestCard from '@/components/requests/Card'
 import MetadataSearch from '@/components/metadata/Search'
 import ReleaseCard from '@/components/metadata/ReleaseCard'
 import ArtistCard from '@/components/metadata/ArtistCard'
@@ -128,6 +133,7 @@ import ReleaseImport from './ReleaseImport'
 import FileUpload from './FileUpload'
 import ArtistImport from './ArtistImport'
 
+import axios from 'axios'
 import router from '@/router'
 import $ from 'jquery'
 
@@ -138,19 +144,22 @@ export default {
     ReleaseCard,
     ArtistImport,
     ReleaseImport,
-    FileUpload
+    FileUpload,
+    RequestCard
   },
   props: {
     mbType: {type: String, required: false},
+    request: {type: String, required: false},
     source: {type: String, required: false},
     mbId: {type: String, required: false}
   },
   data: function () {
     return {
+      currentRequest: null,
       currentType: this.mbType || 'artist',
       currentId: this.mbId,
       currentStep: 0,
-      currentSource: '',
+      currentSource: this.source,
       metadata: {},
       isImporting: false,
       importData: {
@@ -166,6 +175,9 @@ export default {
     }
   },
   created () {
+    if (this.request) {
+      this.fetchRequest(this.request)
+    }
     if (this.currentSource) {
       this.currentStep = 1
     }
@@ -179,7 +191,8 @@ export default {
         query: {
           source: this.currentSource,
           type: this.currentType,
-          id: this.currentId
+          id: this.currentId,
+          request: this.request
         }
       })
     },
@@ -197,6 +210,12 @@ export default {
     },
     updateId (newValue) {
       this.currentId = newValue
+    },
+    fetchRequest (id) {
+      let self = this
+      axios.get(`requests/import-requests/${id}`).then((response) => {
+        self.currentRequest = response.data
+      })
     }
   },
   computed: {

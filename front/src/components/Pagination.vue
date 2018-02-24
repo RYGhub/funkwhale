@@ -49,4 +49,8 @@ export default {
 </script>
 
 <style scoped>
+.ui.menu {
+  border: none;
+  box-shadow: none;
+}
 </style>

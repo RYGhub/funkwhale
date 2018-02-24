@@ -1,11 +1,16 @@
+import ffmpeg
 import os
 import json
+import subprocess
 import unicodedata
 import urllib
+
 from django.urls import reverse
 from django.db import models, transaction
 from django.db.models.functions import Length
 from django.conf import settings
+from django.http import StreamingHttpResponse
+
 from rest_framework import viewsets, views, mixins
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
@@ -14,11 +19,13 @@ from musicbrainzngs import ResponseError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
 
+from . import forms
 from . import models
 from . import serializers
 from . import importers
@@ -183,6 +190,40 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             f.audio_file.url)
         return response
 
+    @list_route(methods=['get'])
+    def viewable(self, request, *args, **kwargs):
+        return Response({}, status=200)
+
+    @list_route(methods=['get'])
+    def transcode(self, request, *args, **kwargs):
+        form = forms.TranscodeForm(request.GET)
+        if not form.is_valid():
+            return Response(form.errors, status=400)
+
+        f = form.cleaned_data['track_file']
+        output_kwargs = {
+            'format': form.cleaned_data['to']
+        }
+        args = (ffmpeg
+            .input(f.audio_file.path)
+            .output('pipe:', **output_kwargs)
+            .get_args()
+        )
+        # we use a generator here so the view return immediatly and send
+        # file chunk to the browser, instead of blocking a few seconds
+        def _transcode():
+            p = subprocess.Popen(
+                ['ffmpeg'] + args,
+                stdout=subprocess.PIPE)
+            for line in p.stdout:
+                yield line
+
+        response = StreamingHttpResponse(
+            _transcode(), status=200,
+            content_type=form.cleaned_data['to'])
+
+        return response
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all().order_by('name')
@@ -274,14 +315,28 @@ class SubmitViewSet(viewsets.ViewSet):
         serializer = serializers.ImportBatchSerializer(batch)
         return Response(serializer.data)
 
+    def get_import_request(self, data):
+        try:
+            raw = data['importRequest']
+        except KeyError:
+            return
+
+        pk = int(raw)
+        try:
+            return ImportRequest.objects.get(pk=pk)
+        except ImportRequest.DoesNotExist:
+            pass
+
     @list_route(methods=['post'])
     @transaction.non_atomic_requests
     def album(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
-        import_data, batch = self._import_album(data, request, batch=None)
+        import_request = self.get_import_request(data)
+        import_data, batch = self._import_album(
+            data, request, batch=None, import_request=import_request)
         return Response(import_data)
 
-    def _import_album(self, data, request, batch=None):
+    def _import_album(self, data, request, batch=None, import_request=None):
         # we import the whole album here to prevent race conditions that occurs
         # when using get_or_create_from_api in tasks
         album_data = api.releases.get(id=data['releaseId'], includes=models.Album.api_includes)['release']
@@ -292,7 +347,9 @@ class SubmitViewSet(viewsets.ViewSet):
         except ResponseError:
             pass
         if not batch:
-            batch = models.ImportBatch.objects.create(submitted_by=request.user)
+            batch = models.ImportBatch.objects.create(
+                submitted_by=request.user,
+                import_request=import_request)
         for row in data['tracks']:
             try:
                 models.TrackFile.objects.get(track__mbid=row['mbid'])
@@ -306,6 +363,7 @@ class SubmitViewSet(viewsets.ViewSet):
     @transaction.non_atomic_requests
     def artist(self, request, *args, **kwargs):
         data = json.loads(request.body.decode('utf-8'))
+        import_request = self.get_import_request(data)
         artist_data = api.artists.get(id=data['artistId'])['artist']
         cleaned_data = models.Artist.clean_musicbrainz_data(artist_data)
         artist = importers.load(models.Artist, cleaned_data, artist_data, import_hooks=[])
@@ -313,7 +371,8 @@ class SubmitViewSet(viewsets.ViewSet):
         import_data = []
         batch = None
         for row in data['albums']:
-            row_data, batch = self._import_album(row, request, batch=batch)
+            row_data, batch = self._import_album(
+                row, request, batch=batch, import_request=import_request)
             import_data.append(row_data)
 
         return Response(import_data[0])

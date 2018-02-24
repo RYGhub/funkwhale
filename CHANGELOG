@@ -1,10 +1,44 @@
 Changelog
 =========
 
-
-0.5 (Unreleased)
+0.6 (Unreleased)
 ----------------
 
+
+0.5 (2018-02-24)
+----------------
+
+- Front: Now reset player colors when track has no cover (#46)
+- Front: play button now disabled for unplayable tracks
+- API: You can now enable or disable registration on the fly, via a preference (#58)
+- Front: can now signup via the web interface (#35)
+- Front: Fixed broken redirection on login
+- Front: Fixed broken error handling on settings and login form
+
+About page:
+
+There is a brand new about page on instances (/about), and instance
+owner can now provide a name, a short and a long description for their instance via the admin (/api/admin/dynamic_preferences/globalpreferencemodel/).
+
+Transcoding:
+
+Basic transcoding is now available to/from the following formats : ogg and mp3.
+
+*This is still an alpha feature at the moment, please report any bug.*
+
+This relies internally on FFMPEG and can put some load on your server.
+It's definitely recommended you setup some caching for the transcoded files
+at your webserver level. Check the the exemple nginx file at deploy/nginx.conf
+for an implementation.
+
+On the frontend, usage of transcoding should be transparent in the player.
+
+Music Requests:
+
+This release includes a new feature, music requests, which allows users
+to request music they'd like to see imported.
+Admins can browse those requests and mark them as completed when
+an import is made.
 
 0.4 (2018-02-18)
 ----------------

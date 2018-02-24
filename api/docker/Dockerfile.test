@@ -1,9 +1,10 @@
 FROM python:3.5
 
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE  1
+ENV PYTHONDONTWRITEBYTECODE 1
 
 # Requirements have to be pulled and installed here, otherwise caching won't work
+RUN echo 'deb http://httpredir.debian.org/debian/ jessie-backports main' > /etc/apt/sources.list.d/ffmpeg.list
 COPY ./requirements.apt /requirements.apt
 COPY ./install_os_dependencies.sh /install_os_dependencies.sh
 RUN bash install_os_dependencies.sh install
