@@ -142,6 +142,7 @@ export default {
     },
     shuffle ({dispatch, commit, state}) {
       let shuffled = _.shuffle(state.tracks)
+      commit('player/currentTime', 0, {root: true})
       commit('tracks', [])
       dispatch('appendMany', {tracks: shuffled})
     }

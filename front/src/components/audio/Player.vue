@@ -308,12 +308,6 @@ export default {
     bottom: 5px;
     left: 10%;
     cursor: pointer;
-    display: none;
-  }
-  &:hover {
-    [type="range"] {
-      display: block;
-    }
   }
 }
 
