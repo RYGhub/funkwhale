@@ -5,6 +5,7 @@ Changelog
 ----------------
 
 - Front: Fixed broken ajax call on radio builder (#69)
+- Front: volume slider should now have the same style everywhere (#72)
 
 0.5 (2018-02-24)
 ----------------

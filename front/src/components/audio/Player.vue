@@ -310,6 +310,54 @@ export default {
     cursor: pointer;
     display: none;
   }
+  input[type=range] {
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    cursor: pointer;
+    background: white;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    background: white;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #white;
+  }
+  input[type=range]::-moz-range-track {
+    cursor: pointer;
+    background: white;
+  }
+  input[type=range]::-moz-range-thumb {
+    background: white;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: white;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: white;
+  }
+  input[type=range]::-ms-thumb {
+    background: white;
+    cursor: pointer;
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: white;
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: #white;
+  }
   &:hover {
     [type="range"] {
       display: block;
