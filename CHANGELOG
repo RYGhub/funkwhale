@@ -4,9 +4,14 @@ Changelog
 0.6 (Unreleased)
 ----------------
 
+
+0.5.1 (2018-02-24)
+------------------
+
 - Front: Fixed broken ajax call on radio builder (#69)
 - Front: Shuffle now restart next track from beginning (#70)
 - Front: volume slider should now have the same style everywhere (#72)
+
 
 0.5 (2018-02-24)
 ----------------
