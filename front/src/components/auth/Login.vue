@@ -12,13 +12,13 @@
             </ul>
           </div>
           <div class="field">
-            <label>Username</label>
+            <label>Username or email</label>
             <input
             ref="username"
             required
             type="text"
             autofocus
-            placeholder="Enter your username"
+            placeholder="Enter your username or email"
             v-model="credentials.username"
             >
           </div>
