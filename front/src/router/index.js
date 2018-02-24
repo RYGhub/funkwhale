@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
+import About from '@/components/About'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Signup from '@/components/auth/Signup'
@@ -32,6 +33,11 @@ export default new Router({
       path: '/',
       name: 'index',
       component: Home
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: About
     },
     {
       path: '/login',

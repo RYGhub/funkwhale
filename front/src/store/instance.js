@@ -6,6 +6,17 @@ export default {
   namespaced: true,
   state: {
     settings: {
+      instance: {
+        name: {
+          value: ''
+        },
+        short_description: {
+          value: ''
+        },
+        long_description: {
+          value: ''
+        }
+      },
       users: {
         registration_enabled: {
           value: true

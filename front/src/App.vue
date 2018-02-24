@@ -9,6 +9,9 @@
           <div class="three wide column">
             <h4 class="ui header">Links</h4>
             <div class="ui link list">
+              <router-link class="item" to="/about">
+                About this instance
+              </router-link>
               <a href="https://funkwhale.audio" class="item" target="_blank">Official website</a>
               <a href="https://docs.funkwhale.audio" class="item" target="_blank">Documentation</a>
               <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">Source code</a>
