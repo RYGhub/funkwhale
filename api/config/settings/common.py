@@ -317,7 +317,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 # )
 CORS_ALLOW_CREDENTIALS = True
 API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
-REGISTRATION_MODE = env('REGISTRATION_MODE', default='disabled')
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
