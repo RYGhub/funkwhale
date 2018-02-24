@@ -40,7 +40,7 @@ export default {
         })
         commit('settings', sections)
         if (payload && payload.callback) {
-          callback()
+          payload.callback()
         }
       }, response => {
         logger.default.error('Error while fetching settings', response.data)
