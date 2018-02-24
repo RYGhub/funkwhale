@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
 import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
+import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
 import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
@@ -37,6 +38,11 @@ export default new Router({
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: Signup
     },
     {
       path: '/logout',

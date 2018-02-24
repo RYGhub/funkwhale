@@ -32,6 +32,9 @@
             >
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Login</button>
+          <router-link class="ui right floated basic button" :to="{path: '/signup'}">
+            Create an account
+          </router-link>
         </form>
       </div>
     </div>
