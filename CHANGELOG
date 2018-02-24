@@ -1,8 +1,11 @@
 Changelog
 =========
 
+0.6 (Unreleased)
+----------------
 
-0.5 (Unreleased)
+
+0.5 (2018-02-24)
 ----------------
 
 - Front: Now reset player colors when track has no cover (#46)
@@ -29,6 +32,13 @@ at your webserver level. Check the the exemple nginx file at deploy/nginx.conf
 for an implementation.
 
 On the frontend, usage of transcoding should be transparent in the player.
+
+Music Requests:
+
+This release includes a new feature, music requests, which allows users
+to request music they'd like to see imported.
+Admins can browse those requests and mark them as completed when
+an import is made.
 
 0.4 (2018-02-18)
 ----------------
