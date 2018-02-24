@@ -7,6 +7,10 @@ Changelog
 
 - Front: Now reset player colors when track has no cover (#46)
 - Front: play button now disabled for unplayable tracks
+- API: You can now enable or disable registration on the fly, via a preference (#58)
+- Front: can now signup via the web interface (#35)
+- Front: Fixed broken redirection on login
+- Front: Fixed broken error handling on settings and login form
 
 Transcoding:
 

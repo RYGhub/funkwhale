@@ -6,7 +6,7 @@ from django.urls import reverse
 from funkwhale_api.users.models import User
 
 
-def test_can_create_user_via_api(settings, client, db):
+def test_can_create_user_via_api(preferences, client, db):
     url = reverse('rest_register')
     data = {
         'username': 'test1',
@@ -14,7 +14,7 @@ def test_can_create_user_via_api(settings, client, db):
         'password1': 'testtest',
         'password2': 'testtest',
     }
-    settings.REGISTRATION_MODE = "public"
+    preferences['users__registration_enabled'] = True
     response = client.post(url, data)
     assert response.status_code == 201
 
@@ -22,7 +22,7 @@ def test_can_create_user_via_api(settings, client, db):
     assert u.username == 'test1'
 
 
-def test_can_disable_registration_view(settings, client, db):
+def test_can_disable_registration_view(preferences, client, db):
     url = reverse('rest_register')
     data = {
         'username': 'test1',
@@ -30,7 +30,7 @@ def test_can_disable_registration_view(settings, client, db):
         'password1': 'testtest',
         'password2': 'testtest',
     }
-    settings.REGISTRATION_MODE = "disabled"
+    preferences['users__registration_enabled'] = False
     response = client.post(url, data)
     assert response.status_code == 403
 
