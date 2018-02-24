@@ -57,6 +57,24 @@ def api_client(client):
 
 
 @pytest.fixture
+def logged_in_api_client(db, factories, api_client):
+    user = factories['users.User']()
+    assert api_client.login(username=user.username, password='test')
+    setattr(api_client, 'user', user)
+    yield api_client
+    delattr(api_client, 'user')
+
+
+@pytest.fixture
+def superuser_api_client(db, factories, api_client):
+    user = factories['users.SuperUser']()
+    assert api_client.login(username=user.username, password='test')
+    setattr(api_client, 'user', user)
+    yield api_client
+    delattr(api_client, 'user')
+
+
+@pytest.fixture
 def superuser_client(db, factories, client):
     user = factories['users.SuperUser']()
     assert client.login(username=user.username, password='test')

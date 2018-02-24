@@ -43,3 +43,13 @@ def get_query(query_string, search_fields):
 def guess_mimetype(f):
     b = min(100000, f.size)
     return magic.from_buffer(f.read(b), mime=True)
+
+
+def compute_status(jobs):
+    errored = any([job.status == 'errored' for job in jobs])
+    if errored:
+        return 'errored'
+    pending = any([job.status == 'pending' for job in jobs])
+    if pending:
+        return 'pending'
+    return 'finished'

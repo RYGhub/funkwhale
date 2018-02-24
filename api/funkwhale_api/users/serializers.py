@@ -3,6 +3,12 @@ from rest_framework import serializers
 from . import models
 
 
+class UserBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ['id', 'username', 'name', 'date_joined']
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()

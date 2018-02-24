@@ -17,9 +17,6 @@ class ListeningViewSet(mixins.CreateModelMixin,
     queryset = models.Listening.objects.all()
     permission_classes = [ConditionalAuthentication]
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:

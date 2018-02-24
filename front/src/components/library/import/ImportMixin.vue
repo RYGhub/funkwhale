@@ -13,7 +13,8 @@ export default {
     defaultEnabled: {type: Boolean, default: true},
     backends: {type: Array},
     defaultBackendId: {type: String},
-    queryTemplate: {type: String, default: '$artist $title'}
+    queryTemplate: {type: String, default: '$artist $title'},
+    request: {type: Object, required: false}
   },
   data () {
     return {
@@ -32,6 +33,9 @@ export default {
       this.isImporting = true
       let url = 'submit/' + self.importType + '/'
       let payload = self.importData
+      if (this.request) {
+        payload.importRequest = this.request.id
+      }
       axios.post(url, payload).then((response) => {
         logger.default.info('launched import for', self.type, self.metadata.id)
         self.isImporting = false
