@@ -360,6 +360,12 @@ class Track(APIModelMixin):
                 self.title,
             )
 
+    def get_activity_url(self):
+        if self.mbid:
+            return 'https://musicbrainz.org/recording/{}'.format(
+                self.mbid)
+        return settings.FUNKWHALE_URL + '/tracks/{}'.format(self.pk)
+
 
 class TrackFile(models.Model):
     track = models.ForeignKey(

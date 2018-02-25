@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 from django.db import models
@@ -43,3 +44,6 @@ class User(AbstractUser):
     def set_password(self, raw_password):
         super().set_password(raw_password)
         self.update_secret_key()
+
+    def get_activity_url(self):
+        return settings.FUNKWHALE_URL + '/@{}'.format(self.username)

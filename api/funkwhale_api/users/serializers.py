@@ -1,6 +1,24 @@
 from rest_framework import serializers
 
+from funkwhale_api.activity import serializers as activity_serializers
+
 from . import models
+
+
+class UserActivitySerializer(activity_serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    name = serializers.CharField(source='username')
+
+    class Meta:
+        model = models.User
+        fields = [
+            'id',
+            'name',
+            'type'
+        ]
+
+    def get_type(self, obj):
+        return 'Person'
 
 
 class UserBasicSerializer(serializers.ModelSerializer):

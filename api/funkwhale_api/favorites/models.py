@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
 from funkwhale_api.music.models import Track
+
 
 class TrackFavorite(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
@@ -18,3 +20,7 @@ class TrackFavorite(models.Model):
     def add(cls, track, user):
         favorite, created = cls.objects.get_or_create(user=user, track=track)
         return favorite
+
+    def get_activity_url(self):
+        return '{}/favorites/tracks/{}'.format(
+            self.user.get_activity_url(), self.pk)
