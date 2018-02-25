@@ -12,5 +12,6 @@ services:
     environment:
       - "DJANGO_ALLOWED_HOSTS=localhost"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
+      - "FUNKWHALE_URL=https://funkwhale.test"
   postgres:
     image: postgres

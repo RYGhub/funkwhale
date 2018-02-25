@@ -25,7 +25,7 @@ except FileNotFoundError:
     pass
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
-
+FUNKWHALE_URL = env('FUNKWHALE_URL')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
