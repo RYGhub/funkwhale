@@ -30,6 +30,7 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
+    'channels',
     # Default Django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -253,9 +254,9 @@ MEDIA_URL = env("MEDIA_URL", default='/media/')
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = 'config.urls'
-
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = "config.routing.application"
 
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -284,6 +285,17 @@ CACHES = {
 }
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
+from urllib.parse import urlparse
+cache_url = urlparse(CACHES['default']['LOCATION'])
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(cache_url.hostname, cache_url.port)],
+        },
+    },
+}
+
 CACHES["default"]["OPTIONS"] = {
     "CLIENT_CLASS": "django_redis.client.DefaultClient",
     "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.

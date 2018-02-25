@@ -32,6 +32,7 @@ module.exports = {
       '/api': {
         target: 'http://nginx:6001',
         changeOrigin: true,
+        ws: true
       },
       '/media': {
         target: 'http://nginx:6001',
