@@ -9,6 +9,7 @@ Changelog
 - Fixed really small size on small screens
 - Added masonry layout for artists, requests and radios (#68)
 - We now have a favicon!
+- Fixed truncated play icon (#65)
 
 
 0.5.1 (2018-02-24)
