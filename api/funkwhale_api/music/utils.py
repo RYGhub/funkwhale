@@ -1,4 +1,5 @@
 import magic
+import mimetypes
 import re
 
 from django.db.models import Q
@@ -42,7 +43,13 @@ def get_query(query_string, search_fields):
 
 def guess_mimetype(f):
     b = min(100000, f.size)
-    return magic.from_buffer(f.read(b), mime=True)
+    t = magic.from_buffer(f.read(b), mime=True)
+    if t == 'application/octet-stream':
+        # failure, we try guessing by extension
+        mt, _ = mimetypes.guess_type(f.path)
+        if mt:
+            t = mt
+    return t
 
 
 def compute_status(jobs):
