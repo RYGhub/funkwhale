@@ -4,6 +4,10 @@ Changelog
 0.6 (Unreleased)
 ----------------
 
+
+0.5.2 (2018-02-26)
+------------------
+
 - Fixed broken file import due to wrong url (#73)
 - More accurate mimetype detection
 - Fixed really small size on small screens
