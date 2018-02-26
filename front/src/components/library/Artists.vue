@@ -34,8 +34,16 @@
         </div>
       </div>
       <div class="ui hidden divider"></div>
-      <div v-if="result" class="ui stackable three column grid">
+      <div
+        v-if="result"
+        v-masonry
+        transition-duration="0"
+        item-selector=".column"
+        percent-position="true"
+        stagger="0"
+        class="ui stackable three column doubling grid">
         <div
+          v-masonry-tile
           v-if="result.results.length > 0"
           v-for="artist in result.results"
           :key="artist.id"

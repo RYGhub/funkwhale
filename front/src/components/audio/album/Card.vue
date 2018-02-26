@@ -17,7 +17,7 @@
           <table class="ui very basic fixed single line compact unstackable table">
             <tbody>
               <tr v-for="track in tracks">
-                <td>
+                <td class="play-cell">
                   <play-button class="basic icon" :track="track" :discrete="true"></play-button>
                 </td>
                 <td colspan="6">
@@ -67,7 +67,7 @@ export default {
   data () {
     return {
       backend: backend,
-      initialTracks: 4,
+      initialTracks: 5,
       showAllTracks: false
     }
   },
@@ -85,6 +85,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
+table.fixed td.play-cell {
+  overflow: auto;
+}
 tr {
   .favorite-icon:not(.favorited) {
     display: none;

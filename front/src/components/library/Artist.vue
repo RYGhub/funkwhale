@@ -30,7 +30,7 @@
       </div>
       <div class="ui vertical stripe segment">
         <h2>Albums by this artist</h2>
-        <div class="ui stackable three column grid">
+        <div class="ui stackable doubling three column grid">
           <div class="column" :key="album.id" v-for="album in albums">
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>
           </div>

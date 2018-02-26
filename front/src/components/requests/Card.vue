@@ -5,10 +5,10 @@
       <div class="description">
         <div
           v-if="request.albums" v-html="$options.filters.markdown(request.albums)"></div>
-        <div v-if="request.comment" class="ui comments">
+        <div class="ui comments">
           <comment
             :user="request.user"
-            :content="request.comment"
+            :content="request.comment || ''"
             :date="request.creation_date"></comment>
         </div>
       </div>
@@ -24,7 +24,7 @@
         @click="createImport"
         v-if="request.status === 'pending' && importAction && $store.state.auth.availablePermissions['import.launch']"
         class="ui mini basic green right floated button">Create import</button>
-      
+
     </div>
   </div>
 </template>

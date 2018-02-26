@@ -5,6 +5,17 @@ Changelog
 ----------------
 
 
+0.5.2 (2018-02-26)
+------------------
+
+- Fixed broken file import due to wrong url (#73)
+- More accurate mimetype detection
+- Fixed really small size on small screens
+- Added masonry layout for artists, requests and radios (#68)
+- We now have a favicon!
+- Fixed truncated play icon (#65)
+
+
 0.5.1 (2018-02-24)
 ------------------
 

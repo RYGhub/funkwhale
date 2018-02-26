@@ -59,7 +59,7 @@ export default {
 
 html, body {
   @include media("<desktop") {
-    font-size: 200%;
+    font-size: 90%;
   }
 }
 #app {
