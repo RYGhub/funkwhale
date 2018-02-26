@@ -9,6 +9,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
+import {VueMasonryPlugin} from 'vue-masonry'
 import VueLazyload from 'vue-lazyload'
 import store from './store'
 import config from './config'
@@ -24,7 +25,9 @@ window.$ = window.jQuery = require('jquery')
 // play really nice with webpack and I want to get rid of Google Fonts
 // require('./semantic/semantic.css')
 require('semantic-ui-css/semantic.js')
+require('masonry-layout')
 
+Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 

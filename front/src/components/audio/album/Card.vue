@@ -67,7 +67,7 @@ export default {
   data () {
     return {
       backend: backend,
-      initialTracks: 4,
+      initialTracks: 5,
       showAllTracks: false
     }
   },
