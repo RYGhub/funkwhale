@@ -29,7 +29,7 @@
       </button>
     </div>
     <div class="ui hidden divider"></div>
-    <p>
+    <p v-if="batch">
       Once all your files are uploaded, simply head over  <router-link :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">import detail page</router-link> to check the import status.
     </p>
     <table class="ui single line table">
@@ -73,7 +73,7 @@ export default {
   data () {
     return {
       files: [],
-      uploadUrl: 'import-jobs/',
+      uploadUrl: '/api/v1/import-jobs/',
       batch: null
     }
   },
