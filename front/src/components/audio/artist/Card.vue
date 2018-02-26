@@ -54,8 +54,8 @@ export default {
   data () {
     return {
       backend: backend,
-      initialAlbums: 3,
-      showAllAlbums: false
+      initialAlbums: 30,
+      showAllAlbums: true
     }
   },
   computed: {
