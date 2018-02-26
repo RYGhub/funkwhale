@@ -8,6 +8,7 @@ Changelog
 - More accurate mimetype detection
 - Fixed really small size on small screens
 - Added masonry layout for artists, requests and radios (#68)
+- We now have a favicon!
 
 
 0.5.1 (2018-02-24)
