@@ -86,6 +86,7 @@ export default {
     },
     loaded: function () {
       this.$refs.audio.volume = this.volume
+      this.$store.commit('player/resetErrorCount')
       if (this.isCurrent) {
         this.$store.commit('player/duration', this.$refs.audio.duration)
         if (this.startTime) {

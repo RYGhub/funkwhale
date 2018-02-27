@@ -69,7 +69,11 @@ describe('store/radios', () => {
       })
       testAction({
         action: store.actions.populateQueue,
-        params: {state: {running: true, current: {session: 1}}},
+        params: {
+          state: {running: true, current: {session: 1}},
+          rootState: {player: {errorCount: 0, maxConsecutiveErrors: 5}}
+
+        },
         expectedActions: [
           { type: 'queue/append', payload: {track: {id: 1}}, options: {root: true} }
         ]
@@ -82,5 +86,17 @@ describe('store/radios', () => {
         expectedActions: []
       }, done)
     })
+    it('populateQueue does nothing when too much errors', (done) => {
+      testAction({
+        action: store.actions.populateQueue,
+        payload: {test: 'track'},
+        params: {
+          rootState: {player: {errorCount: 5, maxConsecutiveErrors: 5}},
+          state: {running: true}
+        },
+        expectedActions: []
+      }, done)
+    })
+
   })
 })
