@@ -10,7 +10,7 @@
     <source
       @error="sourceErrored"
       v-for="src in srcs"
-      src="src.url"
+      :src="src.url"
       :type="src.type">
   </audio>
 </template>
