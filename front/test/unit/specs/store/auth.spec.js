@@ -176,6 +176,7 @@ describe('store/auth', () => {
         action: store.actions.fetchProfile,
         expectedMutations: [
           { type: 'profile', payload: profile },
+          { type: 'username', payload: profile.username },
           { type: 'permission', payload: {key: 'admin', status: true} }
         ],
         expectedActions: [
