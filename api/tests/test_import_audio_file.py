@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from funkwhale_api.providers.audiofile import tasks
+from funkwhale_api.music import tasks as music_tasks
 
 DATA_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -53,7 +54,7 @@ def test_management_command_requires_a_valid_username(factories, mocker):
 
 
 def test_import_files_creates_a_batch_and_job(factories, mocker):
-    m = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    m = m = mocker.patch('funkwhale_api.common.utils.on_commit')
     user = factories['users.User'](username='me')
     path = os.path.join(DATA_DIR, 'dummy_file.ogg')
     call_command(
@@ -74,4 +75,6 @@ def test_import_files_creates_a_batch_and_job(factories, mocker):
         assert job.audio_file.read() == f.read()
 
     assert job.source == 'file://' + path
-    m.assert_called_once_with(import_job_id=job.pk)
+    m.assert_called_once_with(
+        music_tasks.import_job_run.delay,
+        import_job_id=job.pk)

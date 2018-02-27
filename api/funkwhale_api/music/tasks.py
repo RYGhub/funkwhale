@@ -73,7 +73,10 @@ def _do_import(import_job, replace):
 
 
 @celery.app.task(name='ImportJob.run', bind=True)
-@celery.require_instance(models.ImportJob, 'import_job')
+@celery.require_instance(
+    models.ImportJob.objects.filter(
+        status__in=['pending', 'errored']),
+    'import_job')
 def import_job_run(self, import_job, replace=False):
     def mark_errored():
         import_job.status = 'errored'
