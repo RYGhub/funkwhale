@@ -1,0 +1,33 @@
+[tool.towncrier]
+    package = "changes"
+    package_dir = ""
+    filename = "CHANGELOG"
+    directory = "changes/changelog.d/"
+    start_string = ".. towncrier\n"
+    template = "changes/template.rst"
+    issue_format = ""
+    title_format = "{version} (unreleased)"
+    underlines = "-"
+
+    [[tool.towncrier.section]]
+        path = ""
+
+    [[tool.towncrier.type]]
+        directory = "feature"
+        name = "Features"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "bugfix"
+        name = "Bugfixes"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "doc"
+        name = "Documentation"
+        showcontent = true
+
+    [[tool.towncrier.type]]
+        directory = "misc"
+        name = "Other"
+        showcontent = true
