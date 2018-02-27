@@ -3,6 +3,9 @@ import os
 
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+
+from funkwhale_api.common import utils
 from funkwhale_api.music import tasks
 from funkwhale_api.users.models import User
 
@@ -86,6 +89,7 @@ class Command(BaseCommand):
         self.stdout.write(
             "For details, please refer to import batch #".format(batch.pk))
 
+    @transaction.atomic
     def do_import(self, matching, user, options):
         message = 'Importing {}...'
         if options['async']:
@@ -94,7 +98,7 @@ class Command(BaseCommand):
         # we create an import batch binded to the user
         batch = user.imports.create(source='shell')
         async = options['async']
-        handler = tasks.import_job_run.delay if async else tasks.import_job_run
+        import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
         for path in matching:
             job = batch.jobs.create(
                 source='file://' + path,
@@ -105,7 +109,8 @@ class Command(BaseCommand):
 
             job.save()
             try:
-                handler(import_job_id=job.pk)
+                utils.on_commit(import_handler, import_job_id=job.pk)
             except Exception as e:
                 self.stdout.write('Error: {}'.format(e))
+
         return batch

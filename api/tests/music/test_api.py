@@ -6,6 +6,7 @@ from django.urls import reverse
 from funkwhale_api.music import models
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
+from funkwhale_api.music import tasks
 
 from . import data as api_data
 
@@ -208,7 +209,7 @@ def test_user_can_create_an_empty_batch(client, factories):
 
 def test_user_can_create_import_job_with_file(client, factories, mocker):
     path = os.path.join(DATA_DIR, 'test.ogg')
-    m = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    m = mocker.patch('funkwhale_api.common.utils.on_commit')
     user = factories['users.SuperUser']()
     batch = factories['music.ImportBatch'](submitted_by=user)
     url = reverse('api:v1:import-jobs-list')
@@ -231,7 +232,9 @@ def test_user_can_create_import_job_with_file(client, factories, mocker):
     assert 'test.ogg' in job.source
     assert job.audio_file.read() == content
 
-    m.assert_called_once_with(import_job_id=job.pk)
+    m.assert_called_once_with(
+        tasks.import_job_run.delay,
+        import_job_id=job.pk)
 
 
 def test_can_search_artist(factories, client):

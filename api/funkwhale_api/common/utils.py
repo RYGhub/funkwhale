@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from django.db import transaction
+
 
 def rename_file(instance, field_name, new_name, allow_missing_file=False):
     field = getattr(instance, field_name)
@@ -17,3 +19,9 @@ def rename_file(instance, field_name, new_name, allow_missing_file=False):
     field.name = os.path.join(initial_path, new_name_with_extension)
     instance.save()
     return new_name_with_extension
+
+
+def on_commit(f, *args, **kwargs):
+    return transaction.on_commit(
+        lambda: f(*args, **kwargs)
+    )
