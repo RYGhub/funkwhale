@@ -3,6 +3,30 @@ Changelog
 
 .. towncrier
 
+0.5.3 (2018-02-27)
+------------------
+
+Features:
+
+- Added admin interface for radios, track files, favorites and import requests (#80)
+- Added basic instance stats on /about (#82)
+- Search now unaccent letters for queries like "The Dø" or "Björk" yielding more results (#81)
+
+
+Bugfixes:
+
+- Always use username in sidebar (#89)
+- Click event outside of player icons (#83)
+- Fixed broken import because of missing transaction
+- Now always load next radio track on last queue track ended (#87)
+- Now exclude tracks without file from radio candidates (#88)
+- skip to next track properly on 40X errors (#86)
+
+
+Other:
+
+- Switched to towncrier for changelog management and compilation
+
 
 0.5.2 (2018-02-26)
 ------------------
