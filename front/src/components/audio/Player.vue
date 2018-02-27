@@ -52,32 +52,28 @@
 
       <div class="two wide column controls ui grid">
         <div
-          @click="previous"
           title="Previous track"
           class="two wide column control"
           :disabled="!hasPrevious">
-            <i :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
+            <i @click="previous" :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
         </div>
         <div
           v-if="!playing"
-          @click="togglePlay"
           title="Play track"
           class="two wide column control">
-            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
         </div>
         <div
           v-else
-          @click="togglePlay"
           title="Pause track"
           class="two wide column control">
-            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
         </div>
         <div
-          @click="next"
           title="Next track"
           class="two wide column control"
           :disabled="!hasNext">
-            <i :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
+            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
         </div>
         <div class="two wide column control volume-control">
           <i title="Unmute" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
@@ -109,19 +105,17 @@
           </i>
         </div>
         <div
-          @click="shuffle()"
           :disabled="queue.tracks.length === 0"
           title="Shuffle your queue"
           class="two wide column control">
-          <i :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          <i @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
         <div class="one wide column"></div>
         <div
-          @click="clean()"
           :disabled="queue.tracks.length === 0"
           title="Clear your queue"
           class="two wide column control">
-          <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
       </div>
       <GlobalEvents
