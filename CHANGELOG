@@ -1,11 +1,7 @@
 Changelog
 =========
 
-0.6 (Unreleased)
-----------------
-
-- Always use username in sidebar (#89)
-- Fixed broken import because of missing transaction
+.. towncrier
 
 
 0.5.2 (2018-02-26)
