@@ -53,8 +53,11 @@ export default {
       commit('current', null)
       commit('running', false)
     },
-    populateQueue ({state, dispatch}) {
+    populateQueue ({rootState, state, dispatch}) {
       if (!state.running) {
+        return
+      }
+      if (rootState.player.errorCount >= rootState.player.maxConsecutiveErrors - 1) {
         return
       }
       var params = {

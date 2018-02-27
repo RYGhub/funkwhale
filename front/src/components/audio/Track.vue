@@ -7,7 +7,11 @@
     @timeupdate="updateProgress"
     @ended="ended"
     preload>
-    <source v-for="src in srcs" :src="src.url" :type="src.type">
+    <source
+      @error="sourceErrored"
+      v-for="src in srcs"
+      src="src.url"
+      :type="src.type">
   </audio>
 </template>
 
@@ -24,6 +28,11 @@ export default {
     isCurrent: {type: Boolean, default: false},
     startTime: {type: Number, default: 0},
     autoplay: {type: Boolean, default: false}
+  },
+  data () {
+    return {
+      sourceErrors: 0
+    }
   },
   computed: {
     ...mapState({
@@ -65,11 +74,19 @@ export default {
     errored: function () {
       this.$store.dispatch('player/trackErrored')
     },
+    sourceErrored: function () {
+      this.sourceErrors += 1
+      if (this.sourceErrors >= this.srcs.length) {
+        // all sources failed
+        this.errored()
+      }
+    },
     updateDuration: function (e) {
       this.$store.commit('player/duration', this.$refs.audio.duration)
     },
     loaded: function () {
       this.$refs.audio.volume = this.volume
+      this.$store.commit('player/resetErrorCount')
       if (this.isCurrent) {
         this.$store.commit('player/duration', this.$refs.audio.duration)
         if (this.startTime) {
