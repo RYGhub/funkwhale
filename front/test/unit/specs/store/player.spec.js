@@ -122,8 +122,21 @@ describe('store/player', () => {
       testAction({
         action: store.actions.trackEnded,
         payload: {test: 'track'},
+        params: {rootState: {queue: {currentIndex:0, tracks: [1, 2]}}},
         expectedActions: [
           { type: 'trackListened', payload: {test: 'track'} },
+          { type: 'queue/next', payload: null, options: {root: true} }
+        ]
+      }, done)
+    })
+    it('trackEnded calls populateQueue if last', (done) => {
+      testAction({
+        action: store.actions.trackEnded,
+        payload: {test: 'track'},
+        params: {rootState: {queue: {currentIndex:1, tracks: [1, 2]}}},
+        expectedActions: [
+          { type: 'trackListened', payload: {test: 'track'} },
+          { type: 'radios/populateQueue', payload: null, options: {root: true} },
           { type: 'queue/next', payload: null, options: {root: true} }
         ]
       }, done)
