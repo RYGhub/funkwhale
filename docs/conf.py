@@ -57,9 +57,7 @@ author = 'Eliot Berriot'
 # built documents.
 #
 # The short X.Y version.
-# version = funkwhale_api.__version__
-# @TODO use real version here
-version = 'feature/22-debian-installation'
+version = funkwhale_api.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 

@@ -89,6 +89,7 @@ export default {
         logger.default.info('Successfully fetched user profile')
         let data = response.data
         commit('profile', data)
+        commit('username', data.username)
         dispatch('favorites/fetch', null, {root: true})
         Object.keys(data.permissions).forEach(function (key) {
           // this makes it easier to check for permissions in templates

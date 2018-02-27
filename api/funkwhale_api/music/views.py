@@ -19,6 +19,7 @@ from musicbrainzngs import ResponseError
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
@@ -62,7 +63,7 @@ class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
                                 'albums__tracks__tags'))
     serializer_class = serializers.ArtistSerializerNested
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['name']
+    search_fields = ['name__unaccent']
     filter_class = filters.ArtistFilter
     ordering_fields = ('id', 'name', 'creation_date')
 
@@ -75,7 +76,7 @@ class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
                                               'tracks__files'))
     serializer_class = serializers.AlbumSerializerNested
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['title']
+    search_fields = ['title__unaccent']
     ordering_fields = ('creation_date',)
 
 
@@ -116,7 +117,10 @@ class ImportJobViewSet(
     def perform_create(self, serializer):
         source = 'file://' + serializer.validated_data['audio_file'].name
         serializer.save(source=source)
-        tasks.import_job_run.delay(import_job_id=serializer.instance.pk)
+        funkwhale_utils.on_commit(
+            tasks.import_job_run.delay,
+            import_job_id=serializer.instance.pk
+        )
 
 
 class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
@@ -129,9 +133,9 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     search_fields = ['title', 'artist__name']
     ordering_fields = (
         'creation_date',
-        'title',
-        'album__title',
-        'artist__name',
+        'title__unaccent',
+        'album__title__unaccent',
+        'artist__name__unaccent',
     )
 
     def get_queryset(self):
@@ -245,7 +249,11 @@ class Search(views.APIView):
         return Response(results, status=200)
 
     def get_tracks(self, query):
-        search_fields = ['mbid', 'title', 'album__title', 'artist__name']
+        search_fields = [
+            'mbid',
+            'title__unaccent',
+            'album__title__unaccent',
+            'artist__name__unaccent']
         query_obj = utils.get_query(query, search_fields)
         return (
             models.Track.objects.all()
@@ -259,7 +267,10 @@ class Search(views.APIView):
 
 
     def get_albums(self, query):
-        search_fields = ['mbid', 'title', 'artist__name']
+        search_fields = [
+            'mbid',
+            'title__unaccent',
+            'artist__name__unaccent']
         query_obj = utils.get_query(query, search_fields)
         return (
             models.Album.objects.all()
@@ -273,7 +284,7 @@ class Search(views.APIView):
 
 
     def get_artists(self, query):
-        search_fields = ['mbid', 'name']
+        search_fields = ['mbid', 'name__unaccent']
         query_obj = utils.get_query(query, search_fields)
         return (
             models.Artist.objects.all()
@@ -288,7 +299,7 @@ class Search(views.APIView):
 
 
     def get_tags(self, query):
-        search_fields = ['slug', 'name']
+        search_fields = ['slug', 'name__unaccent']
         query_obj = utils.get_query(query, search_fields)
 
         # We want the shortest tag first
@@ -336,6 +347,7 @@ class SubmitViewSet(viewsets.ViewSet):
             data, request, batch=None, import_request=import_request)
         return Response(import_data)
 
+    @transaction.atomic
     def _import_album(self, data, request, batch=None, import_request=None):
         # we import the whole album here to prevent race conditions that occurs
         # when using get_or_create_from_api in tasks
@@ -355,7 +367,11 @@ class SubmitViewSet(viewsets.ViewSet):
                 models.TrackFile.objects.get(track__mbid=row['mbid'])
             except models.TrackFile.DoesNotExist:
                 job = models.ImportJob.objects.create(mbid=row['mbid'], batch=batch, source=row['source'])
-                tasks.import_job_run.delay(import_job_id=job.pk)
+                funkwhale_utils.on_commit(
+                    tasks.import_job_run.delay,
+                    import_job_id=job.pk
+                )
+
         serializer = serializers.ImportBatchSerializer(batch)
         return serializer.data, batch
 

@@ -1,5 +1,6 @@
 import random
 from rest_framework import serializers
+from django.db.models import Count
 from django.core.exceptions import ValidationError
 from taggit.models import Tag
 from funkwhale_api.users.models import User
@@ -39,8 +40,11 @@ class SessionRadio(SimpleRadio):
         self.session = models.RadioSession.objects.create(user=user, radio_type=self.radio_type, **kwargs)
         return self.session
 
-    def get_queryset(self):
-        raise NotImplementedError
+    def get_queryset(self, **kwargs):
+        qs = Track.objects.annotate(
+            files_count=Count('files')
+        )
+        return qs.filter(files_count__gt=0)
 
     def get_queryset_kwargs(self):
         return {}
@@ -75,7 +79,9 @@ class SessionRadio(SimpleRadio):
 @registry.register(name='random')
 class RandomRadio(SessionRadio):
     def get_queryset(self, **kwargs):
-        return Track.objects.all()
+        qs = super().get_queryset(**kwargs)
+        return qs.order_by('?')
+
 
 @registry.register(name='favorites')
 class FavoritesRadio(SessionRadio):
@@ -87,8 +93,9 @@ class FavoritesRadio(SessionRadio):
         return kwargs
 
     def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
         track_ids = kwargs['user'].track_favorites.all().values_list('track', flat=True)
-        return Track.objects.filter(pk__in=track_ids)
+        return qs.filter(pk__in=track_ids)
 
 
 @registry.register(name='custom')
@@ -101,7 +108,11 @@ class CustomRadio(SessionRadio):
         return kwargs
 
     def get_queryset(self, **kwargs):
-        return filters.run(kwargs['custom_radio'].config)
+        qs = super().get_queryset(**kwargs)
+        return filters.run(
+            kwargs['custom_radio'].config,
+            candidates=qs,
+        )
 
     def validate_session(self, data, **context):
         data = super().validate_session(data, **context)
@@ -141,6 +152,7 @@ class TagRadio(RelatedObjectRadio):
     model = Tag
 
     def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
         return Track.objects.filter(tags__in=[self.session.related_object])
 
 @registry.register(name='artist')
@@ -148,7 +160,8 @@ class ArtistRadio(RelatedObjectRadio):
     model = Artist
 
     def get_queryset(self, **kwargs):
-        return self.session.related_object.tracks.all()
+        qs = super().get_queryset(**kwargs)
+        return qs.filter(artist=self.session.related_object)
 
 
 @registry.register(name='less-listened')
@@ -160,5 +173,6 @@ class LessListenedRadio(RelatedObjectRadio):
         super().clean(instance)
 
     def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
         listened = self.session.user.listenings.all().values_list('track', flat=True)
-        return Track.objects.exclude(pk__in=listened).order_by('?')
+        return qs.exclude(pk__in=listened).order_by('?')

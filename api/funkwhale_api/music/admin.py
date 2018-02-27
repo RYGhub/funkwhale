@@ -25,13 +25,26 @@ class TrackAdmin(admin.ModelAdmin):
 
 @admin.register(models.ImportBatch)
 class ImportBatchAdmin(admin.ModelAdmin):
-    list_display = ['creation_date', 'status']
-
+    list_display = [
+        'submitted_by',
+        'creation_date',
+        'import_request',
+        'status']
+    list_select_related = [
+        'submitted_by',
+        'import_request',
+    ]
+    list_filter = ['status']
+    search_fields = [
+        'import_request__name', 'source', 'batch__pk', 'mbid']
 
 @admin.register(models.ImportJob)
 class ImportJobAdmin(admin.ModelAdmin):
     list_display = ['source', 'batch', 'track_file', 'status', 'mbid']
-    list_select_related = True
+    list_select_related = [
+        'track_file',
+        'batch',
+    ]
     search_fields = ['source', 'batch__pk', 'mbid']
     list_filter = ['status']
 
@@ -50,3 +63,19 @@ class LyricsAdmin(admin.ModelAdmin):
     list_select_related = True
     search_fields = ['url', 'work__title']
     list_filter = ['work__language']
+
+
+@admin.register(models.TrackFile)
+class TrackFileAdmin(admin.ModelAdmin):
+    list_display = [
+        'track',
+        'audio_file',
+        'source',
+        'duration',
+        'mimetype',
+    ]
+    list_select_related = [
+        'track'
+    ]
+    search_fields = ['source', 'acoustid_track_id']
+    list_filter = ['mimetype']

@@ -5,6 +5,8 @@ import time from '@/utils/time'
 export default {
   namespaced: true,
   state: {
+    maxConsecutiveErrors: 5,
+    errorCount: 0,
     playing: false,
     volume: 0.5,
     duration: 0,
@@ -24,6 +26,12 @@ export default {
       value = Math.min(value, 1)
       value = Math.max(value, 0)
       state.volume = value
+    },
+    incrementErrorCount (state) {
+      state.errorCount += 1
+    },
+    resetErrorCount (state) {
+      state.errorCount = 0
     },
     duration (state, value) {
       state.duration = value
@@ -78,12 +86,20 @@ export default {
         logger.default.error('Could not record track in history')
       })
     },
-    trackEnded ({dispatch}, track) {
+    trackEnded ({dispatch, rootState}, track) {
       dispatch('trackListened', track)
+      let queueState = rootState.queue
+      if (queueState.currentIndex === queueState.tracks.length - 1) {
+        // we've reached last track of queue, trigger a reload
+        // from radio if any
+        dispatch('radios/populateQueue', null, {root: true})
+      }
+      dispatch('queue/next', null, {root: true})
       dispatch('queue/next', null, {root: true})
     },
-    trackErrored ({commit, dispatch}) {
+    trackErrored ({commit, dispatch, state}) {
       commit('errored', true)
+      commit('incrementErrorCount')
       dispatch('queue/next', null, {root: true})
     },
     updateProgress ({commit}, t) {

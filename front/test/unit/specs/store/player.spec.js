@@ -74,6 +74,16 @@ describe('store/player', () => {
       store.mutations.toggleLooping(state)
       expect(state.looping).to.equal(0)
     })
+    it('increment error count', () => {
+      const state = { errorCount: 0 }
+      store.mutations.incrementErrorCount(state)
+      expect(state.errorCount).to.equal(1)
+    })
+    it('reset error count', () => {
+      const state = { errorCount: 10 }
+      store.mutations.resetErrorCount(state)
+      expect(state.errorCount).to.equal(0)
+    })
   })
   describe('getters', () => {
     it('durationFormatted', () => {
@@ -122,8 +132,21 @@ describe('store/player', () => {
       testAction({
         action: store.actions.trackEnded,
         payload: {test: 'track'},
+        params: {rootState: {queue: {currentIndex:0, tracks: [1, 2]}}},
         expectedActions: [
           { type: 'trackListened', payload: {test: 'track'} },
+          { type: 'queue/next', payload: null, options: {root: true} }
+        ]
+      }, done)
+    })
+    it('trackEnded calls populateQueue if last', (done) => {
+      testAction({
+        action: store.actions.trackEnded,
+        payload: {test: 'track'},
+        params: {rootState: {queue: {currentIndex:1, tracks: [1, 2]}}},
+        expectedActions: [
+          { type: 'trackListened', payload: {test: 'track'} },
+          { type: 'radios/populateQueue', payload: null, options: {root: true} },
           { type: 'queue/next', payload: null, options: {root: true} }
         ]
       }, done)
@@ -132,8 +155,10 @@ describe('store/player', () => {
       testAction({
         action: store.actions.trackErrored,
         payload: {test: 'track'},
+        params: {state: {errorCount: 0, maxConsecutiveErrors: 5}},
         expectedMutations: [
-          { type: 'errored', payload: true }
+          { type: 'errored', payload: true },
+          { type: 'incrementErrorCount' }
         ],
         expectedActions: [
           { type: 'queue/next', payload: null, options: {root: true} }
