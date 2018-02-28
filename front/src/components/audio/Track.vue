@@ -10,7 +10,7 @@
     <source
       @error="sourceErrored"
       v-for="src in srcs"
-      src="src.url"
+      :src="src.url"
       :type="src.type">
   </audio>
 </template>
@@ -19,7 +19,7 @@
 import {mapState} from 'vuex'
 import url from '@/utils/url'
 import formats from '@/audio/formats'
-
+import _ from 'lodash'
 // import logger from '@/logging'
 
 export default {
@@ -98,13 +98,14 @@ export default {
         }
       }
     },
-    updateProgress: function () {
+    updateProgress: _.throttle(function () {
       if (this.$refs.audio) {
         this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
       }
-    },
+    }, 250),
     ended: function () {
-      if (this.looping === 1) {
+      let onlyTrack = this.$store.state.queue.tracks.length === 1
+      if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
         this.setCurrentTime(0)
         this.$refs.audio.play()
       } else {

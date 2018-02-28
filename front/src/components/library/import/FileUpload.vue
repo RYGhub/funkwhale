@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div v-if="batch" class="ui two buttons">
+    <div v-if="batch" class="ui container">
       <file-upload-widget
-        class="ui icon button"
+        :class="['ui', 'icon', 'left', 'floated', 'button']"
         :post-action="uploadUrl"
         :multiple="true"
         :size="1024 * 1024 * 30"
@@ -19,16 +19,18 @@
         <i class="upload icon"></i>
         Select files to upload...
     </file-upload-widget>
-      <button class="ui icon teal button" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
+      <button
+        :class="['ui', 'right', 'floated', 'icon', {disabled: files.length === 0}, 'button']"
+        v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
         <i class="play icon" aria-hidden="true"></i>
         Start Upload
       </button>
-      <button type="button" class="ui icon yellow button" v-else @click.prevent="$refs.upload.active = false">
+      <button type="button" class="ui right floated icon yellow button" v-else @click.prevent="$refs.upload.active = false">
         <i class="pause icon" aria-hidden="true"></i>
         Stop Upload
       </button>
     </div>
-    <div class="ui hidden divider"></div>
+    <div class="ui hidden clearing divider"></div>
     <p v-if="batch">
       Once all your files are uploaded, simply head over  <router-link :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">import detail page</router-link> to check the import status.
     </p>
