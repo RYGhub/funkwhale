@@ -102,9 +102,10 @@ export default {
       if (this.$refs.audio) {
         this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
       }
-    }, 1000),
+    }, 250),
     ended: function () {
-      if (this.looping === 1) {
+      let onlyTrack = this.$store.state.queue.tracks.length === 1
+      if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
         this.setCurrentTime(0)
         this.$refs.audio.play()
       } else {
