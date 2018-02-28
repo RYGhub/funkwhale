@@ -133,8 +133,8 @@ export default {
       }
     },
     clean ({dispatch, commit}) {
+      dispatch('radios/stop', null, {root: true})
       dispatch('player/stop', null, {root: true})
-      // radios.stop()
       commit('tracks', [])
       dispatch('currentIndex', -1)
       // so we replay automatically on next track append

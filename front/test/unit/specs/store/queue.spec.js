@@ -308,6 +308,7 @@ describe('store/queue', () => {
           { type: 'ended', payload: true }
         ],
         expectedActions: [
+          { type: 'radios/stop', payload: null, options: {root: true} },
           { type: 'player/stop', payload: null, options: {root: true} },
           { type: 'currentIndex', payload: -1 }
         ]
