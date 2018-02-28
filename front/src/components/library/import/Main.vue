@@ -23,6 +23,18 @@
           </div>
         </a>
       </div>
+      <div class="ui hidden divider"></div>
+      <div class="ui centered buttons">
+        <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i> Previous step</button>
+        <button @click="currentStep += 1" v-if="currentStep < 2" class="ui icon button">Next step <i class="right arrow icon"></i></button>
+        <button
+          @click="$refs.import.launchImport()"
+          v-if="currentStep === 2"
+          :class="['ui', 'positive', 'icon', {'loading': isImporting}, 'button']"
+          :disabled="isImporting || importData.count === 0"
+          >Import {{ importData.count }} tracks <i class="check icon"></i></button>
+      </div>
+      <div class="ui hidden divider"></div>
       <div class="ui attached segment">
         <template v-if="currentStep === 0">
           <p>First, choose where you want to import the music from :</p>
@@ -100,17 +112,6 @@
             @import-data-changed="updateImportData"
             @import-state-changed="updateImportState"
             ></component>
-        </div>
-        <div class="ui hidden divider"></div>
-        <div class="ui buttons">
-          <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i> Previous step</button>
-          <button @click="currentStep += 1" v-if="currentStep < 2" class="ui icon button">Next step <i class="right arrow icon"></i></button>
-          <button
-            @click="$refs.import.launchImport()"
-            v-if="currentStep === 2"
-            :class="['ui', 'positive', 'icon', {'loading': isImporting}, 'button']"
-            :disabled="isImporting || importData.count === 0"
-            >Import {{ importData.count }} tracks <i class="check icon"></i></button>
         </div>
       </div>
     </div>
