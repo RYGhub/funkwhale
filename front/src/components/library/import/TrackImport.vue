@@ -103,6 +103,7 @@ export default Vue.extend({
         'cover',
         'mix'
       ],
+      customQuery: '',
       time
     }
   },
@@ -115,7 +116,7 @@ export default Vue.extend({
     $('.ui.checkbox').checkbox()
   },
   methods: {
-    search () {
+    search: function () {
       let self = this
       this.isLoading = true
       let url = 'providers/' + this.currentBackendId + '/search/'
@@ -145,17 +146,25 @@ export default Vue.extend({
         source: this.importedUrl
       }
     },
-    query () {
-      let queryMapping = [
-        ['artist', this.releaseMetadata['artist-credit'][0]['artist']['name']],
-        ['album', this.releaseMetadata['title']],
-        ['title', this.metadata['recording']['title']]
-      ]
-      let query = this.customQueryTemplate
-      queryMapping.forEach(e => {
-        query = query.split('$' + e[0]).join(e[1])
-      })
-      return query
+    query: {
+      get: function () {
+        if (this.customQuery.length > 0) {
+          return this.customQuery
+        }
+        let queryMapping = [
+          ['artist', this.releaseMetadata['artist-credit'][0]['artist']['name']],
+          ['album', this.releaseMetadata['title']],
+          ['title', this.metadata['recording']['title']]
+        ]
+        let query = this.customQueryTemplate
+        queryMapping.forEach(e => {
+          query = query.split('$' + e[0]).join(e[1])
+        })
+        return query
+      },
+      set: function (newValue) {
+        this.customQuery = newValue
+      }
     }
   },
   watch: {
