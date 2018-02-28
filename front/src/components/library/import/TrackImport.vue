@@ -100,7 +100,8 @@ export default Vue.extend({
       warnings: [
         'live',
         'full',
-        'cover'
+        'cover',
+        'mix'
       ],
       time
     }
