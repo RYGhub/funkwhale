@@ -19,7 +19,7 @@
 import {mapState} from 'vuex'
 import url from '@/utils/url'
 import formats from '@/audio/formats'
-
+import _ from 'lodash'
 // import logger from '@/logging'
 
 export default {
@@ -98,11 +98,11 @@ export default {
         }
       }
     },
-    updateProgress: function () {
+    updateProgress: _.throttle(function () {
       if (this.$refs.audio) {
         this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
       }
-    },
+    }, 1000),
     ended: function () {
       if (this.looping === 1) {
         this.setCurrentTime(0)
