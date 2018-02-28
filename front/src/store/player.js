@@ -95,7 +95,6 @@ export default {
         dispatch('radios/populateQueue', null, {root: true})
       }
       dispatch('queue/next', null, {root: true})
-      dispatch('queue/next', null, {root: true})
     },
     trackErrored ({commit, dispatch, state}) {
       commit('errored', true)
