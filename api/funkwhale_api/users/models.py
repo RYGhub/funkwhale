@@ -11,6 +11,14 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
+
+PRIVACY_LEVEL_CHOICES = [
+    ('me', 'Only me'),
+    ('followers', 'Me and my followers'),
+    ('instance', 'Everyone on my instance, and my followers'),
+    ('everyone', 'Everyone, including people on other instances'),
+]
+
 @python_2_unicode_compatible
 class User(AbstractUser):
 
@@ -30,6 +38,9 @@ class User(AbstractUser):
             'external_codename': 'settings.change',
         },
     }
+
+    privacy_level = models.CharField(
+        max_length=30, choices=PRIVACY_LEVEL_CHOICES, default='instance')
 
     def __str__(self):
         return self.username
