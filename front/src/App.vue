@@ -44,6 +44,10 @@ export default {
   },
   created () {
     this.$store.dispatch('instance/fetchSettings')
+    setInterval(() => {
+      // used to redraw ago dates every minute
+      self.$store.commit('ui/computeLastDate')
+    }, 1000 * 60)
   }
 }
 </script>
