@@ -1,5 +1,6 @@
 from funkwhale_api.users.serializers import UserActivitySerializer
 from funkwhale_api.favorites import serializers
+from funkwhale_api.favorites import activities
 
 
 def test_get_favorite_activity_url(settings, factories):
@@ -26,3 +27,45 @@ def test_activity_favorite_serializer(factories):
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
 
     assert data == expected
+
+
+def test_track_favorite_serializer_is_connected(activity_registry):
+    conf = activity_registry['favorites.TrackFavorite']
+    assert conf['serializer'] == serializers.TrackFavoriteActivitySerializer
+
+
+def test_track_favorite_serializer_instance_activity_consumer(
+        activity_registry):
+    conf = activity_registry['favorites.TrackFavorite']
+    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    assert consumer in conf['consumers']
+
+
+def test_broadcast_track_favorite_to_instance_timeline(
+        factories, mocker):
+    p = mocker.patch('funkwhale_api.common.channels.group_send')
+    favorite = factories['favorites.TrackFavorite']()
+    data = serializers.TrackFavoriteActivitySerializer(favorite).data
+    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    message = {
+        "type": 'event',
+        "data": data
+    }
+    consumer(data=data, obj=favorite)
+    p.assert_called_once_with('instance_timeline', message)
+
+
+def test_broadcast_track_favorite_to_instance_timeline_private(
+        factories, mocker):
+    p = mocker.patch('funkwhale_api.common.channels.group_send')
+    favorite = factories['favorites.TrackFavorite'](
+        user__privacy_level='me'
+    )
+    data = serializers.TrackFavoriteActivitySerializer(favorite).data
+    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    message = {
+        "type": 'event',
+        "data": data
+    }
+    consumer(data=data, obj=favorite)
+    p.assert_not_called()
