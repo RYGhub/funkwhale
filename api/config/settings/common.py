@@ -83,6 +83,7 @@ if RAVEN_ENABLED:
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'funkwhale_api.common',
+    'funkwhale_api.activity.apps.ActivityConfig',
     'funkwhale_api.users',  # custom users app
     # Your stuff: custom apps go here
     'funkwhale_api.instance',
