@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
 import About from '@/components/About'
 import Home from '@/components/Home'
+import InstanceTimeline from '@/views/instance/Timeline'
 import Login from '@/components/auth/Login'
 import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
@@ -38,6 +39,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: About
+    },
+    {
+      path: '/activity',
+      name: 'activity',
+      component: InstanceTimeline
     },
     {
       path: '/login',
