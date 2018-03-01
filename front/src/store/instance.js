@@ -5,6 +5,8 @@ import _ from 'lodash'
 export default {
   namespaced: true,
   state: {
+    maxEvents: 200,
+    events: [],
     settings: {
       instance: {
         name: {
@@ -35,6 +37,12 @@ export default {
   mutations: {
     settings: (state, value) => {
       _.merge(state.settings, value)
+    },
+    event: (state, value) => {
+      state.events.unshift(value)
+      if (state.events.length > state.maxEvents) {
+        state.events = state.events.slice(0, state.maxEvents)
+      }
     }
   },
   actions: {

@@ -31,6 +31,10 @@ export default new Vuex.Store({
       }
     }),
     createPersistedState({
+      key: 'instance',
+      paths: ['instance.events']
+    }),
+    createPersistedState({
       key: 'radios',
       paths: ['radios'],
       filter: (mutation) => {
