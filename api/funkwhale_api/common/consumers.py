@@ -1,4 +1,5 @@
 from channels.generic.websocket import JsonWebsocketConsumer
+from funkwhale_api.common import channels
 
 
 class JsonAuthConsumer(JsonWebsocketConsumer):
@@ -9,3 +10,8 @@ class JsonAuthConsumer(JsonWebsocketConsumer):
             return self.close()
 
         return self.accept()
+
+    def accept(self):
+        super().accept()
+        for group in self.groups:
+            channels.group_add(group, self.channel_name)

@@ -37,32 +37,32 @@ def test_track_favorite_serializer_is_connected(activity_registry):
 def test_track_favorite_serializer_instance_activity_consumer(
         activity_registry):
     conf = activity_registry['favorites.TrackFavorite']
-    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    consumer = activities.broadcast_track_favorite_to_instance_activity
     assert consumer in conf['consumers']
 
 
-def test_broadcast_track_favorite_to_instance_timeline(
+def test_broadcast_track_favorite_to_instance_activity(
         factories, mocker):
     p = mocker.patch('funkwhale_api.common.channels.group_send')
     favorite = factories['favorites.TrackFavorite']()
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
-    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    consumer = activities.broadcast_track_favorite_to_instance_activity
     message = {
         "type": 'event',
         "data": data
     }
     consumer(data=data, obj=favorite)
-    p.assert_called_once_with('instance_timeline', message)
+    p.assert_called_once_with('instance_activity', message)
 
 
-def test_broadcast_track_favorite_to_instance_timeline_private(
+def test_broadcast_track_favorite_to_instance_activity_private(
         factories, mocker):
     p = mocker.patch('funkwhale_api.common.channels.group_send')
     favorite = factories['favorites.TrackFavorite'](
         user__privacy_level='me'
     )
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
-    consumer = activities.broadcast_track_favorite_to_instance_timeline
+    consumer = activities.broadcast_track_favorite_to_instance_activity
     message = {
         "type": 'event',
         "data": data
