@@ -33,6 +33,9 @@
 </template>
 
 <script>
+import { WebSocketBridge } from 'django-channels'
+
+import logger from '@/logging'
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
 
@@ -44,10 +47,31 @@ export default {
   },
   created () {
     this.$store.dispatch('instance/fetchSettings')
+    this.openWebsocket()
+    let self = this
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
+  },
+  methods: {
+    openWebsocket () {
+      let self = this
+      let token = this.$store.state.auth.token
+      // let token = 'test'
+      const bridge = new WebSocketBridge()
+      bridge.connect(
+        `/api/v1/instance/activity?token=${token}`,
+        null,
+        {reconnectInterval: 5000})
+      bridge.listen(function (event) {
+        logger.default.info('Received timeline update', event)
+        self.$store.commit('instance/event', event)
+      })
+      bridge.socket.addEventListener('open', function () {
+        console.log('Connected to WebSocket')
+      })
+    }
   }
 }
 </script>
