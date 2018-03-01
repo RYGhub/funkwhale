@@ -13,6 +13,7 @@ def test_activity_user_serializer(factories):
     expected = {
         "type": "Person",
         "id": user.get_activity_url(),
+        "local_id": user.username,
         "name": user.username,
     }
 

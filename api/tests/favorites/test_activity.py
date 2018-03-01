@@ -1,4 +1,5 @@
 from funkwhale_api.users.serializers import UserActivitySerializer
+from funkwhale_api.music.serializers import TrackActivitySerializer
 from funkwhale_api.favorites import serializers
 from funkwhale_api.favorites import activities
 
@@ -18,9 +19,10 @@ def test_activity_favorite_serializer(factories):
     field = serializers.serializers.DateTimeField()
     expected = {
         "type": "Like",
+        "local_id": favorite.pk,
         "id": favorite.get_activity_url(),
         "actor": actor,
-        "object": favorite.track.get_activity_url(),
+        "object": TrackActivitySerializer(favorite.track).data,
         "published": field.to_representation(favorite.creation_date),
     }
 
@@ -48,7 +50,8 @@ def test_broadcast_track_favorite_to_instance_activity(
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
     consumer = activities.broadcast_track_favorite_to_instance_activity
     message = {
-        "type": 'event',
+        "type": 'event.send',
+        "text": '',
         "data": data
     }
     consumer(data=data, obj=favorite)
@@ -64,7 +67,8 @@ def test_broadcast_track_favorite_to_instance_activity_private(
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
     consumer = activities.broadcast_track_favorite_to_instance_activity
     message = {
-        "type": 'event',
+        "type": 'event.send',
+        "text": '',
         "data": data
     }
     consumer(data=data, obj=favorite)

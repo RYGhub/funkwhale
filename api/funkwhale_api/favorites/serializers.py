@@ -4,17 +4,15 @@ from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.music.serializers import TrackActivitySerializer
 from funkwhale_api.users.serializers import UserActivitySerializer
 
 from . import models
 
 
-
-
-
 class TrackFavoriteActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-    object = serializers.CharField(source='track.get_activity_url')
+    object = TrackActivitySerializer(source='track')
     actor = UserActivitySerializer(source='user')
     published = serializers.DateTimeField(source='creation_date')
 
@@ -22,6 +20,7 @@ class TrackFavoriteActivitySerializer(activity_serializers.ModelSerializer):
         model = models.TrackFavorite
         fields = [
             'id',
+            'local_id',
             'object',
             'type',
             'actor',
@@ -33,9 +32,6 @@ class TrackFavoriteActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return 'Like'
-
-    def get_object(self, obj):
-        return obj.track.get_activity_url()
 
 
 class UserTrackFavoriteSerializer(serializers.ModelSerializer):

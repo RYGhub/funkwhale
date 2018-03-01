@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from taggit.models import Tag
 
+from funkwhale_api.activity import serializers as activity_serializers
+
 from . import models
 
 
@@ -127,3 +129,24 @@ class ImportBatchSerializer(serializers.ModelSerializer):
         model = models.ImportBatch
         fields = ('id', 'jobs', 'status', 'creation_date', 'import_request')
         read_only_fields = ('creation_date',)
+
+
+class TrackActivitySerializer(activity_serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    name = serializers.CharField(source='title')
+    artist = serializers.CharField(source='artist.name')
+    album = serializers.CharField(source='album.title')
+
+    class Meta:
+        model = models.Track
+        fields = [
+            'id',
+            'local_id',
+            'name',
+            'type',
+            'artist',
+            'album',
+        ]
+
+    def get_type(self, obj):
+        return 'Audio'

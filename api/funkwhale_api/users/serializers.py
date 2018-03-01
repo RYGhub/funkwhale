@@ -8,11 +8,13 @@ from . import models
 class UserActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     name = serializers.CharField(source='username')
+    local_id = serializers.CharField(source='username')
 
     class Meta:
         model = models.User
         fields = [
             'id',
+            'local_id',
             'name',
             'type'
         ]
