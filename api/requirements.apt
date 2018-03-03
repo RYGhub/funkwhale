@@ -1,11 +1,8 @@
 build-essential
-gettext
-zlib1g-dev
+curl
+ffmpeg
 libjpeg-dev
-zlib1g-dev
+libmagic-dev
 libpq-dev
 postgresql-client
-libmagic-dev
-ffmpeg
 python3-dev
-curl
