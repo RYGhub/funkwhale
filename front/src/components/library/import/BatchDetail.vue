@@ -62,11 +62,17 @@ export default {
   data () {
     return {
       isLoading: true,
-      batch: null
+      batch: null,
+      timeout: null
     }
   },
   created () {
     this.fetchData()
+  },
+  destroyed () {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
   },
   methods: {
     fetchData () {
@@ -78,7 +84,7 @@ export default {
         self.batch = response.data
         self.isLoading = false
         if (self.batch.status === 'pending') {
-          setTimeout(
+          self.timeout = setTimeout(
             self.fetchData,
             5000
           )
