@@ -100,24 +100,9 @@ export default {
             username: this.username
           }})
       }, error => {
-        self.errors = this.getErrors(error.response)
+        self.errors = error.backendErrors
         self.isLoading = false
       })
-    },
-    getErrors (response) {
-      let errors = []
-      if (response.status !== 400) {
-        errors.push('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running')
-        return errors
-      }
-      for (var field in response.data) {
-        if (response.data.hasOwnProperty(field)) {
-          response.data[field].forEach(e => {
-            errors.push(e)
-          })
-        }
-      }
-      return errors
     }
   },
   computed: {
