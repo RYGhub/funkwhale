@@ -7,7 +7,8 @@ def test_request_viewset_requires_auth(db, api_client):
     assert response.status_code == 401
 
 
-def test_user_can_create_request(logged_in_api_client):
+@pytest.mark.parametrize('method', ['put', 'patch'])
+def test_user_can_create_request(method, logged_in_api_client):
     url = reverse('api:v1:requests:import-requests-list')
     user = logged_in_api_client.user
     data = {

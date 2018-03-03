@@ -1,4 +1,5 @@
 import json
+import pytest
 
 from django.test import RequestFactory
 from django.urls import reverse
@@ -116,3 +117,37 @@ def test_changing_password_updates_secret_key(logged_in_client):
 
     assert user.secret_key != secret_key
     assert user.password != password
+
+
+def test_user_can_patch_his_own_settings(logged_in_api_client):
+    user = logged_in_api_client.user
+    payload = {
+        'privacy_level': 'me',
+    }
+    url = reverse(
+        'api:v1:users:users-detail',
+        kwargs={'username': user.username})
+
+    response = logged_in_api_client.patch(url, payload)
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+
+    assert user.privacy_level == 'me'
+
+
+@pytest.mark.parametrize('method', ['put', 'patch'])
+def test_user_cannot_patch_another_user(
+        method, logged_in_api_client, factories):
+    user = factories['users.User']()
+    payload = {
+        'privacy_level': 'me',
+    }
+    url = reverse(
+        'api:v1:users:users-detail',
+        kwargs={'username': user.username})
+
+    handler = getattr(logged_in_api_client, method)
+    response = handler(url, payload)
+
+    assert response.status_code == 403

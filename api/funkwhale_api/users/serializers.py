@@ -29,7 +29,16 @@ class UserBasicSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'name', 'date_joined']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = [
+            'name',
+            'privacy_level'
+        ]
+
+
+class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
 
@@ -44,6 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'permissions',
             'date_joined',
+            'privacy_level'
         ]
 
     def get_permissions(self, o):
