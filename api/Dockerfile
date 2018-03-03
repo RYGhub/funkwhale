@@ -24,3 +24,4 @@ RUN pip install --upgrade youtube-dl
 WORKDIR /app
 
 ENTRYPOINT ["./compose/django/entrypoint.sh"]
+CMD ["./compose/django/daphne.sh"]
