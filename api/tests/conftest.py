@@ -5,6 +5,7 @@ from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework.test import APIClient
 
+from funkwhale_api.activity import record
 from funkwhale_api.taskapp import celery
 
 
@@ -81,3 +82,28 @@ def superuser_client(db, factories, client):
     setattr(client, 'user', user)
     yield client
     delattr(client, 'user')
+
+
+@pytest.fixture
+def activity_registry():
+    r = record.registry
+    state = list(record.registry.items())
+    yield record.registry
+    record.registry.clear()
+    for key, value in state:
+        record.registry[key] = value
+
+
+@pytest.fixture
+def activity_registry():
+    r = record.registry
+    state = list(record.registry.items())
+    yield record.registry
+    record.registry.clear()
+    for key, value in state:
+        record.registry[key] = value
+
+
+@pytest.fixture
+def activity_muted(activity_registry, mocker):
+    yield mocker.patch.object(record, 'send')

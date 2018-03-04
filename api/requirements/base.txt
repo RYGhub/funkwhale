@@ -59,3 +59,5 @@ pyacoustid>=1.1.5,<1.2
 raven>=6.5,<7
 python-magic==0.4.15
 ffmpeg-python==0.1.10
+channels>=2,<2.1
+channels_redis>=2.1,<2.2

@@ -1,13 +1,16 @@
 FROM python:3.5
 
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
 
 # Requirements have to be pulled and installed here, otherwise caching won't work
 RUN echo 'deb http://httpredir.debian.org/debian/ jessie-backports main' > /etc/apt/sources.list.d/ffmpeg.list
 COPY ./requirements.apt /requirements.apt
-COPY ./install_os_dependencies.sh /install_os_dependencies.sh
-RUN bash install_os_dependencies.sh install
+RUN apt-get update; \
+    grep "^[^#;]" requirements.apt | \
+    grep -Fv "python3-dev" | \
+    xargs apt-get install -y --no-install-recommends; \
+    rm -rf /usr/share/doc/* /usr/share/locale/*
+
 RUN curl -L https://github.com/acoustid/chromaprint/releases/download/v1.4.2/chromaprint-fpcalc-1.4.2-linux-x86_64.tar.gz | tar -xz -C /usr/local/bin --strip 1
 
 RUN mkdir /requirements
@@ -18,4 +21,5 @@ RUN pip install -r /requirements/local.txt
 COPY ./requirements/test.txt /requirements/test.txt
 RUN pip install -r /requirements/test.txt
 
+COPY . /app
 WORKDIR /app

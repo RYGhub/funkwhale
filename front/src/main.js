@@ -47,10 +47,27 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
+  error.backendErrors = []
   if (error.response.status === 401) {
     store.commit('auth/authenticated', false)
     logger.default.warn('Received 401 response from API, redirecting to login form')
     router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
+  }
+  if (error.response.status === 404) {
+    error.backendErrors.push('Resource not found')
+  } else if (error.response.status === 500) {
+    error.backendErrors.push('A server error occured')
+  } else if (error.response.data) {
+    for (var field in error.response.data) {
+      if (error.response.data.hasOwnProperty(field)) {
+        error.response.data[field].forEach(e => {
+          error.backendErrors.push(e)
+        })
+      }
+    }
+  }
+  if (error.backendErrors.length === 0) {
+    error.backendErrors.push('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running')
   }
   // Do something with response error
   return Promise.reject(error)

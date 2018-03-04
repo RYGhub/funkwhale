@@ -43,7 +43,6 @@ services:
     restart: unless-stopped
     image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
     env_file: .env
-    command: ./compose/django/gunicorn.sh
     volumes:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media

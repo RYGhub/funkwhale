@@ -28,7 +28,8 @@ def test_anonymous_user_can_create_listening_via_api(client, factories, settings
     assert listening.session_key == client.session.session_key
 
 
-def test_logged_in_user_can_create_listening_via_api(logged_in_client, factories):
+def test_logged_in_user_can_create_listening_via_api(
+        logged_in_client, factories, activity_muted):
     track = factories['music.Track']()
 
     url = reverse('api:v1:history:listenings-list')
@@ -40,3 +41,17 @@ def test_logged_in_user_can_create_listening_via_api(logged_in_client, factories
 
     assert listening.track == track
     assert listening.user == logged_in_client.user
+
+
+def test_adding_listening_calls_activity_record(
+        factories, logged_in_client, activity_muted):
+    track = factories['music.Track']()
+
+    url = reverse('api:v1:history:listenings-list')
+    response = logged_in_client.post(url, {
+        'track': track.pk,
+    })
+
+    listening = models.Listening.objects.latest('id')
+
+    activity_muted.assert_called_once_with(listening)
