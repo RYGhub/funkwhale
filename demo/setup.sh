@@ -4,10 +4,10 @@ music_path="/usr/share/music"
 demo_path="/srv/funkwhale-demo/demo"
 
 echo 'Cleaning everything...'
-docker-compose down -v || echo 'Nothing to stop'
-rm -rf /srv/funkwhale-demo/demo*
-mkdir -p $demo_path
 cd $demo_path
+docker-compose down -v || echo 'Nothing to stop'
+rm -rf /srv/funkwhale-demo/demo/*
+mkdir -p $demo_path
 echo 'Downloading demo files...'
 curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker-compose.yml"
 curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/env.prod.sample"
@@ -25,5 +25,5 @@ echo "FUNKWHALE_VERSION=$version" >> .env
 echo "FUNKWHALE_API_PORT=5001" >> .env
 
 docker-compose pull
-docker-compose run --rm api "sleep 5; demo/load-demo-data.sh"
+docker-compose run --rm api bash -c "sleep 5; demo/load-demo-data.sh"
 docker-compose up -d
