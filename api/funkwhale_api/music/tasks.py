@@ -33,11 +33,10 @@ def _do_import(import_job, replace):
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
         match = client.get_best_match(import_job.audio_file.path)
-        if not match:
-            raise ValueError('Cannot get match')
-        duration = match['recordings'][0]['duration']
-        mbid = match['recordings'][0]['id']
-        acoustid_track_id = match['id']
+        if match:
+            duration = match['recordings'][0]['duration']
+            mbid = match['recordings'][0]['id']
+            acoustid_track_id = match['id']
     if mbid:
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
     else:
