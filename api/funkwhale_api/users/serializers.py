@@ -1,6 +1,26 @@
 from rest_framework import serializers
 
+from funkwhale_api.activity import serializers as activity_serializers
+
 from . import models
+
+
+class UserActivitySerializer(activity_serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+    name = serializers.CharField(source='username')
+    local_id = serializers.CharField(source='username')
+
+    class Meta:
+        model = models.User
+        fields = [
+            'id',
+            'local_id',
+            'name',
+            'type'
+        ]
+
+    def get_type(self, obj):
+        return 'Person'
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
@@ -9,7 +29,16 @@ class UserBasicSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'name', 'date_joined']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = [
+            'name',
+            'privacy_level'
+        ]
+
+
+class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
 
@@ -24,6 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'permissions',
             'date_joined',
+            'privacy_level'
         ]
 
     def get_permissions(self, o):

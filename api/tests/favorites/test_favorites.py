@@ -33,7 +33,8 @@ def test_user_can_get_his_favorites(factories, logged_in_client, client):
     assert expected == parsed_json['results']
 
 
-def test_user_can_add_favorite_via_api(factories, logged_in_client, client):
+def test_user_can_add_favorite_via_api(
+        factories, logged_in_client, activity_muted):
     track = factories['music.Track']()
     url = reverse('api:v1:favorites:tracks-list')
     response = logged_in_client.post(url, {'track': track.pk})
@@ -49,6 +50,27 @@ def test_user_can_add_favorite_via_api(factories, logged_in_client, client):
     assert expected == parsed_json
     assert favorite.track == track
     assert favorite.user == logged_in_client.user
+
+
+def test_adding_favorites_calls_activity_record(
+        factories, logged_in_client, activity_muted):
+    track = factories['music.Track']()
+    url = reverse('api:v1:favorites:tracks-list')
+    response = logged_in_client.post(url, {'track': track.pk})
+
+    favorite = TrackFavorite.objects.latest('id')
+    expected = {
+        'track': track.pk,
+        'id': favorite.id,
+        'creation_date': favorite.creation_date.isoformat().replace('+00:00', 'Z'),
+    }
+    parsed_json = json.loads(response.content.decode('utf-8'))
+
+    assert expected == parsed_json
+    assert favorite.track == track
+    assert favorite.user == logged_in_client.user
+
+    activity_muted.assert_called_once_with(favorite)
 
 
 def test_user_can_remove_favorite_via_api(logged_in_client, factories, client):

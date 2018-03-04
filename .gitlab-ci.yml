@@ -22,7 +22,7 @@ test_api:
   variables:
     DJANGO_ALLOWED_HOSTS: "localhost"
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
-
+    FUNKWHALE_URL: "https://funkwhale.ci"
   before_script:
     - cd api
     - pip install -r requirements/base.txt

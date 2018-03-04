@@ -58,8 +58,6 @@ CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 
 # END SITE CONFIGURATION
 
-INSTALLED_APPS += ("gunicorn", )
-
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
 # Uploaded Media Files

@@ -25,3 +25,8 @@ class Listening(models.Model):
             raise ValidationError('Cannot have both session_key and user empty for listening')
 
         super().save(**kwargs)
+
+
+    def get_activity_url(self):
+        return '{}/listenings/tracks/{}'.format(
+            self.user.get_activity_url(), self.pk)

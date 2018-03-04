@@ -36,6 +36,9 @@
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
         <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
         <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
+        <router-link
+          v-if="$store.state.auth.authenticated"
+          class="item" :to="{path: '/activity'}"><i class="bell icon"></i> Activity</router-link>
       </div>
     </div>
     <div v-if="queue.previousQueue " class="ui black icon message">

@@ -2,12 +2,35 @@
   <div class="main pusher">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>Change my password</h2>
-        <form class="ui form" @submit.prevent="submit()">
-          <div v-if="error" class="ui negative message">
+        <h2 class="ui header">Account settings</h2>
+        <form class="ui form" @submit.prevent="submitSettings()">
+          <div v-if="settings.success" class="ui positive message">
+            <div class="header">Settings updated</div>
+          </div>
+          <div v-if="settings.errors.length > 0" class="ui negative message">
+            <div class="header">We cannot save your settings</div>
+            <ul class="list">
+              <li v-for="error in settings.errors">{{ error }}</li>
+            </ul>
+          </div>
+          <div class="field" v-for="f in orderedSettingsFields">
+            <label :for="f.id">{{ f.label }}</label>
+            <p v-if="f.help">{{ f.help }}</p>
+            <select v-if="f.type === 'dropdown'" class="ui dropdown" v-model="f.value">
+              <option :value="c.value" v-for="c in f.choices">{{ c.label }}</option>
+            </select>
+          </div>
+          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Update settings</button>
+        </form>
+      </div>
+      <div class="ui hidden divider"></div>
+      <div class="ui small text container">
+        <h2 class="ui header">Change my password</h2>
+        <form class="ui form" @submit.prevent="submitPassword()">
+          <div v-if="passwordError" class="ui negative message">
             <div class="header">Cannot change your password</div>
             <ul class="list">
-              <li v-if="error == 'invalid_credentials'">Please double-check your password is correct</li>
+              <li v-if="passwordError == 'invalid_credentials'">Please double-check your password is correct</li>
             </ul>
           </div>
           <div class="field">
@@ -36,22 +59,68 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import axios from 'axios'
 import logger from '@/logging'
 
 export default {
   data () {
-    return {
+    let d = {
       // We need to initialize the component with any
       // properties that will be used in it
       old_password: '',
       new_password: '',
-      error: '',
-      isLoading: false
+      passwordError: '',
+      isLoading: false,
+      settings: {
+        success: false,
+        errors: [],
+        order: ['privacy_level'],
+        fields: {
+          'privacy_level': {
+            type: 'dropdown',
+            initial: this.$store.state.auth.profile.privacy_level,
+            label: 'Activity visibility',
+            help: 'Determine the visibility level of your activity',
+            choices: [
+              {
+                value: 'me',
+                label: 'Nobody except me'
+              },
+              {
+                value: 'instance',
+                label: 'Everyone on this instance'
+              }
+            ]
+          }
+        }
+      }
     }
+    d.settings.order.forEach(id => {
+      d.settings.fields[id].value = d.settings.fields[id].initial
+    })
+    return d
+  },
+  mounted () {
+    $('select.dropdown').dropdown()
   },
   methods: {
-    submit () {
+    submitSettings () {
+      this.settings.success = false
+      this.settings.errors = []
+      let self = this
+      let payload = this.settingsValues
+      let url = `users/users/${this.$store.state.auth.username}/`
+      return axios.patch(url, payload).then(response => {
+        logger.default.info('Updated settings successfully')
+        self.settings.success = true
+      }, error => {
+        logger.default.error('Error while updating settings')
+        self.isLoading = false
+        self.settings.errors = error.backendErrors
+      })
+    },
+    submitPassword () {
       var self = this
       self.isLoading = true
       this.error = ''
@@ -70,12 +139,29 @@ export default {
           }})
       }, error => {
         if (error.response.status === 400) {
-          self.error = 'invalid_credentials'
+          self.passwordError = 'invalid_credentials'
         } else {
-          self.error = 'unknown_error'
+          self.passwordError = 'unknown_error'
         }
         self.isLoading = false
       })
+    }
+  },
+  computed: {
+    orderedSettingsFields () {
+      let self = this
+      return this.settings.order.map(id => {
+        return self.settings.fields[id]
+      })
+    },
+    settingsValues () {
+      let self = this
+      let s = {}
+      this.settings.order.forEach(setting => {
+        let conf = self.settings.fields[setting]
+        s[setting] = conf.value
+      })
+      return s
     }
   }
 

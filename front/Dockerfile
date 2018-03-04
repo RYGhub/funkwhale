@@ -3,8 +3,7 @@ FROM node:9
 EXPOSE 8080
 WORKDIR /app/
 ADD package.json .
-RUN yarn install --only=production
-RUN yarn install --only=dev
+RUN yarn install
 VOLUME ["/app/node_modules"]
 COPY . .
 

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import pagination
 from rest_framework.decorators import list_route
 
+from funkwhale_api.activity import record
 from funkwhale_api.music.models import Track
 from funkwhale_api.common.permissions import ConditionalAuthentication
 
@@ -33,6 +34,7 @@ class TrackFavoriteViewSet(mixins.CreateModelMixin,
         instance = self.perform_create(serializer)
         serializer = self.get_serializer(instance=instance)
         headers = self.get_success_headers(serializer.data)
+        record.send(instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_queryset(self):

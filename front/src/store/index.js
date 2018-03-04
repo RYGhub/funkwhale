@@ -8,11 +8,13 @@ import instance from './instance'
 import queue from './queue'
 import radios from './radios'
 import player from './player'
+import ui from './ui'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   modules: {
+    ui,
     auth,
     favorites,
     instance,
@@ -27,6 +29,10 @@ export default new Vuex.Store({
       filter: (mutation) => {
         return mutation.type.startsWith('auth/')
       }
+    }),
+    createPersistedState({
+      key: 'instance',
+      paths: ['instance.events']
     }),
     createPersistedState({
       key: 'radios',
