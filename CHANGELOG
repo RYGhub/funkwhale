@@ -3,6 +3,97 @@ Changelog
 
 .. towncrier
 
+0.6 (2018-03-04)
+----------------
+
+Features:
+
+- Basic activity stream for listening and favorites (#23)
+- Switched to django-channels and daphne for serving HTTP and websocket (#34)
+
+Upgrades notes
+**************
+
+This version contains breaking changes in the way funkwhale is deployed,
+please read the notes carefully.
+
+Instance timeline
+^^^^^^^^^^^^^^^^^
+
+A new "Activity" page is now available from the sidebar, where you can
+browse your instance activity. At the moment, this includes other users
+favorites and listening, but more activity types will be implemented in the
+future.
+
+Internally, we implemented those events by following the Activity Stream
+specification, which will help us to be compatible with other networks
+in the long-term.
+
+A new settings page has been added to control the visibility of your activity.
+By default, your activity will be browsable by anyone on your instance,
+but you can switch to a full private mode where nothing is shared.
+
+The setting form is available in your profile.
+
+Switch from gunicorn to daphne
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This release include an important change in the way we serve the HTTP API.
+To prepare for new realtime features and enable websocket support in Funkwhale,
+we are now using django-channels and daphne to serve HTTP and websocket traffic.
+
+This replaces gunicorn and the switch should be easy assuming you
+follow the upgrade process described bellow.
+
+If you are using docker, please remove the command instruction inside the
+api service, as the up-to-date command is now included directly in the image
+as the default entry point:
+
+.. code-block:: yaml
+
+    api:
+      restart: unless-stopped
+      image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
+      command: ./compose/django/gunicorn.sh  # You can remove this line
+
+On non docker setups, you'll have to update the [Service] block of your
+funkwhale-server systemd unit file to launch the application server using daphne instead of gunicorn.
+
+The new configuration should be similar to this:
+
+.. code-block:: ini
+
+    [Service]
+    User=funkwhale
+    # adapt this depending on the path of your funkwhale installation
+    WorkingDirectory=/srv/funkwhale/api
+    EnvironmentFile=/srv/funkwhale/config/.env
+    ExecStart=/usr/local/bin/daphne -b ${FUNKWHALE_API_IP} -p ${FUNKWHALE_API_PORT} config.asgi:application
+
+Ensure you update funkwhale's dependencies as usual to install the required
+packages.
+
+On both docker and non-docker setup, you'll also have to update your nginx
+configuration for websocket support. Ensure you have the following blocks
+included in your virtualhost file:
+
+.. code-block:: txt
+
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
+    server {
+        ...
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+
+Remember to reload your nginx server after the edit.
+
+
 0.5.4 (2018-02-28)
 ------------------
 
