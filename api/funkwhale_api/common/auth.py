@@ -9,6 +9,7 @@ from rest_framework import exceptions
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.authentication import BaseJSONWebTokenAuthentication
 
+from funkwhale_api.users.models import User
 
 
 class TokenHeaderAuth(BaseJSONWebTokenAuthentication):
@@ -40,7 +41,7 @@ class TokenAuthMiddleware:
         auth = TokenHeaderAuth()
         try:
             user, token = auth.authenticate(scope)
-        except exceptions.AuthenticationFailed:
+        except (User.DoesNotExist, exceptions.AuthenticationFailed):
             user = AnonymousUser()
 
         scope['user'] = user
