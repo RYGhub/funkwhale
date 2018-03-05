@@ -1,23 +1,23 @@
 <template>
   <div class="ui pagination borderless menu">
     <a
-      @click="selectPage(1)"
-      :class="[{'disabled': current === 1}, 'item']"><i class="angle double left icon"></i></a>
-    <a
       @click="selectPage(current - 1)"
       :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></a>
-    <a
-      v-for="page in pages"
-      @click="selectPage(page)"
-      :class="[{'active': page === current}, 'item']">
-      {{ page }}
-    </a>
+    <template>
+      <a
+        v-if="page !== 'skip'"
+        v-for="page in pages"
+        @click="selectPage(page)"
+        :class="[{'active': page === current}, 'item']">
+        {{ page }}
+      </a>
+      <a v-else class="disabled item">
+        ...
+      </a>
+    </template>
     <a
       @click="selectPage(current + 1)"
       :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></a>
-      <a
-        @click="selectPage(maxPage)"
-        :class="[{'disabled': current === maxPage}, 'item']"><i class="angle double right icon"></i></a>
   </div>
 </template>
 
@@ -32,7 +32,38 @@ export default {
   },
   computed: {
     pages: function () {
-      return _.range(1, this.maxPage + 1)
+      let range = 2
+      let current = this.current
+      let beginning = _.range(1, Math.min(this.maxPage, 1 + range))
+      let middle = _.range(Math.max(1, current - range + 1), Math.min(this.maxPage, current + range))
+      let end = _.range(this.maxPage, Math.max(1, this.maxPage - range))
+      let allowed = beginning.concat(middle, end)
+      allowed = _.uniq(allowed)
+      allowed = _.sortBy(allowed, [(e) => { return e }])
+      let final = []
+      allowed.forEach(p => {
+        let last = final.slice(-1)[0]
+        let consecutive = true
+        if (last === 'skip') {
+          consecutive = false
+        } else {
+          if (!last) {
+            consecutive = true
+          } else {
+            consecutive = last + 1 === p
+          }
+        }
+        if (consecutive) {
+          final.push(p)
+        } else {
+          if (p !== 'skip') {
+            final.push('skip')
+            final.push(p)
+          }
+        }
+      })
+      console.log(final)
+      return final
     },
     maxPage: function () {
       return Math.ceil(this.total / this.paginateBy)
