@@ -35,6 +35,13 @@ class Command(BaseCommand):
             help='Will launch celery tasks for each file to import instead of doing it synchronously and block the CLI',
         )
         parser.add_argument(
+            '--no-acoustid',
+            action='store_true',
+            dest='no_acoustid',
+            default=False,
+            help='Use this flag to completely bypass acoustid completely',
+        )
+        parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help="Do NOT prompt the user for input of any kind.",
         )
@@ -81,13 +88,12 @@ class Command(BaseCommand):
                 raise CommandError("Import cancelled.")
 
         batch = self.do_import(matching, user=user, options=options)
-
         message = 'Successfully imported {} tracks'
         if options['async']:
             message = 'Successfully launched import for {} tracks'
         self.stdout.write(message.format(len(matching)))
         self.stdout.write(
-            "For details, please refer to import batch #".format(batch.pk))
+            "For details, please refer to import batch #{}".format(batch.pk))
 
     @transaction.atomic
     def do_import(self, matching, user, options):
@@ -109,7 +115,10 @@ class Command(BaseCommand):
 
             job.save()
             try:
-                utils.on_commit(import_handler, import_job_id=job.pk)
+                utils.on_commit(
+                    import_handler,
+                    import_job_id=job.pk,
+                    use_acoustid=not options['no_acoustid'])
             except Exception as e:
                 self.stdout.write('Error: {}'.format(e))
 

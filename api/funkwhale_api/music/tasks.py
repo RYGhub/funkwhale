@@ -1,5 +1,7 @@
 from django.core.files.base import ContentFile
 
+from dynamic_preferences.registries import global_preferences_registry
+
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
@@ -23,21 +25,22 @@ def set_acoustid_on_track_file(track_file):
         return update(result['id'])
 
 
-def _do_import(import_job, replace):
+def _do_import(import_job, replace, use_acoustid=True):
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
     acoustid_track_id = None
     duration = None
     track = None
-    if not mbid and from_file:
+    manager = global_preferences_registry.manager()
+    use_acoustid = use_acoustid and manager['providers_acoustid__api_key']
+    if not mbid and use_acoustid and from_file:
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
         match = client.get_best_match(import_job.audio_file.path)
-        if not match:
-            raise ValueError('Cannot get match')
-        duration = match['recordings'][0]['duration']
-        mbid = match['recordings'][0]['id']
-        acoustid_track_id = match['id']
+        if match:
+            duration = match['recordings'][0]['duration']
+            mbid = match['recordings'][0]['id']
+            acoustid_track_id = match['id']
     if mbid:
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
     else:
@@ -77,13 +80,13 @@ def _do_import(import_job, replace):
     models.ImportJob.objects.filter(
         status__in=['pending', 'errored']),
     'import_job')
-def import_job_run(self, import_job, replace=False):
+def import_job_run(self, import_job, replace=False, use_acoustid=True):
     def mark_errored():
         import_job.status = 'errored'
-        import_job.save()
+        import_job.save(update_fields=['status'])
 
     try:
-        return _do_import(import_job, replace)
+        return _do_import(import_job, replace, use_acoustid=use_acoustid)
     except Exception as exc:
         if not settings.DEBUG:
             try:
