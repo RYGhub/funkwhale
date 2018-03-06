@@ -55,7 +55,6 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'taggit',
-    'cachalot',
     'rest_auth',
     'rest_auth.registration',
     'mptt',
@@ -370,9 +369,6 @@ MUSICBRAINZ_CACHE_DURATION = env.int(
     'MUSICBRAINZ_CACHE_DURATION',
     default=300
 )
-
-CACHALOT_ENABLED = env.bool('CACHALOT_ENABLED', default=True)
-
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')

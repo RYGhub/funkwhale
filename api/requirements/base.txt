@@ -50,9 +50,6 @@ mutagen>=1.39,<1.40
 django-taggit>=0.22,<0.23
 # Until this is merged
 git+https://github.com/EliotBerriot/PyMemoize.git@django
-# Until this is merged
-#django-cachalot==1.5.0
-git+https://github.com/EliotBerriot/django-cachalot.git@django-2
 
 django-dynamic-preferences>=1.5,<1.6
 pyacoustid>=1.1.5,<1.2
