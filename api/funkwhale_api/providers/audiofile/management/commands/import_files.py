@@ -81,13 +81,12 @@ class Command(BaseCommand):
                 raise CommandError("Import cancelled.")
 
         batch = self.do_import(matching, user=user, options=options)
-
         message = 'Successfully imported {} tracks'
         if options['async']:
             message = 'Successfully launched import for {} tracks'
         self.stdout.write(message.format(len(matching)))
         self.stdout.write(
-            "For details, please refer to import batch #".format(batch.pk))
+            "For details, please refer to import batch #{}".format(batch.pk))
 
     @transaction.atomic
     def do_import(self, matching, user, options):
