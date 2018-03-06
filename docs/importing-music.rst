@@ -25,6 +25,10 @@ to the ``/music`` directory on the container:
 For the best results, we recommand tagging your music collection through
 `Picard <http://picard.musicbrainz.org/>`_ in order to have the best quality metadata.
 
+.. note::
+
+    Autotagging using acoustid is experimental now and can yield unexpected
+    result. You can disable acoustid by passing the --no-acoustid flag.
 
 .. note::
 

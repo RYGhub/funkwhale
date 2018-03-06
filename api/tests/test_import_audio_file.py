@@ -54,7 +54,7 @@ def test_management_command_requires_a_valid_username(factories, mocker):
 
 
 def test_import_files_creates_a_batch_and_job(factories, mocker):
-    m = m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    m = mocker.patch('funkwhale_api.common.utils.on_commit')
     user = factories['users.User'](username='me')
     path = os.path.join(DATA_DIR, 'dummy_file.ogg')
     call_command(
@@ -77,4 +77,24 @@ def test_import_files_creates_a_batch_and_job(factories, mocker):
     assert job.source == 'file://' + path
     m.assert_called_once_with(
         music_tasks.import_job_run.delay,
-        import_job_id=job.pk)
+        import_job_id=job.pk,
+        use_acoustid=True)
+
+
+def test_import_files_skip_acoustid(factories, mocker):
+    m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    user = factories['users.User'](username='me')
+    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
+    call_command(
+        'import_files',
+        path,
+        username='me',
+        async=True,
+        no_acoustid=True,
+        interactive=False)
+    batch = user.imports.latest('id')
+    job = batch.jobs.first()
+    m.assert_called_once_with(
+        music_tasks.import_job_run.delay,
+        import_job_id=job.pk,
+        use_acoustid=False)
