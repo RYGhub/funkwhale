@@ -1,1 +1,0 @@
-Completely removed django-cachalot from the codebase (#110). You can safely remove the CACHALOT_ENABLED setting from your .env file

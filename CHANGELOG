@@ -3,6 +3,27 @@ Changelog
 
 .. towncrier
 
+0.6.1 (unreleased)
+------------------
+
+Features:
+
+- Can now skip acoustid on file import with the --no-acoustid flag (#111)
+
+
+Bugfixes:
+
+- Added missing batch id in output during import (#112)
+- Added some feedback on the play button (#100)
+- Smarter pagination which takes a fixed size (#84)
+
+
+Other:
+
+- Completely removed django-cachalot from the codebase (#110). You can safely
+  remove the CACHALOT_ENABLED setting from your .env file
+
+
 0.6 (2018-03-04)
 ----------------
 
