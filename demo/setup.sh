@@ -25,5 +25,7 @@ echo "FUNKWHALE_VERSION=$version" >> .env
 echo "FUNKWHALE_API_PORT=5001" >> .env
 
 docker-compose pull
-docker-compose run --rm api bash -c "sleep 5; demo/load-demo-data.sh"
+docker-compose up -d postgres redis
+sleep 5
+docker-compose run --rm api demo/load-demo-data.sh
 docker-compose up -d
