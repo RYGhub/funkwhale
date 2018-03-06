@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
     image: funkwhale/funkwhale:${FUNKWHALE_VERSION:-latest}
     env_file: .env
-    command: python manage.py celery worker
+    command: celery -A funkwhale_api.taskapp worker -l INFO
     links:
       - postgres
       - redis
