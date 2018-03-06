@@ -310,7 +310,7 @@ CELERY_BROKER_URL = env(
     "CELERY_BROKER_URL", default=env('CACHE_URL', default=CACHE_DEFAULT))
 ########## END CELERY
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
-ADMIN_URL = r'^admin/'
+
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
