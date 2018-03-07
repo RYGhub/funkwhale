@@ -31,7 +31,7 @@
       <div class="ui vertical stripe segment">
         <h2>Albums by this artist</h2>
         <div class="ui stackable doubling three column grid">
-          <div class="column" :key="album.id" v-for="album in albums">
+          <div class="column" :key="album.id" v-for="album in sortedAlbums">
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>
           </div>
         </div>
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
@@ -83,6 +84,10 @@ export default {
     }
   },
   computed: {
+    sortedAlbums () {
+      let a = this.albums || []
+      return _.orderBy(a, ['release_date'], ['asc'])
+    },
     totalTracks () {
       return this.albums.map((album) => {
         return album.tracks.length

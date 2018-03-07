@@ -6,12 +6,13 @@
           <img v-else src="../../../assets/audio/default-cover.png">
         </div>
         <div class="header">
-          <router-link class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">{{ album.title }}</router-link>
+          <router-link class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">{{ album.title }} </router-link>
         </div>
         <div class="meta">
-          By <router-link :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-            {{ album.artist.name }}
-          </router-link>
+          <span>
+            By <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+              {{ album.artist.name }}</router-link>
+          </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>
         <div class="description" v-if="mode === 'rich'">
           <table class="ui very basic fixed single line compact unstackable table">
