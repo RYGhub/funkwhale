@@ -1,6 +1,7 @@
 <template>
   <div class="ui pagination borderless menu">
     <a
+      v-if="current - 1 >= 1"
       @click="selectPage(current - 1)"
       :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></a>
     <template>
@@ -16,6 +17,7 @@
       </a>
     </template>
     <a
+      v-if="current + 1 <= maxPage"
       @click="selectPage(current + 1)"
       :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></a>
   </div>
