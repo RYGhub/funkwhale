@@ -4,6 +4,7 @@ import pytest
 from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework.test import APIClient
+from rest_framework.test import APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.taskapp import celery
@@ -82,6 +83,11 @@ def superuser_client(db, factories, client):
     setattr(client, 'user', user)
     yield client
     delattr(client, 'user')
+
+
+@pytest.fixture
+def api_request():
+    return APIRequestFactory()
 
 
 @pytest.fixture
