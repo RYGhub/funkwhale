@@ -86,15 +86,12 @@ build_front:
 
 pages:
   stage: test
-  image: alpine
+  image: python:3.6-alpine
   before_script:
     - cd docs
   script:
-    - apk --no-cache add py2-pip python-dev
     - pip install sphinx
-    - apk --no-cache add make
-    - make html
-    - mv _build/html/ ../public
+    - python -m sphinx . ../public
   artifacts:
     paths:
       - public
