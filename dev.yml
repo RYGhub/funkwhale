@@ -71,3 +71,12 @@ services:
       - ./api/funkwhale_api/media:/protected/media
     ports:
       - "0.0.0.0:6001:6001"
+
+  docs:
+    build: docs
+    command: python serve.py
+    volumes:
+      - ".:/app/"
+    ports:
+      - '35730:35730'
+      - '8001:8001'
