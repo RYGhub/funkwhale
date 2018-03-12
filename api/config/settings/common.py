@@ -60,6 +60,7 @@ THIRD_PARTY_APPS = (
     'mptt',
     'dynamic_preferences',
     'django_filters',
+    'cacheops',
 )
 
 
@@ -369,6 +370,15 @@ MUSICBRAINZ_CACHE_DURATION = env.int(
     'MUSICBRAINZ_CACHE_DURATION',
     default=300
 )
+CACHEOPS_REDIS = env('CACHE_URL', default=CACHE_DEFAULT)
+CACHEOPS_ENABLED = env.bool('CACHEOPS_ENABLED', default=True)
+CACHEOPS = {
+    'music.artist': {'ops': 'all', 'timeout': 60 * 60},
+    'music.album': {'ops': 'all', 'timeout': 60 * 60},
+    'music.track': {'ops': 'all', 'timeout': 60 * 60},
+    'music.trackfile': {'ops': 'all', 'timeout': 60 * 60},
+    'taggit.tag': {'ops': 'all', 'timeout': 60 * 60},
+}
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')
