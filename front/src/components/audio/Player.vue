@@ -3,7 +3,7 @@
     <div class="player">
       <audio-track
         ref="currentAudio"
-        v-if="currentTrack"
+        v-if="renderAudio && currentTrack"
         :key="(currentIndex, currentTrack.id)"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
@@ -151,6 +151,7 @@ export default {
   data () {
     let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
     return {
+      renderAudio: true,
       sliderVolume: this.volume,
       Track: Track,
       defaultAmbiantColors: defaultAmbiantColors,
@@ -163,7 +164,6 @@ export default {
   },
   methods: {
     ...mapActions({
-      pause: 'player/pause',
       togglePlay: 'player/togglePlay',
       clean: 'queue/clean',
       next: 'queue/next',
@@ -228,6 +228,17 @@ export default {
     currentTrack (newValue) {
       if (!newValue || !newValue.album.cover) {
         this.ambiantColors = this.defaultAmbiantColors
+      }
+    },
+    currentIndex (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        // why this? to ensure the audio tag is deleted and fully
+        // rerendered, so we don't have any issues with cached position
+        // or whatever
+        this.renderAudio = false
+        this.$nextTick(() => {
+          this.renderAudio = true
+        })
       }
     },
     volume (newValue) {
