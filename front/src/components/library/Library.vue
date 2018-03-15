@@ -5,7 +5,7 @@
       <router-link class="ui item" to="/library/artists" exact>Artists</router-link>
       <router-link class="ui item" to="/library/radios" exact>Radios</router-link>
       <div class="ui secondary right menu">
-        <router-link class="ui item" to="/library/requests/" exact>
+        <router-link v-if="$store.state.auth.authenticated" class="ui item" to="/library/requests/" exact>
           Requests
           <div class="ui teal label">{{ requestsCount }}</div>
         </router-link>
@@ -32,8 +32,11 @@ export default {
   },
   methods: {
     fetchRequestsCount () {
+      if (!this.$store.state.authenticated) {
+        return
+      }
       let self = this
-      axios.get('requests/import-requests', {params: {status: 'pending'}}).then(response => {
+      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
         self.requestsCount = response.data.count
       })
     }
