@@ -240,6 +240,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class Search(views.APIView):
     max_results = 3
+    permission_classes = [ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
         query = request.GET['query']

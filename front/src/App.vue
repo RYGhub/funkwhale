@@ -56,6 +56,9 @@ export default {
   },
   methods: {
     openWebsocket () {
+      if (!this.$store.state.auth.authenticated) {
+        return
+      }
       let self = this
       let token = this.$store.state.auth.token
       // let token = 'test'
