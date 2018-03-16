@@ -5,7 +5,7 @@ from . import models
 
 @admin.register(models.Playlist)
 class PlaylistAdmin(admin.ModelAdmin):
-    list_display = ['name', 'user', 'is_public', 'creation_date']
+    list_display = ['name', 'user', 'privacy_level', 'creation_date']
     search_fields = ['name', ]
     list_select_related = True
 

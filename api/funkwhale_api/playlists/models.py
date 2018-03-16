@@ -3,13 +3,15 @@ from django.utils import timezone
 
 from mptt.models import MPTTModel, TreeOneToOneField
 
+from funkwhale_api.common import fields
+
 
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
-    is_public = models.BooleanField(default=False)
     user = models.ForeignKey(
         'users.User', related_name="playlists", on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
+    privacy_level = fields.get_privacy_field()
 
     def __str__(self):
         return self.name
