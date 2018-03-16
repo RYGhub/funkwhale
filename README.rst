@@ -5,27 +5,107 @@ A self-hosted tribute to Grooveshark.com.
 
 LICENSE: BSD
 
-Setting up a development environment (docker)
-----------------------------------------------
+Getting help
+------------
 
-First of all, pull the repository.
+We offer various Matrix.org rooms to discuss about funkwhale:
 
-Then, pull and build all the containers::
+- `#funkwhale:matrix.org <https://riot.im/app/#/room/#funkwhale:matrix.org>`_ for general questions about funkwhale
+- `#funkwhale-dev:matrix.org <https://riot.im/app/#/room/#funkwhale-dev:matrix.org>`_ for development-focused discussion
+
+Please join those rooms if you have any questions!
+
+Running the development version
+-------------------------------
+
+If you want to fix a bug or implement a feature, you'll need
+to run a local, development copy of funkwhale.
+
+We provide a docker based development environment, which should
+be both easy to setup and work similarly regardless of your
+development machine setup.
+
+Instructions for bare-metal setup will come in the future (Merge requests
+are welcome).
+
+Installing docker and docker-compose
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is already cover in the relevant documentations:
+
+- https://docs.docker.com/install/
+- https://docs.docker.com/compose/install/
+
+Cloning the project
+^^^^^^^^^^^^^^^^^^^
+
+Visit https://code.eliotberriot.com/funkwhale/funkwhale and clone the repository using SSH or HTTPS. Exemple using SSH::
+
+    git clone ssh://git@code.eliotberriot.com:2222/funkwhale/funkwhale.git
+    cd funkwhale
+
+
+A note about branches
+^^^^^^^^^^^^^^^^^^^^^
+
+Next release development occurs on the "develop" branch, and releases are made on the "master" branch. Therefor, when submitting Merge Requests, ensure you are merging on the develop branch.
+
+
+Working with docker
+^^^^^^^^^^^^^^^^^^^
+
+In developpement, we use the docker-compose file named ``dev.yml``, and this is why all our docker-compose commands will look like this::
+
+    docker-compose -f dev.yml logs
+
+If you do not want to add the ``-f dev.yml`` snippet everytime, you can run this command before starting your work::
+
+    export COMPOSE_FILE=dev.yml
+
+
+Building the containers
+^^^^^^^^^^^^^^^^^^^^^^^
+
+On your initial clone, or if there have been some changes in the
+app dependencies, you will have to rebuild your containers. This is done
+via the following command::
 
     docker-compose -f dev.yml build
-    docker-compose -f dev.yml pull
 
 
-API setup
-^^^^^^^^^^
+Database management
+^^^^^^^^^^^^^^^^^^^
 
-You'll have apply database migrations::
+To setup funkwhale's database schema, run this::
 
-    docker-compose -f dev.yml run celeryworker python manage.py migrate
+    docker-compose -f dev.yml run --rm api python manage.py migrate
 
-And to create an admin user::
+This will create all the tables needed for the API to run proprely.
+You will also need to run this whenever changes are made on the database
+schema.
 
-    docker-compose -f dev.yml run celeryworker python manage.py createsuperuser
+It is safe to run this command multiple times, so you can run it whenever
+you fetch develop.
+
+
+Development data
+^^^^^^^^^^^^^^^^
+
+You'll need at least an admin user and some artists/tracks/albums to work
+locally.
+
+Create an admin user with the following command::
+
+    docker-compose -f dev.yml run --rm api python manage.py createsuperuser
+
+Injecting fake data is done by running the fllowing script::
+
+    artists=25
+    command="from funkwhale_api.music import fake_data; fake_data.create_data($artists)"
+    echo $command | docker-compose -f dev.yml run --rm api python manage.py shell -i python
+
+The previous command will create 25 artists with random albums, tracks
+and metadata.
 
 
 Launch all services
@@ -33,18 +113,83 @@ Launch all services
 
 Then you can run everything with::
 
-    docker-compose up
+    docker-compose -f dev.yml up
 
-The API server will be accessible at http://localhost:6001, and the front-end at http://localhost:8080.
+This will launch all services, and output the logs in your current terminal window.
+If you prefer to launch them in the background instead, use the ``-d`` flag, and access the logs when you need it via ``docker-compose -f dev.yml logs --tail=50 --follow``.
+
+Once everything is up, you can access the various funkwhale's components:
+
+- The Vue webapp, on http://localhost:8080
+- The API, on http://localhost:8080/api/v1/
+- The django admin, on http://localhost:8080/api/admin/
+
 
 Running API tests
-------------------
+^^^^^^^^^^^^^^^^^
 
-Everything is managed using docker and docker-compose, just run::
+To run the pytest test suite, use the following command::
 
-    ./api/runtests
+    docker-compose -f dev.yml run --rm api pytest
 
-This bash script invoke `python manage.py test` in a docker container under the hood, so you can use
-traditional django test arguments and options, such as::
+This is regular pytest, so you can use any arguments/options that pytest usually accept::
 
-    ./api/runtests funkwhale_api.music   # run a specific app test
+    # get some help
+    docker-compose -f dev.yml run --rm api pytest -h
+    # Stop on first failure
+    docker-compose -f dev.yml run --rm api pytest -x
+    # Run a specific test file
+    docker-compose -f dev.yml run --rm api pytest tests/test_acoustid.py
+
+
+Running front-end tests
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To run the front-end test suite, use the following command::
+
+    docker-compose -f dev.yml run --rm front yarn run unit
+
+We also support a "watch and test" mode were we continually relaunch
+tests when changes are recorded on the file system::
+
+    docker-compose -f dev.yml run --rm front yarn run unit-watch
+
+The latter is especially useful when you are debugging failing tests.
+
+.. note::
+
+    The front-end test suite coverage is still pretty low
+
+
+Stopping everything
+^^^^^^^^^^^^^^^^^^^
+
+Once you're down with your work, you can stop running containers, if any, with::
+
+    docker-compose -f dev.yml stop
+
+
+Removing everything
+^^^^^^^^^^^^^^^^^^^
+
+If you want to wipe your development environment completely (e.g. if you want to start over from scratch), just run::
+
+    docker-compose -f dev.yml down -v
+
+This will wipe your containers and data, so please be careful before running it.
+
+You can keep your data by removing the ``-v`` flag.
+
+
+Typical workflow for a merge request
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0. Fork the project if you did not already or if you do not have access to the main repository
+1. Checkout the development branch and pull most recent changes: ``git checkout develop && git pull``
+2. Create a dedicated branch for your work ``42-awesome-fix``. It is good practice to prefix your branch name with the ID of the issue you are solving.
+3. Work on your stuff
+4. Commit small, atomic changes to make it easier to review your contribution
+5. Add a changelog fragment to summarize your changes: ``echo "Implemented awesome stuff (#42)" > changes/changelog.d/42.feature"``
+6. Push your branch
+7. Create your merge request
+8. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
