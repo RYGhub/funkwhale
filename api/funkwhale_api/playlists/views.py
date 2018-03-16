@@ -32,7 +32,12 @@ class PlaylistViewSet(
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        return serializer.save(user=self.request.user)
+        return serializer.save(
+            user=self.request.user,
+            privacy_level=serializer.validated_data.get(
+                'privacy_level', self.request.user.privacy_level)
+
+        )
 
 
 class PlaylistTrackViewSet(
