@@ -182,7 +182,7 @@ $sidebar-color: #1B1C1D;
 
 .menu-area {
   .menu .item:not(.active):not(:hover) {
-    background-color: rgba(255, 255, 255, 0.15);
+    opacity: 0.75;
   }
 
   .menu .item {
@@ -225,14 +225,27 @@ $sidebar-color: #1B1C1D;
 .logo {
   cursor: pointer;
   display: inline-block;
+  margin: 0px;
 }
 
 .ui.search {
-  display: block;
+  display: flex;
   .collapse.button {
     margin-right: 0.5rem;
     margin-top: 0.5rem;
     float: right;
+  }
+}
+
+</style>
+
+<style lang="scss">
+.sidebar {
+  .ui.search .input {
+    flex: 1;
+    .prompt {
+      border-radius: 0;
+    }
   }
 }
 </style>
