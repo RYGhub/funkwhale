@@ -159,7 +159,7 @@ $sidebar-color: #3D3E3F;
   }
   @include media(">desktop") {
     .collapse.button {
-      display: none;
+      display: none !important;
     }
   }
   @include media("<desktop") {
@@ -193,7 +193,7 @@ $sidebar-color: #3D3E3F;
   .menu .item.active {
     background-color: $sidebar-color;
     &:hover {
-    background-color: rgba(255, 255, 255, 0.06);
+      background-color: rgba(255, 255, 255, 0.06);
     }
   }
 }
@@ -231,10 +231,13 @@ $sidebar-color: #3D3E3F;
 
 .ui.search {
   display: flex;
-  .collapse.button {
-    margin-right: 0.5rem;
-    margin-top: 0.5rem;
-    float: right;
+
+  .collapse.button, .collapse.button:hover, .collapse.button:active {
+    box-shadow: none !important;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 
