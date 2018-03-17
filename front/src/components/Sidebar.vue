@@ -70,7 +70,7 @@
               <td>
                 <template v-if="$store.getters['favorites/isFavorite'](track.id)">
                   <i class="pink heart icon"></i>
-                </template
+                </template>
               </td>
               <td>
                   <i @click.stop="cleanTrack(index)" class="circular trash icon"></i>
