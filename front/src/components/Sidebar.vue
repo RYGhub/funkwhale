@@ -148,7 +148,7 @@ export default {
 <style scoped lang="scss">
 @import '../style/vendor/media';
 
-$sidebar-color: #1B1C1D;
+$sidebar-color: #3D3E3F;
 
 .sidebar {
 	background: $sidebar-color;
@@ -176,7 +176,8 @@ $sidebar-color: #1B1C1D;
     margin: 0;
     background-color: $sidebar-color;
   }
-  .menu {
+  .menu.vertical {
+    background: $sidebar-color;
   }
 }
 
@@ -192,7 +193,7 @@ $sidebar-color: #1B1C1D;
   .menu .item.active {
     background-color: $sidebar-color;
     &:hover {
-      background-color: $sidebar-color;      
+    background-color: rgba(255, 255, 255, 0.06);
     }
   }
 }
