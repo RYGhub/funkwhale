@@ -181,11 +181,20 @@ $sidebar-color: #1B1C1D;
 }
 
 .menu-area {
-  padding: 0.5rem;
   .menu .item:not(.active):not(:hover) {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.15);
   }
 
+  .menu .item {
+    border-radius: 0;
+  }
+
+  .menu .item.active {
+    background-color: $sidebar-color;
+    &:hover {
+      background-color: $sidebar-color;      
+    }
+  }
 }
 .tabs {
   overflow-y: auto;
