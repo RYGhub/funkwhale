@@ -1,5 +1,6 @@
 from rest_framework import generics, mixins, viewsets
 from rest_framework import status
+from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -27,6 +28,17 @@ class PlaylistViewSet(
         IsAuthenticatedOrReadOnly,
     ]
 
+    @detail_route(methods=['get'])
+    def tracks(self, request, *args, **kwargs):
+        playlist = self.get_object()
+        plts = playlist.playlist_tracks.all()
+        serializer = serializers.PlaylistTrackSerializer(plts, many=True)
+        data = {
+            'count': len(plts),
+            'result': serializer.data
+        }
+        return Response(data, status=200)
+
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(self.request.user))
@@ -36,7 +48,6 @@ class PlaylistViewSet(
             user=self.request.user,
             privacy_level=serializer.validated_data.get(
                 'privacy_level', self.request.user.privacy_level)
-
         )
 
 

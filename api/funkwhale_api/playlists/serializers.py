@@ -22,9 +22,8 @@ class PlaylistTrackCreateSerializer(serializers.ModelSerializer):
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
-    playlist_tracks = PlaylistTrackSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Playlist
-        fields = ('id', 'name', 'privacy_level', 'creation_date', 'playlist_tracks')
-        read_only_fields = ['id', 'playlist_tracks', 'creation_date']
+        fields = ('id', 'name', 'privacy_level', 'creation_date')
+        read_only_fields = ['id', 'creation_date']

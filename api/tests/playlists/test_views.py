@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from funkwhale_api.playlists import models
-from funkwhale_api.playlists.serializers import PlaylistSerializer
+from funkwhale_api.playlists import serializers
 
 
 def test_can_create_playlist_via_api(logged_in_api_client):
@@ -48,6 +48,7 @@ def test_can_add_playlist_track_via_api(factories, logged_in_api_client):
     }
 
     response = logged_in_api_client.post(url, data)
+    assert response.status_code == 201
     plts = logged_in_api_client.user.playlists.latest('id').playlist_tracks.all()
     assert plts.first().track == tracks[0]
 
@@ -114,3 +115,16 @@ def test_playlist_track_privacy_respected_in_list_anon(
     response = api_client.get(url)
 
     assert response.data['count'] == 0
+
+
+@pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
+def test_can_list_tracks_from_playlist(
+        level, factories, logged_in_api_client):
+    plt = factories['playlists.PlaylistTrack'](
+        playlist__user=logged_in_api_client.user)
+    url = reverse('api:v1:playlists-tracks', kwargs={'pk': plt.playlist.pk})
+    response = logged_in_api_client.get(url)
+    serialized_plt = serializers.PlaylistTrackSerializer(plt).data
+
+    assert response.data['count'] == 1
+    assert response.data['result'][0] == serialized_plt
