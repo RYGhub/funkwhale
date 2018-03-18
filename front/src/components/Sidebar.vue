@@ -241,6 +241,9 @@ $sidebar-color: #3D3E3F;
   }
 }
 
+.ui.message.black {
+  background: $sidebar-color;
+}
 </style>
 
 <style lang="scss">
