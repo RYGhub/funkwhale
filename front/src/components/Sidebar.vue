@@ -148,7 +148,7 @@ export default {
 <style scoped lang="scss">
 @import '../style/vendor/media';
 
-$sidebar-color: #1B1C1D;
+$sidebar-color: #3D3E3F;
 
 .sidebar {
 	background: $sidebar-color;
@@ -159,7 +159,7 @@ $sidebar-color: #1B1C1D;
   }
   @include media(">desktop") {
     .collapse.button {
-      display: none;
+      display: none !important;
     }
   }
   @include media("<desktop") {
@@ -176,16 +176,26 @@ $sidebar-color: #1B1C1D;
     margin: 0;
     background-color: $sidebar-color;
   }
-  .menu {
+  .menu.vertical {
+    background: $sidebar-color;
   }
 }
 
 .menu-area {
-  padding: 0.5rem;
   .menu .item:not(.active):not(:hover) {
-    background-color: rgba(255, 255, 255, 0.06);
+    opacity: 0.75;
   }
 
+  .menu .item {
+    border-radius: 0;
+  }
+
+  .menu .item.active {
+    background-color: $sidebar-color;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+  }
 }
 .tabs {
   overflow-y: auto;
@@ -216,14 +226,33 @@ $sidebar-color: #1B1C1D;
 .logo {
   cursor: pointer;
   display: inline-block;
+  margin: 0px;
 }
 
 .ui.search {
-  display: block;
-  .collapse.button {
-    margin-right: 0.5rem;
-    margin-top: 0.5rem;
-    float: right;
+  display: flex;
+
+  .collapse.button, .collapse.button:hover, .collapse.button:active {
+    box-shadow: none !important;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.ui.message.black {
+  background: $sidebar-color;
+}
+</style>
+
+<style lang="scss">
+.sidebar {
+  .ui.search .input {
+    flex: 1;
+    .prompt {
+      border-radius: 0;
+    }
   }
 }
 </style>
