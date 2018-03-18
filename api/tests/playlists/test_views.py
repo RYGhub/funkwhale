@@ -1,4 +1,6 @@
 import json
+import pytest
+
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -48,3 +50,67 @@ def test_can_add_playlist_track_via_api(factories, logged_in_api_client):
     response = logged_in_api_client.post(url, data)
     plts = logged_in_api_client.user.playlists.latest('id').playlist_tracks.all()
     assert plts.first().track == tracks[0]
+
+
+@pytest.mark.parametrize('name,method', [
+    ('api:v1:playlist-tracks-list', 'post'),
+    ('api:v1:playlists-list', 'post'),
+])
+def test_url_requires_login(name, method, factories, api_client):
+    url = reverse(name)
+
+    response = getattr(api_client, method)(url, {})
+
+    assert response.status_code == 401
+
+
+def test_only_can_add_track_on_own_playlist_via_api(
+        factories, logged_in_api_client):
+    track = factories['music.Track']()
+    playlist = factories['playlists.Playlist']()
+    url = reverse('api:v1:playlist-tracks-list')
+    data = {
+        'playlist': playlist.pk,
+        'track': track.pk
+    }
+
+    response = logged_in_api_client.post(url, data)
+    assert response.status_code == 400
+    assert playlist.playlist_tracks.count() == 0
+
+
+@pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
+def test_playlist_privacy_respected_in_list_anon(level, factories, api_client):
+    factories['playlists.Playlist'](privacy_level=level)
+    url = reverse('api:v1:playlists-list')
+    response = api_client.get(url)
+
+    assert response.data['count'] == 0
+
+
+@pytest.mark.parametrize('method', ['PUT', 'PATCH', 'DELETE'])
+def test_only_owner_can_edit_playlist(method, factories, api_client):
+    playlist = factories['playlists.Playlist']()
+    url = reverse('api:v1:playlists-detail', kwargs={'pk': playlist.pk})
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize('method', ['PUT', 'PATCH', 'DELETE'])
+def test_only_owner_can_edit_playlist_track(method, factories, api_client):
+    plt = factories['playlists.PlaylistTrack']()
+    url = reverse('api:v1:playlist-tracks-detail', kwargs={'pk': plt.pk})
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
+def test_playlist_track_privacy_respected_in_list_anon(
+        level, factories, api_client):
+    factories['playlists.PlaylistTrack'](playlist__privacy_level=level)
+    url = reverse('api:v1:playlist-tracks-list')
+    response = api_client.get(url)
+
+    assert response.data['count'] == 0
