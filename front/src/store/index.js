@@ -8,6 +8,7 @@ import instance from './instance'
 import queue from './queue'
 import radios from './radios'
 import player from './player'
+import playlists from './playlists'
 import ui from './ui'
 
 Vue.use(Vuex)
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     instance,
     queue,
     radios,
+    playlists,
     player
   },
   plugins: [

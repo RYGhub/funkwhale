@@ -91,6 +91,7 @@ export default {
         commit('profile', data)
         commit('username', data.username)
         dispatch('favorites/fetch', null, {root: true})
+        dispatch('playlists/fetchOwn', null, {root: true})
         Object.keys(data.permissions).forEach(function (key) {
           // this makes it easier to check for permissions in templates
           commit('permission', {key, status: data.permissions[String(key)].status})
