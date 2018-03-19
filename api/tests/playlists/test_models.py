@@ -5,6 +5,7 @@ from django import forms
 
 def test_can_insert_plt(factories):
     plt = factories['playlists.PlaylistTrack']()
+    modification_date = plt.playlist.modification_date
 
     assert plt.index is None
 
@@ -12,6 +13,7 @@ def test_can_insert_plt(factories):
     plt.refresh_from_db()
 
     assert plt.index == 0
+    assert plt.playlist.modification_date > modification_date
 
 
 def test_insert_use_last_idx_by_default(factories):

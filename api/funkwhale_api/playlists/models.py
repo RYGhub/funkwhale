@@ -11,6 +11,8 @@ class Playlist(models.Model):
     user = models.ForeignKey(
         'users.User', related_name="playlists", on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
     privacy_level = fields.get_privacy_field()
 
     def __str__(self):
@@ -65,10 +67,13 @@ class Playlist(models.Model):
 
         plt.index = index
         plt.save(update_fields=['index'])
+        self.save(update_fields=['modification_date'])
         return index
 
+    @transaction.atomic
     def remove(self, index):
         existing = self.playlist_tracks.select_for_update()
+        self.save(update_fields=['modification_date'])
         to_update = existing.filter(index__gt=index)
         return to_update.update(index=models.F('index') - 1)
 

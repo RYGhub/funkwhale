@@ -23,6 +23,16 @@ def test_can_create_playlist_via_api(logged_in_api_client):
     assert playlist.privacy_level == 'everyone'
 
 
+def test_serializer_includes_tracks_count(factories, logged_in_api_client):
+    playlist = factories['playlists.Playlist']()
+    plt = factories['playlists.PlaylistTrack'](playlist=playlist)
+
+    url = reverse('api:v1:playlists-detail', kwargs={'pk': playlist.pk})
+    response = logged_in_api_client.get(url)
+
+    assert response.data['tracks_count'] == 1
+
+
 def test_playlist_inherits_user_privacy(logged_in_api_client):
     url = reverse('api:v1:playlists-list')
     user = logged_in_api_client.user

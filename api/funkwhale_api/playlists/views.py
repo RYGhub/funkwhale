@@ -1,3 +1,5 @@
+from django.db.models import Count
+
 from rest_framework import generics, mixins, viewsets
 from rest_framework import status
 from rest_framework.decorators import detail_route
@@ -8,6 +10,7 @@ from funkwhale_api.music.models import Track
 from funkwhale_api.common import permissions
 from funkwhale_api.common import fields
 
+from . import filters
 from . import models
 from . import serializers
 
@@ -21,13 +24,17 @@ class PlaylistViewSet(
         viewsets.GenericViewSet):
 
     serializer_class = serializers.PlaylistSerializer
-    queryset = (models.Playlist.objects.all())
+    queryset = (
+        models.Playlist.objects.all()
+              .annotate(tracks_count=Count('playlist_tracks'))
+    )
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
         IsAuthenticatedOrReadOnly,
     ]
     owner_checks = ['write']
+    filter_class = filters.PlaylistFilter
 
     @detail_route(methods=['get'])
     def tracks(self, request, *args, **kwargs):

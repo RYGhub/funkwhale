@@ -62,8 +62,25 @@ class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
+    tracks_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Playlist
-        fields = ('id', 'name', 'privacy_level', 'creation_date')
-        read_only_fields = ['id', 'creation_date']
+        fields = (
+            'id',
+            'name',
+            'tracks_count',
+            'privacy_level',
+            'creation_date',
+            'modification_date')
+        read_only_fields = [
+            'id',
+            'modification_date',
+            'creation_date',]
+
+    def get_tracks_count(self, obj):
+        try:
+            return obj.tracks_count
+        except AttributeError:
+            # no annotation?
+            return obj.playlist_tracks.count()
