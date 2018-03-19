@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from taggit.models import Tag
 
@@ -19,6 +20,14 @@ class PlaylistTrackCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PlaylistTrack
         fields = ('id', 'track', 'playlist', 'position')
+
+    def validate_playlist(self, value):
+        existing = value.playlist_tracks.count()
+        if existing >= settings.PLAYLISTS_MAX_TRACKS:
+            raise serializers.ValidationError(
+                'Playlist has reached the maximum of {} tracks'.format(
+                    settings.PLAYLISTS_MAX_TRACKS))
+        return value
 
 
 class PlaylistSerializer(serializers.ModelSerializer):

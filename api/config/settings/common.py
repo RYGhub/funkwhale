@@ -383,3 +383,6 @@ CACHEOPS = {
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')
 CSRF_USE_SESSIONS = True
+
+# Playlist settings
+PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=500)
