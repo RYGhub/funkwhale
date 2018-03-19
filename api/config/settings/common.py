@@ -57,7 +57,6 @@ THIRD_PARTY_APPS = (
     'taggit',
     'rest_auth',
     'rest_auth.registration',
-    'mptt',
     'dynamic_preferences',
     'django_filters',
     'cacheops',

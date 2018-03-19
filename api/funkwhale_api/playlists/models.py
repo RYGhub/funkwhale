@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from mptt.models import MPTTModel, TreeOneToOneField
-
 from funkwhale_api.common import fields
 
 
@@ -28,18 +26,10 @@ class PlaylistTrack(MPTTModel):
         'music.Track',
         related_name='playlist_tracks',
         on_delete=models.CASCADE)
-    previous = TreeOneToOneField(
-        'self',
-        blank=True,
-        null=True,
-        related_name='next',
-        on_delete=models.CASCADE)
+    index = models.PositiveIntegerField(null=True)
     playlist = models.ForeignKey(
         Playlist, related_name='playlist_tracks', on_delete=models.CASCADE)
 
-    class MPTTMeta:
-        level_attr = 'position'
-        parent_attr = 'previous'
-
     class Meta:
-        ordering = ('-playlist', 'position')
+        ordering = ('-playlist', 'index')
+        unique_together = ('playlist', 'index')
