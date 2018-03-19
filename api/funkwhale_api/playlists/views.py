@@ -27,6 +27,7 @@ class PlaylistViewSet(
         permissions.OwnerPermission,
         IsAuthenticatedOrReadOnly,
     ]
+    owner_checks = ['write']
 
     @detail_route(methods=['get'])
     def tracks(self, request, *args, **kwargs):
@@ -66,25 +67,19 @@ class PlaylistTrackViewSet(
         permissions.OwnerPermission,
         IsAuthenticatedOrReadOnly,
     ]
+    owner_field = 'playlist.user'
+    owner_checks = ['write']
 
-    def create(self, request, *args, **kwargs):
-        serializer = serializers.PlaylistTrackCreateSerializer(
-            data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if serializer.validated_data['playlist'].user != request.user:
-            return Response(
-                {'playlist': [
-                    'This playlist does not exists or you do not have the'
-                    'permission to edit it']
-                },
-                status=400)
-        instance = self.perform_create(serializer)
-        serializer = self.get_serializer(instance=instance)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE', 'POST']:
+            return serializers.PlaylistTrackWriteSerializer
+        return self.serializer_class
 
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(
                 self.request.user,
                 lookup_field='playlist__privacy_level'))
+
+    def perform_destroy(self, instance):
+        instance.delete(update_indexes=True)

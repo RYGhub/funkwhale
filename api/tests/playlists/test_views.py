@@ -80,6 +80,21 @@ def test_only_can_add_track_on_own_playlist_via_api(
     assert playlist.playlist_tracks.count() == 0
 
 
+def test_deleting_plt_updates_indexes(
+        mocker, factories, logged_in_api_client):
+    remove = mocker.spy(models.Playlist, 'remove')
+    track = factories['music.Track']()
+    plt = factories['playlists.PlaylistTrack'](
+        index=0,
+        playlist__user=logged_in_api_client.user)
+    url = reverse('api:v1:playlist-tracks-detail', kwargs={'pk': plt.pk})
+
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+    remove.assert_called_once_with(plt.playlist, 0)
+
+
 @pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
 def test_playlist_privacy_respected_in_list_anon(level, factories, api_client):
     factories['playlists.Playlist'](privacy_level=level)

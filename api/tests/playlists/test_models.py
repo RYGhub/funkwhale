@@ -72,3 +72,18 @@ def test_cannot_insert_at_negative_index(factories):
     new = factories['playlists.PlaylistTrack'](playlist=plt.playlist)
     with pytest.raises(forms.ValidationError):
         plt.playlist.insert(new, -1)
+
+
+def test_remove_update_indexes(factories):
+    playlist = factories['playlists.Playlist']()
+    first = factories['playlists.PlaylistTrack'](playlist=playlist, index=0)
+    second = factories['playlists.PlaylistTrack'](playlist=playlist, index=1)
+    third = factories['playlists.PlaylistTrack'](playlist=playlist, index=2)
+
+    second.delete(update_indexes=True)
+
+    first.refresh_from_db()
+    third.refresh_from_db()
+
+    assert first.index == 0
+    assert third.index == 1

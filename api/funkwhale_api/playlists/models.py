@@ -67,13 +67,18 @@ class Playlist(models.Model):
         plt.save(update_fields=['index'])
         return index
 
+    def remove(self, index):
+        existing = self.playlist_tracks.select_for_update()
+        to_update = existing.filter(index__gt=index)
+        return to_update.update(index=models.F('index') - 1)
+
 
 class PlaylistTrack(models.Model):
     track = models.ForeignKey(
         'music.Track',
         related_name='playlist_tracks',
         on_delete=models.CASCADE)
-    index = models.PositiveIntegerField(null=True)
+    index = models.PositiveIntegerField(null=True, blank=True)
     playlist = models.ForeignKey(
         Playlist, related_name='playlist_tracks', on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
@@ -81,3 +86,12 @@ class PlaylistTrack(models.Model):
     class Meta:
         ordering = ('-playlist', 'index')
         unique_together = ('playlist', 'index')
+
+    def delete(self, *args, **kwargs):
+        playlist = self.playlist
+        index = self.index
+        update_indexes = kwargs.pop('update_indexes', False)
+        r = super().delete(*args, **kwargs)
+        if index is not None and update_indexes:
+            playlist.remove(index)
+        return r
