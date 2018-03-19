@@ -30,7 +30,12 @@
               </router-link>
             </div>
             <div class="description">
-              <track-favorite-icon :track="currentTrack"></track-favorite-icon>
+              <track-favorite-icon
+                v-if="$store.state.auth.authenticated"
+                :track="currentTrack"></track-favorite-icon>
+              <track-playlist-icon
+                v-if="$store.state.auth.authenticated"
+                :track="currentTrack"></track-playlist-icon>
             </div>
           </div>
         </div>
@@ -140,11 +145,13 @@ import ColorThief from '@/vendor/color-thief'
 import Track from '@/audio/track'
 import AudioTrack from '@/components/audio/Track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
+import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 
 export default {
   name: 'player',
   components: {
     TrackFavoriteIcon,
+    TrackPlaylistIcon,
     GlobalEvents,
     AudioTrack
   },
@@ -281,6 +288,7 @@ export default {
     cursor: pointer
 }
 .track-area {
+  margin-top: 0;
   .header, .meta, .artist, .album {
     color: white !important;
   }
@@ -384,4 +392,5 @@ export default {
 .ui.feed.icon {
   margin: 0;
 }
+
 </style>
