@@ -19,7 +19,7 @@ class PlaylistTrackCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.PlaylistTrack
-        fields = ('id', 'track', 'playlist', 'position')
+        fields = ('id', 'track', 'playlist', 'index')
 
     def validate_playlist(self, value):
         existing = value.playlist_tracks.count()

@@ -12,6 +12,6 @@ class PlaylistAdmin(admin.ModelAdmin):
 
 @admin.register(models.PlaylistTrack)
 class PlaylistTrackAdmin(admin.ModelAdmin):
-    list_display = ['playlist', 'track', 'position', ]
+    list_display = ['playlist', 'track', 'index']
     search_fields = ['track__name', 'playlist__name']
     list_select_related = True

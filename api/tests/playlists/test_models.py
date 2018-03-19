@@ -1,20 +1,74 @@
+import pytest
+
+from django import forms
 
 
-def test_can_create_playlist(factories):
-    tracks = factories['music.Track'].create_batch(5)
+def test_can_insert_plt(factories):
+    plt = factories['playlists.PlaylistTrack']()
+
+    assert plt.index is None
+
+    plt.playlist.insert(plt)
+    plt.refresh_from_db()
+
+    assert plt.index == 0
+
+
+def test_insert_use_last_idx_by_default(factories):
     playlist = factories['playlists.Playlist']()
+    plts = factories['playlists.PlaylistTrack'].create_batch(
+        size=3, playlist=playlist)
 
-    previous = None
-    for track in tracks:
-        previous = playlist.add_track(track, previous=previous)
+    for i, plt in enumerate(plts):
+        index = playlist.insert(plt)
+        plt.refresh_from_db()
 
-    playlist_tracks = list(playlist.playlist_tracks.all())
+        assert index == i
+        assert plt.index == i
 
-    previous = None
-    for idx, track in enumerate(tracks):
-        plt = playlist_tracks[idx]
-        assert plt.position == idx
-        assert plt.track == track
-        if previous:
-            assert playlist_tracks[idx + 1] == previous
-        assert plt.playlist == playlist
+def test_can_insert_at_index(factories):
+    playlist = factories['playlists.Playlist']()
+    first = factories['playlists.PlaylistTrack'](playlist=playlist)
+    playlist.insert(first)
+    new_first = factories['playlists.PlaylistTrack'](playlist=playlist)
+    index = playlist.insert(new_first, index=0)
+    first.refresh_from_db()
+    new_first.refresh_from_db()
+
+    assert index == 0
+    assert first.index == 1
+    assert new_first.index == 0
+
+
+def test_can_insert_and_move(factories):
+    playlist = factories['playlists.Playlist']()
+    first = factories['playlists.PlaylistTrack'](playlist=playlist)
+    second = factories['playlists.PlaylistTrack'](playlist=playlist)
+    third = factories['playlists.PlaylistTrack'](playlist=playlist)
+    playlist.insert(first)
+    playlist.insert(second)
+    playlist.insert(third)
+
+    playlist.insert(second, index=0)
+
+    first.refresh_from_db()
+    second.refresh_from_db()
+    third.refresh_from_db()
+
+    assert third.index == 2
+    assert second.index == 0
+    assert first.index == 1
+
+
+def test_cannot_insert_at_wrong_index(factories):
+    plt = factories['playlists.PlaylistTrack']()
+    new = factories['playlists.PlaylistTrack'](playlist=plt.playlist)
+    with pytest.raises(forms.ValidationError):
+        plt.playlist.insert(new, 2)
+
+
+def test_cannot_insert_at_negative_index(factories):
+    plt = factories['playlists.PlaylistTrack']()
+    new = factories['playlists.PlaylistTrack'](playlist=plt.playlist)
+    with pytest.raises(forms.ValidationError):
+        plt.playlist.insert(new, -1)
