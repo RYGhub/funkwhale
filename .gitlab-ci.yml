@@ -16,7 +16,7 @@ test_api:
   stage: test
   image: funkwhale/funkwhale:latest
   cache:
-    key: "$CI_PROJECT_ID/pip_cache"
+    key: "$CI_PROJECT_ID__pip_cache"
     paths:
       - "$PIP_CACHE_DIR"
   variables:
@@ -46,7 +46,7 @@ test_front:
     - yarn install
     - yarn run unit
   cache:
-    key: "$CI_PROJECT_ID/front_dependencies"
+    key: "$CI_PROJECT_ID__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
@@ -68,7 +68,7 @@ build_front:
     - yarn install
     - yarn run build
   cache:
-    key: "$CI_PROJECT_ID/front_dependencies"
+    key: "$CI_PROJECT_ID__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
