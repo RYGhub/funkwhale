@@ -9,7 +9,7 @@
   <i
     v-else
     @click="$store.commit('playlists/chooseTrack', track)"
-    :class="['favorite-icon', 'list', 'link', 'icon']"
+    :class="['playlist-icon', 'list', 'link', 'icon']"
     title="Add to playlist...">
   </i>
 </template>
