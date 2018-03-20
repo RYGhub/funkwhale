@@ -1,5 +1,7 @@
 from django.db.models import Count
+from django.db import transaction
 
+from rest_framework import exceptions
 from rest_framework import generics, mixins, viewsets
 from rest_framework import status
 from rest_framework.decorators import detail_route
@@ -25,7 +27,7 @@ class PlaylistViewSet(
 
     serializer_class = serializers.PlaylistSerializer
     queryset = (
-        models.Playlist.objects.all()
+        models.Playlist.objects.all().select_related('user')
               .annotate(tracks_count=Count('playlist_tracks'))
     )
     permission_classes = [
@@ -35,6 +37,11 @@ class PlaylistViewSet(
     ]
     owner_checks = ['write']
     filter_class = filters.PlaylistFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE', 'POST']:
+            return serializers.PlaylistWriteSerializer
+        return self.serializer_class
 
     @detail_route(methods=['get'])
     def tracks(self, request, *args, **kwargs):
@@ -46,6 +53,24 @@ class PlaylistViewSet(
             'results': serializer.data
         }
         return Response(data, status=200)
+
+    @detail_route(methods=['post'])
+    @transaction.atomic
+    def add(self, request, *args, **kwargs):
+        playlist = self.get_object()
+        serializer = serializers.PlaylistAddManySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            plts = playlist.insert_many(serializer.validated_data['tracks'])
+        except exceptions.ValidationError as e:
+            payload = {'playlist': e.detail}
+            return Response(payload, status=400)
+        serializer = serializers.PlaylistTrackSerializer(plts, many=True)
+        data = {
+            'count': len(plts),
+            'results': serializer.data
+        }
+        return Response(data, status=201)
 
     def get_queryset(self):
         return self.queryset.filter(

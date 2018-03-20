@@ -1,6 +1,6 @@
 import pytest
 
-from django import forms
+from rest_framework import exceptions
 
 
 def test_can_insert_plt(factories):
@@ -79,14 +79,14 @@ def test_can_insert_and_move_last_to_0(factories):
 def test_cannot_insert_at_wrong_index(factories):
     plt = factories['playlists.PlaylistTrack']()
     new = factories['playlists.PlaylistTrack'](playlist=plt.playlist)
-    with pytest.raises(forms.ValidationError):
+    with pytest.raises(exceptions.ValidationError):
         plt.playlist.insert(new, 2)
 
 
 def test_cannot_insert_at_negative_index(factories):
     plt = factories['playlists.PlaylistTrack']()
     new = factories['playlists.PlaylistTrack'](playlist=plt.playlist)
-    with pytest.raises(forms.ValidationError):
+    with pytest.raises(exceptions.ValidationError):
         plt.playlist.insert(new, -1)
 
 
@@ -103,3 +103,24 @@ def test_remove_update_indexes(factories):
 
     assert first.index == 0
     assert third.index == 1
+
+
+def test_can_insert_many(factories):
+    playlist = factories['playlists.Playlist']()
+    existing = factories['playlists.PlaylistTrack'](playlist=playlist, index=0)
+    tracks = factories['music.Track'].create_batch(size=3)
+    plts = playlist.insert_many(tracks)
+    for i, plt in enumerate(plts):
+        assert plt.index == i + 1
+        assert plt.track == tracks[i]
+        assert plt.playlist == playlist
+
+
+def test_insert_many_honor_max_tracks(factories, settings):
+    settings.PLAYLISTS_MAX_TRACKS = 4
+    playlist = factories['playlists.Playlist']()
+    plts = factories['playlists.PlaylistTrack'].create_batch(
+        size=2, playlist=playlist)
+    track = factories['music.Track']()
+    with pytest.raises(exceptions.ValidationError):
+        playlist.insert_many([track, track, track])

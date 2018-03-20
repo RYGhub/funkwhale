@@ -1,7 +1,9 @@
-from django import forms
+from django.conf import settings
 from django.db import models
 from django.db import transaction
 from django.utils import timezone
+
+from rest_framework import exceptions
 
 from funkwhale_api.common import fields
 
@@ -40,17 +42,15 @@ class Playlist(models.Model):
             index = total
 
         if index > total:
-            raise forms.ValidationError('Index is not continuous')
+            raise exceptions.ValidationError('Index is not continuous')
 
         if index < 0:
-            raise forms.ValidationError('Index must be zero or positive')
+            raise exceptions.ValidationError('Index must be zero or positive')
 
         if move:
             # we remove the index temporarily, to avoid integrity errors
             plt.index = None
             plt.save(update_fields=['index'])
-
-        if move:
             if index > old_index:
                 # new index is higher than current, we decrement previous tracks
                 to_update = existing.filter(
@@ -58,8 +58,7 @@ class Playlist(models.Model):
                 to_update.update(index=models.F('index') - 1)
             if index < old_index:
                 # new index is lower than current, we increment next tracks
-                to_update = existing.filter(
-                    index__lt=old_index, index__gte=index)
+                to_update = existing.filter(index__lt=old_index, index__gte=index)
                 to_update.update(index=models.F('index') + 1)
         else:
             to_update = existing.filter(index__gte=index)
@@ -76,6 +75,24 @@ class Playlist(models.Model):
         self.save(update_fields=['modification_date'])
         to_update = existing.filter(index__gt=index)
         return to_update.update(index=models.F('index') - 1)
+
+    @transaction.atomic
+    def insert_many(self, tracks):
+        existing = self.playlist_tracks.select_for_update()
+        now = timezone.now()
+        total = existing.filter(index__isnull=False).count()
+        if existing.count() + len(tracks) > settings.PLAYLISTS_MAX_TRACKS:
+            raise exceptions.ValidationError(
+                'Playlist would reach the maximum of {} tracks'.format(
+                    settings.PLAYLISTS_MAX_TRACKS))
+        self.save(update_fields=['modification_date'])
+        start = total
+        plts = [
+            PlaylistTrack(
+                creation_date=now, playlist=self, track=track, index=start+i)
+            for i, track in enumerate(tracks)
+        ]
+        return PlaylistTrack.objects.bulk_create(plts)
 
 
 class PlaylistTrack(models.Model):

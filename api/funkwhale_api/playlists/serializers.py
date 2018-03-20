@@ -3,8 +3,9 @@ from django.db import transaction
 from rest_framework import serializers
 from taggit.models import Tag
 
+from funkwhale_api.music.models import Track
 from funkwhale_api.music.serializers import TrackSerializerNested
-
+from funkwhale_api.users.serializers import UserBasicSerializer
 from . import models
 
 
@@ -61,20 +62,34 @@ class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
         return []
 
 
+class PlaylistWriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Playlist
+        fields = [
+            'id',
+            'name',
+            'privacy_level',
+        ]
+
+
 class PlaylistSerializer(serializers.ModelSerializer):
     tracks_count = serializers.SerializerMethodField()
+    user = UserBasicSerializer()
 
     class Meta:
         model = models.Playlist
         fields = (
             'id',
             'name',
+            'user',
             'tracks_count',
             'privacy_level',
             'creation_date',
             'modification_date')
         read_only_fields = [
             'id',
+            'user',
             'modification_date',
             'creation_date',]
 
@@ -84,3 +99,8 @@ class PlaylistSerializer(serializers.ModelSerializer):
         except AttributeError:
             # no annotation?
             return obj.playlist_tracks.count()
+
+
+class PlaylistAddManySerializer(serializers.Serializer):
+    tracks = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Track.objects.for_nested_serialization())

@@ -153,3 +153,20 @@ def test_can_list_tracks_from_playlist(
 
     assert response.data['count'] == 1
     assert response.data['results'][0] == serialized_plt
+
+
+def test_can_add_multiple_tracks_at_once_via_api(
+        factories, mocker, logged_in_api_client):
+    playlist = factories['playlists.Playlist'](user=logged_in_api_client.user)
+    tracks = factories['music.Track'].create_batch(size=5)
+    track_ids = [t.id for t in tracks]
+    mocker.spy(playlist, 'insert_many')
+    url = reverse('api:v1:playlists-add', kwargs={'pk': playlist.pk})
+    response = logged_in_api_client.post(url, {'tracks': track_ids})
+
+    assert response.status_code == 201
+    assert playlist.playlist_tracks.count() == len(track_ids)
+
+    for plt in playlist.playlist_tracks.order_by('index'):
+        assert response.data['results'][plt.index]['id'] == plt.id
+        assert plt.track == tracks[plt.index]
