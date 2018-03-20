@@ -94,6 +94,15 @@ class Playlist(models.Model):
         ]
         return PlaylistTrack.objects.bulk_create(plts)
 
+class PlaylistTrackQuerySet(models.QuerySet):
+    def for_nested_serialization(self):
+        return (self.select_related()
+                    .select_related('track__album__artist')
+                    .prefetch_related(
+                        'track__tags',
+                        'track__files',
+                        'track__artist__albums__tracks__tags'))
+
 
 class PlaylistTrack(models.Model):
     track = models.ForeignKey(
@@ -104,6 +113,8 @@ class PlaylistTrack(models.Model):
     playlist = models.ForeignKey(
         Playlist, related_name='playlist_tracks', on_delete=models.CASCADE)
     creation_date = models.DateTimeField(default=timezone.now)
+
+    objects = PlaylistTrackQuerySet.as_manager()
 
     class Meta:
         ordering = ('-playlist', 'index')

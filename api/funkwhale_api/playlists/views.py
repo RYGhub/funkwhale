@@ -46,7 +46,7 @@ class PlaylistViewSet(
     @detail_route(methods=['get'])
     def tracks(self, request, *args, **kwargs):
         playlist = self.get_object()
-        plts = playlist.playlist_tracks.all()
+        plts = playlist.playlist_tracks.all().for_nested_serialization()
         serializer = serializers.PlaylistTrackSerializer(plts, many=True)
         data = {
             'count': len(plts),
@@ -65,6 +65,9 @@ class PlaylistViewSet(
         except exceptions.ValidationError as e:
             payload = {'playlist': e.detail}
             return Response(payload, status=400)
+        ids = [p.id for p in plts]
+        plts = models.PlaylistTrack.objects.filter(
+            pk__in=ids).order_by('index').for_nested_serialization()
         serializer = serializers.PlaylistTrackSerializer(plts, many=True)
         data = {
             'count': len(plts),
@@ -93,7 +96,7 @@ class PlaylistTrackViewSet(
         viewsets.GenericViewSet):
 
     serializer_class = serializers.PlaylistTrackSerializer
-    queryset = (models.PlaylistTrack.objects.all())
+    queryset = (models.PlaylistTrack.objects.all().for_nested_serialization())
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
