@@ -3,11 +3,20 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
-    playlists: []
+    playlists: [],
+    showModal: false,
+    modalTrack: null
   },
   mutations: {
     playlists (state, value) {
       state.playlists = value
+    },
+    chooseTrack (state, value) {
+      state.showModal = true
+      state.modalTrack = value
+    },
+    showModal (state, value) {
+      state.showModal = value
     }
   },
   actions: {

@@ -1,36 +1,53 @@
 <template>
-  <modal @update:show="update" :show="show">
-    <div class="header">
-      Add track "{{ track.title }}" by {{ track.artist.name }} to playlist
-    </div>
-    <div class="content">
-      <div class="description">
-        <playlist-form></playlist-form>
-        <div class="ui divider"></div>
-        <div v-if="errors.length > 0" class="ui negative message">
-          <div class="header">We cannot add the track to a playlist</div>
-          <ul class="list">
-            <li v-for="error in errors">{{ error }}</li>
-          </ul>
-        </div>
-        <div class="ui items">
-          <div class="item" v-for="playlist in sortedPlaylists">
-            <div class="content">
-              <div class="header">{{ playlist.name }}</div>
-              <div class="meta">
-                <span class="tracks"><i class="music icon"></i> {{ playlist.tracks_count }} tracks</span>
-                <span class="date"><i class="clock icon"></i> Last modification {{ playlist.modification_date | ago}}</span>
-              </div>
-              <div class="extra">
-                <div class="ui basic green button" @click="addToPlaylist(playlist.id)">
-                  Add to this playlist
-                </div>
-              </div>
-            </div>
+  <modal @update:show="update" :show="$store.state.playlists.showModal">
+    <template v-if="track">
+      <div class="header">
+        Add "{{ track.title }}" by {{ track.artist.name }} to one of your playlists
+      </div>
+      <div class="scrolling content">
+        <div class="description">
+          <playlist-form></playlist-form>
+          <div class="ui divider"></div>
+          <div v-if="errors.length > 0" class="ui negative message">
+            <div class="header">We cannot add the track to a playlist</div>
+            <ul class="list">
+              <li v-for="error in errors">{{ error }}</li>
+            </ul>
           </div>
+          <h4 class="ui header">Available playlists</h4>
+          <table class="ui single line unstackable very basic table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th class="sorted descending">Last modification</th>
+                <th>Tracks</th>
+                <th>Visibility</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="playlist in sortedPlaylists">
+                <td><router-link :to="{name: 'library.playlists.detail', params: {id: playlist.id }}">{{ playlist.name }}</router-link></td>
+                <td><human-date :date="playlist.modification_date"></human-date></td>
+                <td>{{ playlist.tracks_count }}</td>
+                <td>{{ playlist.privacy_level }}</td>
+                <td>
+                  <div
+                    class="ui green icon right floated button"
+                    title="Add to this playlist"
+                    @click="addToPlaylist(playlist.id)">
+                  <i class="plus icon"></i>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
+      <div class="actions">
+        <div class="ui cancel button">Cancel</div>
+      </div>
+    </template>
   </modal>
 </template>
 
@@ -48,10 +65,6 @@ export default {
     Modal,
     PlaylistForm
   },
-  props: {
-    track: {type: Object},
-    show: {type: Boolean}
-  },
   data () {
     return {
       errors: []
@@ -59,7 +72,7 @@ export default {
   },
   methods: {
     update (v) {
-      this.$emit('update:show', v)
+      this.$store.commit('playlists/showModal', v)
     },
     addToPlaylist (playlistId) {
       let self = this
@@ -69,7 +82,7 @@ export default {
       }
       return axios.post('playlist-tracks/', payload).then(response => {
         logger.default.info('Successfully added track to playlist')
-        self.$emit('update:show', false)
+        self.update(false)
         self.$store.dispatch('playlists/fetchOwn')
       }, error => {
         logger.default.error('Error while adding track to playlist')
@@ -79,7 +92,8 @@ export default {
   },
   computed: {
     ...mapState({
-      playlists: state => state.playlists.playlists
+      playlists: state => state.playlists.playlists,
+      track: state => state.playlists.modalTrack
     }),
     sortedPlaylists () {
       let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])

@@ -1,28 +1,22 @@
 <template>
   <button
-    @click="showModal = true"
+    @click="$store.commit('playlists/chooseTrack', track)"
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
     Add to playlist...
-    <playlist-modal :track="track" :show.sync="showModal"></playlist-modal>
   </button>
   <i
     v-else
-    @click="showModal = true"
+    @click="$store.commit('playlists/chooseTrack', track)"
     :class="['favorite-icon', 'list', 'link', 'icon']"
     title="Add to playlist...">
-    <playlist-modal :track="track" :show.sync="showModal"></playlist-modal>
   </i>
 </template>
 
 <script>
-import PlaylistModal from '@/components/playlists/PlaylistModal'
 
 export default {
-  components: {
-    PlaylistModal
-  },
   props: {
     track: {type: Object},
     button: {type: Boolean, default: false}
