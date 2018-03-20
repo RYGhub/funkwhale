@@ -36,6 +36,12 @@
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
         <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
         <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
+        <a
+          @click="$store.commit('playlists/chooseTrack', null)"
+          v-if="$store.state.auth.authenticated"
+          class="item">
+          <i class="list icon"></i> Playlists
+        </a>
         <router-link
           v-if="$store.state.auth.authenticated"
           class="item" :to="{path: '/activity'}"><i class="bell icon"></i> Activity</router-link>
