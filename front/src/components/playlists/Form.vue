@@ -74,6 +74,7 @@ export default {
         logger.default.info('Successfully created playlist')
         self.success = true
         self.isLoading = false
+        self.name = ''
         self.$store.dispatch('playlists/fetchOwn')
       }, error => {
         logger.default.error('Error while creating playlist')

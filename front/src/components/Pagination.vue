@@ -64,7 +64,6 @@ export default {
           }
         }
       })
-      console.log(final)
       return final
     },
     maxPage: function () {
