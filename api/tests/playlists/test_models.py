@@ -44,12 +44,9 @@ def test_can_insert_at_index(factories):
 
 def test_can_insert_and_move(factories):
     playlist = factories['playlists.Playlist']()
-    first = factories['playlists.PlaylistTrack'](playlist=playlist)
-    second = factories['playlists.PlaylistTrack'](playlist=playlist)
-    third = factories['playlists.PlaylistTrack'](playlist=playlist)
-    playlist.insert(first)
-    playlist.insert(second)
-    playlist.insert(third)
+    first = factories['playlists.PlaylistTrack'](playlist=playlist, index=0)
+    second = factories['playlists.PlaylistTrack'](playlist=playlist, index=1)
+    third = factories['playlists.PlaylistTrack'](playlist=playlist, index=2)
 
     playlist.insert(second, index=0)
 
@@ -60,6 +57,23 @@ def test_can_insert_and_move(factories):
     assert third.index == 2
     assert second.index == 0
     assert first.index == 1
+
+
+def test_can_insert_and_move_last_to_0(factories):
+    playlist = factories['playlists.Playlist']()
+    first = factories['playlists.PlaylistTrack'](playlist=playlist, index=0)
+    second = factories['playlists.PlaylistTrack'](playlist=playlist, index=1)
+    third = factories['playlists.PlaylistTrack'](playlist=playlist, index=2)
+
+    playlist.insert(third, index=0)
+
+    first.refresh_from_db()
+    second.refresh_from_db()
+    third.refresh_from_db()
+
+    assert third.index == 0
+    assert first.index == 1
+    assert second.index == 2
 
 
 def test_cannot_insert_at_wrong_index(factories):
