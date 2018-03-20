@@ -1,6 +1,9 @@
 <template>
-  <div v-if="playlist">
-    <div class="ui head vertical center aligned stripe segment">
+  <div>
+    <div v-if="isLoading" class="ui vertical segment">
+      <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
+    </div>
+    <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment">
       <div class="segment-content">
         <h2 class="ui center aligned icon header">
           <i class="circular inverted list yellow icon"></i>
@@ -23,6 +26,12 @@
           <template v-if="edit">End edition</template>
           <template v-else>Edit...</template>
         </button>
+        <dangerous-button class="labeled icon" :action="deletePlaylist">
+          <i class="trash icon"></i> Delete
+          <p slot="modal-header">Do you want to delete the playlist "{{ playlist.name }}"?</p>
+          <p slot="modal-content">This will completely delete this playlist and cannot be undone.</p>
+          <p slot="modal-confirm">Delete playlist</p>
+        </dangerous-button>
       </div>
     </div>
     <div v-if="tracks.length > 0" class="ui vertical stripe segment">
@@ -45,7 +54,8 @@ import PlaylistEditor from '@/components/playlists/Editor'
 
 export default {
   props: {
-    id: {required: true}
+    id: {required: true},
+    defaultEdit: {type: Boolean, default: false}
   },
   components: {
     PlaylistEditor,
@@ -55,7 +65,8 @@ export default {
   },
   data: function () {
     return {
-      edit: false,
+      edit: this.defaultEdit,
+      isLoading: false,
       playlist: null,
       tracks: [],
       playlistTracks: []
@@ -75,11 +86,24 @@ export default {
     },
     fetch: function () {
       let self = this
+      self.isLoading = true
       let url = 'playlists/' + this.id + '/'
       axios.get(url).then((response) => {
         self.playlist = response.data
         axios.get(url + 'tracks').then((response) => {
           self.updatePlts(response.data.results)
+        }).then(() => {
+          self.isLoading = false
+        })
+      })
+    },
+    deletePlaylist () {
+      let self = this
+      let url = 'playlists/' + this.id + '/'
+      axios.delete(url).then((response) => {
+        self.$store.dispatch('playlists/fetchOwn')
+        self.$router.push({
+          path: '/library'
         })
       })
     }
