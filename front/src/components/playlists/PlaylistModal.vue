@@ -18,7 +18,8 @@
             <div class="content">
               <div class="header">{{ playlist.name }}</div>
               <div class="meta">
-                <span class="tracks">45 tracks</span>
+                <span class="tracks"><i class="music icon"></i> {{ playlist.tracks_count }} tracks</span>
+                <span class="date"><i class="clock icon"></i> Last modification {{ playlist.modification_date | ago}}</span>
               </div>
               <div class="extra">
                 <div class="ui basic green button" @click="addToPlaylist(playlist.id)">
@@ -34,6 +35,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import {mapState} from 'vuex'
 
@@ -80,7 +82,9 @@ export default {
       playlists: state => state.playlists.playlists
     }),
     sortedPlaylists () {
-      return this.playlists
+      let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])
+      p.reverse()
+      return p
     }
   }
 }
