@@ -152,4 +152,4 @@ def test_can_list_tracks_from_playlist(
     serialized_plt = serializers.PlaylistTrackSerializer(plt).data
 
     assert response.data['count'] == 1
-    assert response.data['result'][0] == serialized_plt
+    assert response.data['results'][0] == serialized_plt

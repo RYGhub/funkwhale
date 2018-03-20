@@ -43,7 +43,7 @@ class PlaylistViewSet(
         serializer = serializers.PlaylistTrackSerializer(plts, many=True)
         data = {
             'count': len(plts),
-            'result': serializer.data
+            'results': serializer.data
         }
         return Response(data, status=200)
 
