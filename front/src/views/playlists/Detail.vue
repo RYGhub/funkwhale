@@ -36,7 +36,10 @@
     </div>
     <div class="ui vertical stripe segment">
       <template v-if="edit">
-        <playlist-editor @tracks-updated="updatePlts" :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
+        <playlist-editor
+          @playlist-updated="playlist = $event"
+          @tracks-updated="updatePlts"
+          :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
         <h2>Tracks</h2>

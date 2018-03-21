@@ -1,8 +1,15 @@
 <template>
   <form class="ui form" @submit.prevent="submit()">
-    <h4 class="ui header">Create a new playlist</h4>
+    <h4 v-if="title" class="ui header">Create a new playlist</h4>
     <div v-if="success" class="ui positive message">
-      <div class="header">Playlist created</div>
+      <div class="header">
+        <template v-if="playlist">
+          Playlist updated
+        </template>
+        <template v-else>
+          Playlist created
+        </template>
+      </div>
     </div>
     <div v-if="errors.length > 0" class="ui negative message">
       <div class="header">We cannot create the playlist</div>
@@ -10,7 +17,7 @@
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
-    <div class="fields">
+    <div class="three fields">
       <div class="field">
         <label>Playlist name</label>
         <input v-model="name" required type="text" placeholder="My awesome playlist" />
@@ -23,7 +30,10 @@
       </div>
       <div class="field">
         <label>&nbsp;</label>
-        <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Create playlist</button>
+        <button :class="['ui', 'fluid', {'loading': isLoading}, 'button']" type="submit">
+          <template v-if="playlist">Update playlist</template>
+          <template v-else>Create playlist</template>
+        </button>
       </div>
     </div>
   </form>
@@ -36,13 +46,15 @@ import axios from 'axios'
 import logger from '@/logging'
 
 export default {
+  props: {
+    title: {type: Boolean, default: true},
+    playlist: {type: Object, default: null}
+  },
   mounted () {
     $(this.$el).find('.dropdown').dropdown()
   },
   data () {
-    return {
-      privacyLevel: this.$store.state.auth.profile.privacy_level,
-      name: '',
+    let d = {
       errors: [],
       success: false,
       isLoading: false,
@@ -61,6 +73,14 @@ export default {
         }
       ]
     }
+    if (this.playlist) {
+      d.name = this.playlist.name
+      d.privacyLevel = this.playlist.privacy_level
+    } else {
+      d.privacyLevel = this.$store.state.auth.profile.privacy_level
+      d.name = ''
+    }
+    return d
   },
   methods: {
     submit () {
@@ -72,12 +92,23 @@ export default {
         name: this.name,
         privacy_level: this.privacyLevel
       }
-      let url = `playlists/`
-      return axios.post(url, payload).then(response => {
-        logger.default.info('Successfully created playlist')
+
+      let promise
+      let url
+      if (this.playlist) {
+        url = `playlists/${this.playlist.id}/`
+        promise = axios.patch(url, payload)
+      } else {
+        url = 'playlists/'
+        promise = axios.post(url, payload)
+      }
+      return promise.then(response => {
         self.success = true
         self.isLoading = false
-        self.name = ''
+        if (!self.playlist) {
+          self.name = ''
+        }
+        self.$emit('updated', response.data)
         self.$store.dispatch('playlists/fetchOwn')
       }, error => {
         logger.default.error('Error while creating playlist')

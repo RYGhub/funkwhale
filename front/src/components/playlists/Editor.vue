@@ -1,8 +1,28 @@
 <template>
   <div class="ui text container">
-    <h2 class="ui header">Playlist editor</h2>
-    <p>Drag and drop rows to reorder tracks in the playlist</p>
-    <div>
+    <playlist-form @updated="$emit('playlist-updated', $event)" :title="false" :playlist="playlist"></playlist-form>
+    <h3 class="ui top attached header">
+      Playlist editor
+    </h3>
+    <div class="ui attached segment">
+      <template v-if="status === 'loading'">
+        <div class="ui active tiny inline loader"></div>
+        Syncing changes to server...
+      </template>
+      <template v-else-if="status === 'errored'">
+        <i class="red close icon"></i>
+        An error occured while saving your changes
+        <div v-if="errors.length > 0" class="ui negative message">
+          <ul class="list">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+      </template>
+      <template v-else-if="status === 'saved'">
+        <i class="green check icon"></i> Changes synced with server
+      </template>
+    </div>
+    <div class="ui bottom attached segment">
       <div
         @click="insertMany(queueTracks)"
         :disabled="queueTracks.length === 0"
@@ -16,56 +36,43 @@
         <p slot="modal-content">This will remove all tracks from this playlist and cannot be undone.</p>
         <p slot="modal-confirm">Clear playlist</p>
       </dangerous-button>
+      <div class="ui hidden divider"></div>
+      <template v-if="plts.length > 0">
+        <p>Drag and drop rows to reorder tracks in the playlist</p>
+        <table class="ui compact very basic fixed single line unstackable table">
+          <draggable v-model="plts" element="tbody" @update="reorder">
+            <tr v-for="(plt, index) in plts" :key="plt.id">
+              <td class="left aligned">{{ plt.index + 1}}</td>
+              <td class="center aligned">
+                <img class="ui mini image" v-if="plt.track.album.cover" :src="plt.track.album.cover">
+                <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
+              </td>
+              <td colspan="4">
+                <strong>{{ plt.track.title }}</strong><br />
+                  {{ plt.track.artist.name }}
+              </td>
+              <td class="right aligned">
+                <i @click.stop="removePlt(index)" class="circular red trash icon"></i>
+              </td>
+            </tr>
+          </draggable>
+        </table>
+      </template>
     </div>
-    <h5 class="ui header">Status</h5>
-    <div>
-      <template v-if="status === 'loading'">
-        <div class="ui active tiny inline loader"></div>
-        Syncing changes to server...
-      </template>
-      <template v-else-if="status === 'errored'">
-        <i class="red x icon"></i>
-        An error occured while saving your changes
-        <div v-if="errors.length > 0" class="ui negative message">
-          <ul class="list">
-            <li v-for="error in errors">{{ error }}</li>
-          </ul>
-        </div>
-      </template>
-      <template v-else-if="status === 'saved'">
-        <i class="green check icon"></i> Changes synced with server
-      </template>
-    </div>
-    <table class="ui compact very basic fixed single line unstackable table">
-      <draggable v-model="plts" element="tbody" @update="reorder">
-        <tr v-for="(plt, index) in plts" :key="plt.id">
-          <td class="left aligned">{{ plt.index + 1}}</td>
-          <td class="center aligned">
-            <img class="ui mini image" v-if="plt.track.album.cover" :src="plt.track.album.cover">
-            <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
-          </td>
-          <td colspan="4">
-            <strong>{{ plt.track.title }}</strong><br />
-              {{ plt.track.artist.name }}
-          </td>
-          <td class="right aligned">
-            <i @click.stop="removePlt(index)" class="circular red trash icon"></i>
-          </td>
-        </tr>
-      </draggable>
-    </table>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
 import axios from 'axios'
+import PlaylistForm from '@/components/playlists/Form'
 
 import draggable from 'vuedraggable'
 
 export default {
   components: {
-    draggable
+    draggable,
+    PlaylistForm
   },
   props: ['playlist', 'playlistTracks'],
   data () {
