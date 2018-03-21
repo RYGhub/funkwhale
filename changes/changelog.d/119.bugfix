@@ -1,1 +1,0 @@
-Fixed forced redirection to login event with API_AUTHENTICATION_REQUIRED=False (#119)
