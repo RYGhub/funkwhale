@@ -38,11 +38,6 @@ class PlaylistViewSet(
     filter_class = filters.PlaylistFilter
     ordering_fields = ('id', 'name', 'creation_date', 'modification_date')
 
-    def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE', 'POST']:
-            return serializers.PlaylistWriteSerializer
-        return self.serializer_class
-
     @detail_route(methods=['get'])
     def tracks(self, request, *args, **kwargs):
         playlist = self.get_object()

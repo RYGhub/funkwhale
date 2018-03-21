@@ -62,34 +62,20 @@ class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
         return []
 
 
-class PlaylistWriteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Playlist
-        fields = [
-            'id',
-            'name',
-            'privacy_level',
-        ]
-
-
 class PlaylistSerializer(serializers.ModelSerializer):
-    tracks_count = serializers.SerializerMethodField()
-    user = UserBasicSerializer()
+    tracks_count = serializers.SerializerMethodField(read_only=True)
+    user = UserBasicSerializer(read_only=True)
 
     class Meta:
         model = models.Playlist
         fields = (
             'id',
             'name',
-            'user',
             'tracks_count',
-            'privacy_level',
-            'creation_date',
-            'modification_date')
+            'user',
+            'privacy_level',)
         read_only_fields = [
             'id',
-            'user',
             'modification_date',
             'creation_date',]
 

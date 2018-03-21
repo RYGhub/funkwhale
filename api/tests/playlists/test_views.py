@@ -182,3 +182,16 @@ def test_can_clear_playlist_from_api(
 
     assert response.status_code == 204
     assert playlist.playlist_tracks.count() == 0
+
+
+def test_update_playlist_from_api(
+        factories, mocker, logged_in_api_client):
+    playlist = factories['playlists.Playlist'](user=logged_in_api_client.user)
+    plts = factories['playlists.PlaylistTrack'].create_batch(
+        size=5, playlist=playlist)
+    url = reverse('api:v1:playlists-detail', kwargs={'pk': playlist.pk})
+    response = logged_in_api_client.patch(url, {'name': 'test'})
+    playlist.refresh_from_db()
+
+    assert response.status_code == 200
+    assert response.data['user']['username'] == playlist.user.username
