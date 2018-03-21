@@ -8,14 +8,13 @@ from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from funkwhale_api.music.models import Track
 from funkwhale_api.common import permissions
 from funkwhale_api.common import fields
+from funkwhale_api.music.models import Track
 
 from . import filters
 from . import models
 from . import serializers
-
 
 class PlaylistViewSet(
         mixins.RetrieveModelMixin,
@@ -37,6 +36,7 @@ class PlaylistViewSet(
     ]
     owner_checks = ['write']
     filter_class = filters.PlaylistFilter
+    ordering_fields = ('id', 'name', 'creation_date', 'modification_date')
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE', 'POST']:
