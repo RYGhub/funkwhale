@@ -170,3 +170,15 @@ def test_can_add_multiple_tracks_at_once_via_api(
     for plt in playlist.playlist_tracks.order_by('index'):
         assert response.data['results'][plt.index]['id'] == plt.id
         assert plt.track == tracks[plt.index]
+
+
+def test_can_clear_playlist_from_api(
+        factories, mocker, logged_in_api_client):
+    playlist = factories['playlists.Playlist'](user=logged_in_api_client.user)
+    plts = factories['playlists.PlaylistTrack'].create_batch(
+        size=5, playlist=playlist)
+    url = reverse('api:v1:playlists-clear', kwargs={'pk': playlist.pk})
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+    assert playlist.playlist_tracks.count() == 0

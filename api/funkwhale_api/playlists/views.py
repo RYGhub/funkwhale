@@ -75,6 +75,14 @@ class PlaylistViewSet(
         }
         return Response(data, status=201)
 
+    @detail_route(methods=['delete'])
+    @transaction.atomic
+    def clear(self, request, *args, **kwargs):
+        playlist = self.get_object()
+        playlist.playlist_tracks.all().delete()
+        playlist.save(update_fields=['modification_date'])
+        return Response(status=204)
+
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(self.request.user))

@@ -2,12 +2,20 @@
   <div class="ui text container">
     <h2 class="ui header">Playlist editor</h2>
     <p>Drag and drop rows to reorder tracks in the playlist</p>
-    <div class="ui buttons">
+    <div>
       <div
         @click="insertMany(queueTracks)"
         :disabled="queueTracks.length === 0"
-        :class="['ui', {disabled: queueTracks.length === 0}, 'button']"
-        title="Copy tracks from current queue to playlist">Insert from queue ({{ queueTracks.length }} tracks)</div>
+        :class="['ui', {disabled: queueTracks.length === 0}, 'labeled', 'icon', 'button']"
+        title="Copy tracks from current queue to playlist">
+          <i class="plus icon"></i> Insert from queue ({{ queueTracks.length }} tracks)</div>
+
+      <dangerous-button :disabled="plts.length === 0" class="labeled right floated icon" color='yellow' :action="clearPlaylist">
+        <i class="eraser icon"></i> Clear playlist
+        <p slot="modal-header">Do you want to clear the playlist "{{ playlist.name }}"?</p>
+        <p slot="modal-content">This will remove all tracks from this playlist and cannot be undone.</p>
+        <p slot="modal-confirm">Clear playlist</p>
+      </dangerous-button>
     </div>
     <h5 class="ui header">Status</h5>
     <div>
@@ -95,6 +103,19 @@ export default {
       let url = 'playlist-tracks/' + plt.id + '/'
       axios.delete(url).then((response) => {
         self.success()
+        self.$store.dispatch('playlists/fetchOwn')
+      }, error => {
+        self.errored(error.backendErrors)
+      })
+    },
+    clearPlaylist () {
+      this.plts = []
+      let self = this
+      self.isLoading = true
+      let url = 'playlists/' + this.playlist.id + '/clear'
+      axios.delete(url).then((response) => {
+        self.success()
+        self.$store.dispatch('playlists/fetchOwn')
       }, error => {
         self.errored(error.backendErrors)
       })
@@ -111,6 +132,7 @@ export default {
           self.plts.push(r)
         })
         self.success()
+        self.$store.dispatch('playlists/fetchOwn')
       }, error => {
         self.errored(error.backendErrors)
       })
