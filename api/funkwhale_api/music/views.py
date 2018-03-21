@@ -54,6 +54,7 @@ class TagViewSetMixin(object):
             queryset = queryset.filter(tags__pk=tag)
         return queryset
 
+
 class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Artist.objects.all()
@@ -67,6 +68,7 @@ class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     filter_class = filters.ArtistFilter
     ordering_fields = ('id', 'name', 'creation_date')
 
+
 class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all()
@@ -78,6 +80,7 @@ class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [ConditionalAuthentication]
     search_fields = ['title__unaccent']
     ordering_fields = ('creation_date',)
+    filter_class = filters.AlbumFilter
 
 
 class ImportBatchViewSet(
@@ -237,6 +240,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class Search(views.APIView):
     max_results = 3
+    permission_classes = [ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
         query = request.GET['query']

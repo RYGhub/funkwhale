@@ -31,7 +31,7 @@ export default {
       if (!state.running) {
         return false
       } else {
-        return current.type === this.type & current.objectId === this.objectId
+        return current.type === this.type && current.objectId === this.objectId && current.customRadioId === this.customRadioId
       }
     }
   }

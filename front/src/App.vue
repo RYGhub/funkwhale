@@ -29,6 +29,8 @@
       v-if="$store.state.instance.settings.raven.front_enabled.value"
       :dsn="$store.state.instance.settings.raven.front_dsn.value">
     </raven>
+    <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+
   </div>
 </template>
 
@@ -39,11 +41,14 @@ import logger from '@/logging'
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
 
+import PlaylistModal from '@/components/playlists/PlaylistModal'
+
 export default {
   name: 'app',
   components: {
     Sidebar,
-    Raven
+    Raven,
+    PlaylistModal
   },
   created () {
     this.$store.dispatch('instance/fetchSettings')
@@ -56,6 +61,9 @@ export default {
   },
   methods: {
     openWebsocket () {
+      if (!this.$store.state.auth.authenticated) {
+        return
+      }
       let self = this
       let token = this.$store.state.auth.token
       // let token = 'test'

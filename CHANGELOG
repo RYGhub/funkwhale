@@ -3,7 +3,37 @@ Changelog
 
 .. towncrier
 
-0.6.1 (unreleased)
+0.7 (2018-03-21)
+----------------
+
+Features:
+
+- Can now filter artists and albums with no listenable tracks (#114)
+- Improve the style of the sidebar to make it easier to understand which tab is
+  selected (#118)
+- On artist page, albums are not sorted by release date, if any (#116)
+- Playlists are here \o/ :tada: (#3, #93, #94)
+- Use django-cacheops to cache common ORM requests (#117)
+
+
+Bugfixes:
+
+- Fixed broken import request admin (#115)
+- Fixed forced redirection to login event with
+  API_AUTHENTICATION_REQUIRED=False (#119)
+- Fixed position not being reseted properly when playing the same track
+  multiple times in a row
+- Fixed synchronized start/stop radio buttons for all custom radios (#103)
+- Fixed typo and missing icon on homepage (#96)
+
+
+Documentation:
+
+- Up-to-date and complete development and contribution instructions in
+  README.rst (#123)
+
+
+0.6.1 (2018-03-06)
 ------------------
 
 Features:

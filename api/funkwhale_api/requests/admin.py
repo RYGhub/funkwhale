@@ -7,8 +7,7 @@ from . import models
 class ImportRequestAdmin(admin.ModelAdmin):
     list_display = ['artist_name', 'user', 'status', 'creation_date']
     list_select_related = [
-        'user',
-        'track'
+        'user'
     ]
     list_filter = [
         'status',

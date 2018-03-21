@@ -30,6 +30,9 @@ export default {
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
+          if (!self.$store.state.auth.authenticated) {
+            return xhrObject
+          }
           xhrObject.setRequestHeader('Authorization', self.$store.getters['auth/header'])
           return xhrObject
         },

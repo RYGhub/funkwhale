@@ -94,9 +94,9 @@
         <p>Funkwhale is dead simple to use.</p>
         <div class="ui list">
           <div class="item">
-            <i class="libraryr icon"></i>
+            <i class="book icon"></i>
             <div class="content">
-              No add-ons, no plugins : you only need a web libraryr
+              No add-ons, no plugins : you only need a web library
             </div>
           </div>
           <div class="item">

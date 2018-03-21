@@ -19,10 +19,6 @@ CACHES = {
 
 CELERY_BROKER_URL = 'memory://'
 
-# TESTING
-# ------------------------------------------------------------------------------
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-
 ########## CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
 CELERY_TASK_ALWAYS_EAGER = True
@@ -30,3 +26,4 @@ CELERY_TASK_ALWAYS_EAGER = True
 
 # Your local stuff: Below this line define 3rd party library settings
 API_AUTHENTICATION_REQUIRED = False
+CACHEOPS_ENABLED = False

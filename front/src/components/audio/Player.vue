@@ -3,7 +3,7 @@
     <div class="player">
       <audio-track
         ref="currentAudio"
-        v-if="currentTrack"
+        v-if="renderAudio && currentTrack"
         :key="(currentIndex, currentTrack.id)"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
@@ -30,7 +30,12 @@
               </router-link>
             </div>
             <div class="description">
-              <track-favorite-icon :track="currentTrack"></track-favorite-icon>
+              <track-favorite-icon
+                v-if="$store.state.auth.authenticated"
+                :track="currentTrack"></track-favorite-icon>
+              <track-playlist-icon
+                v-if="$store.state.auth.authenticated"
+                :track="currentTrack"></track-playlist-icon>
             </div>
           </div>
         </div>
@@ -140,17 +145,20 @@ import ColorThief from '@/vendor/color-thief'
 import Track from '@/audio/track'
 import AudioTrack from '@/components/audio/Track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
+import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 
 export default {
   name: 'player',
   components: {
     TrackFavoriteIcon,
+    TrackPlaylistIcon,
     GlobalEvents,
     AudioTrack
   },
   data () {
     let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
     return {
+      renderAudio: true,
       sliderVolume: this.volume,
       Track: Track,
       defaultAmbiantColors: defaultAmbiantColors,
@@ -163,7 +171,6 @@ export default {
   },
   methods: {
     ...mapActions({
-      pause: 'player/pause',
       togglePlay: 'player/togglePlay',
       clean: 'queue/clean',
       next: 'queue/next',
@@ -230,6 +237,17 @@ export default {
         this.ambiantColors = this.defaultAmbiantColors
       }
     },
+    currentIndex (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        // why this? to ensure the audio tag is deleted and fully
+        // rerendered, so we don't have any issues with cached position
+        // or whatever
+        this.renderAudio = false
+        this.$nextTick(() => {
+          this.renderAudio = true
+        })
+      }
+    },
     volume (newValue) {
       this.sliderVolume = newValue
     },
@@ -270,6 +288,7 @@ export default {
     cursor: pointer
 }
 .track-area {
+  margin-top: 0;
   .header, .meta, .artist, .album {
     color: white !important;
   }
@@ -373,4 +392,5 @@ export default {
 .ui.feed.icon {
   margin: 0;
 }
+
 </style>

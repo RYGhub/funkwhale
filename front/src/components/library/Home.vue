@@ -20,7 +20,7 @@
         </div>
         <div class="column">
           <h2 class="ui header">Music requests</h2>
-          <request-form></request-form>
+          <request-form v-if="$store.state.auth.authenticated"></request-form>
         </div>
       </div>
     </div>

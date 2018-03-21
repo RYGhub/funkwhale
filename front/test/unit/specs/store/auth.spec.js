@@ -180,7 +180,8 @@ describe('store/auth', () => {
           { type: 'permission', payload: {key: 'admin', status: true} }
         ],
         expectedActions: [
-          { type: 'favorites/fetch', payload: null, options: {root: true} }
+          { type: 'favorites/fetch', payload: null, options: {root: true} },
+          { type: 'playlists/fetchOwn', payload: null, options: {root: true} },
         ]
       }, done)
     })

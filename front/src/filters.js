@@ -35,6 +35,12 @@ export function momentFormat (date, format) {
 
 Vue.filter('moment', momentFormat)
 
+export function year (date) {
+  return moment(date).year()
+}
+
+Vue.filter('year', year)
+
 export function capitalize (str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
