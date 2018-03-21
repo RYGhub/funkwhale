@@ -24,6 +24,11 @@
 
           <play-button class="orange" :track="track">Play</play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
+          <track-playlist-icon
+            :button="true"
+            v-if="$store.state.auth.authenticated"
+            :track="track"></track-playlist-icon>
+
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
             Search on wikipedia
@@ -66,6 +71,7 @@ import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
+import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 
 const FETCH_URL = 'tracks/'
 
@@ -73,6 +79,7 @@ export default {
   props: ['id'],
   components: {
     PlayButton,
+    TrackPlaylistIcon,
     TrackFavoriteIcon
   },
   data () {

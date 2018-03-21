@@ -11,34 +11,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="track in tracks">
-        <td>
-          <play-button class="basic icon" :discrete="true" :track="track"></play-button>
-        </td>
-        <td>
-          <img class="ui mini image" v-if="track.album.cover" v-lazy="backend.absoluteUrl(track.album.cover)">
-          <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
-        </td>
-        <td colspan="6">
-          <router-link class="track" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
-            <template v-if="displayPosition && track.position">
-              {{ track.position }}.
-            </template>
-            {{ track.title }}
-          </router-link>
-        </td>
-        <td colspan="6">
-          <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
-            {{ track.artist.name }}
-          </router-link>
-        </td>
-        <td colspan="6">
-          <router-link class="album discrete link" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
-            {{ track.album.title }}
-          </router-link>
-        </td>
-        <td><track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon></td>
-      </tr>
+      <track-row
+        :display-position="displayPosition"
+        :track="track"
+        :key="index + '-' + track.id"
+        v-for="(track, index) in tracks"></track-row>
     </tbody>
     <tfoot class="full-width">
       <tr>
@@ -83,9 +60,8 @@ curl -G -o "{{ track.files[0].filename }}" <template v-if="$store.state.auth.aut
 
 <script>
 import backend from '@/audio/backend'
-import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
-import PlayButton from '@/components/audio/PlayButton'
 
+import TrackRow from '@/components/audio/track/Row'
 import Modal from '@/components/semantic/Modal'
 
 export default {
@@ -95,8 +71,7 @@ export default {
   },
   components: {
     Modal,
-    TrackFavoriteIcon,
-    PlayButton
+    TrackRow
   },
   data () {
     return {

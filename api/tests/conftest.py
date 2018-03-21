@@ -1,8 +1,11 @@
+import factory
 import tempfile
 import shutil
 import pytest
+
 from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
+
 from rest_framework.test import APIClient
 from rest_framework.test import APIRequestFactory
 
@@ -27,6 +30,16 @@ def cache():
 @pytest.fixture
 def factories(db):
     from funkwhale_api import factories
+    for v in factories.registry.values():
+        v._meta.strategy = factory.CREATE_STRATEGY
+    yield factories.registry
+
+
+@pytest.fixture
+def nodb_factories():
+    from funkwhale_api import factories
+    for v in factories.registry.values():
+        v._meta.strategy = factory.BUILD_STRATEGY
     yield factories.registry
 
 

@@ -2,7 +2,7 @@
   <div :class="['ui', {'active': show}, 'modal']">
     <i class="close icon"></i>
     <slot>
-      
+
     </slot>
   </div>
 </template>
@@ -19,26 +19,38 @@ export default {
       control: null
     }
   },
-  mounted () {
-    this.control = $(this.$el).modal({
-      onApprove: function () {
-        this.$emit('approved')
-      }.bind(this),
-      onDeny: function () {
-        this.$emit('deny')
-      }.bind(this),
-      onHidden: function () {
-        this.$emit('update:show', false)
-      }.bind(this)
-    })
+  beforeDestroy () {
+    if (this.control) {
+      this.control.remove()
+    }
+  },
+  methods: {
+    initModal () {
+      this.control = $(this.$el).modal({
+        duration: 100,
+        onApprove: function () {
+          this.$emit('approved')
+        }.bind(this),
+        onDeny: function () {
+          this.$emit('deny')
+        }.bind(this),
+        onHidden: function () {
+          this.$emit('update:show', false)
+        }.bind(this)
+      })
+    }
   },
   watch: {
     show: {
       handler (newValue) {
         if (newValue) {
+          this.initModal()
           this.control.modal('show')
         } else {
-          this.control.modal('hide')
+          if (this.control) {
+            this.control.modal('hide')
+            this.control.remove()
+          }
         }
       }
     }

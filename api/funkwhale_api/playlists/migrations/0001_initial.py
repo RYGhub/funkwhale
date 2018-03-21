@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 from django.conf import settings
 import django.utils.timezone
-import mptt.fields
 
 
 class Migration(migrations.Migration):
@@ -34,7 +33,7 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('position', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('playlist', models.ForeignKey(to='playlists.Playlist', related_name='playlist_tracks', on_delete=models.CASCADE)),
-                ('previous', mptt.fields.TreeOneToOneField(null=True, to='playlists.PlaylistTrack', related_name='next', blank=True, on_delete=models.CASCADE)),
+                ('previous', models.OneToOneField(null=True, to='playlists.PlaylistTrack', related_name='next', blank=True, on_delete=models.CASCADE)),
                 ('track', models.ForeignKey(to='music.Track', related_name='playlist_tracks', on_delete=models.CASCADE)),
             ],
             options={
