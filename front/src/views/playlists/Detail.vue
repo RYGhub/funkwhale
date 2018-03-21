@@ -34,7 +34,7 @@
         </dangerous-button>
       </div>
     </div>
-    <div v-if="tracks.length > 0" class="ui vertical stripe segment">
+    <div class="ui vertical stripe segment">
       <template v-if="edit">
         <playlist-editor @tracks-updated="updatePlts" :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>

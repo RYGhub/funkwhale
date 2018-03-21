@@ -22,6 +22,7 @@ import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
 import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
+import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 
 Vue.use(Router)
@@ -110,6 +111,17 @@ export default new Router({
         },
         { path: 'radios/build', name: 'library.radios.build', component: RadioBuilder, props: true },
         { path: 'radios/build/:id', name: 'library.radios.edit', component: RadioBuilder, props: true },
+        {
+          path: 'playlists/',
+          name: 'library.playlists.browse',
+          component: PlaylistList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
         {
           path: 'playlists/:id',
           name: 'library.playlists.detail',

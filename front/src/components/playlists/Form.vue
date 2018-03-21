@@ -21,8 +21,11 @@
           <option :value="c.value" v-for="c in privacyLevelChoices">{{ c.label }}</option>
         </select>
       </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Create playlist</button>
+      </div>
     </div>
-    <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Create playlist</button>
   </form>
 </template>
 
