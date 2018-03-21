@@ -73,6 +73,8 @@ class PlaylistSerializer(serializers.ModelSerializer):
             'name',
             'tracks_count',
             'user',
+            'modification_date',
+            'creation_date',
             'privacy_level',)
         read_only_fields = [
             'id',
