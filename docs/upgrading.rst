@@ -3,9 +3,12 @@ Upgrading your funkwhale instance to a newer version
 
 .. note::
 
-    Before upgrading your instance, we strongly advise you to make a database
-    backup. We're commited to make upgrade as easy and straightforward as possible,
+    Before upgrading your instance, we strongly advise you to make at least a database backup. Ideally, you should make a full backup, including
+    the database and the media files.
+
+    We're commited to make upgrade as easy and straightforward as possible,
     however, funkwhale is still in development and you'll be safer with a backup.
+
 
 Reading the release notes
 -------------------------
@@ -62,14 +65,17 @@ match what is described in :doc:`debian`:
 
 .. parsed-literal::
 
+    # stop the services
+    sudo systemctl stop funkwhale.target
+
     # this assumes you want to upgrade to version "|version|"
     export FUNKWALE_VERSION="|version|"
     cd /srv/funkwhale
 
     # download more recent API files
-    curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
-    unzip "api-|version|.zip" -d extracted
-    mv extracted/api/* api/
+    curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWALE_VERSION/download?job=build_api"
+    unzip "api-$FUNKWALE_VERSION.zip" -d extracted
+    rm -rf api/ && mv extracted/api .
     rm -rf extracted
 
     # update os dependencies
