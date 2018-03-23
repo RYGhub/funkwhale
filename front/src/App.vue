@@ -21,6 +21,7 @@
           <div class="ten wide column">
             <h4 class="ui header">About funkwhale</h4>
             <p>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</p>
+            <p>The funkwhale logo was kindly designed and provided by Francis Gading.</p>
           </div>
         </div>
       </div>
