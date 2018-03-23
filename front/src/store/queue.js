@@ -41,7 +41,6 @@ export default {
         state.currentIndex += 1
       }
     }
-
   },
   getters: {
     currentTrack: state => {
@@ -141,7 +140,9 @@ export default {
       commit('ended', true)
     },
     shuffle ({dispatch, commit, state}) {
-      let shuffled = _.shuffle(state.tracks)
+      let toKeep = state.tracks.slice(0, state.currentIndex + 1)
+      let toShuffle = state.tracks.slice(state.currentIndex + 1)
+      let shuffled = toKeep.concat(_.shuffle(toShuffle))
       commit('player/currentTime', 0, {root: true})
       commit('tracks', [])
       dispatch('appendMany', {tracks: shuffled})
