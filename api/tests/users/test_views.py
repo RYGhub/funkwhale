@@ -23,6 +23,23 @@ def test_can_create_user_via_api(preferences, client, db):
     assert u.username == 'test1'
 
 
+def test_can_restrict_usernames(settings, preferences, db, client):
+    url = reverse('rest_register')
+    preferences['users__registration_enabled'] = True
+    settings.USERNAME_BLACKLIST = ['funkwhale']
+    data = {
+        'username': 'funkwhale',
+        'email': 'contact@funkwhale.io',
+        'password1': 'testtest',
+        'password2': 'testtest',
+    }
+
+    response = client.post(url, data)
+
+    assert response.status_code == 400
+    assert 'username' in response.data
+
+
 def test_can_disable_registration_view(preferences, client, db):
     url = reverse('rest_register')
     data = {

@@ -385,3 +385,12 @@ CSRF_USE_SESSIONS = True
 
 # Playlist settings
 PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
+
+ACCOUNT_USERNAME_BLACKLIST = [
+    'funkwhale',
+    'root',
+    'admin',
+    'owner',
+    'superuser',
+    'staff',
+] + env.list('ACCOUNT_USERNAME_BLACKLIST', default=[])
