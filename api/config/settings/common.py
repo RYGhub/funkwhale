@@ -89,6 +89,7 @@ LOCAL_APPS = (
     'funkwhale_api.music',
     'funkwhale_api.requests',
     'funkwhale_api.favorites',
+    'funkwhale_api.federation',
     'funkwhale_api.radios',
     'funkwhale_api.history',
     'funkwhale_api.playlists',

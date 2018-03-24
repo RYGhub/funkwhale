@@ -60,3 +60,5 @@ channels_redis>=2.1,<2.2
 django-cacheops>=4,<4.1
 
 daphne==2.0.4
+cryptography>=2,<3
+requests-http-signature==0.0.3

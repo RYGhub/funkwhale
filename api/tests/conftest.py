@@ -31,7 +31,11 @@ def cache():
 def factories(db):
     from funkwhale_api import factories
     for v in factories.registry.values():
-        v._meta.strategy = factory.CREATE_STRATEGY
+        try:
+            v._meta.strategy = factory.CREATE_STRATEGY
+        except AttributeError:
+            # probably not a class based factory
+            pass
     yield factories.registry
 
 
@@ -39,7 +43,11 @@ def factories(db):
 def nodb_factories():
     from funkwhale_api import factories
     for v in factories.registry.values():
-        v._meta.strategy = factory.BUILD_STRATEGY
+        try:
+            v._meta.strategy = factory.BUILD_STRATEGY
+        except AttributeError:
+            # probably not a class based factory
+            pass
     yield factories.registry
 
 
