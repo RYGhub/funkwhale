@@ -7,15 +7,12 @@ from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
 from funkwhale_api.music import lyrics as lyrics_utils
 
-from .mocking import lyricswiki
-from . import data as api_data
 
-
-
-def test_works_import_lyrics_if_any(mocker, factories):
+def test_works_import_lyrics_if_any(
+        lyricswiki_content, mocker, factories):
     mocker.patch(
         'funkwhale_api.music.lyrics._get_html',
-        return_value=lyricswiki.content)
+        return_value=lyricswiki_content)
     lyrics = factories['music.Lyrics'](
         url='http://lyrics.wikia.com/System_Of_A_Down:Chop_Suey!')
 
@@ -48,16 +45,22 @@ Is it me you're looking for?"""
     assert expected == l.content_rendered
 
 
-def test_works_import_lyrics_if_any(mocker, factories, logged_in_client):
+def test_works_import_lyrics_if_any(
+        lyricswiki_content,
+        works,
+        tracks,
+        mocker,
+        factories,
+        logged_in_client):
     mocker.patch(
         'funkwhale_api.musicbrainz.api.works.get',
-        return_value=api_data.works['get']['chop_suey'])
+        return_value=works['get']['chop_suey'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.recordings.get',
-        return_value=api_data.tracks['get']['chop_suey'])
+        return_value=tracks['get']['chop_suey'])
     mocker.patch(
         'funkwhale_api.music.lyrics._get_html',
-        return_value=lyricswiki.content)
+        return_value=lyricswiki_content)
     track = factories['music.Track'](
         work=None,
         mbid='07ca77cf-f513-4e9c-b190-d7e24bbad448')
