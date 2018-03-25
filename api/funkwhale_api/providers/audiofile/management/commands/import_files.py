@@ -35,6 +35,13 @@ class Command(BaseCommand):
             help='Will launch celery tasks for each file to import instead of doing it synchronously and block the CLI',
         )
         parser.add_argument(
+            '--exit', '-x',
+            action='store_true',
+            dest='exit_on_failure',
+            default=False,
+            help='use this flag to disable error catching',
+        )
+        parser.add_argument(
             '--no-acoustid',
             action='store_true',
             dest='no_acoustid',
@@ -106,20 +113,27 @@ class Command(BaseCommand):
         async = options['async']
         import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
         for path in matching:
-            job = batch.jobs.create(
-                source='file://' + path,
-            )
-            name = os.path.basename(path)
-            with open(path, 'rb') as f:
-                job.audio_file.save(name, File(f))
-
-            job.save()
             try:
-                utils.on_commit(
-                    import_handler,
-                    import_job_id=job.pk,
-                    use_acoustid=not options['no_acoustid'])
+                self.stdout.write(message.format(path))
+                self.import_file(path, batch, import_handler, options)
             except Exception as e:
-                self.stdout.write('Error: {}'.format(e))
-
+                if options['exit_on_failure']:
+                    raise
+                m = 'Error while importing {}: {} {}'.format(
+                    path, e.__class__.__name__, e)
+                self.stderr.write(m)
         return batch
+
+    def import_file(self, path, batch, import_handler, options):
+        job = batch.jobs.create(
+            source='file://' + path,
+        )
+        name = os.path.basename(path)
+        with open(path, 'rb') as f:
+            job.audio_file.save(name, File(f))
+
+        job.save()
+        utils.on_commit(
+            import_handler,
+            import_job_id=job.pk,
+            use_acoustid=not options['no_acoustid'])

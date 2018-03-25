@@ -121,7 +121,13 @@ class Metadata(object):
 
     def __init__(self, path):
         self._file = mutagen.File(path)
-        self._conf = CONF[self.get_file_type(self._file)]
+        if self._file is None:
+            raise ValueError('Cannot parse metadata from {}'.format(path))
+        ft = self.get_file_type(self._file)
+        try:
+            self._conf = CONF[ft]
+        except KeyError:
+            raise ValueError('Unsupported format {}'.format(ft))
 
     def get_file_type(self, f):
         return f.__class__.__name__
