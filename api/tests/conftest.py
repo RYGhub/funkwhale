@@ -3,6 +3,7 @@ import tempfile
 import shutil
 import pytest
 
+from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -64,6 +65,11 @@ def logged_in_client(db, factories, client):
     setattr(client, 'user', user)
     yield client
     delattr(client, 'user')
+
+
+@pytest.fixture
+def anonymous_user():
+    return AnonymousUser()
 
 
 @pytest.fixture
