@@ -14,7 +14,7 @@ django-allauth>=0.34,<0.35
 
 
 # Python-PostgreSQL Database Adapter
-psycopg2>=2.7,<=2.8
+psycopg2-binary>=2.7,<=2.8
 
 # Time zones support
 pytz==2017.3
