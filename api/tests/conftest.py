@@ -132,3 +132,11 @@ def activity_registry():
 @pytest.fixture
 def activity_muted(activity_registry, mocker):
     yield mocker.patch.object(record, 'send')
+
+
+@pytest.fixture(autouse=True)
+def media_root(settings):
+    tmp_dir = tempfile.mkdtemp()
+    settings.MEDIA_ROOT = tmp_dir
+    yield settings.MEDIA_ROOT
+    shutil.rmtree(tmp_dir)
