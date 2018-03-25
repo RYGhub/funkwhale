@@ -98,3 +98,27 @@ def test_import_files_skip_acoustid(factories, mocker):
         music_tasks.import_job_run.delay,
         import_job_id=job.pk,
         use_acoustid=False)
+
+
+def test_import_files_works_with_utf8_file_name(factories, mocker):
+    m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    user = factories['users.User'](username='me')
+    path = os.path.join(DATA_DIR, 'utf8-éà◌.ogg')
+    call_command(
+        'import_files',
+        path,
+        username='me',
+        async=True,
+        no_acoustid=True,
+        interactive=False)
+    batch = user.imports.latest('id')
+    job = batch.jobs.first()
+    m.assert_called_once_with(
+        music_tasks.import_job_run.delay,
+        import_job_id=job.pk,
+        use_acoustid=False)
+
+
+def test_storage_rename_utf_8_files(factories):
+    tf = factories['music.TrackFile'](audio_file__filename='été.ogg')
+    assert tf.audio_file.name.endswith('ete.ogg')
