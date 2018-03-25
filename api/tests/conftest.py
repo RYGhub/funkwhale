@@ -3,6 +3,7 @@ import tempfile
 import shutil
 import pytest
 
+from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -67,6 +68,11 @@ def logged_in_client(db, factories, client):
 
 
 @pytest.fixture
+def anonymous_user():
+    return AnonymousUser()
+
+
+@pytest.fixture
 def api_client(client):
     return APIClient()
 
@@ -126,3 +132,11 @@ def activity_registry():
 @pytest.fixture
 def activity_muted(activity_registry, mocker):
     yield mocker.patch.object(record, 'send')
+
+
+@pytest.fixture(autouse=True)
+def media_root(settings):
+    tmp_dir = tempfile.mkdtemp()
+    settings.MEDIA_ROOT = tmp_dir
+    yield settings.MEDIA_ROOT
+    shutil.rmtree(tmp_dir)

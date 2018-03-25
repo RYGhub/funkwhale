@@ -8,21 +8,21 @@ from funkwhale_api.musicbrainz import api
 from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
 
-from . import data as api_data
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def test_can_submit_youtube_url_for_track_import(mocker, superuser_client):
+def test_can_submit_youtube_url_for_track_import(
+        artists, albums, tracks, mocker, superuser_client):
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['adhesive_wombat'])
+        return_value=artists['get']['adhesive_wombat'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get']['marsupial'])
+        return_value=albums['get']['marsupial'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.recordings.get',
-        return_value=api_data.tracks['get']['8bitadventures'])
+        return_value=tracks['get']['8bitadventures'])
     mocker.patch(
         'funkwhale_api.music.models.TrackFile.download_file',
         return_value=None)
@@ -58,17 +58,18 @@ def test_import_creates_an_import_with_correct_data(mocker, superuser_client):
     assert job.source == 'https://www.youtube.com/watch?v={0}'.format(video_id)
 
 
-def test_can_import_whole_album(mocker, superuser_client):
+def test_can_import_whole_album(
+        artists, albums, mocker, superuser_client):
     mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['soad'])
+        return_value=artists['get']['soad'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.images.get_front',
         return_value=b'')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get_with_includes']['hypnotize'])
+        return_value=albums['get_with_includes']['hypnotize'])
     payload = {
         'releaseId': '47ae093f-1607-49a3-be11-a15d335ccc94',
         'tracks': [
@@ -97,7 +98,7 @@ def test_can_import_whole_album(mocker, superuser_client):
 
     album = models.Album.objects.latest('id')
     assert str(album.mbid) == '47ae093f-1607-49a3-be11-a15d335ccc94'
-    medium_data = api_data.albums['get_with_includes']['hypnotize']['release']['medium-list'][0]
+    medium_data = albums['get_with_includes']['hypnotize']['release']['medium-list'][0]
     assert int(medium_data['track-count']) == album.tracks.all().count()
 
     for track in medium_data['track-list']:
@@ -113,17 +114,18 @@ def test_can_import_whole_album(mocker, superuser_client):
         assert job.source == row['source']
 
 
-def test_can_import_whole_artist(mocker, superuser_client):
+def test_can_import_whole_artist(
+        artists, albums, mocker, superuser_client):
     mocker.patch('funkwhale_api.music.tasks.import_job_run')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['soad'])
+        return_value=artists['get']['soad'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.images.get_front',
         return_value=b'')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get_with_includes']['hypnotize'])
+        return_value=albums['get_with_includes']['hypnotize'])
     payload = {
         'artistId': 'mbid',
         'albums': [
@@ -157,7 +159,7 @@ def test_can_import_whole_artist(mocker, superuser_client):
 
     album = models.Album.objects.latest('id')
     assert str(album.mbid) == '47ae093f-1607-49a3-be11-a15d335ccc94'
-    medium_data = api_data.albums['get_with_includes']['hypnotize']['release']['medium-list'][0]
+    medium_data = albums['get_with_includes']['hypnotize']['release']['medium-list'][0]
     assert int(medium_data['track-count']) == album.tracks.all().count()
 
     for track in medium_data['track-list']:
@@ -173,55 +175,57 @@ def test_can_import_whole_artist(mocker, superuser_client):
         assert job.source == row['source']
 
 
-def test_user_can_query_api_for_his_own_batches(client, factories):
-    user1 = factories['users.SuperUser']()
-    user2 = factories['users.SuperUser']()
-
-    job = factories['music.ImportJob'](batch__submitted_by=user1)
+def test_user_can_query_api_for_his_own_batches(
+        superuser_api_client, factories):
+    factories['music.ImportJob']()
+    job = factories['music.ImportJob'](
+        batch__submitted_by=superuser_api_client.user)
     url = reverse('api:v1:import-batches-list')
 
-    client.login(username=user2.username, password='test')
-    response2 = client.get(url)
-    results = json.loads(response2.content.decode('utf-8'))
-    assert results['count'] == 0
-    client.logout()
-
-    client.login(username=user1.username, password='test')
-    response1 = client.get(url)
-    results = json.loads(response1.content.decode('utf-8'))
+    response = superuser_api_client.get(url)
+    results = response.data
     assert results['count'] == 1
     assert results['results'][0]['jobs'][0]['mbid'] == job.mbid
 
 
-def test_user_can_create_an_empty_batch(client, factories):
-    user = factories['users.SuperUser']()
+def test_user_cannnot_access_other_batches(
+        superuser_api_client, factories):
+    factories['music.ImportJob']()
+    job = factories['music.ImportJob']()
     url = reverse('api:v1:import-batches-list')
-    client.login(username=user.username, password='test')
-    response = client.post(url)
+
+    response = superuser_api_client.get(url)
+    results = response.data
+    assert results['count'] == 0
+
+
+def test_user_can_create_an_empty_batch(superuser_api_client, factories):
+    url = reverse('api:v1:import-batches-list')
+    response = superuser_api_client.post(url)
 
     assert response.status_code == 201
 
-    batch = user.imports.latest('id')
+    batch = superuser_api_client.user.imports.latest('id')
 
-    assert batch.submitted_by == user
+    assert batch.submitted_by == superuser_api_client.user
     assert batch.source == 'api'
 
 
-def test_user_can_create_import_job_with_file(client, factories, mocker):
+def test_user_can_create_import_job_with_file(
+        superuser_api_client, factories, mocker):
     path = os.path.join(DATA_DIR, 'test.ogg')
     m = mocker.patch('funkwhale_api.common.utils.on_commit')
-    user = factories['users.SuperUser']()
-    batch = factories['music.ImportBatch'](submitted_by=user)
+    batch = factories['music.ImportBatch'](
+        submitted_by=superuser_api_client.user)
     url = reverse('api:v1:import-jobs-list')
-    client.login(username=user.username, password='test')
     with open(path, 'rb') as f:
         content = f.read()
         f.seek(0)
-        response = client.post(url, {
+        response = superuser_api_client.post(url, {
             'batch': batch.pk,
             'audio_file': f,
             'source': 'file://'
-        }, format='multipart')
+        })
 
     assert response.status_code == 201
 
@@ -237,16 +241,16 @@ def test_user_can_create_import_job_with_file(client, factories, mocker):
         import_job_id=job.pk)
 
 
-def test_can_search_artist(factories, client):
+def test_can_search_artist(factories, logged_in_client):
     artist1 = factories['music.Artist']()
     artist2 = factories['music.Artist']()
     expected = [serializers.ArtistSerializerNested(artist1).data]
     url = reverse('api:v1:artists-search')
-    response = client.get(url, {'query': artist1.name})
-    assert json.loads(response.content.decode('utf-8')) == expected
+    response = logged_in_client.get(url, {'query': artist1.name})
+    assert response.data == expected
 
 
-def test_can_search_artist_by_name_start(factories, client):
+def test_can_search_artist_by_name_start(factories, logged_in_client):
     artist1 = factories['music.Artist'](name='alpha')
     artist2 = factories['music.Artist'](name='beta')
     expected = {
@@ -256,20 +260,20 @@ def test_can_search_artist_by_name_start(factories, client):
         'results': [serializers.ArtistSerializerNested(artist1).data]
     }
     url = reverse('api:v1:artists-list')
-    response = client.get(url, {'name__startswith': 'a'})
+    response = logged_in_client.get(url, {'name__startswith': 'a'})
 
-    assert expected == json.loads(response.content.decode('utf-8'))
+    assert expected == response.data
 
 
-def test_can_search_tracks(factories, client):
+def test_can_search_tracks(factories, logged_in_client):
     track1 = factories['music.Track'](title="test track 1")
     track2 = factories['music.Track']()
     query = 'test track 1'
     expected = [serializers.TrackSerializerNested(track1).data]
     url = reverse('api:v1:tracks-search')
-    response = client.get(url, {'query': query})
+    response = logged_in_client.get(url, {'query': query})
 
-    assert expected == json.loads(response.content.decode('utf-8'))
+    assert expected == response.data
 
 
 @pytest.mark.parametrize('route,method', [
@@ -278,24 +282,31 @@ def test_can_search_tracks(factories, client):
     ('api:v1:artists-list', 'get'),
     ('api:v1:albums-list', 'get'),
 ])
-def test_can_restrict_api_views_to_authenticated_users(db, route, method, settings, client):
+def test_can_restrict_api_views_to_authenticated_users(
+        db, route, method, settings, client):
     url = reverse(route)
     settings.API_AUTHENTICATION_REQUIRED = True
     response = getattr(client, method)(url)
     assert response.status_code == 401
 
 
-def test_track_file_url_is_restricted_to_authenticated_users(client, factories, settings):
+def test_track_file_url_is_restricted_to_authenticated_users(
+        api_client, factories, settings):
     settings.API_AUTHENTICATION_REQUIRED = True
     f = factories['music.TrackFile']()
     assert f.audio_file is not None
     url = f.path
-    response = client.get(url)
+    response = api_client.get(url)
     assert response.status_code == 401
 
-    user = factories['users.SuperUser']()
-    client.login(username=user.username, password='test')
-    response = client.get(url)
+
+def test_track_file_url_is_accessible_to_authenticated_users(
+        logged_in_api_client, factories, settings):
+    settings.API_AUTHENTICATION_REQUIRED = True
+    f = factories['music.TrackFile']()
+    assert f.audio_file is not None
+    url = f.path
+    response = logged_in_api_client.get(url)
 
     assert response.status_code == 200
     assert response['X-Accel-Redirect'] == '/_protected{}'.format(f.audio_file.url)

@@ -23,7 +23,7 @@ def test_activity_listening_serializer(factories):
         "id": listening.get_activity_url(),
         "actor": actor,
         "object": TrackActivitySerializer(listening.track).data,
-        "published": field.to_representation(listening.end_date),
+        "published": field.to_representation(listening.creation_date),
     }
 
     data = serializers.ListeningActivitySerializer(listening).data

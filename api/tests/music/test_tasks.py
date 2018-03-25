@@ -4,8 +4,6 @@ import pytest
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.music import tasks
 
-from . import data as api_data
-
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -50,7 +48,7 @@ def test_set_acoustid_on_track_file_required_high_score(factories, mocker):
 
 
 def test_import_job_can_run_with_file_and_acoustid(
-        preferences, factories, mocker):
+        artists, albums, tracks, preferences, factories, mocker):
     preferences['providers_acoustid__api_key'] = 'test'
     path = os.path.join(DATA_DIR, 'test.ogg')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
@@ -66,13 +64,13 @@ def test_import_job_can_run_with_file_and_acoustid(
     }
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['adhesive_wombat'])
+        return_value=artists['get']['adhesive_wombat'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get']['marsupial'])
+        return_value=albums['get']['marsupial'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.recordings.search',
-        return_value=api_data.tracks['search']['8bitadventures'])
+        return_value=tracks['search']['8bitadventures'])
     mocker.patch('acoustid.match', return_value=acoustid_payload)
 
     job = factories['music.FileImportJob'](audio_file__path=path)
@@ -129,7 +127,8 @@ def test__do_import_skipping_accoustid_if_no_key(
     m.assert_called_once_with(p)
 
 
-def test_import_job_can_be_skipped(factories, mocker, preferences):
+def test_import_job_can_be_skipped(
+        artists, albums, tracks, factories, mocker, preferences):
     preferences['providers_acoustid__api_key'] = 'test'
     path = os.path.join(DATA_DIR, 'test.ogg')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
@@ -146,13 +145,13 @@ def test_import_job_can_be_skipped(factories, mocker, preferences):
     }
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=api_data.artists['get']['adhesive_wombat'])
+        return_value=artists['get']['adhesive_wombat'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=api_data.albums['get']['marsupial'])
+        return_value=albums['get']['marsupial'])
     mocker.patch(
         'funkwhale_api.musicbrainz.api.recordings.search',
-        return_value=api_data.tracks['search']['8bitadventures'])
+        return_value=tracks['search']['8bitadventures'])
     mocker.patch('acoustid.match', return_value=acoustid_payload)
 
     job = factories['music.FileImportJob'](audio_file__path=path)

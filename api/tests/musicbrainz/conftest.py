@@ -1,5 +1,7 @@
-artists = {'search': {}, 'get': {}}
-artists['search']['lost fingers'] = {
+import pytest
+
+_artists = {'search': {}, 'get': {}}
+_artists['search']['lost fingers'] = {
     'artist-count': 696,
     'artist-list': [
         {
@@ -21,7 +23,7 @@ artists['search']['lost fingers'] = {
         },
     ]
 }
-artists['get']['lost fingers'] = {
+_artists['get']['lost fingers'] = {
     "artist": {
         "life-span": {
             "begin": "2008"
@@ -102,8 +104,8 @@ artists['get']['lost fingers'] = {
 }
 
 
-release_groups = {'browse': {}}
-release_groups['browse']["lost fingers"] = {
+_release_groups = {'browse': {}}
+_release_groups['browse']["lost fingers"] = {
     "release-group-list": [
         {
             "first-release-date": "2010",
@@ -165,8 +167,8 @@ release_groups['browse']["lost fingers"] = {
     "release-group-count": 8
 }
 
-recordings = {'search': {}, 'get': {}}
-recordings['search']['brontide matador'] = {
+_recordings = {'search': {}, 'get': {}}
+_recordings['search']['brontide matador'] = {
     "recording-count": 1044,
     "recording-list": [
         {
@@ -217,8 +219,8 @@ recordings['search']['brontide matador'] = {
     ]
 }
 
-releases = {'search': {}, 'get': {}, 'browse': {}}
-releases['search']['brontide matador'] = {
+_releases = {'search': {}, 'get': {}, 'browse': {}}
+_releases['search']['brontide matador'] = {
     "release-count": 116, "release-list": [
         {
             "ext:score": "100",
@@ -283,7 +285,7 @@ releases['search']['brontide matador'] = {
     ]
 }
 
-releases['browse']['Lost in the 80s'] = {
+_releases['browse']['Lost in the 80s'] = {
     "release-count": 3,
     "release-list": [
         {
@@ -476,3 +478,23 @@ releases['browse']['Lost in the 80s'] = {
         },
     ]
 }
+
+
+@pytest.fixture()
+def releases():
+    return _releases
+
+
+@pytest.fixture()
+def release_groups():
+    return _release_groups
+
+
+@pytest.fixture()
+def artists():
+    return _artists
+
+
+@pytest.fixture()
+def recordings():
+    return _recordings

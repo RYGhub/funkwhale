@@ -50,6 +50,7 @@ services:
       - ./api:/app
       - ./data/music:/music
     environment:
+      - "PYTHONDONTWRITEBYTECODE=true"
       - "DJANGO_ALLOWED_HOSTS=localhost,nginx"
       - "DJANGO_SETTINGS_MODULE=config.settings.local"
       - "DJANGO_SECRET_KEY=dev"

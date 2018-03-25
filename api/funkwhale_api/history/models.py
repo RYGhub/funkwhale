@@ -6,7 +6,8 @@ from funkwhale_api.music.models import Track
 
 
 class Listening(models.Model):
-    end_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    creation_date = models.DateTimeField(
+        default=timezone.now, null=True, blank=True)
     track = models.ForeignKey(
         Track, related_name="listenings", on_delete=models.CASCADE)
     user = models.ForeignKey(
@@ -18,7 +19,7 @@ class Listening(models.Model):
     session_key = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
-        ordering = ('-end_date',)
+        ordering = ('-creation_date',)
 
     def save(self, **kwargs):
         if not self.user and not self.session_key:
