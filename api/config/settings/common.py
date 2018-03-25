@@ -231,6 +231,7 @@ STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR('staticfiles')))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = env("STATIC_URL", default='/staticfiles/')
+DEFAULT_FILE_STORAGE = 'funkwhale_api.common.storage.ASCIIFileSystemStorage'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
