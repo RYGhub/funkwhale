@@ -43,6 +43,9 @@ export default {
       if (state.events.length > state.maxEvents) {
         state.events = state.events.slice(0, state.maxEvents)
       }
+    },
+    events: (state, value) => {
+      state.events = value
     }
   },
   actions: {
