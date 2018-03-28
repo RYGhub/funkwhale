@@ -17,13 +17,15 @@ def test_can_get_search_results_from_youtube(mocker):
     assert results[0]['full_url'] == 'https://www.youtube.com/watch?v=0HxZn6CzOIo'
 
 
-def test_can_get_search_results_from_funkwhale(mocker, client, db):
+def test_can_get_search_results_from_funkwhale(
+        settings, mocker, api_client, db):
+    settings.API_AUTHENTICATION_REQUIRED = False
     mocker.patch(
         'funkwhale_api.providers.youtube.client._do_search',
         return_value=api_data.search['8 bit adventure'])
     query = '8 bit adventure'
     url = reverse('api:v1:providers:youtube:search')
-    response = client.get(url, {'query': query})
+    response = api_client.get(url, {'query': query})
     # we should cast the youtube result to something more generic
     expected = {
         "id": "0HxZn6CzOIo",
@@ -37,7 +39,7 @@ def test_can_get_search_results_from_funkwhale(mocker, client, db):
         "cover": "https://i.ytimg.com/vi/0HxZn6CzOIo/hqdefault.jpg"
     }
 
-    assert json.loads(response.content.decode('utf-8'))[0] == expected
+    assert response.data[0] == expected
 
 
 def test_can_send_multiple_queries_at_once(mocker):
@@ -67,7 +69,9 @@ def test_can_send_multiple_queries_at_once(mocker):
     assert results['2'][0]['full_url'] == 'https://www.youtube.com/watch?v=BorYwGi2SJc'
 
 
-def test_can_send_multiple_queries_at_once_from_funwkhale(mocker, db, client):
+def test_can_send_multiple_queries_at_once_from_funwkhale(
+        settings, mocker, db, api_client):
+    settings.API_AUTHENTICATION_REQUIRED = False
     mocker.patch(
         'funkwhale_api.providers.youtube.client._do_search',
         return_value=api_data.search['8 bit adventure'])
@@ -89,7 +93,6 @@ def test_can_send_multiple_queries_at_once_from_funwkhale(mocker, db, client):
     }
 
     url = reverse('api:v1:providers:youtube:searchs')
-    response = client.post(
-        url, json.dumps(queries), content_type='application/json')
+    response = api_client.post(url, queries, format='json')
 
-    assert expected == json.loads(response.content.decode('utf-8'))['1'][0]
+    assert expected == response.data['1'][0]

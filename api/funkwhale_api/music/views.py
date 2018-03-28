@@ -328,7 +328,7 @@ class SubmitViewSet(viewsets.ViewSet):
         job = models.ImportJob.objects.create(mbid=request.POST['mbid'], batch=batch, source=request.POST['import_url'])
         tasks.import_job_run.delay(import_job_id=job.pk)
         serializer = serializers.ImportBatchSerializer(batch)
-        return Response(serializer.data)
+        return Response(serializer.data, status=201)
 
     def get_import_request(self, data):
         try:

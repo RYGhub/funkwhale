@@ -13,7 +13,8 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_submit_youtube_url_for_track_import(
-        artists, albums, tracks, mocker, superuser_client):
+        settings, artists, albums, tracks, mocker, superuser_client):
+    mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
     mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=artists['get']['adhesive_wombat'])
@@ -29,13 +30,18 @@ def test_can_submit_youtube_url_for_track_import(
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
     video_id = 'tPEE9ZwTmy0'
     url = reverse('api:v1:submit-single')
+    video_url = 'https://www.youtube.com/watch?v={0}'.format(video_id)
     response = superuser_client.post(
         url,
-        {'import_url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
+        {'import_url': video_url,
          'mbid': mbid})
-    track = models.Track.objects.get(mbid=mbid)
-    assert track.artist.name == 'Adhesive Wombat'
-    assert track.album.title == 'Marsupial Madness'
+
+    assert response.status_code == 201
+    batch = superuser_client.user.imports.latest('id')
+    job = batch.jobs.latest('id')
+    assert job.status == 'pending'
+    assert str(job.mbid) == mbid
+    assert job.source == video_url
 
 
 def test_import_creates_an_import_with_correct_data(mocker, superuser_client):
