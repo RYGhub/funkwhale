@@ -10,3 +10,4 @@ pytest-mock
 pytest-sugar
 pytest-xdist
 pytest-cov
+requests-mock
