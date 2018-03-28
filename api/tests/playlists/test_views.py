@@ -106,7 +106,9 @@ def test_deleting_plt_updates_indexes(
 
 
 @pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
-def test_playlist_privacy_respected_in_list_anon(level, factories, api_client):
+def test_playlist_privacy_respected_in_list_anon(
+        settings, level, factories, api_client):
+    settings.API_AUTHENTICATION_REQUIRED = False
     factories['playlists.Playlist'](privacy_level=level)
     url = reverse('api:v1:playlists-list')
     response = api_client.get(url)
@@ -115,26 +117,28 @@ def test_playlist_privacy_respected_in_list_anon(level, factories, api_client):
 
 
 @pytest.mark.parametrize('method', ['PUT', 'PATCH', 'DELETE'])
-def test_only_owner_can_edit_playlist(method, factories, api_client):
+def test_only_owner_can_edit_playlist(method, factories, logged_in_api_client):
     playlist = factories['playlists.Playlist']()
     url = reverse('api:v1:playlists-detail', kwargs={'pk': playlist.pk})
-    response = api_client.get(url)
+    response = getattr(logged_in_api_client, method.lower())(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.parametrize('method', ['PUT', 'PATCH', 'DELETE'])
-def test_only_owner_can_edit_playlist_track(method, factories, api_client):
+def test_only_owner_can_edit_playlist_track(
+        method, factories, logged_in_api_client):
     plt = factories['playlists.PlaylistTrack']()
     url = reverse('api:v1:playlist-tracks-detail', kwargs={'pk': plt.pk})
-    response = api_client.get(url)
+    response = getattr(logged_in_api_client, method.lower())(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
 def test_playlist_track_privacy_respected_in_list_anon(
-        level, factories, api_client):
+        level, factories, api_client, settings):
+    settings.API_AUTHENTICATION_REQUIRED = False
     factories['playlists.PlaylistTrack'](playlist__privacy_level=level)
     url = reverse('api:v1:playlist-tracks-list')
     response = api_client.get(url)
