@@ -65,5 +65,5 @@ def test_wellknown_webfinger_system(
         url, data={'resource': 'acct:service@test.federation'})
 
     assert response.status_code == 200
-    assert response['Content-Type'] == 'application/jrd+json; charset=utf-8'
+    assert response['Content-Type'] == 'application/jrd+json'
     assert response.data == webfinger.serialize_system_acct()

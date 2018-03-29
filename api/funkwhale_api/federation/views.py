@@ -7,6 +7,7 @@ from rest_framework import views
 from rest_framework import response
 from rest_framework.decorators import list_route
 
+from . import renderers
 from . import serializers
 from . import webfinger
 
@@ -21,6 +22,7 @@ class FederationMixin(object):
 class InstanceViewSet(FederationMixin, viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
 
     @list_route(methods=['get'])
     def actor(self, request, *args, **kwargs):
@@ -38,6 +40,7 @@ class InstanceViewSet(FederationMixin, viewsets.GenericViewSet):
 class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []
+    renderer_classes = [renderers.WebfingerRenderer]
 
     @list_route(methods=['get'])
     def webfinger(self, request, *args, **kwargs):
@@ -62,9 +65,7 @@ class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
         handler = getattr(self, 'handler_{}'.format(resource_type))
         data = handler(result)
 
-        return response.Response(
-            data,
-            content_type='application/jrd+json; charset=utf-8')
+        return response.Response(data)
 
     def handler_acct(self, clean_result):
         username, hostname = clean_result
