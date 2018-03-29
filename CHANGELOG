@@ -3,6 +3,53 @@ Changelog
 
 .. towncrier
 
+Release notes:
+
+Preparing for federation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In order to prepare for federation (see #136 and #137), new API endpoints
+have been added under /federation and /.well-known/webfinger.
+
+For these endpoints to work, you will need to update your nginx configuration,
+and add the following snippets::
+
+    location /federation/ {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/federation/;
+    }
+
+    location /.well-known/webfinger {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/.well-known/webfinger;
+    }
+
+This will ensure federation endpoints will be reachable in the future.
+You can of course skip this part if you know you will not federate your instance.
+
+A new ``FEDERATION_ENABLED`` env var have also been added to control wether
+federation is enabled or not on the application side. This settings defaults
+to True, which should have no consequencies at the moment, since actual
+federation is not implemented and the only available endpoints are for
+testing purposes.
+
+Add ``FEDERATION_ENABLED=false`` to your .env file to disable federation
+on the application side.
+
+The last step involves generating RSA private and public keys for signing
+your instance requests on the federation. This can be done via::
+
+    # on docker setups
+    docker-compose --rm api python manage.py generate_keys --no-input
+
+    # on non-docker setups
+    source /srv/funkwhale/virtualenv/bin/activate
+    source /srv/funkwhale/load_env
+    python manage.py generate_keys --no-input
+
+That's it :)
+
+
 0.7 (2018-03-21)
 ----------------
 
