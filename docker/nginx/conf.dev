@@ -37,19 +37,7 @@ http {
         listen 6001;
         charset     utf-8;
         client_max_body_size 20M;
-
-        # global proxy pass config
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host   localhost:8080;
-        proxy_set_header X-Forwarded-Port   8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_redirect off;
-
+        include /etc/nginx/funkwhale_proxy.conf;
         location /_protected/media {
             internal;
             alias   /protected/media;
@@ -63,8 +51,7 @@ http {
             if ($request_uri ~* "[^\?]+\?(.*)$") {
                 set $query $1;
             }
-            proxy_set_header X-Forwarded-Host   localhost:8080;
-            proxy_set_header X-Forwarded-Port   8080;
+            include /etc/nginx/funkwhale_proxy.conf;
             proxy_pass http://api:12081/api/v1/trackfiles/viewable/?$query;
             proxy_pass_request_body off;
             proxy_set_header        Content-Length "";
@@ -78,6 +65,7 @@ http {
             if ($args ~ (.*)jwt=[^&]*(.*)) {
                 set $cleaned_args $1$2;
             }
+            include /etc/nginx/funkwhale_proxy.conf;
             proxy_cache_key "$scheme$request_method$host$uri$is_args$cleaned_args";
             proxy_cache transcode;
             proxy_cache_valid 200 7d;
@@ -87,6 +75,7 @@ http {
             proxy_pass http://api:12081;
         }
         location / {
+            include /etc/nginx/funkwhale_proxy.conf;
             proxy_pass   http://api:12081/;
         }
     }

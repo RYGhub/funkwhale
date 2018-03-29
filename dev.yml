@@ -72,15 +72,20 @@ services:
       - redis
 
   nginx:
+    command: /entrypoint.sh
     env_file:
       - .env.dev
       - .env
     image: nginx
+    environment:
+      - "WEBPACK_DEVSERVER_PORT=${WEBPACK_DEVSERVER_PORT-8080}"
     links:
       - api
       - front
     volumes:
       - ./docker/nginx/conf.dev:/etc/nginx/nginx.conf
+      - ./docker/nginx/entrypoint.sh:/entrypoint.sh:ro
+      - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf.template:ro
       - ./api/funkwhale_api/media:/protected/media
     ports:
       - "0.0.0.0:6001:6001"
