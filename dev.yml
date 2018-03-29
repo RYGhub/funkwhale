@@ -44,7 +44,7 @@ services:
       - C_FORCE_ROOT=true
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-      - "FUNKWHALE_URL=http://funkwhale.test"
+      - "FUNKWHALE_URL=http://localhost"
     volumes:
       - ./api:/app
       - ./data/music:/music
@@ -66,7 +66,7 @@ services:
       - "DJANGO_SECRET_KEY=dev"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-      - "FUNKWHALE_URL=http://funkwhale.test"
+      - "FUNKWHALE_URL=http://localhost"
     links:
       - postgres
       - redis
