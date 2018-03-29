@@ -73,6 +73,19 @@ via the following command::
     docker-compose -f dev.yml build
 
 
+Creating your env file
+^^^^^^^^^^^^^^^^^^^^^^
+
+We provide a working .env.dev configuration file that is suitable for
+development. However, to enable customization on your machine, you should
+also create a .env file that will hold your personal environment
+variables (those will not be commited to the project).
+
+Create it like this::
+
+    touch .env
+
+
 Database management
 ^^^^^^^^^^^^^^^^^^^
 

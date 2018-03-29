@@ -86,3 +86,4 @@ front/selenium-debug.log
 docs/_build
 
 data/
+.env
