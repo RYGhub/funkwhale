@@ -4,16 +4,16 @@ import requests_http_signature
 
 from funkwhale_api.factories import registry
 
-from . import signing
+from . import keys
 
 
-registry.register(signing.get_key_pair, name='federation.KeyPair')
+registry.register(keys.get_key_pair, name='federation.KeyPair')
 
 
 @registry.register(name='federation.SignatureAuth')
 class SignatureAuthFactory(factory.Factory):
     algorithm = 'rsa-sha256'
-    key = factory.LazyFunction(lambda: signing.get_key_pair()[0])
+    key = factory.LazyFunction(lambda: keys.get_key_pair()[0])
     key_id = factory.Faker('url')
 
     class Meta:

@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+from urllib.parse import urlsplit
 import os
 import environ
 from funkwhale_api import __version__
@@ -24,8 +25,13 @@ try:
 except FileNotFoundError:
     pass
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 FUNKWHALE_URL = env('FUNKWHALE_URL')
+FUNKWHALE_HOSTNAME = urlsplit(FUNKWHALE_URL).netloc
+
+FEDERATION_ENABLED = env.bool('FEDERATION_ENABLED', default=True)
+FEDERATION_HOSTNAME = env('FEDERATION_HOSTNAME', default=FUNKWHALE_HOSTNAME)
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -395,4 +401,5 @@ ACCOUNT_USERNAME_BLACKLIST = [
     'owner',
     'superuser',
     'staff',
+    'service',
 ] + env.list('ACCOUNT_USERNAME_BLACKLIST', default=[])

@@ -1,0 +1,4 @@
+
+
+class MalformedPayload(ValueError):
+    pass

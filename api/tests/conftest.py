@@ -2,6 +2,7 @@ import factory
 import tempfile
 import shutil
 import pytest
+import requests_mock
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
@@ -148,3 +149,9 @@ def media_root(settings):
     settings.MEDIA_ROOT = tmp_dir
     yield settings.MEDIA_ROOT
     shutil.rmtree(tmp_dir)
+
+
+@pytest.fixture
+def r_mock():
+    with requests_mock.mock() as m:
+        yield m

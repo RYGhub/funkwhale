@@ -4,6 +4,7 @@ import pytest
 import requests_http_signature
 
 from funkwhale_api.federation import signing
+from funkwhale_api.federation import keys
 
 
 def test_can_sign_and_verify_request(factories):
@@ -45,7 +46,7 @@ def test_verify_fails_with_wrong_key(factories):
 
 
 def test_can_verify_django_request(factories, api_request):
-    private_key, public_key = signing.get_key_pair()
+    private_key, public_key = keys.get_key_pair()
     signed_request = factories['federation.SignedRequest'](
         auth__key=private_key
     )
@@ -61,7 +62,7 @@ def test_can_verify_django_request(factories, api_request):
 
 
 def test_can_verify_django_request_digest(factories, api_request):
-    private_key, public_key = signing.get_key_pair()
+    private_key, public_key = keys.get_key_pair()
     signed_request = factories['federation.SignedRequest'](
         auth__key=private_key,
         method='post',
@@ -81,7 +82,7 @@ def test_can_verify_django_request_digest(factories, api_request):
 
 
 def test_can_verify_django_request_digest_failure(factories, api_request):
-    private_key, public_key = signing.get_key_pair()
+    private_key, public_key = keys.get_key_pair()
     signed_request = factories['federation.SignedRequest'](
         auth__key=private_key,
         method='post',
@@ -102,7 +103,7 @@ def test_can_verify_django_request_digest_failure(factories, api_request):
 
 
 def test_can_verify_django_request_failure(factories, api_request):
-    private_key, public_key = signing.get_key_pair()
+    private_key, public_key = keys.get_key_pair()
     signed_request = factories['federation.SignedRequest'](
         auth__key=private_key
     )
