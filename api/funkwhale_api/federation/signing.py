@@ -5,7 +5,8 @@ import requests_http_signature
 def verify(request, public_key):
     return requests_http_signature.HTTPSignatureAuth.verify(
         request,
-        key_resolver=lambda **kwargs: public_key
+        key_resolver=lambda **kwargs: public_key,
+        use_auth_header=False,
     )
 
 
@@ -20,7 +21,7 @@ def verify_django(django_request, public_key):
         # with requests_http_signature
         headers[h.lower()] = v
     try:
-        signature = headers['authorization']
+        signature = headers['signature']
     except KeyError:
         raise exceptions.MissingSignature
 

@@ -7,23 +7,23 @@ from funkwhale_api.federation import signing
 from funkwhale_api.federation import keys
 
 
-def test_can_sign_and_verify_request(factories):
-    private, public = factories['federation.KeyPair']()
-    auth = factories['federation.SignatureAuth'](key=private)
-    request = factories['federation.SignedRequest'](
+def test_can_sign_and_verify_request(nodb_factories):
+    private, public = nodb_factories['federation.KeyPair']()
+    auth = nodb_factories['federation.SignatureAuth'](key=private)
+    request = nodb_factories['federation.SignedRequest'](
         auth=auth
     )
     prepared_request = request.prepare()
     assert 'date' in prepared_request.headers
-    assert 'authorization' in prepared_request.headers
-    assert prepared_request.headers['authorization'].startswith('Signature')
-    assert signing.verify(prepared_request, public) is None
+    assert 'signature' in prepared_request.headers
+    assert signing.verify(
+        prepared_request, public) is None
 
 
-def test_can_sign_and_verify_request_digest(factories):
-    private, public = factories['federation.KeyPair']()
-    auth = factories['federation.SignatureAuth'](key=private)
-    request = factories['federation.SignedRequest'](
+def test_can_sign_and_verify_request_digest(nodb_factories):
+    private, public = nodb_factories['federation.KeyPair']()
+    auth = nodb_factories['federation.SignatureAuth'](key=private)
+    request = nodb_factories['federation.SignedRequest'](
         auth=auth,
         method='post',
         data=b'hello=world'
@@ -31,14 +31,13 @@ def test_can_sign_and_verify_request_digest(factories):
     prepared_request = request.prepare()
     assert 'date' in prepared_request.headers
     assert 'digest' in prepared_request.headers
-    assert 'authorization' in prepared_request.headers
-    assert prepared_request.headers['authorization'].startswith('Signature')
+    assert 'signature' in prepared_request.headers
     assert signing.verify(prepared_request, public) is None
 
 
-def test_verify_fails_with_wrong_key(factories):
-    wrong_private, wrong_public = factories['federation.KeyPair']()
-    request = factories['federation.SignedRequest']()
+def test_verify_fails_with_wrong_key(nodb_factories):
+    wrong_private, wrong_public = nodb_factories['federation.KeyPair']()
+    request = nodb_factories['federation.SignedRequest']()
     prepared_request = request.prepare()
 
     with pytest.raises(cryptography.exceptions.InvalidSignature):
@@ -55,7 +54,7 @@ def test_can_verify_django_request(factories, api_request):
         '/',
         headers={
             'Date': prepared.headers['date'],
-            'Authorization': prepared.headers['authorization'],
+            'Signature': prepared.headers['signature'],
         }
     )
     assert signing.verify_django(django_request, public_key) is None
@@ -74,7 +73,7 @@ def test_can_verify_django_request_digest(factories, api_request):
         headers={
             'Date': prepared.headers['date'],
             'Digest': prepared.headers['digest'],
-            'Authorization': prepared.headers['authorization'],
+            'Signature': prepared.headers['signature'],
         }
     )
 
@@ -94,7 +93,7 @@ def test_can_verify_django_request_digest_failure(factories, api_request):
         headers={
             'Date': prepared.headers['date'],
             'Digest': prepared.headers['digest'] + 'noop',
-            'Authorization': prepared.headers['authorization'],
+            'Signature': prepared.headers['signature'],
         }
     )
 
@@ -112,7 +111,7 @@ def test_can_verify_django_request_failure(factories, api_request):
         '/',
         headers={
             'Date': 'Wrong',
-            'Authorization': prepared.headers['authorization'],
+            'Signature': prepared.headers['signature'],
         }
     )
     with pytest.raises(cryptography.exceptions.InvalidSignature):
