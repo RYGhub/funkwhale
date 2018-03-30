@@ -21,7 +21,7 @@ def repr_instance_actor():
             {},
         ],
         'id': utils.full_url(reverse('federation:instance-actor')),
-        'type': 'Service',
+        'type': 'Person',
         'inbox': utils.full_url(reverse('federation:instance-inbox')),
         'outbox': utils.full_url(reverse('federation:instance-outbox')),
         'preferredUsername': 'service',

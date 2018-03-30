@@ -20,7 +20,7 @@ def test_repr_instance_actor(db, preferences, settings):
             {},
         ],
         'id': actor_url,
-        'type': 'Service',
+        'type': 'Person',
         'preferredUsername': 'service',
         'name': 'Service Bot - test.federation',
         'summary': 'Bot account for federating with test.federation',
