@@ -54,12 +54,12 @@ def test_service_serializer(settings):
         'links': [
             {
                 'rel': 'self',
-                'href': 'https://test.federation/instance/actor',
+                'href': 'https://test.federation/federation/instance/actor',
                 'type': 'application/activity+json',
             }
         ],
         'aliases': [
-            'https://test.federation/instance/actor',
+            'https://test.federation/federation/instance/actor',
         ]
     }
 

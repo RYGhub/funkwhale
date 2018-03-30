@@ -2,6 +2,7 @@ from django.urls import reverse
 
 import pytest
 
+from funkwhale_api.federation import serializers
 from funkwhale_api.federation import webfinger
 
 
@@ -9,21 +10,9 @@ def test_instance_actor(db, settings, api_client):
     settings.FUNKWHALE_URL = 'http://test.com'
     url = reverse('federation:instance-actor')
     response = api_client.get(url)
-    assert response.data['id'] == (
-      settings.FUNKWHALE_URL + url
-    )
-    assert response.data['type'] == 'Service'
-    assert response.data['inbox'] == (
-      settings.FUNKWHALE_URL + reverse('federation:instance-inbox')
-    )
-    assert response.data['outbox'] == (
-      settings.FUNKWHALE_URL + reverse('federation:instance-outbox')
-    )
-    assert response.data['@context'] == [
-      'https://www.w3.org/ns/activitystreams',
-      'https://w3id.org/security/v1',
-      {},
-    ]
+
+    assert response.status_code == 200
+    assert response.data == serializers.repr_instance_actor()
 
 
 @pytest.mark.parametrize('route', [
