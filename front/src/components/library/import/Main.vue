@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Import Music'">
     <div class="ui vertical stripe segment">
       <div class="ui top three attached ordered steps">
         <a @click="currentStep = 0" :class="['step', {'active': currentStep === 0}, {'completed': currentStep > 0}]">

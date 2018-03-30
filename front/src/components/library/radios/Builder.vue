@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical stripe segment">
+  <div class="ui vertical stripe segment" v-title="'Radio Builder'">
     <div>
       <div>
         <h2 class="ui header">Builder</h2>

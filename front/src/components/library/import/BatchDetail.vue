@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Import Batch #' + id">
     <div v-if="isLoading && !batch" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>

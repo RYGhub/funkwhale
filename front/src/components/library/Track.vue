@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="isLoadingTrack" class="ui vertical segment">
+    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="'Track'">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
-      <div :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle">
+      <div :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="track.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted music orange icon"></i>

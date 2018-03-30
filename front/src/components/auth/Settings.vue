@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Account Settings'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2 class="ui header">Account settings</h2>
