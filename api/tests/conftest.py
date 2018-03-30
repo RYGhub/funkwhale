@@ -54,7 +54,7 @@ def nodb_factories():
 
 
 @pytest.fixture
-def preferences(db):
+def preferences(db, cache):
     manager = global_preferences_registry.manager()
     manager.all()
     yield manager
