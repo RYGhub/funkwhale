@@ -40,7 +40,7 @@ The last step involves generating RSA private and public keys for signing
 your instance requests on the federation. This can be done via::
 
     # on docker setups
-    docker-compose --rm api python manage.py generate_keys --no-input
+    docker-compose run --rm api python manage.py generate_keys --no-input
 
     # on non-docker setups
     source /srv/funkwhale/virtualenv/bin/activate
