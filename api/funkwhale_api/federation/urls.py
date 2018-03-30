@@ -4,7 +4,7 @@ from . import views
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(
-    r'instance',
+    r'federation/instance',
     views.InstanceViewSet,
     'instance')
 router.register(
