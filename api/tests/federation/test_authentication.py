@@ -20,14 +20,17 @@ def test_authenticate(nodb_factories, mocker, api_request):
         })
     signed_request = nodb_factories['federation.SignedRequest'](
         auth__key=private,
-        auth__key_id=actor_url + '#main-key'
+        auth__key_id=actor_url + '#main-key',
+        auth__headers=[
+            'date',
+        ]
     )
     prepared = signed_request.prepare()
     django_request = api_request.get(
         '/',
-        headers={
-            'Date': prepared.headers['date'],
-            'Signature': prepared.headers['signature'],
+        **{
+            'HTTP_DATE': prepared.headers['date'],
+            'HTTP_SIGNATURE': prepared.headers['signature'],
         }
     )
     authenticator = authentication.SignatureAuthentication()

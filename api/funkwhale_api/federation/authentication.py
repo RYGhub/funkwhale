@@ -9,15 +9,17 @@ from . import actors
 from . import keys
 from . import serializers
 from . import signing
+from . import utils
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):
-    def authenticate(self, request):
+    def authenticate_actor(self, request):
+        headers = utils.clean_wsgi_headers(request.META)
         try:
-            signature = request.META['headers']['Signature']
+            signature = headers['Signature']
             key_id = keys.get_key_id_from_signature_header(signature)
         except KeyError:
-            raise exceptions.AuthenticationFailed('No signature')
+            return
         except ValueError as e:
             raise exceptions.AuthenticationFailed(str(e))
 
@@ -33,14 +35,17 @@ class SignatureAuthentication(authentication.BaseAuthentication):
 
         serializer = serializers.ActorSerializer(data=actor_data)
         if not serializer.is_valid():
-            raise exceptions.AuthenticationFailed('Invalid actor payload')
+            raise exceptions.AuthenticationFailed('Invalid actor payload: {}'.format(serializer.errors))
 
         try:
             signing.verify_django(request, public_key.encode('utf-8'))
         except cryptography.exceptions.InvalidSignature:
             raise exceptions.AuthenticationFailed('Invalid signature')
 
+        return serializer.build()
+
+    def authenticate(self, request):
+        actor = self.authenticate_actor(request)
         user = AnonymousUser()
-        ac = serializer.build()
-        setattr(request, 'actor', ac)
+        setattr(request, 'actor', actor)
         return (user, None)
