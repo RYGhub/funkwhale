@@ -10,10 +10,18 @@ from . import utils
 
 
 def get_actor_data(actor_url):
-    response = requests.get(actor_url)
+    response = requests.get(
+        actor_url,
+        headers={
+            'Accept': 'application/activity+json',
+        }
+    )
     response.raise_for_status()
-    return response.json()
-
+    try:
+        return response.json()
+    except:
+        raise ValueError(
+            'Invalid actor payload: {}'.format(response.text))
 
 SYSTEM_ACTORS = {
     'library': {
