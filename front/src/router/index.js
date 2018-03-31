@@ -18,6 +18,7 @@ import LibraryTrack from '@/components/library/Track'
 import LibraryImport from '@/components/library/import/Main'
 import LibraryRadios from '@/components/library/Radios'
 import RadioBuilder from '@/components/library/radios/Builder'
+import RadioDetail from '@/views/radios/Detail'
 import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
 import RequestsList from '@/components/requests/RequestsList'
@@ -111,6 +112,7 @@ export default new Router({
         },
         { path: 'radios/build', name: 'library.radios.build', component: RadioBuilder, props: true },
         { path: 'radios/build/:id', name: 'library.radios.edit', component: RadioBuilder, props: true },
+        { path: 'radios/:id', name: 'library.radios.detail', component: RadioDetail, props: true },
         {
           path: 'playlists/',
           name: 'library.playlists.browse',

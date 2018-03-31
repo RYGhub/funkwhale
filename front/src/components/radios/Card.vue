@@ -1,7 +1,11 @@
 <template>
     <div class="ui card">
       <div class="content">
-        <div class="header">{{ radio.name }}</div>
+        <div class="header">
+          <router-link class="discrete link" :to="{name: 'library.radios.detail', params: {id: radio.id}}">
+            {{ radio.name }}
+          </router-link>
+        </div>
         <div class="description">
           {{ radio.description }}
         </div>

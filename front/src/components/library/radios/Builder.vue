@@ -180,7 +180,7 @@ export default {
         let url = 'radios/radios/'
         axios.post(url, final).then((response) => {
           self.$router.push({
-            name: 'library.radios.edit',
+            name: 'library.radios.detail',
             params: {
               id: response.data.id
             }
