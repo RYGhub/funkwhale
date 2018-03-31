@@ -8,6 +8,7 @@ from rest_framework import response
 from rest_framework.decorators import list_route, detail_route
 
 from . import actors
+from . import authentication
 from . import renderers
 from . import serializers
 from . import webfinger
@@ -23,7 +24,8 @@ class FederationMixin(object):
 class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
     lookup_field = 'actor'
     lookup_value_regex = '[a-z]*'
-    authentication_classes = []
+    authentication_classes = [
+        authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
 
