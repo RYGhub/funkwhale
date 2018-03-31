@@ -48,9 +48,6 @@ export default {
     },
     hasNext: state => {
       return state.currentIndex < state.tracks.length - 1
-    },
-    hasPrevious: state => {
-      return state.currentIndex > 0
     }
   },
   actions: {
@@ -103,9 +100,11 @@ export default {
         dispatch('next')
       }
     },
-    previous ({state, dispatch}) {
-      if (state.currentIndex > 0) {
+    previous ({state, dispatch, rootState}) {
+      if (state.currentIndex > 0 && rootState.player.currentTime < 3) {
         dispatch('currentIndex', state.currentIndex - 1)
+      } else {
+        dispatch('currentIndex', state.currentIndex)
       }
     },
     next ({state, dispatch, commit, rootState}) {

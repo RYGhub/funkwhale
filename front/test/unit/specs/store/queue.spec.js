@@ -81,14 +81,6 @@ describe('store/queue', () => {
       const state = { tracks: [1, 2, 3], currentIndex: 2 }
       expect(store.getters['hasNext'](state)).to.equal(false)
     })
-    it('hasPrevious true', () => {
-      const state = { currentIndex: 1 }
-      expect(store.getters['hasPrevious'](state)).to.equal(true)
-    })
-    it('hasPrevious false', () => {
-      const state = { currentIndex: 0 }
-      expect(store.getters['hasPrevious'](state)).to.equal(false)
-    })
   })
   describe('actions', () => {
     it('append at end', (done) => {

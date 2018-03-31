@@ -58,9 +58,8 @@
       <div class="two wide column controls ui grid">
         <div
           title="Previous track"
-          class="two wide column control"
-          :disabled="!hasPrevious">
-            <i @click="previous" :class="['ui', {'disabled': !hasPrevious}, 'step', 'backward', 'big', 'icon']" ></i>
+          class="two wide column control">
+            <i @click="previous" class="ui step backward big icon"></i>
         </div>
         <div
           v-if="!playing"
@@ -205,7 +204,6 @@ export default {
     ...mapGetters({
       currentTrack: 'queue/currentTrack',
       hasNext: 'queue/hasNext',
-      hasPrevious: 'queue/hasPrevious',
       durationFormatted: 'player/durationFormatted',
       currentTimeFormatted: 'player/currentTimeFormatted',
       progress: 'player/progress'
