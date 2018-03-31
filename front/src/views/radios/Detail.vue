@@ -32,6 +32,15 @@
     <div class="ui vertical stripe segment">
       <h2>Tracks</h2>
       <track-table :tracks="tracks"></track-table>
+      <div class="ui center aligned basic segment">
+        <pagination
+          v-if="totalTracks > 25"
+          @page-changed="selectPage"
+          :current="page"
+          :paginate-by="25"
+          :total="totalTracks"
+          ></pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +49,7 @@
 import axios from 'axios'
 import TrackTable from '@/components/audio/track/Table'
 import RadioButton from '@/components/radios/Button'
+import Pagination from '@/components/Pagination'
 
 export default {
   props: {
@@ -47,26 +57,34 @@ export default {
   },
   components: {
     TrackTable,
-    RadioButton
+    RadioButton,
+    Pagination
   },
   data: function () {
     return {
       isLoading: false,
       radio: null,
-      tracks: []
+      tracks: [],
+      totalTracks: 0,
+      page: 1
     }
   },
   created: function () {
     this.fetch()
   },
   methods: {
+    selectPage: function (page) {
+      this.page = page
+    },
     fetch: function () {
       let self = this
       self.isLoading = true
       let url = 'radios/radios/' + this.id + '/'
       axios.get(url).then((response) => {
         self.radio = response.data
-        axios.get(url + 'tracks').then((response) => {
+        axios.get(url + 'tracks', {params: {page: this.page}}).then((response) => {
+          console.log(response.data.count)
+          this.totalTracks = response.data.count
           this.tracks = response.data.results
         }).then(() => {
           self.isLoading = false
@@ -81,6 +99,11 @@ export default {
           path: '/library'
         })
       })
+    }
+  },
+  watch: {
+    page: function () {
+      this.fetch()
     }
   }
 }

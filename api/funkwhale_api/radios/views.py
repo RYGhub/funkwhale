@@ -45,12 +45,11 @@ class RadioViewSet(
     def tracks(self, request, *args, **kwargs):
         radio = self.get_object()
         tracks = radio.get_candidates().for_nested_serialization()
-        serializer = TrackSerializerNested(tracks, many=True)
-        data = {
-            'count': len(tracks),
-            'results': serializer.data
-        }
-        return Response(data, status=200)
+
+        page = self.paginate_queryset(tracks)
+        if page is not None:
+            serializer = TrackSerializerNested(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
     @list_route(methods=['get'])
     def filters(self, request, *args, **kwargs):
