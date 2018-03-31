@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import utils
 
 
 def test_actor_fetching(r_mock):
@@ -24,15 +25,18 @@ def test_get_library(settings, preferences):
         'type': 'Person',
         'name': '{}\'s library'.format(settings.FEDERATION_HOSTNAME),
         'manually_approves_followers': True,
-        'url': reverse(
-            'federation:instance-actors-detail',
-            kwargs={'actor': 'library'}),
-        'shared_inbox_url': reverse(
-            'federation:instance-actors-inbox',
-            kwargs={'actor': 'library'}),
-        'inbox_url': reverse(
-            'federation:instance-actors-inbox',
-            kwargs={'actor': 'library'}),
+        'url': utils.full_url(
+            reverse(
+                'federation:instance-actors-detail',
+                kwargs={'actor': 'library'})),
+        'shared_inbox_url': utils.full_url(
+            reverse(
+                'federation:instance-actors-inbox',
+                kwargs={'actor': 'library'})),
+        'inbox_url': utils.full_url(
+            reverse(
+                'federation:instance-actors-inbox',
+                kwargs={'actor': 'library'})),
         'public_key': 'public_key',
         'summary': 'Bot account to federate with {}\'s library'.format(
         settings.FEDERATION_HOSTNAME),
