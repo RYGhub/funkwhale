@@ -6,6 +6,8 @@ import tempfile
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
+from django.test import client
+
 from dynamic_preferences.registries import global_preferences_registry
 
 from rest_framework.test import APIClient
@@ -116,6 +118,11 @@ def superuser_client(db, factories, client):
 @pytest.fixture
 def api_request():
     return APIRequestFactory()
+
+
+@pytest.fixture
+def fake_request():
+    return client.RequestFactory()
 
 
 @pytest.fixture
