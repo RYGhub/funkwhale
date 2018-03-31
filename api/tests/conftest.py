@@ -1,8 +1,8 @@
 import factory
-import tempfile
-import shutil
 import pytest
 import requests_mock
+import shutil
+import tempfile
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache

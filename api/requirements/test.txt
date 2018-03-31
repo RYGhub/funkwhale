@@ -10,4 +10,5 @@ pytest-mock
 pytest-sugar
 pytest-xdist
 pytest-cov
+pytest-env
 requests-mock
