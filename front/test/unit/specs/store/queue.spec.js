@@ -204,19 +204,30 @@ describe('store/queue', () => {
         expectedActions: []
       }, done)
     })
-    it('previous when at beginning does nothing', (done) => {
+    it('previous when at beginning', (done) => {
       testAction({
         action: store.actions.previous,
         params: {state: {currentIndex: 0}},
-        expectedActions: []
-      }, done)
-    })
-    it('previous', (done) => {
-      testAction({
-        action: store.actions.previous,
-        params: {state: {currentIndex: 1}},
         expectedActions: [
           { type: 'currentIndex', payload: 0 }
+        ]
+      }, done)
+    })
+    it('previous after less than 3 seconds of playback', (done) => {
+      testAction({
+        action: store.actions.previous,
+        params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 1}}},
+        expectedActions: [
+          { type: 'currentIndex', payload: 0 }
+        ]
+      }, done)
+    })
+    it('previous after more than 3 seconds of playback', (done) => {
+      testAction({
+        action: store.actions.previous,
+        params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 3}}},
+        expectedActions: [
+          { type: 'currentIndex', payload: 1 }
         ]
       }, done)
     })
