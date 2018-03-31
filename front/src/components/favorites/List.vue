@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Your Favorites'">
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">Loading your favorites...</div>

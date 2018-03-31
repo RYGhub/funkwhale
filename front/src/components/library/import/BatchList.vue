@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Import Batches'">
     <div class="ui vertical stripe segment">
       <div v-if="isLoading" :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       <button

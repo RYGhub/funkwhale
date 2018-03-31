@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'About This Instance'">
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Radios'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">Browsing radios</h2>
       <router-link class="ui green basic button" to="/library/radios/build" exact>Create your own radio</router-link>

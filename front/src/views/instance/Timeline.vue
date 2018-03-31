@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Instance Timeline'">
     <div class="ui vertical center aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">Loading timeline...</div>

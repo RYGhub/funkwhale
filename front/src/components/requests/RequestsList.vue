@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Import Requests'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">Music requests</h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">

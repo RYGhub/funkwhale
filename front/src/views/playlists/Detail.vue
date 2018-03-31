@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment">
+    <div v-if="isLoading" class="ui vertical segment" v-title="'Playlist'">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment">
+    <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment" v-title="playlist.name">
       <div class="segment-content">
         <h2 class="ui center aligned icon header">
           <i class="circular inverted list yellow icon"></i>

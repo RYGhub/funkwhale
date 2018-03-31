@@ -1,9 +1,9 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Welcome'">
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            Welcome on funkwhale
+            Welcome on Funkwhale
         </h1>
         <p>We think listening music should be simple.</p>
         <router-link class="ui icon button" to="/about">
@@ -143,9 +143,7 @@
 export default {
   name: 'home',
   data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
-    }
+    return {}
   }
 }
 </script>

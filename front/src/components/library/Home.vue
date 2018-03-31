@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Home'">
     <div class="ui vertical stripe segment">
       <search :autofocus="true"></search>
     </div>

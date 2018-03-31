@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Page Not Found'">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">

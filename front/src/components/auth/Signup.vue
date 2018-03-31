@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher">
+  <div class="main pusher" v-title="'Sign Up'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2>Create a funkwhale account</h2>
