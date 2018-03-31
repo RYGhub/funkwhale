@@ -20,6 +20,7 @@ class RadioViewSet(
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
         mixins.ListModelMixin,
+        mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
 
     serializer_class = serializers.RadioSerializer
@@ -39,6 +40,16 @@ class RadioViewSet(
         if serializer.instance.user != self.request.user:
             raise Http404
         return serializer.save(user=self.request.user)
+
+    @detail_route(methods=['get'])
+    def tracks(self, request, *args, **kwargs):
+        radio = self.get_object()
+        tracks = radio.get_candidates().for_nested_serialization()
+
+        page = self.paginate_queryset(tracks)
+        if page is not None:
+            serializer = TrackSerializerNested(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
     @list_route(methods=['get'])
     def filters(self, request, *args, **kwargs):
