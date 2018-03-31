@@ -22,6 +22,7 @@ class ActorSerializer(serializers.ModelSerializer):
     publicKey = serializers.JSONField(source='public_key', required=False)
     manuallyApprovesFollowers = serializers.NullBooleanField(
         source='manually_approves_followers', required=False)
+    summary = serializers.CharField(max_length=None, required=False)
 
     class Meta:
         model = models.Actor
@@ -79,6 +80,11 @@ class ActorSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         kwargs.update(self.prepare_missing_fields())
         return super().save(**kwargs)
+
+    def validate_summary(self, value):
+        if value:
+            return value[:500]
+
 
 class ActorWebfingerSerializer(serializers.ModelSerializer):
     class Meta:
