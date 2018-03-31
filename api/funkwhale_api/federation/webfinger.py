@@ -2,7 +2,9 @@ from django import forms
 from django.conf import settings
 from django.urls import reverse
 
+from . import actors
 from . import utils
+
 VALID_RESOURCE_TYPES = ['acct']
 
 
@@ -30,23 +32,7 @@ def clean_acct(acct_string):
     if hostname != settings.FEDERATION_HOSTNAME:
         raise forms.ValidationError('Invalid hostname')
 
-    if username != 'service':
+    if username not in actors.SYSTEM_ACTORS:
         raise forms.ValidationError('Invalid username')
 
     return username, hostname
-
-
-def serialize_system_acct():
-    return {
-        'subject': 'acct:service@{}'.format(settings.FEDERATION_HOSTNAME),
-        'aliases': [
-            utils.full_url(reverse('federation:instance-actor'))
-        ],
-        'links': [
-            {
-                'rel': 'self',
-                'type': 'application/activity+json',
-                'href': utils.full_url(reverse('federation:instance-actor')),
-            }
-        ]
-    }

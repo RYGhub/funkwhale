@@ -1,16 +1,25 @@
+import pytest
+
 from funkwhale_api.federation import keys
 
 
-def test_public_key_fetching(r_mock):
-    payload = {
-        'id': 'https://actor.mock/users/actor#main-key',
-        'owner': 'test',
-        'publicKeyPem': 'test_pem',
-    }
-    actor = 'https://actor.mock/'
-    r_mock.get(actor, json={'publicKey': payload})
-    r = keys.get_public_key(actor)
+@pytest.mark.parametrize('raw, expected', [
+    ('algorithm="test",keyId="https://test.com"', 'https://test.com'),
+    ('keyId="https://test.com",algorithm="test"', 'https://test.com'),
+])
+def test_get_key_from_header(raw, expected):
+    r = keys.get_key_id_from_signature_header(raw)
+    assert r == expected
 
-    assert r['id'] == payload['id']
-    assert r['owner'] == payload['owner']
-    assert r['public_key_pem'] == payload['publicKeyPem']
+
+@pytest.mark.parametrize('raw', [
+    'algorithm="test",keyid="badCase"',
+    'algorithm="test",wrong="wrong"',
+    'keyId = "wrong"',
+    'keyId=\'wrong\'',
+    'keyId="notanurl"',
+    'keyId="wrong://test.com"',
+])
+def test_get_key_from_header_invalid(raw):
+    with pytest.raises(ValueError):
+        keys.get_key_id_from_signature_header(raw)

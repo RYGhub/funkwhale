@@ -5,8 +5,9 @@ from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework import views
 from rest_framework import response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 
+from . import actors
 from . import renderers
 from . import serializers
 from . import webfinger
@@ -19,20 +20,30 @@ class FederationMixin(object):
         return super().dispatch(request, *args, **kwargs)
 
 
-class InstanceViewSet(FederationMixin, viewsets.GenericViewSet):
+class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
+    lookup_field = 'actor'
+    lookup_value_regex = '[a-z]*'
     authentication_classes = []
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
 
-    @list_route(methods=['get'])
-    def actor(self, request, *args, **kwargs):
-        return response.Response(serializers.repr_instance_actor())
+    def get_object(self):
+        try:
+            return actors.SYSTEM_ACTORS[self.kwargs['actor']]
+        except KeyError:
+            raise Http404
 
-    @list_route(methods=['get'])
+    def retrieve(self, request, *args, **kwargs):
+        actor_conf = self.get_object()
+        actor = actor_conf['get_actor']()
+        serializer = serializers.ActorSerializer(actor)
+        return response.Response(serializer.data, status=200)
+
+    @detail_route(methods=['get'])
     def inbox(self, request, *args, **kwargs):
         raise NotImplementedError()
 
-    @list_route(methods=['get'])
+    @detail_route(methods=['get'])
     def outbox(self, request, *args, **kwargs):
         raise NotImplementedError()
 
@@ -69,6 +80,5 @@ class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
 
     def handler_acct(self, clean_result):
         username, hostname = clean_result
-        if username == 'service':
-            return webfinger.serialize_system_acct()
-        return {}
+        actor = actors.SYSTEM_ACTORS[username]['get_actor']()
+        return serializers.ActorWebfingerSerializer(actor).data
