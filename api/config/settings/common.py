@@ -396,6 +396,9 @@ PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
 
 ACCOUNT_USERNAME_BLACKLIST = [
     'funkwhale',
+    'library',
+    'test',
+    'status',
     'root',
     'admin',
     'owner',
