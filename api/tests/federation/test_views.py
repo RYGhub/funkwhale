@@ -21,19 +21,19 @@ def test_instance_actors(system_actor, db, settings, api_client):
     assert response.data == serializer.data
 
 
-# @pytest.mark.parametrize('route', [
-#     'instance-outbox',
-#     'instance-inbox',
-#     'instance-actor',
-#     'well-known-webfinger',
-# ])
-# def test_instance_inbox_405_if_federation_disabled(
-#         db, settings, api_client, route):
-#     settings.FEDERATION_ENABLED = False
-#     url = reverse('federation:{}'.format(route))
-#     response = api_client.get(url)
-#
-#     assert response.status_code == 405
+@pytest.mark.parametrize('route,kwargs', [
+    ('instance-actors-outbox', {'actor': 'library'}),
+    ('instance-actors-inbox', {'actor': 'library'}),
+    ('instance-actors-detail', {'actor': 'library'}),
+    ('well-known-webfinger', {}),
+])
+def test_instance_inbox_405_if_federation_disabled(
+        authenticated_actor, db, settings, api_client, route, kwargs):
+    settings.FEDERATION_ENABLED = False
+    url = reverse('federation:{}'.format(route), kwargs=kwargs)
+    response = api_client.get(url)
+
+    assert response.status_code == 405
 
 
 def test_wellknown_webfinger_validates_resource(

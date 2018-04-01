@@ -5,6 +5,7 @@ import requests_http_signature
 from funkwhale_api.factories import registry
 
 from . import keys
+from . import models
 
 
 registry.register(keys.get_key_pair, name='federation.KeyPair')
@@ -48,14 +49,23 @@ class SignedRequestFactory(factory.Factory):
         self.headers.update(default_headers)
 
 
-# @registry.register
-# class ActorFactory(factory.DjangoModelFactory):
-#     url = factory.Faker('url')
-#     inbox_url = factory.Faker('url')
-#     outbox_url = factory.Faker('url')
-#     public_key = factory.LazyFunction(lambda: keys.get_key_pair()[1])
-#     preferred_username = factory.Faker('username')
-#     summary = factory.Faker('paragraph')
-#
-#     class Meta:
-#         model = models.Actor
+@registry.register
+class ActorFactory(factory.DjangoModelFactory):
+    url = factory.Faker('url')
+    inbox_url = factory.Faker('url')
+    outbox_url = factory.Faker('url')
+    public_key = None
+    private_key = None
+    preferred_username = factory.Faker('user_name')
+    summary = factory.Faker('paragraph')
+
+    class Meta:
+        model = models.Actor
+
+    @classmethod
+    def _generate(cls, create, attrs):
+        has_public = attrs.get('public_key') is None
+        has_private = attrs.get('private_key') is None
+        if not has_public and not has_private:
+            attrs['private_key'], attrs['public'] = keys.get_key_pair()
+        return super()._generate(create, attrs)
