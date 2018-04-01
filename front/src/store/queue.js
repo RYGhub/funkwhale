@@ -48,7 +48,8 @@ export default {
     },
     hasNext: state => {
       return state.currentIndex < state.tracks.length - 1
-    }
+    },
+    isEmpty: state => state.tracks.length === 0
   },
   actions: {
     append ({commit, state, dispatch}, {track, index, skipPlay}) {
