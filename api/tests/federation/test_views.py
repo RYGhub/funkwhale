@@ -10,7 +10,7 @@ from funkwhale_api.federation import webfinger
 
 @pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
 def test_instance_actors(system_actor, db, settings, api_client):
-    actor = actors.SYSTEM_ACTORS[system_actor]['get_actor']()
+    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
     url = reverse(
         'federation:instance-actors-detail',
         kwargs={'actor': system_actor})
@@ -27,7 +27,7 @@ def test_instance_actors(system_actor, db, settings, api_client):
     ('instance-actors-detail', {'actor': 'library'}),
     ('well-known-webfinger', {}),
 ])
-def test_instance_inbox_405_if_federation_disabled(
+def test_instance_endpoints_405_if_federation_disabled(
         authenticated_actor, db, settings, api_client, route, kwargs):
     settings.FEDERATION_ENABLED = False
     url = reverse('federation:{}'.format(route), kwargs=kwargs)
@@ -53,7 +53,7 @@ def test_wellknown_webfinger_validates_resource(
 @pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
 def test_wellknown_webfinger_system(
         system_actor, db, api_client, settings, mocker):
-    actor = actors.SYSTEM_ACTORS[system_actor]['get_actor']()
+    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
     url = reverse('federation:well-known-webfinger')
     response = api_client.get(
         url, data={'resource': 'acct:{}'.format(actor.webfinger_subject)})

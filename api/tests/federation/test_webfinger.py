@@ -32,7 +32,7 @@ def test_webfinger_clean_acct(settings):
 
 @pytest.mark.parametrize('resource,message', [
     ('service', 'Invalid format'),
-    ('service@test.com', 'Invalid hostname'),
+    ('service@test.com', 'Invalid hostname test.com'),
     ('noop@test.federation', 'Invalid account'),
 ])
 def test_webfinger_clean_acct_errors(resource, message, settings):

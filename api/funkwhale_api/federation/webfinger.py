@@ -30,7 +30,8 @@ def clean_acct(acct_string):
         raise forms.ValidationError('Invalid format')
 
     if hostname != settings.FEDERATION_HOSTNAME:
-        raise forms.ValidationError('Invalid hostname')
+        raise forms.ValidationError(
+            'Invalid hostname {}'.format(hostname))
 
     if username not in actors.SYSTEM_ACTORS:
         raise forms.ValidationError('Invalid username')

@@ -36,18 +36,35 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
             raise Http404
 
     def retrieve(self, request, *args, **kwargs):
-        actor_conf = self.get_object()
-        actor = actor_conf['get_actor']()
+        system_actor = self.get_object()
+        actor = system_actor.get_actor_instance()
         serializer = serializers.ActorSerializer(actor)
         return response.Response(serializer.data, status=200)
 
-    @detail_route(methods=['get'])
+    @detail_route(methods=['get', 'post'])
     def inbox(self, request, *args, **kwargs):
-        raise NotImplementedError()
+        system_actor = self.get_object()
+        handler = getattr(system_actor, '{}_inbox'.format(
+            request.method.lower()
+        ))
 
-    @detail_route(methods=['get'])
+        try:
+            data = handler(request.data, actor=request.actor)
+        except NotImplementedError:
+            return response.Response(status=405)
+        return response.Response(data, status=200)
+
+    @detail_route(methods=['get', 'post'])
     def outbox(self, request, *args, **kwargs):
-        raise NotImplementedError()
+        system_actor = self.get_object()
+        handler = getattr(system_actor, '{}_outbox'.format(
+            request.method.lower()
+        ))
+        try:
+            data = handler(request.data, actor=request.actor)
+        except NotImplementedError:
+            return response.Response(status=405)
+        return response.Response(data, status=200)
 
 
 class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
@@ -82,5 +99,5 @@ class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
 
     def handler_acct(self, clean_result):
         username, hostname = clean_result
-        actor = actors.SYSTEM_ACTORS[username]['get_actor']()
+        actor = actors.SYSTEM_ACTORS[username].get_actor_instance()
         return serializers.ActorWebfingerSerializer(actor).data

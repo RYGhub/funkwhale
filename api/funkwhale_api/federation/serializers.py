@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
 
+from . import activity
 from . import models
 from . import utils
 
@@ -105,3 +106,70 @@ class ActorWebfingerSerializer(serializers.ModelSerializer):
             instance.url
         ]
         return data
+
+
+class ActivitySerializer(serializers.Serializer):
+    actor = serializers.URLField()
+    id = serializers.URLField()
+    type = serializers.ChoiceField(
+        choices=[(c, c) for c in activity.ACTIVITY_TYPES])
+    object = serializers.JSONField()
+
+    def validate_object(self, value):
+        try:
+            type = value['type']
+        except KeyError:
+            raise serializers.ValidationError('Missing object type')
+
+        try:
+            object_serializer = OBJECT_SERIALIZERS[type]
+        except KeyError:
+            raise serializers.ValidationError(
+                'Unsupported type {}'.format(type))
+
+        serializer = object_serializer(data=value)
+        serializer.is_valid(raise_exception=True)
+        return serializer.data
+
+    def validate_actor(self, value):
+        request_actor = self.context.get('actor')
+        if request_actor and request_actor.url != value:
+            raise serializers.ValidationError(
+                'The actor making the request do not match'
+                ' the activity actor'
+            )
+        return value
+
+
+class ObjectSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    url = serializers.URLField(required=False, allow_null=True)
+    type = serializers.ChoiceField(
+        choices=[(c, c) for c in activity.OBJECT_TYPES])
+    content = serializers.CharField(
+        required=False, allow_null=True)
+    summary = serializers.CharField(
+        required=False, allow_null=True)
+    name = serializers.CharField(
+        required=False, allow_null=True)
+    published = serializers.DateTimeField(
+        required=False, allow_null=True)
+    updated = serializers.DateTimeField(
+        required=False, allow_null=True)
+    to = serializers.ListField(
+        child=serializers.URLField(),
+        required=False, allow_null=True)
+    cc = serializers.ListField(
+        child=serializers.URLField(),
+        required=False, allow_null=True)
+    bto = serializers.ListField(
+        child=serializers.URLField(),
+        required=False, allow_null=True)
+    bcc = serializers.ListField(
+        child=serializers.URLField(),
+        required=False, allow_null=True)
+
+OBJECT_SERIALIZERS = {
+    t: ObjectSerializer
+    for t in activity.OBJECT_TYPES
+}
