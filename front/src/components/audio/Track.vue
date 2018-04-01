@@ -31,7 +31,8 @@ export default {
   },
   data () {
     return {
-      sourceErrors: 0
+      sourceErrors: 0,
+      isUpdatingTime: false
     }
   },
   computed: {
@@ -99,6 +100,7 @@ export default {
       }
     },
     updateProgress: _.throttle(function () {
+      this.isUpdatingTime = true
       if (this.$refs.audio) {
         this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
       }
@@ -130,6 +132,12 @@ export default {
     },
     volume: function (newValue) {
       this.$refs.audio.volume = newValue
+    },
+    currentTime (newValue) {
+      if (!this.isUpdatingTime) {
+        this.setCurrentTime(newValue)
+      }
+      this.isUpdatingTime = false
     }
   }
 }

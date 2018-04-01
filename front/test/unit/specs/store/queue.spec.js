@@ -81,14 +81,6 @@ describe('store/queue', () => {
       const state = { tracks: [1, 2, 3], currentIndex: 2 }
       expect(store.getters['hasNext'](state)).to.equal(false)
     })
-    it('hasPrevious true', () => {
-      const state = { currentIndex: 1 }
-      expect(store.getters['hasPrevious'](state)).to.equal(true)
-    })
-    it('hasPrevious false', () => {
-      const state = { currentIndex: 0 }
-      expect(store.getters['hasPrevious'](state)).to.equal(false)
-    })
   })
   describe('actions', () => {
     it('append at end', (done) => {
@@ -212,19 +204,30 @@ describe('store/queue', () => {
         expectedActions: []
       }, done)
     })
-    it('previous when at beginning does nothing', (done) => {
+    it('previous when at beginning', (done) => {
       testAction({
         action: store.actions.previous,
         params: {state: {currentIndex: 0}},
-        expectedActions: []
-      }, done)
-    })
-    it('previous', (done) => {
-      testAction({
-        action: store.actions.previous,
-        params: {state: {currentIndex: 1}},
         expectedActions: [
           { type: 'currentIndex', payload: 0 }
+        ]
+      }, done)
+    })
+    it('previous after less than 3 seconds of playback', (done) => {
+      testAction({
+        action: store.actions.previous,
+        params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 1}}},
+        expectedActions: [
+          { type: 'currentIndex', payload: 0 }
+        ]
+      }, done)
+    })
+    it('previous after more than 3 seconds of playback', (done) => {
+      testAction({
+        action: store.actions.previous,
+        params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 3}}},
+        expectedActions: [
+          { type: 'currentIndex', payload: 1 }
         ]
       }, done)
     })
