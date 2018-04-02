@@ -47,6 +47,7 @@ def get_actor(actor_url):
 
 class SystemActor(object):
     additional_attributes = {}
+    manually_approves_followers = False
 
     def get_actor_instance(self):
         args = self.get_instance_argument(
@@ -113,6 +114,9 @@ class LibraryActor(SystemActor):
     additional_attributes = {
         'manually_approves_followers': True
     }
+    @property
+    def manually_approves_followers(self):
+        return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
 
 
 class TestActor(SystemActor):
@@ -125,6 +129,7 @@ class TestActor(SystemActor):
     additional_attributes = {
         'manually_approves_followers': False
     }
+    manually_approves_followers = False
 
     def get_outbox(self, data, actor=None):
         return {

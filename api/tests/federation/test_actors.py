@@ -197,3 +197,28 @@ def test_getting_actor_instance_persists_in_db(db):
 
     for f in test._meta.fields:
         assert getattr(from_db, f.name) == getattr(test, f.name)
+
+
+@pytest.mark.parametrize('username,domain,expected', [
+    ('test', 'wrongdomain.com', False),
+    ('notsystem', '', False),
+    ('test', '', True),
+])
+def test_actor_is_system(
+        username, domain, expected, nodb_factories, settings):
+    if not domain:
+        domain = settings.FEDERATION_HOSTNAME
+
+    actor = nodb_factories['federation.Actor'](
+        preferred_username=username,
+        domain=domain,
+    )
+    assert actor.is_system is expected
+
+
+@pytest.mark.parametrize('value', [False, True])
+def test_library_actor_manually_approves_based_on_setting(
+        value, settings):
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = value
+    library_conf = actors.SYSTEM_ACTORS['library']
+    assert library_conf.manually_approves_followers is value

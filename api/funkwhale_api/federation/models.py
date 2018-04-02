@@ -57,3 +57,11 @@ class Actor(models.Model):
                 setattr(self, field, v.lower())
 
         super().save(**kwargs)
+
+    @property
+    def is_system(self):
+        from . import actors
+        return all([
+            settings.FEDERATION_HOSTNAME == self.domain,
+            self.preferred_username in actors.SYSTEM_ACTORS
+        ])
