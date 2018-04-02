@@ -12,7 +12,7 @@ class ListeningActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     object = TrackActivitySerializer(source='track')
     actor = UserActivitySerializer(source='user')
-    published = serializers.DateTimeField(source='end_date')
+    published = serializers.DateTimeField(source='creation_date')
 
     class Meta:
         model = models.Listening
@@ -36,7 +36,7 @@ class ListeningSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Listening
-        fields = ('id', 'user', 'session_key', 'track', 'end_date')
+        fields = ('id', 'user', 'session_key', 'track', 'creation_date')
 
 
     def create(self, validated_data):

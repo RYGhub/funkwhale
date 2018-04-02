@@ -23,25 +23,37 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8080,
+    port: parseInt(process.env.WEBPACK_DEVSERVER_PORT),
     host: '127.0.0.1',
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
+      '**': {
         target: 'http://nginx:6001',
         changeOrigin: true,
-        ws: true
+        ws: true,
+        filter: function (pathname, req) {
+          let proxified = ['.well-known', 'staticfiles', 'media', 'federation', 'api']
+          let matches = proxified.filter(e => {
+            return pathname.match(`^/${e}`)
+          })
+          return matches.length > 0
+        }
       },
-      '/media': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '/staticfiles': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      }
+      // '/.well-known': {
+      //   target: 'http://nginx:6001',
+      //   changeOrigin: true
+      // },
+      // '/media': {
+      //   target: 'http://nginx:6001',
+      //   changeOrigin: true,
+      // },
+      // '/staticfiles': {
+      //   target: 'http://nginx:6001',
+      //   changeOrigin: true,
+      // },
+
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

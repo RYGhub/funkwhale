@@ -1,5 +1,6 @@
 from rest_framework import routers
 from django.conf.urls import include, url
+from funkwhale_api.activity import views as activity_views
 from funkwhale_api.instance import views as instance_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
@@ -10,6 +11,7 @@ from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
 router = routers.SimpleRouter()
 router.register(r'settings', GlobalPreferencesViewSet, base_name='settings')
+router.register(r'activity', activity_views.ActivityViewSet, 'activity')
 router.register(r'tags', views.TagViewSet, 'tags')
 router.register(r'tracks', views.TrackViewSet, 'tracks')
 router.register(r'trackfiles', views.TrackFileViewSet, 'trackfiles')

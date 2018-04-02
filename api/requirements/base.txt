@@ -14,7 +14,7 @@ django-allauth>=0.34,<0.35
 
 
 # Python-PostgreSQL Database Adapter
-psycopg2>=2.7,<=2.8
+psycopg2-binary>=2.7,<=2.8
 
 # Time zones support
 pytz==2017.3
@@ -60,3 +60,7 @@ channels_redis>=2.1,<2.2
 django-cacheops>=4,<4.1
 
 daphne==2.0.4
+cryptography>=2,<3
+# requests-http-signature==0.0.3
+# clone until the branch is merged and released upstream
+git+https://github.com/EliotBerriot/requests-http-signature.git@signature-header-support

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment">
+    <div v-if="isLoading" class="ui vertical segment" v-title="'Album'">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="album">
-      <div :class="['ui', 'head', {'with-background': album.cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle">
+      <div :class="['ui', 'head', {'with-background': album.cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted sound yellow icon"></i>

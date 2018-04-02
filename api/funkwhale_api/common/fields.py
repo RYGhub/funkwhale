@@ -22,6 +22,6 @@ def privacy_level_query(user, lookup_field='privacy_level'):
 
     return models.Q(**{
         '{}__in'.format(lookup_field): [
-            'me', 'followers', 'instance', 'everyone'
+            'followers', 'instance', 'everyone'
         ]
     })

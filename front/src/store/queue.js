@@ -41,7 +41,6 @@ export default {
         state.currentIndex += 1
       }
     }
-
   },
   getters: {
     currentTrack: state => {
@@ -50,9 +49,7 @@ export default {
     hasNext: state => {
       return state.currentIndex < state.tracks.length - 1
     },
-    hasPrevious: state => {
-      return state.currentIndex > 0
-    }
+    isEmpty: state => state.tracks.length === 0
   },
   actions: {
     append ({commit, state, dispatch}, {track, index, skipPlay}) {
@@ -104,9 +101,11 @@ export default {
         dispatch('next')
       }
     },
-    previous ({state, dispatch}) {
-      if (state.currentIndex > 0) {
+    previous ({state, dispatch, rootState}) {
+      if (state.currentIndex > 0 && rootState.player.currentTime < 3) {
         dispatch('currentIndex', state.currentIndex - 1)
+      } else {
+        dispatch('currentIndex', state.currentIndex)
       }
     },
     next ({state, dispatch, commit, rootState}) {
@@ -141,7 +140,9 @@ export default {
       commit('ended', true)
     },
     shuffle ({dispatch, commit, state}) {
-      let shuffled = _.shuffle(state.tracks)
+      let toKeep = state.tracks.slice(0, state.currentIndex + 1)
+      let toShuffle = state.tracks.slice(state.currentIndex + 1)
+      let shuffled = toKeep.concat(_.shuffle(toShuffle))
       commit('player/currentTime', 0, {root: true})
       commit('tracks', [])
       dispatch('appendMany', {tracks: shuffled})

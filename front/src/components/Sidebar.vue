@@ -16,8 +16,8 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" data-tab="library">Browse</a>
-      <a class="item" data-tab="queue">
+      <a class="active item" @click="selectedTab = 'library'" data-tab="library">Browse</a>
+      <a class="item" @click="selectedTab = 'queue'" data-tab="queue">
         Queue &nbsp;
          <template v-if="queue.tracks.length === 0">
            (empty)
@@ -46,6 +46,8 @@
           v-if="$store.state.auth.authenticated"
           class="item" :to="{path: '/activity'}"><i class="bell icon"></i> Activity</router-link>
       </div>
+
+      <player></player>
     </div>
     <div v-if="queue.previousQueue " class="ui black icon message">
       <i class="history icon"></i>
@@ -96,7 +98,6 @@
       </div>
     </div>
   </div>
-  <player></player>
 </div>
 </template>
 
@@ -121,6 +122,7 @@ export default {
   },
   data () {
     return {
+      selectedTab: 'library',
       backend: backend,
       isCollapsed: true
     }
@@ -140,11 +142,36 @@ export default {
     }),
     reorder: function (oldValue, newValue) {
       this.$store.commit('queue/reorder', {oldValue, newValue})
+    },
+    scrollToCurrent () {
+      let current = $(this.$el).find('[data-tab="queue"] .active')[0]
+      if (!current) {
+        return
+      }
+      let container = $(this.$el).find('.tabs')[0]
+      // Position container at the top line then scroll current into view
+      container.scrollTop = 0
+      current.scrollIntoView(true)
+      // Scroll back nothing if element is at bottom of container else do it
+      // for half the height of the containers display area
+      var scrollBack = (container.scrollHeight - container.scrollTop <= container.clientHeight) ? 0 : container.clientHeight / 2
+      container.scrollTop = container.scrollTop - scrollBack
+      console.log(container.scrollHeight - container.scrollTop, container.clientHeight)
     }
   },
   watch: {
     url: function () {
       this.isCollapsed = true
+    },
+    selectedTab: function (newValue) {
+      if (newValue === 'queue') {
+        this.scrollToCurrent()
+      }
+    },
+    '$store.state.queue.currentIndex': function () {
+      if (this.selectedTab !== 'queue') {
+        this.scrollToCurrent()
+      }
     }
   }
 }
@@ -204,17 +231,36 @@ $sidebar-color: #3D3E3F;
   }
 }
 .tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
+  justify-content: space-between;
   @include media(">tablet") {
     height: 0px;
   }
   @include media("<desktop") {
-    max-height: 400px;
+    max-height: 500px;
   }
 }
+.ui.tab.active {
+  display: flex;
+}
 .tab[data-tab="queue"] {
+  flex-direction: column;
   tr {
     cursor: pointer;
+  }
+}
+.tab[data-tab="library"] {
+  flex-direction: column;
+  flex: 1 1 auto;
+  > .menu {
+    flex: 1;
+    flex-grow: 1;
+  }
+  > .player-wrapper {
+    width: 100%;
   }
 }
 .sidebar .segment {
@@ -224,9 +270,6 @@ $sidebar-color: #3D3E3F;
 
 .ui.inverted.segment.header-wrapper {
   padding: 0;
-}
-.tabs {
-  flex: 1;
 }
 
 .logo {

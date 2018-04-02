@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.users.serializers import UserBasicSerializer
 
 from . import filters
 from . import models
@@ -15,6 +16,8 @@ class FilterSerializer(serializers.Serializer):
 
 
 class RadioSerializer(serializers.ModelSerializer):
+    user = UserBasicSerializer(read_only=True)
+
     class Meta:
         model = models.Radio
         fields = (

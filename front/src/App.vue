@@ -21,6 +21,7 @@
           <div class="ten wide column">
             <h4 class="ui header">About funkwhale</h4>
             <p>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</p>
+            <p>The funkwhale logo was kindly designed and provided by Francis Gading.</p>
           </div>
         </div>
       </div>
@@ -35,9 +36,6 @@
 </template>
 
 <script>
-import { WebSocketBridge } from 'django-channels'
-
-import logger from '@/logging'
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
 
@@ -52,34 +50,11 @@ export default {
   },
   created () {
     this.$store.dispatch('instance/fetchSettings')
-    this.openWebsocket()
     let self = this
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
-  },
-  methods: {
-    openWebsocket () {
-      if (!this.$store.state.auth.authenticated) {
-        return
-      }
-      let self = this
-      let token = this.$store.state.auth.token
-      // let token = 'test'
-      const bridge = new WebSocketBridge()
-      bridge.connect(
-        `/api/v1/instance/activity?token=${token}`,
-        null,
-        {reconnectInterval: 5000})
-      bridge.listen(function (event) {
-        logger.default.info('Received timeline update', event)
-        self.$store.commit('instance/event', event)
-      })
-      bridge.socket.addEventListener('open', function () {
-        console.log('Connected to WebSocket')
-      })
-    }
   }
 }
 </script>

@@ -89,7 +89,7 @@ First, we'll download the latest api release.
 
     curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
     unzip "api-|version|.zip" -d extracted
-    mv extracted/api api
+    mv extracted/api/* api/
     rmdir extracted
 
 
@@ -100,7 +100,7 @@ Then we'll download the frontend files:
     curl -L -o "front-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_front"
     unzip "front-|version|.zip" -d extracted
     mv extracted/front .
-    rmdir extracted
+    rm -rf extracted
 
 You can leave the ZIP archives in the directory, this will help you know
 which version you've installed next time you want to upgrade your installation.

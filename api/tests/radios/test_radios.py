@@ -151,14 +151,18 @@ def test_can_start_radio_for_logged_in_user(logged_in_client):
     assert session.user == logged_in_client.user
 
 
-def test_can_start_radio_for_anonymous_user(client, db):
+def test_can_start_radio_for_anonymous_user(api_client, db, settings):
+    settings.API_AUTHENTICATION_REQUIRED = False
     url = reverse('api:v1:radios:sessions-list')
-    response = client.post(url, {'radio_type': 'random'})
+    response = api_client.post(url, {'radio_type': 'random'})
+
+    assert response.status_code == 201
+
     session = models.RadioSession.objects.latest('id')
 
     assert session.radio_type == 'random'
     assert session.user is None
-    assert session.session_key == client.session.session_key
+    assert session.session_key == api_client.session.session_key
 
 
 def test_can_get_track_for_session_from_api(factories, logged_in_client):
@@ -228,13 +232,18 @@ def test_can_start_tag_radio(factories):
         assert radio.pick() in good_tracks
 
 
-def test_can_start_artist_radio_from_api(client, factories):
+def test_can_start_artist_radio_from_api(api_client, settings, factories):
+    settings.API_AUTHENTICATION_REQUIRED = False
     artist = factories['music.Artist']()
     url = reverse('api:v1:radios:sessions-list')
 
-    response = client.post(
+    response = api_client.post(
         url, {'radio_type': 'artist', 'related_object_id': artist.id})
+
+    assert response.status_code == 201
+
     session = models.RadioSession.objects.latest('id')
+
     assert session.radio_type, 'artist'
     assert session.related_object, artist
 

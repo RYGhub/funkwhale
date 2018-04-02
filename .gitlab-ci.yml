@@ -13,6 +13,7 @@ stages:
 test_api:
   services:
     - postgres:9.4
+    - redis:3
   stage: test
   image: funkwhale/funkwhale:latest
   cache:
@@ -24,6 +25,7 @@ test_api:
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
     FUNKWHALE_URL: "https://funkwhale.ci"
     CACHEOPS_ENABLED: "false"
+    DJANGO_SETTINGS_MODULE: config.settings.local
 
   before_script:
     - cd api
@@ -31,7 +33,7 @@ test_api:
     - pip install -r requirements/local.txt
     - pip install -r requirements/test.txt
   script:
-    - pytest
+    - pytest --cov=funkwhale_api tests/
   tags:
     - docker
 

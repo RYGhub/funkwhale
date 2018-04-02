@@ -30,6 +30,10 @@ require('masonry-layout')
 Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
+Vue.directive('title', {
+  inserted: (el, binding) => { console.log(binding.value); document.title = binding.value + ' - Funkwhale' },
+  updated: (el, binding) => { document.title = binding.value + ' - Funkwhale' }
+})
 
 axios.defaults.baseURL = config.API_URL
 axios.interceptors.request.use(function (config) {

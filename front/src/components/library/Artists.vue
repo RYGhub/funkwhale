@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-title="'Artists'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">Browsing artists</h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">

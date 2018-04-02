@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+from urllib.parse import urlsplit
 import os
 import environ
 from funkwhale_api import __version__
@@ -24,8 +25,13 @@ try:
 except FileNotFoundError:
     pass
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 FUNKWHALE_URL = env('FUNKWHALE_URL')
+FUNKWHALE_HOSTNAME = urlsplit(FUNKWHALE_URL).netloc
+
+FEDERATION_ENABLED = env.bool('FEDERATION_ENABLED', default=True)
+FEDERATION_HOSTNAME = env('FEDERATION_HOSTNAME', default=FUNKWHALE_HOSTNAME)
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -89,6 +95,7 @@ LOCAL_APPS = (
     'funkwhale_api.music',
     'funkwhale_api.requests',
     'funkwhale_api.favorites',
+    'funkwhale_api.federation',
     'funkwhale_api.radios',
     'funkwhale_api.history',
     'funkwhale_api.playlists',
@@ -231,6 +238,7 @@ STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR('staticfiles')))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = env("STATIC_URL", default='/staticfiles/')
+DEFAULT_FILE_STORAGE = 'funkwhale_api.common.storage.ASCIIFileSystemStorage'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
@@ -336,7 +344,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'funkwhale_api.common.pagination.FunkwhalePagination',
     'PAGE_SIZE': 25,
-
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'funkwhale_api.federation.parsers.ActivityParser',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -385,3 +398,16 @@ CSRF_USE_SESSIONS = True
 
 # Playlist settings
 PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
+
+ACCOUNT_USERNAME_BLACKLIST = [
+    'funkwhale',
+    'library',
+    'test',
+    'status',
+    'root',
+    'admin',
+    'owner',
+    'superuser',
+    'staff',
+    'service',
+] + env.list('ACCOUNT_USERNAME_BLACKLIST', default=[])

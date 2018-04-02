@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical stripe segment">
+  <div class="ui vertical stripe segment" v-title="'Radio Builder'">
     <div>
       <div>
         <h2 class="ui header">Builder</h2>
@@ -180,7 +180,7 @@ export default {
         let url = 'radios/radios/'
         axios.post(url, final).then((response) => {
           self.$router.push({
-            name: 'library.radios.edit',
+            name: 'library.radios.detail',
             params: {
               id: response.data.id
             }
