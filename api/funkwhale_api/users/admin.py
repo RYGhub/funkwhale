@@ -36,3 +36,13 @@ class MyUserCreationForm(UserCreationForm):
 class UserAdmin(AuthUserAdmin):
     form = MyUserChangeForm
     add_form = MyUserCreationForm
+    list_display = [
+        'username',
+        'email',
+        'date_joined',
+        'last_login',
+        'privacy_level',
+    ]
+    list_filter = [
+        'privacy_level',
+    ]
