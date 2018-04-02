@@ -1,1 +1,0 @@
-Upgraded to Python 3.6 to fix weird but harmless weakref error on django task (#121)

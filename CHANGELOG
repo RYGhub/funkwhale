@@ -3,10 +3,54 @@ Changelog
 
 .. towncrier
 
-Release notes:
+0.8 (2018-04-02)
+----------------
+
+Features:
+
+- Add a detail page for radios (#64)
+- Implemented page title binding (#1)
+- Previous Track button restart playback after 3 seconds (#146)
+
+
+Enhancements:
+
+- Added credits to Francis Gading for the logotype (#101)
+- API endpoint for fetching instance activity and updated timeline to use this
+  new endpoint (#141)
+- Better error messages in case of missing environment variables (#140)
+- Implemented a @test@yourfunkwhaledomain bot to ensure federation works
+  properly. Send it "/ping" and it will answer back :)
+- Queue shuffle now apply only to tracks after the current one (#97)
+- Removed player from queue tab and consistently show current track in queue
+  (#131)
+- We now restrict some usernames from being used during signup (#139)
+
+
+Bugfixes:
+
+- Better error handling during file import (#120)
+- Better handling of utf-8 filenames during file import (#138)
+- Converted favicon from .ico to .png (#130)
+- Upgraded to Python 3.6 to fix weird but harmless weakref error on django task
+  (#121)
+
+
+Documentation:
+
+- Documented the upgrade process (#127)
+
 
 Preparing for federation
 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+Federation of music libraries is one of the most asked feature.
+While there is still a lot of work to do, this version includes
+the foundation that will enable funkwhale servers to communicate
+between each others, and with other federated software, such as
+Mastodon.
+
+Funkwhale will use ActivityPub as it's federation protocol.
 
 In order to prepare for federation (see #136 and #137), new API endpoints
 have been added under /federation and /.well-known/webfinger.
@@ -47,7 +91,10 @@ your instance requests on the federation. This can be done via::
     source /srv/funkwhale/load_env
     python manage.py generate_keys --no-input
 
-That's it :)
+To test and troobleshoot federation, we've added a bot account. This bot is available at @test@yourinstancedomain,
+and sending it "/ping", for example, via Mastodon, should trigger
+a response.
+
 
 
 0.7 (2018-03-21)
