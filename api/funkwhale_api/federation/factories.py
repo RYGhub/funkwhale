@@ -2,6 +2,8 @@ import factory
 import requests
 import requests_http_signature
 
+from django.utils import timezone
+
 from funkwhale_api.factories import registry
 
 from . import keys
@@ -64,8 +66,24 @@ class ActorFactory(factory.DjangoModelFactory):
 
     @classmethod
     def _generate(cls, create, attrs):
-        has_public = attrs.get('public_key') is None
-        has_private = attrs.get('private_key') is None
+        has_public = attrs.get('public_key') is not None
+        has_private = attrs.get('private_key') is not None
         if not has_public and not has_private:
-            attrs['private_key'], attrs['public'] = keys.get_key_pair()
+            private, public = keys.get_key_pair()
+            attrs['private_key'] = private.decode('utf-8')
+            attrs['public_key'] = public.decode('utf-8')
         return super()._generate(create, attrs)
+
+
+@registry.register(name='federation.Note')
+class NoteFactory(factory.Factory):
+    type = 'Note'
+    id = factory.Faker('url')
+    published = factory.LazyFunction(
+        lambda: timezone.now().isoformat()
+    )
+    inReplyTo = None
+    content = factory.Faker('sentence')
+
+    class Meta:
+        model = dict

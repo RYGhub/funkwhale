@@ -38,3 +38,7 @@ class Actor(models.Model):
             self.preferred_username,
             settings.FEDERATION_HOSTNAME,
         )
+
+    @property
+    def private_key_id(self):
+        return '{}#main-key'.format(self.url)

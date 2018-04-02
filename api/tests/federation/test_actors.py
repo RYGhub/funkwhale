@@ -1,6 +1,8 @@
 import pytest
 
 from django.urls import reverse
+from django.utils import timezone
+
 from rest_framework import exceptions
 
 from funkwhale_api.federation import actors
@@ -128,6 +130,8 @@ def test_test_post_outbox_handles_create_note(mocker, factories):
     deliver = mocker.patch(
         'funkwhale_api.federation.activity.deliver')
     actor = factories['federation.Actor']()
+    now = timezone.now()
+    mocker.patch('django.utils.timezone.now', return_value=now)
     data = {
         'actor': actor.url,
         'type': 'Create',
@@ -138,9 +142,27 @@ def test_test_post_outbox_handles_create_note(mocker, factories):
             'content': '<p><a>@mention</a> /ping</p>'
         }
     }
+    expected_note = factories['federation.Note'](
+        id='https://test.federation/activities/note/{}'.format(
+            now.timestamp()
+        ),
+        content='Pong!',
+        published=now.isoformat(),
+        inReplyTo=data['object']['id'],
+    )
+    test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
+    expected_activity = {
+        'actor': test_actor.url,
+        'id': 'https://test.federation/activities/note/{}/activity'.format(
+            now.timestamp()
+        ),
+        'type': 'Create',
+        'published': now.isoformat(),
+        'object': expected_note
+    }
     actors.SYSTEM_ACTORS['test'].post_inbox(data, actor=actor)
     deliver.assert_called_once_with(
-        content='Pong!',
+        expected_activity,
         to=[actor.url],
         on_behalf_of=actors.SYSTEM_ACTORS['test'].get_actor_instance()
     )

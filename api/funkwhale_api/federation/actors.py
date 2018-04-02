@@ -1,21 +1,27 @@
+import logging
 import requests
 import xml
 
-from django.urls import reverse
 from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
 
 from rest_framework.exceptions import PermissionDenied
 
 from dynamic_preferences.registries import global_preferences_registry
 
 from . import activity
+from . import factories
 from . import models
 from . import serializers
 from . import utils
 
+logger = logging.getLogger(__name__)
+
 
 def remove_tags(text):
-    return ''.join(xml.etree.ElementTree.fromstring(text).itertext())
+    logger.debug('Removing tags from %s', text)
+    return ''.join(xml.etree.ElementTree.fromstring('<div>{}</div>'.format(text)).itertext())
 
 
 def get_actor_data(actor_url):
@@ -31,6 +37,13 @@ def get_actor_data(actor_url):
     except:
         raise ValueError(
             'Invalid actor payload: {}'.format(response.text))
+
+def get_actor(actor_url):
+    data = get_actor_data(actor_url)
+    serializer = serializers.ActorSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+
+    return serializer.build()
 
 
 class SystemActor(object):
@@ -73,6 +86,7 @@ class SystemActor(object):
                     'federation:instance-actors-outbox',
                     kwargs={'actor': id})),
             'public_key': preferences['federation__public_key'],
+            'private_key': preferences['federation__private_key'],
             'summary': summary.format(host=settings.FEDERATION_HOSTNAME)
         }
         p.update(kwargs)
@@ -136,14 +150,13 @@ class TestActor(SystemActor):
         serializer.is_valid(raise_exception=True)
 
         ac = serializer.validated_data
+        logger.info('Received activity on %s inbox', self.id)
         if ac['type'] == 'Create' and ac['object']['type'] == 'Note':
             # we received a toot \o/
             command = self.parse_command(ac['object']['content'])
+            logger.debug('Parsed command: %s', command)
             if command == 'ping':
-                activity.deliver(
-                    content='Pong!',
-                    to=[ac['actor']],
-                    on_behalf_of=self.get_actor_instance())
+                self.handle_ping(ac, actor)
 
     def parse_command(self, message):
         """
@@ -156,6 +169,67 @@ class TestActor(SystemActor):
         except IndexError:
             return
 
+    def handle_ping(self, ac, sender):
+        now = timezone.now()
+        test_actor = self.get_actor_instance()
+        reply_url = 'https://{}/activities/note/{}'.format(
+            settings.FEDERATION_HOSTNAME, now.timestamp()
+        )
+        mention = '@{}@{}'.format(
+            sender.preferred_username,
+            sender.domain
+        )
+        reply_content = '{} Pong!'.format(
+            mention
+        )
+        reply_activity = {
+            "@context": [
+        		"https://www.w3.org/ns/activitystreams",
+        		"https://w3id.org/security/v1",
+        		{
+        			"manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+        			"sensitive": "as:sensitive",
+        			"movedTo": "as:movedTo",
+        			"Hashtag": "as:Hashtag",
+        			"ostatus": "http://ostatus.org#",
+        			"atomUri": "ostatus:atomUri",
+        			"inReplyToAtomUri": "ostatus:inReplyToAtomUri",
+        			"conversation": "ostatus:conversation",
+        			"toot": "http://joinmastodon.org/ns#",
+        			"Emoji": "toot:Emoji"
+        		}
+        	],
+            'type': 'Create',
+            'actor': test_actor.url,
+            'id': '{}/activity'.format(reply_url),
+            'published': now.isoformat(),
+            'to': ac['actor'],
+            'cc': [],
+            'object': factories.NoteFactory(
+                content='Pong!',
+                summary=None,
+                published=now.isoformat(),
+                id=reply_url,
+                inReplyTo=ac['object']['id'],
+                sensitive=False,
+                url=reply_url,
+                to=[ac['actor']],
+                attributedTo=test_actor.url,
+                cc=[],
+                attachment=[],
+                tag=[
+                    {
+                        "type": "Mention",
+                        "href": ac['actor'],
+                        "name": mention
+                    }
+                ]
+            )
+        }
+        activity.deliver(
+            reply_activity,
+            to=[ac['actor']],
+            on_behalf_of=test_actor)
 
 SYSTEM_ACTORS = {
     'library': LibraryActor(),
