@@ -61,4 +61,6 @@ django-cacheops>=4,<4.1
 
 daphne==2.0.4
 cryptography>=2,<3
-requests-http-signature==0.0.3
+# requests-http-signature==0.0.3
+# clone until the branch is merged and released upstream
+git+https://github.com/EliotBerriot/requests-http-signature.git@signature-header-support

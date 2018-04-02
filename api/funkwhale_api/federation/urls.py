@@ -4,9 +4,9 @@ from . import views
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(
-    r'federation/instance',
-    views.InstanceViewSet,
-    'instance')
+    r'federation/instance/actors',
+    views.InstanceActorViewSet,
+    'instance-actors')
 router.register(
     r'.well-known',
     views.WellKnownViewSet,

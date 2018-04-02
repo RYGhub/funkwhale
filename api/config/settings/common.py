@@ -344,7 +344,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'funkwhale_api.common.pagination.FunkwhalePagination',
     'PAGE_SIZE': 25,
-
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'funkwhale_api.federation.parsers.ActivityParser',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -396,6 +401,9 @@ PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
 
 ACCOUNT_USERNAME_BLACKLIST = [
     'funkwhale',
+    'library',
+    'test',
+    'status',
     'root',
     'admin',
     'owner',

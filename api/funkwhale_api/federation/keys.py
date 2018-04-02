@@ -2,9 +2,13 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
+import re
 import requests
+import urllib.parse
 
 from . import exceptions
+
+KEY_ID_REGEX = re.compile(r'keyId=\"(?P<id>.*)\"')
 
 
 def get_key_pair(size=2048):
@@ -25,19 +29,21 @@ def get_key_pair(size=2048):
     return private_key, public_key
 
 
-def get_public_key(actor_url):
-    """
-    Given an actor_url, request it and extract publicKey data from
-    the response payload.
-    """
-    response = requests.get(actor_url)
-    response.raise_for_status()
-    payload = response.json()
+def get_key_id_from_signature_header(header_string):
+    parts = header_string.split(',')
     try:
-        return {
-            'public_key_pem': payload['publicKey']['publicKeyPem'],
-            'id': payload['publicKey']['id'],
-            'owner': payload['publicKey']['owner'],
-        }
-    except KeyError:
-        raise exceptions.MalformedPayload(str(payload))
+        raw_key_id = [p for p in parts if p.startswith('keyId="')][0]
+    except IndexError:
+        raise ValueError('Missing key id')
+
+    match = KEY_ID_REGEX.match(raw_key_id)
+    if not match:
+        raise ValueError('Invalid key id')
+
+    key_id = match.groups()[0]
+    url = urllib.parse.urlparse(key_id)
+    if not url.scheme or not url.netloc:
+        raise ValueError('Invalid url')
+    if url.scheme not in ['http', 'https']:
+        raise ValueError('Invalid shceme')
+    return key_id

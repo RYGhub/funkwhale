@@ -25,42 +25,18 @@ def test_webfinger_clean_resource_errors(resource, message):
 
 
 def test_webfinger_clean_acct(settings):
-    settings.FEDERATION_HOSTNAME = 'test.federation'
-    username, hostname = webfinger.clean_acct('service@test.federation')
-    assert username == 'service'
+    username, hostname = webfinger.clean_acct('library@test.federation')
+    assert username == 'library'
     assert hostname == 'test.federation'
 
 
 @pytest.mark.parametrize('resource,message', [
     ('service', 'Invalid format'),
-    ('service@test.com', 'Invalid hostname'),
+    ('service@test.com', 'Invalid hostname test.com'),
     ('noop@test.federation', 'Invalid account'),
 ])
 def test_webfinger_clean_acct_errors(resource, message, settings):
-    settings.FEDERATION_HOSTNAME = 'test.federation'
-
     with pytest.raises(forms.ValidationError) as excinfo:
         webfinger.clean_resource(resource)
 
         assert message == str(excinfo)
-
-
-def test_service_serializer(settings):
-    settings.FEDERATION_HOSTNAME = 'test.federation'
-    settings.FUNKWHALE_URL = 'https://test.federation'
-
-    expected = {
-        'subject': 'acct:service@test.federation',
-        'links': [
-            {
-                'rel': 'self',
-                'href': 'https://test.federation/federation/instance/actor',
-                'type': 'application/activity+json',
-            }
-        ],
-        'aliases': [
-            'https://test.federation/federation/instance/actor',
-        ]
-    }
-
-    assert expected == webfinger.serialize_system_acct()

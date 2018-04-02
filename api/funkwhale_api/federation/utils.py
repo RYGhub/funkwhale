@@ -12,3 +12,24 @@ def full_url(path):
         return root + '/' + path
     else:
         return root + path
+
+
+def clean_wsgi_headers(raw_headers):
+    """
+    Convert WSGI headers from CONTENT_TYPE to Content-Type notation
+    """
+    cleaned = {}
+    non_prefixed = [
+        'content_type',
+        'content_length',
+    ]
+    for raw_header, value in raw_headers.items():
+        h = raw_header.lower()
+        if not h.startswith('http_') and h not in non_prefixed:
+            continue
+
+        words = h.replace('http_', '', 1).split('_')
+        cleaned_header = '-'.join([w.capitalize() for w in words])
+        cleaned[cleaned_header] = value
+
+    return cleaned

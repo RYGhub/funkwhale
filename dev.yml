@@ -38,13 +38,8 @@ services:
      - redis
     command: celery -A funkwhale_api.taskapp worker -l debug
     environment:
-      - "DJANGO_ALLOWED_HOSTS=localhost"
-      - "DJANGO_SETTINGS_MODULE=config.settings.local"
-      - "DJANGO_SECRET_KEY=dev"
-      - C_FORCE_ROOT=true
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-      - "FUNKWHALE_URL=http://localhost"
     volumes:
       - ./api:/app
       - ./data/music:/music
@@ -60,13 +55,8 @@ services:
       - ./api:/app
       - ./data/music:/music
     environment:
-      - "PYTHONDONTWRITEBYTECODE=true"
-      - "DJANGO_ALLOWED_HOSTS=localhost,nginx"
-      - "DJANGO_SETTINGS_MODULE=config.settings.local"
-      - "DJANGO_SECRET_KEY=dev"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-      - "FUNKWHALE_URL=http://localhost"
     links:
       - postgres
       - redis

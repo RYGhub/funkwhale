@@ -2,29 +2,35 @@ from django.urls import reverse
 
 import pytest
 
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import webfinger
 
 
-def test_instance_actor(db, settings, api_client):
-    settings.FUNKWHALE_URL = 'http://test.com'
-    url = reverse('federation:instance-actor')
+
+@pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
+def test_instance_actors(system_actor, db, settings, api_client):
+    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
+    url = reverse(
+        'federation:instance-actors-detail',
+        kwargs={'actor': system_actor})
     response = api_client.get(url)
+    serializer = serializers.ActorSerializer(actor)
 
     assert response.status_code == 200
-    assert response.data == serializers.repr_instance_actor()
+    assert response.data == serializer.data
 
 
-@pytest.mark.parametrize('route', [
-    'instance-outbox',
-    'instance-inbox',
-    'instance-actor',
-    'well-known-webfinger',
+@pytest.mark.parametrize('route,kwargs', [
+    ('instance-actors-outbox', {'actor': 'library'}),
+    ('instance-actors-inbox', {'actor': 'library'}),
+    ('instance-actors-detail', {'actor': 'library'}),
+    ('well-known-webfinger', {}),
 ])
-def test_instance_inbox_405_if_federation_disabled(
-        db, settings, api_client, route):
+def test_instance_endpoints_405_if_federation_disabled(
+        authenticated_actor, db, settings, api_client, route, kwargs):
     settings.FEDERATION_ENABLED = False
-    url = reverse('federation:{}'.format(route))
+    url = reverse('federation:{}'.format(route), kwargs=kwargs)
     response = api_client.get(url)
 
     assert response.status_code == 405
@@ -33,7 +39,6 @@ def test_instance_inbox_405_if_federation_disabled(
 def test_wellknown_webfinger_validates_resource(
     db, api_client, settings, mocker):
     clean = mocker.spy(webfinger, 'clean_resource')
-    settings.FEDERATION_ENABLED = True
     url = reverse('federation:well-known-webfinger')
     response = api_client.get(url, data={'resource': 'something'})
 
@@ -45,14 +50,15 @@ def test_wellknown_webfinger_validates_resource(
     )
 
 
+@pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
 def test_wellknown_webfinger_system(
-    db, api_client, settings, mocker):
-    settings.FEDERATION_ENABLED = True
-    settings.FEDERATION_HOSTNAME = 'test.federation'
+        system_actor, db, api_client, settings, mocker):
+    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
     url = reverse('federation:well-known-webfinger')
     response = api_client.get(
-        url, data={'resource': 'acct:service@test.federation'})
+        url, data={'resource': 'acct:{}'.format(actor.webfinger_subject)})
+    serializer = serializers.ActorWebfingerSerializer(actor)
 
     assert response.status_code == 200
     assert response['Content-Type'] == 'application/jrd+json'
-    assert response.data == webfinger.serialize_system_acct()
+    assert response.data == serializer.data
