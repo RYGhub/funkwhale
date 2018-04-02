@@ -175,29 +175,14 @@ class TestActor(SystemActor):
         reply_url = 'https://{}/activities/note/{}'.format(
             settings.FEDERATION_HOSTNAME, now.timestamp()
         )
-        mention = '@{}@{}'.format(
-            sender.preferred_username,
-            sender.domain
-        )
         reply_content = '{} Pong!'.format(
-            mention
+            sender.mention_username
         )
         reply_activity = {
             "@context": [
         		"https://www.w3.org/ns/activitystreams",
         		"https://w3id.org/security/v1",
-        		{
-        			"manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
-        			"sensitive": "as:sensitive",
-        			"movedTo": "as:movedTo",
-        			"Hashtag": "as:Hashtag",
-        			"ostatus": "http://ostatus.org#",
-        			"atomUri": "ostatus:atomUri",
-        			"inReplyToAtomUri": "ostatus:inReplyToAtomUri",
-        			"conversation": "ostatus:conversation",
-        			"toot": "http://joinmastodon.org/ns#",
-        			"Emoji": "toot:Emoji"
-        		}
+        		{}
         	],
             'type': 'Create',
             'actor': test_actor.url,
@@ -221,7 +206,7 @@ class TestActor(SystemActor):
                     {
                         "type": "Mention",
                         "href": ac['actor'],
-                        "name": mention
+                        "name": sender.mention_username
                     }
                 ]
             )

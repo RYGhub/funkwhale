@@ -29,7 +29,7 @@ def clean_acct(acct_string):
     except ValueError:
         raise forms.ValidationError('Invalid format')
 
-    if hostname != settings.FEDERATION_HOSTNAME:
+    if hostname.lower() != settings.FEDERATION_HOSTNAME:
         raise forms.ValidationError(
             'Invalid hostname {}'.format(hostname))
 

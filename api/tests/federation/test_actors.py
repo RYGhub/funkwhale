@@ -126,7 +126,8 @@ def test_test_post_outbox_validates_actor(nodb_factories):
         assert msg in exc_info.value
 
 
-def test_test_post_outbox_handles_create_note(mocker, factories):
+def test_test_post_outbox_handles_create_note(
+        settings, mocker, factories):
     deliver = mocker.patch(
         'funkwhale_api.federation.activity.deliver')
     actor = factories['federation.Actor']()
@@ -142,6 +143,7 @@ def test_test_post_outbox_handles_create_note(mocker, factories):
             'content': '<p><a>@mention</a> /ping</p>'
         }
     }
+    test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
     expected_note = factories['federation.Note'](
         id='https://test.federation/activities/note/{}'.format(
             now.timestamp()
@@ -149,16 +151,36 @@ def test_test_post_outbox_handles_create_note(mocker, factories):
         content='Pong!',
         published=now.isoformat(),
         inReplyTo=data['object']['id'],
-    )
-    test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
-    expected_activity = {
-        'actor': test_actor.url,
-        'id': 'https://test.federation/activities/note/{}/activity'.format(
-            now.timestamp()
+        cc=[],
+        summary=None,
+        sensitive=False,
+        attributedTo=test_actor.url,
+        attachment=[],
+        to=[actor.url],
+        url='https://{}/activities/note/{}'.format(
+            settings.FEDERATION_HOSTNAME, now.timestamp()
         ),
+        tag=[{
+            'href': actor.url,
+            'name': actor.mention_username,
+            'type': 'Mention',
+        }]
+    )
+    expected_activity = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {}
+        ],
+        'actor': test_actor.url,
+        'id': 'https://{}/activities/note/{}/activity'.format(
+            settings.FEDERATION_HOSTNAME, now.timestamp()
+        ),
+        'to': actor.url,
         'type': 'Create',
         'published': now.isoformat(),
-        'object': expected_note
+        'object': expected_note,
+        'cc': [],
     }
     actors.SYSTEM_ACTORS['test'].post_inbox(data, actor=actor)
     deliver.assert_called_once_with(

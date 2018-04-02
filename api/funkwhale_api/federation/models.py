@@ -42,3 +42,18 @@ class Actor(models.Model):
     @property
     def private_key_id(self):
         return '{}#main-key'.format(self.url)
+
+    @property
+    def mention_username(self):
+        return '@{}@{}'.format(self.preferred_username, self.domain)
+
+    def save(self, **kwargs):
+        lowercase_fields = [
+            'domain',
+        ]
+        for field in lowercase_fields:
+            v = getattr(self, field, None)
+            if v:
+                setattr(self, field, v.lower())
+
+        super().save(**kwargs)

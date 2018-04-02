@@ -53,13 +53,15 @@ class SignedRequestFactory(factory.Factory):
 
 @registry.register
 class ActorFactory(factory.DjangoModelFactory):
-    url = factory.Faker('url')
-    inbox_url = factory.Faker('url')
-    outbox_url = factory.Faker('url')
+
     public_key = None
     private_key = None
     preferred_username = factory.Faker('user_name')
     summary = factory.Faker('paragraph')
+    domain = factory.Faker('domain_name')
+    url = factory.LazyAttribute(lambda o: 'https://{}/users/{}'.format(o.domain, o.preferred_username))
+    inbox_url = factory.LazyAttribute(lambda o: 'https://{}/users/{}/inbox'.format(o.domain, o.preferred_username))
+    outbox_url = factory.LazyAttribute(lambda o: 'https://{}/users/{}/outbox'.format(o.domain, o.preferred_username))
 
     class Meta:
         model = models.Actor
