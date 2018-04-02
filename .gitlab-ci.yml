@@ -13,6 +13,7 @@ stages:
 test_api:
   services:
     - postgres:9.4
+    - redis:3
   stage: test
   image: funkwhale/funkwhale:latest
   cache:
