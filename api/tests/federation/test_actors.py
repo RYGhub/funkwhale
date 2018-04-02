@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import exceptions
 
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
 
@@ -188,3 +189,11 @@ def test_test_post_outbox_handles_create_note(
         to=[actor.url],
         on_behalf_of=actors.SYSTEM_ACTORS['test'].get_actor_instance()
     )
+
+
+def test_getting_actor_instance_persists_in_db(db):
+    test = actors.SYSTEM_ACTORS['test'].get_actor_instance()
+    from_db = models.Actor.objects.get(url=test.url)
+
+    for f in test._meta.fields:
+        assert getattr(from_db, f.name) == getattr(test, f.name)

@@ -49,15 +49,17 @@ class SystemActor(object):
     additional_attributes = {}
 
     def get_actor_instance(self):
-        a = models.Actor(
-            **self.get_instance_argument(
-                self.id,
-                name=self.name,
-                summary=self.summary,
-                **self.additional_attributes
-            )
+        args = self.get_instance_argument(
+            self.id,
+            name=self.name,
+            summary=self.summary,
+            **self.additional_attributes
         )
-        a.pk = self.id
+        url = args.pop('url')
+        a, created = models.Actor.objects.get_or_create(
+            url=url,
+            defaults=args,
+        )
         return a
 
     def get_instance_argument(self, id, name, summary, **kwargs):
