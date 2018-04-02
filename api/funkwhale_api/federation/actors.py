@@ -11,7 +11,6 @@ from rest_framework.exceptions import PermissionDenied
 from dynamic_preferences.registries import global_preferences_registry
 
 from . import activity
-from . import factories
 from . import models
 from . import serializers
 from . import utils
@@ -190,26 +189,25 @@ class TestActor(SystemActor):
             'published': now.isoformat(),
             'to': ac['actor'],
             'cc': [],
-            'object': factories.NoteFactory(
-                content='Pong!',
-                summary=None,
-                published=now.isoformat(),
-                id=reply_url,
-                inReplyTo=ac['object']['id'],
-                sensitive=False,
-                url=reply_url,
-                to=[ac['actor']],
-                attributedTo=test_actor.url,
-                cc=[],
-                attachment=[],
-                tag=[
-                    {
-                        "type": "Mention",
-                        "href": ac['actor'],
-                        "name": sender.mention_username
-                    }
-                ]
-            )
+            'object': {
+                'type': 'Note',
+                'content': 'Pong!',
+                'summary': None,
+                'published': now.isoformat(),
+                'id': reply_url,
+                'inReplyTo': ac['object']['id'],
+                'sensitive': False,
+                'url': reply_url,
+                'to': [ac['actor']],
+                'attributedTo': test_actor.url,
+                'cc': [],
+                'attachment': [],
+                'tag': [{
+                    "type": "Mention",
+                    "href": ac['actor'],
+                    "name": sender.mention_username
+                }]
+            }
         }
         activity.deliver(
             reply_activity,
