@@ -18,6 +18,11 @@
         showcontent = true
 
     [[tool.towncrier.type]]
+        directory = "enhancement"
+        name = "Enhancements"
+        showcontent = true
+
+    [[tool.towncrier.type]]
         directory = "bugfix"
         name = "Bugfixes"
         showcontent = true
