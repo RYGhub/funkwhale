@@ -53,7 +53,6 @@ class SignedRequestFactory(factory.Factory):
 
 @registry.register
 class ActorFactory(factory.DjangoModelFactory):
-
     public_key = None
     private_key = None
     preferred_username = factory.Faker('user_name')
@@ -75,6 +74,15 @@ class ActorFactory(factory.DjangoModelFactory):
             attrs['private_key'] = private.decode('utf-8')
             attrs['public_key'] = public.decode('utf-8')
         return super()._generate(create, attrs)
+
+
+@registry.register
+class FollowFactory(factory.DjangoModelFactory):
+    target = factory.SubFactory(ActorFactory)
+    actor = factory.SubFactory(ActorFactory)
+
+    class Meta:
+        model = models.Follow
 
 
 @registry.register(name='federation.Note')

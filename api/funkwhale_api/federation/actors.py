@@ -243,6 +243,7 @@ class TestActor(SystemActor):
         # on a follow we:
         # 1. send the accept answer
         # 2. follow back
+        #
         test_actor = self.get_actor_instance()
         accept_uuid = uuid.uuid4()
         accept = activity.get_accept_follow(
@@ -254,6 +255,12 @@ class TestActor(SystemActor):
             accept,
             to=[ac['actor']],
             on_behalf_of=test_actor)
+        # we persist the sender in database
+        sender.save()
+        models.Follow.objects.get_or_create(
+            actor=sender,
+            target=test_actor,
+        )
         follow_uuid = uuid.uuid4()
         follow = activity.get_follow(
             follow_id=follow_uuid,

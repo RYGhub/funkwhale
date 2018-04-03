@@ -313,3 +313,7 @@ def test_test_actor_handles_follow(
         )
     ]
     deliver.assert_has_calls(expected_calls)
+
+    follow = test_actor.received_follows.first()
+    assert follow.actor == actor
+    assert follow.target == test_actor

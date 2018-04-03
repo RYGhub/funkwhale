@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -74,3 +76,23 @@ class Actor(models.Model):
         from . import actors
         if self.is_system:
             return actors.SYSTEM_ACTORS[self.preferred_username]
+
+
+class Follow(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    actor = models.ForeignKey(
+        Actor,
+        related_name='emitted_follows',
+        on_delete=models.CASCADE,
+    )
+    target = models.ForeignKey(
+        Actor,
+        related_name='received_follows',
+        on_delete=models.CASCADE,
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    last_modification_date = models.DateTimeField(
+        default=timezone.now)
+
+    class Meta:
+        unique_together = ['actor', 'target']

@@ -52,7 +52,7 @@ OBJECT_TYPES = [
     'Relationship',
     'Tombstone',
     'Video',
-]
+] + ACTIVITY_TYPES
 
 def deliver(activity, on_behalf_of, to=[]):
     from . import actors
