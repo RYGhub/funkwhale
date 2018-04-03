@@ -144,3 +144,22 @@ def test_webfinger_serializer():
     serializer = serializers.ActorWebfingerSerializer(actor)
 
     assert serializer.data == expected
+
+
+def test_follow_serializer_to_ap(factories):
+    follow = factories['federation.Follow'](local=True)
+    serializer = serializers.FollowSerializer(follow)
+
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url(),
+        'type': 'Follow',
+        'actor': follow.actor.url,
+        'object': follow.target.url,
+    }
+
+    assert serializer.data == expected

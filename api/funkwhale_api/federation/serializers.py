@@ -11,6 +11,12 @@ from . import models
 from . import utils
 
 
+AP_CONTEXT = [
+    'https://www.w3.org/ns/activitystreams',
+    'https://w3id.org/security/v1',
+    {},
+]
+
 class ActorSerializer(serializers.ModelSerializer):
     # left maps to activitypub fields, right to our internal models
     id = serializers.URLField(source='url')
@@ -43,11 +49,7 @@ class ActorSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['@context'] = [
-            'https://www.w3.org/ns/activitystreams',
-            'https://w3id.org/security/v1',
-            {},
-        ]
+        ret['@context'] = AP_CONTEXT
         if instance.public_key:
             ret['publicKey'] = {
                 'owner': instance.url,
@@ -85,6 +87,28 @@ class ActorSerializer(serializers.ModelSerializer):
     def validate_summary(self, value):
         if value:
             return value[:500]
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    # left maps to activitypub fields, right to our internal models
+    id = serializers.URLField(source='get_federation_url')
+    object = serializers.URLField(source='target.url')
+    actor = serializers.URLField(source='actor.url')
+    type = serializers.CharField(source='ap_type')
+
+    class Meta:
+        model = models.Actor
+        fields = [
+            'id',
+            'object',
+            'actor',
+            'type'
+        ]
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['@context'] = AP_CONTEXT
+        return ret
 
 
 class ActorWebfingerSerializer(serializers.ModelSerializer):
