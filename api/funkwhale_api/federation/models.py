@@ -32,6 +32,9 @@ class Actor(models.Model):
         default=timezone.now)
     manually_approves_followers = models.NullBooleanField(default=None)
 
+    class Meta:
+        unique_together = ['domain', 'preferred_username']
+
     @property
     def webfinger_subject(self):
         return '{}@{}'.format(
