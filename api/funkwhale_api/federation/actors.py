@@ -255,8 +255,6 @@ class TestActor(SystemActor):
             accept,
             to=[ac['actor']],
             on_behalf_of=test_actor)
-        # we persist the sender in database
-        sender.save()
         models.Follow.objects.get_or_create(
             actor=sender,
             target=test_actor,

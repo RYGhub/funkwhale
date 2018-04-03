@@ -7,6 +7,7 @@ from rest_framework import exceptions
 
 from . import actors
 from . import keys
+from . import models
 from . import serializers
 from . import signing
 from . import utils
@@ -42,7 +43,10 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         except cryptography.exceptions.InvalidSignature:
             raise exceptions.AuthenticationFailed('Invalid signature')
 
-        return serializer.build()
+        try:
+            return models.Actor.objects.get(url=actor_data['id'])
+        except models.Actor.DoesNotExist:
+            return serializer.save()
 
     def authenticate(self, request):
         setattr(request, 'actor', None)
