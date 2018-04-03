@@ -65,3 +65,9 @@ class Actor(models.Model):
             settings.FEDERATION_HOSTNAME == self.domain,
             self.preferred_username in actors.SYSTEM_ACTORS
         ])
+
+    @property
+    def system_conf(self):
+        from . import actors
+        if self.is_system:
+            return actors.SYSTEM_ACTORS[self.preferred_username]

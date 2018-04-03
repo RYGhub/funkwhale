@@ -216,6 +216,22 @@ def test_actor_is_system(
     assert actor.is_system is expected
 
 
+@pytest.mark.parametrize('username,domain,expected', [
+    ('test', 'wrongdomain.com', None),
+    ('notsystem', '', None),
+    ('test', '', actors.SYSTEM_ACTORS['test']),
+])
+def test_actor_is_system(
+        username, domain, expected, nodb_factories, settings):
+    if not domain:
+        domain = settings.FEDERATION_HOSTNAME
+    actor = nodb_factories['federation.Actor'](
+        preferred_username=username,
+        domain=domain,
+    )
+    assert actor.system_conf == expected
+
+
 @pytest.mark.parametrize('value', [False, True])
 def test_library_actor_manually_approves_based_on_setting(
         value, settings):
