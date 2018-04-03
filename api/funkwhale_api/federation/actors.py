@@ -130,7 +130,7 @@ class SystemActor(object):
                 'No handler for activity %s', ac['type'])
             return
 
-        return handler(ac, actor)
+        return handler(data, actor)
 
 
 class LibraryActor(SystemActor):
@@ -267,6 +267,40 @@ class TestActor(SystemActor):
         activity.deliver(
             follow,
             to=[ac['actor']],
+            on_behalf_of=test_actor)
+
+    def handle_undo(self, ac, sender):
+        if ac['object']['type'] != 'Follow':
+            return
+
+        if ac['object']['actor'] != sender.url:
+            # not the same actor, permission issue
+            return
+
+        test_actor = self.get_actor_instance()
+        models.Follow.objects.filter(
+            actor=sender,
+            target=test_actor,
+        ).delete()
+        # we also unfollow the sender, if possible
+        try:
+            follow = models.Follow.objects.get(
+                target=sender,
+                actor=test_actor,
+            )
+        except models.Follow.DoesNotExist:
+            return
+        undo = {
+            '@context': serializers.AP_CONTEXT,
+            'type': 'Undo',
+            'id': follow.get_federation_url() + '/undo',
+            'actor': test_actor.url,
+            'object': serializers.FollowSerializer(follow).data,
+        }
+        follow.delete()
+        activity.deliver(
+            undo,
+            to=[sender.url],
             on_behalf_of=test_actor)
 
 SYSTEM_ACTORS = {

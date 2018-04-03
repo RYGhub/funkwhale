@@ -169,11 +169,7 @@ def test_test_post_inbox_handles_create_note(
         }]
     )
     expected_activity = {
-        '@context': [
-            'https://www.w3.org/ns/activitystreams',
-            'https://w3id.org/security/v1',
-            {}
-        ],
+        '@context': serializers.AP_CONTEXT,
         'actor': test_actor.url,
         'id': 'https://{}/activities/note/{}/activity'.format(
             settings.FEDERATION_HOSTNAME, now.timestamp()
@@ -288,11 +284,7 @@ def test_test_actor_handles_follow(
     	},
     }
     expected_follow = {
-        '@context': [
-            'https://www.w3.org/ns/activitystreams',
-            'https://w3id.org/security/v1',
-            {}
-        ],
+        '@context': serializers.AP_CONTEXT,
         'actor': test_actor.url,
         'id': test_actor.url + '#follows/{}'.format(uid),
         'object': actor.url,
@@ -317,3 +309,38 @@ def test_test_actor_handles_follow(
     follow = test_actor.received_follows.first()
     assert follow.actor == actor
     assert follow.target == test_actor
+
+
+def test_test_actor_handles_undo_follow(
+        settings, mocker, factories):
+    deliver = mocker.patch(
+        'funkwhale_api.federation.activity.deliver')
+    test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
+    follow = factories['federation.Follow'](target=test_actor)
+    reverse_follow = factories['federation.Follow'](
+        actor=test_actor, target=follow.actor)
+    follow_serializer = serializers.FollowSerializer(follow)
+    reverse_follow_serializer = serializers.FollowSerializer(
+        reverse_follow)
+    undo = {
+        '@context': serializers.AP_CONTEXT,
+        'type': 'Undo',
+        'id': follow_serializer.data['id'] + '/undo',
+        'actor': follow.actor.url,
+        'object': follow_serializer.data,
+    }
+    expected_undo = {
+        '@context': serializers.AP_CONTEXT,
+        'type': 'Undo',
+        'id': reverse_follow_serializer.data['id'] + '/undo',
+        'actor': reverse_follow.actor.url,
+        'object': reverse_follow_serializer.data,
+    }
+
+    actors.SYSTEM_ACTORS['test'].post_inbox(undo, actor=follow.actor)
+    deliver.assert_called_once_with(
+        expected_undo,
+        to=[follow.actor.url],
+        on_behalf_of=test_actor,)
+
+    assert models.Follow.objects.count() == 0

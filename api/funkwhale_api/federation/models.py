@@ -14,6 +14,8 @@ TYPE_CHOICES = [
 
 
 class Actor(models.Model):
+    ap_type = 'Actor'
+
     url = models.URLField(unique=True, max_length=500, db_index=True)
     outbox_url = models.URLField(max_length=500)
     inbox_url = models.URLField(max_length=500)
@@ -79,6 +81,8 @@ class Actor(models.Model):
 
 
 class Follow(models.Model):
+    ap_type = 'Follow'
+
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     actor = models.ForeignKey(
         Actor,
@@ -96,3 +100,6 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ['actor', 'target']
+
+    def get_federation_url(self):
+        return '{}#follows/{}'.format(self.actor.url, self.uuid)

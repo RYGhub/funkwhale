@@ -3,6 +3,7 @@ import requests
 import requests_http_signature
 
 from django.utils import timezone
+from django.conf import settings
 
 from funkwhale_api.factories import registry
 
@@ -65,6 +66,12 @@ class ActorFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Actor
 
+    class Params:
+        local = factory.Trait(
+            domain=factory.LazyAttribute(
+                lambda o: settings.FEDERATION_HOSTNAME)
+        )
+
     @classmethod
     def _generate(cls, create, attrs):
         has_public = attrs.get('public_key') is not None
@@ -83,6 +90,11 @@ class FollowFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Follow
+
+    class Params:
+        local = factory.Trait(
+            actor=factory.SubFactory(ActorFactory, local=True)
+        )
 
 
 @registry.register(name='federation.Note')
