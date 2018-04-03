@@ -83,3 +83,37 @@ def deliver(activity, on_behalf_of, to=[]):
         )
         response.raise_for_status()
         logger.debug('Remote answered with %s', response.status_code)
+
+
+def get_follow(follow_id, follower, followed):
+    return {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {}
+        ],
+        'actor': follower.url,
+        'id': follower.url + '#follows/{}'.format(follow_id),
+        'object': followed.url,
+        'type': 'Follow'
+    }
+
+
+def get_accept_follow(accept_id, accept_actor, follow, follow_actor):
+    return {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {}
+        ],
+        "id": accept_actor.url + '#accepts/follows/{}'.format(
+            accept_id),
+        "type": "Accept",
+        "actor": accept_actor.url,
+        "object": {
+            "id": follow['id'],
+            "type": "Follow",
+            "actor": follow_actor.url,
+            "object": accept_actor.url
+        },
+    }

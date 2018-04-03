@@ -120,7 +120,9 @@ class ActivitySerializer(serializers.Serializer):
             type = value['type']
         except KeyError:
             raise serializers.ValidationError('Missing object type')
-
+        except TypeError:
+            # probably a URL
+            return value
         try:
             object_serializer = OBJECT_SERIALIZERS[type]
         except KeyError:

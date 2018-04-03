@@ -1,4 +1,5 @@
 import pytest
+import uuid
 
 from django.urls import reverse
 from django.utils import timezone
@@ -127,7 +128,7 @@ def test_test_post_outbox_validates_actor(nodb_factories):
         assert msg in exc_info.value
 
 
-def test_test_post_outbox_handles_create_note(
+def test_test_post_inbox_handles_create_note(
         settings, mocker, factories):
     deliver = mocker.patch(
         'funkwhale_api.federation.activity.deliver')
@@ -238,3 +239,77 @@ def test_library_actor_manually_approves_based_on_setting(
     settings.FEDERATION_MUSIC_NEEDS_APPROVAL = value
     library_conf = actors.SYSTEM_ACTORS['library']
     assert library_conf.manually_approves_followers is value
+
+
+def test_system_actor_handle(mocker, nodb_factories):
+    handler = mocker.patch(
+        'funkwhale_api.federation.actors.TestActor.handle_create')
+    actor = nodb_factories['federation.Actor']()
+    activity = nodb_factories['federation.Activity'](
+        type='Create', actor=actor.url)
+    serializer = serializers.ActivitySerializer(
+        data=activity
+    )
+    assert serializer.is_valid()
+    actors.SYSTEM_ACTORS['test'].handle(activity, actor)
+    handler.assert_called_once_with(serializer.data, actor)
+
+
+def test_test_actor_handles_follow(
+        settings, mocker, factories):
+    deliver = mocker.patch(
+        'funkwhale_api.federation.activity.deliver')
+    actor = factories['federation.Actor']()
+    now = timezone.now()
+    mocker.patch('django.utils.timezone.now', return_value=now)
+    test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
+    data = {
+        'actor': actor.url,
+        'type': 'Follow',
+        'id': 'http://test.federation/user#follows/267',
+        'object': test_actor.url,
+    }
+    uid = uuid.uuid4()
+    mocker.patch('uuid.uuid4', return_value=uid)
+    expected_accept = {
+    	"@context": [
+    		"https://www.w3.org/ns/activitystreams",
+    		"https://w3id.org/security/v1",
+    		{}
+    	],
+    	"id": test_actor.url + '#accepts/follows/{}'.format(uid),
+    	"type": "Accept",
+    	"actor": test_actor.url,
+    	"object": {
+    		"id": data['id'],
+    		"type": "Follow",
+    		"actor": actor.url,
+    		"object": test_actor.url
+    	},
+    }
+    expected_follow = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {}
+        ],
+        'actor': test_actor.url,
+        'id': test_actor.url + '#follows/{}'.format(uid),
+        'object': actor.url,
+        'type': 'Follow'
+    }
+
+    actors.SYSTEM_ACTORS['test'].post_inbox(data, actor=actor)
+    expected_calls = [
+        mocker.call(
+            expected_accept,
+            to=[actor.url],
+            on_behalf_of=test_actor,
+        ),
+        mocker.call(
+            expected_follow,
+            to=[actor.url],
+            on_behalf_of=test_actor,
+        )
+    ]
+    deliver.assert_has_calls(expected_calls)

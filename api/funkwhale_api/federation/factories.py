@@ -89,3 +89,20 @@ class NoteFactory(factory.Factory):
 
     class Meta:
         model = dict
+
+
+@registry.register(name='federation.Activity')
+class ActivityFactory(factory.Factory):
+    type = 'Create'
+    id = factory.Faker('url')
+    published = factory.LazyFunction(
+        lambda: timezone.now().isoformat()
+    )
+    actor = factory.Faker('url')
+    object = factory.SubFactory(
+        NoteFactory,
+        actor=factory.SelfAttribute('..actor'),
+        published=factory.SelfAttribute('..published'))
+
+    class Meta:
+        model = dict

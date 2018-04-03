@@ -1,5 +1,6 @@
 import logging
 import requests
+import uuid
 import xml
 
 from django.conf import settings
@@ -98,13 +99,38 @@ class SystemActor(object):
         raise NotImplementedError
 
     def post_inbox(self, data, actor=None):
-        raise NotImplementedError
+        return self.handle(data, actor=actor)
 
     def get_outbox(self, data, actor=None):
         raise NotImplementedError
 
     def post_outbox(self, data, actor=None):
         raise NotImplementedError
+
+    def handle(self, data, actor=None):
+        """
+        Main entrypoint for handling activities posted to the
+        actor's inbox
+        """
+        logger.info('Received activity on %s inbox', self.id)
+
+        if actor is None:
+            raise PermissionDenied('Actor not authenticated')
+
+        serializer = serializers.ActivitySerializer(
+            data=data, context={'actor': actor})
+        serializer.is_valid(raise_exception=True)
+
+        ac = serializer.data
+        try:
+            handler = getattr(
+                self, 'handle_{}'.format(ac['type'].lower()))
+        except (KeyError, AttributeError):
+            logger.debug(
+                'No handler for activity %s', ac['type'])
+            return
+
+        return handler(ac, actor)
 
 
 class LibraryActor(SystemActor):
@@ -147,23 +173,6 @@ class TestActor(SystemActor):
         	"orderedItems": []
         }
 
-    def post_inbox(self, data, actor=None):
-        if actor is None:
-            raise PermissionDenied('Actor not authenticated')
-
-        serializer = serializers.ActivitySerializer(
-            data=data, context={'actor': actor})
-        serializer.is_valid(raise_exception=True)
-
-        ac = serializer.validated_data
-        logger.info('Received activity on %s inbox', self.id)
-        if ac['type'] == 'Create' and ac['object']['type'] == 'Note':
-            # we received a toot \o/
-            command = self.parse_command(ac['object']['content'])
-            logger.debug('Parsed command: %s', command)
-            if command == 'ping':
-                self.handle_ping(ac, actor)
-
     def parse_command(self, message):
         """
         Remove any links or fancy markup to extract /command from
@@ -175,7 +184,16 @@ class TestActor(SystemActor):
         except IndexError:
             return
 
-    def handle_ping(self, ac, sender):
+    def handle_create(self, ac, sender):
+        if ac['object']['type'] != 'Note':
+            return
+
+        # we received a toot \o/
+        command = self.parse_command(ac['object']['content'])
+        logger.debug('Parsed command: %s', command)
+        if command != 'ping':
+            return
+
         now = timezone.now()
         test_actor = self.get_actor_instance()
         reply_url = 'https://{}/activities/note/{}'.format(
@@ -218,6 +236,31 @@ class TestActor(SystemActor):
         }
         activity.deliver(
             reply_activity,
+            to=[ac['actor']],
+            on_behalf_of=test_actor)
+
+    def handle_follow(self, ac, sender):
+        # on a follow we:
+        # 1. send the accept answer
+        # 2. follow back
+        test_actor = self.get_actor_instance()
+        accept_uuid = uuid.uuid4()
+        accept = activity.get_accept_follow(
+            accept_id=accept_uuid,
+            accept_actor=test_actor,
+            follow=ac,
+            follow_actor=sender)
+        activity.deliver(
+            accept,
+            to=[ac['actor']],
+            on_behalf_of=test_actor)
+        follow_uuid = uuid.uuid4()
+        follow = activity.get_follow(
+            follow_id=follow_uuid,
+            follower=test_actor,
+            followed=sender)
+        activity.deliver(
+            follow,
             to=[ac['actor']],
             on_behalf_of=test_actor)
 
