@@ -103,3 +103,21 @@ class Follow(models.Model):
 
     def get_federation_url(self):
         return '{}#follows/{}'.format(self.actor.url, self.uuid)
+
+
+class FollowRequest(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    actor = models.ForeignKey(
+        Actor,
+        related_name='emmited_follow_requests',
+        on_delete=models.CASCADE,
+    )
+    target = models.ForeignKey(
+        Actor,
+        related_name='received_follow_requests',
+        on_delete=models.CASCADE,
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    last_modification_date = models.DateTimeField(
+        default=timezone.now)
+    approved = models.NullBooleanField(default=None)
