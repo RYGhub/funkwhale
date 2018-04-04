@@ -101,6 +101,20 @@ def get_follow(follow_id, follower, followed):
     }
 
 
+def get_undo(id, actor, object):
+    return {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {}
+        ],
+        'type': 'Undo',
+        'id': id + '/undo',
+        'actor': actor.url,
+        'object': object,
+    }
+
+
 def get_accept_follow(accept_id, accept_actor, follow, follow_actor):
     return {
         "@context": [

@@ -146,6 +146,23 @@ class SystemActor(object):
             system_actor, ac, sender
         )
 
+    def handle_undo_follow(self, ac, sender):
+        actor = self.get_actor_instance()
+        models.Follow.objects.filter(
+            actor=sender,
+            target=actor,
+        ).delete()
+
+    def handle_undo(self, ac, sender):
+        if ac['object']['type'] != 'Follow':
+            return
+
+        if ac['object']['actor'] != sender.url:
+            # not the same actor, permission issue
+            return
+
+        self.handle_undo_follow(ac, sender)
+
 
 class LibraryActor(SystemActor):
     id = 'library'
@@ -268,39 +285,28 @@ class TestActor(SystemActor):
             to=[ac['actor']],
             on_behalf_of=test_actor)
 
-    def handle_undo(self, ac, sender):
-        if ac['object']['type'] != 'Follow':
-            return
-
-        if ac['object']['actor'] != sender.url:
-            # not the same actor, permission issue
-            return
-
-        test_actor = self.get_actor_instance()
-        models.Follow.objects.filter(
-            actor=sender,
-            target=test_actor,
-        ).delete()
+    def handle_undo_follow(self, ac, sender):
+        super().handle_undo_follow(ac, sender)
+        actor = self.get_actor_instance()
         # we also unfollow the sender, if possible
         try:
             follow = models.Follow.objects.get(
                 target=sender,
-                actor=test_actor,
+                actor=actor,
             )
         except models.Follow.DoesNotExist:
             return
-        undo = {
-            '@context': serializers.AP_CONTEXT,
-            'type': 'Undo',
-            'id': follow.get_federation_url() + '/undo',
-            'actor': test_actor.url,
-            'object': serializers.FollowSerializer(follow).data,
-        }
+        undo = activity.get_undo(
+            id=follow.get_federation_url(),
+            actor=actor,
+            object=serializers.FollowSerializer(follow).data,
+        )
         follow.delete()
         activity.deliver(
             undo,
             to=[sender.url],
-            on_behalf_of=test_actor)
+            on_behalf_of=actor)
+
 
 SYSTEM_ACTORS = {
     'library': LibraryActor(),
