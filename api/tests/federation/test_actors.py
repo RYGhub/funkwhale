@@ -93,18 +93,18 @@ def test_get_test(settings, preferences):
 
 def test_test_get_outbox():
     expected = {
-    	"@context": [
-    		"https://www.w3.org/ns/activitystreams",
-    		"https://w3id.org/security/v1",
-    		{}
-    	],
-    	"id": utils.full_url(
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {}
+        ],
+        "id": utils.full_url(
             reverse(
                 'federation:instance-actors-outbox',
                 kwargs={'actor': 'test'})),
-    	"type": "OrderedCollection",
-    	"totalItems": 0,
-    	"orderedItems": []
+        "type": "OrderedCollection",
+        "totalItems": 0,
+        "orderedItems": []
     }
 
     data = actors.SYSTEM_ACTORS['test'].get_outbox({}, actor=None)
@@ -248,7 +248,7 @@ def test_system_actor_handle(mocker, nodb_factories):
     )
     assert serializer.is_valid()
     actors.SYSTEM_ACTORS['test'].handle(activity, actor)
-    handler.assert_called_once_with(serializer.data, actor)
+    handler.assert_called_once_with(activity, actor)
 
 
 def test_test_actor_handles_follow(
@@ -258,6 +258,8 @@ def test_test_actor_handles_follow(
     actor = factories['federation.Actor']()
     now = timezone.now()
     mocker.patch('django.utils.timezone.now', return_value=now)
+    accept_follow = mocker.patch(
+        'funkwhale_api.federation.activity.accept_follow')
     test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
     data = {
         'actor': actor.url,
@@ -267,22 +269,6 @@ def test_test_actor_handles_follow(
     }
     uid = uuid.uuid4()
     mocker.patch('uuid.uuid4', return_value=uid)
-    expected_accept = {
-    	"@context": [
-    		"https://www.w3.org/ns/activitystreams",
-    		"https://w3id.org/security/v1",
-    		{}
-    	],
-    	"id": test_actor.url + '#accepts/follows/{}'.format(uid),
-    	"type": "Accept",
-    	"actor": test_actor.url,
-    	"object": {
-    		"id": data['id'],
-    		"type": "Follow",
-    		"actor": actor.url,
-    		"object": test_actor.url
-    	},
-    }
     expected_follow = {
         '@context': serializers.AP_CONTEXT,
         'actor': test_actor.url,
@@ -292,12 +278,10 @@ def test_test_actor_handles_follow(
     }
 
     actors.SYSTEM_ACTORS['test'].post_inbox(data, actor=actor)
+    accept_follow.assert_called_once_with(
+        test_actor, data, actor
+    )
     expected_calls = [
-        mocker.call(
-            expected_accept,
-            to=[actor.url],
-            on_behalf_of=test_actor,
-        ),
         mocker.call(
             expected_follow,
             to=[actor.url],
@@ -305,10 +289,6 @@ def test_test_actor_handles_follow(
         )
     ]
     deliver.assert_has_calls(expected_calls)
-
-    follow = test_actor.received_follows.first()
-    assert follow.actor == actor
-    assert follow.target == test_actor
 
 
 def test_test_actor_handles_undo_follow(
@@ -344,3 +324,42 @@ def test_test_actor_handles_undo_follow(
         on_behalf_of=test_actor,)
 
     assert models.Follow.objects.count() == 0
+
+
+def test_library_actor_handles_follow_manual_approval(
+        settings, mocker, factories):
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+    actor = factories['federation.Actor']()
+    now = timezone.now()
+    mocker.patch('django.utils.timezone.now', return_value=now)
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    data = {
+        'actor': actor.url,
+        'type': 'Follow',
+        'id': 'http://test.federation/user#follows/267',
+        'object': library_actor.url,
+    }
+
+    library_actor.system_conf.post_inbox(data, actor=actor)
+    fr = library_actor.received_follow_requests.first()
+
+    assert library_actor.received_follow_requests.count() == 1
+    assert fr.target == library_actor
+    assert fr.actor == actor
+    assert fr.approved is None
+
+
+def test_library_actor_handles_follow_auto_approval(
+        settings, mocker, factories):
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+    actor = factories['federation.Actor']()
+    accept_follow = mocker.patch(
+        'funkwhale_api.federation.activity.accept_follow')
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    data = {
+        'actor': actor.url,
+        'type': 'Follow',
+        'id': 'http://test.federation/user#follows/267',
+        'object': library_actor.url,
+    }
+    library_actor.system_conf.post_inbox(data, actor=actor)

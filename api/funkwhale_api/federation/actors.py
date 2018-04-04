@@ -132,6 +132,20 @@ class SystemActor(object):
 
         return handler(data, actor)
 
+    def handle_follow(self, ac, sender):
+        system_actor = self.get_actor_instance()
+        if self.manually_approves_followers:
+            fr, created = models.FollowRequest.objects.get_or_create(
+                actor=sender,
+                target=system_actor,
+                approved=None,
+            )
+            return fr
+
+        return activity.accept_follow(
+            system_actor, ac, sender
+        )
+
 
 class LibraryActor(SystemActor):
     id = 'library'
@@ -140,6 +154,7 @@ class LibraryActor(SystemActor):
     additional_attributes = {
         'manually_approves_followers': True
     }
+
     @property
     def manually_approves_followers(self):
         return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
@@ -159,18 +174,18 @@ class TestActor(SystemActor):
 
     def get_outbox(self, data, actor=None):
         return {
-        	"@context": [
-        		"https://www.w3.org/ns/activitystreams",
-        		"https://w3id.org/security/v1",
-        		{}
-        	],
-        	"id": utils.full_url(
+            "@context": [
+                "https://www.w3.org/ns/activitystreams",
+                "https://w3id.org/security/v1",
+                {}
+            ],
+            "id": utils.full_url(
                 reverse(
                     'federation:instance-actors-outbox',
                     kwargs={'actor': self.id})),
-        	"type": "OrderedCollection",
-        	"totalItems": 0,
-        	"orderedItems": []
+            "type": "OrderedCollection",
+            "totalItems": 0,
+            "orderedItems": []
         }
 
     def parse_command(self, message):
@@ -204,10 +219,10 @@ class TestActor(SystemActor):
         )
         reply_activity = {
             "@context": [
-        		"https://www.w3.org/ns/activitystreams",
-        		"https://w3id.org/security/v1",
-        		{}
-        	],
+                "https://www.w3.org/ns/activitystreams",
+                "https://w3id.org/security/v1",
+                {}
+            ],
             'type': 'Create',
             'actor': test_actor.url,
             'id': '{}/activity'.format(reply_url),
@@ -240,25 +255,9 @@ class TestActor(SystemActor):
             on_behalf_of=test_actor)
 
     def handle_follow(self, ac, sender):
-        # on a follow we:
-        # 1. send the accept answer
-        # 2. follow back
-        #
+        super().handle_follow(ac, sender)
+        # also, we follow back
         test_actor = self.get_actor_instance()
-        accept_uuid = uuid.uuid4()
-        accept = activity.get_accept_follow(
-            accept_id=accept_uuid,
-            accept_actor=test_actor,
-            follow=ac,
-            follow_actor=sender)
-        activity.deliver(
-            accept,
-            to=[ac['actor']],
-            on_behalf_of=test_actor)
-        models.Follow.objects.get_or_create(
-            actor=sender,
-            target=test_actor,
-        )
         follow_uuid = uuid.uuid4()
         follow = activity.get_follow(
             follow_id=follow_uuid,

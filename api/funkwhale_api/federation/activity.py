@@ -2,7 +2,9 @@ import logging
 import json
 import requests
 import requests_http_signature
+import uuid
 
+from . import models
 from . import signing
 
 logger = logging.getLogger(__name__)
@@ -117,3 +119,20 @@ def get_accept_follow(accept_id, accept_actor, follow, follow_actor):
             "object": accept_actor.url
         },
     }
+
+
+def accept_follow(target, follow, actor):
+    accept_uuid = uuid.uuid4()
+    accept = get_accept_follow(
+        accept_id=accept_uuid,
+        accept_actor=target,
+        follow=follow,
+        follow_actor=actor)
+    deliver(
+        accept,
+        to=[actor.url],
+        on_behalf_of=target)
+    return models.Follow.objects.get_or_create(
+        actor=actor,
+        target=target,
+    )
