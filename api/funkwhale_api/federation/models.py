@@ -35,6 +35,13 @@ class Actor(models.Model):
     last_fetch_date = models.DateTimeField(
         default=timezone.now)
     manually_approves_followers = models.NullBooleanField(default=None)
+    followers = models.ManyToManyField(
+        to='self',
+        symmetrical=False,
+        through='Follow',
+        through_fields=('target', 'actor'),
+        related_name='following',
+    )
 
     class Meta:
         unique_together = ['domain', 'preferred_username']
@@ -64,6 +71,10 @@ class Actor(models.Model):
                 setattr(self, field, v.lower())
 
         super().save(**kwargs)
+
+    @property
+    def is_local(self):
+        return self.domain == settings.FEDERATION_HOSTNAME
 
     @property
     def is_system(self):
@@ -121,3 +132,28 @@ class FollowRequest(models.Model):
     last_modification_date = models.DateTimeField(
         default=timezone.now)
     approved = models.NullBooleanField(default=None)
+
+    def approve(self):
+        from . import activity
+        from . import serializers
+        self.approved = True
+        self.save(update_fields=['approved'])
+        Follow.objects.get_or_create(
+            target=self.target,
+            actor=self.actor
+        )
+        if self.target.is_local:
+            follow = {
+                '@context': serializers.AP_CONTEXT,
+                'actor': self.actor.url,
+                'id': self.actor.url + '#follows/{}'.format(uuid.uuid4()),
+                'object': self.target.url,
+                'type': 'Follow'
+            }
+            activity.accept_follow(
+                self.target, follow, self.actor
+            )
+
+    def refuse(self):
+        self.approved = False
+        self.save(update_fields=['approved'])

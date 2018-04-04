@@ -351,7 +351,7 @@ def test_library_actor_handles_follow_manual_approval(
 
 def test_library_actor_handles_follow_auto_approval(
         settings, mocker, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
     actor = factories['federation.Actor']()
     accept_follow = mocker.patch(
         'funkwhale_api.federation.activity.accept_follow')
@@ -363,3 +363,8 @@ def test_library_actor_handles_follow_auto_approval(
         'object': library_actor.url,
     }
     library_actor.system_conf.post_inbox(data, actor=actor)
+
+    assert library_actor.received_follow_requests.count() == 0
+    accept_follow.assert_called_once_with(
+        library_actor, data, actor
+    )
