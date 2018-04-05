@@ -7,25 +7,25 @@ from funkwhale_api.federation import serializers
 
 def test_actor_serializer_from_ap(db):
     payload = {
-    	'id': 'https://test.federation/user',
-    	'type': 'Person',
-    	'following': 'https://test.federation/user/following',
-    	'followers': 'https://test.federation/user/followers',
-    	'inbox': 'https://test.federation/user/inbox',
-    	'outbox': 'https://test.federation/user/outbox',
-    	'preferredUsername': 'user',
-    	'name': 'Real User',
-    	'summary': 'Hello world',
-    	'url': 'https://test.federation/@user',
-    	'manuallyApprovesFollowers': False,
-    	'publicKey': {
-    		'id': 'https://test.federation/user#main-key',
-    		'owner': 'https://test.federation/user',
-    		'publicKeyPem': 'yolo'
-    	},
-    	'endpoints': {
-    		'sharedInbox': 'https://test.federation/inbox'
-    	},
+        'id': 'https://test.federation/user',
+        'type': 'Person',
+        'following': 'https://test.federation/user/following',
+        'followers': 'https://test.federation/user/followers',
+        'inbox': 'https://test.federation/user/inbox',
+        'outbox': 'https://test.federation/user/outbox',
+        'preferredUsername': 'user',
+        'name': 'Real User',
+        'summary': 'Hello world',
+        'url': 'https://test.federation/@user',
+        'manuallyApprovesFollowers': False,
+        'publicKey': {
+            'id': 'https://test.federation/user#main-key',
+            'owner': 'https://test.federation/user',
+            'publicKeyPem': 'yolo'
+        },
+        'endpoints': {
+            'sharedInbox': 'https://test.federation/inbox'
+        },
     }
 
     serializer = serializers.ActorSerializer(data=payload)
@@ -50,13 +50,13 @@ def test_actor_serializer_from_ap(db):
 
 def test_actor_serializer_only_mandatory_field_from_ap(db):
     payload = {
-    	'id': 'https://test.federation/user',
-    	'type': 'Person',
-    	'following': 'https://test.federation/user/following',
-    	'followers': 'https://test.federation/user/followers',
-    	'inbox': 'https://test.federation/user/inbox',
-    	'outbox': 'https://test.federation/user/outbox',
-    	'preferredUsername': 'user',
+        'id': 'https://test.federation/user',
+        'type': 'Person',
+        'following': 'https://test.federation/user/following',
+        'followers': 'https://test.federation/user/followers',
+        'inbox': 'https://test.federation/user/inbox',
+        'outbox': 'https://test.federation/user/outbox',
+        'preferredUsername': 'user',
     }
 
     serializer = serializers.ActorSerializer(data=payload)
@@ -82,24 +82,24 @@ def test_actor_serializer_to_ap():
             'https://w3id.org/security/v1',
             {},
         ],
-    	'id': 'https://test.federation/user',
-    	'type': 'Person',
-    	'following': 'https://test.federation/user/following',
-    	'followers': 'https://test.federation/user/followers',
-    	'inbox': 'https://test.federation/user/inbox',
-    	'outbox': 'https://test.federation/user/outbox',
-    	'preferredUsername': 'user',
-    	'name': 'Real User',
-    	'summary': 'Hello world',
-    	'manuallyApprovesFollowers': False,
-    	'publicKey': {
-    		'id': 'https://test.federation/user#main-key',
-    		'owner': 'https://test.federation/user',
-    		'publicKeyPem': 'yolo'
-    	},
-    	'endpoints': {
-    		'sharedInbox': 'https://test.federation/inbox'
-    	},
+        'id': 'https://test.federation/user',
+        'type': 'Person',
+        'following': 'https://test.federation/user/following',
+        'followers': 'https://test.federation/user/followers',
+        'inbox': 'https://test.federation/user/inbox',
+        'outbox': 'https://test.federation/user/outbox',
+        'preferredUsername': 'user',
+        'name': 'Real User',
+        'summary': 'Hello world',
+        'manuallyApprovesFollowers': False,
+        'publicKey': {
+            'id': 'https://test.federation/user#main-key',
+            'owner': 'https://test.federation/user',
+            'publicKeyPem': 'yolo'
+        },
+        'endpoints': {
+            'sharedInbox': 'https://test.federation/inbox'
+        },
     }
     ac = models.Actor(
         url=expected['id'],
