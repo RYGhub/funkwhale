@@ -2,6 +2,10 @@ import factory
 import os
 
 from funkwhale_api.factories import registry, ManyToManyFromList
+from funkwhale_api.federation.factories import (
+    AudioMetadataFactory,
+    ActorFactory,
+)
 from funkwhale_api.users.factories import UserFactory
 
 SAMPLES_PATH = os.path.join(
@@ -61,6 +65,13 @@ class ImportBatchFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'music.ImportBatch'
 
+    class Params:
+        federation = factory.Trait(
+            submitted_by=None,
+            federation_actor=factory.SubFactory(ActorFactory),
+            source='federation',
+        )
+
 
 @registry.register
 class ImportJobFactory(factory.django.DjangoModelFactory):
@@ -70,6 +81,13 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'music.ImportJob'
+
+    class Params:
+        federation = factory.Trait(
+            batch=factory.SubFactory(ImportBatchFactory, federation=True),
+            federation_source=factory.Faker('url'),
+            metadata=factory.SubFactory(AudioMetadataFactory),
+        )
 
 
 @registry.register(name='music.FileImportJob')

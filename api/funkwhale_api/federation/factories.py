@@ -1,6 +1,7 @@
 import factory
 import requests
 import requests_http_signature
+import uuid
 
 from django.utils import timezone
 from django.conf import settings
@@ -50,6 +51,21 @@ class SignedRequestFactory(factory.Factory):
         if extracted:
             default_headers.update(extracted)
         self.headers.update(default_headers)
+
+
+@registry.register(name='federation.Link')
+class LinkFactory(factory.Factory):
+    type = 'Link'
+    href = factory.Faker('url')
+    mediaType = 'text/html'
+
+    class Meta:
+        model = dict
+
+    class Params:
+        audio = factory.Trait(
+            mediaType=factory.Iterator(['audio/mp3', 'audio/ogg'])
+        )
 
 
 @registry.register
@@ -132,6 +148,37 @@ class ActivityFactory(factory.Factory):
         NoteFactory,
         actor=factory.SelfAttribute('..actor'),
         published=factory.SelfAttribute('..published'))
+
+    class Meta:
+        model = dict
+
+
+@registry.register(name='federation.AudioMetadata')
+class AudioMetadataFactory(factory.Factory):
+    recording = factory.LazyAttribute(
+        lambda o: 'https://musicbrainz.org/recording/{}'.format(uuid.uuid4())
+    )
+    artist = factory.LazyAttribute(
+        lambda o: 'https://musicbrainz.org/artist/{}'.format(uuid.uuid4())
+    )
+    release = factory.LazyAttribute(
+        lambda o: 'https://musicbrainz.org/release/{}'.format(uuid.uuid4())
+    )
+
+    class Meta:
+        model = dict
+
+
+@registry.register(name='federation.Audio')
+class AudioFactory(factory.Factory):
+    type = 'Audio'
+    id = factory.Faker('url')
+    published = factory.LazyFunction(
+        lambda: timezone.now().isoformat()
+    )
+    actor = factory.Faker('url')
+    url = factory.SubFactory(LinkFactory, audio=True)
+    metadata = factory.SubFactory(AudioMetadataFactory)
 
     class Meta:
         model = dict
