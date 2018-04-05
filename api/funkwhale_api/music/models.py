@@ -8,6 +8,7 @@ import markdown
 
 from django.conf import settings
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.db.models.signals import post_save
@@ -65,6 +66,7 @@ class APIModelMixin(models.Model):
                 pass
         return cleaned_data
 
+
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
 
@@ -90,9 +92,18 @@ class Artist(APIModelMixin):
                 t.append(tag)
         return set(t)
 
+    @classmethod
+    def get_or_create_from_name(cls, name, **kwargs):
+        kwargs.update({'name': name})
+        return cls.objects.get_or_create(
+            name__iexact=name,
+            defaults=kwargs)[0]
+
+
 def import_artist(v):
     a = Artist.get_or_create_from_api(mbid=v[0]['artist']['id'])[0]
     return a
+
 
 def parse_date(v):
     if len(v) == 4:
@@ -107,6 +118,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data['album'] = instance
         track_cleaned_data['position'] = int(track_data['position'])
         track = importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
+
 
 class Album(APIModelMixin):
     title = models.CharField(max_length=255)
@@ -170,6 +182,14 @@ class Album(APIModelMixin):
                 t.append(tag)
         return set(t)
 
+    @classmethod
+    def get_or_create_from_title(cls, title, **kwargs):
+        kwargs.update({'title': title})
+        return cls.objects.get_or_create(
+            title__iexact=title,
+            defaults=kwargs)[0]
+
+
 def import_tags(instance, cleaned_data, raw_data):
     MINIMUM_COUNT = 2
     tags_to_add = []
@@ -181,6 +201,7 @@ def import_tags(instance, cleaned_data, raw_data):
             continue
         tags_to_add.append(tag_data['name'])
     instance.tags.add(*tags_to_add)
+
 
 def import_album(v):
     a = Album.get_or_create_from_api(mbid=v[0]['id'])[0]
@@ -328,7 +349,7 @@ class Track(APIModelMixin):
     def save(self, **kwargs):
         try:
             self.artist
-        except  Artist.DoesNotExist:
+        except Artist.DoesNotExist:
             self.artist = self.album.artist
         super().save(**kwargs)
 
@@ -365,6 +386,13 @@ class Track(APIModelMixin):
             return 'https://musicbrainz.org/recording/{}'.format(
                 self.mbid)
         return settings.FUNKWHALE_URL + '/tracks/{}'.format(self.pk)
+
+    @classmethod
+    def get_or_create_from_title(cls, title, **kwargs):
+        kwargs.update({'title': title})
+        return cls.objects.get_or_create(
+            title__iexact=title,
+            defaults=kwargs)[0]
 
 
 class TrackFile(models.Model):
@@ -420,7 +448,8 @@ IMPORT_STATUS_CHOICES = (
 class ImportBatch(models.Model):
     IMPORT_BATCH_SOURCES = [
         ('api', 'api'),
-        ('shell', 'shell')
+        ('shell', 'shell'),
+        ('federation', 'federation'),
     ]
     source = models.CharField(
         max_length=30, default='api', choices=IMPORT_BATCH_SOURCES)
@@ -428,6 +457,8 @@ class ImportBatch(models.Model):
     submitted_by = models.ForeignKey(
         'users.User',
         related_name='imports',
+        null=True,
+        blank=True,
         on_delete=models.CASCADE)
     status = models.CharField(
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
@@ -437,6 +468,16 @@ class ImportBatch(models.Model):
         null=True,
         blank=True,
         on_delete=models.CASCADE)
+
+    federation_source = models.URLField(null=True, blank=True)
+    federation_actor = models.ForeignKey(
+        'federation.Actor',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='import_batches',
+    )
+
     class Meta:
         ordering = ['-creation_date']
 
@@ -464,6 +505,8 @@ class ImportJob(models.Model):
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
     audio_file = models.FileField(
         upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
+    federation_source = models.URLField(null=True, blank=True)
+    metadata = JSONField(default={})
 
     class Meta:
         ordering = ('id', )

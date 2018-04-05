@@ -61,6 +61,7 @@ def test_import_job_from_federation_no_musicbrainz(factories):
     job.refresh_from_db()
 
     tf = job.track_file
+    assert tf.source == job.source
     assert tf.track.title == 'Ping'
     assert tf.track.artist.name == 'Hello'
     assert tf.track.album.title == 'World'
@@ -82,6 +83,7 @@ def test_import_job_from_federation_musicbrainz_recording(factories, mocker):
     job.refresh_from_db()
 
     tf = job.track_file
+    assert tf.source == job.source
     assert tf.track == t
     track_from_api.assert_called_once_with(
         mbid=tasks.get_mbid(job.metadata['recording'], 'recording'))
@@ -103,6 +105,7 @@ def test_import_job_from_federation_musicbrainz_release(factories, mocker):
     job.refresh_from_db()
 
     tf = job.track_file
+    assert tf.source == job.source
     assert tf.track.title == 'Ping'
     assert tf.track.artist == a.artist
     assert tf.track.album == a
@@ -127,6 +130,7 @@ def test_import_job_from_federation_musicbrainz_artist(factories, mocker):
     job.refresh_from_db()
 
     tf = job.track_file
+    assert tf.source == job.source
     assert tf.track.title == 'Ping'
     assert tf.track.artist == a
     assert tf.track.album.artist == a
