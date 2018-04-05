@@ -25,6 +25,44 @@ def set_acoustid_on_track_file(track_file):
         return update(result['id'])
 
 
+def get_mbid(url, type):
+    prefix = 'https://musicbrainz.org/{}/'.format(type)
+    if url.startswith(prefix):
+        return url.replace(prefix, '')
+
+
+def import_track_from_metadata(metadata):
+    raw_track = metadata['recording']
+    if isinstance(raw_track, str):
+        track_mbid = get_mbid(raw_track, 'recording')
+        return models.Track.get_or_create_from_api(mbid=track_mbid)
+
+    raw_album = metadata['release']
+    if isinstance(raw_album, str):
+        album_mbid = get_mbid(raw_album, 'release')
+        album = models.Album.get_or_create_from_api(mbid=album_mbid)
+        return models.Track.get_or_create_from_title(
+            raw_track['title'], artist=album.artist, album=album)
+
+    raw_artist = metadata['artist']
+    if isinstance(raw_artist, str):
+        artist_mbid = get_mbid(raw_artist, 'artist')
+        artist = models.Artist.get_or_create_from_api(mbid=artist_mbid)
+        album = models.Album.get_or_create_from_title(
+            raw_album['title'], artist=artist)
+        return models.Track.get_or_create_from_title(
+            raw_track['title'], artist=artist, album=album)
+
+    # worst case scenario, we have absolutely no way to link to a
+    # musicbrainz resource, we rely on the name/titles
+    artist = models.Artist.get_or_create_from_name(
+        raw_artist['name'])
+    album = models.Album.get_or_create_from_title(
+        raw_album['title'], artist=artist)
+    return models.Track.get_or_create_from_title(
+        raw_track['title'], artist=artist, album=album)
+
+
 def _do_import(import_job, replace, use_acoustid=True):
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
@@ -43,9 +81,14 @@ def _do_import(import_job, replace, use_acoustid=True):
             acoustid_track_id = match['id']
     if mbid:
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
-    else:
+    elif import_job.audio_file:
         track = import_track_data_from_path(import_job.audio_file.path)
+    else:
+        # probably federation, we use metadata stored on the job itself
+        if not import_job.metadata:
+            raise ValueError('We cannot import without at least metadatas')
 
+        track = import_track_from_metadata(import_job.metadata)
     track_file = None
     if replace:
         track_file = track.files.first()
@@ -63,6 +106,9 @@ def _do_import(import_job, replace, use_acoustid=True):
         track_file.audio_file = ContentFile(import_job.audio_file.read())
         track_file.audio_file.name = import_job.audio_file.name
         track_file.duration = duration
+    elif import_job.federation_source:
+        # no downloading, we hotlink
+        pass
     else:
         track_file.download_file()
     track_file.save()

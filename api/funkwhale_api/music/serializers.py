@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 from taggit.models import Tag
 
@@ -150,3 +151,83 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return 'Audio'
+
+
+class AudioMetadataSerializer(serializers.Serializer):
+    artist = serializers.CharField(required=False)
+    release = serializers.CharField(required=False)
+    recording = serializers.CharField(required=False)
+
+
+class AudioSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    id = serializers.URLField()
+    url = serializers.JSONField()
+    metadata = AudioMetadataSerializer()
+
+    def validate_type(self, v):
+        if v != 'Audio':
+            raise serializers.ValidationError('Invalid type for audio')
+        return v
+
+    def validate_url(self, v):
+        try:
+            url = v['href']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing href')
+
+        try:
+            media_type = v['mediaType']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing mediaType')
+
+        if not media_type.startswith('audio/'):
+            raise serializers.ValidationError('Invalid mediaType')
+
+        return url
+
+    def validate_url(self, v):
+        try:
+            url = v['href']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing href')
+
+        try:
+            media_type = v['mediaType']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing mediaType')
+
+        if not media_type.startswith('audio/'):
+            raise serializers.ValidationError('Invalid mediaType')
+
+        return v
+
+    def create(self, validated_data, batch):
+        metadata = validated_data['metadata'].copy()
+        metadata['mediaType'] = validated_data['url']['mediaType']
+        return models.ImportJob.objects.create(
+            batch=batch,
+            source=validated_data['url']['href'],
+            federation_source=validated_data['id'],
+            metadata=metadata,
+        )
+
+
+class AudioCollectionImportSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    items = serializers.ListField(
+        child=AudioSerializer(),
+        min_length=1,
+    )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        batch = models.ImportBatch.objects.create(
+            federation_actor=self.context['sender'],
+            federation_source=validated_data['id'],
+            source='federation',
+        )
+        for i in validated_data['items']:
+            s = AudioSerializer(data=i)
+            job = s.create(i, batch)
+        return batch
