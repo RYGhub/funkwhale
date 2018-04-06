@@ -414,6 +414,12 @@ class TrackFile(models.Model):
         Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
     source = models.URLField(null=True, blank=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(auto_now=True)
+
+    # points to the URL of the original trackfile ActivityPub Object
+    federation_source = models.URLField(null=True, blank=True)
+
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)

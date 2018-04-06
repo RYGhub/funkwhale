@@ -106,8 +106,8 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
     )
     creation_date = models.DateTimeField(default=timezone.now)
-    last_modification_date = models.DateTimeField(
-        default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
 
     class Meta:
         unique_together = ['actor', 'target']
@@ -129,8 +129,8 @@ class FollowRequest(models.Model):
         on_delete=models.CASCADE,
     )
     creation_date = models.DateTimeField(default=timezone.now)
-    last_modification_date = models.DateTimeField(
-        default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
     approved = models.NullBooleanField(default=None)
 
     def approve(self):
