@@ -3,6 +3,8 @@ from rest_framework import serializers
 from taggit.models import Tag
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.federation.serializers import AP_CONTEXT
+from funkwhale_api.federation import utils as federation_utils
 
 from . import models
 
@@ -212,6 +214,29 @@ class AudioSerializer(serializers.Serializer):
             metadata=metadata,
         )
 
+    def to_representation(self, instance):
+        d = {
+            'type': 'Audio',
+            'id': instance.get_federation_url(),
+            'name': instance.track.full_name,
+            'metadata': {
+                'artist': instance.track.artist.musicbrainz_url,
+                'release': instance.track.album.musicbrainz_url,
+                'track': instance.track.musicbrainz_url,
+            },
+            'url': {
+                'href': federation_utils.full_url(instance.path),
+                'type': 'Link',
+                'mediaType': instance.mimetype
+            },
+            'attributedTo': [
+                self.context['actor'].url
+            ]
+        }
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d
+
 
 class AudioCollectionImportSerializer(serializers.Serializer):
     id = serializers.URLField()
@@ -231,3 +256,24 @@ class AudioCollectionImportSerializer(serializers.Serializer):
             s = AudioSerializer(data=i)
             job = s.create(i, batch)
         return batch
+
+    def to_representation(self, instance):
+        d = {
+            'id': instance['id'],
+            'actor': instance['actor'].url,
+            'totalItems': len(instance['items']),
+            'type': 'Collection',
+            'items': [
+                AudioSerializer(
+                    i,
+                    context={
+                        'actor': instance['actor'],
+                        'include_ap_context': False
+                    }
+                ).data
+                for i in instance['items']
+            ]
+        }
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d

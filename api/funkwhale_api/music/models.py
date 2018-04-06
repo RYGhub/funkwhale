@@ -22,6 +22,7 @@ from versatileimagefield.fields import VersatileImageField
 
 from funkwhale_api import downloader
 from funkwhale_api import musicbrainz
+from funkwhale_api.federation import utils as federation_utils
 from . import importers
 from . import utils
 
@@ -68,6 +69,12 @@ class APIModelMixin(models.Model):
             except KeyError as e:
                 pass
         return cleaned_data
+
+    @property
+    def musicbrainz_url(self):
+        if self.mbid:
+            return 'https://musicbrainz.org/{}/{}'.format(
+                self.musicbrainz_model, self.mbid)
 
 
 class Artist(APIModelMixin):
@@ -425,6 +432,11 @@ class TrackFile(models.Model):
         )
         shutil.rmtree(tmp_dir)
         return self.audio_file
+
+    def get_federation_url(self):
+        return federation_utils.full_url(
+            '/federation/music/file/{}'.format(self.uuid)
+        )
 
     @property
     def path(self):
