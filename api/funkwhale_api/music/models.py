@@ -5,6 +5,7 @@ import datetime
 import tempfile
 import shutil
 import markdown
+import uuid
 
 from django.conf import settings
 from django.db import models
@@ -27,6 +28,8 @@ from . import utils
 
 class APIModelMixin(models.Model):
     mbid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now)
     import_hooks = []
@@ -269,6 +272,8 @@ class Work(APIModelMixin):
 
 
 class Lyrics(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     work = models.ForeignKey(
         Work,
         related_name='lyrics',
@@ -396,6 +401,8 @@ class Track(APIModelMixin):
 
 
 class TrackFile(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     track = models.ForeignKey(
         Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
@@ -446,6 +453,8 @@ IMPORT_STATUS_CHOICES = (
 )
 
 class ImportBatch(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     IMPORT_BATCH_SOURCES = [
         ('api', 'api'),
         ('shell', 'shell'),
@@ -490,6 +499,8 @@ class ImportBatch(models.Model):
 
 
 class ImportJob(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     batch = models.ForeignKey(
         ImportBatch, related_name='jobs', on_delete=models.CASCADE)
     track_file = models.ForeignKey(
