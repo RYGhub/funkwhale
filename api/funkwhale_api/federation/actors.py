@@ -50,6 +50,11 @@ class SystemActor(object):
     additional_attributes = {}
     manually_approves_followers = False
 
+    def serialize(self):
+        actor = self.get_actor_instance()
+        serializer = serializers.ActorSerializer()
+        return serializer.data
+
     def get_actor_instance(self):
         args = self.get_instance_argument(
             self.id,
@@ -171,6 +176,17 @@ class LibraryActor(SystemActor):
     additional_attributes = {
         'manually_approves_followers': True
     }
+
+    def serialize(self):
+        data = super().serialize()
+        urls = data.setdefault('url', [])
+        urls.append({
+            'type': 'Link',
+            'mediaType': 'application/activity+json',
+            'name': 'library',
+            'href': utils.full_url(reverse('federation:music:files-list'))
+        })
+        return data
 
     @property
     def manually_approves_followers(self):
