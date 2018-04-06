@@ -210,7 +210,7 @@ class AudioSerializer(serializers.Serializer):
         return models.ImportJob.objects.create(
             batch=batch,
             source=validated_data['url']['href'],
-            federation_source=validated_data['id'],
+            source_library_url=validated_data['id'],
             metadata=metadata,
         )
 
@@ -248,8 +248,8 @@ class AudioCollectionImportSerializer(serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         batch = models.ImportBatch.objects.create(
-            federation_actor=self.context['sender'],
-            federation_source=validated_data['id'],
+            source_library=self.context['library'],
+            source_library_url=validated_data['id'],
             source='federation',
         )
         for i in validated_data['items']:

@@ -102,14 +102,18 @@ def _do_import(import_job, replace, use_acoustid=True):
     track_file = track_file or models.TrackFile(
         track=track, source=import_job.source)
     track_file.acoustid_track_id = acoustid_track_id
-    track_file.federation_source = import_job.federation_source
+    track_file.source_library = import_job.batch.source_library
+    track_file.source_library_url = import_job.source_library_url
     if from_file:
         track_file.audio_file = ContentFile(import_job.audio_file.read())
         track_file.audio_file.name = import_job.audio_file.name
         track_file.duration = duration
-    elif import_job.federation_source:
-        # no downloading, we hotlink
-        pass
+    elif import_job.source_library_url:
+        if track_file.source_library.download_files:
+            raise NotImplementedError()
+        else:
+            # no downloading, we hotlink
+            pass
     else:
         track_file.download_file()
     track_file.save()

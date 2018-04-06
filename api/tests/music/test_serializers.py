@@ -5,7 +5,7 @@ from funkwhale_api.music import serializers
 
 
 def test_activity_pub_audio_collection_serializer_to_import(factories):
-    sender = factories['federation.Actor']()
+    remote_library = factories['federation.Library']()
 
     collection = {
         'id': 'https://batch.import',
@@ -15,7 +15,7 @@ def test_activity_pub_audio_collection_serializer_to_import(factories):
     }
 
     serializer = serializers.AudioCollectionImportSerializer(
-        data=collection, context={'sender': sender})
+        data=collection, context={'library': remote_library})
 
     assert serializer.is_valid(raise_exception=True)
 
@@ -23,13 +23,13 @@ def test_activity_pub_audio_collection_serializer_to_import(factories):
     jobs = list(batch.jobs.all())
 
     assert batch.source == 'federation'
-    assert batch.federation_source == collection['id']
-    assert batch.federation_actor == sender
+    assert batch.source_library_url == collection['id']
+    assert batch.source_library == remote_library
     assert len(jobs) == 2
 
     for i, a in enumerate(collection['items']):
         job = jobs[i]
-        assert job.federation_source == a['id']
+        assert job.source_library_url == a['id']
         assert job.source == a['url']['href']
         a['metadata']['mediaType'] = a['url']['mediaType']
         assert job.metadata == a['metadata']

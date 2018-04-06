@@ -26,6 +26,7 @@ def test_cannot_duplicate_follow(factories):
             actor=follow.actor,
         )
 
+
 def test_follow_federation_url(factories):
     follow = factories['federation.Follow'](local=True)
     expected = '{}#follows/{}'.format(
@@ -76,3 +77,9 @@ def test_follow_request_refused(mocker, factories):
 
     assert fr.approved is False
     assert fr.target.followers.count() == 0
+
+
+def test_library_model_unique_per_actor(factories):
+    library = factories['federation.Library']()
+    with pytest.raises(db.IntegrityError):
+        factories['federation.Library'](actor=library.actor)

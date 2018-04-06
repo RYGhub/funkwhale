@@ -157,3 +157,21 @@ class FollowRequest(models.Model):
     def refuse(self):
         self.approved = False
         self.save(update_fields=['approved'])
+
+
+class Library(models.Model):
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+    fetched_date = models.DateTimeField(null=True, blank=True)
+    actor = models.OneToOneField(
+        Actor,
+        on_delete=models.CASCADE,
+        related_name='library')
+    uuid = models.UUIDField(default=uuid.uuid4)
+    url = models.URLField()
+    # use this flag to disable federation with a library
+    federation_enabled = models.BooleanField()
+    # should we mirror files locally or hotlink them?
+    download_files = models.BooleanField()
+    files_count = models.PositiveIntegerField(null=True, blank=True)

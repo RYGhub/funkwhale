@@ -52,7 +52,7 @@ class SystemActor(object):
 
     def serialize(self):
         actor = self.get_actor_instance()
-        serializer = serializers.ActorSerializer()
+        serializer = serializers.ActorSerializer(actor)
         return serializer.data
 
     def get_actor_instance(self):
@@ -196,8 +196,12 @@ class LibraryActor(SystemActor):
         from funkwhale_api.music.serializers import (
             AudioCollectionImportSerializer)
 
-        library = self.get_actor_instance()
-        if not library.following.filter(url=sender.url).exists():
+        try:
+            remote_library = models.Library.objects.get(
+                actor=sender,
+                federation_enabled=True,
+            )
+        except models.Library.DoesNotExist:
             logger.info(
                 'Skipping import, we\'re not following %s', sender.url)
             return
@@ -212,7 +216,7 @@ class LibraryActor(SystemActor):
 
         serializer = AudioCollectionImportSerializer(
             data=ac['object'],
-            context={'sender': sender})
+            context={'library': remote_library})
 
         if not serializer.is_valid():
             logger.error(

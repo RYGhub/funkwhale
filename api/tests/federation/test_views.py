@@ -19,6 +19,8 @@ def test_instance_actors(system_actor, db, settings, api_client):
     response = api_client.get(url)
     serializer = serializers.ActorSerializer(actor)
 
+    if system_actor == 'library':
+        response.data.pop('url')
     assert response.status_code == 200
     assert response.data == serializer.data
 

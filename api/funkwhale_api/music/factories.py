@@ -5,6 +5,7 @@ from funkwhale_api.factories import registry, ManyToManyFromList
 from funkwhale_api.federation.factories import (
     AudioMetadataFactory,
     ActorFactory,
+    LibraryFactory,
 )
 from funkwhale_api.users.factories import UserFactory
 
@@ -68,7 +69,8 @@ class ImportBatchFactory(factory.django.DjangoModelFactory):
     class Params:
         federation = factory.Trait(
             submitted_by=None,
-            federation_actor=factory.SubFactory(ActorFactory),
+            source_library=factory.SubFactory(LibraryFactory),
+            source_library_url=factory.Faker('url'),
             source='federation',
         )
 
@@ -85,7 +87,7 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
     class Params:
         federation = factory.Trait(
             batch=factory.SubFactory(ImportBatchFactory, federation=True),
-            federation_source=factory.Faker('url'),
+            source_library_url=factory.Faker('url'),
             metadata=factory.SubFactory(AudioMetadataFactory),
         )
 

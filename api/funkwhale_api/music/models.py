@@ -417,8 +417,14 @@ class TrackFile(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
 
+    source_library = models.ForeignKey(
+        'federation.Library',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='track_files')
     # points to the URL of the original trackfile ActivityPub Object
-    federation_source = models.URLField(null=True, blank=True)
+    source_library_url = models.URLField(null=True, blank=True)
 
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
@@ -470,6 +476,7 @@ IMPORT_STATUS_CHOICES = (
     ('skipped', 'Skipped'),
 )
 
+
 class ImportBatch(models.Model):
     uuid = models.UUIDField(
         unique=True, db_index=True, default=uuid.uuid4)
@@ -496,14 +503,13 @@ class ImportBatch(models.Model):
         blank=True,
         on_delete=models.CASCADE)
 
-    federation_source = models.URLField(null=True, blank=True)
-    federation_actor = models.ForeignKey(
-        'federation.Actor',
-        on_delete=models.SET_NULL,
+    source_library = models.ForeignKey(
+        'federation.Library',
         null=True,
         blank=True,
-        related_name='import_batches',
-    )
+        on_delete=models.SET_NULL,
+        related_name='import_batches')
+    source_library_url = models.URLField(null=True, blank=True)
 
     class Meta:
         ordering = ['-creation_date']
@@ -534,7 +540,7 @@ class ImportJob(models.Model):
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
     audio_file = models.FileField(
         upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
-    federation_source = models.URLField(null=True, blank=True)
+    source_library_url = models.URLField(null=True, blank=True)
     metadata = JSONField(default={})
 
     class Meta:

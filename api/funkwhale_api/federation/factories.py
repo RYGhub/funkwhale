@@ -122,6 +122,17 @@ class FollowRequestFactory(factory.DjangoModelFactory):
         model = models.FollowRequest
 
 
+@registry.register
+class LibraryFactory(factory.DjangoModelFactory):
+    actor = factory.SubFactory(ActorFactory)
+    url = factory.Faker('url')
+    federation_enabled = True
+    download_files = False
+
+    class Meta:
+        model = models.Library
+
+
 @registry.register(name='federation.Note')
 class NoteFactory(factory.Factory):
     type = 'Note'
