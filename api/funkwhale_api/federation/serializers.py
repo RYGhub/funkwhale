@@ -2,9 +2,12 @@ import urllib.parse
 
 from django.urls import reverse
 from django.conf import settings
+from django.core.paginator import Paginator
 
 from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
+
+from funkwhale_api.common.utils import set_query_parameter
 
 from . import activity
 from . import models
@@ -199,3 +202,66 @@ OBJECT_SERIALIZERS = {
     t: ObjectSerializer
     for t in activity.OBJECT_TYPES
 }
+
+
+class PaginatedCollectionSerializer(serializers.Serializer):
+
+    def to_representation(self, conf):
+        paginator = Paginator(
+            conf['items'],
+            conf.get('page_size', 20)
+        )
+        first = set_query_parameter(conf['id'], page=1)
+        current = first
+        last = set_query_parameter(conf['id'], page=paginator.num_pages)
+        d = {
+            'id': conf['id'],
+            'actor': conf['actor'].url,
+            'totalItems': paginator.count,
+            'type': 'Collection',
+            'current': current,
+            'first': first,
+            'last': last,
+        }
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d
+
+
+class CollectionPageSerializer(serializers.Serializer):
+
+    def to_representation(self, conf):
+        page = conf['page']
+        first = set_query_parameter(conf['id'], page=1)
+        last = set_query_parameter(conf['id'], page=page.paginator.num_pages)
+        id = set_query_parameter(conf['id'], page=page.number)
+        d = {
+            'id': id,
+            'partOf': conf['id'],
+            'actor': conf['actor'].url,
+            'totalItems': page.paginator.count,
+            'type': 'CollectionPage',
+            'first': first,
+            'last': last,
+            'items': [
+                conf['item_serializer'](
+                    i,
+                    context={
+                        'actor': conf['actor'],
+                        'include_ap_context': False}
+                ).data
+                for i in page.object_list
+            ]
+        }
+
+        if page.has_previous():
+            d['prev'] = set_query_parameter(
+                conf['id'], page=page.previous_page_number())
+
+        if page.has_previous():
+            d['next'] = set_query_parameter(
+                conf['id'], page=page.next_page_number())
+
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d

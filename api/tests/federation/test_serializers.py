@@ -1,8 +1,10 @@
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
+from funkwhale_api.music.serializers import AudioSerializer
 
 
 def test_actor_serializer_from_ap(db):
@@ -161,5 +163,75 @@ def test_follow_serializer_to_ap(factories):
         'actor': follow.actor.url,
         'object': follow.target.url,
     }
+
+    assert serializer.data == expected
+
+
+def test_paginated_collection_serializer(factories):
+    tfs = factories['music.TrackFile'].create_batch(size=5)
+    actor = factories['federation.Actor'](local=True)
+
+    conf = {
+        'id': 'https://test.federation/test',
+        'items': tfs,
+        'item_serializer': AudioSerializer,
+        'actor': actor,
+        'page_size': 2,
+    }
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'type': 'Collection',
+        'id': conf['id'],
+        'actor': actor.url,
+        'totalItems': len(tfs),
+        'current': conf['id'] + '?page=1',
+        'last': conf['id'] + '?page=3',
+        'first': conf['id'] + '?page=1',
+    }
+
+    serializer = serializers.PaginatedCollectionSerializer(conf)
+
+    assert serializer.data == expected
+
+
+def test_collection_page_serializer(factories):
+    tfs = factories['music.TrackFile'].create_batch(size=5)
+    actor = factories['federation.Actor'](local=True)
+
+    conf = {
+        'id': 'https://test.federation/test',
+        'item_serializer': AudioSerializer,
+        'actor': actor,
+        'page': Paginator(tfs, 2).page(2),
+    }
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'type': 'CollectionPage',
+        'id': conf['id'] + '?page=2',
+        'actor': actor.url,
+        'totalItems': len(tfs),
+        'partOf': conf['id'],
+        'prev': conf['id'] + '?page=1',
+        'next': conf['id'] + '?page=3',
+        'first': conf['id'] + '?page=1',
+        'last': conf['id'] + '?page=3',
+        'items': [
+            conf['item_serializer'](
+                i,
+                context={'actor': actor, 'include_ap_context': False}
+            ).data
+            for i in conf['page'].object_list
+        ]
+    }
+
+    serializer = serializers.CollectionPageSerializer(conf)
 
     assert serializer.data == expected
