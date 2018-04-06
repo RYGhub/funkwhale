@@ -176,6 +176,35 @@ class LibraryActor(SystemActor):
     def manually_approves_followers(self):
         return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
 
+    def handle_create(self, ac, sender):
+        from funkwhale_api.music.serializers import (
+            AudioCollectionImportSerializer)
+
+        library = self.get_actor_instance()
+        if not library.following.filter(url=sender.url).exists():
+            logger.info(
+                'Skipping import, we\'re not following %s', sender.url)
+            return
+
+        if ac['object']['type'] != 'Collection':
+            return
+
+        if ac['object']['totalItems'] <= 0:
+            return
+
+        items = ac['object']['items']
+
+        serializer = AudioCollectionImportSerializer(
+            data=ac['object'],
+            context={'sender': sender})
+
+        if not serializer.is_valid():
+            logger.error(
+                'Cannot import audio collection: %s', serializer.errors)
+            return
+
+        serializer.save()
+
 
 class TestActor(SystemActor):
     id = 'test'

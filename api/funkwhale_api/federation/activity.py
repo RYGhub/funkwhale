@@ -44,10 +44,12 @@ ACTIVITY_TYPES = [
 OBJECT_TYPES = [
     'Article',
     'Audio',
+    'Collection',
     'Document',
     'Event',
     'Image',
     'Note',
+    'OrderedCollection',
     'Page',
     'Place',
     'Profile',

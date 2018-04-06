@@ -10,6 +10,7 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
+from funkwhale_api.music import models as music_models
 
 
 def test_actor_fetching(r_mock):
@@ -368,3 +369,59 @@ def test_library_actor_handles_follow_auto_approval(
     accept_follow.assert_called_once_with(
         library_actor, data, actor
     )
+
+
+def test_library_actor_handle_create_audio_not_following(mocker, factories):
+    # when we receive inbox create audio, we should not do anything
+    # if we're not actually following the sender
+    mocked_create = mocker.patch(
+        'funkwhale_api.music.serializers.AudioCollectionImportSerializer.create'
+    )
+    actor = factories['federation.Actor']()
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    data = {
+        'actor': actor.url,
+        'type': 'Create',
+        'id': 'http://test.federation/audio/create',
+        'object': {
+            'id': 'https://batch.import',
+            'type': 'Collection',
+            'totalItems': 2,
+            'items': factories['federation.Audio'].create_batch(size=2)
+        },
+    }
+    library_actor.system_conf.post_inbox(data, actor=actor)
+
+    mocked_create.assert_not_called()
+    music_models.ImportBatch.objects.count() == 0
+
+
+def test_library_actor_handle_create_audio(mocker, factories):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow = factories['federation.Follow'](actor=library_actor)
+
+    data = {
+        'actor': follow.target.url,
+        'type': 'Create',
+        'id': 'http://test.federation/audio/create',
+        'object': {
+            'id': 'https://batch.import',
+            'type': 'Collection',
+            'totalItems': 2,
+            'items': factories['federation.Audio'].create_batch(size=2)
+        },
+    }
+
+    library_actor.system_conf.post_inbox(data, actor=follow.target)
+
+    batch = follow.target.import_batches.latest('id')
+
+    assert batch.federation_source == data['object']['id']
+    assert batch.federation_actor == follow.target
+    assert batch.jobs.count() == 2
+
+    jobs = list(batch.jobs.order_by('id'))
+    for i, a in enumerate(data['object']['items']):
+        job = jobs[i]
+        assert job.federation_source == a['id']
+        assert job.source == a['url']['href']
