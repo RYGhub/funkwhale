@@ -7,6 +7,16 @@ import django.utils.timezone
 import uuid
 
 
+def delete_system_actors(apps, schema_editor):
+    """Revert site domain and name to default."""
+    Actor = apps.get_model("federation", "Actor")
+    Actor.objects.filter(preferred_username__in=['test', 'library']).delete()
+
+
+def backward(apps, schema_editor):
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,6 +24,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(delete_system_actors, backward),
         migrations.CreateModel(
             name='Follow',
             fields=[
