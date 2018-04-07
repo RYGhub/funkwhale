@@ -86,7 +86,6 @@ class SystemActor(object):
                 kwargs={'actor': self.id}))
 
     def get_instance_argument(self, id, name, summary, **kwargs):
-        preferences = global_preferences_registry.manager()
         p = {
             'preferred_username': id,
             'domain': settings.FEDERATION_HOSTNAME,
@@ -106,8 +105,6 @@ class SystemActor(object):
                 reverse(
                     'federation:instance-actors-outbox',
                     kwargs={'actor': id})),
-            'public_key': preferences['federation__public_key'],
-            'private_key': preferences['federation__private_key'],
             'summary': summary.format(host=settings.FEDERATION_HOSTNAME)
         }
         p.update(kwargs)
