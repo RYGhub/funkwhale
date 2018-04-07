@@ -203,6 +203,20 @@ class LibraryActor(SystemActor):
     def manually_approves_followers(self):
         return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
 
+    def handle_follow(self, ac, sender):
+        system_actor = self.get_actor_instance()
+        if self.manually_approves_followers:
+            fr, created = models.FollowRequest.objects.get_or_create(
+                actor=sender,
+                target=system_actor,
+                approved=None,
+            )
+            return fr
+
+        return activity.accept_follow(
+            system_actor, ac, sender
+        )
+
     @transaction.atomic
     def handle_create(self, ac, sender):
         try:
