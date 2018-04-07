@@ -121,7 +121,7 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         qs = TrackFile.objects.order_by('-creation_date').select_related(
             'track__artist',
             'track__album__artist'
-        )
+        ).filter(library_track__isnull=True)
         if page is None:
             conf = {
                 'id': utils.full_url(reverse('federation:music:files-list')),

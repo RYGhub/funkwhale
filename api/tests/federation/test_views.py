@@ -116,6 +116,18 @@ def test_audio_file_list_actor_page(
     assert response.status_code == 200
     assert response.data == expected
 
+def test_audio_file_list_actor_page_exclude_federated_files(
+        db, settings, api_client, factories):
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
+    library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    tfs = factories['music.TrackFile'].create_batch(size=5, federation=True)
+
+    url = reverse('federation:music:files-list')
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['totalItems'] == 0
+
 
 def test_audio_file_list_actor_page_error(
         db, settings, api_client, factories):
