@@ -26,14 +26,17 @@ def test_actor_fetching(r_mock):
     assert r == payload
 
 
-def test_get_library(settings, preferences):
-    preferences['federation__public_key'] = 'public_key'
+def test_get_library(db, settings, mocker):
+    get_key_pair = mocker.patch(
+        'funkwhale_api.federation.keys.get_key_pair',
+        return_value=(b'private', b'public'))
     expected = {
         'preferred_username': 'library',
         'domain': settings.FEDERATION_HOSTNAME,
         'type': 'Person',
         'name': '{}\'s library'.format(settings.FEDERATION_HOSTNAME),
         'manually_approves_followers': True,
+        'public_key': 'public',
         'url': utils.full_url(
             reverse(
                 'federation:instance-actors-detail',
@@ -50,7 +53,6 @@ def test_get_library(settings, preferences):
             reverse(
                 'federation:instance-actors-outbox',
                 kwargs={'actor': 'library'})),
-        'public_key': 'public_key',
         'summary': 'Bot account to federate with {}\'s library'.format(
         settings.FEDERATION_HOSTNAME),
     }
@@ -59,14 +61,17 @@ def test_get_library(settings, preferences):
         assert getattr(actor, key) == value
 
 
-def test_get_test(settings, preferences):
-    preferences['federation__public_key'] = 'public_key'
+def test_get_test(db, mocker, settings):
+    get_key_pair = mocker.patch(
+        'funkwhale_api.federation.keys.get_key_pair',
+        return_value=(b'private', b'public'))
     expected = {
         'preferred_username': 'test',
         'domain': settings.FEDERATION_HOSTNAME,
         'type': 'Person',
         'name': '{}\'s test account'.format(settings.FEDERATION_HOSTNAME),
         'manually_approves_followers': False,
+        'public_key': 'public',
         'url': utils.full_url(
             reverse(
                 'federation:instance-actors-detail',
@@ -83,7 +88,6 @@ def test_get_test(settings, preferences):
             reverse(
                 'federation:instance-actors-outbox',
                 kwargs={'actor': 'test'})),
-        'public_key': 'public_key',
         'summary': 'Bot account to test federation with {}. Send me /ping and I\'ll answer you.'.format(
         settings.FEDERATION_HOSTNAME),
     }

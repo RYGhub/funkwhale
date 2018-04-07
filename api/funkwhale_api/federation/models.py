@@ -192,13 +192,6 @@ class LibraryTrack(models.Model):
     published_date = models.DateTimeField(null=True, blank=True)
     library = models.ForeignKey(
         Library, related_name='tracks', on_delete=models.CASCADE)
-    local_track_file = models.OneToOneField(
-        'music.TrackFile',
-        related_name='library_track',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
     artist_name = models.CharField(max_length=500)
     album_title = models.CharField(max_length=500)
     title = models.CharField(max_length=500)

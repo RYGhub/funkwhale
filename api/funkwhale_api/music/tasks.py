@@ -112,6 +112,7 @@ def _do_import(import_job, replace, use_acoustid=True):
         track_file.audio_file.name = import_job.audio_file.name
         track_file.duration = duration
     elif import_job.library_track:
+        track_file.library_track = import_job.library_track
         track_file.mimetype = import_job.library_track.audio_mimetype
         if import_job.library_track.library.download_files:
             raise NotImplementedError()
@@ -121,10 +122,6 @@ def _do_import(import_job, replace, use_acoustid=True):
     else:
         track_file.download_file()
     track_file.save()
-    if import_job.library_track:
-        import_job.library_track.local_track_file = track_file
-        import_job.library_track.save(
-            update_fields=['modification_date', 'local_track_file'])
     import_job.status = 'finished'
     import_job.track_file = track_file
     if import_job.audio_file:

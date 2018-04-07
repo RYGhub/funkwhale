@@ -13,8 +13,10 @@ from rest_framework.exceptions import PermissionDenied
 from dynamic_preferences.registries import global_preferences_registry
 
 from . import activity
+from . import keys
 from . import models
 from . import serializers
+from . import signing
 from . import utils
 
 logger = logging.getLogger(__name__)
@@ -51,24 +53,37 @@ class SystemActor(object):
     additional_attributes = {}
     manually_approves_followers = False
 
+    def get_request_auth(self):
+        actor = self.get_actor_instance()
+        return signing.get_auth(
+            actor.private_key, actor.private_key_id)
+
     def serialize(self):
         actor = self.get_actor_instance()
         serializer = serializers.ActorSerializer(actor)
         return serializer.data
 
     def get_actor_instance(self):
+        try:
+            return models.Actor.objects.get(url=self.get_actor_url())
+        except models.Actor.DoesNotExist:
+            pass
+        private, public = keys.get_key_pair()
         args = self.get_instance_argument(
             self.id,
             name=self.name,
             summary=self.summary,
             **self.additional_attributes
         )
-        url = args.pop('url')
-        a, created = models.Actor.objects.get_or_create(
-            url=url,
-            defaults=args,
-        )
-        return a
+        args['private_key'] = private.decode('utf-8')
+        args['public_key'] = public.decode('utf-8')
+        return models.Actor.objects.create(**args)
+
+    def get_actor_url(self):
+        return utils.full_url(
+            reverse(
+                'federation:instance-actors-detail',
+                kwargs={'actor': self.id}))
 
     def get_instance_argument(self, id, name, summary, **kwargs):
         preferences = global_preferences_registry.manager()
@@ -78,10 +93,7 @@ class SystemActor(object):
             'type': 'Person',
             'name': name.format(host=settings.FEDERATION_HOSTNAME),
             'manually_approves_followers': True,
-            'url': utils.full_url(
-                reverse(
-                    'federation:instance-actors-detail',
-                    kwargs={'actor': id})),
+            'url': self.get_actor_url(),
             'shared_inbox_url': utils.full_url(
                 reverse(
                     'federation:instance-actors-inbox',

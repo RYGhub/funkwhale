@@ -56,6 +56,18 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'music.TrackFile'
 
+    class Params:
+        federation = factory.Trait(
+            audio_file=None,
+            library_track=factory.SubFactory(LibraryTrackFactory),
+            mimetype=factory.LazyAttribute(
+                lambda o: o.library_track.audio_mimetype
+            ),
+            source=factory.LazyAttribute(
+                lambda o: o.library_track.audio_url
+            ),
+        )
+
 
 @registry.register
 class ImportBatchFactory(factory.django.DjangoModelFactory):

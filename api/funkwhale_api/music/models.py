@@ -419,6 +419,14 @@ class TrackFile(models.Model):
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
 
+    library_track = models.OneToOneField(
+        'federation.LibraryTrack',
+        related_name='local_track_file',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
     def download_file(self):
         # import the track file, since there is not any
         # we create a tmp dir for the download
@@ -441,10 +449,8 @@ class TrackFile(models.Model):
 
     @property
     def path(self):
-        if settings.PROTECT_AUDIO_FILES:
-            return reverse(
-                'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
-        return self.audio_file.url
+        return reverse(
+            'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
 
     @property
     def filename(self):

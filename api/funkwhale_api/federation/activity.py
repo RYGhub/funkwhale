@@ -58,21 +58,12 @@ OBJECT_TYPES = [
     'Video',
 ] + ACTIVITY_TYPES
 
+
 def deliver(activity, on_behalf_of, to=[]):
     from . import actors
     logger.info('Preparing activity delivery to %s', to)
-    auth = requests_http_signature.HTTPSignatureAuth(
-        use_auth_header=False,
-        headers=[
-            '(request-target)',
-            'user-agent',
-            'host',
-            'date',
-            'content-type',],
-        algorithm='rsa-sha256',
-        key=on_behalf_of.private_key.encode('utf-8'),
-        key_id=on_behalf_of.private_key_id,
-    )
+    auth = signing.get_auth(
+        on_behalf_of.private_key, on_behalf_of.private_key_id)
     for url in to:
         recipient_actor = actors.get_actor(url)
         logger.debug('delivering to %s', recipient_actor.inbox_url)

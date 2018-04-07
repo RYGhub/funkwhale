@@ -51,6 +51,8 @@ class SignatureAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         setattr(request, 'actor', None)
         actor = self.authenticate_actor(request)
+        if not actor:
+            return
         user = AnonymousUser()
         setattr(request, 'actor', actor)
         return (user, None)
