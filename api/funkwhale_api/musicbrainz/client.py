@@ -5,7 +5,7 @@ from django.conf import settings
 from funkwhale_api import __version__
 
 _api = musicbrainzngs
-_api.set_useragent('funkwhale', str(__version__), 'contact@eliotberriot.com')
+_api.set_useragent('funkwhale', str(__version__), settings.FUNKWHALE_URL)
 
 
 store = memoize.djangocache.Cache('default')

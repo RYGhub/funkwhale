@@ -1,7 +1,6 @@
 import ffmpeg
 import os
 import json
-import requests
 import subprocess
 import unicodedata
 import urllib
@@ -23,6 +22,7 @@ from rest_framework import permissions
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.common import session
 from funkwhale_api.federation import actors
 from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
@@ -214,7 +214,7 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             file_extension = utils.get_ext_from_type(mt)
             filename = '{}.{}'.format(f.track.full_name, file_extension)
             auth = actors.SYSTEM_ACTORS['library'].get_request_auth()
-            remote_response = requests.get(
+            remote_response = session.get_session().get(
                 library_track.audio_url,
                 auth=auth,
                 stream=True,
