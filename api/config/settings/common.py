@@ -149,16 +149,6 @@ FIXTURE_DIRS = (
 # ------------------------------------------------------------------------------
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 
-# MANAGER CONFIGURATION
-# ------------------------------------------------------------------------------
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = (
-    ("""Eliot Berriot""", 'contact@eliotberriot.om'),
-)
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
-MANAGERS = ADMINS
-
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases

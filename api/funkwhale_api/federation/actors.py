@@ -1,5 +1,4 @@
 import logging
-import requests
 import uuid
 import xml
 
@@ -11,6 +10,8 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 
 from dynamic_preferences.registries import global_preferences_registry
+
+from funkwhale_api.common import session
 
 from . import activity
 from . import keys
@@ -28,7 +29,7 @@ def remove_tags(text):
 
 
 def get_actor_data(actor_url):
-    response = requests.get(
+    response = session.get_session().get(
         actor_url,
         headers={
             'Accept': 'application/activity+json',

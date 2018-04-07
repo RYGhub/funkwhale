@@ -1,8 +1,9 @@
 import logging
 import json
-import requests
 import requests_http_signature
 import uuid
+
+from funkwhale_api.common import session
 
 from . import models
 from . import signing
@@ -68,7 +69,7 @@ def deliver(activity, on_behalf_of, to=[]):
         recipient_actor = actors.get_actor(url)
         logger.debug('delivering to %s', recipient_actor.inbox_url)
         logger.debug('activity content: %s', json.dumps(activity))
-        response = requests.post(
+        response = session.get_session().post(
             auth=auth,
             json=activity,
             url=recipient_actor.inbox_url,
