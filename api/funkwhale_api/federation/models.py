@@ -1,4 +1,7 @@
+import uuid
+
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 
@@ -12,6 +15,8 @@ TYPE_CHOICES = [
 
 
 class Actor(models.Model):
+    ap_type = 'Actor'
+
     url = models.URLField(unique=True, max_length=500, db_index=True)
     outbox_url = models.URLField(max_length=500)
     inbox_url = models.URLField(max_length=500)
@@ -31,6 +36,16 @@ class Actor(models.Model):
     last_fetch_date = models.DateTimeField(
         default=timezone.now)
     manually_approves_followers = models.NullBooleanField(default=None)
+    followers = models.ManyToManyField(
+        to='self',
+        symmetrical=False,
+        through='Follow',
+        through_fields=('target', 'actor'),
+        related_name='following',
+    )
+
+    class Meta:
+        unique_together = ['domain', 'preferred_username']
 
     @property
     def webfinger_subject(self):
@@ -57,3 +72,127 @@ class Actor(models.Model):
                 setattr(self, field, v.lower())
 
         super().save(**kwargs)
+
+    @property
+    def is_local(self):
+        return self.domain == settings.FEDERATION_HOSTNAME
+
+    @property
+    def is_system(self):
+        from . import actors
+        return all([
+            settings.FEDERATION_HOSTNAME == self.domain,
+            self.preferred_username in actors.SYSTEM_ACTORS
+        ])
+
+    @property
+    def system_conf(self):
+        from . import actors
+        if self.is_system:
+            return actors.SYSTEM_ACTORS[self.preferred_username]
+
+
+class Follow(models.Model):
+    ap_type = 'Follow'
+
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    actor = models.ForeignKey(
+        Actor,
+        related_name='emitted_follows',
+        on_delete=models.CASCADE,
+    )
+    target = models.ForeignKey(
+        Actor,
+        related_name='received_follows',
+        on_delete=models.CASCADE,
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+
+    class Meta:
+        unique_together = ['actor', 'target']
+
+    def get_federation_url(self):
+        return '{}#follows/{}'.format(self.actor.url, self.uuid)
+
+
+class FollowRequest(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    actor = models.ForeignKey(
+        Actor,
+        related_name='emmited_follow_requests',
+        on_delete=models.CASCADE,
+    )
+    target = models.ForeignKey(
+        Actor,
+        related_name='received_follow_requests',
+        on_delete=models.CASCADE,
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+    approved = models.NullBooleanField(default=None)
+
+    def approve(self):
+        from . import activity
+        from . import serializers
+        self.approved = True
+        self.save(update_fields=['approved'])
+        Follow.objects.get_or_create(
+            target=self.target,
+            actor=self.actor
+        )
+        if self.target.is_local:
+            follow = {
+                '@context': serializers.AP_CONTEXT,
+                'actor': self.actor.url,
+                'id': self.actor.url + '#follows/{}'.format(uuid.uuid4()),
+                'object': self.target.url,
+                'type': 'Follow'
+            }
+            activity.accept_follow(
+                self.target, follow, self.actor
+            )
+
+    def refuse(self):
+        self.approved = False
+        self.save(update_fields=['approved'])
+
+
+class Library(models.Model):
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+    fetched_date = models.DateTimeField(null=True, blank=True)
+    actor = models.OneToOneField(
+        Actor,
+        on_delete=models.CASCADE,
+        related_name='library')
+    uuid = models.UUIDField(default=uuid.uuid4)
+    url = models.URLField()
+
+    # use this flag to disable federation with a library
+    federation_enabled = models.BooleanField()
+    # should we mirror files locally or hotlink them?
+    download_files = models.BooleanField()
+    # should we automatically import new files from this library?
+    autoimport = models.BooleanField()
+    tracks_count = models.PositiveIntegerField(null=True, blank=True)
+
+
+class LibraryTrack(models.Model):
+    url = models.URLField(unique=True)
+    audio_url = models.URLField()
+    audio_mimetype = models.CharField(max_length=200)
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+    fetched_date = models.DateTimeField(null=True, blank=True)
+    published_date = models.DateTimeField(null=True, blank=True)
+    library = models.ForeignKey(
+        Library, related_name='tracks', on_delete=models.CASCADE)
+    artist_name = models.CharField(max_length=500)
+    album_title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500)
+    metadata = JSONField(default={}, max_length=10000)

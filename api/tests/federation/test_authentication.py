@@ -3,7 +3,7 @@ from funkwhale_api.federation import keys
 from funkwhale_api.federation import signing
 
 
-def test_authenticate(nodb_factories, mocker, api_request):
+def test_authenticate(factories, mocker, api_request):
     private, public = keys.get_key_pair()
     actor_url = 'https://test.federation/actor'
     mocker.patch(
@@ -18,7 +18,7 @@ def test_authenticate(nodb_factories, mocker, api_request):
                 'id': actor_url + '#main-key',
             }
         })
-    signed_request = nodb_factories['federation.SignedRequest'](
+    signed_request = factories['federation.SignedRequest'](
         auth__key=private,
         auth__key_id=actor_url + '#main-key',
         auth__headers=[

@@ -162,3 +162,12 @@ def media_root(settings):
 def r_mock():
     with requests_mock.mock() as m:
         yield m
+
+
+@pytest.fixture
+def authenticated_actor(factories, mocker):
+    actor = factories['federation.Actor']()
+    mocker.patch(
+        'funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor',
+        return_value=actor)
+    yield actor

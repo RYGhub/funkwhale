@@ -60,3 +60,10 @@ def compute_status(jobs):
     if pending:
         return 'pending'
     return 'finished'
+
+
+def get_ext_from_type(mimetype):
+    mapping = {
+        'audio/ogg': 'ogg',
+        'audio/mpeg': 'mp3',
+    }

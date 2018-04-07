@@ -1,36 +1,42 @@
 import ffmpeg
 import os
 import json
+import requests
 import subprocess
 import unicodedata
 import urllib
 
-from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models.functions import Length
-from django.conf import settings
 from django.http import StreamingHttpResponse
+from django.urls import reverse
+from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets, views, mixins
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+from rest_framework import settings as rest_settings
 from rest_framework import permissions
 from musicbrainzngs import ResponseError
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.federation import actors
 from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
+from funkwhale_api.federation.authentication import SignatureAuthentication
 
-from . import forms
-from . import models
-from . import serializers
-from . import importers
 from . import filters
+from . import forms
+from . import importers
+from . import models
+from . import permissions as music_permissions
+from . import serializers
 from . import tasks
 from . import utils
 
@@ -44,6 +50,7 @@ class SearchMixin(object):
         queryset = self.get_queryset().filter(query)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
 
 class TagViewSetMixin(object):
 
@@ -179,22 +186,54 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (models.TrackFile.objects.all().order_by('-id'))
     serializer_class = serializers.TrackFileSerializer
-    permission_classes = [ConditionalAuthentication]
+    authentication_classes = rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
+        SignatureAuthentication
+    ]
+    permission_classes = [music_permissions.Listen]
 
     @detail_route(methods=['get'])
     def serve(self, request, *args, **kwargs):
         try:
-            f = models.TrackFile.objects.get(pk=kwargs['pk'])
+            f = models.TrackFile.objects.select_related(
+                'library_track',
+                'track__album__artist',
+                'track__artist',
+            ).get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
 
-        response = Response()
+        mt = f.mimetype
+        try:
+            library_track = f.library_track
+        except ObjectDoesNotExist:
+            library_track = None
+        if library_track and not f.audio_file:
+            # we proxy the response to the remote library
+            # since we did not mirror the file locally
+            mt = library_track.audio_mimetype
+            file_extension = utils.get_ext_from_type(mt)
+            filename = '{}.{}'.format(f.track.full_name, file_extension)
+            auth = actors.SYSTEM_ACTORS['library'].get_request_auth()
+            remote_response = requests.get(
+                library_track.audio_url,
+                auth=auth,
+                stream=True,
+                headers={
+                    'Content-Type': 'application/activity+json'
+                })
+            response = StreamingHttpResponse(remote_response.iter_content())
+        else:
+            response = Response()
+            filename = f.filename
+            response['X-Accel-Redirect'] = "{}{}".format(
+                settings.PROTECT_FILES_PATH,
+                f.audio_file.url)
         filename = "filename*=UTF-8''{}".format(
-            urllib.parse.quote(f.filename))
+            urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)
-        response['X-Accel-Redirect'] = "{}{}".format(
-            settings.PROTECT_FILES_PATH,
-            f.audio_file.url)
+        if mt:
+            response["Content-Type"] = mt
+
         return response
 
     @list_route(methods=['get'])
