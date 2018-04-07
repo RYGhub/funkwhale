@@ -34,7 +34,7 @@ def test_actor_serializer_from_ap(db):
     }
 
     serializer = serializers.ActorSerializer(data=payload)
-    assert serializer.is_valid()
+    assert serializer.is_valid(raise_exception=True)
 
     actor = serializer.build()
 
@@ -65,7 +65,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     }
 
     serializer = serializers.ActorSerializer(data=payload)
-    assert serializer.is_valid()
+    assert serializer.is_valid(raise_exception=True)
 
     actor = serializer.build()
 
@@ -199,6 +199,53 @@ def test_paginated_collection_serializer(factories):
     serializer = serializers.PaginatedCollectionSerializer(conf)
 
     assert serializer.data == expected
+
+
+def test_paginated_collection_serializer_validation():
+    data = {
+        'type': 'Collection',
+        'id': 'https://test.federation/test',
+        'totalItems': 5,
+        'actor': 'http://test.actor',
+        'items': []
+    }
+
+    serializer = serializers.PaginatedCollectionSerializer(
+        data=data
+    )
+
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data['totalItems'] == 5
+    assert serializer.validated_data['id'] == data['id']
+    assert serializer.validated_data['actor'] == data['actor']
+    assert serializer.validated_data['items'] == []
+
+
+def test_collection_page_serializer_validdation():
+    base = 'https://test.federation/test'
+    data = {
+        'type': 'CollectionPage',
+        'id': base + '?page=2',
+        'totalItems': 5,
+        'actor': 'https://test.actor',
+        'items': [],
+        'prev': base + '?page=1',
+        'next': base + '?page=3',
+        'partOf': base,
+    }
+
+    serializer = serializers.CollectionPageSerializer(
+        data=data
+    )
+
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data['totalItems'] == 5
+    assert serializer.validated_data['id'] == data['id']
+    assert serializer.validated_data['actor'] == data['actor']
+    assert serializer.validated_data['items'] == []
+    assert serializer.validated_data['prev'] == data['prev']
+    assert serializer.validated_data['next'] == data['next']
+    assert serializer.validated_data['partOf'] == data['partOf']
 
 
 def test_collection_page_serializer(factories):

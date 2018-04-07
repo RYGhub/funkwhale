@@ -21,6 +21,7 @@ AP_CONTEXT = [
     {},
 ]
 
+
 class ActorSerializer(serializers.ModelSerializer):
     # left maps to activitypub fields, right to our internal models
     id = serializers.URLField(source='url')
@@ -206,6 +207,11 @@ OBJECT_SERIALIZERS = {
 
 
 class PaginatedCollectionSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=['Collection'])
+    totalItems = serializers.IntegerField(min_value=0)
+    items = serializers.ListField()
+    actor = serializers.URLField()
+    id = serializers.URLField()
 
     def to_representation(self, conf):
         paginator = Paginator(
@@ -230,6 +236,14 @@ class PaginatedCollectionSerializer(serializers.Serializer):
 
 
 class CollectionPageSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=['CollectionPage'])
+    totalItems = serializers.IntegerField(min_value=0)
+    items = serializers.ListField()
+    actor = serializers.URLField()
+    id = serializers.URLField()
+    prev = serializers.URLField(required=False)
+    next = serializers.URLField(required=False)
+    partOf = serializers.URLField()
 
     def to_representation(self, conf):
         page = conf['page']

@@ -116,6 +116,7 @@ def test_audio_file_list_actor_page(
     assert response.status_code == 200
     assert response.data == expected
 
+
 def test_audio_file_list_actor_page_exclude_federated_files(
         db, settings, api_client, factories):
     settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
