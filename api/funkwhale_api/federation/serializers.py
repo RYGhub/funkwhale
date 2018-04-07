@@ -273,7 +273,7 @@ class CollectionPageSerializer(serializers.Serializer):
             d['prev'] = set_query_parameter(
                 conf['id'], page=page.previous_page_number())
 
-        if page.has_previous():
+        if page.has_next():
             d['next'] = set_query_parameter(
                 conf['id'], page=page.next_page_number())
 
