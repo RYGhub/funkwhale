@@ -128,9 +128,71 @@ class LibraryFactory(factory.DjangoModelFactory):
     url = factory.Faker('url')
     federation_enabled = True
     download_files = False
+    autoimport = False
 
     class Meta:
         model = models.Library
+
+
+class ArtistMetadataFactory(factory.Factory):
+    name = factory.Faker('name')
+
+    class Meta:
+        model = dict
+
+    class Params:
+        musicbrainz = factory.Trait(
+            musicbrainz_id=factory.Faker('uuid4')
+        )
+
+
+class ReleaseMetadataFactory(factory.Factory):
+    title = factory.Faker('sentence')
+
+    class Meta:
+        model = dict
+
+    class Params:
+        musicbrainz = factory.Trait(
+            musicbrainz_id=factory.Faker('uuid4')
+        )
+
+
+class RecordingMetadataFactory(factory.Factory):
+    title = factory.Faker('sentence')
+
+    class Meta:
+        model = dict
+
+    class Params:
+        musicbrainz = factory.Trait(
+            musicbrainz_id=factory.Faker('uuid4')
+        )
+
+
+@registry.register(name='federation.LibraryTrackMetadata')
+class LibraryTrackMetadataFactory(factory.Factory):
+    artist = factory.SubFactory(ArtistMetadataFactory)
+    recording = factory.SubFactory(RecordingMetadataFactory)
+    release = factory.SubFactory(ReleaseMetadataFactory)
+
+    class Meta:
+        model = dict
+
+
+@registry.register
+class LibraryTrackFactory(factory.DjangoModelFactory):
+    library = factory.SubFactory(LibraryFactory)
+    url = factory.Faker('url')
+    title = factory.Faker('sentence')
+    artist_name = factory.Faker('sentence')
+    album_title = factory.Faker('sentence')
+    audio_url = factory.Faker('url')
+    audio_mimetype = 'audio/ogg'
+    metadata = factory.SubFactory(LibraryTrackMetadataFactory)
+
+    class Meta:
+        model = models.LibraryTrack
 
 
 @registry.register(name='federation.Note')
@@ -189,7 +251,7 @@ class AudioFactory(factory.Factory):
     )
     actor = factory.Faker('url')
     url = factory.SubFactory(LinkFactory, audio=True)
-    metadata = factory.SubFactory(AudioMetadataFactory)
+    metadata = factory.SubFactory(LibraryTrackMetadataFactory)
 
     class Meta:
         model = dict

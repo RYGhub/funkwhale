@@ -1,3 +1,4 @@
+import arrow
 import pytest
 import uuid
 
@@ -10,7 +11,6 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
-from funkwhale_api.music import models as music_models
 
 
 def test_actor_fetching(r_mock):
@@ -375,7 +375,7 @@ def test_library_actor_handle_create_audio_no_library(mocker, factories):
     # when we receive inbox create audio, we should not do anything
     # if we don't have a configured library matching the sender
     mocked_create = mocker.patch(
-        'funkwhale_api.music.serializers.AudioCollectionImportSerializer.create'
+        'funkwhale_api.federation.serializers.AudioSerializer.create'
     )
     actor = factories['federation.Actor']()
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
@@ -393,7 +393,7 @@ def test_library_actor_handle_create_audio_no_library(mocker, factories):
     library_actor.system_conf.post_inbox(data, actor=actor)
 
     mocked_create.assert_not_called()
-    music_models.ImportBatch.objects.count() == 0
+    models.LibraryTrack.objects.count() == 0
 
 
 def test_library_actor_handle_create_audio_no_library_enabled(
@@ -401,7 +401,7 @@ def test_library_actor_handle_create_audio_no_library_enabled(
     # when we receive inbox create audio, we should not do anything
     # if we don't have an enabled library
     mocked_create = mocker.patch(
-        'funkwhale_api.music.serializers.AudioCollectionImportSerializer.create'
+        'funkwhale_api.federation.serializers.AudioSerializer.create'
     )
     disabled_library = factories['federation.Library'](
         federation_enabled=False)
@@ -421,12 +421,14 @@ def test_library_actor_handle_create_audio_no_library_enabled(
     library_actor.system_conf.post_inbox(data, actor=actor)
 
     mocked_create.assert_not_called()
-    music_models.ImportBatch.objects.count() == 0
+    models.LibraryTrack.objects.count() == 0
 
 
 def test_library_actor_handle_create_audio(mocker, factories):
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-    remote_library = factories['federation.Library']()
+    remote_library = factories['federation.Library'](
+        federation_enabled=True
+    )
 
     data = {
         'actor': remote_library.actor.url,
@@ -442,14 +444,19 @@ def test_library_actor_handle_create_audio(mocker, factories):
 
     library_actor.system_conf.post_inbox(data, actor=remote_library.actor)
 
-    batch = remote_library.import_batches.latest('id')
+    lts = list(remote_library.tracks.order_by('id'))
 
-    assert batch.source_library_url == data['object']['id']
-    assert batch.source_library == remote_library
-    assert batch.jobs.count() == 2
+    assert len(lts) == 2
 
-    jobs = list(batch.jobs.order_by('id'))
     for i, a in enumerate(data['object']['items']):
-        job = jobs[i]
-        assert job.source_library_url == a['id']
-        assert job.source == a['url']['href']
+        lt = lts[i]
+        assert lt.pk is not None
+        assert lt.url == a['id']
+        assert lt.library == remote_library
+        assert lt.audio_url == a['url']['href']
+        assert lt.audio_mimetype == a['url']['mediaType']
+        assert lt.metadata == a['metadata']
+        assert lt.title == a['metadata']['recording']['title']
+        assert lt.artist_name == a['metadata']['artist']['name']
+        assert lt.album_title == a['metadata']['release']['title']
+        assert lt.published_date == arrow.get(a['published'])

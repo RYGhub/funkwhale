@@ -7,7 +7,6 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
 from funkwhale_api.federation import webfinger
-from funkwhale_api.music.serializers import AudioSerializer
 
 
 @pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
@@ -87,7 +86,7 @@ def test_audio_file_list_actor_no_page(
         'id': utils.full_url(reverse('federation:music:files-list')),
         'page_size': 2,
         'items': list(reversed(tfs)),  # we order by -creation_date
-        'item_serializer': AudioSerializer,
+        'item_serializer': serializers.AudioSerializer,
         'actor': library
     }
     expected = serializers.PaginatedCollectionSerializer(conf).data
@@ -107,7 +106,7 @@ def test_audio_file_list_actor_page(
     conf = {
         'id': utils.full_url(reverse('federation:music:files-list')),
         'page': Paginator(list(reversed(tfs)), 2).page(2),
-        'item_serializer': AudioSerializer,
+        'item_serializer': serializers.AudioSerializer,
         'actor': library
     }
     expected = serializers.CollectionPageSerializer(conf).data

@@ -25,42 +25,46 @@ def set_acoustid_on_track_file(track_file):
         return update(result['id'])
 
 
-def get_mbid(url, type):
-    prefix = 'https://musicbrainz.org/{}/'.format(type)
-    if url.startswith(prefix):
-        return url.replace(prefix, '')
-
-
-def import_track_from_metadata(metadata):
-    raw_track = metadata['recording']
-    if isinstance(raw_track, str):
-        track_mbid = get_mbid(raw_track, 'recording')
+def import_track_from_remote(library_track):
+    metadata = library_track.metadata
+    try:
+        track_mbid = metadata['recording']['musicbrainz_id']
+        assert track_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
         return models.Track.get_or_create_from_api(mbid=track_mbid)
 
-    raw_album = metadata['release']
-    if isinstance(raw_album, str):
-        album_mbid = get_mbid(raw_album, 'release')
+    try:
+        album_mbid = metadata['release']['musicbrainz_id']
+        assert album_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
         album = models.Album.get_or_create_from_api(mbid=album_mbid)
         return models.Track.get_or_create_from_title(
-            raw_track['title'], artist=album.artist, album=album)
+            library_track.title, artist=album.artist, album=album)
 
-    raw_artist = metadata['artist']
-    if isinstance(raw_artist, str):
-        artist_mbid = get_mbid(raw_artist, 'artist')
+    try:
+        artist_mbid = metadata['artist']['musicbrainz_id']
+        assert artist_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
         artist = models.Artist.get_or_create_from_api(mbid=artist_mbid)
         album = models.Album.get_or_create_from_title(
-            raw_album['title'], artist=artist)
+            library_track.album_title, artist=artist)
         return models.Track.get_or_create_from_title(
-            raw_track['title'], artist=artist, album=album)
+            library_track.title, artist=artist, album=album)
 
     # worst case scenario, we have absolutely no way to link to a
     # musicbrainz resource, we rely on the name/titles
     artist = models.Artist.get_or_create_from_name(
-        raw_artist['name'])
+        library_track.artist_name)
     album = models.Album.get_or_create_from_title(
-        raw_album['title'], artist=artist)
+        library_track.album_title, artist=artist)
     return models.Track.get_or_create_from_title(
-        raw_track['title'], artist=artist, album=album)
+        library_track.title, artist=artist, album=album)
 
 
 def _do_import(import_job, replace, use_acoustid=True):
@@ -83,12 +87,13 @@ def _do_import(import_job, replace, use_acoustid=True):
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
     elif import_job.audio_file:
         track = import_track_data_from_path(import_job.audio_file.path)
+    elif import_job.library_track:
+        track = import_track_from_remote(import_job.library_track)
     else:
-        # probably federation, we use metadata stored on the job itself
-        if not import_job.metadata:
-            raise ValueError('We cannot import without at least metadatas')
+        raise ValueError(
+            'Not enough data to process import, '
+            'add a mbid, an audio file or a library track')
 
-        track = import_track_from_metadata(import_job.metadata)
     track_file = None
     if replace:
         track_file = track.files.first()
@@ -102,14 +107,13 @@ def _do_import(import_job, replace, use_acoustid=True):
     track_file = track_file or models.TrackFile(
         track=track, source=import_job.source)
     track_file.acoustid_track_id = acoustid_track_id
-    track_file.source_library = import_job.batch.source_library
-    track_file.source_library_url = import_job.source_library_url
     if from_file:
         track_file.audio_file = ContentFile(import_job.audio_file.read())
         track_file.audio_file.name = import_job.audio_file.name
         track_file.duration = duration
-    elif import_job.source_library_url:
-        if track_file.source_library.download_files:
+    elif import_job.library_track:
+        track_file.mimetype = import_job.library_track.audio_mimetype
+        if import_job.library_track.library.download_files:
             raise NotImplementedError()
         else:
             # no downloading, we hotlink
@@ -117,6 +121,10 @@ def _do_import(import_job, replace, use_acoustid=True):
     else:
         track_file.download_file()
     track_file.save()
+    if import_job.library_track:
+        import_job.library_track.local_track_file = track_file
+        import_job.library_track.save(
+            update_fields=['modification_date', 'local_track_file'])
     import_job.status = 'finished'
     import_job.track_file = track_file
     if import_job.audio_file:

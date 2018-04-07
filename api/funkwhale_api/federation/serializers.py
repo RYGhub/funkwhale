@@ -3,6 +3,7 @@ import urllib.parse
 from django.urls import reverse
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.db import transaction
 
 from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
@@ -261,6 +262,152 @@ class CollectionPageSerializer(serializers.Serializer):
         if page.has_previous():
             d['next'] = set_query_parameter(
                 conf['id'], page=page.next_page_number())
+
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d
+
+
+class ArtistMetadataSerializer(serializers.Serializer):
+    musicbrainz_id = serializers.UUIDField(required=False)
+    name = serializers.CharField()
+
+
+class ReleaseMetadataSerializer(serializers.Serializer):
+    musicbrainz_id = serializers.UUIDField(required=False)
+    title = serializers.CharField()
+
+
+class RecordingMetadataSerializer(serializers.Serializer):
+    musicbrainz_id = serializers.UUIDField(required=False)
+    title = serializers.CharField()
+
+
+class AudioMetadataSerializer(serializers.Serializer):
+    artist = ArtistMetadataSerializer()
+    release = ReleaseMetadataSerializer()
+    recording = RecordingMetadataSerializer()
+
+
+class AudioSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    id = serializers.URLField()
+    url = serializers.JSONField()
+    published = serializers.DateTimeField()
+    updated = serializers.DateTimeField(required=False)
+    metadata = AudioMetadataSerializer()
+
+    def validate_type(self, v):
+        if v != 'Audio':
+            raise serializers.ValidationError('Invalid type for audio')
+        return v
+
+    def validate_url(self, v):
+        try:
+            url = v['href']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing href')
+
+        try:
+            media_type = v['mediaType']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing mediaType')
+
+        if not media_type.startswith('audio/'):
+            raise serializers.ValidationError('Invalid mediaType')
+
+        return url
+
+    def validate_url(self, v):
+        try:
+            url = v['href']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing href')
+
+        try:
+            media_type = v['mediaType']
+        except (KeyError, TypeError):
+            raise serializers.ValidationError('Missing mediaType')
+
+        if not media_type.startswith('audio/'):
+            raise serializers.ValidationError('Invalid mediaType')
+
+        return v
+
+    def create(self, validated_data):
+        defaults = {
+            'audio_mimetype': validated_data['url']['mediaType'],
+            'audio_url': validated_data['url']['href'],
+            'metadata': validated_data['metadata'],
+            'artist_name': validated_data['metadata']['artist']['name'],
+            'album_title': validated_data['metadata']['release']['title'],
+            'title': validated_data['metadata']['recording']['title'],
+            'published_date': validated_data['published'],
+            'modification_date': validated_data.get('updated'),
+        }
+        return models.LibraryTrack.objects.get_or_create(
+            library=self.context['library'],
+            url=validated_data['id'],
+            defaults=defaults
+        )[0]
+
+    def to_representation(self, instance):
+        track = instance.track
+        album = instance.track.album
+        artist = instance.track.artist
+
+        d = {
+            'type': 'Audio',
+            'id': instance.get_federation_url(),
+            'name': instance.track.full_name,
+            'published': instance.creation_date.isoformat(),
+            'updated': instance.modification_date.isoformat(),
+            'metadata': {
+                'artist': {
+                    'musicbrainz_id': str(artist.mbid) if artist.mbid else None,
+                    'name': artist.name,
+                },
+                'release': {
+                    'musicbrainz_id': str(album.mbid) if album.mbid else None,
+                    'title': album.title,
+                },
+                'recording': {
+                    'musicbrainz_id': str(track.mbid) if track.mbid else None,
+                    'title': track.title,
+                },
+            },
+            'url': {
+                'href': utils.full_url(instance.path),
+                'type': 'Link',
+                'mediaType': instance.mimetype
+            },
+            'attributedTo': [
+                self.context['actor'].url
+            ]
+        }
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d
+
+
+class CollectionSerializer(serializers.Serializer):
+
+    def to_representation(self, conf):
+        d = {
+            'id': conf['id'],
+            'actor': conf['actor'].url,
+            'totalItems': len(conf['items']),
+            'type': 'Collection',
+            'items': [
+                conf['item_serializer'](
+                    i,
+                    context={
+                        'actor': conf['actor'],
+                        'include_ap_context': False}
+                ).data
+                for i in conf['items']
+            ]
+        }
 
         if self.context.get('include_ap_context', True):
             d['@context'] = AP_CONTEXT

@@ -10,7 +10,6 @@ from rest_framework import response
 from rest_framework.decorators import list_route, detail_route
 
 from funkwhale_api.music.models import TrackFile
-from funkwhale_api.music.serializers import AudioSerializer
 
 from . import actors
 from . import authentication
@@ -119,13 +118,16 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         page = request.GET.get('page')
         library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-        qs = TrackFile.objects.order_by('-creation_date')
+        qs = TrackFile.objects.order_by('-creation_date').select_related(
+            'track__artist',
+            'track__album__artist'
+        )
         if page is None:
             conf = {
                 'id': utils.full_url(reverse('federation:music:files-list')),
                 'page_size': settings.FEDERATION_COLLECTION_PAGE_SIZE,
                 'items': qs,
-                'item_serializer': AudioSerializer,
+                'item_serializer': serializers.AudioSerializer,
                 'actor': library,
             }
             serializer = serializers.PaginatedCollectionSerializer(conf)
@@ -140,15 +142,15 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
                 qs, settings.FEDERATION_COLLECTION_PAGE_SIZE)
             try:
                 page = p.page(page_number)
+                conf = {
+                    'id': utils.full_url(reverse('federation:music:files-list')),
+                    'page': page,
+                    'item_serializer': serializers.AudioSerializer,
+                    'actor': library,
+                }
+                serializer = serializers.CollectionPageSerializer(conf)
+                data = serializer.data
             except paginator.EmptyPage:
                 return response.Response(status=404)
-            conf = {
-                'id': utils.full_url(reverse('federation:music:files-list')),
-                'page': page,
-                'item_serializer': AudioSerializer,
-                'actor': library,
-            }
-            serializer = serializers.CollectionPageSerializer(conf)
-            data = serializer.data
 
         return response.Response(data)

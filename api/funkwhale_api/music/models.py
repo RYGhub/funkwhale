@@ -9,7 +9,6 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.db.models.signals import post_save
@@ -416,16 +415,6 @@ class TrackFile(models.Model):
     source = models.URLField(null=True, blank=True)
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
-
-    source_library = models.ForeignKey(
-        'federation.Library',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='track_files')
-    # points to the URL of the original trackfile ActivityPub Object
-    source_library_url = models.URLField(null=True, blank=True)
-
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
@@ -503,14 +492,6 @@ class ImportBatch(models.Model):
         blank=True,
         on_delete=models.CASCADE)
 
-    source_library = models.ForeignKey(
-        'federation.Library',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='import_batches')
-    source_library_url = models.URLField(null=True, blank=True)
-
     class Meta:
         ordering = ['-creation_date']
 
@@ -540,8 +521,14 @@ class ImportJob(models.Model):
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
     audio_file = models.FileField(
         upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
-    source_library_url = models.URLField(null=True, blank=True)
-    metadata = JSONField(default={})
+
+    library_track = models.ForeignKey(
+        'federation.LibraryTrack',
+        related_name='import_jobs',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ('id', )

@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 
@@ -170,8 +171,35 @@ class Library(models.Model):
         related_name='library')
     uuid = models.UUIDField(default=uuid.uuid4)
     url = models.URLField()
+
     # use this flag to disable federation with a library
     federation_enabled = models.BooleanField()
     # should we mirror files locally or hotlink them?
     download_files = models.BooleanField()
-    files_count = models.PositiveIntegerField(null=True, blank=True)
+    # should we automatically import new files from this library?
+    autoimport = models.BooleanField()
+    tracks_count = models.PositiveIntegerField(null=True, blank=True)
+
+
+class LibraryTrack(models.Model):
+    url = models.URLField(unique=True)
+    audio_url = models.URLField()
+    audio_mimetype = models.CharField(max_length=200)
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(
+        auto_now=True)
+    fetched_date = models.DateTimeField(null=True, blank=True)
+    published_date = models.DateTimeField(null=True, blank=True)
+    library = models.ForeignKey(
+        Library, related_name='tracks', on_delete=models.CASCADE)
+    local_track_file = models.OneToOneField(
+        'music.TrackFile',
+        related_name='library_track',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    artist_name = models.CharField(max_length=500)
+    album_title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500)
+    metadata = JSONField(default={}, max_length=10000)

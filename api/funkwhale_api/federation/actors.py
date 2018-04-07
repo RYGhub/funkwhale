@@ -4,6 +4,7 @@ import uuid
 import xml
 
 from django.conf import settings
+from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 
@@ -192,10 +193,8 @@ class LibraryActor(SystemActor):
     def manually_approves_followers(self):
         return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
 
+    @transaction.atomic
     def handle_create(self, ac, sender):
-        from funkwhale_api.music.serializers import (
-            AudioCollectionImportSerializer)
-
         try:
             remote_library = models.Library.objects.get(
                 actor=sender,
@@ -212,18 +211,28 @@ class LibraryActor(SystemActor):
         if ac['object']['totalItems'] <= 0:
             return
 
-        items = ac['object']['items']
-
-        serializer = AudioCollectionImportSerializer(
-            data=ac['object'],
-            context={'library': remote_library})
-
-        if not serializer.is_valid():
-            logger.error(
-                'Cannot import audio collection: %s', serializer.errors)
+        try:
+            items = ac['object']['items']
+        except KeyError:
+            logger.warning('No items in collection!')
             return
 
-        serializer.save()
+        item_serializers = [
+            serializers.AudioSerializer(
+                data=i, context={'library': remote_library})
+            for i in items
+        ]
+
+        valid_serializers = []
+        for s in item_serializers:
+            if s.is_valid():
+                valid_serializers.append(s)
+            else:
+                logger.debug(
+                    'Skipping invalid item %s, %s', s.initial_data, s.errors)
+
+        for s in valid_serializers:
+            s.save()
 
 
 class TestActor(SystemActor):

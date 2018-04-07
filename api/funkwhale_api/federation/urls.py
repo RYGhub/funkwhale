@@ -15,10 +15,10 @@ router.register(
     'well-known')
 
 music_router.register(
-    r'federation/files',
+    r'files',
     views.MusicFilesViewSet,
     'files',
 )
 urlpatterns = router.urls + [
-    url('music/', include((music_router.urls, 'music'), namespace='music'))
+    url('federation/music/', include((music_router.urls, 'music'), namespace='music'))
 ]
