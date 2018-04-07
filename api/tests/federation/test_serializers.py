@@ -262,6 +262,25 @@ def test_activity_pub_audio_serializer_to_library_track(factories):
     assert lt.published_date == arrow.get(audio['published'])
 
 
+def test_activity_pub_audio_serializer_to_library_track_no_duplicate(
+        factories):
+    remote_library = factories['federation.Library']()
+    audio = factories['federation.Audio']()
+    serializer1 = serializers.AudioSerializer(
+        data=audio, context={'library': remote_library})
+    serializer2 = serializers.AudioSerializer(
+        data=audio, context={'library': remote_library})
+
+    assert serializer1.is_valid() is True
+    assert serializer2.is_valid() is True
+
+    lt1 = serializer1.save()
+    lt2 = serializer2.save()
+
+    assert lt1 == lt2
+    assert models.LibraryTrack.objects.count() == 1
+
+
 def test_activity_pub_audio_serializer_to_ap(factories):
     tf = factories['music.TrackFile'](mimetype='audio/mp3')
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
