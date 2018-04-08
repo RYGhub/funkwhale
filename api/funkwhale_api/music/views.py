@@ -218,6 +218,7 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                 library_track.audio_url,
                 auth=auth,
                 stream=True,
+                timeout=20,
                 headers={
                     'Content-Type': 'application/activity+json'
                 })

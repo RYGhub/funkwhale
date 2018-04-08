@@ -73,6 +73,7 @@ def deliver(activity, on_behalf_of, to=[]):
             auth=auth,
             json=activity,
             url=recipient_actor.inbox_url,
+            timeout=5,
             headers={
                 'Content-Type': 'application/activity+json'
             }

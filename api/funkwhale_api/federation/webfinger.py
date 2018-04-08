@@ -47,7 +47,7 @@ def get_resource(resource_string):
     username, hostname = clean_acct(resource, ensure_local=False)
     url = 'https://{}/.well-known/webfinger?resource={}'.format(
         hostname, resource_string)
-    response = session.get_session().get(url)
+    response = session.get_session().get(url, timeout=5)
     response.raise_for_status()
     serializer = serializers.ActorWebfingerSerializer(data=response.json())
     serializer.is_valid(raise_exception=True)

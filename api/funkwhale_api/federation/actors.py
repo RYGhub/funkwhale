@@ -31,6 +31,7 @@ def remove_tags(text):
 def get_actor_data(actor_url):
     response = session.get_session().get(
         actor_url,
+        timeout=5,
         headers={
             'Accept': 'application/activity+json',
         }
@@ -41,6 +42,7 @@ def get_actor_data(actor_url):
     except:
         raise ValueError(
             'Invalid actor payload: {}'.format(response.text))
+
 
 def get_actor(actor_url):
     data = get_actor_data(actor_url)
