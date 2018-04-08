@@ -1,5 +1,7 @@
 import requests
 
+from django.conf import settings
+
 from funkwhale_api.common import session
 
 from . import actors
@@ -69,6 +71,7 @@ def get_library_data(library_url):
             library_url,
             auth=auth,
             timeout=5,
+            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={
                 'Content-Type': 'application/activity+json'
             }

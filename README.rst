@@ -273,3 +273,11 @@ we will default to node1 as the name of your instance.
 Assuming your project name is ``node1``, your server will be reachable
 at ``https://node1.funkwhale.test/``. Not that you'll have to trust
 the SSL Certificate as it's self signed.
+
+When working on federation with traefik, ensure you have this in your ``env``::
+
+    # This will ensure we don't bind any port on the host, and thus enable
+    # multiple instances of funkwhale to be spawned concurrently.
+    WEBPACK_DEVSERVER_PORT_BINDING=
+    # This disable certificate verification
+    EXTERNAL_REQUESTS_VERIFY_SSL=false

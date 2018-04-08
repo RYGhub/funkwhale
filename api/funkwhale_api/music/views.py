@@ -219,6 +219,7 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                 auth=auth,
                 stream=True,
                 timeout=20,
+                verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
                 headers={
                     'Content-Type': 'application/activity+json'
                 })

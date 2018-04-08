@@ -3,6 +3,8 @@ import json
 import requests_http_signature
 import uuid
 
+from django.conf import settings
+
 from funkwhale_api.common import session
 
 from . import models
@@ -74,6 +76,7 @@ def deliver(activity, on_behalf_of, to=[]):
             json=activity,
             url=recipient_actor.inbox_url,
             timeout=5,
+            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={
                 'Content-Type': 'application/activity+json'
             }

@@ -32,6 +32,7 @@ def get_actor_data(actor_url):
     response = session.get_session().get(
         actor_url,
         timeout=5,
+        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         headers={
             'Accept': 'application/activity+json',
         }
