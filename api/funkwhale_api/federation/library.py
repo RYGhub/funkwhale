@@ -96,5 +96,10 @@ def get_library_data(library_url):
     serializer = serializers.PaginatedCollectionSerializer(
         data=response.json(),
     )
-    serializer.is_valid(raise_exception=True)
+    if not serializer.is_valid():
+        return {
+            'errors': [
+                'Invalid ActivityPub response from remote library']
+        }
+
     return serializer.validated_data
