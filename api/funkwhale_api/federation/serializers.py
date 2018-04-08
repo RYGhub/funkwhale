@@ -116,10 +116,27 @@ class FollowSerializer(serializers.ModelSerializer):
         return ret
 
 
-class ActorWebfingerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Actor
-        fields = ['url']
+class ActorWebfingerSerializer(serializers.Serializer):
+    subject = serializers.CharField()
+    aliases = serializers.ListField(child=serializers.URLField())
+    links = serializers.ListField()
+    actor_url = serializers.URLField(required=False)
+
+    def validate(self, validated_data):
+        validated_data['actor_url'] = None
+        for l in validated_data['links']:
+            try:
+                if not l['rel'] == 'self':
+                    continue
+                if not l['type'] == 'application/activity+json':
+                    continue
+                validated_data['actor_url'] = l['href']
+                break
+            except KeyError:
+                pass
+        if validated_data['actor_url'] is None:
+            raise serializers.ValidationError('No valid actor url found')
+        return validated_data
 
     def to_representation(self, instance):
         data = {}
