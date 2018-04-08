@@ -164,3 +164,18 @@ def test_library_actor_includes_library_link(db, settings, api_client):
     ]
     assert response.status_code == 200
     assert response.data['url'] == expected_links
+
+
+def test_can_scan_library(superuser_api_client, mocker):
+    result = {'test': 'test'}
+    scan = mocker.patch(
+        'funkwhale_api.federation.library.scan_from_account_name',
+        return_value=result)
+
+    url = reverse('api:v1:federation:libraries-scan')
+    response = superuser_api_client.get(
+        url, data={'account': 'test@test.library'})
+
+    assert response.status_code == 200
+    assert response.data == result
+    scan.assert_called_once_with('test@test.library')

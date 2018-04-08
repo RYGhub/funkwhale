@@ -36,7 +36,7 @@ def clean_acct(acct_string, ensure_local=True):
         raise forms.ValidationError(
             'Invalid hostname {}'.format(hostname))
 
-    if username not in actors.SYSTEM_ACTORS:
+    if ensure_local and username not in actors.SYSTEM_ACTORS:
         raise forms.ValidationError('Invalid username')
 
     return username, hostname

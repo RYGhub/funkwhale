@@ -27,8 +27,10 @@ class ActorSerializer(serializers.ModelSerializer):
     id = serializers.URLField(source='url')
     outbox = serializers.URLField(source='outbox_url')
     inbox = serializers.URLField(source='inbox_url')
-    following = serializers.URLField(source='following_url', required=False)
-    followers = serializers.URLField(source='followers_url', required=False)
+    following = serializers.URLField(
+        source='following_url', required=False, allow_null=True)
+    followers = serializers.URLField(
+        source='followers_url', required=False, allow_null=True)
     preferredUsername = serializers.CharField(
         source='preferred_username', required=False)
     publicKey = serializers.JSONField(source='public_key', required=False)
@@ -92,6 +94,31 @@ class ActorSerializer(serializers.ModelSerializer):
     def validate_summary(self, value):
         if value:
             return value[:500]
+
+
+class LibraryActorSerializer(ActorSerializer):
+    url = serializers.ListField(
+        child=serializers.JSONField())
+
+    class Meta(ActorSerializer.Meta):
+        fields = ActorSerializer.Meta.fields + ['url']
+
+    def validate(self, validated_data):
+        try:
+            urls = validated_data['url']
+        except KeyError:
+            raise serializers.ValidationError('Missing URL field')
+
+        for u in urls:
+            try:
+                if u['name'] != 'library':
+                    continue
+                validated_data['library_url'] = u['href']
+                break
+            except KeyError:
+                continue
+
+        return validated_data
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -226,7 +253,6 @@ OBJECT_SERIALIZERS = {
 class PaginatedCollectionSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=['Collection'])
     totalItems = serializers.IntegerField(min_value=0)
-    items = serializers.ListField()
     actor = serializers.URLField()
     id = serializers.URLField()
 

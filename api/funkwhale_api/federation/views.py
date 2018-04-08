@@ -4,15 +4,18 @@ from django.core import paginator
 from django.http import HttpResponse
 from django.urls import reverse
 
-from rest_framework import viewsets
-from rest_framework import views
+from rest_framework import permissions as rest_permissions
 from rest_framework import response
+from rest_framework import views
+from rest_framework import viewsets
 from rest_framework.decorators import list_route, detail_route
 
 from funkwhale_api.music.models import TrackFile
 
 from . import actors
 from . import authentication
+from . import library
+from . import models
 from . import permissions
 from . import renderers
 from . import serializers
@@ -153,4 +156,19 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
             except paginator.EmptyPage:
                 return response.Response(status=404)
 
+        return response.Response(data)
+
+
+class LibraryViewSet(viewsets.GenericViewSet):
+    permission_classes = [rest_permissions.DjangoModelPermissions]
+    queryset = models.Library.objects.all()
+
+    @list_route(methods=['get'])
+    def scan(self, request, *args, **kwargs):
+        account = request.GET.get('account')
+        if not account:
+            return response.Response(
+                {'account': 'This field is mandatory'}, status=400)
+
+        data = library.scan_from_account_name(account)
         return response.Response(data)
