@@ -221,7 +221,7 @@ def test_paginated_collection_serializer_validation():
     assert serializer.validated_data['items'] == []
 
 
-def test_collection_page_serializer_validdation():
+def test_collection_page_serializer_validation():
     base = 'https://test.federation/test'
     data = {
         'type': 'CollectionPage',
