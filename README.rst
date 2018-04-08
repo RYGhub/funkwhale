@@ -281,3 +281,5 @@ When working on federation with traefik, ensure you have this in your ``env``::
     WEBPACK_DEVSERVER_PORT_BINDING=
     # This disable certificate verification
     EXTERNAL_REQUESTS_VERIFY_SSL=false
+    # this ensure you don't have incorrect urls pointing to http resources
+    FUNKWHALE_PROTOCOL=https
