@@ -1,0 +1,26 @@
+defaultEntryPoints = ["http", "https"]
+
+################################################################
+# Web configuration backend
+################################################################
+[web]
+address = ":8040"
+################################################################
+# Docker configuration backend
+################################################################
+[docker]
+domain = "funkwhale.test"
+watch = true
+exposedbydefault = false
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+      certFile = "/ssl/traefik.crt"
+      keyFile = "/ssl/traefik.key"

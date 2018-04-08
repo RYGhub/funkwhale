@@ -206,3 +206,70 @@ Typical workflow for a merge request
 6. Push your branch
 7. Create your merge request
 8. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
+
+
+Working with federation locally
+-------------------------------
+
+To achieve that, you'll need:
+
+1. to update your dns resolver to resolve all your .dev hostnames locally
+2. a reverse proxy (such as traefik) to catch those .dev requests and
+   and with https certificate
+3. two instances (or more) running locally, following the regular dev setup
+
+Resolve .dev names locally
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you use dnsmasq, this is as simple as doing::
+
+    echo "address=/test/172.17.0.1" | sudo tee /etc/dnsmasq.d/test.conf
+    sudo systemctl restart dnsmasq
+
+If you use NetworkManager with dnsmasq integration, use this instead::
+
+    echo "address=/test/172.17.0.1" | sudo tee /etc/NetworkManager/dnsmasq.d/test.conf
+    sudo systemctl restart NetworkManager
+
+Add wildcard certificate to the trusted certificates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simply copy bundled certificates::
+
+    sudo cp docker/ssl/test.crt /usr/local/share/ca-certificates/
+    sudo update-ca-certificates
+
+This certificate is a wildcard for ``*.funkwhale.test``
+
+Run a reverse proxy for your instances
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Crete docker network
+^^^^^^^^^^^^^^^^^^^^
+
+Create the federation network::
+
+    docker network create federation
+
+Launch everything
+^^^^^^^^^^^^^^^^^
+
+Launch the traefik proxy::
+
+    docker-compose -f docker/traefik.yml up -d
+
+Then, in separate terminals, you can setup as many different instances as you
+need::
+
+    export COMPOSE_PROJECT_NAME=node2
+    docker-compose -f dev.yml run --rm api python manage.py migrate
+    docker-compose -f dev.yml run --rm api python manage.py createsuperuser
+    docker-compose -f dev.yml up nginx api front
+
+Note that by default, if you don't export the COMPOSE_PROJECT_NAME,
+we will default to node1 as the name of your instance.
+
+Assuming your project name is ``node1``, your server will be reachable
+at ``https://node1.funkwhale.test/``. Not that you'll have to trust
+the SSL Certificate as it's self signed.
