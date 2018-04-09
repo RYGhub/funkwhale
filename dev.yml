@@ -13,6 +13,7 @@ services:
       - "${WEBPACK_DEVSERVER_PORT-8080}:${WEBPACK_DEVSERVER_PORT-8080}"
     volumes:
       - './front:/app'
+      - './po:/po'
 
   postgres:
     env_file:

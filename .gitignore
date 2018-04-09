@@ -75,6 +75,7 @@ api/static
 api/.pytest_cache
 
 # Front
+front/static/translations
 front/node_modules/
 front/dist/
 front/npm-debug.log*
