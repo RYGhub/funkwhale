@@ -39,6 +39,10 @@ def test_library_scan_from_account_name(mocker, factories):
         'webfinger': get_resource_result,
         'actor': actor_data,
         'library': get_library_data_result,
+        'local': {
+            'following': False,
+            'awaiting_approval': False,
+        },
     }
 
 
@@ -63,4 +67,4 @@ def test_get_library_data_requires_authentication(r_mock, factories):
     url = 'https://test.library'
     r_mock.get(url, status_code=403)
     result = library.get_library_data(url)
-    assert result['errors'] == ['This library requires authentication']
+    assert result['errors'] == ['Permission denied while scanning library']

@@ -1,3 +1,4 @@
+import json
 import requests
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.conf import settings
 from funkwhale_api.common import session
 
 from . import actors
+from . import models
 from . import serializers
 from . import signing
 from . import webfinger
@@ -23,6 +25,39 @@ def scan_from_account_name(account_name):
 
     data = {}
     try:
+        username, domain = webfinger.clean_acct(
+            account_name, ensure_local=False)
+    except serializers.ValidationError:
+        return {
+            'webfinger': {
+                'errors': ['Invalid account string']
+            }
+        }
+    system_library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    library = models.Library.objects.filter(
+        actor__domain=domain,
+        actor__preferred_username=username
+    ).select_related('actor').first()
+    follow_request = None
+    if library:
+        data['local']['following'] = True
+        data['local']['awaiting_approval'] = True
+
+    else:
+        follow_request = models.FollowRequest.objects.filter(
+            target__preferred_username=username,
+            target__domain=username,
+            actor=system_library,
+        ).first()
+        data['local'] = {
+            'following': False,
+            'awaiting_approval': False,
+        }
+        if follow_request:
+            data['awaiting_approval'] = follow_request.approved is None
+
+    follow_request = models.Follow
+    try:
         data['webfinger'] = webfinger.get_resource(
             'acct:{}'.format(account_name))
     except requests.ConnectionError:
@@ -37,6 +72,12 @@ def scan_from_account_name(account_name):
                 'errors': [
                     'Error {} during webfinger request'.format(
                         e.response.status_code)]
+            }
+        }
+    except json.JSONDecodeError as e:
+        return {
+            'webfinger': {
+                'errors': ['Could not process webfinger response']
             }
         }
 
@@ -56,7 +97,11 @@ def scan_from_account_name(account_name):
         return data
 
     serializer = serializers.LibraryActorSerializer(data=data['actor'])
-    serializer.is_valid(raise_exception=True)
+    if not serializer.is_valid():
+        data['actor'] = {
+            'errors': ['Invalid ActivityPub actor']
+        }
+        return data
     data['library'] = get_library_data(
         serializer.validated_data['library_url'])
 

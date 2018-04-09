@@ -218,7 +218,6 @@ def test_paginated_collection_serializer_validation():
     assert serializer.validated_data['totalItems'] == 5
     assert serializer.validated_data['id'] == data['id']
     assert serializer.validated_data['actor'] == data['actor']
-    assert serializer.validated_data['items'] == []
 
 
 def test_collection_page_serializer_validation():
