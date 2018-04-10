@@ -170,7 +170,7 @@ class SystemActor(object):
         if not serializer.is_valid(raise_exception=True):
             return logger.info('Received invalid payload')
 
-        serializer.save()
+        return serializer.save()
 
     def handle_undo_follow(self, ac, sender):
         system_actor = self.get_actor_instance()

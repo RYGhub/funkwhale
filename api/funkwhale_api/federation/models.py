@@ -137,6 +137,13 @@ class Library(models.Model):
     # should we automatically import new files from this library?
     autoimport = models.BooleanField()
     tracks_count = models.PositiveIntegerField(null=True, blank=True)
+    follow = models.OneToOneField(
+        Follow,
+        related_name='library',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
 
 class LibraryTrack(models.Model):

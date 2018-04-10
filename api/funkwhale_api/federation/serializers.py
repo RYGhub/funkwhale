@@ -8,7 +8,7 @@ from django.db import transaction
 from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
 
-from funkwhale_api.common.utils import set_query_parameter
+from funkwhale_api.common import utils as funkwhale_utils
 
 from . import activity
 from . import models
@@ -121,6 +121,66 @@ class LibraryActorSerializer(ActorSerializer):
         return validated_data
 
 
+class APILibraryCreateSerializer(serializers.ModelSerializer):
+    actor = serializers.URLField()
+
+    class Meta:
+        model = models.Library
+        fields = [
+            'actor',
+            'autoimport',
+            'federation_enabled',
+            'download_files',
+        ]
+
+    def validate(self, validated_data):
+        from . import actors
+        from . import library
+
+        actor_url = validated_data['actor']
+        actor_data = actors.get_actor_data(actor_url)
+        acs = LibraryActorSerializer(data=actor_data)
+        acs.is_valid(raise_exception=True)
+        try:
+            actor = models.Actor.objects.get(url=actor_url)
+        except models.Actor.DoesNotExist:
+            actor = acs.save()
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        validated_data['follow'] = models.Follow.objects.get_or_create(
+            actor=library_actor,
+            target=actor,
+        )[0]
+        if validated_data['follow'].approved is None:
+            funkwhale_utils.on_commit(
+                activity.deliver,
+                FollowSerializer(validated_data['follow']).data,
+                on_behalf_of=validated_data['follow'].actor,
+                to=[validated_data['follow'].target.url],
+            )
+
+        library_data = library.get_library_data(
+            acs.validated_data['library_url'])
+        if 'errors' in library_data:
+            raise serializers.ValidationError(str(library_data['errors']))
+        validated_data['library'] = library_data
+        validated_data['actor'] = actor
+        return validated_data
+
+    def create(self, validated_data):
+        library = models.Library.objects.get_or_create(
+            url=validated_data['library']['id'],
+            defaults={
+                'actor': validated_data['actor'],
+                'follow': validated_data['follow'],
+                'tracks_count': validated_data['library']['totalItems'],
+                'federation_enabled': validated_data['federation_enabled'],
+                'autoimport': validated_data['autoimport'],
+                'download_files': validated_data['download_files'],
+            }
+        )[0]
+        return library
+
+
 class FollowSerializer(serializers.Serializer):
     id = serializers.URLField()
     object = serializers.URLField()
@@ -161,6 +221,20 @@ class FollowSerializer(serializers.Serializer):
             'type': 'Follow'
         }
         return ret
+
+
+class APIFollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Follow
+        fields = [
+            'uuid',
+            'id',
+            'approved',
+            'creation_date',
+            'modification_date',
+            'actor',
+            'target',
+        ]
 
 
 class AcceptFollowSerializer(serializers.Serializer):
@@ -244,7 +318,7 @@ class UndoFollowSerializer(serializers.Serializer):
         }
 
     def save(self):
-        self.validated_data['follow'].delete()
+        return self.validated_data['follow'].delete()
 
 
 class ActorWebfingerSerializer(serializers.Serializer):
@@ -365,9 +439,10 @@ class PaginatedCollectionSerializer(serializers.Serializer):
             conf['items'],
             conf.get('page_size', 20)
         )
-        first = set_query_parameter(conf['id'], page=1)
+        first = funkwhale_utils.set_query_parameter(conf['id'], page=1)
         current = first
-        last = set_query_parameter(conf['id'], page=paginator.num_pages)
+        last = funkwhale_utils.set_query_parameter(
+            conf['id'], page=paginator.num_pages)
         d = {
             'id': conf['id'],
             'actor': conf['actor'].url,
@@ -394,9 +469,12 @@ class CollectionPageSerializer(serializers.Serializer):
 
     def to_representation(self, conf):
         page = conf['page']
-        first = set_query_parameter(conf['id'], page=1)
-        last = set_query_parameter(conf['id'], page=page.paginator.num_pages)
-        id = set_query_parameter(conf['id'], page=page.number)
+        first = funkwhale_utils.set_query_parameter(
+            conf['id'], page=1)
+        last = funkwhale_utils.set_query_parameter(
+            conf['id'], page=page.paginator.num_pages)
+        id = funkwhale_utils.set_query_parameter(
+            conf['id'], page=page.number)
         d = {
             'id': id,
             'partOf': conf['id'],
@@ -417,11 +495,11 @@ class CollectionPageSerializer(serializers.Serializer):
         }
 
         if page.has_previous():
-            d['prev'] = set_query_parameter(
+            d['prev'] = funkwhale_utils.set_query_parameter(
                 conf['id'], page=page.previous_page_number())
 
         if page.has_next():
-            d['next'] = set_query_parameter(
+            d['next'] = funkwhale_utils.set_query_parameter(
                 conf['id'], page=page.next_page_number())
 
         if self.context.get('include_ap_context', True):

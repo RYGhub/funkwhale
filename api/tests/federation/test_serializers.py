@@ -619,3 +619,46 @@ def test_collection_serializer_to_ap(factories):
         collection, context={'actor': library, 'id': 'https://test.id'})
 
     assert serializer.data == expected
+
+
+def test_api_library_create_serializer_save(factories, r_mock):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    actor = factories['federation.Actor']()
+    follow = factories['federation.Follow'](
+        target=actor,
+        actor=library_actor,
+    )
+    actor_data = serializers.ActorSerializer(actor).data
+    actor_data['url'] = [{
+        'href': 'https://test.library',
+        'name': 'library',
+        'type': 'Link',
+    }]
+    library_conf = {
+        'id': 'https://test.library',
+        'items': range(10),
+        'actor': actor,
+        'page_size': 5,
+    }
+    library_data = serializers.PaginatedCollectionSerializer(library_conf).data
+    r_mock.get(actor.url, json=actor_data)
+    r_mock.get('https://test.library', json=library_data)
+    data = {
+        'actor': actor.url,
+        'autoimport': False,
+        'federation_enabled': True,
+        'download_files': False,
+    }
+
+    serializer = serializers.APILibraryCreateSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True) is True
+    library = serializer.save()
+    follow = models.Follow.objects.get(
+        target=actor, actor=library_actor, approved=None)
+
+    assert library.autoimport is data['autoimport']
+    assert library.federation_enabled is data['federation_enabled']
+    assert library.download_files is data['download_files']
+    assert library.tracks_count == 10
+    assert library.actor == actor
+    assert library.follow == follow

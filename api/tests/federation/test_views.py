@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 import pytest
 
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import activity
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
@@ -182,22 +183,37 @@ def test_can_scan_library(superuser_api_client, mocker):
     scan.assert_called_once_with('test@test.library')
 
 
-def test_follow_library_manually(superuser_api_client, mocker, factories):
+def test_follow_library(superuser_api_client, mocker, factories, r_mock):
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-    actor = factories['federation.Actor'](manually_approves_followers=True)
+    actor = factories['federation.Actor']()
     follow = {'test': 'follow'}
-    deliver = mocker.patch(
-        'funkwhale_api.federation.activity.deliver')
-    actor_get = mocker.patch(
-        'funkwhale_api.federation.actors.get_actor',
-        return_value=actor)
-    library_get = mocker.patch(
-        'funkwhale_api.federation.library.get_library_data',
-        return_value={})
+    on_commit = mocker.patch(
+        'funkwhale_api.common.utils.on_commit')
+    actor_data = serializers.ActorSerializer(actor).data
+    actor_data['url'] = [{
+        'href': 'https://test.library',
+        'name': 'library',
+        'type': 'Link',
+    }]
+    library_conf = {
+        'id': 'https://test.library',
+        'items': range(10),
+        'actor': actor,
+        'page_size': 5,
+    }
+    library_data = serializers.PaginatedCollectionSerializer(library_conf).data
+    r_mock.get(actor.url, json=actor_data)
+    r_mock.get('https://test.library', json=library_data)
+    data = {
+        'actor': actor.url,
+        'autoimport': False,
+        'federation_enabled': True,
+        'download_files': False,
+    }
 
     url = reverse('api:v1:federation:libraries-list')
     response = superuser_api_client.post(
-        url, {'actor_url': actor.url})
+        url, data)
 
     assert response.status_code == 201
 
@@ -206,8 +222,13 @@ def test_follow_library_manually(superuser_api_client, mocker, factories):
         target=actor,
         approved=None,
     )
+    library = follow.library
 
-    deliver.assert_called_once_with(
+    assert response.data == serializers.APILibraryCreateSerializer(
+        library).data
+
+    on_commit.assert_called_once_with(
+        activity.deliver,
         serializers.FollowSerializer(follow).data,
         on_behalf_of=library_actor,
         to=[actor.url]

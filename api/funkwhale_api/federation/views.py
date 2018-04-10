@@ -179,26 +179,7 @@ class LibraryViewSet(viewsets.GenericViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        try:
-            actor_url = request.data['actor_url']
-        except KeyError:
-            raise ValidationError('Missing actor_url')
-
-        try:
-            actor = actors.get_actor(actor_url)
-            library_data = library.get_library_data(actor.url)
-        except Exception as e:
-            raise ValidationError('Error while fetching actor and library')
-
-        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-        follow, created = models.Follow.objects.get_or_create(
-            actor=library_actor,
-            target=actor,
-        )
-        serializer = serializers.FollowSerializer(follow)
-        activity.deliver(
-            serializer.data,
-            on_behalf_of=library_actor,
-            to=[actor.url]
-        )
-        return response.Response({}, status=201)
+        serializer = serializers.APILibraryCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        library = serializer.save()
+        return response.Response(serializer.data, status=201)
