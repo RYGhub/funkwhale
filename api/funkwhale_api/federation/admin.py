@@ -23,24 +23,13 @@ class FollowAdmin(admin.ModelAdmin):
     list_display = [
         'actor',
         'target',
+        'approved',
         'creation_date'
     ]
-    search_fields = ['actor__url', 'target__url']
-    list_select_related = True
-
-
-@admin.register(models.FollowRequest)
-class FollowRequestAdmin(admin.ModelAdmin):
-    list_display = [
-        'actor',
-        'target',
-        'creation_date',
-        'approved'
-    ]
-    search_fields = ['actor__url', 'target__url']
     list_filter = [
         'approved'
     ]
+    search_fields = ['actor__url', 'target__url']
     list_select_related = True
 
 

@@ -153,24 +153,32 @@ class SystemActor(object):
 
     def handle_follow(self, ac, sender):
         system_actor = self.get_actor_instance()
-        if self.manually_approves_followers:
-            fr, created = models.FollowRequest.objects.get_or_create(
-                actor=sender,
-                target=system_actor,
-                approved=None,
-            )
-            return fr
+        serializer = serializers.FollowSerializer(
+            data=ac, context={'follow_actor': sender})
+        if not serializer.is_valid():
+            return logger.info('Invalid follow payload')
+        approved = True if not self.manually_approves_followers else None
+        follow = serializer.save(approved=approved)
+        if follow.approved:
+            return activity.accept_follow(follow)
 
-        return activity.accept_follow(
-            system_actor, ac, sender
-        )
+    def handle_accept(self, ac, sender):
+        system_actor = self.get_actor_instance()
+        serializer = serializers.AcceptFollowSerializer(
+            data=ac,
+            context={'follow_target': sender, 'follow_actor': system_actor})
+        if not serializer.is_valid(raise_exception=True):
+            return logger.info('Received invalid payload')
+
+        serializer.save()
 
     def handle_undo_follow(self, ac, sender):
-        actor = self.get_actor_instance()
-        models.Follow.objects.filter(
-            actor=sender,
-            target=actor,
-        ).delete()
+        system_actor = self.get_actor_instance()
+        serializer = serializers.UndoFollowSerializer(
+            data=ac, context={'actor': sender, 'target': system_actor})
+        if not serializer.is_valid():
+            return logger.info('Received invalid payload')
+        serializer.save()
 
     def handle_undo(self, ac, sender):
         if ac['object']['type'] != 'Follow':
@@ -205,20 +213,6 @@ class LibraryActor(SystemActor):
     @property
     def manually_approves_followers(self):
         return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
-
-    def handle_follow(self, ac, sender):
-        system_actor = self.get_actor_instance()
-        if self.manually_approves_followers:
-            fr, created = models.FollowRequest.objects.get_or_create(
-                actor=sender,
-                target=system_actor,
-                approved=None,
-            )
-            return fr
-
-        return activity.accept_follow(
-            system_actor, ac, sender
-        )
 
     @transaction.atomic
     def handle_create(self, ac, sender):
@@ -360,15 +354,15 @@ class TestActor(SystemActor):
         super().handle_follow(ac, sender)
         # also, we follow back
         test_actor = self.get_actor_instance()
-        follow_uuid = uuid.uuid4()
-        follow = activity.get_follow(
-            follow_id=follow_uuid,
-            follower=test_actor,
-            followed=sender)
+        follow_back = models.Follow.objects.get_or_create(
+            actor=test_actor,
+            target=sender,
+            approved=None,
+        )[0]
         activity.deliver(
-            follow,
-            to=[ac['actor']],
-            on_behalf_of=test_actor)
+            serializers.FollowSerializer(follow_back).data,
+            to=[follow_back.target.url],
+            on_behalf_of=follow_back.actor)
 
     def handle_undo_follow(self, ac, sender):
         super().handle_undo_follow(ac, sender)
@@ -381,11 +375,7 @@ class TestActor(SystemActor):
             )
         except models.Follow.DoesNotExist:
             return
-        undo = activity.get_undo(
-            id=follow.get_federation_url(),
-            actor=actor,
-            object=serializers.FollowSerializer(follow).data,
-        )
+        undo = serializers.UndoFollowSerializer(follow).data
         follow.delete()
         activity.deliver(
             undo,

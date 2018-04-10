@@ -114,15 +114,6 @@ class FollowFactory(factory.DjangoModelFactory):
 
 
 @registry.register
-class FollowRequestFactory(factory.DjangoModelFactory):
-    target = factory.SubFactory(ActorFactory)
-    actor = factory.SubFactory(ActorFactory)
-
-    class Meta:
-        model = models.FollowRequest
-
-
-@registry.register
 class LibraryFactory(factory.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory)
     url = factory.Faker('url')

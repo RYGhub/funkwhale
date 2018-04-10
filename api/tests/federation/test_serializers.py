@@ -1,4 +1,5 @@
 import arrow
+import pytest
 
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -168,6 +169,184 @@ def test_follow_serializer_to_ap(factories):
     }
 
     assert serializer.data == expected
+
+
+def test_follow_serializer_save(factories):
+    actor = factories['federation.Actor']()
+    target = factories['federation.Actor']()
+
+    data = expected = {
+        'id': 'https://test.follow',
+        'type': 'Follow',
+        'actor': actor.url,
+        'object': target.url,
+    }
+    serializer = serializers.FollowSerializer(data=data)
+
+    assert serializer.is_valid(raise_exception=True)
+
+    follow = serializer.save()
+
+    assert follow.pk is not None
+    assert follow.actor == actor
+    assert follow.target == target
+    assert follow.approved is None
+
+
+def test_follow_serializer_save_validates_on_context(factories):
+    actor = factories['federation.Actor']()
+    target = factories['federation.Actor']()
+    impostor = factories['federation.Actor']()
+
+    data = expected = {
+        'id': 'https://test.follow',
+        'type': 'Follow',
+        'actor': actor.url,
+        'object': target.url,
+    }
+    serializer = serializers.FollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+
+    assert 'actor' in serializer.errors
+    assert 'object' in serializer.errors
+
+
+def test_accept_follow_serializer_representation(factories):
+    follow = factories['federation.Follow'](approved=None)
+
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': follow.target.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(follow)
+
+    assert serializer.data == expected
+
+
+def test_accept_follow_serializer_save(factories):
+    follow = factories['federation.Follow'](approved=None)
+
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': follow.target.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    follow.refresh_from_db()
+
+    assert follow.approved is True
+
+
+def test_accept_follow_serializer_validates_on_context(factories):
+    follow = factories['federation.Follow'](approved=None)
+    impostor = factories['federation.Actor']()
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': impostor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+    assert 'actor' in serializer.errors['object']
+    assert 'object' in serializer.errors['object']
+
+
+def test_undo_follow_serializer_representation(factories):
+    follow = factories['federation.Follow'](approved=True)
+
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': follow.actor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(follow)
+
+    assert serializer.data == expected
+
+
+def test_undo_follow_serializer_save(factories):
+    follow = factories['federation.Follow'](approved=True)
+
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': follow.actor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    with pytest.raises(models.Follow.DoesNotExist):
+        follow.refresh_from_db()
+
+
+def test_undo_follow_serializer_validates_on_context(factories):
+    follow = factories['federation.Follow'](approved=True)
+    impostor = factories['federation.Actor']()
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': impostor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+    assert 'actor' in serializer.errors['object']
+    assert 'object' in serializer.errors['object']
 
 
 def test_paginated_collection_serializer(factories):

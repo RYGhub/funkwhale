@@ -38,25 +38,21 @@ def scan_from_account_name(account_name):
         actor__domain=domain,
         actor__preferred_username=username
     ).select_related('actor').first()
-    follow_request = None
-    if library:
-        data['local']['following'] = True
-        data['local']['awaiting_approval'] = True
-
-    else:
-        follow_request = models.FollowRequest.objects.filter(
+    data['local'] = {
+        'following': False,
+        'awaiting_approval': False,
+    }
+    try:
+        follow = models.Follow.objects.get(
             target__preferred_username=username,
             target__domain=username,
             actor=system_library,
-        ).first()
-        data['local'] = {
-            'following': False,
-            'awaiting_approval': False,
-        }
-        if follow_request:
-            data['awaiting_approval'] = follow_request.approved is None
+        )
+        data['local']['awaiting_approval'] = not bool(follow.approved)
+        data['local']['following'] = True
+    except models.Follow.DoesNotExist:
+        pass
 
-    follow_request = models.Follow
     try:
         data['webfinger'] = webfinger.get_resource(
             'acct:{}'.format(account_name))

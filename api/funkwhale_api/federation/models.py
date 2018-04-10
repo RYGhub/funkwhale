@@ -109,55 +109,13 @@ class Follow(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(
         auto_now=True)
+    approved = models.NullBooleanField(default=None)
 
     class Meta:
         unique_together = ['actor', 'target']
 
     def get_federation_url(self):
         return '{}#follows/{}'.format(self.actor.url, self.uuid)
-
-
-class FollowRequest(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
-    actor = models.ForeignKey(
-        Actor,
-        related_name='emmited_follow_requests',
-        on_delete=models.CASCADE,
-    )
-    target = models.ForeignKey(
-        Actor,
-        related_name='received_follow_requests',
-        on_delete=models.CASCADE,
-    )
-    creation_date = models.DateTimeField(default=timezone.now)
-    modification_date = models.DateTimeField(
-        auto_now=True)
-    approved = models.NullBooleanField(default=None)
-
-    def approve(self):
-        from . import activity
-        from . import serializers
-        self.approved = True
-        self.save(update_fields=['approved'])
-        Follow.objects.get_or_create(
-            target=self.target,
-            actor=self.actor
-        )
-        if self.target.is_local:
-            follow = {
-                '@context': serializers.AP_CONTEXT,
-                'actor': self.actor.url,
-                'id': self.actor.url + '#follows/{}'.format(uuid.uuid4()),
-                'object': self.target.url,
-                'type': 'Follow'
-            }
-            activity.accept_follow(
-                self.target, follow, self.actor
-            )
-
-    def refuse(self):
-        self.approved = False
-        self.save(update_fields=['approved'])
 
 
 class Library(models.Model):

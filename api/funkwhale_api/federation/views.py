@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core import paginator
+from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 
@@ -9,9 +10,12 @@ from rest_framework import response
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.serializers import ValidationError
 
+from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music.models import TrackFile
 
+from . import activity
 from . import actors
 from . import authentication
 from . import library
@@ -172,3 +176,29 @@ class LibraryViewSet(viewsets.GenericViewSet):
 
         data = library.scan_from_account_name(account)
         return response.Response(data)
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        try:
+            actor_url = request.data['actor_url']
+        except KeyError:
+            raise ValidationError('Missing actor_url')
+
+        try:
+            actor = actors.get_actor(actor_url)
+            library_data = library.get_library_data(actor.url)
+        except Exception as e:
+            raise ValidationError('Error while fetching actor and library')
+
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        follow, created = models.Follow.objects.get_or_create(
+            actor=library_actor,
+            target=actor,
+        )
+        serializer = serializers.FollowSerializer(follow)
+        activity.deliver(
+            serializer.data,
+            on_behalf_of=library_actor,
+            to=[actor.url]
+        )
+        return response.Response({}, status=201)

@@ -1,6 +1,7 @@
 import uuid
 
 from funkwhale_api.federation import activity
+from funkwhale_api.federation import serializers
 
 
 def test_deliver(nodb_factories, r_mock, mocker):
@@ -38,37 +39,9 @@ def test_deliver(nodb_factories, r_mock, mocker):
 def test_accept_follow(mocker, factories):
     deliver = mocker.patch(
         'funkwhale_api.federation.activity.deliver')
-    actor = factories['federation.Actor']()
-    target = factories['federation.Actor'](local=True)
-    follow = {
-        'actor': actor.url,
-        'type': 'Follow',
-        'id': 'http://test.federation/user#follows/267',
-        'object': target.url,
-    }
-    uid = uuid.uuid4()
-    mocker.patch('uuid.uuid4', return_value=uid)
-    expected_accept = {
-        "@context": [
-            "https://www.w3.org/ns/activitystreams",
-            "https://w3id.org/security/v1",
-            {}
-        ],
-        "id": target.url + '#accepts/follows/{}'.format(uid),
-        "type": "Accept",
-        "actor": target.url,
-        "object": {
-            "id": follow['id'],
-            "type": "Follow",
-            "actor": actor.url,
-            "object": target.url
-        },
-    }
-    activity.accept_follow(
-        target, follow, actor
-    )
+    follow = factories['federation.Follow'](approved=None)
+    expected_accept = serializers.AcceptFollowSerializer(follow).data
+    activity.accept_follow(follow)
     deliver.assert_called_once_with(
-        expected_accept, to=[actor.url], on_behalf_of=target
+        expected_accept, to=[follow.actor.url], on_behalf_of=follow.target
     )
-    follow_instance = actor.emitted_follows.first()
-    assert follow_instance.target == target

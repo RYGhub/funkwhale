@@ -121,26 +121,130 @@ class LibraryActorSerializer(ActorSerializer):
         return validated_data
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    # left maps to activitypub fields, right to our internal models
-    id = serializers.URLField(source='get_federation_url')
-    object = serializers.URLField(source='target.url')
-    actor = serializers.URLField(source='actor.url')
-    type = serializers.CharField(source='ap_type')
+class FollowSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    object = serializers.URLField()
+    actor = serializers.URLField()
+    type = serializers.ChoiceField(choices=['Follow'])
 
-    class Meta:
-        model = models.Actor
-        fields = [
-            'id',
-            'object',
-            'actor',
-            'type'
-        ]
+    def validate_object(self, v):
+        expected = self.context.get('follow_target')
+        if expected and expected.url != v:
+            raise serializers.ValidationError('Invalid target')
+        try:
+            return models.Actor.objects.get(url=v)
+        except models.Actor.DoesNotExist:
+            raise serializers.ValidationError('Target not found')
+
+    def validate_actor(self, v):
+        expected = self.context.get('follow_actor')
+        if expected and expected.url != v:
+            raise serializers.ValidationError('Invalid actor')
+        try:
+            return models.Actor.objects.get(url=v)
+        except models.Actor.DoesNotExist:
+            raise serializers.ValidationError('Actor not found')
+
+    def save(self, **kwargs):
+        return models.Follow.objects.get_or_create(
+            actor=self.validated_data['actor'],
+            target=self.validated_data['object'],
+            **kwargs,
+        )[0]
 
     def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['@context'] = AP_CONTEXT
+        return {
+            '@context': AP_CONTEXT,
+            'actor': instance.actor.url,
+            'id': instance.get_federation_url(),
+            'object': instance.target.url,
+            'type': 'Follow'
+        }
         return ret
+
+
+class AcceptFollowSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    actor = serializers.URLField()
+    object = FollowSerializer()
+    type = serializers.ChoiceField(choices=['Accept'])
+
+    def validate_actor(self, v):
+        expected = self.context.get('follow_target')
+        if expected and expected.url != v:
+            raise serializers.ValidationError('Invalid actor')
+        try:
+            return models.Actor.objects.get(url=v)
+        except models.Actor.DoesNotExist:
+            raise serializers.ValidationError('Actor not found')
+
+    def validate(self, validated_data):
+        # we ensure the accept actor actually match the follow target
+        if validated_data['actor'] != validated_data['object']['object']:
+            raise serializers.ValidationError('Actor mismatch')
+        try:
+            validated_data['follow'] = models.Follow.objects.filter(
+                target=validated_data['actor'],
+                actor=validated_data['object']['actor']
+            ).exclude(approved=True).get()
+        except models.Follow.DoesNotExist:
+            raise serializers.ValidationError('No follow to accept')
+        return validated_data
+
+    def to_representation(self, instance):
+        return {
+            "@context": AP_CONTEXT,
+            "id": instance.get_federation_url() + '/accept',
+            "type": "Accept",
+            "actor": instance.target.url,
+            "object": FollowSerializer(instance).data
+        }
+
+    def save(self):
+        self.validated_data['follow'].approved = True
+        self.validated_data['follow'].save()
+        return self.validated_data['follow']
+
+
+class UndoFollowSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    actor = serializers.URLField()
+    object = FollowSerializer()
+    type = serializers.ChoiceField(choices=['Undo'])
+
+    def validate_actor(self, v):
+        expected = self.context.get('follow_target')
+        if expected and expected.url != v:
+            raise serializers.ValidationError('Invalid actor')
+        try:
+            return models.Actor.objects.get(url=v)
+        except models.Actor.DoesNotExist:
+            raise serializers.ValidationError('Actor not found')
+
+    def validate(self, validated_data):
+        # we ensure the accept actor actually match the follow actor
+        if validated_data['actor'] != validated_data['object']['actor']:
+            raise serializers.ValidationError('Actor mismatch')
+        try:
+            validated_data['follow'] = models.Follow.objects.filter(
+                actor=validated_data['actor'],
+                target=validated_data['object']['object']
+            ).get()
+        except models.Follow.DoesNotExist:
+            raise serializers.ValidationError('No follow to remove')
+        return validated_data
+
+    def to_representation(self, instance):
+        return {
+            "@context": AP_CONTEXT,
+            "id": instance.get_federation_url() + '/undo',
+            "type": "Undo",
+            "actor": instance.actor.url,
+            "object": FollowSerializer(instance).data
+        }
+
+    def save(self):
+        self.validated_data['follow'].delete()
 
 
 class ActorWebfingerSerializer(serializers.Serializer):

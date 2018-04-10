@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 import pytest
 
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
 from funkwhale_api.federation import webfinger
@@ -179,3 +180,35 @@ def test_can_scan_library(superuser_api_client, mocker):
     assert response.status_code == 200
     assert response.data == result
     scan.assert_called_once_with('test@test.library')
+
+
+def test_follow_library_manually(superuser_api_client, mocker, factories):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    actor = factories['federation.Actor'](manually_approves_followers=True)
+    follow = {'test': 'follow'}
+    deliver = mocker.patch(
+        'funkwhale_api.federation.activity.deliver')
+    actor_get = mocker.patch(
+        'funkwhale_api.federation.actors.get_actor',
+        return_value=actor)
+    library_get = mocker.patch(
+        'funkwhale_api.federation.library.get_library_data',
+        return_value={})
+
+    url = reverse('api:v1:federation:libraries-list')
+    response = superuser_api_client.post(
+        url, {'actor_url': actor.url})
+
+    assert response.status_code == 201
+
+    follow = models.Follow.objects.get(
+        actor=library_actor,
+        target=actor,
+        approved=None,
+    )
+
+    deliver.assert_called_once_with(
+        serializers.FollowSerializer(follow).data,
+        on_behalf_of=library_actor,
+        to=[actor.url]
+    )
