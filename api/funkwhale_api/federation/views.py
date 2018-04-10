@@ -18,6 +18,7 @@ from funkwhale_api.music.models import TrackFile
 from . import activity
 from . import actors
 from . import authentication
+from . import filters
 from . import library
 from . import models
 from . import permissions
@@ -175,6 +176,40 @@ class LibraryViewSet(viewsets.GenericViewSet):
                 {'account': 'This field is mandatory'}, status=400)
 
         data = library.scan_from_account_name(account)
+        return response.Response(data)
+
+    @list_route(methods=['get'])
+    def following(self, request, *args, **kwargs):
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        queryset = models.Follow.objects.filter(
+            actor=library_actor
+        ).select_related(
+            'target',
+            'target',
+        ).order_by('-creation_date')
+        filterset = filters.FollowFilter(request.GET, queryset=queryset)
+        serializer = serializers.APIFollowSerializer(filterset.qs, many=True)
+        data = {
+            'results': serializer.data,
+            'count': len(filterset.qs),
+        }
+        return response.Response(data)
+
+    @list_route(methods=['get'])
+    def followers(self, request, *args, **kwargs):
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        queryset = models.Follow.objects.filter(
+            target=library_actor
+        ).select_related(
+            'target',
+            'target',
+        ).order_by('-creation_date')
+        filterset = filters.FollowFilter(request.GET, queryset=queryset)
+        serializer = serializers.APIFollowSerializer(filterset.qs, many=True)
+        data = {
+            'results': serializer.data,
+            'count': len(filterset.qs),
+        }
         return response.Response(data)
 
     @transaction.atomic

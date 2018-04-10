@@ -233,3 +233,31 @@ def test_follow_library(superuser_api_client, mocker, factories, r_mock):
         on_behalf_of=library_actor,
         to=[actor.url]
     )
+
+
+def test_can_list_system_actor_following(factories, superuser_api_client):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow1 = factories['federation.Follow'](actor=library_actor)
+    follow2 = factories['federation.Follow']()
+
+    url = reverse('api:v1:federation:libraries-following')
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['results'] == [
+        serializers.APIFollowSerializer(follow1).data
+    ]
+
+
+def test_can_list_system_actor_followers(factories, superuser_api_client):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow1 = factories['federation.Follow'](actor=library_actor)
+    follow2 = factories['federation.Follow'](target=library_actor)
+
+    url = reverse('api:v1:federation:libraries-followers')
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['results'] == [
+        serializers.APIFollowSerializer(follow2).data
+    ]

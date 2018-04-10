@@ -96,6 +96,22 @@ class ActorSerializer(serializers.ModelSerializer):
             return value[:500]
 
 
+class APIActorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Actor
+        fields = [
+            'id',
+            'url',
+            'creation_date',
+            'summary',
+            'preferred_username',
+            'name',
+            'last_fetch_date',
+            'domain',
+            'type',
+            'manually_approves_followers',
+
+        ]
 class LibraryActorSerializer(ActorSerializer):
     url = serializers.ListField(
         child=serializers.JSONField())
@@ -224,6 +240,9 @@ class FollowSerializer(serializers.Serializer):
 
 
 class APIFollowSerializer(serializers.ModelSerializer):
+    actor = APIActorSerializer()
+    target = APIActorSerializer()
+
     class Meta:
         model = models.Follow
         fields = [
