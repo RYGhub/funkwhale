@@ -5,6 +5,7 @@ from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 
+from rest_framework import mixins
 from rest_framework import permissions as rest_permissions
 from rest_framework import response
 from rest_framework import views
@@ -164,9 +165,22 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         return response.Response(data)
 
 
-class LibraryViewSet(viewsets.GenericViewSet):
+class LibraryViewSet(
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissions]
-    queryset = models.Library.objects.all()
+    queryset = models.Library.objects.all().select_related(
+        'actor',
+        'follow',
+    )
+    filter_class = filters.LibraryFilter
+    serializer_class = serializers.APILibrarySerializer
+    ordering_fields = (
+        'id',
+        'creation_date',
+        'fetched_date',
+        'actor__domain',
+    )
 
     @list_route(methods=['get'])
     def scan(self, request, *args, **kwargs):

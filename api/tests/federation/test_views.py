@@ -261,3 +261,17 @@ def test_can_list_system_actor_followers(factories, superuser_api_client):
     assert response.data['results'] == [
         serializers.APIFollowSerializer(follow2).data
     ]
+
+
+def test_can_list_libraries(factories, superuser_api_client):
+    library1 = factories['federation.Library']()
+    library2 = factories['federation.Library']()
+
+    url = reverse('api:v1:federation:libraries-list')
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['results'] == [
+        serializers.APILibrarySerializer(library1).data,
+        serializers.APILibrarySerializer(library2).data,
+    ]

@@ -137,6 +137,26 @@ class LibraryActorSerializer(ActorSerializer):
         return validated_data
 
 
+class APILibrarySerializer(serializers.ModelSerializer):
+    actor = APIActorSerializer
+
+    class Meta:
+        model = models.Library
+        fields = [
+            'actor',
+            'autoimport',
+            'federation_enabled',
+            'download_files',
+            'tracks_count',
+            'url',
+            'uuid',
+            'creation_date',
+            'follow',
+            'fetched_date',
+            'modification_date',
+        ]
+
+
 class APILibraryCreateSerializer(serializers.ModelSerializer):
     actor = serializers.URLField()
 
