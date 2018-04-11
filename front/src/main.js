@@ -12,7 +12,7 @@ import axios from 'axios'
 import {VueMasonryPlugin} from 'vue-masonry'
 import VueLazyload from 'vue-lazyload'
 import i18next from 'i18next'
-// import i18nextFetch from 'i18next-fetch-backend'
+import i18nextFetch from 'i18next-fetch-backend'
 import VueI18Next from '@panter/vue-i18next'
 import store from './store'
 import config from './config'
@@ -83,21 +83,15 @@ axios.interceptors.response.use(function (response) {
 store.dispatch('auth/check')
 
 // i18n
-i18next.init({
-  lng: 'en',
-  resources: {
-    en: {
-      translation: {
-        'hello': 'Hello'
-      }
-    },
-    fr: {
-      translation: {
-        'hello': 'Bonjour'
-      }
+i18next
+  .use(i18nextFetch)
+  .init({
+    lng: 'en',
+    preload: ['en'],
+    backend: {
+      loadPath: '/static/translations/{{lng}}.json'
     }
-  }
-})
+  })
 const i18n = new VueI18Next(i18next)
 
 /* eslint-disable no-new */

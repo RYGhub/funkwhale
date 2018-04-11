@@ -9,6 +9,7 @@
           <div class="three wide column">
             <h4 class="ui header">Links</h4>
             <div class="ui link list">
+              <p>{{ $t('Hello, world!') }}</p>
               <router-link class="item" to="/about">
                 About this instance
               </router-link>
@@ -49,7 +50,8 @@ export default {
     PlaylistModal
   },
   created () {
-    console.log(this.$t('hello'))
+    this.$i18n.i18next.changeLanguage('fr')
+    console.log(this.$t('Hello, world!'))
     this.$store.dispatch('instance/fetchSettings')
     let self = this
     setInterval(() => {
