@@ -159,6 +159,7 @@ class APILibrarySerializer(serializers.ModelSerializer):
 
 class APILibraryCreateSerializer(serializers.ModelSerializer):
     actor = serializers.URLField()
+    federation_enabled = serializers.BooleanField()
 
     class Meta:
         model = models.Library

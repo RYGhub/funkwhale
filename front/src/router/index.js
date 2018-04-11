@@ -25,6 +25,7 @@ import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
+import Federation from '@/views/federation/Home'
 
 Vue.use(Router)
 
@@ -82,6 +83,10 @@ export default new Router({
         defaultPage: route.query.page,
         defaultPaginateBy: route.query.paginateBy
       })
+    },
+    {
+      path: '/manage/federation',
+      component: Federation
     },
     {
       path: '/library',
