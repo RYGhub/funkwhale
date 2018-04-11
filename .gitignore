@@ -35,7 +35,6 @@ htmlcov
 
 # Translations
 *.mo
-*.pot
 
 # Pycharm
 .idea

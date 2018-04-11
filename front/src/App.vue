@@ -49,6 +49,7 @@ export default {
     PlaylistModal
   },
   created () {
+    console.log(this.$t('hello'))
     this.$store.dispatch('instance/fetchSettings')
     let self = this
     setInterval(() => {

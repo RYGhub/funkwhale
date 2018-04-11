@@ -11,6 +11,9 @@ import router from './router'
 import axios from 'axios'
 import {VueMasonryPlugin} from 'vue-masonry'
 import VueLazyload from 'vue-lazyload'
+import i18next from 'i18next'
+// import i18nextFetch from 'i18next-fetch-backend'
+import VueI18Next from '@panter/vue-i18next'
 import store from './store'
 import config from './config'
 import { sync } from 'vuex-router-sync'
@@ -27,6 +30,7 @@ window.$ = window.jQuery = require('jquery')
 require('semantic-ui-css/semantic.js')
 require('masonry-layout')
 
+Vue.use(VueI18Next)
 Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
@@ -77,11 +81,31 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 store.dispatch('auth/check')
+
+// i18n
+i18next.init({
+  lng: 'en',
+  resources: {
+    en: {
+      translation: {
+        'hello': 'Hello'
+      }
+    },
+    fr: {
+      translation: {
+        'hello': 'Bonjour'
+      }
+    }
+  }
+})
+const i18n = new VueI18Next(i18next)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   template: '<App/>',
   components: { App }
 })
