@@ -43,7 +43,7 @@ export default {
   data () {
     return {
       isLoading: false,
-      libraryUsername: 'library@node2.funkwhale.test',
+      libraryUsername: '',
       result: null,
       errors: []
     }

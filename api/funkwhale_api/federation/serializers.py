@@ -494,6 +494,8 @@ class PaginatedCollectionSerializer(serializers.Serializer):
     totalItems = serializers.IntegerField(min_value=0)
     actor = serializers.URLField()
     id = serializers.URLField()
+    first = serializers.URLField()
+    last = serializers.URLField()
 
     def to_representation(self, conf):
         paginator = Paginator(
@@ -524,9 +526,21 @@ class CollectionPageSerializer(serializers.Serializer):
     items = serializers.ListField()
     actor = serializers.URLField()
     id = serializers.URLField()
-    prev = serializers.URLField(required=False)
+    first = serializers.URLField()
+    last = serializers.URLField()
     next = serializers.URLField(required=False)
+    prev = serializers.URLField(required=False)
     partOf = serializers.URLField()
+
+    def validate_items(self, v):
+        item_serializer = self.context.get('item_serializer')
+        if not item_serializer:
+            return v
+        raw_items = [item_serializer(data=i, context=self.context) for i in v]
+        for i in raw_items:
+            i.is_valid(raise_exception=True)
+
+        return raw_items
 
     def to_representation(self, conf):
         page = conf['page']

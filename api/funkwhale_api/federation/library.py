@@ -144,3 +144,24 @@ def get_library_data(library_url):
         }
 
     return serializer.validated_data
+
+
+def get_library_page(library, page_url):
+    actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    auth = signing.get_auth(actor.private_key, actor.private_key_id)
+    response = session.get_session().get(
+        page_url,
+        auth=auth,
+        timeout=5,
+        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+        headers={
+            'Content-Type': 'application/activity+json'
+        }
+    )
+    serializer = serializers.CollectionPageSerializer(
+        data=response.json(),
+        context={
+            'library': library,
+            'item_serializer': serializers.AudioSerializer})
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data

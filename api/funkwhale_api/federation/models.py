@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 
@@ -160,4 +161,5 @@ class LibraryTrack(models.Model):
     artist_name = models.CharField(max_length=500)
     album_title = models.CharField(max_length=500)
     title = models.CharField(max_length=500)
-    metadata = JSONField(default={}, max_length=10000)
+    metadata = JSONField(
+        default={}, max_length=10000, encoder=DjangoJSONEncoder)

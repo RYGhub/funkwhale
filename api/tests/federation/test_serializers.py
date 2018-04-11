@@ -386,6 +386,8 @@ def test_paginated_collection_serializer_validation():
         'id': 'https://test.federation/test',
         'totalItems': 5,
         'actor': 'http://test.actor',
+        'first': 'https://test.federation/test?page=1',
+        'last': 'https://test.federation/test?page=1',
         'items': []
     }
 
@@ -407,6 +409,8 @@ def test_collection_page_serializer_validation():
         'totalItems': 5,
         'actor': 'https://test.actor',
         'items': [],
+        'first': 'https://test.federation/test?page=1',
+        'last': 'https://test.federation/test?page=3',
         'prev': base + '?page=1',
         'next': base + '?page=3',
         'partOf': base,
@@ -424,6 +428,21 @@ def test_collection_page_serializer_validation():
     assert serializer.validated_data['prev'] == data['prev']
     assert serializer.validated_data['next'] == data['next']
     assert serializer.validated_data['partOf'] == data['partOf']
+
+
+def test_collection_page_serializer_can_validate_child():
+    base = 'https://test.federation/test'
+    data = {
+        'items': [{'in': 'valid'}],
+    }
+
+    serializer = serializers.CollectionPageSerializer(
+        data=data,
+        context={'item_serializer': serializers.AudioSerializer}
+    )
+
+    assert serializer.is_valid() is False
+    assert 'items' in serializer.errors
 
 
 def test_collection_page_serializer(factories):

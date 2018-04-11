@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.serializers.json import DjangoJSONEncoder
 
 from funkwhale_api.music.models import Track
 
@@ -23,7 +24,7 @@ class Radio(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     is_public = models.BooleanField(default=False)
     version = models.PositiveIntegerField(default=0)
-    config = JSONField()
+    config = JSONField(encoder=DjangoJSONEncoder)
 
     def get_candidates(self):
         return filters.run(self.config)

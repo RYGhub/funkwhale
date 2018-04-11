@@ -77,6 +77,14 @@
                 </td>
                 <td></td>
               </tr>
+              <tr>
+                <td>Last fetched</td>
+                <td>
+                  <human-date v-if="object.fetched_date" :date="object.fetched_date"></human-date>
+                  <template v-else>Never</template>
+                </td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
         </div>
