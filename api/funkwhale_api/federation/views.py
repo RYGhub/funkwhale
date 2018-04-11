@@ -166,6 +166,8 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
 
 
 class LibraryViewSet(
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissions]
@@ -173,6 +175,7 @@ class LibraryViewSet(
         'actor',
         'follow',
     )
+    lookup_field = 'uuid'
     filter_class = filters.LibraryFilter
     serializer_class = serializers.APILibrarySerializer
     ordering_fields = (

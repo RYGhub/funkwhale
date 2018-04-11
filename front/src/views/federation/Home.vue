@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Federation'">
+  <div>
     <div class="ui vertical stripe segment">
       <h1 class="ui header">Manage federation</h1>
       <library-form @scanned="updateLibraryData"></library-form>

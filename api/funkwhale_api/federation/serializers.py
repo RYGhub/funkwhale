@@ -112,6 +112,8 @@ class APIActorSerializer(serializers.ModelSerializer):
             'manually_approves_followers',
 
         ]
+
+
 class LibraryActorSerializer(ActorSerializer):
     url = serializers.ListField(
         child=serializers.JSONField())
@@ -137,33 +139,52 @@ class LibraryActorSerializer(ActorSerializer):
         return validated_data
 
 
+class APIFollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Follow
+        fields = [
+            'uuid',
+            'actor',
+            'target',
+            'approved',
+            'creation_date',
+            'modification_date',
+        ]
+
+
 class APILibrarySerializer(serializers.ModelSerializer):
-    actor = APIActorSerializer
+    actor = APIActorSerializer()
+    follow = APIFollowSerializer()
 
     class Meta:
         model = models.Library
-        fields = [
+
+        read_only_fields = [
             'actor',
-            'autoimport',
-            'federation_enabled',
-            'download_files',
-            'tracks_count',
-            'url',
             'uuid',
-            'creation_date',
+            'url',
+            'tracks_count',
             'follow',
             'fetched_date',
             'modification_date',
+            'creation_date',
         ]
+        fields = [
+            'autoimport',
+            'federation_enabled',
+            'download_files',
+        ] + read_only_fields
 
 
 class APILibraryCreateSerializer(serializers.ModelSerializer):
     actor = serializers.URLField()
     federation_enabled = serializers.BooleanField()
+    uuid = serializers.UUIDField(read_only=True)
 
     class Meta:
         model = models.Library
         fields = [
+            'uuid',
             'actor',
             'autoimport',
             'federation_enabled',

@@ -275,3 +275,34 @@ def test_can_list_libraries(factories, superuser_api_client):
         serializers.APILibrarySerializer(library1).data,
         serializers.APILibrarySerializer(library2).data,
     ]
+
+
+def test_can_detail_library(factories, superuser_api_client):
+    library = factories['federation.Library']()
+
+    url = reverse(
+        'api:v1:federation:libraries-detail',
+        kwargs={'uuid': str(library.uuid)})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializers.APILibrarySerializer(library).data
+
+
+def test_can_patch_library(factories, superuser_api_client):
+    library = factories['federation.Library']()
+    data = {
+        'federation_enabled': not library.federation_enabled,
+        'download_files': not library.download_files,
+        'autoimport': not library.autoimport,
+    }
+    url = reverse(
+        'api:v1:federation:libraries-detail',
+        kwargs={'uuid': str(library.uuid)})
+    response = superuser_api_client.patch(url, data)
+
+    assert response.status_code == 200
+    library.refresh_from_db()
+
+    for k, v in data.items():
+        assert getattr(library, k) == v
