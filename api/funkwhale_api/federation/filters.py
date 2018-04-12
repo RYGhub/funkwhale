@@ -1,5 +1,7 @@
 import django_filters
 
+from funkwhale_api.common import fields
+
 from . import models
 
 
@@ -19,6 +21,12 @@ class LibraryFilter(django_filters.FilterSet):
 
 class LibraryTrackFilter(django_filters.FilterSet):
     library = django_filters.CharFilter('library__uuid')
+    q = fields.SearchFilter(search_fields=[
+        'artist_name',
+        'title',
+        'album_title',
+        'library__actor__domain',
+    ])
 
     class Meta:
         model = models.LibraryTrack

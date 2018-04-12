@@ -1,4 +1,8 @@
+import django_filters
+
 from django.db import models
+
+from funkwhale_api.music import utils
 
 
 PRIVACY_LEVEL_CHOICES = [
@@ -25,3 +29,15 @@ def privacy_level_query(user, lookup_field='privacy_level'):
             'followers', 'instance', 'everyone'
         ]
     })
+
+
+class SearchFilter(django_filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        self.search_fields = kwargs.pop('search_fields')
+        super().__init__(*args, **kwargs)
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+        query = utils.get_query(value, self.search_fields)
+        return qs.filter(query)
