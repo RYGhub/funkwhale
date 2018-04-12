@@ -22,40 +22,38 @@ AP_CONTEXT = [
 ]
 
 
-class ActorSerializer(serializers.ModelSerializer):
-    # left maps to activitypub fields, right to our internal models
-    id = serializers.URLField(source='url')
-    outbox = serializers.URLField(source='outbox_url')
-    inbox = serializers.URLField(source='inbox_url')
-    following = serializers.URLField(
-        source='following_url', required=False, allow_null=True)
-    followers = serializers.URLField(
-        source='followers_url', required=False, allow_null=True)
-    preferredUsername = serializers.CharField(
-        source='preferred_username', required=False)
-    publicKey = serializers.JSONField(source='public_key', required=False)
-    manuallyApprovesFollowers = serializers.NullBooleanField(
-        source='manually_approves_followers', required=False)
+class ActorSerializer(serializers.Serializer):
+    id = serializers.URLField()
+    outbox = serializers.URLField()
+    inbox = serializers.URLField()
+    type = serializers.ChoiceField(choices=models.TYPE_CHOICES)
+    preferredUsername = serializers.CharField()
+    manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
+    name = serializers.CharField(required=False, max_length=200)
     summary = serializers.CharField(max_length=None, required=False)
-
-    class Meta:
-        model = models.Actor
-        fields = [
-            'id',
-            'type',
-            'name',
-            'summary',
-            'preferredUsername',
-            'publicKey',
-            'inbox',
-            'outbox',
-            'following',
-            'followers',
-            'manuallyApprovesFollowers',
-        ]
+    followers = serializers.URLField(required=False, allow_null=True)
+    following = serializers.URLField(required=False, allow_null=True)
+    publicKey = serializers.JSONField(required=False)
 
     def to_representation(self, instance):
-        ret = super().to_representation(instance)
+        ret = {
+            'id': instance.url,
+            'outbox': instance.outbox_url,
+            'inbox': instance.inbox_url,
+            'preferredUsername': instance.preferred_username,
+            'type': instance.type,
+        }
+        if instance.name:
+            ret['name'] = instance.name
+        if instance.followers_url:
+            ret['followers'] = instance.followers_url
+        if instance.following_url:
+            ret['following'] = instance.following_url
+        if instance.summary:
+            ret['summary'] = instance.summary
+        if instance.manually_approves_followers is not None:
+            ret['manuallyApprovesFollowers'] = instance.manually_approves_followers
+
         ret['@context'] = AP_CONTEXT
         if instance.public_key:
             ret['publicKey'] = {
@@ -69,8 +67,21 @@ class ActorSerializer(serializers.ModelSerializer):
         return ret
 
     def prepare_missing_fields(self):
-        kwargs = {}
-        domain = urllib.parse.urlparse(self.validated_data['url']).netloc
+        kwargs = {
+            'url': self.validated_data['id'],
+            'outbox_url': self.validated_data['outbox'],
+            'inbox_url': self.validated_data['inbox'],
+            'following_url': self.validated_data.get('following'),
+            'followers_url': self.validated_data.get('followers'),
+            'summary': self.validated_data.get('summary'),
+            'type': self.validated_data['type'],
+            'name': self.validated_data.get('name'),
+            'preferred_username': self.validated_data['preferredUsername'],
+        }
+        maf = self.validated_data.get('manuallyApprovesFollowers')
+        if maf is not None:
+            kwargs['manually_approves_followers'] = maf
+        domain = urllib.parse.urlparse(kwargs['url']).netloc
         kwargs['domain'] = domain
         for endpoint, url in self.initial_data.get('endpoints', {}).items():
             if endpoint == 'sharedInbox':
@@ -83,13 +94,15 @@ class ActorSerializer(serializers.ModelSerializer):
         return kwargs
 
     def build(self):
-        d = self.validated_data.copy()
-        d.update(self.prepare_missing_fields())
-        return self.Meta.model(**d)
+        d = self.prepare_missing_fields()
+        return models.Actor(**d)
 
     def save(self, **kwargs):
-        kwargs.update(self.prepare_missing_fields())
-        return super().save(**kwargs)
+        d = self.prepare_missing_fields()
+        d.update(kwargs)
+        return models.Actor.objects.create(
+            **d
+        )
 
     def validate_summary(self, value):
         if value:
@@ -117,9 +130,6 @@ class APIActorSerializer(serializers.ModelSerializer):
 class LibraryActorSerializer(ActorSerializer):
     url = serializers.ListField(
         child=serializers.JSONField())
-
-    class Meta(ActorSerializer.Meta):
-        fields = ActorSerializer.Meta.fields + ['url']
 
     def validate(self, validated_data):
         try:

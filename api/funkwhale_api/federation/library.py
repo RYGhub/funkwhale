@@ -22,7 +22,6 @@ def scan_from_account_name(account_name):
 
     and return corresponding data in a dictionary.
     """
-
     data = {}
     try:
         username, domain = webfinger.clean_acct(
