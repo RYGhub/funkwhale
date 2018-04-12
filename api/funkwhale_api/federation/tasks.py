@@ -1,9 +1,48 @@
+import json
+import logging
+
+from django.conf import settings
+
 from requests.exceptions import RequestException
 
+from funkwhale_api.common import session
 from funkwhale_api.taskapp import celery
 
+from . import actors
 from . import library as lb
 from . import models
+from . import signing
+
+
+logger = logging.getLogger(__name__)
+
+
+@celery.app.task(
+    name='federation.send',
+    autoretry_for=[RequestException],
+    retry_backoff=30,
+    max_retries=5)
+@celery.require_instance(models.Actor, 'actor')
+def send(activity, actor, to):
+    logger.info('Preparing activity delivery to %s', to)
+    auth = signing.get_auth(
+        actor.private_key, actor.private_key_id)
+    for url in to:
+        recipient_actor = actors.get_actor(url)
+        logger.debug('delivering to %s', recipient_actor.inbox_url)
+        logger.debug('activity content: %s', json.dumps(activity))
+        response = session.get_session().post(
+            auth=auth,
+            json=activity,
+            url=recipient_actor.inbox_url,
+            timeout=5,
+            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+            headers={
+                'Content-Type': 'application/activity+json'
+            }
+        )
+        response.raise_for_status()
+        logger.debug('Remote answered with %s', response.status_code)
 
 
 @celery.app.task(

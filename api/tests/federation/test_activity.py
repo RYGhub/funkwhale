@@ -4,12 +4,13 @@ from funkwhale_api.federation import activity
 from funkwhale_api.federation import serializers
 
 
-def test_deliver(nodb_factories, r_mock, mocker):
-    to = nodb_factories['federation.Actor']()
+def test_deliver(factories, r_mock, mocker, settings):
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    to = factories['federation.Actor']()
     mocker.patch(
         'funkwhale_api.federation.actors.get_actor',
         return_value=to)
-    sender = nodb_factories['federation.Actor']()
+    sender = factories['federation.Actor']()
     ac = {
         'id': 'http://test.federation/activity',
         'type': 'Create',
