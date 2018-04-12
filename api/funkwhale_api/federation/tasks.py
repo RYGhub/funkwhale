@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.utils import timezone
 
 from requests.exceptions import RequestException
 
@@ -58,6 +59,9 @@ def scan_library(library, until=None):
     data = lb.get_library_data(library.url)
     scan_library_page.delay(
         library_id=library.id, page_url=data['first'], until=until)
+    library.fetched_date = timezone.now()
+    library.tracks_count = data['totalItems']
+    library.save(update_fields=['fetched_date', 'tracks_count'])
 
 
 @celery.app.task(

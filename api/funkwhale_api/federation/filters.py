@@ -17,6 +17,20 @@ class LibraryFilter(django_filters.FilterSet):
         }
 
 
+class LibraryTrackFilter(django_filters.FilterSet):
+    library = django_filters.CharFilter('library__uuid')
+
+    class Meta:
+        model = models.LibraryTrack
+        fields = {
+            'library': ['exact'],
+            'artist_name': ['exact', 'icontains'],
+            'title': ['exact', 'icontains'],
+            'album_title': ['exact', 'icontains'],
+            'audio_mimetype': ['exact', 'icontains'],
+        }
+
+
 class FollowFilter(django_filters.FilterSet):
     ordering = django_filters.OrderingFilter(
         # tuple-mapping retains order

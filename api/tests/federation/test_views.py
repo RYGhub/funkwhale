@@ -312,7 +312,7 @@ def test_can_patch_library(factories, superuser_api_client):
 def test_scan_library(factories, mocker, superuser_api_client):
     scan = mocker.patch(
         'funkwhale_api.federation.tasks.scan_library.delay',
-        return_value='id')
+        return_value=mocker.Mock(id='id'))
     library = factories['federation.Library']()
     now = timezone.now()
     data = {
@@ -329,3 +329,20 @@ def test_scan_library(factories, mocker, superuser_api_client):
         library_id=library.pk,
         until=now
     )
+
+
+def test_list_library_tracks(factories, superuser_api_client):
+    library = factories['federation.Library']()
+    lts = list(reversed(factories['federation.LibraryTrack'].create_batch(
+        size=5, library=library)))
+    factories['federation.LibraryTrack'].create_batch(size=5)
+    url = reverse('api:v1:federation:library-tracks-list')
+    response = superuser_api_client.get(url, {'library': library.uuid})
+
+    assert response.status_code == 200
+    assert response.data == {
+        'results': serializers.APILibraryTrackSerializer(lts, many=True).data,
+        'count': 5,
+        'previous': None,
+        'next': None,
+    }

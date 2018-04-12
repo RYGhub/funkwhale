@@ -14,6 +14,7 @@ from rest_framework.decorators import list_route, detail_route
 from rest_framework.serializers import ValidationError
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.common.permissions import HasModelPermission
 from funkwhale_api.music.models import TrackFile
 
 from . import activity
@@ -166,12 +167,16 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         return response.Response(data)
 
 
+class LibraryPermission(HasModelPermission):
+    model = models.Library
+
+
 class LibraryViewSet(
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
-    permission_classes = [rest_permissions.DjangoModelPermissions]
+    permission_classes = [LibraryPermission]
     queryset = models.Library.objects.all().select_related(
         'actor',
         'follow',
@@ -184,6 +189,7 @@ class LibraryViewSet(
         'creation_date',
         'fetched_date',
         'actor__domain',
+        'tracks_count',
     )
 
     @list_route(methods=['get'])
@@ -203,11 +209,11 @@ class LibraryViewSet(
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        id = tasks.scan_library.delay(
+        result = tasks.scan_library.delay(
             library_id=library.pk,
-            until=serializer.validated_data['until']
+            until=serializer.validated_data.get('until')
         )
-        return response.Response({'task': id})
+        return response.Response({'task': result.id})
 
     @list_route(methods=['get'])
     def following(self, request, *args, **kwargs):
@@ -249,3 +255,26 @@ class LibraryViewSet(
         serializer.is_valid(raise_exception=True)
         library = serializer.save()
         return response.Response(serializer.data, status=201)
+
+
+class LibraryTrackViewSet(
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+    permission_classes = [LibraryPermission]
+    queryset = models.LibraryTrack.objects.all().select_related(
+        'library__actor',
+        'library__follow',
+        'local_track_file',
+    )
+    filter_class = filters.LibraryTrackFilter
+    serializer_class = serializers.APILibraryTrackSerializer
+    ordering_fields = (
+        'id',
+        'artist_name',
+        'title',
+        'album_title',
+        'creation_date',
+        'modification_date',
+        'fetched_date',
+        'published_date',
+    )

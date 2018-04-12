@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import tasks
@@ -21,6 +22,7 @@ def test_scan_library_page_does_nothing_if_federation_disabled(
 
 def test_scan_library_fetches_page_and_calls_scan_page(
         mocker, factories, r_mock):
+    now = timezone.now()
     library = factories['federation.Library'](federation_enabled=True)
     collection_conf = {
         'actor': library.actor,
@@ -39,6 +41,8 @@ def test_scan_library_fetches_page_and_calls_scan_page(
         page_url=collection.data['first'],
         until=None,
     )
+    library.refresh_from_db()
+    assert library.fetched_date > now
 
 
 def test_scan_page_fetches_page_and_creates_tracks(

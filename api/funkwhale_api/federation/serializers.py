@@ -253,6 +253,29 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
         return library
 
 
+class APILibraryTrackSerializer(serializers.ModelSerializer):
+    library = APILibrarySerializer()
+
+    class Meta:
+        model = models.LibraryTrack
+        fields = [
+            'id',
+            'url',
+            'audio_url',
+            'audio_mimetype',
+            'creation_date',
+            'modification_date',
+            'fetched_date',
+            'published_date',
+            'metadata',
+            'artist_name',
+            'album_title',
+            'title',
+            'library',
+            'local_track_file',
+        ]
+
+
 class FollowSerializer(serializers.Serializer):
     id = serializers.URLField()
     object = serializers.URLField()
