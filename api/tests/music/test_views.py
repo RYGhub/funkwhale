@@ -1,6 +1,8 @@
 import io
 import pytest
 
+from django.urls import reverse
+
 from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
@@ -83,3 +85,21 @@ def test_can_proxy_remote_track(
     assert response.status_code == 200
     assert list(response.streaming_content) == [b't', b'e', b's', b't']
     assert response['Content-Type'] == track_file.library_track.audio_mimetype
+
+
+def test_can_create_import_from_federation_tracks(
+        factories, superuser_api_client, mocker):
+    lts = factories['federation.LibraryTrack'].create_batch(size=5)
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
+
+    payload = {
+        'library_tracks': [l.pk for l in lts]
+    }
+    url = reverse('api:v1:submit-federation')
+    response = superuser_api_client.post(url, payload)
+
+    assert response.status_code == 201
+    batch = superuser_api_client.user.imports.latest('id')
+    assert batch.jobs.count() == 5
+    for i, job in enumerate(batch.jobs.all()):
+        assert job.library_track == lts[i]

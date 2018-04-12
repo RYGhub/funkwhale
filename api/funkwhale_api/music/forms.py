@@ -19,5 +19,5 @@ class TranscodeForm(forms.Form):
         choices=BITRATE_CHOICES, required=False)
 
     track_file = forms.ModelChoiceField(
-        queryset=models.TrackFile.objects.all()
+        queryset=models.TrackFile.objects.exclude(audio_file__isnull=True)
     )

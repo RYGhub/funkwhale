@@ -1,6 +1,7 @@
 import ffmpeg
 import os
 import json
+import logging
 import subprocess
 import unicodedata
 import urllib
@@ -39,6 +40,8 @@ from . import permissions as music_permissions
 from . import serializers
 from . import tasks
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class SearchMixin(object):
@@ -223,6 +226,8 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                 headers={
                     'Content-Type': 'application/activity+json'
                 })
+            logger.debug(
+                'Proxying media request to %s', library_track.audio_url)
             response = StreamingHttpResponse(remote_response.iter_content())
         else:
             response = Response()
@@ -249,6 +254,8 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(form.errors, status=400)
 
         f = form.cleaned_data['track_file']
+        if not f.audio_file:
+            return Response(status=400)
         output_kwargs = {
             'format': form.cleaned_data['to']
         }
@@ -391,6 +398,22 @@ class SubmitViewSet(viewsets.ViewSet):
         import_data, batch = self._import_album(
             data, request, batch=None, import_request=import_request)
         return Response(import_data)
+
+    @list_route(methods=['post'])
+    @transaction.non_atomic_requests
+    def federation(self, request, *args, **kwargs):
+        serializer = serializers.SubmitFederationTracksSerializer(
+            data=request.data)
+        serializer.is_valid(raise_exception=True)
+        batch = serializer.save(submitted_by=request.user)
+        for job in batch.jobs.all():
+            funkwhale_utils.on_commit(
+                tasks.import_job_run.delay,
+                import_job_id=job.pk,
+                use_acoustid=False,
+            )
+
+        return Response({'id': batch.id}, status=201)
 
     @transaction.atomic
     def _import_album(self, data, request, batch=None, import_request=None):

@@ -82,6 +82,16 @@
                 <td>
                   <human-date v-if="object.fetched_date" :date="object.fetched_date"></human-date>
                   <template v-else>Never</template>
+                  <button
+                    @click="scan"
+                    v-if="!scanTrigerred"
+                    :class="['ui', 'basic', {loading: isScanLoading}, 'button']">
+                    <i class="sync icon"></i> Trigger scan
+                  </button>
+                  <button v-else class="ui success button">
+                    <i class="check icon"></i> Scan triggered!
+                  </button>
+
                 </td>
                 <td></td>
               </tr>
@@ -91,6 +101,7 @@
       </div>
       <div class="ui vertical stripe segment">
         <h2>Tracks available in this library</h2>
+        <library-track-table :filters="{library: id}"></library-track-table>
         <div class="ui stackable doubling three column grid">
         </div>
       </div>
@@ -102,13 +113,19 @@
 import axios from 'axios'
 import logger from '@/logging'
 
+import LibraryTrackTable from '@/components/federation/LibraryTrackTable'
+
 export default {
   props: ['id'],
-  components: {},
+  components: {
+    LibraryTrackTable
+  },
   data () {
     return {
       isLoading: true,
-      object: null
+      isScanLoading: false,
+      object: null,
+      scanTrigerred: false
     }
   },
   created () {
@@ -123,6 +140,18 @@ export default {
       axios.get(url).then((response) => {
         self.object = response.data
         self.isLoading = false
+      })
+    },
+    scan (until) {
+      var self = this
+      this.isScanLoading = true
+      let data = {}
+      let url = 'federation/libraries/' + this.id + '/scan/'
+      logger.default.debug('Triggering scan for library "' + this.id + '"')
+      axios.post(url, data).then((response) => {
+        self.scanTrigerred = true
+        logger.default.debug('Scan triggered with id', response.data)
+        self.isScanLoading = false
       })
     },
     update (attr) {

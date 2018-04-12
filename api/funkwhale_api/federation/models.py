@@ -163,3 +163,10 @@ class LibraryTrack(models.Model):
     title = models.CharField(max_length=500)
     metadata = JSONField(
         default={}, max_length=10000, encoder=DjangoJSONEncoder)
+
+    @property
+    def mbid(self):
+        try:
+            return self.metadata['recording']['musicbrainz_id']
+        except KeyError:
+            pass
