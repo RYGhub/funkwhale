@@ -176,6 +176,10 @@ class APILibrarySerializer(serializers.ModelSerializer):
         ] + read_only_fields
 
 
+class APILibraryScanSerializer(serializers.Serializer):
+    until = serializers.DateTimeField(required=False)
+
+
 class APILibraryCreateSerializer(serializers.ModelSerializer):
     actor = serializers.URLField()
     federation_enabled = serializers.BooleanField()

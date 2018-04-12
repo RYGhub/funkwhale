@@ -1,5 +1,6 @@
-from django.urls import reverse
 from django.core.paginator import Paginator
+from django.urls import reverse
+from django.utils import timezone
 
 import pytest
 
@@ -168,13 +169,13 @@ def test_library_actor_includes_library_link(db, settings, api_client):
     assert response.data['url'] == expected_links
 
 
-def test_can_scan_library(superuser_api_client, mocker):
+def test_can_fetch_library(superuser_api_client, mocker):
     result = {'test': 'test'}
     scan = mocker.patch(
         'funkwhale_api.federation.library.scan_from_account_name',
         return_value=result)
 
-    url = reverse('api:v1:federation:libraries-scan')
+    url = reverse('api:v1:federation:libraries-fetch')
     response = superuser_api_client.get(
         url, data={'account': 'test@test.library'})
 
@@ -306,3 +307,25 @@ def test_can_patch_library(factories, superuser_api_client):
 
     for k, v in data.items():
         assert getattr(library, k) == v
+
+
+def test_scan_library(factories, mocker, superuser_api_client):
+    scan = mocker.patch(
+        'funkwhale_api.federation.tasks.scan_library.delay',
+        return_value='id')
+    library = factories['federation.Library']()
+    now = timezone.now()
+    data = {
+        'until': now,
+    }
+    url = reverse(
+        'api:v1:federation:libraries-scan',
+        kwargs={'uuid': str(library.uuid)})
+    response = superuser_api_client.post(url, data)
+
+    assert response.status_code == 200
+    assert response.data == {'task': 'id'}
+    scan.assert_called_once_with(
+        library_id=library.pk,
+        until=now
+    )

@@ -25,6 +25,7 @@ from . import models
 from . import permissions
 from . import renderers
 from . import serializers
+from . import tasks
 from . import utils
 from . import webfinger
 
@@ -186,7 +187,7 @@ class LibraryViewSet(
     )
 
     @list_route(methods=['get'])
-    def scan(self, request, *args, **kwargs):
+    def fetch(self, request, *args, **kwargs):
         account = request.GET.get('account')
         if not account:
             return response.Response(
@@ -194,6 +195,19 @@ class LibraryViewSet(
 
         data = library.scan_from_account_name(account)
         return response.Response(data)
+
+    @detail_route(methods=['post'])
+    def scan(self, request, *args, **kwargs):
+        library = self.get_object()
+        serializer = serializers.APILibraryScanSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        id = tasks.scan_library.delay(
+            library_id=library.pk,
+            until=serializer.validated_data['until']
+        )
+        return response.Response({'task': id})
 
     @list_route(methods=['get'])
     def following(self, request, *args, **kwargs):
