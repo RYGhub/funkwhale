@@ -239,7 +239,7 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        library = models.Library.objects.get_or_create(
+        library = models.Library.objects.update_or_create(
             url=validated_data['library']['id'],
             defaults={
                 'actor': validated_data['actor'],

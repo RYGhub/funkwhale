@@ -68,7 +68,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
             data = handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
-        return response.Response(data, status=200)
+        return response.Response({}, status=200)
 
     @detail_route(methods=['get', 'post'])
     def outbox(self, request, *args, **kwargs):
@@ -80,7 +80,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
             data = handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
-        return response.Response(data, status=200)
+        return response.Response({}, status=200)
 
 
 class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
