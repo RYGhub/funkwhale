@@ -87,6 +87,7 @@ i18next
   .use(i18nextFetch)
   .init({
     lng: 'en',
+    fallbackLng: ['en'],
     preload: ['en'],
     backend: {
       loadPath: '/static/translations/{{lng}}.json'
