@@ -23,7 +23,6 @@ from rest_framework import permissions
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.common import session
 from funkwhale_api.federation import actors
 from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
@@ -206,35 +205,22 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=404)
 
         mt = f.mimetype
+        audio_file = f.audio_file
         try:
             library_track = f.library_track
         except ObjectDoesNotExist:
             library_track = None
-        if library_track and not f.audio_file:
-            # we proxy the response to the remote library
-            # since we did not mirror the file locally
+        if library_track and not audio_file:
+            if not library_track.audio_file:
+                # we need to populate from cache
+                library_track.download_audio()
+            audio_file = library_track.audio_file
             mt = library_track.audio_mimetype
-            file_extension = utils.get_ext_from_type(mt)
-            filename = '{}.{}'.format(f.track.full_name, file_extension)
-            auth = actors.SYSTEM_ACTORS['library'].get_request_auth()
-            remote_response = session.get_session().get(
-                library_track.audio_url,
-                auth=auth,
-                stream=True,
-                timeout=20,
-                verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-                headers={
-                    'Content-Type': 'application/activity+json'
-                })
-            logger.debug(
-                'Proxying media request to %s', library_track.audio_url)
-            response = StreamingHttpResponse(remote_response.iter_content())
-        else:
-            response = Response()
-            filename = f.filename
-            response['X-Accel-Redirect'] = "{}{}".format(
-                settings.PROTECT_FILES_PATH,
-                f.audio_file.url)
+        response = Response()
+        filename = f.filename
+        response['X-Accel-Redirect'] = "{}{}".format(
+            settings.PROTECT_FILES_PATH,
+            audio_file.url)
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)

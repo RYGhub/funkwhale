@@ -1,10 +1,15 @@
+import os
 import uuid
+import tempfile
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
+
+from funkwhale_api.common import session
+from funkwhale_api.music import utils as music_utils
 
 TYPE_CHOICES = [
     ('Person', 'Person'),
@@ -147,10 +152,23 @@ class Library(models.Model):
     )
 
 
+def get_file_path(instance, filename):
+    uid = str(uuid.uuid4())
+    chunk_size = 2
+    chunks = [uid[i:i+chunk_size] for i in range(0, len(uid), chunk_size)]
+    parts = chunks[:3] + [filename]
+    return os.path.join('federation_cache', *parts)
+
+
 class LibraryTrack(models.Model):
     url = models.URLField(unique=True)
     audio_url = models.URLField()
     audio_mimetype = models.CharField(max_length=200)
+    audio_file = models.FileField(
+        upload_to=get_file_path,
+        null=True,
+        blank=True)
+
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(
         auto_now=True)
@@ -170,3 +188,26 @@ class LibraryTrack(models.Model):
             return self.metadata['recording']['musicbrainz_id']
         except KeyError:
             pass
+
+    def download_audio(self):
+        from . import actors
+        auth = actors.SYSTEM_ACTORS['library'].get_request_auth()
+        remote_response = session.get_session().get(
+            self.audio_url,
+            auth=auth,
+            stream=True,
+            timeout=20,
+            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+            headers={
+                'Content-Type': 'application/activity+json'
+            }
+        )
+        with remote_response as r:
+            remote_response.raise_for_status()
+            extension = music_utils.get_ext_from_type(self.audio_mimetype)
+            title = ' - '.join([self.title, self.album_title, self.artist_name])
+            filename = '{}.{}'.format(title, extension)
+            tmp_file = tempfile.TemporaryFile()
+            for chunk in r.iter_content(chunk_size=512):
+                tmp_file.write(chunk)
+            self.audio_file.save(filename, tmp_file)

@@ -79,12 +79,16 @@ def test_can_proxy_remote_track(
     settings.PROTECT_AUDIO_FILES = False
     track_file = factories['music.TrackFile'](federation=True)
 
-    r_mock.get(track_file.library_track.audio_url, body=io.StringIO('test'))
+    r_mock.get(track_file.library_track.audio_url, body=io.BytesIO(b'test'))
     response = api_client.get(track_file.path)
 
+    library_track = track_file.library_track
+    library_track.refresh_from_db()
     assert response.status_code == 200
-    assert list(response.streaming_content) == [b't', b'e', b's', b't']
-    assert response['Content-Type'] == track_file.library_track.audio_mimetype
+    assert response['X-Accel-Redirect'] == "{}{}".format(
+        settings.PROTECT_FILES_PATH,
+        library_track.audio_file.url)
+    assert library_track.audio_file.read() == b'test'
 
 
 def test_can_create_import_from_federation_tracks(
