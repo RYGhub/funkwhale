@@ -50,7 +50,7 @@ export default {
     PlaylistModal
   },
   created () {
-    this.$i18n.i18next.changeLanguage('fr')
+    // this.$i18n.i18next.changeLanguage('fr')
     console.log(this.$t('Hello, world!'))
     this.$store.dispatch('instance/fetchSettings')
     let self = this

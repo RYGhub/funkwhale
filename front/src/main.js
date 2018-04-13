@@ -86,9 +86,9 @@ store.dispatch('auth/check')
 i18next
   .use(i18nextFetch)
   .init({
-    lng: 'en',
+    lng: navigator.language,
     fallbackLng: ['en'],
-    preload: ['en'],
+    preload: [navigator.language, 'en'],
     backend: {
       loadPath: '/static/translations/{{lng}}.json'
     }
