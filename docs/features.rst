@@ -42,3 +42,14 @@ The project itself is splitted in two parts:
 While the main interface to the server and API is the bundled front-end, the project itself is agnostic in the way you connect to it. Therefore, desktop clients or apps could be developped and implement the same (or even more) features as the bundled frontend.
 
 This modularity also makes it possible do deploy only a single component from the system.
+
+Federation
+----------
+
+Each Funkwhale instance is able to fetch music from other compatible servers,
+and share its own library on the network. The federation is implemented
+using the ActivityPub protocol, in order to leverage existing tools
+and be compatible with other services such as Mastodon.
+
+As of today, federation only targets music acquisition, meaning user interaction
+are not shared via ActivityPub. This will be implemented at a later point.
