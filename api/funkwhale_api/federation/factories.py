@@ -185,6 +185,11 @@ class LibraryTrackFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.LibraryTrack
 
+    class Params:
+        with_audio_file = factory.Trait(
+            audio_file=factory.django.FileField()
+        )
+
 
 @registry.register(name='federation.Note')
 class NoteFactory(factory.Factory):

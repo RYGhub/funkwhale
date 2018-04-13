@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.paginator import Paginator
 from django.utils import timezone
 
@@ -108,3 +110,31 @@ def test_scan_page_stops_once_until_is_reached(
     assert len(lts) == 2
     for i, tf in enumerate(tfs[:1]):
         assert tf.creation_date == lts[i].published_date
+
+
+def test_clean_federation_music_cache_if_no_listen(preferences, factories):
+    preferences['federation__music_cache_duration'] = 60
+    lt1 = factories['federation.LibraryTrack'](with_audio_file=True)
+    lt2 = factories['federation.LibraryTrack'](with_audio_file=True)
+    lt3 = factories['federation.LibraryTrack'](with_audio_file=True)
+    tf1 = factories['music.TrackFile'](library_track=lt1)
+    tf2 = factories['music.TrackFile'](library_track=lt2)
+    tf3 = factories['music.TrackFile'](library_track=lt3)
+
+    # we listen to the first one, and the second one (but weeks ago)
+    listening1 = factories['history.Listening'](
+        track=tf1.track,
+        creation_date=timezone.now())
+    listening2 = factories['history.Listening'](
+        track=tf2.track,
+        creation_date=timezone.now() - datetime.timedelta(minutes=61))
+
+    tasks.clean_music_cache()
+
+    lt1.refresh_from_db()
+    lt2.refresh_from_db()
+    lt3.refresh_from_db()
+
+    assert bool(lt1.audio_file) is True
+    assert bool(lt2.audio_file) is False
+    assert bool(lt3.audio_file) is False

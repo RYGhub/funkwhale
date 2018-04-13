@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 
@@ -5,8 +6,10 @@ from django.conf import settings
 from django.utils import timezone
 
 from requests.exceptions import RequestException
+from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import session
+from funkwhale_api.history.models import Listening
 from funkwhale_api.taskapp import celery
 
 from . import actors
@@ -85,3 +88,24 @@ def scan_library_page(library, page_url, until=None):
     next_page = data.get('next')
     if next_page and next_page != page_url:
         scan_library_page.delay(library_id=library.id, page_url=next_page)
+
+
+@celery.app.task(name='federation.clean_music_cache')
+def clean_music_cache():
+    preferences = global_preferences_registry.manager()
+    delay = preferences['federation__music_cache_duration']
+    if delay < 1:
+        return  # cache clearing disabled
+
+    candidates = models.LibraryTrack.objects.filter(
+        audio_file__isnull=False
+    ).values_list('local_track_file__track', flat=True)
+    listenings = Listening.objects.filter(
+        creation_date__gte=timezone.now() - datetime.timedelta(minutes=delay),
+        track__pk__in=candidates).values_list('track', flat=True)
+    too_old = set(candidates) - set(listenings)
+
+    to_remove = models.LibraryTrack.objects.filter(
+        local_track_file__track__pk__in=too_old).only('audio_file')
+    for lt in to_remove:
+        lt.audio_file.delete()
