@@ -54,7 +54,9 @@ def test_can_serve_track_file_as_remote_library(
     settings.PROTECT_AUDIO_FILES = True
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     follow = factories['federation.Follow'](
-        actor=authenticated_actor, target=library_actor)
+        approved=True,
+        actor=authenticated_actor,
+        target=library_actor)
 
     track_file = factories['music.TrackFile']()
     response = api_client.get(track_file.path)
