@@ -12,5 +12,60 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Hello, world!"
-msgstr "Bonjour tout le monde !"
+msgid ""
+"An unknown error occured, ensure your are connected to the internet and your "
+"funkwhale instance is up and running"
+msgstr ""
+"An unknown error occured, ensure your are connected to the internet and your "
+"funkwhale instance is up and running"
+
+msgid "Links"
+msgstr "Liens"
+
+msgid "About this instance"
+msgstr "À propos de cette instance"
+
+msgid "Official website"
+msgstr "Site officiel"
+
+msgid "Source code"
+msgstr "Source code"
+
+msgid "Issue tracker"
+msgstr "Issue tracker"
+
+msgid "About funkwhale"
+msgstr "About funkwhale"
+
+msgid ""
+"Funkwhale is a free and open-source project run by volunteers. You can help "
+"us improve the platform by reporting bugs, suggesting features and share the "
+"project with your friends!"
+msgstr ""
+"Funkwhale is a free and open-source project run by volunteers. You can help "
+"us improve the platform by reporting bugs, suggesting features and share the "
+"project with your friends!"
+
+msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
+msgstr "The funkwhale logo was kindly designed and provided by Francis Gading."
+
+msgid "favorited a track"
+msgstr "favorited a track"
+
+msgid "from album {%album%}, by "
+msgstr "from album {%album%}, by "
+
+msgid ", by "
+msgstr ", by "
+
+msgid "listened to a track"
+msgstr "listened to a track"
+
+msgid "Show {%0%} more tracks"
+msgstr "Afficher {%0%} chansons supplémentaires"
+
+msgid "Collapse"
+msgstr "Masquer"
+
+#~ msgid "Hello, world!"
+#~ msgstr "Bonjour tout le monde !"

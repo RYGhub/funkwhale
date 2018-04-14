@@ -75,7 +75,7 @@ axios.interceptors.response.use(function (response) {
     }
   }
   if (error.backendErrors.length === 0) {
-    error.backendErrors.push('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running')
+    error.backendErrors.push(i18next.t('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running'))
   }
   // Do something with response error
   return Promise.reject(error)
@@ -90,7 +90,11 @@ i18next
     fallbackLng: ['en'],
     preload: [navigator.language, 'en'],
     backend: {
-      loadPath: '/static/translations/{{lng}}.json'
+      loadPath: '/static/translations/{%lng%}.json'
+    },
+    interpolation: {
+      prefix: '{%',
+      suffix: '%}'
     }
   })
 const i18n = new VueI18Next(i18next)

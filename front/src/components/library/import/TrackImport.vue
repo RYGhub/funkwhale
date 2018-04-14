@@ -9,13 +9,13 @@
       </h5>
       <div class="ui toggle checkbox">
         <input type="checkbox" v-model="enabled" />
-        <label>Import this track</label>
+        <i18next tag="label" path="Import this track"/>
       </div>
     </div>
     <div class="three wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <label>Source</label>
+          <i18next tag="label" path="Source"/>
           <select v-model="currentBackendId">
             <option v-for="backend in backends" :value="backend.id">
               {{ backend.label }}
@@ -28,7 +28,10 @@
         <button @click="currentResultIndex -= 1" class="ui basic tiny icon button" :disabled="currentResultIndex === 0">
           <i class="left arrow icon"></i>
         </button>
-        Result {{ currentResultIndex + 1 }}/{{ results.length }}
+        <i18next path="Result {%0%}/{%1%}">
+          {{ currentResultIndex + 1 }}
+          {{ results.length }}
+        </i18next>
         <button @click="currentResultIndex += 1" class="ui basic tiny icon button" :disabled="currentResultIndex + 1 === results.length">
           <i class="right arrow icon"></i>
         </button>
@@ -37,9 +40,9 @@
     <div class="four wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <label>Search query</label>
+          <i18next tag="label" path="Search query"/>
           <input type="text" v-model="query" />
-          <label>Imported URL</label>
+          <i18next tag="label" path="Imported URL"/>
           <input type="text" v-model="importedUrl" />
         </div>
       </form>

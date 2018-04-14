@@ -2,11 +2,13 @@
   <div class="main pusher" v-title="'Your Favorites'">
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader">Loading your favorites...</div>
+        <div class="ui text loader"><i18next path="Loading your favorites..."/></div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
         <i class="circular inverted heart pink icon"></i>
-        {{ $store.state.favorites.count }} favorites
+        <i18next path="{%0%} favorites">
+          {{ $store.state.favorites.count }}
+        </i18next>
       </h2>
       <radio-button type="favorites"></radio-button>
     </div>
@@ -14,7 +16,7 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>Ordering</label>
+            <i18next tag="label" path="Ordering"/>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -22,14 +24,14 @@
             </select>
           </div>
           <div class="field">
-            <label>Ordering direction</label>
+            <i18next tag="label" path="Ordering direction"/>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="">Ascending</option>
-              <option value="-">Descending</option>
+              <option value=""><i18next path="Ascending"/></option>
+              <option value="-"><i18next path="Descending"/></option>
             </select>
           </div>
           <div class="field">
-            <label>Results per page</label>
+            <i18next tag="label" path="Results per page"/>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -83,9 +85,9 @@ export default {
       orderingDirection: defaultOrdering.direction,
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['title', 'Track name'],
-        ['album__title', 'Album name'],
-        ['artist__name', 'Artist name']
+        ['title', this.$t('Track name')],
+        ['album__title', this.$t('Album name')],
+        ['artist__name', this.$t('Artist name')]
       ]
     }
   },

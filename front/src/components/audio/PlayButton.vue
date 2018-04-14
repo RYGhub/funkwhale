@@ -1,18 +1,18 @@
 <template>
   <div :class="['ui', {'tiny': discrete}, 'buttons']">
     <button
-      title="Add to current queue"
+      :title="$t('Add to current queue')"
       @click="add"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
       <i class="ui play icon"></i>
-      <template v-if="!discrete"><slot>Play</slot></template>
+      <template v-if="!discrete"><slot><i18next path="Play"/></slot></template>
     </button>
     <div v-if="!discrete" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', 'icon', 'button']">
       <i class="dropdown icon"></i>
       <div class="menu">
-        <div class="item"@click="add"><i class="plus icon"></i> Add to queue</div>
-        <div class="item"@click="addNext()"><i class="step forward icon"></i> Play next</div>
-        <div class="item"@click="addNext(true)"><i class="arrow down icon"></i> Play now</div>
+        <div class="item"@click="add"><i class="plus icon"></i><i18next path="Add to queue"/></div>
+        <div class="item"@click="addNext()"><i class="step forward icon"></i><i18next path="Play next"/></div>
+        <div class="item"@click="addNext(true)"><i class="arrow down icon"></i><i18next path="Play now"/></div>
       </div>
     </div>
   </div>

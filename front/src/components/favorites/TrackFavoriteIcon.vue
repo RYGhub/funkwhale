@@ -1,12 +1,8 @@
  <template>
   <button @click="$store.dispatch('favorites/toggle', track.id)" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'button']">
     <i class="heart icon"></i>
-    <template v-if="isFavorite">
-      In favorites
-    </template>
-    <template v-else>
-      Add to favorites
-    </template>
+    <i18next v-if="isFavorite" path="In favorites"/>
+    <i18next v-else path="Add to favorites"/>
   </button>
   <i v-else @click="$store.dispatch('favorites/toggle', track.id)" :class="['favorite-icon', 'heart', {'pink': isFavorite}, {'favorited': isFavorite}, 'link', 'icon']" :title="title"></i>
 </template>
@@ -20,9 +16,9 @@ export default {
   computed: {
     title () {
       if (this.isFavorite) {
-        return 'Remove from favorites'
+        return this.$t('Remove from favorites')
       } else {
-        return 'Add to favorites'
+        return this.$t('Add to favorites')
       }
     },
     isFavorite () {

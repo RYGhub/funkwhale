@@ -1,13 +1,16 @@
 <template>
   <div>
     <h3 class="ui dividing block header">
-      Album <a :href="getMusicbrainzUrl('release', metadata.id)" target="_blank" title="View on MusicBrainz">{{ metadata.title }}</a> ({{ tracks.length}} tracks) by
-      <a :href="getMusicbrainzUrl('artist', metadata['artist-credit'][0]['artist']['id'])" target="_blank" title="View on MusicBrainz">{{ metadata['artist-credit-phrase'] }}</a>
+      <i18next path="Album {%0%} ({%1%} tracks) by {%2%}">
+        <a :href="getMusicbrainzUrl('release', metadata.id)" target="_blank" title="View on MusicBrainz">{{ metadata.title }}</a>
+        ({{ tracks.length}} tracks)
+        <a :href="getMusicbrainzUrl('artist', metadata['artist-credit'][0]['artist']['id'])" target="_blank" title="View on MusicBrainz">{{ metadata['artist-credit-phrase'] }}</a>
+      </i18next>
       <div class="ui divider"></div>
       <div class="sub header">
         <div class="ui toggle checkbox">
           <input type="checkbox" v-model="enabled" />
-          <label>Import this release</label>
+          <i18next tag="label" path="Import this release"/>
         </div>
       </div>
     </h3>

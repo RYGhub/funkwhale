@@ -57,44 +57,44 @@
 
       <div class="two wide column controls ui grid">
         <div
-          title="Previous track"
+          :title="$t('Previous track')"
           class="two wide column control"
           :disabled="emptyQueue">
             <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'big', 'icon']"></i>
         </div>
         <div
           v-if="!playing"
-          title="Play track"
+          :title="$t('Play track')"
           class="two wide column control">
             <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
         </div>
         <div
           v-else
-          title="Pause track"
+          :title="$t('Pause track')"
           class="two wide column control">
             <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
         </div>
         <div
-          title="Next track"
+          :title="$t('Next track')"
           class="two wide column control"
           :disabled="!hasNext">
             <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
         </div>
         <div class="two wide column control volume-control">
-          <i title="Unmute" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
-          <i title="Mute" @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
-          <i title="Mute" @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
+          <i :title="$t('Unmute')" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
+          <i :title="$t('Mute')" @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
+          <i :title="$t('Mute')" @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
           <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
         </div>
         <div class="two wide column control looping">
           <i
-            title="Looping disabled. Click to switch to single-track looping."
+            :title="$t('Looping disabled. Click to switch to single-track looping.')"
             v-if="looping === 0"
             @click="$store.commit('player/looping', 1)"
             :disabled="!currentTrack"
             :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
           <i
-            title="Looping on a single track. Click to switch to whole queue looping."
+            :title="$t('Looping on a single track. Click to switch to whole queue looping.')"
             v-if="looping === 1"
             @click="$store.commit('player/looping', 2)"
             :disabled="!currentTrack"
@@ -102,7 +102,7 @@
             <span class="ui circular tiny orange label">1</span>
           </i>
           <i
-            title="Looping on whole queue. Click to disable looping."
+            :title="$t('Looping on whole queue. Click to disable looping.')"
             v-if="looping === 2"
             @click="$store.commit('player/looping', 0)"
             :disabled="!currentTrack"
@@ -111,14 +111,14 @@
         </div>
         <div
           :disabled="queue.tracks.length === 0"
-          title="Shuffle your queue"
+          :title="$t('Shuffle your queue')"
           class="two wide column control">
           <i @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
         <div class="one wide column"></div>
         <div
           :disabled="queue.tracks.length === 0"
-          title="Clear your queue"
+          :title="$t('Clear your queue')"
           class="two wide column control">
           <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>

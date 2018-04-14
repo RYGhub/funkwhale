@@ -10,8 +10,10 @@
         </div>
         <div class="meta">
           <span>
-            By <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+            <i18next path="By {%0%}">
+              <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
               {{ album.artist.name }}</router-link>
+            </i18next>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>
         <div class="description" v-if="mode === 'rich'">
@@ -36,16 +38,24 @@
             </tbody>
           </table>
           <div class="center aligned segment" v-if="album.tracks.length > initialTracks">
-            <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">Show {{ album.tracks.length - initialTracks }} more tracks</em>
-            <em v-else @click="showAllTracks = false" class="expand">Collapse</em>
+            <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">
+              <i18next path="Show {%0%} more tracks">{{ album.tracks.length - initialTracks }}</i18next>
+            </em>
+            <em v-else @click="showAllTracks = false" class="expand">
+              <i18next path="Collapse" />
+            </em>
           </div>
         </div>
       </div>
       <div class="extra content">
-        <play-button class="mini basic orange right floated" :tracks="album.tracks">Play all</play-button>
+        <play-button class="mini basic orange right floated" :tracks="album.tracks">
+          <i18next path="Play all"/>
+        </play-button>
         <span>
           <i class="music icon"></i>
-          {{ album.tracks.length }} tracks
+          <i18next path="{%0%} tracks">
+            {{ album.tracks.length }}
+          </i18next>
         </span>
       </div>
     </div>
