@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="ui vertical stripe segment">
-      <h1 class="ui header">Manage federation</h1>
       <library-form @scanned="updateLibraryData"></library-form>
       <library-card v-if="libraryData" :library-data="libraryData"></library-card>
     </div>

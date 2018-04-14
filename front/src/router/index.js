@@ -26,8 +26,9 @@ import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import FederationBase from '@/views/federation/Base'
-import FederationHome from '@/views/federation/Home'
+import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
+import FederationLibraryList from '@/views/federation/LibraryList'
 
 Vue.use(Router)
 
@@ -90,15 +91,29 @@ export default new Router({
       path: '/manage/federation',
       component: FederationBase,
       children: [
-        { path: '', component: FederationHome },
-        { path: 'library/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
+        {
+          path: 'scan',
+          name: 'federation.libraries.scan',
+          component: FederationScan },
+        {
+          path: 'libraries',
+          name: 'federation.libraries.list',
+          component: FederationLibraryList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        { path: 'libraries/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
       ]
     },
     {
       path: '/library',
       component: Library,
       children: [
-        { path: '', component: LibraryHome },
+        { path: 'scan', component: LibraryHome },
         {
           path: 'artists/',
           name: 'library.artists.browse',

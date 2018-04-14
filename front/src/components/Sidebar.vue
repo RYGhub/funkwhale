@@ -47,7 +47,7 @@
           class="item" :to="{path: '/activity'}"><i class="bell icon"></i> Activity</router-link>
         <router-link
           class="item" v-if="$store.state.auth.availablePermissions['federation.manage']"
-          :to="{path: '/manage/federation'}"><i class="sitemap icon"></i> Federation</router-link>
+          :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> Federation</router-link>
       </div>
 
       <player></player>

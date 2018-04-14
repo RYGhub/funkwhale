@@ -2,33 +2,39 @@
   <div class="ui card">
     <div class="content">
       <div class="header">
-        {{ libraryData.display_name }}
+        {{ displayName }}
       </div>
     </div>
     <div class="content">
-      <span class="right floated" v-if="libraryData.actor.manuallyApprovesFollowers">
+      <span class="right floated" v-if="following">
+        <i class="check icon"></i> Following
+      </span>
+      <span class="right floated" v-else-if="manuallyApprovesFollowers">
         <i class="lock icon"></i> Followers only
+      </span>
+      <span class="right floated" v-else>
+        <i class="open lock icon"></i> Open
       </span>
       <span>
         <i class="music icon"></i>
-        {{ libraryData.library.totalItems }} tracks
+        {{ totalItems }} tracks
       </span>
     </div>
     <div class="extra content">
-      <template v-if="libraryData.local.awaiting_approval">
+      <template v-if="awaitingApproval">
         <i class="clock icon"></i>
         Follow request pending approval
       </template>
-      <template v-else-if="libraryData.local.following">Pending follow request
+      <template v-else-if="following">
         <i class="check icon"></i>
         Already following this library
       </template>
       <div
-        v-else-if="!library"
+        v-if="!library"
         @click="follow"
         :disabled="isLoading"
         :class="['ui', 'basic', {loading: isLoading}, 'green', 'button']">
-        <template v-if="libraryData.actor.manuallyApprovesFollowers">
+        <template v-if="manuallyApprovesFollowers">
           Send a follow request
         </template>
         <template v-else>
@@ -49,13 +55,13 @@
 import axios from 'axios'
 
 export default {
-  props: ['libraryData'],
+  props: ['libraryData', 'libraryInstance'],
   data () {
     return {
+      library: this.libraryInstance,
       isLoading: false,
       data: null,
-      errors: [],
-      library: null
+      errors: []
     }
   },
   methods: {
@@ -76,6 +82,43 @@ export default {
         self.isLoading = false
         self.errors = error.backendErrors
       })
+    }
+  },
+  computed: {
+    displayName () {
+      if (this.libraryData) {
+        return this.libraryData.display_name
+      } else {
+        return `${this.library.actor.preferred_username}@${this.library.actor.domain}`
+      }
+    },
+    manuallyApprovesFollowers () {
+      if (this.libraryData) {
+        return this.libraryData.actor.manuallyApprovesFollowers
+      } else {
+        return this.library.actor.manually_approves_followers
+      }
+    },
+    totalItems () {
+      if (this.libraryData) {
+        return this.libraryData.library.totalItems
+      } else {
+        return this.library.tracks_count
+      }
+    },
+    awaitingApproval () {
+      if (this.libraryData) {
+        return this.libraryData.local.awaiting_approval
+      } else {
+        return this.library.follow.approved === null
+      }
+    },
+    following () {
+      if (this.libraryData) {
+        return this.libraryData.local.following
+      } else {
+        return this.library.follow.approved
+      }
     }
   }
 }

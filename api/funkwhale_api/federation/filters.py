@@ -7,6 +7,9 @@ from . import models
 
 class LibraryFilter(django_filters.FilterSet):
     approved = django_filters.BooleanFilter('following__approved')
+    q = fields.SearchFilter(search_fields=[
+        'actor__domain',
+    ])
 
     class Meta:
         model = models.Library
