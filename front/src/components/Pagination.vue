@@ -1,25 +1,25 @@
 <template>
-  <div class="ui pagination borderless menu">
-    <a
-      v-if="current - 1 >= 1"
+  <div class="ui pagination menu">
+    <div
+      :disabled="current - 1 < 1"
       @click="selectPage(current - 1)"
-      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></a>
-    <template>
-      <a
+      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></div>
+    <template v-if="!compact">
+      <div
         v-if="page !== 'skip'"
         v-for="page in pages"
         @click="selectPage(page)"
         :class="[{'active': page === current}, 'item']">
         {{ page }}
-      </a>
-      <a v-else class="disabled item">
+      </div>
+      <div v-else class="disabled item">
         ...
-      </a>
+      </div>
     </template>
-    <a
-      v-if="current + 1 <= maxPage"
+    <div
+      :disabled="current + 1 > maxPage"
       @click="selectPage(current + 1)"
-      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></a>
+      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></div>
   </div>
 </template>
 
@@ -30,7 +30,8 @@ export default {
   props: {
     current: {type: Number, default: 1},
     paginateBy: {type: Number, default: 25},
-    total: {type: Number}
+    total: {type: Number},
+    compact: {type: Boolean, default: false}
   },
   computed: {
     pages: function () {
@@ -72,6 +73,9 @@ export default {
   },
   methods: {
     selectPage: function (page) {
+      if (page > this.maxPage || page < 1) {
+        return
+      }
       if (this.current !== page) {
         this.$emit('page-changed', page)
       }
