@@ -20,11 +20,11 @@
       <table class="ui unstackable table">
         <thead>
           <tr>
-            <th>Job ID</th>
-            <th>Recording MusicBrainz ID</th>
-            <th>Source</th>
-            <th>Status</th>
-            <th>Track</th>
+            <i18next tag="th" path="Job ID"/>
+            <i18next tag="th" path="Recording MusicBrainz ID"/>
+            <i18next tag="th" path="Source"/>
+            <i18next tag="th" path="Status"/>
+            <i18next tag="th" path="Track"/>
           </tr>
         </thead>
         <tbody>

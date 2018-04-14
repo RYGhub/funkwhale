@@ -27,17 +27,27 @@
             </tbody>
           </table>
           <div class="center aligned segment" v-if="artist.albums.length > initialAlbums">
-            <em v-if="!showAllAlbums" @click="showAllAlbums = true" class="expand">Show {{ artist.albums.length - initialAlbums }} more albums</em>
-            <em v-else @click="showAllAlbums = false" class="expand">Collapse</em>
+            <em v-if="!showAllAlbums" @click="showAllAlbums = true" class="expand">
+              <i18next path="Show {%0%} more albums">
+                {{ artist.albums.length - initialAlbums }}
+              </i18next>
+            </em>
+            <em v-else @click="showAllAlbums = false" class="expand">
+              <i18next path="Collapse"/>
+            </em>
           </div>
         </div>
     </div>
     <div class="extra content">
         <span>
           <i class="sound icon"></i>
-          {{ artist.albums.length }} albums
+          <i18next path="{%0%} albums">
+            {{ artist.albums.length }}
+          </i18next>
         </span>
-        <play-button class="mini basic orange right floated" :tracks="allTracks">Play all</play-button>
+        <play-button class="mini basic orange right floated" :tracks="allTracks">
+          <i18next path="Play all"/>
+        </play-button>
       </div>
     </div>
 </template>

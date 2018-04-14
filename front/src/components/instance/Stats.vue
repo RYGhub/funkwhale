@@ -2,32 +2,26 @@
   <div>
     <div v-if="stats" class="ui stackable two column grid">
       <div class="column">
-        <h3 class="ui left aligned header">User activity</h3>
+        <h3 class="ui left aligned header"><i18next path="User activity"/></h3>
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
               <i class="green user icon"></i>
               {{ stats.users }}
             </div>
-            <div class="label">
-              Users
-            </div>
+            <i18next tag="div" class="label" path="users"/>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="orange sound icon"></i> {{ stats.listenings }}
             </div>
-            <div class="label">
-              tracks listened
-            </div>
+            <i18next tag="div" class="label" path="tracks listened"/>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="pink heart icon"></i> {{ stats.track_favorites }}
             </div>
-            <div class="label">
-              Tracks favorited
-            </div>
+            <i18next tag="div" class="label" path="Tracks favorited"/>
           </div>
         </div>
       </div>
@@ -38,33 +32,25 @@
             <div class="value">
               {{ parseInt(stats.music_duration) }}
             </div>
-            <div class="label">
-              hours of music
-            </div>
+            <i18next tag="div" class="label" path="hours of music"/>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.artists }}
             </div>
-            <div class="label">
-              Artists
-            </div>
+            <i18next tag="div" class="label" path="Artists"/>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.albums }}
             </div>
-            <div class="label">
-              Albums
-            </div>
+            <i18next tag="div" class="label" path="Albums"/>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.tracks }}
             </div>
-            <div class="label">
-              tracks
-            </div>
+            <i18next tag="div" class="label" path="tracks"/>
           </div>
         </div>
       </div>

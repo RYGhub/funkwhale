@@ -2,19 +2,19 @@
   <div class="main pusher" v-title="'Sign Up'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>Create a funkwhale account</h2>
+        <h2><i18next path="Create a funkwhale account"/></h2>
         <form
           v-if="$store.state.instance.settings.users.registration_enabled.value"
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">We cannot create your account</div>
+            <div class="header"><i18next path="We cannot create your account"/></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label>Username</label>
+            <i18next tag="label" path="Username"/>
             <input
             ref="username"
             required
@@ -24,7 +24,7 @@
             v-model="username">
           </div>
           <div class="field">
-            <label>Email</label>
+            <i18next tag="label" path="Email"/>
             <input
             ref="email"
             required
@@ -33,7 +33,7 @@
             v-model="email">
           </div>
           <div class="field">
-            <label>Password</label>
+            <i18next tag="label" path="Password"/>
             <div class="ui action input">
               <input
               required
@@ -45,9 +45,9 @@
               </span>
             </div>
           </div>
-          <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit">Create my account</button>
+          <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit"><i18next path="Create my account"/></button>
         </form>
-        <p v-else>Registration is currently disabled on this instance, please try again later.</p>
+        <i18next v-else tag="p" path="Registration is currently disabled on this instance, please try again later."/>
       </div>
     </div>
   </div>
