@@ -46,6 +46,7 @@
                 <td>
                 </td>
               </tr>
+              <!-- Disabled until properly implemented on the backend
               <tr>
                 <td>Auto importing</td>
                 <td>
@@ -70,6 +71,7 @@
                 </td>
                 <td></td>
               </tr>
+              -->
               <tr>
                 <td>Library size</td>
                 <td>
@@ -98,10 +100,12 @@
             </tbody>
           </table>
         </div>
+        <div class="ui hidden divider"></div>
+        <button @click="fetchData" class="ui basic button">Refresh</button>
       </div>
       <div class="ui vertical stripe segment">
         <h2>Tracks available in this library</h2>
-        <library-track-table :filters="{library: id}"></library-track-table>
+        <library-track-table v-if="!isLoading" :filters="{library: id}"></library-track-table>
       </div>
     </template>
   </div>
@@ -158,9 +162,9 @@ export default {
       let self = this
       params[attr] = newValue
       axios.patch('federation/libraries/' + this.id + '/', params).then((response) => {
-        console.log(`${attr} was updated succcessfully to ${newValue}`)
+        logger.default.info(`${attr} was updated succcessfully to ${newValue}`)
       }, (error) => {
-        console.log(`Error while setting ${attr} to ${newValue}`, error)
+        logger.default.error(`Error while setting ${attr} to ${newValue}`, error)
         self.object[attr] = !newValue
       })
     }
