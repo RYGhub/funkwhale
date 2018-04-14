@@ -102,8 +102,6 @@
       <div class="ui vertical stripe segment">
         <h2>Tracks available in this library</h2>
         <library-track-table :filters="{library: id}"></library-track-table>
-        <div class="ui stackable doubling three column grid">
-        </div>
       </div>
     </template>
   </div>

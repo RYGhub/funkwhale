@@ -6,7 +6,7 @@
     <table v-if="result" class="ui compact very basic single line unstackable table">
       <thead>
         <tr>
-          <th colspan="1">
+          <th>
             <div class="ui checkbox">
               <input
                 type="checkbox"
@@ -18,6 +18,7 @@
           <th>Artist</th>
           <th>Album</th>
           <th>Published date</th>
+          <th v-if="showLibrary">Library</th>
         </tr>
       </thead>
       <tbody>
@@ -34,28 +35,47 @@
             </div>
           </td>
           <td>
-            {{ track.title }}
+            <span :title="track.title">{{ track.title|truncate(30) }}</span>
           </td>
           <td>
-            {{ track.artist_name }}
+            <span :title="track.artist_name">{{ track.artist_name|truncate(30) }}</span>
           </td>
           <td>
-            {{ track.album_title }}
+            <span :title="track.album_title">{{ track.album_title|truncate(20) }}</span>
           </td>
           <td>
             <human-date :date="track.published_date"></human-date>
+          </td>
+          <td v-if="showLibrary">
+            {{ track.library.actor.domain }}
           </td>
         </tr>
       </tbody>
       <tfoot class="full-width">
         <tr>
-          <th colspan="5">
+          <th>
+            <pagination
+            v-if="result && result.results.length > 0"
+            @page-changed="selectPage"
+            :compact="true"
+            :current="page"
+            :paginate-by="paginateBy"
+            :total="result.count"
+            ></pagination>
+
+          </th>
+          <th>Showing results {{ ((page-1) * paginateBy) + 1 }}-{{ ((page-1) * paginateBy) + result.results.length }} on {{ result.count }}</th>
+          <th>
             <button
               @click="launchImport"
               :disabled="checked.length === 0 || isImporting"
               :class="['ui', 'green', {loading: isImporting}, 'button']">Import {{ checked.length }} tracks
             </button>
           </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th v-if="showLibrary"></th>
         </tr>
       </tfoot>
     </table>
@@ -66,14 +86,22 @@
 import axios from 'axios'
 import _ from 'lodash'
 
+import Pagination from '@/components/Pagination'
+
 export default {
-  props: ['filters'],
+  props: {
+    filters: {type: Object, required: false},
+    showLibrary: {type: Boolean, default: false}
+  },
+  components: {
+    Pagination
+  },
   data () {
     return {
       isLoading: false,
       result: null,
       page: 1,
-      paginateBy: 50,
+      paginateBy: 25,
       search: '',
       checked: {},
       isImporting: false
@@ -86,7 +114,7 @@ export default {
     fetchData () {
       let params = _.merge({
         'page': this.page,
-        'paginate_by': this.paginateBy,
+        'page_size': this.paginateBy,
         'q': this.search
       }, this.filters)
       let self = this
@@ -107,7 +135,6 @@ export default {
         library_tracks: this.checked
       }
       axios.post('/submit/federation/', payload).then((response) => {
-        console.log('Triggered import', response.data)
         self.isImporting = false
         self.fetchData()
       }, error => {
@@ -120,7 +147,9 @@ export default {
         // we uncheck
         this.checked = []
       } else {
-        this.checked = this.result.results.map(t => { return t.id })
+        this.checked = this.result.results.filter(t => {
+          return t.local_track_file === null
+        }).map(t => { return t.id })
       }
     },
     toggleCheck (id) {
@@ -130,6 +159,9 @@ export default {
       } else {
         this.checked.push(id)
       }
+    },
+    selectPage: function (page) {
+      this.page = page
     }
   },
   watch: {
@@ -137,6 +169,9 @@ export default {
       if (newValue.length > 0) {
         this.fetchData()
       }
+    },
+    page () {
+      this.fetchData()
     }
   }
 }

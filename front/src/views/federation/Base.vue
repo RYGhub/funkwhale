@@ -4,6 +4,9 @@
       <router-link
         class="ui item"
         :to="{name: 'federation.libraries.list'}">Libraries</router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'federation.tracks.list'}">Tracks</router-link>
     </div>
     <router-view :key="$route.fullPath"></router-view>
   </div>

@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Artists'">
+  <div v-title="'Libraries'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">Browsing libraries</h2>
       <router-link
