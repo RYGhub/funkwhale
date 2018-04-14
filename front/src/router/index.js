@@ -30,6 +30,7 @@ import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
 import FederationLibraryList from '@/views/federation/LibraryList'
 import FederationTrackList from '@/views/federation/LibraryTrackList'
+import FederationFollowersList from '@/views/federation/LibraryFollowersList'
 
 Vue.use(Router)
 
@@ -111,6 +112,17 @@ export default new Router({
           path: 'tracks',
           name: 'federation.tracks.list',
           component: FederationTrackList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        {
+          path: 'followers',
+          name: 'federation.followers.list',
+          component: FederationFollowersList,
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,

@@ -221,31 +221,42 @@ class LibraryViewSet(
         queryset = models.Follow.objects.filter(
             actor=library_actor
         ).select_related(
-            'target',
+            'actor',
             'target',
         ).order_by('-creation_date')
         filterset = filters.FollowFilter(request.GET, queryset=queryset)
-        serializer = serializers.APIFollowSerializer(filterset.qs, many=True)
+        final_qs = filterset.qs
+        serializer = serializers.APIFollowSerializer(final_qs, many=True)
         data = {
             'results': serializer.data,
-            'count': len(filterset.qs),
+            'count': len(final_qs),
         }
         return response.Response(data)
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get', 'patch'])
     def followers(self, request, *args, **kwargs):
+        if request.method.lower() == 'patch':
+            serializer = serializers.APILibraryFollowUpdateSerializer(
+                data=request.data)
+            serializer.is_valid(raise_exception=True)
+            follow = serializer.save()
+            return response.Response(
+                serializers.APIFollowSerializer(follow).data
+            )
+
         library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
         queryset = models.Follow.objects.filter(
             target=library_actor
         ).select_related(
-            'target',
+            'actor',
             'target',
         ).order_by('-creation_date')
         filterset = filters.FollowFilter(request.GET, queryset=queryset)
-        serializer = serializers.APIFollowSerializer(filterset.qs, many=True)
+        final_qs = filterset.qs
+        serializer = serializers.APIFollowSerializer(final_qs, many=True)
         data = {
             'results': serializer.data,
-            'count': len(filterset.qs),
+            'count': len(final_qs),
         }
         return response.Response(data)
 

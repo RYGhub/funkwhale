@@ -26,7 +26,7 @@ import Modal from '@/components/semantic/Modal'
 
 export default {
   props: {
-    action: {type: Function, required: true},
+    action: {type: Function, required: false},
     disabled: {type: Boolean, default: false},
     color: {type: String, default: 'red'}
   },
@@ -41,7 +41,10 @@ export default {
   methods: {
     confirm () {
       this.showModal = false
-      this.action()
+      this.$emit('confirm')
+      if (this.action) {
+        this.action()
+      }
     }
   }
 }

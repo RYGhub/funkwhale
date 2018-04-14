@@ -64,13 +64,19 @@
             ></pagination>
 
           </th>
-          <th>Showing results {{ ((page-1) * paginateBy) + 1 }}-{{ ((page-1) * paginateBy) + result.results.length }} on {{ result.count }}</th>
+          <th v-if="result && result.results.length > 0">
+            Showing results {{ ((page-1) * paginateBy) + 1 }}-{{ ((page-1) * paginateBy) + result.results.length }} on {{ result.count }}</th>
           <th>
             <button
               @click="launchImport"
               :disabled="checked.length === 0 || isImporting"
               :class="['ui', 'green', {loading: isImporting}, 'button']">Import {{ checked.length }} tracks
             </button>
+            <router-link
+              v-if="importBatch"
+              :to="{name: 'library.import.batches.detail', params: {id: importBatch.id }}">
+              Import #{{ importBatch.id }} launched
+            </router-link>
           </th>
           <th></th>
           <th></th>
@@ -104,7 +110,8 @@ export default {
       paginateBy: 25,
       search: '',
       checked: {},
-      isImporting: false
+      isImporting: false,
+      importBatch: null
     }
   },
   created () {
@@ -135,6 +142,7 @@ export default {
         library_tracks: this.checked
       }
       axios.post('/submit/federation/', payload).then((response) => {
+        self.importBatch = response.data
         self.isImporting = false
         self.fetchData()
       }, error => {

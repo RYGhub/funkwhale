@@ -15,7 +15,7 @@
       <span class="right floated" v-else>
         <i class="open lock icon"></i> Open
       </span>
-      <span>
+      <span v-if="totalItems">
         <i class="music icon"></i>
         {{ totalItems }} tracks
       </span>
@@ -24,10 +24,6 @@
       <template v-if="awaitingApproval">
         <i class="clock icon"></i>
         Follow request pending approval
-      </template>
-      <template v-else-if="following">
-        <i class="check icon"></i>
-        Already following this library
       </template>
       <div
         v-if="!library"

@@ -346,3 +346,37 @@ def test_list_library_tracks(factories, superuser_api_client):
         'previous': None,
         'next': None,
     }
+
+
+def test_can_update_follow_status(factories, superuser_api_client, mocker):
+    patched_accept = mocker.patch(
+        'funkwhale_api.federation.activity.accept_follow'
+    )
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow = factories['federation.Follow'](target=library_actor)
+
+    payload = {
+        'follow': follow.pk,
+        'approved': True
+    }
+    url = reverse('api:v1:federation:libraries-followers')
+    response = superuser_api_client.patch(url, payload)
+    follow.refresh_from_db()
+
+    assert response.status_code == 200
+    assert follow.approved is True
+    patched_accept.assert_called_once_with(follow)
+
+
+def test_can_filter_pending_follows(factories, superuser_api_client):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow = factories['federation.Follow'](
+        target=library_actor,
+        approved=True)
+
+    params = {'pending': True}
+    url = reverse('api:v1:federation:libraries-followers')
+    response = superuser_api_client.get(url, params)
+
+    assert response.status_code == 200
+    assert len(response.data['results']) == 0

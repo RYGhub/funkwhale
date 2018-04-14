@@ -190,6 +190,35 @@ class APILibraryScanSerializer(serializers.Serializer):
     until = serializers.DateTimeField(required=False)
 
 
+class APILibraryFollowUpdateSerializer(serializers.Serializer):
+    follow = serializers.IntegerField()
+    approved = serializers.BooleanField()
+
+    def validate_follow(self, value):
+        from . import actors
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        qs = models.Follow.objects.filter(
+            pk=value,
+            target=library_actor,
+        )
+        try:
+            return qs.get()
+        except models.Follow.DoesNotExist:
+            raise serializers.ValidationError('Invalid follow')
+
+    def save(self):
+        new_status = self.validated_data['approved']
+        follow = self.validated_data['follow']
+        if new_status == follow.approved:
+            return follow
+
+        follow.approved = new_status
+        follow.save(update_fields=['approved', 'modification_date'])
+        if new_status:
+            activity.accept_follow(follow)
+        return follow
+
+
 class APILibraryCreateSerializer(serializers.ModelSerializer):
     actor = serializers.URLField()
     federation_enabled = serializers.BooleanField()
@@ -233,8 +262,13 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
         library_data = library.get_library_data(
             acs.validated_data['library_url'])
         if 'errors' in library_data:
-            raise serializers.ValidationError(str(library_data['errors']))
+            # we pass silently because it may means we require permission
+            # before scanning
+            pass
         validated_data['library'] = library_data
+        validated_data['library'].setdefault(
+            'id', acs.validated_data['library_url']
+        )
         validated_data['actor'] = actor
         return validated_data
 
@@ -244,7 +278,7 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
             defaults={
                 'actor': validated_data['actor'],
                 'follow': validated_data['follow'],
-                'tracks_count': validated_data['library']['totalItems'],
+                'tracks_count': validated_data['library'].get('totalItems'),
                 'federation_enabled': validated_data['federation_enabled'],
                 'autoimport': validated_data['autoimport'],
                 'download_files': validated_data['download_files'],
