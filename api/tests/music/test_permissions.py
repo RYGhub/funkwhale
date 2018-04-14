@@ -47,10 +47,25 @@ def test_list_permission_protect_following_actor(
         factories, api_request, settings):
     settings.PROTECT_AUDIO_FILES = True
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-    follow = factories['federation.Follow'](target=library_actor)
+    follow = factories['federation.Follow'](
+        approved=True, target=library_actor)
     view = APIView.as_view()
     permission = permissions.Listen()
     request = api_request.get('/')
     setattr(request, 'actor', follow.actor)
 
     assert permission.has_permission(request, view) is True
+
+
+def test_list_permission_protect_following_actor_not_approved(
+        factories, api_request, settings):
+    settings.PROTECT_AUDIO_FILES = True
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow = factories['federation.Follow'](
+        approved=False, target=library_actor)
+    view = APIView.as_view()
+    permission = permissions.Listen()
+    request = api_request.get('/')
+    setattr(request, 'actor', follow.actor)
+
+    assert permission.has_permission(request, view) is False
