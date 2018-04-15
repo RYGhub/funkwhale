@@ -495,3 +495,50 @@ msgstr "Search query"
 msgid "Imported URL"
 msgstr "Imported URL"
 
+msgid "Builder"
+msgstr "Builder"
+
+msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria"
+msgstr "You can use this interface to build your own custom radio, which will play tracks according to your criteria"
+
+msgid "Radio name"
+msgstr "Radio name"
+
+msgid "Display publicly"
+msgstr "Display publicly"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Add filters to customize your radio"
+msgstr "Add filters to customize your radio"
+
+msgid "Select a filter"
+msgstr "Select a filter"
+
+msgid "Add filter"
+msgstr "Add filter"
+
+msgid "Filter name"
+msgstr "Filter name"
+
+msgid "Exclude"
+msgstr "Exclude"
+
+msgid "Config"
+msgstr "Config"
+
+msgid "Candidates"
+msgstr "Candidates"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "{%0%} tracks matching combined filters"
+msgstr "{%0%} tracks matching combined filters"
+
+msgid "Track matching filter"
+msgstr "Track matching filter"
+
+msgid "Remove"
+msgstr "Remove"
