@@ -7,41 +7,39 @@
     </div>
     <div class="content">
       <span class="right floated" v-if="following">
-        <i class="check icon"></i> Following
+        <i class="check icon"></i><i18next path="Following"/>
       </span>
       <span class="right floated" v-else-if="manuallyApprovesFollowers">
-        <i class="lock icon"></i> Followers only
+        <i class="lock icon"></i><i18next path="Followers only"/>
       </span>
       <span class="right floated" v-else>
-        <i class="open lock icon"></i> Open
+        <i class="open lock icon"></i><i18next path="Open"/>
       </span>
       <span v-if="totalItems">
         <i class="music icon"></i>
-        {{ totalItems }} tracks
+        <i18next path="{%0%} tracks">
+          {{ totalItems }}
+        </i18next>
       </span>
     </div>
     <div class="extra content">
       <template v-if="awaitingApproval">
         <i class="clock icon"></i>
-        Follow request pending approval
+        <i18next path="Follow request pending approval"/>
       </template>
       <div
         v-if="!library"
         @click="follow"
         :disabled="isLoading"
         :class="['ui', 'basic', {loading: isLoading}, 'green', 'button']">
-        <template v-if="manuallyApprovesFollowers">
-          Send a follow request
-        </template>
-        <template v-else>
-          Follow
-        </template>
+        <i18next v-if="manuallyApprovesFollowers" path="Send a follow request"/>
+        <i18next v-else path="Follow">
       </div>
       <router-link
         v-else
         class="ui basic button"
         :to="{name: 'federation.libraries.detail', params: {id: library.uuid }}">
-        Detail
+        <i18next path="Detail"/>
       </router-link>
     </div>
   </div>
