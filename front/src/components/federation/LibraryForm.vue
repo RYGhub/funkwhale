@@ -1,9 +1,9 @@
 <template>
   <form class="ui form" @submit.prevent="fetchInstanceInfo">
-    <h3 class="ui header">Federate with a new instance</h3>
-    <p>Use this form to scan an instance and setup federation.</p>
+    <h3 class="ui header"><i18next path="Federate with a new instance"/></h3>
+    <p><i18next path="Use this form to scan an instance and setup federation."/></p>
     <div v-if="errors.length > 0 || scanErrors.length > 0" class="ui negative message">
-      <div class="header">Error while scanning library</div>
+      <div class="header"><i18next path="Error while scanning library"/></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
         <li v-for="error in scanErrors">{{ error }}</li>
@@ -11,7 +11,7 @@
     </div>
     <div class="ui two fields">
       <div class="ui field">
-        <label>Library name</label>
+        <label><i18next path="Library name"/></label>
         <input v-model="libraryUsername" type="text" placeholder="library@demo.funkwhale.audio" />
       </div>
       <div class="ui field">
@@ -21,7 +21,7 @@
           :disabled="isLoading"
           :class="['ui', 'icon', {loading: isLoading}, 'button']">
           <i class="search icon"></i>
-          Launch scan
+          <i18next path="Launch scan"/>
         </button>
       </div>
     </div>

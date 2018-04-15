@@ -14,11 +14,11 @@
                 :checked="result.results.length === checked.length"><label>&nbsp;</label>
             </div>
           </th>
-          <th>Title</th>
-          <th>Artist</th>
-          <th>Album</th>
-          <th>Published date</th>
-          <th v-if="showLibrary">Library</th>
+          <i18next tag="th" path="Title"/>
+          <i18next tag="th" path="Artist"/>
+          <i18next tag="th" path="Album"/>
+          <i18next tag="th" path="Published date"/>
+          <i18next tag="th" v-if="showLibrary" path="Library"/>
         </tr>
       </thead>
       <tbody>
@@ -31,7 +31,7 @@
                 :checked="checked.indexOf(track.id) > -1"><label>&nbsp;</label>
             </div>
             <div v-else class="ui label">
-              In library
+              <i18next path="In library"/>
             </div>
           </td>
           <td>
@@ -65,17 +65,22 @@
 
           </th>
           <th v-if="result && result.results.length > 0">
-            Showing results {{ ((page-1) * paginateBy) + 1 }}-{{ ((page-1) * paginateBy) + result.results.length }} on {{ result.count }}</th>
+            <i18next path="Showing results {%0%}-{%1%} on {%2%}">
+              {{ ((page-1) * paginateBy) + 1 }}
+              {{ ((page-1) * paginateBy) + result.results.length }}
+              {{ result.count }}
+            </i18next>
           <th>
             <button
               @click="launchImport"
               :disabled="checked.length === 0 || isImporting"
-              :class="['ui', 'green', {loading: isImporting}, 'button']">Import {{ checked.length }} tracks
+              :class="['ui', 'green', {loading: isImporting}, 'button']">
+              <i18next path="Import {%count%} tracks" :count="checked.length"/>
             </button>
             <router-link
               v-if="importBatch"
               :to="{name: 'library.import.batches.detail', params: {id: importBatch.id }}">
-              Import #{{ importBatch.id }} launched
+              <i18next path="Import #{%id%} launched" :id="importBatch.id"/>              
             </router-link>
           </th>
           <th></th>
