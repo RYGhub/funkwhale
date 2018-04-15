@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
-import uuid
 
 
 class Migration(migrations.Migration):
@@ -18,17 +17,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='album',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='artist',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='importbatch',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='importjob',
@@ -38,17 +37,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='importjob',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='lyrics',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='track',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='trackfile',
@@ -68,12 +67,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='trackfile',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AddField(
             model_name='work',
             name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+            field=models.UUIDField(db_index=True, null=True, unique=True),
         ),
         migrations.AlterField(
             model_name='importbatch',

@@ -25,6 +25,12 @@ import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
+import FederationBase from '@/views/federation/Base'
+import FederationScan from '@/views/federation/Scan'
+import FederationLibraryDetail from '@/views/federation/LibraryDetail'
+import FederationLibraryList from '@/views/federation/LibraryList'
+import FederationTrackList from '@/views/federation/LibraryTrackList'
+import FederationFollowersList from '@/views/federation/LibraryFollowersList'
 
 Vue.use(Router)
 
@@ -82,6 +88,50 @@ export default new Router({
         defaultPage: route.query.page,
         defaultPaginateBy: route.query.paginateBy
       })
+    },
+    {
+      path: '/manage/federation',
+      component: FederationBase,
+      children: [
+        {
+          path: 'scan',
+          name: 'federation.libraries.scan',
+          component: FederationScan },
+        {
+          path: 'libraries',
+          name: 'federation.libraries.list',
+          component: FederationLibraryList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        {
+          path: 'tracks',
+          name: 'federation.tracks.list',
+          component: FederationTrackList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        {
+          path: 'followers',
+          name: 'federation.followers.list',
+          component: FederationFollowersList,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        { path: 'libraries/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
+      ]
     },
     {
       path: '/library',

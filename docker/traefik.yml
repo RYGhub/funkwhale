@@ -1,0 +1,22 @@
+version: '2.1'
+
+services:
+  traefik:
+    image: traefik:alpine
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./ssl/test.key:/ssl/traefik.key
+      - ./ssl/test.crt:/ssl/traefik.crt
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8040:8040'
+    networks:
+      federation:
+
+
+networks:
+  federation:
+    external:
+      name: federation

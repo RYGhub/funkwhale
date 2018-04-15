@@ -31,6 +31,9 @@ class User(AbstractUser):
         'dynamic_preferences.change_globalpreferencemodel': {
             'external_codename': 'settings.change',
         },
+        'federation.change_library': {
+            'external_codename': 'federation.manage',
+        },
     }
 
     privacy_level = fields.get_privacy_field()

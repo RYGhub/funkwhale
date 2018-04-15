@@ -1,4 +1,5 @@
 import arrow
+import pytest
 
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -34,7 +35,7 @@ def test_actor_serializer_from_ap(db):
     }
 
     serializer = serializers.ActorSerializer(data=payload)
-    assert serializer.is_valid()
+    assert serializer.is_valid(raise_exception=True)
 
     actor = serializer.build()
 
@@ -65,7 +66,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     }
 
     serializer = serializers.ActorSerializer(data=payload)
-    assert serializer.is_valid()
+    assert serializer.is_valid(raise_exception=True)
 
     actor = serializer.build()
 
@@ -170,6 +171,184 @@ def test_follow_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
+def test_follow_serializer_save(factories):
+    actor = factories['federation.Actor']()
+    target = factories['federation.Actor']()
+
+    data = expected = {
+        'id': 'https://test.follow',
+        'type': 'Follow',
+        'actor': actor.url,
+        'object': target.url,
+    }
+    serializer = serializers.FollowSerializer(data=data)
+
+    assert serializer.is_valid(raise_exception=True)
+
+    follow = serializer.save()
+
+    assert follow.pk is not None
+    assert follow.actor == actor
+    assert follow.target == target
+    assert follow.approved is None
+
+
+def test_follow_serializer_save_validates_on_context(factories):
+    actor = factories['federation.Actor']()
+    target = factories['federation.Actor']()
+    impostor = factories['federation.Actor']()
+
+    data = expected = {
+        'id': 'https://test.follow',
+        'type': 'Follow',
+        'actor': actor.url,
+        'object': target.url,
+    }
+    serializer = serializers.FollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+
+    assert 'actor' in serializer.errors
+    assert 'object' in serializer.errors
+
+
+def test_accept_follow_serializer_representation(factories):
+    follow = factories['federation.Follow'](approved=None)
+
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': follow.target.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(follow)
+
+    assert serializer.data == expected
+
+
+def test_accept_follow_serializer_save(factories):
+    follow = factories['federation.Follow'](approved=None)
+
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': follow.target.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    follow.refresh_from_db()
+
+    assert follow.approved is True
+
+
+def test_accept_follow_serializer_validates_on_context(factories):
+    follow = factories['federation.Follow'](approved=None)
+    impostor = factories['federation.Actor']()
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/accept',
+        'type': 'Accept',
+        'actor': impostor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.AcceptFollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+    assert 'actor' in serializer.errors['object']
+    assert 'object' in serializer.errors['object']
+
+
+def test_undo_follow_serializer_representation(factories):
+    follow = factories['federation.Follow'](approved=True)
+
+    expected = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': follow.actor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(follow)
+
+    assert serializer.data == expected
+
+
+def test_undo_follow_serializer_save(factories):
+    follow = factories['federation.Follow'](approved=True)
+
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': follow.actor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    with pytest.raises(models.Follow.DoesNotExist):
+        follow.refresh_from_db()
+
+
+def test_undo_follow_serializer_validates_on_context(factories):
+    follow = factories['federation.Follow'](approved=True)
+    impostor = factories['federation.Actor']()
+    data = {
+        '@context': [
+            'https://www.w3.org/ns/activitystreams',
+            'https://w3id.org/security/v1',
+            {},
+        ],
+        'id': follow.get_federation_url() + '/undo',
+        'type': 'Undo',
+        'actor': impostor.url,
+        'object': serializers.FollowSerializer(follow).data,
+    }
+
+    serializer = serializers.UndoFollowSerializer(
+        data=data,
+        context={'follow_actor': impostor, 'follow_target': impostor})
+
+    assert serializer.is_valid() is False
+    assert 'actor' in serializer.errors['object']
+    assert 'object' in serializer.errors['object']
+
+
 def test_paginated_collection_serializer(factories):
     tfs = factories['music.TrackFile'].create_batch(size=5)
     actor = factories['federation.Actor'](local=True)
@@ -199,6 +378,71 @@ def test_paginated_collection_serializer(factories):
     serializer = serializers.PaginatedCollectionSerializer(conf)
 
     assert serializer.data == expected
+
+
+def test_paginated_collection_serializer_validation():
+    data = {
+        'type': 'Collection',
+        'id': 'https://test.federation/test',
+        'totalItems': 5,
+        'actor': 'http://test.actor',
+        'first': 'https://test.federation/test?page=1',
+        'last': 'https://test.federation/test?page=1',
+        'items': []
+    }
+
+    serializer = serializers.PaginatedCollectionSerializer(
+        data=data
+    )
+
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data['totalItems'] == 5
+    assert serializer.validated_data['id'] == data['id']
+    assert serializer.validated_data['actor'] == data['actor']
+
+
+def test_collection_page_serializer_validation():
+    base = 'https://test.federation/test'
+    data = {
+        'type': 'CollectionPage',
+        'id': base + '?page=2',
+        'totalItems': 5,
+        'actor': 'https://test.actor',
+        'items': [],
+        'first': 'https://test.federation/test?page=1',
+        'last': 'https://test.federation/test?page=3',
+        'prev': base + '?page=1',
+        'next': base + '?page=3',
+        'partOf': base,
+    }
+
+    serializer = serializers.CollectionPageSerializer(
+        data=data
+    )
+
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data['totalItems'] == 5
+    assert serializer.validated_data['id'] == data['id']
+    assert serializer.validated_data['actor'] == data['actor']
+    assert serializer.validated_data['items'] == []
+    assert serializer.validated_data['prev'] == data['prev']
+    assert serializer.validated_data['next'] == data['next']
+    assert serializer.validated_data['partOf'] == data['partOf']
+
+
+def test_collection_page_serializer_can_validate_child():
+    base = 'https://test.federation/test'
+    data = {
+        'items': [{'in': 'valid'}],
+    }
+
+    serializer = serializers.CollectionPageSerializer(
+        data=data,
+        context={'item_serializer': serializers.AudioSerializer}
+    )
+
+    assert serializer.is_valid() is False
+    assert 'items' in serializer.errors
 
 
 def test_collection_page_serializer(factories):
@@ -260,6 +504,25 @@ def test_activity_pub_audio_serializer_to_library_track(factories):
     assert lt.artist_name == audio['metadata']['artist']['name']
     assert lt.album_title == audio['metadata']['release']['title']
     assert lt.published_date == arrow.get(audio['published'])
+
+
+def test_activity_pub_audio_serializer_to_library_track_no_duplicate(
+        factories):
+    remote_library = factories['federation.Library']()
+    audio = factories['federation.Audio']()
+    serializer1 = serializers.AudioSerializer(
+        data=audio, context={'library': remote_library})
+    serializer2 = serializers.AudioSerializer(
+        data=audio, context={'library': remote_library})
+
+    assert serializer1.is_valid() is True
+    assert serializer2.is_valid() is True
+
+    lt1 = serializer1.save()
+    lt2 = serializer2.save()
+
+    assert lt1 == lt2
+    assert models.LibraryTrack.objects.count() == 1
 
 
 def test_activity_pub_audio_serializer_to_ap(factories):
@@ -375,3 +638,46 @@ def test_collection_serializer_to_ap(factories):
         collection, context={'actor': library, 'id': 'https://test.id'})
 
     assert serializer.data == expected
+
+
+def test_api_library_create_serializer_save(factories, r_mock):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    actor = factories['federation.Actor']()
+    follow = factories['federation.Follow'](
+        target=actor,
+        actor=library_actor,
+    )
+    actor_data = serializers.ActorSerializer(actor).data
+    actor_data['url'] = [{
+        'href': 'https://test.library',
+        'name': 'library',
+        'type': 'Link',
+    }]
+    library_conf = {
+        'id': 'https://test.library',
+        'items': range(10),
+        'actor': actor,
+        'page_size': 5,
+    }
+    library_data = serializers.PaginatedCollectionSerializer(library_conf).data
+    r_mock.get(actor.url, json=actor_data)
+    r_mock.get('https://test.library', json=library_data)
+    data = {
+        'actor': actor.url,
+        'autoimport': False,
+        'federation_enabled': True,
+        'download_files': False,
+    }
+
+    serializer = serializers.APILibraryCreateSerializer(data=data)
+    assert serializer.is_valid(raise_exception=True) is True
+    library = serializer.save()
+    follow = models.Follow.objects.get(
+        target=actor, actor=library_actor, approved=None)
+
+    assert library.autoimport is data['autoimport']
+    assert library.federation_enabled is data['federation_enabled']
+    assert library.download_files is data['download_files']
+    assert library.tracks_count == 10
+    assert library.actor == actor
+    assert library.follow == follow

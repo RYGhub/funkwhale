@@ -3,6 +3,7 @@ from django.conf import settings
 from rest_framework.permissions import BasePermission
 
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import models
 
 
 class Listen(BasePermission):
@@ -20,4 +21,8 @@ class Listen(BasePermission):
             return False
 
         library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-        return library.followers.filter(url=actor.url).exists()
+        return models.Follow.objects.filter(
+            target=library,
+            actor=actor,
+            approved=True
+        ).exists()

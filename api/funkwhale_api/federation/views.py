@@ -1,21 +1,32 @@
 from django import forms
 from django.conf import settings
 from django.core import paginator
+from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 
-from rest_framework import viewsets
-from rest_framework import views
+from rest_framework import mixins
+from rest_framework import permissions as rest_permissions
 from rest_framework import response
+from rest_framework import views
+from rest_framework import viewsets
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.serializers import ValidationError
 
+from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.common.permissions import HasModelPermission
 from funkwhale_api.music.models import TrackFile
 
+from . import activity
 from . import actors
 from . import authentication
+from . import filters
+from . import library
+from . import models
 from . import permissions
 from . import renderers
 from . import serializers
+from . import tasks
 from . import utils
 from . import webfinger
 
@@ -58,7 +69,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
             data = handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
-        return response.Response(data, status=200)
+        return response.Response({}, status=200)
 
     @detail_route(methods=['get', 'post'])
     def outbox(self, request, *args, **kwargs):
@@ -70,7 +81,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
             data = handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
-        return response.Response(data, status=200)
+        return response.Response({}, status=200)
 
 
 class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
@@ -121,7 +132,7 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         qs = TrackFile.objects.order_by('-creation_date').select_related(
             'track__artist',
             'track__album__artist'
-        )
+        ).filter(library_track__isnull=True)
         if page is None:
             conf = {
                 'id': utils.full_url(reverse('federation:music:files-list')),
@@ -154,3 +165,127 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
                 return response.Response(status=404)
 
         return response.Response(data)
+
+
+class LibraryPermission(HasModelPermission):
+    model = models.Library
+
+
+class LibraryViewSet(
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+    permission_classes = [LibraryPermission]
+    queryset = models.Library.objects.all().select_related(
+        'actor',
+        'follow',
+    )
+    lookup_field = 'uuid'
+    filter_class = filters.LibraryFilter
+    serializer_class = serializers.APILibrarySerializer
+    ordering_fields = (
+        'id',
+        'creation_date',
+        'fetched_date',
+        'actor__domain',
+        'tracks_count',
+    )
+
+    @list_route(methods=['get'])
+    def fetch(self, request, *args, **kwargs):
+        account = request.GET.get('account')
+        if not account:
+            return response.Response(
+                {'account': 'This field is mandatory'}, status=400)
+
+        data = library.scan_from_account_name(account)
+        return response.Response(data)
+
+    @detail_route(methods=['post'])
+    def scan(self, request, *args, **kwargs):
+        library = self.get_object()
+        serializer = serializers.APILibraryScanSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        result = tasks.scan_library.delay(
+            library_id=library.pk,
+            until=serializer.validated_data.get('until')
+        )
+        return response.Response({'task': result.id})
+
+    @list_route(methods=['get'])
+    def following(self, request, *args, **kwargs):
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        queryset = models.Follow.objects.filter(
+            actor=library_actor
+        ).select_related(
+            'actor',
+            'target',
+        ).order_by('-creation_date')
+        filterset = filters.FollowFilter(request.GET, queryset=queryset)
+        final_qs = filterset.qs
+        serializer = serializers.APIFollowSerializer(final_qs, many=True)
+        data = {
+            'results': serializer.data,
+            'count': len(final_qs),
+        }
+        return response.Response(data)
+
+    @list_route(methods=['get', 'patch'])
+    def followers(self, request, *args, **kwargs):
+        if request.method.lower() == 'patch':
+            serializer = serializers.APILibraryFollowUpdateSerializer(
+                data=request.data)
+            serializer.is_valid(raise_exception=True)
+            follow = serializer.save()
+            return response.Response(
+                serializers.APIFollowSerializer(follow).data
+            )
+
+        library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+        queryset = models.Follow.objects.filter(
+            target=library_actor
+        ).select_related(
+            'actor',
+            'target',
+        ).order_by('-creation_date')
+        filterset = filters.FollowFilter(request.GET, queryset=queryset)
+        final_qs = filterset.qs
+        serializer = serializers.APIFollowSerializer(final_qs, many=True)
+        data = {
+            'results': serializer.data,
+            'count': len(final_qs),
+        }
+        return response.Response(data)
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.APILibraryCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        library = serializer.save()
+        return response.Response(serializer.data, status=201)
+
+
+class LibraryTrackViewSet(
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+    permission_classes = [LibraryPermission]
+    queryset = models.LibraryTrack.objects.all().select_related(
+        'library__actor',
+        'library__follow',
+        'local_track_file',
+    )
+    filter_class = filters.LibraryTrackFilter
+    serializer_class = serializers.APILibraryTrackSerializer
+    ordering_fields = (
+        'id',
+        'artist_name',
+        'title',
+        'album_title',
+        'creation_date',
+        'modification_date',
+        'fetched_date',
+        'published_date',
+    )

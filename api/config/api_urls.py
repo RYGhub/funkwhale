@@ -32,6 +32,10 @@ v1_patterns += [
         include(
             ('funkwhale_api.instance.urls', 'instance'),
             namespace='instance')),
+    url(r'^federation/',
+        include(
+            ('funkwhale_api.federation.api_urls', 'federation'),
+            namespace='federation')),
     url(r'^providers/',
         include(
             ('funkwhale_api.providers.urls', 'providers'),

@@ -10,8 +10,10 @@ def test_authenticate(factories, mocker, api_request):
         'funkwhale_api.federation.actors.get_actor_data',
         return_value={
             'id': actor_url,
+            'type': 'Person',
             'outbox': 'https://test.com',
             'inbox': 'https://test.com',
+            'preferredUsername': 'test',
             'publicKey': {
                 'publicKeyPem': public.decode('utf-8'),
                 'owner': actor_url,

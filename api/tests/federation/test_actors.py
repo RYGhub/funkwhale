@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from rest_framework import exceptions
 
+from funkwhale_api.federation import activity
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
@@ -261,8 +262,6 @@ def test_test_actor_handles_follow(
     deliver = mocker.patch(
         'funkwhale_api.federation.activity.deliver')
     actor = factories['federation.Actor']()
-    now = timezone.now()
-    mocker.patch('django.utils.timezone.now', return_value=now)
     accept_follow = mocker.patch(
         'funkwhale_api.federation.activity.accept_follow')
     test_actor = actors.SYSTEM_ACTORS['test'].get_actor_instance()
@@ -272,28 +271,15 @@ def test_test_actor_handles_follow(
         'id': 'http://test.federation/user#follows/267',
         'object': test_actor.url,
     }
-    uid = uuid.uuid4()
-    mocker.patch('uuid.uuid4', return_value=uid)
-    expected_follow = {
-        '@context': serializers.AP_CONTEXT,
-        'actor': test_actor.url,
-        'id': test_actor.url + '#follows/{}'.format(uid),
-        'object': actor.url,
-        'type': 'Follow'
-    }
-
     actors.SYSTEM_ACTORS['test'].post_inbox(data, actor=actor)
-    accept_follow.assert_called_once_with(
-        test_actor, data, actor
+    follow = models.Follow.objects.get(target=test_actor, approved=True)
+    follow_back = models.Follow.objects.get(actor=test_actor, approved=None)
+    accept_follow.assert_called_once_with(follow)
+    deliver.assert_called_once_with(
+        serializers.FollowSerializer(follow_back).data,
+        on_behalf_of=test_actor,
+        to=[actor.url]
     )
-    expected_calls = [
-        mocker.call(
-            expected_follow,
-            to=[actor.url],
-            on_behalf_of=test_actor,
-        )
-    ]
-    deliver.assert_has_calls(expected_calls)
 
 
 def test_test_actor_handles_undo_follow(
@@ -346,12 +332,10 @@ def test_library_actor_handles_follow_manual_approval(
     }
 
     library_actor.system_conf.post_inbox(data, actor=actor)
-    fr = library_actor.received_follow_requests.first()
+    follow = library_actor.received_follows.first()
 
-    assert library_actor.received_follow_requests.count() == 1
-    assert fr.target == library_actor
-    assert fr.actor == actor
-    assert fr.approved is None
+    assert follow.actor == actor
+    assert follow.approved is None
 
 
 def test_library_actor_handles_follow_auto_approval(
@@ -369,10 +353,27 @@ def test_library_actor_handles_follow_auto_approval(
     }
     library_actor.system_conf.post_inbox(data, actor=actor)
 
-    assert library_actor.received_follow_requests.count() == 0
-    accept_follow.assert_called_once_with(
-        library_actor, data, actor
+    follow = library_actor.received_follows.first()
+
+    assert follow.actor == actor
+    assert follow.approved is True
+
+
+def test_library_actor_handles_accept(
+        mocker, factories):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    actor = factories['federation.Actor']()
+    pending_follow = factories['federation.Follow'](
+        actor=library_actor,
+        target=actor,
+        approved=None,
     )
+    serializer = serializers.AcceptFollowSerializer(pending_follow)
+    library_actor.system_conf.post_inbox(serializer.data, actor=actor)
+
+    pending_follow.refresh_from_db()
+
+    assert pending_follow.approved is True
 
 
 def test_library_actor_handle_create_audio_no_library(mocker, factories):
