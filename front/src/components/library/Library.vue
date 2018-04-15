@@ -1,17 +1,20 @@
 <template>
   <div class="main library pusher">
     <div class="ui secondary pointing menu">
-      <router-link class="ui item" to="/library" exact>Browse</router-link>
-      <router-link class="ui item" to="/library/artists" exact>Artists</router-link>
-      <router-link class="ui item" to="/library/radios" exact>Radios</router-link>
-      <router-link class="ui item" to="/library/playlists" exact>Playlists</router-link>
+      <router-link class="ui item" to="/library" exact><i18next path="Browse"/></router-link>
+      <router-link class="ui item" to="/library/artists" exact><i18next path="Artists"/></router-link>
+      <router-link class="ui item" to="/library/radios" exact><i18next path="Radios"/></router-link>
+      <router-link class="ui item" to="/library/playlists" exact><i18next path="Playlists"/></router-link>
       <div class="ui secondary right menu">
         <router-link v-if="$store.state.auth.authenticated" class="ui item" to="/library/requests/" exact>
-          Requests
+          <i18next path="Requests"/>
           <div class="ui teal label">{{ requestsCount }}</div>
         </router-link>
-        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>Import</router-link>
-        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">Import batches
+        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>
+          <i18next path="Import"/>
+        </router-link>
+        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">
+          <i18next path="Import batches"/>
         </router-link>
       </div>
     </div>

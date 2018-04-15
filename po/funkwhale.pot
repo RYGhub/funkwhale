@@ -495,3 +495,71 @@ msgstr "Search query"
 msgid "Imported URL"
 msgstr "Imported URL"
 
+msgid "Album containing {%0%} tracks, by {%1%}"
+msgstr "Album containing {%0%} tracks, by {%1%}"
+
+msgid "Search on Wikipedia"
+msgstr "Search on Wikipedia"
+
+msgid "View on MusicBrainz"
+msgstr "View on MusicBrainz"
+
+msgid "{%0%} tracks in {%1%} albums"
+msgstr "{%0%} tracks in {%1%} albums"
+
+msgid "Play all albums"
+msgstr "Play all albums"
+
+msgid "Albums by this artist"
+msgstr "Albums by this artist"
+
+msgid "Browsing artists"
+msgstr "Browsing artists"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Latest artists"
+msgstr "Latest artists"
+
+msgid "Radios"
+msgstr "Radios"
+
+msgid "Music requests"
+msgstr "Music requests"
+
+msgid "Browse"
+msgstr "Browse"
+
+msgid "Playlists"
+msgstr "Playlists"
+
+msgid "Requests"
+msgstr "Requests"
+
+msgid "Import"
+msgstr "Import"
+
+msgid "Import batches"
+msgstr "Import batches"
+
+msgid "Browsing radios"
+msgstr "Browsing radios"
+
+msgid "Create your own radio"
+msgstr "Create your own radio"
+
+msgid "From album {%0%} by {%1%}"
+msgstr "From album {%0%} by {%1%}"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Lyrics"
+msgstr "Lyrics"
+
+msgid "No lyrics available for this track."
+msgstr "No lyrics available for this track."
+
+msgid "Search on lyrics.wikia.com"
+msgstr "Search on lyrics.wikia.com"

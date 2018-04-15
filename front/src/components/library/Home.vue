@@ -6,20 +6,20 @@
     <div class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
-          <h2 class="ui header">Latest artists</h2>
+          <h2 class="ui header"><i18next path="Latest artists"/></h2>
           <div :class="['ui', {'active': isLoadingArtists}, 'inline', 'loader']"></div>
           <div v-if="artists.length > 0" v-for="artist in artists.slice(0, 3)" :key="artist.id" class="ui cards">
             <artist-card :artist="artist"></artist-card>
           </div>
         </div>
         <div class="column">
-          <h2 class="ui header">Radios</h2>
+          <h2 class="ui header"><i18next path="Radios"/></h2>
           <radio-card :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
           <radio-card :type="'less-listened'"></radio-card>
         </div>
         <div class="column">
-          <h2 class="ui header">Music requests</h2>
+          <h2 class="ui header"><i18next path="Music requests"/></h2>
           <request-form v-if="$store.state.auth.authenticated"></request-form>
         </div>
       </div>
