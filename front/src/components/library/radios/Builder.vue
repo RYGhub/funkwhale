@@ -2,33 +2,30 @@
   <div class="ui vertical stripe segment" v-title="'Radio Builder'">
     <div>
       <div>
-        <h2 class="ui header">Builder</h2>
-        <p>
-          You can use this interface to build your own custom radio, which
-          will play tracks according to your criteria
-        </p>
-        <div class="ui form">
+        <h2 class="ui header"><i18next path="Builder"/></h2>
+        <i18next tag="p" path="You can use this interface to build your own custom radio, which will play tracks according to your criteria"/>
+          <div class="ui form">
           <div class="inline fields">
             <div class="field">
-              <label for="name">Radio name</label>
+              <i18next tag="label" for="name" path="Radio name"/>
               <input id="name" type="text" v-model="radioName" placeholder="My awesome radio" />
             </div>
             <div class="field">
               <input id="public" type="checkbox" v-model="isPublic" />
-              <label for="public">Display publicly</label>
+              <i18next tag="label" for="public" path="Display publicly"/>
             </div>
-            <button :disabled="!canSave" @click="save" class="ui green button">Save</button>
+            <button :disabled="!canSave" @click="save" class="ui green button"><i18ext path="Save"/></button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>
         <div class="ui form">
-          <p>Add filters to customize your radio</p>
+          <p><i18next path="Add filters to customize your radio"/></p>
           <div class="inline field">
             <select class="ui dropdown" v-model="currentFilterType">
-              <option value="">Select a filter</option>
+              <option value=""><i18next path="Select a filter"/></option>
               <option v-for="f in availableFilters" :value="f.type">{{ f.label }}</option>
             </select>
-            <button :disabled="!currentFilterType" @click="add" class="ui button">Add filter</button>
+            <button :disabled="!currentFilterType" @click="add" class="ui button"><i18next path="Add filter"/></button>
           </div>
           <p v-if="currentFilter">
             {{ currentFilter.help_text }}
@@ -37,11 +34,11 @@
         <table class="ui table">
           <thead>
             <tr>
-              <th class="two wide">Filter name</th>
-              <th class="one wide">Exclude</th>
-              <th class="six wide">Config</th>
-              <th class="five wide">Candidates</th>
-              <th class="two wide">Actions</th>
+              <i18next tag="th" class="two wide" path="Filter name"/>
+              <i18next tag="th" class="one wide" path="Exclude"/>
+              <i18next tag="th" class="six wide" path="Config"/>
+              <i18next tag="th" class="five wide" path="Candidates"/>
+              <i18next tag="th" class="two wide" path="Actions"/>
             </tr>
           </thead>
           <tbody>
@@ -57,9 +54,9 @@
           </tbody>
         </table>
         <template v-if="checkResult">
-          <h3 class="ui header">
-            {{ checkResult.candidates.count }} tracks matching combined filters
-          </h3>
+          <i18next tag="h3" class="ui header" path="{%0%} tracks matching combined filters">
+            {{ checkResult.candidates.count }}
+          </i18next>
           <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample"></track-table>
         </template>
       </div>
