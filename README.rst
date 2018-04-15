@@ -208,6 +208,17 @@ Typical workflow for a merge request
 8. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
 
 
+Internationalization
+--------------------
+
+When working on the front-end, any end-user string should be translated
+using either ``<i18next path="yourstring">`` or the ``$t('yourstring')``
+function.
+
+Extraction is done by calling ``yarn run i18n-extract``, which
+will pull all the strings from source files and put them in a PO file.
+
+
 Working with federation locally
 -------------------------------
 
@@ -245,7 +256,7 @@ Run a reverse proxy for your instances
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Crete docker network
+Create docker network
 ^^^^^^^^^^^^^^^^^^^^
 
 Create the federation network::
@@ -265,7 +276,7 @@ need::
     export COMPOSE_PROJECT_NAME=node2
     docker-compose -f dev.yml run --rm api python manage.py migrate
     docker-compose -f dev.yml run --rm api python manage.py createsuperuser
-    docker-compose -f dev.yml up nginx api front
+    docker-compose -f dev.yml up nginx api front nginx api celeryworker
 
 Note that by default, if you don't export the COMPOSE_PROJECT_NAME,
 we will default to node1 as the name of your instance.
