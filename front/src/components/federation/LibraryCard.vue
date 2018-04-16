@@ -33,7 +33,7 @@
         :disabled="isLoading"
         :class="['ui', 'basic', {loading: isLoading}, 'green', 'button']">
         <i18next v-if="manuallyApprovesFollowers" path="Send a follow request"/>
-        <i18next v-else path="Follow">
+        <i18next v-else path="Follow"/>
       </div>
       <router-link
         v-else
