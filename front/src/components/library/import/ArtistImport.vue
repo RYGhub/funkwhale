@@ -53,8 +53,14 @@ export default Vue.extend({
       releaseImportData: [],
       releaseGroupsData: {},
       releases: [],
-      releaseTypes: [this.$t('Album')],
-      availableReleaseTypes: [this.$t('Album'), this.$t('Live'), this.$t('Compilation'), this.$t('EP'), this.$t('Single'), this.$t('Other')]
+      releaseTypes: ['Album'],
+      availableReleaseTypes: [
+        'Album',
+        'Live',
+        'Compilation',
+        'EP',
+        'Single',
+        'Other']
     }
   },
   created () {
