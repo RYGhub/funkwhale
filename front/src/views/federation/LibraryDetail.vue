@@ -46,7 +46,6 @@
                 <td>
                 </td>
               </tr>
-              <!-- Disabled until properly implemented on the backend
               <tr>
                 <td>Auto importing</td>
                 <td>
@@ -59,6 +58,7 @@
                 </td>
                 <td></td>
               </tr>
+              <!-- Disabled until properly implemented on the backend
               <tr>
                 <td>File mirroring</td>
                 <td>

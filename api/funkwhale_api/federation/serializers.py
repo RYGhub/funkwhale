@@ -493,7 +493,7 @@ class ActorWebfingerSerializer(serializers.Serializer):
 
 class ActivitySerializer(serializers.Serializer):
     actor = serializers.URLField()
-    id = serializers.URLField()
+    id = serializers.URLField(required=False)
     type = serializers.ChoiceField(
         choices=[(c, c) for c in activity.ACTIVITY_TYPES])
     object = serializers.JSONField()
@@ -524,6 +524,14 @@ class ActivitySerializer(serializers.Serializer):
                 ' the activity actor'
             )
         return value
+
+    def to_representation(self, conf):
+        d = {}
+        d.update(conf)
+
+        if self.context.get('include_ap_context', True):
+            d['@context'] = AP_CONTEXT
+        return d
 
 
 class ObjectSerializer(serializers.Serializer):

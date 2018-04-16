@@ -12,6 +12,9 @@ from rest_framework.exceptions import PermissionDenied
 from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import session
+from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.music import models as music_models
+from funkwhale_api.music import tasks as music_tasks
 
 from . import activity
 from . import keys
@@ -243,7 +246,7 @@ class LibraryActor(SystemActor):
                 data=i, context={'library': remote_library})
             for i in items
         ]
-
+        now = timezone.now()
         valid_serializers = []
         for s in item_serializers:
             if s.is_valid():
@@ -252,8 +255,30 @@ class LibraryActor(SystemActor):
                 logger.debug(
                     'Skipping invalid item %s, %s', s.initial_data, s.errors)
 
+        lts = []
         for s in valid_serializers:
-            s.save()
+            lts.append(s.save())
+
+        if remote_library.autoimport:
+            batch = music_models.ImportBatch.objects.create(
+                source='federation',
+            )
+            for lt in lts:
+                if lt.creation_date < now:
+                    # track was already in the library, we do not trigger
+                    # an import
+                    continue
+                job = music_models.ImportJob.objects.create(
+                    batch=batch,
+                    library_track=lt,
+                    mbid=lt.mbid,
+                    source=lt.url,
+                )
+                funkwhale_utils.on_commit(
+                    music_tasks.import_job_run.delay,
+                    import_job_id=job.pk,
+                    use_acoustid=False,
+                )
 
 
 class TestActor(SystemActor):

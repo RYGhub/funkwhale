@@ -81,6 +81,9 @@ class ImportBatchFactory(factory.django.DjangoModelFactory):
             submitted_by=None,
             source='federation',
         )
+        finished = factory.Trait(
+            status='finished',
+        )
 
 
 @registry.register
@@ -97,6 +100,10 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
             mbid=None,
             library_track=factory.SubFactory(LibraryTrackFactory),
             batch=factory.SubFactory(ImportBatchFactory, federation=True),
+        )
+        finished = factory.Trait(
+            status='finished',
+            track_file=factory.SubFactory(TrackFileFactory),
         )
 
 

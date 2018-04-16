@@ -3,6 +3,8 @@ import pytest
 
 from django.urls import reverse
 
+from funkwhale_api.federation import actors
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import tasks
 
 
@@ -144,3 +146,88 @@ def test_import_job_from_federation_musicbrainz_artist(factories, mocker):
 
     artist_from_api.assert_called_once_with(
         mbid=lt.metadata['artist']['musicbrainz_id'])
+
+
+def test_import_job_run_triggers_notifies_followers(
+        factories, mocker, tmpfile):
+    mocker.patch(
+        'funkwhale_api.downloader.download',
+        return_value={'audio_file_path': tmpfile.name})
+    mocked_notify = mocker.patch(
+        'funkwhale_api.music.tasks.import_batch_notify_followers.delay')
+    batch = factories['music.ImportBatch']()
+    job = factories['music.ImportJob'](
+        finished=True, batch=batch)
+    track = factories['music.Track'](mbid=job.mbid)
+
+    batch.update_status()
+    batch.refresh_from_db()
+
+    assert batch.status == 'finished'
+
+    mocked_notify.assert_called_once_with(import_batch_id=batch.pk)
+
+
+def test_import_batch_notifies_followers_skip_on_disabled_federation(
+        settings, factories, mocker):
+    mocked_deliver = mocker.patch('funkwhale_api.federation.activity.deliver')
+    batch = factories['music.ImportBatch'](finished=True)
+    settings.FEDERATION_ENABLED = False
+    tasks.import_batch_notify_followers(import_batch_id=batch.pk)
+
+    mocked_deliver.assert_not_called()
+
+
+def test_import_batch_notifies_followers_skip_on_federation_import(
+        factories, mocker):
+    mocked_deliver = mocker.patch('funkwhale_api.federation.activity.deliver')
+    batch = factories['music.ImportBatch'](finished=True, federation=True)
+    tasks.import_batch_notify_followers(import_batch_id=batch.pk)
+
+    mocked_deliver.assert_not_called()
+
+
+def test_import_batch_notifies_followers(
+        factories, mocker):
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+
+    f1 = factories['federation.Follow'](approved=True, target=library_actor)
+    f2 = factories['federation.Follow'](approved=False, target=library_actor)
+    f3 = factories['federation.Follow']()
+
+    mocked_deliver = mocker.patch('funkwhale_api.federation.activity.deliver')
+    batch = factories['music.ImportBatch']()
+    job1 = factories['music.ImportJob'](
+        finished=True, batch=batch)
+    job2 = factories['music.ImportJob'](
+        finished=True, federation=True, batch=batch)
+    job3 = factories['music.ImportJob'](
+        status='pending', batch=batch)
+
+    batch.status = 'finished'
+    batch.save()
+    tasks.import_batch_notify_followers(import_batch_id=batch.pk)
+
+    # only f1 match the requirements to be notified
+    # and only job1 is a non federated track with finished import
+    expected = {
+        '@context': federation_serializers.AP_CONTEXT,
+        'actor': library_actor.url,
+        'type': 'Create',
+        'id': batch.get_federation_url(),
+        'to': [f1.actor.url],
+        'object': federation_serializers.CollectionSerializer(
+            {
+                'id': batch.get_federation_url(),
+                'items': [job1.track_file],
+                'actor': library_actor,
+                'item_serializer': federation_serializers.AudioSerializer
+            }
+        ).data
+    }
+
+    mocked_deliver.assert_called_once_with(
+        expected,
+        on_behalf_of=library_actor,
+        to=[f1.actor.url]
+    )
