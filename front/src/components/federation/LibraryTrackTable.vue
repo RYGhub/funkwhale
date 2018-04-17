@@ -65,22 +65,18 @@
 
           </th>
           <th v-if="result && result.results.length > 0">
-            <i18next path="Showing results {%0%}-{%1%} on {%2%}">
-              {{ ((page-1) * paginateBy) + 1 }}
-              {{ ((page-1) * paginateBy) + result.results.length }}
-              {{ result.count }}
-            </i18next>
+            {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
           <th>
             <button
               @click="launchImport"
               :disabled="checked.length === 0 || isImporting"
               :class="['ui', 'green', {loading: isImporting}, 'button']">
-              <i18next path="Import {%count%} tracks" :count="checked.length"/>
+              {{ $t('Import {%count%} tracks', {'count': checked.length}) }}
             </button>
             <router-link
               v-if="importBatch"
               :to="{name: 'library.import.batches.detail', params: {id: importBatch.id }}">
-              <i18next path="Import #{%id%} launched" :id="importBatch.id"/>              
+              <i18next path="Import #{%id%} launched" :id="importBatch.id"/>
             </router-link>
           </th>
           <th></th>
