@@ -43,7 +43,7 @@ def test_instance_endpoints_405_if_federation_disabled(
 
 
 def test_wellknown_webfinger_validates_resource(
-    db, api_client, settings, mocker):
+        db, api_client, settings, mocker):
     clean = mocker.spy(webfinger, 'clean_resource')
     url = reverse('federation:well-known-webfinger')
     response = api_client.get(url, data={'resource': 'something'})
