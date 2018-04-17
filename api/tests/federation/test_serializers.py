@@ -431,8 +431,14 @@ def test_collection_page_serializer_validation():
 
 
 def test_collection_page_serializer_can_validate_child():
-    base = 'https://test.federation/test'
     data = {
+        'type': 'CollectionPage',
+        'id': 'https://test.page?page=2',
+        'actor': 'https://test.actor',
+        'first': 'https://test.page?page=1',
+        'last': 'https://test.page?page=3',
+        'partOf': 'https://test.page',
+        'totalItems': 1,
         'items': [{'in': 'valid'}],
     }
 
@@ -441,8 +447,9 @@ def test_collection_page_serializer_can_validate_child():
         context={'item_serializer': serializers.AudioSerializer}
     )
 
-    assert serializer.is_valid() is False
-    assert 'items' in serializer.errors
+    # child are validated but not included in data if not valid
+    assert serializer.is_valid(raise_exception=True) is True
+    assert len(serializer.validated_data['items']) == 0
 
 
 def test_collection_page_serializer(factories):
