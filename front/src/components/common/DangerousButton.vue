@@ -4,7 +4,7 @@
 
     <modal class="small" :show.sync="showModal">
       <div class="header">
-        <slot name="modal-header">Do you want to confirm this action?</slot>
+        <slot name="modal-header"><i18next path="Do you want to confirm this action?"/></slot>
       </div>
       <div class="scrolling content">
         <div class="description">
@@ -12,9 +12,9 @@
         </div>
       </div>
       <div class="actions">
-        <div class="ui cancel button">Cancel</div>
+        <div class="ui cancel button"><i18next path="Cancel"/></div>
         <div :class="['ui', 'confirm', color, 'button']" @click="confirm">
-          <slot name="modal-confirm">Confirm</slot>
+          <slot name="modal-confirm"><i18next path="Confirm"/></slot>
         </div>
       </div>
     </modal>
@@ -26,7 +26,7 @@ import Modal from '@/components/semantic/Modal'
 
 export default {
   props: {
-    action: {type: Function, required: true},
+    action: {type: Function, required: false},
     disabled: {type: Boolean, default: false},
     color: {type: String, default: 'red'}
   },
@@ -41,7 +41,10 @@ export default {
   methods: {
     confirm () {
       this.showModal = false
-      this.action()
+      this.$emit('confirm')
+      if (this.action) {
+        this.action()
+      }
     }
   }
 }

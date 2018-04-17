@@ -67,3 +67,9 @@ under creative commons (courtesy of Jamendo):
     ./download-tracks.sh music.txt
 
 This will download a bunch of zip archives (one per album) under the ``data/music`` directory and unzip their content.
+
+From other instances
+--------------------
+
+Funkwhale also supports importing music from other instances. Please refer
+to :doc:`federation` for more details.

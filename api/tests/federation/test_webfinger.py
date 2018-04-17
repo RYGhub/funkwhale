@@ -40,3 +40,29 @@ def test_webfinger_clean_acct_errors(resource, message, settings):
         webfinger.clean_resource(resource)
 
         assert message == str(excinfo)
+
+
+def test_webfinger_get_resource(r_mock):
+    resource = 'acct:test@test.webfinger'
+    payload = {
+        'subject': resource,
+        'aliases': ['https://test.webfinger'],
+        'links': [
+            {
+                'rel': 'self',
+                'type': 'application/activity+json',
+                'href': 'https://test.webfinger/user/test'
+            }
+        ]
+    }
+    r_mock.get(
+        'https://test.webfinger/.well-known/webfinger?resource={}'.format(
+            resource
+        ),
+        json=payload
+    )
+
+    data = webfinger.get_resource('acct:test@test.webfinger')
+
+    assert data['actor_url'] == 'https://test.webfinger/user/test'
+    assert data['subject'] == resource

@@ -5,6 +5,7 @@ import datetime
 import tempfile
 import shutil
 import markdown
+import uuid
 
 from django.conf import settings
 from django.db import models
@@ -20,12 +21,15 @@ from versatileimagefield.fields import VersatileImageField
 
 from funkwhale_api import downloader
 from funkwhale_api import musicbrainz
+from funkwhale_api.federation import utils as federation_utils
 from . import importers
 from . import utils
 
 
 class APIModelMixin(models.Model):
     mbid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now)
     import_hooks = []
@@ -65,6 +69,13 @@ class APIModelMixin(models.Model):
                 pass
         return cleaned_data
 
+    @property
+    def musicbrainz_url(self):
+        if self.mbid:
+            return 'https://musicbrainz.org/{}/{}'.format(
+                self.musicbrainz_model, self.mbid)
+
+
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
 
@@ -90,9 +101,18 @@ class Artist(APIModelMixin):
                 t.append(tag)
         return set(t)
 
+    @classmethod
+    def get_or_create_from_name(cls, name, **kwargs):
+        kwargs.update({'name': name})
+        return cls.objects.get_or_create(
+            name__iexact=name,
+            defaults=kwargs)[0]
+
+
 def import_artist(v):
     a = Artist.get_or_create_from_api(mbid=v[0]['artist']['id'])[0]
     return a
+
 
 def parse_date(v):
     if len(v) == 4:
@@ -107,6 +127,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data['album'] = instance
         track_cleaned_data['position'] = int(track_data['position'])
         track = importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
+
 
 class Album(APIModelMixin):
     title = models.CharField(max_length=255)
@@ -170,6 +191,14 @@ class Album(APIModelMixin):
                 t.append(tag)
         return set(t)
 
+    @classmethod
+    def get_or_create_from_title(cls, title, **kwargs):
+        kwargs.update({'title': title})
+        return cls.objects.get_or_create(
+            title__iexact=title,
+            defaults=kwargs)[0]
+
+
 def import_tags(instance, cleaned_data, raw_data):
     MINIMUM_COUNT = 2
     tags_to_add = []
@@ -181,6 +210,7 @@ def import_tags(instance, cleaned_data, raw_data):
             continue
         tags_to_add.append(tag_data['name'])
     instance.tags.add(*tags_to_add)
+
 
 def import_album(v):
     a = Album.get_or_create_from_api(mbid=v[0]['id'])[0]
@@ -248,6 +278,8 @@ class Work(APIModelMixin):
 
 
 class Lyrics(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     work = models.ForeignKey(
         Work,
         related_name='lyrics',
@@ -328,7 +360,7 @@ class Track(APIModelMixin):
     def save(self, **kwargs):
         try:
             self.artist
-        except  Artist.DoesNotExist:
+        except Artist.DoesNotExist:
             self.artist = self.album.artist
         super().save(**kwargs)
 
@@ -366,15 +398,34 @@ class Track(APIModelMixin):
                 self.mbid)
         return settings.FUNKWHALE_URL + '/tracks/{}'.format(self.pk)
 
+    @classmethod
+    def get_or_create_from_title(cls, title, **kwargs):
+        kwargs.update({'title': title})
+        return cls.objects.get_or_create(
+            title__iexact=title,
+            defaults=kwargs)[0]
+
 
 class TrackFile(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     track = models.ForeignKey(
         Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
     source = models.URLField(null=True, blank=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(auto_now=True)
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
+
+    library_track = models.OneToOneField(
+        'federation.LibraryTrack',
+        related_name='local_track_file',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     def download_file(self):
         # import the track file, since there is not any
@@ -391,12 +442,15 @@ class TrackFile(models.Model):
         shutil.rmtree(tmp_dir)
         return self.audio_file
 
+    def get_federation_url(self):
+        return federation_utils.full_url(
+            '/federation/music/file/{}'.format(self.uuid)
+        )
+
     @property
     def path(self):
-        if settings.PROTECT_AUDIO_FILES:
-            return reverse(
-                'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
-        return self.audio_file.url
+        return reverse(
+            'api:v1:trackfiles-serve', kwargs={'pk': self.pk})
 
     @property
     def filename(self):
@@ -417,10 +471,14 @@ IMPORT_STATUS_CHOICES = (
     ('skipped', 'Skipped'),
 )
 
+
 class ImportBatch(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     IMPORT_BATCH_SOURCES = [
         ('api', 'api'),
-        ('shell', 'shell')
+        ('shell', 'shell'),
+        ('federation', 'federation'),
     ]
     source = models.CharField(
         max_length=30, default='api', choices=IMPORT_BATCH_SOURCES)
@@ -428,6 +486,8 @@ class ImportBatch(models.Model):
     submitted_by = models.ForeignKey(
         'users.User',
         related_name='imports',
+        null=True,
+        blank=True,
         on_delete=models.CASCADE)
     status = models.CharField(
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
@@ -437,6 +497,7 @@ class ImportBatch(models.Model):
         null=True,
         blank=True,
         on_delete=models.CASCADE)
+
     class Meta:
         ordering = ['-creation_date']
 
@@ -444,11 +505,22 @@ class ImportBatch(models.Model):
         return str(self.pk)
 
     def update_status(self):
+        old_status = self.status
         self.status = utils.compute_status(self.jobs.all())
         self.save(update_fields=['status'])
+        if self.status != old_status and self.status == 'finished':
+            from . import tasks
+            tasks.import_batch_notify_followers.delay(import_batch_id=self.pk)
+
+    def get_federation_url(self):
+        return federation_utils.full_url(
+            '/federation/music/import/batch/{}'.format(self.uuid)
+        )
 
 
 class ImportJob(models.Model):
+    uuid = models.UUIDField(
+        unique=True, db_index=True, default=uuid.uuid4)
     batch = models.ForeignKey(
         ImportBatch, related_name='jobs', on_delete=models.CASCADE)
     track_file = models.ForeignKey(
@@ -464,6 +536,14 @@ class ImportJob(models.Model):
         choices=IMPORT_STATUS_CHOICES, default='pending', max_length=30)
     audio_file = models.FileField(
         upload_to='imports/%Y/%m/%d', max_length=255, null=True, blank=True)
+
+    library_track = models.ForeignKey(
+        'federation.LibraryTrack',
+        related_name='import_jobs',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         ordering = ('id', )

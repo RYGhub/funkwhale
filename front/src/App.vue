@@ -7,21 +7,25 @@
       <div class="ui container">
         <div class="ui stackable equal height stackable grid">
           <div class="three wide column">
-            <h4 class="ui header">Links</h4>
+            <i18next tag="h4" class="ui header" path="Links"></i18next>
             <div class="ui link list">
               <router-link class="item" to="/about">
-                About this instance
+                <i18next path="About this instance" />
               </router-link>
-              <a href="https://funkwhale.audio" class="item" target="_blank">Official website</a>
-              <a href="https://docs.funkwhale.audio" class="item" target="_blank">Documentation</a>
-              <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">Source code</a>
-              <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">Issue tracker</a>
+              <i18next tag="a" href="https://funkwhale.audio" class="item" target="_blank" path="Official website" />
+              <i18next tag="a" href="https://docs.funkwhale.audio" class="item" target="_blank" path="Documentation" />
+              <i18next tag="a" href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank" path="Source code" />
+              <i18next tag="a" href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank" path="Issue tracker" />
             </div>
           </div>
           <div class="ten wide column">
-            <h4 class="ui header">About funkwhale</h4>
-            <p>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</p>
-            <p>The funkwhale logo was kindly designed and provided by Francis Gading.</p>
+            <i18next tag="h4" class="ui header" path="About funkwhale" />
+            <p>
+              <i18next path="Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"/>
+            </p>
+            <p>
+              <i18next path="The funkwhale logo was kindly designed and provided by Francis Gading."/>
+            </p>
           </div>
         </div>
       </div>
@@ -31,7 +35,6 @@
       :dsn="$store.state.instance.settings.raven.front_dsn.value">
     </raven>
     <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
-
   </div>
 </template>
 

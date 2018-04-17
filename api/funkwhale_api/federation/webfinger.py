@@ -2,8 +2,11 @@ from django import forms
 from django.conf import settings
 from django.urls import reverse
 
+from funkwhale_api.common import session
+
 from . import actors
 from . import utils
+from . import serializers
 
 VALID_RESOURCE_TYPES = ['acct']
 
@@ -23,17 +26,32 @@ def clean_resource(resource_string):
     return resource_type, resource
 
 
-def clean_acct(acct_string):
+def clean_acct(acct_string, ensure_local=True):
     try:
         username, hostname = acct_string.split('@')
     except ValueError:
         raise forms.ValidationError('Invalid format')
 
-    if hostname.lower() != settings.FEDERATION_HOSTNAME:
+    if ensure_local and hostname.lower() != settings.FEDERATION_HOSTNAME:
         raise forms.ValidationError(
             'Invalid hostname {}'.format(hostname))
 
-    if username not in actors.SYSTEM_ACTORS:
+    if ensure_local and username not in actors.SYSTEM_ACTORS:
         raise forms.ValidationError('Invalid username')
 
     return username, hostname
+
+
+def get_resource(resource_string):
+    resource_type, resource = clean_resource(resource_string)
+    username, hostname = clean_acct(resource, ensure_local=False)
+    url = 'https://{}/.well-known/webfinger?resource={}'.format(
+        hostname, resource_string)
+    response = session.get_session().get(
+        url,
+        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+        timeout=5)
+    response.raise_for_status()
+    serializer = serializers.ActorWebfingerSerializer(data=response.json())
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data

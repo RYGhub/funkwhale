@@ -1,0 +1,613 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Funkwhale 0.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-23 15:49-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgid "An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running"
+msgstr "An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running"
+
+msgid "Links"
+msgstr "Links"
+
+msgid "About this instance"
+msgstr "About this instance"
+
+msgid "Official website"
+msgstr "Official website"
+
+msgid "Source code"
+msgstr "Source code"
+
+msgid "Issue tracker"
+msgstr "Issue tracker"
+
+msgid "About funkwhale"
+msgstr "About funkwhale"
+
+msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
+msgstr "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
+
+msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
+msgstr "The funkwhale logo was kindly designed and provided by Francis Gading."
+
+msgid "{%0%} favorited a track {%1%}"
+msgstr "{%0%} favorited a track {%1%}"
+
+msgid "from album {%0%}, by {%1%}"
+msgstr "from album {%0%}, by {%1%}"
+
+msgid ", by {%0%}"
+msgstr ", by {%0%}"
+
+msgid "{%0%} listened to a track {%1%}"
+msgstr "{%0%} listened to a track {%1%}"
+
+msgid "Show {%0%} more tracks"
+msgstr "Show {%0%} more tracks"
+
+msgid "Collapse"
+msgstr "Collapse"
+
+msgid "Play all"
+msgstr "Play all"
+
+msgid "{%0%} tracks"
+msgstr "{%0%} tracks"
+
+msgid "Show {%0%} more albums"
+msgstr "Show {%0%} more albums"
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Artist"
+msgstr "Artist"
+
+msgid "Album"
+msgstr "Album"
+
+msgid "Download..."
+msgstr "Download..."
+
+msgid "Download tracks"
+msgstr "Download tracks"
+
+msgid "There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as {%0%} to easily download a list of tracks."
+msgstr "There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as {%0%} to easily download a list of tracks."
+
+msgid "Simply copy paste the snippet below into a terminal to launch the download."
+msgstr "Simply copy paste the snippet below into a terminal to launch the download."
+
+msgid "Keep your PRIVATE_TOKEN secret as it gives access to your account."
+msgstr "Keep your PRIVATE_TOKEN secret as it gives access to your account."
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Add to current queue"
+msgstr "Add to current queue"
+
+msgid "Play"
+msgstr "Play"
+
+msgid "Add to queue"
+msgstr "Add to queue"
+
+msgid "Play next"
+msgstr "Play next"
+
+msgid "Play now"
+msgstr "Play now"
+
+msgid "Previous track"
+msgstr "Previous track"
+
+msgid "Play track"
+msgstr "Play track"
+
+msgid "Pause track"
+msgstr "Pause track"
+
+msgid "Next track"
+msgstr "Next track"
+
+msgid "Unmute"
+msgstr "Unmute"
+
+msgid "Mute"
+msgstr "Mute"
+
+msgid "Looping disabled. Click to switch to single-track looping."
+msgstr "Looping disabled. Click to switch to single-track looping."
+
+msgid "Looping on a single track. Click to switch to whole queue looping."
+msgstr "Looping on a single track. Click to switch to whole queue looping."
+
+msgid "Looping on whole queue. Click to disable looping."
+msgstr "Looping on whole queue. Click to disable looping."
+
+msgid "Shuffle your queue"
+msgstr "Shuffle your queue"
+
+msgid "Clear your queue"
+msgstr "Clear your queue"
+
+msgid "Search for some music"
+msgstr "Search for some music"
+
+msgid "Artists"
+msgstr "Artists"
+
+msgid "Sorry, we did not found any artist matching your query"
+msgstr "Sorry, we did not found any artist matching your query"
+
+msgid "Albums"
+msgstr "Albums"
+
+msgid "Sorry, we did not found any album matching your query"
+msgstr "Sorry, we did not found any album matching your query"
+
+msgid "Log in to your Funkwhale account"
+msgstr "Log in to your Funkwhale account"
+
+msgid "We cannot log you in"
+msgstr "We cannot log you in"
+
+msgid "Please double-check your username/password couple is correct"
+msgstr "Please double-check your username/password couple is correct"
+
+msgid "An unknown error happend, this can mean the server is down or cannot be reached"
+msgstr "An unknown error happend, this can mean the server is down or cannot be reached"
+
+msgid "Username or email"
+msgstr "Username or email"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Create an account"
+msgstr "Create an account"
+
+msgid "Are you sure you want to log out?"
+msgstr "Are you sure you want to log out?"
+
+msgid "You are currently logged in as {%0%}"
+msgstr "You are currently logged in as {%0%}"
+
+msgid "Yes, log me out!"
+msgstr "Yes, log me out!"
+
+msgid "Registered since {%0%}"
+msgstr "Registered since {%0%}"
+
+msgid "This is you!"
+msgstr "This is you!"
+
+msgid "Staff member"
+msgstr "Staff member"
+
+msgid "Settings..."
+msgstr "Settings..."
+
+msgid "Account settings"
+msgstr "Account settings"
+
+msgid "Settings updated"
+msgstr "Settings updated"
+
+msgid "We cannot save your settings"
+msgstr "We cannot save your settings"
+
+msgid "Update settings"
+msgstr "Update settings"
+
+msgid "Change my password"
+msgstr "Change my password"
+
+msgid "Cannot change your password"
+msgstr "Cannot change your password"
+
+msgid "Please double-check your password is correct"
+msgstr "Please double-check your password is correct"
+
+msgid "Old password"
+msgstr "Old password"
+
+msgid "New password"
+msgid "New password"
+
+msgid "Change password"
+msgstr "Change password"
+
+msgid "Activity visibility"
+msgstr "Activity visibility"
+
+msgid "Determine the visibility level of your activity"
+msgstr "Determine the visibility level of your activity"
+
+msgid "Nobody except me"
+msgstr "Nobody except me"
+
+msgid "Everyone on this instance"
+msgstr "Everyone on this instance"
+
+msgid "Create a funkwhale account"
+msgstr "Create a funkwhale account"
+
+msgid "We cannot create your account"
+msgstr "We cannot create your account"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Create my account"
+msgstr "Create my account"
+
+msgid "Registration is currently disabled on this instance, please try again later."
+msgstr "Registration is currently disabled on this instance, please try again later."
+
+msgid "Do you want to confirm this action?"
+msgstr "Do you want to confirm this action?"
+
+msgid "Confirm"
+msgstr "Confirm"
+
+msgid "Expand"
+msgstr "Expand"
+
+msgid "Loading your favorites..."
+msgstr "Loading your favorites..."
+
+msgid "{%0%} favorites"
+msgstr "{%0%} favorites"
+
+msgid "Ordering"
+msgstr "Ordering"
+
+msgid "Ordering direction"
+msgstr "Ordering direction"
+
+msgid "Ascending"
+msgstr "Ascending"
+
+msgid "Descending"
+msgstr "Descending"
+
+msgid "Results per page"
+msgstr "Results per page"
+
+msgid "Track name"
+msgstr "Track name"
+
+msgid "Album name"
+msgstr "Album name"
+
+msgid "Artist name"
+msgstr "Artist name"
+
+msgid "In favorites"
+msgstr "In favorites"
+
+msgid "Add to favorites"
+msgstr "Add to favorites"
+
+msgid "Remove from favorites"
+msgstr "Remove from favorites"
+
+msgid "User activity"
+msgstr "User activity"
+
+msgid "users"
+msgstr "users"
+
+msgid "tracks listened"
+msgstr "tracks listened"
+
+msgid "Tracks favorited"
+msgstr "Tracks favorited"
+
+msgid "hours of music"
+msgstr "hours of music"
+
+msgid "Artists"
+msgstr "Artists"
+
+msgid "Albums"
+msgstr "Albums"
+
+msgid "tracks"
+msgstr "tracks"
+
+msgid "Filter album types"
+msgstr "Filter album types"
+
+msgid "Query template"
+msgstr "Query template"
+
+msgid "Live"
+msgstr "Live"
+
+msgid "Compilation"
+msgstr "Compilation"
+
+msgid "EP"
+msgstr "EP"
+
+msgid "Single"
+msgstr "Single"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Job ID"
+msgstr "Job ID"
+
+msgid "Recording MusicBrainz ID"
+msgstr "Recording MusicBrainz ID"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Track"
+msgstr "Track"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Launch date"
+msgstr "Launch date"
+
+msgid "Jobs"
+msgstr "Jobs"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Select files to upload..."
+msgstr "Select files to upload..."
+
+msgid "Start Upload"
+msgstr "Start Upload"
+
+msgid "Stop Upload"
+msgstr "Stop Upload"
+
+msgid "Once all your files are uploaded, simply head over {%0%} to check the import status."
+msgstr "Once all your files are uploaded, simply head over {%0%} to check the import status."
+
+msgid "import detail page"
+msgstr "import detail page"
+
+msgid "File name"
+msgstr "File name"
+
+msgid "Size"
+msgstr "Size"
+
+msgid "Success"
+msgstr "Success"
+
+msgid "Uploading..."
+msgstr "Uploading..."
+
+msgid "Pending"
+msgstr "Pending"
+
+msgid "Import source"
+msgstr "Import source"
+
+msgid "Uploaded files or external source"
+msgstr "Uploaded files or external source"
+
+msgid "Metadata"
+msgstr "Metadata"
+
+msgid "Grab corresponding metadata"
+msgstr "Grab corresponding metadata"
+
+msgid "Music"
+msgstr "Music"
+
+msgid "Select relevant sources or files for import"
+msgstr "Select relevant sources or files for import"
+
+msgid "Previous step"
+msgstr "Previous step"
+
+msgid "Next step"
+msgstr "Next step"
+
+msgid "Import {%0%} tracks"
+msgstr "Import {%0%} tracks"
+
+msgid "First, choose where you want to import the music from:"
+msgstr "First, choose where you want to import the music from:"
+
+msgid "External source. Supported backends:"
+msgstr "External source. Supported backends:"
+
+msgid "File upload"
+msgstr "File upload"
+
+msgid "Search an entity you want to import:"
+msgstr "Search an entity you want to import:"
+
+msgid "Input a MusicBrainz ID manually:"
+msgstr "Input a MusicBrainz ID manually:"
+
+msgid "Or"
+msgstr "Or"
+
+msgid "You will import:"
+msgstr "You will import:"
+
+msgid "You can also skip this step and enter metadata manually."
+msgstr "You can also skip this step and enter metadata manually."
+
+msgid "Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the {%0%} project, which you can think about as the Wikipedia of music."
+msgstr "Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the {%0%} project, which you can think about as the Wikipedia of music."
+
+msgid "Music request"
+msgstr "Music request"
+
+msgid "This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled."
+msgstr "This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled."
+
+msgid "Album {%0%} ({%1%} tracks) by {%2%}"
+msgstr "Album {%0%} ({%1%} tracks) by {%2%}"
+
+msgid "Import this release"
+msgstr "Import this release"
+
+msgid "Import this track"
+msgstr "Import this track"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Result {%0%}/{%1%}"
+msgstr "Result {%0%}/{%1%}"
+
+msgid "Search query"
+msgstr "Search query"
+
+msgid "Imported URL"
+msgstr "Imported URL"
+
+msgid "Album containing {%0%} tracks, by {%1%}"
+msgstr "Album containing {%0%} tracks, by {%1%}"
+
+msgid "Search on Wikipedia"
+msgstr "Search on Wikipedia"
+
+msgid "View on MusicBrainz"
+msgstr "View on MusicBrainz"
+
+msgid "{%0%} tracks in {%1%} albums"
+msgstr "{%0%} tracks in {%1%} albums"
+
+msgid "Play all albums"
+msgstr "Play all albums"
+
+msgid "Albums by this artist"
+msgstr "Albums by this artist"
+
+msgid "Browsing artists"
+msgstr "Browsing artists"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Latest artists"
+msgstr "Latest artists"
+
+msgid "Radios"
+msgstr "Radios"
+
+msgid "Music requests"
+msgstr "Music requests"
+
+msgid "Browse"
+msgstr "Browse"
+
+msgid "Playlists"
+msgstr "Playlists"
+
+msgid "Requests"
+msgstr "Requests"
+
+msgid "Import"
+msgstr "Import"
+
+msgid "Import batches"
+msgstr "Import batches"
+
+msgid "Browsing radios"
+msgstr "Browsing radios"
+
+msgid "Create your own radio"
+msgstr "Create your own radio"
+
+msgid "From album {%0%} by {%1%}"
+msgstr "From album {%0%} by {%1%}"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Lyrics"
+msgstr "Lyrics"
+
+msgid "No lyrics available for this track."
+msgstr "No lyrics available for this track."
+
+msgid "Search on lyrics.wikia.com"
+msgstr "Search on lyrics.wikia.com"
+
+msgid "Builder"
+msgstr "Builder"
+
+msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria"
+msgstr "You can use this interface to build your own custom radio, which will play tracks according to your criteria"
+
+msgid "Radio name"
+msgstr "Radio name"
+
+msgid "Display publicly"
+msgstr "Display publicly"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Add filters to customize your radio"
+msgstr "Add filters to customize your radio"
+
+msgid "Select a filter"
+msgstr "Select a filter"
+
+msgid "Add filter"
+msgstr "Add filter"
+
+msgid "Filter name"
+msgstr "Filter name"
+
+msgid "Exclude"
+msgstr "Exclude"
+
+msgid "Config"
+msgstr "Config"
+
+msgid "Candidates"
+msgstr "Candidates"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "{%0%} tracks matching combined filters"
+msgstr "{%0%} tracks matching combined filters"
+
+msgid "Track matching filter"
+msgstr "Track matching filter"
+
+msgid "Remove"
+msgstr "Remove"

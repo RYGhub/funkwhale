@@ -10,21 +10,40 @@ services:
       - "HOST=0.0.0.0"
       - "WEBPACK_DEVSERVER_PORT=${WEBPACK_DEVSERVER_PORT-8080}"
     ports:
-      - "${WEBPACK_DEVSERVER_PORT-8080}:${WEBPACK_DEVSERVER_PORT-8080}"
+      - "${WEBPACK_DEVSERVER_PORT_BINDING-8080:}${WEBPACK_DEVSERVER_PORT-8080}"
     volumes:
       - './front:/app'
+      - '/app/node_modules'
+      - './po:/po'
+    networks:
+      - federation
+      - internal
+    labels:
+      traefik.backend: "${COMPOSE_PROJECT_NAME-node1}"
+      traefik.frontend.rule: "Host: ${COMPOSE_PROJECT_NAME-node1}.funkwhale.test"
+      traefik.enable: 'true'
+      traefik.federation.protocol: 'http'
+      traefik.federation.port: "${WEBPACK_DEVSERVER_PORT-8080}"
 
   postgres:
     env_file:
       - .env.dev
       - .env
     image: postgres
+    volumes:
+      - "./data/${COMPOSE_PROJECT_NAME-node1}/postgres:/var/lib/postgresql/data"
+    networks:
+      - internal
 
   redis:
     env_file:
       - .env.dev
       - .env
     image: redis:3.0
+    volumes:
+      - "./data/${COMPOSE_PROJECT_NAME-node1}/redis:/data"
+    networks:
+      - internal
 
   celeryworker:
     env_file:
@@ -38,11 +57,17 @@ services:
      - redis
     command: celery -A funkwhale_api.taskapp worker -l debug
     environment:
+      - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
+      - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
+      - "FUNKWHALE_HOSTNAME_PREFIX=${COMPOSE_PROJECT_NAME}"
+      - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
     volumes:
       - ./api:/app
       - ./data/music:/music
+    networks:
+      - internal
   api:
     env_file:
       - .env.dev
@@ -55,12 +80,17 @@ services:
       - ./api:/app
       - ./data/music:/music
     environment:
+      - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
+      - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
+      - "FUNKWHALE_HOSTNAME_PREFIX=${COMPOSE_PROJECT_NAME}"
+      - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
     links:
       - postgres
       - redis
-
+    networks:
+      - internal
   nginx:
     command: /entrypoint.sh
     env_file:
@@ -69,6 +99,8 @@ services:
     image: nginx
     environment:
       - "WEBPACK_DEVSERVER_PORT=${WEBPACK_DEVSERVER_PORT-8080}"
+      - "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME- }"
+      - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
     links:
       - api
       - front
@@ -78,8 +110,9 @@ services:
       - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf.template:ro
       - ./api/funkwhale_api/media:/protected/media
     ports:
-      - "0.0.0.0:6001:6001"
-
+      - "6001"
+    networks:
+      - internal
   docs:
     build: docs
     command: python serve.py
@@ -88,3 +121,9 @@ services:
     ports:
       - '35730:35730'
       - '8001:8001'
+
+networks:
+  internal:
+  federation:
+    external:
+      name: federation

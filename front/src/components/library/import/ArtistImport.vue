@@ -4,7 +4,7 @@
       <a :href="getMusicbrainzUrl('artist', metadata.id)" target="_blank" title="View on MusicBrainz">{{ metadata.name }}</a>
     </h3>
     <form class="ui form" @submit.prevent="">
-      <h6 class="ui header">Filter album types</h6>
+      <h6 class="ui header"><i18next path="Filter album types"/></h6>
       <div class="inline fields">
         <div class="field" v-for="t in availableReleaseTypes">
           <div class="ui checkbox">
@@ -13,7 +13,7 @@
           </div>
         </div>
         <div class="field">
-          <label>Query template</label>
+          <i18next tag="label" path="Query template"/>
           <input v-model="customQueryTemplate" />
         </div>
       </div>
@@ -54,7 +54,13 @@ export default Vue.extend({
       releaseGroupsData: {},
       releases: [],
       releaseTypes: ['Album'],
-      availableReleaseTypes: ['Album', 'Live', 'Compilation', 'EP', 'Single', 'Other']
+      availableReleaseTypes: [
+        'Album',
+        'Live',
+        'Compilation',
+        'EP',
+        'Single',
+        'Other']
     }
   },
   created () {

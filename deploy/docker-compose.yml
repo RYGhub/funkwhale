@@ -53,3 +53,19 @@ services:
     links:
       - postgres
       - redis
+
+  # If you want to have the nginx proxy managed by docker for some reason
+  # (i.e. if you use apache as a proxy on your host),
+  # you can uncomment the following lines.
+  # nginx:
+  #   image: nginx
+  #   links:
+  #     - api
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/funkwhale.conf:ro
+  #     - ./funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro
+  #     - ./data/media:/srv/funkwhale/data/media:ro
+  #     - ./front/dist:/srv/funkwhale/front/dist:ro
+  #     - ./data/static:/srv/funkwhale/data/static/:ro
+  #   ports:
+  #     - "127.0.0.1:5001:80"

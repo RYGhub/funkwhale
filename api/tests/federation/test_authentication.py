@@ -3,22 +3,24 @@ from funkwhale_api.federation import keys
 from funkwhale_api.federation import signing
 
 
-def test_authenticate(nodb_factories, mocker, api_request):
+def test_authenticate(factories, mocker, api_request):
     private, public = keys.get_key_pair()
     actor_url = 'https://test.federation/actor'
     mocker.patch(
         'funkwhale_api.federation.actors.get_actor_data',
         return_value={
             'id': actor_url,
+            'type': 'Person',
             'outbox': 'https://test.com',
             'inbox': 'https://test.com',
+            'preferredUsername': 'test',
             'publicKey': {
                 'publicKeyPem': public.decode('utf-8'),
                 'owner': actor_url,
                 'id': actor_url + '#main-key',
             }
         })
-    signed_request = nodb_factories['federation.SignedRequest'](
+    signed_request = factories['federation.SignedRequest'](
         auth__key=private,
         auth__key_id=actor_url + '#main-key',
         auth__headers=[

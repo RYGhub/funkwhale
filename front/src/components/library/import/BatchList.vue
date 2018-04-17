@@ -5,20 +5,20 @@
       <button
         class="ui left floated labeled icon button"
         @click="fetchData(previousLink)"
-        :disabled="!previousLink"><i class="left arrow icon"></i> Previous</button>
+        :disabled="!previousLink"><i class="left arrow icon"></i><i18next path="Previous"/></button>
       <button
         class="ui right floated right labeled icon button"
         @click="fetchData(nextLink)"
-        :disabled="!nextLink">Next <i class="right arrow icon"></i></button>
+        :disabled="!nextLink"><i18next path="Next"/><i class="right arrow icon"></i></button>
       <div class="ui hidden clearing divider"></div>
       <div class="ui hidden clearing divider"></div>
       <table v-if="results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Launch date</th>
-            <th>Jobs</th>
-            <th>Status</th>
+            <i18next tag="th" path="ID"/>
+            <i18next tag="th" path="Launch date"/>
+            <i18next tag="th" path="Jobs"/>
+            <i18next tag="th" path="Status"/>
           </tr>
         </thead>
         <tbody>

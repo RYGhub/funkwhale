@@ -5,17 +5,20 @@
    </div>
    <div class="content">
      <div class="summary">
-       <slot name="user"></slot>
-       listened to a track
-       <slot name="date"></slot>
+       <i18next path="{%0%} listened to a track {%1%}">
+        <slot name="user"></slot>
+        <slot name="date"></slot>
+       </i18next>
      </div>
      <div class="extra text">
        <router-link :to="{name: 'library.tracks.detail', params: {id: event.object.local_id }}">{{ event.object.name }}</router-link>
-        <template v-if="event.object.album">from album {{ event.object.album }}, by <em>{{ event.object.artist }}</em>
-        </template>
-        <template v-else>, by <em>{{ event.object.artist }}</em>
-        </template>
-
+        <i18next path="from album {%0%}, by {%1%}" v-if="event.object.album">
+          {{ event.object.album }}
+          <em>{{ event.object.artist }}</em>
+        </i18next>
+        <i18next path=", by {%0%}" v-else>
+          <em>{{ event.object.artist }}</em>
+        </i18next>
       </div>
    </div>
  </div>

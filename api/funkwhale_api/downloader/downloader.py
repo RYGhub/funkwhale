@@ -1,5 +1,4 @@
 import os
-import requests
 import json
 from urllib.parse import quote_plus
 import youtube_dl

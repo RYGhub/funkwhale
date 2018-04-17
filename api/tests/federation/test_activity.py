@@ -1,11 +1,16 @@
-from funkwhale_api.federation import activity
+import uuid
 
-def test_deliver(nodb_factories, r_mock, mocker):
-    to = nodb_factories['federation.Actor']()
+from funkwhale_api.federation import activity
+from funkwhale_api.federation import serializers
+
+
+def test_deliver(factories, r_mock, mocker, settings):
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    to = factories['federation.Actor']()
     mocker.patch(
         'funkwhale_api.federation.actors.get_actor',
         return_value=to)
-    sender = nodb_factories['federation.Actor']()
+    sender = factories['federation.Actor']()
     ac = {
         'id': 'http://test.federation/activity',
         'type': 'Create',
@@ -30,3 +35,14 @@ def test_deliver(nodb_factories, r_mock, mocker):
     assert r_mock.call_count == 1
     assert request.url == to.inbox_url
     assert request.headers['content-type'] == 'application/activity+json'
+
+
+def test_accept_follow(mocker, factories):
+    deliver = mocker.patch(
+        'funkwhale_api.federation.activity.deliver')
+    follow = factories['federation.Follow'](approved=None)
+    expected_accept = serializers.AcceptFollowSerializer(follow).data
+    activity.accept_follow(follow)
+    deliver.assert_called_once_with(
+        expected_accept, to=[follow.actor.url], on_behalf_of=follow.target
+    )

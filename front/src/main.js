@@ -11,6 +11,9 @@ import router from './router'
 import axios from 'axios'
 import {VueMasonryPlugin} from 'vue-masonry'
 import VueLazyload from 'vue-lazyload'
+import i18next from 'i18next'
+import i18nextFetch from 'i18next-fetch-backend'
+import VueI18Next from '@panter/vue-i18next'
 import store from './store'
 import config from './config'
 import { sync } from 'vuex-router-sync'
@@ -27,6 +30,7 @@ window.$ = window.jQuery = require('jquery')
 require('semantic-ui-css/semantic.js')
 require('masonry-layout')
 
+Vue.use(VueI18Next)
 Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
@@ -71,17 +75,36 @@ axios.interceptors.response.use(function (response) {
     }
   }
   if (error.backendErrors.length === 0) {
-    error.backendErrors.push('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running')
+    error.backendErrors.push(i18next.t('An unknown error occured, ensure your are connected to the internet and your funkwhale instance is up and running'))
   }
   // Do something with response error
   return Promise.reject(error)
 })
 store.dispatch('auth/check')
+
+// i18n
+i18next
+  .use(i18nextFetch)
+  .init({
+    lng: navigator.language,
+    fallbackLng: ['en'],
+    preload: [navigator.language, 'en'],
+    backend: {
+      loadPath: '/static/translations/{%lng%}.json'
+    },
+    interpolation: {
+      prefix: '{%',
+      suffix: '%}'
+    }
+  })
+const i18n = new VueI18Next(i18next)
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   template: '<App/>',
   components: { App }
 })

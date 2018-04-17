@@ -1,38 +1,46 @@
 import ffmpeg
 import os
 import json
+import logging
 import subprocess
 import unicodedata
 import urllib
 
-from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models.functions import Length
-from django.conf import settings
 from django.http import StreamingHttpResponse
+from django.urls import reverse
+from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets, views, mixins
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+from rest_framework import settings as rest_settings
 from rest_framework import permissions
 from musicbrainzngs import ResponseError
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.federation import actors
 from funkwhale_api.requests.models import ImportRequest
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
+from funkwhale_api.federation.authentication import SignatureAuthentication
 
-from . import forms
-from . import models
-from . import serializers
-from . import importers
 from . import filters
+from . import forms
+from . import importers
+from . import models
+from . import permissions as music_permissions
+from . import serializers
 from . import tasks
 from . import utils
+
+logger = logging.getLogger(__name__)
 
 
 class SearchMixin(object):
@@ -44,6 +52,7 @@ class SearchMixin(object):
         queryset = self.get_queryset().filter(query)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
 
 class TagViewSetMixin(object):
 
@@ -179,22 +188,45 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (models.TrackFile.objects.all().order_by('-id'))
     serializer_class = serializers.TrackFileSerializer
-    permission_classes = [ConditionalAuthentication]
+    authentication_classes = rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
+        SignatureAuthentication
+    ]
+    permission_classes = [music_permissions.Listen]
 
     @detail_route(methods=['get'])
     def serve(self, request, *args, **kwargs):
         try:
-            f = models.TrackFile.objects.get(pk=kwargs['pk'])
+            f = models.TrackFile.objects.select_related(
+                'library_track',
+                'track__album__artist',
+                'track__artist',
+            ).get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
 
+        mt = f.mimetype
+        audio_file = f.audio_file
+        try:
+            library_track = f.library_track
+        except ObjectDoesNotExist:
+            library_track = None
+        if library_track and not audio_file:
+            if not library_track.audio_file:
+                # we need to populate from cache
+                library_track.download_audio()
+            audio_file = library_track.audio_file
+            mt = library_track.audio_mimetype
         response = Response()
-        filename = "filename*=UTF-8''{}".format(
-            urllib.parse.quote(f.filename))
-        response["Content-Disposition"] = "attachment; {}".format(filename)
+        filename = f.filename
         response['X-Accel-Redirect'] = "{}{}".format(
             settings.PROTECT_FILES_PATH,
-            f.audio_file.url)
+            audio_file.url)
+        filename = "filename*=UTF-8''{}".format(
+            urllib.parse.quote(filename))
+        response["Content-Disposition"] = "attachment; {}".format(filename)
+        if mt:
+            response["Content-Type"] = mt
+
         return response
 
     @list_route(methods=['get'])
@@ -208,6 +240,8 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(form.errors, status=400)
 
         f = form.cleaned_data['track_file']
+        if not f.audio_file:
+            return Response(status=400)
         output_kwargs = {
             'format': form.cleaned_data['to']
         }
@@ -350,6 +384,22 @@ class SubmitViewSet(viewsets.ViewSet):
         import_data, batch = self._import_album(
             data, request, batch=None, import_request=import_request)
         return Response(import_data)
+
+    @list_route(methods=['post'])
+    @transaction.non_atomic_requests
+    def federation(self, request, *args, **kwargs):
+        serializer = serializers.SubmitFederationTracksSerializer(
+            data=request.data)
+        serializer.is_valid(raise_exception=True)
+        batch = serializer.save(submitted_by=request.user)
+        for job in batch.jobs.all():
+            funkwhale_utils.on_commit(
+                tasks.import_job_run.delay,
+                import_job_id=job.pk,
+                use_acoustid=False,
+            )
+
+        return Response({'id': batch.id}, status=201)
 
     @transaction.atomic
     def _import_album(self, data, request, batch=None, import_request=None):

@@ -68,6 +68,8 @@ build_front:
 
   script:
     - yarn install
+    - yarn run i18n-extract
+    - yarn run i18n-compile
     - yarn run build
   cache:
     key: "$CI_PROJECT_ID__front_dependencies"

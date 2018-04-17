@@ -1,7 +1,11 @@
+from django.db import transaction
 from rest_framework import serializers
 from taggit.models import Tag
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.federation.models import LibraryTrack
+from funkwhale_api.federation.serializers import AP_CONTEXT
 
 from . import models
 
@@ -150,3 +154,25 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return 'Audio'
+
+
+class SubmitFederationTracksSerializer(serializers.Serializer):
+    library_tracks = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=LibraryTrack.objects.filter(local_track_file__isnull=True),
+    )
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        batch = models.ImportBatch.objects.create(
+            source='federation',
+            **kwargs
+        )
+        for lt in self.validated_data['library_tracks']:
+            models.ImportJob.objects.create(
+                batch=batch,
+                library_track=lt,
+                mbid=lt.mbid,
+                source=lt.url,
+            )
+        return batch

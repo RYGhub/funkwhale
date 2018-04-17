@@ -1,11 +1,5 @@
-import logging
-import json
-import requests
-import requests_http_signature
-
-from . import signing
-
-logger = logging.getLogger(__name__)
+from . import serializers
+from . import tasks
 
 ACTIVITY_TYPES = [
     'Accept',
@@ -42,44 +36,32 @@ ACTIVITY_TYPES = [
 OBJECT_TYPES = [
     'Article',
     'Audio',
+    'Collection',
     'Document',
     'Event',
     'Image',
     'Note',
+    'OrderedCollection',
     'Page',
     'Place',
     'Profile',
     'Relationship',
     'Tombstone',
     'Video',
-]
+] + ACTIVITY_TYPES
+
 
 def deliver(activity, on_behalf_of, to=[]):
-    from . import actors
-    logger.info('Preparing activity delivery to %s', to)
-    auth = requests_http_signature.HTTPSignatureAuth(
-        use_auth_header=False,
-        headers=[
-            '(request-target)',
-            'user-agent',
-            'host',
-            'date',
-            'content-type',],
-        algorithm='rsa-sha256',
-        key=on_behalf_of.private_key.encode('utf-8'),
-        key_id=on_behalf_of.private_key_id,
+    return tasks.send.delay(
+        activity=activity,
+        actor_id=on_behalf_of.pk,
+        to=to
     )
-    for url in to:
-        recipient_actor = actors.get_actor(url)
-        logger.debug('delivering to %s', recipient_actor.inbox_url)
-        logger.debug('activity content: %s', json.dumps(activity))
-        response = requests.post(
-            auth=auth,
-            json=activity,
-            url=recipient_actor.inbox_url,
-            headers={
-                'Content-Type': 'application/activity+json'
-            }
-        )
-        response.raise_for_status()
-        logger.debug('Remote answered with %s', response.status_code)
+
+
+def accept_follow(follow):
+    serializer = serializers.AcceptFollowSerializer(follow)
+    return deliver(
+        serializer.data,
+        to=[follow.actor.url],
+        on_behalf_of=follow.target)

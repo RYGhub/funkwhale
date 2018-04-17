@@ -2,17 +2,17 @@
   <div class="main pusher" v-title="'Log In'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>Log in to your Funkwhale account</h2>
+        <h2><i18next path="Log in to your Funkwhale account"/></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="error" class="ui negative message">
-            <div class="header">We cannot log you in</div>
+            <div class="header"><i18next path="We cannot log you in"/></div>
             <ul class="list">
-              <li v-if="error == 'invalid_credentials'">Please double-check your username/password couple is correct</li>
-              <li v-else>An unknown error happend, this can mean the server is down or cannot be reached</li>
+              <i18next tag="li" v-if="error == 'invalid_credentials'" path="Please double-check your username/password couple is correct"/>
+              <i18next tag="li" v-else path="An unknown error happend, this can mean the server is down or cannot be reached"/>
             </ul>
           </div>
           <div class="field">
-            <label>Username or email</label>
+            <i18next tag="label" path="Username or email"/>
             <input
             ref="username"
             required
@@ -23,7 +23,7 @@
             >
           </div>
           <div class="field">
-            <label>Password</label>
+            <i18next tag="label" path="Password"/>            
             <input
             required
             type="password"
@@ -31,9 +31,9 @@
             v-model="credentials.password"
             >
           </div>
-          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">Login</button>
+          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit"><i18next path="Login"/></button>
           <router-link class="ui right floated basic button" :to="{path: '/signup'}">
-            Create an account
+            <i18next path="Create an account"/>
           </router-link>
         </form>
       </div>

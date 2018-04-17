@@ -70,6 +70,11 @@ def tmpdir():
 
 
 @pytest.fixture
+def tmpfile():
+    yield tempfile.NamedTemporaryFile()
+
+
+@pytest.fixture
 def logged_in_client(db, factories, client):
     user = factories['users.User']()
     assert client.login(username=user.username, password='test')
@@ -162,3 +167,12 @@ def media_root(settings):
 def r_mock():
     with requests_mock.mock() as m:
         yield m
+
+
+@pytest.fixture
+def authenticated_actor(factories, mocker):
+    actor = factories['federation.Actor']()
+    mocker.patch(
+        'funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor',
+        return_value=actor)
+    yield actor

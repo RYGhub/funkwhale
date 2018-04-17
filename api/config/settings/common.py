@@ -13,6 +13,8 @@ from __future__ import absolute_import, unicode_literals
 from urllib.parse import urlsplit
 import os
 import environ
+from celery.schedules import crontab
+
 from funkwhale_api import __version__
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
@@ -25,12 +27,35 @@ try:
 except FileNotFoundError:
     pass
 
-FUNKWHALE_URL = env('FUNKWHALE_URL')
-FUNKWHALE_HOSTNAME = urlsplit(FUNKWHALE_URL).netloc
+FUNKWHALE_HOSTNAME = None
+FUNKWHALE_HOSTNAME_SUFFIX = env('FUNKWHALE_HOSTNAME_SUFFIX', default=None)
+FUNKWHALE_HOSTNAME_PREFIX = env('FUNKWHALE_HOSTNAME_PREFIX', default=None)
+if FUNKWHALE_HOSTNAME_PREFIX and FUNKWHALE_HOSTNAME_SUFFIX:
+    # We're in traefik case, in development
+    FUNKWHALE_HOSTNAME = '{}.{}'.format(
+        FUNKWHALE_HOSTNAME_PREFIX, FUNKWHALE_HOSTNAME_SUFFIX)
+    FUNKWHALE_PROTOCOL = env('FUNKWHALE_PROTOCOL', default='https')
+else:
+    try:
+        FUNKWHALE_HOSTNAME = env('FUNKWHALE_HOSTNAME')
+        FUNKWHALE_PROTOCOL = env('FUNKWHALE_PROTOCOL', default='https')
+    except Exception:
+        FUNKWHALE_URL = env('FUNKWHALE_URL')
+        _parsed = urlsplit(FUNKWHALE_URL)
+        FUNKWHALE_HOSTNAME = _parsed.netloc
+        FUNKWHALE_PROTOCOL = _parsed.scheme
+
+FUNKWHALE_URL = '{}://{}'.format(FUNKWHALE_PROTOCOL, FUNKWHALE_HOSTNAME)
+
 
 FEDERATION_ENABLED = env.bool('FEDERATION_ENABLED', default=True)
 FEDERATION_HOSTNAME = env('FEDERATION_HOSTNAME', default=FUNKWHALE_HOSTNAME)
-
+FEDERATION_COLLECTION_PAGE_SIZE = env.int(
+    'FEDERATION_COLLECTION_PAGE_SIZE', default=50
+)
+FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
+    'FEDERATION_MUSIC_NEEDS_APPROVAL', default=True
+)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # APP CONFIGURATION
@@ -143,16 +168,6 @@ FIXTURE_DIRS = (
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-
-# MANAGER CONFIGURATION
-# ------------------------------------------------------------------------------
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = (
-    ("""Eliot Berriot""", 'contact@eliotberriot.om'),
-)
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#managers
-MANAGERS = ADMINS
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -321,6 +336,16 @@ CELERY_BROKER_URL = env(
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
+CELERYBEAT_SCHEDULE = {
+    'federation.clean_music_cache': {
+        'task': 'funkwhale_api.federation.tasks.clean_music_cache',
+        'schedule': crontab(hour='*/2'),
+        'options': {
+            'expires': 60 * 2,
+        },
+    }
+}
+
 import datetime
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
@@ -411,3 +436,8 @@ ACCOUNT_USERNAME_BLACKLIST = [
     'staff',
     'service',
 ] + env.list('ACCOUNT_USERNAME_BLACKLIST', default=[])
+
+EXTERNAL_REQUESTS_VERIFY_SSL = env.bool(
+    'EXTERNAL_REQUESTS_VERIFY_SSL',
+    default=True
+)

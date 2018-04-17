@@ -7,28 +7,14 @@ federation = types.Section('federation')
 
 
 @global_preferences_registry.register
-class FederationPrivateKey(types.StringPreference):
-    show_in_api = False
+class MusicCacheDuration(types.IntPreference):
+    show_in_api = True
     section = federation
-    name = 'private_key'
-    default = ''
+    name = 'music_cache_duration'
+    default = 60 * 24 * 2
+    verbose_name = 'Music cache duration'
     help_text = (
-        'Instance private key, used for signing federation HTTP requests'
-    )
-    verbose_name = (
-        'Instance private key (keep it secret, do not change it)'
-    )
-
-
-@global_preferences_registry.register
-class FederationPublicKey(types.StringPreference):
-    show_in_api = False
-    section = federation
-    name = 'public_key'
-    default = ''
-    help_text = (
-        'Instance public key, used for signing federation HTTP requests'
-    )
-    verbose_name = (
-        'Instance public key (do not change it)'
+        'How much minutes do you want to keep a copy of federated tracks'
+        'locally? Federated files that were not listened in this interval '
+        'will be erased and refetched from the remote on the next listening.'
     )

@@ -10,30 +10,30 @@
             <i class="circular inverted sound yellow icon"></i>
             <div class="content">
               {{ album.title }}
-              <div class="sub header">
-                Album containing {{ album.tracks.length }} tracks,
-                by <router-link :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+              <i18next tag="div" class="sub header" path="Album containing {%0%} tracks, by {%1%}">
+                {{ album.tracks.length }}
+                <router-link :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
                   {{ album.artist.name }}
                 </router-link>
-              </div>
+              </i18next>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
           </button>
-          <play-button class="orange" :tracks="album.tracks">Play all</play-button>
+          <play-button class="orange" :tracks="album.tracks"><i18next path="Play all"/></play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            Search on wikipedia
+            <i18next path="Search on Wikipedia"/>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            View on MusicBrainz
+            <i18next path="View on MusicBrainz"/>
           </a>
         </div>
       </div>
       <div class="ui vertical stripe segment">
-        <h2>Tracks</h2>
+        <h2><i18next path="Tracks"/></h2>
         <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
     </template>

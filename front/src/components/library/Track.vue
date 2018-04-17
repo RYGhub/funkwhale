@@ -11,18 +11,19 @@
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                From album
-                <router-link :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
-                  {{ track.album.title }}
-                </router-link>
-                by <router-link :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
-                  {{ track.artist.name }}
-                </router-link>
+                <i18next path="From album {%0%} by {%1%}">
+                  <router-link :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
+                    {{ track.album.title }}
+                  </router-link>
+                  <router-link :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+                    {{ track.artist.name }}
+                  </router-link>
+                </i18next>
               </div>
             </div>
           </h2>
 
-          <play-button class="orange" :track="track">Play</play-button>
+          <play-button class="orange" :track="track"><i18next path="Play"/></play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
           <track-playlist-icon
             :button="true"
@@ -31,32 +32,30 @@
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            Search on wikipedia
+            <i18next path="Search on Wikipedia"/>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            View on MusicBrainz
+            <i18next path="View on MusicBrainz"/>
           </a>
           <a v-if="downloadUrl" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
-            Download
+            <i18next path="Download"/>
           </a>
         </div>
       </div>
       <div class="ui vertical stripe center aligned segment">
-        <h2>Lyrics</h2>
+        <h2><i18next path="Lyrics"/></h2>
         <div v-if="isLoadingLyrics" class="ui vertical segment">
           <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
         </div>
         <div v-if="lyrics" v-html="lyrics.content_rendered">
         </div>
         <template v-if="!isLoadingLyrics & !lyrics">
-          <p>
-            No lyrics available for this track.
-          </p>
+          <i18next tag="p" path="No lyrics available for this track."/>
           <a class="ui button" target="_blank" :href="lyricsSearchUrl">
             <i class="search icon"></i>
-            Search on lyrics.wikia.com
+            <i18next path="Search on lyrics.wikia.com"/>
           </a>
         </template>
       </div>

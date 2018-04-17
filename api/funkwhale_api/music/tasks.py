@@ -2,6 +2,10 @@ from django.core.files.base import ContentFile
 
 from dynamic_preferences.registries import global_preferences_registry
 
+from funkwhale_api.federation import activity
+from funkwhale_api.federation import actors
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
@@ -25,6 +29,48 @@ def set_acoustid_on_track_file(track_file):
         return update(result['id'])
 
 
+def import_track_from_remote(library_track):
+    metadata = library_track.metadata
+    try:
+        track_mbid = metadata['recording']['musicbrainz_id']
+        assert track_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
+        return models.Track.get_or_create_from_api(mbid=track_mbid)
+
+    try:
+        album_mbid = metadata['release']['musicbrainz_id']
+        assert album_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
+        album = models.Album.get_or_create_from_api(mbid=album_mbid)
+        return models.Track.get_or_create_from_title(
+            library_track.title, artist=album.artist, album=album)
+
+    try:
+        artist_mbid = metadata['artist']['musicbrainz_id']
+        assert artist_mbid  # for null/empty values
+    except (KeyError, AssertionError):
+        pass
+    else:
+        artist = models.Artist.get_or_create_from_api(mbid=artist_mbid)
+        album = models.Album.get_or_create_from_title(
+            library_track.album_title, artist=artist)
+        return models.Track.get_or_create_from_title(
+            library_track.title, artist=artist, album=album)
+
+    # worst case scenario, we have absolutely no way to link to a
+    # musicbrainz resource, we rely on the name/titles
+    artist = models.Artist.get_or_create_from_name(
+        library_track.artist_name)
+    album = models.Album.get_or_create_from_title(
+        library_track.album_title, artist=artist)
+    return models.Track.get_or_create_from_title(
+        library_track.title, artist=artist, album=album)
+
+
 def _do_import(import_job, replace, use_acoustid=True):
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
@@ -43,8 +89,14 @@ def _do_import(import_job, replace, use_acoustid=True):
             acoustid_track_id = match['id']
     if mbid:
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
-    else:
+    elif import_job.audio_file:
         track = import_track_data_from_path(import_job.audio_file.path)
+    elif import_job.library_track:
+        track = import_track_from_remote(import_job.library_track)
+    else:
+        raise ValueError(
+            'Not enough data to process import, '
+            'add a mbid, an audio file or a library track')
 
     track_file = None
     if replace:
@@ -63,6 +115,14 @@ def _do_import(import_job, replace, use_acoustid=True):
         track_file.audio_file = ContentFile(import_job.audio_file.read())
         track_file.audio_file.name = import_job.audio_file.name
         track_file.duration = duration
+    elif import_job.library_track:
+        track_file.library_track = import_job.library_track
+        track_file.mimetype = import_job.library_track.audio_mimetype
+        if import_job.library_track.library.download_files:
+            raise NotImplementedError()
+        else:
+            # no downloading, we hotlink
+            pass
     else:
         track_file.download_file()
     track_file.save()
@@ -72,6 +132,7 @@ def _do_import(import_job, replace, use_acoustid=True):
         # it's imported on the track, we don't need it anymore
         import_job.audio_file.delete()
     import_job.save()
+
     return track.pk
 
 
@@ -106,3 +167,44 @@ def fetch_content(lyrics):
     cleaned_content = lyrics_utils.clean_content(content)
     lyrics.content = cleaned_content
     lyrics.save(update_fields=['content'])
+
+
+@celery.app.task(name='music.import_batch_notify_followers')
+@celery.require_instance(
+    models.ImportBatch.objects.filter(status='finished'), 'import_batch')
+def import_batch_notify_followers(import_batch):
+    if not settings.FEDERATION_ENABLED:
+        return
+
+    if import_batch.source == 'federation':
+        return
+
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    followers = library_actor.get_approved_followers()
+    jobs = import_batch.jobs.filter(
+        status='finished',
+        library_track__isnull=True,
+        track_file__isnull=False,
+    ).select_related(
+        'track_file__track__artist',
+        'track_file__track__album__artist',
+    )
+    track_files = [job.track_file for job in jobs]
+    collection = federation_serializers.CollectionSerializer({
+        'actor': library_actor,
+        'id': import_batch.get_federation_url(),
+        'items': track_files,
+        'item_serializer': federation_serializers.AudioSerializer
+    }).data
+    for f in followers:
+        create = federation_serializers.ActivitySerializer(
+            {
+                'type': 'Create',
+                'id': collection['id'],
+                'object': collection,
+                'actor': library_actor.url,
+                'to': [f.url],
+            }
+        ).data
+
+        activity.deliver(create, on_behalf_of=library_actor, to=[f.url])

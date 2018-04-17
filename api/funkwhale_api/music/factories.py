@@ -2,6 +2,9 @@ import factory
 import os
 
 from funkwhale_api.factories import registry, ManyToManyFromList
+from funkwhale_api.federation.factories import (
+    LibraryTrackFactory,
+)
 from funkwhale_api.users.factories import UserFactory
 
 SAMPLES_PATH = os.path.join(
@@ -53,6 +56,18 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = 'music.TrackFile'
 
+    class Params:
+        federation = factory.Trait(
+            audio_file=None,
+            library_track=factory.SubFactory(LibraryTrackFactory),
+            mimetype=factory.LazyAttribute(
+                lambda o: o.library_track.audio_mimetype
+            ),
+            source=factory.LazyAttribute(
+                lambda o: o.library_track.audio_url
+            ),
+        )
+
 
 @registry.register
 class ImportBatchFactory(factory.django.DjangoModelFactory):
@@ -60,6 +75,15 @@ class ImportBatchFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'music.ImportBatch'
+
+    class Params:
+        federation = factory.Trait(
+            submitted_by=None,
+            source='federation',
+        )
+        finished = factory.Trait(
+            status='finished',
+        )
 
 
 @registry.register
@@ -70,6 +94,17 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = 'music.ImportJob'
+
+    class Params:
+        federation = factory.Trait(
+            mbid=None,
+            library_track=factory.SubFactory(LibraryTrackFactory),
+            batch=factory.SubFactory(ImportBatchFactory, federation=True),
+        )
+        finished = factory.Trait(
+            status='finished',
+            track_file=factory.SubFactory(TrackFileFactory),
+        )
 
 
 @registry.register(name='music.FileImportJob')

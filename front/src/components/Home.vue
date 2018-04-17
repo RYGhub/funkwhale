@@ -3,7 +3,7 @@
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            Welcome on Funkwhale
+          Welcome on Funkwhale
         </h1>
         <p>We think listening music should be simple.</p>
         <router-link class="ui icon button" to="/about">

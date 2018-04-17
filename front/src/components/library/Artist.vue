@@ -10,26 +10,31 @@
             <i class="circular inverted users violet icon"></i>
             <div class="content">
               {{ artist.name }}
-              <div class="sub header">{{ totalTracks }} tracks in {{ albums.length }} albums</div>
+              <div class="sub header">
+                <i18next path="{%0%} tracks in {%1%} albums">
+                  {{ totalTracks }}
+                  {{ albums.length }}
+                </i18next>
+              </div>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
           </button>
-          <play-button class="orange" :tracks="allTracks">Play all albums</play-button>
+          <play-button class="orange" :tracks="allTracks"><i18next path="Play all albums"/></play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            Search on wikipedia
+            <i18next path="Search on Wikipedia"/>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            View on MusicBrainz
+            <i18next path="View on MusicBrainz"/>
           </a>
         </div>
       </div>
       <div class="ui vertical stripe segment">
-        <h2>Albums by this artist</h2>
+        <h2><i18next path="Albums by this artist"/></h2>
         <div class="ui stackable doubling three column grid">
           <div class="column" :key="album.id" v-for="album in sortedAlbums">
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>

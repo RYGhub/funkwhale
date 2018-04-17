@@ -17,29 +17,31 @@
         @input-file="inputFile"
         ref="upload">
         <i class="upload icon"></i>
-        Select files to upload...
+        <i18next path="Select files to upload..."/>
     </file-upload-widget>
       <button
         :class="['ui', 'right', 'floated', 'icon', {disabled: files.length === 0}, 'button']"
         v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
         <i class="play icon" aria-hidden="true"></i>
-        Start Upload
+        <i18next path="Start Upload"/>
       </button>
       <button type="button" class="ui right floated icon yellow button" v-else @click.prevent="$refs.upload.active = false">
         <i class="pause icon" aria-hidden="true"></i>
-        Stop Upload
+        <i18next path="Stop Upload"/>
       </button>
     </div>
     <div class="ui hidden clearing divider"></div>
-    <p v-if="batch">
-      Once all your files are uploaded, simply head over  <router-link :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">import detail page</router-link> to check the import status.
-    </p>
+    <i18next v-if="batch" path="Once all your files are uploaded, simply head over {%0%} to check the import status.">
+      <router-link :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">
+        <i18next path="import detail page"/>
+      </router-link>
+    </i18next>
     <table class="ui single line table">
       <thead>
         <tr>
-          <th>File name</th>
-          <th>Size</th>
-          <th>Status</th>
+          <i18next tag="th" path="File name"/>
+          <i18next tag="th" path="Size"/>
+          <i18next tag="th" path="Status"/>
         </tr>
       </thead>
       <tbody>
@@ -50,10 +52,10 @@
             <span v-if="file.error" class="ui red label">
               {{ file.error }}
             </span>
-            <span v-else-if="file.success" class="ui green label">Success</span>
-            <span v-else-if="file.active" class="ui yellow label">Uploading...</span>
+            <i18next v-else-if="file.success" class="ui green label" path="Success"/>
+            <i18next v-else-if="file.active" class="ui yellow label" path="Uploading..."/>
             <template v-else>
-              <span class="ui label">Pending</span>
+              <i18next class="ui label" path="Pending"/>
               <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
             </template>
           </td>
