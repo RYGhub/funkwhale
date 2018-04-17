@@ -1,7 +1,20 @@
 <template>
   <div>
     <div class="ui inline form">
-      <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
+      <div class="fields">
+        <div class="ui field">
+          <label>{{ $t('Search') }}</label>
+          <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
+        </div>
+        <div class="ui field">
+          <label>{{ $t('Import status') }}</label>
+          <select class="ui dropdown" v-model="importedFilter">
+            <option :value="null">{{ $t('Any') }}</option>
+            <option :value="true">{{ $t('Imported') }}</option>
+            <option :value="false">{{ $t('Not imported') }}</option>
+          </select>
+        </div>
+      </div>
     </div>
     <table v-if="result" class="ui compact very basic single line unstackable table">
       <thead>
@@ -112,7 +125,8 @@ export default {
       search: '',
       checked: {},
       isImporting: false,
-      importBatch: null
+      importBatch: null,
+      importedFilter: null
     }
   },
   created () {
@@ -125,6 +139,9 @@ export default {
         'page_size': this.paginateBy,
         'q': this.search
       }, this.filters)
+      if (this.importedFilter !== null) {
+        params.imported = this.importedFilter
+      }
       let self = this
       self.isLoading = true
       self.checked = []
@@ -180,6 +197,9 @@ export default {
       }
     },
     page () {
+      this.fetchData()
+    },
+    importedFilter () {
       this.fetchData()
     }
   }
