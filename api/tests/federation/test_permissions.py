@@ -30,11 +30,26 @@ def test_library_follower_actor_non_follower(
     assert check is False
 
 
+def test_library_follower_actor_follower_not_approved(
+        factories, api_request, anonymous_user, settings):
+    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+    library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    follow = factories['federation.Follow'](target=library, approved=False)
+    view = APIView.as_view()
+    permission = permissions.LibraryFollower()
+    request = api_request.get('/')
+    setattr(request, 'user', anonymous_user)
+    setattr(request, 'actor', follow.actor)
+    check = permission.has_permission(request, view)
+
+    assert check is False
+
+
 def test_library_follower_actor_follower(
         factories, api_request, anonymous_user, settings):
     settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-    follow = factories['federation.Follow'](target=library)
+    follow = factories['federation.Follow'](target=library, approved=True)
     view = APIView.as_view()
     permission = permissions.LibraryFollower()
     request = api_request.get('/')

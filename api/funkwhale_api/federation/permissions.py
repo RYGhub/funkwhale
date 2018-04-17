@@ -16,4 +16,5 @@ class LibraryFollower(BasePermission):
             return False
 
         library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-        return library.followers.filter(url=actor.url).exists()
+        return library.received_follows.filter(
+            approved=True, actor=actor).exists()

@@ -616,10 +616,12 @@ class CollectionPageSerializer(serializers.Serializer):
         if not item_serializer:
             return v
         raw_items = [item_serializer(data=i, context=self.context) for i in v]
+        valid_items = []
         for i in raw_items:
-            i.is_valid(raise_exception=True)
+            if i.is_valid():
+                valid_items.append(i)
 
-        return raw_items
+        return valid_items
 
     def to_representation(self, conf):
         page = conf['page']
