@@ -708,23 +708,7 @@ class AudioSerializer(serializers.Serializer):
         except (KeyError, TypeError):
             raise serializers.ValidationError('Missing mediaType')
 
-        if not media_type.startswith('audio/'):
-            raise serializers.ValidationError('Invalid mediaType')
-
-        return url
-
-    def validate_url(self, v):
-        try:
-            url = v['href']
-        except (KeyError, TypeError):
-            raise serializers.ValidationError('Missing href')
-
-        try:
-            media_type = v['mediaType']
-        except (KeyError, TypeError):
-            raise serializers.ValidationError('Missing mediaType')
-
-        if not media_type.startswith('audio/'):
+        if not media_type or not media_type.startswith('audio/'):
             raise serializers.ValidationError('Invalid mediaType')
 
         return v
