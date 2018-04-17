@@ -97,6 +97,11 @@ class Actor(models.Model):
         if self.is_system:
             return actors.SYSTEM_ACTORS[self.preferred_username]
 
+    def get_approved_followers(self):
+        follows = self.received_follows.filter(approved=True)
+        return self.followers.filter(
+            pk__in=follows.values_list('actor', flat=True))
+
 
 class Follow(models.Model):
     ap_type = 'Follow'

@@ -505,8 +505,17 @@ class ImportBatch(models.Model):
         return str(self.pk)
 
     def update_status(self):
+        old_status = self.status
         self.status = utils.compute_status(self.jobs.all())
         self.save(update_fields=['status'])
+        if self.status != old_status and self.status == 'finished':
+            from . import tasks
+            tasks.import_batch_notify_followers.delay(import_batch_id=self.pk)
+
+    def get_federation_url(self):
+        return federation_utils.full_url(
+            '/federation/music/import/batch/{}'.format(self.uuid)
+        )
 
 
 class ImportJob(models.Model):

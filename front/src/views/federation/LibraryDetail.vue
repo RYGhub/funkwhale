@@ -18,7 +18,10 @@
           <table class="ui collapsing very basic table">
             <tbody>
               <tr>
-                <td>Follow status</td>
+                <td >
+                  Follow status
+                  <span :data-tooltip="$t('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
+                </td>
                 <td>
                   <template v-if="object.follow.approved === null">
                     <i class="loading icon"></i> Pending approval
@@ -34,7 +37,10 @@
                 </td>
               </tr>
               <tr>
-                <td>Federation</td>
+                <td>
+                  Federation
+                  <span :data-tooltip="$t('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
+                </td>
                 <td>
                   <div class="ui toggle checkbox">
                     <input
@@ -46,9 +52,11 @@
                 <td>
                 </td>
               </tr>
-              <!-- Disabled until properly implemented on the backend
               <tr>
-                <td>Auto importing</td>
+                <td>
+                  Auto importing
+                  <span :data-tooltip="$t('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
+                </td>
                 <td>
                   <div class="ui toggle checkbox">
                     <input
@@ -59,6 +67,7 @@
                 </td>
                 <td></td>
               </tr>
+              <!-- Disabled until properly implemented on the backend
               <tr>
                 <td>File mirroring</td>
                 <td>

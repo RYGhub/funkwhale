@@ -12,6 +12,8 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
+from funkwhale_api.music import models as music_models
+from funkwhale_api.music import tasks as music_tasks
 
 
 def test_actor_fetching(r_mock):
@@ -465,3 +467,62 @@ def test_library_actor_handle_create_audio(mocker, factories):
         assert lt.artist_name == a['metadata']['artist']['name']
         assert lt.album_title == a['metadata']['release']['title']
         assert lt.published_date == arrow.get(a['published'])
+
+
+def test_library_actor_handle_create_audio_autoimport(mocker, factories):
+    mocked_import = mocker.patch(
+        'funkwhale_api.common.utils.on_commit')
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    remote_library = factories['federation.Library'](
+        federation_enabled=True,
+        autoimport=True,
+    )
+
+    data = {
+        'actor': remote_library.actor.url,
+        'type': 'Create',
+        'id': 'http://test.federation/audio/create',
+        'object': {
+            'id': 'https://batch.import',
+            'type': 'Collection',
+            'totalItems': 2,
+            'items': factories['federation.Audio'].create_batch(size=2)
+        },
+    }
+
+    library_actor.system_conf.post_inbox(data, actor=remote_library.actor)
+
+    lts = list(remote_library.tracks.order_by('id'))
+
+    assert len(lts) == 2
+
+    for i, a in enumerate(data['object']['items']):
+        lt = lts[i]
+        assert lt.pk is not None
+        assert lt.url == a['id']
+        assert lt.library == remote_library
+        assert lt.audio_url == a['url']['href']
+        assert lt.audio_mimetype == a['url']['mediaType']
+        assert lt.metadata == a['metadata']
+        assert lt.title == a['metadata']['recording']['title']
+        assert lt.artist_name == a['metadata']['artist']['name']
+        assert lt.album_title == a['metadata']['release']['title']
+        assert lt.published_date == arrow.get(a['published'])
+
+    batch = music_models.ImportBatch.objects.latest('id')
+
+    assert batch.jobs.count() == len(lts)
+    assert batch.source == 'federation'
+    assert batch.submitted_by is None
+
+    for i, job in enumerate(batch.jobs.order_by('id')):
+        lt = lts[i]
+        assert job.library_track == lt
+        assert job.mbid == lt.mbid
+        assert job.source == lt.url
+
+        mocked_import.assert_any_call(
+            music_tasks.import_job_run.delay,
+            import_job_id=job.pk,
+            use_acoustid=False,
+        )

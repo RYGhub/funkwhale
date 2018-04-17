@@ -24,12 +24,20 @@ class LibraryFilter(django_filters.FilterSet):
 
 class LibraryTrackFilter(django_filters.FilterSet):
     library = django_filters.CharFilter('library__uuid')
+    imported = django_filters.CharFilter(method='filter_imported')
     q = fields.SearchFilter(search_fields=[
         'artist_name',
         'title',
         'album_title',
         'library__actor__domain',
     ])
+
+    def filter_imported(self, queryset, field_name, value):
+        if value.lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(local_track_file__isnull=False)
+        elif value.lower() in ['false', '0', 'no']:
+            queryset = queryset.filter(local_track_file__isnull=True)
+        return queryset
 
     class Meta:
         model = models.LibraryTrack

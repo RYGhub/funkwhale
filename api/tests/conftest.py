@@ -70,6 +70,11 @@ def tmpdir():
 
 
 @pytest.fixture
+def tmpfile():
+    yield tempfile.NamedTemporaryFile()
+
+
+@pytest.fixture
 def logged_in_client(db, factories, client):
     user = factories['users.User']()
     assert client.login(username=user.username, password='test')

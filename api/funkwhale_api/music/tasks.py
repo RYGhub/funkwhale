@@ -2,6 +2,10 @@ from django.core.files.base import ContentFile
 
 from dynamic_preferences.registries import global_preferences_registry
 
+from funkwhale_api.federation import activity
+from funkwhale_api.federation import actors
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
@@ -128,6 +132,7 @@ def _do_import(import_job, replace, use_acoustid=True):
         # it's imported on the track, we don't need it anymore
         import_job.audio_file.delete()
     import_job.save()
+
     return track.pk
 
 
@@ -162,3 +167,44 @@ def fetch_content(lyrics):
     cleaned_content = lyrics_utils.clean_content(content)
     lyrics.content = cleaned_content
     lyrics.save(update_fields=['content'])
+
+
+@celery.app.task(name='music.import_batch_notify_followers')
+@celery.require_instance(
+    models.ImportBatch.objects.filter(status='finished'), 'import_batch')
+def import_batch_notify_followers(import_batch):
+    if not settings.FEDERATION_ENABLED:
+        return
+
+    if import_batch.source == 'federation':
+        return
+
+    library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
+    followers = library_actor.get_approved_followers()
+    jobs = import_batch.jobs.filter(
+        status='finished',
+        library_track__isnull=True,
+        track_file__isnull=False,
+    ).select_related(
+        'track_file__track__artist',
+        'track_file__track__album__artist',
+    )
+    track_files = [job.track_file for job in jobs]
+    collection = federation_serializers.CollectionSerializer({
+        'actor': library_actor,
+        'id': import_batch.get_federation_url(),
+        'items': track_files,
+        'item_serializer': federation_serializers.AudioSerializer
+    }).data
+    for f in followers:
+        create = federation_serializers.ActivitySerializer(
+            {
+                'type': 'Create',
+                'id': collection['id'],
+                'object': collection,
+                'actor': library_actor.url,
+                'to': [f.url],
+            }
+        ).data
+
+        activity.deliver(create, on_behalf_of=library_actor, to=[f.url])
