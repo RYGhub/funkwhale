@@ -3,6 +3,79 @@ Changelog
 
 .. towncrier
 
+0.9 (2018-04-17)
+----------------
+
+Features:
+
+- Add internationalization support (#5)
+- Can now follow and import music from remote libraries (#136, #137)
+
+
+Enhancements:
+
+- Added a i18n-extract yarn script to extract strings to PO files (#162)
+- User admin now includes signup and last login dates (#148)
+- We now use a proper user agent including instance version and url during
+  outgoing requests
+
+
+Federation is here!
+^^^^^^^^^^^^^^^^^^^
+
+This is for real this time, and includes:
+
+- Following other Funkwhale libraries
+- Importing tracks from remote libraries (tracks are hotlinked, and only cached for a short amount of time)
+- Searching accross federated catalogs
+
+Note that by default, federation is opt-in, on a per-instance basis:
+instances will request access to your catalog, and you can accept or refuse
+those requests. You can also revoke the access at any time.
+
+Documentation was updated with relevant instructions to use and benefit
+from this new feature: https://docs.funkwhale.audio/federation.html
+
+Preparing internationalization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale's front-end as always been english-only, and this is a barrier
+to new users. The work make Funkwhale's interface translatable was started
+in this release by Baptiste. Although nothing is translated yet,
+this release includes behind the stage changes that will make it possible in
+the near future.
+
+Many thank to Baptiste for the hard work and for figuring out a proper solution
+to this difficult problem.
+
+Upgrade path
+^^^^^^^^^^^^
+
+In addition to the usual instructions from
+https://docs.funkwhale.audio/upgrading.html, non-docker users will have
+to setup an additional systemd unit file for recurrent tasks.
+
+This was forgotten in the deployment documentation, but recurrent tasks,
+managed by the celery beat process, will be needed more and more in subsequent
+releases. Right now, we'll be using to clear the cache for federated music files
+and keep disk usage to a minimum.
+
+In the future, they will also be needed to refetch music metadata or federated
+information periodically.
+
+Celery beat can be enabled easily::
+
+    curl -L -o "/etc/systemd/system/funkwhale-beat.service" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale-beat.service"
+    # Also edit /etc/systemd/system/funkwhale.target
+    # and ensure the Wants= line contains the following:
+    # Wants=funkwhale-server.service funkwhale-worker.service funkwhale-beat.service
+    nano /etc/systemd/system/funkwhale.target
+    # reload configuration
+    systemctl daemon-reload
+
+Docker users already have celerybeat enabled.
+
+
 0.8 (2018-04-02)
 ----------------
 
@@ -71,27 +144,16 @@ and add the following snippets::
 This will ensure federation endpoints will be reachable in the future.
 You can of course skip this part if you know you will not federate your instance.
 
-A new ``FEDERATION_ENABLED`` env var have also been added to control wether
+A new ``FEDERATION_ENABLED`` env var have also been added to control whether
 federation is enabled or not on the application side. This settings defaults
-to True, which should have no consequencies at the moment, since actual
+to True, which should have no consequences at the moment, since actual
 federation is not implemented and the only available endpoints are for
 testing purposes.
 
 Add ``FEDERATION_ENABLED=false`` to your .env file to disable federation
 on the application side.
 
-The last step involves generating RSA private and public keys for signing
-your instance requests on the federation. This can be done via::
-
-    # on docker setups
-    docker-compose run --rm api python manage.py generate_keys --no-input
-
-    # on non-docker setups
-    source /srv/funkwhale/virtualenv/bin/activate
-    source /srv/funkwhale/load_env
-    python manage.py generate_keys --no-input
-
-To test and troobleshoot federation, we've added a bot account. This bot is available at @test@yourinstancedomain,
+To test and troubleshoot federation, we've added a bot account. This bot is available at @test@yourinstancedomain,
 and sending it "/ping", for example, via Mastodon, should trigger
 a response.
 
