@@ -3,6 +3,16 @@ Changelog
 
 .. towncrier
 
+0.9.1 (2018-04-17)
+------------------
+
+Bugfixes:
+
+- Allow null values for musicbrainz_id in Audio ActivityPub representation
+- Fixed broken permission check on library scanning and too aggressive page
+  validation
+
+
 0.9 (2018-04-17)
 ----------------
 
