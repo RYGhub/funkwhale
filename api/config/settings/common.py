@@ -13,6 +13,8 @@ from __future__ import absolute_import, unicode_literals
 from urllib.parse import urlsplit
 import os
 import environ
+from celery.schedules import crontab
+
 from funkwhale_api import __version__
 
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
@@ -334,6 +336,16 @@ CELERY_BROKER_URL = env(
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
+CELERYBEAT_SCHEDULE = {
+    'federation.clean_music_cache': {
+        'task': 'funkwhale_api.federation.tasks.clean_music_cache',
+        'schedule': crontab(hour='*/2'),
+        'options': {
+            'expires': 60 * 2,
+        },
+    }
+}
+
 import datetime
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
