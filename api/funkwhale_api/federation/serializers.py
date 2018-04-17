@@ -662,17 +662,17 @@ class CollectionPageSerializer(serializers.Serializer):
 
 
 class ArtistMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False)
+    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
     name = serializers.CharField()
 
 
 class ReleaseMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False)
+    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
     title = serializers.CharField()
 
 
 class RecordingMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False)
+    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
     title = serializers.CharField()
 
 
