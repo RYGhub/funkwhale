@@ -80,16 +80,16 @@ export default {
           'privacy_level': {
             type: 'dropdown',
             initial: this.$store.state.auth.profile.privacy_level,
-            label: this.$t('Activity visibility'),
-            help: this.$t('Determine the visibility level of your activity'),
+            label: 'Activity visibility',
+            help: 'Determine the visibility level of your activity',
             choices: [
               {
                 value: 'me',
-                label: this.$t('Nobody except me')
+                label: 'Nobody except me'
               },
               {
                 value: 'instance',
-                label: this.$t('Everyone on this instance')
+                label: 'Everyone on this instance'
               }
             ]
           }

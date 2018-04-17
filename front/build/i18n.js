@@ -29,6 +29,17 @@ fs.readdir(poDir, (err, files) => {
                             console.log(err)
                         } else {
                             console.log(`Wrote translation file: ${output}`)
+                            if (lang === 'en') {
+                                // for english, we need to specify that json values are equal to the keys.
+                                // otherwise we end up with empty strings on the front end for english
+                                var contents = fs.readFileSync(output)
+                                var jsonContent = JSON.parse(contents)
+                                var finalContent = {}
+                                Object.keys(jsonContent).forEach(function(key) {
+                                    finalContent[key] = key
+                                })
+                                fs.writeFile(output, JSON.stringify(finalContent))
+                            }
                         }
                     })
                 })
@@ -36,4 +47,3 @@ fs.readdir(poDir, (err, files) => {
         }
     }
 })
-

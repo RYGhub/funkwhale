@@ -38,13 +38,13 @@
       <div class="ui hidden divider"></div>
       <div class="ui attached segment">
         <template v-if="currentStep === 0">
-          <i18next tag="p" path="First, choose where you want to import the music from:"/>
+          <i18next tag="p" path="First, choose where you want to import the music from"/>
           <form class="ui form">
             <div class="field">
               <div class="ui radio checkbox">
                 <input type="radio" id="external" value="external" v-model="currentSource">
                 <label for="external">
-                  <i18next path="External source. Supported backends:"/>
+                  <i18next path="External source. Supported backends"/>
                   <div v-for="backend in backends" class="ui basic label">
                     <i v-if="backend.icon" :class="[backend.icon, 'icon']"></i>
                     {{ backend.label }}

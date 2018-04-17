@@ -85,9 +85,9 @@ export default {
       orderingDirection: defaultOrdering.direction,
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['title', this.$t('Track name')],
-        ['album__title', this.$t('Album name')],
-        ['artist__name', this.$t('Artist name')]
+        ['title', 'Track name'],
+        ['album__title', 'Album name'],
+        ['artist__name', 'Artist name']
       ]
     }
   },
