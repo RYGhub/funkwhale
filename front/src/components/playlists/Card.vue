@@ -10,13 +10,16 @@
         <i class="user icon"></i> {{ playlist.user.username }}
       </div>
       <div class="meta">
-        <i class="clock icon"></i> Updated <human-date :date="playlist.modification_date"></human-date>
+        <i class="clock icon"></i>
+        <i18next path="Updated {%date%}">
+          <human-date :date="playlist.modification_date" />
+        </i18next>
       </div>
     </div>
     <div class="extra content">
       <span>
         <i class="sound icon"></i>
-        {{ playlist.tracks_count }} tracks
+        {{ $t('{%count%} tracks', { count: playlist.tracks_count }) }}
       </span>
       <play-button class="mini basic orange right floated" :playlist="playlist">Play all</play-button>
     </div>
