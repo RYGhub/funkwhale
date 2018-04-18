@@ -1,15 +1,15 @@
 <template>
   <div v-title="'Import Requests'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">Music requests</h2>
+      <h2 class="ui header">{{ $t('Music requests') }}</h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>Search</label>
+            <label>{{ $t('Search') }}</label>
             <input type="text" v-model="query" placeholder="Enter an artist name, a username..."/>
           </div>
           <div class="field">
-            <label>Ordering</label>
+            <label>{{ $t('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -17,14 +17,14 @@
             </select>
           </div>
           <div class="field">
-            <label>Ordering direction</label>
+            <label>{{ $t('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="">Ascending</option>
               <option value="-">Descending</option>
             </select>
           </div>
           <div class="field">
-            <label>Results per page</label>
+            <label>{{ $t('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -98,9 +98,9 @@ export default {
       orderingDirection: defaultOrdering.direction,
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['creation_date', 'Creation date'],
-        ['artist_name', 'Artist name'],
-        ['user__username', 'User']
+        ['creation_date', this.$t('Creation date')],
+        ['artist_name', this.$t('Artist name')],
+        ['user__username', this.$t('User')]
       ]
     }
   },
