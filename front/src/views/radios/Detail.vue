@@ -83,7 +83,6 @@ export default {
       axios.get(url).then((response) => {
         self.radio = response.data
         axios.get(url + 'tracks', {params: {page: this.page}}).then((response) => {
-          console.log(response.data.count)
           this.totalTracks = response.data.count
           this.tracks = response.data.results
         }).then(() => {
