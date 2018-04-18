@@ -96,12 +96,7 @@ export default {
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 12),
       orderingDirection: defaultOrdering.direction,
-      ordering: defaultOrdering.field,
-      orderingOptions: [
-        ['creation_date', this.$t('Creation date')],
-        ['artist_name', this.$t('Artist name')],
-        ['user__username', this.$t('User')]
-      ]
+      ordering: defaultOrdering.field
     }
   },
   created () {
@@ -139,6 +134,15 @@ export default {
     }, 500),
     selectPage: function (page) {
       this.page = page
+    }
+  },
+  computed: {
+    orderingOptions: function () {
+      return [
+        ['creation_date', this.$t('Creation date')],
+        ['artist_name', this.$t('Artist name')],
+        ['user__username', this.$t('User')]
+      ]
     }
   },
   watch: {
