@@ -32,21 +32,7 @@ export default {
   data: function () {
     return {
       currentType: this.mbType || 'artist',
-      currentId: this.mbId || '',
-      types: [
-        {
-          value: 'artist',
-          label: this.$t('Artist')
-        },
-        {
-          value: 'release',
-          label: this.$t('Album')
-        },
-        {
-          value: 'recording',
-          label: this.$t('Track')
-        }
-      ]
+      currentId: this.mbId || ''
     }
   },
 
@@ -132,6 +118,22 @@ export default {
     },
     searchUrl: function () {
       return config.API_URL + 'providers/musicbrainz/search/' + this.currentTypeObject.value + 's/?query={query}'
+    },
+    types: function () {
+      return [
+        {
+          value: 'artist',
+          label: this.$t('Artist')
+        },
+        {
+          value: 'release',
+          label: this.$t('Album')
+        },
+        {
+          value: 'recording',
+          label: this.$t('Track')
+        }
+      ]
     }
   },
   watch: {
