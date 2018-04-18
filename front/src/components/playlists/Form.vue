@@ -57,8 +57,20 @@ export default {
     let d = {
       errors: [],
       success: false,
-      isLoading: false,
-      privacyLevelChoices: [
+      isLoading: false
+    }
+    if (this.playlist) {
+      d.name = this.playlist.name
+      d.privacyLevel = this.playlist.privacy_level
+    } else {
+      d.privacyLevel = this.$store.state.auth.profile.privacy_level
+      d.name = ''
+    }
+    return d
+  },
+  computed: {
+    privacyLevelChoices: function () {
+      return [
         {
           value: 'me',
           label: this.$t('Nobody except me')
@@ -73,14 +85,6 @@ export default {
         }
       ]
     }
-    if (this.playlist) {
-      d.name = this.playlist.name
-      d.privacyLevel = this.playlist.privacy_level
-    } else {
-      d.privacyLevel = this.$store.state.auth.profile.privacy_level
-      d.name = ''
-    }
-    return d
   },
   methods: {
     submit () {
