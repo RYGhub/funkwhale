@@ -35,7 +35,7 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', {
-  inserted: (el, binding) => { console.log(binding.value); document.title = binding.value + ' - Funkwhale' },
+  inserted: (el, binding) => { document.title = binding.value + ' - Funkwhale' },
   updated: (el, binding) => { document.title = binding.value + ' - Funkwhale' }
 })
 

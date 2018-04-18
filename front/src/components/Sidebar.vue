@@ -159,7 +159,6 @@ export default {
       // for half the height of the containers display area
       var scrollBack = (container.scrollHeight - container.scrollTop <= container.clientHeight) ? 0 : container.clientHeight / 2
       container.scrollTop = container.scrollTop - scrollBack
-      console.log(container.scrollHeight - container.scrollTop, container.clientHeight)
     }
   },
   watch: {
