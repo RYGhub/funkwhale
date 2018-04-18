@@ -12,7 +12,7 @@
     </div>
     <div class="ui fluid search">
       <div class="ui icon input">
-        <input class="prompt" placeholder="Enter your search query..." type="text">
+        <input class="prompt" :placeholder="$t('Enter your search query...')" type="text">
         <i class="search icon"></i>
       </div>
       <div class="results"></div>
@@ -36,15 +36,15 @@ export default {
       types: [
         {
           value: 'artist',
-          label: 'Artist'
+          label: this.$t('Artist')
         },
         {
           value: 'release',
-          label: 'Album'
+          label: this.$t('Album')
         },
         {
           value: 'recording',
-          label: 'Track'
+          label: this.$t('Track')
         }
       ]
     }

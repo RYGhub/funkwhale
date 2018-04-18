@@ -19,7 +19,7 @@
                   {{ track.position }}
                 </td>
                 <td colspan="3">
-                  <a :href="getMusicbrainzUrl('recording', track.id)" class="discrete link" target="_blank" title="View on MusicBrainz">
+                  <a :href="getMusicbrainzUrl('recording', track.id)" class="discrete link" target="_blank" :title="$t('View on MusicBrainz')">
                     {{ track.recording.title }}
                   </a>
                 </td>
