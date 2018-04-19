@@ -23,13 +23,14 @@ from rest_framework import permissions
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.federation import actors
-from funkwhale_api.requests.models import ImportRequest
-from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
+from funkwhale_api.federation import actors
 from funkwhale_api.federation.authentication import SignatureAuthentication
+from funkwhale_api.federation.models import LibraryTrack
+from funkwhale_api.musicbrainz import api
+from funkwhale_api.requests.models import ImportRequest
 
 from . import filters
 from . import forms
@@ -195,12 +196,13 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
 
     @detail_route(methods=['get'])
     def serve(self, request, *args, **kwargs):
+        queryset = models.TrackFile.objects.select_related(
+            'library_track',
+            'track__album__artist',
+            'track__artist',
+        )
         try:
-            f = models.TrackFile.objects.select_related(
-                'library_track',
-                'track__album__artist',
-                'track__artist',
-            ).get(pk=kwargs['pk'])
+            f = queryset.get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
 
@@ -213,7 +215,14 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
         if library_track and not audio_file:
             if not library_track.audio_file:
                 # we need to populate from cache
-                library_track.download_audio()
+                with transaction.atomic():
+                    # why the transaction/select_for_update?
+                    # this is because browsers may send multiple requests
+                    # in a short time range, for partial content,
+                    # thus resulting in multiple downloads from the remote
+                    qs = LibraryTrack.objects.select_for_update()
+                    library_track = qs.get(pk=library_track.pk)
+                    library_track.download_audio()
             audio_file = library_track.audio_file
             mt = library_track.audio_mimetype
         response = Response()
