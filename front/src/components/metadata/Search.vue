@@ -12,7 +12,7 @@
     </div>
     <div class="ui fluid search">
       <div class="ui icon input">
-        <input class="prompt" placeholder="Enter your search query..." type="text">
+        <input class="prompt" :placeholder="$t('Enter your search query...')" type="text">
         <i class="search icon"></i>
       </div>
       <div class="results"></div>
@@ -32,21 +32,7 @@ export default {
   data: function () {
     return {
       currentType: this.mbType || 'artist',
-      currentId: this.mbId || '',
-      types: [
-        {
-          value: 'artist',
-          label: 'Artist'
-        },
-        {
-          value: 'release',
-          label: 'Album'
-        },
-        {
-          value: 'recording',
-          label: 'Track'
-        }
-      ]
+      currentId: this.mbId || ''
     }
   },
 
@@ -132,6 +118,22 @@ export default {
     },
     searchUrl: function () {
       return config.API_URL + 'providers/musicbrainz/search/' + this.currentTypeObject.value + 's/?query={query}'
+    },
+    types: function () {
+      return [
+        {
+          value: 'artist',
+          label: this.$t('Artist')
+        },
+        {
+          value: 'release',
+          label: this.$t('Album')
+        },
+        {
+          value: 'recording',
+          label: this.$t('Track')
+        }
+      ]
     }
   },
   watch: {
