@@ -19,6 +19,14 @@ export default {
     }
   },
   mutations: {
+    reset (state) {
+      state.authenticated = false
+      state.profile = null
+      state.username = ''
+      state.token = ''
+      state.tokenData = {}
+      state.availablePermissions = {}
+    },
     profile: (state, value) => {
       state.profile = value
     },
@@ -53,8 +61,6 @@ export default {
       return axios.post('token/', credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
         commit('token', response.data.token)
-        commit('username', credentials.username)
-        commit('authenticated', true)
         dispatch('fetchProfile')
         // Redirect to a specified route
         router.push(next)
@@ -64,19 +70,25 @@ export default {
       })
     },
     logout ({commit}) {
-      commit('authenticated', false)
+      let modules = [
+        'auth',
+        'favorites',
+        'player',
+        'playlists',
+        'queue',
+        'radios'
+      ]
+      modules.forEach(m => {
+        commit(`${m}/reset`, null, {root: true})
+      })
       logger.default.info('Log out, goodbye!')
       router.push({name: 'index'})
     },
     check ({commit, dispatch, state}) {
       logger.default.info('Checking authentication...')
       var jwt = state.token
-      var username = state.username
       if (jwt) {
-        commit('authenticated', true)
-        commit('username', username)
         commit('token', jwt)
-        logger.default.info('Logged back in as ' + username)
         dispatch('fetchProfile')
         dispatch('refreshToken')
       } else {
@@ -88,6 +100,7 @@ export default {
       return axios.get('users/users/me/').then((response) => {
         logger.default.info('Successfully fetched user profile')
         let data = response.data
+        commit('authenticated', true)
         commit('profile', data)
         commit('username', data.username)
         dispatch('favorites/fetch', null, {root: true})
