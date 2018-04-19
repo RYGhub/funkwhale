@@ -18,12 +18,12 @@
     <div class="ui compact fluid two item inverted menu">
       <a class="active item" @click="selectedTab = 'library'" data-tab="library">Browse</a>
       <a class="item" @click="selectedTab = 'queue'" data-tab="queue">
-        Queue &nbsp;
+        {{ $t('Queue') }}
          <template v-if="queue.tracks.length === 0">
-           (empty)
+           {{ $t('(empty)') }}
          </template>
          <template v-else>
-           ({{ queue.currentIndex + 1}} of {{ queue.tracks.length }})
+           {{ $t('({%index%} of {%length%})', { index: queue.currentIndex + 1, length: queue.tracks.length }) }}
          </template>
       </a>
     </div>
@@ -31,23 +31,23 @@
   <div class="tabs">
     <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical fluid menu">
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i> Logged in as {{ $store.state.auth.username }}</router-link>
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> Logout</router-link>
-        <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> Login</router-link>
-        <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>Browse library</router-link>
-        <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> Favorites</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> {{ $t('Logout') }}</router-link>
+        <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> {{ $t('Login') }}</router-link>
+        <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
+        <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
         <a
           @click="$store.commit('playlists/chooseTrack', null)"
           v-if="$store.state.auth.authenticated"
           class="item">
-          <i class="list icon"></i> Playlists
+          <i class="list icon"></i> {{ $t('Playlists') }}
         </a>
         <router-link
           v-if="$store.state.auth.authenticated"
-          class="item" :to="{path: '/activity'}"><i class="bell icon"></i> Activity</router-link>
+          class="item" :to="{path: '/activity'}"><i class="bell icon"></i> {{ $t('Activity') }}</router-link>
         <router-link
           class="item" v-if="$store.state.auth.availablePermissions['federation.manage']"
-          :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> Federation</router-link>
+          :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> {{ $t('Federation') }}</router-link>
       </div>
 
       <player></player>
@@ -56,12 +56,12 @@
       <i class="history icon"></i>
       <div class="content">
         <div class="header">
-          Do you want to restore your previous queue?
+          {{ $t('Do you want to restore your previous queue?') }}
         </div>
-        <p>{{ queue.previousQueue.tracks.length }} tracks</p>
+        <p>{{ $t('{%count%} tracks', { count: queue.previousQueue.tracks.length }) }}</p>
         <div class="ui two buttons">
-          <div @click="queue.restore()" class="ui basic inverted green button">Yes</div>
-          <div @click="queue.removePrevious()" class="ui basic inverted red button">No</div>
+          <div @click="queue.restore()" class="ui basic inverted green button">{{ $t('Yes') }}</div>
+          <div @click="queue.removePrevious()" class="ui basic inverted red button">{{ $t('No') }}</div>
         </div>
       </div>
     </div>
@@ -93,10 +93,10 @@
 
         <div class="content">
           <div class="header">
-            <i class="feed icon"></i> You have a radio playing
+            <i class="feed icon"></i> {{ $t('You have a radio playing') }}
           </div>
-          <p>New tracks will be appended here automatically.</p>
-          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button">Stop radio</div>
+          <p>{{ $t('New tracks will be appended here automatically.') }}</p>
+          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button">{{ $t('Stop radio') }}</div>
         </div>
       </div>
     </div>

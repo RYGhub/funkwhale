@@ -3,15 +3,16 @@
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <template v-if="instance.name.value">About {{ instance.name.value }}</template>
-            <template v-else="instance.name.value">About this instance</template>
+            <template v-if="instance.name.value">{{ $t('About {%instance%}', { instance: instance.name.value }) }}</template>
+            <template v-else="instance.name.value">{{ $t('About this instance') }}</template>
         </h1>
         <stats></stats>
       </div>
     </div>
     <div class="ui vertical stripe segment">
       <p v-if="!instance.short_description.value && !instance.long_description.value">
-        Unfortunately, owners of this instance did not yet take the time to complete this page.</p>
+        {{ $t('Unfortunately, owners of this instance did not yet take the time to complete this page.') }}
+      </p>
       <div
         v-if="instance.short_description.value"
         class="ui middle aligned stackable text container">
