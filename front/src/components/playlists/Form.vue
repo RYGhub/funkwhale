@@ -1,29 +1,29 @@
 <template>
   <form class="ui form" @submit.prevent="submit()">
-    <h4 v-if="title" class="ui header">Create a new playlist</h4>
+    <h4 v-if="title" class="ui header">{{ $t('Create a new playlist') }}</h4>
     <div v-if="success" class="ui positive message">
       <div class="header">
         <template v-if="playlist">
-          Playlist updated
+          {{ $t('Playlist updated') }}
         </template>
         <template v-else>
-          Playlist created
+          {{ $t('Playlist created') }}
         </template>
       </div>
     </div>
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header">We cannot create the playlist</div>
+      <div class="header">{{ $t('We cannot create the playlist') }}</div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div class="three fields">
       <div class="field">
-        <label>Playlist name</label>
+        <label>{{ $t('Playlist name') }}</label>
         <input v-model="name" required type="text" placeholder="My awesome playlist" />
       </div>
       <div class="field">
-        <label>Playlist visibility</label>
+        <label>{{ $t('Playlist visibility') }}</label>
         <select class="ui dropdown" v-model="privacyLevel">
           <option :value="c.value" v-for="c in privacyLevelChoices">{{ c.label }}</option>
         </select>
@@ -31,8 +31,8 @@
       <div class="field">
         <label>&nbsp;</label>
         <button :class="['ui', 'fluid', {'loading': isLoading}, 'button']" type="submit">
-          <template v-if="playlist">Update playlist</template>
-          <template v-else>Create playlist</template>
+          <template v-if="playlist">{{ $t('Update playlist') }}</template>
+          <template v-else>{{ $t('Create playlist') }}</template>
         </button>
       </div>
     </div>
@@ -57,21 +57,7 @@ export default {
     let d = {
       errors: [],
       success: false,
-      isLoading: false,
-      privacyLevelChoices: [
-        {
-          value: 'me',
-          label: 'Nobody except me'
-        },
-        {
-          value: 'instance',
-          label: 'Everyone on this instance'
-        },
-        {
-          value: 'everyone',
-          label: 'Everyone'
-        }
-      ]
+      isLoading: false
     }
     if (this.playlist) {
       d.name = this.playlist.name
@@ -81,6 +67,24 @@ export default {
       d.name = ''
     }
     return d
+  },
+  computed: {
+    privacyLevelChoices: function () {
+      return [
+        {
+          value: 'me',
+          label: this.$t('Nobody except me')
+        },
+        {
+          value: 'instance',
+          label: this.$t('Everyone on this instance')
+        },
+        {
+          value: 'everyone',
+          label: this.$t('Everyone')
+        }
+      ]
+    }
   },
   methods: {
     submit () {
