@@ -10,6 +10,12 @@ export default {
     previousQueue: null
   },
   mutations: {
+    reset (state) {
+      state.tracks = []
+      state.currentIndex = -1
+      state.ended = true
+      state.previousQueue = null
+    },
     currentIndex (state, value) {
       state.currentIndex = value
     },
