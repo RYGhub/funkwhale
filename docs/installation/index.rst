@@ -12,8 +12,47 @@ The project relies on the following components and services to work:
 - A celery worker to run asynchronouse tasks (such as music import)
 - A celery scheduler to run recurrent tasks
 
+
+Hardware requirements
+---------------------
+
+Funkwhale is not especially CPU hungry, unless you're relying heavily
+on the transcoding feature (which is basic and unoptimized at the moment).
+
+On a dockerized instance with 2 CPUs and a few active users, the memory footprint is around ~500Mb::
+
+   CONTAINER                   MEM USAGE
+   funkwhale_api_1             202.1 MiB
+   funkwhale_celerybeat_1      96.52 MiB
+   funkwhale_celeryworker_1    168.7 MiB
+   funkwhale_postgres_1        22.73 MiB
+   funkwhale_redis_1           1.496 MiB
+
+Thus, Funkwhale should run fine on commodity hardware, small hosting boxes and
+Raspberry Pi. We lack real-world exemples of such deployments, so don't hesitate
+do give us your feedback (either positive or negative).
+
+Software requirements
+---------------------
+
+Software requirements will vary depending of your installation method. For
+Docker-based installations, the only requirement will be an Nginx reverse-proxy
+that will expose your instance to the outside world.
+
+If you plan to install your Funkwhale instance without Docker, most of the
+dependencies should be available in your distribution's repositories.
+
+.. note::
+
+   Funkwhale works only with Pyhon >= 3.5, as we need support for async/await.
+   Older versions of Python are not supported.
+
+
 Available installation methods
 -------------------------------
+
+Docker is the recommended and easiest way to setup your Funkwhale instance.
+We also maintain an installation guide for Debian 9.
 
 .. toctree::
    :maxdepth: 1
