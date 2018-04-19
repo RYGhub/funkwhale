@@ -412,7 +412,7 @@ class TrackFile(models.Model):
     track = models.ForeignKey(
         Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
-    source = models.URLField(null=True, blank=True)
+    source = models.URLField(null=True, blank=True, max_length=500)
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
     duration = models.IntegerField(null=True, blank=True)
