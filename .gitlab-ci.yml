@@ -46,7 +46,6 @@ test_front:
 
   script:
     - yarn install
-    - yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
     - yarn run unit
   cache:
     key: "$CI_PROJECT_ID__front_dependencies"
