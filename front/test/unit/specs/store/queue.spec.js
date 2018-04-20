@@ -326,7 +326,7 @@ describe('store/queue', () => {
         action: store.actions.shuffle,
         params: {state: {currentIndex: 1, tracks: tracks}},
         expectedMutations: [
-          { type: 'player/currentTime', payload: 0, options: {root: true}},
+          { type: 'player/currentTime', payload: 0, options: {root: true} },
           { type: 'tracks', payload: [] }
         ],
         expectedActions: [

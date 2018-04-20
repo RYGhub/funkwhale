@@ -134,7 +134,7 @@ describe('store/auth', () => {
         action: store.actions.login,
         payload: {credentials: credentials},
         expectedMutations: [
-          { type: 'token', payload: 'test' },
+          { type: 'token', payload: 'test' }
         ],
         expectedActions: [
           { type: 'fetchProfile' }
@@ -183,7 +183,7 @@ describe('store/auth', () => {
         ],
         expectedActions: [
           { type: 'favorites/fetch', payload: null, options: {root: true} },
-          { type: 'playlists/fetchOwn', payload: null, options: {root: true} },
+          { type: 'playlists/fetchOwn', payload: null, options: {root: true} }
         ]
       }, done)
     })
