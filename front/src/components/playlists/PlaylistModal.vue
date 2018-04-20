@@ -48,7 +48,7 @@
                 <div
                   v-if="track"
                   class="ui green icon basic small right floated button"
-                  :title="{{ $t('Add to this playlist') }}"
+                  :title="$t('Add to this playlist')"
                   @click="addToPlaylist(playlist.id)">
                   <i class="plus icon"></i> {{ $t('Add track') }}
                 </div>

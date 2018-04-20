@@ -1,4 +1,11 @@
 // helper for testing action with expected mutations
+import Vue from 'vue'
+
+export const render = (Component, propsData) => {
+  const Constructor = Vue.extend(Component)
+  return new Constructor({ propsData: propsData }).$mount()
+}
+
 export const testAction = ({action, payload, params, expectedMutations, expectedActions}, done) => {
   let mutationsCount = 0
   let actionsCount = 0
