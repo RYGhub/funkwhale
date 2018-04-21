@@ -22,8 +22,15 @@ to the ``/music`` directory on the container:
 
     docker-compose run --rm api python manage.py import_files "/music/**/*.ogg" --recursive --noinput
 
-For the best results, we recommand tagging your music collection through
-`Picard <http://picard.musicbrainz.org/>`_ in order to have the best quality metadata.
+The import command supports several options, and you can check the help to
+get details::
+
+    docker-compose run --rm api python manage.py import_files --help
+
+.. note::
+
+    For the best results, we recommand tagging your music collection through
+    `Picard <http://picard.musicbrainz.org/>`_ in order to have the best quality metadata.
 
 .. note::
 
@@ -39,18 +46,39 @@ For the best results, we recommand tagging your music collection through
 
     At the moment, only OGG/Vorbis and MP3 files with ID3 tags are supported
 
-.. note::
 
-    The --recursive flag will work only on Python 3.5+, which is the default
-    version When using Docker or Debian 9. If you use an older version of Python,
-    remove the --recursive flag and use more explicit import patterns instead::
+.. _in-place-import:
 
-        # this will only import ogg files at the second level
-        "/srv/funkwhale/data/music/*/*.ogg"
-        # this will only import ogg files in the fiven directory
-        "/srv/funkwhale/data/music/System-of-a-down/*.ogg"
+In-place import
+^^^^^^^^^^^^^^^
 
+By default, the CLI-importer will copy imported files to Funkwhale's internal
+storage. This means importing a 1Gb library will result in the same amount
+of space being used by Funkwhale.
 
+While this behaviour has some benefits (easier backups and configuration),
+it's not always the best choice, especially if you have a huge library
+to import and don't want to double your disk usage.
+
+The CLI importer supports an additional ``--in-place`` option that triggers the
+following behaviour during import:
+
+1. Imported files are not store in funkwhale anymore
+2. Instead, Funkwhale will store the file path and use it to serve the music
+
+Because those files are not managed by Funkwhale, we offer additional
+configuration options to ensure the webserver can serve them properly:
+
+- :ref:`setting-MUSIC_DIRECTORY_PATH`
+- :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH`
+
+.. warning::
+
+    While in-place import is faster and less disk-space-hungry, it's also
+    more fragile: if, for some reason, you move or rename the source files,
+    Funkwhale will not be able to serve those files anymore.
+
+    Thus, be especially careful when you manipulate the source files.
 
 Getting demo tracks
 ^^^^^^^^^^^^^^^^^^^

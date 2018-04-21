@@ -3,6 +3,52 @@ Changelog
 
 .. towncrier
 
+0.10 (Unreleased)
+-----------------
+
+
+In-place import
+^^^^^^^^^^^^^^^
+
+This release includes in-place imports for the CLI import. This means you can
+load gigabytes of music into funkwhale without worrying about about Funkwhale
+copying those music files in its internal storage and eating your disk space.
+
+This new feature is documented <here> and require additional configuration
+to ensure funkwhale and your webserver can serve those files properly.
+
+**Non-docker users:**
+
+Assuming your music is stored in ``/srv/funkwhale/data/music``, add the following
+block to your nginx configuration::
+
+    location /_protected/music {
+        internal;
+        alias   /srv/funkwhale/data/music;
+    }
+
+And the following to your .env file::
+
+    MUSIC_DIRECTORY_PATH=/srv/funkwhale/data/music
+
+**Docker users:**
+
+Assuming your music is stored in ``/srv/funkwhale/data/music``, add the following
+block to your nginx configuration::
+
+    location /_protected/music {
+        internal;
+        alias   /srv/funkwhale/data/music;
+    }
+
+Assuming you have the following volume directive in your ``docker-compose.yml``
+(it's the default): ``/srv/funkwhale/data/music:/music:ro``, then add
+the following to your .env file::
+
+    MUSIC_DIRECTORY_PATH=/music
+    MUSIC_DIRECTORY_SERVE_PATH=/srv/funkwhale/data/music
+
+
 0.9.1 (2018-04-17)
 ------------------
 
