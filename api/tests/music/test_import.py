@@ -231,3 +231,15 @@ def test_import_batch_notifies_followers(
         on_behalf_of=library_actor,
         to=[f1.actor.url]
     )
+
+
+def test__do_import_in_place_mbid(factories, tmpfile):
+    path = '/test.ogg'
+    job = factories['music.ImportJob'](
+        in_place=True, source='file:///test.ogg')
+
+    track = factories['music.Track'](mbid=job.mbid)
+    tf = tasks._do_import(job, use_acoustid=False)
+
+    assert bool(tf.audio_file) is False
+    assert tf.source == 'file:///test.ogg'

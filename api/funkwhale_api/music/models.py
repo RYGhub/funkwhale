@@ -463,6 +463,26 @@ class TrackFile(models.Model):
             self.mimetype = utils.guess_mimetype(self.audio_file)
         return super().save(**kwargs)
 
+    @property
+    def serve_from_source_path(self):
+        if not self.source or not self.source.startswith('file://'):
+            raise ValueError('Cannot serve this file from source')
+        serve_path = settings.MUSIC_DIRECTORY_SERVE_PATH
+        prefix = settings.MUSIC_DIRECTORY_PATH
+        if not serve_path or not prefix:
+            raise ValueError(
+                'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+            )
+        file_path = self.source.replace('file://', '', 1)
+        parts = os.path.split(file_path.replace(prefix, '', 1))
+        if parts[0] == '/':
+            parts = parts[1:]
+        return os.path.join(
+            serve_path,
+            *parts
+        )
+
 
 IMPORT_STATUS_CHOICES = (
     ('pending', 'Pending'),

@@ -1,6 +1,7 @@
 import glob
 import os
 
+from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 
@@ -38,7 +39,20 @@ class Command(BaseCommand):
             action='store_true',
             dest='exit_on_failure',
             default=False,
-            help='use this flag to disable error catching',
+            help='Use this flag to disable error catching',
+        )
+        parser.add_argument(
+            '--in-place', '-i',
+            action='store_true',
+            dest='in_place',
+            default=False,
+            help=(
+                'Import files without duplicating them into the media directory.'
+                'For in-place import to work, the music files must be readable'
+                'by the web-server and funkwhale api and celeryworker processes.'
+                'You may want to use this if you have a big music library to '
+                'import and not much disk space available.'
+            )
         )
         parser.add_argument(
             '--no-acoustid',
@@ -53,10 +67,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        # self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
-
-        # Recursive is supported only on Python 3.5+, so we pass the option
-        # only if it's True to avoid breaking on older versions of Python
         glob_kwargs = {}
         if options['recursive']:
             glob_kwargs['recursive'] = True
@@ -65,6 +75,21 @@ class Command(BaseCommand):
         except TypeError:
             raise Exception('You need Python 3.5 to use the --recursive flag')
 
+        if options['in_place']:
+            self.stdout.write(
+                'Checking imported paths against settings.MUSIC_DIRECTORY_PATH')
+            p = settings.MUSIC_DIRECTORY_PATH
+            if not p:
+                raise CommandError(
+                    'Importing in-place requires setting the '
+                    'MUSIC_DIRECTORY_PATH variable')
+            for m in matching:
+                if not m.startswith(p):
+                    raise CommandError(
+                        'Importing in-place only works if importing'
+                        'from {} (MUSIC_DIRECTORY_PATH), as this directory'
+                        'needs to be accessible by the webserver.'
+                        'Culprit: {}'.format(p, m))
         if not matching:
             raise CommandError('No file matching pattern, aborting')
 
@@ -92,6 +117,10 @@ class Command(BaseCommand):
         self.stdout.write('- {} new files'.format(
             len(filtered['new'])))
 
+        self.stdout.write('Selected options: {}'.format(', '.join([
+            'no acoustid' if options['no_acoustid'] else 'use acoustid',
+            'in place' if options['in_place'] else 'copy music files',
+        ])))
         if len(filtered['new']) == 0:
             self.stdout.write('Nothing new to import, exiting')
             return
@@ -164,11 +193,12 @@ class Command(BaseCommand):
         job = batch.jobs.create(
             source='file://' + path,
         )
-        name = os.path.basename(path)
-        with open(path, 'rb') as f:
-            job.audio_file.save(name, File(f))
+        if not options['in_place']:
+            name = os.path.basename(path)
+            with open(path, 'rb') as f:
+                job.audio_file.save(name, File(f))
 
-        job.save()
+            job.save()
         import_handler(
             import_job_id=job.pk,
             use_acoustid=not options['no_acoustid'])
