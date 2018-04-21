@@ -2,12 +2,14 @@ import acoustid
 import os
 import datetime
 from django.core.files import File
+from django.db import transaction
 
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.music import models, metadata
 
 
+@transaction.atomic
 def import_track_data_from_path(path):
     data = metadata.Metadata(path)
     artist = models.Artist.objects.get_or_create(
@@ -44,6 +46,7 @@ def import_track_data_from_path(path):
 
 def import_metadata_with_musicbrainz(path):
     pass
+
 
 @celery.app.task(name='audiofile.from_path')
 def from_path(path):

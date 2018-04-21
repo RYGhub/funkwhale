@@ -61,7 +61,7 @@ class Command(BaseCommand):
         if options['recursive']:
             glob_kwargs['recursive'] = True
         try:
-            matching = glob.glob(options['path'], **glob_kwargs)
+            matching = sorted(glob.glob(options['path'], **glob_kwargs))
         except TypeError:
             raise Exception('You need Python 3.5 to use the --recursive flag')
 
@@ -110,13 +110,13 @@ class Command(BaseCommand):
         if options['async']:
             message = 'Successfully launched import for {} tracks'
 
-        self.stdout.write(message.format(len(matching)))
+        self.stdout.write(message.format(len(filtered['new'])))
         if len(errors) > 0:
             self.stderr.write(
                 '{} tracks could not be imported:'.format(len(errors)))
 
             for path, error in errors:
-                self.stderr('- {}: {}'.format(path, error))
+                self.stderr.write('- {}: {}'.format(path, error))
         self.stdout.write(
             "For details, please refer to import batch #{}".format(batch.pk))
 
@@ -130,8 +130,8 @@ class Command(BaseCommand):
         skipped = set(matching) & existing
         result = {
             'initial': matching,
-            'skipped': list(skipped),
-            'new': list(set(matching) - skipped)
+            'skipped': list(sorted(skipped)),
+            'new': list(sorted(set(matching) - skipped)),
         }
         return result
 
@@ -146,7 +146,7 @@ class Command(BaseCommand):
         batch = user.imports.create(source='shell')
         total = len(paths)
         errors = []
-        for i, path in enumerate(paths):
+        for i, path in list(enumerate(paths)):
             try:
                 self.stdout.write(
                     message.format(path=path, i=i+1, total=len(paths)))
@@ -157,7 +157,7 @@ class Command(BaseCommand):
                 m = 'Error while importing {}: {} {}'.format(
                     path, e.__class__.__name__, e)
                 self.stderr.write(m)
-                errors.append((m, path))
+                errors.append((path, '{} {}'.format(e.__class__.__name__, e)))
         return batch, errors
 
     def import_file(self, path, batch, import_handler, options):
