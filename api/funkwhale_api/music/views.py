@@ -224,12 +224,21 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                     library_track = qs.get(pk=library_track.pk)
                     library_track.download_audio()
             audio_file = library_track.audio_file
+            file_path = '{}{}'.format(
+                settings.PROTECT_FILES_PATH,
+                audio_file.url)
             mt = library_track.audio_mimetype
+        elif audio_file:
+            file_path = '{}{}'.format(
+                settings.PROTECT_FILES_PATH,
+                audio_file.url)
+        elif f.source and f.source.startswith('file://'):
+            file_path = '{}{}'.format(
+                settings.PROTECT_FILES_PATH + '/music',
+                f.serve_from_source_path)
         response = Response()
         filename = f.filename
-        response['X-Accel-Redirect'] = "{}{}".format(
-            settings.PROTECT_FILES_PATH,
-            audio_file.url)
+        response['X-Accel-Redirect'] = file_path
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)

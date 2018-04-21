@@ -93,6 +93,25 @@ def test_can_proxy_remote_track(
     assert library_track.audio_file.read() == b'test'
 
 
+def test_can_serve_in_place_imported_file(
+        factories, settings, api_client, r_mock):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    track_file = factories['music.TrackFile'](
+        in_place=True,
+        source='file:///music/test.ogg')
+
+    response = api_client.get(track_file.path)
+
+    assert response.status_code == 200
+    assert response['X-Accel-Redirect'] == '{}{}'.format(
+        settings.PROTECT_FILES_PATH,
+        '/music/host/music/test.ogg'
+    )
+
+
 def test_can_create_import_from_federation_tracks(
         factories, superuser_api_client, mocker):
     lts = factories['federation.LibraryTrack'].create_batch(size=5)
