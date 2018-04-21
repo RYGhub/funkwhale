@@ -58,6 +58,20 @@ def test_management_command_requires_a_valid_username(factories, mocker):
     call_command('import_files', path, username='me', interactive=False)
 
 
+def test_in_place_import_only_from_music_dir(factories, settings):
+    user = factories['users.User'](username='me')
+    settings.MUSIC_DIRECTORY_PATH = '/nope'
+    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
+    with pytest.raises(CommandError):
+        call_command(
+            'import_files',
+            path,
+            in_place=True,
+            username='me',
+            interactive=False
+        )
+
+
 def test_import_files_creates_a_batch_and_job(factories, mocker):
     m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
     user = factories['users.User'](username='me')
@@ -132,6 +146,27 @@ def test_import_files_works_with_utf8_file_name(factories, mocker):
         interactive=False)
     batch = user.imports.latest('id')
     job = batch.jobs.first()
+    m.assert_called_once_with(
+        import_job_id=job.pk,
+        use_acoustid=False)
+
+
+def test_import_files_in_place(factories, mocker, settings):
+    settings.MUSIC_DIRECTORY_PATH = DATA_DIR
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
+    user = factories['users.User'](username='me')
+    path = os.path.join(DATA_DIR, 'utf8-éà◌.ogg')
+    call_command(
+        'import_files',
+        path,
+        username='me',
+        async=False,
+        in_place=True,
+        no_acoustid=True,
+        interactive=False)
+    batch = user.imports.latest('id')
+    job = batch.jobs.first()
+    assert bool(job.audio_file) is False
     m.assert_called_once_with(
         import_job_id=job.pk,
         use_acoustid=False)
