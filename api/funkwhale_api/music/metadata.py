@@ -1,5 +1,6 @@
-import mutagen
+from django import forms
 import arrow
+import mutagen
 
 NODEFAULT = object()
 
@@ -49,6 +50,13 @@ def convert_track_number(v):
         return int(v.split('/')[0])
     except (ValueError, AttributeError, IndexError):
         pass
+
+
+VALIDATION = {
+    'musicbrainz_artistid': forms.UUIDField(),
+    'musicbrainz_albumid': forms.UUIDField(),
+    'musicbrainz_recordingid': forms.UUIDField(),
+}
 
 CONF = {
     'OggVorbis': {
@@ -146,4 +154,7 @@ class Metadata(object):
         converter = field_conf.get('to_application')
         if converter:
             v = converter(v)
+        field = VALIDATION.get(key)
+        if field:
+            v = field.to_python(v)
         return v

@@ -65,7 +65,7 @@ services:
       - "CACHE_URL=redis://redis:6379/0"
     volumes:
       - ./api:/app
-      - ./data/music:/music
+      - "${MUSIC_DIRECTORY-./data/music}:/music"
     networks:
       - internal
   api:
@@ -78,7 +78,7 @@ services:
     command: python /app/manage.py runserver 0.0.0.0:12081
     volumes:
       - ./api:/app
-      - ./data/music:/music
+      - "${MUSIC_DIRECTORY-./data/music}:/music"
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"

@@ -507,6 +507,8 @@ class ImportBatch(models.Model):
     def update_status(self):
         old_status = self.status
         self.status = utils.compute_status(self.jobs.all())
+        if self.status == old_status:
+            return
         self.save(update_fields=['status'])
         if self.status != old_status and self.status == 'finished':
             from . import tasks

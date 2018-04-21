@@ -3,9 +3,8 @@ import os
 
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
 
-from funkwhale_api.common import utils
+from funkwhale_api.music import models
 from funkwhale_api.music import tasks
 from funkwhale_api.users.models import User
 
@@ -62,12 +61,9 @@ class Command(BaseCommand):
         if options['recursive']:
             glob_kwargs['recursive'] = True
         try:
-            matching = glob.glob(options['path'], **glob_kwargs)
+            matching = sorted(glob.glob(options['path'], **glob_kwargs))
         except TypeError:
             raise Exception('You need Python 3.5 to use the --recursive flag')
-
-        self.stdout.write('This will import {} files matching this pattern: {}'.format(
-            len(matching), options['path']))
 
         if not matching:
             raise CommandError('No file matching pattern, aborting')
@@ -86,6 +82,20 @@ class Command(BaseCommand):
             except AssertionError:
                 raise CommandError(
                     'No superuser available, please provide a --username')
+
+        filtered = self.filter_matching(matching, options)
+        self.stdout.write('Import summary:')
+        self.stdout.write('- {} files found matching this pattern: {}'.format(
+            len(matching), options['path']))
+        self.stdout.write('- {} files already found in database'.format(
+            len(filtered['skipped'])))
+        self.stdout.write('- {} new files'.format(
+            len(filtered['new'])))
+
+        if len(filtered['new']) == 0:
+            self.stdout.write('Nothing new to import, exiting')
+            return
+
         if options['interactive']:
             message = (
                 'Are you sure you want to do this?\n\n'
@@ -94,27 +104,52 @@ class Command(BaseCommand):
             if input(''.join(message)) != 'yes':
                 raise CommandError("Import cancelled.")
 
-        batch = self.do_import(matching, user=user, options=options)
+        batch, errors = self.do_import(
+            filtered['new'], user=user, options=options)
         message = 'Successfully imported {} tracks'
         if options['async']:
             message = 'Successfully launched import for {} tracks'
-        self.stdout.write(message.format(len(matching)))
+
+        self.stdout.write(message.format(len(filtered['new'])))
+        if len(errors) > 0:
+            self.stderr.write(
+                '{} tracks could not be imported:'.format(len(errors)))
+
+            for path, error in errors:
+                self.stderr.write('- {}: {}'.format(path, error))
         self.stdout.write(
             "For details, please refer to import batch #{}".format(batch.pk))
 
-    @transaction.atomic
-    def do_import(self, matching, user, options):
-        message = 'Importing {}...'
+    def filter_matching(self, matching, options):
+        sources = ['file://{}'.format(p) for p in matching]
+        # we skip reimport for path that are already found
+        # as a TrackFile.source
+        existing = models.TrackFile.objects.filter(source__in=sources)
+        existing = existing.values_list('source', flat=True)
+        existing = set([p.replace('file://', '', 1) for p in existing])
+        skipped = set(matching) & existing
+        result = {
+            'initial': matching,
+            'skipped': list(sorted(skipped)),
+            'new': list(sorted(set(matching) - skipped)),
+        }
+        return result
+
+    def do_import(self, paths, user, options):
+        message = '{i}/{total} Importing {path}...'
         if options['async']:
-            message = 'Launching import for {}...'
+            message = '{i}/{total} Launching import for {path}...'
 
         # we create an import batch binded to the user
-        batch = user.imports.create(source='shell')
         async = options['async']
         import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
-        for path in matching:
+        batch = user.imports.create(source='shell')
+        total = len(paths)
+        errors = []
+        for i, path in list(enumerate(paths)):
             try:
-                self.stdout.write(message.format(path))
+                self.stdout.write(
+                    message.format(path=path, i=i+1, total=len(paths)))
                 self.import_file(path, batch, import_handler, options)
             except Exception as e:
                 if options['exit_on_failure']:
@@ -122,7 +157,8 @@ class Command(BaseCommand):
                 m = 'Error while importing {}: {} {}'.format(
                     path, e.__class__.__name__, e)
                 self.stderr.write(m)
-        return batch
+                errors.append((path, '{} {}'.format(e.__class__.__name__, e)))
+        return batch, errors
 
     def import_file(self, path, batch, import_handler, options):
         job = batch.jobs.create(
@@ -133,7 +169,6 @@ class Command(BaseCommand):
             job.audio_file.save(name, File(f))
 
         job.save()
-        utils.on_commit(
-            import_handler,
+        import_handler(
             import_job_id=job.pk,
             use_acoustid=not options['no_acoustid'])
