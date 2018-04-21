@@ -100,6 +100,22 @@ def test_import_files_skip_acoustid(factories, mocker):
         use_acoustid=False)
 
 
+def test_import_files_skip_if_path_already_imported(factories, mocker):
+    user = factories['users.User'](username='me')
+    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
+    existing = factories['music.TrackFile'](
+        source='file://{}'.format(path))
+
+    call_command(
+        'import_files',
+        path,
+        username='me',
+        async=False,
+        no_acoustid=True,
+        interactive=False)
+    assert user.imports.count() == 0
+
+
 def test_import_files_works_with_utf8_file_name(factories, mocker):
     m = mocker.patch('funkwhale_api.common.utils.on_commit')
     user = factories['users.User'](username='me')

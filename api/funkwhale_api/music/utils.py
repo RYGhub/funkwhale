@@ -53,7 +53,7 @@ def guess_mimetype(f):
 
 
 def compute_status(jobs):
-    statuses = jobs.values_list('status', flat=True).distinct()
+    statuses = jobs.order_by().values_list('status', flat=True).distinct()
     errored = any([status == 'errored' for status in statuses])
     if errored:
         return 'errored'
