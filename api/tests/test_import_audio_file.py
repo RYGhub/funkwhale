@@ -2,6 +2,8 @@ import pytest
 import acoustid
 import datetime
 import os
+import uuid
+
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
@@ -15,7 +17,8 @@ DATA_DIR = os.path.join(
 
 
 def test_can_create_track_from_file_metadata(db, mocker):
-    mocker.patch('acoustid.match', side_effect=acoustid.WebServiceError('test'))
+    mocker.patch(
+        'acoustid.match', side_effect=acoustid.WebServiceError('test'))
     metadata = {
         'artist': ['Test artist'],
         'album': ['Test album'],
@@ -35,33 +38,35 @@ def test_can_create_track_from_file_metadata(db, mocker):
         os.path.join(DATA_DIR, 'dummy_file.ogg'))
 
     assert track.title == metadata['title'][0]
-    assert track.mbid == metadata['musicbrainz_trackid'][0]
+    assert track.mbid == uuid.UUID(metadata['musicbrainz_trackid'][0])
     assert track.position == 4
     assert track.album.title == metadata['album'][0]
-    assert track.album.mbid == metadata['musicbrainz_albumid'][0]
+    assert track.album.mbid == uuid.UUID(metadata['musicbrainz_albumid'][0])
     assert track.album.release_date == datetime.date(2012, 8, 15)
     assert track.artist.name == metadata['artist'][0]
-    assert track.artist.mbid == metadata['musicbrainz_artistid'][0]
+    assert track.artist.mbid == uuid.UUID(metadata['musicbrainz_artistid'][0])
 
 
 def test_management_command_requires_a_valid_username(factories, mocker):
     path = os.path.join(DATA_DIR, 'dummy_file.ogg')
     user = factories['users.User'](username='me')
-    mocker.patch('funkwhale_api.providers.audiofile.management.commands.import_files.Command.do_import')  # NOQA
+    mocker.patch(
+        'funkwhale_api.providers.audiofile.management.commands.import_files.Command.do_import',  # noqa
+        return_value=(mocker.MagicMock(), []))
     with pytest.raises(CommandError):
         call_command('import_files', path, username='not_me', interactive=False)
     call_command('import_files', path, username='me', interactive=False)
 
 
 def test_import_files_creates_a_batch_and_job(factories, mocker):
-    m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
     user = factories['users.User'](username='me')
     path = os.path.join(DATA_DIR, 'dummy_file.ogg')
     call_command(
         'import_files',
         path,
         username='me',
-        async=True,
+        async=False,
         interactive=False)
 
     batch = user.imports.latest('id')
@@ -76,26 +81,24 @@ def test_import_files_creates_a_batch_and_job(factories, mocker):
 
     assert job.source == 'file://' + path
     m.assert_called_once_with(
-        music_tasks.import_job_run.delay,
         import_job_id=job.pk,
         use_acoustid=True)
 
 
 def test_import_files_skip_acoustid(factories, mocker):
-    m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
     user = factories['users.User'](username='me')
     path = os.path.join(DATA_DIR, 'dummy_file.ogg')
     call_command(
         'import_files',
         path,
         username='me',
-        async=True,
+        async=False,
         no_acoustid=True,
         interactive=False)
     batch = user.imports.latest('id')
     job = batch.jobs.first()
     m.assert_called_once_with(
-        music_tasks.import_job_run.delay,
         import_job_id=job.pk,
         use_acoustid=False)
 
@@ -117,20 +120,19 @@ def test_import_files_skip_if_path_already_imported(factories, mocker):
 
 
 def test_import_files_works_with_utf8_file_name(factories, mocker):
-    m = mocker.patch('funkwhale_api.common.utils.on_commit')
+    m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
     user = factories['users.User'](username='me')
     path = os.path.join(DATA_DIR, 'utf8-éà◌.ogg')
     call_command(
         'import_files',
         path,
         username='me',
-        async=True,
+        async=False,
         no_acoustid=True,
         interactive=False)
     batch = user.imports.latest('id')
     job = batch.jobs.first()
     m.assert_called_once_with(
-        music_tasks.import_job_run.delay,
         import_job_id=job.pk,
         use_acoustid=False)
 
