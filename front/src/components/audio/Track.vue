@@ -73,7 +73,10 @@ export default {
   },
   methods: {
     errored: function () {
-      this.$store.dispatch('player/trackErrored')
+      let self = this
+      setTimeout(
+        () => { self.$store.dispatch('player/trackErrored') }
+      , 1000)
     },
     sourceErrored: function () {
       this.sourceErrors += 1
