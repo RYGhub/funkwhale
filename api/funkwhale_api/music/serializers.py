@@ -6,6 +6,7 @@ from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.federation.models import LibraryTrack
 from funkwhale_api.federation.serializers import AP_CONTEXT
+from funkwhale_api.users.serializers import UserBasicSerializer
 
 from . import models
 
@@ -90,6 +91,7 @@ class TrackSerializerNested(LyricsMixin):
     files = TrackFileSerializer(many=True, read_only=True)
     album = SimpleAlbumSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Track
         fields = ('id', 'mbid', 'title', 'artist', 'files', 'album', 'tags', 'lyrics')
@@ -108,6 +110,7 @@ class AlbumSerializerNested(serializers.ModelSerializer):
 class ArtistSerializerNested(serializers.ModelSerializer):
     albums = AlbumSerializerNested(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Artist
         fields = ('id', 'mbid', 'name', 'albums', 'tags')
@@ -121,18 +124,43 @@ class LyricsSerializer(serializers.ModelSerializer):
 
 class ImportJobSerializer(serializers.ModelSerializer):
     track_file = TrackFileSerializer(read_only=True)
+
     class Meta:
         model = models.ImportJob
-        fields = ('id', 'mbid', 'batch', 'source', 'status', 'track_file', 'audio_file')
+        fields = (
+            'id',
+            'mbid',
+            'batch',
+            'source',
+            'status',
+            'track_file',
+            'audio_file')
         read_only_fields = ('status', 'track_file')
 
 
 class ImportBatchSerializer(serializers.ModelSerializer):
-    jobs = ImportJobSerializer(many=True, read_only=True)
+    submitted_by = UserBasicSerializer(read_only=True)
+
     class Meta:
         model = models.ImportBatch
-        fields = ('id', 'jobs', 'status', 'creation_date', 'import_request')
-        read_only_fields = ('creation_date',)
+        fields = (
+            'id',
+            'submitted_by',
+            'source',
+            'status',
+            'creation_date',
+            'import_request')
+        read_only_fields = (
+            'creation_date', 'submitted_by', 'source')
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        try:
+            repr['job_count'] = instance.job_count
+        except AttributeError:
+            # Queryset was not annotated
+            pass
+        return repr
 
 
 class TrackActivitySerializer(activity_serializers.ModelSerializer):

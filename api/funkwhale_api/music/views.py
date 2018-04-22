@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models.functions import Length
+from django.db.models import Count
 from django.http import StreamingHttpResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -99,14 +100,14 @@ class ImportBatchViewSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     queryset = (
-        models.ImportBatch.objects.all()
-                          .prefetch_related('jobs__track_file')
-                          .order_by('-creation_date'))
+        models.ImportBatch.objects
+              .select_related()
+              .order_by('-creation_date')
+              .annotate(job_count=Count('jobs'))
+    )
     serializer_class = serializers.ImportBatchSerializer
     permission_classes = (permissions.DjangoModelPermissions, )
-
-    def get_queryset(self):
-        return super().get_queryset().filter(submitted_by=self.request.user)
+    filter_class = filters.ImportBatchFilter
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
@@ -119,13 +120,30 @@ class ImportJobPermission(HasModelPermission):
 
 class ImportJobViewSet(
         mixins.CreateModelMixin,
+        mixins.ListModelMixin,
         viewsets.GenericViewSet):
-    queryset = (models.ImportJob.objects.all())
+    queryset = (models.ImportJob.objects.all().select_related())
     serializer_class = serializers.ImportJobSerializer
     permission_classes = (ImportJobPermission, )
+    filter_class = filters.ImportJobFilter
 
-    def get_queryset(self):
-        return super().get_queryset().filter(batch__submitted_by=self.request.user)
+    @list_route(methods=['get'])
+    def stats(self, request, *args, **kwargs):
+        qs = models.ImportJob.objects.all()
+        filterset = filters.ImportJobFilter(request.GET, queryset=qs)
+        qs = filterset.qs
+        qs = qs.values('status').order_by('status')
+        qs = qs.annotate(status_count=Count('status'))
+
+        data = {}
+        for row in qs:
+            data[row['status']] = row['status_count']
+
+        for s, _ in models.IMPORT_STATUS_CHOICES:
+            data.setdefault(s, 0)
+
+        data['count'] = sum([v for v in data.values()])
+        return Response(data)
 
     def perform_create(self, serializer):
         source = 'file://' + serializer.validated_data['audio_file'].name
@@ -136,7 +154,8 @@ class ImportJobViewSet(
         )
 
 
-class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+        TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """

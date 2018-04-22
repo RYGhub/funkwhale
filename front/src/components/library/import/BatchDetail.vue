@@ -4,31 +4,80 @@
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <div v-if="batch" class="ui vertical stripe segment">
-      <div :class="
-        ['ui',
-        {'active': batch.status === 'pending'},
-        {'warning': batch.status === 'pending'},
-        {'error': batch.status === 'errored'},
-        {'success': batch.status === 'finished'},
-        'progress']">
-        <div class="bar" :style="progressBarStyle">
-          <div class="progress"></div>
+      <table class="ui very basic table">
+        <tbody>
+          <tr>
+            <td>
+              <strong>{{ $t('Import batch') }}</strong>
+            </td>
+            <td>
+              #{{ batch.id }}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>{{ $t('Launch date') }}</strong>
+            </td>
+            <td>
+              <human-date :date="batch.creation_date"></human-date>
+            </td>
+          </tr>
+          <tr v-if="batch.user">
+            <td>
+              <strong>{{ $t('Submitted by') }}</strong>
+            </td>
+            <td>
+              <username :username="batch.user.username" />
+            </td>
+          </tr>
+          <tr v-if="stats">
+            <td><strong>{{ $t('Pending') }}</strong></td>
+            <td>{{ stats.pending }}</td>
+          </tr>
+          <tr v-if="stats">
+            <td><strong>{{ $t('Skipped') }}</strong></td>
+            <td>{{ stats.skipped }}</td>
+          </tr>
+          <tr v-if="stats">
+            <td><strong>{{ $t('Errored') }}</strong></td>
+            <td>{{ stats.errored }}</td>
+          </tr>
+          <tr v-if="stats">
+            <td><strong>{{ $t('Finished') }}</strong></td>
+            <td>{{ stats.finished }}/{{ stats.count}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="ui inline form">
+        <div class="fields">
+          <div class="ui field">
+            <label>{{ $t('Search') }}</label>
+            <input type="text" v-model="jobFilters.search" placeholder="Search by source..." />
+          </div>
+          <div class="ui field">
+            <label>{{ $t('Status') }}</label>
+            <select class="ui dropdown" v-model="jobFilters.status">
+              <option :value="null">{{ $t('Any') }}</option>
+              <option :value="'pending'">{{ $t('Pending') }}</option>
+              <option :value="'errored'">{{ $t('Errored') }}</option>
+              <option :value="'finished'">{{ $t('Success') }}</option>
+              <option :value="'skipped'">{{ $t('Skipped') }}</option>
+            </select>
+          </div>
         </div>
-        <div v-if="batch.status === 'pending'" class="label">Importing {{ batch.jobs.length }} tracks...</div>
-        <div v-if="batch.status === 'finished'" class="label">Imported {{ batch.jobs.length }} tracks!</div>
       </div>
-      <table class="ui unstackable table">
+      <table v-if="jobResult" class="ui unstackable table">
         <thead>
           <tr>
-            <i18next tag="th" path="Job ID"/>
-            <i18next tag="th" path="Recording MusicBrainz ID"/>
-            <i18next tag="th" path="Source"/>
-            <i18next tag="th" path="Status"/>
-            <i18next tag="th" path="Track"/>
+            <th>{{ $t('Job ID') }}</th>
+            <th>{{ $t('Recording MusicBrainz ID') }}</th>
+            <th>{{ $t('Source') }}</th>
+            <th>{{ $t('Status') }}</th>
+            <th>{{ $t('Track') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="job in batch.jobs">
+          <tr v-for="job in jobResult.results">
             <td>{{ job.id }}</th>
             <td>
               <a :href="'https://www.musicbrainz.org/recording/' + job.mbid" target="_blank">{{ job.mbid }}</a>
@@ -45,29 +94,64 @@
             </td>
           </tr>
         </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th>
+              <pagination
+              v-if="jobResult && jobResult.results.length > 0"
+              @page-changed="selectPage"
+              :compact="true"
+              :current="jobFilters.page"
+              :paginate-by="jobFilters.paginateBy"
+              :total="jobResult.count"
+              ></pagination>
+            </th>
+            <th v-if="jobResult && jobResult.results.length > 0">
+              {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((jobFilters.page-1) * jobFilters.paginateBy) + 1 , end: ((jobFilters.page-1) * jobFilters.paginateBy) + jobResult.results.length, total: jobResult.count})}}
+            <th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
       </table>
-
     </div>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
-
-const FETCH_URL = 'import-batches/'
+import Pagination from '@/components/Pagination'
 
 export default {
   props: ['id'],
+  components: {
+    Pagination
+  },
   data () {
     return {
       isLoading: true,
       batch: null,
-      timeout: null
+      stats: null,
+      jobResult: null,
+      timeout: null,
+      jobFilters: {
+        status: null,
+        source: null,
+        search: '',
+        paginateBy: 25,
+        page: 1
+      }
     }
   },
   created () {
-    this.fetchData()
+    let self = this
+    this.fetchData().then(() => {
+      self.fetchJobs()
+      self.fetchStats()
+    })
   },
   destroyed () {
     if (this.timeout) {
@@ -78,9 +162,9 @@ export default {
     fetchData () {
       var self = this
       this.isLoading = true
-      let url = FETCH_URL + this.id + '/'
+      let url = 'import-batches/' + this.id + '/'
       logger.default.debug('Fetching batch "' + this.id + '"')
-      axios.get(url).then((response) => {
+      return axios.get(url).then((response) => {
         self.batch = response.data
         self.isLoading = false
         if (self.batch.status === 'pending') {
@@ -90,21 +174,58 @@ export default {
           )
         }
       })
-    }
-  },
-  computed: {
-    progress () {
-      return this.batch.jobs.filter(j => {
-        return j.status !== 'pending'
-      }).length * 100 / this.batch.jobs.length
     },
-    progressBarStyle () {
-      return 'width: ' + parseInt(this.progress) + '%'
+    fetchStats () {
+      var self = this
+      let url = 'import-jobs/stats/'
+      axios.get(url, {params: {batch: self.id}}).then((response) => {
+        let old = self.stats
+        self.stats = response.data
+        self.isLoading = false
+        if (!_.isEqual(old, self.stats)) {
+          self.fetchJobs()
+          self.fetchData()
+        }
+        if (self.batch.status === 'pending') {
+          self.timeout = setTimeout(
+            self.fetchStats,
+            5000
+          )
+        }
+      })
+    },
+    fetchJobs () {
+      let params = {
+        batch: this.id,
+        page_size: this.jobFilters.paginateBy,
+        page: this.jobFilters.page,
+        q: this.jobFilters.search
+      }
+      if (this.jobFilters.status) {
+        params.status = this.jobFilters.status
+      }
+      if (this.jobFilters.source) {
+        params.source = this.jobFilters.source
+      }
+      let self = this
+      axios.get('import-jobs/', {params}).then((response) => {
+        self.jobResult = response.data
+      })
+    },
+    selectPage: function (page) {
+      this.jobFilters.page = page
     }
+
   },
   watch: {
     id () {
       this.fetchData()
+    },
+    jobFilters: {
+      handler () {
+        this.fetchJobs()
+      },
+      deep: true
     }
   }
 }

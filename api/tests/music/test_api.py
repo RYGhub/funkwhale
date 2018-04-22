@@ -181,30 +181,6 @@ def test_can_import_whole_artist(
         assert job.source == row['source']
 
 
-def test_user_can_query_api_for_his_own_batches(
-        superuser_api_client, factories):
-    factories['music.ImportJob']()
-    job = factories['music.ImportJob'](
-        batch__submitted_by=superuser_api_client.user)
-    url = reverse('api:v1:import-batches-list')
-
-    response = superuser_api_client.get(url)
-    results = response.data
-    assert results['count'] == 1
-    assert results['results'][0]['jobs'][0]['mbid'] == job.mbid
-
-
-def test_user_cannnot_access_other_batches(
-        superuser_api_client, factories):
-    factories['music.ImportJob']()
-    job = factories['music.ImportJob']()
-    url = reverse('api:v1:import-batches-list')
-
-    response = superuser_api_client.get(url)
-    results = response.data
-    assert results['count'] == 0
-
-
 def test_user_can_create_an_empty_batch(superuser_api_client, factories):
     url = reverse('api:v1:import-batches-list')
     response = superuser_api_client.post(url)
