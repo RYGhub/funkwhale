@@ -390,6 +390,11 @@ REST_FRAMEWORK = {
 ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
+
+# Wether we should use Apache or Nginx headers when serving audio files
+# Default to Nginx
+USE_APACHE_HEADERS = False
+
 # Wether we should check user permission before serving audio files (meaning
 # return an obfuscated url)
 # This require a special configuration on the reverse proxy side
