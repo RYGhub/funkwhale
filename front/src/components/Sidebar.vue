@@ -238,9 +238,6 @@ $sidebar-color: #3D3E3F;
   flex-direction: column;
   overflow-y: auto;
   justify-content: space-between;
-  @include media(">tablet") {
-    height: 0px;
-  }
   @include media("<desktop") {
     max-height: 500px;
   }
