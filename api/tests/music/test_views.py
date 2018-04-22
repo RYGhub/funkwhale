@@ -128,3 +128,46 @@ def test_can_create_import_from_federation_tracks(
     assert batch.jobs.count() == 5
     for i, job in enumerate(batch.jobs.all()):
         assert job.library_track == lts[i]
+
+
+def test_can_list_import_jobs(factories, superuser_api_client):
+    job = factories['music.ImportJob']()
+    url = reverse('api:v1:import-jobs-list')
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['results'][0]['id'] == job.pk
+
+
+def test_import_job_stats(factories, superuser_api_client):
+    job1 = factories['music.ImportJob'](status='pending')
+    job2 = factories['music.ImportJob'](status='errored')
+
+    url = reverse('api:v1:import-jobs-stats')
+    response = superuser_api_client.get(url)
+    expected = {
+        'errored': 1,
+        'pending': 1,
+        'finished': 0,
+        'skipped': 0,
+        'count': 2,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_import_job_stats_filter(factories, superuser_api_client):
+    job1 = factories['music.ImportJob'](status='pending')
+    job2 = factories['music.ImportJob'](status='errored')
+
+    url = reverse('api:v1:import-jobs-stats')
+    response = superuser_api_client.get(url, {'batch': job1.batch.pk})
+    expected = {
+        'errored': 0,
+        'pending': 1,
+        'finished': 0,
+        'skipped': 0,
+        'count': 1,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
