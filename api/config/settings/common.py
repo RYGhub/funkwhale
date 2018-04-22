@@ -391,9 +391,10 @@ ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
-# Wether we should use Apache or Nginx headers when serving audio files
+# Wether we should use Apache, Nginx (or other) headers when serving audio files
 # Default to Nginx
-USE_APACHE_HEADERS = False
+REVERSE_PROXY_TYPE = env('REVERSE_PROXY_TYPE', default='nginx')
+assert REVERSE_PROXY_TYPE in ['apache2', 'nginx'], 'Unsupported REVERSE_PROXY_TYPE'
 
 # Wether we should check user permission before serving audio files (meaning
 # return an obfuscated url)
