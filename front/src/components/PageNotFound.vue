@@ -5,13 +5,13 @@
         <h1 class="ui huge header">
           <i class="warning icon"></i>
           <div class="content">
-            <strike>Whale</strike> Page not found!
+            <strike>{{ $t('Whale') }}</strike> {{ $t('Page not found!') }}
           </div>
         </h1>
-        <p>We're sorry, the page you asked for does not exists.</p>
-        <p>Requested URL: <a :href="path">{{ path }}</a></p>
+        <p>{{ $t('We\'re sorry, the page you asked for does not exists.') }}</p>
+        <i18next path="Requested URL: {%0%}"><a :href="path">{{ path }}</a></i18next>
         <router-link class="ui icon button" to="/">
-          Go to home page
+          {{ $t('Go to home page') }}
           <i class="right arrow icon"></i>
         </router-link>
       </div>
