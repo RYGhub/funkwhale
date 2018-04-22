@@ -238,9 +238,9 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                 f.serve_from_source_path)
         response = Response()
         filename = f.filename
-        if settings.USE_APACHE_HEADERS:
+        if settings.REVERSE_PROXY_TYPE == 'apache':
             response['X-Sendfile'] = file_path
-        else:
+        elif settings.REVERSE_PROXY_TYPE == 'nginx':
             response['X-Accel-Redirect'] = file_path
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
