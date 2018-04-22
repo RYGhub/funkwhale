@@ -76,6 +76,31 @@ def test_can_serve_track_file_as_remote_library_deny_not_following(
     assert response.status_code == 403
 
 
+def test_serve_file_apache(factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.REVERSE_PROXY_TYPE = 'apache2'
+    tf = factories['music.TrackFile']()
+    response = api_client.get(tf.path)
+
+    assert response.status_code == 200
+    assert response['X-Sendfile'] == tf.audio_file.path
+
+
+def test_serve_file_apache_in_place(factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.REVERSE_PROXY_TYPE = 'apache2'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
+    track_file = factories['music.TrackFile'](
+        in_place=True,
+        source='file:///music/test.ogg')
+
+    response = api_client.get(track_file.path)
+
+    assert response.status_code == 200
+    assert response['X-Sendfile'] == '/host/music/test.ogg'
+
+
 def test_can_proxy_remote_track(
         factories, settings, api_client, r_mock):
     settings.PROTECT_AUDIO_FILES = False
