@@ -126,7 +126,8 @@ def _do_import(import_job, replace=False, use_acoustid=True):
         else:
             # no downloading, we hotlink
             pass
-    elif import_job.audio_file:
+    elif not import_job.audio_file and not import_job.source.startswith('file://'):
+        # not an implace import, and we have a source, so let's download it
         track_file.download_file()
     track_file.save()
     import_job.status = 'finished'
