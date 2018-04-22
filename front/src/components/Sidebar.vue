@@ -35,7 +35,7 @@
         <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> {{ $t('Logout') }}</router-link>
         <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> {{ $t('Login') }}</router-link>
         <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
-        <router-link class="item" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
+        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
         <a
           @click="$store.commit('playlists/chooseTrack', null)"
           v-if="$store.state.auth.authenticated"

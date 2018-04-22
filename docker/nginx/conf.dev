@@ -42,6 +42,10 @@ http {
             internal;
             alias   /protected/media;
         }
+        location /_protected/music {
+            internal;
+            alias   /music;
+        }
         location = /transcode-auth {
             # needed so we can authenticate transcode requests, but still
             # cache the result

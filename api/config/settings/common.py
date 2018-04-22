@@ -441,3 +441,9 @@ EXTERNAL_REQUESTS_VERIFY_SSL = env.bool(
     'EXTERNAL_REQUESTS_VERIFY_SSL',
     default=True
 )
+
+MUSIC_DIRECTORY_PATH = env('MUSIC_DIRECTORY_PATH', default=None)
+# on Docker setup, the music directory may not match the host path,
+# and we need to know it for it to serve stuff properly
+MUSIC_DIRECTORY_SERVE_PATH = env(
+    'MUSIC_DIRECTORY_SERVE_PATH', default=MUSIC_DIRECTORY_PATH)

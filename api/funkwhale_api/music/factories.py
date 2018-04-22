@@ -43,6 +43,7 @@ class TrackFactory(factory.django.DjangoModelFactory):
     artist = factory.SelfAttribute('album.artist')
     position = 1
     tags = ManyToManyFromList('tags')
+
     class Meta:
         model = 'music.Track'
 
@@ -57,6 +58,9 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
         model = 'music.TrackFile'
 
     class Params:
+        in_place = factory.Trait(
+            audio_file=None,
+        )
         federation = factory.Trait(
             audio_file=None,
             library_track=factory.SubFactory(LibraryTrackFactory),
@@ -104,6 +108,10 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
         finished = factory.Trait(
             status='finished',
             track_file=factory.SubFactory(TrackFileFactory),
+        )
+        in_place = factory.Trait(
+            status='finished',
+            audio_file=None,
         )
 
 

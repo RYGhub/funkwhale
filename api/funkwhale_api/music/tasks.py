@@ -71,7 +71,7 @@ def import_track_from_remote(library_track):
         library_track.title, artist=artist, album=album)
 
 
-def _do_import(import_job, replace, use_acoustid=True):
+def _do_import(import_job, replace=False, use_acoustid=True):
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
     acoustid_track_id = None
@@ -93,6 +93,9 @@ def _do_import(import_job, replace, use_acoustid=True):
         track = import_track_data_from_path(import_job.audio_file.path)
     elif import_job.library_track:
         track = import_track_from_remote(import_job.library_track)
+    elif import_job.source.startswith('file://'):
+        track = import_track_data_from_path(
+            import_job.source.replace('file://', '', 1))
     else:
         raise ValueError(
             'Not enough data to process import, '
@@ -123,7 +126,7 @@ def _do_import(import_job, replace, use_acoustid=True):
         else:
             # no downloading, we hotlink
             pass
-    else:
+    elif import_job.audio_file:
         track_file.download_file()
     track_file.save()
     import_job.status = 'finished'
@@ -133,7 +136,7 @@ def _do_import(import_job, replace, use_acoustid=True):
         import_job.audio_file.delete()
     import_job.save()
 
-    return track.pk
+    return track_file
 
 
 @celery.app.task(name='ImportJob.run', bind=True)
@@ -147,7 +150,8 @@ def import_job_run(self, import_job, replace=False, use_acoustid=True):
         import_job.save(update_fields=['status'])
 
     try:
-        return _do_import(import_job, replace, use_acoustid=use_acoustid)
+        tf = _do_import(import_job, replace, use_acoustid=use_acoustid)
+        return tf.pk if tf else None
     except Exception as exc:
         if not settings.DEBUG:
             try:

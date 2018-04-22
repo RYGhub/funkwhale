@@ -53,10 +53,11 @@ def guess_mimetype(f):
 
 
 def compute_status(jobs):
-    errored = any([job.status == 'errored' for job in jobs])
+    statuses = jobs.order_by().values_list('status', flat=True).distinct()
+    errored = any([status == 'errored' for status in statuses])
     if errored:
         return 'errored'
-    pending = any([job.status == 'pending' for job in jobs])
+    pending = any([status == 'pending' for status in statuses])
     if pending:
         return 'pending'
     return 'finished'

@@ -15,6 +15,10 @@ export default {
     looping: 0 // 0 -> no, 1 -> on  track, 2 -> on queue
   },
   mutations: {
+    reset (state) {
+      state.errorCount = 0
+      state.playing = false
+    },
     volume (state, value) {
       value = parseFloat(value)
       value = Math.min(value, 1)

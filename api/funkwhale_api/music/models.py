@@ -412,7 +412,7 @@ class TrackFile(models.Model):
     track = models.ForeignKey(
         Track, related_name='files', on_delete=models.CASCADE)
     audio_file = models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255)
-    source = models.URLField(null=True, blank=True)
+    source = models.URLField(null=True, blank=True, max_length=500)
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
     duration = models.IntegerField(null=True, blank=True)
@@ -463,6 +463,26 @@ class TrackFile(models.Model):
             self.mimetype = utils.guess_mimetype(self.audio_file)
         return super().save(**kwargs)
 
+    @property
+    def serve_from_source_path(self):
+        if not self.source or not self.source.startswith('file://'):
+            raise ValueError('Cannot serve this file from source')
+        serve_path = settings.MUSIC_DIRECTORY_SERVE_PATH
+        prefix = settings.MUSIC_DIRECTORY_PATH
+        if not serve_path or not prefix:
+            raise ValueError(
+                'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+            )
+        file_path = self.source.replace('file://', '', 1)
+        parts = os.path.split(file_path.replace(prefix, '', 1))
+        if parts[0] == '/':
+            parts = parts[1:]
+        return os.path.join(
+            serve_path,
+            *parts
+        )
+
 
 IMPORT_STATUS_CHOICES = (
     ('pending', 'Pending'),
@@ -507,6 +527,8 @@ class ImportBatch(models.Model):
     def update_status(self):
         old_status = self.status
         self.status = utils.compute_status(self.jobs.all())
+        if self.status == old_status:
+            return
         self.save(update_fields=['status'])
         if self.status != old_status and self.status == 'finished':
             from . import tasks

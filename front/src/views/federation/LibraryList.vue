@@ -1,22 +1,22 @@
 <template>
   <div v-title="'Libraries'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">Browsing libraries</h2>
+      <h2 class="ui header">{{ $t('Browsing libraries') }}</h2>
       <router-link
         class="ui basic green button"
         :to="{name: 'federation.libraries.scan'}">
         <i class="plus icon"></i>
-        Add a new library
+        {{ $t('Add a new library') }}
       </router-link>
       <div class="ui hidden divider"></div>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>Search</label>
+            <label>{{ $t('Search') }}</label>
             <input type="text" v-model="query" placeholder="Enter an library domain name..."/>
           </div>
           <div class="field">
-            <label>Ordering</label>
+            <label>{{ $t('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -24,14 +24,14 @@
             </select>
           </div>
           <div class="field">
-            <label>Ordering direction</label>
+            <label>{{ $t('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="">Ascending</option>
-              <option value="-">Descending</option>
+              <option value="">{{ $t('Ascending') }}</option>
+              <option value="-">{{ $t('Descending') }}</option>
             </select>
           </div>
           <div class="field">
-            <label>Results per page</label>
+            <label>{{ $t('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

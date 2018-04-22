@@ -26,6 +26,10 @@ export default {
     }
   },
   mutations: {
+    reset (state) {
+      state.running = false
+      state.current = false
+    },
     current: (state, value) => {
       state.current = value
     },

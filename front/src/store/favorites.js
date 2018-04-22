@@ -20,6 +20,10 @@ export default {
         }
       }
       state.count = state.tracks.length
+    },
+    reset (state) {
+      state.tracks = []
+      state.count = 0
     }
   },
   getters: {
