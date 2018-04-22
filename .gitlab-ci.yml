@@ -83,9 +83,9 @@ build_front:
     paths:
       - front/dist/
   only:
-    - tags
-    - master
-    - develop
+    - tags@funkwhale/funkwhale
+    - master@funkwhale/funkwhale
+    - develop@funkwhale/funkwhale
   tags:
     - docker
 
@@ -102,7 +102,7 @@ pages:
     paths:
       - public
   only:
-    - develop
+    - develop@funkwhale/funkwhale
   tags:
     - docker
 
@@ -116,7 +116,7 @@ docker_develop:
     - docker build -t $IMAGE .
     - docker push $IMAGE
   only:
-    - develop
+    - develop@funkwhale/funkwhale
   tags:
     - dind
 
@@ -130,9 +130,9 @@ build_api:
       - api
   script: echo Done!
   only:
-    - tags
-    - master
-    - develop
+    - tags@funkwhale/funkwhale
+    - master@funkwhale/funkwhale
+    - develop@funkwhale/funkwhale
 
 
 docker_release:
@@ -146,6 +146,6 @@ docker_release:
     - docker push $IMAGE
     - docker push $IMAGE_LATEST
   only:
-    - tags
+    - tags@funkwhale/funkwhale
   tags:
     - dind
