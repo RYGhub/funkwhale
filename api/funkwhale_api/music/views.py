@@ -205,6 +205,25 @@ class TrackViewSet(
         return Response(serializer.data)
 
 
+def get_file_path(audio_file):
+    t = settings.REVERSE_PROXY_TYPE
+    if t == 'nginx':
+        # we have to use the internal locations
+        try:
+            path = audio_file.url
+        except AttributeError:
+            # a path was given
+            path = '/music' + audio_file
+        return settings.PROTECT_FILES_PATH + path
+    if t == 'apache2':
+        try:
+            path = audio_file.path
+        except AttributeError:
+            # a path was given
+            path = audio_file
+        return path
+
+
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (models.TrackFile.objects.all().order_by('-id'))
     serializer_class = serializers.TrackFileSerializer
@@ -243,24 +262,20 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                     library_track = qs.get(pk=library_track.pk)
                     library_track.download_audio()
             audio_file = library_track.audio_file
-            file_path = '{}{}'.format(
-                settings.PROTECT_FILES_PATH,
-                audio_file.url)
+            file_path = get_file_path(audio_file)
             mt = library_track.audio_mimetype
         elif audio_file:
-            file_path = '{}{}'.format(
-                settings.PROTECT_FILES_PATH,
-                audio_file.url)
+            file_path = get_file_path(audio_file)
         elif f.source and f.source.startswith('file://'):
-            file_path = '{}{}'.format(
-                settings.PROTECT_FILES_PATH + '/music',
-                f.serve_from_source_path)
+            file_path = get_file_path(f.serve_from_source_path)
         response = Response()
         filename = f.filename
-        if settings.REVERSE_PROXY_TYPE == 'apache2':
-            response['X-Sendfile'] = file_path
-        elif settings.REVERSE_PROXY_TYPE == 'nginx':
-            response['X-Accel-Redirect'] = file_path
+        mapping = {
+            'nginx': 'X-Accel-Redirect',
+            'apache2': 'X-Sendfile',
+        }
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        response[file_header] = file_path
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)
