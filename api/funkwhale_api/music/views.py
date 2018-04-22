@@ -238,7 +238,10 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
                 f.serve_from_source_path)
         response = Response()
         filename = f.filename
-        response['X-Accel-Redirect'] = file_path
+        if settings.USE_APACHE_HEADERS:
+            response['X-Sendfile'] = file_path
+        else:
+            response['X-Accel-Redirect'] = file_path
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)
