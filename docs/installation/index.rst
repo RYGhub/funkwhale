@@ -106,3 +106,24 @@ Then, download our sample virtualhost file and proxy conf:
     curl -L -o /etc/nginx/sites-enabled/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
 
 Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``. If everything is fine, you can restart your nginx server with ``service nginx restart``.
+
+About internal locations
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Music (and other static) files are never served by the app itself, but by the reverse
+proxy. This is needed because a webserver is way more efficient at serving
+files than a Python process.
+
+However, we do want to ensure users have the right to access music files, and
+it can't be done at the proxy's level. To tackle this issue, `we use
+nginx's internal directive <http://nginx.org/en/docs/http/ngx_http_core_module.html#internal>`_.
+
+When the API receives a request on its music serving endpoint, it will check
+that the user making the request can access the file. Then, it will return an empty
+response with a ``X-Accel-Redirect`` header. This header will contain the path
+to the file to serve to the user, and will be picked by nginx, but never sent
+back to the client.
+
+Using this technique, we can ensure music files are covered by the authentication
+and permission policy of your instance, while keeping as much as performance
+as possible.
