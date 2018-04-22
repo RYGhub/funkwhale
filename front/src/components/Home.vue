@@ -24,8 +24,8 @@
               <h2 class="ui header">
                 {{ $t('Why funkwhale?') }}
               </h2>
-              <p>{{('That\'s simple: we loved Grooveshark and we want to build something even better.') }}</p>
-             $t</div>
+              <p>{{ $t('That\'s simple: we loved Grooveshark and we want to build something even better.') }}</p>
+            </div>
             <div class="four wide left floated column">
               <img class="ui medium image" src="../assets/logo/logo.png" />
             </div>
