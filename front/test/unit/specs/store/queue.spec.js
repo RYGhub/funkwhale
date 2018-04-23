@@ -158,9 +158,7 @@ describe('store/queue', () => {
         payload: 1,
         params: {state: {currentIndex: 2}},
         expectedMutations: [
-          { type: 'splice', payload: {start: 1, size: 1} }
-        ],
-        expectedActions: [
+          { type: 'splice', payload: {start: 1, size: 1} },
           { type: 'currentIndex', payload: 1 }
         ]
       }, done)

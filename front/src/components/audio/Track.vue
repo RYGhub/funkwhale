@@ -86,9 +86,15 @@ export default {
       }
     },
     updateDuration: function (e) {
+      if (!this.$refs.audio) {
+        return
+      }
       this.$store.commit('player/duration', this.$refs.audio.duration)
     },
     loaded: function () {
+      if (!this.$refs.audio) {
+        return
+      }
       this.$refs.audio.volume = this.volume
       this.$store.commit('player/resetErrorCount')
       if (this.isCurrent) {

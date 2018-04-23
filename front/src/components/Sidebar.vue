@@ -143,8 +143,9 @@ export default {
     ...mapActions({
       cleanTrack: 'queue/cleanTrack'
     }),
-    reorder: function (oldValue, newValue) {
-      this.$store.commit('queue/reorder', {oldValue, newValue})
+    reorder: function (event) {
+      this.$store.commit('queue/reorder', {
+        oldIndex: event.oldIndex, newIndex: event.newIndex})
     },
     scrollToCurrent () {
       let current = $(this.$el).find('[data-tab="queue"] .active')[0]
