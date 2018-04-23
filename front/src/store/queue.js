@@ -100,6 +100,9 @@ export default {
         // we play next track, which now have the same index
         dispatch('currentIndex', index)
       }
+      if (state.currentIndex + 1 === state.tracks.length) {
+        dispatch('radios/populateQueue', null, {root: true})
+      }
     },
 
     resume ({state, dispatch, rootState}) {
