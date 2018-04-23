@@ -3,8 +3,41 @@ Changelog
 
 .. towncrier
 
-0.10 (Unreleased)
+0.10 (2018-04-23)
 -----------------
+
+Features:
+
+- Can now import files in-place from the CLI importer (#155)
+
+
+Enhancements:
+
+- Avoid downloading audio files multiple times from remote libraries (#163)
+- Better file import performance and error handling (#144)
+- Import job and batch API and front-end have been improved with better
+  performance, pagination and additional filters (#171)
+- Increased max_length on TrackFile.source, this will help when importing files
+  with a really long path (#142)
+- Player is back in Queue tab (#150)
+
+
+Bugfixes:
+
+- Fail graciously when AP representation includes a null_value for mediaType
+- Fix sidebar tabs not showing under small resolution under Chrome (#173)
+- Fixed broken login due to badly configured Axios (#172)
+- Fixed broken playlist modal after login (#155)
+- Fixed queue reorder or track deletion restarting currently playing track
+  (#151)
+- Radio will now append new track if you delete the last track in queue (#145)
+- Reset all sensitive front-end data on logout (#124)
+- Typos/not showing text due to i18n work (#175)
+
+
+Documentation:
+
+- Better documentation for hardware requirements and memory usage (#165)
 
 
 In-place import
@@ -14,8 +47,9 @@ This release includes in-place imports for the CLI import. This means you can
 load gigabytes of music into funkwhale without worrying about about Funkwhale
 copying those music files in its internal storage and eating your disk space.
 
-This new feature is documented <here> and require additional configuration
-to ensure funkwhale and your webserver can serve those files properly.
+`This new feature is documented here <https://docs.funkwhale.audio/importing-music.html#in-place-import>`_
+and require additional configuration to ensure funkwhale and your webserver can
+serve those files properly.
 
 **Non-docker users:**
 
@@ -45,7 +79,9 @@ Assuming you have the following volume directive in your ``docker-compose.yml``
 (it's the default): ``/srv/funkwhale/data/music:/music:ro``, then add
 the following to your .env file::
 
+    # this is the path in the container
     MUSIC_DIRECTORY_PATH=/music
+    # this is the path on the host
     MUSIC_DIRECTORY_SERVE_PATH=/srv/funkwhale/data/music
 
 
