@@ -4,7 +4,7 @@
       <audio-track
         ref="currentAudio"
         v-if="renderAudio && currentTrack"
-        :key="(currentIndex, currentTrack.id)"
+        :key="currentTrack.id"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
         :autoplay="$store.state.player.playing"
