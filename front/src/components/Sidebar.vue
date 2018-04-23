@@ -49,8 +49,6 @@
           class="item" v-if="$store.state.auth.availablePermissions['federation.manage']"
           :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> {{ $t('Federation') }}</router-link>
       </div>
-
-      <player></player>
     </div>
     <div v-if="queue.previousQueue " class="ui black icon message">
       <i class="history icon"></i>
@@ -90,7 +88,6 @@
           </draggable>
       </table>
       <div v-if="$store.state.radios.running" class="ui black message">
-
         <div class="content">
           <div class="header">
             <i class="feed icon"></i> {{ $t('You have a radio playing') }}
@@ -101,6 +98,7 @@
       </div>
     </div>
   </div>
+  <player @next="scrollToCurrent" @previous="scrollToCurrent"></player>
 </div>
 </template>
 
