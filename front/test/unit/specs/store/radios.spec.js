@@ -97,6 +97,5 @@ describe('store/radios', () => {
         expectedActions: []
       }, done)
     })
-
   })
 })

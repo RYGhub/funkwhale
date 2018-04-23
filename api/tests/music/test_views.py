@@ -76,6 +76,31 @@ def test_can_serve_track_file_as_remote_library_deny_not_following(
     assert response.status_code == 403
 
 
+def test_serve_file_apache(factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.REVERSE_PROXY_TYPE = 'apache2'
+    tf = factories['music.TrackFile']()
+    response = api_client.get(tf.path)
+
+    assert response.status_code == 200
+    assert response['X-Sendfile'] == tf.audio_file.path
+
+
+def test_serve_file_apache_in_place(factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.REVERSE_PROXY_TYPE = 'apache2'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
+    track_file = factories['music.TrackFile'](
+        in_place=True,
+        source='file:///music/test.ogg')
+
+    response = api_client.get(track_file.path)
+
+    assert response.status_code == 200
+    assert response['X-Sendfile'] == '/host/music/test.ogg'
+
+
 def test_can_proxy_remote_track(
         factories, settings, api_client, r_mock):
     settings.PROTECT_AUDIO_FILES = False
@@ -91,6 +116,25 @@ def test_can_proxy_remote_track(
         settings.PROTECT_FILES_PATH,
         library_track.audio_file.url)
     assert library_track.audio_file.read() == b'test'
+
+
+def test_can_serve_in_place_imported_file(
+        factories, settings, api_client, r_mock):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    settings.MUSIC_DIRECTORY_PATH = '/music'
+    track_file = factories['music.TrackFile'](
+        in_place=True,
+        source='file:///music/test.ogg')
+
+    response = api_client.get(track_file.path)
+
+    assert response.status_code == 200
+    assert response['X-Accel-Redirect'] == '{}{}'.format(
+        settings.PROTECT_FILES_PATH,
+        '/music/host/music/test.ogg'
+    )
 
 
 def test_can_create_import_from_federation_tracks(
@@ -109,3 +153,46 @@ def test_can_create_import_from_federation_tracks(
     assert batch.jobs.count() == 5
     for i, job in enumerate(batch.jobs.all()):
         assert job.library_track == lts[i]
+
+
+def test_can_list_import_jobs(factories, superuser_api_client):
+    job = factories['music.ImportJob']()
+    url = reverse('api:v1:import-jobs-list')
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['results'][0]['id'] == job.pk
+
+
+def test_import_job_stats(factories, superuser_api_client):
+    job1 = factories['music.ImportJob'](status='pending')
+    job2 = factories['music.ImportJob'](status='errored')
+
+    url = reverse('api:v1:import-jobs-stats')
+    response = superuser_api_client.get(url)
+    expected = {
+        'errored': 1,
+        'pending': 1,
+        'finished': 0,
+        'skipped': 0,
+        'count': 2,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_import_job_stats_filter(factories, superuser_api_client):
+    job1 = factories['music.ImportJob'](status='pending')
+    job2 = factories['music.ImportJob'](status='errored')
+
+    url = reverse('api:v1:import-jobs-stats')
+    response = superuser_api_client.get(url, {'batch': job1.batch.pk})
+    expected = {
+        'errored': 0,
+        'pending': 1,
+        'finished': 0,
+        'skipped': 0,
+        'count': 1,
+    }
+    assert response.status_code == 200
+    assert response.data == expected

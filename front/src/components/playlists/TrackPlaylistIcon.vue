@@ -4,13 +4,13 @@
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
-    Add to playlist...
+    {{ $t('Add to playlist...') }}
   </button>
   <i
     v-else
     @click="$store.commit('playlists/chooseTrack', track)"
     :class="['playlist-icon', 'list', 'link', 'icon']"
-    title="Add to playlist...">
+    :title="$t('Add to playlist...')">
   </i>
 </template>
 

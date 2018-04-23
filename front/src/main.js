@@ -35,14 +35,14 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', {
-  inserted: (el, binding) => { console.log(binding.value); document.title = binding.value + ' - Funkwhale' },
+  inserted: (el, binding) => { document.title = binding.value + ' - Funkwhale' },
   updated: (el, binding) => { document.title = binding.value + ' - Funkwhale' }
 })
 
 axios.defaults.baseURL = config.API_URL
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
-  if (store.state.auth.authenticated) {
+  if (store.state.auth.token) {
     config.headers['Authorization'] = store.getters['auth/header']
   }
   return config

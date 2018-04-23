@@ -17,6 +17,11 @@ export default {
     },
     showModal (state, value) {
       state.showModal = value
+    },
+    reset (state) {
+      state.playlists = []
+      state.modalTrack = null
+      state.showModal = false
     }
   },
   actions: {

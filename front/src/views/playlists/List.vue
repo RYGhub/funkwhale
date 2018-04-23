@@ -1,21 +1,21 @@
 <template>
-  <div v-title="'Playlists'">
+  <div v-title="$t('Playlists')">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">Browsing playlists</h2>
+      <h2 class="ui header">{{ $t('Browsing playlists') }}</h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <template v-if="$store.state.auth.authenticated">
           <button
             @click="$store.commit('playlists/chooseTrack', null)"
-            class="ui basic green button">Manage your playlists</button>
+            class="ui basic green button">{{ $t('Manage your playlists') }}</button>
           <div class="ui hidden divider"></div>
         </template>
         <div class="fields">
           <div class="field">
-            <label>Search</label>
-            <input type="text" v-model="query" placeholder="Enter an playlist name..."/>
+            <label>{{ $t('Search') }}</label>
+            <input type="text" v-model="query" :placeholder="$t('Enter an playlist name...')"/>
           </div>
           <div class="field">
-            <label>Ordering</label>
+            <label>{{ $t('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -23,14 +23,14 @@
             </select>
           </div>
           <div class="field">
-            <label>Ordering direction</label>
+            <label>{{ $t('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="">Ascending</option>
-              <option value="-">Descending</option>
+              <option value="">{{ $t('Ascending') }}</option>
+              <option value="-">{{ $t('Descending') }}</option>
             </select>
           </div>
           <div class="field">
-            <label>Results per page</label>
+            <label>{{ $t('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -76,6 +76,7 @@ export default {
     Pagination
   },
   data () {
+    console.log('YOLO', this.$t)
     let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       isLoading: true,

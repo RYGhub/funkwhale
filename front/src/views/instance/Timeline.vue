@@ -2,10 +2,10 @@
   <div class="main pusher" v-title="'Instance Timeline'">
     <div class="ui vertical center aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader">Loading timeline...</div>
+        <div class="ui text loader">{{ $t('Loading timeline...') }}</div>
       </div>
       <div v-else class="ui text container">
-        <h1 class="ui header">Recent activity on this instance</h1>
+        <h1 class="ui header">{{ $t('Recent activity on this instance') }}</h1>
         <div class="ui feed">
           <component
             class="event"
@@ -14,12 +14,6 @@
             v-if="components[event.type]"
             :is="components[event.type]"
             :event="event">
-            <username
-              class="user"
-              :username="event.actor.local_id"
-              slot="user"></username>
-              {{ event.published }}
-            <human-date class="date" :date="event.published" slot="date"></human-date>
           </component>
         </div>
       </div>

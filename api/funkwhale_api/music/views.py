@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models.functions import Length
+from django.db.models import Count
 from django.http import StreamingHttpResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -23,13 +24,14 @@ from rest_framework import permissions
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.federation import actors
-from funkwhale_api.requests.models import ImportRequest
-from funkwhale_api.musicbrainz import api
 from funkwhale_api.common.permissions import (
     ConditionalAuthentication, HasModelPermission)
 from taggit.models import Tag
+from funkwhale_api.federation import actors
 from funkwhale_api.federation.authentication import SignatureAuthentication
+from funkwhale_api.federation.models import LibraryTrack
+from funkwhale_api.musicbrainz import api
+from funkwhale_api.requests.models import ImportRequest
 
 from . import filters
 from . import forms
@@ -98,14 +100,14 @@ class ImportBatchViewSet(
         mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     queryset = (
-        models.ImportBatch.objects.all()
-                          .prefetch_related('jobs__track_file')
-                          .order_by('-creation_date'))
+        models.ImportBatch.objects
+              .select_related()
+              .order_by('-creation_date')
+              .annotate(job_count=Count('jobs'))
+    )
     serializer_class = serializers.ImportBatchSerializer
     permission_classes = (permissions.DjangoModelPermissions, )
-
-    def get_queryset(self):
-        return super().get_queryset().filter(submitted_by=self.request.user)
+    filter_class = filters.ImportBatchFilter
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
@@ -118,13 +120,30 @@ class ImportJobPermission(HasModelPermission):
 
 class ImportJobViewSet(
         mixins.CreateModelMixin,
+        mixins.ListModelMixin,
         viewsets.GenericViewSet):
-    queryset = (models.ImportJob.objects.all())
+    queryset = (models.ImportJob.objects.all().select_related())
     serializer_class = serializers.ImportJobSerializer
     permission_classes = (ImportJobPermission, )
+    filter_class = filters.ImportJobFilter
 
-    def get_queryset(self):
-        return super().get_queryset().filter(batch__submitted_by=self.request.user)
+    @list_route(methods=['get'])
+    def stats(self, request, *args, **kwargs):
+        qs = models.ImportJob.objects.all()
+        filterset = filters.ImportJobFilter(request.GET, queryset=qs)
+        qs = filterset.qs
+        qs = qs.values('status').order_by('status')
+        qs = qs.annotate(status_count=Count('status'))
+
+        data = {}
+        for row in qs:
+            data[row['status']] = row['status_count']
+
+        for s, _ in models.IMPORT_STATUS_CHOICES:
+            data.setdefault(s, 0)
+
+        data['count'] = sum([v for v in data.values()])
+        return Response(data)
 
     def perform_create(self, serializer):
         source = 'file://' + serializer.validated_data['audio_file'].name
@@ -135,7 +154,8 @@ class ImportJobViewSet(
         )
 
 
-class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+        TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
@@ -185,6 +205,25 @@ class TrackViewSet(TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
+def get_file_path(audio_file):
+    t = settings.REVERSE_PROXY_TYPE
+    if t == 'nginx':
+        # we have to use the internal locations
+        try:
+            path = audio_file.url
+        except AttributeError:
+            # a path was given
+            path = '/music' + audio_file
+        return settings.PROTECT_FILES_PATH + path
+    if t == 'apache2':
+        try:
+            path = audio_file.path
+        except AttributeError:
+            # a path was given
+            path = audio_file
+        return path
+
+
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (models.TrackFile.objects.all().order_by('-id'))
     serializer_class = serializers.TrackFileSerializer
@@ -195,12 +234,13 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
 
     @detail_route(methods=['get'])
     def serve(self, request, *args, **kwargs):
+        queryset = models.TrackFile.objects.select_related(
+            'library_track',
+            'track__album__artist',
+            'track__artist',
+        )
         try:
-            f = models.TrackFile.objects.select_related(
-                'library_track',
-                'track__album__artist',
-                'track__artist',
-            ).get(pk=kwargs['pk'])
+            f = queryset.get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
 
@@ -213,14 +253,29 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
         if library_track and not audio_file:
             if not library_track.audio_file:
                 # we need to populate from cache
-                library_track.download_audio()
+                with transaction.atomic():
+                    # why the transaction/select_for_update?
+                    # this is because browsers may send multiple requests
+                    # in a short time range, for partial content,
+                    # thus resulting in multiple downloads from the remote
+                    qs = LibraryTrack.objects.select_for_update()
+                    library_track = qs.get(pk=library_track.pk)
+                    library_track.download_audio()
             audio_file = library_track.audio_file
+            file_path = get_file_path(audio_file)
             mt = library_track.audio_mimetype
+        elif audio_file:
+            file_path = get_file_path(audio_file)
+        elif f.source and f.source.startswith('file://'):
+            file_path = get_file_path(f.serve_from_source_path)
         response = Response()
         filename = f.filename
-        response['X-Accel-Redirect'] = "{}{}".format(
-            settings.PROTECT_FILES_PATH,
-            audio_file.url)
+        mapping = {
+            'nginx': 'X-Accel-Redirect',
+            'apache2': 'X-Sendfile',
+        }
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        response[file_header] = file_path
         filename = "filename*=UTF-8''{}".format(
             urllib.parse.quote(filename))
         response["Content-Disposition"] = "attachment; {}".format(filename)

@@ -11,10 +11,7 @@
             <div class="content">
               {{ artist.name }}
               <div class="sub header">
-                <i18next path="{%0%} tracks in {%1%} albums">
-                  {{ totalTracks }}
-                  {{ albums.length }}
-                </i18next>
+                {{ $t('{% track_count %} tracks in {% album_count %} albums', {track_count: totalTracks, album_count: albums.length})}}
               </div>
             </div>
           </h2>

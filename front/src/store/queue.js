@@ -10,6 +10,12 @@ export default {
     previousQueue: null
   },
   mutations: {
+    reset (state) {
+      state.tracks = []
+      state.currentIndex = -1
+      state.ended = true
+      state.previousQueue = null
+    },
     currentIndex (state, value) {
       state.currentIndex = value
     },
@@ -86,13 +92,16 @@ export default {
       if (current) {
         dispatch('player/stop', null, {root: true})
       }
-      if (index < state.currentIndex) {
-        dispatch('currentIndex', state.currentIndex - 1)
-      }
       commit('splice', {start: index, size: 1})
+      if (index < state.currentIndex) {
+        commit('currentIndex', state.currentIndex - 1)
+      }
       if (current) {
         // we play next track, which now have the same index
         dispatch('currentIndex', index)
+      }
+      if (state.currentIndex + 1 === state.tracks.length) {
+        dispatch('radios/populateQueue', null, {root: true})
       }
     },
 

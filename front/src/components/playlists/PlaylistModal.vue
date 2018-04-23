@@ -1,14 +1,14 @@
 <template>
   <modal @update:show="update" :show="$store.state.playlists.showModal">
     <div class="header">
-      Manage playlists
+      {{ $t('Manage playlists') }}
     </div>
     <div class="scrolling content">
       <div class="description">
         <template v-if="track">
-          <h4 class="ui header">Current track</h4>
+          <h4 class="ui header">{{ $t('Current track') }}</h4>
           <div>
-            "{{ track.title }}" by {{ track.artist.name }}
+            {{ $t('"{%title%}" by {%artist%}', { title: track.title, artist: track.artist.name }) }}
           </div>
           <div class="ui divider"></div>
         </template>
@@ -16,20 +16,20 @@
         <playlist-form></playlist-form>
         <div class="ui divider"></div>
         <div v-if="errors.length > 0" class="ui negative message">
-          <div class="header">We cannot add the track to a playlist</div>
+          <div class="header">{{ $t('We cannot add the track to a playlist') }}</div>
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
         </div>
-        <h4 class="ui header">Available playlists</h4>
+        <h4 class="ui header">{{ $t('Available playlists') }}</h4>
         <table class="ui unstackable very basic table">
           <thead>
             <tr>
               <th></th>
-              <th>Name</th>
-              <th class="sorted descending">Last modification</th>
-              <th>Tracks</th>
+              <th>{{ $t('Name') }}</th>
+              <th class="sorted descending">{{ $t('Last modification') }}</th>
+              <th>{{ $t('Tracks') }}</th>
               <th></th>
             </tr>
           </thead>
@@ -48,9 +48,9 @@
                 <div
                   v-if="track"
                   class="ui green icon basic small right floated button"
-                  title="Add to this playlist"
+                  :title="$t('Add to this playlist')"
                   @click="addToPlaylist(playlist.id)">
-                  <i class="plus icon"></i> Add track
+                  <i class="plus icon"></i> {{ $t('Add track') }}
                 </div>
               </td>
             </tr>
@@ -59,7 +59,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button">Cancel</div>
+      <div class="ui cancel button">{{ $t('Cancel') }}</div>
     </div>
   </modal>
 </template>

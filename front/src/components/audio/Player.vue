@@ -4,7 +4,7 @@
       <audio-track
         ref="currentAudio"
         v-if="renderAudio && currentTrack"
-        :key="(currentIndex, currentTrack.id)"
+        :key="currentTrack.id"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
         :autoplay="$store.state.player.playing"
@@ -173,11 +173,21 @@ export default {
     ...mapActions({
       togglePlay: 'player/togglePlay',
       clean: 'queue/clean',
-      next: 'queue/next',
-      previous: 'queue/previous',
       shuffle: 'queue/shuffle',
       updateProgress: 'player/updateProgress'
     }),
+    next () {
+      let self = this
+      this.$store.dispatch('queue/next').then(() => {
+        self.$emit('next')
+      })
+    },
+    previous () {
+      let self = this
+      this.$store.dispatch('queue/previous').then(() => {
+        self.$emit('previous')
+      })
+    },
     touchProgress (e) {
       let time
       let target = this.$refs.progress

@@ -390,6 +390,12 @@ REST_FRAMEWORK = {
 ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
+
+# Wether we should use Apache, Nginx (or other) headers when serving audio files
+# Default to Nginx
+REVERSE_PROXY_TYPE = env('REVERSE_PROXY_TYPE', default='nginx')
+assert REVERSE_PROXY_TYPE in ['apache2', 'nginx'], 'Unsupported REVERSE_PROXY_TYPE'
+
 # Wether we should check user permission before serving audio files (meaning
 # return an obfuscated url)
 # This require a special configuration on the reverse proxy side
@@ -441,3 +447,9 @@ EXTERNAL_REQUESTS_VERIFY_SSL = env.bool(
     'EXTERNAL_REQUESTS_VERIFY_SSL',
     default=True
 )
+
+MUSIC_DIRECTORY_PATH = env('MUSIC_DIRECTORY_PATH', default=None)
+# on Docker setup, the music directory may not match the host path,
+# and we need to know it for it to serve stuff properly
+MUSIC_DIRECTORY_SERVE_PATH = env(
+    'MUSIC_DIRECTORY_SERVE_PATH', default=MUSIC_DIRECTORY_PATH)

@@ -89,7 +89,12 @@ describe('store/auth', () => {
         action: store.actions.logout,
         params: {state: {}},
         expectedMutations: [
-          { type: 'authenticated', payload: false }
+          { type: 'auth/reset', payload: null, options: {root: true} },
+          { type: 'favorites/reset', payload: null, options: {root: true} },
+          { type: 'player/reset', payload: null, options: {root: true} },
+          { type: 'playlists/reset', payload: null, options: {root: true} },
+          { type: 'queue/reset', payload: null, options: {root: true} },
+          { type: 'radios/reset', payload: null, options: {root: true} }
         ]
       }, done)
     })
@@ -107,8 +112,6 @@ describe('store/auth', () => {
         action: store.actions.check,
         params: {state: {token: 'test', username: 'user'}},
         expectedMutations: [
-          { type: 'authenticated', payload: true },
-          { type: 'username', payload: 'user' },
           { type: 'token', payload: 'test' }
         ],
         expectedActions: [
@@ -131,9 +134,7 @@ describe('store/auth', () => {
         action: store.actions.login,
         payload: {credentials: credentials},
         expectedMutations: [
-          { type: 'token', payload: 'test' },
-          { type: 'username', payload: 'bob' },
-          { type: 'authenticated', payload: true }
+          { type: 'token', payload: 'test' }
         ],
         expectedActions: [
           { type: 'fetchProfile' }
@@ -175,13 +176,14 @@ describe('store/auth', () => {
       testAction({
         action: store.actions.fetchProfile,
         expectedMutations: [
+          { type: 'authenticated', payload: true },
           { type: 'profile', payload: profile },
           { type: 'username', payload: profile.username },
           { type: 'permission', payload: {key: 'admin', status: true} }
         ],
         expectedActions: [
           { type: 'favorites/fetch', payload: null, options: {root: true} },
-          { type: 'playlists/fetchOwn', payload: null, options: {root: true} },
+          { type: 'playlists/fetchOwn', payload: null, options: {root: true} }
         ]
       }, done)
     })
