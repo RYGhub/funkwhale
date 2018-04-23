@@ -14,12 +14,6 @@
             v-if="components[event.type]"
             :is="components[event.type]"
             :event="event">
-            <username
-              class="user"
-              :username="event.actor.local_id"
-              slot="user"></username>
-              {{ event.published }}
-            <human-date class="date" :date="event.published" slot="date"></human-date>
           </component>
         </div>
       </div>

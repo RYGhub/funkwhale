@@ -5,10 +5,10 @@
    </div>
    <div class="content">
      <div class="summary">
-       <i18next path="{%0%} favorited a track {%1%}">
-        <slot name="user"></slot>
-        <slot name="date"></slot>
+       <i18next path="{%0%} favorited a track">
+         <username class="user" :username="event.actor.local_id" />
        </i18next>
+       <human-date class="date" :date="event.published" />
      </div>
      <div class="extra text">
        <router-link :to="{name: 'library.tracks.detail', params: {id: event.object.local_id }}">{{ event.object.name }}</router-link>
