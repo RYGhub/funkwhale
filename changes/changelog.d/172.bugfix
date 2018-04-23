@@ -1,1 +1,0 @@
-Fixed broken login due to badly configured Axios (#172)
