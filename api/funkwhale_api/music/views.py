@@ -206,6 +206,8 @@ class TrackViewSet(
 
 
 def get_file_path(audio_file):
+    serve_path = settings.MUSIC_DIRECTORY_SERVE_PATH
+    prefix = settings.MUSIC_DIRECTORY_PATH
     t = settings.REVERSE_PROXY_TYPE
     if t == 'nginx':
         # we have to use the internal locations
@@ -213,14 +215,24 @@ def get_file_path(audio_file):
             path = audio_file.url
         except AttributeError:
             # a path was given
-            path = '/music' + audio_file
+            if not serve_path or not prefix:
+                raise ValueError(
+                    'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                    'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+                )
+            path = '/music' + audio_file.replace(prefix, '', 1)
         return settings.PROTECT_FILES_PATH + path
     if t == 'apache2':
         try:
             path = audio_file.path
         except AttributeError:
             # a path was given
-            path = audio_file
+            if not serve_path or not prefix:
+                raise ValueError(
+                    'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                    'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+                )
+            path = audio_file.replace(prefix, serve_path, 1)
         return path
 
 
@@ -267,7 +279,7 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
         elif audio_file:
             file_path = get_file_path(audio_file)
         elif f.source and f.source.startswith('file://'):
-            file_path = get_file_path(f.serve_from_source_path)
+            file_path = get_file_path(f.source.replace('file://', '', 1))
         response = Response()
         filename = f.filename
         mapping = {
