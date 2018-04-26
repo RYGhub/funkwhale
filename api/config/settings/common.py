@@ -377,6 +377,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
+        'funkwhale_api.common.authentication.BearerTokenHeaderAuth',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
