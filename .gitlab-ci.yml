@@ -92,12 +92,14 @@ build_front:
 
 pages:
   stage: test
-  image: python:3.6-alpine
+  image: python:3.6
+  variables:
+    BUILD_PATH: "../public"
   before_script:
     - cd docs
   script:
     - pip install sphinx
-    - python -m sphinx . ../public
+    - ./build_docs.sh
   artifacts:
     paths:
       - public

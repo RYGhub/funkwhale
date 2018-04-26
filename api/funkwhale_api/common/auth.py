@@ -29,9 +29,6 @@ class TokenHeaderAuth(BaseJSONWebTokenAuthentication):
 
 
 class TokenAuthMiddleware:
-    """
-    Custom middleware (insecure) that takes user IDs from the query string.
-    """
 
     def __init__(self, inner):
         # Store the ASGI application we were passed
