@@ -76,29 +76,60 @@ def test_can_serve_track_file_as_remote_library_deny_not_following(
     assert response.status_code == 403
 
 
-def test_serve_file_apache(factories, api_client, settings):
+@pytest.mark.parametrize('proxy,serve_path,expected', [
+    ('apache2', '/host/music', '/host/music/hello/world.mp3'),
+    ('apache2', '/app/music', '/app/music/hello/world.mp3'),
+    ('nginx', '/host/music', '/_protected/music/hello/world.mp3'),
+    ('nginx', '/app/music', '/_protected/music/hello/world.mp3'),
+])
+def test_serve_file_in_place(
+        proxy, serve_path, expected, factories, api_client, settings):
+    headers = {
+        'apache2': 'X-Sendfile',
+        'nginx': 'X-Accel-Redirect',
+    }
     settings.PROTECT_AUDIO_FILES = False
-    settings.REVERSE_PROXY_TYPE = 'apache2'
-    tf = factories['music.TrackFile']()
+    settings.PROTECT_FILE_PATH = '/_protected/music'
+    settings.REVERSE_PROXY_TYPE = proxy
+    settings.MUSIC_DIRECTORY_PATH = '/app/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
+    tf = factories['music.TrackFile'](
+        in_place=True,
+        source='file:///app/music/hello/world.mp3'
+    )
     response = api_client.get(tf.path)
 
     assert response.status_code == 200
-    assert response['X-Sendfile'] == tf.audio_file.path
+    assert response[headers[proxy]] == expected
 
 
-def test_serve_file_apache_in_place(factories, api_client, settings):
+@pytest.mark.parametrize('proxy,serve_path,expected', [
+    ('apache2', '/host/music', '/host/media/tracks/hello/world.mp3'),
+    # apache with container not supported yet
+    # ('apache2', '/app/music', '/app/music/tracks/hello/world.mp3'),
+    ('nginx', '/host/music', '/_protected/media/tracks/hello/world.mp3'),
+    ('nginx', '/app/music', '/_protected/media/tracks/hello/world.mp3'),
+])
+def test_serve_file_media(
+        proxy, serve_path, expected, factories, api_client, settings):
+    headers = {
+        'apache2': 'X-Sendfile',
+        'nginx': 'X-Accel-Redirect',
+    }
     settings.PROTECT_AUDIO_FILES = False
-    settings.REVERSE_PROXY_TYPE = 'apache2'
-    settings.MUSIC_DIRECTORY_PATH = '/music'
-    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
-    track_file = factories['music.TrackFile'](
-        in_place=True,
-        source='file:///music/test.ogg')
+    settings.MEDIA_ROOT = '/host/media'
+    settings.PROTECT_FILE_PATH = '/_protected/music'
+    settings.REVERSE_PROXY_TYPE = proxy
+    settings.MUSIC_DIRECTORY_PATH = '/app/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
 
-    response = api_client.get(track_file.path)
+    tf = factories['music.TrackFile']()
+    tf.__class__.objects.filter(pk=tf.pk).update(
+        audio_file='tracks/hello/world.mp3')
+    response = api_client.get(tf.path)
 
     assert response.status_code == 200
-    assert response['X-Sendfile'] == '/host/music/test.ogg'
+    assert response[headers[proxy]] == expected
 
 
 def test_can_proxy_remote_track(
@@ -116,25 +147,6 @@ def test_can_proxy_remote_track(
         settings.PROTECT_FILES_PATH,
         library_track.audio_file.url)
     assert library_track.audio_file.read() == b'test'
-
-
-def test_can_serve_in_place_imported_file(
-        factories, settings, api_client, r_mock):
-    settings.PROTECT_AUDIO_FILES = False
-    settings.MUSIC_DIRECTORY_SERVE_PATH = '/host/music'
-    settings.MUSIC_DIRECTORY_PATH = '/music'
-    settings.MUSIC_DIRECTORY_PATH = '/music'
-    track_file = factories['music.TrackFile'](
-        in_place=True,
-        source='file:///music/test.ogg')
-
-    response = api_client.get(track_file.path)
-
-    assert response.status_code == 200
-    assert response['X-Accel-Redirect'] == '{}{}'.format(
-        settings.PROTECT_FILES_PATH,
-        '/music/host/music/test.ogg'
-    )
 
 
 def test_can_create_import_from_federation_tracks(
