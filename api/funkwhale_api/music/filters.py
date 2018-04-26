@@ -20,6 +20,9 @@ class ListenableMixin(filters.FilterSet):
 
 
 class ArtistFilter(ListenableMixin):
+    q = fields.SearchFilter(search_fields=[
+        'name',
+    ])
 
     class Meta:
         model = models.Artist
