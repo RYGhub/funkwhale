@@ -103,7 +103,8 @@ Then, download our sample virtualhost file and proxy conf:
 .. parsed-literal::
 
     curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-enabled/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``. If everything is fine, you can restart your nginx server with ``service nginx restart``.
 

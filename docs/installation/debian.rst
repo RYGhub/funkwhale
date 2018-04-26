@@ -31,7 +31,7 @@ Layout
 
 All funkwhale-related files will be located under ``/srv/funkwhale`` apart
 from database files and a few configuration files. We will also have a
-dedicated ``funwhale`` user to launch the processes we need and own those files.
+dedicated ``funkwhale`` user to launch the processes we need and own those files.
 
 You are free to use different values here, just remember to adapt those in the
 next steps.
