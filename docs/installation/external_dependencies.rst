@@ -18,7 +18,7 @@ On debian-like systems, you would install the database server like this:
 
 .. code-block:: shell
 
-    sudo apt-get install postgresql
+    sudo apt-get install postgresql postgresql-contrib
 
 The remaining steps are heavily inspired from `this Digital Ocean guide <https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04>`_.
 
