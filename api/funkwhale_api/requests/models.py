@@ -15,6 +15,7 @@ STATUS_CHOICES = [
     ('closed', 'closed'),
 ]
 
+
 class ImportRequest(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     imported_date = models.DateTimeField(null=True, blank=True)
