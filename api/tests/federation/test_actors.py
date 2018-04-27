@@ -29,6 +29,42 @@ def test_actor_fetching(r_mock):
     assert r == payload
 
 
+def test_get_actor(factories, r_mock):
+    actor = factories['federation.Actor'].build()
+    payload = serializers.ActorSerializer(actor).data
+    r_mock.get(actor.url, json=payload)
+    new_actor = actors.get_actor(actor.url)
+
+    assert new_actor.pk is not None
+    assert serializers.ActorSerializer(new_actor).data == payload
+
+
+def test_get_actor_use_existing(factories, settings, mocker):
+    settings.FEDERATION_ACTOR_FETCH_DELAY = 60
+    actor = factories['federation.Actor']()
+    get_data = mocker.patch('funkwhale_api.federation.actors.get_actor_data')
+    new_actor = actors.get_actor(actor.url)
+
+    assert new_actor == actor
+    get_data.assert_not_called()
+
+
+def test_get_actor_refresh(factories, settings, mocker):
+    settings.FEDERATION_ACTOR_FETCH_DELAY = 0
+    actor = factories['federation.Actor']()
+    payload = serializers.ActorSerializer(actor).data
+    # actor changed their username in the meantime
+    payload['preferredUsername'] = 'New me'
+    get_data = mocker.patch(
+        'funkwhale_api.federation.actors.get_actor_data',
+        return_value=payload)
+    new_actor = actors.get_actor(actor.url)
+
+    assert new_actor == actor
+    assert new_actor.last_fetch_date > actor.last_fetch_date
+    assert new_actor.preferred_username == 'New me'
+
+
 def test_get_library(db, settings, mocker):
     get_key_pair = mocker.patch(
         'funkwhale_api.federation.keys.get_key_pair',

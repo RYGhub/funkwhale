@@ -150,6 +150,7 @@ export default {
   methods: {
     fetchData () {
       var self = this
+      this.scanTrigerred = false
       this.isLoading = true
       let url = 'federation/libraries/' + this.id + '/'
       logger.default.debug('Fetching library "' + this.id + '"')

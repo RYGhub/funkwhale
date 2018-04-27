@@ -1,3 +1,4 @@
+import datetime
 import logging
 import uuid
 import xml
@@ -49,11 +50,20 @@ def get_actor_data(actor_url):
 
 
 def get_actor(actor_url):
+    try:
+        actor = models.Actor.objects.get(url=actor_url)
+    except models.Actor.DoesNotExist:
+        actor = None
+    fetch_delta = datetime.timedelta(
+        minutes=settings.FEDERATION_ACTOR_FETCH_DELAY)
+    if actor and actor.last_fetch_date > timezone.now() - fetch_delta:
+        # cache is hot, we can return as is
+        return actor
     data = get_actor_data(actor_url)
     serializer = serializers.ActorSerializer(data=data)
     serializer.is_valid(raise_exception=True)
 
-    return serializer.build()
+    return serializer.save(last_fetch_date=timezone.now())
 
 
 class SystemActor(object):

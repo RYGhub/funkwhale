@@ -103,9 +103,10 @@ class ActorSerializer(serializers.Serializer):
     def save(self, **kwargs):
         d = self.prepare_missing_fields()
         d.update(kwargs)
-        return models.Actor.objects.create(
-            **d
-        )
+        return models.Actor.objects.update_or_create(
+            url=d['url'],
+            defaults=d,
+        )[0]
 
     def validate_summary(self, value):
         if value:

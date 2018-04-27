@@ -3,10 +3,12 @@
     <div class="content">
       <div class="header ellipsis">
         <router-link
+          v-if="library"
           :title="displayName"
           :to="{name: 'federation.libraries.detail', params: {id: library.uuid }}">
           {{ displayName }}
         </router-link>
+        <span :title="displayName" v-else>{{ displayName }}</span>
       </div>
     </div>
     <div class="content">

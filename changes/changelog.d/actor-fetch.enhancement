@@ -1,0 +1,1 @@
+Avoid fetching Actor object on every request authentication
