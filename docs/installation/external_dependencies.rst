@@ -32,12 +32,21 @@ Create the project database and user:
 
 .. code-block:: shell
 
-    CREATE DATABASE funkwhale;
+    CREATE DATABASE "scratch"
+      WITH ENCODING 'utf8'
+      LC_COLLATE = 'en_US.utf8'
+      LC_CTYPE = 'en_US.utf8';
     CREATE USER funkwhale;
     GRANT ALL PRIVILEGES ON DATABASE funkwhale TO funkwhale;
 
 Assuming you already have :ref:`created your funkwhale user <create-funkwhale-user>`,
 you should now be able to open a postgresql shell:
+
+.. warning::
+
+    It's importing that you use utf-8 encoding for your database,
+    otherwise you'll end up with errors and crashes later on when dealing
+    with music metedata that contains non-ascii chars.
 
 .. code-block:: shell
 
