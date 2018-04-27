@@ -97,6 +97,12 @@ html, body {
   }
 }
 
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .ui.small.text.container {
   max-width: 500px !important;
 }
