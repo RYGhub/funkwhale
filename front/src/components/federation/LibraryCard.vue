@@ -1,8 +1,12 @@
 <template>
   <div class="ui card">
     <div class="content">
-      <div class="header">
-        {{ displayName }}
+      <div class="header ellipsis">
+        <router-link
+          :title="displayName"
+          :to="{name: 'federation.libraries.detail', params: {id: library.uuid }}">
+          {{ displayName }}
+        </router-link>
       </div>
     </div>
     <div class="content">

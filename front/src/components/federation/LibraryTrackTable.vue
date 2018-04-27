@@ -89,7 +89,7 @@
             <router-link
               v-if="importBatch"
               :to="{name: 'library.import.batches.detail', params: {id: importBatch.id }}">
-              <i18next path="Import #{%id%} launched" :id="importBatch.id"/>
+              {{ $t('Import #{% id %} launched', {id: importBatch.id}) }}
             </router-link>
           </th>
           <th></th>

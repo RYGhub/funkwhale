@@ -13,7 +13,7 @@
         <div class="fields">
           <div class="field">
             <label>{{ $t('Search') }}</label>
-            <input type="text" v-model="query" placeholder="Enter an library domain name..."/>
+            <input class="search" type="text" v-model="query" placeholder="Enter an library domain name..."/>
           </div>
           <div class="field">
             <label>{{ $t('Ordering') }}</label>
@@ -115,6 +115,7 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+    $(this.$el).find('.field .search').focus()
   },
   methods: {
     updateQueryString: _.debounce(function () {
