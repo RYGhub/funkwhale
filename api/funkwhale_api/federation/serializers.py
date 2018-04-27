@@ -1,3 +1,4 @@
+import logging
 import urllib.parse
 
 from django.urls import reverse
@@ -20,6 +21,8 @@ AP_CONTEXT = [
     'https://w3id.org/security/v1',
     {},
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class ActorSerializer(serializers.Serializer):
@@ -620,6 +623,8 @@ class CollectionPageSerializer(serializers.Serializer):
         for i in raw_items:
             if i.is_valid():
                 valid_items.append(i)
+            else:
+                logger.debug('Invalid item %s: %s', i.data, i.errors)
 
         return valid_items
 

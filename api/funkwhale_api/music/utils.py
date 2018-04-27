@@ -63,8 +63,21 @@ def compute_status(jobs):
     return 'finished'
 
 
+AUDIO_EXTENSIONS_AND_MIMETYPE = [
+    ('ogg', 'audio/ogg'),
+    ('mp3', 'audio/mpeg'),
+]
+
+EXTENSION_TO_MIMETYPE = {ext: mt for ext, mt in AUDIO_EXTENSIONS_AND_MIMETYPE}
+MIMETYPE_TO_EXTENSION = {mt: ext for ext, mt in AUDIO_EXTENSIONS_AND_MIMETYPE}
+
+
 def get_ext_from_type(mimetype):
-    mapping = {
-        'audio/ogg': 'ogg',
-        'audio/mpeg': 'mp3',
-    }
+    return MIMETYPE_TO_EXTENSION.get(mimetype)
+
+
+def get_type_from_ext(extension):
+    if extension.startswith('.'):
+        # we remove leading dot
+        extension = extension[1:]
+    return EXTENSION_TO_MIMETYPE.get(extension)
