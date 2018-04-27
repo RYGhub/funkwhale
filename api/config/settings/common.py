@@ -56,6 +56,10 @@ FEDERATION_COLLECTION_PAGE_SIZE = env.int(
 FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
     'FEDERATION_MUSIC_NEEDS_APPROVAL', default=True
 )
+# how much minutes to wait before refetching actor data
+# when authenticating
+FEDERATION_ACTOR_FETCH_DELAY = env.int(
+    'FEDERATION_ACTOR_FETCH_DELAY', default=60 * 12)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # APP CONFIGURATION
