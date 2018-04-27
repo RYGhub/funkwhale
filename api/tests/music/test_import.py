@@ -243,3 +243,4 @@ def test__do_import_in_place_mbid(factories, tmpfile):
 
     assert bool(tf.audio_file) is False
     assert tf.source == 'file:///test.ogg'
+    assert tf.mimetype == 'audio/ogg'

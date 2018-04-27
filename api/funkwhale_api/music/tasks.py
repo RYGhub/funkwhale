@@ -1,3 +1,5 @@
+import os
+
 from django.core.files.base import ContentFile
 
 from dynamic_preferences.registries import global_preferences_registry
@@ -13,6 +15,7 @@ from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
 from django.conf import settings
 from . import models
 from . import lyrics as lyrics_utils
+from . import utils as music_utils
 
 
 @celery.app.task(name='acoustid.set_on_track_file')
@@ -129,6 +132,10 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     elif not import_job.audio_file and not import_job.source.startswith('file://'):
         # not an implace import, and we have a source, so let's download it
         track_file.download_file()
+    elif not import_job.audio_file and import_job.source.startswith('file://'):
+        # in place import, we set mimetype from extension
+        path, ext = os.path.splitext(import_job.source)
+        track_file.mimetype = music_utils.get_type_from_ext(ext)
     track_file.save()
     import_job.status = 'finished'
     import_job.track_file = track_file
