@@ -212,7 +212,7 @@ export default new Router({
             defaultQuery: route.query.query,
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page,
-            defaultStatus: route.query.status || 'pending'
+            defaultStatus: route.query.status || 'any'
           }),
           children: [
           ]

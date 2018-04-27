@@ -9,6 +9,16 @@
             <input type="text" v-model="query" placeholder="Enter an artist name, a username..."/>
           </div>
           <div class="field">
+            <label>{{ $t('Status') }}</label>
+            <select class="ui dropdown" v-model="status">
+              <option :value="'any'">{{ $t('Any') }}</option>
+              <option :value="'pending'">{{ $t('Pending') }}</option>
+              <option :value="'accepted'">{{ $t('Accepted') }}</option>
+              <option :value="'imported'">{{ $t('Imported') }}</option>
+              <option :value="'closed'">{{ $t('Closed') }}</option>
+            </select>
+          </div>
+          <div class="field">
             <label>{{ $t('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
@@ -81,7 +91,8 @@ const FETCH_URL = 'requests/import-requests/'
 export default {
   mixins: [OrderingMixin, PaginationMixin],
   props: {
-    defaultQuery: {type: String, required: false, default: ''}
+    defaultQuery: {type: String, required: false, default: ''},
+    defaultStatus: {required: false, default: 'any'}
   },
   components: {
     RequestCard,
@@ -96,7 +107,8 @@ export default {
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 12),
       orderingDirection: defaultOrdering.direction,
-      ordering: defaultOrdering.field
+      ordering: defaultOrdering.field,
+      status: this.defaultStatus || 'any'
     }
   },
   created () {
@@ -107,14 +119,18 @@ export default {
   },
   methods: {
     updateQueryString: _.debounce(function () {
-      this.$router.replace({
+      let query = {
         query: {
           query: this.query,
           page: this.page,
           paginateBy: this.paginateBy,
           ordering: this.getOrderingAsString()
         }
-      })
+      }
+      if (this.status !== 'any') {
+        query.query.status = this.status
+      }
+      this.$router.replace(query)
     }, 500),
     fetchData: _.debounce(function () {
       var self = this
@@ -123,8 +139,11 @@ export default {
       let params = {
         page: this.page,
         page_size: this.paginateBy,
-        search: this.query,
+        q: this.query,
         ordering: this.getOrderingAsString()
+      }
+      if (this.status !== 'any') {
+        params.status = this.status
       }
       logger.default.debug('Fetching request...')
       axios.get(url, {params: params}).then((response) => {
@@ -163,6 +182,10 @@ export default {
       this.fetchData()
     },
     query () {
+      this.updateQueryString()
+      this.fetchData()
+    },
+    status () {
       this.updateQueryString()
       this.fetchData()
     }

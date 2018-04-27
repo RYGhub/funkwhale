@@ -6,7 +6,11 @@
       <router-link class="ui item" to="/library/radios" exact><i18next path="Radios"/></router-link>
       <router-link class="ui item" to="/library/playlists" exact><i18next path="Playlists"/></router-link>
       <div class="ui secondary right menu">
-        <router-link v-if="$store.state.auth.authenticated" class="ui item" to="/library/requests/" exact>
+        <router-link
+          v-if="$store.state.auth.authenticated"
+          class="ui item"
+          :to="{name: 'library.requests', query: {status: 'pending' }}"
+          exact>
           <i18next path="Requests"/>
           <div class="ui teal label">{{ requestsCount }}</div>
         </router-link>
