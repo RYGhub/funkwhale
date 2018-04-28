@@ -145,6 +145,14 @@ class ImportJobViewSet(
         data['count'] = sum([v for v in data.values()])
         return Response(data)
 
+    @list_route(methods=['post'])
+    def run(self, request, *args, **kwargs):
+        serializer = serializers.ImportJobRunSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payload = serializer.save()
+
+        return Response(payload)
+
     def perform_create(self, serializer):
         source = 'file://' + serializer.validated_data['audio_file'].name
         serializer.save(source=source)

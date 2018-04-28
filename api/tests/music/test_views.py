@@ -208,3 +208,64 @@ def test_import_job_stats_filter(factories, superuser_api_client):
     }
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_import_job_run_via_api(factories, superuser_api_client, mocker):
+    run = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+    job1 = factories['music.ImportJob'](status='errored')
+    job2 = factories['music.ImportJob'](status='pending')
+
+    url = reverse('api:v1:import-jobs-run')
+    response = superuser_api_client.post(url, {'jobs': [job2.pk, job1.pk]})
+
+    job1.refresh_from_db()
+    job2.refresh_from_db()
+    assert response.status_code == 200
+    assert response.data == {'jobs': [job1.pk, job2.pk]}
+    assert job1.status == 'pending'
+    assert job2.status == 'pending'
+
+    run.assert_any_call(import_job_id=job1.pk)
+    run.assert_any_call(import_job_id=job2.pk)
+
+
+def test_import_batch_run_via_api(factories, superuser_api_client, mocker):
+    run = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+
+    batch = factories['music.ImportBatch']()
+    job1 = factories['music.ImportJob'](batch=batch, status='errored')
+    job2 = factories['music.ImportJob'](batch=batch, status='pending')
+
+    url = reverse('api:v1:import-jobs-run')
+    response = superuser_api_client.post(url, {'batches': [batch.pk]})
+
+    job1.refresh_from_db()
+    job2.refresh_from_db()
+    assert response.status_code == 200
+    assert job1.status == 'pending'
+    assert job2.status == 'pending'
+
+    run.assert_any_call(import_job_id=job1.pk)
+    run.assert_any_call(import_job_id=job2.pk)
+
+
+def test_import_batch_and_job_run_via_api(
+        factories, superuser_api_client, mocker):
+    run = mocker.patch('funkwhale_api.music.tasks.import_job_run.delay')
+
+    batch = factories['music.ImportBatch']()
+    job1 = factories['music.ImportJob'](batch=batch, status='errored')
+    job2 = factories['music.ImportJob'](status='pending')
+
+    url = reverse('api:v1:import-jobs-run')
+    response = superuser_api_client.post(
+        url, {'batches': [batch.pk], 'jobs': [job2.pk]})
+
+    job1.refresh_from_db()
+    job2.refresh_from_db()
+    assert response.status_code == 200
+    assert job1.status == 'pending'
+    assert job2.status == 'pending'
+
+    run.assert_any_call(import_job_id=job1.pk)
+    run.assert_any_call(import_job_id=job2.pk)
