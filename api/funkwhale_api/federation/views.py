@@ -13,6 +13,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.serializers import ValidationError
 
+from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.common.permissions import HasModelPermission
 from funkwhale_api.music.models import TrackFile
@@ -33,7 +34,7 @@ from . import webfinger
 
 class FederationMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        if not settings.FEDERATION_ENABLED:
+        if not preferences.get('federation__enabled'):
             return HttpResponse(status=405)
         return super().dispatch(request, *args, **kwargs)
 
@@ -136,7 +137,8 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         if page is None:
             conf = {
                 'id': utils.full_url(reverse('federation:music:files-list')),
-                'page_size': settings.FEDERATION_COLLECTION_PAGE_SIZE,
+                'page_size': preferences.get(
+                    'federation__collection_page_size'),
                 'items': qs,
                 'item_serializer': serializers.AudioSerializer,
                 'actor': library,
@@ -150,7 +152,7 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
                 return response.Response(
                     {'page': ['Invalid page number']}, status=400)
             p = paginator.Paginator(
-                qs, settings.FEDERATION_COLLECTION_PAGE_SIZE)
+                qs, preferences.get('federation__collection_page_size'))
             try:
                 page = p.page(page_number)
                 conf = {

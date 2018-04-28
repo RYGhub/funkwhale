@@ -39,8 +39,8 @@ def test_get_actor(factories, r_mock):
     assert serializers.ActorSerializer(new_actor).data == payload
 
 
-def test_get_actor_use_existing(factories, settings, mocker):
-    settings.FEDERATION_ACTOR_FETCH_DELAY = 60
+def test_get_actor_use_existing(factories, preferences, mocker):
+    preferences['federation__actor_fetch_delay'] = 60
     actor = factories['federation.Actor']()
     get_data = mocker.patch('funkwhale_api.federation.actors.get_actor_data')
     new_actor = actors.get_actor(actor.url)
@@ -49,8 +49,8 @@ def test_get_actor_use_existing(factories, settings, mocker):
     get_data.assert_not_called()
 
 
-def test_get_actor_refresh(factories, settings, mocker):
-    settings.FEDERATION_ACTOR_FETCH_DELAY = 0
+def test_get_actor_refresh(factories, preferences, mocker):
+    preferences['federation__actor_fetch_delay'] = 0
     actor = factories['federation.Actor']()
     payload = serializers.ActorSerializer(actor).data
     # actor changed their username in the meantime
@@ -274,9 +274,9 @@ def test_actor_is_system(
 
 
 @pytest.mark.parametrize('value', [False, True])
-def test_library_actor_manually_approves_based_on_setting(
-        value, settings):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = value
+def test_library_actor_manually_approves_based_on_preference(
+        value, preferences):
+    preferences['federation__music_needs_approval'] = value
     library_conf = actors.SYSTEM_ACTORS['library']
     assert library_conf.manually_approves_followers is value
 
@@ -356,8 +356,8 @@ def test_test_actor_handles_undo_follow(
 
 
 def test_library_actor_handles_follow_manual_approval(
-        settings, mocker, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        preferences, mocker, factories):
+    preferences['federation__music_needs_approval'] = True
     actor = factories['federation.Actor']()
     now = timezone.now()
     mocker.patch('django.utils.timezone.now', return_value=now)
@@ -377,8 +377,8 @@ def test_library_actor_handles_follow_manual_approval(
 
 
 def test_library_actor_handles_follow_auto_approval(
-        settings, mocker, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
+        preferences, mocker, factories):
+    preferences['federation__music_needs_approval'] = False
     actor = factories['federation.Actor']()
     accept_follow = mocker.patch(
         'funkwhale_api.federation.activity.accept_follow')

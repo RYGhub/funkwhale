@@ -2,8 +2,7 @@ import os
 
 from django.core.files.base import ContentFile
 
-from dynamic_preferences.registries import global_preferences_registry
-
+from funkwhale_api.common import preferences
 from funkwhale_api.federation import activity
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models as federation_models
@@ -80,8 +79,7 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     acoustid_track_id = None
     duration = None
     track = None
-    manager = global_preferences_registry.manager()
-    use_acoustid = use_acoustid and manager['providers_acoustid__api_key']
+    use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
     if not mbid and use_acoustid and from_file:
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
@@ -185,7 +183,7 @@ def fetch_content(lyrics):
 @celery.require_instance(
     models.ImportBatch.objects.filter(status='finished'), 'import_batch')
 def import_batch_notify_followers(import_batch):
-    if not settings.FEDERATION_ENABLED:
+    if not preferences.get('federation__enabled'):
         return
 
     if import_batch.source == 'federation':

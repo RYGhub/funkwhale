@@ -169,10 +169,10 @@ def test_import_job_run_triggers_notifies_followers(
 
 
 def test_import_batch_notifies_followers_skip_on_disabled_federation(
-        settings, factories, mocker):
+        preferences, factories, mocker):
     mocked_deliver = mocker.patch('funkwhale_api.federation.activity.deliver')
     batch = factories['music.ImportBatch'](finished=True)
-    settings.FEDERATION_ENABLED = False
+    preferences['federation__enabled'] = False
     tasks.import_batch_notify_followers(import_batch_id=batch.pk)
 
     mocked_deliver.assert_not_called()
