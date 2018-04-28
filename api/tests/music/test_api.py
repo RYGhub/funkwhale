@@ -265,16 +265,16 @@ def test_can_search_tracks(factories, logged_in_client):
     ('api:v1:albums-list', 'get'),
 ])
 def test_can_restrict_api_views_to_authenticated_users(
-        db, route, method, settings, client):
+        db, route, method, preferences, client):
     url = reverse(route)
-    settings.API_AUTHENTICATION_REQUIRED = True
+    preferences['common__api_authentication_required'] = True
     response = getattr(client, method)(url)
     assert response.status_code == 401
 
 
 def test_track_file_url_is_restricted_to_authenticated_users(
-        api_client, factories, settings):
-    settings.API_AUTHENTICATION_REQUIRED = True
+        api_client, factories, preferences):
+    preferences['common__api_authentication_required'] = True
     f = factories['music.TrackFile']()
     assert f.audio_file is not None
     url = f.path
@@ -283,8 +283,8 @@ def test_track_file_url_is_restricted_to_authenticated_users(
 
 
 def test_track_file_url_is_accessible_to_authenticated_users(
-        logged_in_api_client, factories, settings):
-    settings.API_AUTHENTICATION_REQUIRED = True
+        logged_in_api_client, factories, preferences):
+    preferences['common__api_authentication_required'] = True
     f = factories['music.TrackFile']()
     assert f.audio_file is not None
     url = f.path

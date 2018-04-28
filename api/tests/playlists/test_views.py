@@ -107,8 +107,8 @@ def test_deleting_plt_updates_indexes(
 
 @pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
 def test_playlist_privacy_respected_in_list_anon(
-        settings, level, factories, api_client):
-    settings.API_AUTHENTICATION_REQUIRED = False
+        preferences, level, factories, api_client):
+    preferences['common__api_authentication_required'] = False
     factories['playlists.Playlist'](privacy_level=level)
     url = reverse('api:v1:playlists-list')
     response = api_client.get(url)
@@ -137,8 +137,8 @@ def test_only_owner_can_edit_playlist_track(
 
 @pytest.mark.parametrize('level', ['instance', 'me', 'followers'])
 def test_playlist_track_privacy_respected_in_list_anon(
-        level, factories, api_client, settings):
-    settings.API_AUTHENTICATION_REQUIRED = False
+        level, factories, api_client, preferences):
+    preferences['common__api_authentication_required'] = False
     factories['playlists.PlaylistTrack'](playlist__privacy_level=level)
     url = reverse('api:v1:playlist-tracks-list')
     response = api_client.get(url)
