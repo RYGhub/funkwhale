@@ -18,6 +18,8 @@ and technical aspects of your instance, such as database credentials.
     on environment variables.
 
 
+.. _instance-settings:
+
 Instance settings
 -----------------
 

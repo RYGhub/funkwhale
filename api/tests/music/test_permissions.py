@@ -13,7 +13,7 @@ def test_list_permission_no_protect(anonymous_user, api_request, settings):
 
 
 def test_list_permission_protect_anonymous(
-        anonymous_user, api_request, settings):
+        db, anonymous_user, api_request, settings):
     settings.PROTECT_AUDIO_FILES = True
     view = APIView.as_view()
     permission = permissions.Listen()
