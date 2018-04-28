@@ -31,23 +31,38 @@
   <div class="tabs">
     <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical fluid menu">
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> {{ $t('Logout') }}</router-link>
-        <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> {{ $t('Login') }}</router-link>
-        <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
-        <a
-          @click="$store.commit('playlists/chooseTrack', null)"
-          v-if="$store.state.auth.authenticated"
-          class="item">
-          <i class="list icon"></i> {{ $t('Playlists') }}
-        </a>
-        <router-link
-          v-if="$store.state.auth.authenticated"
-          class="item" :to="{path: '/activity'}"><i class="bell icon"></i> {{ $t('Activity') }}</router-link>
-        <router-link
-          class="item" v-if="$store.state.auth.availablePermissions['federation.manage']"
-          :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> {{ $t('Federation') }}</router-link>
+        <div class="item">
+          <div class="header">{{ $t('My account') }}</div>
+          <div class="menu">
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> {{ $t('Logout') }}</router-link>
+            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> {{ $t('Login') }}</router-link>
+          </div>
+        </div>
+        <div class="item">
+          <div class="header">{{ $t('Music') }}</div>
+          <div class="menu">
+            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
+            <a
+              @click="$store.commit('playlists/chooseTrack', null)"
+              v-if="$store.state.auth.authenticated"
+              class="item">
+              <i class="list icon"></i> {{ $t('Playlists') }}
+            </a>
+            <router-link
+              v-if="$store.state.auth.authenticated"
+              class="item" :to="{path: '/activity'}"><i class="bell icon"></i> {{ $t('Activity') }}</router-link>
+          </div>
+        </div>
+        <div class="item" v-if="$store.state.auth.availablePermissions['federation.manage']">
+          <div class="header">{{ $t('Administration') }}</div>
+          <div class="menu">
+            <router-link
+              class="item"
+              :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> {{ $t('Federation') }}</router-link>
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="queue.previousQueue " class="ui black icon message">
@@ -229,6 +244,11 @@ $sidebar-color: #3D3E3F;
     &:hover {
       background-color: rgba(255, 255, 255, 0.06);
     }
+  }
+}
+.vertical.menu {
+  .item .item {
+    font-size: 1em;
   }
 }
 .tabs {
