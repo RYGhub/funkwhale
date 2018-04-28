@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
 from taggit.models import Tag
 
@@ -9,6 +10,7 @@ from funkwhale_api.federation.serializers import AP_CONTEXT
 from funkwhale_api.users.serializers import UserBasicSerializer
 
 from . import models
+from . import tasks
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -204,3 +206,33 @@ class SubmitFederationTracksSerializer(serializers.Serializer):
                 source=lt.url,
             )
         return batch
+
+
+class ImportJobRunSerializer(serializers.Serializer):
+    jobs = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=models.ImportJob.objects.filter(
+            status__in=['pending', 'errored']
+        )
+    )
+    batches = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=models.ImportBatch.objects.all()
+    )
+
+    def validate(self, validated_data):
+        jobs = validated_data['jobs']
+        batches_ids = [b.pk for b in validated_data['batches']]
+        query = Q(batch__pk__in=batches_ids)
+        query |= Q(pk__in=[j.id for j in jobs])
+        queryset = models.ImportJob.objects.filter(query).filter(
+            status__in=['pending', 'errored']).distinct()
+        validated_data['_jobs'] = queryset
+        return validated_data
+
+    def create(self, validated_data):
+        ids = validated_data['_jobs'].values_list('id', flat=True)
+        validated_data['_jobs'].update(status='pending')
+        for id in ids:
+            tasks.import_job_run.delay(import_job_id=id)
+        return {'jobs': list(ids)}
