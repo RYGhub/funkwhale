@@ -1,6 +1,13 @@
 Changelog
 =========
 
+You can subscribe to release announcements by:
+
+- Following `funkwhale@mastodon.eliotberriot.com <https://mastodon.eliotberriot.com/@funkwhale>`_ on Mastodon
+- Subscribing to the following Atom feed: https://code.eliotberriot.com/funkwhale/funkwhale/commits/develop?format=atom&search=tag
+
+This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.html.
+
 .. towncrier
 
 0.10 (2018-04-23)
