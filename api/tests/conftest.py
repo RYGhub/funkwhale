@@ -27,12 +27,19 @@ def factories_autodiscover():
 
 @pytest.fixture(autouse=True)
 def cache():
+    """
+    Returns a django Cache instance for cache-related operations
+    """
     yield django_cache
     django_cache.clear()
 
 
 @pytest.fixture
 def factories(db):
+    """
+    Returns a dictionnary containing all registered factories with keys such as
+    users.User or music.Track
+    """
     from funkwhale_api import factories
     for v in factories.registry.values():
         try:
@@ -45,6 +52,10 @@ def factories(db):
 
 @pytest.fixture
 def nodb_factories():
+    """
+    Returns a dictionnary containing all registered factories with a build strategy
+    that does not require access to the database
+    """
     from funkwhale_api import factories
     for v in factories.registry.values():
         try:
@@ -57,6 +68,9 @@ def nodb_factories():
 
 @pytest.fixture
 def preferences(db, cache):
+    """
+    return a dynamic_preferences manager for global_preferences
+    """
     manager = global_preferences_registry.manager()
     manager.all()
     yield manager
@@ -64,6 +78,10 @@ def preferences(db, cache):
 
 @pytest.fixture
 def tmpdir():
+    """
+    Returns a temporary directory path where you can write things during your
+    test
+    """
     d = tempfile.mkdtemp()
     yield d
     shutil.rmtree(d)
@@ -71,11 +89,18 @@ def tmpdir():
 
 @pytest.fixture
 def tmpfile():
+    """
+    Returns a temporary file where you can write things during your test
+    """
     yield tempfile.NamedTemporaryFile()
 
 
 @pytest.fixture
 def logged_in_client(db, factories, client):
+    """
+    Returns a logged-in, non-API client with an authenticated ``User``
+    stored in the ``user`` attribute
+    """
     user = factories['users.User']()
     assert client.login(username=user.username, password='test')
     setattr(client, 'user', user)
@@ -85,16 +110,24 @@ def logged_in_client(db, factories, client):
 
 @pytest.fixture
 def anonymous_user():
+    """Returns a AnonymousUser() instance"""
     return AnonymousUser()
 
 
 @pytest.fixture
 def api_client(client):
+    """
+    Return an API client without any authentication
+    """
     return APIClient()
 
 
 @pytest.fixture
 def logged_in_api_client(db, factories, api_client):
+    """
+    Return a logged-in API client with an authenticated ``User``
+    stored in the ``user`` attribute
+    """
     user = factories['users.User']()
     assert api_client.login(username=user.username, password='test')
     setattr(api_client, 'user', user)
@@ -104,6 +137,10 @@ def logged_in_api_client(db, factories, api_client):
 
 @pytest.fixture
 def superuser_api_client(db, factories, api_client):
+    """
+    Return a logged-in API client with an authenticated superuser
+    stored in the ``user`` attribute
+    """
     user = factories['users.SuperUser']()
     assert api_client.login(username=user.username, password='test')
     setattr(api_client, 'user', user)
@@ -113,6 +150,10 @@ def superuser_api_client(db, factories, api_client):
 
 @pytest.fixture
 def superuser_client(db, factories, client):
+    """
+    Return a logged-in, non-API client with an authenticated ``User``
+    stored in the ``user`` attribute
+    """
     user = factories['users.SuperUser']()
     assert client.login(username=user.username, password='test')
     setattr(client, 'user', user)
@@ -122,22 +163,18 @@ def superuser_client(db, factories, client):
 
 @pytest.fixture
 def api_request():
+    """
+    Returns a dummy API request object you can pass to API views
+    """
     return APIRequestFactory()
 
 
 @pytest.fixture
 def fake_request():
+    """
+    Returns a dummy, non-API request object you can pass to regular views
+    """
     return client.RequestFactory()
-
-
-@pytest.fixture
-def activity_registry():
-    r = record.registry
-    state = list(record.registry.items())
-    yield record.registry
-    record.registry.clear()
-    for key, value in state:
-        record.registry[key] = value
 
 
 @pytest.fixture
@@ -157,6 +194,9 @@ def activity_muted(activity_registry, mocker):
 
 @pytest.fixture(autouse=True)
 def media_root(settings):
+    """
+    Sets settings.MEDIA_ROOT to a temporary path and returns this path
+    """
     tmp_dir = tempfile.mkdtemp()
     settings.MEDIA_ROOT = tmp_dir
     yield settings.MEDIA_ROOT
@@ -165,12 +205,19 @@ def media_root(settings):
 
 @pytest.fixture
 def r_mock():
+    """
+    Returns a requests_mock.mock() object you can use to mock HTTP calls made
+    using python-requests
+    """
     with requests_mock.mock() as m:
         yield m
 
 
 @pytest.fixture
 def authenticated_actor(factories, mocker):
+    """
+    Returns an authenticated ActivityPub actor
+    """
     actor = factories['federation.Actor']()
     mocker.patch(
         'funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor',
