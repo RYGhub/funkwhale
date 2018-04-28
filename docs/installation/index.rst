@@ -29,7 +29,7 @@ On a dockerized instance with 2 CPUs and a few active users, the memory footprin
    funkwhale_redis_1           1.496 MiB
 
 Some users have reported running Funkwhale on Raspberry Pis with a memory
-consuption of less than 200MiB.
+consumption of less than 350MiB.
 
 Thus, Funkwhale should run fine on commodity hardware, small hosting boxes and
 Raspberry Pi. We lack real-world exemples of such deployments, so don't hesitate
