@@ -5,11 +5,13 @@ from django.http import Http404
 
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
+from funkwhale_api.common import preferences
+
 
 class ConditionalAuthentication(BasePermission):
 
     def has_permission(self, request, view):
-        if settings.API_AUTHENTICATION_REQUIRED:
+        if preferences.get('common__api_authentication_required'):
             return request.user and request.user.is_authenticated
         return True
 

@@ -116,8 +116,8 @@ def test_can_insert_many(factories):
         assert plt.playlist == playlist
 
 
-def test_insert_many_honor_max_tracks(factories, settings):
-    settings.PLAYLISTS_MAX_TRACKS = 4
+def test_insert_many_honor_max_tracks(preferences, factories):
+    preferences['playlists__max_tracks'] = 4
     playlist = factories['playlists.Playlist']()
     plts = factories['playlists.PlaylistTrack'].create_batch(
         size=2, playlist=playlist)

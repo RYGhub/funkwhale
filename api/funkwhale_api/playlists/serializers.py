@@ -3,6 +3,7 @@ from django.db import transaction
 from rest_framework import serializers
 from taggit.models import Tag
 
+from funkwhale_api.common import preferences
 from funkwhale_api.music.models import Track
 from funkwhale_api.music.serializers import TrackSerializerNested
 from funkwhale_api.users.serializers import UserBasicSerializer
@@ -32,10 +33,11 @@ class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'You do not have the permission to edit this playlist')
         existing = value.playlist_tracks.count()
-        if existing >= settings.PLAYLISTS_MAX_TRACKS:
+        max_tracks = preferences.get('playlists__max_tracks')
+        if existing >= max_tracks:
             raise serializers.ValidationError(
                 'Playlist has reached the maximum of {} tracks'.format(
-                    settings.PLAYLISTS_MAX_TRACKS))
+                    max_tracks))
         return value
 
     @transaction.atomic

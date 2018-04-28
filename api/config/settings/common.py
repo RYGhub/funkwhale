@@ -48,16 +48,18 @@ else:
 FUNKWHALE_URL = '{}://{}'.format(FUNKWHALE_PROTOCOL, FUNKWHALE_HOSTNAME)
 
 
+# XXX: deprecated, see #186
 FEDERATION_ENABLED = env.bool('FEDERATION_ENABLED', default=True)
 FEDERATION_HOSTNAME = env('FEDERATION_HOSTNAME', default=FUNKWHALE_HOSTNAME)
+# XXX: deprecated, see #186
 FEDERATION_COLLECTION_PAGE_SIZE = env.int(
     'FEDERATION_COLLECTION_PAGE_SIZE', default=50
 )
+# XXX: deprecated, see #186
 FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
     'FEDERATION_MUSIC_NEEDS_APPROVAL', default=True
 )
-# how much minutes to wait before refetching actor data
-# when authenticating
+# XXX: deprecated, see #186
 FEDERATION_ACTOR_FETCH_DELAY = env.int(
     'FEDERATION_ACTOR_FETCH_DELAY', default=60 * 12)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
@@ -366,7 +368,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'funkwhale.localhost',
 # )
 CORS_ALLOW_CREDENTIALS = True
-API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -433,6 +434,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')
 CSRF_USE_SESSIONS = True
 
 # Playlist settings
+# XXX: deprecated, see #186
 PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
 
 ACCOUNT_USERNAME_BLACKLIST = [
@@ -452,6 +454,8 @@ EXTERNAL_REQUESTS_VERIFY_SSL = env.bool(
     'EXTERNAL_REQUESTS_VERIFY_SSL',
     default=True
 )
+# XXX: deprecated, see #186
+API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
 
 MUSIC_DIRECTORY_PATH = env('MUSIC_DIRECTORY_PATH', default=None)
 # on Docker setup, the music directory may not match the host path,

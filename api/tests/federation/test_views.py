@@ -13,7 +13,7 @@ from funkwhale_api.federation import webfinger
 
 
 @pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())
-def test_instance_actors(system_actor, db, settings, api_client):
+def test_instance_actors(system_actor, db, api_client):
     actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
     url = reverse(
         'federation:instance-actors-detail',
@@ -34,8 +34,8 @@ def test_instance_actors(system_actor, db, settings, api_client):
     ('well-known-webfinger', {}),
 ])
 def test_instance_endpoints_405_if_federation_disabled(
-        authenticated_actor, db, settings, api_client, route, kwargs):
-    settings.FEDERATION_ENABLED = False
+        authenticated_actor, db, preferences, api_client, route, kwargs):
+    preferences['federation__enabled'] = False
     url = reverse('federation:{}'.format(route), kwargs=kwargs)
     response = api_client.get(url)
 
@@ -71,8 +71,8 @@ def test_wellknown_webfinger_system(
 
 
 def test_audio_file_list_requires_authenticated_actor(
-        db, settings, api_client):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        db, preferences, api_client):
+    preferences['federation__music_needs_approval'] = True
     url = reverse('federation:music:files-list')
     response = api_client.get(url)
 
@@ -80,9 +80,9 @@ def test_audio_file_list_requires_authenticated_actor(
 
 
 def test_audio_file_list_actor_no_page(
-        db, settings, api_client, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
-    settings.FEDERATION_COLLECTION_PAGE_SIZE = 2
+        db, preferences, api_client, factories):
+    preferences['federation__music_needs_approval'] = False
+    preferences['federation__collection_page_size'] = 2
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     tfs = factories['music.TrackFile'].create_batch(size=5)
     conf = {
@@ -101,9 +101,9 @@ def test_audio_file_list_actor_no_page(
 
 
 def test_audio_file_list_actor_page(
-        db, settings, api_client, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
-    settings.FEDERATION_COLLECTION_PAGE_SIZE = 2
+        db, preferences, api_client, factories):
+    preferences['federation__music_needs_approval'] = False
+    preferences['federation__collection_page_size'] = 2
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     tfs = factories['music.TrackFile'].create_batch(size=5)
     conf = {
@@ -121,8 +121,8 @@ def test_audio_file_list_actor_page(
 
 
 def test_audio_file_list_actor_page_exclude_federated_files(
-        db, settings, api_client, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
+        db, preferences, api_client, factories):
+    preferences['federation__music_needs_approval'] = False
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     tfs = factories['music.TrackFile'].create_batch(size=5, federation=True)
 
@@ -134,8 +134,8 @@ def test_audio_file_list_actor_page_exclude_federated_files(
 
 
 def test_audio_file_list_actor_page_error(
-        db, settings, api_client, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
+        db, preferences, api_client, factories):
+    preferences['federation__music_needs_approval'] = False
     url = reverse('federation:music:files-list')
     response = api_client.get(url, data={'page': 'nope'})
 
@@ -143,15 +143,15 @@ def test_audio_file_list_actor_page_error(
 
 
 def test_audio_file_list_actor_page_error_too_far(
-        db, settings, api_client, factories):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = False
+        db, preferences, api_client, factories):
+    preferences['federation__music_needs_approval'] = False
     url = reverse('federation:music:files-list')
     response = api_client.get(url, data={'page': 5000})
 
     assert response.status_code == 404
 
 
-def test_library_actor_includes_library_link(db, settings, api_client):
+def test_library_actor_includes_library_link(db, preferences, api_client):
     actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     url = reverse(
         'federation:instance-actors-detail',

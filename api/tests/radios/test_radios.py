@@ -151,8 +151,8 @@ def test_can_start_radio_for_logged_in_user(logged_in_client):
     assert session.user == logged_in_client.user
 
 
-def test_can_start_radio_for_anonymous_user(api_client, db, settings):
-    settings.API_AUTHENTICATION_REQUIRED = False
+def test_can_start_radio_for_anonymous_user(api_client, db, preferences):
+    preferences['common__api_authentication_required'] = False
     url = reverse('api:v1:radios:sessions-list')
     response = api_client.post(url, {'radio_type': 'random'})
 
@@ -232,8 +232,8 @@ def test_can_start_tag_radio(factories):
         assert radio.pick() in good_tracks
 
 
-def test_can_start_artist_radio_from_api(api_client, settings, factories):
-    settings.API_AUTHENTICATION_REQUIRED = False
+def test_can_start_artist_radio_from_api(api_client, preferences, factories):
+    preferences['common__api_authentication_required'] = False
     artist = factories['music.Artist']()
     url = reverse('api:v1:radios:sessions-list')
 

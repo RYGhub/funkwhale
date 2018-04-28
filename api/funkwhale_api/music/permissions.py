@@ -2,6 +2,7 @@ from django.conf import settings
 
 from rest_framework.permissions import BasePermission
 
+from funkwhale_api.common import preferences
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 
@@ -10,6 +11,9 @@ class Listen(BasePermission):
 
     def has_permission(self, request, view):
         if not settings.PROTECT_AUDIO_FILES:
+            return True
+
+        if not preferences.get('common__api_authentication_required'):
             return True
 
         user = getattr(request, 'user', None)

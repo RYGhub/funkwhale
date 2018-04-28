@@ -2,8 +2,8 @@ from funkwhale_api.playlists import models
 from funkwhale_api.playlists import serializers
 
 
-def test_cannot_max_500_tracks_per_playlist(factories, settings):
-    settings.PLAYLISTS_MAX_TRACKS = 2
+def test_cannot_max_500_tracks_per_playlist(factories, preferences):
+    preferences['playlists__max_tracks'] = 2
     playlist = factories['playlists.Playlist']()
     plts = factories['playlists.PlaylistTrack'].create_batch(
         size=2, playlist=playlist)

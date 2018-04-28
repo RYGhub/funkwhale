@@ -1,0 +1,24 @@
+Store high-level settings (such as federation or auth-related ones) in database (#186)
+
+Changelog
+^^^^^^^^^
+Due to the work done in #186, the following environment variables have been
+deprecated:
+
+- FEDERATION_ENABLED
+- FEDERATION_COLLECTION_PAGE_SIZE
+- FEDERATION_MUSIC_NEEDS_APPROVAL
+- FEDERATION_ACTOR_FETCH_DELAY
+- PLAYLISTS_MAX_TRACKS
+- API_AUTHENTICATION_REQUIRED
+
+Configuration for this settings has been moved to database, as it will provide
+a better user-experience, by allowing you to edit these values on-the-fly,
+without restarting Funkwhale processes.
+
+You can leave those environment variables in your .env file for now, as the
+values will be used to populate the database entries. We'll make a proper
+announcement when the variables won't be used anymore.
+
+Please browse https://docs.funkwhale.audio/configuration.html#instance-settings
+for more information about instance configuration using the web interface.
