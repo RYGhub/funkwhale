@@ -12,7 +12,6 @@
           :to="{name: 'library.requests', query: {status: 'pending' }}"
           exact>
           <i18next path="Requests"/>
-          <div class="ui teal label">{{ requestsCount }}</div>
         </router-link>
         <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>
           <i18next path="Import"/>
@@ -27,28 +26,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
-  name: 'library',
-  data () {
-    return {
-      requestsCount: 0
-    }
-  },
-  created () {
-    this.fetchRequestsCount()
-  },
-  methods: {
-    fetchRequestsCount () {
-      if (!this.$store.state.authenticated) {
-        return
-      }
-      let self = this
-      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        self.requestsCount = response.data.count
-      })
-    }
-  }
+  name: 'library'
 }
 </script>
 
