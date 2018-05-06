@@ -85,7 +85,10 @@ export default {
     togglePlay ({commit, state}) {
       commit('playing', !state.playing)
     },
-    trackListened ({commit}, track) {
+    trackListened ({commit, rootState}, track) {
+      if (!rootState.auth.authenticated) {
+        return
+      }
       return axios.post('history/listenings/', {'track': track.id}).then((response) => {}, (response) => {
         logger.default.error('Could not record track in history')
       })

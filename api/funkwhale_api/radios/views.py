@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.http import Http404
 
 from rest_framework import generics, mixins, viewsets
+from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
@@ -24,7 +25,7 @@ class RadioViewSet(
         viewsets.GenericViewSet):
 
     serializer_class = serializers.RadioSerializer
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
     filter_class = filtersets.RadioFilter
 
     def get_queryset(self):
@@ -84,21 +85,15 @@ class RadioSessionViewSet(mixins.CreateModelMixin,
 
     serializer_class = serializers.RadioSessionSerializer
     queryset = models.RadioSession.objects.all()
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.request.user.is_authenticated:
-            return queryset.filter(user=self.request.user)
-        else:
-            return queryset.filter(session_key=self.request.session.session_key)
+        return queryset.filter(user=self.request.user)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.request.user.is_authenticated:
-            context['user'] = self.request.user
-        else:
-            context['session_key'] = self.request.session.session_key
+        context['user'] = self.request.user
         return context
 
 
@@ -106,17 +101,14 @@ class RadioSessionTrackViewSet(mixins.CreateModelMixin,
                                viewsets.GenericViewSet):
     serializer_class = serializers.RadioSessionTrackSerializer
     queryset = models.RadioSessionTrack.objects.all()
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session = serializer.validated_data['session']
         try:
-            if request.user.is_authenticated:
-                assert request.user == session.user
-            else:
-                assert request.session.session_key == session.session_key
+            assert request.user == session.user
         except AssertionError:
             return Response(status=status.HTTP_403_FORBIDDEN)
         track = session.radio.pick()
