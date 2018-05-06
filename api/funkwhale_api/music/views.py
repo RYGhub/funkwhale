@@ -14,6 +14,7 @@ from django.db.models.functions import Length
 from django.db.models import Count
 from django.http import StreamingHttpResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets, views, mixins
@@ -263,6 +264,10 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             f = queryset.get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
+
+        # we update the accessed_date
+        f.accessed_date = timezone.now()
+        f.save(update_fields=['accessed_date'])
 
         mt = f.mimetype
         audio_file = f.audio_file
