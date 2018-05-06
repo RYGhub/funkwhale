@@ -17,29 +17,9 @@ Please take a few minutes to read the :doc:`changelog`: updates should work
 similarly from version to version, but some of them may require additional steps.
 Those steps would be described in the version release notes.
 
-Upgrade the static files
-------------------------
-
-Regardless of your deployment choice (docker/non-docker) the front-end app
-is updated separately from the API. This is as simple as downloading
-the zip with the static files and extracting it in the correct place.
-
-The following example assume your setup match :ref:`frontend-setup`.
-
-.. parsed-literal::
-
-    # this assumes you want to upgrade to version "|version|"
-    export FUNKWHALE_VERSION="|version|"
-    cd /srv/funkwhale
-    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
-    unzip -o front.zip
-    rm front.zip
-
-Upgrading the API
------------------
 
 Docker setup
-^^^^^^^^^^^^
+------------
 
 If you've followed the setup instructions in :doc:`Docker`, upgrade path is
 easy:
@@ -57,10 +37,33 @@ easy:
     # Relaunch the containers
     docker-compose up -d
 
-Non-docker setup
-^^^^^^^^^^^^^^^^
 
-On non docker-setup, upgrade involves a few more commands. We assume your setup
+
+Non-docker setup
+----------------
+
+Upgrade the static files
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+On non-docker setups, the front-end app
+is updated separately from the API. This is as simple as downloading
+the zip with the static files and extracting it in the correct place.
+
+The following example assume your setup match :ref:`frontend-setup`.
+
+.. parsed-literal::
+
+    # this assumes you want to upgrade to version "|version|"
+    export FUNKWHALE_VERSION="|version|"
+    cd /srv/funkwhale
+    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
+    unzip -o front.zip
+    rm front.zip
+
+Upgrading the API
+^^^^^^^^^^^^^^^^^
+
+On non-docker, upgrade involves a few more commands. We assume your setup
 match what is described in :doc:`debian`:
 
 .. parsed-literal::
