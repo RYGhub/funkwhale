@@ -172,6 +172,18 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
+
+# EMAIL
+# ------------------------------------------------------------------------------
+DEFAULT_FROM_EMAIL = env(
+    'DEFAULT_FROM_EMAIL',
+    default='Funkwhale <noreply@{}>'.format(FUNKWHALE_HOSTNAME))
+
+EMAIL_SUBJECT_PREFIX = env(
+    "EMAIL_SUBJECT_PREFIX", default='[Funkwhale] ')
+SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+
+
 EMAIL_CONFIG = env.email_url(
     'EMAIL_CONFIG', default='consolemail://')
 

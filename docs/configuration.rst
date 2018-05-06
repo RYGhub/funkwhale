@@ -56,6 +56,20 @@ Possible values:
 - ``smtp+ssl://user:password@youremail.host:465``: Send emails via SMTP via youremail.host on port 465, using SSL encryption, authenticating as user "user" with password "password"
 - ``smtp+tls://user:password@youremail.host:587``: Send emails via SMTP via youremail.host on port 587, using TLS encryption, authenticating as user "user" with password "password"
 
+.. _setting-DEFAULT_FROM_EMAIL:
+
+``DEFAULT_FROM_EMAIL``
+^^^^^^^^^^^^^^^^^^^^^^
+
+The email address to use to send email.
+
+Default: ``Funkwhale <noreply@yourdomain>``
+
+.. note::
+
+    Both the forms ``Funkwhale <noreply@yourdomain>`` and
+    ``noreply@yourdomain`` work.
+
 
 .. _setting-MUSIC_DIRECTORY_PATH:
 
