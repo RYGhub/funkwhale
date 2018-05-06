@@ -5,7 +5,7 @@
         <h2>{{ $t('Change your password') }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $('Error while changing your password') }}</div>
+            <div class="header">{{ $t('Error while changing your password') }}</div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>

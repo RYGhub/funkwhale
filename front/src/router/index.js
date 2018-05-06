@@ -11,6 +11,7 @@ import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
 import PasswordReset from '@/views/auth/PasswordReset'
 import PasswordResetConfirm from '@/views/auth/PasswordResetConfirm'
+import EmailConfirm from '@/views/auth/EmailConfirm'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
 import LibraryArtist from '@/components/library/Artist'
@@ -67,6 +68,14 @@ export default new Router({
       component: PasswordReset,
       props: (route) => ({
         defaultEmail: route.query.email
+      })
+    },
+    {
+      path: '/auth/email/confirm',
+      name: 'auth.email-confirm',
+      component: EmailConfirm,
+      props: (route) => ({
+        defaultKey: route.query.key
       })
     },
     {

@@ -1,32 +1,32 @@
 <template>
-  <div class="main pusher" v-title="$t('Reset your password')">
+  <div class="main pusher" v-title="$t('Confirm your email')">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $t('Reset your password') }}</h2>
-        <form class="ui form" @submit.prevent="submit()">
+        <h2>{{ $t('Confirm your email') }}</h2>
+        <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $t('Error while asking for a password reset') }}</div>
+            <div class="header">{{ $t('Error while confirming your email') }}</div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
-          <p>{{ $t('Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.') }}</p>
           <div class="field">
-            <label>{{ $t('Account\'s email') }}</label>
-            <input
-              required
-              ref="email"
-              type="email"
-              autofocus
-              :placeholder="$t('Input the email address binded to your account')"
-              v-model="email">
+            <label>{{ $t('Confirmation code') }}</label>
+            <input type="text" required v-model="key" />
           </div>
           <router-link :to="{path: '/login'}">
             {{ $t('Back to login') }}
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            {{ $t('Ask for a password reset') }}</button>
+            {{ $t('Confirm your email') }}</button>
         </form>
+        <div v-else class="ui positive message">
+          <div class="header">{{ $t('Email confirmed') }}</div>
+          <p>{{ $t('Your email address was confirmed, you can now use the service without limitations.') }}</p>
+          <router-link :to="{name: 'login'}">
+            {{ $t('Proceed to login') }}
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -36,16 +36,14 @@
 import axios from 'axios'
 
 export default {
-  props: ['defaultEmail'],
+  props: ['defaultKey'],
   data () {
     return {
-      email: this.defaultEmail,
       isLoading: false,
-      errors: []
+      errors: [],
+      key: this.defaultKey,
+      success: false
     }
-  },
-  mounted () {
-    this.$refs.email.focus()
   },
   methods: {
     submit () {
@@ -53,13 +51,11 @@ export default {
       self.isLoading = true
       self.errors = []
       let payload = {
-        email: this.email
+        key: this.key
       }
-      return axios.post('auth/password/reset/', payload).then(response => {
+      return axios.post('auth/registration/verify-email/', payload).then(response => {
         self.isLoading = false
-        self.$router.push({
-          name: 'auth.password-reset-confirm'
-        })
+        self.success = true
       }, error => {
         self.errors = error.backendErrors
         self.isLoading = false
