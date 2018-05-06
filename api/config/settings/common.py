@@ -391,6 +391,11 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     )
 }
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 'funkwhale_api.users.serializers.PasswordResetSerializer'  # noqa
+}
+REST_SESSION_LOGIN = False
+REST_USE_JWT = True
 
 ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
