@@ -1,4 +1,7 @@
 import datetime
+import os
+import pathlib
+import pytest
 
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -117,17 +120,16 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     lt1 = factories['federation.LibraryTrack'](with_audio_file=True)
     lt2 = factories['federation.LibraryTrack'](with_audio_file=True)
     lt3 = factories['federation.LibraryTrack'](with_audio_file=True)
-    tf1 = factories['music.TrackFile'](library_track=lt1)
-    tf2 = factories['music.TrackFile'](library_track=lt2)
-    tf3 = factories['music.TrackFile'](library_track=lt3)
-
-    # we listen to the first one, and the second one (but weeks ago)
-    listening1 = factories['history.Listening'](
-        track=tf1.track,
-        creation_date=timezone.now())
-    listening2 = factories['history.Listening'](
-        track=tf2.track,
-        creation_date=timezone.now() - datetime.timedelta(minutes=61))
+    tf1 = factories['music.TrackFile'](
+        accessed_date=timezone.now(), library_track=lt1)
+    tf2 = factories['music.TrackFile'](
+        accessed_date=timezone.now()-datetime.timedelta(minutes=61),
+        library_track=lt2)
+    tf3 = factories['music.TrackFile'](
+        accessed_date=None, library_track=lt3)
+    path1 = lt1.audio_file.path
+    path2 = lt2.audio_file.path
+    path3 = lt3.audio_file.path
 
     tasks.clean_music_cache()
 
@@ -138,3 +140,32 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     assert bool(lt1.audio_file) is True
     assert bool(lt2.audio_file) is False
     assert bool(lt3.audio_file) is False
+    assert os.path.exists(path1) is True
+    assert os.path.exists(path2) is False
+    assert os.path.exists(path3) is False
+
+
+def test_clean_federation_music_cache_orphaned(
+        settings, preferences, factories):
+    preferences['federation__music_cache_duration'] = 60
+    path = os.path.join(settings.MEDIA_ROOT, 'federation_cache')
+    keep_path = os.path.join(os.path.join(path, '1a', 'b2'), 'keep.ogg')
+    remove_path = os.path.join(os.path.join(path, 'c3', 'd4'), 'remove.ogg')
+    os.makedirs(os.path.dirname(keep_path), exist_ok=True)
+    os.makedirs(os.path.dirname(remove_path), exist_ok=True)
+    pathlib.Path(keep_path).touch()
+    pathlib.Path(remove_path).touch()
+    lt = factories['federation.LibraryTrack'](
+        with_audio_file=True,
+        audio_file__path=keep_path)
+    tf = factories['music.TrackFile'](
+        library_track=lt,
+        accessed_date=timezone.now())
+
+    tasks.clean_music_cache()
+
+    lt.refresh_from_db()
+
+    assert bool(lt.audio_file) is True
+    assert os.path.exists(lt.audio_file.path) is True
+    assert os.path.exists(remove_path) is False
