@@ -2,6 +2,7 @@ import io
 import pytest
 
 from django.urls import reverse
+from django.utils import timezone
 
 from funkwhale_api.music import views
 from funkwhale_api.federation import actors
@@ -147,6 +148,19 @@ def test_can_proxy_remote_track(
         settings.PROTECT_FILES_PATH,
         library_track.audio_file.url)
     assert library_track.audio_file.read() == b'test'
+
+
+def test_serve_updates_access_date(factories, settings, api_client):
+    settings.PROTECT_AUDIO_FILES = False
+    track_file = factories['music.TrackFile']()
+    now = timezone.now()
+    assert track_file.accessed_date is None
+
+    response = api_client.get(track_file.path)
+    track_file.refresh_from_db()
+
+    assert response.status_code == 200
+    assert track_file.accessed_date > now
 
 
 def test_can_create_import_from_federation_tracks(

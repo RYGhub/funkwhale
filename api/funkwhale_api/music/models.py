@@ -415,6 +415,7 @@ class TrackFile(models.Model):
     source = models.URLField(null=True, blank=True, max_length=500)
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
+    accessed_date = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
