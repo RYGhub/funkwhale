@@ -9,6 +9,8 @@ import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
 import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
+import PasswordReset from '@/views/auth/PasswordReset'
+import PasswordResetConfirm from '@/views/auth/PasswordResetConfirm'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
 import LibraryArtist from '@/components/library/Artist'
@@ -58,6 +60,23 @@ export default new Router({
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/auth/password/reset',
+      name: 'auth.password-reset',
+      component: PasswordReset,
+      props: (route) => ({
+        defaultEmail: route.query.email
+      })
+    },
+    {
+      path: '/auth/password/reset/confirm',
+      name: 'auth.password-reset-confirm',
+      component: PasswordResetConfirm,
+      props: (route) => ({
+        defaultUid: route.query.uid,
+        defaultToken: route.query.token
+      })
     },
     {
       path: '/signup',
