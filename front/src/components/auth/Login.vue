@@ -12,9 +12,15 @@
             </ul>
           </div>
           <div class="field">
-            <i18next tag="label" path="Username or email"/>
+            <label>
+              {{ $t('Username or email') }} |
+              <router-link :to="{path: '/signup'}">
+                {{ $t('Create an account') }}
+              </router-link>
+            </label>
             <input
             ref="username"
+            tabindex="1"
             required
             type="text"
             autofocus
@@ -23,18 +29,16 @@
             >
           </div>
           <div class="field">
-            <i18next tag="label" path="Password"/>            
-            <input
-            required
-            type="password"
-            placeholder="Enter your password"
-            v-model="credentials.password"
-            >
+            <label>
+              {{ $t('Password') }} |
+              <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
+                {{ $t('Reset your password') }}
+              </router-link>
+            </label>
+            <password-input :index="2" required v-model="credentials.password" />
+
           </div>
-          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit"><i18next path="Login"/></button>
-          <router-link class="ui right floated basic button" :to="{path: '/signup'}">
-            <i18next path="Create an account"/>
-          </router-link>
+          <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit"><i18next path="Login"/></button>
         </form>
       </div>
     </div>
@@ -42,11 +46,14 @@
 </template>
 
 <script>
+import PasswordInput from '@/components/forms/PasswordInput'
 
 export default {
-  name: 'login',
   props: {
     next: {type: String, default: '/'}
+  },
+  components: {
+    PasswordInput
   },
   data () {
     return {

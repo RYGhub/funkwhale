@@ -1,5 +1,7 @@
-from rest_framework import serializers
+from django.conf import settings
 
+from rest_framework import serializers
+from rest_auth.serializers import PasswordResetSerializer as PRS
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
@@ -63,3 +65,12 @@ class UserReadSerializer(serializers.ModelSerializer):
                 'status': o.has_perm(internal_codename)
             }
         return perms
+
+
+class PasswordResetSerializer(PRS):
+    def get_email_options(self):
+        return {
+            'extra_email_context': {
+                'funkwhale_url': settings.FUNKWHALE_URL
+            }
+        }

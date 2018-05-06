@@ -89,3 +89,4 @@ data/
 .env
 
 po/*.po
+docs/swagger

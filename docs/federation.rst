@@ -12,8 +12,7 @@ Managing federation
 
 Federation management is only available to instance admins and users
 who have the proper permissions. You can disable federation completely
-at the instance level by setting the FEDERATION_ENABLED environment variable
-to False.
+at the instance level by editing the ``federation__enabled`` :ref:`setting <instance-settings>`.
 
 On the front end, assuming you have the proper permission, you will see
 a "Federation" link in the sidebar.
@@ -52,6 +51,6 @@ each other instance asking for access to library. This is by design,
 to ensure your library is not shared publicly without your consent.
 
 However, if you're confident about federating publicly without manual approval,
-you can set the FEDERATION_MUSIC_NEEDS_APPROVAL environment variable to false.
+you can set the ``federation__music_needs_approval`` :ref:`setting <instance-settings>` to false.
 Follow requests will be accepted automatically and followers
 given access to your library without manual intervention.

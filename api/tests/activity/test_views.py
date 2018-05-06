@@ -4,8 +4,8 @@ from funkwhale_api.activity import serializers
 from funkwhale_api.activity import utils
 
 
-def test_activity_view(factories, api_client, settings, anonymous_user):
-    settings.API_AUTHENTICATION_REQUIRED = False
+def test_activity_view(factories, api_client, preferences, anonymous_user):
+    preferences['common__api_authentication_required'] = False
     favorite = factories['favorites.TrackFavorite'](
         user__privacy_level='everyone')
     listening = factories['history.Listening']()

@@ -14,6 +14,7 @@ from django.db.models.functions import Length
 from django.db.models import Count
 from django.http import StreamingHttpResponse
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets, views, mixins
@@ -145,6 +146,14 @@ class ImportJobViewSet(
         data['count'] = sum([v for v in data.values()])
         return Response(data)
 
+    @list_route(methods=['post'])
+    def run(self, request, *args, **kwargs):
+        serializer = serializers.ImportJobRunSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payload = serializer.save()
+
+        return Response(payload)
+
     def perform_create(self, serializer):
         source = 'file://' + serializer.validated_data['audio_file'].name
         serializer.save(source=source)
@@ -206,6 +215,8 @@ class TrackViewSet(
 
 
 def get_file_path(audio_file):
+    serve_path = settings.MUSIC_DIRECTORY_SERVE_PATH
+    prefix = settings.MUSIC_DIRECTORY_PATH
     t = settings.REVERSE_PROXY_TYPE
     if t == 'nginx':
         # we have to use the internal locations
@@ -213,14 +224,24 @@ def get_file_path(audio_file):
             path = audio_file.url
         except AttributeError:
             # a path was given
-            path = '/music' + audio_file
+            if not serve_path or not prefix:
+                raise ValueError(
+                    'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                    'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+                )
+            path = '/music' + audio_file.replace(prefix, '', 1)
         return settings.PROTECT_FILES_PATH + path
     if t == 'apache2':
         try:
             path = audio_file.path
         except AttributeError:
             # a path was given
-            path = audio_file
+            if not serve_path or not prefix:
+                raise ValueError(
+                    'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
+                    'MUSIC_DIRECTORY_PATH to serve in-place imported files'
+                )
+            path = audio_file.replace(prefix, serve_path, 1)
         return path
 
 
@@ -243,6 +264,10 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             f = queryset.get(pk=kwargs['pk'])
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
+
+        # we update the accessed_date
+        f.accessed_date = timezone.now()
+        f.save(update_fields=['accessed_date'])
 
         mt = f.mimetype
         audio_file = f.audio_file
@@ -267,7 +292,7 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
         elif audio_file:
             file_path = get_file_path(audio_file)
         elif f.source and f.source.startswith('file://'):
-            file_path = get_file_path(f.serve_from_source_path)
+            file_path = get_file_path(f.source.replace('file://', '', 1))
         response = Response()
         filename = f.filename
         mapping = {

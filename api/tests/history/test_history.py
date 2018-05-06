@@ -14,20 +14,6 @@ def test_can_create_listening(factories):
     l = models.Listening.objects.create(user=user, track=track)
 
 
-def test_anonymous_user_can_create_listening_via_api(client, factories, settings):
-    settings.API_AUTHENTICATION_REQUIRED = False
-    track = factories['music.Track']()
-    url = reverse('api:v1:history:listenings-list')
-    response = client.post(url, {
-        'track': track.pk,
-    })
-
-    listening = models.Listening.objects.latest('id')
-
-    assert listening.track == track
-    assert listening.session_key == client.session.session_key
-
-
 def test_logged_in_user_can_create_listening_via_api(
         logged_in_client, factories, activity_muted):
     track = factories['music.Track']()

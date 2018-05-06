@@ -55,8 +55,6 @@ class RadioSession(models.Model):
     related_object = GenericForeignKey('related_object_content_type', 'related_object_id')
 
     def save(self, **kwargs):
-        if not self.user and not self.session_key:
-            raise ValidationError('Cannot have both session_key and user empty for radio session')
         self.radio.clean(self)
         super().save(**kwargs)
 

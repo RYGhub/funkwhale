@@ -25,28 +25,19 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(str(e))
 
         try:
-            actor_data = actors.get_actor_data(key_id)
+            actor = actors.get_actor(key_id.split('#')[0])
         except Exception as e:
             raise exceptions.AuthenticationFailed(str(e))
 
-        try:
-            public_key = actor_data['publicKey']['publicKeyPem']
-        except KeyError:
+        if not actor.public_key:
             raise exceptions.AuthenticationFailed('No public key found')
 
-        serializer = serializers.ActorSerializer(data=actor_data)
-        if not serializer.is_valid():
-            raise exceptions.AuthenticationFailed('Invalid actor payload: {}'.format(serializer.errors))
-
         try:
-            signing.verify_django(request, public_key.encode('utf-8'))
+            signing.verify_django(request, actor.public_key.encode('utf-8'))
         except cryptography.exceptions.InvalidSignature:
             raise exceptions.AuthenticationFailed('Invalid signature')
 
-        try:
-            return models.Actor.objects.get(url=actor_data['id'])
-        except models.Actor.DoesNotExist:
-            return serializer.save()
+        return actor
 
     def authenticate(self, request):
         setattr(request, 'actor', None)

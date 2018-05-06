@@ -40,7 +40,16 @@
           </tr>
           <tr v-if="stats">
             <td><strong>{{ $t('Errored') }}</strong></td>
-            <td>{{ stats.errored }}</td>
+            <td>
+              {{ stats.errored }}
+              <button
+                @click="rerun({batches: [batch.id], jobs: []})"
+                v-if="stats.errored > 0"
+                class="ui tiny basic icon button">
+                <i class="redo icon" />
+                {{ $t('Rerun errored jobs')}}
+              </button>
+            </td>
           </tr>
           <tr v-if="stats">
             <td><strong>{{ $t('Finished') }}</strong></td>
@@ -83,11 +92,21 @@
               <a :href="'https://www.musicbrainz.org/recording/' + job.mbid" target="_blank">{{ job.mbid }}</a>
             </td>
             <td>
-              <a :href="job.source" target="_blank">{{ job.source }}</a>
+              <a :title="job.source" :href="job.source" target="_blank">
+                {{ job.source|truncate(50) }}
+              </a>
             </td>
             <td>
               <span
-                :class="['ui', {'yellow': job.status === 'pending'}, {'red': job.status === 'errored'}, {'green': job.status === 'finished'}, 'label']">{{ job.status }}</span>
+                :class="['ui', {'yellow': job.status === 'pending'}, {'red': job.status === 'errored'}, {'green': job.status === 'finished'}, 'label']">
+                {{ job.status }}</span>
+                <button
+                  @click="rerun({batches: [], jobs: [job.id]})"
+                  v-if="job.status === 'errored'"
+                  :title="$t('Rerun job')"
+                  class="ui tiny basic icon button">
+                  <i class="redo icon" />
+                </button>
             </td>
             <td>
               <router-link v-if="job.track_file" :to="{name: 'library.tracks.detail', params: {id: job.track_file.track }}">{{ job.track_file.track }}</router-link>
@@ -167,12 +186,6 @@ export default {
       return axios.get(url).then((response) => {
         self.batch = response.data
         self.isLoading = false
-        if (self.batch.status === 'pending') {
-          self.timeout = setTimeout(
-            self.fetchData,
-            5000
-          )
-        }
       })
     },
     fetchStats () {
@@ -186,12 +199,21 @@ export default {
           self.fetchJobs()
           self.fetchData()
         }
-        if (self.batch.status === 'pending') {
+        if (self.stats.pending > 0) {
           self.timeout = setTimeout(
             self.fetchStats,
             5000
           )
         }
+      })
+    },
+    rerun ({jobs, batches}) {
+      let payload = {
+        jobs, batches
+      }
+      let self = this
+      axios.post('import-jobs/run/', payload).then((response) => {
+        self.fetchStats()
       })
     },
     fetchJobs () {

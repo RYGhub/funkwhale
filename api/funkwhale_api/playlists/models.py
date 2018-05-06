@@ -6,6 +6,7 @@ from django.utils import timezone
 from rest_framework import exceptions
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import preferences
 
 
 class Playlist(models.Model):
@@ -81,10 +82,11 @@ class Playlist(models.Model):
         existing = self.playlist_tracks.select_for_update()
         now = timezone.now()
         total = existing.filter(index__isnull=False).count()
-        if existing.count() + len(tracks) > settings.PLAYLISTS_MAX_TRACKS:
+        max_tracks = preferences.get('playlists__max_tracks')
+        if existing.count() + len(tracks) > max_tracks:
             raise exceptions.ValidationError(
                 'Playlist would reach the maximum of {} tracks'.format(
-                    settings.PLAYLISTS_MAX_TRACKS))
+                    max_tracks))
         self.save(update_fields=['modification_date'])
         start = total
         plts = [

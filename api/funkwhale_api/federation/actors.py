@@ -1,3 +1,4 @@
+import datetime
 import logging
 import uuid
 import xml
@@ -11,6 +12,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from dynamic_preferences.registries import global_preferences_registry
 
+from funkwhale_api.common import preferences
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
@@ -49,11 +51,20 @@ def get_actor_data(actor_url):
 
 
 def get_actor(actor_url):
+    try:
+        actor = models.Actor.objects.get(url=actor_url)
+    except models.Actor.DoesNotExist:
+        actor = None
+    fetch_delta = datetime.timedelta(
+        minutes=preferences.get('federation__actor_fetch_delay'))
+    if actor and actor.last_fetch_date > timezone.now() - fetch_delta:
+        # cache is hot, we can return as is
+        return actor
     data = get_actor_data(actor_url)
     serializer = serializers.ActorSerializer(data=data)
     serializer.is_valid(raise_exception=True)
 
-    return serializer.build()
+    return serializer.save(last_fetch_date=timezone.now())
 
 
 class SystemActor(object):
@@ -215,7 +226,7 @@ class LibraryActor(SystemActor):
 
     @property
     def manually_approves_followers(self):
-        return settings.FEDERATION_MUSIC_NEEDS_APPROVAL
+        return preferences.get('federation__music_needs_approval')
 
     @transaction.atomic
     def handle_create(self, ac, sender):

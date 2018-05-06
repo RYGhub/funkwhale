@@ -5,9 +5,10 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
-def test_can_authenticate_using_token_param_in_url(factories, settings, client):
+def test_can_authenticate_using_token_param_in_url(
+        factories, preferences, client):
     user = factories['users.User']()
-    settings.API_AUTHENTICATION_REQUIRED = True
+    preferences['common__api_authentication_required'] = True
     url = reverse('api:v1:tracks-list')
     response = client.get(url)
 

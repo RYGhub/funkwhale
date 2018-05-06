@@ -1,8 +1,10 @@
 import datetime
 import json
 import logging
+import os
 
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 
 from requests.exceptions import RequestException
@@ -96,16 +98,38 @@ def clean_music_cache():
     delay = preferences['federation__music_cache_duration']
     if delay < 1:
         return  # cache clearing disabled
+    limit = timezone.now() - datetime.timedelta(minutes=delay)
 
     candidates = models.LibraryTrack.objects.filter(
-        audio_file__isnull=False
-    ).values_list('local_track_file__track', flat=True)
-    listenings = Listening.objects.filter(
-        creation_date__gte=timezone.now() - datetime.timedelta(minutes=delay),
-        track__pk__in=candidates).values_list('track', flat=True)
-    too_old = set(candidates) - set(listenings)
-
-    to_remove = models.LibraryTrack.objects.filter(
-        local_track_file__track__pk__in=too_old).only('audio_file')
-    for lt in to_remove:
+        Q(audio_file__isnull=False) & (
+            Q(local_track_file__accessed_date__lt=limit) |
+            Q(local_track_file__accessed_date=None)
+        )
+    ).exclude(audio_file='').only('audio_file', 'id')
+    for lt in candidates:
         lt.audio_file.delete()
+
+    # we also delete orphaned files, if any
+    storage = models.LibraryTrack._meta.get_field('audio_file').storage
+    files = get_files(storage, 'federation_cache')
+    existing = models.LibraryTrack.objects.filter(audio_file__in=files)
+    missing = set(files) - set(existing.values_list('audio_file', flat=True))
+    for m in missing:
+        storage.delete(m)
+
+
+def get_files(storage, *parts):
+    """
+    This is a recursive function that return all files available
+    in a given directory using django's storage.
+    """
+    if not parts:
+        raise ValueError('Missing path')
+
+    dirs, files = storage.listdir(os.path.join(*parts))
+    for dir in dirs:
+        files += get_files(storage, *(list(parts) + [dir]))
+    return [
+        os.path.join(parts[-1], path)
+        for path in files
+    ]

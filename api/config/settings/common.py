@@ -48,14 +48,20 @@ else:
 FUNKWHALE_URL = '{}://{}'.format(FUNKWHALE_PROTOCOL, FUNKWHALE_HOSTNAME)
 
 
+# XXX: deprecated, see #186
 FEDERATION_ENABLED = env.bool('FEDERATION_ENABLED', default=True)
 FEDERATION_HOSTNAME = env('FEDERATION_HOSTNAME', default=FUNKWHALE_HOSTNAME)
+# XXX: deprecated, see #186
 FEDERATION_COLLECTION_PAGE_SIZE = env.int(
     'FEDERATION_COLLECTION_PAGE_SIZE', default=50
 )
+# XXX: deprecated, see #186
 FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
     'FEDERATION_MUSIC_NEEDS_APPROVAL', default=True
 )
+# XXX: deprecated, see #186
+FEDERATION_ACTOR_FETCH_DELAY = env.int(
+    'FEDERATION_ACTOR_FETCH_DELAY', default=60 * 12)
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # APP CONFIGURATION
@@ -138,7 +144,6 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = (
     # Make sure djangosecure.middleware.SecurityMiddleware is listed first
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'funkwhale_api.users.middleware.AnonymousSessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -167,7 +172,22 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+
+# EMAIL
+# ------------------------------------------------------------------------------
+DEFAULT_FROM_EMAIL = env(
+    'DEFAULT_FROM_EMAIL',
+    default='Funkwhale <noreply@{}>'.format(FUNKWHALE_HOSTNAME))
+
+EMAIL_SUBJECT_PREFIX = env(
+    "EMAIL_SUBJECT_PREFIX", default='[Funkwhale] ')
+SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+
+
+EMAIL_CONFIG = env.email_url(
+    'EMAIL_CONFIG', default='consolemail://')
+
+vars().update(EMAIL_CONFIG)
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -287,7 +307,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-
+SESSION_COOKIE_HTTPONLY = False
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
@@ -362,7 +382,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'funkwhale.localhost',
 # )
 CORS_ALLOW_CREDENTIALS = True
-API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -377,6 +397,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS',
+        'funkwhale_api.common.authentication.BearerTokenHeaderAuth',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -386,6 +407,11 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     )
 }
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 'funkwhale_api.users.serializers.PasswordResetSerializer'  # noqa
+}
+REST_SESSION_LOGIN = False
+REST_USE_JWT = True
 
 ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
@@ -428,6 +454,7 @@ ADMIN_URL = env('DJANGO_ADMIN_URL', default='^api/admin/')
 CSRF_USE_SESSIONS = True
 
 # Playlist settings
+# XXX: deprecated, see #186
 PLAYLISTS_MAX_TRACKS = env.int('PLAYLISTS_MAX_TRACKS', default=250)
 
 ACCOUNT_USERNAME_BLACKLIST = [
@@ -447,6 +474,8 @@ EXTERNAL_REQUESTS_VERIFY_SSL = env.bool(
     'EXTERNAL_REQUESTS_VERIFY_SSL',
     default=True
 )
+# XXX: deprecated, see #186
+API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
 
 MUSIC_DIRECTORY_PATH = env('MUSIC_DIRECTORY_PATH', default=None)
 # on Docker setup, the music directory may not match the host path,

@@ -72,7 +72,7 @@ export default {
       this.isLoading = true
       self.errors = []
       self.result = null
-      axios.get('/federation/libraries/fetch/', {params: {account: this.libraryUsername}}).then((response) => {
+      axios.get('/federation/libraries/fetch/', {params: {account: this.libraryUsername.trim()}}).then((response) => {
         self.result = response.data
         self.result.display_name = self.libraryUsername
         self.isLoading = false

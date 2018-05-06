@@ -6,9 +6,12 @@
       <router-link class="ui item" to="/library/radios" exact><i18next path="Radios"/></router-link>
       <router-link class="ui item" to="/library/playlists" exact><i18next path="Playlists"/></router-link>
       <div class="ui secondary right menu">
-        <router-link v-if="$store.state.auth.authenticated" class="ui item" to="/library/requests/" exact>
+        <router-link
+          v-if="$store.state.auth.authenticated"
+          class="ui item"
+          :to="{name: 'library.requests', query: {status: 'pending' }}"
+          exact>
           <i18next path="Requests"/>
-          <div class="ui teal label">{{ requestsCount }}</div>
         </router-link>
         <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>
           <i18next path="Import"/>
@@ -23,28 +26,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
-  name: 'library',
-  data () {
-    return {
-      requestsCount: 0
-    }
-  },
-  created () {
-    this.fetchRequestsCount()
-  },
-  methods: {
-    fetchRequestsCount () {
-      if (!this.$store.state.authenticated) {
-        return
-      }
-      let self = this
-      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        self.requestsCount = response.data.count
-      })
-    }
-  }
+  name: 'library'
 }
 </script>
 

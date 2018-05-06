@@ -1,0 +1,186 @@
+openapi: "3.0"
+info:
+  description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
+  version: "1.0.0"
+  title: "Funkwhale API"
+
+servers:
+  - url: https://demo.funkwhale.audio/api/v1
+    description: Demo server
+  - url: https://node1.funkwhale.test/api/v1
+    description: Node 1 (local)
+
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "You can get a token by using the /token endpoint"
+
+security:
+  - jwt: []
+
+paths:
+  /token/:
+    post:
+      tags:
+        - "auth"
+      description:
+        Obtain a JWT token you can use for authenticating your next requests.
+      security: []
+      responses:
+        '200':
+          description: Successfull auth
+        '400':
+          description: Invalid credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                  example: "demo"
+                password:
+                  type: "string"
+                  example: "demo"
+
+  /artists/:
+    get:
+      tags:
+        - "artists"
+      parameters:
+        - name: "q"
+          in: "query"
+          description: "Search query used to filter artists"
+          schema:
+            required: false
+            type: "string"
+            example: "carpenter"
+        - name: "listenable"
+          in: "query"
+          description: "Filter/exclude artists with listenable tracks"
+          schema:
+            required: false
+            type: "boolean"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  count:
+                    $ref: "#/properties/resultsCount"
+                  results:
+                    type: "array"
+                    items:
+                      $ref: "#/definitions/ArtistNested"
+
+properties:
+  resultsCount:
+    type: "integer"
+    format: "int64"
+    description: "The total number of resources matching the request"
+  mbid:
+    type: "string"
+    formats: "uuid"
+    description: "A musicbrainz ID"
+definitions:
+  Artist:
+    type: "object"
+    properties:
+      mbid:
+        required: false
+        $ref: "#/properties/mbid"
+      id:
+        type: "integer"
+        format: "int64"
+        example: 42
+      name:
+        type: "string"
+        example: "System of a Down"
+      creation_date:
+        type: "string"
+        format: "date-time"
+  ArtistNested:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/Artist"
+      - type: "object"
+        properties:
+          albums:
+            type: "array"
+            items:
+              $ref: "#/definitions/AlbumNested"
+
+  Album:
+    type: "object"
+    properties:
+      mbid:
+        required: false
+        $ref: "#/properties/mbid"
+      id:
+        type: "integer"
+        format: "int64"
+        example: 16
+      artist:
+        type: "integer"
+        format: "int64"
+        example: 42
+      title:
+        type: "string"
+        example: "Toxicity"
+      creation_date:
+        type: "string"
+        format: "date-time"
+      release_date:
+        type: "string"
+        required: false
+        format: "date"
+        example: "2001-01-01"
+
+  AlbumNested:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/Album"
+      - type: "object"
+        properties:
+          tracks:
+            type: "array"
+            items:
+              $ref: "#/definitions/Track"
+
+  Track:
+    type: "object"
+    properties:
+      mbid:
+        required: false
+        $ref: "#/properties/mbid"
+      id:
+        type: "integer"
+        format: "int64"
+        example: 66
+      artist:
+        type: "integer"
+        format: "int64"
+        example: 42
+      album:
+        type: "integer"
+        format: "int64"
+        example: 16
+      title:
+        type: "string"
+        example: "Chop Suey!"
+      position:
+        required: false
+        description: "Position of the track in the album"
+        type: "number"
+        minimum: 1
+        example: 1
+      creation_date:
+        type: "string"
+        format: "date-time"

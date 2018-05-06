@@ -9,6 +9,9 @@ import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
 import Settings from '@/components/auth/Settings'
 import Logout from '@/components/auth/Logout'
+import PasswordReset from '@/views/auth/PasswordReset'
+import PasswordResetConfirm from '@/views/auth/PasswordResetConfirm'
+import EmailConfirm from '@/views/auth/EmailConfirm'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
 import LibraryArtist from '@/components/library/Artist'
@@ -58,6 +61,31 @@ export default new Router({
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/auth/password/reset',
+      name: 'auth.password-reset',
+      component: PasswordReset,
+      props: (route) => ({
+        defaultEmail: route.query.email
+      })
+    },
+    {
+      path: '/auth/email/confirm',
+      name: 'auth.email-confirm',
+      component: EmailConfirm,
+      props: (route) => ({
+        defaultKey: route.query.key
+      })
+    },
+    {
+      path: '/auth/password/reset/confirm',
+      name: 'auth.password-reset-confirm',
+      component: PasswordResetConfirm,
+      props: (route) => ({
+        defaultUid: route.query.uid,
+        defaultToken: route.query.token
+      })
     },
     {
       path: '/signup',
@@ -212,7 +240,7 @@ export default new Router({
             defaultQuery: route.query.query,
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page,
-            defaultStatus: route.query.status || 'pending'
+            defaultStatus: route.query.status || 'any'
           }),
           children: [
           ]

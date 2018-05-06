@@ -84,7 +84,12 @@
               <tr>
                 <td>{{ $t('Library size') }}</td>
                 <td>
-                  {{ $t('{%count%} tracks', { count: object.tracks_count }) }}
+                  <template v-if="object.tracks_count">
+                    {{ $t('{%count%} tracks', { count: object.tracks_count }) }}
+                  </template>
+                  <template v-else>
+                    {{ $t('Unkwnown') }}
+                  </template>
                 </td>
                 <td></td>
               </tr>
@@ -145,6 +150,7 @@ export default {
   methods: {
     fetchData () {
       var self = this
+      this.scanTrigerred = false
       this.isLoading = true
       let url = 'federation/libraries/' + this.id + '/'
       logger.default.debug('Fetching library "' + this.id + '"')

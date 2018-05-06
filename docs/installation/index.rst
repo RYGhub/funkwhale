@@ -28,9 +28,15 @@ On a dockerized instance with 2 CPUs and a few active users, the memory footprin
    funkwhale_postgres_1        22.73 MiB
    funkwhale_redis_1           1.496 MiB
 
+Some users have reported running Funkwhale on Raspberry Pis with a memory
+consumption of less than 350MiB.
+
 Thus, Funkwhale should run fine on commodity hardware, small hosting boxes and
 Raspberry Pi. We lack real-world exemples of such deployments, so don't hesitate
 do give us your feedback (either positive or negative).
+
+Check out :doc:`optimization` for advices on how to tune your instance on small
+configurations.
 
 Software requirements
 ---------------------
@@ -86,7 +92,7 @@ Files for the web frontend are purely static and can simply be downloaded, unzip
 Reverse proxy
 --------------
 
-In order to make funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy. At the moment, we only have documentation for nginx, if you know how to implement the same thing for apache, you're welcome.
+In order to make funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy.
 
 Nginx
 ^^^^^
@@ -103,9 +109,44 @@ Then, download our sample virtualhost file and proxy conf:
 .. parsed-literal::
 
     curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-enabled/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
-Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``. If everything is fine, you can restart your nginx server with ``service nginx restart``.
+Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``.
+If everything is fine, you can restart your nginx server with ``service nginx restart``.
+
+Apache2
+^^^^^^^
+
+.. note::
+
+    Apache2 support is still very recent and the following features
+    are not working yet:
+
+    - Websocket (used for real-time updates on Instance timeline)
+    - Transcoding of audio files
+
+    Those features are not necessary to use your Funkwhale instance, and
+    transcoding in particular is still in alpha-state anyway.
+
+Ensure you have a recent version of apache2 installed on your server.
+You'll also need the following dependencies::
+
+   apt install libapache2-mod-xsendfile
+
+Then, download our sample virtualhost file:
+
+.. parsed-literal::
+
+    curl -L -o /etc/apache2/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/apache.conf"
+    ln -s /etc/apache2/sites-available/funkwhale.conf /etc/apache2/sites-enabled/
+
+You can tweak the configuration file according to your setup, especially the
+TLS configuration. Otherwise, defaults, should work if you followed the
+installation guide.
+
+Check the configuration is valid with ``apache2ctl configtest``, and once you're
+done, load the new configuration with ``service apache2 restart``.
 
 About internal locations
 ~~~~~~~~~~~~~~~~~~~~~~~~

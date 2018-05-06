@@ -1,7 +1,119 @@
 Changelog
 =========
 
+You can subscribe to release announcements by:
+
+- Following `funkwhale@mastodon.eliotberriot.com <https://mastodon.eliotberriot.com/@funkwhale>`_ on Mastodon
+- Subscribing to the following Atom feed: https://code.eliotberriot.com/funkwhale/funkwhale/commits/develop?format=atom&search=tag
+
+This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.html.
+
 .. towncrier
+
+0.11 (unreleased)
+-----------------
+
+Upgrade instructions are available at https://docs.funkwhale.audio/upgrading.html
+
+Special thanks for this release go to @renon:matrix.org (@Hazmo on Gitlab)
+for bringing Apache2 support to Funkwhale and contributing on other issues.
+Thank you!
+
+Features:
+
+- Funkwhale now works behind an Apache2 reverse proxy (!165)
+  check out the brand new documentation at https://docs.funkwhale.audio/installation/index.html#apache2
+  if you want to try it!
+- Users can now request password reset by email, assuming a SMTP server was
+  correctly configured (#187)
+
+Enhancements:
+
+- Added a fix_track_files command to run checks and fixes against library
+  (#183)
+- Avoid fetching Actor object on every request authentication
+- Can now relaunch errored jobs and batches (#176)
+- List pending requests by default, added a status filter for requests (#109)
+- More structured menus in sidebar, added labels with notifications
+- Sample virtual-host file for Apache2 reverse-proxy (!165)
+- Store high-level settings (such as federation or auth-related ones) in
+  database (#186)
+
+
+Bugfixes:
+
+- Ensure in place imported files get a proper mimetype (#183)
+- Federation cache suppression is now simpler and also deletes orphaned files
+  (#189)
+- Fixed small UI glitches/bugs in federation tabs (#184)
+- X-sendfile not working with in place import (#182)
+
+
+Documentation:
+
+- Added a documentation area for third-party projects (#180)
+- Added documentation for optimizing Funkwhale and reduce its memory footprint.
+- Document that the database should use an utf-8 encoding (#185)
+- Foundations for API documentation with Swagger (#178)
+
+
+Database storage for high-level settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Due to the work done in #186, the following environment variables have been
+deprecated:
+
+- FEDERATION_ENABLED
+- FEDERATION_COLLECTION_PAGE_SIZE
+- FEDERATION_MUSIC_NEEDS_APPROVAL
+- FEDERATION_ACTOR_FETCH_DELAY
+- PLAYLISTS_MAX_TRACKS
+- API_AUTHENTICATION_REQUIRED
+
+Configuration for this settings has been moved to database, as it will provide
+a better user-experience, by allowing you to edit these values on-the-fly,
+without restarting Funkwhale processes.
+
+You can leave those environment variables in your .env file for now, as the
+values will be used to populate the database entries. We'll make a proper
+announcement when the variables won't be used anymore.
+
+Please browse https://docs.funkwhale.audio/configuration.html#instance-settings
+for more information about instance configuration using the web interface.
+
+
+System emails
+^^^^^^^^^^^^^
+
+Starting from this release, Funkwhale will send two types
+of emails:
+
+- Email confirmation emails, to ensure a user's email is valid
+- Password reset emails, enabling user to reset their password without an admin's intervention
+
+Email sending is disabled by default, as it requires additional configuration.
+In this mode, emails are simply outputed on stdout.
+
+If you want to actually send those emails to your users, you should edit your
+.env file and tweak the EMAIL_CONFIG variable. See :ref:`setting-EMAIL_CONFIG`
+for more details.
+
+.. note::
+
+  As a result of these changes, the DJANGO_EMAIL_BACKEND variable,
+  which was not documented, has no effect anymore. You can safely remove it from
+  your .env file if it is set.
+
+
+Proxy headers for non-docker deployments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For non-docker deployments, add ``--proxy-headers`` at the end of the ``daphne``
+command in :file:`/etc/systemd/system/funkwhale-server.service`.
+
+This will ensure the application receive the correct IP address from the client
+and not the proxy's one.
+
 
 0.10 (2018-04-23)
 -----------------

@@ -5,8 +5,8 @@ from funkwhale_api.federation import permissions
 
 
 def test_library_follower(
-        factories, api_request, anonymous_user, settings):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        factories, api_request, anonymous_user, preferences):
+    preferences['federation__music_needs_approval'] = True
     view = APIView.as_view()
     permission = permissions.LibraryFollower()
     request = api_request.get('/')
@@ -17,8 +17,8 @@ def test_library_follower(
 
 
 def test_library_follower_actor_non_follower(
-        factories, api_request, anonymous_user, settings):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        factories, api_request, anonymous_user, preferences):
+    preferences['federation__music_needs_approval'] = True
     actor = factories['federation.Actor']()
     view = APIView.as_view()
     permission = permissions.LibraryFollower()
@@ -31,8 +31,8 @@ def test_library_follower_actor_non_follower(
 
 
 def test_library_follower_actor_follower_not_approved(
-        factories, api_request, anonymous_user, settings):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        factories, api_request, anonymous_user, preferences):
+    preferences['federation__music_needs_approval'] = True
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     follow = factories['federation.Follow'](target=library, approved=False)
     view = APIView.as_view()
@@ -46,8 +46,8 @@ def test_library_follower_actor_follower_not_approved(
 
 
 def test_library_follower_actor_follower(
-        factories, api_request, anonymous_user, settings):
-    settings.FEDERATION_MUSIC_NEEDS_APPROVAL = True
+        factories, api_request, anonymous_user, preferences):
+    preferences['federation__music_needs_approval'] = True
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     follow = factories['federation.Follow'](target=library, approved=True)
     view = APIView.as_view()

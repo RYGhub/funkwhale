@@ -18,6 +18,8 @@ and technical aspects of your instance, such as database credentials.
     on environment variables.
 
 
+.. _instance-settings:
+
 Instance settings
 -----------------
 
@@ -36,6 +38,38 @@ settings in this interface.
 
 Configuration reference
 -----------------------
+
+.. _setting-EMAIL_CONFIG:
+
+``EMAIL_CONFIG``
+^^^^^^^^^^^^^^^^
+
+Determine how emails are sent.
+
+Default: ``consolemail://``
+
+Possible values:
+
+- ``consolemail://``: Output sent emails to stdout
+- ``dummymail://``: Completely discard sent emails
+- ``smtp://user:password@youremail.host:25``: Send emails via SMTP via youremail.host on port 25, without encryption, authenticating as user "user" with password "password"
+- ``smtp+ssl://user:password@youremail.host:465``: Send emails via SMTP via youremail.host on port 465, using SSL encryption, authenticating as user "user" with password "password"
+- ``smtp+tls://user:password@youremail.host:587``: Send emails via SMTP via youremail.host on port 587, using TLS encryption, authenticating as user "user" with password "password"
+
+.. _setting-DEFAULT_FROM_EMAIL:
+
+``DEFAULT_FROM_EMAIL``
+^^^^^^^^^^^^^^^^^^^^^^
+
+The email address to use to send email.
+
+Default: ``Funkwhale <noreply@yourdomain>``
+
+.. note::
+
+    Both the forms ``Funkwhale <noreply@yourdomain>`` and
+    ``noreply@yourdomain`` work.
+
 
 .. _setting-MUSIC_DIRECTORY_PATH:
 

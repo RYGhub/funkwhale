@@ -30,24 +30,56 @@
   </div>
   <div class="tabs">
     <div class="ui bottom attached active tab" data-tab="library">
-      <div class="ui inverted vertical fluid menu">
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i> {{ $t('Logout') }}</router-link>
-        <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i> {{ $t('Login') }}</router-link>
-        <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
-        <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i> {{ $t('Favorites') }}</router-link>
-        <a
-          @click="$store.commit('playlists/chooseTrack', null)"
-          v-if="$store.state.auth.authenticated"
-          class="item">
-          <i class="list icon"></i> {{ $t('Playlists') }}
-        </a>
-        <router-link
-          v-if="$store.state.auth.authenticated"
-          class="item" :to="{path: '/activity'}"><i class="bell icon"></i> {{ $t('Activity') }}</router-link>
-        <router-link
-          class="item" v-if="$store.state.auth.availablePermissions['federation.manage']"
-          :to="{path: '/manage/federation/libraries'}"><i class="sitemap icon"></i> {{ $t('Federation') }}</router-link>
+      <div class="ui inverted vertical large fluid menu">
+        <div class="item">
+          <div class="header">{{ $t('My account') }}</div>
+          <div class="menu">
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i>{{ $t('Logout') }}</router-link>
+            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i>{{ $t('Login') }}</router-link>
+          </div>
+        </div>
+        <div class="item">
+          <div class="header">{{ $t('Music') }}</div>
+          <div class="menu">
+            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i>{{ $t('Favorites') }}</router-link>
+            <a
+              @click="$store.commit('playlists/chooseTrack', null)"
+              v-if="$store.state.auth.authenticated"
+              class="item">
+              <i class="list icon"></i>{{ $t('Playlists') }}
+            </a>
+            <router-link
+              v-if="$store.state.auth.authenticated"
+              class="item" :to="{path: '/activity'}"><i class="bell icon"></i>{{ $t('Activity') }}</router-link>
+          </div>
+        </div>
+        <div class="item" v-if="showAdmin">
+          <div class="header">{{ $t('Administration') }}</div>
+          <div class="menu">
+            <router-link
+              class="item"
+              v-if="$store.state.auth.availablePermissions['import.launch']"
+              :to="{name: 'library.requests', query: {status: 'pending' }}">
+              <i class="download icon"></i>{{ $t('Import requests') }}
+              <div
+                :class="['ui', {'teal': notifications.importRequests > 0}, 'label']"
+                :title="$t('Pending import requests')">
+                {{ notifications.importRequests }}</div>
+            </router-link>
+            <router-link
+              class="item"
+              v-if="$store.state.auth.availablePermissions['federation.manage']"
+              :to="{path: '/manage/federation/libraries'}">
+              <i class="sitemap icon"></i>{{ $t('Federation') }}
+              <div
+                :class="['ui', {'teal': notifications.federation > 0}, 'label']"
+                :title="$t('Pending follow requests')">
+                {{ notifications.federation }}</div>
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="queue.previousQueue " class="ui black icon message">
@@ -104,6 +136,7 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
+import axios from 'axios'
 
 import Player from '@/components/audio/Player'
 import Logo from '@/components/Logo'
@@ -125,22 +158,69 @@ export default {
     return {
       selectedTab: 'library',
       backend: backend,
-      isCollapsed: true
+      isCollapsed: true,
+      fetchInterval: null,
+      notifications: {
+        federation: 0,
+        importRequests: 0
+      }
     }
   },
   mounted () {
     $(this.$el).find('.menu .item').tab()
   },
+  created () {
+    this.fetchNotificationsCount()
+    this.fetchInterval = setInterval(
+        this.fetchNotificationsCount, 1000 * 60 * 15)
+  },
+  destroy () {
+    if (this.fetchInterval) {
+      clearInterval(this.fetchInterval)
+    }
+  },
   computed: {
     ...mapState({
       queue: state => state.queue,
       url: state => state.route.path
-    })
+    }),
+    showAdmin () {
+      let adminPermissions = [
+        this.$store.state.auth.availablePermissions['federation.manage'],
+        this.$store.state.auth.availablePermissions['import.launch']
+      ]
+      return adminPermissions.filter(e => {
+        return e
+      }).length > 0
+    }
   },
   methods: {
     ...mapActions({
       cleanTrack: 'queue/cleanTrack'
     }),
+    fetchNotificationsCount () {
+      this.fetchFederationNotificationsCount()
+      this.fetchFederationImportRequestsCount()
+    },
+    fetchFederationNotificationsCount () {
+      if (!this.$store.state.auth.availablePermissions['federation.manage']) {
+        return
+      }
+      let self = this
+      axios.get('federation/libraries/followers/', {params: {pending: true}}).then(response => {
+        self.notifications.federation = response.data.count
+      })
+    },
+    fetchFederationImportRequestsCount () {
+      if (!this.$store.state.auth.availablePermissions['import.launch']) {
+        return
+      }
+      let self = this
+      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
+        console.log('YOLo')
+        self.notifications.importRequests = response.data.count
+      })
+    },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {
         oldIndex: event.oldIndex, newIndex: event.newIndex})
@@ -173,6 +253,13 @@ export default {
       if (this.selectedTab !== 'queue') {
         this.scrollToCurrent()
       }
+    },
+    '$store.state.availablePermissions': {
+      handler () {
+        console.log('YOLO')
+        this.fetchNotificationsCount()
+      },
+      deep: true
     }
   }
 }
@@ -182,7 +269,7 @@ export default {
 <style scoped lang="scss">
 @import '../style/vendor/media';
 
-$sidebar-color: #3D3E3F;
+$sidebar-color: #3d3e3f;
 
 .sidebar {
 	background: $sidebar-color;
@@ -228,6 +315,18 @@ $sidebar-color: #3D3E3F;
     background-color: $sidebar-color;
     &:hover {
       background-color: rgba(255, 255, 255, 0.06);
+    }
+  }
+}
+.vertical.menu {
+  .item .item {
+    font-size: 1em;
+    > i.icon {
+      float: none;
+      margin: 0 0.5em 0 0;
+    }
+    &:not(.active) {
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 }

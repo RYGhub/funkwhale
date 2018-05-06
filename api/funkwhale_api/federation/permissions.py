@@ -2,13 +2,14 @@ from django.conf import settings
 
 from rest_framework.permissions import BasePermission
 
+from funkwhale_api.common import preferences
 from . import actors
 
 
 class LibraryFollower(BasePermission):
 
     def has_permission(self, request, view):
-        if not settings.FEDERATION_MUSIC_NEEDS_APPROVAL:
+        if not preferences.get('federation__music_needs_approval'):
             return True
 
         actor = getattr(request, 'actor', None)

@@ -1,7 +1,8 @@
+import os
+
 from django.core.files.base import ContentFile
 
-from dynamic_preferences.registries import global_preferences_registry
-
+from funkwhale_api.common import preferences
 from funkwhale_api.federation import activity
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models as federation_models
@@ -13,6 +14,7 @@ from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
 from django.conf import settings
 from . import models
 from . import lyrics as lyrics_utils
+from . import utils as music_utils
 
 
 @celery.app.task(name='acoustid.set_on_track_file')
@@ -77,8 +79,7 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     acoustid_track_id = None
     duration = None
     track = None
-    manager = global_preferences_registry.manager()
-    use_acoustid = use_acoustid and manager['providers_acoustid__api_key']
+    use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
     if not mbid and use_acoustid and from_file:
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
@@ -129,6 +130,10 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     elif not import_job.audio_file and not import_job.source.startswith('file://'):
         # not an implace import, and we have a source, so let's download it
         track_file.download_file()
+    elif not import_job.audio_file and import_job.source.startswith('file://'):
+        # in place import, we set mimetype from extension
+        path, ext = os.path.splitext(import_job.source)
+        track_file.mimetype = music_utils.get_type_from_ext(ext)
     track_file.save()
     import_job.status = 'finished'
     import_job.track_file = track_file
@@ -178,7 +183,7 @@ def fetch_content(lyrics):
 @celery.require_instance(
     models.ImportBatch.objects.filter(status='finished'), 'import_batch')
 def import_batch_notify_followers(import_batch):
-    if not settings.FEDERATION_ENABLED:
+    if not preferences.get('federation__enabled'):
         return
 
     if import_batch.source == 'federation':

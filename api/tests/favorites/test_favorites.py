@@ -99,8 +99,8 @@ def test_user_can_remove_favorite_via_api_using_track_id(
 @pytest.mark.parametrize('url,method', [
     ('api:v1:favorites:tracks-list', 'get'),
 ])
-def test_url_require_auth(url, method, db, settings, client):
-    settings.API_AUTHENTICATION_REQUIRED = True
+def test_url_require_auth(url, method, db, preferences, client):
+    preferences['common__api_authentication_required'] = True
     url = reverse(url)
     response = getattr(client, method)(url)
     assert response.status_code == 401

@@ -123,6 +123,15 @@ services:
       - '35730:35730'
       - '8001:8001'
 
+  api-docs:
+    image: swaggerapi/swagger-ui
+    environment:
+      - "API_URL=/swagger.yml"
+    ports:
+      - '8002:8080'
+    volumes:
+      - "./api/docs/swagger.yml:/usr/share/nginx/html/swagger.yml"
+
 networks:
   internal:
   federation:

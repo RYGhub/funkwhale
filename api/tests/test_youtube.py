@@ -18,8 +18,8 @@ def test_can_get_search_results_from_youtube(mocker):
 
 
 def test_can_get_search_results_from_funkwhale(
-        settings, mocker, api_client, db):
-    settings.API_AUTHENTICATION_REQUIRED = False
+        preferences, mocker, api_client, db):
+    preferences['common__api_authentication_required'] = False
     mocker.patch(
         'funkwhale_api.providers.youtube.client._do_search',
         return_value=api_data.search['8 bit adventure'])
@@ -70,8 +70,8 @@ def test_can_send_multiple_queries_at_once(mocker):
 
 
 def test_can_send_multiple_queries_at_once_from_funwkhale(
-        settings, mocker, db, api_client):
-    settings.API_AUTHENTICATION_REQUIRED = False
+        preferences, mocker, db, api_client):
+    preferences['common__api_authentication_required'] = False
     mocker.patch(
         'funkwhale_api.providers.youtube.client._do_search',
         return_value=api_data.search['8 bit adventure'])
