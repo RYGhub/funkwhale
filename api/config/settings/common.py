@@ -172,7 +172,10 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_CONFIG = env.email_url(
+    'EMAIL_CONFIG', default='consolemail://')
+
+vars().update(EMAIL_CONFIG)
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -367,6 +370,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'funkwhale.localhost',
 # )
 CORS_ALLOW_CREDENTIALS = True
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
