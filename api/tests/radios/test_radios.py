@@ -151,20 +151,6 @@ def test_can_start_radio_for_logged_in_user(logged_in_client):
     assert session.user == logged_in_client.user
 
 
-def test_can_start_radio_for_anonymous_user(api_client, db, preferences):
-    preferences['common__api_authentication_required'] = False
-    url = reverse('api:v1:radios:sessions-list')
-    response = api_client.post(url, {'radio_type': 'random'})
-
-    assert response.status_code == 201
-
-    session = models.RadioSession.objects.latest('id')
-
-    assert session.radio_type == 'random'
-    assert session.user is None
-    assert session.session_key == api_client.session.session_key
-
-
 def test_can_get_track_for_session_from_api(factories, logged_in_client):
     files = factories['music.TrackFile'].create_batch(1)
     tracks = [f.track for f in files]
@@ -227,25 +213,25 @@ def test_can_start_tag_radio(factories):
 
     radio = radios.TagRadio()
     session = radio.start_session(user, related_object=tag)
-    assert session.radio_type =='tag'
+    assert session.radio_type == 'tag'
     for i in range(5):
         assert radio.pick() in good_tracks
 
 
-def test_can_start_artist_radio_from_api(api_client, preferences, factories):
-    preferences['common__api_authentication_required'] = False
+def test_can_start_artist_radio_from_api(
+        logged_in_api_client, preferences, factories):
     artist = factories['music.Artist']()
     url = reverse('api:v1:radios:sessions-list')
 
-    response = api_client.post(
+    response = logged_in_api_client.post(
         url, {'radio_type': 'artist', 'related_object_id': artist.id})
 
     assert response.status_code == 201
 
     session = models.RadioSession.objects.latest('id')
 
-    assert session.radio_type, 'artist'
-    assert session.related_object, artist
+    assert session.radio_type == 'artist'
+    assert session.related_object == artist
 
 
 def test_can_start_less_listened_radio(factories):
@@ -257,6 +243,6 @@ def test_can_start_less_listened_radio(factories):
     good_tracks = [f.track for f in good_files]
     radio = radios.LessListenedRadio()
     session = radio.start_session(user)
-    assert session.related_object == user
+
     for i in range(5):
         assert radio.pick() in good_tracks

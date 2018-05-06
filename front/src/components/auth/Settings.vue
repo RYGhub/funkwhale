@@ -35,21 +35,13 @@
           </div>
           <div class="field">
             <label><i18next path="Old password"/></label>
-            <input
-            required
-            type="password"
-            autofocus
-            placeholder="Enter your old password"
-            v-model="old_password">
+            <password-input required v-model="old_password" />
+
           </div>
           <div class="field">
             <label><i18next path="New password"/></label>
-            <input
-            required
-            type="password"
-            autofocus
-            placeholder="Enter your new password"
-            v-model="new_password">
+            <password-input required v-model="new_password" />
+
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit"><i18next path="Change password"/></button>
         </form>
@@ -62,8 +54,12 @@
 import $ from 'jquery'
 import axios from 'axios'
 import logger from '@/logging'
+import PasswordInput from '@/components/forms/PasswordInput'
 
 export default {
+  components: {
+    PasswordInput
+  },
   data () {
     let d = {
       // We need to initialize the component with any

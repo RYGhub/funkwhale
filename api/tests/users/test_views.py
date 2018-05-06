@@ -136,6 +136,20 @@ def test_changing_password_updates_secret_key(logged_in_client):
     assert user.password != password
 
 
+def test_can_request_password_reset(
+        factories, api_client, mailoutbox):
+    user = factories['users.User']()
+    payload = {
+        'email': user.email,
+    }
+    emails = len(mailoutbox)
+    url = reverse('rest_password_reset')
+
+    response = api_client.post(url, payload)
+    assert response.status_code == 200
+    assert len(mailoutbox) > emails
+
+
 def test_user_can_patch_his_own_settings(logged_in_api_client):
     user = logged_in_api_client.user
     payload = {

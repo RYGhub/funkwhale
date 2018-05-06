@@ -38,6 +38,7 @@ class RadioSerializer(serializers.ModelSerializer):
 
         return super().save(**kwargs)
 
+
 class RadioSessionTrackSerializerCreate(serializers.ModelSerializer):
     class Meta:
         model = models.RadioSessionTrack
@@ -62,17 +63,14 @@ class RadioSessionSerializer(serializers.ModelSerializer):
             'user',
             'creation_date',
             'custom_radio',
-            'session_key')
+        )
 
     def validate(self, data):
         registry[data['radio_type']]().validate_session(data, **self.context)
         return data
 
     def create(self, validated_data):
-        if self.context.get('user'):
-            validated_data['user'] = self.context.get('user')
-        else:
-            validated_data['session_key'] = self.context['session_key']
+        validated_data['user'] = self.context['user']
         if validated_data.get('related_object_id'):
             radio = registry[validated_data['radio_type']]()
             validated_data['related_object'] = radio.get_related_object(validated_data['related_object_id'])

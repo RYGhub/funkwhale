@@ -34,16 +34,7 @@
           </div>
           <div class="field">
             <i18next tag="label" path="Password"/>
-            <div class="ui action input">
-              <input
-              required
-              :type="passwordInputType"
-              placeholder="Enter your password"
-              v-model="password">
-              <span @click="showPassword = !showPassword" title="Show/hide password" class="ui icon button">
-                <i class="eye icon"></i>
-              </span>
-            </div>
+            <password-input v-model="password" />
           </div>
           <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit"><i18next path="Create my account"/></button>
         </form>
@@ -57,8 +48,13 @@
 import axios from 'axios'
 import logger from '@/logging'
 
+import PasswordInput from '@/components/forms/PasswordInput'
+
 export default {
   name: 'login',
+  components: {
+    PasswordInput
+  },
   props: {
     next: {type: String, default: '/'}
   },
@@ -69,8 +65,7 @@ export default {
       password: '',
       isLoadingInstanceSetting: true,
       errors: [],
-      isLoading: false,
-      showPassword: false
+      isLoading: false
     }
   },
   created () {
@@ -104,16 +99,7 @@ export default {
         self.isLoading = false
       })
     }
-  },
-  computed: {
-    passwordInputType () {
-      if (this.showPassword) {
-        return 'text'
-      }
-      return 'password'
-    }
   }
-
 }
 </script>
 

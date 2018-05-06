@@ -21,13 +21,6 @@ class Listening(models.Model):
     class Meta:
         ordering = ('-creation_date',)
 
-    def save(self, **kwargs):
-        if not self.user and not self.session_key:
-            raise ValidationError('Cannot have both session_key and user empty for listening')
-
-        super().save(**kwargs)
-
-
     def get_activity_url(self):
         return '{}/listenings/tracks/{}'.format(
             self.user.get_activity_url(), self.pk)

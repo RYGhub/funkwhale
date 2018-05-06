@@ -97,6 +97,11 @@ export default {
       }
     },
     fetchProfile ({commit, dispatch, state}) {
+      if (document) {
+        // this is to ensure we do not have any leaking cookie set by django
+        document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      }
+
       return axios.get('users/users/me/').then((response) => {
         logger.default.info('Successfully fetched user profile')
         let data = response.data

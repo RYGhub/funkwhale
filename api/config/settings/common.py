@@ -144,7 +144,6 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = (
     # Make sure djangosecure.middleware.SecurityMiddleware is listed first
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'funkwhale_api.users.middleware.AnonymousSessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -173,7 +172,10 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_CONFIG = env.email_url(
+    'EMAIL_CONFIG', default='consolemail://')
+
+vars().update(EMAIL_CONFIG)
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -293,7 +295,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-
+SESSION_COOKIE_HTTPONLY = False
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
@@ -368,6 +370,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     'funkwhale.localhost',
 # )
 CORS_ALLOW_CREDENTIALS = True
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -392,6 +395,11 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     )
 }
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 'funkwhale_api.users.serializers.PasswordResetSerializer'  # noqa
+}
+REST_SESSION_LOGIN = False
+REST_USE_JWT = True
 
 ATOMIC_REQUESTS = False
 USE_X_FORWARDED_HOST = True
