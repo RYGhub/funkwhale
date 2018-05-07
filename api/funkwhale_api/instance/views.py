@@ -10,6 +10,11 @@ from . import nodeinfo
 from . import stats
 
 
+NODEINFO_2_CONTENT_TYPE = (
+    'application/json; profile=http://nodeinfo.diaspora.software/ns/schema/2.0#; charset=utf-8'  # noqa
+)
+
+
 class InstanceSettings(views.APIView):
     permission_classes = []
     authentication_classes = []
@@ -38,4 +43,5 @@ class NodeInfo(views.APIView):
         if not preferences.get('instance__nodeinfo_enabled'):
             return Response(status=404)
         data = nodeinfo.get()
-        return Response(data, status=200)
+        return Response(
+            data, status=200, content_type=NODEINFO_2_CONTENT_TYPE)
