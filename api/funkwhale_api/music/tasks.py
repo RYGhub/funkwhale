@@ -39,7 +39,7 @@ def import_track_from_remote(library_track):
     except (KeyError, AssertionError):
         pass
     else:
-        return models.Track.get_or_create_from_api(mbid=track_mbid)
+        return models.Track.get_or_create_from_api(mbid=track_mbid)[0]
 
     try:
         album_mbid = metadata['release']['musicbrainz_id']
@@ -47,9 +47,9 @@ def import_track_from_remote(library_track):
     except (KeyError, AssertionError):
         pass
     else:
-        album = models.Album.get_or_create_from_api(mbid=album_mbid)
+        album, _ = models.Album.get_or_create_from_api(mbid=album_mbid)
         return models.Track.get_or_create_from_title(
-            library_track.title, artist=album.artist, album=album)
+            library_track.title, artist=album.artist, album=album)[0]
 
     try:
         artist_mbid = metadata['artist']['musicbrainz_id']
@@ -57,20 +57,20 @@ def import_track_from_remote(library_track):
     except (KeyError, AssertionError):
         pass
     else:
-        artist = models.Artist.get_or_create_from_api(mbid=artist_mbid)
-        album = models.Album.get_or_create_from_title(
+        artist, _ = models.Artist.get_or_create_from_api(mbid=artist_mbid)
+        album, _ = models.Album.get_or_create_from_title(
             library_track.album_title, artist=artist)
         return models.Track.get_or_create_from_title(
-            library_track.title, artist=artist, album=album)
+            library_track.title, artist=artist, album=album)[0]
 
     # worst case scenario, we have absolutely no way to link to a
     # musicbrainz resource, we rely on the name/titles
-    artist = models.Artist.get_or_create_from_name(
+    artist, _ = models.Artist.get_or_create_from_name(
         library_track.artist_name)
-    album = models.Album.get_or_create_from_title(
+    album, _ = models.Album.get_or_create_from_title(
         library_track.album_title, artist=artist)
     return models.Track.get_or_create_from_title(
-        library_track.title, artist=artist, album=album)
+        library_track.title, artist=artist, album=album)[0]
 
 
 def _do_import(import_job, replace=False, use_acoustid=True):

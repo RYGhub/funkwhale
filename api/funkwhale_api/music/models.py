@@ -106,7 +106,7 @@ class Artist(APIModelMixin):
         kwargs.update({'name': name})
         return cls.objects.get_or_create(
             name__iexact=name,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 def import_artist(v):
@@ -196,7 +196,7 @@ class Album(APIModelMixin):
         kwargs.update({'title': title})
         return cls.objects.get_or_create(
             title__iexact=title,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 def import_tags(instance, cleaned_data, raw_data):
@@ -403,7 +403,7 @@ class Track(APIModelMixin):
         kwargs.update({'title': title})
         return cls.objects.get_or_create(
             title__iexact=title,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 class TrackFile(models.Model):
