@@ -33,9 +33,7 @@ def test_nodeinfo_dump(preferences, mocker):
         'usage': {
             'users': {
                 'total': stats['users'],
-            },
-            'localPosts': 0,
-            'localComments': 0,
+            }
         },
         'metadata': {
             'shortDescription': preferences['instance__short_description'],
@@ -90,9 +88,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
         'usage': {
             'users': {
                 'total': 0,
-            },
-            'localPosts': 0,
-            'localComments': 0,
+            }
         },
         'metadata': {
             'shortDescription': preferences['instance__short_description'],

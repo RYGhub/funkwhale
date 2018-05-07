@@ -27,9 +27,7 @@ def get():
         'usage': {
             'users': {
                 'total': 0,
-            },
-            'localPosts': 0,
-            'localComments': 0,
+            }
         },
         'metadata': {
             'shortDescription': preferences.get('instance__short_description'),
