@@ -70,6 +70,32 @@ def test_wellknown_webfinger_system(
     assert response.data == serializer.data
 
 
+def test_wellknown_nodeinfo(db, preferences, api_client, settings):
+    expected = {
+        'links': [
+            {
+                'rel': 'http://nodeinfo.diaspora.software/ns/schema/2.0',
+                'href': '{}{}'.format(
+                    settings.FUNKWHALE_URL,
+                    reverse('api:v1:instance:nodeinfo-2.0')
+                )
+            }
+        ]
+    }
+    url = reverse('federation:well-known-nodeinfo')
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'application/jrd+json'
+    assert response.data == expected
+
+
+def test_wellknown_nodeinfo_disabled(db, preferences, api_client):
+    preferences['instance__nodeinfo_enabled'] = False
+    url = reverse('federation:well-known-nodeinfo')
+    response = api_client.get(url)
+    assert response.status_code == 404
+
+
 def test_audio_file_list_requires_authenticated_actor(
         db, preferences, api_client):
     preferences['federation__music_needs_approval'] = True

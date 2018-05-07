@@ -85,13 +85,31 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
         return response.Response({}, status=200)
 
 
-class WellKnownViewSet(FederationMixin, viewsets.GenericViewSet):
+class WellKnownViewSet(viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []
     renderer_classes = [renderers.WebfingerRenderer]
 
     @list_route(methods=['get'])
+    def nodeinfo(self, request, *args, **kwargs):
+        if not preferences.get('instance__nodeinfo_enabled'):
+            return HttpResponse(status=404)
+        data = {
+            'links': [
+                {
+                    'rel': 'http://nodeinfo.diaspora.software/ns/schema/2.0',
+                    'href': utils.full_url(
+                        reverse('api:v1:instance:nodeinfo-2.0')
+                    )
+                }
+            ]
+        }
+        return response.Response(data)
+
+    @list_route(methods=['get'])
     def webfinger(self, request, *args, **kwargs):
+        if not preferences.get('federation__enabled'):
+            return HttpResponse(status=405)
         try:
             resource_type, resource = webfinger.clean_resource(
                 request.GET['resource'])
