@@ -3,7 +3,7 @@
     <div v-if="stats" class="ui stackable two column grid">
       <div class="column">
         <h3 class="ui left aligned header"><i18next path="User activity"/></h3>
-        <div class="ui mini horizontal statistics">
+        <div v-if="stats" class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
               <i class="green user icon"></i>
@@ -19,7 +19,7 @@
           </div>
           <div class="statistic">
             <div class="value">
-              <i class="pink heart icon"></i> {{ stats.track_favorites }}
+              <i class="pink heart icon"></i> {{ stats.trackFavorites }}
             </div>
             <i18next tag="div" class="label" path="Tracks favorited"/>
           </div>
@@ -30,7 +30,7 @@
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
-              {{ parseInt(stats.music_duration) }}
+              {{ parseInt(stats.musicDuration) }}
             </div>
             <i18next tag="div" class="label" path="hours of music"/>
           </div>
@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
 
@@ -76,8 +77,16 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching instance stats...')
-      axios.get('instance/stats/').then((response) => {
-        self.stats = response.data
+      axios.get('instance/nodeinfo/').then((response) => {
+        let d = response.data
+        self.stats = {}
+        self.stats.users = _.get(d, 'usage.users.total')
+        self.stats.listenings = _.get(d, 'metadata.usage.listenings.total')
+        self.stats.trackFavorites = _.get(d, 'metadata.usage.favorites.tracks.total')
+        self.stats.musicDuration = _.get(d, 'metadata.library.music.hours')
+        self.stats.artists = _.get(d, 'metadata.library.artists.total')
+        self.stats.albums = _.get(d, 'metadata.library.albums.total')
+        self.stats.tracks = _.get(d, 'metadata.library.tracks.total')
         self.isLoading = false
       })
     }
