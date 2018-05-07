@@ -1,0 +1,22 @@
+from django.urls import reverse
+
+
+def test_nodeinfo_endpoint(db, api_client, mocker):
+    payload = {
+        'test': 'test'
+    }
+    mocked_nodeinfo = mocker.patch(
+        'funkwhale_api.instance.nodeinfo.get', return_value=payload)
+    url = reverse('api:v1:instance:nodeinfo')
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == payload
+
+
+def test_nodeinfo_endpoint_disabled(db, api_client, preferences):
+    preferences['instance__nodeinfo_enabled'] = False
+    url = reverse('api:v1:instance:nodeinfo')
+    response = api_client.get(url)
+
+    assert response.status_code == 404
