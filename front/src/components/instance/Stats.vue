@@ -77,7 +77,7 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching instance stats...')
-      axios.get('instance/nodeinfo/').then((response) => {
+      axios.get('instance/nodeinfo/2.0/').then((response) => {
         let d = response.data
         self.stats = {}
         self.stats.users = _.get(d, 'usage.users.total')
