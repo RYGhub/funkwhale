@@ -32,10 +32,11 @@ def get():
         'metadata': {
             'shortDescription': preferences.get('instance__short_description'),
             'longDescription': preferences.get('instance__long_description'),
-            'name': preferences.get('instance__name'),
+            'nodeName': preferences.get('instance__name'),
             'library': {
                 'federationEnabled': preferences.get('federation__enabled'),
                 'federationNeedsApproval': preferences.get('federation__music_needs_approval'),
+                'anonymousCanListen': preferences.get('common__api_authentication_required'),
             },
         }
     }
