@@ -133,3 +133,43 @@ def test_get_album_list2_serializer(factories):
     ]
     data = serializers.get_album_list2_data(qs)
     assert data == expected
+
+
+def test_playlist_serializer(factories):
+    plt = factories['playlists.PlaylistTrack']()
+    playlist = plt.playlist
+    qs = music_models.Album.objects.with_tracks_count().order_by('pk')
+    expected = {
+        'id': playlist.pk,
+        'name': playlist.name,
+        'owner': playlist.user.username,
+        'public': 'false',
+        'songCount': 1,
+        'duration': 0,
+        'created': playlist.creation_date,
+    }
+    qs = playlist.__class__.objects.with_tracks_count()
+    data = serializers.get_playlist_data(qs.first())
+    assert data == expected
+
+
+def test_playlist_detail_serializer(factories):
+    plt = factories['playlists.PlaylistTrack']()
+    tf = factories['music.TrackFile'](track=plt.track)
+    playlist = plt.playlist
+    qs = music_models.Album.objects.with_tracks_count().order_by('pk')
+    expected = {
+        'id': playlist.pk,
+        'name': playlist.name,
+        'owner': playlist.user.username,
+        'public': 'false',
+        'songCount': 1,
+        'duration': 0,
+        'created': playlist.creation_date,
+        'entry': [
+            serializers.get_track_data(plt.track.album, plt.track, tf)
+        ]
+    }
+    qs = playlist.__class__.objects.with_tracks_count()
+    data = serializers.get_playlist_detail_data(qs.first())
+    assert data == expected

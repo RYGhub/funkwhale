@@ -13,6 +13,7 @@ from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
+from funkwhale_api.playlists import models as playlists_models
 
 from . import authentication
 from . import filters
@@ -38,13 +39,16 @@ def find_object(queryset, model_field='pk', field='id', cast=int):
                     'code': 0,
                     'message': 'For input string "{}"'.format(raw_value)
                 })
+            qs = queryset
+            if hasattr(qs, '__call__'):
+                qs = qs(request)
             try:
-                obj = queryset.get(**{model_field: value})
-            except queryset.model.DoesNotExist:
+                obj = qs.get(**{model_field: value})
+            except qs.model.DoesNotExist:
                 return response.Response({
                     'code': 70,
                     'message': '{} not found'.format(
-                        queryset.model.__class__.__name__)
+                        qs.model.__class__.__name__)
                 })
             kwargs['obj'] = obj
             return func(self, request, *args, **kwargs)
@@ -241,7 +245,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data)
 
-
     @list_route(
         methods=['get', 'post'],
         url_name='search3',
@@ -308,3 +311,116 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             queryset = queryset[offset:size]
             payload['searchResult3'][c['subsonic']] = c['serializer'](queryset)
         return response.Response(payload)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_playlists',
+        url_path='getPlaylists')
+    def get_playlists(self, request, *args, **kwargs):
+        playlists = request.user.playlists.with_tracks_count().select_related(
+            'user'
+        )
+        data = {
+            'playlists': {
+                'playlist': [
+                    serializers.get_playlist_data(p) for p in playlists]
+            }
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_playlist',
+        url_path='getPlaylist')
+    @find_object(
+        playlists_models.Playlist.objects.with_tracks_count())
+    def get_playlist(self, request, *args, **kwargs):
+        playlist = kwargs.pop('obj')
+        data = {
+            'playlist': serializers.get_playlist_detail_data(playlist)
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='update_playlist',
+        url_path='updatePlaylist')
+    @find_object(
+        lambda request: request.user.playlists.all(),
+        field='playlistId')
+    def update_playlist(self, request, *args, **kwargs):
+        playlist = kwargs.pop('obj')
+        data = request.GET or request.POST
+        new_name = data.get('name', '')
+        if new_name:
+            playlist.name = new_name
+            playlist.save(update_fields=['name', 'modification_date'])
+        try:
+            to_remove = int(data['songIndexToRemove'])
+            plt = playlist.playlist_tracks.get(index=to_remove)
+        except (TypeError, ValueError, KeyError):
+            pass
+        except playlists_models.PlaylistTrack.DoesNotExist:
+            pass
+        else:
+            plt.delete(update_indexes=True)
+
+        try:
+            to_add = int(data['songIdToAdd'])
+            track = music_models.Track.objects.get(pk=to_add)
+        except (TypeError, ValueError, KeyError):
+            pass
+        except music_models.Track.DoesNotExist:
+            pass
+        else:
+            playlist.insert_many([track])
+        data = {
+            'status': 'ok'
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='delete_playlist',
+        url_path='deletePlaylist')
+    @find_object(
+        lambda request: request.user.playlists.all())
+    def delete_playlist(self, request, *args, **kwargs):
+        playlist = kwargs.pop('obj')
+        playlist.delete()
+        data = {
+            'status': 'ok'
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='create_playlist',
+        url_path='createPlaylist')
+    def create_playlist(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        name = data.get('name', '')
+        if not name:
+            return response.Response({
+                'code': 10,
+                'message': 'Playlist ID or name must be specified.'
+            }, data)
+
+        playlist = request.user.playlists.create(
+            name=name
+        )
+        try:
+            to_add = int(data['songId'])
+            track = music_models.Track.objects.get(pk=to_add)
+        except (TypeError, ValueError, KeyError):
+            pass
+        except music_models.Track.DoesNotExist:
+            pass
+        else:
+            playlist.insert_many([track])
+        playlist = request.user.playlists.with_tracks_count().get(
+            pk=playlist.pk)
+        data = {
+            'playlist': serializers.get_playlist_detail_data(playlist)
+        }
+        return response.Response(data)

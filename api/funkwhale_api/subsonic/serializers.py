@@ -150,3 +150,31 @@ def get_album_list2_data(albums):
         get_album2_data(a)
         for a in albums
     ]
+
+
+def get_playlist_data(playlist):
+    return {
+        'id': playlist.pk,
+        'name': playlist.name,
+        'owner': playlist.user.username,
+        'public': 'false',
+        'songCount': playlist._tracks_count,
+        'duration': 0,
+        'created': playlist.creation_date,
+    }
+
+
+def get_playlist_detail_data(playlist):
+    data = get_playlist_data(playlist)
+    qs = playlist.playlist_tracks.select_related(
+        'track__album__artist'
+    ).prefetch_related('track__files').order_by('index')
+    data['entry'] = []
+    for plt in qs:
+        try:
+            tf = [tf for tf in plt.track.files.all()][0]
+        except IndexError:
+            continue
+        td = get_track_data(plt.track.album, plt.track, tf)
+        data['entry'].append(td)
+    return data

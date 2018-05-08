@@ -240,3 +240,94 @@ def test_search3(f, db, logged_in_api_client, factories):
             'song': serializers.get_song_list_data([track]),
         }
     }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_playlists(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-playlists')
+    assert url.endswith('getPlaylists') is True
+    playlist = factories['playlists.Playlist'](
+        user=logged_in_api_client.user
+    )
+    response = logged_in_api_client.get(url, {'f': f})
+
+    qs = playlist.__class__.objects.with_tracks_count()
+    assert response.status_code == 200
+    assert response.data == {
+        'playlists': {
+            'playlist': [serializers.get_playlist_data(qs.first())],
+        }
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_playlist(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-playlist')
+    assert url.endswith('getPlaylist') is True
+    playlist = factories['playlists.Playlist'](
+        user=logged_in_api_client.user
+    )
+    response = logged_in_api_client.get(url, {'f': f, 'id': playlist.pk})
+
+    qs = playlist.__class__.objects.with_tracks_count()
+    assert response.status_code == 200
+    assert response.data == {
+        'playlist': serializers.get_playlist_detail_data(qs.first())
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_update_playlist(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-update-playlist')
+    assert url.endswith('updatePlaylist') is True
+    playlist = factories['playlists.Playlist'](
+        user=logged_in_api_client.user
+    )
+    plt = factories['playlists.PlaylistTrack'](
+        index=0, playlist=playlist)
+    new_track = factories['music.Track']()
+    response = logged_in_api_client.get(
+        url, {
+            'f': f,
+            'name': 'new_name',
+            'playlistId': playlist.pk,
+            'songIdToAdd': new_track.pk,
+            'songIndexToRemove': 0})
+    playlist.refresh_from_db()
+    assert response.status_code == 200
+    assert playlist.name == 'new_name'
+    assert playlist.playlist_tracks.count() == 1
+    assert playlist.playlist_tracks.first().track_id == new_track.pk
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_delete_playlist(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-delete-playlist')
+    assert url.endswith('deletePlaylist') is True
+    playlist = factories['playlists.Playlist'](
+        user=logged_in_api_client.user
+    )
+    response = logged_in_api_client.get(
+        url, {'f': f, 'id': playlist.pk})
+    assert response.status_code == 200
+    with pytest.raises(playlist.__class__.DoesNotExist):
+        playlist.refresh_from_db()
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_create_playlist(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-create-playlist')
+    assert url.endswith('createPlaylist') is True
+    track = factories['music.Track']()
+    response = logged_in_api_client.get(
+        url, {'f': f, 'name': 'hello', 'songId': track.pk})
+    assert response.status_code == 200
+    playlist = logged_in_api_client.user.playlists.latest('id')
+    plt = playlist.playlist_tracks.latest('id')
+    assert playlist.name == 'hello'
+    assert plt.index == 0
+    assert plt.track == track
+    qs = playlist.__class__.objects.with_tracks_count()
+    assert response.data == {
+        'playlist': serializers.get_playlist_detail_data(qs.first())
+    }
