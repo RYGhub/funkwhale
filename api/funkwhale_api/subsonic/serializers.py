@@ -4,6 +4,16 @@ from django.db.models import functions, Count
 
 from rest_framework import serializers
 
+from funkwhale_api.music import models as music_models
+
+
+def get_artist_data(artist_values):
+    return {
+        'id': artist_values['id'],
+        'name': artist_values['name'],
+        'albumCount': artist_values['_albums_count']
+    }
+
 
 class GetArtistsSerializer(serializers.Serializer):
     def to_representation(self, queryset):
@@ -11,7 +21,7 @@ class GetArtistsSerializer(serializers.Serializer):
             'ignoredArticles': '',
             'index': []
         }
-        queryset = queryset.annotate(_albums_count=Count('albums'))
+        queryset = queryset.with_albums_count()
         queryset = queryset.order_by(functions.Lower('name'))
         values = queryset.values('id', '_albums_count', 'name')
 
@@ -23,11 +33,7 @@ class GetArtistsSerializer(serializers.Serializer):
             letter_data = {
                 'name': letter,
                 'artist': [
-                    {
-                        'id': v['id'],
-                        'name': v['name'],
-                        'albumCount': v['_albums_count']
-                    }
+                    get_artist_data(v)
                     for v in artists
                 ]
             }
@@ -59,42 +65,88 @@ class GetArtistSerializer(serializers.Serializer):
         return payload
 
 
+def get_track_data(album, track, tf):
+    data = {
+        'id': track.pk,
+        'isDir': 'false',
+        'title': track.title,
+        'album': album.title,
+        'artist': album.artist.name,
+        'track': track.position,
+        'contentType': tf.mimetype,
+        'suffix': tf.extension or '',
+        'duration': tf.duration or 0,
+        'created': track.creation_date,
+        'albumId': album.pk,
+        'artistId': album.artist.pk,
+        'type': 'music',
+    }
+    if album.release_date:
+        data['year'] = album.release_date.year
+    return data
+
+
+def get_album2_data(album):
+    payload = {
+        'id': album.id,
+        'artistId': album.artist.id,
+        'name': album.title,
+        'artist': album.artist.name,
+        'created': album.creation_date,
+    }
+    try:
+        payload['songCount'] = album._tracks_count
+    except AttributeError:
+        payload['songCount'] = len(album.tracks.prefetch_related('files'))
+    return payload
+
+
+def get_song_list_data(tracks):
+    songs = []
+    for track in tracks:
+        try:
+            tf = [tf for tf in track.files.all()][0]
+        except IndexError:
+            continue
+        track_data = get_track_data(track.album, track, tf)
+        songs.append(track_data)
+    return songs
+
+
 class GetAlbumSerializer(serializers.Serializer):
     def to_representation(self, album):
-        tracks = album.tracks.prefetch_related('files')
-        payload = {
-            'id': album.id,
-            'artistId': album.artist.id,
-            'name': album.title,
-            'artist': album.artist.name,
-            'created': album.creation_date,
-            'songCount': len(tracks),
-            'song': [],
-        }
+        tracks = album.tracks.prefetch_related('files').select_related('album')
+        payload = get_album2_data(album)
         if album.release_date:
             payload['year'] = album.release_date.year
 
-        for track in tracks:
-            try:
-                tf = [tf for tf in track.files.all()][0]
-            except IndexError:
-                continue
-            track_data = {
-                'id': track.pk,
-                'isDir': False,
-                'title': track.title,
-                'album': album.title,
-                'artist': album.artist.name,
-                'track': track.position,
-                'contentType': tf.mimetype,
-                'suffix': tf.extension,
-                'duration': tf.duration,
-                'created': track.creation_date,
-                'albumId': album.pk,
-                'artistId': album.artist.pk,
-                'type': 'music',
-            }
-            if album.release_date:
-                track_data['year'] = album.release_date.year
-            payload['song'].append(track_data)
+        payload['song'] = get_song_list_data(tracks)
         return payload
+
+
+def get_starred_tracks_data(favorites):
+    by_track_id = {
+        f.track_id: f
+        for f in favorites
+    }
+    tracks = music_models.Track.objects.filter(
+        pk__in=by_track_id.keys()
+    ).select_related('album__artist').prefetch_related('files')
+    tracks = tracks.order_by('-creation_date')
+    data = []
+    for t in tracks:
+        try:
+            tf = [tf for tf in t.files.all()][0]
+        except IndexError:
+            continue
+        td = get_track_data(t.album, t, tf)
+        td['starred'] = by_track_id[t.pk].creation_date
+        data.append(td)
+    return data
+
+
+def get_album_list2_data(albums):
+    return [
+        get_album2_data(a)
+        for a in albums
+    ]

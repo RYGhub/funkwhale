@@ -1,7 +1,10 @@
+import datetime
 import json
 import pytest
 
+from django.utils import timezone
 from django.urls import reverse
+
 from rest_framework.response import Response
 
 from funkwhale_api.music import models as music_models
@@ -36,6 +39,26 @@ def test_exception_wrong_credentials(f, db, api_client):
         'error': {
             'code': 40,
             'message': 'Wrong username or password.'
+        }
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_license(f, db, logged_in_api_client, mocker):
+    url = reverse('api:subsonic-get-license')
+    assert url.endswith('getLicense') is True
+    now = timezone.now()
+    mocker.patch('django.utils.timezone.now', return_value=now)
+    response = logged_in_api_client.get(url, {'f': f})
+    expected = {
+        'status': 'ok',
+        'version': '1.16.0',
+        'license': {
+            'valid': 'true',
+            'email': 'valid@valid.license',
+            'licenseExpires': now + datetime.timedelta(days=365)
         }
     }
     assert response.status_code == 200
@@ -87,6 +110,21 @@ def test_get_artist(f, db, logged_in_api_client, factories):
 
 
 @pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_artist_info2(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-artist-info2')
+    assert url.endswith('getArtistInfo2') is True
+    artist = factories['music.Artist']()
+
+    expected = {
+        'artist-info2': {}
+    }
+    response = logged_in_api_client.get(url, {'id': artist.pk})
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
 def test_get_album(f, db, logged_in_api_client, factories):
     url = reverse('api:subsonic-get-album')
     assert url.endswith('getAlbum') is True
@@ -118,3 +156,87 @@ def test_stream(f, db, logged_in_api_client, factories, mocker):
         track_file=tf
     )
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_star(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-star')
+    assert url.endswith('star') is True
+    track = factories['music.Track']()
+    response = logged_in_api_client.get(url, {'f': f, 'id': track.pk})
+
+    assert response.status_code == 200
+    assert response.data == {'status': 'ok'}
+
+    favorite = logged_in_api_client.user.track_favorites.latest('id')
+    assert favorite.track == track
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_unstar(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-unstar')
+    assert url.endswith('unstar') is True
+    track = factories['music.Track']()
+    favorite = factories['favorites.TrackFavorite'](
+        track=track, user=logged_in_api_client.user)
+    response = logged_in_api_client.get(url, {'f': f, 'id': track.pk})
+
+    assert response.status_code == 200
+    assert response.data == {'status': 'ok'}
+    assert logged_in_api_client.user.track_favorites.count() == 0
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_starred2(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-starred2')
+    assert url.endswith('getStarred2') is True
+    track = factories['music.Track']()
+    favorite = factories['favorites.TrackFavorite'](
+        track=track, user=logged_in_api_client.user)
+    response = logged_in_api_client.get(url, {'f': f, 'id': track.pk})
+
+    assert response.status_code == 200
+    assert response.data == {
+        'song': serializers.get_starred_tracks_data([favorite])
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_album_list2(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-album-list2')
+    assert url.endswith('getAlbumList2') is True
+    album1 = factories['music.Album']()
+    album2 = factories['music.Album']()
+    response = logged_in_api_client.get(url, {'f': f, 'type': 'newest'})
+
+    assert response.status_code == 200
+    assert response.data == {
+        'albumList2': {
+            'album': serializers.get_album_list2_data([album2, album1])
+        }
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_search3(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-search3')
+    assert url.endswith('search3') is True
+    artist = factories['music.Artist'](name='testvalue')
+    factories['music.Artist'](name='nope')
+    album = factories['music.Album'](title='testvalue')
+    factories['music.Album'](title='nope')
+    track = factories['music.Track'](title='testvalue')
+    factories['music.Track'](title='nope')
+
+    response = logged_in_api_client.get(url, {'f': f, 'query': 'testval'})
+
+    artist_qs = music_models.Artist.objects.with_albums_count().filter(
+        pk=artist.pk).values('_albums_count', 'id', 'name')
+    assert response.status_code == 200
+    assert response.data == {
+        'searchResult3': {
+            'artist': [serializers.get_artist_data(a) for a in artist_qs],
+            'album': serializers.get_album_list2_data([album]),
+            'song': serializers.get_song_list_data([track]),
+        }
+    }

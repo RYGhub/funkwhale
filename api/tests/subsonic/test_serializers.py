@@ -1,3 +1,4 @@
+from funkwhale_api.music import models as music_models
 from funkwhale_api.subsonic import serializers
 
 
@@ -89,15 +90,15 @@ def test_get_album_serializer(factories):
         'song': [
             {
                 'id': track.pk,
-                'isDir': False,
+                'isDir': 'false',
                 'title': track.title,
                 'album': album.title,
                 'artist': artist.name,
                 'track': track.position,
                 'year': track.album.release_date.year,
                 'contentType': tf.mimetype,
-                'suffix': tf.extension,
-                'duration': tf.duration,
+                'suffix': tf.extension or '',
+                'duration': tf.duration or 0,
                 'created': track.creation_date,
                 'albumId': album.pk,
                 'artistId': artist.pk,
@@ -107,3 +108,28 @@ def test_get_album_serializer(factories):
     }
 
     assert serializers.GetAlbumSerializer(album).data == expected
+
+
+def test_starred_tracks2_serializer(factories):
+    artist = factories['music.Artist']()
+    album = factories['music.Album'](artist=artist)
+    track = factories['music.Track'](album=album)
+    tf = factories['music.TrackFile'](track=track)
+    favorite = factories['favorites.TrackFavorite'](track=track)
+    expected = [serializers.get_track_data(album, track, tf)]
+    expected[0]['starred'] = favorite.creation_date
+    data = serializers.get_starred_tracks_data([favorite])
+    assert data == expected
+
+
+def test_get_album_list2_serializer(factories):
+    album1 = factories['music.Album']()
+    album2 = factories['music.Album']()
+
+    qs = music_models.Album.objects.with_tracks_count().order_by('pk')
+    expected = [
+        serializers.get_album2_data(album1),
+        serializers.get_album2_data(album2),
+    ]
+    data = serializers.get_album_list2_data(qs)
+    assert data == expected
