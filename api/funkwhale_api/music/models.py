@@ -76,6 +76,11 @@ class APIModelMixin(models.Model):
                 self.musicbrainz_model, self.mbid)
 
 
+class ArtistQuerySet(models.QuerySet):
+    def with_albums_count(self):
+        return self.annotate(_albums_count=models.Count('albums'))
+
+
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
 
@@ -89,6 +94,7 @@ class Artist(APIModelMixin):
         }
     }
     api = musicbrainz.api.artists
+    objects = ArtistQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -127,6 +133,11 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data['album'] = instance
         track_cleaned_data['position'] = int(track_data['position'])
         track = importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
+
+
+class AlbumQuerySet(models.QuerySet):
+    def with_tracks_count(self):
+        return self.annotate(_tracks_count=models.Count('tracks'))
 
 
 class Album(APIModelMixin):
@@ -173,6 +184,7 @@ class Album(APIModelMixin):
             'converter': import_artist,
         }
     }
+    objects = AlbumQuerySet.as_manager()
 
     def get_image(self):
         image_data =  musicbrainz.api.images.get_front(str(self.mbid))
