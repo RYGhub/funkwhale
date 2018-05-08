@@ -457,7 +457,13 @@ class TrackFile(models.Model):
     def filename(self):
         return '{}{}'.format(
             self.track.full_name,
-            os.path.splitext(self.audio_file.name)[-1])
+            self.extension)
+
+    @property
+    def extension(self):
+        if not self.audio_file:
+            return
+        return os.path.splitext(self.audio_file.name)[-1].replace('.', '', 1)
 
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:

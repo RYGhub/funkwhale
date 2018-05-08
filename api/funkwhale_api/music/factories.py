@@ -26,7 +26,7 @@ class ArtistFactory(factory.django.DjangoModelFactory):
 class AlbumFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('sentence', nb_words=3)
     mbid = factory.Faker('uuid4')
-    release_date = factory.Faker('date')
+    release_date = factory.Faker('date_object')
     cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker('uuid4')
