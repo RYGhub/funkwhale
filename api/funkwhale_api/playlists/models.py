@@ -9,6 +9,12 @@ from funkwhale_api.common import fields
 from funkwhale_api.common import preferences
 
 
+class PlaylistQuerySet(models.QuerySet):
+    def with_tracks_count(self):
+        return self.annotate(
+            _tracks_count=models.Count('playlist_tracks'))
+
+
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
     user = models.ForeignKey(
@@ -17,6 +23,8 @@ class Playlist(models.Model):
     modification_date = models.DateTimeField(
         auto_now=True)
     privacy_level = fields.get_privacy_field()
+
+    objects = PlaylistQuerySet.as_manager()
 
     def __str__(self):
         return self.name

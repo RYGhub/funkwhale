@@ -20,7 +20,7 @@ services:
       - internal
     labels:
       traefik.backend: "${COMPOSE_PROJECT_NAME-node1}"
-      traefik.frontend.rule: "Host: ${COMPOSE_PROJECT_NAME-node1}.funkwhale.test"
+      traefik.frontend.rule: "Host:${COMPOSE_PROJECT_NAME-node1}.funkwhale.test,${NODE_IP-127.0.0.1}"
       traefik.enable: 'true'
       traefik.federation.protocol: 'http'
       traefik.federation.port: "${WEBPACK_DEVSERVER_PORT-8080}"

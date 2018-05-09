@@ -9,6 +9,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: 'user-{0}'.format(n))
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
+    subsonic_api_token = None
 
     class Meta:
         model = 'users.User'
