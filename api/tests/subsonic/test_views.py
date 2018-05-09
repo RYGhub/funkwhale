@@ -45,6 +45,13 @@ def test_exception_wrong_credentials(f, db, api_client):
     assert response.data == expected
 
 
+def test_disabled_subsonic(preferences, api_client):
+    preferences['subsonic__enabled'] = False
+    url = reverse('api:subsonic-ping')
+    response = api_client.get(url)
+    assert response.status_code == 405
+
+
 @pytest.mark.parametrize('f', ['xml', 'json'])
 def test_get_license(f, db, logged_in_api_client, mocker):
     url = reverse('api:subsonic-get-license')
