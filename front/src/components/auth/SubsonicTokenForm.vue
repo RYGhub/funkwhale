@@ -11,7 +11,7 @@
     <p>
       {{ $t('However, accessing Funkwhale from those clients require a separate password you can set below.') }}
     </p>
-    <p><a href="https://docs.funkwhale.audio/users/apps.html#subsonic" target="_blank">
+    <p><a href="https://docs.funkwhale.audio/users/apps.html#subsonic-compatible-clients" target="_blank">
       {{ $t('Discover how to use Funkwhale from other apps') }}
     </a></p>
     <div v-if="success" class="ui positive message">
