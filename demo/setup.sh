@@ -5,7 +5,7 @@ demo_path="/srv/funkwhale-demo/demo"
 
 echo 'Cleaning everything...'
 cd $demo_path
-docker-compose down -v || echo 'Nothing to stop'
+/usr/local/bin/docker-compose down -v || echo 'Nothing to stop'
 rm -rf /srv/funkwhale-demo/demo/*
 mkdir -p $demo_path
 echo 'Downloading demo files...'
@@ -23,9 +23,10 @@ echo "DJANGO_SECRET_KEY=demo" >> .env
 echo "DJANGO_ALLOWED_HOSTS=demo.funkwhale.audio" >> .env
 echo "FUNKWHALE_VERSION=$version" >> .env
 echo "FUNKWHALE_API_PORT=5001" >> .env
-
-docker-compose pull
-docker-compose up -d postgres redis
+echo "FEDERATION_MUSIC_NEEDS_APPROVAL=False" >>.env
+echo "PROTECT_AUDIO_FILES=False" >> .env
+/usr/local/bin/docker-compose pull
+/usr/local/bin/docker-compose up -d postgres redis
 sleep 5
-docker-compose run --rm api demo/load-demo-data.sh
-docker-compose up -d
+/usr/local/bin/docker-compose run --rm api demo/load-demo-data.sh
+/usr/local/bin/docker-compose up -d
