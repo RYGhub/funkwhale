@@ -10,6 +10,154 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.12 (2018-05-09)
+-----------------
+
+Upgrade instructions are available at
+  https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Subsonic API implementation to offer compatibility with existing clients such
+  as DSub (#75)
+- Use nodeinfo standard for publishing instance information (#192)
+
+
+Enhancements:
+
+- Play button now play tracks immediately instead of appending them to the
+  queue (#99, #156)
+
+
+Bugfixes:
+
+- Fix broken federated import (#193)
+
+
+Documentation:
+
+- Up-to-date documentation for upgrading front-end files on docker setup (#132)
+
+
+Subsonic API
+^^^^^^^^^^^^
+
+This release implements some core parts of the Subsonic API, which is widely
+deployed in various projects and supported by numerous clients.
+
+By offering this API in Funkwhale, we make it possible to access the instance
+library and listen to the music without from existing Subsonic clients, and
+without developping our own alternative clients for each and every platform.
+
+Most advanced Subsonic clients support offline caching of music files,
+playlist management and search, which makes them well-suited for nomadic use.
+
+Please head over :doc:`users/apps` for more informations about supported clients
+and user instructions.
+
+At the instance-level, the Subsonic API is enabled by default, but require
+and additional endpoint to be added in you reverse-proxy configuration.
+
+On nginx, add the following block::
+
+    location /rest/ {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/api/subsonic/rest/;
+    }
+
+On Apache, add the following block::
+
+    <Location "/rest">
+        ProxyPass ${funkwhale-api}/api/subsonic/rest
+        ProxyPassReverse ${funkwhale-api}/api/subsonic/rest
+    </Location>
+
+The Subsonic can be disabled at the instance level from the django admin.
+
+.. note::
+
+    Because of Subsonic's API design which assumes cleartext storing of
+    user passwords, we chose to have a dedicated, separate password
+    for that purpose. Users can generate this password from their
+    settings page in the web client.
+
+
+Nodeinfo standard for instance information and stats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. warning::
+
+    The ``/api/v1/instance/stats/`` endpoint which was used to display
+    instance data in the about page is removed in favor of the new
+    ``/api/v1/instance/nodeinfo/2.0/`` endpoint.
+
+In earlier version, we where using a custom endpoint and format for
+our instance information and statistics. While this was working,
+this was not compatible with anything else on the fediverse.
+
+We now offer a nodeinfo 2.0 endpoint which provides, in a single place,
+all the instance information such as library and user activity statistics,
+public instance settings (description, registration and federation status, etc.).
+
+We offer two settings to manage nodeinfo in your Funkwhale instance:
+
+1. One setting to completely disable nodeinfo, but this is not recommended
+   as the exposed data may be needed to make some parts of the front-end
+   work (especially the about page).
+2. One setting to disable only usage and library statistics in the nodeinfo
+   endpoint. This is useful if you want the nodeinfo endpoint to work,
+   but don't feel comfortable sharing aggregated statistics about your library
+   and user activity.
+
+To make your instance fully compatible with the nodeinfo protocol, you need to
+to edit your nginx configuration file:
+
+.. code-block::
+
+    # before
+    ...
+    location /.well-known/webfinger {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/.well-known/webfinger;
+    }
+    ...
+
+    # after
+    ...
+    location /.well-known/ {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/.well-known/;
+    }
+    ...
+
+You can do the same if you use apache:
+
+.. code-block::
+
+    # before
+    ...
+    <Location "/.well-known/webfinger">
+      ProxyPass ${funkwhale-api}/.well-known/webfinger
+      ProxyPassReverse ${funkwhale-api}/.well-known/webfinger
+    </Location>
+    ...
+
+    # after
+    ...
+    <Location "/.well-known/">
+      ProxyPass ${funkwhale-api}/.well-known/
+      ProxyPassReverse ${funkwhale-api}/.well-known/
+    </Location>
+    ...
+
+This will ensure all well-known endpoints are proxied to funkwhale, and
+not just webfinger one.
+
+Links:
+
+- About nodeinfo: https://github.com/jhass/nodeinfo
+
+
 0.11 (2018-05-06)
 -----------------
 
