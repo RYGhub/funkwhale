@@ -127,6 +127,19 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
     @list_route(
         methods=['get', 'post'],
+        url_name='get_indexes',
+        url_path='getIndexes')
+    def get_indexes(self, request, *args, **kwargs):
+        artists = music_models.Artist.objects.all()
+        data = serializers.GetArtistsSerializer(artists).data
+        payload = {
+            'indexes': data
+        }
+
+        return response.Response(payload, status=200)
+
+    @list_route(
+        methods=['get', 'post'],
         url_name='get_artist',
         url_path='getArtist')
     @find_object(music_models.Artist.objects.all())
@@ -213,7 +226,22 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     def get_starred2(self, request, *args, **kwargs):
         favorites = request.user.track_favorites.all()
         data = {
-            'song': serializers.get_starred_tracks_data(favorites)
+            'starred2': {
+                'song': serializers.get_starred_tracks_data(favorites)
+            }
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_starred',
+        url_path='getStarred')
+    def get_starred(self, request, *args, **kwargs):
+        favorites = request.user.track_favorites.all()
+        data = {
+            'starred': {
+                'song': serializers.get_starred_tracks_data(favorites)
+            }
         }
         return response.Response(data)
 
@@ -440,5 +468,20 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             pk=playlist.pk)
         data = {
             'playlist': serializers.get_playlist_detail_data(playlist)
+        }
+        return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_music_folders',
+        url_path='getMusicFolders')
+    def get_music_folders(self, request, *args, **kwargs):
+        data = {
+            'musicFolders': {
+                'musicFolder': [{
+                    'id': 1,
+                    'name': 'Music'
+                }]
+            }
         }
         return response.Response(data)

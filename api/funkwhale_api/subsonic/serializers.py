@@ -72,7 +72,7 @@ def get_track_data(album, track, tf):
         'title': track.title,
         'album': album.title,
         'artist': album.artist.name,
-        'track': track.position,
+        'track': track.position or 1,
         'contentType': tf.mimetype,
         'suffix': tf.extension or '',
         'duration': tf.duration or 0,
@@ -177,4 +177,39 @@ def get_playlist_detail_data(playlist):
             continue
         td = get_track_data(plt.track.album, plt.track, tf)
         data['entry'].append(td)
+    return data
+
+
+def get_music_directory_data(artist):
+    tracks = artist.tracks.select_related('album').prefetch_related('files')
+    data = {
+        'id': artist.pk,
+        'parent': 1,
+        'name': artist.name,
+        'child': []
+    }
+    for track in tracks:
+        try:
+            tf = [tf for tf in track.files.all()][0]
+        except IndexError:
+            continue
+        album = track.album
+        td = {
+            'id': track.pk,
+            'isDir': 'false',
+            'title': track.title,
+            'album': album.title,
+            'artist': artist.name,
+            'track': track.position or 1,
+            'year': track.album.release_date.year if track.album.release_date else 0,
+            'contentType': tf.mimetype,
+            'suffix': tf.extension or '',
+            'duration': tf.duration or 0,
+            'created': track.creation_date,
+            'albumId': album.pk,
+            'artistId': artist.pk,
+            'parent': artist.id,
+            'type': 'music',
+        }
+        data['child'].append(td)
     return data

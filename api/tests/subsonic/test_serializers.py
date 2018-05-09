@@ -173,3 +173,35 @@ def test_playlist_detail_serializer(factories):
     qs = playlist.__class__.objects.with_tracks_count()
     data = serializers.get_playlist_detail_data(qs.first())
     assert data == expected
+
+
+def test_directory_serializer_artist(factories):
+    track = factories['music.Track']()
+    tf = factories['music.TrackFile'](track=track)
+    album = track.album
+    artist = track.artist
+
+    expected = {
+        'id': artist.pk,
+        'parent': 1,
+        'name': artist.name,
+        'child': [{
+            'id': track.pk,
+            'isDir': 'false',
+            'title': track.title,
+            'album': album.title,
+            'artist': artist.name,
+            'track': track.position,
+            'year': track.album.release_date.year,
+            'contentType': tf.mimetype,
+            'suffix': tf.extension or '',
+            'duration': tf.duration or 0,
+            'created': track.creation_date,
+            'albumId': album.pk,
+            'artistId': artist.pk,
+            'parent': artist.pk,
+            'type': 'music',
+        }]
+    }
+    data = serializers.get_music_directory_data(artist)
+    assert data == expected

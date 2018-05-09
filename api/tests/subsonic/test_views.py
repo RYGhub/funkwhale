@@ -88,7 +88,7 @@ def test_get_artists(f, db, logged_in_api_client, factories):
             music_models.Artist.objects.all()
         ).data
     }
-    response = logged_in_api_client.get(url)
+    response = logged_in_api_client.get(url, {'f': f})
 
     assert response.status_code == 200
     assert response.data == expected
@@ -197,7 +197,26 @@ def test_get_starred2(f, db, logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == {
-        'song': serializers.get_starred_tracks_data([favorite])
+        'starred2': {
+            'song': serializers.get_starred_tracks_data([favorite])
+        }
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_starred(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-starred')
+    assert url.endswith('getStarred') is True
+    track = factories['music.Track']()
+    favorite = factories['favorites.TrackFavorite'](
+        track=track, user=logged_in_api_client.user)
+    response = logged_in_api_client.get(url, {'f': f, 'id': track.pk})
+
+    assert response.status_code == 200
+    assert response.data == {
+        'starred': {
+            'song': serializers.get_starred_tracks_data([favorite])
+        }
     }
 
 
@@ -333,3 +352,35 @@ def test_create_playlist(f, db, logged_in_api_client, factories):
     assert response.data == {
         'playlist': serializers.get_playlist_detail_data(qs.first())
     }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_music_folders(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-music-folders')
+    assert url.endswith('getMusicFolders') is True
+    response = logged_in_api_client.get(url, {'f': f})
+    assert response.status_code == 200
+    assert response.data == {
+        'musicFolders': {
+            'musicFolder': [{
+                'id': 1,
+                'name': 'Music'
+            }]
+        }
+    }
+
+
+@pytest.mark.parametrize('f', ['xml', 'json'])
+def test_get_indexes(f, db, logged_in_api_client, factories):
+    url = reverse('api:subsonic-get-indexes')
+    assert url.endswith('getIndexes') is True
+    artists = factories['music.Artist'].create_batch(size=10)
+    expected = {
+        'indexes': serializers.GetArtistsSerializer(
+            music_models.Artist.objects.all()
+        ).data
+    }
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
