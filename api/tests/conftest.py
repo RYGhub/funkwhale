@@ -130,6 +130,7 @@ def logged_in_api_client(db, factories, api_client):
     """
     user = factories['users.User']()
     assert api_client.login(username=user.username, password='test')
+    api_client.force_authenticate(user=user)
     setattr(api_client, 'user', user)
     yield api_client
     delattr(api_client, 'user')

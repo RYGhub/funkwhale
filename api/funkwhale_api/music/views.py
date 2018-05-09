@@ -245,6 +245,53 @@ def get_file_path(audio_file):
         return path
 
 
+def handle_serve(track_file):
+    f = track_file
+    # we update the accessed_date
+    f.accessed_date = timezone.now()
+    f.save(update_fields=['accessed_date'])
+
+    mt = f.mimetype
+    audio_file = f.audio_file
+    try:
+        library_track = f.library_track
+    except ObjectDoesNotExist:
+        library_track = None
+    if library_track and not audio_file:
+        if not library_track.audio_file:
+            # we need to populate from cache
+            with transaction.atomic():
+                # why the transaction/select_for_update?
+                # this is because browsers may send multiple requests
+                # in a short time range, for partial content,
+                # thus resulting in multiple downloads from the remote
+                qs = LibraryTrack.objects.select_for_update()
+                library_track = qs.get(pk=library_track.pk)
+                library_track.download_audio()
+        audio_file = library_track.audio_file
+        file_path = get_file_path(audio_file)
+        mt = library_track.audio_mimetype
+    elif audio_file:
+        file_path = get_file_path(audio_file)
+    elif f.source and f.source.startswith('file://'):
+        file_path = get_file_path(f.source.replace('file://', '', 1))
+    response = Response()
+    filename = f.filename
+    mapping = {
+        'nginx': 'X-Accel-Redirect',
+        'apache2': 'X-Sendfile',
+    }
+    file_header = mapping[settings.REVERSE_PROXY_TYPE]
+    response[file_header] = file_path
+    filename = "filename*=UTF-8''{}".format(
+        urllib.parse.quote(filename))
+    response["Content-Disposition"] = "attachment; {}".format(filename)
+    if mt:
+        response["Content-Type"] = mt
+
+    return response
+
+
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (models.TrackFile.objects.all().order_by('-id'))
     serializer_class = serializers.TrackFileSerializer
@@ -261,53 +308,9 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             'track__artist',
         )
         try:
-            f = queryset.get(pk=kwargs['pk'])
+            return handle_serve(queryset.get(pk=kwargs['pk']))
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
-
-        # we update the accessed_date
-        f.accessed_date = timezone.now()
-        f.save(update_fields=['accessed_date'])
-
-        mt = f.mimetype
-        audio_file = f.audio_file
-        try:
-            library_track = f.library_track
-        except ObjectDoesNotExist:
-            library_track = None
-        if library_track and not audio_file:
-            if not library_track.audio_file:
-                # we need to populate from cache
-                with transaction.atomic():
-                    # why the transaction/select_for_update?
-                    # this is because browsers may send multiple requests
-                    # in a short time range, for partial content,
-                    # thus resulting in multiple downloads from the remote
-                    qs = LibraryTrack.objects.select_for_update()
-                    library_track = qs.get(pk=library_track.pk)
-                    library_track.download_audio()
-            audio_file = library_track.audio_file
-            file_path = get_file_path(audio_file)
-            mt = library_track.audio_mimetype
-        elif audio_file:
-            file_path = get_file_path(audio_file)
-        elif f.source and f.source.startswith('file://'):
-            file_path = get_file_path(f.source.replace('file://', '', 1))
-        response = Response()
-        filename = f.filename
-        mapping = {
-            'nginx': 'X-Accel-Redirect',
-            'apache2': 'X-Sendfile',
-        }
-        file_header = mapping[settings.REVERSE_PROXY_TYPE]
-        response[file_header] = file_path
-        filename = "filename*=UTF-8''{}".format(
-            urllib.parse.quote(filename))
-        response["Content-Disposition"] = "attachment; {}".format(filename)
-        if mt:
-            response["Content-Type"] = mt
-
-        return response
 
     @list_route(methods=['get'])
     def viewable(self, request, *args, **kwargs):

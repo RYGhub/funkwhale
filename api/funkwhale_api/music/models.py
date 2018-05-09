@@ -76,6 +76,11 @@ class APIModelMixin(models.Model):
                 self.musicbrainz_model, self.mbid)
 
 
+class ArtistQuerySet(models.QuerySet):
+    def with_albums_count(self):
+        return self.annotate(_albums_count=models.Count('albums'))
+
+
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
 
@@ -89,6 +94,7 @@ class Artist(APIModelMixin):
         }
     }
     api = musicbrainz.api.artists
+    objects = ArtistQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -106,7 +112,7 @@ class Artist(APIModelMixin):
         kwargs.update({'name': name})
         return cls.objects.get_or_create(
             name__iexact=name,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 def import_artist(v):
@@ -127,6 +133,11 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data['album'] = instance
         track_cleaned_data['position'] = int(track_data['position'])
         track = importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
+
+
+class AlbumQuerySet(models.QuerySet):
+    def with_tracks_count(self):
+        return self.annotate(_tracks_count=models.Count('tracks'))
 
 
 class Album(APIModelMixin):
@@ -173,6 +184,7 @@ class Album(APIModelMixin):
             'converter': import_artist,
         }
     }
+    objects = AlbumQuerySet.as_manager()
 
     def get_image(self):
         image_data =  musicbrainz.api.images.get_front(str(self.mbid))
@@ -196,7 +208,7 @@ class Album(APIModelMixin):
         kwargs.update({'title': title})
         return cls.objects.get_or_create(
             title__iexact=title,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 def import_tags(instance, cleaned_data, raw_data):
@@ -403,7 +415,7 @@ class Track(APIModelMixin):
         kwargs.update({'title': title})
         return cls.objects.get_or_create(
             title__iexact=title,
-            defaults=kwargs)[0]
+            defaults=kwargs)
 
 
 class TrackFile(models.Model):
@@ -457,7 +469,13 @@ class TrackFile(models.Model):
     def filename(self):
         return '{}{}'.format(
             self.track.full_name,
-            os.path.splitext(self.audio_file.name)[-1])
+            self.extension)
+
+    @property
+    def extension(self):
+        if not self.audio_file:
+            return
+        return os.path.splitext(self.audio_file.name)[-1].replace('.', '', 1)
 
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:

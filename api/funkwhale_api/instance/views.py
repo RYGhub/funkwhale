@@ -4,7 +4,15 @@ from rest_framework.response import Response
 from dynamic_preferences.api import serializers
 from dynamic_preferences.registries import global_preferences_registry
 
+from funkwhale_api.common import preferences
+
+from . import nodeinfo
 from . import stats
+
+
+NODEINFO_2_CONTENT_TYPE = (
+    'application/json; profile=http://nodeinfo.diaspora.software/ns/schema/2.0#; charset=utf-8'  # noqa
+)
 
 
 class InstanceSettings(views.APIView):
@@ -27,10 +35,13 @@ class InstanceSettings(views.APIView):
         return Response(data, status=200)
 
 
-class InstanceStats(views.APIView):
+class NodeInfo(views.APIView):
     permission_classes = []
     authentication_classes = []
 
     def get(self, request, *args, **kwargs):
-        data = stats.get()
-        return Response(data, status=200)
+        if not preferences.get('instance__nodeinfo_enabled'):
+            return Response(status=404)
+        data = nodeinfo.get()
+        return Response(
+            data, status=200, content_type=NODEINFO_2_CONTENT_TYPE)

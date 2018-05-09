@@ -5,7 +5,7 @@
         <h1 class="ui huge header">
           {{ $t('Welcome on Funkwhale') }}
         </h1>
-        <p>{{ $t('We think listening music should be simple.') }}</p>
+        <p>{{ $t('We think listening to music should be simple.') }}</p>
         <router-link class="ui icon button" to="/about">
           <i class="info icon"></i>
           {{ $t('Learn more about this instance') }}

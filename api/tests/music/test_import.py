@@ -66,7 +66,7 @@ def test_import_job_from_federation_musicbrainz_recording(factories, mocker):
     t = factories['music.Track']()
     track_from_api = mocker.patch(
         'funkwhale_api.music.models.Track.get_or_create_from_api',
-        return_value=t)
+        return_value=(t, True))
     lt = factories['federation.LibraryTrack'](
         metadata__recording__musicbrainz=True,
         artist_name='Hello',
@@ -92,7 +92,7 @@ def test_import_job_from_federation_musicbrainz_release(factories, mocker):
     a = factories['music.Album']()
     album_from_api = mocker.patch(
         'funkwhale_api.music.models.Album.get_or_create_from_api',
-        return_value=a)
+        return_value=(a, True))
     lt = factories['federation.LibraryTrack'](
         metadata__release__musicbrainz=True,
         artist_name='Hello',
@@ -121,7 +121,7 @@ def test_import_job_from_federation_musicbrainz_artist(factories, mocker):
     a = factories['music.Artist']()
     artist_from_api = mocker.patch(
         'funkwhale_api.music.models.Artist.get_or_create_from_api',
-        return_value=a)
+        return_value=(a, True))
     lt = factories['federation.LibraryTrack'](
         metadata__artist__musicbrainz=True,
         album_title='World',

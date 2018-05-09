@@ -3,16 +3,6 @@ from django.urls import reverse
 from funkwhale_api.instance import stats
 
 
-def test_can_get_stats_via_api(db, api_client, mocker):
-    stats = {
-        'foo': 'bar'
-    }
-    mocker.patch('funkwhale_api.instance.stats.get', return_value=stats)
-    url = reverse('api:v1:instance:stats')
-    response = api_client.get(url)
-    assert response.data == stats
-
-
 def test_get_users(mocker):
     mocker.patch(
         'funkwhale_api.users.models.User.objects.count', return_value=42)

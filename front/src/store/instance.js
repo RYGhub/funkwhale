@@ -24,6 +24,11 @@ export default {
           value: true
         }
       },
+      subsonic: {
+        enabled: {
+          value: true
+        }
+      },
       raven: {
         front_enabled: {
           value: false

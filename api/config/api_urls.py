@@ -1,9 +1,11 @@
 from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
 from django.conf.urls import include, url
 from funkwhale_api.activity import views as activity_views
 from funkwhale_api.instance import views as instance_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
+from funkwhale_api.subsonic.views import SubsonicViewSet
 from rest_framework_jwt import views as jwt_views
 
 from dynamic_preferences.api.viewsets import GlobalPreferencesViewSet
@@ -26,6 +28,10 @@ router.register(
     playlists_views.PlaylistTrackViewSet,
     'playlist-tracks')
 v1_patterns = router.urls
+
+subsonic_router = routers.SimpleRouter(trailing_slash=False)
+subsonic_router.register(r'subsonic/rest', SubsonicViewSet, base_name='subsonic')
+
 
 v1_patterns += [
     url(r'^instance/',
@@ -68,4 +74,4 @@ v1_patterns += [
 
 urlpatterns = [
     url(r'^v1/', include((v1_patterns, 'v1'), namespace='v1'))
-]
+] + format_suffix_patterns(subsonic_router.urls, allowed=['view'])

@@ -26,6 +26,10 @@
       <div class="ui hidden divider"></div>
       <div class="ui small text container">
         <h2 class="ui header"><i18next path="Change my password"/></h2>
+        <div class="ui message">
+          {{ $t('Changing your password will also change your Subsonic API password if you have requested one.') }}
+          {{ $t('You will have to update your password on your clients that use this password.') }}
+        </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">
             <div class="header"><i18next path="Cannot change your password"/></div>
@@ -41,10 +45,25 @@
           <div class="field">
             <label><i18next path="New password"/></label>
             <password-input required v-model="new_password" />
-
           </div>
-          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit"><i18next path="Change password"/></button>
+          <dangerous-button
+            color="yellow"
+            :class="['ui', {'loading': isLoading}, 'button']"
+            :action="submitPassword">
+            {{ $t('Change password') }}
+            <p slot="modal-header">{{ $t('Change your password?') }}</p>
+            <div slot="modal-content">
+              <p>{{ $t("Changing your password will have the following consequences") }}</p>
+              <ul>
+                <li>{{ $t('You will be logged out from this session and have to log out with the new one') }}</li>
+                <li>{{ $t('Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password') }}</li>
+              </ul>
+            </div>
+            <p slot="modal-confirm">{{ $t('Disable access') }}</p>
+          </dangerous-button>
         </form>
+        <div class="ui hidden divider" />
+        <subsonic-token-form />
       </div>
     </div>
   </div>
@@ -55,10 +74,12 @@ import $ from 'jquery'
 import axios from 'axios'
 import logger from '@/logging'
 import PasswordInput from '@/components/forms/PasswordInput'
+import SubsonicTokenForm from '@/components/auth/SubsonicTokenForm'
 
 export default {
   components: {
-    PasswordInput
+    PasswordInput,
+    SubsonicTokenForm
   },
   data () {
     let d = {

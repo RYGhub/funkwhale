@@ -68,3 +68,31 @@ class RavenEnabled(types.BooleanPreference):
         'Wether error reporting to a Sentry instance using raven is enabled'
         ' for front-end errors'
     )
+
+
+@global_preferences_registry.register
+class InstanceNodeinfoEnabled(types.BooleanPreference):
+    show_in_api = False
+    section = instance
+    name = 'nodeinfo_enabled'
+    default = True
+    verbose_name = 'Enable nodeinfo endpoint'
+    help_text = (
+        'This endpoint is needed for your about page to work.'
+        'It\'s also helpful for the various monitoring '
+        'tools that map and analyzize the fediverse, '
+        'but you can disable it completely if needed.'
+    )
+
+
+@global_preferences_registry.register
+class InstanceNodeinfoStatsEnabled(types.BooleanPreference):
+    show_in_api = False
+    section = instance
+    name = 'nodeinfo_stats_enabled'
+    default = True
+    verbose_name = 'Enable usage and library stats in nodeinfo endpoint'
+    help_text = (
+        'Disable this f you don\'t want to share usage and library statistics'
+        'in the nodeinfo endpoint but don\'t want to disable it completely.'
+    )

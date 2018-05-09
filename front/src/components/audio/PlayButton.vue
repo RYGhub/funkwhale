@@ -2,7 +2,7 @@
   <div :class="['ui', {'tiny': discrete}, 'buttons']">
     <button
       :title="$t('Add to current queue')"
-      @click="add"
+      @click="addNext(true)"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
       <i class="ui play icon"></i>
       <template v-if="!discrete"><slot><i18next path="Play"/></slot></template>
@@ -42,9 +42,7 @@ export default {
     }
   },
   mounted () {
-    if (!this.discrete) {
-      jQuery(this.$el).find('.ui.dropdown').dropdown()
-    }
+    jQuery(this.$el).find('.ui.dropdown').dropdown()
   },
   computed: {
     playable () {
@@ -98,9 +96,11 @@ export default {
     addNext (next) {
       let self = this
       this.triggerLoad()
+      let wasEmpty = this.$store.state.queue.tracks.length === 0
       this.getPlayableTracks().then((tracks) => {
         self.$store.dispatch('queue/appendMany', {tracks: tracks, index: self.$store.state.queue.currentIndex + 1})
-        if (next) {
+        let goNext = next && !wasEmpty
+        if (goNext) {
           self.$store.dispatch('queue/next')
         }
       })
