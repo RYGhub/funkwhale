@@ -34,7 +34,7 @@ module.exports = {
         changeOrigin: true,
         ws: true,
         filter: function (pathname, req) {
-          let proxified = ['.well-known', 'staticfiles', 'media', 'federation', 'api']
+          let proxified = ['rest', '.well-known', 'staticfiles', 'media', 'federation', 'api']
           let matches = proxified.filter(e => {
             return pathname.match(`^/${e}`)
           })
