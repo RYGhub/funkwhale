@@ -318,15 +318,17 @@ def test_delete_playlist(f, db, logged_in_api_client, factories):
 def test_create_playlist(f, db, logged_in_api_client, factories):
     url = reverse('api:subsonic-create-playlist')
     assert url.endswith('createPlaylist') is True
-    track = factories['music.Track']()
+    track1 = factories['music.Track']()
+    track2 = factories['music.Track']()
     response = logged_in_api_client.get(
-        url, {'f': f, 'name': 'hello', 'songId': track.pk})
+        url, {'f': f, 'name': 'hello', 'songId': [track1.pk, track2.pk]})
     assert response.status_code == 200
     playlist = logged_in_api_client.user.playlists.latest('id')
-    plt = playlist.playlist_tracks.latest('id')
+    assert playlist.playlist_tracks.count() == 2
+    for i, t in enumerate([track1, track2]):
+        plt = playlist.playlist_tracks.get(track=t)
+        assert plt.index == i
     assert playlist.name == 'hello'
-    assert plt.index == 0
-    assert plt.track == track
     qs = playlist.__class__.objects.with_tracks_count()
     assert response.data == {
         'playlist': serializers.get_playlist_detail_data(qs.first())

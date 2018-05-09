@@ -365,15 +365,24 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         else:
             plt.delete(update_indexes=True)
 
-        try:
-            to_add = int(data['songIdToAdd'])
-            track = music_models.Track.objects.get(pk=to_add)
-        except (TypeError, ValueError, KeyError):
-            pass
-        except music_models.Track.DoesNotExist:
-            pass
-        else:
-            playlist.insert_many([track])
+        ids = []
+        for i in data.getlist('songIdToAdd'):
+            try:
+                ids.append(int(i))
+            except (TypeError, ValueError):
+                pass
+        if ids:
+            tracks = music_models.Track.objects.filter(pk__in=ids)
+            by_id = {t.id: t for t in tracks}
+            sorted_tracks = []
+            for i in ids:
+                try:
+                    sorted_tracks.append(by_id[i])
+                except KeyError:
+                    pass
+            if sorted_tracks:
+                playlist.insert_many(sorted_tracks)
+
         data = {
             'status': 'ok'
         }
@@ -409,15 +418,24 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         playlist = request.user.playlists.create(
             name=name
         )
-        try:
-            to_add = int(data['songId'])
-            track = music_models.Track.objects.get(pk=to_add)
-        except (TypeError, ValueError, KeyError):
-            pass
-        except music_models.Track.DoesNotExist:
-            pass
-        else:
-            playlist.insert_many([track])
+        ids = []
+        for i in data.getlist('songId'):
+            try:
+                ids.append(int(i))
+            except (TypeError, ValueError):
+                pass
+
+        if ids:
+            tracks = music_models.Track.objects.filter(pk__in=ids)
+            by_id = {t.id: t for t in tracks}
+            sorted_tracks = []
+            for i in ids:
+                try:
+                    sorted_tracks.append(by_id[i])
+                except KeyError:
+                    pass
+            if sorted_tracks:
+                playlist.insert_many(sorted_tracks)
         playlist = request.user.playlists.with_tracks_count().get(
             pk=playlist.pk)
         data = {
