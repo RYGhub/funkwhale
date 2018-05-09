@@ -133,6 +133,7 @@ LOCAL_APPS = (
     'funkwhale_api.providers.audiofile',
     'funkwhale_api.providers.youtube',
     'funkwhale_api.providers.acoustid',
+    'funkwhale_api.subsonic',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

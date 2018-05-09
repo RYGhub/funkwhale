@@ -4,11 +4,13 @@ from django.utils import timezone
 
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
+from rest_framework import renderers
 from rest_framework import response
 from rest_framework import viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
+from funkwhale_api.common import preferences
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
@@ -60,6 +62,15 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     content_negotiation_class = negotiation.SubsonicContentNegociation
     authentication_classes = [authentication.SubsonicAuthentication]
     permissions_classes = [rest_permissions.IsAuthenticated]
+
+    def dispatch(self, request, *args, **kwargs):
+        if not preferences.get('subsonic__enabled'):
+            r = response.Response({}, status=405)
+            r.accepted_renderer = renderers.JSONRenderer()
+            r.accepted_media_type = 'application/json'
+            r.renderer_context = {}
+            return r
+        return super().dispatch(request, *args, **kwargs)
 
     def handle_exception(self, exc):
         # subsonic API sends 200 status code with custom error
