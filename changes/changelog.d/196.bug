@@ -1,0 +1,1 @@
+Tracks with special UTF-8 characters don't break anymore, fixing Bug #196
