@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 
+import binascii
+import os
 import uuid
-import secrets
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -12,6 +13,10 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from funkwhale_api.common import fields
+
+
+def get_token():
+    return binascii.b2a_hex(os.urandom(15)).decode('utf-8')
 
 
 @python_2_unicode_compatible
@@ -58,7 +63,7 @@ class User(AbstractUser):
         return self.secret_key
 
     def update_subsonic_api_token(self):
-        self.subsonic_api_token = secrets.token_hex(32)
+        self.subsonic_api_token = get_token()
         return self.subsonic_api_token
 
     def set_password(self, raw_password):
