@@ -110,9 +110,7 @@ We offer two settings to manage nodeinfo in your Funkwhale instance:
    and user activity.
 
 To make your instance fully compatible with the nodeinfo protocol, you need to
-to edit your nginx configuration file:
-
-.. code-block::
+to edit your nginx configuration file::
 
     # before
     ...
@@ -130,9 +128,7 @@ to edit your nginx configuration file:
     }
     ...
 
-You can do the same if you use apache:
-
-.. code-block::
+You can do the same if you use apache::
 
     # before
     ...
