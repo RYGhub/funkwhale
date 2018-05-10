@@ -241,7 +241,7 @@ def get_file_path(audio_file):
                     'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
                     'MUSIC_DIRECTORY_PATH to serve in-place imported files'
                 )
-            path = audio_file.replace(prefix, serve_path, 1)
+            path = audio_file.replace(prefix, serve_path, 1).encode('utf-8')
         return path
 
 
