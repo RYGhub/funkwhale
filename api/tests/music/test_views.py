@@ -105,6 +105,24 @@ def test_serve_file_in_place(
 
 
 @pytest.mark.parametrize('proxy,serve_path,expected', [
+    ('apache2', '/host/music', '/host/music/hello/worldéà.mp3'),
+    ('apache2', '/app/music', '/app/music/hello/worldéà.mp3'),
+    ('nginx', '/host/music', '/_protected/music/hello/worldéà.mp3'),
+    ('nginx', '/app/music', '/_protected/music/hello/worldéà.mp3'),
+])
+def test_serve_file_in_place_utf8(
+        proxy, serve_path, expected, factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.PROTECT_FILE_PATH = '/_protected/music'
+    settings.REVERSE_PROXY_TYPE = proxy
+    settings.MUSIC_DIRECTORY_PATH = '/app/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
+    path = views.get_file_path('/app/music/hello/worldéà.mp3')
+
+    assert path == expected.encode('utf-8')
+
+
+@pytest.mark.parametrize('proxy,serve_path,expected', [
     ('apache2', '/host/music', '/host/media/tracks/hello/world.mp3'),
     # apache with container not supported yet
     # ('apache2', '/app/music', '/app/music/tracks/hello/world.mp3'),

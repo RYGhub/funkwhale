@@ -230,7 +230,7 @@ def get_file_path(audio_file):
                     'MUSIC_DIRECTORY_PATH to serve in-place imported files'
                 )
             path = '/music' + audio_file.replace(prefix, '', 1)
-        return settings.PROTECT_FILES_PATH + path
+        return (settings.PROTECT_FILES_PATH + path).encode('utf-8')
     if t == 'apache2':
         try:
             path = audio_file.path
@@ -241,7 +241,7 @@ def get_file_path(audio_file):
                     'You need to specify MUSIC_DIRECTORY_SERVE_PATH and '
                     'MUSIC_DIRECTORY_PATH to serve in-place imported files'
                 )
-            path = audio_file.replace(prefix, serve_path, 1)
+            path = audio_file.replace(prefix, serve_path, 1).encode('utf-8')
         return path
 
 
