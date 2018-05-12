@@ -66,6 +66,7 @@ def compute_status(jobs):
 AUDIO_EXTENSIONS_AND_MIMETYPE = [
     ('ogg', 'audio/ogg'),
     ('mp3', 'audio/mpeg'),
+    ('flac', 'audio/flac'),
 ]
 
 EXTENSION_TO_MIMETYPE = {ext: mt for ext, mt in AUDIO_EXTENSIONS_AND_MIMETYPE}
