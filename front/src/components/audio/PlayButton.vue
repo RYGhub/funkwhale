@@ -1,8 +1,9 @@
 <template>
-  <div :class="['ui', {'tiny': discrete}, 'buttons']">
+  <div :title="title" :class="['ui', {'tiny': discrete}, 'buttons']">
     <button
       :title="$t('Add to current queue')"
       @click="addNext(true)"
+      :disabled="!playable"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
       <i class="ui play icon"></i>
       <template v-if="!discrete"><slot><i18next path="Play"/></slot></template>
@@ -10,9 +11,9 @@
     <div v-if="!discrete" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', 'icon', 'button']">
       <i class="dropdown icon"></i>
       <div class="menu">
-        <div class="item"@click="add"><i class="plus icon"></i><i18next path="Add to queue"/></div>
-        <div class="item"@click="addNext()"><i class="step forward icon"></i><i18next path="Play next"/></div>
-        <div class="item"@click="addNext(true)"><i class="arrow down icon"></i><i18next path="Play now"/></div>
+        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i><i18next path="Add to queue"/></div>
+        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i><i18next path="Play next"/></div>
+        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i><i18next path="Play now"/></div>
       </div>
     </div>
   </div>
@@ -45,9 +46,18 @@ export default {
     jQuery(this.$el).find('.ui.dropdown').dropdown()
   },
   computed: {
+    title () {
+      if (this.playable) {
+        return this.$t('Play immediatly')
+      } else {
+        if (this.track) {
+          return this.$t('This track is not imported and cannot be played')
+        }
+      }
+    },
     playable () {
       if (this.track) {
-        return true
+        return this.track.files.length > 0
       } else if (this.tracks) {
         return this.tracks.length > 0
       } else if (this.playlist) {

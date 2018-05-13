@@ -31,15 +31,19 @@ def find_object(queryset, model_field='pk', field='id', cast=int):
                 raw_value = data[field]
             except KeyError:
                 return response.Response({
-                    'code': 10,
-                    'message': "required parameter '{}' not present".format(field)
+                    'error': {
+                        'code': 10,
+                        'message': "required parameter '{}' not present".format(field)
+                    }
                 })
             try:
                 value = cast(raw_value)
             except (TypeError, ValidationError):
                 return response.Response({
-                    'code': 0,
-                    'message': 'For input string "{}"'.format(raw_value)
+                    'error': {
+                        'code': 0,
+                        'message': 'For input string "{}"'.format(raw_value)
+                    }
                 })
             qs = queryset
             if hasattr(qs, '__call__'):
@@ -48,9 +52,11 @@ def find_object(queryset, model_field='pk', field='id', cast=int):
                 obj = qs.get(**{model_field: value})
             except qs.model.DoesNotExist:
                 return response.Response({
-                    'code': 70,
-                    'message': '{} not found'.format(
-                        qs.model.__class__.__name__)
+                    'error': {
+                        'code': 70,
+                        'message': '{} not found'.format(
+                            qs.model.__class__.__name__)
+                    }
                 })
             kwargs['obj'] = obj
             return func(self, request, *args, **kwargs)
@@ -83,15 +89,14 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         payload = {
             'status': 'failed'
         }
-        try:
+        if exc.__class__ in mapping:
             code, message = mapping[exc.__class__]
-        except KeyError:
-            return super().handle_exception(exc)
         else:
-            payload['error'] = {
-                'code': code,
-                'message': message
-            }
+            return super().handle_exception(exc)
+        payload['error'] = {
+            'code': code,
+            'message': message
+        }
 
         return response.Response(payload, status=200)
 
@@ -450,8 +455,10 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         name = data.get('name', '')
         if not name:
             return response.Response({
-                'code': 10,
-                'message': 'Playlist ID or name must be specified.'
+                'error': {
+                    'code': 10,
+                    'message': 'Playlist ID or name must be specified.'
+                }
             }, data)
 
         playlist = request.user.playlists.create(
