@@ -406,8 +406,18 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.OrderingFilter',
         'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     )
 }
+
+BROWSABLE_API_ENABLED = env.bool('BROWSABLE_API_ENABLED', default=False)
+if BROWSABLE_API_ENABLED:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+
 REST_AUTH_SERIALIZERS = {
     'PASSWORD_RESET_SERIALIZER': 'funkwhale_api.users.serializers.PasswordResetSerializer'  # noqa
 }
