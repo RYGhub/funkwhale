@@ -77,7 +77,8 @@ def test_get_album_serializer(factories):
     artist = factories['music.Artist']()
     album = factories['music.Album'](artist=artist)
     track = factories['music.Track'](album=album)
-    tf = factories['music.TrackFile'](track=track)
+    tf = factories['music.TrackFile'](
+        track=track, bitrate=42000, duration=43, size=44)
 
     expected = {
         'id': album.pk,
@@ -98,7 +99,9 @@ def test_get_album_serializer(factories):
                 'year': track.album.release_date.year,
                 'contentType': tf.mimetype,
                 'suffix': tf.extension or '',
-                'duration': tf.duration or 0,
+                'bitrate': 42,
+                'duration': 43,
+                'size': 44,
                 'created': track.creation_date,
                 'albumId': album.pk,
                 'artistId': artist.pk,
@@ -177,7 +180,8 @@ def test_playlist_detail_serializer(factories):
 
 def test_directory_serializer_artist(factories):
     track = factories['music.Track']()
-    tf = factories['music.TrackFile'](track=track)
+    tf = factories['music.TrackFile'](
+        track=track, bitrate=42000, duration=43, size=44)
     album = track.album
     artist = track.artist
 
@@ -195,7 +199,9 @@ def test_directory_serializer_artist(factories):
             'year': track.album.release_date.year,
             'contentType': tf.mimetype,
             'suffix': tf.extension or '',
-            'duration': tf.duration or 0,
+            'bitrate': 42,
+            'duration': 43,
+            'size': 44,
             'created': track.creation_date,
             'albumId': album.pk,
             'artistId': artist.pk,

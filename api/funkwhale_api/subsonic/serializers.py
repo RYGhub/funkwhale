@@ -81,6 +81,10 @@ def get_track_data(album, track, tf):
         'artistId': album.artist.pk,
         'type': 'music',
     }
+    if tf.bitrate:
+        data['bitrate'] = int(tf.bitrate/1000)
+    if tf.size:
+        data['size'] = tf.size
     if album.release_date:
         data['year'] = album.release_date.year
     return data
@@ -211,5 +215,9 @@ def get_music_directory_data(artist):
             'parent': artist.id,
             'type': 'music',
         }
+        if tf.bitrate:
+            td['bitrate'] = int(tf.bitrate/1000)
+        if tf.size:
+            td['size'] = tf.size
         data['child'].append(td)
     return data
