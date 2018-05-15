@@ -74,6 +74,8 @@ class TrackFileAdmin(admin.ModelAdmin):
         'source',
         'duration',
         'mimetype',
+        'size',
+        'bitrate'
     ]
     list_select_related = [
         'track'
