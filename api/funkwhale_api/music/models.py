@@ -467,7 +467,7 @@ class TrackFile(models.Model):
 
     @property
     def filename(self):
-        return '{}{}'.format(
+        return '{}.{}'.format(
             self.track.full_name,
             self.extension)
 

@@ -275,7 +275,10 @@ def handle_serve(track_file):
         file_path = get_file_path(audio_file)
     elif f.source and f.source.startswith('file://'):
         file_path = get_file_path(f.source.replace('file://', '', 1))
-    response = Response()
+    if mt:
+        response = Response(content_type=mt)
+    else:
+        response = Response()
     filename = f.filename
     mapping = {
         'nginx': 'X-Accel-Redirect',

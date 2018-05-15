@@ -77,3 +77,11 @@ def test_audio_track_mime_type(extention, mimetype, factories):
     tf = factories['music.TrackFile'](audio_file__from_path=path)
 
     assert tf.mimetype == mimetype
+
+
+def test_track_file_file_name(factories):
+    name = 'test.mp3'
+    path = os.path.join(DATA_DIR, name)
+    tf = factories['music.TrackFile'](audio_file__from_path=path)
+
+    assert tf.filename == tf.track.full_name + '.mp3'
