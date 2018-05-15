@@ -479,6 +479,24 @@ class TrackFile(models.Model):
             return
         return os.path.splitext(self.audio_file.name)[-1].replace('.', '', 1)
 
+    def get_file_size(self):
+        if self.audio_file:
+            return self.audio_file.size
+
+        if self.source.startswith('file://'):
+            return os.path.getsize(self.source.replace('file://', '', 1))
+
+        if self.library_track and self.library_track.audio_file:
+            return self.library_track.audio_file.size
+
+    def get_audio_file(self):
+        if self.audio_file:
+            return self.audio_file.open()
+        if self.source.startswith('file://'):
+            return open(self.source.replace('file://', '', 1), 'rb')
+        if self.library_track and self.library_track.audio_file:
+            return self.library_track.audio_file.open()
+
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:
             self.mimetype = utils.guess_mimetype(self.audio_file)

@@ -1,5 +1,6 @@
 import magic
 import mimetypes
+import mutagen
 import re
 
 from django.db.models import Q
@@ -82,3 +83,12 @@ def get_type_from_ext(extension):
         # we remove leading dot
         extension = extension[1:]
     return EXTENSION_TO_MIMETYPE.get(extension)
+
+
+def get_audio_file_data(f):
+    data = mutagen.File(f)
+    d = {}
+    d['bitrate'] = data.info.bitrate
+    d['length'] = data.info.length
+
+    return d
