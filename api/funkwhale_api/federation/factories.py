@@ -233,6 +233,9 @@ class AudioMetadataFactory(factory.Factory):
     release = factory.LazyAttribute(
         lambda o: 'https://musicbrainz.org/release/{}'.format(uuid.uuid4())
     )
+    bitrate = 42
+    length = 43
+    size = 44
 
     class Meta:
         model = dict

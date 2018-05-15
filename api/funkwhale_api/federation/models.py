@@ -216,3 +216,6 @@ class LibraryTrack(models.Model):
             for chunk in r.iter_content(chunk_size=512):
                 tmp_file.write(chunk)
             self.audio_file.save(filename, tmp_file)
+
+    def get_metadata(self, key):
+        return self.metadata.get(key)

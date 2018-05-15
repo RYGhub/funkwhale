@@ -533,7 +533,12 @@ def test_activity_pub_audio_serializer_to_library_track_no_duplicate(
 
 
 def test_activity_pub_audio_serializer_to_ap(factories):
-    tf = factories['music.TrackFile'](mimetype='audio/mp3')
+    tf = factories['music.TrackFile'](
+        mimetype='audio/mp3',
+        bitrate=42,
+        duration=43,
+        size=44,
+    )
     library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     expected = {
         '@context': serializers.AP_CONTEXT,
@@ -555,6 +560,9 @@ def test_activity_pub_audio_serializer_to_ap(factories):
                 'musicbrainz_id': tf.track.mbid,
                 'title': tf.track.title,
             },
+            'size': tf.size,
+            'length': tf.duration,
+            'bitrate': tf.bitrate,
         },
         'url': {
             'href': utils.full_url(tf.path),
@@ -599,6 +607,9 @@ def test_activity_pub_audio_serializer_to_ap_no_mbid(factories):
                 'title': tf.track.title,
                 'musicbrainz_id': None,
             },
+            'size': None,
+            'length': None,
+            'bitrate': None,
         },
         'url': {
             'href': utils.full_url(tf.path),
