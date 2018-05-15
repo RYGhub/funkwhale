@@ -7,9 +7,7 @@
       <div class="description">
         <template v-if="track">
           <h4 class="ui header">{{ $t('Current track') }}</h4>
-          <div>
-            {{ $t('"{%title%}" by {%artist%}', { title: track.title, artist: track.artist.name }) }}
-          </div>
+          <div v-html='trackDisplay'></div>
           <div class="ui divider"></div>
         </template>
 
@@ -112,6 +110,12 @@ export default {
       let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])
       p.reverse()
       return p
+    },
+    trackDisplay () {
+      return this.$t('"{%title%}" by {%artist%}', {
+        title: this.track.title,
+        artist: this.track.artist.name }
+      )
     }
   },
   watch: {
