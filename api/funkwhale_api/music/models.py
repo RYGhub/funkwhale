@@ -361,7 +361,7 @@ class Track(APIModelMixin):
         import_tags
     ]
     objects = TrackQuerySet.as_manager()
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         ordering = ['album', 'position']
