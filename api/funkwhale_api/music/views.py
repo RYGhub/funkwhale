@@ -296,7 +296,11 @@ def handle_serve(track_file):
 
 
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = (models.TrackFile.objects.all().order_by('-id'))
+    queryset = (
+        models.TrackFile.objects.all()
+            .select_related('track__artist', 'track__album')
+            .order_by('-id')
+    )
     serializer_class = serializers.TrackFileSerializer
     authentication_classes = rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
         SignatureAuthentication
