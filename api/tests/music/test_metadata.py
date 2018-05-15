@@ -40,3 +40,20 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
     data = metadata.Metadata(path)
 
     assert data.get(field) == value
+
+
+@pytest.mark.parametrize('field,value', [
+    ('title', '999,999'),
+    ('artist', 'Nine Inch Nails'),
+    ('album', 'The Slip'),
+    ('date', datetime.date(2008, 5, 5)),
+    ('track_number', 1),
+    ('musicbrainz_albumid', uuid.UUID('12b57d46-a192-499e-a91f-7da66790a1c1')),
+    ('musicbrainz_recordingid', uuid.UUID('30f3f33e-8d0c-4e69-8539-cbd701d18f28')),
+    ('musicbrainz_artistid', uuid.UUID('b7ffd2af-418f-4be2-bdd1-22f8b48613da')),
+])
+def test_can_get_metadata_from_flac_file(field, value):
+    path = os.path.join(DATA_DIR, 'sample.flac')
+    data = metadata.Metadata(path)
+
+    assert data.get(field) == value

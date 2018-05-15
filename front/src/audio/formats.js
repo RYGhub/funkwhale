@@ -5,6 +5,7 @@ export default {
   ],
   formatsMap: {
     'audio/ogg': 'ogg',
-    'audio/mpeg': 'mp3'
+    'audio/mpeg': 'mp3',
+    'audio/flac': 'flac'
   }
 }
