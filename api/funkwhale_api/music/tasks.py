@@ -134,6 +134,7 @@ def _do_import(import_job, replace=False, use_acoustid=True):
         # in place import, we set mimetype from extension
         path, ext = os.path.splitext(import_job.source)
         track_file.mimetype = music_utils.get_type_from_ext(ext)
+    track_file.set_audio_data()
     track_file.save()
     import_job.status = 'finished'
     import_job.track_file = track_file

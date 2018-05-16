@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 
 from django.urls import reverse
@@ -6,6 +7,8 @@ from django.urls import reverse
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import tasks
+
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_create_import_can_bind_to_request(
@@ -40,11 +43,20 @@ def test_create_import_can_bind_to_request(
     assert batch.import_request == request
 
 
-def test_import_job_from_federation_no_musicbrainz(factories):
+def test_import_job_from_federation_no_musicbrainz(factories, mocker):
+    mocker.patch(
+        'funkwhale_api.music.utils.get_audio_file_data',
+        return_value={'bitrate': 24, 'length': 666})
+    mocker.patch(
+        'funkwhale_api.music.models.TrackFile.get_file_size',
+        return_value=42)
     lt = factories['federation.LibraryTrack'](
         artist_name='Hello',
         album_title='World',
         title='Ping',
+        metadata__length=42,
+        metadata__bitrate=43,
+        metadata__size=44,
     )
     job = factories['music.ImportJob'](
         federation=True,
@@ -56,6 +68,9 @@ def test_import_job_from_federation_no_musicbrainz(factories):
 
     tf = job.track_file
     assert tf.mimetype == lt.audio_mimetype
+    assert tf.duration == 42
+    assert tf.bitrate == 43
+    assert tf.size == 44
     assert tf.library_track == job.library_track
     assert tf.track.title == 'Ping'
     assert tf.track.artist.name == 'Hello'
@@ -234,13 +249,13 @@ def test_import_batch_notifies_followers(
 
 
 def test__do_import_in_place_mbid(factories, tmpfile):
-    path = '/test.ogg'
+    path = os.path.join(DATA_DIR, 'test.ogg')
     job = factories['music.ImportJob'](
-        in_place=True, source='file:///test.ogg')
+        in_place=True, source='file://{}'.format(path))
 
     track = factories['music.Track'](mbid=job.mbid)
     tf = tasks._do_import(job, use_acoustid=False)
 
     assert bool(tf.audio_file) is False
-    assert tf.source == 'file:///test.ogg'
+    assert tf.source == 'file://{}'.format(path)
     assert tf.mimetype == 'audio/ogg'

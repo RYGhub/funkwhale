@@ -688,6 +688,12 @@ class AudioMetadataSerializer(serializers.Serializer):
     artist = ArtistMetadataSerializer()
     release = ReleaseMetadataSerializer()
     recording = RecordingMetadataSerializer()
+    bitrate = serializers.IntegerField(
+        required=False, allow_null=True, min_value=0)
+    size = serializers.IntegerField(
+        required=False, allow_null=True, min_value=0)
+    length = serializers.IntegerField(
+        required=False, allow_null=True, min_value=0)
 
 
 class AudioSerializer(serializers.Serializer):
@@ -760,6 +766,9 @@ class AudioSerializer(serializers.Serializer):
                     'musicbrainz_id': str(track.mbid) if track.mbid else None,
                     'title': track.title,
                 },
+                'bitrate': instance.bitrate,
+                'size': instance.size,
+                'length': instance.duration,
             },
             'url': {
                 'href': utils.full_url(instance.path),

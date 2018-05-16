@@ -27,6 +27,7 @@ class SimpleArtistSerializer(serializers.ModelSerializer):
 
 class ArtistSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Artist
         fields = ('id', 'mbid', 'name', 'tags', 'creation_date')
@@ -40,11 +41,21 @@ class TrackFileSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'path',
-            'duration',
             'source',
             'filename',
             'mimetype',
-            'track')
+            'track',
+            'duration',
+            'mimetype',
+            'bitrate',
+            'size',
+        )
+        read_only_fields = [
+            'duration',
+            'mimetype',
+            'bitrate',
+            'size',
+        ]
 
     def get_path(self, o):
         url = o.path

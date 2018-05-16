@@ -268,6 +268,10 @@ def handle_serve(track_file):
                 qs = LibraryTrack.objects.select_for_update()
                 library_track = qs.get(pk=library_track.pk)
                 library_track.download_audio()
+            track_file.library_track = library_track
+            track_file.set_audio_data()
+            track_file.save(update_fields=['bitrate', 'duration', 'size'])
+
         audio_file = library_track.audio_file
         file_path = get_file_path(audio_file)
         mt = library_track.audio_mimetype
@@ -296,7 +300,11 @@ def handle_serve(track_file):
 
 
 class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = (models.TrackFile.objects.all().order_by('-id'))
+    queryset = (
+        models.TrackFile.objects.all()
+            .select_related('track__artist', 'track__album')
+            .order_by('-id')
+    )
     serializer_class = serializers.TrackFileSerializer
     authentication_classes = rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES + [
         SignatureAuthentication
