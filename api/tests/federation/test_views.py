@@ -62,7 +62,10 @@ def test_wellknown_webfinger_system(
     actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
     url = reverse('federation:well-known-webfinger')
     response = api_client.get(
-        url, data={'resource': 'acct:{}'.format(actor.webfinger_subject)})
+        url,
+        data={'resource': 'acct:{}'.format(actor.webfinger_subject)},
+        HTTP_ACCEPT='application/jrd+json',
+    )
     serializer = serializers.ActorWebfingerSerializer(actor)
 
     assert response.status_code == 200
@@ -83,7 +86,7 @@ def test_wellknown_nodeinfo(db, preferences, api_client, settings):
         ]
     }
     url = reverse('federation:well-known-nodeinfo')
-    response = api_client.get(url)
+    response = api_client.get(url, HTTP_ACCEPT='application/jrd+json')
     assert response.status_code == 200
     assert response['Content-Type'] == 'application/jrd+json'
     assert response.data == expected
