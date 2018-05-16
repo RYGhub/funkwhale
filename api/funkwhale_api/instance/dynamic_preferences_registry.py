@@ -86,6 +86,20 @@ class InstanceNodeinfoEnabled(types.BooleanPreference):
 
 
 @global_preferences_registry.register
+class InstanceNodeinfoPrivate(types.BooleanPreference):
+    show_in_api = False
+    section = instance
+    name = 'nodeinfo_private'
+    default = False
+    verbose_name = 'Enable nodeinfo endpoint'
+    help_text = (
+        'Indicate in the nodeinfo endpoint that you do not want your instance'
+        'to be tracked by third-party services.'
+        'There is no guarantee these tools will honor this setting though.'
+    )
+
+
+@global_preferences_registry.register
 class InstanceNodeinfoStatsEnabled(types.BooleanPreference):
     show_in_api = False
     section = instance
