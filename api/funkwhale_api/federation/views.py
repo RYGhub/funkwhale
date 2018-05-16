@@ -88,7 +88,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
 class WellKnownViewSet(viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []
-    renderer_classes = [renderers.WebfingerRenderer]
+    renderer_classes = [renderers.JSONRenderer, renderers.WebfingerRenderer]
 
     @list_route(methods=['get'])
     def nodeinfo(self, request, *args, **kwargs):
