@@ -497,6 +497,23 @@ class TrackFile(models.Model):
         if self.library_track and self.library_track.audio_file:
             return self.library_track.audio_file.open()
 
+    def set_audio_data(self):
+        audio_file = self.get_audio_file()
+        if audio_file:
+            with audio_file as f:
+                audio_data = utils.get_audio_file_data(f)
+            if not audio_data:
+                return
+            self.duration = int(audio_data['length'])
+            self.bitrate = audio_data['bitrate']
+            self.size = self.get_file_size()
+        else:
+            lt = self.library_track
+            if lt:
+                self.duration = lt.get_metadata('length')
+                self.size = lt.get_metadata('size')
+                self.bitrate = lt.get_metadata('bitrate')
+
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:
             self.mimetype = utils.guess_mimetype(self.audio_file)

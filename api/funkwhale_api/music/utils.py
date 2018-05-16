@@ -87,6 +87,8 @@ def get_type_from_ext(extension):
 
 def get_audio_file_data(f):
     data = mutagen.File(f)
+    if not data:
+        return
     d = {}
     d['bitrate'] = data.info.bitrate
     d['length'] = data.info.length

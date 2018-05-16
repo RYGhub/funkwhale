@@ -134,19 +134,7 @@ def _do_import(import_job, replace=False, use_acoustid=True):
         # in place import, we set mimetype from extension
         path, ext = os.path.splitext(import_job.source)
         track_file.mimetype = music_utils.get_type_from_ext(ext)
-    audio_file = track_file.get_audio_file()
-    if audio_file:
-        with audio_file as f:
-            audio_data = music_utils.get_audio_file_data(f)
-        track_file.duration = int(audio_data['length'])
-        track_file.bitrate = audio_data['bitrate']
-        track_file.size = track_file.get_file_size()
-    else:
-        lt = track_file.library_track
-        if lt:
-            track_file.duration = lt.get_metadata('length')
-            track_file.size = lt.get_metadata('size')
-            track_file.bitrate = lt.get_metadata('bitrate')
+    track_file.set_audio_data()
     track_file.save()
     import_job.status = 'finished'
     import_job.track_file = track_file
