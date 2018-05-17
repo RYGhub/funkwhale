@@ -1,3 +1,5 @@
+from django import forms
+
 from dynamic_preferences.types import StringPreference, Section
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -11,3 +13,7 @@ class APIKey(StringPreference):
     default = ''
     verbose_name = 'Acoustid API key'
     help_text = 'The API key used to query AcoustID. Get one at https://acoustid.org/new-application.'
+    widget = forms.PasswordInput
+    field_kwargs = {
+        'required': False,
+    }

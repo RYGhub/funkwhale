@@ -1,3 +1,5 @@
+from django import forms
+
 from dynamic_preferences.types import StringPreference, Section
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -11,3 +13,7 @@ class APIKey(StringPreference):
     default = 'CHANGEME'
     verbose_name = 'YouTube API key'
     help_text = 'The API key used to query YouTube. Get one at https://console.developers.google.com/.'
+    widget = forms.PasswordInput
+    field_kwargs = {
+        'required': False,
+    }

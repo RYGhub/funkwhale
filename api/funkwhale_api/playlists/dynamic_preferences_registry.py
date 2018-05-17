@@ -13,3 +13,6 @@ class MaxTracks(preferences.DefaultFromSettingMixin, types.IntegerPreference):
     name = 'max_tracks'
     verbose_name = 'Max tracks per playlist'
     setting = 'PLAYLISTS_MAX_TRACKS'
+    field_kwargs = {
+        'required': False,
+    }

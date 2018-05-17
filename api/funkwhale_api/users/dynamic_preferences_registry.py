@@ -10,6 +10,7 @@ class RegistrationEnabled(types.BooleanPreference):
     section = users
     name = 'registration_enabled'
     default = False
-    verbose_name = (
-        'Can visitors open a new account on this instance?'
+    verbose_name = 'Open registrations to new users'
+    help_text = (
+        'When enabled, new users will be able to register on this instance.'
     )

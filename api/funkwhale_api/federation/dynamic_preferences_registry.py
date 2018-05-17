@@ -19,6 +19,9 @@ class MusicCacheDuration(types.IntPreference):
         'locally? Federated files that were not listened in this interval '
         'will be erased and refetched from the remote on the next listening.'
     )
+    field_kwargs = {
+        'required': False,
+    }
 
 
 @global_preferences_registry.register
@@ -29,7 +32,7 @@ class Enabled(preferences.DefaultFromSettingMixin, types.BooleanPreference):
     verbose_name = 'Federation enabled'
     help_text = (
         'Use this setting to enable or disable federation logic and API'
-        ' globally'
+        ' globally.'
     )
 
 
@@ -41,8 +44,11 @@ class CollectionPageSize(
     setting = 'FEDERATION_COLLECTION_PAGE_SIZE'
     verbose_name = 'Federation collection page size'
     help_text = (
-        'How much items to display in ActivityPub collections'
+        'How much items to display in ActivityPub collections.'
     )
+    field_kwargs = {
+        'required': False,
+    }
 
 
 @global_preferences_registry.register
@@ -54,8 +60,11 @@ class ActorFetchDelay(
     verbose_name = 'Federation actor fetch delay'
     help_text = (
         'How much minutes to wait before refetching actors on '
-        'request authentication'
+        'request authentication.'
     )
+    field_kwargs = {
+        'required': False,
+    }
 
 
 @global_preferences_registry.register
@@ -66,6 +75,6 @@ class MusicNeedsApproval(
     setting = 'FEDERATION_MUSIC_NEEDS_APPROVAL'
     verbose_name = 'Federation music needs approval'
     help_text = (
-        'When true, other federation actors will require your approval'
+        'When true, other federation actors will need your approval'
         ' before being able to browse your library.'
     )
