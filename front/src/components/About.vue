@@ -13,6 +13,12 @@
       <p v-if="!instance.short_description.value && !instance.long_description.value">
         {{ $t('Unfortunately, owners of this instance did not yet take the time to complete this page.') }}
       </p>
+      <router-link
+        class="ui button"
+        v-if="$store.state.auth.availablePermissions['settings.change']"
+        :to="{path: '/manage/settings', hash: 'instance'}">
+        <i class="pencil icon"></i>{{ $t('Edit instance info') }}
+      </router-link>
       <div
         v-if="instance.short_description.value"
         class="ui middle aligned stackable text container">
