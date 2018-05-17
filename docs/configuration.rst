@@ -27,14 +27,23 @@ Those settings are stored in database and do not require a restart of your
 instance after modification. They typically relate to higher level configuration,
 such your instance description, signup policy and so on.
 
-There is no polished interface for those settings, yet, but you can view update
-them using the administration interface provided by Django (the framework funkwhale is built on).
-
-The URL should be ``/api/admin/dynamic_preferences/globalpreferencemodel/`` (prepend your domain in front of it, of course).
+You can edit those settings directly from the web application, assuming
+you have the required permissions. The URL is ``/manage/settings``, and
+you will also find a link to this page in the sidebar.
 
 If you plan to use acoustid and external imports
 (e.g. with the youtube backends), you should edit the corresponding
 settings in this interface.
+
+.. note::
+
+    If you have any issue with the web application, a management interface is also
+    available for those settings from Django's administration interface. It's
+    less user friendly, though, and we recommend you use the web app interface
+    whenever possible.
+
+    The URL should be ``/api/admin/dynamic_preferences/globalpreferencemodel/`` (prepend your domain in front of it, of course).
+
 
 Configuration reference
 -----------------------
