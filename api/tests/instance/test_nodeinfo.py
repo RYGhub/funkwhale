@@ -36,6 +36,7 @@ def test_nodeinfo_dump(preferences, mocker):
             }
         },
         'metadata': {
+            'private': preferences['instance__nodeinfo_private'],
             'shortDescription': preferences['instance__short_description'],
             'longDescription': preferences['instance__long_description'],
             'nodeName': preferences['instance__name'],
@@ -92,6 +93,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             }
         },
         'metadata': {
+            'private': preferences['instance__nodeinfo_private'],
             'shortDescription': preferences['instance__short_description'],
             'longDescription': preferences['instance__long_description'],
             'nodeName': preferences['instance__name'],
