@@ -6,7 +6,7 @@ import os
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission
 from django.urls import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -54,6 +54,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def add_permission(self, codename):
+        p = Permission.objects.get(codename=codename)
+        self.user_permissions.add(p)
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})
