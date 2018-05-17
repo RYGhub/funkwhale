@@ -78,6 +78,12 @@
                 :title="$t('Pending follow requests')">
                 {{ notifications.federation }}</div>
             </router-link>
+            <router-link
+              class="item"
+              v-if="$store.state.auth.availablePermissions['settings.change']"
+              :to="{path: '/manage/settings'}">
+              <i class="settings icon"></i>{{ $t('Settings') }}
+            </router-link>
           </div>
         </div>
       </div>
@@ -217,7 +223,6 @@ export default {
       }
       let self = this
       axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        console.log('YOLo')
         self.notifications.importRequests = response.data.count
       })
     },
@@ -256,7 +261,6 @@ export default {
     },
     '$store.state.availablePermissions': {
       handler () {
-        console.log('YOLO')
         this.fetchNotificationsCount()
       },
       deep: true

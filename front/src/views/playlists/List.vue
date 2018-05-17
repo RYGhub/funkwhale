@@ -76,7 +76,6 @@ export default {
     Pagination
   },
   data () {
-    console.log('YOLO', this.$t)
     let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       isLoading: true,

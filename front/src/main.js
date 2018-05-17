@@ -35,8 +35,26 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', {
-  inserted: (el, binding) => { document.title = binding.value + ' - Funkwhale' },
-  updated: (el, binding) => { document.title = binding.value + ' - Funkwhale' }
+  inserted: (el, binding) => {
+    let parts = []
+    let instanceName = store.state.instance.settings.instance.name.value
+    if (instanceName.length === 0) {
+      instanceName = 'Funkwhale'
+    }
+    parts.unshift(instanceName)
+    parts.unshift(binding.value)
+    document.title = parts.join(' - ')
+  },
+  updated: (el, binding) => {
+    let parts = []
+    let instanceName = store.state.instance.settings.instance.name.value
+    if (instanceName.length === 0) {
+      instanceName = 'Funkwhale'
+    }
+    parts.unshift(instanceName)
+    parts.unshift(binding.value)
+    document.title = parts.join(' - ')
+  }
 })
 
 axios.defaults.baseURL = config.API_URL
