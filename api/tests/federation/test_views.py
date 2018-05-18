@@ -9,7 +9,16 @@ from funkwhale_api.federation import activity
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
+from funkwhale_api.federation import views
 from funkwhale_api.federation import webfinger
+
+
+@pytest.mark.parametrize('view,permissions', [
+    (views.LibraryViewSet, ['federation']),
+    (views.LibraryTrackViewSet, ['federation']),
+])
+def test_permissions(assert_user_permission, view, permissions):
+    assert_user_permission(view, permissions)
 
 
 @pytest.mark.parametrize('system_actor', actors.SYSTEM_ACTORS.keys())

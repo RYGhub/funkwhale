@@ -15,8 +15,8 @@ from rest_framework.serializers import ValidationError
 
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.common.permissions import HasModelPermission
 from funkwhale_api.music.models import TrackFile
+from funkwhale_api.users.permissions import HasUserPermission
 
 from . import activity
 from . import actors
@@ -187,16 +187,13 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         return response.Response(data)
 
 
-class LibraryPermission(HasModelPermission):
-    model = models.Library
-
-
 class LibraryViewSet(
         mixins.RetrieveModelMixin,
         mixins.UpdateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
-    permission_classes = [LibraryPermission]
+    permission_classes = (HasUserPermission,)
+    required_permissions = ['federation']
     queryset = models.Library.objects.all().select_related(
         'actor',
         'follow',
@@ -291,7 +288,8 @@ class LibraryViewSet(
 class LibraryTrackViewSet(
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
-    permission_classes = [LibraryPermission]
+    permission_classes = (HasUserPermission,)
+    required_permissions = ['federation']
     queryset = models.LibraryTrack.objects.all().select_related(
         'library__actor',
         'library__follow',

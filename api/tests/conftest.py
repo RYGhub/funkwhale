@@ -14,6 +14,7 @@ from rest_framework.test import APIClient
 from rest_framework.test import APIRequestFactory
 
 from funkwhale_api.activity import record
+from funkwhale_api.users.permissions import HasUserPermission
 from funkwhale_api.taskapp import celery
 
 
@@ -224,3 +225,11 @@ def authenticated_actor(factories, mocker):
         'funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor',
         return_value=actor)
     yield actor
+
+
+@pytest.fixture
+def assert_user_permission():
+    def inner(view, permissions):
+        assert HasUserPermission in view.permission_classes
+        assert set(view.required_permissions) == set(permissions)
+    return inner

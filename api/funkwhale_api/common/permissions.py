@@ -3,7 +3,7 @@ import operator
 from django.conf import settings
 from django.http import Http404
 
-from rest_framework.permissions import BasePermission, DjangoModelPermissions
+from rest_framework.permissions import BasePermission
 
 from funkwhale_api.common import preferences
 
@@ -14,17 +14,6 @@ class ConditionalAuthentication(BasePermission):
         if preferences.get('common__api_authentication_required'):
             return request.user and request.user.is_authenticated
         return True
-
-
-class HasModelPermission(DjangoModelPermissions):
-    """
-    Same as DjangoModelPermissions, but we pin the model:
-
-        class MyModelPermission(HasModelPermission):
-            model = User
-    """
-    def get_required_permissions(self, method, model_cls):
-        return super().get_required_permissions(method, self.model)
 
 
 class OwnerPermission(BasePermission):

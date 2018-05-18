@@ -55,16 +55,11 @@ class UserReadSerializer(serializers.ModelSerializer):
             'is_superuser',
             'permissions',
             'date_joined',
-            'privacy_level'
+            'privacy_level',
         ]
 
     def get_permissions(self, o):
-        perms = {}
-        for internal_codename, conf in o.relevant_permissions.items():
-            perms[conf['external_codename']] = {
-                'status': o.has_perm(internal_codename)
-            }
-        return perms
+        return o.get_permissions()
 
 
 class PasswordResetSerializer(PRS):

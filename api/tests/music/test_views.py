@@ -8,6 +8,14 @@ from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
 
+@pytest.mark.parametrize('view,permissions', [
+    (views.ImportBatchViewSet, ['library']),
+    (views.ImportJobViewSet, ['library']),
+])
+def test_permissions(assert_user_permission, view, permissions):
+    assert_user_permission(view, permissions)
+
+
 @pytest.mark.parametrize('param,expected', [
     ('true', 'full'),
     ('false', 'empty'),
