@@ -117,3 +117,28 @@ Then, the value of :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH` should be
 On non-docker setup, you don't need to configure this setting.
 
 .. note:: This path should not include any trailing slash
+
+User permissions
+----------------
+
+Funkwhale's permission model works as follows:
+
+- Anonymous users cannot do anything unless configured specifically
+- Logged-in users can use the application, but cannot do things that affect
+  the whole instance
+- Superusers can do anything
+
+To make things more granular and allow some delegation of responsability,
+superusers can grant specific permissions to specific users. Available
+permissions are:
+
+- **Manage instance-level settings**: users with this permission can edit instance
+  settings as described in :ref:`instance-settings`
+- **Manage library**: users with this permission can import new music in the
+  instance
+- **Manage library federation**: users with this permission can ask to federate with
+  other instances, and accept/deny federation requests from other intances
+
+There is no dedicated interface to manage users permissions, but superusers
+can login on the Django's admin at ``/api/admin/`` and grant permissions
+to users at ``/api/admin/users/user/``.
