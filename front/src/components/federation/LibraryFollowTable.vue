@@ -55,7 +55,7 @@
               <p slot="modal-confirm"><i18next path="Deny"/></p>
             </dangerous-button>
             <dangerous-button v-if="follow.approved !== true" class="tiny basic labeled icon" color='green' @confirm="updateFollow(follow, true)">
-              <i class="x icon"></i> <i18next path="Approve"/>
+              <i class="check icon"></i> <i18next path="Approve"/>
               <p slot="modal-header"><i18next path="Approve access?"/></p>
               <p slot="modal-content">
                 <i18next path="By confirming, {%0%}@{%1%} will be granted access to your library.">
