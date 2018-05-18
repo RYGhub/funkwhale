@@ -46,9 +46,17 @@ class User(AbstractUser):
         blank=True, null=True, max_length=255)
 
     # permissions
-    permission_federation = models.BooleanField(default=False)
-    permission_library = models.BooleanField(default=False)
-    permission_settings = models.BooleanField(default=False)
+    permission_federation = models.BooleanField(
+        'Manage library federation',
+        help_text='Follow other instances, accept/deny library follow requests...',
+        default=False)
+    permission_library = models.BooleanField(
+        'Manage library',
+        help_text='Import new content, manage existing content',
+        default=False)
+    permission_settings = models.BooleanField(
+        'Manage instance-level settings',
+        default=False)
 
     def __str__(self):
         return self.username

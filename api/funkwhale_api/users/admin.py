@@ -5,6 +5,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.utils.translation import ugettext_lazy as _
 
 from .models import User
 
@@ -41,8 +42,22 @@ class UserAdmin(AuthUserAdmin):
         'email',
         'date_joined',
         'last_login',
-        'privacy_level',
+        'is_staff',
+        'is_superuser',
     ]
     list_filter = [
+        'is_superuser',
+        'is_staff',
         'privacy_level',
+        'permission_settings',
+        'permission_library',
+        'permission_federation',
     ]
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password', 'privacy_level')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'permission_library', 'permission_settings', 'permission_federation')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
