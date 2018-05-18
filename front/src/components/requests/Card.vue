@@ -22,7 +22,7 @@
       </span>
       <button
         @click="createImport"
-        v-if="request.status === 'pending' && importAction && $store.state.auth.availablePermissions['import.launch']"
+        v-if="request.status === 'pending' && importAction && $store.state.auth.availablePermissions['library']"
         class="ui mini basic green right floated button">{{ $t('Create import') }}</button>
 
     </div>

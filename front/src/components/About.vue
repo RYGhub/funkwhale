@@ -15,7 +15,7 @@
       </p>
       <router-link
         class="ui button"
-        v-if="$store.state.auth.availablePermissions['settings.change']"
+        v-if="$store.state.auth.availablePermissions['settings']"
         :to="{path: '/manage/settings', hash: 'instance'}">
         <i class="pencil icon"></i>{{ $t('Edit instance info') }}
       </router-link>
