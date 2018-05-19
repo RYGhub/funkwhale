@@ -13,10 +13,10 @@
           exact>
           <i18next path="Requests"/>
         </router-link>
-        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/launch" exact>
+        <router-link v-if="$store.state.auth.availablePermissions['library']" class="ui item" to="/library/import/launch" exact>
           <i18next path="Import"/>
         </router-link>
-        <router-link v-if="$store.state.auth.availablePermissions['import.launch']" class="ui item" to="/library/import/batches">
+        <router-link v-if="$store.state.auth.availablePermissions['library']" class="ui item" to="/library/import/batches">
           <i18next path="Import batches"/>
         </router-link>
       </div>

@@ -28,6 +28,7 @@ import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
+import AdminSettings from '@/views/admin/Settings'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -116,6 +117,11 @@ export default new Router({
         defaultPage: route.query.page,
         defaultPaginateBy: route.query.paginateBy
       })
+    },
+    {
+      path: '/manage/settings',
+      name: 'manage.settings',
+      component: AdminSettings
     },
     {
       path: '/manage/federation',

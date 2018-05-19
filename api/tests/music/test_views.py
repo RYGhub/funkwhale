@@ -8,6 +8,14 @@ from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
 
+@pytest.mark.parametrize('view,permissions', [
+    (views.ImportBatchViewSet, ['library']),
+    (views.ImportJobViewSet, ['library']),
+])
+def test_permissions(assert_user_permission, view, permissions):
+    assert_user_permission(view, permissions)
+
+
 @pytest.mark.parametrize('param,expected', [
     ('true', 'full'),
     ('false', 'empty'),
@@ -102,6 +110,24 @@ def test_serve_file_in_place(
 
     assert response.status_code == 200
     assert response[headers[proxy]] == expected
+
+
+@pytest.mark.parametrize('proxy,serve_path,expected', [
+    ('apache2', '/host/music', '/host/music/hello/worldéà.mp3'),
+    ('apache2', '/app/music', '/app/music/hello/worldéà.mp3'),
+    ('nginx', '/host/music', '/_protected/music/hello/worldéà.mp3'),
+    ('nginx', '/app/music', '/_protected/music/hello/worldéà.mp3'),
+])
+def test_serve_file_in_place_utf8(
+        proxy, serve_path, expected, factories, api_client, settings):
+    settings.PROTECT_AUDIO_FILES = False
+    settings.PROTECT_FILE_PATH = '/_protected/music'
+    settings.REVERSE_PROXY_TYPE = proxy
+    settings.MUSIC_DIRECTORY_PATH = '/app/music'
+    settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
+    path = views.get_file_path('/app/music/hello/worldéà.mp3')
+
+    assert path == expected.encode('utf-8')
 
 
 @pytest.mark.parametrize('proxy,serve_path,expected', [

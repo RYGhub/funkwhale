@@ -77,3 +77,36 @@ def test_audio_track_mime_type(extention, mimetype, factories):
     tf = factories['music.TrackFile'](audio_file__from_path=path)
 
     assert tf.mimetype == mimetype
+
+
+def test_track_file_file_name(factories):
+    name = 'test.mp3'
+    path = os.path.join(DATA_DIR, name)
+    tf = factories['music.TrackFile'](audio_file__from_path=path)
+
+    assert tf.filename == tf.track.full_name + '.mp3'
+
+
+def test_track_get_file_size(factories):
+    name = 'test.mp3'
+    path = os.path.join(DATA_DIR, name)
+    tf = factories['music.TrackFile'](audio_file__from_path=path)
+
+    assert tf.get_file_size() == 297745
+
+
+def test_track_get_file_size_federation(factories):
+    tf = factories['music.TrackFile'](
+        federation=True,
+        library_track__with_audio_file=True)
+
+    assert tf.get_file_size() == tf.library_track.audio_file.size
+
+
+def test_track_get_file_size_in_place(factories):
+    name = 'test.mp3'
+    path = os.path.join(DATA_DIR, name)
+    tf = factories['music.TrackFile'](
+        in_place=True, source='file://{}'.format(path))
+
+    assert tf.get_file_size() == 297745

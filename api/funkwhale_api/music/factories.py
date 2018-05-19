@@ -54,6 +54,10 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     audio_file = factory.django.FileField(
         from_path=os.path.join(SAMPLES_PATH, 'test.ogg'))
 
+    bitrate = None
+    size = None
+    duration = None
+
     class Meta:
         model = 'music.TrackFile'
 

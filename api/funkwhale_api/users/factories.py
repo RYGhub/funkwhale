@@ -1,7 +1,32 @@
 import factory
 
-from funkwhale_api.factories import registry
+from funkwhale_api.factories import registry, ManyToManyFromList
 from django.contrib.auth.models import Permission
+
+
+@registry.register
+class GroupFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: 'group-{0}'.format(n))
+
+    class Meta:
+        model = 'auth.Group'
+
+    @factory.post_generation
+    def perms(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            perms = [
+                Permission.objects.get(
+                    content_type__app_label=p.split('.')[0],
+                    codename=p.split('.')[1],
+                )
+                for p in extracted
+            ]
+            # A list of permissions were passed in, use them
+            self.permissions.add(*perms)
 
 
 @registry.register
@@ -10,6 +35,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
     subsonic_api_token = None
+    groups = ManyToManyFromList('groups')
 
     class Meta:
         model = 'users.User'

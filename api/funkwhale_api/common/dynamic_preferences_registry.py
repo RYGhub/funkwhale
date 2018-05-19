@@ -16,5 +16,5 @@ class APIAutenticationRequired(
     help_text = (
         'If disabled, anonymous users will be able to query the API'
         'and access music data (as well as other data exposed in the API '
-        'without specific permissions)'
+        'without specific permissions).'
     )

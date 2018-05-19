@@ -28,6 +28,13 @@ def get_id3_tag(f, k):
         raise TagNotFound(k)
 
 
+def get_flac_tag(f, k):
+    try:
+        return f.get(k)[0]
+    except (KeyError, IndexError):
+        raise TagNotFound(k)
+
+
 def get_mp3_recording_id(f, k):
     try:
         return [
@@ -121,7 +128,38 @@ CONF = {
                 'getter': get_mp3_recording_id,
             },
         }
-    }
+    },
+    'FLAC': {
+        'getter': get_flac_tag,
+        'fields': {
+            'track_number': {
+                'field': 'tracknumber',
+                'to_application': convert_track_number
+            },
+            'title': {
+                'field': 'title'
+            },
+            'artist': {
+                'field': 'artist'
+            },
+            'album': {
+                'field': 'album'
+            },
+            'date': {
+                'field': 'date',
+                'to_application': lambda v: arrow.get(str(v)).date()
+            },
+            'musicbrainz_albumid': {
+                'field': 'musicbrainz_albumid'
+            },
+            'musicbrainz_artistid': {
+                'field': 'musicbrainz_artistid'
+            },
+            'musicbrainz_recordingid': {
+                'field': 'musicbrainz_trackid'
+            },
+        }
+    },
 }
 
 

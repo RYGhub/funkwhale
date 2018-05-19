@@ -15,6 +15,9 @@ class SubsonicJSONRenderer(renderers.JSONRenderer):
             }
         }
         final['subsonic-response'].update(data)
+        if 'error' in final:
+            # an error was returned
+            final['subsonic-response']['status'] = 'failed'
         return super().render(final, accepted_media_type, renderer_context)
 
 
@@ -31,6 +34,9 @@ class SubsonicXMLRenderer(renderers.JSONRenderer):
             'version': '1.16.0',
         }
         final.update(data)
+        if 'error' in final:
+            # an error was returned
+            final['status'] = 'failed'
         tree = dict_to_xml_tree('subsonic-response', final)
         return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(tree, encoding='utf-8')
 

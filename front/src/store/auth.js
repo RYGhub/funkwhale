@@ -112,7 +112,7 @@ export default {
         dispatch('playlists/fetchOwn', null, {root: true})
         Object.keys(data.permissions).forEach(function (key) {
           // this makes it easier to check for permissions in templates
-          commit('permission', {key, status: data.permissions[String(key)].status})
+          commit('permission', {key, status: data.permissions[String(key)]})
         })
         return response.data
       }, (response) => {

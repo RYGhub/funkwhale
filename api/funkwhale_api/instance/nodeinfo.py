@@ -12,6 +12,7 @@ memo = memoize.Memoizer(store, namespace='instance:stats')
 
 def get():
     share_stats = preferences.get('instance__nodeinfo_stats_enabled')
+    private = preferences.get('instance__nodeinfo_private')
     data = {
         'version': '2.0',
         'software': {
@@ -30,6 +31,7 @@ def get():
             }
         },
         'metadata': {
+            'private': preferences.get('instance__nodeinfo_private'),
             'shortDescription': preferences.get('instance__short_description'),
             'longDescription': preferences.get('instance__long_description'),
             'nodeName': preferences.get('instance__name'),

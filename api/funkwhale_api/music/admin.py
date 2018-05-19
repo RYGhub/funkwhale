@@ -38,6 +38,7 @@ class ImportBatchAdmin(admin.ModelAdmin):
     search_fields = [
         'import_request__name', 'source', 'batch__pk', 'mbid']
 
+
 @admin.register(models.ImportJob)
 class ImportJobAdmin(admin.ModelAdmin):
     list_display = ['source', 'batch', 'track_file', 'status', 'mbid']
@@ -73,9 +74,16 @@ class TrackFileAdmin(admin.ModelAdmin):
         'source',
         'duration',
         'mimetype',
+        'size',
+        'bitrate'
     ]
     list_select_related = [
         'track'
     ]
-    search_fields = ['source', 'acoustid_track_id']
+    search_fields = [
+        'source',
+        'acoustid_track_id',
+        'track__title',
+        'track__album__title',
+        'track__artist__name']
     list_filter = ['mimetype']

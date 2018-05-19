@@ -44,6 +44,46 @@
           </a>
         </div>
       </div>
+      <div v-if="file" class="ui vertical stripe center aligned segment">
+        <h2 class="ui header">{{ $t('Track information') }}</h2>
+        <table class="ui very basic collapsing celled center aligned table">
+          <tbody>
+            <tr>
+              <td>
+                {{ $t('Duration') }}
+              </td>
+              <td v-if="file.duration">
+                {{ time.parse(file.duration) }}
+              </td>
+              <td v-else>
+                {{ $t('N/A') }}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {{ $t('Size') }}
+              </td>
+              <td v-if="file.size">
+                {{ file.size | humanSize }}
+              </td>
+              <td v-else>
+                {{ $t('N/A') }}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {{ $t('Bitrate') }}
+              </td>
+              <td v-if="file.bitrate">
+                {{ file.bitrate | humanSize }}/s
+              </td>
+              <td v-else>
+                {{ $t('N/A') }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="ui vertical stripe center aligned segment">
         <h2><i18next path="Lyrics"/></h2>
         <div v-if="isLoadingLyrics" class="ui vertical segment">
@@ -64,6 +104,8 @@
 </template>
 
 <script>
+
+import time from '@/utils/time'
 import axios from 'axios'
 import url from '@/utils/url'
 import logger from '@/logging'
@@ -83,6 +125,7 @@ export default {
   },
   data () {
     return {
+      time,
       isLoadingTrack: true,
       isLoadingLyrics: true,
       track: null,
@@ -134,6 +177,9 @@ export default {
         return u
       }
     },
+    file () {
+      return this.track.files[0]
+    },
     lyricsSearchUrl () {
       let base = 'http://lyrics.wikia.com/wiki/Special:Search?query='
       let query = this.track.artist.name + ' ' + this.track.title
@@ -159,5 +205,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
+.table.center.aligned {
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>

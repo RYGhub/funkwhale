@@ -27,14 +27,23 @@ Those settings are stored in database and do not require a restart of your
 instance after modification. They typically relate to higher level configuration,
 such your instance description, signup policy and so on.
 
-There is no polished interface for those settings, yet, but you can view update
-them using the administration interface provided by Django (the framework funkwhale is built on).
-
-The URL should be ``/api/admin/dynamic_preferences/globalpreferencemodel/`` (prepend your domain in front of it, of course).
+You can edit those settings directly from the web application, assuming
+you have the required permissions. The URL is ``/manage/settings``, and
+you will also find a link to this page in the sidebar.
 
 If you plan to use acoustid and external imports
 (e.g. with the youtube backends), you should edit the corresponding
 settings in this interface.
+
+.. note::
+
+    If you have any issue with the web application, a management interface is also
+    available for those settings from Django's administration interface. It's
+    less user friendly, though, and we recommend you use the web app interface
+    whenever possible.
+
+    The URL should be ``/api/admin/dynamic_preferences/globalpreferencemodel/`` (prepend your domain in front of it, of course).
+
 
 Configuration reference
 -----------------------
@@ -108,3 +117,28 @@ Then, the value of :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH` should be
 On non-docker setup, you don't need to configure this setting.
 
 .. note:: This path should not include any trailing slash
+
+User permissions
+----------------
+
+Funkwhale's permission model works as follows:
+
+- Anonymous users cannot do anything unless configured specifically
+- Logged-in users can use the application, but cannot do things that affect
+  the whole instance
+- Superusers can do anything
+
+To make things more granular and allow some delegation of responsability,
+superusers can grant specific permissions to specific users. Available
+permissions are:
+
+- **Manage instance-level settings**: users with this permission can edit instance
+  settings as described in :ref:`instance-settings`
+- **Manage library**: users with this permission can import new music in the
+  instance
+- **Manage library federation**: users with this permission can ask to federate with
+  other instances, and accept/deny federation requests from other intances
+
+There is no dedicated interface to manage users permissions, but superusers
+can login on the Django's admin at ``/api/admin/`` and grant permissions
+to users at ``/api/admin/users/user/``.

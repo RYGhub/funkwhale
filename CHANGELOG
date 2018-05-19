@@ -10,6 +10,127 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.13 (2018-05-19)
+-----------------
+
+Upgrade instructions are available at
+  https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Can now import and play flac files (#157)
+- Simpler permission system (#152)
+- Store file length, size and bitrate (#195)
+- We now have a brand new instance settings interface in the front-end (#206)
+
+
+Enhancements:
+
+- Disabled browsable HTML API in production (#205)
+- Instances can now indicate on the nodeinfo endpoint if they want to remain
+  private (#200)
+
+
+Bugfixes:
+
+- .well-known/nodeinfo endpoint can now answer to request with Accept:
+  application/json (#197)
+- Fixed escaping issue of track name in playlist modal (#201)
+- Fixed missing dot when downloading file (#204)
+- In-place imported tracks with non-ascii characters don't break reverse-proxy
+  serving (#196)
+- Removed Python 3.6 dependency (secrets module) (#198)
+- Uplayable tracks are now properly disabled in the interface (#199)
+
+
+Instance settings interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Prior to this release, the only way to update instance settings (such as
+instance description, signup policy, federation configuration, etc.) was using
+the admin interface provided by Django (the back-end framework which power the API).
+
+This interface worked, but was not really-user friendly and intuitive.
+
+Starting from this release, we now offer a dedicated interface directly
+in the front-end. You can view and edit all your instance settings from here,
+assuming you have the required permissions.
+
+This interface is available at ``/manage/settings` and via link in the sidebar.
+
+
+Storage of bitrate, size and length in database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Starting with this release, when importing files, Funkwhale will store
+additional information about audio files:
+
+- Bitrate
+- Size (in bytes)
+- Duration
+
+This change is not retroactive, meaning already imported files will lack those
+informations. The interface and API should work as before in such case, however,
+we offer a command to deal with legacy files and populate the missing values.
+
+On docker setups:
+
+.. code-block:: shell
+
+    docker-compose run --rm api python manage.py fix_track_files
+
+
+On non-docker setups:
+
+.. code-block:: shell
+
+    # from your activated virtualenv
+    python manage.py fix_track_files
+
+.. note::
+
+    The execution time for this command is proportional to the number of
+    audio files stored on your instance. This is because we need to read the
+    files from disk to fetch the data. You can run it in the background
+    while Funkwhale is up.
+
+    It's also safe to interrupt this command and rerun it at a later point, or run
+    it multiple times.
+
+    Use the --dry-run flag to check how many files would be impacted.
+
+
+Simpler permission system
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Starting from this release, the permission system is much simpler. Up until now,
+we were using Django's built-in permission system, which was working, but also
+quite complex to deal with.
+
+The new implementation relies on simpler logic, which will make integration
+on the front-end in upcoming releases faster and easier.
+
+If you have manually given permissions to users on your instance,
+you can migrate those to the new system.
+
+On docker setups:
+
+.. code-block:: shell
+
+    docker-compose run --rm api python manage.py script django_permissions_to_user_permissions --no-input
+
+On non-docker setups:
+
+.. code-block:: shell
+
+    # in your virtualenv
+    python api/manage.py script django_permissions_to_user_permissions --no-input
+
+There is still no dedicated interface to manage user permissions, but you
+can use the admin interface at ``/api/admin/users/user/`` for that purpose in
+the meantime.
+
+
 0.12 (2018-05-09)
 -----------------
 
@@ -110,9 +231,7 @@ We offer two settings to manage nodeinfo in your Funkwhale instance:
    and user activity.
 
 To make your instance fully compatible with the nodeinfo protocol, you need to
-to edit your nginx configuration file:
-
-.. code-block::
+to edit your nginx configuration file::
 
     # before
     ...
@@ -130,9 +249,7 @@ to edit your nginx configuration file:
     }
     ...
 
-You can do the same if you use apache:
-
-.. code-block::
+You can do the same if you use apache::
 
     # before
     ...

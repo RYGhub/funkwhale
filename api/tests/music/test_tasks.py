@@ -63,6 +63,9 @@ def test_import_job_can_run_with_file_and_acoustid(
         'status': 'ok'
     }
     mocker.patch(
+        'funkwhale_api.music.utils.get_audio_file_data',
+        return_value={'bitrate': 42, 'length': 43})
+    mocker.patch(
         'funkwhale_api.musicbrainz.api.artists.get',
         return_value=artists['get']['adhesive_wombat'])
     mocker.patch(
@@ -82,7 +85,9 @@ def test_import_job_can_run_with_file_and_acoustid(
 
     with open(path, 'rb') as f:
         assert track_file.audio_file.read() == f.read()
-    assert track_file.duration == 268
+    assert track_file.bitrate == 42
+    assert track_file.duration == 43
+    assert track_file.size == os.path.getsize(path)
     # audio file is deleted from import job once persisted to audio file
     assert not job.audio_file
     assert job.status == 'finished'

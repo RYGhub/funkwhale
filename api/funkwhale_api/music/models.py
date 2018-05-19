@@ -361,7 +361,7 @@ class Track(APIModelMixin):
         import_tags
     ]
     objects = TrackQuerySet.as_manager()
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         ordering = ['album', 'position']
@@ -429,6 +429,8 @@ class TrackFile(models.Model):
     modification_date = models.DateTimeField(auto_now=True)
     accessed_date = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
+    size = models.IntegerField(null=True, blank=True)
+    bitrate = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
 
@@ -467,7 +469,7 @@ class TrackFile(models.Model):
 
     @property
     def filename(self):
-        return '{}{}'.format(
+        return '{}.{}'.format(
             self.track.full_name,
             self.extension)
 
@@ -476,6 +478,41 @@ class TrackFile(models.Model):
         if not self.audio_file:
             return
         return os.path.splitext(self.audio_file.name)[-1].replace('.', '', 1)
+
+    def get_file_size(self):
+        if self.audio_file:
+            return self.audio_file.size
+
+        if self.source.startswith('file://'):
+            return os.path.getsize(self.source.replace('file://', '', 1))
+
+        if self.library_track and self.library_track.audio_file:
+            return self.library_track.audio_file.size
+
+    def get_audio_file(self):
+        if self.audio_file:
+            return self.audio_file.open()
+        if self.source.startswith('file://'):
+            return open(self.source.replace('file://', '', 1), 'rb')
+        if self.library_track and self.library_track.audio_file:
+            return self.library_track.audio_file.open()
+
+    def set_audio_data(self):
+        audio_file = self.get_audio_file()
+        if audio_file:
+            with audio_file as f:
+                audio_data = utils.get_audio_file_data(f)
+            if not audio_data:
+                return
+            self.duration = int(audio_data['length'])
+            self.bitrate = audio_data['bitrate']
+            self.size = self.get_file_size()
+        else:
+            lt = self.library_track
+            if lt:
+                self.duration = lt.get_metadata('length')
+                self.size = lt.get_metadata('size')
+                self.bitrate = lt.get_metadata('bitrate')
 
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:
