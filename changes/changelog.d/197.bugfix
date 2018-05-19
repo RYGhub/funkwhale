@@ -1,1 +1,0 @@
-.well-known/nodeinfo endpoint can now answer to request with Accept: application/json (#197)

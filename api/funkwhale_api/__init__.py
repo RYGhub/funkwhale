@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.12'
+__version__ = '0.13'
 __version_info__ = tuple([int(num) if num.isdigit() else num for num in __version__.replace('-', '.', 1).split('.')])
