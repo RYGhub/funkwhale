@@ -164,9 +164,7 @@ describe('store/auth', () => {
       const profile = {
         username: 'bob',
         permissions: {
-          admin: {
-            status: true
-          }
+          admin: true
         }
       }
       moxios.stubRequest('users/users/me/', {

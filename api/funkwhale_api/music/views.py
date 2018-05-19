@@ -25,8 +25,8 @@ from rest_framework import permissions
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.common.permissions import (
-    ConditionalAuthentication, HasModelPermission)
+from funkwhale_api.common.permissions import ConditionalAuthentication
+from funkwhale_api.users.permissions import HasUserPermission
 from taggit.models import Tag
 from funkwhale_api.federation import actors
 from funkwhale_api.federation.authentication import SignatureAuthentication
@@ -107,16 +107,12 @@ class ImportBatchViewSet(
               .annotate(job_count=Count('jobs'))
     )
     serializer_class = serializers.ImportBatchSerializer
-    permission_classes = (permissions.DjangoModelPermissions, )
+    permission_classes = (HasUserPermission,)
+    required_permissions = ['library']
     filter_class = filters.ImportBatchFilter
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
-
-
-class ImportJobPermission(HasModelPermission):
-    # not a typo, perms on import job is proxied to import batch
-    model = models.ImportBatch
 
 
 class ImportJobViewSet(
@@ -125,7 +121,8 @@ class ImportJobViewSet(
         viewsets.GenericViewSet):
     queryset = (models.ImportJob.objects.all().select_related())
     serializer_class = serializers.ImportJobSerializer
-    permission_classes = (ImportJobPermission, )
+    permission_classes = (HasUserPermission,)
+    required_permissions = ['library']
     filter_class = filters.ImportJobFilter
 
     @list_route(methods=['get'])
@@ -442,7 +439,8 @@ class Search(views.APIView):
 
 class SubmitViewSet(viewsets.ViewSet):
     queryset = models.ImportBatch.objects.none()
-    permission_classes = (permissions.DjangoModelPermissions, )
+    permission_classes = (HasUserPermission,)
+    required_permissions = ['library']
 
     @list_route(methods=['post'])
     @transaction.non_atomic_requests

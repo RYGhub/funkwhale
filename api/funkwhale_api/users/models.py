@@ -19,6 +19,13 @@ def get_token():
     return binascii.b2a_hex(os.urandom(15)).decode('utf-8')
 
 
+PERMISSIONS = [
+    'federation',
+    'library',
+    'settings',
+]
+
+
 @python_2_unicode_compatible
 class User(AbstractUser):
 
@@ -28,20 +35,6 @@ class User(AbstractUser):
 
     # updated on logout or password change, to invalidate JWT
     secret_key = models.UUIDField(default=uuid.uuid4, null=True)
-    # permissions that are used for API access and that worth serializing
-    relevant_permissions = {
-        # internal_codename : {external_codename}
-        'music.add_importbatch': {
-            'external_codename': 'import.launch',
-        },
-        'dynamic_preferences.change_globalpreferencemodel': {
-            'external_codename': 'settings.change',
-        },
-        'federation.change_library': {
-            'external_codename': 'federation.manage',
-        },
-    }
-
     privacy_level = fields.get_privacy_field()
 
     # Unfortunately, Subsonic API assumes a MD5/password authentication
@@ -52,12 +45,32 @@ class User(AbstractUser):
     subsonic_api_token = models.CharField(
         blank=True, null=True, max_length=255)
 
+    # permissions
+    permission_federation = models.BooleanField(
+        'Manage library federation',
+        help_text='Follow other instances, accept/deny library follow requests...',
+        default=False)
+    permission_library = models.BooleanField(
+        'Manage library',
+        help_text='Import new content, manage existing content',
+        default=False)
+    permission_settings = models.BooleanField(
+        'Manage instance-level settings',
+        default=False)
+
     def __str__(self):
         return self.username
 
-    def add_permission(self, codename):
-        p = Permission.objects.get(codename=codename)
-        self.user_permissions.add(p)
+    def get_permissions(self):
+        perms = {}
+        for p in PERMISSIONS:
+            v = self.is_superuser or getattr(self, 'permission_{}'.format(p))
+            perms[p] = v
+        return perms
+
+    def has_permissions(self, *perms):
+        permissions = self.get_permissions()
+        return all([permissions[p] for p in perms])
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})

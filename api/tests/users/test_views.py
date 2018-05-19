@@ -53,33 +53,24 @@ def test_can_disable_registration_view(preferences, client, db):
     assert response.status_code == 403
 
 
-def test_can_fetch_data_from_api(client, factories):
+def test_can_fetch_data_from_api(api_client, factories):
     url = reverse('api:v1:users:users-me')
-    response = client.get(url)
+    response = api_client.get(url)
     # login required
     assert response.status_code == 401
 
     user = factories['users.User'](
-        is_staff=True,
-        perms=[
-            'music.add_importbatch',
-            'dynamic_preferences.change_globalpreferencemodel',
-        ]
+        permission_library=True
     )
-    assert user.has_perm('music.add_importbatch')
-    client.login(username=user.username, password='test')
-    response = client.get(url)
+    api_client.login(username=user.username, password='test')
+    response = api_client.get(url)
     assert response.status_code == 200
-
-    payload = json.loads(response.content.decode('utf-8'))
-
-    assert payload['username'] == user.username
-    assert payload['is_staff'] == user.is_staff
-    assert payload['is_superuser'] == user.is_superuser
-    assert payload['email'] == user.email
-    assert payload['name'] == user.name
-    assert payload['permissions']['import.launch']['status']
-    assert payload['permissions']['settings.change']['status']
+    assert response.data['username'] == user.username
+    assert response.data['is_staff'] == user.is_staff
+    assert response.data['is_superuser'] == user.is_superuser
+    assert response.data['email'] == user.email
+    assert response.data['name'] == user.name
+    assert response.data['permissions'] == user.get_permissions()
 
 
 def test_can_get_token_via_api(client, factories):
@@ -202,6 +193,8 @@ def test_user_can_get_new_subsonic_token(logged_in_api_client):
     assert response.data == {
         'subsonic_api_token': 'test'
     }
+
+
 def test_user_can_request_new_subsonic_token(logged_in_api_client):
     user = logged_in_api_client.user
     user.subsonic_api_token = 'test'

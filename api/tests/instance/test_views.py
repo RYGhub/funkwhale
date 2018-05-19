@@ -1,4 +1,15 @@
+import pytest
+
 from django.urls import reverse
+
+from funkwhale_api.instance import views
+
+
+@pytest.mark.parametrize('view,permissions', [
+    (views.AdminSettings, ['settings']),
+])
+def test_permissions(assert_user_permission, view, permissions):
+    assert_user_permission(view, permissions)
 
 
 def test_nodeinfo_endpoint(db, api_client, mocker):
@@ -43,7 +54,8 @@ def test_admin_settings_restrict_access(db, logged_in_api_client, preferences):
 def test_admin_settings_correct_permission(
         db, logged_in_api_client, preferences):
     user = logged_in_api_client.user
-    user.add_permission('change_globalpreferencemodel')
+    user.permission_settings = True
+    user.save()
     url = reverse('api:v1:instance:admin-settings-list')
     response = logged_in_api_client.get(url)
 

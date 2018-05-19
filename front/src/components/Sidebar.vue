@@ -60,7 +60,7 @@
           <div class="menu">
             <router-link
               class="item"
-              v-if="$store.state.auth.availablePermissions['import.launch']"
+              v-if="$store.state.auth.availablePermissions['library']"
               :to="{name: 'library.requests', query: {status: 'pending' }}">
               <i class="download icon"></i>{{ $t('Import requests') }}
               <div
@@ -70,7 +70,7 @@
             </router-link>
             <router-link
               class="item"
-              v-if="$store.state.auth.availablePermissions['federation.manage']"
+              v-if="$store.state.auth.availablePermissions['federation']"
               :to="{path: '/manage/federation/libraries'}">
               <i class="sitemap icon"></i>{{ $t('Federation') }}
               <div
@@ -80,7 +80,7 @@
             </router-link>
             <router-link
               class="item"
-              v-if="$store.state.auth.availablePermissions['settings.change']"
+              v-if="$store.state.auth.availablePermissions['settings']"
               :to="{path: '/manage/settings'}">
               <i class="settings icon"></i>{{ $t('Settings') }}
             </router-link>
@@ -192,8 +192,8 @@ export default {
     }),
     showAdmin () {
       let adminPermissions = [
-        this.$store.state.auth.availablePermissions['federation.manage'],
-        this.$store.state.auth.availablePermissions['import.launch']
+        this.$store.state.auth.availablePermissions['federation'],
+        this.$store.state.auth.availablePermissions['library']
       ]
       return adminPermissions.filter(e => {
         return e
@@ -209,7 +209,7 @@ export default {
       this.fetchFederationImportRequestsCount()
     },
     fetchFederationNotificationsCount () {
-      if (!this.$store.state.auth.availablePermissions['federation.manage']) {
+      if (!this.$store.state.auth.availablePermissions['federation']) {
         return
       }
       let self = this
@@ -218,7 +218,7 @@ export default {
       })
     },
     fetchFederationImportRequestsCount () {
-      if (!this.$store.state.auth.availablePermissions['import.launch']) {
+      if (!this.$store.state.auth.availablePermissions['library']) {
         return
       }
       let self = this
