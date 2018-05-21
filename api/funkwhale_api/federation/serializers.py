@@ -26,16 +26,16 @@ logger = logging.getLogger(__name__)
 
 
 class ActorSerializer(serializers.Serializer):
-    id = serializers.URLField()
-    outbox = serializers.URLField()
-    inbox = serializers.URLField()
+    id = serializers.URLField(max_length=500)
+    outbox = serializers.URLField(max_length=500)
+    inbox = serializers.URLField(max_length=500)
     type = serializers.ChoiceField(choices=models.TYPE_CHOICES)
     preferredUsername = serializers.CharField()
     manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
     name = serializers.CharField(required=False, max_length=200)
     summary = serializers.CharField(max_length=None, required=False)
-    followers = serializers.URLField(required=False, allow_null=True)
-    following = serializers.URLField(required=False, allow_null=True)
+    followers = serializers.URLField(max_length=500, required=False, allow_null=True)
+    following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = serializers.JSONField(required=False)
 
     def to_representation(self, instance):
@@ -224,7 +224,7 @@ class APILibraryFollowUpdateSerializer(serializers.Serializer):
 
 
 class APILibraryCreateSerializer(serializers.ModelSerializer):
-    actor = serializers.URLField()
+    actor = serializers.URLField(max_length=500)
     federation_enabled = serializers.BooleanField()
     uuid = serializers.UUIDField(read_only=True)
 
@@ -315,9 +315,9 @@ class APILibraryTrackSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.Serializer):
-    id = serializers.URLField()
-    object = serializers.URLField()
-    actor = serializers.URLField()
+    id = serializers.URLField(max_length=500)
+    object = serializers.URLField(max_length=500)
+    actor = serializers.URLField(max_length=500)
     type = serializers.ChoiceField(choices=['Follow'])
 
     def validate_object(self, v):
@@ -374,8 +374,8 @@ class APIFollowSerializer(serializers.ModelSerializer):
 
 
 class AcceptFollowSerializer(serializers.Serializer):
-    id = serializers.URLField()
-    actor = serializers.URLField()
+    id = serializers.URLField(max_length=500)
+    actor = serializers.URLField(max_length=500)
     object = FollowSerializer()
     type = serializers.ChoiceField(choices=['Accept'])
 
@@ -417,8 +417,8 @@ class AcceptFollowSerializer(serializers.Serializer):
 
 
 class UndoFollowSerializer(serializers.Serializer):
-    id = serializers.URLField()
-    actor = serializers.URLField()
+    id = serializers.URLField(max_length=500)
+    actor = serializers.URLField(max_length=500)
     object = FollowSerializer()
     type = serializers.ChoiceField(choices=['Undo'])
 
@@ -459,9 +459,9 @@ class UndoFollowSerializer(serializers.Serializer):
 
 class ActorWebfingerSerializer(serializers.Serializer):
     subject = serializers.CharField()
-    aliases = serializers.ListField(child=serializers.URLField())
+    aliases = serializers.ListField(child=serializers.URLField(max_length=500))
     links = serializers.ListField()
-    actor_url = serializers.URLField(required=False)
+    actor_url = serializers.URLField(max_length=500, required=False)
 
     def validate(self, validated_data):
         validated_data['actor_url'] = None
@@ -496,8 +496,8 @@ class ActorWebfingerSerializer(serializers.Serializer):
 
 
 class ActivitySerializer(serializers.Serializer):
-    actor = serializers.URLField()
-    id = serializers.URLField(required=False)
+    actor = serializers.URLField(max_length=500)
+    id = serializers.URLField(max_length=500, required=False)
     type = serializers.ChoiceField(
         choices=[(c, c) for c in activity.ACTIVITY_TYPES])
     object = serializers.JSONField()
@@ -539,8 +539,8 @@ class ActivitySerializer(serializers.Serializer):
 
 
 class ObjectSerializer(serializers.Serializer):
-    id = serializers.URLField()
-    url = serializers.URLField(required=False, allow_null=True)
+    id = serializers.URLField(max_length=500)
+    url = serializers.URLField(max_length=500, required=False, allow_null=True)
     type = serializers.ChoiceField(
         choices=[(c, c) for c in activity.OBJECT_TYPES])
     content = serializers.CharField(
@@ -554,16 +554,16 @@ class ObjectSerializer(serializers.Serializer):
     updated = serializers.DateTimeField(
         required=False, allow_null=True)
     to = serializers.ListField(
-        child=serializers.URLField(),
+        child=serializers.URLField(max_length=500),
         required=False, allow_null=True)
     cc = serializers.ListField(
-        child=serializers.URLField(),
+        child=serializers.URLField(max_length=500),
         required=False, allow_null=True)
     bto = serializers.ListField(
-        child=serializers.URLField(),
+        child=serializers.URLField(max_length=500),
         required=False, allow_null=True)
     bcc = serializers.ListField(
-        child=serializers.URLField(),
+        child=serializers.URLField(max_length=500),
         required=False, allow_null=True)
 
 OBJECT_SERIALIZERS = {
@@ -575,10 +575,10 @@ OBJECT_SERIALIZERS = {
 class PaginatedCollectionSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=['Collection'])
     totalItems = serializers.IntegerField(min_value=0)
-    actor = serializers.URLField()
-    id = serializers.URLField()
-    first = serializers.URLField()
-    last = serializers.URLField()
+    actor = serializers.URLField(max_length=500)
+    id = serializers.URLField(max_length=500)
+    first = serializers.URLField(max_length=500)
+    last = serializers.URLField(max_length=500)
 
     def to_representation(self, conf):
         paginator = Paginator(
@@ -607,13 +607,13 @@ class CollectionPageSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=['CollectionPage'])
     totalItems = serializers.IntegerField(min_value=0)
     items = serializers.ListField()
-    actor = serializers.URLField()
-    id = serializers.URLField()
-    first = serializers.URLField()
-    last = serializers.URLField()
-    next = serializers.URLField(required=False)
-    prev = serializers.URLField(required=False)
-    partOf = serializers.URLField()
+    actor = serializers.URLField(max_length=500)
+    id = serializers.URLField(max_length=500)
+    first = serializers.URLField(max_length=500)
+    last = serializers.URLField(max_length=500)
+    next = serializers.URLField(max_length=500, required=False)
+    prev = serializers.URLField(max_length=500, required=False)
+    partOf = serializers.URLField(max_length=500)
 
     def validate_items(self, v):
         item_serializer = self.context.get('item_serializer')
@@ -698,7 +698,7 @@ class AudioMetadataSerializer(serializers.Serializer):
 
 class AudioSerializer(serializers.Serializer):
     type = serializers.CharField()
-    id = serializers.URLField()
+    id = serializers.URLField(max_length=500)
     url = serializers.JSONField()
     published = serializers.DateTimeField()
     updated = serializers.DateTimeField(required=False)
