@@ -9,7 +9,7 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
-from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
+from funkwhale_api.providers.audiofile import tasks as audiofile_tasks
 
 from django.conf import settings
 from . import models
@@ -73,13 +73,15 @@ def import_track_from_remote(library_track):
         library_track.title, artist=artist, album=album)[0]
 
 
-def _do_import(import_job, replace=False, use_acoustid=True):
+def _do_import(import_job, replace=False, use_acoustid=False):
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
     acoustid_track_id = None
     duration = None
     track = None
-    use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
+    # use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
+    # Acoustid is not reliable, we disable it for now.
+    use_acoustid = False
     if not mbid and use_acoustid and from_file:
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
@@ -91,11 +93,12 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     if mbid:
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
     elif import_job.audio_file:
-        track = import_track_data_from_path(import_job.audio_file.path)
+        track = audiofile_tasks.import_track_data_from_path(
+            import_job.audio_file.path)
     elif import_job.library_track:
         track = import_track_from_remote(import_job.library_track)
     elif import_job.source.startswith('file://'):
-        track = import_track_data_from_path(
+        track = audiofile_tasks.import_track_data_from_path(
             import_job.source.replace('file://', '', 1))
     else:
         raise ValueError(
@@ -151,7 +154,7 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     models.ImportJob.objects.filter(
         status__in=['pending', 'errored']),
     'import_job')
-def import_job_run(self, import_job, replace=False, use_acoustid=True):
+def import_job_run(self, import_job, replace=False, use_acoustid=False):
     def mark_errored():
         import_job.status = 'errored'
         import_job.save(update_fields=['status'])

@@ -1,5 +1,4 @@
 import pytest
-import acoustid
 import datetime
 import os
 import uuid
@@ -17,8 +16,6 @@ DATA_DIR = os.path.join(
 
 
 def test_can_create_track_from_file_metadata(db, mocker):
-    mocker.patch(
-        'acoustid.match', side_effect=acoustid.WebServiceError('test'))
     metadata = {
         'artist': ['Test artist'],
         'album': ['Test album'],
@@ -96,24 +93,6 @@ def test_import_files_creates_a_batch_and_job(factories, mocker):
     assert job.source == 'file://' + path
     m.assert_called_once_with(
         import_job_id=job.pk,
-        use_acoustid=True)
-
-
-def test_import_files_skip_acoustid(factories, mocker):
-    m = mocker.patch('funkwhale_api.music.tasks.import_job_run')
-    user = factories['users.User'](username='me')
-    path = os.path.join(DATA_DIR, 'dummy_file.ogg')
-    call_command(
-        'import_files',
-        path,
-        username='me',
-        async=False,
-        no_acoustid=True,
-        interactive=False)
-    batch = user.imports.latest('id')
-    job = batch.jobs.first()
-    m.assert_called_once_with(
-        import_job_id=job.pk,
         use_acoustid=False)
 
 
@@ -128,7 +107,6 @@ def test_import_files_skip_if_path_already_imported(factories, mocker):
         path,
         username='me',
         async=False,
-        no_acoustid=True,
         interactive=False)
     assert user.imports.count() == 0
 
@@ -142,7 +120,6 @@ def test_import_files_works_with_utf8_file_name(factories, mocker):
         path,
         username='me',
         async=False,
-        no_acoustid=True,
         interactive=False)
     batch = user.imports.latest('id')
     job = batch.jobs.first()
@@ -162,7 +139,6 @@ def test_import_files_in_place(factories, mocker, settings):
         username='me',
         async=False,
         in_place=True,
-        no_acoustid=True,
         interactive=False)
     batch = user.imports.latest('id')
     job = batch.jobs.first()

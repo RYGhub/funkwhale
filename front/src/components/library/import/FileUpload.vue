@@ -1,6 +1,10 @@
 <template>
   <div>
     <div v-if="batch" class="ui container">
+      <div class="ui message">
+        {{ $t('Ensure your music files are properly tagged before uploading them.') }}
+        <a href="http://picard.musicbrainz.org/" target='_blank'>{{ $t('We recommend using Picard for that purpose.') }}</a>
+      </div>
       <file-upload-widget
         :class="['ui', 'icon', 'left', 'floated', 'button']"
         :post-action="uploadUrl"
@@ -8,7 +12,7 @@
         :size="1024 * 1024 * 30"
         :data="uploadData"
         :drop="true"
-        extensions="ogg,mp3"
+        extensions="ogg,mp3,flac"
         accept="audio/*"
         v-model="files"
         name="audio_file"
@@ -21,7 +25,7 @@
     </file-upload-widget>
       <button
         :class="['ui', 'right', 'floated', 'icon', {disabled: files.length === 0}, 'button']"
-        v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
+        v-if="!$refs.upload || !$refs.upload.active" @click.prevent="startUpload()">
         <i class="play icon" aria-hidden="true"></i>
         <i18next path="Start Upload"/>
       </button>
@@ -88,7 +92,7 @@ export default {
     inputFilter (newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         let extension = newFile.name.split('.').pop()
-        if (['ogg', 'mp3'].indexOf(extension) < 0) {
+        if (['ogg', 'mp3', 'flac'].indexOf(extension) < 0) {
           prevent()
         }
       }
@@ -114,6 +118,10 @@ export default {
       }, (response) => {
         logger.default.error('error while launching creating batch')
       })
+    },
+    startUpload () {
+      this.$emit('batch-created', this.batch)
+      this.$refs.upload.active = true
     }
   },
   computed: {
