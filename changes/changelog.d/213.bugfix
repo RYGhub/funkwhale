@@ -1,0 +1,9 @@
+File-upload import now supports Flac files (#213)
+
+Flac files imports via upload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You have nothing to do to benefit from this, however, since Flac files
+tend to be a lot bigger than other files, you may want to increase the
+``client_max_body_size`` value in your Nginx configuration if you plan
+to upload flac files.

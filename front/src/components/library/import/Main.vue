@@ -24,14 +24,23 @@
       <div class="ui hidden divider"></div>
       <div class="ui centered buttons">
         <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i><i18next path="Previous step"/></button>
-        <button @click="currentStep += 1" v-if="currentStep < 2" class="ui icon button"><i18next path="Next step"/><i class="right arrow icon"></i></button>
+        <button @click="nextStep()" v-if="currentStep < 2" class="ui icon button"><i18next path="Next step"/><i class="right arrow icon"></i></button>
         <button
           @click="$refs.import.launchImport()"
-          v-if="currentStep === 2"
+          v-if="currentStep === 2 && currentSource != 'upload'"
           :class="['ui', 'positive', 'icon', {'loading': isImporting}, 'button']"
           :disabled="isImporting || importData.count === 0"
           >
             <i18next path="Import {%0%} tracks">{{ importData.count }}</i18next>
+            <i class="check icon"></i>
+          </button>
+        <button
+          v-else-if="currentStep === 2 && currentSource === 'upload'"
+          @click="$router.push({name: 'library.import.batches.detail', params: {id: importBatch.id}})"
+          :class="['ui', 'positive', 'icon', {'disabled': !importBatch}, 'button']"
+          :disabled="!importBatch"
+          >
+            {{ $t('Finish import' )}}
             <i class="check icon"></i>
           </button>
       </div>
@@ -100,6 +109,7 @@
         <div v-if="currentStep === 2">
           <file-upload
             ref="import"
+            @batch-created="updateBatch"
             v-if="currentSource == 'upload'"
             ></file-upload>
 
@@ -165,6 +175,7 @@ export default {
       currentSource: this.source,
       metadata: {},
       isImporting: false,
+      importBatch: null,
       importData: {
         tracks: []
       },
@@ -214,11 +225,22 @@ export default {
     updateId (newValue) {
       this.currentId = newValue
     },
+    updateBatch (batch) {
+      this.importBatch = batch
+    },
     fetchRequest (id) {
       let self = this
       axios.get(`requests/import-requests/${id}`).then((response) => {
         self.currentRequest = response.data
       })
+    },
+    nextStep () {
+      if (this.currentStep === 0 && this.currentSource === 'upload') {
+        // we skip metadata directly
+        this.currentStep += 2
+      } else {
+        this.currentStep += 1
+      }
     }
   },
   computed: {
