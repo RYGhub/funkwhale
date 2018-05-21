@@ -93,8 +93,7 @@ export default {
           label: this.$t('Imports'),
           id: 'imports',
           settings: [
-            'providers_youtube__api_key',
-            'providers_acoustid__api_key'
+            'providers_youtube__api_key'
           ]
         },
         {

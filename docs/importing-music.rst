@@ -6,7 +6,8 @@ From music directory on the server
 
 You can import music files in funkwhale assuming they are located on the server
 and readable by the funkwhale application. Your music files should contain at
-least an ``artist``, ``album`` and ``title`` tags.
+least an ``artist``, ``album`` and ``title`` tags, but we recommend you tag
+it extensively using a proper tool, such as Beets or Musicbrainz Picard.
 
 You can import those tracks as follows, assuming they are located in
 ``/srv/funkwhale/data/music``:
@@ -34,17 +35,12 @@ get details::
 
 .. note::
 
-    Autotagging using acoustid is experimental now and can yield unexpected
-    result. You can disable acoustid by passing the --no-acoustid flag.
-
-.. note::
-
     This command is idempotent, meaning you can run it multiple times on the same
     files and already imported files will simply be skipped.
 
 .. note::
 
-    At the moment, only OGG/Vorbis and MP3 files with ID3 tags are supported
+    At the moment, only Flac, OGG/Vorbis and MP3 files with ID3 tags are supported
 
 
 .. _in-place-import:

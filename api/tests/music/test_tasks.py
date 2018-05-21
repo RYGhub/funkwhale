@@ -105,7 +105,7 @@ def test_run_import_skipping_accoustid(factories, mocker):
 def test__do_import_skipping_accoustid(factories, mocker):
     t = factories['music.Track']()
     m = mocker.patch(
-        'funkwhale_api.music.tasks.import_track_data_from_path',
+        'funkwhale_api.providers.audiofile.tasks.import_track_data_from_path',
         return_value=t)
     path = os.path.join(DATA_DIR, 'test.ogg')
     job = factories['music.FileImportJob'](
@@ -121,7 +121,7 @@ def test__do_import_skipping_accoustid_if_no_key(
     preferences['providers_acoustid__api_key'] = ''
     t = factories['music.Track']()
     m = mocker.patch(
-        'funkwhale_api.music.tasks.import_track_data_from_path',
+        'funkwhale_api.providers.audiofile.tasks.import_track_data_from_path',
         return_value=t)
     path = os.path.join(DATA_DIR, 'test.ogg')
     job = factories['music.FileImportJob'](
@@ -132,32 +132,14 @@ def test__do_import_skipping_accoustid_if_no_key(
     m.assert_called_once_with(p)
 
 
-def test_import_job_can_be_skipped(
-        artists, albums, tracks, factories, mocker, preferences):
-    preferences['providers_acoustid__api_key'] = 'test'
+def test_import_job_skip_if_already_exists(
+        artists, albums, tracks, factories, mocker):
     path = os.path.join(DATA_DIR, 'test.ogg')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
     track_file = factories['music.TrackFile'](track__mbid=mbid)
-    acoustid_payload = {
-        'results': [
-            {'id': 'e475bf79-c1ce-4441-bed7-1e33f226c0a2',
-             'recordings': [
-                {
-                 'duration': 268,
-                 'id': mbid}],
-            'score': 0.860825}],
-        'status': 'ok'
-    }
     mocker.patch(
-        'funkwhale_api.musicbrainz.api.artists.get',
-        return_value=artists['get']['adhesive_wombat'])
-    mocker.patch(
-        'funkwhale_api.musicbrainz.api.releases.get',
-        return_value=albums['get']['marsupial'])
-    mocker.patch(
-        'funkwhale_api.musicbrainz.api.recordings.search',
-        return_value=tracks['search']['8bitadventures'])
-    mocker.patch('acoustid.match', return_value=acoustid_payload)
+        'funkwhale_api.providers.audiofile.tasks.import_track_data_from_path',
+        return_value=track_file.track)
 
     job = factories['music.FileImportJob'](audio_file__path=path)
     f = job.audio_file
@@ -171,29 +153,23 @@ def test_import_job_can_be_skipped(
 
 
 def test_import_job_can_be_errored(factories, mocker, preferences):
-    preferences['providers_acoustid__api_key'] = 'test'
     path = os.path.join(DATA_DIR, 'test.ogg')
     mbid = '9968a9d6-8d92-4051-8f76-674e157b6eed'
     track_file = factories['music.TrackFile'](track__mbid=mbid)
-    acoustid_payload = {
-        'results': [
-            {'id': 'e475bf79-c1ce-4441-bed7-1e33f226c0a2',
-             'recordings': [
-                {
-                 'duration': 268,
-                 'id': mbid}],
-            'score': 0.860825}],
-        'status': 'ok'
-    }
+
     class MyException(Exception):
         pass
-    mocker.patch('acoustid.match', side_effect=MyException())
+
+    mocker.patch(
+        'funkwhale_api.music.tasks._do_import',
+        side_effect=MyException())
 
     job = factories['music.FileImportJob'](
         audio_file__path=path, track_file=None)
 
     with pytest.raises(MyException):
         tasks.import_job_run(import_job_id=job.pk)
+
     job.refresh_from_db()
 
     assert job.track_file is None
