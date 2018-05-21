@@ -10,7 +10,7 @@ Pillow>=4.3,<4.4
 
 # For user registration, either via email or social
 # Well-built with regular release cycles!
-django-allauth>=0.34,<0.35
+django-allauth>=0.36,<0.37
 
 
 # Python-PostgreSQL Database Adapter
