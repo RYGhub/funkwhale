@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.users.serializers import UserBasicSerializer
 
 from . import filters
@@ -46,7 +46,7 @@ class RadioSessionTrackSerializerCreate(serializers.ModelSerializer):
 
 
 class RadioSessionTrackSerializer(serializers.ModelSerializer):
-    track = TrackSerializerNested()
+    track = TrackSerializer()
 
     class Meta:
         model = models.RadioSessionTrack

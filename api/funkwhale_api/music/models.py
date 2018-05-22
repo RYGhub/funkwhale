@@ -80,6 +80,12 @@ class ArtistQuerySet(models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count('albums'))
 
+    def with_albums(self):
+        return self.prefetch_related(
+            models.Prefetch(
+                'albums', queryset=Album.objects.with_tracks_count())
+        )
+
 
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)

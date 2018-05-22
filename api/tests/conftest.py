@@ -1,3 +1,4 @@
+import datetime
 import factory
 import pytest
 import requests_mock
@@ -10,6 +11,7 @@ from django.test import client
 
 from dynamic_preferences.registries import global_preferences_registry
 
+from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient
 from rest_framework.test import APIRequestFactory
 
@@ -232,4 +234,17 @@ def assert_user_permission():
     def inner(view, permissions):
         assert HasUserPermission in view.permission_classes
         assert set(view.required_permissions) == set(permissions)
+    return inner
+
+
+@pytest.fixture
+def to_api_date():
+    def inner(value):
+        if isinstance(value, datetime.datetime):
+            f = rest_fields.DateTimeField()
+            return f.to_representation(value)
+        if isinstance(value, datetime.date):
+            f = rest_fields.DateField()
+            return f.to_representation(value)
+        raise ValueError('Invalid value: {}'.format(value))
     return inner

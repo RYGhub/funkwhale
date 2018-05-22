@@ -223,41 +223,6 @@ def test_user_can_create_import_job_with_file(
         import_job_id=job.pk)
 
 
-def test_can_search_artist(factories, logged_in_client):
-    artist1 = factories['music.Artist']()
-    artist2 = factories['music.Artist']()
-    expected = [serializers.ArtistSerializerNested(artist1).data]
-    url = reverse('api:v1:artists-search')
-    response = logged_in_client.get(url, {'query': artist1.name})
-    assert response.data == expected
-
-
-def test_can_search_artist_by_name_start(factories, logged_in_client):
-    artist1 = factories['music.Artist'](name='alpha')
-    artist2 = factories['music.Artist'](name='beta')
-    expected = {
-        'next': None,
-        'previous': None,
-        'count': 1,
-        'results': [serializers.ArtistSerializerNested(artist1).data]
-    }
-    url = reverse('api:v1:artists-list')
-    response = logged_in_client.get(url, {'name__startswith': 'a'})
-
-    assert expected == response.data
-
-
-def test_can_search_tracks(factories, logged_in_client):
-    track1 = factories['music.Track'](title="test track 1")
-    track2 = factories['music.Track']()
-    query = 'test track 1'
-    expected = [serializers.TrackSerializerNested(track1).data]
-    url = reverse('api:v1:tracks-search')
-    response = logged_in_client.get(url, {'query': query})
-
-    assert expected == response.data
-
-
 @pytest.mark.parametrize('route,method', [
     ('api:v1:tags-list', 'get'),
     ('api:v1:tracks-list', 'get'),
