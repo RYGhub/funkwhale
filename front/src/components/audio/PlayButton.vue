@@ -21,7 +21,6 @@
 
 <script>
 import axios from 'axios'
-import logger from '@/logging'
 import jQuery from 'jquery'
 
 export default {
@@ -30,16 +29,13 @@ export default {
     tracks: {type: Array, required: false},
     track: {type: Object, required: false},
     playlist: {type: Object, required: false},
-    discrete: {type: Boolean, default: false}
+    discrete: {type: Boolean, default: false},
+    artist: {type: Number, required: false},
+    album: {type: Number, required: false}
   },
   data () {
     return {
       isLoading: false
-    }
-  },
-  created () {
-    if (!this.playlist && !this.track && !this.tracks) {
-      logger.default.error('You have to provide either a track playlist or tracks property')
     }
   },
   mounted () {
@@ -62,6 +58,10 @@ export default {
         return this.tracks.length > 0
       } else if (this.playlist) {
         return true
+      } else if (this.artist) {
+        return true
+      } else if (this.album) {
+        return true
       }
       return false
     }
@@ -80,6 +80,20 @@ export default {
             resolve(response.data.results.map(plt => {
               return plt.track
             }))
+          })
+        } else if (self.artist) {
+          let params = {
+            params: {'artist': self.artist, 'ordering': 'album__release_date,position'}
+          }
+          axios.get('tracks', params).then((response) => {
+            resolve(response.data.results)
+          })
+        } else if (self.album) {
+          let params = {
+            params: {'album': self.album, 'ordering': 'position'}
+          }
+          axios.get('tracks', params).then((response) => {
+            resolve(response.data.results)
           })
         }
       })

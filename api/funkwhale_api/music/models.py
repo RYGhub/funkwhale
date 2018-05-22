@@ -319,11 +319,8 @@ class Lyrics(models.Model):
 class TrackQuerySet(models.QuerySet):
     def for_nested_serialization(self):
         return (self.select_related()
-                    .select_related('album__artist')
-                    .prefetch_related(
-                        'tags',
-                        'files',
-                        'artist__albums__tracks__tags'))
+                    .select_related('album__artist', 'artist')
+                    .prefetch_related('files'))
 
 
 class Track(APIModelMixin):

@@ -14,7 +14,7 @@
               <input id="public" type="checkbox" v-model="isPublic" />
               <i18next tag="label" for="public" path="Display publicly"/>
             </div>
-            <button :disabled="!canSave" @click="save" class="ui green button"><i18ext path="Save"/></button>
+            <button :disabled="!canSave" @click="save" class="ui green button"><i18next path="Save"/></button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>

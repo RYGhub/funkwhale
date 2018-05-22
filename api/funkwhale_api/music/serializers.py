@@ -122,7 +122,10 @@ class AlbumSerializer(serializers.ModelSerializer):
         )
 
     def get_tracks(self, o):
-        ordered_tracks = sorted(o.tracks.all(), key=lambda v: v.position)
+        ordered_tracks = sorted(
+            o.tracks.all(),
+            key=lambda v: (v.position, v.title) if v.position else (99999, v.title)
+        )
         return AlbumTrackSerializer(ordered_tracks, many=True).data
 
 

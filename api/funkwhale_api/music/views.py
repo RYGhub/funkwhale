@@ -46,17 +46,6 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
-class SearchMixin(object):
-    search_fields = []
-
-    @list_route(methods=['get'])
-    def search(self, request, *args, **kwargs):
-        query = utils.get_query(request.GET['query'], self.search_fields)
-        queryset = self.get_queryset().filter(query)
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
-
-
 class TagViewSetMixin(object):
 
     def get_queryset(self):
@@ -67,26 +56,25 @@ class TagViewSetMixin(object):
         return queryset
 
 
-class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
+class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.with_albums()
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['name__unaccent']
     filter_class = filters.ArtistFilter
     ordering_fields = ('id', 'name', 'creation_date')
 
 
-class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all()
-                            .order_by('-creation_date')
+                            .order_by('artist', 'release_date')
                             .select_related()
-                            .prefetch_related('tracks__tags',
-                                              'tracks__files'))
+                            .prefetch_related(
+                                'tracks__artist',
+                                'tracks__files'))
     serializer_class = serializers.AlbumSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['title__unaccent']
-    ordering_fields = ('creation_date',)
+    ordering_fields = ('creation_date', 'release_date', 'title')
     filter_class = filters.AlbumFilter
 
 
@@ -155,19 +143,20 @@ class ImportJobViewSet(
         )
 
 
-class TrackViewSet(
-        TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
     queryset = (models.Track.objects.all().for_nested_serialization())
     serializer_class = serializers.TrackSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['title', 'artist__name']
+    filter_class = filters.TrackFilter
     ordering_fields = (
         'creation_date',
         'title__unaccent',
         'album__title__unaccent',
+        'album__release_date',
+        'position',
         'artist__name__unaccent',
     )
 
