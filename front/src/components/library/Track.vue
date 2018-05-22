@@ -14,8 +14,7 @@
                 <i18next path="From album {%0%} by {%1%}">
                   <router-link :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
                     {{ track.album.title }}
-                  </router-link>
-                  <router-link :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+                  </router-link><router-link :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
                     {{ track.artist.name }}
                   </router-link>
                 </i18next>

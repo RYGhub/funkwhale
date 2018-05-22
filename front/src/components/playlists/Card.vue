@@ -11,7 +11,7 @@
       </div>
       <div class="meta">
         <i class="clock icon"></i>
-        <i18next path="Updated {%date%}">
+        <i18next path="Updated {%0%}">
           <human-date :date="playlist.modification_date" />
         </i18next>
       </div>
