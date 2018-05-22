@@ -57,3 +57,11 @@ def test_can_get_metadata_from_flac_file(field, value):
     data = metadata.Metadata(path)
 
     assert data.get(field) == value
+
+
+def test_can_get_metadata_from_flac_file_not_crash_if_empty():
+    path = os.path.join(DATA_DIR, 'sample.flac')
+    data = metadata.Metadata(path)
+
+    with pytest.raises(metadata.TagNotFound):
+        data.get('test')
