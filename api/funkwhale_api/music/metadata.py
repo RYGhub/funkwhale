@@ -30,7 +30,7 @@ def get_id3_tag(f, k):
 
 def get_flac_tag(f, k):
     try:
-        return f.get(k)[0]
+        return f.get(k, [])[0]
     except (KeyError, IndexError):
         raise TagNotFound(k)
 
@@ -157,6 +157,9 @@ CONF = {
             },
             'musicbrainz_recordingid': {
                 'field': 'musicbrainz_trackid'
+            },
+            'test': {
+                'field': 'test'
             },
         }
     },
