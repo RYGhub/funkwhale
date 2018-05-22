@@ -23,7 +23,7 @@
           <div class="field">
             <i18next tag="label" path="Ordering direction"/>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value=""><i18next path="Ascending"/></option>
+              <option value="+"><i18next path="Ascending"/></option>
               <option value="-"><i18next path="Descending"/></option>
             </select>
           </div>
@@ -99,7 +99,7 @@ export default {
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction,
+      orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
         ['creation_date', 'Creation date'],
