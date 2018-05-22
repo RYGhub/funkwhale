@@ -130,7 +130,7 @@ services:
     ports:
       - '8002:8080'
     volumes:
-      - "./api/docs/swagger.yml:/usr/share/nginx/html/swagger.yml"
+      - "./docs/swagger.yml:/usr/share/nginx/html/swagger.yml"
 
 networks:
   internal:
