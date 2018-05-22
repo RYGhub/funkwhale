@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 
-from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.common.permissions import ConditionalAuthentication
 
 from . import models
@@ -49,7 +49,7 @@ class RadioViewSet(
 
         page = self.paginate_queryset(tracks)
         if page is not None:
-            serializer = TrackSerializerNested(page, many=True)
+            serializer = TrackSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
     @list_route(methods=['get'])
@@ -72,7 +72,7 @@ class RadioViewSet(
             results = filters.test(f)
             if results['candidates']['sample']:
                 qs = results['candidates']['sample'].for_nested_serialization()
-                results['candidates']['sample'] = TrackSerializerNested(
+                results['candidates']['sample'] = TrackSerializer(
                     qs, many=True).data
             data['filters'].append(results)
 

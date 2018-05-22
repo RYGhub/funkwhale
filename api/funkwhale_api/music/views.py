@@ -46,17 +46,6 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
-class SearchMixin(object):
-    search_fields = []
-
-    @list_route(methods=['get'])
-    def search(self, request, *args, **kwargs):
-        query = utils.get_query(request.GET['query'], self.search_fields)
-        queryset = self.get_queryset().filter(query)
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
-
-
 class TagViewSetMixin(object):
 
     def get_queryset(self):
@@ -67,31 +56,25 @@ class TagViewSetMixin(object):
         return queryset
 
 
-class ArtistViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        models.Artist.objects.all()
-                             .prefetch_related(
-                                'albums__tracks__files',
-                                'albums__tracks__artist',
-                                'albums__tracks__tags'))
-    serializer_class = serializers.ArtistSerializerNested
+class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Artist.objects.with_albums()
+    serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['name__unaccent']
     filter_class = filters.ArtistFilter
     ordering_fields = ('id', 'name', 'creation_date')
 
 
-class AlbumViewSet(SearchMixin, viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all()
-                            .order_by('-creation_date')
+                            .order_by('artist', 'release_date')
                             .select_related()
-                            .prefetch_related('tracks__tags',
-                                              'tracks__files'))
-    serializer_class = serializers.AlbumSerializerNested
+                            .prefetch_related(
+                                'tracks__artist',
+                                'tracks__files'))
+    serializer_class = serializers.AlbumSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['title__unaccent']
-    ordering_fields = ('creation_date',)
+    ordering_fields = ('creation_date', 'release_date', 'title')
     filter_class = filters.AlbumFilter
 
 
@@ -160,19 +143,20 @@ class ImportJobViewSet(
         )
 
 
-class TrackViewSet(
-        TagViewSetMixin, SearchMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
     queryset = (models.Track.objects.all().for_nested_serialization())
-    serializer_class = serializers.TrackSerializerNested
+    serializer_class = serializers.TrackSerializer
     permission_classes = [ConditionalAuthentication]
-    search_fields = ['title', 'artist__name']
+    filter_class = filters.TrackFilter
     ordering_fields = (
         'creation_date',
         'title__unaccent',
         'album__title__unaccent',
+        'album__release_date',
+        'position',
         'artist__name__unaccent',
     )
 
@@ -370,10 +354,10 @@ class Search(views.APIView):
     def get(self, request, *args, **kwargs):
         query = request.GET['query']
         results = {
-            'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
-            'artists': serializers.ArtistSerializerNested(self.get_artists(query), many=True).data,
-            'tracks': serializers.TrackSerializerNested(self.get_tracks(query), many=True).data,
-            'albums': serializers.AlbumSerializerNested(self.get_albums(query), many=True).data,
+            # 'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
+            'artists': serializers.ArtistWithAlbumsSerializer(self.get_artists(query), many=True).data,
+            'tracks': serializers.TrackSerializer(self.get_tracks(query), many=True).data,
+            'albums': serializers.AlbumSerializer(self.get_albums(query), many=True).data,
         }
         return Response(results, status=200)
 
@@ -387,13 +371,9 @@ class Search(views.APIView):
         return (
             models.Track.objects.all()
                         .filter(query_obj)
-                        .select_related('album__artist')
-                        .prefetch_related(
-                            'tags',
-                            'artist__albums__tracks__tags',
-                            'files')
+                        .select_related('artist', 'album__artist')
+                        .prefetch_related('files')
         )[:self.max_results]
-
 
     def get_albums(self, query):
         search_fields = [
@@ -406,11 +386,9 @@ class Search(views.APIView):
                         .filter(query_obj)
                         .select_related()
                         .prefetch_related(
-                            'tracks__tags',
                             'tracks__files',
-                            )
+                        )
         )[:self.max_results]
-
 
     def get_artists(self, query):
         search_fields = ['mbid', 'name__unaccent']
@@ -418,14 +396,8 @@ class Search(views.APIView):
         return (
             models.Artist.objects.all()
                          .filter(query_obj)
-                         .select_related()
-                         .prefetch_related(
-                             'albums__tracks__tags',
-                             'albums__tracks__files',
-                             )
-
+                         .with_albums()
         )[:self.max_results]
-
 
     def get_tags(self, query):
         search_fields = ['slug', 'name__unaccent']

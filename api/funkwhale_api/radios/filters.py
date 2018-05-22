@@ -144,8 +144,8 @@ class ArtistFilter(RadioFilter):
             'name': 'ids',
             'type': 'list',
             'subtype': 'number',
-            'autocomplete': reverse_lazy('api:v1:artists-search'),
-            'autocomplete_qs': 'query={query}',
+            'autocomplete': reverse_lazy('api:v1:artists-list'),
+            'autocomplete_qs': 'q={query}',
             'autocomplete_fields': {'name': 'name', 'value': 'id'},
             'label': 'Artist',
             'placeholder': 'Select artists'

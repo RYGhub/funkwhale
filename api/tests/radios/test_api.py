@@ -3,7 +3,7 @@ import pytest
 
 from django.urls import reverse
 
-from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.radios import filters
 from funkwhale_api.radios import serializers
 
@@ -43,7 +43,7 @@ def test_can_validate_config(logged_in_client, factories):
 
     expected = {
         'count': candidates.count(),
-        'sample': TrackSerializerNested(candidates, many=True).data
+        'sample': TrackSerializer(candidates, many=True).data
     }
     assert payload['filters'][0]['candidates'] == expected
     assert payload['filters'][0]['errors'] == []

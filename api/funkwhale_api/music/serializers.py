@@ -13,24 +13,38 @@ from . import models
 from . import tasks
 
 
-class TagSerializer(serializers.ModelSerializer):
+class ArtistAlbumSerializer(serializers.ModelSerializer):
+    tracks_count = serializers.SerializerMethodField()
+
     class Meta:
-        model = Tag
-        fields = ('id', 'name', 'slug')
+        model = models.Album
+        fields = (
+            'id',
+            'mbid',
+            'title',
+            'artist',
+            'release_date',
+            'cover',
+            'creation_date',
+            'tracks_count',
+        )
+
+    def get_tracks_count(self, o):
+        return o._tracks_count
 
 
-class SimpleArtistSerializer(serializers.ModelSerializer):
+class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
+    albums = ArtistAlbumSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Artist
-        fields = ('id', 'mbid', 'name', 'creation_date')
-
-
-class ArtistSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = models.Artist
-        fields = ('id', 'mbid', 'name', 'tags', 'creation_date')
+        fields = (
+            'id',
+            'mbid',
+            'name',
+            'creation_date',
+            'albums',
+        )
 
 
 class TrackFileSerializer(serializers.ModelSerializer):
@@ -62,71 +76,110 @@ class TrackFileSerializer(serializers.ModelSerializer):
         return url
 
 
-class SimpleAlbumSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Album
-        fields = ('id', 'mbid', 'title', 'release_date', 'cover')
-
-
-class AlbumSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True, read_only=True)
-    class Meta:
-        model = models.Album
-        fields = ('id', 'mbid', 'title', 'cover', 'release_date', 'tags')
-
-
-class LyricsMixin(serializers.ModelSerializer):
-    lyrics = serializers.SerializerMethodField()
-
-    def get_lyrics(self, obj):
-        return obj.get_lyrics_url()
-
-
-class TrackSerializer(LyricsMixin):
+class AlbumTrackSerializer(serializers.ModelSerializer):
     files = TrackFileSerializer(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Track
         fields = (
             'id',
             'mbid',
             'title',
+            'album',
             'artist',
+            'creation_date',
             'files',
-            'tags',
             'position',
-            'lyrics')
+        )
 
 
-class TrackSerializerNested(LyricsMixin):
-    artist = ArtistSerializer()
-    files = TrackFileSerializer(many=True, read_only=True)
-    album = SimpleAlbumSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-
+class ArtistSimpleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Track
-        fields = ('id', 'mbid', 'title', 'artist', 'files', 'album', 'tags', 'lyrics')
+        model = models.Artist
+        fields = (
+            'id',
+            'mbid',
+            'name',
+            'creation_date',
+        )
 
 
-class AlbumSerializerNested(serializers.ModelSerializer):
-    tracks = TrackSerializer(many=True, read_only=True)
-    artist = SimpleArtistSerializer()
-    tags = TagSerializer(many=True, read_only=True)
+class AlbumSerializer(serializers.ModelSerializer):
+    tracks = serializers.SerializerMethodField()
+    artist = ArtistSimpleSerializer(read_only=True)
 
     class Meta:
         model = models.Album
-        fields = ('id', 'mbid', 'title', 'cover', 'artist', 'release_date', 'tracks', 'tags')
+        fields = (
+            'id',
+            'mbid',
+            'title',
+            'artist',
+            'tracks',
+            'release_date',
+            'cover',
+            'creation_date',
+        )
+
+    def get_tracks(self, o):
+        ordered_tracks = sorted(
+            o.tracks.all(),
+            key=lambda v: (v.position, v.title) if v.position else (99999, v.title)
+        )
+        return AlbumTrackSerializer(ordered_tracks, many=True).data
 
 
-class ArtistSerializerNested(serializers.ModelSerializer):
-    albums = AlbumSerializerNested(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+class TrackAlbumSerializer(serializers.ModelSerializer):
+    artist = ArtistSimpleSerializer(read_only=True)
 
     class Meta:
-        model = models.Artist
-        fields = ('id', 'mbid', 'name', 'albums', 'tags')
+        model = models.Album
+        fields = (
+            'id',
+            'mbid',
+            'title',
+            'artist',
+            'release_date',
+            'cover',
+            'creation_date',
+        )
+
+
+class TrackSerializer(serializers.ModelSerializer):
+    files = TrackFileSerializer(many=True, read_only=True)
+    artist = ArtistSimpleSerializer(read_only=True)
+    album = TrackAlbumSerializer(read_only=True)
+    lyrics = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Track
+        fields = (
+            'id',
+            'mbid',
+            'title',
+            'album',
+            'artist',
+            'creation_date',
+            'files',
+            'position',
+            'lyrics',
+        )
+
+    def get_lyrics(self, obj):
+        return obj.get_lyrics_url()
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'slug')
+
+
+class SimpleAlbumSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Album
+        fields = ('id', 'mbid', 'title', 'release_date', 'cover')
 
 
 class LyricsSerializer(serializers.ModelSerializer):

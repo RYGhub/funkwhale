@@ -6,7 +6,6 @@ from rest_framework.decorators import detail_route
 
 from funkwhale_api.activity import record
 from funkwhale_api.common.permissions import ConditionalAuthentication
-from funkwhale_api.music.serializers import TrackSerializerNested
 
 from . import models
 from . import serializers

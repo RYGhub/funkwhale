@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+from funkwhale_api.music import serializers
 from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
@@ -14,6 +15,65 @@ from funkwhale_api.federation import actors
 ])
 def test_permissions(assert_user_permission, view, permissions):
     assert_user_permission(view, permissions)
+
+
+def test_artist_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    artist = track.artist
+    request = api_request.get('/')
+    qs = artist.__class__.objects.with_albums()
+    serializer = serializers.ArtistWithAlbumsSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:artists-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_album_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    album = track.album
+    request = api_request.get('/')
+    qs = album.__class__.objects.all()
+    serializer = serializers.AlbumSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:albums-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_track_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    request = api_request.get('/')
+    qs = track.__class__.objects.all()
+    serializer = serializers.TrackSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:tracks-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
 
 
 @pytest.mark.parametrize('param,expected', [

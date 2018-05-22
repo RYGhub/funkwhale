@@ -80,6 +80,12 @@ class ArtistQuerySet(models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count('albums'))
 
+    def with_albums(self):
+        return self.prefetch_related(
+            models.Prefetch(
+                'albums', queryset=Album.objects.with_tracks_count())
+        )
+
 
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
@@ -313,11 +319,8 @@ class Lyrics(models.Model):
 class TrackQuerySet(models.QuerySet):
     def for_nested_serialization(self):
         return (self.select_related()
-                    .select_related('album__artist')
-                    .prefetch_related(
-                        'tags',
-                        'files',
-                        'artist__albums__tracks__tags'))
+                    .select_related('album__artist', 'artist')
+                    .prefetch_related('files'))
 
 
 class Track(APIModelMixin):

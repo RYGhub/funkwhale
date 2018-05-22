@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
-from funkwhale_api.music.serializers import TrackSerializerNested
 from funkwhale_api.music.serializers import TrackActivitySerializer
 from funkwhale_api.users.serializers import UserActivitySerializer
 
