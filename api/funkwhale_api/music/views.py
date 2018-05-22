@@ -153,11 +153,11 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     filter_class = filters.TrackFilter
     ordering_fields = (
         'creation_date',
-        'title__unaccent',
-        'album__title__unaccent',
+        'title',
+        'album__title',
         'album__release_date',
         'position',
-        'artist__name__unaccent',
+        'artist__name',
     )
 
     def get_queryset(self):

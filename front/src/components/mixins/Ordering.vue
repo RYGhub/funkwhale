@@ -13,13 +13,17 @@ export default {
         }
       } else {
         return {
-          direction: '',
+          direction: '+',
           field: s
         }
       }
     },
     getOrderingAsString () {
-      return [this.orderingDirection, this.ordering].join('')
+      let direction = this.orderingDirection
+      if (direction === '+') {
+        direction = ''
+      }
+      return [direction, this.ordering].join('')
     }
   }
 }
