@@ -157,10 +157,11 @@ export default {
       let self = this
       self.isImporting = true
       let payload = {
-        library_tracks: this.checked
+        objects: this.checked,
+        action: 'import'
       }
-      axios.post('/submit/federation/', payload).then((response) => {
-        self.importBatch = response.data
+      axios.post('/federation/library-tracks/action/', payload).then((response) => {
+        self.importBatch = response.data.result.batch
         self.isImporting = false
         self.fetchData()
       }, error => {

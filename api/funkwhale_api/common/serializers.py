@@ -49,17 +49,19 @@ class ActionSerializer(serializers.Serializer):
             'list of identifiers or the string "all".'.format(value))
 
     def validate(self, data):
-        if not self.filterset_class or 'filters' not in data:
-            # no additional filters to apply, we just skip
-            return data
+        if self.filterset_class and 'filters' in data:
+            qs_filterset = self.filterset_class(
+                data['filters'], queryset=data['objects'])
+            try:
+                assert qs_filterset.form.is_valid()
+            except (AssertionError, TypeError):
+                raise serializers.ValidationError('Invalid filters')
+            data['objects'] = qs_filterset.qs
 
-        qs_filterset = self.filterset_class(
-            data['filters'], queryset=data['objects'])
-        try:
-            assert qs_filterset.form.is_valid()
-        except (AssertionError, TypeError):
-            raise serializers.ValidationError('Invalid filters')
-        data['objects'] = qs_filterset.qs
+        data['count'] = data['objects'].count()
+        if data['count'] < 1:
+            raise serializers.ValidationError(
+                'No object matching your request')
         return data
 
     def save(self):
@@ -67,7 +69,7 @@ class ActionSerializer(serializers.Serializer):
         handler = getattr(self, handler_name)
         result = handler(self.validated_data['objects'])
         payload = {
-            'updated': self.validated_data['objects'].count(),
+            'updated': self.validated_data['count'],
             'action': self.validated_data['action'],
             'result': result,
         }

@@ -449,22 +449,6 @@ class SubmitViewSet(viewsets.ViewSet):
             data, request, batch=None, import_request=import_request)
         return Response(import_data)
 
-    @list_route(methods=['post'])
-    @transaction.non_atomic_requests
-    def federation(self, request, *args, **kwargs):
-        serializer = serializers.SubmitFederationTracksSerializer(
-            data=request.data)
-        serializer.is_valid(raise_exception=True)
-        batch = serializer.save(submitted_by=request.user)
-        for job in batch.jobs.all():
-            funkwhale_utils.on_commit(
-                tasks.import_job_run.delay,
-                import_job_id=job.pk,
-                use_acoustid=False,
-            )
-
-        return Response({'id': batch.id}, status=201)
-
     @transaction.atomic
     def _import_album(self, data, request, batch=None, import_request=None):
         # we import the whole album here to prevent race conditions that occurs

@@ -15,7 +15,7 @@ from rest_framework.serializers import ValidationError
 
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.music.models import TrackFile
+from funkwhale_api.music import models as music_models
 from funkwhale_api.users.permissions import HasUserPermission
 
 from . import activity
@@ -148,7 +148,9 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         page = request.GET.get('page')
         library = actors.SYSTEM_ACTORS['library'].get_actor_instance()
-        qs = TrackFile.objects.order_by('-creation_date').select_related(
+        qs = music_models.TrackFile.objects.order_by(
+            '-creation_date'
+        ).select_related(
             'track__artist',
             'track__album__artist'
         ).filter(library_track__isnull=True)
@@ -307,3 +309,16 @@ class LibraryTrackViewSet(
         'fetched_date',
         'published_date',
     )
+
+    @list_route(methods=['post'])
+    def action(self, request, *args, **kwargs):
+        queryset = models.LibraryTrack.objects.filter(
+            local_track_file__isnull=True)
+        serializer = serializers.LibraryTrackActionSerializer(
+            request.data,
+            queryset=queryset,
+            context={'submitted_by': request.user}
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)

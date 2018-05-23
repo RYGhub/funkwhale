@@ -418,3 +418,37 @@ def test_can_filter_pending_follows(factories, superuser_api_client):
 
     assert response.status_code == 200
     assert len(response.data['results']) == 0
+
+
+def test_library_track_action_import(
+        factories, superuser_api_client, mocker):
+    lt1 = factories['federation.LibraryTrack']()
+    lt2 = factories['federation.LibraryTrack'](library=lt1.library)
+    lt3 = factories['federation.LibraryTrack']()
+    lt4 = factories['federation.LibraryTrack'](library=lt3.library)
+    mocker.patch('funkwhale_api.music.tasks.import_job_run')
+
+    payload = {
+        'objects': 'all',
+        'action': 'import',
+        'filters': {
+            'library': lt1.library.uuid
+        }
+    }
+    url = reverse('api:v1:federation:library-tracks-action')
+    response = superuser_api_client.post(url, payload, format='json')
+    batch = superuser_api_client.user.imports.latest('id')
+    expected = {
+        'updated': 2,
+        'action': 'import',
+        'result': {
+            'batch': {'id': batch.pk}
+        }
+    }
+
+    imported_lts = [lt1, lt2]
+    assert response.status_code == 200
+    assert response.data == expected
+    assert batch.jobs.count() == 2
+    for i, job in enumerate(batch.jobs.all()):
+        assert job.library_track == imported_lts[i]

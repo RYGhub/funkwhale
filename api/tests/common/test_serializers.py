@@ -87,3 +87,14 @@ def test_action_serializers_filterset(factories):
 
     assert serializer.is_valid() is True
     assert list(serializer.validated_data['objects']) == [user2]
+
+
+def test_action_serializers_validates_at_least_one_object():
+    data = {
+        'objects': 'all',
+        'action': 'test',
+    }
+    serializer = TestSerializer(data, queryset=models.User.objects.none())
+
+    assert serializer.is_valid() is False
+    assert 'non_field_errors' in serializer.errors

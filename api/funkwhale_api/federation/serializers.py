@@ -10,8 +10,11 @@ from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import utils as funkwhale_utils
-
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.music import models as music_models
+from funkwhale_api.music import tasks as music_tasks
 from . import activity
+from . import filters
 from . import models
 from . import utils
 
@@ -806,3 +809,29 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get('include_ap_context', True):
             d['@context'] = AP_CONTEXT
         return d
+
+
+class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
+    actions = ['import']
+    filterset_class = filters.LibraryTrackFilter
+
+    @transaction.atomic
+    def handle_import(self, objects):
+        batch = music_models.ImportBatch.objects.create(
+            source='federation',
+            submitted_by=self.context['submitted_by']
+        )
+        for lt in objects:
+            job = music_models.ImportJob.objects.create(
+                batch=batch,
+                library_track=lt,
+                mbid=lt.mbid,
+                source=lt.url,
+            )
+            funkwhale_utils.on_commit(
+                music_tasks.import_job_run.delay,
+                import_job_id=job.pk,
+                use_acoustid=False,
+            )
+
+        return {'batch': {'id': batch.pk}}

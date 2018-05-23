@@ -250,28 +250,6 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
         return 'Audio'
 
 
-class SubmitFederationTracksSerializer(serializers.Serializer):
-    library_tracks = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=LibraryTrack.objects.filter(local_track_file__isnull=True),
-    )
-
-    @transaction.atomic
-    def save(self, **kwargs):
-        batch = models.ImportBatch.objects.create(
-            source='federation',
-            **kwargs
-        )
-        for lt in self.validated_data['library_tracks']:
-            models.ImportJob.objects.create(
-                batch=batch,
-                library_track=lt,
-                mbid=lt.mbid,
-                source=lt.url,
-            )
-        return batch
-
-
 class ImportJobRunSerializer(serializers.Serializer):
     jobs = serializers.PrimaryKeyRelatedField(
         many=True,

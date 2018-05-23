@@ -249,24 +249,6 @@ def test_serve_updates_access_date(factories, settings, api_client):
     assert track_file.accessed_date > now
 
 
-def test_can_create_import_from_federation_tracks(
-        factories, superuser_api_client, mocker):
-    lts = factories['federation.LibraryTrack'].create_batch(size=5)
-    mocker.patch('funkwhale_api.music.tasks.import_job_run')
-
-    payload = {
-        'library_tracks': [l.pk for l in lts]
-    }
-    url = reverse('api:v1:submit-federation')
-    response = superuser_api_client.post(url, payload)
-
-    assert response.status_code == 201
-    batch = superuser_api_client.user.imports.latest('id')
-    assert batch.jobs.count() == 5
-    for i, job in enumerate(batch.jobs.all()):
-        assert job.library_track == lts[i]
-
-
 def test_can_list_import_jobs(factories, superuser_api_client):
     job = factories['music.ImportJob']()
     url = reverse('api:v1:import-jobs-list')
