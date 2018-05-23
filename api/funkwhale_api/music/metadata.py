@@ -118,13 +118,13 @@ CONF = {
                 'to_application': lambda v: arrow.get(v).date()
             },
             'musicbrainz_albumid': {
-                'field': 'musicbrainz_albumid'
+                'field': 'MusicBrainz Album Id'
             },
             'musicbrainz_artistid': {
-                'field': 'musicbrainz_artistid'
+                'field': 'MusicBrainz Artist Id'
             },
             'musicbrainz_recordingid': {
-                'field': 'musicbrainz_trackid'
+                'field': 'MusicBrainz Track Id'
             },
         }
     },
