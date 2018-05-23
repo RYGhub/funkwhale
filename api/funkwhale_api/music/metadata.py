@@ -97,6 +97,37 @@ CONF = {
             },
         }
     },
+    'OggTheora': {
+        'getter': lambda f, k: f[k][0],
+        'fields': {
+            'track_number': {
+                'field': 'TRACKNUMBER',
+                'to_application': convert_track_number
+            },
+            'title': {
+                'field': 'title'
+            },
+            'artist': {
+                'field': 'artist'
+            },
+            'album': {
+                'field': 'album'
+            },
+            'date': {
+                'field': 'date',
+                'to_application': lambda v: arrow.get(v).date()
+            },
+            'musicbrainz_albumid': {
+                'field': 'musicbrainz_albumid'
+            },
+            'musicbrainz_artistid': {
+                'field': 'musicbrainz_artistid'
+            },
+            'musicbrainz_recordingid': {
+                'field': 'musicbrainz_trackid'
+            },
+        }
+    },
     'MP3': {
         'getter': get_id3_tag,
         'fields': {
