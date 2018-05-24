@@ -834,17 +834,17 @@ class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
             source='federation',
             submitted_by=self.context['submitted_by']
         )
+        jobs = []
         for lt in objects:
-            job = music_models.ImportJob.objects.create(
+            job = music_models.ImportJob(
                 batch=batch,
                 library_track=lt,
                 mbid=lt.mbid,
                 source=lt.url,
             )
-            funkwhale_utils.on_commit(
-                music_tasks.import_job_run.delay,
-                import_job_id=job.pk,
-                use_acoustid=False,
-            )
+            jobs.append(job)
+
+        music_models.ImportJob.objects.bulk_create(jobs)
+        music_tasks.import_batch_run.delay(import_batch_id=batch.pk)
 
         return {'batch': {'id': batch.pk}}

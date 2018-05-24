@@ -426,7 +426,8 @@ def test_library_track_action_import(
     lt2 = factories['federation.LibraryTrack'](library=lt1.library)
     lt3 = factories['federation.LibraryTrack']()
     lt4 = factories['federation.LibraryTrack'](library=lt3.library)
-    mocker.patch('funkwhale_api.music.tasks.import_job_run')
+    mocked_run = mocker.patch(
+        'funkwhale_api.music.tasks.import_batch_run.delay')
 
     payload = {
         'objects': 'all',
@@ -452,3 +453,4 @@ def test_library_track_action_import(
     assert batch.jobs.count() == 2
     for i, job in enumerate(batch.jobs.all()):
         assert job.library_track == imported_lts[i]
+    mocked_run.assert_called_once_with(import_batch_id=batch.pk)
