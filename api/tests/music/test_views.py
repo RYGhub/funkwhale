@@ -9,12 +9,12 @@ from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
 
-@pytest.mark.parametrize('view,permissions', [
-    (views.ImportBatchViewSet, ['library']),
-    (views.ImportJobViewSet, ['library']),
+@pytest.mark.parametrize('view,permissions,operator', [
+    (views.ImportBatchViewSet, ['library', 'upload'], 'or'),
+    (views.ImportJobViewSet, ['library', 'upload'], 'or'),
 ])
-def test_permissions(assert_user_permission, view, permissions):
-    assert_user_permission(view, permissions)
+def test_permissions(assert_user_permission, view, permissions, operator):
+    assert_user_permission(view, permissions, operator)
 
 
 def test_artist_list_serializer(api_request, factories, logged_in_api_client):
@@ -351,3 +351,27 @@ def test_import_batch_and_job_run_via_api(
 
     run.assert_any_call(import_job_id=job1.pk)
     run.assert_any_call(import_job_id=job2.pk)
+
+
+def test_import_job_viewset_get_queryset_upload_filters_user(
+        factories, logged_in_api_client):
+    logged_in_api_client.user.permission_upload = True
+    logged_in_api_client.user.save()
+
+    job = factories['music.ImportJob']()
+    url = reverse('api:v1:import-jobs-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.data['count'] == 0
+
+
+def test_import_batch_viewset_get_queryset_upload_filters_user(
+        factories, logged_in_api_client):
+    logged_in_api_client.user.permission_upload = True
+    logged_in_api_client.user.save()
+
+    job = factories['music.ImportBatch']()
+    url = reverse('api:v1:import-batches-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.data['count'] == 0

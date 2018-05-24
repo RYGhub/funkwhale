@@ -91,11 +91,20 @@ class ImportBatchViewSet(
     )
     serializer_class = serializers.ImportBatchSerializer
     permission_classes = (HasUserPermission,)
-    required_permissions = ['library']
+    required_permissions = ['library', 'upload']
+    permission_operator = 'or'
     filter_class = filters.ImportBatchFilter
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # if user do not have library permission, we limit to their
+        # own jobs
+        if not self.request.user.has_permissions('library'):
+            qs = qs.filter(submitted_by=self.request.user)
+        return qs
 
 
 class ImportJobViewSet(
@@ -105,11 +114,22 @@ class ImportJobViewSet(
     queryset = (models.ImportJob.objects.all().select_related())
     serializer_class = serializers.ImportJobSerializer
     permission_classes = (HasUserPermission,)
-    required_permissions = ['library']
+    required_permissions = ['library', 'upload']
+    permission_operator = 'or'
     filter_class = filters.ImportJobFilter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # if user do not have library permission, we limit to their
+        # own jobs
+        if not self.request.user.has_permissions('library'):
+            qs = qs.filter(batch__submitted_by=self.request.user)
+        return qs
 
     @list_route(methods=['get'])
     def stats(self, request, *args, **kwargs):
+        if not request.user.has_permissions('library'):
+            return Response(status=403)
         qs = models.ImportJob.objects.all()
         filterset = filters.ImportJobFilter(request.GET, queryset=qs)
         qs = filterset.qs

@@ -70,6 +70,12 @@
             </router-link>
             <router-link
               class="item"
+              v-else-if="$store.state.auth.availablePermissions['upload']"
+              to="/library/import/launch">
+              <i class="download icon"></i>{{ $t('Import music') }}
+            </router-link>
+            <router-link
+              class="item"
               v-if="$store.state.auth.availablePermissions['federation']"
               :to="{path: '/manage/federation/libraries'}">
               <i class="sitemap icon"></i>{{ $t('Federation') }}
@@ -193,7 +199,8 @@ export default {
     showAdmin () {
       let adminPermissions = [
         this.$store.state.auth.availablePermissions['federation'],
-        this.$store.state.auth.availablePermissions['library']
+        this.$store.state.auth.availablePermissions['library'],
+        this.$store.state.auth.availablePermissions['upload']
       ]
       return adminPermissions.filter(e => {
         return e
