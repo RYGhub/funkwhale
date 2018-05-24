@@ -1,0 +1,22 @@
+Added a new "upload" permission that allows user to launch import and view
+their own imports (#230)
+
+New "upload" permission
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This new permission is helpful if you want to give upload/import rights
+to some users, but don't want them to be able to manage the library as a whole:
+although there are no controls yet for managing library in the fron-end,
+subsequent release will introduce management interfaces for artists, files,
+etc.
+
+Because of that, users with the "library" permission will have much more power,
+and will also be able to remove content from the platform. On the other hand,
+users with the "upload" permission will only have the ability to add new
+content.
+
+Also, this release also includes a new feature called "default permissions":
+those are permissions that are granted to every users on the platform.
+On public/open instances, this will play well with the "upload" permission
+since everyone will be able to contribute to the instance library without
+an admin giving the permission to every single user.
