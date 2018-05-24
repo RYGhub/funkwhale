@@ -433,12 +433,6 @@ USE_X_FORWARDED_PORT = True
 REVERSE_PROXY_TYPE = env('REVERSE_PROXY_TYPE', default='nginx')
 assert REVERSE_PROXY_TYPE in ['apache2', 'nginx'], 'Unsupported REVERSE_PROXY_TYPE'
 
-# Wether we should check user permission before serving audio files (meaning
-# return an obfuscated url)
-# This require a special configuration on the reverse proxy side
-# See https://wellfire.co/learn/nginx-django-x-accel-redirects/ for example
-PROTECT_AUDIO_FILES = env.bool('PROTECT_AUDIO_FILES', default=True)
-
 # Which path will be used to process the internal redirection
 # **DO NOT** put a slash at the end
 PROTECT_FILES_PATH = env('PROTECT_FILES_PATH', default='/_protected')

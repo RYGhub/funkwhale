@@ -119,8 +119,8 @@ def test_album_view_filter_listenable(
 
 
 def test_can_serve_track_file_as_remote_library(
-        factories, authenticated_actor, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = True
+        factories, authenticated_actor, api_client, settings, preferences):
+    preferences['common__api_authentication_required'] = True
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     follow = factories['federation.Follow'](
         approved=True,
@@ -137,8 +137,8 @@ def test_can_serve_track_file_as_remote_library(
 
 
 def test_can_serve_track_file_as_remote_library_deny_not_following(
-        factories, authenticated_actor, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = True
+        factories, authenticated_actor, settings, api_client, preferences):
+    preferences['common__api_authentication_required'] = True
     track_file = factories['music.TrackFile']()
     response = api_client.get(track_file.path)
 
@@ -152,12 +152,18 @@ def test_can_serve_track_file_as_remote_library_deny_not_following(
     ('nginx', '/app/music', '/_protected/music/hello/world.mp3'),
 ])
 def test_serve_file_in_place(
-        proxy, serve_path, expected, factories, api_client, settings):
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        preferences,
+        settings):
     headers = {
         'apache2': 'X-Sendfile',
         'nginx': 'X-Accel-Redirect',
     }
-    settings.PROTECT_AUDIO_FILES = False
+    preferences['common__api_authentication_required'] = False
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
     settings.MUSIC_DIRECTORY_PATH = '/app/music'
@@ -179,8 +185,14 @@ def test_serve_file_in_place(
     ('nginx', '/app/music', '/_protected/music/hello/worldéà.mp3'),
 ])
 def test_serve_file_in_place_utf8(
-        proxy, serve_path, expected, factories, api_client, settings):
-    settings.PROTECT_AUDIO_FILES = False
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        settings,
+        preferences):
+    preferences['common__api_authentication_required'] = False
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
     settings.MUSIC_DIRECTORY_PATH = '/app/music'
@@ -198,12 +210,18 @@ def test_serve_file_in_place_utf8(
     ('nginx', '/app/music', '/_protected/media/tracks/hello/world.mp3'),
 ])
 def test_serve_file_media(
-        proxy, serve_path, expected, factories, api_client, settings):
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        settings,
+        preferences):
     headers = {
         'apache2': 'X-Sendfile',
         'nginx': 'X-Accel-Redirect',
     }
-    settings.PROTECT_AUDIO_FILES = False
+    preferences['common__api_authentication_required'] = False
     settings.MEDIA_ROOT = '/host/media'
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
@@ -220,8 +238,8 @@ def test_serve_file_media(
 
 
 def test_can_proxy_remote_track(
-        factories, settings, api_client, r_mock):
-    settings.PROTECT_AUDIO_FILES = False
+        factories, settings, api_client, r_mock, preferences):
+    preferences['common__api_authentication_required'] = False
     track_file = factories['music.TrackFile'](federation=True)
 
     r_mock.get(track_file.library_track.audio_url, body=io.BytesIO(b'test'))
@@ -236,8 +254,9 @@ def test_can_proxy_remote_track(
     assert library_track.audio_file.read() == b'test'
 
 
-def test_serve_updates_access_date(factories, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = False
+def test_serve_updates_access_date(
+        factories, settings, api_client, preferences):
+    preferences['common__api_authentication_required'] = False
     track_file = factories['music.TrackFile']()
     now = timezone.now()
     assert track_file.accessed_date is None

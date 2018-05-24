@@ -23,8 +23,6 @@ echo "DJANGO_SECRET_KEY=demo" >> .env
 echo "DJANGO_ALLOWED_HOSTS=demo.funkwhale.audio" >> .env
 echo "FUNKWHALE_VERSION=$version" >> .env
 echo "FUNKWHALE_API_PORT=5001" >> .env
-echo "FEDERATION_MUSIC_NEEDS_APPROVAL=False" >>.env
-echo "PROTECT_AUDIO_FILES=False" >> .env
 /usr/local/bin/docker-compose pull
 /usr/local/bin/docker-compose up -d postgres redis
 sleep 5
