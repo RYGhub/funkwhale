@@ -296,7 +296,7 @@ class LibraryTrackViewSet(
         'library__actor',
         'library__follow',
         'local_track_file',
-    )
+    ).prefetch_related('import_jobs')
     filter_class = filters.LibraryTrackFilter
     serializer_class = serializers.APILibraryTrackSerializer
     ordering_fields = (

@@ -296,6 +296,7 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
 
 class APILibraryTrackSerializer(serializers.ModelSerializer):
     library = APILibrarySerializer()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = models.LibraryTrack
@@ -314,7 +315,19 @@ class APILibraryTrackSerializer(serializers.ModelSerializer):
             'title',
             'library',
             'local_track_file',
+            'status',
         ]
+
+    def get_status(self, o):
+        try:
+            if o.local_track_file is not None:
+                return 'imported'
+        except music_models.TrackFile.DoesNotExist:
+            pass
+        for job in o.import_jobs.all():
+            if job.status == 'pending':
+                return 'import_pending'
+        return 'not_imported'
 
 
 class FollowSerializer(serializers.Serializer):
