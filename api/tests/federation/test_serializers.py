@@ -699,3 +699,26 @@ def test_api_library_create_serializer_save(factories, r_mock):
     assert library.tracks_count == 10
     assert library.actor == actor
     assert library.follow == follow
+
+
+def test_tapi_library_track_serializer_not_imported(factories):
+    lt = factories['federation.LibraryTrack']()
+    serializer = serializers.APILibraryTrackSerializer(lt)
+
+    assert serializer.get_status(lt) == 'not_imported'
+
+
+def test_tapi_library_track_serializer_imported(factories):
+    tf = factories['music.TrackFile'](federation=True)
+    lt = tf.library_track
+    serializer = serializers.APILibraryTrackSerializer(lt)
+
+    assert serializer.get_status(lt) == 'imported'
+
+
+def test_tapi_library_track_serializer_import_pending(factories):
+    job = factories['music.ImportJob'](federation=True, status='pending')
+    lt = job.library_track
+    serializer = serializers.APILibraryTrackSerializer(lt)
+
+    assert serializer.get_status(lt) == 'import_pending'

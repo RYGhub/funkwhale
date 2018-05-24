@@ -173,6 +173,13 @@ def import_job_run(self, import_job, replace=False, use_acoustid=False):
         raise
 
 
+@celery.app.task(name='ImportBatch.run')
+@celery.require_instance(models.ImportBatch, 'import_batch')
+def import_batch_run(import_batch):
+    for job_id in import_batch.jobs.order_by('id').values_list('id', flat=True):
+        import_job_run.delay(import_job_id=job_id)
+
+
 @celery.app.task(name='Lyrics.fetch_content')
 @celery.require_instance(models.Lyrics, 'lyrics')
 def fetch_content(lyrics):

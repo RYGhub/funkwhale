@@ -47,6 +47,15 @@ def test_set_acoustid_on_track_file_required_high_score(factories, mocker):
     assert track_file.acoustid_track_id is None
 
 
+def test_import_batch_run(factories, mocker):
+    job = factories['music.ImportJob']()
+    mocked_job_run = mocker.patch(
+        'funkwhale_api.music.tasks.import_job_run.delay')
+    tasks.import_batch_run(import_batch_id=job.batch.pk)
+
+    mocked_job_run.assert_called_once_with(import_job_id=job.pk)
+
+
 def test_import_job_can_run_with_file_and_acoustid(
         artists, albums, tracks, preferences, factories, mocker):
     preferences['providers_acoustid__api_key'] = 'test'

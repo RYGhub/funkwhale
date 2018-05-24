@@ -10,8 +10,11 @@ from rest_framework import serializers
 from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import utils as funkwhale_utils
-
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.music import models as music_models
+from funkwhale_api.music import tasks as music_tasks
 from . import activity
+from . import filters
 from . import models
 from . import utils
 
@@ -293,6 +296,7 @@ class APILibraryCreateSerializer(serializers.ModelSerializer):
 
 class APILibraryTrackSerializer(serializers.ModelSerializer):
     library = APILibrarySerializer()
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = models.LibraryTrack
@@ -311,7 +315,19 @@ class APILibraryTrackSerializer(serializers.ModelSerializer):
             'title',
             'library',
             'local_track_file',
+            'status',
         ]
+
+    def get_status(self, o):
+        try:
+            if o.local_track_file is not None:
+                return 'imported'
+        except music_models.TrackFile.DoesNotExist:
+            pass
+        for job in o.import_jobs.all():
+            if job.status == 'pending':
+                return 'import_pending'
+        return 'not_imported'
 
 
 class FollowSerializer(serializers.Serializer):
@@ -806,3 +822,29 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get('include_ap_context', True):
             d['@context'] = AP_CONTEXT
         return d
+
+
+class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
+    actions = ['import']
+    filterset_class = filters.LibraryTrackFilter
+
+    @transaction.atomic
+    def handle_import(self, objects):
+        batch = music_models.ImportBatch.objects.create(
+            source='federation',
+            submitted_by=self.context['submitted_by']
+        )
+        jobs = []
+        for lt in objects:
+            job = music_models.ImportJob(
+                batch=batch,
+                library_track=lt,
+                mbid=lt.mbid,
+                source=lt.url,
+            )
+            jobs.append(job)
+
+        music_models.ImportJob.objects.bulk_create(jobs)
+        music_tasks.import_batch_run.delay(import_batch_id=batch.pk)
+
+        return {'batch': {'id': batch.pk}}

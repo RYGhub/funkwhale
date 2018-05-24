@@ -13,7 +13,7 @@
       </div>
       <div class="actions">
         <div class="ui cancel button"><i18next path="Cancel"/></div>
-        <div :class="['ui', 'confirm', color, 'button']" @click="confirm">
+        <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
           <slot name="modal-confirm"><i18next path="Confirm"/></slot>
         </div>
       </div>
@@ -28,7 +28,8 @@ export default {
   props: {
     action: {type: Function, required: false},
     disabled: {type: Boolean, default: false},
-    color: {type: String, default: 'red'}
+    color: {type: String, default: 'red'},
+    confirmColor: {type: String, default: null, required: false}
   },
   components: {
     Modal
@@ -36,6 +37,14 @@ export default {
   data () {
     return {
       showModal: false
+    }
+  },
+  computed: {
+    confirmButtonColor () {
+      if (this.confirmColor) {
+        return this.confirmColor
+      }
+      return this.color
     }
   },
   methods: {

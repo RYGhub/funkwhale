@@ -24,7 +24,7 @@ class LibraryFilter(django_filters.FilterSet):
 
 class LibraryTrackFilter(django_filters.FilterSet):
     library = django_filters.CharFilter('library__uuid')
-    imported = django_filters.CharFilter(method='filter_imported')
+    status = django_filters.CharFilter(method='filter_status')
     q = fields.SearchFilter(search_fields=[
         'artist_name',
         'title',
@@ -32,11 +32,15 @@ class LibraryTrackFilter(django_filters.FilterSet):
         'library__actor__domain',
     ])
 
-    def filter_imported(self, queryset, field_name, value):
-        if value.lower() in ['true', '1', 'yes']:
-            queryset = queryset.filter(local_track_file__isnull=False)
-        elif value.lower() in ['false', '0', 'no']:
-            queryset = queryset.filter(local_track_file__isnull=True)
+    def filter_status(self, queryset, field_name, value):
+        if value == 'imported':
+            return queryset.filter(local_track_file__isnull=False)
+        elif value == 'not_imported':
+            return queryset.filter(
+                local_track_file__isnull=True
+            ).exclude(import_jobs__status='pending')
+        elif value == 'import_pending':
+            return queryset.filter(import_jobs__status='pending')
         return queryset
 
     class Meta:
