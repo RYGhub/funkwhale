@@ -10,55 +10,63 @@
           <label>{{ $t('Import status') }}</label>
           <select class="ui dropdown" v-model="importedFilter">
             <option :value="null">{{ $t('Any') }}</option>
-            <option :value="true">{{ $t('Imported') }}</option>
-            <option :value="false">{{ $t('Not imported') }}</option>
+            <option :value="'imported'">{{ $t('Imported') }}</option>
+            <option :value="'not_imported'">{{ $t('Not imported') }}</option>
+            <option :value="'import_pending'">{{ $t('Import pending') }}</option>
           </select>
         </div>
       </div>
     </div>
-    <action-table
-      v-if="result"
-      :objects-data="result"
-      :actions="[['import', $t('Import')]]"
-      :action-url="'federation/library-tracks/action/'"
-      :filters="actionFilters">
-      <template slot="header-cells">
-        <th>{{ $t('Status') }}</th>
-        <th>{{ $t('Title') }}</th>
-        <th>{{ $t('Artist') }}</th>
-        <th>{{ $t('Album') }}</th>
-        <th>{{ $t('Published date') }}</th>
-        <th v-if="showLibrary">{{ $t('Library') }}</th>
-      </template>
-      <template slot="action-success-footer" slot-scope="scope">
-        <router-link
-          v-if="scope.result.action === 'import'"
-          :to="{name: 'library.import.batches.detail', params: {id: scope.result.result.batch.id }}">
-          {{ $t('Import #{% id %} launched', {id: scope.result.result.batch.id}) }}
-        </router-link>
-      </template>
-      <template slot="row-cells" slot-scope="scope">
-        <td>
-          <span v-if="scope.obj.local_track_file" class="ui basic green label">{{ $t('In library') }}</span>
-          <span v-else class="ui basic yellow label">{{ $t('Not imported') }}</span>
-        </td>
-        <td>
-          <span :title="scope.obj.title">{{ scope.obj.title|truncate(30) }}</span>
-        </td>
-        <td>
-          <span :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>
-        </td>
-        <td>
-          <span :title="scope.obj.album_title">{{ scope.obj.album_title|truncate(20) }}</span>
-        </td>
-        <td>
-          <human-date :date="scope.obj.published_date"></human-date>
-        </td>
-        <td v-if="showLibrary">
-          {{ scope.obj.library.actor.domain }}
-        </td>
-      </template>
-    </action-table>
+    <div class="dimmable">
+      <div v-if="isLoading" class="ui active inverted dimmer">
+          <div class="ui loader"></div>
+      </div>
+      <action-table
+        v-if="result"
+        @action-launched="fetchData"
+        :objects-data="result"
+        :actions="actions"
+        :action-url="'federation/library-tracks/action/'"
+        :filters="actionFilters">
+        <template slot="header-cells">
+          <th>{{ $t('Status') }}</th>
+          <th>{{ $t('Title') }}</th>
+          <th>{{ $t('Artist') }}</th>
+          <th>{{ $t('Album') }}</th>
+          <th>{{ $t('Published date') }}</th>
+          <th v-if="showLibrary">{{ $t('Library') }}</th>
+        </template>
+        <template slot="action-success-footer" slot-scope="scope">
+          <router-link
+            v-if="scope.result.action === 'import'"
+            :to="{name: 'library.import.batches.detail', params: {id: scope.result.result.batch.id }}">
+            {{ $t('Import #{% id %} launched', {id: scope.result.result.batch.id}) }}
+          </router-link>
+        </template>
+        <template slot="row-cells" slot-scope="scope">
+          <td>
+            <span v-if="scope.obj.status === 'imported'" class="ui basic green label">{{ $t('In library') }}</span>
+            <span v-else-if="scope.obj.status === 'import_pending'" class="ui basic yellow label">{{ $t('Import pending') }}</span>
+            <span v-else class="ui basic label">{{ $t('Not imported') }}</span>
+          </td>
+          <td>
+            <span :title="scope.obj.title">{{ scope.obj.title|truncate(30) }}</span>
+          </td>
+          <td>
+            <span :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>
+          </td>
+          <td>
+            <span :title="scope.obj.album_title">{{ scope.obj.album_title|truncate(20) }}</span>
+          </td>
+          <td>
+            <human-date :date="scope.obj.published_date"></human-date>
+          </td>
+          <td v-if="showLibrary">
+            {{ scope.obj.library.actor.domain }}
+          </td>
+        </template>
+      </action-table>
+    </div>
     <div>
       <pagination
         v-if="result && result.results.length > 0"
@@ -113,7 +121,7 @@ export default {
         'q': this.search
       }, this.filters)
       if (this.importedFilter !== null) {
-        params.imported = this.importedFilter
+        params.status = this.importedFilter
       }
       let self = this
       self.isLoading = true
@@ -140,14 +148,21 @@ export default {
       } else {
         return currentFilters
       }
+    },
+    actions () {
+      return [
+        {
+          name: 'import',
+          label: this.$t('Import'),
+          filterCheckable: (obj) => { return obj.status === 'not_imported' }
+        }
+      ]
     }
   },
   watch: {
     search (newValue) {
-      if (newValue.length > 0) {
-        this.page = 1
-        this.fetchData()
-      }
+      this.page = 1
+      this.fetchData()
     },
     page () {
       this.fetchData()

@@ -1,29 +1,42 @@
 <template>
   <table class="ui compact very basic single line unstackable table">
     <thead>
-      <tr v-if="actions.length > 0 && objectsData.count > 0">
+      <tr v-if="actions.length > 0">
         <th colspan="1000">
           <div class="ui small form">
             <div class="ui inline fields">
               <div class="field">
                 <label>{{ $t('Actions') }}</label>
-                <select class="ui dropdown" v-model="currentAction">
-                  <option v-for="action in actions" :value="action[0]">
-                    {{ action[1] }}
+                <select class="ui dropdown" v-model="currentActionName">
+                  <option v-for="action in actions" :value="action.name">
+                    {{ action.label }}
                   </option>
                 </select>
               </div>
               <div class="field">
                 <div
+                  v-if="!selectAll"
                   @click="launchAction"
                   :disabled="checked.length === 0"
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
                   {{ $t('Go') }}</div>
+                <dangerous-button
+                  v-else :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
+                  confirm-color="green"
+                  color=""
+                  @confirm="launchAction">
+                  {{ $t('Go') }}
+                  <p slot="modal-header">{{ $t('Do you want to launch action "{% action %}" on {% total %} elements?', {action: currentActionName, total: objectsData.count}) }}
+                  <p slot="modal-content">
+                    {{ $t('This may affect a lot of elements, please double check this is really what you want.')}}
+                  </p>
+                  <p slot="modal-confirm">{{ $t('Launch') }}</p>
+                </dangerous-button>
               </div>
               <div class="count field">
                 <span v-if="selectAll">{{ $t('{% count %} on {% total %} selected', {count: objectsData.count, total: objectsData.count}) }}</span>
                 <span v-else>{{ $t('{% count %} on {% total %} selected', {count: checked.length, total: objectsData.count}) }}</span>
-                <template v-if="checked.length === objectsData.results.length">
+                <template v-if="checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
                     {{ $t('Select all {% total %} elements', {total: objectsData.count}) }}
                   </a>
@@ -53,18 +66,20 @@
             <input
               type="checkbox"
               @change="toggleCheckAll"
-              :checked="objectsData.results.length === checked.length"><label>&nbsp;</label>
+              :disabled="checkable.length === 0"
+              :checked="checkable.length > 0 && checked.length === checkable.length"><label>&nbsp;</label>
           </div>
         </th>
         <slot name="header-cells"></slot>
       </tr>
     </thead>
-    <tbody>
-      <tr v-for="obj in objectsData.results">
+    <tbody v-if="objectsData.count > 0">
+      <tr v-for="(obj, index) in objectsData.results">
         <td class="collapsing">
           <input
             type="checkbox"
-            @change="toggleCheck(obj.id)"
+            :disabled="checkable.indexOf(obj.id) === -1"
+            @click="toggleCheck($event, obj.id, index)"
             :checked="checked.indexOf(obj.id) > -1"><label>&nbsp;</label>
           </div>
         </td>
@@ -90,38 +105,60 @@ export default {
       actionLoading: false,
       actionResult: null,
       actionErrors: [],
-      currentAction: null,
-      selectAll: false
+      currentActionName: null,
+      selectAll: false,
+      lastCheckedIndex: -1
     }
     if (this.actions.length > 0) {
-      d.currentAction = this.actions[0][0]
+      d.currentActionName = this.actions[0].name
     }
     return d
   },
   methods: {
     toggleCheckAll () {
-      if (this.checked.length === this.objectsData.results.length) {
+      this.lastCheckedIndex = -1
+      if (this.checked.length === this.checkable.length) {
         // we uncheck
         this.checked = []
       } else {
-        this.checked = this.objectsData.results.map(t => { return t.id })
+        this.checked = this.checkable.map(i => { return i })
       }
     },
-    toggleCheck (id) {
+    toggleCheck (event, id, index) {
+      let self = this
+      let affectedIds = [id]
+      let newValue = null
       if (this.checked.indexOf(id) > -1) {
         // we uncheck
         this.selectAll = false
-        this.checked.splice(this.checked.indexOf(id), 1)
+        newValue = false
       } else {
-        this.checked.push(id)
+        newValue = true
       }
+      if (event.shiftKey && this.lastCheckedIndex > -1) {
+        // we also add inbetween ids to the list of affected ids
+        let idxs = [index, this.lastCheckedIndex]
+        idxs.sort((a, b) => a - b)
+        let objs = this.objectsData.results.slice(idxs[0], idxs[1] + 1)
+        affectedIds = affectedIds.concat(objs.map((o) => { return o.id }))
+      }
+      affectedIds.forEach((i) => {
+        let checked = self.checked.indexOf(i) > -1
+        if (newValue && !checked && self.checkable.indexOf(i) > -1) {
+          return self.checked.push(i)
+        }
+        if (!newValue && checked) {
+          self.checked.splice(self.checked.indexOf(i), 1)
+        }
+      })
+      this.lastCheckedIndex = index
     },
     launchAction () {
       let self = this
       self.actionLoading = true
       self.result = null
       let payload = {
-        action: this.currentAction,
+        action: this.currentActionName,
         filters: this.filters
       }
       if (this.selectAll) {
@@ -132,10 +169,38 @@ export default {
       axios.post(this.actionUrl, payload).then((response) => {
         self.actionResult = response.data
         self.actionLoading = false
+        self.$emit('action-launched', response.data)
       }, error => {
         self.actionLoading = false
         self.actionErrors = error.backendErrors
       })
+    }
+  },
+  computed: {
+    currentAction () {
+      let self = this
+      return this.actions.filter((a) => {
+        return a.name === self.currentActionName
+      })[0]
+    },
+    checkable () {
+      let objs = this.objectsData.results
+      let filter = this.currentAction.filterCheckable
+      if (filter) {
+        objs = objs.filter((o) => {
+          return filter(o)
+        })
+      }
+      return objs.map((o) => { return o.id })
+    }
+  },
+  watch: {
+    objectsData: {
+      handler () {
+        this.checked = []
+        this.selectAll = false
+      },
+      deep: true
     }
   }
 }
