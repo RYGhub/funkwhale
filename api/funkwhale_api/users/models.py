@@ -23,6 +23,7 @@ PERMISSIONS = [
     'federation',
     'library',
     'settings',
+    'upload',
 ]
 
 
@@ -52,10 +53,13 @@ class User(AbstractUser):
         default=False)
     permission_library = models.BooleanField(
         'Manage library',
-        help_text='Import new content, manage existing content',
+        help_text='Manage library',
         default=False)
     permission_settings = models.BooleanField(
         'Manage instance-level settings',
+        default=False)
+    permission_upload = models.BooleanField(
+        'Upload new content to the library',
         default=False)
 
     def __str__(self):
