@@ -23,6 +23,7 @@ PERMISSIONS = [
     'federation',
     'library',
     'settings',
+    'upload',
 ]
 
 
@@ -52,10 +53,13 @@ class User(AbstractUser):
         default=False)
     permission_library = models.BooleanField(
         'Manage library',
-        help_text='Import new content, manage existing content',
+        help_text='Manage library',
         default=False)
     permission_settings = models.BooleanField(
         'Manage instance-level settings',
+        default=False)
+    permission_upload = models.BooleanField(
+        'Upload new content to the library',
         default=False)
 
     def __str__(self):
@@ -68,9 +72,12 @@ class User(AbstractUser):
             perms[p] = v
         return perms
 
-    def has_permissions(self, *perms):
+    def has_permissions(self, *perms, operator='and'):
+        if operator not in ['and', 'or']:
+            raise ValueError('Invalid operator {}'.format(operator))
         permissions = self.get_permissions()
-        return all([permissions[p] for p in perms])
+        checker = all if operator == 'and' else any
+        return checker([permissions[p] for p in perms])
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})

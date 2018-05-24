@@ -39,7 +39,7 @@ def test_has_user_permission_logged_in_single(value, factories, api_request):
     (False, False, False),
     (True, True, True),
 ])
-def test_has_user_permission_logged_in_single(
+def test_has_user_permission_logged_in_multiple_and(
         federation, library, expected, factories, api_request):
     user = factories['users.User'](
         permission_federation=federation,
@@ -48,9 +48,35 @@ def test_has_user_permission_logged_in_single(
 
     class View(APIView):
         required_permissions = ['federation', 'library']
+        permission_operator = 'and'
     view = View()
     permission = permissions.HasUserPermission()
     request = api_request.get('/')
     setattr(request, 'user', user)
     result = permission.has_permission(request, view)
     assert result == user.has_permissions('federation', 'library') == expected
+
+
+@pytest.mark.parametrize('federation,library,expected', [
+    (True, False, True),
+    (False, True, True),
+    (False, False, False),
+    (True, True, True),
+])
+def test_has_user_permission_logged_in_multiple_or(
+        federation, library, expected, factories, api_request):
+    user = factories['users.User'](
+        permission_federation=federation,
+        permission_library=library,
+    )
+
+    class View(APIView):
+        required_permissions = ['federation', 'library']
+        permission_operator = 'or'
+    view = View()
+    permission = permissions.HasUserPermission()
+    request = api_request.get('/')
+    setattr(request, 'user', user)
+    result = permission.has_permission(request, view)
+    assert result == user.has_permissions(
+        'federation', 'library', operator='or') == expected

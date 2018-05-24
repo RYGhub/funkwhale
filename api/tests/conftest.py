@@ -231,8 +231,9 @@ def authenticated_actor(factories, mocker):
 
 @pytest.fixture
 def assert_user_permission():
-    def inner(view, permissions):
+    def inner(view, permissions, operator='and'):
         assert HasUserPermission in view.permission_classes
+        assert getattr(view, 'permission_operator', 'and') == operator
         assert set(view.required_permissions) == set(permissions)
     return inner
 

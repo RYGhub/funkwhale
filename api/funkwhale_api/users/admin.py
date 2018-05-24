@@ -62,6 +62,7 @@ class UserAdmin(AuthUserAdmin):
                 'is_active',
                 'is_staff',
                 'is_superuser',
+                'permission_upload',
                 'permission_library',
                 'permission_settings',
                 'permission_federation')}),
