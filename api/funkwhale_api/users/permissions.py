@@ -16,4 +16,6 @@ class HasUserPermission(BasePermission):
             return False
         if request.user.is_anonymous:
             return False
-        return request.user.has_permissions(*view.required_permissions)
+        operator = getattr(view, 'permission_operator', 'and')
+        return request.user.has_permissions(
+            *view.required_permissions, operator=operator)

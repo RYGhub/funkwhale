@@ -72,9 +72,12 @@ class User(AbstractUser):
             perms[p] = v
         return perms
 
-    def has_permissions(self, *perms):
+    def has_permissions(self, *perms, operator='and'):
+        if operator not in ['and', 'or']:
+            raise ValueError('Invalid operator {}'.format(operator))
         permissions = self.get_permissions()
-        return all([permissions[p] for p in perms])
+        checker = all if operator == 'and' else any
+        return checker([permissions[p] for p in perms])
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})
