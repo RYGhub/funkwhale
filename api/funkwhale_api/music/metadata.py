@@ -67,7 +67,7 @@ VALIDATION = {
 
 CONF = {
     'OggVorbis': {
-        'getter': lambda f, k: f[kTr][0],
+        'getter': lambda f, k: f[k][0],
         'fields': {
             'track_number': {
                 'field': 'TRACKNUMBER',
