@@ -43,10 +43,10 @@ def test_can_get_metadata_from_ogg_theora_file(field, value):
 
 @pytest.mark.parametrize('field,value', [
     ('title', 'Bend'),
-    ('artist', 'Binärpilot'),
+    ('artist', 'Bindrpilot'),
     ('album', 'You Can\'t Stop Da Funk'),
     ('date', datetime.date(2006, 2, 7)),
-    ('track_number', 1),
+    ('track_number', 2),
     ('musicbrainz_albumid', uuid.UUID('ce40cdb1-a562-4fd8-a269-9269f98d4124')),
     ('musicbrainz_recordingid', uuid.UUID('f269d497-1cc0-4ae4-a0c4-157ec7d73fcb')),
     ('musicbrainz_artistid', uuid.UUID('9c6bddde-6228-4d9f-ad0d-03f6fcb19e13')),
