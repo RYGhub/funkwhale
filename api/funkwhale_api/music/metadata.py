@@ -132,7 +132,7 @@ CONF = {
         'getter': get_id3_tag,
         'fields': {
             'track_number': {
-                'field': 'TPOS',
+                'field': 'TRCK',
                 'to_application': convert_track_number
             },
             'title': {
