@@ -51,12 +51,12 @@ export default {
         if (self.$store.state.route.hash) {
           self.scrollTo(self.$store.state.route.hash.substr(1))
         }
+        $('select.dropdown').dropdown()
       })
     })
   },
   methods: {
     scrollTo (id) {
-      console.log(id, 'hello')
       this.current = id
       document.getElementById(id).scrollIntoView()
     },
@@ -86,7 +86,8 @@ export default {
           id: 'users',
           settings: [
             'users__registration_enabled',
-            'common__api_authentication_required'
+            'common__api_authentication_required',
+            'users__default_permissions'
           ]
         },
         {
