@@ -41,6 +41,17 @@ def test_get_permissions_regular(factories):
             assert perms[p] is False
 
 
+def test_get_permissions_default(factories, preferences):
+    preferences['users__default_permissions'] = ['upload', 'federation']
+    user = factories['users.User']()
+
+    perms = user.get_permissions()
+    assert perms['upload'] is True
+    assert perms['federation'] is True
+    assert perms['library'] is False
+    assert perms['settings'] is False
+
+
 @pytest.mark.parametrize('args,perms,expected', [
     ({'is_superuser': True}, ['federation', 'library'], True),
     ({'is_superuser': False}, ['federation'], False),
