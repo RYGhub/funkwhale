@@ -81,6 +81,8 @@ axios.interceptors.response.use(function (response) {
   }
   if (error.response.status === 404) {
     error.backendErrors.push('Resource not found')
+  } else if (error.response.status === 403) {
+    error.backendErrors.push('Permission denied')
   } else if (error.response.status === 500) {
     error.backendErrors.push('A server error occured')
   } else if (error.response.data) {
