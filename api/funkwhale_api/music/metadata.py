@@ -67,7 +67,7 @@ VALIDATION = {
 
 CONF = {
     'OggVorbis': {
-        'getter': lambda f, k: f[k][0],
+        'getter': lambda f, k: f[kTr][0],
         'fields': {
             'track_number': {
                 'field': 'TRACKNUMBER',
@@ -132,7 +132,7 @@ CONF = {
         'getter': get_id3_tag,
         'fields': {
             'track_number': {
-                'field': 'TPOS',
+                'field': 'TRCK',
                 'to_application': convert_track_number
             },
             'title': {
