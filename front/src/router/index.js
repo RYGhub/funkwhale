@@ -29,6 +29,8 @@ import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
+import AdminLibraryBase from '@/views/admin/library/Base'
+import AdminLibraryFilesList from '@/views/admin/library/FilesList'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -165,6 +167,17 @@ export default new Router({
           })
         },
         { path: 'libraries/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
+      ]
+    },
+    {
+      path: '/manage/library',
+      component: AdminLibraryBase,
+      children: [
+        {
+          path: 'files',
+          name: 'manage.library.files',
+          component: AdminLibraryFilesList
+        }
       ]
     },
     {
