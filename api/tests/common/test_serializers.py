@@ -18,6 +18,17 @@ class TestSerializer(serializers.ActionSerializer):
         return {'hello': 'world'}
 
 
+class TestDangerousSerializer(serializers.ActionSerializer):
+    actions = ['test', 'test_dangerous']
+    dangerous_actions = ['test_dangerous']
+
+    def handle_test(self, objects):
+        pass
+
+    def handle_test_dangerous(self, objects):
+        pass
+
+
 def test_action_serializer_validates_action():
     data = {'objects': 'all', 'action': 'nope'}
     serializer = TestSerializer(data, queryset=models.User.objects.none())
@@ -98,3 +109,28 @@ def test_action_serializers_validates_at_least_one_object():
 
     assert serializer.is_valid() is False
     assert 'non_field_errors' in serializer.errors
+
+
+def test_dangerous_actions_refuses_all(factories):
+    factories['users.User']()
+    data = {
+        'objects': 'all',
+        'action': 'test_dangerous',
+    }
+    serializer = TestDangerousSerializer(
+        data, queryset=models.User.objects.all())
+
+    assert serializer.is_valid() is False
+    assert 'non_field_errors' in serializer.errors
+
+
+def test_dangerous_actions_refuses_not_listed(factories):
+    factories['users.User']()
+    data = {
+        'objects': 'all',
+        'action': 'test',
+    }
+    serializer = TestDangerousSerializer(
+        data, queryset=models.User.objects.all())
+
+    assert serializer.is_valid() is True
