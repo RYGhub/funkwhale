@@ -27,7 +27,7 @@ PERMISSIONS_CONFIGURATION = {
     },
     'library': {
         'label': 'Manage library',
-        'help_text': 'Manage library',
+        'help_text': 'Manage library, delete files, tracks, artists, albums...',
     },
     'settings': {
         'label': 'Manage instance-level settings',
