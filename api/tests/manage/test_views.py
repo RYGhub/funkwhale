@@ -19,7 +19,8 @@ def test_track_file_view(factories, superuser_api_client):
     url = reverse('api:v1:manage:library:track-files-list')
 
     response = superuser_api_client.get(url, {'sort': '-creation_date'})
-    expected = serializers.ManageTrackFileSerializer(qs, many=True).data
+    expected = serializers.ManageTrackFileSerializer(
+        qs, many=True, context={'request': response.wsgi_request}).data
 
     assert response.data['count'] == len(tfs)
     assert response.data['results'] == expected
