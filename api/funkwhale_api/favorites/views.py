@@ -12,12 +12,6 @@ from . import models
 from . import serializers
 
 
-class CustomLimitPagination(pagination.PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-
 class TrackFavoriteViewSet(mixins.CreateModelMixin,
                            mixins.DestroyModelMixin,
                            mixins.ListModelMixin,
@@ -26,7 +20,6 @@ class TrackFavoriteViewSet(mixins.CreateModelMixin,
     serializer_class = serializers.UserTrackFavoriteSerializer
     queryset = (models.TrackFavorite.objects.all())
     permission_classes = [ConditionalAuthentication]
-    pagination_class = CustomLimitPagination
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
