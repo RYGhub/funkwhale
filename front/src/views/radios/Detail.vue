@@ -10,7 +10,7 @@
           <div class="content">
             {{ radio.name }}
             <div class="sub header">
-              Radio containing {{ tracks.length }} tracks,
+              Radio containing {{ totalTracks }} tracks,
               by <username :username="radio.user.username"></username>
             </div>
           </div>
