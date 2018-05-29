@@ -70,6 +70,12 @@
             </router-link>
             <router-link
               class="item"
+              v-if="$store.state.auth.availablePermissions['library']"
+              :to="{name: 'manage.library.files'}">
+              <i class="book icon"></i>{{ $t('Library') }}
+            </router-link>
+            <router-link
+              class="item"
               v-else-if="$store.state.auth.availablePermissions['upload']"
               to="/library/import/launch">
               <i class="download icon"></i>{{ $t('Import music') }}

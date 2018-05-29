@@ -12,6 +12,9 @@ class ActionSerializer(serializers.Serializer):
     filters = serializers.DictField(required=False)
     actions = None
     filterset_class = None
+    # those are actions identifier where we don't want to allow the "all"
+    # selector because it's to dangerous. Like object deletion.
+    dangerous_actions = []
 
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
@@ -49,6 +52,10 @@ class ActionSerializer(serializers.Serializer):
             'list of identifiers or the string "all".'.format(value))
 
     def validate(self, data):
+        dangerous = data['action'] in self.dangerous_actions
+        if dangerous and self.initial_data['objects'] == 'all':
+            raise serializers.ValidationError(
+                'This action is to dangerous to be applied to all objects')
         if self.filterset_class and 'filters' in data:
             qs_filterset = self.filterset_class(
                 data['filters'], queryset=data['objects'])

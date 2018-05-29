@@ -97,6 +97,7 @@ THIRD_PARTY_APPS = (
     'dynamic_preferences',
     'django_filters',
     'cacheops',
+    'django_cleanup',
 )
 
 

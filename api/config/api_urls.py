@@ -38,6 +38,10 @@ v1_patterns += [
         include(
             ('funkwhale_api.instance.urls', 'instance'),
             namespace='instance')),
+    url(r'^manage/',
+        include(
+            ('funkwhale_api.manage.urls', 'manage'),
+            namespace='manage')),
     url(r'^federation/',
         include(
             ('funkwhale_api.federation.api_urls', 'federation'),
