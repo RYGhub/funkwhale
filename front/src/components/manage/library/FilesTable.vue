@@ -181,7 +181,8 @@ export default {
       return [
         {
           name: 'delete',
-          label: this.$t('Delete')
+          label: this.$t('Delete'),
+          isDangerous: true
         }
       ]
     }

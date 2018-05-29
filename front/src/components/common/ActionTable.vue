@@ -21,7 +21,7 @@
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
                   {{ $t('Go') }}</div>
                 <dangerous-button
-                  v-else :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
+                  v-else-if="!currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
@@ -36,7 +36,7 @@
               <div class="count field">
                 <span v-if="selectAll">{{ $t('{% count %} on {% total %} selected', {count: objectsData.count, total: objectsData.count}) }}</span>
                 <span v-else>{{ $t('{% count %} on {% total %} selected', {count: checked.length, total: objectsData.count}) }}</span>
-                <template v-if="checkable.length === checked.length">
+                <template v-if="!currentAction.isDangerous && checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
                     {{ $t('Select all {% total %} elements', {total: objectsData.count}) }}
                   </a>

@@ -74,6 +74,7 @@ class ManageTrackFileSerializer(serializers.ModelSerializer):
 
 class ManageTrackFileActionSerializer(common_serializers.ActionSerializer):
     actions = ['delete']
+    dangerous_actions = ['delete']
     filterset_class = filters.ManageTrackFileFilterSet
 
     @transaction.atomic
