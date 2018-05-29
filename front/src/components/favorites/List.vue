@@ -136,19 +136,15 @@ export default {
   watch: {
     page: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     paginateBy: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     orderingDirection: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     ordering: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     }
   }
 }
