@@ -60,6 +60,7 @@ def test_get_artist_serializer(factories):
         'album': [
             {
                 'id': album.pk,
+                'coverArt': 'al-{}'.format(album.id),
                 'artistId': artist.pk,
                 'name': album.title,
                 'artist': artist.name,
@@ -88,11 +89,13 @@ def test_get_album_serializer(factories):
         'songCount': 1,
         'created': album.creation_date,
         'year': album.release_date.year,
+        'coverArt': 'al-{}'.format(album.id),
         'song': [
             {
                 'id': track.pk,
                 'isDir': 'false',
                 'title': track.title,
+                'coverArt': 'al-{}'.format(album.id),
                 'album': album.title,
                 'artist': artist.name,
                 'track': track.position,

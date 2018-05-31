@@ -391,3 +391,16 @@ def test_get_indexes(f, db, logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_get_cover_art_album(factories, logged_in_api_client):
+    url = reverse('api:subsonic-get-cover-art')
+    assert url.endswith('getCoverArt') is True
+    album = factories['music.Album']()
+    response = logged_in_api_client.get(url, {'id': 'al-{}'.format(album.pk)})
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == ''
+    assert response['X-Accel-Redirect'] == music_views.get_file_path(
+        album.cover
+    ).decode('utf-8')
