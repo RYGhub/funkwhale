@@ -404,3 +404,17 @@ def test_get_cover_art_album(factories, logged_in_api_client):
     assert response['X-Accel-Redirect'] == music_views.get_file_path(
         album.cover
     ).decode('utf-8')
+
+
+def test_scrobble(factories, logged_in_api_client):
+    tf = factories['music.TrackFile']()
+    track = tf.track
+    url = reverse('api:subsonic-scrobble')
+    assert url.endswith('scrobble') is True
+    response = logged_in_api_client.get(
+        url, {'id': track.pk, 'submission': True})
+
+    assert response.status_code == 200
+
+    l = logged_in_api_client.user.listenings.latest('id')
+    assert l.track == track

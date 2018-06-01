@@ -4,6 +4,7 @@ from django.db.models import functions, Count
 
 from rest_framework import serializers
 
+from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
 
 
@@ -228,3 +229,18 @@ def get_music_directory_data(artist):
             td['size'] = tf.size
         data['child'].append(td)
     return data
+
+
+class ScrobbleSerializer(serializers.Serializer):
+    submission = serializers.BooleanField(default=True, required=False)
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=music_models.Track.objects.annotate(
+            files_count=Count('files')
+        ).filter(files_count__gt=0)
+    )
+
+    def create(self, data):
+        return history_models.Listening.objects.create(
+            user=self.context['user'],
+            track=data['id'],
+        )
