@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.utils import timezone
 
 from rest_framework import exceptions
@@ -459,7 +460,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                     'code': 10,
                     'message': 'Playlist ID or name must be specified.'
                 }
-            }, data)
+            })
 
         playlist = request.user.playlists.create(
             name=name
@@ -503,3 +504,51 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             }
         }
         return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_cover_art',
+        url_path='getCoverArt')
+    def get_cover_art(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        id = data.get('id', '')
+        if not id:
+            return response.Response({
+                'error': {
+                    'code': 10,
+                    'message': 'cover art ID must be specified.'
+                }
+            })
+        
+        if id.startswith('al-'):
+            try:
+                album_id = int(id.replace('al-', ''))
+                album = music_models.Album.objects.exclude(
+                    cover__isnull=True
+                ).exclude(cover='').get(pk=album_id)
+            except (TypeError, ValueError, music_models.Album.DoesNotExist):
+                return response.Response({
+                    'error': {
+                        'code': 70,
+                        'message': 'cover art not found.'
+                    }
+                })
+            cover = album.cover
+        else:
+            return response.Response({
+                'error': {
+                    'code': 70,
+                    'message': 'cover art not found.'
+                }
+            })
+
+        mapping = {
+            'nginx': 'X-Accel-Redirect',
+            'apache2': 'X-Sendfile',
+        }
+        path = music_views.get_file_path(cover)
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        # let the proxy set the content-type
+        r = response.Response({}, content_type='')
+        r[file_header] = path
+        return r
