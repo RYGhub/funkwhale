@@ -11,6 +11,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
+from funkwhale_api.activity import record
 from funkwhale_api.common import preferences
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
@@ -569,5 +570,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 }
             })
         if serializer.validated_data['submission']:
-            serializer.save()
+            l = serializer.save()
+            record.send(l)
         return response.Response({})
