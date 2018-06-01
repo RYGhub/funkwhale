@@ -519,7 +519,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                     'message': 'cover art ID must be specified.'
                 }
             })
-        
+
         if id.startswith('al-'):
             try:
                 album_id = int(id.replace('al-', ''))
@@ -552,3 +552,22 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         r = response.Response({}, content_type='')
         r[file_header] = path
         return r
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='scrobble',
+        url_path='scrobble')
+    def scrobble(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        serializer = serializers.ScrobbleSerializer(
+            data=data, context={'user': request.user})
+        if not serializer.is_valid():
+            return response.Response({
+                'error': {
+                    'code': 0,
+                    'message': 'Invalid payload'
+                }
+            })
+        if serializer.validated_data['submission']:
+            serializer.save()
+        return response.Response({})

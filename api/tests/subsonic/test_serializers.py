@@ -214,3 +214,22 @@ def test_directory_serializer_artist(factories):
     }
     data = serializers.get_music_directory_data(artist)
     assert data == expected
+
+
+def test_scrobble_serializer(factories):
+    tf = factories['music.TrackFile']()
+    track = tf.track
+    user = factories['users.User']()
+    payload = {
+        'id': track.pk,
+        'submission': True,
+    }
+    serializer = serializers.ScrobbleSerializer(
+        data=payload, context={'user': user})
+
+    assert serializer.is_valid(raise_exception=True)
+
+    listening = serializer.save()
+
+    assert listening.user == user
+    assert listening.track == track
