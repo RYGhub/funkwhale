@@ -303,6 +303,9 @@ ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = "config.routing.application"
 
+# This ensures that Django will be able to detect a secure connection
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
