@@ -76,6 +76,15 @@ configuration options to ensure the webserver can serve them properly:
 
     Thus, be especially careful when you manipulate the source files.
 
+Album covers
+^^^^^^^^^^^^
+
+Whenever possible, Funkwhale will import album cover, with the following precedence:
+
+1. It will use the cover embedded in the audio files themeselves, if any (Flac/MP3 only)
+2. It will use a cover.jpg or a cover.png file from the imported track directory, if any
+3. It will fectch cover art from musicbrainz, assuming the file is tagged correctly
+
 Getting demo tracks
 ^^^^^^^^^^^^^^^^^^^
 

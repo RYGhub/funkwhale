@@ -110,3 +110,11 @@ def test_track_get_file_size_in_place(factories):
         in_place=True, source='file://{}'.format(path))
 
     assert tf.get_file_size() == 297745
+
+
+def test_album_get_image_content(factories):
+    album = factories['music.Album']()
+    album.get_image(data={'content': b'test', 'mimetype':'image/jpeg'})
+    album.refresh_from_db()
+
+    assert album.cover.read() == b'test'
