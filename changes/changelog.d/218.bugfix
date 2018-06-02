@@ -1,2 +1,0 @@
-Ensure inactive users cannot get auth tokens (#218)
-This was already the case bug we missed some checks

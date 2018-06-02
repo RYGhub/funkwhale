@@ -10,6 +10,210 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.14 (2018-06-02)
+-----------------
+
+Upgrade instructions are available at
+  https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Admins can now configure default permissions that will be granted to all
+  registered users (#236)
+- Files management interface for users with "library" permission (#223)
+- New action table component for quick and efficient batch actions (#228) This
+  is implemented on the federated tracks pages, but will be included in other
+  pages as well depending on the feedback.
+
+
+Enhancements:
+
+- Added a new "upload" permission that allows user to launch import and view
+  their own imports (#230)
+- Added Support for OggTheora in import.
+- Autoremove media files on model instance deletion (#241)
+- Can now import a whole remote library at once thanks to new Action Table
+  component (#164)
+- Can now use album covers from flac/mp3 metadata and separate file in track
+  directory (#219)
+- Implemented getCovertArt in Subsonic API to serve album covers (#258)
+- Implemented scrobble endpoint of subsonic API, listenings are now tracked
+  correctly from third party apps that use this endpoint (#260)
+- Retructured music API to increase performance and remove useless endpoints
+  (#224)
+
+
+Bugfixes:
+
+- Consistent constraints/checks for URL size (#207)
+- Display proper total number of tracks on radio detail (#225)
+- Do not crash on flac import if musicbrainz tags are missing (#214)
+- Empty save button in radio builder (#226)
+- Ensure anonymous users can use the app if the instance is configured
+  accordingly (#229)
+- Ensure inactive users cannot get auth tokens (#218) This was already the case
+  bug we missed some checks
+- File-upload import now supports Flac files (#213)
+- File-upload importer should now work properly, assuming files are tagged
+  (#106)
+- Fixed a few broken translations strings (#227)
+- Fixed broken ordering in front-end lists (#179)
+- Fixed ignored page_size paremeter on artist and favorites list (#240)
+- Read ID3Tag Tracknumber from TRCK (#220)
+- We now fetch album covers regardless of the import methods (#231)
+
+Documentation:
+
+- Added missing subsonic configuration block in deployment vhost files (#249)
+- Moved upgrade doc under install doc in TOC (#251)
+
+
+Other:
+
+- Removed acoustid support, as the integration was buggy and error-prone (#106)
+
+
+Files management interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is the first bit of an ongoing work that will span several releases, to
+bring more powerful library management features to Funkwhale. This iteration
+includes a basic file management interface where users with the "library"
+permission can list and search available files, order them using
+various criterias (size, bitrate, duration...) and delete them.
+
+New "upload" permission
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This new permission is helpful if you want to give upload/import rights
+to some users, but don't want them to be able to manage the library as a whole:
+although there are no controls yet for managing library in the fron-end,
+subsequent release will introduce management interfaces for artists, files,
+etc.
+
+Because of that, users with the "library" permission will have much more power,
+and will also be able to remove content from the platform. On the other hand,
+users with the "upload" permission will only have the ability to add new
+content.
+
+Also, this release also includes a new feature called "default permissions":
+those are permissions that are granted to every users on the platform.
+On public/open instances, this will play well with the "upload" permission
+since everyone will be able to contribute to the instance library without
+an admin giving the permission to every single user.
+
+Smarter album cover importer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In earlier versions, covers where only imported when launching a YouTube import.
+Starting from this release, covers will be imported regardless of the import mode
+(file upload, youtube-dl, CLI, in-place...). Funkwhale will look for covers
+in the following order:
+
+1. In the imported file itself (FLAC/MP3 only)
+2. In a cover.jpg or cover.png in the file directory
+3. By fetching cover art from Musibrainz, assuming the file is tagged correctly
+
+This will only work for newly imported tracks and albums though. In the future,
+we may offer an option to refetch album covers from the interface, but in the
+meantime, you can use the following snippet:
+
+.. code-block:: python
+
+    # Store this in /tmp/update_albums.py
+    from funkwhale_api.music.models import Album, TrackFile
+    from funkwhale_api.music.tasks import update_album_cover
+
+    albums_without_covers = Album.objects.filter(cover='')
+    total = albums_without_covers.count()
+    print('Found {} albums without cover'.format(total))
+    for i, album in enumerate(albums_without_covers.iterator()):
+        print('[{}/{}] Fetching cover for {}...'.format(i+1, total, album.title))
+        f = TrackFile.objects.filter(track__album=album).filter(source__startswith='file://').first()
+        update_album_cover(album, track_file=f)
+
+Then launch it::
+
+    # docker setups
+    cat /tmp/update_albums.py | docker-compose run --rm api python manage.py shell -i python
+
+    # non-docker setups
+    source /srv/funkwhale/load_env
+    source /srv/funkwhale/virtualenv/bin/activate
+    cat /tmp/update_albums.py | python manage.py shell -i python
+
+    # cleanup
+    rm /tmp/update_albums.py
+
+.. note::
+
+    Depending on your number of albums, the previous snippet may take some time
+    to execute. You can interrupt it at any time using ctrl-c and relaunch it later,
+    as it's idempotent.
+
+Music API changes
+^^^^^^^^^^^^^^^^^
+
+This release includes an API break. Even though the API is advertised
+as unstable, and not documented, here is a brief explanation of the change in
+case you are using the API in a client or in a script. Summary of the changes:
+
+- ``/api/v1/artists`` does not includes a list of tracks anymore. It was to heavy
+  to return all of this data all the time. You can get all tracks for an
+  artist using ``/api/v1/tracks?artist=artist_id``
+- Additionally, ``/api/v1/tracks`` now support an ``album`` filter to filter
+  tracks matching an album
+- ``/api/v1/artists/search``, ``/api/v1/albums/search`` and ``/api/v1/tracks/search``
+  endpoints are removed. Use ``/api/v1/{artists|albums|tracks}/?q=yourquery``
+  instead. It's also more powerful, since you can combine search with other
+  filters and ordering options.
+- ``/api/v1/requests/import-requests/search`` endpoint is removed as well.
+  Use ``/api/v1/requests/import-requests/?q=yourquery``
+  instead. It's also more powerful, since you can combine search with other
+  filters and ordering options.
+
+Of course, the front-end was updated to work with the new API, so this should
+not impact end-users in any way, apart from slight performance gains.
+
+.. note::
+
+    The API is still not stable and may evolve again in the future. API freeze
+    will come at a later point.
+
+Flac files imports via upload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You have nothing to do to benefit from this, however, since Flac files
+tend to be a lot bigger than other files, you may want to increase the
+``client_max_body_size`` value in your Nginx configuration if you plan
+to upload flac files.
+
+Missing subsonic configuration bloc in vhost files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Because of a missing bloc in the sample Nginx and Apache configurations,
+instances that were deployed after the 0.13 release are likely to be unable
+to answer to Subsonic clients (the missing bits were properly documented
+in the changelog).
+
+Ensure you have the following snippets in your Nginx or Apache configuration
+if you plan to use the Subsonic API.
+
+Nginx::
+
+    location /rest/ {
+        include /etc/nginx/funkwhale_proxy.conf;
+        proxy_pass   http://funkwhale-api/api/subsonic/rest/;
+    }
+
+Apache2::
+
+    <Location "/rest">
+        ProxyPass ${funkwhale-api}/api/subsonic/rest
+        ProxyPassReverse ${funkwhale-api}/api/subsonic/rest
+     </Location>
+
+
 0.13 (2018-05-19)
 -----------------
 

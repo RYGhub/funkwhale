@@ -1,2 +1,0 @@
-Implemented scrobble endpoint of subsonic API, listenings are now tracked
-correctly from third party apps that use this endpoint (#260)
