@@ -58,6 +58,20 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
     assert data.get(field) == value
 
 
+@pytest.mark.parametrize('name', ['test.mp3', 'sample.flac'])
+def test_can_get_pictures(name):
+    path = os.path.join(DATA_DIR, name)
+    data = metadata.Metadata(path)
+
+    pictures = data.get('pictures')
+    assert len(pictures) == 1
+    cover_data = data.get_picture('cover_front')
+    assert cover_data['mimetype'].startswith('image/')
+    assert len(cover_data['content']) > 0
+    assert type(cover_data['content']) == bytes
+    assert type(cover_data['description']) == str
+
+
 @pytest.mark.parametrize('field,value', [
     ('title', '999,999'),
     ('artist', 'Nine Inch Nails'),

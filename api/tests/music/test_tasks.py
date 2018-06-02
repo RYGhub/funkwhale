@@ -56,6 +56,7 @@ def test_import_batch_run(factories, mocker):
     mocked_job_run.assert_called_once_with(import_job_id=job.pk)
 
 
+@pytest.mark.skip('Acoustid is disabled')
 def test_import_job_can_run_with_file_and_acoustid(
         artists, albums, tracks, preferences, factories, mocker):
     preferences['providers_acoustid__api_key'] = 'test'
@@ -183,3 +184,73 @@ def test_import_job_can_be_errored(factories, mocker, preferences):
 
     assert job.track_file is None
     assert job.status == 'errored'
+
+
+def test__do_import_calls_update_album_cover_if_no_cover(factories, mocker):
+    path = os.path.join(DATA_DIR, 'test.ogg')
+    album = factories['music.Album'](cover='')
+    track = factories['music.Track'](album=album)
+
+    mocker.patch(
+        'funkwhale_api.providers.audiofile.tasks.import_track_data_from_path',
+        return_value=track)
+
+    mocked_update = mocker.patch(
+        'funkwhale_api.music.tasks.update_album_cover')
+
+    job = factories['music.FileImportJob'](
+        audio_file__path=path, track_file=None)
+
+    tasks.import_job_run(import_job_id=job.pk)
+
+    mocked_update.assert_called_once_with(album, track.files.first())
+
+
+def test_update_album_cover_mbid(factories, mocker):
+    album = factories['music.Album'](cover='')
+
+    mocked_get = mocker.patch('funkwhale_api.music.models.Album.get_image')
+    tasks.update_album_cover(album=album, track_file=None)
+
+    mocked_get.assert_called_once_with()
+
+
+def test_update_album_cover_file_data(factories, mocker):
+    path = os.path.join(DATA_DIR, 'test.mp3')
+    album = factories['music.Album'](cover='', mbid=None)
+    tf = factories['music.TrackFile'](track__album=album)
+
+    mocked_get = mocker.patch('funkwhale_api.music.models.Album.get_image')
+    mocker.patch(
+        'funkwhale_api.music.metadata.Metadata.get_picture',
+        return_value={'hello': 'world'})
+    tasks.update_album_cover(album=album, track_file=tf)
+    md = data = tf.get_metadata()
+    mocked_get.assert_called_once_with(
+        data={'hello': 'world'})
+
+
+@pytest.mark.parametrize('ext,mimetype', [
+    ('jpg', 'image/jpeg'),
+    ('png', 'image/png'),
+])
+def test_update_album_cover_file_cover_separate_file(
+        ext, mimetype, factories, mocker):
+    mocker.patch('funkwhale_api.music.tasks.IMAGE_TYPES', [(ext, mimetype)])
+    path = os.path.join(DATA_DIR, 'test.mp3')
+    image_path = os.path.join(DATA_DIR, 'cover.{}'.format(ext))
+    with open(image_path, 'rb') as f:
+        image_content = f.read()
+    album = factories['music.Album'](cover='', mbid=None)
+    tf = factories['music.TrackFile'](
+        track__album=album,
+        source='file://' + image_path)
+
+    mocked_get = mocker.patch('funkwhale_api.music.models.Album.get_image')
+    mocker.patch(
+        'funkwhale_api.music.metadata.Metadata.get_picture',
+        return_value=None)
+    tasks.update_album_cover(album=album, track_file=tf)
+    md = data = tf.get_metadata()
+    mocked_get.assert_called_once_with(
+        data={'mimetype': mimetype, 'content': image_content})

@@ -9,7 +9,13 @@ class TagNotFound(KeyError):
     pass
 
 
+class UnsupportedTag(KeyError):
+    pass
+
+
 def get_id3_tag(f, k):
+    if k == 'pictures':
+        return f.tags.getall('APIC')
     # First we try to grab the standard key
     try:
         return f.tags[k].text[0]
@@ -28,11 +34,37 @@ def get_id3_tag(f, k):
         raise TagNotFound(k)
 
 
+def clean_id3_pictures(apic):
+    pictures = []
+    for p in list(apic):
+        pictures.append({
+            'mimetype': p.mime,
+            'content': p.data,
+            'description': p.desc,
+            'type': p.type.real,
+        })
+    return pictures
+
+
 def get_flac_tag(f, k):
+    if k == 'pictures':
+        return f.pictures
     try:
         return f.get(k, [])[0]
     except (KeyError, IndexError):
         raise TagNotFound(k)
+
+
+def clean_flac_pictures(apic):
+    pictures = []
+    for p in list(apic):
+        pictures.append({
+            'mimetype': p.mime,
+            'content': p.data,
+            'description': p.desc,
+            'type': p.type.real,
+        })
+    return pictures
 
 
 def get_mp3_recording_id(f, k):
@@ -73,25 +105,15 @@ CONF = {
                 'field': 'TRACKNUMBER',
                 'to_application': convert_track_number
             },
-            'title': {
-                'field': 'title'
-            },
-            'artist': {
-                'field': 'artist'
-            },
-            'album': {
-                'field': 'album'
-            },
+            'title': {},
+            'artist': {},
+            'album': {},
             'date': {
                 'field': 'date',
                 'to_application': lambda v: arrow.get(v).date()
             },
-            'musicbrainz_albumid': {
-                'field': 'musicbrainz_albumid'
-            },
-            'musicbrainz_artistid': {
-                'field': 'musicbrainz_artistid'
-            },
+            'musicbrainz_albumid': {},
+            'musicbrainz_artistid': {},
             'musicbrainz_recordingid': {
                 'field': 'musicbrainz_trackid'
             },
@@ -104,15 +126,9 @@ CONF = {
                 'field': 'TRACKNUMBER',
                 'to_application': convert_track_number
             },
-            'title': {
-                'field': 'title'
-            },
-            'artist': {
-                'field': 'artist'
-            },
-            'album': {
-                'field': 'album'
-            },
+            'title': {},
+            'artist': {},
+            'album': {},
             'date': {
                 'field': 'date',
                 'to_application': lambda v: arrow.get(v).date()
@@ -130,6 +146,7 @@ CONF = {
     },
     'MP3': {
         'getter': get_id3_tag,
+        'clean_pictures': clean_id3_pictures,
         'fields': {
             'track_number': {
                 'field': 'TRCK',
@@ -158,40 +175,31 @@ CONF = {
                 'field': 'UFID',
                 'getter': get_mp3_recording_id,
             },
+            'pictures': {},
         }
     },
     'FLAC': {
         'getter': get_flac_tag,
+        'clean_pictures': clean_flac_pictures,
         'fields': {
             'track_number': {
                 'field': 'tracknumber',
                 'to_application': convert_track_number
             },
-            'title': {
-                'field': 'title'
-            },
-            'artist': {
-                'field': 'artist'
-            },
-            'album': {
-                'field': 'album'
-            },
+            'title': {},
+            'artist': {},
+            'album': {},
             'date': {
                 'field': 'date',
                 'to_application': lambda v: arrow.get(str(v)).date()
             },
-            'musicbrainz_albumid': {
-                'field': 'musicbrainz_albumid'
-            },
-            'musicbrainz_artistid': {
-                'field': 'musicbrainz_artistid'
-            },
+            'musicbrainz_albumid': {},
+            'musicbrainz_artistid': {},
             'musicbrainz_recordingid': {
                 'field': 'musicbrainz_trackid'
             },
-            'test': {
-                'field': 'test'
-            },
+            'test': {},
+            'pictures': {},
         }
     },
 }
@@ -213,8 +221,12 @@ class Metadata(object):
         return f.__class__.__name__
 
     def get(self, key, default=NODEFAULT):
-        field_conf = self._conf['fields'][key]
-        real_key = field_conf['field']
+        try:
+            field_conf = self._conf['fields'][key]
+        except KeyError:
+            raise UnsupportedTag(
+                '{} is not supported for this file format'.format(key))
+        real_key = field_conf.get('field', key)
         try:
             getter = field_conf.get('getter', self._conf['getter'])
             v = getter(self._file, real_key)
@@ -230,3 +242,16 @@ class Metadata(object):
         if field:
             v = field.to_python(v)
         return v
+
+    def get_picture(self, picture_type='cover_front'):
+        ptype = getattr(mutagen.id3.PictureType, picture_type.upper())
+        try:
+            pictures = self.get('pictures')
+        except (UnsupportedTag, TagNotFound):
+            return
+
+        cleaner = self._conf.get('clean_pictures', lambda v: v)
+        pictures = cleaner(pictures)
+        for p in pictures:
+            if p['type'] == ptype:
+                return p

@@ -1,0 +1,50 @@
+We now fetch album covers regardless of the import methods (#231)
+
+Smarter album cover importer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In earlier versions, covers where only imported when launching a YouTube import.
+Starting from this release, covers will be imported regardless of the import mode
+(file upload, youtube-dl, CLI, in-place...). Funkwhale will look for covers
+in the following order:
+
+1. In the imported file itself (FLAC/MP3 only)
+2. In a cover.jpg or cover.png in the file directory
+3. By fetching cover art from Musibrainz, assuming the file is tagged correctly
+
+This will only work for newly imported tracks and albums though. In the future,
+we may offer an option to refetch album covers from the interface, but in the
+meantime, you can use the following snippet:
+
+.. code-block:: python
+
+    # Store this in /tmp/update_albums.py
+    from funkwhale_api.music.models import Album, TrackFile
+    from funkwhale_api.music.tasks import update_album_cover
+
+    albums_without_covers = Album.objects.filter(cover='')
+    total = albums_without_covers.count()
+    print('Found {} albums without cover'.format(total))
+    for i, album in enumerate(albums_without_covers.iterator()):
+        print('[{}/{}] Fetching cover for {}...'.format(i+1, total, album.title))
+        f = TrackFile.objects.filter(track__album=album).filter(source__startswith='file://').first()
+        update_album_cover(album, track_file=f)
+
+Then launch it::
+
+    # docker setups
+    cat /tmp/update_albums.py | docker-compose run --rm api python manage.py shell -i python
+
+    # non-docker setups
+    source /srv/funkwhale/load_env
+    source /srv/funkwhale/virtualenv/bin/activate
+    cat /tmp/update_albums.py | python manage.py shell -i python
+
+    # cleanup
+    rm /tmp/update_albums.py
+
+.. note::
+
+    Depending on your number of albums, the previous snippet may take some time
+    to execute. You can interrupt it at any time using ctrl-c and relaunch it later,
+    as it's idempotent.
