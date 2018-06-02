@@ -139,7 +139,7 @@ class Library(models.Model):
         on_delete=models.CASCADE,
         related_name='library')
     uuid = models.UUIDField(default=uuid.uuid4)
-    url = models.URLField()
+    url = models.URLField(max_length=500)
 
     # use this flag to disable federation with a library
     federation_enabled = models.BooleanField()
@@ -166,8 +166,8 @@ def get_file_path(instance, filename):
 
 
 class LibraryTrack(models.Model):
-    url = models.URLField(unique=True)
-    audio_url = models.URLField()
+    url = models.URLField(unique=True, max_length=500)
+    audio_url = models.URLField(max_length=500)
     audio_mimetype = models.CharField(max_length=200)
     audio_file = models.FileField(
         upload_to=get_file_path,

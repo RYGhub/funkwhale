@@ -7,7 +7,7 @@ from django.urls import reverse
 from funkwhale_api.users.models import User
 
 
-def test_can_create_user_via_api(preferences, client, db):
+def test_can_create_user_via_api(preferences, api_client, db):
     url = reverse('rest_register')
     data = {
         'username': 'test1',
@@ -16,14 +16,14 @@ def test_can_create_user_via_api(preferences, client, db):
         'password2': 'testtest',
     }
     preferences['users__registration_enabled'] = True
-    response = client.post(url, data)
+    response = api_client.post(url, data)
     assert response.status_code == 201
 
     u = User.objects.get(email='test1@test.com')
     assert u.username == 'test1'
 
 
-def test_can_restrict_usernames(settings, preferences, db, client):
+def test_can_restrict_usernames(settings, preferences, db, api_client):
     url = reverse('rest_register')
     preferences['users__registration_enabled'] = True
     settings.USERNAME_BLACKLIST = ['funkwhale']
@@ -34,13 +34,13 @@ def test_can_restrict_usernames(settings, preferences, db, client):
         'password2': 'testtest',
     }
 
-    response = client.post(url, data)
+    response = api_client.post(url, data)
 
     assert response.status_code == 400
     assert 'username' in response.data
 
 
-def test_can_disable_registration_view(preferences, client, db):
+def test_can_disable_registration_view(preferences, api_client, db):
     url = reverse('rest_register')
     data = {
         'username': 'test1',
@@ -49,7 +49,7 @@ def test_can_disable_registration_view(preferences, client, db):
         'password2': 'testtest',
     }
     preferences['users__registration_enabled'] = False
-    response = client.post(url, data)
+    response = api_client.post(url, data)
     assert response.status_code == 403
 
 
@@ -73,7 +73,7 @@ def test_can_fetch_data_from_api(api_client, factories):
     assert response.data['permissions'] == user.get_permissions()
 
 
-def test_can_get_token_via_api(client, factories):
+def test_can_get_token_via_api(api_client, factories):
     user = factories['users.User']()
     url = reverse('api:v1:token')
     payload = {
@@ -81,12 +81,24 @@ def test_can_get_token_via_api(client, factories):
         'password': 'test'
     }
 
-    response = client.post(url, payload)
+    response = api_client.post(url, payload)
     assert response.status_code == 200
-    assert '"token":' in response.content.decode('utf-8')
+    assert 'token' in response.data
 
 
-def test_can_refresh_token_via_api(client, factories):
+def test_can_get_token_via_api_inactive(api_client, factories):
+    user = factories['users.User'](is_active=False)
+    url = reverse('api:v1:token')
+    payload = {
+        'username': user.username,
+        'password': 'test'
+    }
+
+    response = api_client.post(url, payload)
+    assert response.status_code == 400
+
+
+def test_can_refresh_token_via_api(api_client, factories, mocker):
     # first, we get a token
     user = factories['users.User']()
     url = reverse('api:v1:token')
@@ -95,21 +107,19 @@ def test_can_refresh_token_via_api(client, factories):
         'password': 'test'
     }
 
-    response = client.post(url, payload)
+    response = api_client.post(url, payload)
     assert response.status_code == 200
 
-    token = json.loads(response.content.decode('utf-8'))['token']
+    token = response.data['token']
     url = reverse('api:v1:token_refresh')
-    response = client.post(url,{'token': token})
+    response = api_client.post(url, {'token': token})
 
     assert response.status_code == 200
-    assert '"token":' in response.content.decode('utf-8')
-    # a different token should be returned
-    assert token in response.content.decode('utf-8')
+    assert 'token' in response.data
 
 
-def test_changing_password_updates_secret_key(logged_in_client):
-    user = logged_in_client.user
+def test_changing_password_updates_secret_key(logged_in_api_client):
+    user = logged_in_api_client.user
     password = user.password
     secret_key = user.secret_key
     payload = {
@@ -119,7 +129,7 @@ def test_changing_password_updates_secret_key(logged_in_client):
     }
     url = reverse('change_password')
 
-    response = logged_in_client.post(url, payload)
+    response = logged_in_api_client.post(url, payload)
 
     user.refresh_from_db()
 

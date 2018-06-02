@@ -13,17 +13,33 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import preferences
 
 
 def get_token():
     return binascii.b2a_hex(os.urandom(15)).decode('utf-8')
 
 
-PERMISSIONS = [
-    'federation',
-    'library',
-    'settings',
-]
+PERMISSIONS_CONFIGURATION = {
+    'federation': {
+        'label': 'Manage library federation',
+        'help_text': 'Follow other instances, accept/deny library follow requests...',
+    },
+    'library': {
+        'label': 'Manage library',
+        'help_text': 'Manage library, delete files, tracks, artists, albums...',
+    },
+    'settings': {
+        'label': 'Manage instance-level settings',
+        'help_text': '',
+    },
+    'upload': {
+        'label': 'Upload new content to the library',
+        'help_text': '',
+    },
+}
+
+PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
 
 
 @python_2_unicode_compatible
@@ -47,30 +63,43 @@ class User(AbstractUser):
 
     # permissions
     permission_federation = models.BooleanField(
-        'Manage library federation',
-        help_text='Follow other instances, accept/deny library follow requests...',
+        PERMISSIONS_CONFIGURATION['federation']['label'],
+        help_text=PERMISSIONS_CONFIGURATION['federation']['help_text'],
         default=False)
     permission_library = models.BooleanField(
-        'Manage library',
-        help_text='Import new content, manage existing content',
+        PERMISSIONS_CONFIGURATION['library']['label'],
+        help_text=PERMISSIONS_CONFIGURATION['library']['help_text'],
         default=False)
     permission_settings = models.BooleanField(
-        'Manage instance-level settings',
+        PERMISSIONS_CONFIGURATION['settings']['label'],
+        help_text=PERMISSIONS_CONFIGURATION['settings']['help_text'],
+        default=False)
+    permission_upload = models.BooleanField(
+        PERMISSIONS_CONFIGURATION['upload']['label'],
+        help_text=PERMISSIONS_CONFIGURATION['upload']['help_text'],
         default=False)
 
     def __str__(self):
         return self.username
 
     def get_permissions(self):
+        defaults = preferences.get('users__default_permissions')
         perms = {}
         for p in PERMISSIONS:
-            v = self.is_superuser or getattr(self, 'permission_{}'.format(p))
+            v = (
+                self.is_superuser or
+                getattr(self, 'permission_{}'.format(p)) or
+                p in defaults
+            )
             perms[p] = v
         return perms
 
-    def has_permissions(self, *perms):
+    def has_permissions(self, *perms, operator='and'):
+        if operator not in ['and', 'or']:
+            raise ValueError('Invalid operator {}'.format(operator))
         permissions = self.get_permissions()
-        return all([permissions[p] for p in perms])
+        checker = all if operator == 'and' else any
+        return checker([permissions[p] for p in perms])
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'username': self.username})

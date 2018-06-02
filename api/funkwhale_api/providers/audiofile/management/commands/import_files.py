@@ -55,13 +55,6 @@ class Command(BaseCommand):
             )
         )
         parser.add_argument(
-            '--no-acoustid',
-            action='store_true',
-            dest='no_acoustid',
-            default=False,
-            help='Use this flag to completely bypass acoustid completely',
-        )
-        parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help="Do NOT prompt the user for input of any kind.",
         )
@@ -118,7 +111,6 @@ class Command(BaseCommand):
             len(filtered['new'])))
 
         self.stdout.write('Selected options: {}'.format(', '.join([
-            'no acoustid' if options['no_acoustid'] else 'use acoustid',
             'in place' if options['in_place'] else 'copy music files',
         ])))
         if len(filtered['new']) == 0:
@@ -201,4 +193,4 @@ class Command(BaseCommand):
             job.save()
         import_handler(
             import_job_id=job.pk,
-            use_acoustid=not options['no_acoustid'])
+            use_acoustid=False)

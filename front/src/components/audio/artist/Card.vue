@@ -18,10 +18,10 @@
                   <router-link class="discrete link":to="{name: 'library.albums.detail', params: {id: album.id }}">
                     <strong>{{ album.title }}</strong>
                   </router-link><br />
-                  {{ album.tracks.length }} tracks
+                  {{ album.tracks_count }} tracks
                 </td>
                 <td>
-                  <play-button class="right floated basic icon" :discrete="true" :tracks="album.tracks"></play-button>
+                  <play-button class="right floated basic icon" :discrete="true" :album="album.id"></play-button>
                 </td>
               </tr>
             </tbody>
@@ -45,7 +45,7 @@
             {{ artist.albums.length }}
           </i18next>
         </span>
-        <play-button class="mini basic orange right floated" :tracks="allTracks">
+        <play-button class="mini basic orange right floated" :artist="artist.id">
           <i18next path="Play all"/>
         </play-button>
       </div>
@@ -74,15 +74,6 @@ export default {
         return this.artist.albums
       }
       return this.artist.albums.slice(0, this.initialAlbums)
-    },
-    allTracks () {
-      let tracks = []
-      this.artist.albums.forEach(album => {
-        album.tracks.forEach(track => {
-          tracks.push(track)
-        })
-      })
-      return tracks
     }
   }
 }

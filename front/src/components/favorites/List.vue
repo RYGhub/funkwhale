@@ -26,7 +26,7 @@
           <div class="field">
             <i18next tag="label" path="Ordering direction"/>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value=""><i18next path="Ascending"/></option>
+              <option value="+"><i18next path="Ascending"/></option>
               <option value="-"><i18next path="Descending"/></option>
             </select>
           </div>
@@ -74,7 +74,7 @@ export default {
     Pagination
   },
   data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || 'artist__name')
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       results: null,
       isLoading: false,
@@ -82,9 +82,10 @@ export default {
       previousLink: null,
       page: parseInt(this.defaultPage),
       paginateBy: parseInt(this.defaultPaginateBy || 25),
-      orderingDirection: defaultOrdering.direction,
+      orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
+        ['creation_date', 'Creation date'],
         ['title', 'Track name'],
         ['album__title', 'Album name'],
         ['artist__name', 'Artist name']
@@ -135,19 +136,15 @@ export default {
   watch: {
     page: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     paginateBy: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     orderingDirection: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     },
     ordering: function () {
       this.updateQueryString()
-      this.fetchFavorites(FAVORITES_URL)
     }
   }
 }

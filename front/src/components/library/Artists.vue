@@ -19,7 +19,7 @@
           <div class="field">
             <i18next tag="label" path="Ordering direction"/>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="">Ascending</option>
+              <option value="+">Ascending</option>
               <option value="-">Descending</option>
             </select>
           </div>
@@ -69,7 +69,6 @@ import axios from 'axios'
 import _ from 'lodash'
 import $ from 'jquery'
 
-import backend from '@/audio/backend'
 import logger from '@/logging'
 
 import OrderingMixin from '@/components/mixins/Ordering'
@@ -96,7 +95,7 @@ export default {
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction,
+      orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
         ['creation_date', 'Creation date'],
@@ -135,13 +134,6 @@ export default {
       logger.default.debug('Fetching artists')
       axios.get(url, {params: params}).then((response) => {
         self.result = response.data
-        self.result.results.map((artist) => {
-          var albums = JSON.parse(JSON.stringify(artist.albums)).map((album) => {
-            return backend.Album.clean(album)
-          })
-          artist.albums = albums
-          return artist
-        })
         self.isLoading = false
       })
     }, 500),

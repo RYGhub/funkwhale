@@ -1,4 +1,7 @@
 import binascii
+import pytest
+
+from rest_framework import exceptions
 
 from funkwhale_api.subsonic import authentication
 
@@ -54,3 +57,19 @@ def test_auth_with_password_cleartext(api_request, factories):
     u, _ = authenticator.authenticate(request)
 
     assert user == u
+
+
+def test_auth_with_inactive_users(api_request, factories):
+    salt = 'salt'
+    user = factories['users.User'](is_active=False)
+    user.subsonic_api_token = 'password'
+    user.save()
+    token = authentication.get_token(salt, 'password')
+    request = api_request.get('/', {
+        'u': user.username,
+        'p': 'password',
+    })
+
+    authenticator = authentication.SubsonicAuthentication()
+    with pytest.raises(exceptions.AuthenticationFailed):
+        authenticator.authenticate(request)

@@ -14,11 +14,11 @@ Funkwhale is a self-hosted, modern free and open-source music server, heavily in
    users/index
    features
    installation/index
+   upgrading
    configuration
    importing-music
    federation
    api
-   upgrading
    third-party
    contributing
    changelog

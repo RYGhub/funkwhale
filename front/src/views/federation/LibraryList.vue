@@ -26,7 +26,7 @@
           <div class="field">
             <label>{{ $t('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="">{{ $t('Ascending') }}</option>
+              <option value="+">{{ $t('Ascending') }}</option>
               <option value="-">{{ $t('Descending') }}</option>
             </select>
           </div>
@@ -102,7 +102,7 @@ export default {
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 50),
-      orderingDirection: defaultOrdering.direction,
+      orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
         ['creation_date', 'Creation date'],

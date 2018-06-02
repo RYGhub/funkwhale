@@ -123,7 +123,7 @@ export default {
             if (settings.fields.remoteValues) {
               return initialResponse
             }
-            return {results: initialResponse}
+            return {results: initialResponse.results}
           }
         }
       }

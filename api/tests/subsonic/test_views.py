@@ -391,3 +391,30 @@ def test_get_indexes(f, db, logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_get_cover_art_album(factories, logged_in_api_client):
+    url = reverse('api:subsonic-get-cover-art')
+    assert url.endswith('getCoverArt') is True
+    album = factories['music.Album']()
+    response = logged_in_api_client.get(url, {'id': 'al-{}'.format(album.pk)})
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == ''
+    assert response['X-Accel-Redirect'] == music_views.get_file_path(
+        album.cover
+    ).decode('utf-8')
+
+
+def test_scrobble(factories, logged_in_api_client):
+    tf = factories['music.TrackFile']()
+    track = tf.track
+    url = reverse('api:subsonic-scrobble')
+    assert url.endswith('scrobble') is True
+    response = logged_in_api_client.get(
+        url, {'id': track.pk, 'submission': True})
+
+    assert response.status_code == 200
+
+    l = logged_in_api_client.user.listenings.latest('id')
+    assert l.track == track

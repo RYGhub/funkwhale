@@ -5,13 +5,13 @@ from taggit.models import Tag
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music.models import Track
-from funkwhale_api.music.serializers import TrackSerializerNested
+from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.users.serializers import UserBasicSerializer
 from . import models
 
 
 class PlaylistTrackSerializer(serializers.ModelSerializer):
-    track = TrackSerializerNested()
+    track = TrackSerializer()
 
     class Meta:
         model = models.PlaylistTrack

@@ -51,12 +51,12 @@ export default {
         if (self.$store.state.route.hash) {
           self.scrollTo(self.$store.state.route.hash.substr(1))
         }
+        $('select.dropdown').dropdown()
       })
     })
   },
   methods: {
     scrollTo (id) {
-      console.log(id, 'hello')
       this.current = id
       document.getElementById(id).scrollIntoView()
     },
@@ -86,15 +86,15 @@ export default {
           id: 'users',
           settings: [
             'users__registration_enabled',
-            'common__api_authentication_required'
+            'common__api_authentication_required',
+            'users__default_permissions'
           ]
         },
         {
           label: this.$t('Imports'),
           id: 'imports',
           settings: [
-            'providers_youtube__api_key',
-            'providers_acoustid__api_key'
+            'providers_youtube__api_key'
           ]
         },
         {

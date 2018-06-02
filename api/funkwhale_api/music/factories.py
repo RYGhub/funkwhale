@@ -117,6 +117,11 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
             status='finished',
             audio_file=None,
         )
+        with_audio_file = factory.Trait(
+            status='finished',
+            audio_file=factory.django.FileField(
+                from_path=os.path.join(SAMPLES_PATH, 'test.ogg')),
+        )
 
 
 @registry.register(name='music.FileImportJob')

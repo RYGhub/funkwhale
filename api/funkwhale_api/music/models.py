@@ -23,6 +23,7 @@ from funkwhale_api import downloader
 from funkwhale_api import musicbrainz
 from funkwhale_api.federation import utils as federation_utils
 from . import importers
+from . import metadata
 from . import utils
 
 
@@ -79,6 +80,12 @@ class APIModelMixin(models.Model):
 class ArtistQuerySet(models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count('albums'))
+
+    def with_albums(self):
+        return self.prefetch_related(
+            models.Prefetch(
+                'albums', queryset=Album.objects.with_tracks_count())
+        )
 
 
 class Artist(APIModelMixin):
@@ -186,10 +193,20 @@ class Album(APIModelMixin):
     }
     objects = AlbumQuerySet.as_manager()
 
-    def get_image(self):
-        image_data =  musicbrainz.api.images.get_front(str(self.mbid))
-        f = ContentFile(image_data)
-        self.cover.save('{0}.jpg'.format(self.mbid), f)
+    def get_image(self, data=None):
+        if data:
+            f = ContentFile(data['content'])
+            extensions = {
+                'image/jpeg': 'jpg',
+                'image/png': 'png',
+                'image/gif': 'gif',
+            }
+            extension = extensions.get(data['mimetype'], 'jpg')
+            self.cover.save('{}.{}'.format(self.uuid, extension), f)
+        else:
+            image_data =  musicbrainz.api.images.get_front(str(self.mbid))
+            f = ContentFile(image_data)
+            self.cover.save('{0}.jpg'.format(self.mbid), f)
         return self.cover.file
 
     def __str__(self):
@@ -313,11 +330,8 @@ class Lyrics(models.Model):
 class TrackQuerySet(models.QuerySet):
     def for_nested_serialization(self):
         return (self.select_related()
-                    .select_related('album__artist')
-                    .prefetch_related(
-                        'tags',
-                        'files',
-                        'artist__albums__tracks__tags'))
+                    .select_related('album__artist', 'artist')
+                    .prefetch_related('files'))
 
 
 class Track(APIModelMixin):
@@ -518,6 +532,12 @@ class TrackFile(models.Model):
         if not self.mimetype and self.audio_file:
             self.mimetype = utils.guess_mimetype(self.audio_file)
         return super().save(**kwargs)
+
+    def get_metadata(self):
+        audio_file = self.get_audio_file()
+        if not audio_file:
+            return
+        return metadata.Metadata(audio_file)
 
 
 IMPORT_STATUS_CHOICES = (

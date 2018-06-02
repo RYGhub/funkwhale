@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.utils import timezone
 
 from rest_framework import exceptions
@@ -10,6 +11,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
+from funkwhale_api.activity import record
 from funkwhale_api.common import preferences
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
@@ -459,7 +461,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                     'code': 10,
                     'message': 'Playlist ID or name must be specified.'
                 }
-            }, data)
+            })
 
         playlist = request.user.playlists.create(
             name=name
@@ -503,3 +505,71 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             }
         }
         return response.Response(data)
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='get_cover_art',
+        url_path='getCoverArt')
+    def get_cover_art(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        id = data.get('id', '')
+        if not id:
+            return response.Response({
+                'error': {
+                    'code': 10,
+                    'message': 'cover art ID must be specified.'
+                }
+            })
+
+        if id.startswith('al-'):
+            try:
+                album_id = int(id.replace('al-', ''))
+                album = music_models.Album.objects.exclude(
+                    cover__isnull=True
+                ).exclude(cover='').get(pk=album_id)
+            except (TypeError, ValueError, music_models.Album.DoesNotExist):
+                return response.Response({
+                    'error': {
+                        'code': 70,
+                        'message': 'cover art not found.'
+                    }
+                })
+            cover = album.cover
+        else:
+            return response.Response({
+                'error': {
+                    'code': 70,
+                    'message': 'cover art not found.'
+                }
+            })
+
+        mapping = {
+            'nginx': 'X-Accel-Redirect',
+            'apache2': 'X-Sendfile',
+        }
+        path = music_views.get_file_path(cover)
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        # let the proxy set the content-type
+        r = response.Response({}, content_type='')
+        r[file_header] = path
+        return r
+
+    @list_route(
+        methods=['get', 'post'],
+        url_name='scrobble',
+        url_path='scrobble')
+    def scrobble(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        serializer = serializers.ScrobbleSerializer(
+            data=data, context={'user': request.user})
+        if not serializer.is_valid():
+            return response.Response({
+                'error': {
+                    'code': 0,
+                    'message': 'Invalid payload'
+                }
+            })
+        if serializer.validated_data['submission']:
+            l = serializer.save()
+            record.send(l)
+        return response.Response({})

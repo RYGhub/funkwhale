@@ -50,6 +50,13 @@
         <label :for="setting.identifier">{{ setting.verbose_name }}</label>
         <p v-if="setting.help_text">{{ setting.help_text }}</p>
       </div>
+      <select
+        v-else-if="setting.field.class === 'MultipleChoiceField'"
+        v-model="values[setting.identifier]"
+        multiple
+        class="ui search selection dropdown">
+        <option v-for="v in setting.additional_data.choices" :value="v[0]">{{ v[1] }}</option>
+      </select>
     </div>
     <button
       type="submit"

@@ -4,16 +4,76 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+from funkwhale_api.music import serializers
 from funkwhale_api.music import views
 from funkwhale_api.federation import actors
 
 
-@pytest.mark.parametrize('view,permissions', [
-    (views.ImportBatchViewSet, ['library']),
-    (views.ImportJobViewSet, ['library']),
+@pytest.mark.parametrize('view,permissions,operator', [
+    (views.ImportBatchViewSet, ['library', 'upload'], 'or'),
+    (views.ImportJobViewSet, ['library', 'upload'], 'or'),
 ])
-def test_permissions(assert_user_permission, view, permissions):
-    assert_user_permission(view, permissions)
+def test_permissions(assert_user_permission, view, permissions, operator):
+    assert_user_permission(view, permissions, operator)
+
+
+def test_artist_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    artist = track.artist
+    request = api_request.get('/')
+    qs = artist.__class__.objects.with_albums()
+    serializer = serializers.ArtistWithAlbumsSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:artists-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_album_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    album = track.album
+    request = api_request.get('/')
+    qs = album.__class__.objects.all()
+    serializer = serializers.AlbumSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:albums-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_track_list_serializer(api_request, factories, logged_in_api_client):
+    track = factories['music.Track']()
+    request = api_request.get('/')
+    qs = track.__class__.objects.all()
+    serializer = serializers.TrackSerializer(
+        qs, many=True, context={'request': request})
+    expected = {
+        'count': 1,
+        'next': None,
+        'previous': None,
+        'results': serializer.data
+    }
+    url = reverse('api:v1:tracks-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
 
 
 @pytest.mark.parametrize('param,expected', [
@@ -59,8 +119,8 @@ def test_album_view_filter_listenable(
 
 
 def test_can_serve_track_file_as_remote_library(
-        factories, authenticated_actor, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = True
+        factories, authenticated_actor, api_client, settings, preferences):
+    preferences['common__api_authentication_required'] = True
     library_actor = actors.SYSTEM_ACTORS['library'].get_actor_instance()
     follow = factories['federation.Follow'](
         approved=True,
@@ -77,8 +137,8 @@ def test_can_serve_track_file_as_remote_library(
 
 
 def test_can_serve_track_file_as_remote_library_deny_not_following(
-        factories, authenticated_actor, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = True
+        factories, authenticated_actor, settings, api_client, preferences):
+    preferences['common__api_authentication_required'] = True
     track_file = factories['music.TrackFile']()
     response = api_client.get(track_file.path)
 
@@ -92,12 +152,18 @@ def test_can_serve_track_file_as_remote_library_deny_not_following(
     ('nginx', '/app/music', '/_protected/music/hello/world.mp3'),
 ])
 def test_serve_file_in_place(
-        proxy, serve_path, expected, factories, api_client, settings):
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        preferences,
+        settings):
     headers = {
         'apache2': 'X-Sendfile',
         'nginx': 'X-Accel-Redirect',
     }
-    settings.PROTECT_AUDIO_FILES = False
+    preferences['common__api_authentication_required'] = False
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
     settings.MUSIC_DIRECTORY_PATH = '/app/music'
@@ -119,8 +185,14 @@ def test_serve_file_in_place(
     ('nginx', '/app/music', '/_protected/music/hello/worldéà.mp3'),
 ])
 def test_serve_file_in_place_utf8(
-        proxy, serve_path, expected, factories, api_client, settings):
-    settings.PROTECT_AUDIO_FILES = False
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        settings,
+        preferences):
+    preferences['common__api_authentication_required'] = False
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
     settings.MUSIC_DIRECTORY_PATH = '/app/music'
@@ -138,12 +210,18 @@ def test_serve_file_in_place_utf8(
     ('nginx', '/app/music', '/_protected/media/tracks/hello/world.mp3'),
 ])
 def test_serve_file_media(
-        proxy, serve_path, expected, factories, api_client, settings):
+        proxy,
+        serve_path,
+        expected,
+        factories,
+        api_client,
+        settings,
+        preferences):
     headers = {
         'apache2': 'X-Sendfile',
         'nginx': 'X-Accel-Redirect',
     }
-    settings.PROTECT_AUDIO_FILES = False
+    preferences['common__api_authentication_required'] = False
     settings.MEDIA_ROOT = '/host/media'
     settings.PROTECT_FILE_PATH = '/_protected/music'
     settings.REVERSE_PROXY_TYPE = proxy
@@ -160,8 +238,8 @@ def test_serve_file_media(
 
 
 def test_can_proxy_remote_track(
-        factories, settings, api_client, r_mock):
-    settings.PROTECT_AUDIO_FILES = False
+        factories, settings, api_client, r_mock, preferences):
+    preferences['common__api_authentication_required'] = False
     track_file = factories['music.TrackFile'](federation=True)
 
     r_mock.get(track_file.library_track.audio_url, body=io.BytesIO(b'test'))
@@ -176,8 +254,9 @@ def test_can_proxy_remote_track(
     assert library_track.audio_file.read() == b'test'
 
 
-def test_serve_updates_access_date(factories, settings, api_client):
-    settings.PROTECT_AUDIO_FILES = False
+def test_serve_updates_access_date(
+        factories, settings, api_client, preferences):
+    preferences['common__api_authentication_required'] = False
     track_file = factories['music.TrackFile']()
     now = timezone.now()
     assert track_file.accessed_date is None
@@ -187,24 +266,6 @@ def test_serve_updates_access_date(factories, settings, api_client):
 
     assert response.status_code == 200
     assert track_file.accessed_date > now
-
-
-def test_can_create_import_from_federation_tracks(
-        factories, superuser_api_client, mocker):
-    lts = factories['federation.LibraryTrack'].create_batch(size=5)
-    mocker.patch('funkwhale_api.music.tasks.import_job_run')
-
-    payload = {
-        'library_tracks': [l.pk for l in lts]
-    }
-    url = reverse('api:v1:submit-federation')
-    response = superuser_api_client.post(url, payload)
-
-    assert response.status_code == 201
-    batch = superuser_api_client.user.imports.latest('id')
-    assert batch.jobs.count() == 5
-    for i, job in enumerate(batch.jobs.all()):
-        assert job.library_track == lts[i]
 
 
 def test_can_list_import_jobs(factories, superuser_api_client):
@@ -309,3 +370,27 @@ def test_import_batch_and_job_run_via_api(
 
     run.assert_any_call(import_job_id=job1.pk)
     run.assert_any_call(import_job_id=job2.pk)
+
+
+def test_import_job_viewset_get_queryset_upload_filters_user(
+        factories, logged_in_api_client):
+    logged_in_api_client.user.permission_upload = True
+    logged_in_api_client.user.save()
+
+    job = factories['music.ImportJob']()
+    url = reverse('api:v1:import-jobs-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.data['count'] == 0
+
+
+def test_import_batch_viewset_get_queryset_upload_filters_user(
+        factories, logged_in_api_client):
+    logged_in_api_client.user.permission_upload = True
+    logged_in_api_client.user.save()
+
+    job = factories['music.ImportBatch']()
+    url = reverse('api:v1:import-batches-list')
+    response = logged_in_api_client.get(url)
+
+    assert response.data['count'] == 0

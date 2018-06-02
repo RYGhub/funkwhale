@@ -3,15 +3,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
-from funkwhale_api.music.views import SearchMixin
-
 from . import filters
 from . import models
 from . import serializers
 
 
 class ImportRequestViewSet(
-        SearchMixin,
         mixins.CreateModelMixin,
         mixins.RetrieveModelMixin,
         mixins.ListModelMixin,
@@ -22,7 +19,6 @@ class ImportRequestViewSet(
         models.ImportRequest.objects.all()
               .select_related()
               .order_by('-creation_date'))
-    search_fields = ['artist_name', 'album_name', 'comment']
     filter_class = filters.ImportRequestFilter
     ordering_fields = ('id', 'artist_name', 'creation_date', 'status')
 

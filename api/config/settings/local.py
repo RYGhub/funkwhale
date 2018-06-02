@@ -76,3 +76,4 @@ LOGGING = {
         },
     },
 }
+CSRF_TRUSTED_ORIGINS = [o for o in ALLOWED_HOSTS]

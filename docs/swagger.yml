@@ -78,7 +78,7 @@ paths:
                   results:
                     type: "array"
                     items:
-                      $ref: "#/definitions/ArtistNested"
+                      $ref: "#/definitions/ArtistWithAlbums"
 
 properties:
   resultsCount:
@@ -106,7 +106,7 @@ definitions:
       creation_date:
         type: "string"
         format: "date-time"
-  ArtistNested:
+  ArtistWithAlbums:
     type: "object"
     allOf:
       - $ref: "#/definitions/Artist"
@@ -115,7 +115,7 @@ definitions:
           albums:
             type: "array"
             items:
-              $ref: "#/definitions/AlbumNested"
+              $ref: "#/definitions/ArtistAlbum"
 
   Album:
     type: "object"
@@ -143,16 +143,16 @@ definitions:
         format: "date"
         example: "2001-01-01"
 
-  AlbumNested:
+  ArtistAlbum:
     type: "object"
     allOf:
       - $ref: "#/definitions/Album"
       - type: "object"
         properties:
-          tracks:
-            type: "array"
-            items:
-              $ref: "#/definitions/Track"
+          tracks_count:
+            type: "integer"
+            format: "int64"
+            example: 16
 
   Track:
     type: "object"

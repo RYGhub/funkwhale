@@ -10,9 +10,6 @@ from funkwhale_api.federation import models
 class Listen(BasePermission):
 
     def has_permission(self, request, view):
-        if not settings.PROTECT_AUDIO_FILES:
-            return True
-
         if not preferences.get('common__api_authentication_required'):
             return True
 

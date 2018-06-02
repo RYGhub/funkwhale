@@ -1,6 +1,9 @@
+import logging
 import os
 
 from django.core.files.base import ContentFile
+
+from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import activity
@@ -9,12 +12,14 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
-from funkwhale_api.providers.audiofile.tasks import import_track_data_from_path
+from funkwhale_api.providers.audiofile import tasks as audiofile_tasks
 
 from django.conf import settings
 from . import models
 from . import lyrics as lyrics_utils
 from . import utils as music_utils
+
+logger = logging.getLogger(__name__)
 
 
 @celery.app.task(name='acoustid.set_on_track_file')
@@ -73,13 +78,16 @@ def import_track_from_remote(library_track):
         library_track.title, artist=artist, album=album)[0]
 
 
-def _do_import(import_job, replace=False, use_acoustid=True):
+def _do_import(import_job, replace=False, use_acoustid=False):
+    logger.info('[Import Job %s] starting job', import_job.pk)
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
     acoustid_track_id = None
     duration = None
     track = None
-    use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
+    # use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
+    # Acoustid is not reliable, we disable it for now.
+    use_acoustid = False
     if not mbid and use_acoustid and from_file:
         # we try to deduce mbid from acoustid
         client = get_acoustid_client()
@@ -89,14 +97,32 @@ def _do_import(import_job, replace=False, use_acoustid=True):
             mbid = match['recordings'][0]['id']
             acoustid_track_id = match['id']
     if mbid:
+        logger.info(
+            '[Import Job %s] importing track from musicbrainz recording %s',
+            import_job.pk,
+            str(mbid))
         track, _ = models.Track.get_or_create_from_api(mbid=mbid)
     elif import_job.audio_file:
-        track = import_track_data_from_path(import_job.audio_file.path)
+        logger.info(
+            '[Import Job %s] importing track from uploaded track data at %s',
+            import_job.pk,
+            import_job.audio_file.path)
+        track = audiofile_tasks.import_track_data_from_path(
+            import_job.audio_file.path)
     elif import_job.library_track:
+        logger.info(
+            '[Import Job %s] importing track from federated library track %s',
+            import_job.pk,
+            import_job.library_track.pk)
         track = import_track_from_remote(import_job.library_track)
     elif import_job.source.startswith('file://'):
-        track = import_track_data_from_path(
-            import_job.source.replace('file://', '', 1))
+        tf_path = import_job.source.replace('file://', '', 1)
+        logger.info(
+            '[Import Job %s] importing track from local track data at %s',
+            import_job.pk,
+            tf_path)
+        track = audiofile_tasks.import_track_data_from_path(
+            tf_path)
     else:
         raise ValueError(
             'Not enough data to process import, '
@@ -104,8 +130,13 @@ def _do_import(import_job, replace=False, use_acoustid=True):
 
     track_file = None
     if replace:
+        logger.info(
+            '[Import Job %s] replacing existing audio file', import_job.pk)
         track_file = track.files.first()
     elif track.files.count() > 0:
+        logger.info(
+            '[Import Job %s] skipping, we already have a file for this track',
+            import_job.pk)
         if import_job.audio_file:
             import_job.audio_file.delete()
         import_job.status = 'skipped'
@@ -129,6 +160,9 @@ def _do_import(import_job, replace=False, use_acoustid=True):
             pass
     elif not import_job.audio_file and not import_job.source.startswith('file://'):
         # not an implace import, and we have a source, so let's download it
+        logger.info(
+            '[Import Job %s] downloading audio file from remote',
+            import_job.pk)
         track_file.download_file()
     elif not import_job.audio_file and import_job.source.startswith('file://'):
         # in place import, we set mimetype from extension
@@ -136,14 +170,86 @@ def _do_import(import_job, replace=False, use_acoustid=True):
         track_file.mimetype = music_utils.get_type_from_ext(ext)
     track_file.set_audio_data()
     track_file.save()
+    # if no cover is set on track album, we try to update it as well:
+    if not track.album.cover:
+        logger.info(
+            '[Import Job %s] retrieving album cover',
+            import_job.pk)
+        update_album_cover(track.album, track_file)
     import_job.status = 'finished'
     import_job.track_file = track_file
     if import_job.audio_file:
         # it's imported on the track, we don't need it anymore
         import_job.audio_file.delete()
     import_job.save()
-
+    logger.info(
+        '[Import Job %s] job finished',
+        import_job.pk)
     return track_file
+
+
+def update_album_cover(album, track_file, replace=False):
+    if album.cover and not replace:
+        return
+
+    if track_file:
+        # maybe the file has a cover embedded?
+        try:
+            metadata = track_file.get_metadata()
+        except FileNotFoundError:
+            metadata = None
+        if metadata:
+            cover = metadata.get_picture('cover_front')
+            if cover:
+                # best case scenario, cover is embedded in the track
+                logger.info(
+                    '[Album %s] Using cover embedded in file',
+                    album.pk)
+                return album.get_image(data=cover)
+        if track_file.source and track_file.source.startswith('file://'):
+            # let's look for a cover in the same directory
+            path = os.path.dirname(track_file.source.replace('file://', '', 1))
+            logger.info(
+                '[Album %s] scanning covers from %s',
+                album.pk,
+                path)
+            cover = get_cover_from_fs(path)
+            if cover:
+                return album.get_image(data=cover)
+    if not album.mbid:
+        return
+    try:
+        logger.info(
+            '[Album %s] Fetching cover from musicbrainz release %s',
+            album.pk,
+            str(album.mbid))
+        return album.get_image()
+    except ResponseError as exc:
+        logger.warning(
+            '[Album %s] cannot fetch cover from musicbrainz: %s',
+            album.pk,
+            str(exc))
+
+
+IMAGE_TYPES = [
+    ('jpg', 'image/jpeg'),
+    ('png', 'image/png'),
+]
+
+def get_cover_from_fs(dir_path):
+    if os.path.exists(dir_path):
+        for e, m in IMAGE_TYPES:
+            cover_path = os.path.join(dir_path, 'cover.{}'.format(e))
+            if not os.path.exists(cover_path):
+                logger.debug('Cover %s does not exists', cover_path)
+                continue
+            with open(cover_path, 'rb') as c:
+                logger.info('Found cover at %s', cover_path)
+                return {
+                    'mimetype': m,
+                    'content': c.read(),
+                }
+
 
 
 @celery.app.task(name='ImportJob.run', bind=True)
@@ -151,8 +257,9 @@ def _do_import(import_job, replace=False, use_acoustid=True):
     models.ImportJob.objects.filter(
         status__in=['pending', 'errored']),
     'import_job')
-def import_job_run(self, import_job, replace=False, use_acoustid=True):
-    def mark_errored():
+def import_job_run(self, import_job, replace=False, use_acoustid=False):
+    def mark_errored(exc):
+        logger.error('[Import Job %s] Error during import: %s', str(exc))
         import_job.status = 'errored'
         import_job.save(update_fields=['status'])
 
@@ -164,10 +271,17 @@ def import_job_run(self, import_job, replace=False, use_acoustid=True):
             try:
                 self.retry(exc=exc, countdown=30, max_retries=3)
             except:
-                mark_errored()
+                mark_errored(exc)
                 raise
-        mark_errored()
+        mark_errored(exc)
         raise
+
+
+@celery.app.task(name='ImportBatch.run')
+@celery.require_instance(models.ImportBatch, 'import_batch')
+def import_batch_run(import_batch):
+    for job_id in import_batch.jobs.order_by('id').values_list('id', flat=True):
+        import_job_run.delay(import_job_id=job_id)
 
 
 @celery.app.task(name='Lyrics.fetch_content')

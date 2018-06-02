@@ -10,7 +10,7 @@
             <i class="circular inverted users violet icon"></i>
             <div class="content">
               {{ artist.name }}
-              <div class="sub header">
+              <div class="sub header" v-if="albums">
                 {{ $t('{% track_count %} tracks in {% album_count %} albums', {track_count: totalTracks, album_count: albums.length})}}
               </div>
             </div>
@@ -18,7 +18,7 @@
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
           </button>
-          <play-button class="orange" :tracks="allTracks"><i18next path="Play all albums"/></play-button>
+          <play-button class="orange" :artist="artist.id"><i18next path="Play all albums"/></play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
@@ -30,10 +30,13 @@
           </a>
         </div>
       </div>
-      <div class="ui vertical stripe segment">
+      <div v-if="isLoadingAlbums" class="ui vertical stripe segment">
+        <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
+      </div>
+      <div v-else-if="albums" class="ui vertical stripe segment">
         <h2><i18next path="Albums by this artist"/></h2>
         <div class="ui stackable doubling three column grid">
-          <div class="column" :key="album.id" v-for="album in sortedAlbums">
+          <div class="column" :key="album.id" v-for="album in albums">
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>
           </div>
         </div>
@@ -43,7 +46,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
@@ -63,6 +65,7 @@ export default {
   data () {
     return {
       isLoading: true,
+      isLoadingAlbums: true,
       artist: null,
       albums: null
     }
@@ -78,18 +81,19 @@ export default {
       logger.default.debug('Fetching artist "' + this.id + '"')
       axios.get(url).then((response) => {
         self.artist = response.data
-        self.albums = JSON.parse(JSON.stringify(self.artist.albums)).map((album) => {
-          return backend.Album.clean(album)
-        })
         self.isLoading = false
+        self.isLoadingAlbums = true
+        axios.get('albums/', {params: {artist: this.id, ordering: '-release_date'}}).then((response) => {
+          self.albums = JSON.parse(JSON.stringify(response.data.results)).map((album) => {
+            return backend.Album.clean(album)
+          })
+
+          self.isLoadingAlbums = false
+        })
       })
     }
   },
   computed: {
-    sortedAlbums () {
-      let a = this.albums || []
-      return _.orderBy(a, ['release_date'], ['asc'])
-    },
     totalTracks () {
       return this.albums.map((album) => {
         return album.tracks.length

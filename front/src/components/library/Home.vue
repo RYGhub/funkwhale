@@ -30,7 +30,6 @@
 <script>
 import axios from 'axios'
 import Search from '@/components/audio/Search'
-import backend from '@/audio/backend'
 import logger from '@/logging'
 import ArtistCard from '@/components/audio/artist/Card'
 import RadioCard from '@/components/radios/Card'
@@ -66,13 +65,6 @@ export default {
       logger.default.time('Loading latest artists')
       axios.get(url, {params: params}).then((response) => {
         self.artists = response.data.results
-        self.artists.map((artist) => {
-          var albums = JSON.parse(JSON.stringify(artist.albums)).map((album) => {
-            return backend.Album.clean(album)
-          })
-          artist.albums = albums
-          return artist
-        })
         logger.default.timeEnd('Loading latest artists')
         self.isLoadingArtists = false
       })

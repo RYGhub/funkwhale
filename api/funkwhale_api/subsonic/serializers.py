@@ -4,6 +4,7 @@ from django.db.models import functions, Count
 
 from rest_framework import serializers
 
+from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
 
 
@@ -57,8 +58,10 @@ class GetArtistSerializer(serializers.Serializer):
                 'name': album.title,
                 'artist': artist.name,
                 'created': album.creation_date,
-                'songCount': len(album.tracks.all())
+                'songCount': len(album.tracks.all()),
             }
+            if album.cover:
+                album_data['coverArt'] = 'al-{}'.format(album.id)
             if album.release_date:
                 album_data['year'] = album.release_date.year
             payload['album'].append(album_data)
@@ -81,6 +84,8 @@ def get_track_data(album, track, tf):
         'artistId': album.artist.pk,
         'type': 'music',
     }
+    if track.album.cover:
+        data['coverArt'] = 'al-{}'.format(track.album.id)
     if tf.bitrate:
         data['bitrate'] = int(tf.bitrate/1000)
     if tf.size:
@@ -98,6 +103,9 @@ def get_album2_data(album):
         'artist': album.artist.name,
         'created': album.creation_date,
     }
+    if album.cover:
+        payload['coverArt'] = 'al-{}'.format(album.id)
+
     try:
         payload['songCount'] = album._tracks_count
     except AttributeError:
@@ -221,3 +229,18 @@ def get_music_directory_data(artist):
             td['size'] = tf.size
         data['child'].append(td)
     return data
+
+
+class ScrobbleSerializer(serializers.Serializer):
+    submission = serializers.BooleanField(default=True, required=False)
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=music_models.Track.objects.annotate(
+            files_count=Count('files')
+        ).filter(files_count__gt=0)
+    )
+
+    def create(self, data):
+        return history_models.Listening.objects.create(
+            user=self.context['user'],
+            track=data['id'],
+        )

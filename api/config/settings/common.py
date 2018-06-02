@@ -97,6 +97,7 @@ THIRD_PARTY_APPS = (
     'dynamic_preferences',
     'django_filters',
     'cacheops',
+    'django_cleanup',
 )
 
 
@@ -302,6 +303,9 @@ ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = "config.routing.application"
 
+# This ensures that Django will be able to detect a secure connection
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
@@ -432,12 +436,6 @@ USE_X_FORWARDED_PORT = True
 # Default to Nginx
 REVERSE_PROXY_TYPE = env('REVERSE_PROXY_TYPE', default='nginx')
 assert REVERSE_PROXY_TYPE in ['apache2', 'nginx'], 'Unsupported REVERSE_PROXY_TYPE'
-
-# Wether we should check user permission before serving audio files (meaning
-# return an obfuscated url)
-# This require a special configuration on the reverse proxy side
-# See https://wellfire.co/learn/nginx-django-x-accel-redirects/ for example
-PROTECT_AUDIO_FILES = env.bool('PROTECT_AUDIO_FILES', default=True)
 
 # Which path will be used to process the internal redirection
 # **DO NOT** put a slash at the end

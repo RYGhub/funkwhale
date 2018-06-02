@@ -6,7 +6,8 @@ From music directory on the server
 
 You can import music files in funkwhale assuming they are located on the server
 and readable by the funkwhale application. Your music files should contain at
-least an ``artist``, ``album`` and ``title`` tags.
+least an ``artist``, ``album`` and ``title`` tags, but we recommend you tag
+it extensively using a proper tool, such as Beets or Musicbrainz Picard.
 
 You can import those tracks as follows, assuming they are located in
 ``/srv/funkwhale/data/music``:
@@ -34,17 +35,12 @@ get details::
 
 .. note::
 
-    Autotagging using acoustid is experimental now and can yield unexpected
-    result. You can disable acoustid by passing the --no-acoustid flag.
-
-.. note::
-
     This command is idempotent, meaning you can run it multiple times on the same
     files and already imported files will simply be skipped.
 
 .. note::
 
-    At the moment, only OGG/Vorbis and MP3 files with ID3 tags are supported
+    At the moment, only Flac, OGG/Vorbis and MP3 files with ID3 tags are supported
 
 
 .. _in-place-import:
@@ -79,6 +75,15 @@ configuration options to ensure the webserver can serve them properly:
     Funkwhale will not be able to serve those files anymore.
 
     Thus, be especially careful when you manipulate the source files.
+
+Album covers
+^^^^^^^^^^^^
+
+Whenever possible, Funkwhale will import album cover, with the following precedence:
+
+1. It will use the cover embedded in the audio files themeselves, if any (Flac/MP3 only)
+2. It will use a cover.jpg or a cover.png file from the imported track directory, if any
+3. It will fectch cover art from musicbrainz, assuming the file is tagged correctly
 
 Getting demo tracks
 ^^^^^^^^^^^^^^^^^^^
