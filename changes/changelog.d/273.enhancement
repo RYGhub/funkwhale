@@ -1,0 +1,2 @@
+fix_track_files will now update files with bad mimetype (and not only
+the one with no mimetype) (#273)

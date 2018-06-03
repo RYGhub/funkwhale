@@ -33,9 +33,9 @@ class Command(BaseCommand):
     def fix_mimetypes(self, dry_run, **kwargs):
         self.stdout.write('Fixing missing mimetypes...')
         matching = models.TrackFile.objects.filter(
-            source__startswith='file://', mimetype=None)
+            source__startswith='file://').exclude(mimetype__startswith='audio/')
         self.stdout.write(
-            '[mimetypes] {} entries found with no mimetype'.format(
+            '[mimetypes] {} entries found with bad or no mimetype'.format(
                 matching.count()))
         for extension, mimetype in utils.EXTENSION_TO_MIMETYPE.items():
             qs = matching.filter(source__endswith='.{}'.format(extension))
