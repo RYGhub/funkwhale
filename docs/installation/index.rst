@@ -16,10 +16,8 @@ The project relies on the following components and services to work:
 Hardware requirements
 ---------------------
 
-Funkwhale is not especially CPU hungry, unless you're relying heavily
-on the transcoding feature (which is basic and unoptimized at the moment).
-
-On a dockerized instance with 2 CPUs and a few active users, the memory footprint is around ~500Mb::
+Funkwhale is not especially CPU hungry. On a dockerized instance with 2 CPUs
+and a few active users, the memory footprint is around ~500Mb::
 
    CONTAINER                   MEM USAGE
    funkwhale_api_1             202.1 MiB
@@ -125,10 +123,8 @@ Apache2
     are not working yet:
 
     - Websocket (used for real-time updates on Instance timeline)
-    - Transcoding of audio files
 
-    Those features are not necessary to use your Funkwhale instance, and
-    transcoding in particular is still in alpha-state anyway.
+    Those features are not necessary to use your Funkwhale instance.
 
 Ensure you have a recent version of apache2 installed on your server.
 You'll also need the following dependencies::
