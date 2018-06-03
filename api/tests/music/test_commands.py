@@ -1,4 +1,8 @@
+import os
+
 from funkwhale_api.music.management.commands import fix_track_files
+
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_fix_track_files_bitrate_length(factories, mocker):
@@ -43,3 +47,27 @@ def test_fix_track_files_size(factories, mocker):
 
     # updated
     assert tf2.size == 2
+
+
+def test_fix_track_files_mimetype(factories, mocker):
+    name = 'test.mp3'
+    mp3_path = os.path.join(DATA_DIR, 'test.mp3')
+    ogg_path = os.path.join(DATA_DIR, 'test.ogg')
+    tf1 = factories['music.TrackFile'](
+        audio_file__from_path=mp3_path,
+        source='file://{}'.format(mp3_path),
+        mimetype='application/x-empty')
+
+    # this one already has a mimetype set, to it should not be updated
+    tf2 = factories['music.TrackFile'](
+        audio_file__from_path=ogg_path,
+        source='file://{}'.format(ogg_path),
+        mimetype='audio/something')
+    c = fix_track_files.Command()
+    c.fix_mimetypes(dry_run=False)
+
+    tf1.refresh_from_db()
+    tf2.refresh_from_db()
+
+    assert tf1.mimetype == 'audio/mpeg'
+    assert tf2.mimetype == 'audio/something'
