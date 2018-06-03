@@ -43,9 +43,9 @@ def get_query(query_string, search_fields):
 
 
 def guess_mimetype(f):
-    b = min(100000, f.size)
+    b = min(1000000, f.size)
     t = magic.from_buffer(f.read(b), mime=True)
-    if t == 'application/octet-stream':
+    if not t.startswith('audio/'):
         # failure, we try guessing by extension
         mt, _ = mimetypes.guess_type(f.path)
         if mt:
