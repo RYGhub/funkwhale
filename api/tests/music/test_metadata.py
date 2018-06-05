@@ -95,3 +95,17 @@ def test_can_get_metadata_from_flac_file_not_crash_if_empty():
 
     with pytest.raises(metadata.TagNotFound):
         data.get('test')
+
+
+@pytest.mark.parametrize('field_name', [
+    'musicbrainz_artistid',
+    'musicbrainz_albumid',
+    'musicbrainz_recordingid',
+])
+def test_mbid_clean_keeps_only_first(field_name):
+    u1 = str(uuid.uuid4())
+    u2 = str(uuid.uuid4())
+    field = metadata.VALIDATION[field_name]
+    result = field.to_python('/'.join([u1, u2]))
+
+    assert str(result) == u1
