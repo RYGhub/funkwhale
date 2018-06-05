@@ -29,9 +29,9 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
-import backend from '@/audio/backend'
 import AlbumCard from '@/components/audio/album/Card'
 import ArtistCard from '@/components/audio/artist/Card'
 
@@ -50,7 +50,6 @@ export default {
         albums: [],
         artists: []
       },
-      backend: backend,
       isLoading: false
     }
   },
@@ -61,7 +60,7 @@ export default {
     this.search()
   },
   methods: {
-    search () {
+    search: _.debounce(function () {
       if (this.query.length < 1) {
         return
       }
@@ -77,15 +76,11 @@ export default {
         self.results = self.castResults(response.data)
         self.isLoading = false
       })
-    },
+    }, 500),
     castResults (results) {
       return {
-        albums: results.albums.map((album) => {
-          return backend.Album.clean(album)
-        }),
-        artists: results.artists.map((artist) => {
-          return backend.Artist.clean(artist)
-        })
+        albums: results.albums,
+        artists: results.artists
       }
     }
   },
