@@ -9,7 +9,6 @@
         :class="['ui', 'icon', 'left', 'floated', 'button']"
         :post-action="uploadUrl"
         :multiple="true"
-        :size="1024 * 1024 * 30"
         :data="uploadData"
         :drop="true"
         extensions="ogg,mp3,flac"
