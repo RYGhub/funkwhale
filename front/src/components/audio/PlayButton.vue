@@ -67,8 +67,31 @@ export default {
     }
   },
   methods: {
+    getTracksPage (page, params, resolve, tracks) {
+      if (page > 10) {
+        // it's 10 * 100 tracks already, let's stop here
+        resolve(tracks)
+      }
+      // when fetching artists/or album tracks, sometimes, we may have to fetch
+      // multiple pages
+      let self = this
+      params['page_size'] = 100
+      params['page'] = page
+      tracks = tracks || []
+      axios.get('tracks/', {params: params}).then((response) => {
+        response.data.results.forEach(t => {
+          tracks.push(t)
+        })
+        if (response.data.next) {
+          self.getTracksPage(page + 1, params, resolve, tracks)
+        } else {
+          resolve(tracks)
+        }
+      })
+    },
     getPlayableTracks () {
       let self = this
+      this.isLoading = true
       let getTracks = new Promise((resolve, reject) => {
         if (self.track) {
           resolve([self.track])
@@ -82,44 +105,30 @@ export default {
             }))
           })
         } else if (self.artist) {
-          let params = {
-            params: {'artist': self.artist, 'ordering': 'album__release_date,position'}
-          }
-          axios.get('tracks', params).then((response) => {
-            resolve(response.data.results)
-          })
+          let params = {'artist': self.artist, 'ordering': 'album__release_date,position'}
+          self.getTracksPage(1, params, resolve)
         } else if (self.album) {
-          let params = {
-            params: {'album': self.album, 'ordering': 'position'}
-          }
-          axios.get('tracks', params).then((response) => {
-            resolve(response.data.results)
-          })
+          let params = {'album': self.album, 'ordering': 'position'}
+          self.getTracksPage(1, params, resolve)
         }
       })
       return getTracks.then((tracks) => {
+        setTimeout(e => {
+          self.isLoading = false
+        }, 250)
         return tracks.filter(e => {
           return e.files.length > 0
         })
       })
     },
-    triggerLoad () {
-      let self = this
-      this.isLoading = true
-      setTimeout(() => {
-        self.isLoading = false
-      }, 500)
-    },
     add () {
       let self = this
-      this.triggerLoad()
       this.getPlayableTracks().then((tracks) => {
         self.$store.dispatch('queue/appendMany', {tracks: tracks})
       })
     },
     addNext (next) {
       let self = this
-      this.triggerLoad()
       let wasEmpty = this.$store.state.queue.tracks.length === 0
       this.getPlayableTracks().then((tracks) => {
         self.$store.dispatch('queue/appendMany', {tracks: tracks, index: self.$store.state.queue.currentIndex + 1})
