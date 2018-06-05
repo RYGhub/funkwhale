@@ -114,6 +114,13 @@ Then, download our sample virtualhost file and proxy conf:
 Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``.
 If everything is fine, you can restart your nginx server with ``service nginx restart``.
 
+.. warning::
+
+    If you plan to use to in-place import, ensure the alias value
+    in the ``_protected/music`` location matches your MUSIC_DIRECTORY_SERVE_PATH
+    env var.
+
+
 Apache2
 ^^^^^^^
 
