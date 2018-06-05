@@ -259,7 +259,9 @@ def get_cover_from_fs(dir_path):
     'import_job')
 def import_job_run(self, import_job, replace=False, use_acoustid=False):
     def mark_errored(exc):
-        logger.error('[Import Job %s] Error during import: %s', str(exc))
+        logger.error(
+            '[Import Job %s] Error during import: %s',
+            import_job.pk, str(exc))
         import_job.status = 'errored'
         import_job.save(update_fields=['status'])
 
