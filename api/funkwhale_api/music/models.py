@@ -334,6 +334,11 @@ class TrackQuerySet(models.QuerySet):
                     .prefetch_related('files'))
 
 
+def get_artist(release_list):
+    return Artist.get_or_create_from_api(
+        mbid=release_list[0]['artist-credits'][0]['artists']['id'])[0]
+
+
 class Track(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(
@@ -363,8 +368,9 @@ class Track(APIModelMixin):
             'musicbrainz_field_name': 'title'
         },
         'artist': {
-            'musicbrainz_field_name': 'artist-credit',
-            'converter': lambda v: Artist.get_or_create_from_api(mbid=v[0]['artist']['id'])[0],
+            # we use the artist from the release to avoid #237
+            'musicbrainz_field_name': 'release-list',
+            'converter': get_artist,
         },
         'album': {
             'musicbrainz_field_name': 'release-list',
