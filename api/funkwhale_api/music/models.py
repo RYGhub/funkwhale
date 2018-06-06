@@ -437,7 +437,40 @@ class Track(APIModelMixin):
             title__iexact=title,
             defaults=kwargs)
 
+    @classmethod
+    def get_or_create_from_release(cls, release_mbid, mbid):
+        release_mbid = str(release_mbid)
+        mbid = str(mbid)
+        try:
+            return cls.objects.get(mbid=mbid), False
+        except cls.DoesNotExist:
+            pass
 
+        album = Album.get_or_create_from_api(release_mbid)[0]
+        data = musicbrainz.client.api.releases.get(
+            str(album.mbid), includes=Album.api_includes)
+        tracks = [
+            t
+            for m in data['release']['medium-list']
+            for t in m['track-list']
+        ]
+        track_data = None
+        for track in tracks:
+            if track['recording']['id'] == mbid:
+                track_data = track
+                break
+        if not track_data:
+            raise ValueError('No track found matching this ID')
+
+        return cls.objects.update_or_create(
+            mbid=mbid,
+            defaults={
+                'position': int(track['position']),
+                'title': track['recording']['title'],
+                'album': album,
+                'artist': album.artist,
+            }
+        )
 class TrackFile(models.Model):
     uuid = models.UUIDField(
         unique=True, db_index=True, default=uuid.uuid4)
