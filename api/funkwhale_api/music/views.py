@@ -35,7 +35,6 @@ from funkwhale_api.musicbrainz import api
 from funkwhale_api.requests.models import ImportRequest
 
 from . import filters
-from . import forms
 from . import importers
 from . import models
 from . import permissions as music_permissions
@@ -323,42 +322,6 @@ class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
             return handle_serve(queryset.get(pk=kwargs['pk']))
         except models.TrackFile.DoesNotExist:
             return Response(status=404)
-
-    @list_route(methods=['get'])
-    def viewable(self, request, *args, **kwargs):
-        return Response({}, status=200)
-
-    @list_route(methods=['get'])
-    def transcode(self, request, *args, **kwargs):
-        form = forms.TranscodeForm(request.GET)
-        if not form.is_valid():
-            return Response(form.errors, status=400)
-
-        f = form.cleaned_data['track_file']
-        if not f.audio_file:
-            return Response(status=400)
-        output_kwargs = {
-            'format': form.cleaned_data['to']
-        }
-        args = (ffmpeg
-            .input(f.audio_file.path)
-            .output('pipe:', **output_kwargs)
-            .get_args()
-        )
-        # we use a generator here so the view return immediatly and send
-        # file chunk to the browser, instead of blocking a few seconds
-        def _transcode():
-            p = subprocess.Popen(
-                ['ffmpeg'] + args,
-                stdout=subprocess.PIPE)
-            for line in p.stdout:
-                yield line
-
-        response = StreamingHttpResponse(
-            _transcode(), status=200,
-            content_type=form.cleaned_data['to'])
-
-        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

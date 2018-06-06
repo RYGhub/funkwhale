@@ -91,10 +91,23 @@ def convert_track_number(v):
         pass
 
 
+
+class FirstUUIDField(forms.UUIDField):
+    def to_python(self, value):
+        try:
+            # sometimes, Picard leaves to uuids in the field, separated
+            # by a slash
+            value = value.split('/')[0]
+        except (AttributeError, IndexError, TypeError):
+            pass
+
+        return super().to_python(value)
+
+
 VALIDATION = {
-    'musicbrainz_artistid': forms.UUIDField(),
-    'musicbrainz_albumid': forms.UUIDField(),
-    'musicbrainz_recordingid': forms.UUIDField(),
+    'musicbrainz_artistid': FirstUUIDField(),
+    'musicbrainz_albumid': FirstUUIDField(),
+    'musicbrainz_recordingid': FirstUUIDField(),
 }
 
 CONF = {

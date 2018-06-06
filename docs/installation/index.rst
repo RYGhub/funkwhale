@@ -16,10 +16,8 @@ The project relies on the following components and services to work:
 Hardware requirements
 ---------------------
 
-Funkwhale is not especially CPU hungry, unless you're relying heavily
-on the transcoding feature (which is basic and unoptimized at the moment).
-
-On a dockerized instance with 2 CPUs and a few active users, the memory footprint is around ~500Mb::
+Funkwhale is not especially CPU hungry. On a dockerized instance with 2 CPUs
+and a few active users, the memory footprint is around ~500Mb::
 
    CONTAINER                   MEM USAGE
    funkwhale_api_1             202.1 MiB
@@ -116,6 +114,13 @@ Then, download our sample virtualhost file and proxy conf:
 Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``.
 If everything is fine, you can restart your nginx server with ``service nginx restart``.
 
+.. warning::
+
+    If you plan to use to in-place import, ensure the alias value
+    in the ``_protected/music`` location matches your MUSIC_DIRECTORY_SERVE_PATH
+    env var.
+
+
 Apache2
 ^^^^^^^
 
@@ -125,10 +130,8 @@ Apache2
     are not working yet:
 
     - Websocket (used for real-time updates on Instance timeline)
-    - Transcoding of audio files
 
-    Those features are not necessary to use your Funkwhale instance, and
-    transcoding in particular is still in alpha-state anyway.
+    Those features are not necessary to use your Funkwhale instance.
 
 Ensure you have a recent version of apache2 installed on your server.
 You'll also need the following dependencies::

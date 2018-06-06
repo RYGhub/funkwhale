@@ -12,10 +12,13 @@
               <router-link class="item" to="/about">
                 <i18next path="About this instance" />
               </router-link>
-              <i18next tag="a" href="https://funkwhale.audio" class="item" target="_blank" path="Official website" />
-              <i18next tag="a" href="https://docs.funkwhale.audio" class="item" target="_blank" path="Documentation" />
-              <i18next tag="a" href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank" path="Source code" />
-              <i18next tag="a" href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank" path="Issue tracker" />
+              <a href="https://funkwhale.audio" class="item" target="_blank">{{ $t('Official website') }}</a>
+              <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $t('Documentation') }}</a>
+              <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
+                <template v-if="version">{{ $t('Source code ({% version %})', {version: version}) }}</template>
+                <template v-else>{{ $t('Source code') }}</template>
+              </a>
+              <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
             </div>
           </div>
           <div class="ten wide column">
@@ -39,6 +42,9 @@
 </template>
 
 <script>
+import axios from 'axios'
+import _ from 'lodash'
+
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
 
@@ -51,6 +57,11 @@ export default {
     Raven,
     PlaylistModal
   },
+  data () {
+    return {
+      nodeinfo: null
+    }
+  },
   created () {
     this.$store.dispatch('instance/fetchSettings')
     let self = this
@@ -58,6 +69,23 @@ export default {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
+    this.fetchNodeInfo()
+  },
+  methods: {
+    fetchNodeInfo () {
+      let self = this
+      axios.get('instance/nodeinfo/2.0/').then(response => {
+        self.nodeinfo = response.data
+      })
+    }
+  },
+  computed: {
+    version () {
+      if (!this.nodeinfo) {
+        return null
+      }
+      return _.get(this.nodeinfo, 'software.version')
+    }
   }
 }
 </script>

@@ -84,4 +84,7 @@ export default {
 tr:not(:hover) .favorite-icon:not(.favorited) {
   display: none;
 }
+pre {
+  overflow-x: scroll;
+}
 </style>

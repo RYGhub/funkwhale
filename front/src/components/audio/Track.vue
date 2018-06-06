@@ -18,7 +18,6 @@
 <script>
 import {mapState} from 'vuex'
 import url from '@/utils/url'
-import formats from '@/audio/formats'
 import _ from 'lodash'
 // import logger from '@/logging'
 
@@ -52,13 +51,6 @@ export default {
       let sources = [
         {type: file.mimetype, url: file.path}
       ]
-      formats.formats.forEach(f => {
-        if (f !== file.mimetype) {
-          let format = formats.formatsMap[f]
-          let url = `/api/v1/trackfiles/transcode/?track_file=${file.id}&to=${format}`
-          sources.push({type: f, url: url})
-        }
-      })
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url
         // so authentication can be checked by the backend

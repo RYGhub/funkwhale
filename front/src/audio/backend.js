@@ -26,7 +26,11 @@ export default {
       return url
     }
     if (url.startsWith('/')) {
-      return config.BACKEND_URL + url.substr(1)
+      let rootUrl = (
+        window.location.protocol + '//' + window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '')
+      )
+      return rootUrl + url
     } else {
       return config.BACKEND_URL + url
     }
