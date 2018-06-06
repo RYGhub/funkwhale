@@ -15,16 +15,13 @@ DATA_DIR = os.path.join(
 )
 
 
-def test_can_create_track_from_file_metadata(db, mocker):
+def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     metadata = {
         'artist': ['Test artist'],
         'album': ['Test album'],
         'title': ['Test track'],
         'TRACKNUMBER': ['4'],
         'date': ['2012-08-15'],
-        'musicbrainz_albumid': ['a766da8b-8336-47aa-a3ee-371cc41ccc75'],
-        'musicbrainz_trackid': ['bd21ac48-46d8-4e78-925f-d9cc2a294656'],
-        'musicbrainz_artistid': ['013c8e5b-d72a-4cd3-8dee-6c64d6125823'],
     }
     m1 = mocker.patch('mutagen.File', return_value=metadata)
     m2 = mocker.patch(
@@ -35,13 +32,64 @@ def test_can_create_track_from_file_metadata(db, mocker):
         os.path.join(DATA_DIR, 'dummy_file.ogg'))
 
     assert track.title == metadata['title'][0]
-    assert track.mbid == uuid.UUID(metadata['musicbrainz_trackid'][0])
+    assert track.mbid is None
     assert track.position == 4
     assert track.album.title == metadata['album'][0]
-    assert track.album.mbid == uuid.UUID(metadata['musicbrainz_albumid'][0])
+    assert track.album.mbid is None
     assert track.album.release_date == datetime.date(2012, 8, 15)
     assert track.artist.name == metadata['artist'][0]
-    assert track.artist.mbid == uuid.UUID(metadata['musicbrainz_artistid'][0])
+    assert track.artist.mbid is None
+
+
+def test_can_create_track_from_file_metadata_mbid(factories, mocker):
+    album = factories['music.Album']()
+    mocker.patch(
+        'funkwhale_api.music.models.Album.get_or_create_from_api',
+        return_value=(album, True),
+    )
+
+    album_data = {
+        'release': {
+            'id': album.mbid,
+            'medium-list': [
+                {
+                    'track-list': [
+                        {
+                            'id': '03baca8b-855a-3c05-8f3d-d3235287d84d',
+                            'position': '4',
+                            'number': '4',
+                            'recording': {
+                                'id': '2109e376-132b-40ad-b993-2bb6812e19d4',
+                                'title': 'Teen Age Riot',
+                            },
+                        }
+                    ],
+                    'track-count': 1
+                }
+            ],
+        }
+    }
+    mocker.patch(
+        'funkwhale_api.musicbrainz.api.releases.get',
+        return_value=album_data)
+    track_data = album_data['release']['medium-list'][0]['track-list'][0]
+    metadata = {
+        'musicbrainz_albumid': [album.mbid],
+        'musicbrainz_trackid': [track_data['recording']['id']],
+    }
+    m1 = mocker.patch('mutagen.File', return_value=metadata)
+    m2 = mocker.patch(
+        'funkwhale_api.music.metadata.Metadata.get_file_type',
+        return_value='OggVorbis',
+    )
+    track = tasks.import_track_data_from_path(
+        os.path.join(DATA_DIR, 'dummy_file.ogg'))
+
+    assert track.title == track_data['recording']['title']
+    assert track.mbid == track_data['recording']['id']
+    assert track.position == 4
+    assert track.album == album
+    assert track.artist == album.artist
 
 
 def test_management_command_requires_a_valid_username(factories, mocker):

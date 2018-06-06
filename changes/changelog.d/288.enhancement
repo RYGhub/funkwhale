@@ -1,0 +1,1 @@
+Huge performance boost (~x5 to x7) during CLI import that queries MusicBrainz (#288)

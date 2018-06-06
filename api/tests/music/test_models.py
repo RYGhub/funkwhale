@@ -43,6 +43,53 @@ def test_import_album_stores_release_group(factories):
     assert album.artist == artist
 
 
+def test_import_track_from_release(factories, mocker):
+    album = factories['music.Album'](
+        mbid='430347cb-0879-3113-9fde-c75b658c298e')
+    album_data = {
+        'release': {
+            'id': album.mbid,
+            'title': 'Daydream Nation',
+            'status': 'Official',
+            'medium-count': 1,
+            'medium-list': [
+                {
+                    'position': '1',
+                    'format': 'CD',
+                    'track-list': [
+                        {
+                            'id': '03baca8b-855a-3c05-8f3d-d3235287d84d',
+                            'position': '4',
+                            'number': '4',
+                            'length': '417973',
+                            'recording': {
+                                'id': '2109e376-132b-40ad-b993-2bb6812e19d4',
+                                'title': 'Teen Age Riot',
+                                'length': '417973'},
+                            'track_or_recording_length': '417973'
+                        }
+                    ],
+                    'track-count': 1
+                }
+            ],
+        }
+    }
+    mocked_get = mocker.patch(
+        'funkwhale_api.musicbrainz.api.releases.get',
+        return_value=album_data)
+    track_data = album_data['release']['medium-list'][0]['track-list'][0]
+    track = models.Track.get_or_create_from_release(
+        '430347cb-0879-3113-9fde-c75b658c298e',
+        track_data['recording']['id'],
+    )[0]
+    mocked_get.assert_called_once_with(
+        album.mbid, includes=models.Album.api_includes)
+    assert track.title == track_data['recording']['title']
+    assert track.mbid == track_data['recording']['id']
+    assert track.album == album
+    assert track.artist == album.artist
+    assert track.position == int(track_data['position'])
+
 def test_import_job_is_bound_to_track_file(factories, mocker):
     track = factories['music.Track']()
     job = factories['music.ImportJob'](mbid=track.mbid)
