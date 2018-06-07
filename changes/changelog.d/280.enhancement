@@ -1,0 +1,15 @@
+Switch from BSD-3 licence to AGPL-3 licence (#280)
+
+Funkwhale is now licenced under AGPL-3
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Following the recent switch made by PixelFed
+(https://github.com/dansup/pixelfed/issues/143), we decided along with
+the community to relicence Funkwhale under the AGPL-3 licence. We did this
+switch for various reasons:
+
+- This is better aligned with other fediverse software
+- It prohibits anyone to distribute closed-source and proprietary forks of Funkwhale
+
+As end users and instance owners, this does not change anything. You can
+continue to use Funkwhale exactly as you did before :)
