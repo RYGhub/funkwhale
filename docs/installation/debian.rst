@@ -240,6 +240,14 @@ This will create the required tables and rows.
     You can safely execute this command any time you want, this will only
     run unapplied migrations.
 
+.. warning::
+
+    You may sometimes get the following warning while applying migrations::
+
+        "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+    This is a warning, not an error, and it can be safely ignored.
+    Never run the ``makemigrations`` command yourself.
 
 Create an admin account
 -----------------------

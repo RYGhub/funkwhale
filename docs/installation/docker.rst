@@ -36,6 +36,15 @@ Run the database container and the initial migrations:
     docker-compose up -d postgres
     docker-compose run --rm api python manage.py migrate
 
+.. warning::
+
+    You may sometimes get the following warning while applying migrations::
+
+        "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+    This is a warning, not an error, and it can be safely ignored.
+    Never run the ``makemigrations`` command yourself.
+
 Create your admin user:
 
 .. code-block:: bash
