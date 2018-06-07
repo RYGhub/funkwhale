@@ -1,0 +1,37 @@
+Album cover served in http (#264)
+
+Apache is now serving album covers in https
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Two issues are addressed here. The first one was about Django replying with
+mixed content (http) when queried for covers. Setting up the `X-Forwarded-Proto`
+allows Django to know that the client is using https, and that the reply must
+be https as well.
+
+Second issue was a problem of permission causing Apache a denied access to
+album cover folder. It was solved by adding another block for this path in
+the Apache configuration file for funkwhale.
+
+Here is how to modify your `funkwhale.conf` :
+
+<VirtualHost *:443>
+
+    ...
+    Include /etc/letsencrypt/options-ssl-apache.conf
+
+    #Add this new line
+    RequestHeader set X-Forwarded-Proto "https"
+
+    ...
+
+    #Add this new block below the other <Directory/> blocks
+    <Directory /srv/funkwhale/data/media/albums>
+      Options FollowSymLinks
+      AllowOverride None
+      Require all granted
+    </Directory>
+
+    ...
+</VirtualHost>
+
+
