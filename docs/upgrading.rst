@@ -37,6 +37,14 @@ easy:
     # Relaunch the containers
     docker-compose up -d
 
+.. warning::
+
+    You may sometimes get the following warning while applying migrations::
+
+        "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+    This is a warning, not an error, and it can be safely ignored.
+    Never run the ``makemigrations`` command yourself.
 
 
 Non-docker setup
@@ -95,3 +103,12 @@ match what is described in :doc:`debian`:
 
     # restart the services
     sudo systemctl restart funkwhale.target
+
+.. warning::
+
+    You may sometimes get the following warning while applying migrations::
+
+        "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+    This is a warning, not an error, and it can be safely ignored.
+    Never run the ``makemigrations`` command yourself.
