@@ -90,7 +90,7 @@ First, we'll download the latest api release.
     curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
     unzip "api-|version|.zip" -d extracted
     mv extracted/api/* api/
-    rmdir extracted
+    rm -rf extracted
 
 
 Then we'll download the frontend files:
