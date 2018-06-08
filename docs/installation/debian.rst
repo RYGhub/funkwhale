@@ -23,7 +23,7 @@ default on system. You can install them using:
 .. code-block:: shell
 
     sudo apt-get update
-    sudo apt-get install curl python3-venv git unzip
+    sudo apt-get install curl python3-pip python3-venv git unzip
 
 
 Layout
