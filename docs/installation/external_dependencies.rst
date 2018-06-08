@@ -33,9 +33,7 @@ Create the project database and user:
 .. code-block:: shell
 
     CREATE DATABASE "funkwhale"
-      WITH ENCODING 'utf8'
-      LC_COLLATE = 'en_US.utf8'
-      LC_CTYPE = 'en_US.utf8';
+      WITH ENCODING 'utf8';
     CREATE USER funkwhale;
     GRANT ALL PRIVILEGES ON DATABASE funkwhale TO funkwhale;
 
