@@ -6,9 +6,19 @@ variables:
 
 
 stages:
+  - lint
   - test
   - build
   - deploy
+
+black:
+  image: python:3.6
+  stage: lint
+  before_script:
+    - pip install black
+  script:
+    - black --check api/
+
 
 test_api:
   services:
