@@ -22,8 +22,17 @@ black:
   script:
     - black --check api/
 
+flake8:
+  image: python:3.6
+  stage: lint
+  variables:
+    GIT_STRATEGY: fetch
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 api
   cache:
-    key: "$CI_PROJECT_ID__black_pip_cache"
+    key: "$CI_PROJECT_ID__flake8_pip_cache"
     paths:
       - "$PIP_CACHE_DIR"
 
