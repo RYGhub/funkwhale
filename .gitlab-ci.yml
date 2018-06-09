@@ -118,7 +118,7 @@ pages:
   tags:
     - docker
 
-docker_develop:
+docker_release:
   stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
@@ -129,8 +129,9 @@ docker_develop:
     - docker push $IMAGE
   only:
     - develop@funkwhale/funkwhale
+    - tags@funkwhale/funkwhale
   tags:
-    - dind
+    - docker-build
 
 build_api:
   # Simply publish a zip containing api/ directory
@@ -145,19 +146,3 @@ build_api:
     - tags@funkwhale/funkwhale
     - master@funkwhale/funkwhale
     - develop@funkwhale/funkwhale
-
-
-docker_release:
-  stage: deploy
-  before_script:
-    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-    - cp -r front/dist api/frontend
-    - cd api
-  script:
-    - docker build -t $IMAGE -t $IMAGE_LATEST .
-    - docker push $IMAGE
-    - docker push $IMAGE_LATEST
-  only:
-    - tags@funkwhale/funkwhale
-  tags:
-    - dind
