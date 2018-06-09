@@ -5,4 +5,4 @@ You can launch it just to check how it works.
 
 
 def main(command, **kwargs):
-    command.stdout.write('Test script run successfully')
+    command.stdout.write("Test script run successfully")

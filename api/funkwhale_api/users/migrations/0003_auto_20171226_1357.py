@@ -6,19 +6,19 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0002_auto_20171214_2205'),
-    ]
+    dependencies = [("users", "0002_auto_20171214_2205")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='secret_key',
+            model_name="user",
+            name="secret_key",
             field=models.UUIDField(default=uuid.uuid4, null=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, max_length=150, verbose_name='last name'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                blank=True, max_length=150, verbose_name="last name"
+            ),
         ),
     ]

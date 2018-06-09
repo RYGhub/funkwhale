@@ -11,4 +11,4 @@ class ListeningFactory(factory.django.DjangoModelFactory):
     track = factory.SubFactory(factories.TrackFactory)
 
     class Meta:
-        model = 'history.Listening'
+        model = "history.Listening"

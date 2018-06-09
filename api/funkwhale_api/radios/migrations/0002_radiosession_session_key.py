@@ -6,14 +6,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('radios', '0001_initial'),
-    ]
+    dependencies = [("radios", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='radiosession',
-            name='session_key',
+            model_name="radiosession",
+            name="session_key",
             field=models.CharField(null=True, blank=True, max_length=100),
-        ),
+        )
     ]

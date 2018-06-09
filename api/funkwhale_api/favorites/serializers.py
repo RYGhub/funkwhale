@@ -11,29 +11,22 @@ from . import models
 
 class TrackFavoriteActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-    object = TrackActivitySerializer(source='track')
-    actor = UserActivitySerializer(source='user')
-    published = serializers.DateTimeField(source='creation_date')
+    object = TrackActivitySerializer(source="track")
+    actor = UserActivitySerializer(source="user")
+    published = serializers.DateTimeField(source="creation_date")
 
     class Meta:
         model = models.TrackFavorite
-        fields = [
-            'id',
-            'local_id',
-            'object',
-            'type',
-            'actor',
-            'published'
-        ]
+        fields = ["id", "local_id", "object", "type", "actor", "published"]
 
     def get_actor(self, obj):
         return UserActivitySerializer(obj.user).data
 
     def get_type(self, obj):
-        return 'Like'
+        return "Like"
 
 
 class UserTrackFavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TrackFavorite
-        fields = ('id', 'track', 'creation_date')
+        fields = ("id", "track", "creation_date")

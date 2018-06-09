@@ -5,23 +5,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('playlists', '0003_auto_20180319_1214'),
-    ]
+    dependencies = [("playlists", "0003_auto_20180319_1214")]
 
     operations = [
         migrations.AddField(
-            model_name='playlist',
-            name='modification_date',
+            model_name="playlist",
+            name="modification_date",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='playlisttrack',
-            name='index',
+            model_name="playlisttrack",
+            name="index",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
-        migrations.AlterUniqueTogether(
-            name='playlisttrack',
-            unique_together=set(),
-        ),
+        migrations.AlterUniqueTogether(name="playlisttrack", unique_together=set()),
     ]

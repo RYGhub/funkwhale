@@ -7,42 +7,40 @@ import urllib.parse
 
 from . import exceptions
 
-KEY_ID_REGEX = re.compile(r'keyId=\"(?P<id>.*)\"')
+KEY_ID_REGEX = re.compile(r"keyId=\"(?P<id>.*)\"")
 
 
 def get_key_pair(size=2048):
     key = rsa.generate_private_key(
-        backend=crypto_default_backend(),
-        public_exponent=65537,
-        key_size=size
+        backend=crypto_default_backend(), public_exponent=65537, key_size=size
     )
     private_key = key.private_bytes(
         crypto_serialization.Encoding.PEM,
         crypto_serialization.PrivateFormat.PKCS8,
-        crypto_serialization.NoEncryption())
+        crypto_serialization.NoEncryption(),
+    )
     public_key = key.public_key().public_bytes(
-        crypto_serialization.Encoding.PEM,
-        crypto_serialization.PublicFormat.PKCS1
+        crypto_serialization.Encoding.PEM, crypto_serialization.PublicFormat.PKCS1
     )
 
     return private_key, public_key
 
 
 def get_key_id_from_signature_header(header_string):
-    parts = header_string.split(',')
+    parts = header_string.split(",")
     try:
         raw_key_id = [p for p in parts if p.startswith('keyId="')][0]
     except IndexError:
-        raise ValueError('Missing key id')
+        raise ValueError("Missing key id")
 
     match = KEY_ID_REGEX.match(raw_key_id)
     if not match:
-        raise ValueError('Invalid key id')
+        raise ValueError("Invalid key id")
 
     key_id = match.groups()[0]
     url = urllib.parse.urlparse(key_id)
     if not url.scheme or not url.netloc:
-        raise ValueError('Invalid url')
-    if url.scheme not in ['http', 'https']:
-        raise ValueError('Invalid shceme')
+        raise ValueError("Invalid url")
+    if url.scheme not in ["http", "https"]:
+        raise ValueError("Invalid shceme")
     return key_id

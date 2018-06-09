@@ -11,38 +11,35 @@ from . import serializers
 
 
 class ManageTrackFileViewSet(
-        mixins.ListModelMixin,
-        mixins.RetrieveModelMixin,
-        mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = (
         music_models.TrackFile.objects.all()
-            .select_related(
-                'track__artist',
-                'track__album__artist',
-                'library_track')
-            .order_by('-id')
+        .select_related("track__artist", "track__album__artist", "library_track")
+        .order_by("-id")
     )
     serializer_class = serializers.ManageTrackFileSerializer
     filter_class = filters.ManageTrackFileFilterSet
     permission_classes = (HasUserPermission,)
-    required_permissions = ['library']
+    required_permissions = ["library"]
     ordering_fields = [
-        'accessed_date',
-        'modification_date',
-        'creation_date',
-        'track__artist__name',
-        'bitrate',
-        'size',
-        'duration',
+        "accessed_date",
+        "modification_date",
+        "creation_date",
+        "track__artist__name",
+        "bitrate",
+        "size",
+        "duration",
     ]
 
-    @list_route(methods=['post'])
+    @list_route(methods=["post"])
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageTrackFileActionSerializer(
-            request.data,
-            queryset=queryset,
+            request.data, queryset=queryset
         )
         serializer.is_valid(raise_exception=True)
         result = serializer.save()

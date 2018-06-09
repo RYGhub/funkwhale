@@ -6,34 +6,34 @@ from rest_framework_jwt import authentication
 from rest_framework_jwt.settings import api_settings
 
 
-class JSONWebTokenAuthenticationQS(
-        authentication.BaseJSONWebTokenAuthentication):
+class JSONWebTokenAuthenticationQS(authentication.BaseJSONWebTokenAuthentication):
 
-    www_authenticate_realm = 'api'
+    www_authenticate_realm = "api"
 
     def get_jwt_value(self, request):
-        token = request.query_params.get('jwt')
-        if 'jwt' in request.query_params and not token:
-            msg = _('Invalid Authorization header. No credentials provided.')
+        token = request.query_params.get("jwt")
+        if "jwt" in request.query_params and not token:
+            msg = _("Invalid Authorization header. No credentials provided.")
             raise exceptions.AuthenticationFailed(msg)
         return token
 
     def authenticate_header(self, request):
         return '{0} realm="{1}"'.format(
-            api_settings.JWT_AUTH_HEADER_PREFIX, self.www_authenticate_realm)
+            api_settings.JWT_AUTH_HEADER_PREFIX, self.www_authenticate_realm
+        )
 
 
-class BearerTokenHeaderAuth(
-        authentication.BaseJSONWebTokenAuthentication):
+class BearerTokenHeaderAuth(authentication.BaseJSONWebTokenAuthentication):
     """
     For backward compatibility purpose, we used Authorization: JWT <token>
     but Authorization: Bearer <token> is probably better.
     """
-    www_authenticate_realm = 'api'
+
+    www_authenticate_realm = "api"
 
     def get_jwt_value(self, request):
         auth = authentication.get_authorization_header(request).split()
-        auth_header_prefix = 'bearer'
+        auth_header_prefix = "bearer"
 
         if not auth:
             if api_settings.JWT_AUTH_COOKIE:
@@ -44,14 +44,16 @@ class BearerTokenHeaderAuth(
             return None
 
         if len(auth) == 1:
-            msg = _('Invalid Authorization header. No credentials provided.')
+            msg = _("Invalid Authorization header. No credentials provided.")
             raise exceptions.AuthenticationFailed(msg)
         elif len(auth) > 2:
-            msg = _('Invalid Authorization header. Credentials string '
-                    'should not contain spaces.')
+            msg = _(
+                "Invalid Authorization header. Credentials string "
+                "should not contain spaces."
+            )
             raise exceptions.AuthenticationFailed(msg)
 
         return auth[1]
 
     def authenticate_header(self, request):
-        return '{0} realm="{1}"'.format('Bearer', self.www_authenticate_realm)
+        return '{0} realm="{1}"'.format("Bearer", self.www_authenticate_realm)

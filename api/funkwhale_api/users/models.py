@@ -17,26 +17,20 @@ from funkwhale_api.common import preferences
 
 
 def get_token():
-    return binascii.b2a_hex(os.urandom(15)).decode('utf-8')
+    return binascii.b2a_hex(os.urandom(15)).decode("utf-8")
 
 
 PERMISSIONS_CONFIGURATION = {
-    'federation': {
-        'label': 'Manage library federation',
-        'help_text': 'Follow other instances, accept/deny library follow requests...',
+    "federation": {
+        "label": "Manage library federation",
+        "help_text": "Follow other instances, accept/deny library follow requests...",
     },
-    'library': {
-        'label': 'Manage library',
-        'help_text': 'Manage library, delete files, tracks, artists, albums...',
+    "library": {
+        "label": "Manage library",
+        "help_text": "Manage library, delete files, tracks, artists, albums...",
     },
-    'settings': {
-        'label': 'Manage instance-level settings',
-        'help_text': '',
-    },
-    'upload': {
-        'label': 'Upload new content to the library',
-        'help_text': '',
-    },
+    "settings": {"label": "Manage instance-level settings", "help_text": ""},
+    "upload": {"label": "Upload new content to the library", "help_text": ""},
 }
 
 PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
@@ -58,51 +52,54 @@ class User(AbstractUser):
     # anyway since django use stronger schemes for storing passwords.
     # Users that want to use the subsonic API from external client
     # should set this token and use it as their password in such clients
-    subsonic_api_token = models.CharField(
-        blank=True, null=True, max_length=255)
+    subsonic_api_token = models.CharField(blank=True, null=True, max_length=255)
 
     # permissions
     permission_federation = models.BooleanField(
-        PERMISSIONS_CONFIGURATION['federation']['label'],
-        help_text=PERMISSIONS_CONFIGURATION['federation']['help_text'],
-        default=False)
+        PERMISSIONS_CONFIGURATION["federation"]["label"],
+        help_text=PERMISSIONS_CONFIGURATION["federation"]["help_text"],
+        default=False,
+    )
     permission_library = models.BooleanField(
-        PERMISSIONS_CONFIGURATION['library']['label'],
-        help_text=PERMISSIONS_CONFIGURATION['library']['help_text'],
-        default=False)
+        PERMISSIONS_CONFIGURATION["library"]["label"],
+        help_text=PERMISSIONS_CONFIGURATION["library"]["help_text"],
+        default=False,
+    )
     permission_settings = models.BooleanField(
-        PERMISSIONS_CONFIGURATION['settings']['label'],
-        help_text=PERMISSIONS_CONFIGURATION['settings']['help_text'],
-        default=False)
+        PERMISSIONS_CONFIGURATION["settings"]["label"],
+        help_text=PERMISSIONS_CONFIGURATION["settings"]["help_text"],
+        default=False,
+    )
     permission_upload = models.BooleanField(
-        PERMISSIONS_CONFIGURATION['upload']['label'],
-        help_text=PERMISSIONS_CONFIGURATION['upload']['help_text'],
-        default=False)
+        PERMISSIONS_CONFIGURATION["upload"]["label"],
+        help_text=PERMISSIONS_CONFIGURATION["upload"]["help_text"],
+        default=False,
+    )
 
     def __str__(self):
         return self.username
 
     def get_permissions(self):
-        defaults = preferences.get('users__default_permissions')
+        defaults = preferences.get("users__default_permissions")
         perms = {}
         for p in PERMISSIONS:
             v = (
-                self.is_superuser or
-                getattr(self, 'permission_{}'.format(p)) or
-                p in defaults
+                self.is_superuser
+                or getattr(self, "permission_{}".format(p))
+                or p in defaults
             )
             perms[p] = v
         return perms
 
-    def has_permissions(self, *perms, operator='and'):
-        if operator not in ['and', 'or']:
-            raise ValueError('Invalid operator {}'.format(operator))
+    def has_permissions(self, *perms, operator="and"):
+        if operator not in ["and", "or"]:
+            raise ValueError("Invalid operator {}".format(operator))
         permissions = self.get_permissions()
-        checker = all if operator == 'and' else any
+        checker = all if operator == "and" else any
         return checker([permissions[p] for p in perms])
 
     def get_absolute_url(self):
-        return reverse('users:detail', kwargs={'username': self.username})
+        return reverse("users:detail", kwargs={"username": self.username})
 
     def update_secret_key(self):
         self.secret_key = uuid.uuid4()
@@ -119,4 +116,4 @@ class User(AbstractUser):
             self.update_subsonic_api_token()
 
     def get_activity_url(self):
-        return settings.FUNKWHALE_URL + '/@{}'.format(self.username)
+        return settings.FUNKWHALE_URL + "/@{}".format(self.username)

@@ -7,6 +7,4 @@ class Migration(migrations.Migration):
 
     dependencies = []
 
-    operations = [
-        UnaccentExtension()
-    ]
+    operations = [UnaccentExtension()]

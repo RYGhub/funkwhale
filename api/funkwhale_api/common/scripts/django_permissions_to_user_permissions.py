@@ -8,22 +8,22 @@ from funkwhale_api.users import models
 from django.contrib.auth.models import Permission
 
 mapping = {
-    'dynamic_preferences.change_globalpreferencemodel': 'settings',
-    'music.add_importbatch': 'library',
-    'federation.change_library': 'federation',
+    "dynamic_preferences.change_globalpreferencemodel": "settings",
+    "music.add_importbatch": "library",
+    "federation.change_library": "federation",
 }
 
 
 def main(command, **kwargs):
     for codename, user_permission in sorted(mapping.items()):
-        app_label, c = codename.split('.')
-        p = Permission.objects.get(
-            content_type__app_label=app_label, codename=c)
+        app_label, c = codename.split(".")
+        p = Permission.objects.get(content_type__app_label=app_label, codename=c)
         users = models.User.objects.filter(
-            Q(groups__permissions=p) | Q(user_permissions=p)).distinct()
+            Q(groups__permissions=p) | Q(user_permissions=p)
+        ).distinct()
         total = users.count()
 
-        command.stdout.write('Updating {} users with {} permission...'.format(
-            total, user_permission
-        ))
-        users.update(**{'permission_{}'.format(user_permission): True})
+        command.stdout.write(
+            "Updating {} users with {} permission...".format(total, user_permission)
+        )
+        users.update(**{"permission_{}".format(user_permission): True})

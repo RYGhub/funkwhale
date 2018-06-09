@@ -9,38 +9,26 @@ def command():
     return script.Command()
 
 
-@pytest.mark.parametrize('script_name', [
-    'django_permissions_to_user_permissions',
-    'test',
-])
+@pytest.mark.parametrize(
+    "script_name", ["django_permissions_to_user_permissions", "test"]
+)
 def test_script_command_list(command, script_name, mocker):
-    mocked = mocker.patch(
-        'funkwhale_api.common.scripts.{}.main'.format(script_name))
+    mocked = mocker.patch("funkwhale_api.common.scripts.{}.main".format(script_name))
 
     command.handle(script_name=script_name, interactive=False)
 
-    mocked.assert_called_once_with(
-        command, script_name=script_name, interactive=False)
+    mocked.assert_called_once_with(command, script_name=script_name, interactive=False)
 
 
 def test_django_permissions_to_user_permissions(factories, command):
-    group = factories['auth.Group'](
+    group = factories["auth.Group"](perms=["federation.change_library"])
+    user1 = factories["users.User"](
         perms=[
-            'federation.change_library'
+            "dynamic_preferences.change_globalpreferencemodel",
+            "music.add_importbatch",
         ]
     )
-    user1 = factories['users.User'](
-        perms=[
-            'dynamic_preferences.change_globalpreferencemodel',
-            'music.add_importbatch',
-        ]
-    )
-    user2 = factories['users.User'](
-        perms=[
-            'music.add_importbatch',
-        ],
-        groups=[group]
-    )
+    user2 = factories["users.User"](perms=["music.add_importbatch"], groups=[group])
 
     scripts.django_permissions_to_user_permissions.main(command)
 

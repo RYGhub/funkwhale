@@ -7,11 +7,12 @@ from django.db import migrations, models
 
 def populate_status(apps, schema_editor):
     from funkwhale_api.music.utils import compute_status
+
     ImportBatch = apps.get_model("music", "ImportBatch")
 
-    for ib in ImportBatch.objects.prefetch_related('jobs'):
+    for ib in ImportBatch.objects.prefetch_related("jobs"):
         ib.status = compute_status(ib.jobs.all())
-        ib.save(update_fields=['status'])
+        ib.save(update_fields=["status"])
 
 
 def rewind(apps, schema_editor):
@@ -20,10 +21,6 @@ def rewind(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0020_importbatch_status'),
-    ]
+    dependencies = [("music", "0020_importbatch_status")]
 
-    operations = [
-        migrations.RunPython(populate_status, rewind),
-    ]
+    operations = [migrations.RunPython(populate_status, rewind)]

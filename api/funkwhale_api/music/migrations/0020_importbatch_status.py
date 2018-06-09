@@ -5,14 +5,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0019_populate_mimetypes'),
-    ]
+    dependencies = [("music", "0019_populate_mimetypes")]
 
     operations = [
         migrations.AddField(
-            model_name='importbatch',
-            name='status',
-            field=models.CharField(choices=[('pending', 'Pending'), ('finished', 'Finished'), ('errored', 'Errored'), ('skipped', 'Skipped')], default='pending', max_length=30),
-        ),
+            model_name="importbatch",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Pending"),
+                    ("finished", "Finished"),
+                    ("errored", "Errored"),
+                    ("skipped", "Skipped"),
+                ],
+                default="pending",
+                max_length=30,
+            ),
+        )
     ]
