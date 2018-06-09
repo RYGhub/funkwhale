@@ -3,6 +3,7 @@ variables:
   IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
   IMAGE_LATEST: $IMAGE_NAME:latest
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+  PYTHONDONTWRITEBYTECODE: "true"
 
 
 stages:
@@ -14,11 +15,17 @@ stages:
 black:
   image: python:3.6
   stage: lint
+  variables:
+    GIT_STRATEGY: fetch
   before_script:
     - pip install black
   script:
     - black --check api/
 
+  cache:
+    key: "$CI_PROJECT_ID__black_pip_cache"
+    paths:
+      - "$PIP_CACHE_DIR"
 
 test_api:
   services:
