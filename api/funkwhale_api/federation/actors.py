@@ -1,6 +1,5 @@
 import datetime
 import logging
-import uuid
 import xml
 
 from django.conf import settings
@@ -155,7 +154,6 @@ class SystemActor(object):
         return handler(data, actor)
 
     def handle_follow(self, ac, sender):
-        system_actor = self.get_actor_instance()
         serializer = serializers.FollowSerializer(
             data=ac, context={"follow_actor": sender}
         )
@@ -325,7 +323,6 @@ class TestActor(SystemActor):
         reply_url = "https://{}/activities/note/{}".format(
             settings.FEDERATION_HOSTNAME, now.timestamp()
         )
-        reply_content = "{} Pong!".format(sender.mention_username)
         reply_activity = {
             "@context": [
                 "https://www.w3.org/ns/activitystreams",

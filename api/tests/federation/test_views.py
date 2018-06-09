@@ -159,7 +159,6 @@ def test_audio_file_list_actor_page_exclude_federated_files(
     db, preferences, api_client, factories
 ):
     preferences["federation__music_needs_approval"] = False
-    library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     tfs = factories["music.TrackFile"].create_batch(size=5, federation=True)
 
     url = reverse("federation:music:files-list")
@@ -188,7 +187,6 @@ def test_audio_file_list_actor_page_error_too_far(
 
 
 def test_library_actor_includes_library_link(db, preferences, api_client):
-    actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     url = reverse("federation:instance-actors-detail", kwargs={"actor": "library"})
     response = api_client.get(url)
     expected_links = [
@@ -263,7 +261,7 @@ def test_follow_library(superuser_api_client, mocker, factories, r_mock):
 def test_can_list_system_actor_following(factories, superuser_api_client):
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     follow1 = factories["federation.Follow"](actor=library_actor)
-    follow2 = factories["federation.Follow"]()
+    factories["federation.Follow"]()
 
     url = reverse("api:v1:federation:libraries-following")
     response = superuser_api_client.get(url)

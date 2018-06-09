@@ -1,6 +1,5 @@
 import acoustid
 import os
-import datetime
 from django.core.files import File
 from django.db import transaction
 

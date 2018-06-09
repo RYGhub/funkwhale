@@ -40,7 +40,6 @@ class ActionSerializer(serializers.Serializer):
         return value
 
     def validate_objects(self, value):
-        qs = None
         if value == "all":
             return self.queryset.all().order_by("id")
         if type(value) in [list, tuple]:

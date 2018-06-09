@@ -12,7 +12,6 @@ memo = memoize.Memoizer(store, namespace="instance:stats")
 
 def get():
     share_stats = preferences.get("instance__nodeinfo_stats_enabled")
-    private = preferences.get("instance__nodeinfo_private")
     data = {
         "version": "2.0",
         "software": {"name": "funkwhale", "version": funkwhale_api.__version__},

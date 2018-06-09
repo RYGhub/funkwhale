@@ -687,7 +687,7 @@ class AudioSerializer(serializers.Serializer):
 
     def validate_url(self, v):
         try:
-            url = v["href"]
+            v["href"]
         except (KeyError, TypeError):
             raise serializers.ValidationError("Missing href")
 

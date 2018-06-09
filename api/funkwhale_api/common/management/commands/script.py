@@ -41,7 +41,6 @@ class Command(BaseCommand):
         script["entrypoint"](self, **options)
 
     def show_help(self):
-        indentation = 4
         self.stdout.write("")
         self.stdout.write("Available scripts:")
         self.stdout.write("Launch with: python manage.py <script_name>")

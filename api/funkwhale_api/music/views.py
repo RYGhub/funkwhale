@@ -1,8 +1,6 @@
 import ffmpeg
-import os
 import json
 import logging
-import subprocess
 import unicodedata
 import urllib
 

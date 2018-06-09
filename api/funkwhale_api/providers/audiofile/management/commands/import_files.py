@@ -178,7 +178,6 @@ class Command(BaseCommand):
         async = options["async"]
         import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
         batch = user.imports.create(source="shell")
-        total = len(paths)
         errors = []
         for i, path in list(enumerate(paths)):
             try:

@@ -1,5 +1,4 @@
 import os
-import io
 import arrow
 import datetime
 import tempfile

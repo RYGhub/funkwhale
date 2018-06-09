@@ -158,7 +158,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     )
     @find_object(music_models.Artist.objects.all())
     def get_artist_info2(self, request, *args, **kwargs):
-        artist = kwargs.pop("obj")
         payload = {"artist-info2": {}}
 
         return response.Response(payload, status=200)

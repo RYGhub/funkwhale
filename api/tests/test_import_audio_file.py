@@ -1,7 +1,6 @@
 import pytest
 import datetime
 import os
-import uuid
 
 from django.core.management import call_command
 from django.core.management.base import CommandError

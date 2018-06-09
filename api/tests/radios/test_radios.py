@@ -75,7 +75,6 @@ def test_can_get_choices_for_custom_radio(factories):
     files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
     tracks = [f.track for f in files]
     wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
 
     session = factories["radios.CustomRadioSession"](
         custom_radio__config=[{"type": "artist", "ids": [artist.pk]}]
@@ -115,13 +114,12 @@ def test_can_start_custom_radio_from_api(logged_in_client, factories):
 
 def test_can_use_radio_session_to_filter_choices(factories):
     files = factories["music.TrackFile"].create_batch(30)
-    tracks = [f.track for f in files]
     user = factories["users.User"]()
     radio = radios.RandomRadio()
     session = radio.start_session(user)
 
     for i in range(30):
-        p = radio.pick()
+        radio.pick()
 
     # ensure 30 differents tracks have been suggested
     tracks_id = [
@@ -186,7 +184,6 @@ def test_can_start_artist_radio(factories):
     user = factories["users.User"]()
     artist = factories["music.Artist"]()
     wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
     good_files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
     good_tracks = [f.track for f in good_files]
 
@@ -201,7 +198,6 @@ def test_can_start_tag_radio(factories):
     user = factories["users.User"]()
     tag = factories["taggit.Tag"]()
     wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
     good_files = factories["music.TrackFile"].create_batch(5, track__tags=[tag])
     good_tracks = [f.track for f in good_files]
 
@@ -236,7 +232,7 @@ def test_can_start_less_listened_radio(factories):
     good_files = factories["music.TrackFile"].create_batch(5)
     good_tracks = [f.track for f in good_files]
     radio = radios.LessListenedRadio()
-    session = radio.start_session(user)
+    radio.start_session(user)
 
     for i in range(5):
         assert radio.pick() in good_tracks

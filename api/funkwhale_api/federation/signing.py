@@ -47,7 +47,7 @@ def verify_django(django_request, public_key):
         v = request.headers[h]
         if v:
             request.headers[h] = str(v)
-    prepared_request = request.prepare()
+    request.prepare()
     return verify(request, public_key)
 
 

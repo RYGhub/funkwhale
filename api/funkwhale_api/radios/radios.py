@@ -147,7 +147,7 @@ class TagRadio(RelatedObjectRadio):
 
     def get_queryset(self, **kwargs):
         qs = super().get_queryset(**kwargs)
-        return Track.objects.filter(tags__in=[self.session.related_object])
+        return qs.filter(tags__in=[self.session.related_object])
 
 
 @registry.register(name="artist")

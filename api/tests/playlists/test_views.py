@@ -1,4 +1,3 @@
-import json
 import pytest
 
 from django.urls import reverse
@@ -13,7 +12,7 @@ def test_can_create_playlist_via_api(logged_in_api_client):
     url = reverse("api:v1:playlists-list")
     data = {"name": "test", "privacy_level": "everyone"}
 
-    response = logged_in_api_client.post(url, data)
+    logged_in_api_client.post(url, data)
 
     playlist = logged_in_api_client.user.playlists.latest("id")
     assert playlist.name == "test"
@@ -38,7 +37,7 @@ def test_playlist_inherits_user_privacy(logged_in_api_client):
 
     data = {"name": "test"}
 
-    response = logged_in_api_client.post(url, data)
+    logged_in_api_client.post(url, data)
     playlist = user.playlists.latest("id")
     assert playlist.privacy_level == user.privacy_level
 
@@ -80,7 +79,7 @@ def test_only_can_add_track_on_own_playlist_via_api(factories, logged_in_api_cli
 
 def test_deleting_plt_updates_indexes(mocker, factories, logged_in_api_client):
     remove = mocker.spy(models.Playlist, "remove")
-    track = factories["music.Track"]()
+    factories["music.Track"]()
     plt = factories["playlists.PlaylistTrack"](
         index=0, playlist__user=logged_in_api_client.user
     )

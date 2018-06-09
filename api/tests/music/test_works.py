@@ -1,4 +1,3 @@
-import json
 from django.urls import reverse
 
 from funkwhale_api.music import models

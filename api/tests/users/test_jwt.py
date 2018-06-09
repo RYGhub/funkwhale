@@ -1,5 +1,4 @@
 import pytest
-import uuid
 
 from jwt.exceptions import DecodeError
 from rest_framework_jwt.settings import api_settings

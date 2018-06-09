@@ -49,7 +49,6 @@ def test_fix_track_files_size(factories, mocker):
 
 
 def test_fix_track_files_mimetype(factories, mocker):
-    name = "test.mp3"
     mp3_path = os.path.join(DATA_DIR, "test.mp3")
     ogg_path = os.path.join(DATA_DIR, "test.ogg")
     tf1 = factories["music.TrackFile"](

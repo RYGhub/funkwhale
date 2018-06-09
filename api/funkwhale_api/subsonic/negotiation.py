@@ -12,7 +12,6 @@ MAPPING = {
 
 class SubsonicContentNegociation(negotiation.DefaultContentNegotiation):
     def select_renderer(self, request, renderers, format_suffix=None):
-        path = request.path
         data = request.GET or request.POST
         requested_format = data.get("f", "xml")
         try:

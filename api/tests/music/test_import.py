@@ -195,7 +195,7 @@ def test_import_batch_notifies_followers(factories, mocker):
 
     f1 = factories["federation.Follow"](approved=True, target=library_actor)
     f2 = factories["federation.Follow"](approved=False, target=library_actor)
-    f3 = factories["federation.Follow"]()
+    factories["federation.Follow"]()
 
     mocked_deliver = mocker.patch("funkwhale_api.federation.activity.deliver")
     batch = factories["music.ImportBatch"]()

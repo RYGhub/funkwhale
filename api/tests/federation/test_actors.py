@@ -1,6 +1,5 @@
 import arrow
 import pytest
-import uuid
 
 from django.urls import reverse
 from django.utils import timezone
@@ -350,7 +349,7 @@ def test_library_actor_handles_follow_manual_approval(preferences, mocker, facto
 def test_library_actor_handles_follow_auto_approval(preferences, mocker, factories):
     preferences["federation__music_needs_approval"] = False
     actor = factories["federation.Actor"]()
-    accept_follow = mocker.patch("funkwhale_api.federation.activity.accept_follow")
+    mocker.patch("funkwhale_api.federation.activity.accept_follow")
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     data = {
         "actor": actor.url,

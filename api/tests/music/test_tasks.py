@@ -44,7 +44,6 @@ def test_set_acoustid_on_track_file(factories, mocker, preferences):
 
 def test_set_acoustid_on_track_file_required_high_score(factories, mocker):
     track_file = factories["music.TrackFile"](acoustid_track_id=None)
-    id = "e475bf79-c1ce-4441-bed7-1e33f226c0a2"
     payload = {"results": [{"score": 0.79}], "status": "ok"}
     m = mocker.patch("acoustid.match", return_value=payload)
     r = tasks.set_acoustid_on_track_file(track_file_id=track_file.pk)
@@ -159,7 +158,6 @@ def test_import_job_skip_if_already_exists(artists, albums, tracks, factories, m
     )
 
     job = factories["music.FileImportJob"](audio_file__path=path)
-    f = job.audio_file
     tasks.import_job_run(import_job_id=job.pk)
     job.refresh_from_db()
 
@@ -219,7 +217,6 @@ def test_update_album_cover_mbid(factories, mocker):
 
 
 def test_update_album_cover_file_data(factories, mocker):
-    path = os.path.join(DATA_DIR, "test.mp3")
     album = factories["music.Album"](cover="", mbid=None)
     tf = factories["music.TrackFile"](track__album=album)
 
@@ -236,7 +233,6 @@ def test_update_album_cover_file_data(factories, mocker):
 @pytest.mark.parametrize("ext,mimetype", [("jpg", "image/jpeg"), ("png", "image/png")])
 def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, mocker):
     mocker.patch("funkwhale_api.music.tasks.IMAGE_TYPES", [(ext, mimetype)])
-    path = os.path.join(DATA_DIR, "test.mp3")
     image_path = os.path.join(DATA_DIR, "cover.{}".format(ext))
     with open(image_path, "rb") as f:
         image_content = f.read()

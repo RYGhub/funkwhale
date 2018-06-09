@@ -249,7 +249,7 @@ class LibraryViewSet(
     def create(self, request, *args, **kwargs):
         serializer = serializers.APILibraryCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        library = serializer.save()
+        serializer.save()
         return response.Response(serializer.data, status=201)
 
 

@@ -47,7 +47,7 @@ def test_action_serializer_validates_objects():
 
 def test_action_serializers_objects_clean_ids(factories):
     user1 = factories["users.User"]()
-    user2 = factories["users.User"]()
+    factories["users.User"]()
 
     data = {"objects": [user1.pk], "action": "test"}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
@@ -69,8 +69,8 @@ def test_action_serializers_objects_clean_all(factories):
 
 def test_action_serializers_save(factories, mocker):
     handler = mocker.spy(TestSerializer, "handle_test")
-    user1 = factories["users.User"]()
-    user2 = factories["users.User"]()
+    factories["users.User"]()
+    factories["users.User"]()
 
     data = {"objects": "all", "action": "test"}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
@@ -82,7 +82,7 @@ def test_action_serializers_save(factories, mocker):
 
 
 def test_action_serializers_filterset(factories):
-    user1 = factories["users.User"](is_active=False)
+    factories["users.User"](is_active=False)
     user2 = factories["users.User"](is_active=True)
 
     data = {"objects": "all", "action": "test", "filters": {"is_active": True}}

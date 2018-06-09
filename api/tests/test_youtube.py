@@ -1,4 +1,3 @@
-import json
 from collections import OrderedDict
 from django.urls import reverse
 from funkwhale_api.providers.youtube.client import client

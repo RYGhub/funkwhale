@@ -1,4 +1,3 @@
-import uuid
 
 from funkwhale_api.federation import activity
 from funkwhale_api.federation import serializers

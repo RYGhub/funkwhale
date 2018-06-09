@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import os
 
 from django.db import migrations, models
 from funkwhale_api.music.utils import guess_mimetype

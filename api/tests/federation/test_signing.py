@@ -1,5 +1,4 @@
 import cryptography.exceptions
-import io
 import pytest
 import requests_http_signature
 

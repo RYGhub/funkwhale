@@ -186,7 +186,6 @@ def fake_request():
 
 @pytest.fixture
 def activity_registry():
-    r = record.registry
     state = list(record.registry.items())
     yield record.registry
     record.registry.clear()

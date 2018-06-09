@@ -334,7 +334,7 @@ def test_import_job_viewset_get_queryset_upload_filters_user(
     logged_in_api_client.user.permission_upload = True
     logged_in_api_client.user.save()
 
-    job = factories["music.ImportJob"]()
+    factories["music.ImportJob"]()
     url = reverse("api:v1:import-jobs-list")
     response = logged_in_api_client.get(url)
 
@@ -347,7 +347,7 @@ def test_import_batch_viewset_get_queryset_upload_filters_user(
     logged_in_api_client.user.permission_upload = True
     logged_in_api_client.user.save()
 
-    job = factories["music.ImportBatch"]()
+    factories["music.ImportBatch"]()
     url = reverse("api:v1:import-batches-list")
     response = logged_in_api_client.get(url)
 

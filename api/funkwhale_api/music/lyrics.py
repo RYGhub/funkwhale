@@ -1,5 +1,4 @@
 import urllib.request
-import html.parser
 from bs4 import BeautifulSoup
 
 

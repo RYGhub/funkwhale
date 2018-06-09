@@ -1,4 +1,3 @@
-import json
 import pytest
 
 from django.test import RequestFactory
@@ -114,7 +113,7 @@ def test_changing_password_updates_secret_key(logged_in_api_client):
     payload = {"old_password": "test", "new_password1": "new", "new_password2": "new"}
     url = reverse("change_password")
 
-    response = logged_in_api_client.post(url, payload)
+    logged_in_api_client.post(url, payload)
 
     user.refresh_from_db()
 

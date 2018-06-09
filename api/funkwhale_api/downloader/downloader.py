@@ -1,9 +1,6 @@
 import os
-import json
-from urllib.parse import quote_plus
 import youtube_dl
 from django.conf import settings
-import glob
 
 
 def download(

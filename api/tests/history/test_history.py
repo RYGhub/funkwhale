@@ -1,5 +1,3 @@
-import random
-import json
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -10,7 +8,6 @@ from funkwhale_api.history import models
 def test_can_create_listening(factories):
     track = factories["music.Track"]()
     user = factories["users.User"]()
-    now = timezone.now()
     l = models.Listening.objects.create(user=user, track=track)
 
 

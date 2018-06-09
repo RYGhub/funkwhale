@@ -1,5 +1,4 @@
 import cacheops
-import os
 
 from django.db import transaction
 from django.db.models import Q

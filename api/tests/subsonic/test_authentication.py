@@ -25,7 +25,6 @@ def test_auth_with_password_hex(api_request, factories):
     user = factories["users.User"]()
     user.subsonic_api_token = "password"
     user.save()
-    token = authentication.get_token(salt, "password")
     request = api_request.get(
         "/",
         {
@@ -49,7 +48,6 @@ def test_auth_with_password_cleartext(api_request, factories):
     user = factories["users.User"]()
     user.subsonic_api_token = "password"
     user.save()
-    token = authentication.get_token(salt, "password")
     request = api_request.get("/", {"u": user.username, "p": "password"})
 
     authenticator = authentication.SubsonicAuthentication()
@@ -63,7 +61,6 @@ def test_auth_with_inactive_users(api_request, factories):
     user = factories["users.User"](is_active=False)
     user.subsonic_api_token = "password"
     user.save()
-    token = authentication.get_token(salt, "password")
     request = api_request.get("/", {"u": user.username, "p": "password"})
 
     authenticator = authentication.SubsonicAuthentication()
