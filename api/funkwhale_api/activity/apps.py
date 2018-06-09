@@ -2,8 +2,9 @@ from django.apps import AppConfig, apps
 
 from . import record
 
+
 class ActivityConfig(AppConfig):
-    name = 'funkwhale_api.activity'
+    name = "funkwhale_api.activity"
 
     def ready(self):
         super(ActivityConfig, self).ready()

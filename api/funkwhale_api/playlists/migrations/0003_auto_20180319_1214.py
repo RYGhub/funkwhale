@@ -6,47 +6,28 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('playlists', '0002_auto_20180316_2217'),
-    ]
+    dependencies = [("playlists", "0002_auto_20180316_2217")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='playlisttrack',
-            options={'ordering': ('-playlist', 'index')},
+            name="playlisttrack", options={"ordering": ("-playlist", "index")}
         ),
         migrations.AddField(
-            model_name='playlisttrack',
-            name='creation_date',
+            model_name="playlisttrack",
+            name="creation_date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AddField(
-            model_name='playlisttrack',
-            name='index',
+            model_name="playlisttrack",
+            name="index",
             field=models.PositiveIntegerField(null=True),
         ),
-        migrations.RemoveField(
-            model_name='playlisttrack',
-            name='lft',
-        ),
-        migrations.RemoveField(
-            model_name='playlisttrack',
-            name='position',
-        ),
-        migrations.RemoveField(
-            model_name='playlisttrack',
-            name='previous',
-        ),
-        migrations.RemoveField(
-            model_name='playlisttrack',
-            name='rght',
-        ),
-        migrations.RemoveField(
-            model_name='playlisttrack',
-            name='tree_id',
-        ),
+        migrations.RemoveField(model_name="playlisttrack", name="lft"),
+        migrations.RemoveField(model_name="playlisttrack", name="position"),
+        migrations.RemoveField(model_name="playlisttrack", name="previous"),
+        migrations.RemoveField(model_name="playlisttrack", name="rght"),
+        migrations.RemoveField(model_name="playlisttrack", name="tree_id"),
         migrations.AlterUniqueTogether(
-            name='playlisttrack',
-            unique_together={('playlist', 'index')},
+            name="playlisttrack", unique_together={("playlist", "index")}
         ),
     ]

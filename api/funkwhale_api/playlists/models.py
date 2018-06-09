@@ -11,17 +11,16 @@ from funkwhale_api.common import preferences
 
 class PlaylistQuerySet(models.QuerySet):
     def with_tracks_count(self):
-        return self.annotate(
-            _tracks_count=models.Count('playlist_tracks'))
+        return self.annotate(_tracks_count=models.Count("playlist_tracks"))
 
 
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
     user = models.ForeignKey(
-        'users.User', related_name="playlists", on_delete=models.CASCADE)
+        "users.User", related_name="playlists", on_delete=models.CASCADE
+    )
     creation_date = models.DateTimeField(default=timezone.now)
-    modification_date = models.DateTimeField(
-        auto_now=True)
+    modification_date = models.DateTimeField(auto_now=True)
     privacy_level = fields.get_privacy_field()
 
     objects = PlaylistQuerySet.as_manager()
@@ -51,89 +50,91 @@ class Playlist(models.Model):
             index = total
 
         if index > total:
-            raise exceptions.ValidationError('Index is not continuous')
+            raise exceptions.ValidationError("Index is not continuous")
 
         if index < 0:
-            raise exceptions.ValidationError('Index must be zero or positive')
+            raise exceptions.ValidationError("Index must be zero or positive")
 
         if move:
             # we remove the index temporarily, to avoid integrity errors
             plt.index = None
-            plt.save(update_fields=['index'])
+            plt.save(update_fields=["index"])
             if index > old_index:
                 # new index is higher than current, we decrement previous tracks
-                to_update = existing.filter(
-                    index__gt=old_index, index__lte=index)
-                to_update.update(index=models.F('index') - 1)
+                to_update = existing.filter(index__gt=old_index, index__lte=index)
+                to_update.update(index=models.F("index") - 1)
             if index < old_index:
                 # new index is lower than current, we increment next tracks
                 to_update = existing.filter(index__lt=old_index, index__gte=index)
-                to_update.update(index=models.F('index') + 1)
+                to_update.update(index=models.F("index") + 1)
         else:
             to_update = existing.filter(index__gte=index)
-            to_update.update(index=models.F('index') + 1)
+            to_update.update(index=models.F("index") + 1)
 
         plt.index = index
-        plt.save(update_fields=['index'])
-        self.save(update_fields=['modification_date'])
+        plt.save(update_fields=["index"])
+        self.save(update_fields=["modification_date"])
         return index
 
     @transaction.atomic
     def remove(self, index):
         existing = self.playlist_tracks.select_for_update()
-        self.save(update_fields=['modification_date'])
+        self.save(update_fields=["modification_date"])
         to_update = existing.filter(index__gt=index)
-        return to_update.update(index=models.F('index') - 1)
+        return to_update.update(index=models.F("index") - 1)
 
     @transaction.atomic
     def insert_many(self, tracks):
         existing = self.playlist_tracks.select_for_update()
         now = timezone.now()
         total = existing.filter(index__isnull=False).count()
-        max_tracks = preferences.get('playlists__max_tracks')
+        max_tracks = preferences.get("playlists__max_tracks")
         if existing.count() + len(tracks) > max_tracks:
             raise exceptions.ValidationError(
-                'Playlist would reach the maximum of {} tracks'.format(
-                    max_tracks))
-        self.save(update_fields=['modification_date'])
+                "Playlist would reach the maximum of {} tracks".format(max_tracks)
+            )
+        self.save(update_fields=["modification_date"])
         start = total
         plts = [
             PlaylistTrack(
-                creation_date=now, playlist=self, track=track, index=start+i)
+                creation_date=now, playlist=self, track=track, index=start + i
+            )
             for i, track in enumerate(tracks)
         ]
         return PlaylistTrack.objects.bulk_create(plts)
 
+
 class PlaylistTrackQuerySet(models.QuerySet):
     def for_nested_serialization(self):
-        return (self.select_related()
-                    .select_related('track__album__artist')
-                    .prefetch_related(
-                        'track__tags',
-                        'track__files',
-                        'track__artist__albums__tracks__tags'))
+        return (
+            self.select_related()
+            .select_related("track__album__artist")
+            .prefetch_related(
+                "track__tags", "track__files", "track__artist__albums__tracks__tags"
+            )
+        )
 
 
 class PlaylistTrack(models.Model):
     track = models.ForeignKey(
-        'music.Track',
-        related_name='playlist_tracks',
-        on_delete=models.CASCADE)
+        "music.Track", related_name="playlist_tracks", on_delete=models.CASCADE
+    )
     index = models.PositiveIntegerField(null=True, blank=True)
     playlist = models.ForeignKey(
-        Playlist, related_name='playlist_tracks', on_delete=models.CASCADE)
+        Playlist, related_name="playlist_tracks", on_delete=models.CASCADE
+    )
     creation_date = models.DateTimeField(default=timezone.now)
 
     objects = PlaylistTrackQuerySet.as_manager()
 
     class Meta:
-        ordering = ('-playlist', 'index')
-        unique_together = ('playlist', 'index')
+        ordering = ("-playlist", "index")
+        unique_together = ("playlist", "index")
 
     def delete(self, *args, **kwargs):
         playlist = self.playlist
         index = self.index
-        update_indexes = kwargs.pop('update_indexes', False)
+        update_indexes = kwargs.pop("update_indexes", False)
         r = super().delete(*args, **kwargs)
         if index is not None and update_indexes:
             playlist.remove(index)

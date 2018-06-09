@@ -6,24 +6,28 @@ import taggit.managers
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0026_trackfile_accessed_date'),
-    ]
+    dependencies = [("music", "0026_trackfile_accessed_date")]
 
     operations = [
         migrations.AddField(
-            model_name='trackfile',
-            name='bitrate',
+            model_name="trackfile",
+            name="bitrate",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='trackfile',
-            name='size',
+            model_name="trackfile",
+            name="size",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='track',
-            name='tags',
-            field=taggit.managers.TaggableManager(blank=True, help_text='A comma-separated list of tags.', through='taggit.TaggedItem', to='taggit.Tag', verbose_name='Tags'),
+            model_name="track",
+            name="tags",
+            field=taggit.managers.TaggableManager(
+                blank=True,
+                help_text="A comma-separated list of tags.",
+                through="taggit.TaggedItem",
+                to="taggit.Tag",
+                verbose_name="Tags",
+            ),
         ),
     ]

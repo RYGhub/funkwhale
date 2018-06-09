@@ -8,14 +8,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0013_auto_20171213_2211'),
-    ]
+    dependencies = [("music", "0013_auto_20171213_2211")]
 
     operations = [
         migrations.AddField(
-            model_name='importjob',
-            name='track_file',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='music.TrackFile'),
-        ),
+            model_name="importjob",
+            name="track_file",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="jobs",
+                to="music.TrackFile",
+            ),
+        )
     ]

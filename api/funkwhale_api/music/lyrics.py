@@ -6,22 +6,22 @@ from bs4 import BeautifulSoup
 def _get_html(url):
     with urllib.request.urlopen(url) as response:
         html = response.read()
-    return html.decode('utf-8')
+    return html.decode("utf-8")
 
 
 def extract_content(html):
     soup = BeautifulSoup(html, "html.parser")
-    return soup.find_all("div", class_='lyricbox')[0].contents
+    return soup.find_all("div", class_="lyricbox")[0].contents
 
 
 def clean_content(contents):
     final_content = ""
     for e in contents:
-        if e == '\n':
+        if e == "\n":
             continue
-        if e.name == 'script':
+        if e.name == "script":
             continue
-        if e.name == 'br':
+        if e.name == "br":
             final_content += "\n"
             continue
         try:

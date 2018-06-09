@@ -6,10 +6,9 @@ from funkwhale_api.music.models import Track, Artist
 from funkwhale_api.favorites.models import TrackFavorite
 
 
-
 def test_user_can_add_favorite(factories):
-    track = factories['music.Track']()
-    user = factories['users.User']()
+    track = factories["music.Track"]()
+    user = factories["users.User"]()
     f = TrackFavorite.add(track, user)
 
     assert f.track == track
@@ -17,35 +16,34 @@ def test_user_can_add_favorite(factories):
 
 
 def test_user_can_get_his_favorites(factories, logged_in_client, client):
-    favorite = factories['favorites.TrackFavorite'](user=logged_in_client.user)
-    url = reverse('api:v1:favorites:tracks-list')
+    favorite = factories["favorites.TrackFavorite"](user=logged_in_client.user)
+    url = reverse("api:v1:favorites:tracks-list")
     response = logged_in_client.get(url)
 
     expected = [
         {
-            'track': favorite.track.pk,
-            'id': favorite.id,
-            'creation_date': favorite.creation_date.isoformat().replace('+00:00', 'Z'),
+            "track": favorite.track.pk,
+            "id": favorite.id,
+            "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
         }
     ]
-    parsed_json = json.loads(response.content.decode('utf-8'))
+    parsed_json = json.loads(response.content.decode("utf-8"))
 
-    assert expected == parsed_json['results']
+    assert expected == parsed_json["results"]
 
 
-def test_user_can_add_favorite_via_api(
-        factories, logged_in_client, activity_muted):
-    track = factories['music.Track']()
-    url = reverse('api:v1:favorites:tracks-list')
-    response = logged_in_client.post(url, {'track': track.pk})
+def test_user_can_add_favorite_via_api(factories, logged_in_client, activity_muted):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:favorites:tracks-list")
+    response = logged_in_client.post(url, {"track": track.pk})
 
-    favorite = TrackFavorite.objects.latest('id')
+    favorite = TrackFavorite.objects.latest("id")
     expected = {
-        'track': track.pk,
-        'id': favorite.id,
-        'creation_date': favorite.creation_date.isoformat().replace('+00:00', 'Z'),
+        "track": track.pk,
+        "id": favorite.id,
+        "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
     }
-    parsed_json = json.loads(response.content.decode('utf-8'))
+    parsed_json = json.loads(response.content.decode("utf-8"))
 
     assert expected == parsed_json
     assert favorite.track == track
@@ -53,18 +51,19 @@ def test_user_can_add_favorite_via_api(
 
 
 def test_adding_favorites_calls_activity_record(
-        factories, logged_in_client, activity_muted):
-    track = factories['music.Track']()
-    url = reverse('api:v1:favorites:tracks-list')
-    response = logged_in_client.post(url, {'track': track.pk})
+    factories, logged_in_client, activity_muted
+):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:favorites:tracks-list")
+    response = logged_in_client.post(url, {"track": track.pk})
 
-    favorite = TrackFavorite.objects.latest('id')
+    favorite = TrackFavorite.objects.latest("id")
     expected = {
-        'track': track.pk,
-        'id': favorite.id,
-        'creation_date': favorite.creation_date.isoformat().replace('+00:00', 'Z'),
+        "track": track.pk,
+        "id": favorite.id,
+        "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
     }
-    parsed_json = json.loads(response.content.decode('utf-8'))
+    parsed_json = json.loads(response.content.decode("utf-8"))
 
     assert expected == parsed_json
     assert favorite.track == track
@@ -74,44 +73,42 @@ def test_adding_favorites_calls_activity_record(
 
 
 def test_user_can_remove_favorite_via_api(logged_in_client, factories, client):
-    favorite = factories['favorites.TrackFavorite'](user=logged_in_client.user)
-    url = reverse('api:v1:favorites:tracks-detail', kwargs={'pk': favorite.pk})
-    response = client.delete(url, {'track': favorite.track.pk})
+    favorite = factories["favorites.TrackFavorite"](user=logged_in_client.user)
+    url = reverse("api:v1:favorites:tracks-detail", kwargs={"pk": favorite.pk})
+    response = client.delete(url, {"track": favorite.track.pk})
     assert response.status_code == 204
     assert TrackFavorite.objects.count() == 0
 
 
-@pytest.mark.parametrize('method', ['delete', 'post'])
+@pytest.mark.parametrize("method", ["delete", "post"])
 def test_user_can_remove_favorite_via_api_using_track_id(
-        method, factories, logged_in_client):
-    favorite = factories['favorites.TrackFavorite'](user=logged_in_client.user)
+    method, factories, logged_in_client
+):
+    favorite = factories["favorites.TrackFavorite"](user=logged_in_client.user)
 
-    url = reverse('api:v1:favorites:tracks-remove')
+    url = reverse("api:v1:favorites:tracks-remove")
     response = getattr(logged_in_client, method)(
-        url, json.dumps({'track': favorite.track.pk}),
-        content_type='application/json'
+        url, json.dumps({"track": favorite.track.pk}), content_type="application/json"
     )
 
     assert response.status_code == 204
     assert TrackFavorite.objects.count() == 0
 
 
-@pytest.mark.parametrize('url,method', [
-    ('api:v1:favorites:tracks-list', 'get'),
-])
+@pytest.mark.parametrize("url,method", [("api:v1:favorites:tracks-list", "get")])
 def test_url_require_auth(url, method, db, preferences, client):
-    preferences['common__api_authentication_required'] = True
+    preferences["common__api_authentication_required"] = True
     url = reverse(url)
     response = getattr(client, method)(url)
     assert response.status_code == 401
 
 
 def test_can_filter_tracks_by_favorites(factories, logged_in_client):
-    favorite = factories['favorites.TrackFavorite'](user=logged_in_client.user)
+    favorite = factories["favorites.TrackFavorite"](user=logged_in_client.user)
 
-    url = reverse('api:v1:tracks-list')
-    response = logged_in_client.get(url, data={'favorites': True})
+    url = reverse("api:v1:tracks-list")
+    response = logged_in_client.get(url, data={"favorites": True})
 
-    parsed_json = json.loads(response.content.decode('utf-8'))
-    assert parsed_json['count'] == 1
-    assert parsed_json['results'][0]['id'] == favorite.track.id
+    parsed_json = json.loads(response.content.decode("utf-8"))
+    assert parsed_json["count"] == 1
+    assert parsed_json["results"][0]["id"] == favorite.track.id

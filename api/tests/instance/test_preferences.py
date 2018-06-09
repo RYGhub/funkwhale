@@ -6,12 +6,13 @@ from dynamic_preferences.api import serializers
 
 
 def test_can_list_settings_via_api(preferences, api_client):
-    url = reverse('api:v1:instance:settings')
+    url = reverse("api:v1:instance:settings")
     all_preferences = preferences.model.objects.all()
     expected_preferences = {
         p.preference.identifier(): p
         for p in all_preferences
-        if getattr(p.preference, 'show_in_api', False)}
+        if getattr(p.preference, "show_in_api", False)
+    }
 
     assert len(expected_preferences) > 0
 
@@ -20,15 +21,18 @@ def test_can_list_settings_via_api(preferences, api_client):
     assert len(response.data) == len(expected_preferences)
 
     for p in response.data:
-        i = '__'.join([p['section'], p['name']])
+        i = "__".join([p["section"], p["name"]])
         assert i in expected_preferences
 
 
-@pytest.mark.parametrize('pref,value', [
-    ('instance__name', 'My instance'),
-    ('instance__short_description', 'For music lovers'),
-    ('instance__long_description', 'For real music lovers'),
-])
+@pytest.mark.parametrize(
+    "pref,value",
+    [
+        ("instance__name", "My instance"),
+        ("instance__short_description", "For music lovers"),
+        ("instance__long_description", "For real music lovers"),
+    ],
+)
 def test_instance_settings(pref, value, preferences):
     preferences[pref] = value
 

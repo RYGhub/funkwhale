@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('federation', '0001_initial'),
-    ]
+    dependencies = [("federation", "0001_initial")]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='actor',
-            unique_together={('domain', 'preferred_username')},
-        ),
+            name="actor", unique_together={("domain", "preferred_username")}
+        )
     ]

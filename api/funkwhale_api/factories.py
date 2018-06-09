@@ -3,7 +3,7 @@ import persisting_theory
 
 
 class FactoriesRegistry(persisting_theory.Registry):
-    look_into = 'factories'
+    look_into = "factories"
 
     def prepare_name(self, data, name=None):
         return name or data._meta.model._meta.label

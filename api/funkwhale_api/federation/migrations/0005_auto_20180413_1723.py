@@ -8,19 +8,25 @@ import funkwhale_api.federation.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('federation', '0004_auto_20180410_2025'),
-    ]
+    dependencies = [("federation", "0004_auto_20180410_2025")]
 
     operations = [
         migrations.AddField(
-            model_name='librarytrack',
-            name='audio_file',
-            field=models.FileField(blank=True, null=True, upload_to=funkwhale_api.federation.models.get_file_path),
+            model_name="librarytrack",
+            name="audio_file",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=funkwhale_api.federation.models.get_file_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='librarytrack',
-            name='metadata',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default={}, encoder=django.core.serializers.json.DjangoJSONEncoder, max_length=10000),
+            model_name="librarytrack",
+            name="metadata",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default={},
+                encoder=django.core.serializers.json.DjangoJSONEncoder,
+                max_length=10000,
+            ),
         ),
     ]

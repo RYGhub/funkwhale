@@ -8,30 +8,74 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Actor',
+            name="Actor",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(db_index=True, max_length=500, unique=True)),
-                ('outbox_url', models.URLField(max_length=500)),
-                ('inbox_url', models.URLField(max_length=500)),
-                ('following_url', models.URLField(blank=True, max_length=500, null=True)),
-                ('followers_url', models.URLField(blank=True, max_length=500, null=True)),
-                ('shared_inbox_url', models.URLField(blank=True, max_length=500, null=True)),
-                ('type', models.CharField(choices=[('Person', 'Person'), ('Application', 'Application'), ('Group', 'Group'), ('Organization', 'Organization'), ('Service', 'Service')], default='Person', max_length=25)),
-                ('name', models.CharField(blank=True, max_length=200, null=True)),
-                ('domain', models.CharField(max_length=1000)),
-                ('summary', models.CharField(blank=True, max_length=500, null=True)),
-                ('preferred_username', models.CharField(blank=True, max_length=200, null=True)),
-                ('public_key', models.CharField(blank=True, max_length=5000, null=True)),
-                ('private_key', models.CharField(blank=True, max_length=5000, null=True)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('last_fetch_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('manually_approves_followers', models.NullBooleanField(default=None)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("url", models.URLField(db_index=True, max_length=500, unique=True)),
+                ("outbox_url", models.URLField(max_length=500)),
+                ("inbox_url", models.URLField(max_length=500)),
+                (
+                    "following_url",
+                    models.URLField(blank=True, max_length=500, null=True),
+                ),
+                (
+                    "followers_url",
+                    models.URLField(blank=True, max_length=500, null=True),
+                ),
+                (
+                    "shared_inbox_url",
+                    models.URLField(blank=True, max_length=500, null=True),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("Person", "Person"),
+                            ("Application", "Application"),
+                            ("Group", "Group"),
+                            ("Organization", "Organization"),
+                            ("Service", "Service"),
+                        ],
+                        default="Person",
+                        max_length=25,
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=200, null=True)),
+                ("domain", models.CharField(max_length=1000)),
+                ("summary", models.CharField(blank=True, max_length=500, null=True)),
+                (
+                    "preferred_username",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "public_key",
+                    models.CharField(blank=True, max_length=5000, null=True),
+                ),
+                (
+                    "private_key",
+                    models.CharField(blank=True, max_length=5000, null=True),
+                ),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    "last_fetch_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("manually_approves_followers", models.NullBooleanField(default=None)),
             ],
-        ),
+        )
     ]

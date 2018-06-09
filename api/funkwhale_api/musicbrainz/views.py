@@ -14,8 +14,7 @@ class ReleaseDetail(APIView):
     permission_classes = [ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
-        result = api.releases.get(
-            id=kwargs['uuid'], includes=['artists', 'recordings'])
+        result = api.releases.get(id=kwargs["uuid"], includes=["artists", "recordings"])
         return Response(result)
 
 
@@ -23,9 +22,7 @@ class ArtistDetail(APIView):
     permission_classes = [ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
-        result = api.artists.get(
-            id=kwargs['uuid'],
-            includes=['release-groups'])
+        result = api.artists.get(id=kwargs["uuid"], includes=["release-groups"])
         # import json; print(json.dumps(result, indent=4))
         return Response(result)
 
@@ -34,8 +31,7 @@ class ReleaseGroupBrowse(APIView):
     permission_classes = [ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
-        result = api.release_groups.browse(
-            artist=kwargs['artist_uuid'])
+        result = api.release_groups.browse(artist=kwargs["artist_uuid"])
         return Response(result)
 
 
@@ -44,29 +40,30 @@ class ReleaseBrowse(APIView):
 
     def get(self, request, *args, **kwargs):
         result = api.releases.browse(
-            release_group=kwargs['release_group_uuid'],
-            includes=['recordings', 'artist-credits'])
+            release_group=kwargs["release_group_uuid"],
+            includes=["recordings", "artist-credits"],
+        )
         return Response(result)
 
 
 class SearchViewSet(viewsets.ViewSet):
     permission_classes = [ConditionalAuthentication]
 
-    @list_route(methods=['get'])
+    @list_route(methods=["get"])
     def recordings(self, request, *args, **kwargs):
-        query = request.GET['query']
+        query = request.GET["query"]
         results = api.recordings.search(query)
         return Response(results)
 
-    @list_route(methods=['get'])
+    @list_route(methods=["get"])
     def releases(self, request, *args, **kwargs):
-        query = request.GET['query']
+        query = request.GET["query"]
         results = api.releases.search(query)
         return Response(results)
 
-    @list_route(methods=['get'])
+    @list_route(methods=["get"])
     def artists(self, request, *args, **kwargs):
-        query = request.GET['query']
+        query = request.GET["query"]
         results = api.artists.search(query)
         # results = musicbrainzngs.search_artists(query)
         return Response(results)

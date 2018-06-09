@@ -12,9 +12,8 @@ from . import serializers
 
 
 class ListeningViewSet(
-        mixins.CreateModelMixin,
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet):
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
 
     serializer_class = serializers.ListeningSerializer
     queryset = models.Listening.objects.all()
@@ -31,5 +30,5 @@ class ListeningViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['user'] = self.request.user
+        context["user"] = self.request.user
         return context

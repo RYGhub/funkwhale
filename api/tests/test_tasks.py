@@ -10,24 +10,25 @@ class Dummy:
 
 
 def test_require_instance_decorator(factories, mocker):
-    user = factories['users.User']()
+    user = factories["users.User"]()
 
-    @celery.require_instance(user.__class__, 'user')
+    @celery.require_instance(user.__class__, "user")
     def t(user):
         Dummy.noop(user)
 
-    m = mocker.patch.object(Dummy, 'noop')
+    m = mocker.patch.object(Dummy, "noop")
     t(user_id=user.pk)
 
     m.assert_called_once_with(user)
 
 
 def test_require_instance_decorator_accepts_qs(factories, mocker):
-    user = factories['users.User'](is_active=False)
+    user = factories["users.User"](is_active=False)
     qs = user.__class__.objects.filter(is_active=True)
 
-    @celery.require_instance(qs, 'user')
+    @celery.require_instance(qs, "user")
     def t(user):
         pass
+
     with pytest.raises(user.__class__.DoesNotExist):
         t(user_id=user.pk)

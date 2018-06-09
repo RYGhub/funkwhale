@@ -7,22 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0012_auto_20161122_1905'),
-    ]
+    dependencies = [("music", "0012_auto_20161122_1905")]
 
     operations = [
+        migrations.AlterModelOptions(name="importjob", options={"ordering": ("id",)}),
         migrations.AlterModelOptions(
-            name='importjob',
-            options={'ordering': ('id',)},
-        ),
-        migrations.AlterModelOptions(
-            name='track',
-            options={'ordering': ['album', 'position']},
+            name="track", options={"ordering": ["album", "position"]}
         ),
         migrations.AddField(
-            model_name='album',
-            name='release_group_id',
+            model_name="album",
+            name="release_group_id",
             field=models.UUIDField(blank=True, null=True),
         ),
     ]

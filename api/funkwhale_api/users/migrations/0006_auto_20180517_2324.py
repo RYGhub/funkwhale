@@ -5,24 +5,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0005_user_subsonic_api_token'),
-    ]
+    dependencies = [("users", "0005_user_subsonic_api_token")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='permission_federation',
+            model_name="user",
+            name="permission_federation",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='permission_library',
+            model_name="user",
+            name="permission_library",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='permission_settings',
+            model_name="user",
+            name="permission_settings",
             field=models.BooleanField(default=False),
         ),
     ]

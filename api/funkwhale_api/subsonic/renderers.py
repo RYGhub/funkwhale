@@ -8,37 +8,34 @@ class SubsonicJSONRenderer(renderers.JSONRenderer):
         if not data:
             # when stream view is called, we don't have any data
             return super().render(data, accepted_media_type, renderer_context)
-        final = {
-            'subsonic-response': {
-                'status': 'ok',
-                'version': '1.16.0',
-            }
-        }
-        final['subsonic-response'].update(data)
-        if 'error' in final:
+        final = {"subsonic-response": {"status": "ok", "version": "1.16.0"}}
+        final["subsonic-response"].update(data)
+        if "error" in final:
             # an error was returned
-            final['subsonic-response']['status'] = 'failed'
+            final["subsonic-response"]["status"] = "failed"
         return super().render(final, accepted_media_type, renderer_context)
 
 
 class SubsonicXMLRenderer(renderers.JSONRenderer):
-    media_type = 'text/xml'
+    media_type = "text/xml"
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if not data:
             # when stream view is called, we don't have any data
             return super().render(data, accepted_media_type, renderer_context)
         final = {
-            'xmlns': 'http://subsonic.org/restapi',
-            'status': 'ok',
-            'version': '1.16.0',
+            "xmlns": "http://subsonic.org/restapi",
+            "status": "ok",
+            "version": "1.16.0",
         }
         final.update(data)
-        if 'error' in final:
+        if "error" in final:
             # an error was returned
-            final['status'] = 'failed'
-        tree = dict_to_xml_tree('subsonic-response', final)
-        return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(tree, encoding='utf-8')
+            final["status"] = "failed"
+        tree = dict_to_xml_tree("subsonic-response", final)
+        return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(
+            tree, encoding="utf-8"
+        )
 
 
 def dict_to_xml_tree(root_tag, d, parent=None):

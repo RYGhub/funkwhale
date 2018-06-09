@@ -11,32 +11,30 @@ from django.views import defaults as default_views
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, admin.site.urls),
-
-    url(r'^api/', include(("config.api_urls", 'api'), namespace="api")),
-    url(r'^', include(
-        ('funkwhale_api.federation.urls', 'federation'),
-        namespace="federation")),
-    url(r'^api/v1/auth/', include('rest_auth.urls')),
-    url(r'^api/v1/auth/registration/', include('funkwhale_api.users.rest_auth_urls')),
-    url(r'^accounts/', include('allauth.urls')),
-
+    url(r"^api/", include(("config.api_urls", "api"), namespace="api")),
+    url(
+        r"^",
+        include(
+            ("funkwhale_api.federation.urls", "federation"), namespace="federation"
+        ),
+    ),
+    url(r"^api/v1/auth/", include("rest_auth.urls")),
+    url(r"^api/v1/auth/registration/", include("funkwhale_api.users.rest_auth_urls")),
+    url(r"^accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
-
-
 ]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
     # these url in browser to see how these error pages look like.
     urlpatterns += [
-        url(r'^400/$', default_views.bad_request),
-        url(r'^403/$', default_views.permission_denied),
-        url(r'^404/$', default_views.page_not_found),
-        url(r'^500/$', default_views.server_error),
+        url(r"^400/$", default_views.bad_request),
+        url(r"^403/$", default_views.permission_denied),
+        url(r"^404/$", default_views.page_not_found),
+        url(r"^500/$", default_views.server_error),
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-    if 'debug_toolbar' in settings.INSTALLED_APPS:
+    if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
-        urlpatterns += [
-            url(r'^__debug__/', include(debug_toolbar.urls)),
-        ]
+
+        urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]

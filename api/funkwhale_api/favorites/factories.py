@@ -12,4 +12,4 @@ class TrackFavorite(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
 
     class Meta:
-        model = 'favorites.TrackFavorite'
+        model = "favorites.TrackFavorite"

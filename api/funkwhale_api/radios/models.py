@@ -14,11 +14,12 @@ from . import filters
 class Radio(models.Model):
     CONFIG_VERSION = 0
     user = models.ForeignKey(
-        'users.User',
-        related_name='radios',
+        "users.User",
+        related_name="radios",
         null=True,
         blank=True,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     creation_date = models.DateTimeField(default=timezone.now)
@@ -32,27 +33,25 @@ class Radio(models.Model):
 
 class RadioSession(models.Model):
     user = models.ForeignKey(
-        'users.User',
-        related_name='radio_sessions',
+        "users.User",
+        related_name="radio_sessions",
         null=True,
         blank=True,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     session_key = models.CharField(max_length=100, null=True, blank=True)
     radio_type = models.CharField(max_length=50)
     custom_radio = models.ForeignKey(
-        Radio,
-        related_name='sessions',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE)
+        Radio, related_name="sessions", null=True, blank=True, on_delete=models.CASCADE
+    )
     creation_date = models.DateTimeField(default=timezone.now)
     related_object_content_type = models.ForeignKey(
-        ContentType,
-        blank=True,
-        null=True,
-        on_delete=models.CASCADE)
+        ContentType, blank=True, null=True, on_delete=models.CASCADE
+    )
     related_object_id = models.PositiveIntegerField(blank=True, null=True)
-    related_object = GenericForeignKey('related_object_content_type', 'related_object_id')
+    related_object = GenericForeignKey(
+        "related_object_content_type", "related_object_id"
+    )
 
     def save(self, **kwargs):
         self.radio.clean(self)
@@ -62,14 +61,16 @@ class RadioSession(models.Model):
     def next_position(self):
         next_position = 1
 
-        last_session_track = self.session_tracks.all().order_by('-position').first()
+        last_session_track = self.session_tracks.all().order_by("-position").first()
         if last_session_track:
             next_position = last_session_track.position + 1
 
         return next_position
 
     def add(self, track):
-        new_session_track = RadioSessionTrack.objects.create(track=track, session=self, position=self.next_position)
+        new_session_track = RadioSessionTrack.objects.create(
+            track=track, session=self, position=self.next_position
+        )
 
         return new_session_track
 
@@ -77,16 +78,19 @@ class RadioSession(models.Model):
     def radio(self):
         from .registries import registry
         from . import radios
+
         return registry[self.radio_type](session=self)
 
 
 class RadioSessionTrack(models.Model):
     session = models.ForeignKey(
-        RadioSession, related_name='session_tracks', on_delete=models.CASCADE)
+        RadioSession, related_name="session_tracks", on_delete=models.CASCADE
+    )
     position = models.IntegerField(default=1)
     track = models.ForeignKey(
-        Track, related_name='radio_session_tracks', on_delete=models.CASCADE)
+        Track, related_name="radio_session_tracks", on_delete=models.CASCADE
+    )
 
     class Meta:
-        ordering = ('session', 'position')
-        unique_together = ('session', 'position')
+        ordering = ("session", "position")
+        unique_together = ("session", "position")

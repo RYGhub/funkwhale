@@ -2,7 +2,8 @@ from django.conf.urls import include, url
 from . import views
 
 from rest_framework import routers
+
 router = routers.SimpleRouter()
-router.register(r'tracks', views.TrackFavoriteViewSet, 'tracks')
+router.register(r"tracks", views.TrackFavoriteViewSet, "tracks")
 
 urlpatterns = router.urls
