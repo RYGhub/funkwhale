@@ -23,7 +23,7 @@ default on system. You can install them using:
 .. code-block:: shell
 
     sudo apt-get update
-    sudo apt-get install curl python3-venv git unzip
+    sudo apt-get install curl python3-pip python3-venv git unzip
 
 
 Layout
@@ -90,7 +90,7 @@ First, we'll download the latest api release.
     curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
     unzip "api-|version|.zip" -d extracted
     mv extracted/api/* api/
-    rmdir extracted
+    rm -rf extracted
 
 
 Then we'll download the frontend files:

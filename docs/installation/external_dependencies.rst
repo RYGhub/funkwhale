@@ -32,10 +32,8 @@ Create the project database and user:
 
 .. code-block:: shell
 
-    CREATE DATABASE "scratch"
-      WITH ENCODING 'utf8'
-      LC_COLLATE = 'en_US.utf8'
-      LC_CTYPE = 'en_US.utf8';
+    CREATE DATABASE "funkwhale"
+      WITH ENCODING 'utf8';
     CREATE USER funkwhale;
     GRANT ALL PRIVILEGES ON DATABASE funkwhale TO funkwhale;
 
@@ -58,7 +56,7 @@ for funkwhale to work properly:
 
 .. code-block:: shell
 
-    sudo -u postgres psql -c 'CREATE EXTENSION "unaccent";'
+    sudo -u postgres psql funkwhale -c 'CREATE EXTENSION "unaccent";'
 
 
 Cache setup (Redis)
