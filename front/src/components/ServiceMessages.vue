@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import {mapState} from 'vuex'
 
 export default {
@@ -36,7 +35,7 @@ export default {
       let toDisplay = this.messages.filter(m => {
         return now - m.date <= interval
       })
-      return _.reverse(toDisplay).slice(0, 5)
+      return toDisplay.slice(0, 3)
     }
   },
   methods: {
@@ -54,7 +53,7 @@ export default {
       }, 1000)
     },
     getLevel (message) {
-      return message.level || 'blue'
+      return message.level || 'info'
     }
   },
   watch: {
