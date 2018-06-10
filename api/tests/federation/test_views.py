@@ -3,7 +3,15 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.federation import activity, actors, models, serializers, utils, views, webfinger
+from funkwhale_api.federation import (
+    activity,
+    actors,
+    models,
+    serializers,
+    utils,
+    views,
+    webfinger,
+)
 
 
 @pytest.mark.parametrize(
@@ -152,7 +160,7 @@ def test_audio_file_list_actor_page_exclude_federated_files(
     db, preferences, api_client, factories
 ):
     preferences["federation__music_needs_approval"] = False
-    tfs = factories["music.TrackFile"].create_batch(size=5, federation=True)
+    factories["music.TrackFile"].create_batch(size=5, federation=True)
 
     url = reverse("federation:music:files-list")
     response = api_client.get(url)
@@ -265,7 +273,7 @@ def test_can_list_system_actor_following(factories, superuser_api_client):
 
 def test_can_list_system_actor_followers(factories, superuser_api_client):
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    follow1 = factories["federation.Follow"](actor=library_actor)
+    factories["federation.Follow"](actor=library_actor)
     follow2 = factories["federation.Follow"](target=library_actor)
 
     url = reverse("api:v1:federation:libraries-followers")
@@ -375,7 +383,7 @@ def test_can_update_follow_status(factories, superuser_api_client, mocker):
 
 def test_can_filter_pending_follows(factories, superuser_api_client):
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    follow = factories["federation.Follow"](target=library_actor, approved=True)
+    factories["federation.Follow"](target=library_actor, approved=True)
 
     params = {"pending": True}
     url = reverse("api:v1:federation:libraries-followers")
@@ -389,7 +397,7 @@ def test_library_track_action_import(factories, superuser_api_client, mocker):
     lt1 = factories["federation.LibraryTrack"]()
     lt2 = factories["federation.LibraryTrack"](library=lt1.library)
     lt3 = factories["federation.LibraryTrack"]()
-    lt4 = factories["federation.LibraryTrack"](library=lt3.library)
+    factories["federation.LibraryTrack"](library=lt3.library)
     mocked_run = mocker.patch("funkwhale_api.music.tasks.import_batch_run.delay")
 
     payload = {

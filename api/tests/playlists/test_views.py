@@ -17,7 +17,7 @@ def test_can_create_playlist_via_api(logged_in_api_client):
 
 def test_serializer_includes_tracks_count(factories, logged_in_api_client):
     playlist = factories["playlists.Playlist"]()
-    plt = factories["playlists.PlaylistTrack"](playlist=playlist)
+    factories["playlists.PlaylistTrack"](playlist=playlist)
 
     url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.get(url)
@@ -160,7 +160,7 @@ def test_can_add_multiple_tracks_at_once_via_api(
 
 def test_can_clear_playlist_from_api(factories, mocker, logged_in_api_client):
     playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
     url = reverse("api:v1:playlists-clear", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.delete(url)
 
@@ -170,7 +170,7 @@ def test_can_clear_playlist_from_api(factories, mocker, logged_in_api_client):
 
 def test_update_playlist_from_api(factories, mocker, logged_in_api_client):
     playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
     url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.patch(url, {"name": "test"})
     playlist.refresh_from_db()

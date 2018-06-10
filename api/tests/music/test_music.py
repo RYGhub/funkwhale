@@ -120,7 +120,7 @@ def test_can_get_or_create_track_from_api(artists, albums, tracks, mocker, db):
 def test_album_tags_deduced_from_tracks_tags(factories, django_assert_num_queries):
     tag = factories["taggit.Tag"]()
     album = factories["music.Album"]()
-    tracks = factories["music.Track"].create_batch(5, album=album, tags=[tag])
+    factories["music.Track"].create_batch(5, album=album, tags=[tag])
 
     album = models.Album.objects.prefetch_related("tracks__tags").get(pk=album.pk)
 
@@ -132,7 +132,7 @@ def test_artist_tags_deduced_from_album_tags(factories, django_assert_num_querie
     tag = factories["taggit.Tag"]()
     album = factories["music.Album"]()
     artist = album.artist
-    tracks = factories["music.Track"].create_batch(5, album=album, tags=[tag])
+    factories["music.Track"].create_batch(5, album=album, tags=[tag])
 
     artist = models.Artist.objects.prefetch_related("albums__tracks__tags").get(
         pk=artist.pk

@@ -21,7 +21,7 @@ from . import (
     serializers,
     tasks,
     utils,
-    webfinger
+    webfinger,
 )
 
 
@@ -57,7 +57,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
         handler = getattr(system_actor, "{}_inbox".format(request.method.lower()))
 
         try:
-            data = handler(request.data, actor=request.actor)
+            handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
         return response.Response({}, status=200)
@@ -67,7 +67,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
         system_actor = self.get_object()
         handler = getattr(system_actor, "{}_outbox".format(request.method.lower()))
         try:
-            data = handler(request.data, actor=request.actor)
+            handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
         return response.Response({}, status=200)

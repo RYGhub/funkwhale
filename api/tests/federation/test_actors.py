@@ -48,9 +48,7 @@ def test_get_actor_refresh(factories, preferences, mocker):
     payload = serializers.ActorSerializer(actor).data
     # actor changed their username in the meantime
     payload["preferredUsername"] = "New me"
-    get_data = mocker.patch(
-        "funkwhale_api.federation.actors.get_actor_data", return_value=payload
-    )
+    mocker.patch("funkwhale_api.federation.actors.get_actor_data", return_value=payload)
     new_actor = actors.get_actor(actor.url)
 
     assert new_actor == actor
@@ -59,7 +57,7 @@ def test_get_actor_refresh(factories, preferences, mocker):
 
 
 def test_get_library(db, settings, mocker):
-    get_key_pair = mocker.patch(
+    mocker.patch(
         "funkwhale_api.federation.keys.get_key_pair",
         return_value=(b"private", b"public"),
     )
@@ -92,7 +90,7 @@ def test_get_library(db, settings, mocker):
 
 
 def test_get_test(db, mocker, settings):
-    get_key_pair = mocker.patch(
+    mocker.patch(
         "funkwhale_api.federation.keys.get_key_pair",
         return_value=(b"private", b"public"),
     )
@@ -240,7 +238,7 @@ def test_actor_is_system(username, domain, expected, nodb_factories, settings):
         ("test", "", actors.SYSTEM_ACTORS["test"]),
     ],
 )
-def test_actor_is_system(username, domain, expected, nodb_factories, settings):
+def test_actor_system_conf(username, domain, expected, nodb_factories, settings):
     if not domain:
         domain = settings.FEDERATION_HOSTNAME
     actor = nodb_factories["federation.Actor"](

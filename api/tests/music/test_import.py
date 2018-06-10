@@ -35,9 +35,7 @@ def test_create_import_can_bind_to_request(
         ],
     }
     url = reverse("api:v1:submit-album")
-    response = superuser_api_client.post(
-        url, json.dumps(payload), content_type="application/json"
-    )
+    superuser_api_client.post(url, json.dumps(payload), content_type="application/json")
     batch = request.import_batches.latest("id")
 
     assert batch.import_request == request
@@ -160,7 +158,7 @@ def test_import_job_run_triggers_notifies_followers(factories, mocker, tmpfile):
     )
     batch = factories["music.ImportBatch"]()
     job = factories["music.ImportJob"](finished=True, batch=batch)
-    track = factories["music.Track"](mbid=job.mbid)
+    factories["music.Track"](mbid=job.mbid)
 
     batch.update_status()
     batch.refresh_from_db()
@@ -193,14 +191,14 @@ def test_import_batch_notifies_followers(factories, mocker):
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
 
     f1 = factories["federation.Follow"](approved=True, target=library_actor)
-    f2 = factories["federation.Follow"](approved=False, target=library_actor)
+    factories["federation.Follow"](approved=False, target=library_actor)
     factories["federation.Follow"]()
 
     mocked_deliver = mocker.patch("funkwhale_api.federation.activity.deliver")
     batch = factories["music.ImportBatch"]()
     job1 = factories["music.ImportJob"](finished=True, batch=batch)
-    job2 = factories["music.ImportJob"](finished=True, federation=True, batch=batch)
-    job3 = factories["music.ImportJob"](status="pending", batch=batch)
+    factories["music.ImportJob"](finished=True, federation=True, batch=batch)
+    factories["music.ImportJob"](status="pending", batch=batch)
 
     batch.status = "finished"
     batch.save()
@@ -233,7 +231,7 @@ def test__do_import_in_place_mbid(factories, tmpfile):
     path = os.path.join(DATA_DIR, "test.ogg")
     job = factories["music.ImportJob"](in_place=True, source="file://{}".format(path))
 
-    track = factories["music.Track"](mbid=job.mbid)
+    factories["music.Track"](mbid=job.mbid)
     tf = tasks._do_import(job, use_acoustid=False)
 
     assert bool(tf.audio_file) is False

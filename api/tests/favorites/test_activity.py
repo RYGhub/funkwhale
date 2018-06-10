@@ -55,6 +55,5 @@ def test_broadcast_track_favorite_to_instance_activity_private(factories, mocker
     favorite = factories["favorites.TrackFavorite"](user__privacy_level="me")
     data = serializers.TrackFavoriteActivitySerializer(favorite).data
     consumer = activities.broadcast_track_favorite_to_instance_activity
-    message = {"type": "event.send", "text": "", "data": data}
     consumer(data=data, obj=favorite)
     p.assert_not_called()

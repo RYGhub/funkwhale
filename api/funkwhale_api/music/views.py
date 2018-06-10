@@ -457,9 +457,7 @@ class SubmitViewSet(viewsets.ViewSet):
         import_request = self.get_import_request(data)
         artist_data = api.artists.get(id=data["artistId"])["artist"]
         cleaned_data = models.Artist.clean_musicbrainz_data(artist_data)
-        artist = importers.load(
-            models.Artist, cleaned_data, artist_data, import_hooks=[]
-        )
+        importers.load(models.Artist, cleaned_data, artist_data, import_hooks=[])
 
         import_data = []
         batch = None

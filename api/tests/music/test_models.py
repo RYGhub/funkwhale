@@ -104,7 +104,7 @@ def test_saving_job_updates_batch_status(status, factories, mocker):
 
     assert batch.status == "pending"
 
-    job = factories["music.ImportJob"](batch=batch, status=status)
+    factories["music.ImportJob"](batch=batch, status=status)
 
     batch.refresh_from_db()
 

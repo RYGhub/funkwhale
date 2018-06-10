@@ -55,6 +55,5 @@ def test_broadcast_listening_to_instance_activity_private(factories, mocker):
     listening = factories["history.Listening"](user__privacy_level="me")
     data = serializers.ListeningActivitySerializer(listening).data
     consumer = activities.broadcast_listening_to_instance_activity
-    message = {"type": "event.send", "text": "", "data": data}
     consumer(data=data, obj=listening)
     p.assert_not_called()

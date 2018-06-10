@@ -105,7 +105,7 @@ def test_can_serve_track_file_as_remote_library(
 ):
     preferences["common__api_authentication_required"] = True
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    follow = factories["federation.Follow"](
+    factories["federation.Follow"](
         approved=True, actor=authenticated_actor, target=library_actor
     )
 
@@ -245,8 +245,8 @@ def test_can_list_import_jobs(factories, superuser_api_client):
 
 
 def test_import_job_stats(factories, superuser_api_client):
-    job1 = factories["music.ImportJob"](status="pending")
-    job2 = factories["music.ImportJob"](status="errored")
+    factories["music.ImportJob"](status="pending")
+    factories["music.ImportJob"](status="errored")
 
     url = reverse("api:v1:import-jobs-stats")
     response = superuser_api_client.get(url)
@@ -257,7 +257,7 @@ def test_import_job_stats(factories, superuser_api_client):
 
 def test_import_job_stats_filter(factories, superuser_api_client):
     job1 = factories["music.ImportJob"](status="pending")
-    job2 = factories["music.ImportJob"](status="errored")
+    factories["music.ImportJob"](status="errored")
 
     url = reverse("api:v1:import-jobs-stats")
     response = superuser_api_client.get(url, {"batch": job1.batch.pk})

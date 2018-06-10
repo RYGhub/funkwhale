@@ -67,7 +67,7 @@ class APIModelMixin(models.Model):
             try:
                 cleaned_key, cleaned_value = mapping.from_musicbrainz(key, value)
                 cleaned_data[cleaned_key] = cleaned_value
-            except KeyError as e:
+            except KeyError:
                 pass
         return cleaned_data
 
@@ -134,9 +134,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data = Track.clean_musicbrainz_data(track_data["recording"])
         track_cleaned_data["album"] = instance
         track_cleaned_data["position"] = int(track_data["position"])
-        track = importers.load(
-            Track, track_cleaned_data, track_data, Track.import_hooks
-        )
+        importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
 
 
 class AlbumQuerySet(models.QuerySet):

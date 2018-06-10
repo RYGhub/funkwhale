@@ -162,7 +162,7 @@ def test_follow_serializer_save(factories):
     actor = factories["federation.Actor"]()
     target = factories["federation.Actor"]()
 
-    data = expected = {
+    data = {
         "id": "https://test.follow",
         "type": "Follow",
         "actor": actor.url,
@@ -185,7 +185,7 @@ def test_follow_serializer_save_validates_on_context(factories):
     target = factories["federation.Actor"]()
     impostor = factories["federation.Actor"]()
 
-    data = expected = {
+    data = {
         "id": "https://test.follow",
         "type": "Follow",
         "actor": actor.url,
