@@ -1,7 +1,6 @@
 import pytest
 
 from django import forms
-from django.urls import reverse
 
 from funkwhale_api.federation import webfinger
 

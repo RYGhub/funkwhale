@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 import persisting_theory
 
 from funkwhale_api.music import models
-from funkwhale_api.taskapp.celery import require_instance
 
 
 class RadioFilterRegistry(persisting_theory.Registry):

@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from rest_framework import exceptions
 
-from funkwhale_api.federation import activity
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers

@@ -2,7 +2,6 @@ import json
 import pytest
 from django.urls import reverse
 
-from funkwhale_api.music.models import Track, Artist
 from funkwhale_api.favorites.models import TrackFavorite
 
 

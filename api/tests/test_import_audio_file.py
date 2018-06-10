@@ -6,7 +6,6 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from funkwhale_api.providers.audiofile import tasks
-from funkwhale_api.music import tasks as music_tasks
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 

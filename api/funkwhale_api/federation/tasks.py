@@ -11,7 +11,6 @@ from requests.exceptions import RequestException
 from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import session
-from funkwhale_api.history.models import Listening
 from funkwhale_api.taskapp import celery
 
 from . import actors

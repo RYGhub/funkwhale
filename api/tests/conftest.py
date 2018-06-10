@@ -17,7 +17,6 @@ from rest_framework.test import APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
-from funkwhale_api.taskapp import celery
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -1,6 +1,4 @@
-import pytest
 
-from django.forms import ValidationError
 
 
 def test_can_bind_import_batch_to_request(factories):

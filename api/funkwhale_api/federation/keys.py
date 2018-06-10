@@ -5,7 +5,6 @@ from cryptography.hazmat.backends import default_backend as crypto_default_backe
 import re
 import urllib.parse
 
-from . import exceptions
 
 KEY_ID_REGEX = re.compile(r"keyId=\"(?P<id>.*)\"")
 

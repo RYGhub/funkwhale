@@ -2,8 +2,6 @@ import pytest
 
 from django import db
 
-from funkwhale_api.federation import models
-from funkwhale_api.federation import serializers
 
 
 def test_cannot_duplicate_actor(factories):

@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -77,7 +76,6 @@ class RadioSession(models.Model):
     @property
     def radio(self):
         from .registries import registry
-        from . import radios
 
         return registry[self.radio_type](session=self)
 

@@ -1,6 +1,4 @@
 from django.urls import reverse
-from django.core.exceptions import ValidationError
-from django.utils import timezone
 
 from funkwhale_api.history import models
 

@@ -1,8 +1,6 @@
 import pytest
 
 from django.urls import reverse
-from django.core.exceptions import ValidationError
-from django.utils import timezone
 
 from funkwhale_api.playlists import models
 from funkwhale_api.playlists import serializers

@@ -1,24 +1,18 @@
 from django import forms
-from django.conf import settings
 from django.core import paginator
 from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 
 from rest_framework import mixins
-from rest_framework import permissions as rest_permissions
 from rest_framework import response
-from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.decorators import list_route, detail_route
-from rest_framework.serializers import ValidationError
 
 from funkwhale_api.common import preferences
-from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users.permissions import HasUserPermission
 
-from . import activity
 from . import actors
 from . import authentication
 from . import filters

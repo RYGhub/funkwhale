@@ -1,6 +1,5 @@
 from django.urls import reverse
 
-from funkwhale_api.musicbrainz import api
 
 
 def test_can_search_recording_in_musicbrainz_api(

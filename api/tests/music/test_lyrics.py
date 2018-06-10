@@ -1,8 +1,6 @@
 from django.urls import reverse
 
 from funkwhale_api.music import models
-from funkwhale_api.musicbrainz import api
-from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
 from funkwhale_api.music import lyrics as lyrics_utils
 

@@ -1,7 +1,6 @@
 import os
 import pytest
 
-from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.music import tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))

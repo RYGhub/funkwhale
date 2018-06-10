@@ -2,7 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from dynamic_preferences.api import serializers
 
 
 def test_can_list_settings_via_api(preferences, api_client):

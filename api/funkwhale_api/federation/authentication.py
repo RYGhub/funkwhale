@@ -7,8 +7,6 @@ from rest_framework import exceptions
 
 from . import actors
 from . import keys
-from . import models
-from . import serializers
 from . import signing
 from . import utils
 

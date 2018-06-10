@@ -1,11 +1,9 @@
 import arrow
 import pytest
 
-from django.urls import reverse
 from django.core.paginator import Paginator
 
 from funkwhale_api.federation import actors
-from funkwhale_api.federation import keys
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils

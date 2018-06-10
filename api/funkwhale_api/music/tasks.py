@@ -8,7 +8,6 @@ from musicbrainzngs import ResponseError
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import activity
 from funkwhale_api.federation import actors
-from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client

@@ -1,6 +1,3 @@
-from . import serializers
-from . import tasks
-
 ACTIVITY_TYPES = [
     "Accept",
     "Add",
@@ -52,9 +49,13 @@ OBJECT_TYPES = [
 
 
 def deliver(activity, on_behalf_of, to=[]):
+    from . import tasks
+
     return tasks.send.delay(activity=activity, actor_id=on_behalf_of.pk, to=to)
 
 
 def accept_follow(follow):
+    from . import serializers
+
     serializer = serializers.AcceptFollowSerializer(follow)
     return deliver(serializer.data, to=[follow.actor.url], on_behalf_of=follow.target)

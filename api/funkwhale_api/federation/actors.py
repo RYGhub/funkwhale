@@ -9,7 +9,6 @@ from django.utils import timezone
 
 from rest_framework.exceptions import PermissionDenied
 
-from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import preferences
 from funkwhale_api.common import session

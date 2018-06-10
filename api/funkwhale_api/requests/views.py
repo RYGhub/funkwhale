@@ -1,7 +1,4 @@
-from rest_framework import generics, mixins, viewsets
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import detail_route
+from rest_framework import mixins, viewsets
 
 from . import filters
 from . import models

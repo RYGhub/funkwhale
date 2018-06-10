@@ -1,13 +1,10 @@
 import logging
 import urllib.parse
 
-from django.urls import reverse
-from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import transaction
 
 from rest_framework import serializers
-from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.common import serializers as common_serializers

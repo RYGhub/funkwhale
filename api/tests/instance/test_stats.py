@@ -1,4 +1,3 @@
-from django.urls import reverse
 
 from funkwhale_api.instance import stats
 

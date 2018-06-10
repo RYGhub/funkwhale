@@ -1,14 +1,13 @@
 from django.db.models import Q
 from django.http import Http404
 
-from rest_framework import generics, mixins, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 
 from funkwhale_api.music.serializers import TrackSerializer
-from funkwhale_api.common.permissions import ConditionalAuthentication
 
 from . import models
 from . import filters

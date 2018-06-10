@@ -1,6 +1,5 @@
 import pytest
 
-from django.test import RequestFactory
 from django.urls import reverse
 
 from funkwhale_api.users.models import User

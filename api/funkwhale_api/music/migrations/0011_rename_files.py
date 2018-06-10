@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from funkwhale_api.common.utils import rename_file
 
 
 def rename_files(apps, schema_editor):

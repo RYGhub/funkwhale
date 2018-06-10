@@ -9,7 +9,6 @@ from funkwhale_api.common import preferences
 from funkwhale_api.users.permissions import HasUserPermission
 
 from . import nodeinfo
-from . import stats
 
 
 NODEINFO_2_CONTENT_TYPE = "application/json; profile=http://nodeinfo.diaspora.software/ns/schema/2.0#; charset=utf-8"  # noqa

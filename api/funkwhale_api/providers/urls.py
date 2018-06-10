@@ -1,5 +1,4 @@
 from django.conf.urls import include, url
-from funkwhale_api.music import views
 
 urlpatterns = [
     url(

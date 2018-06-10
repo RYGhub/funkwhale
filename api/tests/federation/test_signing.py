@@ -1,6 +1,5 @@
 import cryptography.exceptions
 import pytest
-import requests_http_signature
 
 from funkwhale_api.federation import signing
 from funkwhale_api.federation import keys

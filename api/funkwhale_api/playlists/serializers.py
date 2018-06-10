@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
-from taggit.models import Tag
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music.models import Track

@@ -1,6 +1,5 @@
 import operator
 
-from django.conf import settings
 from django.http import Http404
 
 from rest_framework.permissions import BasePermission

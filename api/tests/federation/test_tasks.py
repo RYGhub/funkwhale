@@ -1,7 +1,6 @@
 import datetime
 import os
 import pathlib
-import pytest
 
 from django.core.paginator import Paginator
 from django.utils import timezone

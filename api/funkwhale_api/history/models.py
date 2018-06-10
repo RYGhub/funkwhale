@@ -1,6 +1,5 @@
 from django.utils import timezone
 from django.db import models
-from django.core.exceptions import ValidationError
 
 from funkwhale_api.music.models import Track
 
