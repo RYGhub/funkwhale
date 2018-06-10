@@ -1,5 +1,7 @@
 from collections import OrderedDict
+
 from django.urls import reverse
+
 from funkwhale_api.providers.youtube.client import client
 
 from .data import youtube as api_data

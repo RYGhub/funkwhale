@@ -1,6 +1,5 @@
-from django.conf import settings
-
 from allauth.account.adapter import DefaultAccountAdapter
+from django.conf import settings
 from dynamic_preferences.registries import global_preferences_registry
 
 

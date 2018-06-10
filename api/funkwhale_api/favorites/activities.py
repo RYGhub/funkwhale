@@ -1,5 +1,5 @@
-from funkwhale_api.common import channels
 from funkwhale_api.activity import record
+from funkwhale_api.common import channels
 
 from . import serializers
 

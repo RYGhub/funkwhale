@@ -1,7 +1,7 @@
 from django.conf import settings
-
-from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer as PRS
+from rest_framework import serializers
+
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models

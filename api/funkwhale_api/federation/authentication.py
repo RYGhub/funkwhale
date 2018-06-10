@@ -1,14 +1,8 @@
 import cryptography
-
 from django.contrib.auth.models import AnonymousUser
+from rest_framework import authentication, exceptions
 
-from rest_framework import authentication
-from rest_framework import exceptions
-
-from . import actors
-from . import keys
-from . import signing
-from . import utils
+from . import actors, keys, signing, utils
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):

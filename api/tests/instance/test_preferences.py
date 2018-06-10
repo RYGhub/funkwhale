@@ -1,7 +1,5 @@
 import pytest
-
 from django.urls import reverse
-
 
 
 def test_can_list_settings_via_api(preferences, api_client):

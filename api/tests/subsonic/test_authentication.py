@@ -1,6 +1,6 @@
 import binascii
-import pytest
 
+import pytest
 from rest_framework import exceptions
 
 from funkwhale_api.subsonic import authentication

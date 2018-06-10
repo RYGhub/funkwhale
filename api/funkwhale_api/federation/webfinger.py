@@ -3,8 +3,7 @@ from django.conf import settings
 
 from funkwhale_api.common import session
 
-from . import actors
-from . import serializers
+from . import actors, serializers
 
 VALID_RESOURCE_TYPES = ["acct"]
 

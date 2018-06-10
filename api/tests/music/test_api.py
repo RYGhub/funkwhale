@@ -1,11 +1,10 @@
 import json
 import os
+
 import pytest
 from django.urls import reverse
 
-from funkwhale_api.music import models
-from funkwhale_api.music import tasks
-
+from funkwhale_api.music import models, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 

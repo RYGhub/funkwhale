@@ -5,8 +5,7 @@ import pathlib
 from django.core.paginator import Paginator
 from django.utils import timezone
 
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import tasks
+from funkwhale_api.federation import serializers, tasks
 
 
 def test_scan_library_does_nothing_if_federation_disabled(mocker, factories):

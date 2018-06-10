@@ -1,9 +1,7 @@
 import pytest
-
 from django.urls import reverse
 
-from funkwhale_api.manage import serializers
-from funkwhale_api.manage import views
+from funkwhale_api.manage import serializers, views
 
 
 @pytest.mark.parametrize(

@@ -1,12 +1,11 @@
 import io
-import pytest
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import serializers
-from funkwhale_api.music import views
 from funkwhale_api.federation import actors
+from funkwhale_api.music import serializers, views
 
 
 @pytest.mark.parametrize(

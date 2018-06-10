@@ -5,8 +5,7 @@ from taggit.models import Tag
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.users.serializers import UserBasicSerializer
 
-from . import models
-from . import tasks
+from . import models, tasks
 
 
 class ArtistAlbumSerializer(serializers.ModelSerializer):

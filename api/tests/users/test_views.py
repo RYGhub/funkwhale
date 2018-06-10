@@ -1,5 +1,4 @@
 import pytest
-
 from django.urls import reverse
 
 from funkwhale_api.users.models import User

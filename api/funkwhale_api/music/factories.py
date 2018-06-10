@@ -1,7 +1,8 @@
-import factory
 import os
 
-from funkwhale_api.factories import registry, ManyToManyFromList
+import factory
+
+from funkwhale_api.factories import ManyToManyFromList, registry
 from funkwhale_api.federation.factories import LibraryTrackFactory
 from funkwhale_api.users.factories import UserFactory
 

@@ -1,8 +1,6 @@
 from urllib.parse import parse_qs
 
-
 from django.contrib.auth.models import AnonymousUser
-
 from rest_framework import exceptions
 from rest_framework_jwt.authentication import BaseJSONWebTokenAuthentication
 

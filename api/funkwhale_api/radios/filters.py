@@ -1,10 +1,9 @@
 import collections
 
+import persisting_theory
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.urls import reverse_lazy
-
-import persisting_theory
 
 from funkwhale_api.music import models
 

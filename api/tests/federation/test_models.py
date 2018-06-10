@@ -1,7 +1,5 @@
 import pytest
-
 from django import db
-
 
 
 def test_cannot_duplicate_actor(factories):

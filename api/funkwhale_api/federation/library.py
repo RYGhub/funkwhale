@@ -1,15 +1,11 @@
 import json
-import requests
 
+import requests
 from django.conf import settings
 
 from funkwhale_api.common import session
 
-from . import actors
-from . import models
-from . import serializers
-from . import signing
-from . import webfinger
+from . import actors, models, serializers, signing, webfinger
 
 
 def scan_from_account_name(account_name):

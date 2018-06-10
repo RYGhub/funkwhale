@@ -1,8 +1,7 @@
 from django.urls import reverse
 
-from funkwhale_api.music import models
-from funkwhale_api.music import tasks
 from funkwhale_api.music import lyrics as lyrics_utils
+from funkwhale_api.music import models, tasks
 
 
 def test_works_import_lyrics_if_any(lyricswiki_content, mocker, factories):

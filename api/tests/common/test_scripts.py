@@ -1,7 +1,7 @@
 import pytest
 
-from funkwhale_api.common.management.commands import script
 from funkwhale_api.common import scripts
+from funkwhale_api.common.management.commands import script
 
 
 @pytest.fixture

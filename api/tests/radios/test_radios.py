@@ -1,15 +1,12 @@
 import json
 import random
+
 import pytest
-
-from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
-
-from funkwhale_api.radios import radios
-from funkwhale_api.radios import models
-from funkwhale_api.radios import serializers
 from funkwhale_api.favorites.models import TrackFavorite
+from funkwhale_api.radios import models, radios, serializers
 
 
 def test_can_pick_track_from_choices():

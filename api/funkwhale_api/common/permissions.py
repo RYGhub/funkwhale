@@ -1,7 +1,6 @@
 import operator
 
 from django.http import Http404
-
 from rest_framework.permissions import BasePermission
 
 from funkwhale_api.common import preferences

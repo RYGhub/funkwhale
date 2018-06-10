@@ -1,15 +1,10 @@
 import arrow
 import pytest
-
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework import exceptions
 
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import models
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import utils
+from funkwhale_api.federation import actors, models, serializers, utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 

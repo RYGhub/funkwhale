@@ -5,8 +5,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 
-from funkwhale_api.music import models
-from funkwhale_api.music import tasks
+from funkwhale_api.music import models, tasks
 from funkwhale_api.users.models import User
 
 

@@ -1,12 +1,8 @@
 import arrow
 import pytest
-
 from django.core.paginator import Paginator
 
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import models
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import utils
+from funkwhale_api.federation import actors, models, serializers, utils
 
 
 def test_actor_serializer_from_ap(db):

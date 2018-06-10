@@ -1,14 +1,13 @@
 import datetime
 import json
-import pytest
 
-from django.utils import timezone
+import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
-from funkwhale_api.subsonic import renderers
-from funkwhale_api.subsonic import serializers
+from funkwhale_api.subsonic import renderers, serializers
 
 
 def render_json(data):

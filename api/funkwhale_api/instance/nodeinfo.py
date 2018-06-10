@@ -5,7 +5,6 @@ from funkwhale_api.common import preferences
 
 from . import stats
 
-
 store = memoize.djangocache.Cache("default")
 memo = memoize.Memoizer(store, namespace="instance:stats")
 

@@ -5,6 +5,7 @@ from funkwhale_api.common import preferences
 from funkwhale_api.music.models import Track
 from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.users.serializers import UserBasicSerializer
+
 from . import models
 
 

@@ -1,9 +1,7 @@
 import django_filters
-
 from django.db import models
 
 from funkwhale_api.music import utils
-
 
 PRIVACY_LEVEL_CHOICES = [
     ("me", "Only me"),

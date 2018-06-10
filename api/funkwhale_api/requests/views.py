@@ -1,8 +1,6 @@
 from rest_framework import mixins, viewsets
 
-from . import filters
-from . import models
-from . import serializers
+from . import filters, models, serializers
 
 
 class ImportRequestViewSet(

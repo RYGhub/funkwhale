@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from funkwhale_api.music import tasks

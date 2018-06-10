@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import permissions
+from funkwhale_api.federation import actors, permissions
 
 
 def test_library_follower(factories, api_request, anonymous_user, preferences):

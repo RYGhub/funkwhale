@@ -1,10 +1,8 @@
-from rest_framework import mixins, viewsets
-from rest_framework import permissions
+from rest_framework import mixins, permissions, viewsets
 
 from funkwhale_api.activity import record
 
-from . import models
-from . import serializers
+from . import models, serializers
 
 
 class ListeningViewSet(

@@ -1,7 +1,6 @@
 from django.urls import reverse
 
 
-
 def test_can_search_recording_in_musicbrainz_api(
     recordings, db, mocker, logged_in_api_client
 ):

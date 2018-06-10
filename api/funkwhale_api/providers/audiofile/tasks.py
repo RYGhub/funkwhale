@@ -1,11 +1,12 @@
-import acoustid
 import os
+
+import acoustid
 from django.core.files import File
 from django.db import transaction
 
-from funkwhale_api.taskapp import celery
+from funkwhale_api.music import metadata, models
 from funkwhale_api.providers.acoustid import get_acoustid_client
-from funkwhale_api.music import models, metadata
+from funkwhale_api.taskapp import celery
 
 
 @transaction.atomic

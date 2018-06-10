@@ -1,29 +1,26 @@
-import os
-import arrow
 import datetime
-import tempfile
+import os
 import shutil
-import markdown
+import tempfile
 import uuid
 
+import arrow
+import markdown
 from django.conf import settings
-from django.db import models
-from django.core.files.base import ContentFile
 from django.core.files import File
+from django.core.files.base import ContentFile
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-
 from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField
 
-from funkwhale_api import downloader
-from funkwhale_api import musicbrainz
+from funkwhale_api import downloader, musicbrainz
 from funkwhale_api.federation import utils as federation_utils
-from . import importers
-from . import metadata
-from . import utils
+
+from . import importers, metadata, utils
 
 
 class APIModelMixin(models.Model):

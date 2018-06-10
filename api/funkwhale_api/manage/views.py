@@ -1,13 +1,10 @@
-from rest_framework import mixins
-from rest_framework import response
-from rest_framework import viewsets
+from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import list_route
 
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users.permissions import HasUserPermission
 
-from . import filters
-from . import serializers
+from . import filters, serializers
 
 
 class ManageTrackFileViewSet(

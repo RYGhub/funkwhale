@@ -1,7 +1,6 @@
 from django import forms
-
-from dynamic_preferences.types import StringPreference, Section
 from dynamic_preferences.registries import global_preferences_registry
+from dynamic_preferences.types import Section, StringPreference
 
 youtube = Section("providers_youtube")
 

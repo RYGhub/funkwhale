@@ -1,8 +1,7 @@
 import cryptography.exceptions
 import pytest
 
-from funkwhale_api.federation import signing
-from funkwhale_api.federation import keys
+from funkwhale_api.federation import keys, signing
 
 
 def test_can_sign_and_verify_request(nodb_factories):

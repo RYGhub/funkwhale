@@ -1,5 +1,4 @@
 import pytest
-
 from django.core.exceptions import ValidationError
 
 from funkwhale_api.music.models import Track

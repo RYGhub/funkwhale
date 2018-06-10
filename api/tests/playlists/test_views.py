@@ -1,9 +1,7 @@
 import pytest
-
 from django.urls import reverse
 
-from funkwhale_api.playlists import models
-from funkwhale_api.playlists import serializers
+from funkwhale_api.playlists import models, serializers
 
 
 def test_can_create_playlist_via_api(logged_in_api_client):

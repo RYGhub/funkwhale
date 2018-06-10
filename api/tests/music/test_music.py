@@ -1,6 +1,8 @@
-import pytest
-from funkwhale_api.music import models
 import datetime
+
+import pytest
+
+from funkwhale_api.music import models
 
 
 def test_can_create_artist_from_api(artists, mocker, db):

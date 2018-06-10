@@ -1,9 +1,9 @@
 import logging
+
 import requests
 import requests_http_signature
 
-from . import exceptions
-from . import utils
+from . import exceptions, utils
 
 logger = logging.getLogger(__name__)
 

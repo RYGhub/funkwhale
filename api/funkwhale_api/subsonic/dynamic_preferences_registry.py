@@ -1,7 +1,6 @@
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
-
 subsonic = types.Section("subsonic")
 
 

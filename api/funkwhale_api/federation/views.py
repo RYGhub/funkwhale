@@ -3,27 +3,26 @@ from django.core import paginator
 from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
-
-from rest_framework import mixins
-from rest_framework import response
-from rest_framework import viewsets
-from rest_framework.decorators import list_route, detail_route
+from rest_framework import mixins, response, viewsets
+from rest_framework.decorators import detail_route, list_route
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users.permissions import HasUserPermission
 
-from . import actors
-from . import authentication
-from . import filters
-from . import library
-from . import models
-from . import permissions
-from . import renderers
-from . import serializers
-from . import tasks
-from . import utils
-from . import webfinger
+from . import (
+    actors,
+    authentication,
+    filters,
+    library,
+    models,
+    permissions,
+    renderers,
+    serializers,
+    tasks,
+    utils,
+    webfinger
+)
 
 
 class FederationMixin(object):

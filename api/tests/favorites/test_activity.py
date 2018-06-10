@@ -1,7 +1,6 @@
-from funkwhale_api.users.serializers import UserActivitySerializer
+from funkwhale_api.favorites import activities, serializers
 from funkwhale_api.music.serializers import TrackActivitySerializer
-from funkwhale_api.favorites import serializers
-from funkwhale_api.favorites import activities
+from funkwhale_api.users.serializers import UserActivitySerializer
 
 
 def test_get_favorite_activity_url(settings, factories):

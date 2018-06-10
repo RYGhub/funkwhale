@@ -3,8 +3,7 @@ from rest_framework import serializers
 from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.users.serializers import UserBasicSerializer
 
-from . import filters
-from . import models
+from . import filters, models
 from .radios import registry
 
 

@@ -1,6 +1,5 @@
 
 import funkwhale_api
-
 from funkwhale_api.instance import nodeinfo
 
 

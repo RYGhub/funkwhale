@@ -1,13 +1,14 @@
 import random
-from rest_framework import serializers
-from django.db.models import Count
-from django.core.exceptions import ValidationError
-from taggit.models import Tag
-from funkwhale_api.users.models import User
-from funkwhale_api.music.models import Track, Artist
 
-from . import filters
-from . import models
+from django.core.exceptions import ValidationError
+from django.db.models import Count
+from rest_framework import serializers
+from taggit.models import Tag
+
+from funkwhale_api.music.models import Artist, Track
+from funkwhale_api.users.models import User
+
+from . import filters, models
 from .registries import registry
 
 

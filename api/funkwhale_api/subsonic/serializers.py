@@ -1,7 +1,6 @@
 import collections
 
-from django.db.models import functions, Count
-
+from django.db.models import Count, functions
 from rest_framework import serializers
 
 from funkwhale_api.history import models as history_models

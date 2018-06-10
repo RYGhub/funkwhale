@@ -1,8 +1,6 @@
 import pytest
-
 from jwt.exceptions import DecodeError
 from rest_framework_jwt.settings import api_settings
-
 
 
 def test_can_invalidate_token_when_changing_user_secret_key(factories):

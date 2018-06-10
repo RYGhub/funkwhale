@@ -2,35 +2,31 @@ import json
 import logging
 import urllib
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
-from django.db.models.functions import Length
 from django.db.models import Count
+from django.db.models.functions import Length
 from django.utils import timezone
-
-from rest_framework import viewsets, views, mixins
+from musicbrainzngs import ResponseError
+from rest_framework import mixins
+from rest_framework import settings as rest_settings
+from rest_framework import views, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
-from rest_framework import settings as rest_settings
-from musicbrainzngs import ResponseError
+from taggit.models import Tag
 
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.common.permissions import ConditionalAuthentication
-from funkwhale_api.users.permissions import HasUserPermission
-from taggit.models import Tag
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation.models import LibraryTrack
 from funkwhale_api.musicbrainz import api
 from funkwhale_api.requests.models import ImportRequest
+from funkwhale_api.users.permissions import HasUserPermission
 
-from . import filters
-from . import importers
-from . import models
+from . import filters, importers, models
 from . import permissions as music_permissions
-from . import serializers
-from . import tasks
-from . import utils
+from . import serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
 

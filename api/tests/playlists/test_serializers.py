@@ -1,5 +1,4 @@
-from funkwhale_api.playlists import models
-from funkwhale_api.playlists import serializers
+from funkwhale_api.playlists import models, serializers
 
 
 def test_cannot_max_500_tracks_per_playlist(factories, preferences):

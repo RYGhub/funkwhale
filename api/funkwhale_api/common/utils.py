@@ -1,6 +1,6 @@
-from urllib.parse import urlencode, parse_qs, urlsplit, urlunsplit
 import os
 import shutil
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from django.db import transaction
 

@@ -6,22 +6,14 @@ from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework.exceptions import PermissionDenied
 
-
-from funkwhale_api.common import preferences
-from funkwhale_api.common import session
+from funkwhale_api.common import preferences, session
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 
-from . import activity
-from . import keys
-from . import models
-from . import serializers
-from . import signing
-from . import utils
+from . import activity, keys, models, serializers, signing, utils
 
 logger = logging.getLogger(__name__)
 

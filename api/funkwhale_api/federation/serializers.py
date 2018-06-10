@@ -3,18 +3,14 @@ import urllib.parse
 
 from django.core.paginator import Paginator
 from django.db import transaction
-
 from rest_framework import serializers
 
-from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
-from . import activity
-from . import filters
-from . import models
-from . import utils
 
+from . import activity, filters, models, utils
 
 AP_CONTEXT = [
     "https://www.w3.org/ns/activitystreams",

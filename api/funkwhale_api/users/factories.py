@@ -1,7 +1,7 @@
 import factory
-
-from funkwhale_api.factories import registry, ManyToManyFromList
 from django.contrib.auth.models import Permission
+
+from funkwhale_api.factories import ManyToManyFromList, registry
 
 
 @registry.register

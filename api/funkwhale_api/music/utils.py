@@ -1,8 +1,8 @@
-import magic
 import mimetypes
-import mutagen
 import re
 
+import magic
+import mutagen
 from django.db.models import Q
 
 

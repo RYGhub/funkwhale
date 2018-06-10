@@ -1,8 +1,6 @@
-from rest_framework import exceptions
-from rest_framework import negotiation
+from rest_framework import exceptions, negotiation
 
 from . import renderers
-
 
 MAPPING = {
     "json": (renderers.SubsonicJSONRenderer(), "application/json"),

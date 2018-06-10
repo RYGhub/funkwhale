@@ -1,6 +1,6 @@
 import pytest
-
 from dynamic_preferences.registries import global_preferences_registry
+
 from funkwhale_api.common import preferences as common_preferences
 
 

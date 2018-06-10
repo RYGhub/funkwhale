@@ -1,8 +1,6 @@
-from django.conf import settings
 from django import forms
-
-from dynamic_preferences import serializers
-from dynamic_preferences import types
+from django.conf import settings
+from dynamic_preferences import serializers, types
 from dynamic_preferences.registries import global_preferences_registry
 
 

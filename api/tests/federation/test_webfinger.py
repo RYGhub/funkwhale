@@ -1,5 +1,4 @@
 import pytest
-
 from django import forms
 
 from funkwhale_api.federation import webfinger

@@ -1,7 +1,6 @@
 from django.urls import reverse
 
-from funkwhale_api.activity import serializers
-from funkwhale_api.activity import utils
+from funkwhale_api.activity import serializers, utils
 
 
 def test_activity_view(factories, api_client, preferences, anonymous_user):

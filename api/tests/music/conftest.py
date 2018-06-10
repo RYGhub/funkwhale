@@ -1,6 +1,5 @@
 import pytest
 
-
 _artists = {"search": {}, "get": {}}
 
 _artists["search"]["adhesive_wombat"] = {
