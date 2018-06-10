@@ -1,12 +1,9 @@
 from django import forms
 from django.conf import settings
-from django.urls import reverse
 
 from funkwhale_api.common import session
 
-from . import actors
-from . import utils
-from . import serializers
+from . import actors, serializers
 
 VALID_RESOURCE_TYPES = ["acct"]
 

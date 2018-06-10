@@ -6,19 +6,15 @@ import os
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
-
-from requests.exceptions import RequestException
 from dynamic_preferences.registries import global_preferences_registry
+from requests.exceptions import RequestException
 
 from funkwhale_api.common import session
-from funkwhale_api.history.models import Listening
 from funkwhale_api.taskapp import celery
 
 from . import actors
 from . import library as lb
-from . import models
-from . import signing
-
+from . import models, signing
 
 logger = logging.getLogger(__name__)
 

@@ -3,12 +3,38 @@ variables:
   IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
   IMAGE_LATEST: $IMAGE_NAME:latest
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+  PYTHONDONTWRITEBYTECODE: "true"
 
 
 stages:
+  - lint
   - test
   - build
   - deploy
+
+black:
+  image: python:3.6
+  stage: lint
+  variables:
+    GIT_STRATEGY: fetch
+  before_script:
+    - pip install black
+  script:
+    - black --check --diff api/
+
+flake8:
+  image: python:3.6
+  stage: lint
+  variables:
+    GIT_STRATEGY: fetch
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 -v api
+  cache:
+    key: "$CI_PROJECT_ID__flake8_pip_cache"
+    paths:
+      - "$PIP_CACHE_DIR"
 
 test_api:
   services:
@@ -108,7 +134,7 @@ pages:
   tags:
     - docker
 
-docker_develop:
+docker_release:
   stage: deploy
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
@@ -119,8 +145,9 @@ docker_develop:
     - docker push $IMAGE
   only:
     - develop@funkwhale/funkwhale
+    - tags@funkwhale/funkwhale
   tags:
-    - dind
+    - docker-build
 
 build_api:
   # Simply publish a zip containing api/ directory
@@ -135,19 +162,3 @@ build_api:
     - tags@funkwhale/funkwhale
     - master@funkwhale/funkwhale
     - develop@funkwhale/funkwhale
-
-
-docker_release:
-  stage: deploy
-  before_script:
-    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-    - cp -r front/dist api/frontend
-    - cd api
-  script:
-    - docker build -t $IMAGE -t $IMAGE_LATEST .
-    - docker push $IMAGE
-    - docker push $IMAGE_LATEST
-  only:
-    - tags@funkwhale/funkwhale
-  tags:
-    - dind

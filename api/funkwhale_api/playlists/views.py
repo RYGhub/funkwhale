@@ -1,20 +1,13 @@
-from django.db.models import Count
 from django.db import transaction
-
-from rest_framework import exceptions
-from rest_framework import generics, mixins, viewsets
-from rest_framework import status
+from django.db.models import Count
+from rest_framework import exceptions, mixins, viewsets
 from rest_framework.decorators import detail_route
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
-from funkwhale_api.common import permissions
-from funkwhale_api.common import fields
-from funkwhale_api.music.models import Track
+from funkwhale_api.common import fields, permissions
 
-from . import filters
-from . import models
-from . import serializers
+from . import filters, models, serializers
 
 
 class PlaylistViewSet(

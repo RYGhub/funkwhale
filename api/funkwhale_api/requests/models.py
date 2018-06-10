@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.utils import timezone
 
 NATURE_CHOICES = [("artist", "artist"), ("album", "album"), ("track", "track")]

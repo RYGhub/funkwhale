@@ -1,9 +1,4 @@
-import json
-from django.urls import reverse
-
 from funkwhale_api.music import models
-from funkwhale_api.musicbrainz import api
-from funkwhale_api.music import serializers
 
 
 def test_can_import_work(factories, mocker, works):
@@ -40,7 +35,7 @@ def test_can_get_work_from_recording(factories, mocker, works, tracks):
     )
     mbid = "e2ecabc4-1b9d-30b2-8f30-3596ec423dc5"
 
-    assert recording.work == None
+    assert recording.work is None
 
     work = recording.get_work()
 

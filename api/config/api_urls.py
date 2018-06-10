@@ -1,15 +1,13 @@
+from django.conf.urls import include, url
+from dynamic_preferences.api.viewsets import GlobalPreferencesViewSet
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
-from django.conf.urls import include, url
+from rest_framework_jwt import views as jwt_views
+
 from funkwhale_api.activity import views as activity_views
-from funkwhale_api.instance import views as instance_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
-from rest_framework_jwt import views as jwt_views
-
-from dynamic_preferences.api.viewsets import GlobalPreferencesViewSet
-from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 
 router = routers.SimpleRouter()
 router.register(r"settings", GlobalPreferencesViewSet, base_name="settings")

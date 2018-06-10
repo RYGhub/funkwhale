@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 

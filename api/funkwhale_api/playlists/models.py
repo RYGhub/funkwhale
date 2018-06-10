@@ -1,12 +1,8 @@
-from django.conf import settings
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction
 from django.utils import timezone
-
 from rest_framework import exceptions
 
-from funkwhale_api.common import fields
-from funkwhale_api.common import preferences
+from funkwhale_api.common import fields, preferences
 
 
 class PlaylistQuerySet(models.QuerySet):

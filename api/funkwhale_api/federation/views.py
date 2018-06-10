@@ -1,35 +1,28 @@
 from django import forms
-from django.conf import settings
 from django.core import paginator
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.urls import reverse
-
-from rest_framework import mixins
-from rest_framework import permissions as rest_permissions
-from rest_framework import response
-from rest_framework import views
-from rest_framework import viewsets
-from rest_framework.decorators import list_route, detail_route
-from rest_framework.serializers import ValidationError
+from rest_framework import mixins, response, viewsets
+from rest_framework.decorators import detail_route, list_route
 
 from funkwhale_api.common import preferences
-from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users.permissions import HasUserPermission
 
-from . import activity
-from . import actors
-from . import authentication
-from . import filters
-from . import library
-from . import models
-from . import permissions
-from . import renderers
-from . import serializers
-from . import tasks
-from . import utils
-from . import webfinger
+from . import (
+    actors,
+    authentication,
+    filters,
+    library,
+    models,
+    permissions,
+    renderers,
+    serializers,
+    tasks,
+    utils,
+    webfinger,
+)
 
 
 class FederationMixin(object):
@@ -64,7 +57,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
         handler = getattr(system_actor, "{}_inbox".format(request.method.lower()))
 
         try:
-            data = handler(request.data, actor=request.actor)
+            handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
         return response.Response({}, status=200)
@@ -74,7 +67,7 @@ class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
         system_actor = self.get_object()
         handler = getattr(system_actor, "{}_outbox".format(request.method.lower()))
         try:
-            data = handler(request.data, actor=request.actor)
+            handler(request.data, actor=request.actor)
         except NotImplementedError:
             return response.Response(status=405)
         return response.Response({}, status=200)
@@ -151,7 +144,7 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         else:
             try:
                 page_number = int(page)
-            except:
+            except Exception:
                 return response.Response({"page": ["Invalid page number"]}, status=400)
             p = paginator.Paginator(
                 qs, preferences.get("federation__collection_page_size")
@@ -249,7 +242,7 @@ class LibraryViewSet(
     def create(self, request, *args, **kwargs):
         serializer = serializers.APILibraryCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        library = serializer.save()
+        serializer.save()
         return response.Response(serializer.data, status=201)
 
 

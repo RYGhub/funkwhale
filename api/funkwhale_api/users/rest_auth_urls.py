@@ -1,11 +1,9 @@
-from django.views.generic import TemplateView
 from django.conf.urls import url
-
-from rest_auth.registration import views as registration_views
+from django.views.generic import TemplateView
 from rest_auth import views as rest_auth_views
+from rest_auth.registration import views as registration_views
 
 from . import views
-
 
 urlpatterns = [
     url(r"^$", views.RegisterView.as_view(), name="rest_register"),

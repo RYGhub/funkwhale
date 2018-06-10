@@ -1,15 +1,12 @@
 import json
 import random
+
 import pytest
-
-from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
-
-from funkwhale_api.radios import radios
-from funkwhale_api.radios import models
-from funkwhale_api.radios import serializers
 from funkwhale_api.favorites.models import TrackFavorite
+from funkwhale_api.radios import models, radios, serializers
 
 
 def test_can_pick_track_from_choices():
@@ -74,8 +71,7 @@ def test_can_get_choices_for_custom_radio(factories):
     artist = factories["music.Artist"]()
     files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
     tracks = [f.track for f in files]
-    wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
+    factories["music.TrackFile"].create_batch(5)
 
     session = factories["radios.CustomRadioSession"](
         custom_radio__config=[{"type": "artist", "ids": [artist.pk]}]
@@ -114,14 +110,13 @@ def test_can_start_custom_radio_from_api(logged_in_client, factories):
 
 
 def test_can_use_radio_session_to_filter_choices(factories):
-    files = factories["music.TrackFile"].create_batch(30)
-    tracks = [f.track for f in files]
+    factories["music.TrackFile"].create_batch(30)
     user = factories["users.User"]()
     radio = radios.RandomRadio()
     session = radio.start_session(user)
 
     for i in range(30):
-        p = radio.pick()
+        radio.pick()
 
     # ensure 30 differents tracks have been suggested
     tracks_id = [
@@ -141,7 +136,7 @@ def test_can_restore_radio_from_previous_session(factories):
 
 def test_can_start_radio_for_logged_in_user(logged_in_client):
     url = reverse("api:v1:radios:sessions-list")
-    response = logged_in_client.post(url, {"radio_type": "random"})
+    logged_in_client.post(url, {"radio_type": "random"})
     session = models.RadioSession.objects.latest("id")
     assert session.radio_type == "random"
     assert session.user == logged_in_client.user
@@ -185,8 +180,7 @@ def test_related_object_radio_validate_related_object(factories):
 def test_can_start_artist_radio(factories):
     user = factories["users.User"]()
     artist = factories["music.Artist"]()
-    wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
+    factories["music.TrackFile"].create_batch(5)
     good_files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
     good_tracks = [f.track for f in good_files]
 
@@ -200,8 +194,7 @@ def test_can_start_artist_radio(factories):
 def test_can_start_tag_radio(factories):
     user = factories["users.User"]()
     tag = factories["taggit.Tag"]()
-    wrong_files = factories["music.TrackFile"].create_batch(5)
-    wrong_tracks = [f.track for f in wrong_files]
+    factories["music.TrackFile"].create_batch(5)
     good_files = factories["music.TrackFile"].create_batch(5, track__tags=[tag])
     good_tracks = [f.track for f in good_files]
 
@@ -236,7 +229,7 @@ def test_can_start_less_listened_radio(factories):
     good_files = factories["music.TrackFile"].create_batch(5)
     good_tracks = [f.track for f in good_files]
     radio = radios.LessListenedRadio()
-    session = radio.start_session(user)
+    radio.start_session(user)
 
     for i in range(5):
         assert radio.pick() in good_tracks

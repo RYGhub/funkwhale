@@ -1,10 +1,9 @@
-from django.db import models
-from django.utils import timezone
-from django.core.exceptions import ValidationError
-from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
+from django.utils import timezone
 
 from funkwhale_api.music.models import Track
 
@@ -77,7 +76,6 @@ class RadioSession(models.Model):
     @property
     def radio(self):
         from .registries import registry
-        from . import radios
 
         return registry[self.radio_type](session=self)
 

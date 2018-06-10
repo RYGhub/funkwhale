@@ -1,29 +1,19 @@
 import datetime
 import logging
-import uuid
 import xml
 
 from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework.exceptions import PermissionDenied
 
-from dynamic_preferences.registries import global_preferences_registry
-
-from funkwhale_api.common import preferences
-from funkwhale_api.common import session
+from funkwhale_api.common import preferences, session
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 
-from . import activity
-from . import keys
-from . import models
-from . import serializers
-from . import signing
-from . import utils
+from . import activity, keys, models, serializers, signing, utils
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +35,7 @@ def get_actor_data(actor_url):
     response.raise_for_status()
     try:
         return response.json()
-    except:
+    except Exception:
         raise ValueError("Invalid actor payload: {}".format(response.text))
 
 
@@ -155,7 +145,6 @@ class SystemActor(object):
         return handler(data, actor)
 
     def handle_follow(self, ac, sender):
-        system_actor = self.get_actor_instance()
         serializer = serializers.FollowSerializer(
             data=ac, context={"follow_actor": sender}
         )
@@ -325,7 +314,6 @@ class TestActor(SystemActor):
         reply_url = "https://{}/activities/note/{}".format(
             settings.FEDERATION_HOSTNAME, now.timestamp()
         )
-        reply_content = "{} Pong!".format(sender.mention_username)
         reply_activity = {
             "@context": [
                 "https://www.w3.org/ns/activitystreams",

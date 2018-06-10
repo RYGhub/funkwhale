@@ -1,6 +1,6 @@
 import pytest
-
 from dynamic_preferences.registries import global_preferences_registry
+
 from funkwhale_api.common import preferences as common_preferences
 
 
@@ -26,14 +26,14 @@ def string_list_pref(preferences):
     ],
 )
 def test_string_list_serializer_to_db(input, output):
-    s = common_preferences.StringListSerializer.to_db(input) == output
+    common_preferences.StringListSerializer.to_db(input) == output
 
 
 @pytest.mark.parametrize(
     "input,output", [("a,b,c", ["a", "b", "c"]), (None, []), ("", [])]
 )
 def test_string_list_serializer_to_python(input, output):
-    s = common_preferences.StringListSerializer.to_python(input) == output
+    common_preferences.StringListSerializer.to_python(input) == output
 
 
 def test_string_list_pref_default(string_list_pref, preferences):

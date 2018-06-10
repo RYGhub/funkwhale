@@ -10,8 +10,9 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
-from urllib.parse import urlsplit
-import os
+import datetime
+from urllib.parse import urlparse, urlsplit
+
 import environ
 from celery.schedules import crontab
 
@@ -21,7 +22,6 @@ ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("funkwhale_api")
 
 env = environ.Env()
-
 try:
     env.read_env(ROOT_DIR.file(".env"))
 except FileNotFoundError:
@@ -315,7 +315,6 @@ CACHE_DEFAULT = "redis://127.0.0.1:6379/0"
 CACHES = {"default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT)}
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
-from urllib.parse import urlparse
 
 cache_url = urlparse(CACHES["default"]["LOCATION"])
 CHANNEL_LAYERS = {
@@ -332,12 +331,12 @@ CACHES["default"]["OPTIONS"] = {
 }
 
 
-########## CELERY
+# CELERY
 INSTALLED_APPS += ("funkwhale_api.taskapp.celery.CeleryConfig",)
 CELERY_BROKER_URL = env(
     "CELERY_BROKER_URL", default=env("CACHE_URL", default=CACHE_DEFAULT)
 )
-########## END CELERY
+# END CELERY
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 
 # Your common stuff: Below this line define 3rd party library settings
@@ -350,8 +349,6 @@ CELERYBEAT_SCHEDULE = {
         "options": {"expires": 60 * 2},
     }
 }
-
-import datetime
 
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import os
 
-from django.db import migrations, models
-from funkwhale_api.common.utils import rename_file
+from django.db import migrations
 
 
 def bind_jobs(apps, schema_editor):

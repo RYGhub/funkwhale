@@ -1,22 +1,19 @@
 import logging
 import os
 
+from django.conf import settings
 from django.core.files.base import ContentFile
-
 from musicbrainzngs import ResponseError
 
 from funkwhale_api.common import preferences
-from funkwhale_api.federation import activity
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import activity, actors
 from funkwhale_api.federation import serializers as federation_serializers
-from funkwhale_api.taskapp import celery
 from funkwhale_api.providers.acoustid import get_acoustid_client
 from funkwhale_api.providers.audiofile import tasks as audiofile_tasks
+from funkwhale_api.taskapp import celery
 
-from django.conf import settings
-from . import models
 from . import lyrics as lyrics_utils
+from . import models
 from . import utils as music_utils
 
 logger = logging.getLogger(__name__)
@@ -259,7 +256,7 @@ def import_job_run(self, import_job, replace=False, use_acoustid=False):
         if not settings.DEBUG:
             try:
                 self.retry(exc=exc, countdown=30, max_retries=3)
-            except:
+            except Exception:
                 mark_errored(exc)
                 raise
         mark_errored(exc)

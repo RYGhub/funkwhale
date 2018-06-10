@@ -1,15 +1,11 @@
 import json
-import requests
 
+import requests
 from django.conf import settings
 
 from funkwhale_api.common import session
 
-from . import actors
-from . import models
-from . import serializers
-from . import signing
-from . import webfinger
+from . import actors, models, serializers, signing, webfinger
 
 
 def scan_from_account_name(account_name):
@@ -28,13 +24,6 @@ def scan_from_account_name(account_name):
     except serializers.ValidationError:
         return {"webfinger": {"errors": ["Invalid account string"]}}
     system_library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    library = (
-        models.Library.objects.filter(
-            actor__domain=domain, actor__preferred_username=username
-        )
-        .select_related("actor")
-        .first()
-    )
     data["local"] = {"following": False, "awaiting_approval": False}
     try:
         follow = models.Follow.objects.get(

@@ -1,23 +1,19 @@
 import datetime
-import factory
-import pytest
-import requests_mock
 import shutil
 import tempfile
 
+import factory
+import pytest
+import requests_mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
 from django.test import client
-
 from dynamic_preferences.registries import global_preferences_registry
-
 from rest_framework import fields as rest_fields
-from rest_framework.test import APIClient
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
-from funkwhale_api.taskapp import celery
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -186,7 +182,6 @@ def fake_request():
 
 @pytest.fixture
 def activity_registry():
-    r = record.registry
     state = list(record.registry.items())
     yield record.registry
     record.registry.clear()

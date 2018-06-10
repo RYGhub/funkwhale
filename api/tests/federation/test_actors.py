@@ -1,17 +1,10 @@
 import arrow
 import pytest
-import uuid
-
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework import exceptions
 
-from funkwhale_api.federation import activity
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import models
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import utils
+from funkwhale_api.federation import actors, models, serializers, utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 
@@ -55,9 +48,7 @@ def test_get_actor_refresh(factories, preferences, mocker):
     payload = serializers.ActorSerializer(actor).data
     # actor changed their username in the meantime
     payload["preferredUsername"] = "New me"
-    get_data = mocker.patch(
-        "funkwhale_api.federation.actors.get_actor_data", return_value=payload
-    )
+    mocker.patch("funkwhale_api.federation.actors.get_actor_data", return_value=payload)
     new_actor = actors.get_actor(actor.url)
 
     assert new_actor == actor
@@ -66,7 +57,7 @@ def test_get_actor_refresh(factories, preferences, mocker):
 
 
 def test_get_library(db, settings, mocker):
-    get_key_pair = mocker.patch(
+    mocker.patch(
         "funkwhale_api.federation.keys.get_key_pair",
         return_value=(b"private", b"public"),
     )
@@ -99,7 +90,7 @@ def test_get_library(db, settings, mocker):
 
 
 def test_get_test(db, mocker, settings):
-    get_key_pair = mocker.patch(
+    mocker.patch(
         "funkwhale_api.federation.keys.get_key_pair",
         return_value=(b"private", b"public"),
     )
@@ -247,7 +238,7 @@ def test_actor_is_system(username, domain, expected, nodb_factories, settings):
         ("test", "", actors.SYSTEM_ACTORS["test"]),
     ],
 )
-def test_actor_is_system(username, domain, expected, nodb_factories, settings):
+def test_actor_system_conf(username, domain, expected, nodb_factories, settings):
     if not domain:
         domain = settings.FEDERATION_HOSTNAME
     actor = nodb_factories["federation.Actor"](
@@ -350,7 +341,7 @@ def test_library_actor_handles_follow_manual_approval(preferences, mocker, facto
 def test_library_actor_handles_follow_auto_approval(preferences, mocker, factories):
     preferences["federation__music_needs_approval"] = False
     actor = factories["federation.Actor"]()
-    accept_follow = mocker.patch("funkwhale_api.federation.activity.accept_follow")
+    mocker.patch("funkwhale_api.federation.activity.accept_follow")
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     data = {
         "actor": actor.url,

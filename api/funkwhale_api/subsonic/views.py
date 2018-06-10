@@ -2,12 +2,9 @@ import datetime
 
 from django.conf import settings
 from django.utils import timezone
-
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
-from rest_framework import renderers
-from rest_framework import response
-from rest_framework import viewsets
+from rest_framework import renderers, response, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
@@ -19,10 +16,7 @@ from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
 from funkwhale_api.playlists import models as playlists_models
 
-from . import authentication
-from . import filters
-from . import negotiation
-from . import serializers
+from . import authentication, filters, negotiation, serializers
 
 
 def find_object(queryset, model_field="pk", field="id", cast=int):
@@ -158,7 +152,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     )
     @find_object(music_models.Artist.objects.all())
     def get_artist_info2(self, request, *args, **kwargs):
-        artist = kwargs.pop("obj")
         payload = {"artist-info2": {}}
 
         return response.Response(payload, status=200)
@@ -463,6 +456,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 {"error": {"code": 0, "message": "Invalid payload"}}
             )
         if serializer.validated_data["submission"]:
-            l = serializer.save()
-            record.send(l)
+            listening = serializer.save()
+            record.send(listening)
         return response.Response({})

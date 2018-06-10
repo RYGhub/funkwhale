@@ -5,8 +5,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 
-from funkwhale_api.music import models
-from funkwhale_api.music import tasks
+from funkwhale_api.music import models, tasks
 from funkwhale_api.users.models import User
 
 
@@ -178,7 +177,6 @@ class Command(BaseCommand):
         async = options["async"]
         import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
         batch = user.imports.create(source="shell")
-        total = len(paths)
         errors = []
         for i, path in list(enumerate(paths)):
             try:

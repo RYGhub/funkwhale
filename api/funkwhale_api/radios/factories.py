@@ -24,7 +24,7 @@ class RadioSessionFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register(name="radios.CustomRadioSession")
-class RadioSessionFactory(factory.django.DjangoModelFactory):
+class CustomRadioSessionFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     radio_type = "custom"
     custom_radio = factory.SubFactory(

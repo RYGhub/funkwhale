@@ -1,6 +1,6 @@
-from django import forms
 import arrow
 import mutagen
+from django import forms
 
 NODEFAULT = object()
 

@@ -1,10 +1,7 @@
 import cacheops
-import os
-
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
 
 from funkwhale_api.music import models, utils
 
@@ -70,8 +67,7 @@ class Command(BaseCommand):
             try:
                 audio_file = tf.get_audio_file()
                 if audio_file:
-                    with audio_file as f:
-                        data = utils.get_audio_file_data(audio_file)
+                    data = utils.get_audio_file_data(audio_file)
                     tf.bitrate = data["bitrate"]
                     tf.duration = data["length"]
                     tf.save(update_fields=["duration", "bitrate"])

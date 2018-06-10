@@ -1,6 +1,5 @@
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
-
 from rest_framework import exceptions
 from rest_framework_jwt import authentication
 from rest_framework_jwt.settings import api_settings

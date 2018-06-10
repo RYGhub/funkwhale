@@ -2,10 +2,10 @@
 Convert django permissions to user permissions in the database,
 following the work done in #152.
 """
-from django.db.models import Q
-from funkwhale_api.users import models
-
 from django.contrib.auth.models import Permission
+from django.db.models import Q
+
+from funkwhale_api.users import models
 
 mapping = {
     "dynamic_preferences.change_globalpreferencemodel": "settings",

@@ -1,7 +1,7 @@
-import musicbrainzngs
 import memoize.djangocache
-
+import musicbrainzngs
 from django.conf import settings
+
 from funkwhale_api import __version__
 
 _api = musicbrainzngs

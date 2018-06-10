@@ -1,16 +1,14 @@
+import uuid
+
 import factory
 import requests
 import requests_http_signature
-import uuid
-
-from django.utils import timezone
 from django.conf import settings
+from django.utils import timezone
 
 from funkwhale_api.factories import registry
 
-from . import keys
-from . import models
-
+from . import keys, models
 
 registry.register(keys.get_key_pair, name="federation.KeyPair")
 

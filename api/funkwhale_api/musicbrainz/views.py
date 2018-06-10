@@ -1,11 +1,9 @@
 from rest_framework import viewsets
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.decorators import list_route
-import musicbrainzngs
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from funkwhale_api.common.permissions import ConditionalAuthentication
-
 
 from .client import api
 

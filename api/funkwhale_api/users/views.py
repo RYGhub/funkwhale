@@ -1,15 +1,12 @@
-from rest_framework.response import Response
-from rest_framework import mixins
-from rest_framework import viewsets
-from rest_framework.decorators import detail_route, list_route
-
-from rest_auth.registration.views import RegisterView as BaseRegisterView
 from allauth.account.adapter import get_adapter
+from rest_auth.registration.views import RegisterView as BaseRegisterView
+from rest_framework import mixins, viewsets
+from rest_framework.decorators import detail_route, list_route
+from rest_framework.response import Response
 
 from funkwhale_api.common import preferences
 
-from . import models
-from . import serializers
+from . import models, serializers
 
 
 class RegisterView(BaseRegisterView):

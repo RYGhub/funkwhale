@@ -1,7 +1,6 @@
-from django.conf.urls import include, url
-from . import views
-
 from rest_framework import routers
+
+from . import views
 
 router = routers.SimpleRouter()
 router.register(r"listenings", views.ListeningViewSet, "listenings")

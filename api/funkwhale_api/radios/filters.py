@@ -1,13 +1,11 @@
 import collections
 
+import persisting_theory
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.urls import reverse_lazy
 
-import persisting_theory
-
 from funkwhale_api.music import models
-from funkwhale_api.taskapp.celery import require_instance
 
 
 class RadioFilterRegistry(persisting_theory.Registry):
@@ -177,7 +175,6 @@ class TagFilter(RadioFilter):
             "type": "list",
             "subtype": "string",
             "autocomplete": reverse_lazy("api:v1:tags-list"),
-            "autocomplete_qs": "",
             "autocomplete_fields": {
                 "remoteValues": "results",
                 "name": "name",

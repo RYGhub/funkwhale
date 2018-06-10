@@ -1,19 +1,12 @@
 from django.db.models import Q
 from django.http import Http404
-
-from rest_framework import generics, mixins, viewsets
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.response import Response
 
 from funkwhale_api.music.serializers import TrackSerializer
-from funkwhale_api.common.permissions import ConditionalAuthentication
 
-from . import models
-from . import filters
-from . import filtersets
-from . import serializers
+from . import filters, filtersets, models, serializers
 
 
 class RadioViewSet(
@@ -108,7 +101,7 @@ class RadioSessionTrackViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet)
             assert request.user == session.user
         except AssertionError:
             return Response(status=status.HTTP_403_FORBIDDEN)
-        track = session.radio.pick()
+        session.radio.pick()
         session_track = session.session_tracks.all().latest("id")
         # self.perform_create(serializer)
         # dirty override here, since we use a different serializer for creation and detail

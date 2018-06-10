@@ -1,13 +1,11 @@
 import datetime
 import os
 import pathlib
-import pytest
 
 from django.core.paginator import Paginator
 from django.utils import timezone
 
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import tasks
+from funkwhale_api.federation import serializers, tasks
 
 
 def test_scan_library_does_nothing_if_federation_disabled(mocker, factories):
@@ -111,11 +109,11 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     lt1 = factories["federation.LibraryTrack"](with_audio_file=True)
     lt2 = factories["federation.LibraryTrack"](with_audio_file=True)
     lt3 = factories["federation.LibraryTrack"](with_audio_file=True)
-    tf1 = factories["music.TrackFile"](accessed_date=timezone.now(), library_track=lt1)
-    tf2 = factories["music.TrackFile"](
+    factories["music.TrackFile"](accessed_date=timezone.now(), library_track=lt1)
+    factories["music.TrackFile"](
         accessed_date=timezone.now() - datetime.timedelta(minutes=61), library_track=lt2
     )
-    tf3 = factories["music.TrackFile"](accessed_date=None, library_track=lt3)
+    factories["music.TrackFile"](accessed_date=None, library_track=lt3)
     path1 = lt1.audio_file.path
     path2 = lt2.audio_file.path
     path3 = lt3.audio_file.path
@@ -146,7 +144,7 @@ def test_clean_federation_music_cache_orphaned(settings, preferences, factories)
     lt = factories["federation.LibraryTrack"](
         with_audio_file=True, audio_file__path=keep_path
     )
-    tf = factories["music.TrackFile"](library_track=lt, accessed_date=timezone.now())
+    factories["music.TrackFile"](library_track=lt, accessed_date=timezone.now())
 
     tasks.clean_music_cache()
 

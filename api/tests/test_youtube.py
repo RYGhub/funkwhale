@@ -1,6 +1,7 @@
-import json
 from collections import OrderedDict
+
 from django.urls import reverse
+
 from funkwhale_api.providers.youtube.client import client
 
 from .data import youtube as api_data
@@ -32,7 +33,7 @@ def test_can_get_search_results_from_funkwhale(preferences, mocker, api_client, 
         "id": "0HxZn6CzOIo",
         "url": "https://www.youtube.com/watch?v=0HxZn6CzOIo",
         "type": "youtube#video",
-        "description": "Make sure to apply adhesive evenly before use. GET IT HERE: http://adhesivewombat.bandcamp.com/album/marsupial-madness Facebook: ...",
+        "description": "Description",
         "channelId": "UCps63j3krzAG4OyXeEyuhFw",
         "title": "AdhesiveWombat - 8 Bit Adventure",
         "channelTitle": "AdhesiveWombat",
@@ -81,7 +82,7 @@ def test_can_send_multiple_queries_at_once_from_funwkhale(
         "id": "0HxZn6CzOIo",
         "url": "https://www.youtube.com/watch?v=0HxZn6CzOIo",
         "type": "youtube#video",
-        "description": "Make sure to apply adhesive evenly before use. GET IT HERE: http://adhesivewombat.bandcamp.com/album/marsupial-madness Facebook: ...",
+        "description": "Description",
         "channelId": "UCps63j3krzAG4OyXeEyuhFw",
         "title": "AdhesiveWombat - 8 Bit Adventure",
         "channelTitle": "AdhesiveWombat",

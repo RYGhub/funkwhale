@@ -1,5 +1,4 @@
 import funkwhale_api
-
 from funkwhale_api.common import session
 
 

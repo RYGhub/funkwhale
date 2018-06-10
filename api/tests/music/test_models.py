@@ -1,9 +1,8 @@
 import os
+
 import pytest
 
-from funkwhale_api.music import models
-from funkwhale_api.music import importers
-from funkwhale_api.music import tasks
+from funkwhale_api.music import importers, models, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -105,7 +104,7 @@ def test_saving_job_updates_batch_status(status, factories, mocker):
 
     assert batch.status == "pending"
 
-    job = factories["music.ImportJob"](batch=batch, status=status)
+    factories["music.ImportJob"](batch=batch, status=status)
 
     batch.refresh_from_db()
 

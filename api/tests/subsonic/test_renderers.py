@@ -24,7 +24,7 @@ def test_xml_renderer_dict_to_xml():
 
 def test_xml_renderer():
     payload = {"hello": "world"}
-    expected = b'<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response hello="world" status="ok" version="1.16.0" xmlns="http://subsonic.org/restapi" />'
+    expected = b'<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response hello="world" status="ok" version="1.16.0" xmlns="http://subsonic.org/restapi" />'  # noqa
 
     renderer = renderers.SubsonicXMLRenderer()
     rendered = renderer.render(payload)

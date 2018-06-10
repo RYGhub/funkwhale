@@ -1,5 +1,4 @@
-from funkwhale_api.federation import library
-from funkwhale_api.federation import serializers
+from funkwhale_api.federation import library, serializers
 
 
 def test_library_scan_from_account_name(mocker, factories):

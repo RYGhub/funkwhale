@@ -1,8 +1,6 @@
 import pytest
-
-from rest_framework.views import APIView
-
 from django.http import Http404
+from rest_framework.views import APIView
 
 from funkwhale_api.common import permissions
 

@@ -1,0 +1,2 @@
+Added Black and flake8 checks in CI to ensure consistent code styling and
+formatting (#297)

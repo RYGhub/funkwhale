@@ -1,6 +1,6 @@
 import os
-import uuid
 import tempfile
+import uuid
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField

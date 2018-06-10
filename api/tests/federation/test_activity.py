@@ -1,7 +1,5 @@
-import uuid
 
-from funkwhale_api.federation import activity
-from funkwhale_api.federation import serializers
+from funkwhale_api.federation import activity, serializers
 
 
 def test_deliver(factories, r_mock, mocker, settings):

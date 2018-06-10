@@ -1,5 +1,4 @@
 import pytest
-
 from django.core.exceptions import ValidationError
 
 from funkwhale_api.music.models import Track
@@ -15,7 +14,7 @@ class NoopFilter(filters.RadioFilter):
 
 
 def test_most_simple_radio_does_not_filter_anything(factories):
-    tracks = factories["music.Track"].create_batch(3)
+    factories["music.Track"].create_batch(3)
     radio = factories["radios.Radio"](config=[{"type": "noop"}])
 
     assert radio.version == 0

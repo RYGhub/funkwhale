@@ -1,13 +1,11 @@
-import pytest
 import datetime
 import os
-import uuid
 
+import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from funkwhale_api.providers.audiofile import tasks
-from funkwhale_api.music import tasks as music_tasks
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 
@@ -20,8 +18,8 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
         "TRACKNUMBER": ["4"],
         "date": ["2012-08-15"],
     }
-    m1 = mocker.patch("mutagen.File", return_value=metadata)
-    m2 = mocker.patch(
+    mocker.patch("mutagen.File", return_value=metadata)
+    mocker.patch(
         "funkwhale_api.music.metadata.Metadata.get_file_type", return_value="OggVorbis"
     )
     track = tasks.import_track_data_from_path(os.path.join(DATA_DIR, "dummy_file.ogg"))
@@ -70,8 +68,8 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
         "musicbrainz_albumid": [album.mbid],
         "musicbrainz_trackid": [track_data["recording"]["id"]],
     }
-    m1 = mocker.patch("mutagen.File", return_value=metadata)
-    m2 = mocker.patch(
+    mocker.patch("mutagen.File", return_value=metadata)
+    mocker.patch(
         "funkwhale_api.music.metadata.Metadata.get_file_type", return_value="OggVorbis"
     )
     track = tasks.import_track_data_from_path(os.path.join(DATA_DIR, "dummy_file.ogg"))
@@ -85,7 +83,7 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
 
 def test_management_command_requires_a_valid_username(factories, mocker):
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    user = factories["users.User"](username="me")
+    factories["users.User"](username="me")
     mocker.patch(
         "funkwhale_api.providers.audiofile.management.commands.import_files.Command.do_import",  # noqa
         return_value=(mocker.MagicMock(), []),
@@ -96,7 +94,7 @@ def test_management_command_requires_a_valid_username(factories, mocker):
 
 
 def test_in_place_import_only_from_music_dir(factories, settings):
-    user = factories["users.User"](username="me")
+    factories["users.User"](username="me")
     settings.MUSIC_DIRECTORY_PATH = "/nope"
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
     with pytest.raises(CommandError):
@@ -128,7 +126,7 @@ def test_import_files_creates_a_batch_and_job(factories, mocker):
 def test_import_files_skip_if_path_already_imported(factories, mocker):
     user = factories["users.User"](username="me")
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    existing = factories["music.TrackFile"](source="file://{}".format(path))
+    factories["music.TrackFile"](source="file://{}".format(path))
 
     call_command("import_files", path, username="me", async=False, interactive=False)
     assert user.imports.count() == 0

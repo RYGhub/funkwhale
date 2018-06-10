@@ -1,14 +1,8 @@
 import arrow
 import pytest
-
-from django.urls import reverse
 from django.core.paginator import Paginator
 
-from funkwhale_api.federation import actors
-from funkwhale_api.federation import keys
-from funkwhale_api.federation import models
-from funkwhale_api.federation import serializers
-from funkwhale_api.federation import utils
+from funkwhale_api.federation import actors, models, serializers, utils
 
 
 def test_actor_serializer_from_ap(db):
@@ -168,7 +162,7 @@ def test_follow_serializer_save(factories):
     actor = factories["federation.Actor"]()
     target = factories["federation.Actor"]()
 
-    data = expected = {
+    data = {
         "id": "https://test.follow",
         "type": "Follow",
         "actor": actor.url,
@@ -191,7 +185,7 @@ def test_follow_serializer_save_validates_on_context(factories):
     target = factories["federation.Actor"]()
     impostor = factories["federation.Actor"]()
 
-    data = expected = {
+    data = {
         "id": "https://test.follow",
         "type": "Follow",
         "actor": actor.url,

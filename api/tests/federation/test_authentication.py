@@ -1,6 +1,4 @@
-from funkwhale_api.federation import authentication
-from funkwhale_api.federation import keys
-from funkwhale_api.federation import signing
+from funkwhale_api.federation import authentication, keys
 
 
 def test_authenticate(factories, mocker, api_request):

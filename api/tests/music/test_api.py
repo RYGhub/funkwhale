@@ -1,13 +1,10 @@
 import json
 import os
+
 import pytest
 from django.urls import reverse
 
-from funkwhale_api.music import models
-from funkwhale_api.musicbrainz import api
-from funkwhale_api.music import serializers
-from funkwhale_api.music import tasks
-
+from funkwhale_api.music import models, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -50,7 +47,7 @@ def test_import_creates_an_import_with_correct_data(mocker, superuser_client):
     mbid = "9968a9d6-8d92-4051-8f76-674e157b6eed"
     video_id = "tPEE9ZwTmy0"
     url = reverse("api:v1:submit-single")
-    response = superuser_client.post(
+    superuser_client.post(
         url,
         {
             "import_url": "https://www.youtube.com/watch?v={0}".format(video_id),
@@ -96,9 +93,7 @@ def test_can_import_whole_album(artists, albums, mocker, superuser_client):
         ],
     }
     url = reverse("api:v1:submit-album")
-    response = superuser_client.post(
-        url, json.dumps(payload), content_type="application/json"
-    )
+    superuser_client.post(url, json.dumps(payload), content_type="application/json")
 
     batch = models.ImportBatch.objects.latest("id")
     assert batch.jobs.count() == 3
@@ -156,9 +151,7 @@ def test_can_import_whole_artist(artists, albums, mocker, superuser_client):
         ],
     }
     url = reverse("api:v1:submit-artist")
-    response = superuser_client.post(
-        url, json.dumps(payload), content_type="application/json"
-    )
+    superuser_client.post(url, json.dumps(payload), content_type="application/json")
 
     batch = models.ImportBatch.objects.latest("id")
     assert batch.jobs.count() == 3

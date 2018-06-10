@@ -1,12 +1,11 @@
 import io
-import pytest
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import serializers
-from funkwhale_api.music import views
 from funkwhale_api.federation import actors
+from funkwhale_api.music import serializers, views
 
 
 @pytest.mark.parametrize(
@@ -106,7 +105,7 @@ def test_can_serve_track_file_as_remote_library(
 ):
     preferences["common__api_authentication_required"] = True
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    follow = factories["federation.Follow"](
+    factories["federation.Follow"](
         approved=True, actor=authenticated_actor, target=library_actor
     )
 
@@ -246,8 +245,8 @@ def test_can_list_import_jobs(factories, superuser_api_client):
 
 
 def test_import_job_stats(factories, superuser_api_client):
-    job1 = factories["music.ImportJob"](status="pending")
-    job2 = factories["music.ImportJob"](status="errored")
+    factories["music.ImportJob"](status="pending")
+    factories["music.ImportJob"](status="errored")
 
     url = reverse("api:v1:import-jobs-stats")
     response = superuser_api_client.get(url)
@@ -258,7 +257,7 @@ def test_import_job_stats(factories, superuser_api_client):
 
 def test_import_job_stats_filter(factories, superuser_api_client):
     job1 = factories["music.ImportJob"](status="pending")
-    job2 = factories["music.ImportJob"](status="errored")
+    factories["music.ImportJob"](status="errored")
 
     url = reverse("api:v1:import-jobs-stats")
     response = superuser_api_client.get(url, {"batch": job1.batch.pk})
@@ -334,7 +333,7 @@ def test_import_job_viewset_get_queryset_upload_filters_user(
     logged_in_api_client.user.permission_upload = True
     logged_in_api_client.user.save()
 
-    job = factories["music.ImportJob"]()
+    factories["music.ImportJob"]()
     url = reverse("api:v1:import-jobs-list")
     response = logged_in_api_client.get(url)
 
@@ -347,7 +346,7 @@ def test_import_batch_viewset_get_queryset_upload_filters_user(
     logged_in_api_client.user.permission_upload = True
     logged_in_api_client.user.save()
 
-    job = factories["music.ImportBatch"]()
+    factories["music.ImportBatch"]()
     url = reverse("api:v1:import-batches-list")
     response = logged_in_api_client.get(url)
 

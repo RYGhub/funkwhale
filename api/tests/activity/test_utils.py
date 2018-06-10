@@ -11,9 +11,9 @@ def test_get_activity(factories):
 
 
 def test_get_activity_honors_privacy_level(factories, anonymous_user):
-    listening = factories["history.Listening"](user__privacy_level="me")
+    factories["history.Listening"](user__privacy_level="me")
     favorite1 = factories["favorites.TrackFavorite"](user__privacy_level="everyone")
-    favorite2 = factories["favorites.TrackFavorite"](user__privacy_level="instance")
+    factories["favorites.TrackFavorite"](user__privacy_level="instance")
 
     objects = list(utils.get_activity(anonymous_user))
     assert objects == [favorite1]

@@ -1,19 +1,14 @@
-import json
 import pytest
-
 from django.urls import reverse
-from django.core.exceptions import ValidationError
-from django.utils import timezone
 
-from funkwhale_api.playlists import models
-from funkwhale_api.playlists import serializers
+from funkwhale_api.playlists import models, serializers
 
 
 def test_can_create_playlist_via_api(logged_in_api_client):
     url = reverse("api:v1:playlists-list")
     data = {"name": "test", "privacy_level": "everyone"}
 
-    response = logged_in_api_client.post(url, data)
+    logged_in_api_client.post(url, data)
 
     playlist = logged_in_api_client.user.playlists.latest("id")
     assert playlist.name == "test"
@@ -22,7 +17,7 @@ def test_can_create_playlist_via_api(logged_in_api_client):
 
 def test_serializer_includes_tracks_count(factories, logged_in_api_client):
     playlist = factories["playlists.Playlist"]()
-    plt = factories["playlists.PlaylistTrack"](playlist=playlist)
+    factories["playlists.PlaylistTrack"](playlist=playlist)
 
     url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.get(url)
@@ -38,7 +33,7 @@ def test_playlist_inherits_user_privacy(logged_in_api_client):
 
     data = {"name": "test"}
 
-    response = logged_in_api_client.post(url, data)
+    logged_in_api_client.post(url, data)
     playlist = user.playlists.latest("id")
     assert playlist.privacy_level == user.privacy_level
 
@@ -80,7 +75,7 @@ def test_only_can_add_track_on_own_playlist_via_api(factories, logged_in_api_cli
 
 def test_deleting_plt_updates_indexes(mocker, factories, logged_in_api_client):
     remove = mocker.spy(models.Playlist, "remove")
-    track = factories["music.Track"]()
+    factories["music.Track"]()
     plt = factories["playlists.PlaylistTrack"](
         index=0, playlist__user=logged_in_api_client.user
     )
@@ -165,7 +160,7 @@ def test_can_add_multiple_tracks_at_once_via_api(
 
 def test_can_clear_playlist_from_api(factories, mocker, logged_in_api_client):
     playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
     url = reverse("api:v1:playlists-clear", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.delete(url)
 
@@ -175,7 +170,7 @@ def test_can_clear_playlist_from_api(factories, mocker, logged_in_api_client):
 
 def test_update_playlist_from_api(factories, mocker, logged_in_api_client):
     playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=5, playlist=playlist)
     url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
     response = logged_in_api_client.patch(url, {"name": "test"})
     playlist.refresh_from_db()

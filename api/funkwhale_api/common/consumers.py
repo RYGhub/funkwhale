@@ -1,4 +1,5 @@
 from channels.generic.websocket import JsonWebsocketConsumer
+
 from funkwhale_api.common import channels
 
 

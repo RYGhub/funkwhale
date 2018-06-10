@@ -4,8 +4,7 @@ from rest_framework.response import Response
 from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.favorites.models import TrackFavorite
 
-from . import serializers
-from . import utils
+from . import serializers, utils
 
 
 class ActivityViewSet(viewsets.GenericViewSet):

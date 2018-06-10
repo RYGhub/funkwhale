@@ -1,11 +1,10 @@
-from funkwhale_api.playlists import models
-from funkwhale_api.playlists import serializers
+from funkwhale_api.playlists import models, serializers
 
 
 def test_cannot_max_500_tracks_per_playlist(factories, preferences):
     preferences["playlists__max_tracks"] = 2
     playlist = factories["playlists.Playlist"]()
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=2, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=2, playlist=playlist)
     track = factories["music.Track"]()
     serializer = serializers.PlaylistTrackWriteSerializer(
         data={"playlist": playlist.pk, "track": track.pk}
@@ -53,7 +52,7 @@ def test_update_insert_is_called_when_index_is_provided(factories, mocker):
     second = factories["playlists.PlaylistTrack"](playlist=playlist, index=1)
     insert = mocker.spy(models.Playlist, "insert")
     factories["playlists.Playlist"]()
-    track = factories["music.Track"]()
+    factories["music.Track"]()
     serializer = serializers.PlaylistTrackWriteSerializer(
         second, data={"playlist": playlist.pk, "track": second.track.pk, "index": 0}
     )

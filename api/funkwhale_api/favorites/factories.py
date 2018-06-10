@@ -1,7 +1,6 @@
 import factory
 
 from funkwhale_api.factories import registry
-
 from funkwhale_api.music.factories import TrackFactory
 from funkwhale_api.users.factories import UserFactory
 

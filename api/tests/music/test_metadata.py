@@ -1,7 +1,8 @@
 import datetime
 import os
-import pytest
 import uuid
+
+import pytest
 
 from funkwhale_api.music import metadata
 

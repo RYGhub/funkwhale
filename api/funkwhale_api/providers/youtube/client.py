@@ -1,9 +1,6 @@
 import threading
 
 from apiclient.discovery import build
-from apiclient.errors import HttpError
-from oauth2client.tools import argparser
-
 from dynamic_preferences.registries import global_preferences_registry as registry
 
 YOUTUBE_API_SERVICE_NAME = "youtube"

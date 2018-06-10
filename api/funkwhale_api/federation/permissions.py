@@ -1,8 +1,8 @@
-from django.conf import settings
 
 from rest_framework.permissions import BasePermission
 
 from funkwhale_api.common import preferences
+
 from . import actors
 
 

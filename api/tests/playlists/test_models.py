@@ -1,5 +1,4 @@
 import pytest
-
 from rest_framework import exceptions
 
 
@@ -107,7 +106,7 @@ def test_remove_update_indexes(factories):
 
 def test_can_insert_many(factories):
     playlist = factories["playlists.Playlist"]()
-    existing = factories["playlists.PlaylistTrack"](playlist=playlist, index=0)
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0)
     tracks = factories["music.Track"].create_batch(size=3)
     plts = playlist.insert_many(tracks)
     for i, plt in enumerate(plts):
@@ -119,7 +118,7 @@ def test_can_insert_many(factories):
 def test_insert_many_honor_max_tracks(preferences, factories):
     preferences["playlists__max_tracks"] = 4
     playlist = factories["playlists.Playlist"]()
-    plts = factories["playlists.PlaylistTrack"].create_batch(size=2, playlist=playlist)
+    factories["playlists.PlaylistTrack"].create_batch(size=2, playlist=playlist)
     track = factories["music.Track"]()
     with pytest.raises(exceptions.ValidationError):
         playlist.insert_many([track, track, track])

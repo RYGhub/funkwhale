@@ -1,30 +1,26 @@
-import os
-import io
-import arrow
 import datetime
-import tempfile
+import os
 import shutil
-import markdown
+import tempfile
 import uuid
 
+import arrow
+import markdown
 from django.conf import settings
-from django.db import models
-from django.core.files.base import ContentFile
 from django.core.files import File
+from django.core.files.base import ContentFile
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-
 from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField
 
-from funkwhale_api import downloader
-from funkwhale_api import musicbrainz
+from funkwhale_api import downloader, musicbrainz
 from funkwhale_api.federation import utils as federation_utils
-from . import importers
-from . import metadata
-from . import utils
+
+from . import importers, metadata, utils
 
 
 class APIModelMixin(models.Model):
@@ -71,7 +67,7 @@ class APIModelMixin(models.Model):
             try:
                 cleaned_key, cleaned_value = mapping.from_musicbrainz(key, value)
                 cleaned_data[cleaned_key] = cleaned_value
-            except KeyError as e:
+            except KeyError:
                 pass
         return cleaned_data
 
@@ -138,9 +134,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         track_cleaned_data = Track.clean_musicbrainz_data(track_data["recording"])
         track_cleaned_data["album"] = instance
         track_cleaned_data["position"] = int(track_data["position"])
-        track = importers.load(
-            Track, track_cleaned_data, track_data, Track.import_hooks
-        )
+        importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
 
 
 class AlbumQuerySet(models.QuerySet):
@@ -265,13 +259,13 @@ class Work(APIModelMixin):
     import_hooks = [import_lyrics, link_recordings]
 
     def fetch_lyrics(self):
-        l = self.lyrics.first()
-        if l:
-            return l
+        lyric = self.lyrics.first()
+        if lyric:
+            return lyric
         data = self.api.get(self.mbid, includes=["url-rels"])["work"]
-        l = import_lyrics(self, {}, data)
+        lyric = import_lyrics(self, {}, data)
 
-        return l
+        return lyric
 
 
 class Lyrics(models.Model):
@@ -612,7 +606,7 @@ def update_request_status(sender, instance, created, **kwargs):
     if not instance.import_request:
         return
 
-    if not created and not "status" in update_fields:
+    if not created and "status" not in update_fields:
         return
 
     r_status = instance.import_request.status

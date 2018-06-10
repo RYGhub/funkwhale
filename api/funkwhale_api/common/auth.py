@@ -1,12 +1,7 @@
 from urllib.parse import parse_qs
 
-import jwt
-
 from django.contrib.auth.models import AnonymousUser
-from django.utils.encoding import smart_text
-
 from rest_framework import exceptions
-from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.authentication import BaseJSONWebTokenAuthentication
 
 from funkwhale_api.users.models import User

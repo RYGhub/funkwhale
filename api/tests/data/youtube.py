@@ -1,5 +1,3 @@
-
-
 search = {}
 
 
@@ -13,7 +11,7 @@ search["8 bit adventure"] = {
             "etag": '"gMxXHe-zinKdE9lTnzKu8vjcmDI/GxK-wHBWUYfrJsd1dijBPTufrVE"',
             "snippet": {
                 "liveBroadcastContent": "none",
-                "description": "Make sure to apply adhesive evenly before use. GET IT HERE: http://adhesivewombat.bandcamp.com/album/marsupial-madness Facebook: ...",
+                "description": "Description",
                 "channelId": "UCps63j3krzAG4OyXeEyuhFw",
                 "title": "AdhesiveWombat - 8 Bit Adventure",
                 "channelTitle": "AdhesiveWombat",

@@ -3,7 +3,6 @@ Populates the database with fake data
 """
 import random
 
-from funkwhale_api.music import models
 from funkwhale_api.music import factories
 
 

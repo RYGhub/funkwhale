@@ -1,5 +1,3 @@
-from django.urls import reverse
-
 from funkwhale_api.instance import stats
 
 
@@ -55,7 +53,7 @@ def test_get(mocker):
         "listenings",
         "music_duration",
     ]
-    mocks = [
+    [
         mocker.patch.object(stats, "get_{}".format(k), return_value=i)
         for i, k in enumerate(keys)
     ]

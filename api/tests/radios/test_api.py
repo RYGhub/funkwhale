@@ -1,11 +1,9 @@
 import json
-import pytest
 
 from django.urls import reverse
 
 from funkwhale_api.music.serializers import TrackSerializer
-from funkwhale_api.radios import filters
-from funkwhale_api.radios import serializers
+from funkwhale_api.radios import filters, serializers
 
 
 def test_can_list_config_options(logged_in_client):

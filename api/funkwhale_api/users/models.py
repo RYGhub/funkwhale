@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import binascii
 import os
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, Permission
-from django.urls import reverse
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from funkwhale_api.common import fields
-from funkwhale_api.common import preferences
+from funkwhale_api.common import fields, preferences
 
 
 def get_token():
@@ -91,7 +90,8 @@ class User(AbstractUser):
             perms[p] = v
         return perms
 
-    def has_permissions(self, *perms, operator="and"):
+    def has_permissions(self, *perms, **kwargs):
+        operator = kwargs.pop("operator", "and")
         if operator not in ["and", "or"]:
             raise ValueError("Invalid operator {}".format(operator))
         permissions = self.get_permissions()

@@ -1,8 +1,7 @@
 import binascii
 import hashlib
 
-from rest_framework import authentication
-from rest_framework import exceptions
+from rest_framework import authentication, exceptions
 
 from funkwhale_api.users.models import User
 

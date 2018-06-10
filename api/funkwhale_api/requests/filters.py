@@ -1,6 +1,7 @@
 import django_filters
 
 from funkwhale_api.common import fields
+
 from . import models
 
 

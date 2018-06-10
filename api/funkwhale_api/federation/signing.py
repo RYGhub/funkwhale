@@ -1,9 +1,9 @@
 import logging
+
 import requests
 import requests_http_signature
 
-from . import exceptions
-from . import utils
+from . import exceptions, utils
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def verify_django(django_request, public_key):
         v = request.headers[h]
         if v:
             request.headers[h] = str(v)
-    prepared_request = request.prepare()
+    request.prepare()
     return verify(request, public_key)
 
 

@@ -1,5 +1,4 @@
 import pytest
-
 from django.urls import reverse
 
 from funkwhale_api.instance import views
@@ -12,9 +11,7 @@ def test_permissions(assert_user_permission, view, permissions):
 
 def test_nodeinfo_endpoint(db, api_client, mocker):
     payload = {"test": "test"}
-    mocked_nodeinfo = mocker.patch(
-        "funkwhale_api.instance.nodeinfo.get", return_value=payload
-    )
+    mocker.patch("funkwhale_api.instance.nodeinfo.get", return_value=payload)
     url = reverse("api:v1:instance:nodeinfo-2.0")
     response = api_client.get(url)
     ct = "application/json; profile=http://nodeinfo.diaspora.software/ns/schema/2.0#; charset=utf-8"  # noqa

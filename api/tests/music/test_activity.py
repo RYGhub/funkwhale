@@ -1,7 +1,3 @@
-from funkwhale_api.users.serializers import UserActivitySerializer
-from funkwhale_api.favorites import serializers
-
-
 def test_get_track_activity_url_mbid(factories):
     track = factories["music.Track"]()
     expected = "https://musicbrainz.org/recording/{}".format(track.mbid)

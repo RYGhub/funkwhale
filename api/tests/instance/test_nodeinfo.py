@@ -1,7 +1,5 @@
-from django.urls import reverse
 
 import funkwhale_api
-
 from funkwhale_api.instance import nodeinfo
 
 
