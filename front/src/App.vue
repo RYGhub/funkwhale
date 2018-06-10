@@ -154,4 +154,15 @@ html, body {
 .floated.buttons .button ~ .dropdown {
   border-left: none;
 }
+
+.ui.icon.header .circular.icon {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.segment-content .button{
+  margin:  0.5em;
+}
+
 </style>
