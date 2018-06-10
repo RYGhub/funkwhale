@@ -259,13 +259,13 @@ class Work(APIModelMixin):
     import_hooks = [import_lyrics, link_recordings]
 
     def fetch_lyrics(self):
-        l = self.lyrics.first()
-        if l:
-            return l
+        lyric = self.lyrics.first()
+        if lyric:
+            return lyric
         data = self.api.get(self.mbid, includes=["url-rels"])["work"]
-        l = import_lyrics(self, {}, data)
+        lyric = import_lyrics(self, {}, data)
 
-        return l
+        return lyric
 
 
 class Lyrics(models.Model):
@@ -606,7 +606,7 @@ def update_request_status(sender, instance, created, **kwargs):
     if not instance.import_request:
         return
 
-    if not created and not "status" in update_fields:
+    if not created and "status" not in update_fields:
         return
 
     r_status = instance.import_request.status

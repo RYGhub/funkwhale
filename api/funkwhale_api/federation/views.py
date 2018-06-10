@@ -1,7 +1,7 @@
 from django import forms
 from django.core import paginator
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.urls import reverse
 from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
@@ -144,7 +144,7 @@ class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
         else:
             try:
                 page_number = int(page)
-            except:
+            except Exception:
                 return response.Response({"page": ["Invalid page number"]}, status=400)
             p = paginator.Paginator(
                 qs, preferences.get("federation__collection_page_size")

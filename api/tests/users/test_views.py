@@ -161,7 +161,7 @@ def test_user_can_request_new_subsonic_token(logged_in_api_client):
     assert response.data == {"subsonic_api_token": user.subsonic_api_token}
 
 
-def test_user_can_get_new_subsonic_token(logged_in_api_client):
+def test_user_can_get_subsonic_token(logged_in_api_client):
     user = logged_in_api_client.user
     user.subsonic_api_token = "test"
     user.save()
@@ -174,24 +174,6 @@ def test_user_can_get_new_subsonic_token(logged_in_api_client):
 
     assert response.status_code == 200
     assert response.data == {"subsonic_api_token": "test"}
-
-
-def test_user_can_request_new_subsonic_token(logged_in_api_client):
-    user = logged_in_api_client.user
-    user.subsonic_api_token = "test"
-    user.save()
-
-    url = reverse(
-        "api:v1:users:users-subsonic-token", kwargs={"username": user.username}
-    )
-
-    response = logged_in_api_client.post(url)
-
-    assert response.status_code == 200
-    user.refresh_from_db()
-    assert user.subsonic_api_token != "test"
-    assert user.subsonic_api_token is not None
-    assert response.data == {"subsonic_api_token": user.subsonic_api_token}
 
 
 def test_user_can_delete_subsonic_token(logged_in_api_client):

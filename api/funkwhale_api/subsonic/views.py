@@ -456,6 +456,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 {"error": {"code": 0, "message": "Invalid payload"}}
             )
         if serializer.validated_data["submission"]:
-            l = serializer.save()
-            record.send(l)
+            listening = serializer.save()
+            record.send(listening)
         return response.Response({})

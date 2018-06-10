@@ -4,7 +4,7 @@ from funkwhale_api.music import lyrics as lyrics_utils
 from funkwhale_api.music import models, tasks
 
 
-def test_works_import_lyrics_if_any(lyricswiki_content, mocker, factories):
+def test_lyrics_tasks(lyricswiki_content, mocker, factories):
     mocker.patch(
         "funkwhale_api.music.lyrics._get_html", return_value=lyricswiki_content
     )
@@ -14,7 +14,7 @@ def test_works_import_lyrics_if_any(lyricswiki_content, mocker, factories):
 
     tasks.fetch_content(lyrics_id=lyrics.pk)
     lyrics.refresh_from_db()
-    self.assertIn("Grab a brush and put on a little makeup", lyrics.content)
+    assert "Grab a brush and put on a little makeup" in lyrics.content
 
 
 def test_clean_content():
@@ -32,10 +32,10 @@ def test_markdown_rendering(factories):
     content = """Hello
 Is it me you're looking for?"""
 
-    l = factories["music.Lyrics"](content=content)
+    lyrics = factories["music.Lyrics"](content=content)
 
     expected = "<p>Hello<br />\nIs it me you're looking for?</p>"
-    assert expected == l.content_rendered
+    assert expected == lyrics.content_rendered
 
 
 def test_works_import_lyrics_if_any(

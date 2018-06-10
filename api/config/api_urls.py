@@ -1,12 +1,10 @@
 from django.conf.urls import include, url
 from dynamic_preferences.api.viewsets import GlobalPreferencesViewSet
-from dynamic_preferences.users.viewsets import UserPreferencesViewSet
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework_jwt import views as jwt_views
 
 from funkwhale_api.activity import views as activity_views
-from funkwhale_api.instance import views as instance_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet

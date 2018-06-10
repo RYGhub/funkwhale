@@ -617,7 +617,7 @@ def lyricswiki_content():
 <head>
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="generator" content="MediaWiki 1.19.24" />
 <meta name="keywords" content="Chop Suey! lyrics,System Of A Down Chop Suey! lyrics,Chop Suey! by System Of A Down lyrics,lyrics,LyricWiki,LyricWikia,lyricwiki,System Of A Down:Chop Suey!,System Of A Down,System Of A Down:Toxicity (2001),Enter Shikari,Enter Shikari:Chop Suey!,&quot;Weird Al&quot; Yankovic,&quot;Weird Al&quot; Yankovic:Angry White Boy Polka,Renard,Renard:Physicality,System Of A Down:Chop Suey!/pt,Daron Malakian" />
 <meta name="description" content="Chop Suey! This song is by System of a Down and appears on the album Toxicity (2001)." />

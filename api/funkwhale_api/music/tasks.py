@@ -256,7 +256,7 @@ def import_job_run(self, import_job, replace=False, use_acoustid=False):
         if not settings.DEBUG:
             try:
                 self.retry(exc=exc, countdown=30, max_retries=3)
-            except:
+            except Exception:
                 mark_errored(exc)
                 raise
         mark_errored(exc)

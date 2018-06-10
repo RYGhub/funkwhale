@@ -35,7 +35,7 @@ def get_actor_data(actor_url):
     response.raise_for_status()
     try:
         return response.json()
-    except:
+    except Exception:
         raise ValueError("Invalid actor payload: {}".format(response.text))
 
 

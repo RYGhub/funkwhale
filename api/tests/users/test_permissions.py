@@ -87,8 +87,6 @@ def test_has_user_permission_logged_in_multiple_or(
     request = api_request.get("/")
     setattr(request, "user", user)
     result = permission.has_permission(request, view)
-    assert (
-        result
-        == user.has_permissions("federation", "library", operator="or")
-        == expected
-    )
+    has_permission_result = user.has_permissions("federation", "library", operator="or")
+
+    assert result == has_permission_result == expected

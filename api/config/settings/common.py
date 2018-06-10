@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import datetime
-import os
 from urllib.parse import urlparse, urlsplit
 
 import environ
@@ -23,7 +22,6 @@ ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("funkwhale_api")
 
 env = environ.Env()
-
 try:
     env.read_env(ROOT_DIR.file(".env"))
 except FileNotFoundError:
@@ -333,12 +331,12 @@ CACHES["default"]["OPTIONS"] = {
 }
 
 
-########## CELERY
+# CELERY
 INSTALLED_APPS += ("funkwhale_api.taskapp.celery.CeleryConfig",)
 CELERY_BROKER_URL = env(
     "CELERY_BROKER_URL", default=env("CACHE_URL", default=CACHE_DEFAULT)
 )
-########## END CELERY
+# END CELERY
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 
 # Your common stuff: Below this line define 3rd party library settings

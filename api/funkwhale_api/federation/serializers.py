@@ -334,7 +334,7 @@ class FollowSerializer(serializers.Serializer):
         return models.Follow.objects.get_or_create(
             actor=self.validated_data["actor"],
             target=self.validated_data["object"],
-            **kwargs,
+            **kwargs,  # noqa
         )[0]
 
     def to_representation(self, instance):
@@ -345,7 +345,6 @@ class FollowSerializer(serializers.Serializer):
             "object": instance.target.url,
             "type": "Follow",
         }
-        return ret
 
 
 class APIFollowSerializer(serializers.ModelSerializer):

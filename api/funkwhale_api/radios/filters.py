@@ -175,7 +175,6 @@ class TagFilter(RadioFilter):
             "type": "list",
             "subtype": "string",
             "autocomplete": reverse_lazy("api:v1:tags-list"),
-            "autocomplete_qs": "",
             "autocomplete_fields": {
                 "remoteValues": "results",
                 "name": "name",

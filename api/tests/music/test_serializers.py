@@ -63,7 +63,6 @@ def test_track_file_serializer(factories, to_api_date):
         "path": tf.path,
         "source": tf.source,
         "filename": tf.filename,
-        "mimetype": tf.mimetype,
         "track": tf.track.pk,
         "duration": tf.duration,
         "mimetype": tf.mimetype,

@@ -4,7 +4,7 @@ import urllib
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, transaction
+from django.db import transaction
 from django.db.models import Count
 from django.db.models.functions import Length
 from django.utils import timezone

@@ -10,6 +10,7 @@ Local settings
 
 from .common import *  # noqa
 
+
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
@@ -49,10 +50,10 @@ INSTALLED_APPS += ("debug_toolbar",)
 # ------------------------------------------------------------------------------
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
-########## CELERY
+# CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
 CELERY_TASK_ALWAYS_EAGER = False
-########## END CELERY
+# END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings
 
