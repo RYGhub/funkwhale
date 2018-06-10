@@ -10,8 +10,10 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
-from urllib.parse import urlsplit
+import datetime
 import os
+from urllib.parse import urlparse, urlsplit
+
 import environ
 from celery.schedules import crontab
 
@@ -315,7 +317,6 @@ CACHE_DEFAULT = "redis://127.0.0.1:6379/0"
 CACHES = {"default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT)}
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
-from urllib.parse import urlparse
 
 cache_url = urlparse(CACHES["default"]["LOCATION"])
 CHANNEL_LAYERS = {
@@ -350,8 +351,6 @@ CELERYBEAT_SCHEDULE = {
         "options": {"expires": 60 * 2},
     }
 }
-
-import datetime
 
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
