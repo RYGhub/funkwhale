@@ -20,7 +20,7 @@ black:
   before_script:
     - pip install black
   script:
-    - black --check api/
+    - black --check --diff api/
 
 flake8:
   image: python:3.6
@@ -30,7 +30,7 @@ flake8:
   before_script:
     - pip install flake8
   script:
-    - flake8 api
+    - flake8 -v api
   cache:
     key: "$CI_PROJECT_ID__flake8_pip_cache"
     paths:

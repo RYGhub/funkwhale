@@ -163,9 +163,7 @@ def test_unstar(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-unstar")
     assert url.endswith("unstar") is True
     track = factories["music.Track"]()
-    factories["favorites.TrackFavorite"](
-        track=track, user=logged_in_api_client.user
-    )
+    factories["favorites.TrackFavorite"](track=track, user=logged_in_api_client.user)
     response = logged_in_api_client.get(url, {"f": f, "id": track.pk})
 
     assert response.status_code == 200

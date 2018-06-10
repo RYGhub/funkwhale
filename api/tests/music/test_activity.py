@@ -1,5 +1,3 @@
-
-
 def test_get_track_activity_url_mbid(factories):
     track = factories["music.Track"]()
     expected = "https://musicbrainz.org/recording/{}".format(track.mbid)
