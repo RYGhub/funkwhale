@@ -218,6 +218,22 @@ def test_get_album_list2(f, db, logged_in_api_client, factories):
 
 
 @pytest.mark.parametrize("f", ["xml", "json"])
+def test_get_album_list2_pagination(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get-album-list2")
+    assert url.endswith("getAlbumList2") is True
+    album1 = factories["music.Album"]()
+    factories["music.Album"]()
+    response = logged_in_api_client.get(
+        url, {"f": f, "type": "newest", "size": 1, "offset": 1}
+    )
+
+    assert response.status_code == 200
+    assert response.data == {
+        "albumList2": {"album": serializers.get_album_list2_data([album1])}
+    }
+
+
+@pytest.mark.parametrize("f", ["xml", "json"])
 def test_search3(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-search3")
     assert url.endswith("search3") is True

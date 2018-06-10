@@ -208,7 +208,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         methods=["get", "post"], url_name="get_album_list2", url_path="getAlbumList2"
     )
     def get_album_list2(self, request, *args, **kwargs):
-        queryset = music_models.Album.objects.with_tracks_count()
+        queryset = music_models.Album.objects.with_tracks_count().order_by(
+            "artist__name"
+        )
         data = request.GET or request.POST
         filterset = filters.AlbumList2FilterSet(data, queryset=queryset)
         queryset = filterset.qs
@@ -223,7 +225,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             size = 50
 
         size = min(size, 500)
-        queryset = queryset[offset:size]
+        queryset = queryset[offset : offset + size]
         data = {"albumList2": {"album": serializers.get_album_list2_data(queryset)}}
         return response.Response(data)
 
@@ -283,7 +285,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 queryset = c["queryset"].filter(
                     utils.get_query(query, c["search_fields"])
                 )
-            queryset = queryset[offset:size]
+            queryset = queryset[offset : offset + size]
             payload["searchResult3"][c["subsonic"]] = c["serializer"](queryset)
         return response.Response(payload)
 
