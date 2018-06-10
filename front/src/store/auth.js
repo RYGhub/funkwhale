@@ -25,7 +25,11 @@ export default {
       state.username = ''
       state.token = ''
       state.tokenData = {}
-      state.availablePermissions = {}
+      state.availablePermissions = {
+        federation: false,
+        library: false,
+        upload: false
+      }
     },
     profile: (state, value) => {
       state.profile = value
@@ -108,8 +112,8 @@ export default {
         commit('authenticated', true)
         commit('profile', data)
         commit('username', data.username)
-        dispatch('favorites/fetch', null, {root: true})
-        dispatch('playlists/fetchOwn', null, {root: true})
+        dispatch('favorites/fetch', null, { root: true })
+        dispatch('playlists/fetchOwn', null, { root: true })
         Object.keys(data.permissions).forEach(function (key) {
           // this makes it easier to check for permissions in templates
           commit('permission', {key, status: data.permissions[String(key)]})

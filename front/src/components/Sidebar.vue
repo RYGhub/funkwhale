@@ -272,7 +272,7 @@ export default {
         this.scrollToCurrent()
       }
     },
-    '$store.state.availablePermissions': {
+    '$store.state.auth.availablePermissions': {
       handler () {
         this.fetchNotificationsCount()
       },
