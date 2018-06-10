@@ -3,8 +3,7 @@ Debian installation
 
 .. note::
 
-    this guide targets Debian 9, which is the latest debian, but should work
-    similarly on Debian 8.
+    This guide targets Debian 9 (Stretch), which is the latest Debian.
 
 External dependencies
 ---------------------
