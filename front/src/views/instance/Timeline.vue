@@ -34,6 +34,7 @@ export default {
   data () {
     return {
       isLoading: false,
+      bridge: null,
       components: {
         'Like': Like,
         'Listen': Listen
@@ -43,6 +44,9 @@ export default {
   created () {
     this.openWebsocket()
     this.fetchEvents()
+  },
+  destroyed () {
+    this.disconnect()
   },
   computed: {
     ...mapState({
@@ -58,14 +62,22 @@ export default {
         self.$store.commit('instance/events', response.data.results)
       })
     },
+    disconnect () {
+      if (!this.bridge) {
+        return
+      }
+      this.bridge.socket.close(1000, 'goodbye', {keepClosed: true})
+    },
     openWebsocket () {
       if (!this.$store.state.auth.authenticated) {
         return
       }
+      this.disconnect()
       let self = this
       let token = this.$store.state.auth.token
       // let token = 'test'
       const bridge = new WebSocketBridge()
+      this.bridge = bridge
       bridge.connect(
         `/api/v1/instance/activity?token=${token}`,
         null,
