@@ -72,16 +72,20 @@ export default {
       }
     },
 
-    appendMany ({state, dispatch}, {tracks, index}) {
+    appendMany ({state, dispatch}, {tracks, index, callback}) {
       logger.default.info('Appending many tracks to the queue', tracks.map(e => { return e.title }))
       if (state.tracks.length === 0) {
         index = 0
       } else {
         index = index || state.tracks.length
       }
-      tracks.forEach((t) => {
-        dispatch('append', {track: t, index: index, skipPlay: true})
+      let total = tracks.length
+      tracks.forEach((t, i) => {
+        let p = dispatch('append', {track: t, index: index, skipPlay: true})
         index += 1
+        if (callback && i + 1 === total) {
+          p.then(callback)
+        }
       })
       dispatch('resume')
     },
@@ -148,13 +152,17 @@ export default {
       // so we replay automatically on next track append
       commit('ended', true)
     },
-    shuffle ({dispatch, commit, state}) {
+    shuffle ({dispatch, commit, state}, callback) {
       let toKeep = state.tracks.slice(0, state.currentIndex + 1)
       let toShuffle = state.tracks.slice(state.currentIndex + 1)
       let shuffled = toKeep.concat(_.shuffle(toShuffle))
       commit('player/currentTime', 0, {root: true})
       commit('tracks', [])
-      dispatch('appendMany', {tracks: shuffled})
+      let params = {tracks: shuffled}
+      if (callback) {
+        params.callback = callback
+      }
+      dispatch('appendMany', params)
     }
   }
 }

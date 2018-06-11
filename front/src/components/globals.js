@@ -12,4 +12,8 @@ import DangerousButton from '@/components/common/DangerousButton'
 
 Vue.component('dangerous-button', DangerousButton)
 
+import Message from '@/components/common/Message'
+
+Vue.component('message', Message)
+
 export default {}
