@@ -97,6 +97,12 @@ for this value. For non-docker installation, you can use any absolute path.
 
 .. note:: This path should not include any trailing slash
 
+.. warning::
+
+   You need to adapt your :ref:`reverse-proxy configuration<reverse-proxy-setup>` to
+   serve the directory pointed by ``MUSIC_DIRECTORY_PATH`` on
+   ``/_protected/music`` URL.
+
 .. _setting-MUSIC_DIRECTORY_SERVE_PATH:
 
 ``MUSIC_DIRECTORY_SERVE_PATH``
