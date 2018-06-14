@@ -74,6 +74,14 @@ Create it like this::
     touch .env
 
 
+Create docker network
+^^^^^^^^^^^^^^^^^^^^
+
+Create the federation network::
+
+    docker network create federation
+
+
 Building the containers
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -193,13 +201,6 @@ This certificate is a wildcard for ``*.funkwhale.test``
 Run a reverse proxy for your instances
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-Create docker network
-^^^^^^^^^^^^^^^^^^^^
-
-Create the federation network::
-
-    docker network create federation
 
 Launch everything
 ^^^^^^^^^^^^^^^^^
