@@ -1,0 +1,15 @@
+Apache2 reverse proxy now supports websockets (tested with Apache 2.4.25) (!252)
+
+Apache support for websocket
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Add this at the beginning of your Apache configuration file::
+
+    Define funkwhale-api-ws ws://localhost:5000
+
+Add this to your Apache configuration file, before the "/api" block::
+
+    # Activating WebSockets
+    ProxyPass "/api/v1/instance/activity" ${funkwhale-api-ws}/api/v1/instance/activity
+
+Websockets may not be supported in older versions of Apache2. Be sure to upgrade to the latest version available.
