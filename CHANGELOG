@@ -10,6 +10,133 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.14.2 (2018-06-16)
+-------------------
+
+.. warning::
+
+    This release contains a fix for a permission issue. You should upgrade
+    as soon as possible. Read the changelog below for more details.
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Enhancements:
+
+- Added feedback on shuffle button (#262)
+- Added multiple warnings in the documentation that you should never run
+  makemigrations yourself (#291)
+- Album cover served in http (#264)
+- Apache2 reverse proxy now supports websockets (tested with Apache 2.4.25)
+  (!252)
+- Display file size in human format during file upload (#289)
+- Switch from BSD-3 licence to AGPL-3 licence (#280)
+
+Bugfixes:
+
+- Ensure radios can only be edited and deleted by their owners (#311)
+- Fixed admin menu not showing after login (#245)
+- Fixed broken pagination in Subsonic API (#295)
+- Fixed duplicated websocket connexion on timeline (#287)
+
+
+Documentation:
+
+- Improved documentation about in-place imports setup (#298)
+
+
+Other:
+
+- Added Black and flake8 checks in CI to ensure consistent code styling and
+  formatting (#297)
+- Added bug and feature issue templates (#299)
+
+
+Permission issues on radios
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Because of an error in the way we checked user permissions on radios,
+public radios could be deleted by any logged-in user, even if they were not
+the owner of the radio.
+
+We recommend instances owners to upgrade as fast as possible to avoid any abuse
+and data loss.
+
+
+Funkwhale is now licenced under AGPL-3
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Following the recent switch made by PixelFed
+(https://github.com/dansup/pixelfed/issues/143), we decided along with
+the community to relicence Funkwhale under the AGPL-3 licence. We did this
+switch for various reasons:
+
+- This is better aligned with other fediverse software
+- It prohibits anyone to distribute closed-source and proprietary forks of Funkwhale
+
+As end users and instance owners, this does not change anything. You can
+continue to use Funkwhale exactly as you did before :)
+
+
+Apache support for websocket
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Up until now, our Apache2 configuration was not working with websockets. This is now
+solved by adding this at the beginning of your Apache2 configuration file::
+
+    Define funkwhale-api-ws ws://localhost:5000
+
+And this, before the "/api" block::
+
+    # Activating WebSockets
+    ProxyPass "/api/v1/instance/activity" ${funkwhale-api-ws}/api/v1/instance/activity
+
+Websockets may not be supported in older versions of Apache2. Be sure to upgrade to the latest version available.
+
+
+Serving album covers in https (Apache2 proxy)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Two issues are addressed here. The first one was about Django replying with
+mixed content (http) when queried for covers. Setting up the `X-Forwarded-Proto`
+allows Django to know that the client is using https, and that the reply must
+be https as well.
+
+Second issue was a problem of permission causing Apache a denied access to
+album cover folder. It is solved by adding another block for this path in
+the Apache configuration file for funkwhale.
+
+Here is how to modify your `funkwhale.conf` apache2 configuration::
+
+  <VirtualHost *:443>
+
+    ...
+    #Add this new line
+    RequestHeader set X-Forwarded-Proto "https"
+    ...
+    # Add this new block below the other <Directory/> blocks
+    # replace /srv/funkwhale/data/media with the path to your media directory
+    # if you're not using the standard layout.
+    <Directory /srv/funkwhale/data/media/albums>
+      Options FollowSymLinks
+      AllowOverride None
+      Require all granted
+    </Directory>
+    ...
+  </VirtualHost>
+
+
+About the makemigrations warning
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You may sometimes get the following warning while applying migrations::
+
+    "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+This is a warning, not an error, and it can be safely ignored.
+Never run the ``makemigrations`` command yourself.
+
+
 0.14.1 (2018-06-06)
 -------------------
 
