@@ -1,0 +1,11 @@
+Ensure radios can only be edited and deleted by their owners (#311)
+
+Permission issues on radios
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Because of an error in the way we checked user permissions on radios,
+public radios could be deleted by any logged-in user, even if they were not
+the owner of the radio.
+
+We recommend instances owners to upgrade as fast as possible to avoid any abuse
+and data loss.
