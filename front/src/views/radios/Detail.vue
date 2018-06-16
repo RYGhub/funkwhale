@@ -17,16 +17,18 @@
         </h2>
         <div class="ui hidden divider"></div>
         <radio-button type="custom" :custom-radio-id="radio.id"></radio-button>
-        <router-link class="ui icon button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
-          <i class="pencil icon"></i>
-          Edit…
-        </router-link>
-        <dangerous-button class="labeled icon" :action="deleteRadio">
-          <i class="trash icon"></i> Delete
-          <p slot="modal-header">Do you want to delete the radio "{{ radio.name }}"?</p>
-          <p slot="modal-content">This will completely delete this radio and cannot be undone.</p>
-          <p slot="modal-confirm">Delete radio</p>
-        </dangerous-button>
+        <template v-if="$store.state.auth.username === radio.user.username">
+          <router-link class="ui icon button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
+            <i class="pencil icon"></i>
+            Edit…
+          </router-link>
+          <dangerous-button class="labeled icon" :action="deleteRadio">
+            <i class="trash icon"></i> Delete
+            <p slot="modal-header">Do you want to delete the radio "{{ radio.name }}"?</p>
+            <p slot="modal-content">This will completely delete this radio and cannot be undone.</p>
+            <p slot="modal-confirm">Delete radio</p>
+          </dangerous-button>
+        </template>
       </div>
     </div>
     <div class="ui vertical stripe segment">
@@ -82,7 +84,7 @@ export default {
       let url = 'radios/radios/' + this.id + '/'
       axios.get(url).then((response) => {
         self.radio = response.data
-        axios.get(url + 'tracks', {params: {page: this.page}}).then((response) => {
+        axios.get(url + 'tracks/', {params: {page: this.page}}).then((response) => {
           this.totalTracks = response.data.count
           this.tracks = response.data.results
         }).then(() => {

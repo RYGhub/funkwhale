@@ -1,9 +1,9 @@
 from django.db.models import Q
-from django.http import Http404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
+from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.music.serializers import TrackSerializer
 
 from . import filters, filtersets, models, serializers
@@ -19,21 +19,25 @@ class RadioViewSet(
 ):
 
     serializer_class = serializers.RadioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        common_permissions.OwnerPermission,
+    ]
     filter_class = filtersets.RadioFilter
+    owner_field = "user"
+    owner_checks = ["write"]
 
     def get_queryset(self):
+        queryset = models.Radio.objects.all()
         query = Q(is_public=True)
         if self.request.user.is_authenticated:
             query |= Q(user=self.request.user)
-        return models.Radio.objects.filter(query)
+        return queryset.filter(query)
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
-        if serializer.instance.user != self.request.user:
-            raise Http404
         return serializer.save(user=self.request.user)
 
     @detail_route(methods=["get"])
