@@ -50,7 +50,7 @@
       <tbody>
         <tr v-for="(file, index) in files" :key="file.id">
           <td>{{ file.name }}</td>
-          <td>{{ file.size }}</td>
+          <td>{{ file.size | humanSize }}</td>
           <td>
             <span v-if="file.error" class="ui red label">
               {{ file.error }}

@@ -6,30 +6,26 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('federation', '0003_auto_20180407_1010'),
-    ]
+    dependencies = [("federation", "0003_auto_20180407_1010")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='followrequest',
-            name='actor',
-        ),
-        migrations.RemoveField(
-            model_name='followrequest',
-            name='target',
-        ),
+        migrations.RemoveField(model_name="followrequest", name="actor"),
+        migrations.RemoveField(model_name="followrequest", name="target"),
         migrations.AddField(
-            model_name='follow',
-            name='approved',
+            model_name="follow",
+            name="approved",
             field=models.NullBooleanField(default=None),
         ),
         migrations.AddField(
-            model_name='library',
-            name='follow',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='library', to='federation.Follow'),
+            model_name="library",
+            name="follow",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="library",
+                to="federation.Follow",
+            ),
         ),
-        migrations.DeleteModel(
-            name='FollowRequest',
-        ),
+        migrations.DeleteModel(name="FollowRequest"),
     ]

@@ -15,10 +15,8 @@ framework.
 """
 import os
 
-
 from django.core.wsgi import get_wsgi_application
 from whitenoise.django import DjangoWhiteNoise
-
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
 # if running multiple sites in the same mod_wsgi process. To fix this, use

@@ -7,6 +7,7 @@ class ASCIIFileSystemStorage(FileSystemStorage):
     """
     Convert unicode characters in name to ASCII characters.
     """
+
     def get_valid_name(self, name):
-        name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+        name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore")
         return super().get_valid_name(name)

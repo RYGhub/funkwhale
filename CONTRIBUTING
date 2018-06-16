@@ -61,16 +61,6 @@ If you do not want to add the ``-f dev.yml`` snippet everytime, you can run this
     export COMPOSE_FILE=dev.yml
 
 
-Building the containers
-^^^^^^^^^^^^^^^^^^^^^^^
-
-On your initial clone, or if there have been some changes in the
-app dependencies, you will have to rebuild your containers. This is done
-via the following command::
-
-    docker-compose -f dev.yml build
-
-
 Creating your env file
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -82,6 +72,24 @@ variables (those will not be commited to the project).
 Create it like this::
 
     touch .env
+
+
+Create docker network
+^^^^^^^^^^^^^^^^^^^^
+
+Create the federation network::
+
+    docker network create federation
+
+
+Building the containers
+^^^^^^^^^^^^^^^^^^^^^^^
+
+On your initial clone, or if there have been some changes in the
+app dependencies, you will have to rebuild your containers. This is done
+via the following command::
+
+    docker-compose -f dev.yml build
 
 
 Database management
@@ -124,7 +132,7 @@ Launch all services
 
 Then you can run everything with::
 
-    docker-compose -f dev.yml up
+    docker-compose -f dev.yml up front api nginx celeryworker
 
 This will launch all services, and output the logs in your current terminal window.
 If you prefer to launch them in the background instead, use the ``-d`` flag, and access the logs when you need it via ``docker-compose -f dev.yml logs --tail=50 --follow``.
@@ -193,13 +201,6 @@ This certificate is a wildcard for ``*.funkwhale.test``
 Run a reverse proxy for your instances
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-Create docker network
-^^^^^^^^^^^^^^^^^^^^
-
-Create the federation network::
-
-    docker network create federation
 
 Launch everything
 ^^^^^^^^^^^^^^^^^

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <sidebar></sidebar>
+    <service-messages v-if="messages.length > 0" />
     <router-view :key="$route.fullPath"></router-view>
     <div class="ui fitted divider"></div>
     <div id="footer" class="ui vertical footer segment">
@@ -44,9 +45,11 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import {mapState} from 'vuex'
 
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
+import ServiceMessages from '@/components/ServiceMessages'
 
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 
@@ -55,7 +58,8 @@ export default {
   components: {
     Sidebar,
     Raven,
-    PlaylistModal
+    PlaylistModal,
+    ServiceMessages
   },
   data () {
     return {
@@ -80,6 +84,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      messages: state => state.ui.messages
+    }),
     version () {
       if (!this.nodeinfo) {
         return null
@@ -114,6 +121,14 @@ html, body {
     margin-left: 350px !important;
   }
   transform: none !important;
+}
+.service-messages {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+  @include media(">desktop") {
+    left: 350px;
+  }
 }
 .main-pusher {
   padding: 1.5rem 0;
@@ -154,4 +169,15 @@ html, body {
 .floated.buttons .button ~ .dropdown {
   border-left: none;
 }
+
+.ui.icon.header .circular.icon {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.segment-content .button{
+  margin:  0.5em;
+}
+
 </style>

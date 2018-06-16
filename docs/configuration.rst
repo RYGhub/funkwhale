@@ -97,6 +97,12 @@ for this value. For non-docker installation, you can use any absolute path.
 
 .. note:: This path should not include any trailing slash
 
+.. warning::
+
+   You need to adapt your :ref:`reverse-proxy configuration<reverse-proxy-setup>` to
+   serve the directory pointed by ``MUSIC_DIRECTORY_PATH`` on
+   ``/_protected/music`` URL.
+
 .. _setting-MUSIC_DIRECTORY_SERVE_PATH:
 
 ``MUSIC_DIRECTORY_SERVE_PATH``
@@ -112,7 +118,7 @@ in your :file:`docker-compose.yml` file::
       - /srv/funkwhale/data/music:/music:ro
 
 Then, the value of :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH` should be
-``/srv/funkwhale/data``. This must be readable by the webserver.
+``/srv/funkwhale/data/music``. This must be readable by the webserver.
 
 On non-docker setup, you don't need to configure this setting.
 

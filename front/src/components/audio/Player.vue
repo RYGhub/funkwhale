@@ -113,7 +113,8 @@
           :disabled="queue.tracks.length === 0"
           :title="$t('Shuffle your queue')"
           class="two wide column control">
-          <i @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          <div v-if="isShuffling" class="ui inline shuffling inverted small active loader"></div>
+          <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
         <div class="one wide column"></div>
         <div
@@ -158,6 +159,7 @@ export default {
   data () {
     let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
     return {
+      isShuffling: false,
       renderAudio: true,
       sliderVolume: this.volume,
       Track: Track,
@@ -173,9 +175,24 @@ export default {
     ...mapActions({
       togglePlay: 'player/togglePlay',
       clean: 'queue/clean',
-      shuffle: 'queue/shuffle',
       updateProgress: 'player/updateProgress'
     }),
+    shuffle () {
+      if (this.isShuffling) {
+        return
+      }
+      let self = this
+      this.isShuffling = true
+      setTimeout(() => {
+        self.$store.dispatch('queue/shuffle', () => {
+          self.isShuffling = false
+          self.$store.commit('ui/addMessage', {
+            content: self.$t('Queue shuffled!'),
+            date: new Date()
+          })
+        })
+      }, 100)
+    },
     next () {
       let self = this
       this.$store.dispatch('queue/next').then(() => {
@@ -400,6 +417,9 @@ export default {
   }
 }
 .ui.feed.icon {
+  margin: 0;
+}
+.shuffling.loader.inline {
   margin: 0;
 }
 

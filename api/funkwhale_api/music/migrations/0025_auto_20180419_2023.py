@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0024_populate_uuid'),
-    ]
+    dependencies = [("music", "0024_populate_uuid")]
 
     operations = [
         migrations.AlterField(
-            model_name='trackfile',
-            name='source',
+            model_name="trackfile",
+            name="source",
             field=models.URLField(blank=True, max_length=500, null=True),
-        ),
+        )
     ]

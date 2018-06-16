@@ -5,29 +5,37 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0006_auto_20180517_2324'),
-    ]
+    dependencies = [("users", "0006_auto_20180517_2324")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='permission_upload',
-            field=models.BooleanField(default=False, verbose_name='Upload new content to the library'),
+            model_name="user",
+            name="permission_upload",
+            field=models.BooleanField(
+                default=False, verbose_name="Upload new content to the library"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='permission_federation',
-            field=models.BooleanField(default=False, help_text='Follow other instances, accept/deny library follow requests...', verbose_name='Manage library federation'),
+            model_name="user",
+            name="permission_federation",
+            field=models.BooleanField(
+                default=False,
+                help_text="Follow other instances, accept/deny library follow requests...",
+                verbose_name="Manage library federation",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='permission_library',
-            field=models.BooleanField(default=False, help_text='Manage library', verbose_name='Manage library'),
+            model_name="user",
+            name="permission_library",
+            field=models.BooleanField(
+                default=False, help_text="Manage library", verbose_name="Manage library"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='permission_settings',
-            field=models.BooleanField(default=False, verbose_name='Manage instance-level settings'),
+            model_name="user",
+            name="permission_settings",
+            field=models.BooleanField(
+                default=False, verbose_name="Manage instance-level settings"
+            ),
         ),
     ]

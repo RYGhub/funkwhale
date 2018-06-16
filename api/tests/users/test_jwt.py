@@ -1,13 +1,10 @@
 import pytest
-import uuid
-
 from jwt.exceptions import DecodeError
 from rest_framework_jwt.settings import api_settings
 
-from funkwhale_api.users.models import User
 
 def test_can_invalidate_token_when_changing_user_secret_key(factories):
-    user = factories['users.User']()
+    user = factories["users.User"]()
     u1 = user.secret_key
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER

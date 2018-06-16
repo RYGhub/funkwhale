@@ -7,7 +7,7 @@ Funkwhale
 
 A self-hosted tribute to Grooveshark.com.
 
-LICENSE: BSD
+LICENSE: AGPL3
 
 Getting help
 ------------

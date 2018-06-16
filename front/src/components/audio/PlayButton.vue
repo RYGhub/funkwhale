@@ -124,18 +124,27 @@ export default {
     add () {
       let self = this
       this.getPlayableTracks().then((tracks) => {
-        self.$store.dispatch('queue/appendMany', {tracks: tracks})
+        self.$store.dispatch('queue/appendMany', {tracks: tracks}).then(() => self.addMessage(tracks))
       })
     },
     addNext (next) {
       let self = this
       let wasEmpty = this.$store.state.queue.tracks.length === 0
       this.getPlayableTracks().then((tracks) => {
-        self.$store.dispatch('queue/appendMany', {tracks: tracks, index: self.$store.state.queue.currentIndex + 1})
+        self.$store.dispatch('queue/appendMany', {tracks: tracks, index: self.$store.state.queue.currentIndex + 1}).then(() => self.addMessage(tracks))
         let goNext = next && !wasEmpty
         if (goNext) {
           self.$store.dispatch('queue/next')
         }
+      })
+    },
+    addMessage (tracks) {
+      if (tracks.length < 1) {
+        return
+      }
+      this.$store.commit('ui/addMessage', {
+        content: this.$t('{% tracks %} tracks were added to your queue.', {tracks: tracks.length}),
+        date: new Date()
       })
     }
   }

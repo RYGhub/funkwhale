@@ -1,8 +1,8 @@
-from django.conf.urls import include, url
+from rest_framework import routers
+
 from . import views
 
-from rest_framework import routers
 router = routers.SimpleRouter()
-router.register(r'listenings', views.ListeningViewSet, 'listenings')
+router.register(r"listenings", views.ListeningViewSet, "listenings")
 
 urlpatterns = router.urls

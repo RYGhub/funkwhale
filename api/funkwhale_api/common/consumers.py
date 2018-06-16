@@ -1,11 +1,12 @@
 from channels.generic.websocket import JsonWebsocketConsumer
+
 from funkwhale_api.common import channels
 
 
 class JsonAuthConsumer(JsonWebsocketConsumer):
     def connect(self):
         try:
-            assert self.scope['user'].pk is not None
+            assert self.scope["user"].pk is not None
         except (AssertionError, AttributeError, KeyError):
             return self.close()
 

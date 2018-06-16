@@ -124,15 +124,6 @@ If everything is fine, you can restart your nginx server with ``service nginx re
 Apache2
 ^^^^^^^
 
-.. note::
-
-    Apache2 support is still very recent and the following features
-    are not working yet:
-
-    - Websocket (used for real-time updates on Instance timeline)
-
-    Those features are not necessary to use your Funkwhale instance.
-
 Ensure you have a recent version of apache2 installed on your server.
 You'll also need the following dependencies::
 

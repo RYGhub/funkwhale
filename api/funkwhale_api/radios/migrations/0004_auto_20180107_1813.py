@@ -11,26 +11,52 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('radios', '0003_auto_20160521_1708'),
+        ("radios", "0003_auto_20160521_1708"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Radio',
+            name="Radio",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('is_public', models.BooleanField(default=False)),
-                ('version', models.PositiveIntegerField(default=0)),
-                ('config', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='radios', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("is_public", models.BooleanField(default=False)),
+                ("version", models.PositiveIntegerField(default=0)),
+                ("config", django.contrib.postgres.fields.jsonb.JSONField()),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="radios",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='radiosession',
-            name='custom_radio',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='sessions', to='radios.Radio'),
+            model_name="radiosession",
+            name="custom_radio",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sessions",
+                to="radios.Radio",
+            ),
         ),
     ]

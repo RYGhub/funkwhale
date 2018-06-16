@@ -1,7 +1,6 @@
 import factory
 
 from funkwhale_api.factories import registry
-
 from funkwhale_api.music.factories import TrackFactory
 from funkwhale_api.users.factories import UserFactory
 
@@ -12,4 +11,4 @@ class TrackFavorite(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
 
     class Meta:
-        model = 'favorites.TrackFavorite'
+        model = "favorites.TrackFavorite"

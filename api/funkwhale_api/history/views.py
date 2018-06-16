@@ -1,20 +1,13 @@
-from rest_framework import generics, mixins, viewsets
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import detail_route
+from rest_framework import mixins, permissions, viewsets
 
 from funkwhale_api.activity import record
-from funkwhale_api.common.permissions import ConditionalAuthentication
 
-from . import models
-from . import serializers
+from . import models, serializers
 
 
 class ListeningViewSet(
-        mixins.CreateModelMixin,
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet):
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
 
     serializer_class = serializers.ListeningSerializer
     queryset = models.Listening.objects.all()
@@ -31,5 +24,5 @@ class ListeningViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['user'] = self.request.user
+        context["user"] = self.request.user
         return context

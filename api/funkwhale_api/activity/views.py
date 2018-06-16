@@ -4,8 +4,7 @@ from rest_framework.response import Response
 from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.favorites.models import TrackFavorite
 
-from . import serializers
-from . import utils
+from . import serializers, utils
 
 
 class ActivityViewSet(viewsets.GenericViewSet):
@@ -17,4 +16,4 @@ class ActivityViewSet(viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         activity = utils.get_activity(user=request.user)
         serializer = self.serializer_class(activity, many=True)
-        return Response({'results': serializer.data}, status=200)
+        return Response({"results": serializer.data}, status=200)

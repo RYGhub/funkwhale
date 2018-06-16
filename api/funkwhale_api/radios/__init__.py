@@ -1,1 +1,0 @@
-from .registries import registry

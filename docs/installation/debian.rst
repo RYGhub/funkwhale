@@ -3,8 +3,7 @@ Debian installation
 
 .. note::
 
-    this guide targets Debian 9, which is the latest debian, but should work
-    similarly on Debian 8.
+    This guide targets Debian 9 (Stretch), which is the latest Debian.
 
 External dependencies
 ---------------------
@@ -23,7 +22,7 @@ default on system. You can install them using:
 .. code-block:: shell
 
     sudo apt-get update
-    sudo apt-get install curl python3-venv git unzip
+    sudo apt-get install curl python3-pip python3-venv git unzip
 
 
 Layout
@@ -90,7 +89,7 @@ First, we'll download the latest api release.
     curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
     unzip "api-|version|.zip" -d extracted
     mv extracted/api/* api/
-    rmdir extracted
+    rm -rf extracted
 
 
 Then we'll download the frontend files:
@@ -240,6 +239,14 @@ This will create the required tables and rows.
     You can safely execute this command any time you want, this will only
     run unapplied migrations.
 
+.. warning::
+
+    You may sometimes get the following warning while applying migrations::
+
+        "Your models have changes that are not yet reflected in a migration, and so won't be applied."
+
+    This is a warning, not an error, and it can be safely ignored.
+    Never run the ``makemigrations`` command yourself.
 
 Create an admin account
 -----------------------

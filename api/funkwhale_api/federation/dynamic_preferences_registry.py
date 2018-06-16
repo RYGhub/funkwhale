@@ -1,80 +1,68 @@
-from django.forms import widgets
 
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
 from funkwhale_api.common import preferences
-federation = types.Section('federation')
+
+federation = types.Section("federation")
 
 
 @global_preferences_registry.register
 class MusicCacheDuration(types.IntPreference):
     show_in_api = True
     section = federation
-    name = 'music_cache_duration'
+    name = "music_cache_duration"
     default = 60 * 24 * 2
-    verbose_name = 'Music cache duration'
+    verbose_name = "Music cache duration"
     help_text = (
-        'How much minutes do you want to keep a copy of federated tracks'
-        'locally? Federated files that were not listened in this interval '
-        'will be erased and refetched from the remote on the next listening.'
+        "How much minutes do you want to keep a copy of federated tracks"
+        "locally? Federated files that were not listened in this interval "
+        "will be erased and refetched from the remote on the next listening."
     )
-    field_kwargs = {
-        'required': False,
-    }
+    field_kwargs = {"required": False}
 
 
 @global_preferences_registry.register
 class Enabled(preferences.DefaultFromSettingMixin, types.BooleanPreference):
     section = federation
-    name = 'enabled'
-    setting = 'FEDERATION_ENABLED'
-    verbose_name = 'Federation enabled'
+    name = "enabled"
+    setting = "FEDERATION_ENABLED"
+    verbose_name = "Federation enabled"
     help_text = (
-        'Use this setting to enable or disable federation logic and API'
-        ' globally.'
+        "Use this setting to enable or disable federation logic and API" " globally."
     )
 
 
 @global_preferences_registry.register
-class CollectionPageSize(
-        preferences.DefaultFromSettingMixin, types.IntPreference):
+class CollectionPageSize(preferences.DefaultFromSettingMixin, types.IntPreference):
     section = federation
-    name = 'collection_page_size'
-    setting = 'FEDERATION_COLLECTION_PAGE_SIZE'
-    verbose_name = 'Federation collection page size'
-    help_text = (
-        'How much items to display in ActivityPub collections.'
-    )
-    field_kwargs = {
-        'required': False,
-    }
+    name = "collection_page_size"
+    setting = "FEDERATION_COLLECTION_PAGE_SIZE"
+    verbose_name = "Federation collection page size"
+    help_text = "How much items to display in ActivityPub collections."
+    field_kwargs = {"required": False}
 
 
 @global_preferences_registry.register
-class ActorFetchDelay(
-        preferences.DefaultFromSettingMixin, types.IntPreference):
+class ActorFetchDelay(preferences.DefaultFromSettingMixin, types.IntPreference):
     section = federation
-    name = 'actor_fetch_delay'
-    setting = 'FEDERATION_ACTOR_FETCH_DELAY'
-    verbose_name = 'Federation actor fetch delay'
+    name = "actor_fetch_delay"
+    setting = "FEDERATION_ACTOR_FETCH_DELAY"
+    verbose_name = "Federation actor fetch delay"
     help_text = (
-        'How much minutes to wait before refetching actors on '
-        'request authentication.'
+        "How much minutes to wait before refetching actors on "
+        "request authentication."
     )
-    field_kwargs = {
-        'required': False,
-    }
+    field_kwargs = {"required": False}
 
 
 @global_preferences_registry.register
-class MusicNeedsApproval(
-        preferences.DefaultFromSettingMixin, types.BooleanPreference):
+class MusicNeedsApproval(preferences.DefaultFromSettingMixin, types.BooleanPreference):
     section = federation
-    name = 'music_needs_approval'
-    setting = 'FEDERATION_MUSIC_NEEDS_APPROVAL'
-    verbose_name = 'Federation music needs approval'
+    name = "music_needs_approval"
+    setting = "FEDERATION_MUSIC_NEEDS_APPROVAL"
+    verbose_name = "Federation music needs approval"
     help_text = (
-        'When true, other federation actors will need your approval'
-        ' before being able to browse your library.'
+        "When true, other federation actors will need your approval"
+        " before being able to browse your library."
     )

@@ -1,29 +1,26 @@
 import datetime
-import factory
-import pytest
-import requests_mock
 import shutil
 import tempfile
 
+import factory
+import pytest
+import requests_mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
 from django.test import client
-
 from dynamic_preferences.registries import global_preferences_registry
-
 from rest_framework import fields as rest_fields
-from rest_framework.test import APIClient
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
-from funkwhale_api.taskapp import celery
 
 
 @pytest.fixture(scope="session", autouse=True)
 def factories_autodiscover():
     from django.apps import apps
     from funkwhale_api import factories
+
     app_names = [app.name for app in apps.app_configs.values()]
     factories.registry.autodiscover(app_names)
 
@@ -44,6 +41,7 @@ def factories(db):
     users.User or music.Track
     """
     from funkwhale_api import factories
+
     for v in factories.registry.values():
         try:
             v._meta.strategy = factory.CREATE_STRATEGY
@@ -60,6 +58,7 @@ def nodb_factories():
     that does not require access to the database
     """
     from funkwhale_api import factories
+
     for v in factories.registry.values():
         try:
             v._meta.strategy = factory.BUILD_STRATEGY
@@ -104,11 +103,11 @@ def logged_in_client(db, factories, client):
     Returns a logged-in, non-API client with an authenticated ``User``
     stored in the ``user`` attribute
     """
-    user = factories['users.User']()
-    assert client.login(username=user.username, password='test')
-    setattr(client, 'user', user)
+    user = factories["users.User"]()
+    assert client.login(username=user.username, password="test")
+    setattr(client, "user", user)
     yield client
-    delattr(client, 'user')
+    delattr(client, "user")
 
 
 @pytest.fixture
@@ -131,12 +130,12 @@ def logged_in_api_client(db, factories, api_client):
     Return a logged-in API client with an authenticated ``User``
     stored in the ``user`` attribute
     """
-    user = factories['users.User']()
-    assert api_client.login(username=user.username, password='test')
+    user = factories["users.User"]()
+    assert api_client.login(username=user.username, password="test")
     api_client.force_authenticate(user=user)
-    setattr(api_client, 'user', user)
+    setattr(api_client, "user", user)
     yield api_client
-    delattr(api_client, 'user')
+    delattr(api_client, "user")
 
 
 @pytest.fixture
@@ -145,11 +144,11 @@ def superuser_api_client(db, factories, api_client):
     Return a logged-in API client with an authenticated superuser
     stored in the ``user`` attribute
     """
-    user = factories['users.SuperUser']()
-    assert api_client.login(username=user.username, password='test')
-    setattr(api_client, 'user', user)
+    user = factories["users.SuperUser"]()
+    assert api_client.login(username=user.username, password="test")
+    setattr(api_client, "user", user)
     yield api_client
-    delattr(api_client, 'user')
+    delattr(api_client, "user")
 
 
 @pytest.fixture
@@ -158,11 +157,11 @@ def superuser_client(db, factories, client):
     Return a logged-in, non-API client with an authenticated ``User``
     stored in the ``user`` attribute
     """
-    user = factories['users.SuperUser']()
-    assert client.login(username=user.username, password='test')
-    setattr(client, 'user', user)
+    user = factories["users.SuperUser"]()
+    assert client.login(username=user.username, password="test")
+    setattr(client, "user", user)
     yield client
-    delattr(client, 'user')
+    delattr(client, "user")
 
 
 @pytest.fixture
@@ -183,7 +182,6 @@ def fake_request():
 
 @pytest.fixture
 def activity_registry():
-    r = record.registry
     state = list(record.registry.items())
     yield record.registry
     record.registry.clear()
@@ -193,7 +191,7 @@ def activity_registry():
 
 @pytest.fixture
 def activity_muted(activity_registry, mocker):
-    yield mocker.patch.object(record, 'send')
+    yield mocker.patch.object(record, "send")
 
 
 @pytest.fixture(autouse=True)
@@ -222,19 +220,21 @@ def authenticated_actor(factories, mocker):
     """
     Returns an authenticated ActivityPub actor
     """
-    actor = factories['federation.Actor']()
+    actor = factories["federation.Actor"]()
     mocker.patch(
-        'funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor',
-        return_value=actor)
+        "funkwhale_api.federation.authentication.SignatureAuthentication.authenticate_actor",
+        return_value=actor,
+    )
     yield actor
 
 
 @pytest.fixture
 def assert_user_permission():
-    def inner(view, permissions, operator='and'):
+    def inner(view, permissions, operator="and"):
         assert HasUserPermission in view.permission_classes
-        assert getattr(view, 'permission_operator', 'and') == operator
+        assert getattr(view, "permission_operator", "and") == operator
         assert set(view.required_permissions) == set(permissions)
+
     return inner
 
 
@@ -247,5 +247,6 @@ def to_api_date():
         if isinstance(value, datetime.date):
             f = rest_fields.DateField()
             return f.to_representation(value)
-        raise ValueError('Invalid value: {}'.format(value))
+        raise ValueError("Invalid value: {}".format(value))
+
     return inner

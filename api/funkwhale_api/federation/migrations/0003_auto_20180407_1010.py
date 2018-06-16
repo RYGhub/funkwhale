@@ -10,7 +10,7 @@ import uuid
 def delete_system_actors(apps, schema_editor):
     """Revert site domain and name to default."""
     Actor = apps.get_model("federation", "Actor")
-    Actor.objects.filter(preferred_username__in=['test', 'library']).delete()
+    Actor.objects.filter(preferred_username__in=["test", "library"]).delete()
 
 
 def backward(apps, schema_editor):
@@ -19,76 +19,168 @@ def backward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('federation', '0002_auto_20180403_1620'),
-    ]
+    dependencies = [("federation", "0002_auto_20180403_1620")]
 
     operations = [
         migrations.RunPython(delete_system_actors, backward),
         migrations.CreateModel(
-            name='Follow',
+            name="Follow",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uuid', models.UUIDField(default=uuid.uuid4, unique=True)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modification_date', models.DateTimeField(auto_now=True)),
-                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='emitted_follows', to='federation.Actor')),
-                ('target', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='received_follows', to='federation.Actor')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("uuid", models.UUIDField(default=uuid.uuid4, unique=True)),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("modification_date", models.DateTimeField(auto_now=True)),
+                (
+                    "actor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="emitted_follows",
+                        to="federation.Actor",
+                    ),
+                ),
+                (
+                    "target",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="received_follows",
+                        to="federation.Actor",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FollowRequest',
+            name="FollowRequest",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('uuid', models.UUIDField(default=uuid.uuid4, unique=True)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modification_date', models.DateTimeField(auto_now=True)),
-                ('approved', models.NullBooleanField(default=None)),
-                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='emmited_follow_requests', to='federation.Actor')),
-                ('target', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='received_follow_requests', to='federation.Actor')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("uuid", models.UUIDField(default=uuid.uuid4, unique=True)),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("modification_date", models.DateTimeField(auto_now=True)),
+                ("approved", models.NullBooleanField(default=None)),
+                (
+                    "actor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="emmited_follow_requests",
+                        to="federation.Actor",
+                    ),
+                ),
+                (
+                    "target",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="received_follow_requests",
+                        to="federation.Actor",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Library',
+            name="Library",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modification_date', models.DateTimeField(auto_now=True)),
-                ('fetched_date', models.DateTimeField(blank=True, null=True)),
-                ('uuid', models.UUIDField(default=uuid.uuid4)),
-                ('url', models.URLField()),
-                ('federation_enabled', models.BooleanField()),
-                ('download_files', models.BooleanField()),
-                ('autoimport', models.BooleanField()),
-                ('tracks_count', models.PositiveIntegerField(blank=True, null=True)),
-                ('actor', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='library', to='federation.Actor')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("modification_date", models.DateTimeField(auto_now=True)),
+                ("fetched_date", models.DateTimeField(blank=True, null=True)),
+                ("uuid", models.UUIDField(default=uuid.uuid4)),
+                ("url", models.URLField()),
+                ("federation_enabled", models.BooleanField()),
+                ("download_files", models.BooleanField()),
+                ("autoimport", models.BooleanField()),
+                ("tracks_count", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "actor",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="library",
+                        to="federation.Actor",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LibraryTrack',
+            name="LibraryTrack",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(unique=True)),
-                ('audio_url', models.URLField()),
-                ('audio_mimetype', models.CharField(max_length=200)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('modification_date', models.DateTimeField(auto_now=True)),
-                ('fetched_date', models.DateTimeField(blank=True, null=True)),
-                ('published_date', models.DateTimeField(blank=True, null=True)),
-                ('artist_name', models.CharField(max_length=500)),
-                ('album_title', models.CharField(max_length=500)),
-                ('title', models.CharField(max_length=500)),
-                ('metadata', django.contrib.postgres.fields.jsonb.JSONField(default={}, max_length=10000)),
-                ('library', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tracks', to='federation.Library')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("url", models.URLField(unique=True)),
+                ("audio_url", models.URLField()),
+                ("audio_mimetype", models.CharField(max_length=200)),
+                (
+                    "creation_date",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("modification_date", models.DateTimeField(auto_now=True)),
+                ("fetched_date", models.DateTimeField(blank=True, null=True)),
+                ("published_date", models.DateTimeField(blank=True, null=True)),
+                ("artist_name", models.CharField(max_length=500)),
+                ("album_title", models.CharField(max_length=500)),
+                ("title", models.CharField(max_length=500)),
+                (
+                    "metadata",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default={}, max_length=10000
+                    ),
+                ),
+                (
+                    "library",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tracks",
+                        to="federation.Library",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='actor',
-            name='followers',
-            field=models.ManyToManyField(related_name='following', through='federation.Follow', to='federation.Actor'),
+            model_name="actor",
+            name="followers",
+            field=models.ManyToManyField(
+                related_name="following",
+                through="federation.Follow",
+                to="federation.Actor",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='follow',
-            unique_together={('actor', 'target')},
+            name="follow", unique_together={("actor", "target")}
         ),
     ]

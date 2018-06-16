@@ -8,13 +8,13 @@ from funkwhale_api.users.models import User
 
 def get():
     return {
-        'users': get_users(),
-        'tracks': get_tracks(),
-        'albums': get_albums(),
-        'artists': get_artists(),
-        'track_favorites': get_track_favorites(),
-        'listenings': get_listenings(),
-        'music_duration': get_music_duration(),
+        "users": get_users(),
+        "tracks": get_tracks(),
+        "albums": get_albums(),
+        "artists": get_artists(),
+        "track_favorites": get_track_favorites(),
+        "listenings": get_listenings(),
+        "music_duration": get_music_duration(),
     }
 
 
@@ -43,9 +43,7 @@ def get_artists():
 
 
 def get_music_duration():
-    seconds = models.TrackFile.objects.aggregate(
-        d=Sum('duration'),
-    )['d']
+    seconds = models.TrackFile.objects.aggregate(d=Sum("duration"))["d"]
     if seconds:
         return seconds / 3600
     return 0

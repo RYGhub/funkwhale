@@ -5,24 +5,28 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0016_trackfile_acoustid_track_id'),
-    ]
+    dependencies = [("music", "0016_trackfile_acoustid_track_id")]
 
     operations = [
         migrations.AddField(
-            model_name='importbatch',
-            name='source',
-            field=models.CharField(choices=[('api', 'api'), ('shell', 'shell')], default='api', max_length=30),
+            model_name="importbatch",
+            name="source",
+            field=models.CharField(
+                choices=[("api", "api"), ("shell", "shell")],
+                default="api",
+                max_length=30,
+            ),
         ),
         migrations.AddField(
-            model_name='importjob',
-            name='audio_file',
-            field=models.FileField(blank=True, max_length=255, null=True, upload_to='imports/%Y/%m/%d'),
+            model_name="importjob",
+            name="audio_file",
+            field=models.FileField(
+                blank=True, max_length=255, null=True, upload_to="imports/%Y/%m/%d"
+            ),
         ),
         migrations.AlterField(
-            model_name='importjob',
-            name='mbid',
+            model_name="importjob",
+            name="mbid",
             field=models.UUIDField(blank=True, editable=False, null=True),
         ),
     ]

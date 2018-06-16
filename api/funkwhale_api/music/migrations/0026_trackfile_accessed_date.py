@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0025_auto_20180419_2023'),
-    ]
+    dependencies = [("music", "0025_auto_20180419_2023")]
 
     operations = [
         migrations.AddField(
-            model_name='trackfile',
-            name='accessed_date',
+            model_name="trackfile",
+            name="accessed_date",
             field=models.DateTimeField(blank=True, null=True),
-        ),
+        )
     ]

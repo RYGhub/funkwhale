@@ -7,11 +7,11 @@ from funkwhale_api.users.factories import UserFactory
 
 @registry.register
 class PlaylistFactory(factory.django.DjangoModelFactory):
-    name = factory.Faker('name')
+    name = factory.Faker("name")
     user = factory.SubFactory(UserFactory)
 
     class Meta:
-        model = 'playlists.Playlist'
+        model = "playlists.Playlist"
 
 
 @registry.register
@@ -20,4 +20,4 @@ class PlaylistTrackFactory(factory.django.DjangoModelFactory):
     track = factory.SubFactory(TrackFactory)
 
     class Meta:
-        model = 'playlists.PlaylistTrack'
+        model = "playlists.PlaylistTrack"

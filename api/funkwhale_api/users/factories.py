@@ -1,15 +1,15 @@
 import factory
-
-from funkwhale_api.factories import registry, ManyToManyFromList
 from django.contrib.auth.models import Permission
+
+from funkwhale_api.factories import ManyToManyFromList, registry
 
 
 @registry.register
 class GroupFactory(factory.django.DjangoModelFactory):
-    name = factory.Sequence(lambda n: 'group-{0}'.format(n))
+    name = factory.Sequence(lambda n: "group-{0}".format(n))
 
     class Meta:
-        model = 'auth.Group'
+        model = "auth.Group"
 
     @factory.post_generation
     def perms(self, create, extracted, **kwargs):
@@ -20,8 +20,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
         if extracted:
             perms = [
                 Permission.objects.get(
-                    content_type__app_label=p.split('.')[0],
-                    codename=p.split('.')[1],
+                    content_type__app_label=p.split(".")[0], codename=p.split(".")[1]
                 )
                 for p in extracted
             ]
@@ -31,15 +30,15 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
 @registry.register
 class UserFactory(factory.django.DjangoModelFactory):
-    username = factory.Sequence(lambda n: 'user-{0}'.format(n))
-    email = factory.Sequence(lambda n: 'user-{0}@example.com'.format(n))
-    password = factory.PostGenerationMethodCall('set_password', 'test')
+    username = factory.Sequence(lambda n: "user-{0}".format(n))
+    email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
+    password = factory.PostGenerationMethodCall("set_password", "test")
     subsonic_api_token = None
-    groups = ManyToManyFromList('groups')
+    groups = ManyToManyFromList("groups")
 
     class Meta:
-        model = 'users.User'
-        django_get_or_create = ('username', )
+        model = "users.User"
+        django_get_or_create = ("username",)
 
     @factory.post_generation
     def perms(self, create, extracted, **kwargs):
@@ -50,8 +49,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         if extracted:
             perms = [
                 Permission.objects.get(
-                    content_type__app_label=p.split('.')[0],
-                    codename=p.split('.')[1],
+                    content_type__app_label=p.split(".")[0], codename=p.split(".")[1]
                 )
                 for p in extracted
             ]
@@ -59,7 +57,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             self.user_permissions.add(*perms)
 
 
-@registry.register(name='users.SuperUser')
+@registry.register(name="users.SuperUser")
 class SuperUserFactory(UserFactory):
     is_staff = True
     is_superuser = True

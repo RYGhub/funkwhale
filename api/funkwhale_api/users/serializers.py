@@ -1,7 +1,7 @@
 from django.conf import settings
-
-from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer as PRS
+from rest_framework import serializers
+
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
@@ -9,35 +9,27 @@ from . import models
 
 class UserActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
-    name = serializers.CharField(source='username')
-    local_id = serializers.CharField(source='username')
+    name = serializers.CharField(source="username")
+    local_id = serializers.CharField(source="username")
 
     class Meta:
         model = models.User
-        fields = [
-            'id',
-            'local_id',
-            'name',
-            'type'
-        ]
+        fields = ["id", "local_id", "name", "type"]
 
     def get_type(self, obj):
-        return 'Person'
+        return "Person"
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ['id', 'username', 'name', 'date_joined']
+        fields = ["id", "username", "name", "date_joined"]
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = [
-            'name',
-            'privacy_level'
-        ]
+        fields = ["name", "privacy_level"]
 
 
 class UserReadSerializer(serializers.ModelSerializer):
@@ -47,15 +39,15 @@ class UserReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
         fields = [
-            'id',
-            'username',
-            'name',
-            'email',
-            'is_staff',
-            'is_superuser',
-            'permissions',
-            'date_joined',
-            'privacy_level',
+            "id",
+            "username",
+            "name",
+            "email",
+            "is_staff",
+            "is_superuser",
+            "permissions",
+            "date_joined",
+            "privacy_level",
         ]
 
     def get_permissions(self, o):
@@ -64,8 +56,4 @@ class UserReadSerializer(serializers.ModelSerializer):
 
 class PasswordResetSerializer(PRS):
     def get_email_options(self):
-        return {
-            'extra_email_context': {
-                'funkwhale_url': settings.FUNKWHALE_URL
-            }
-        }
+        return {"extra_email_context": {"funkwhale_url": settings.FUNKWHALE_URL}}

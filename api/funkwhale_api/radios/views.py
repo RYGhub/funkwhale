@@ -1,48 +1,46 @@
 from django.db.models import Q
-from django.http import Http404
-
-from rest_framework import generics, mixins, viewsets
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.response import Response
 
+from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.music.serializers import TrackSerializer
-from funkwhale_api.common.permissions import ConditionalAuthentication
 
-from . import models
-from . import filters
-from . import filtersets
-from . import serializers
+from . import filters, filtersets, models, serializers
 
 
 class RadioViewSet(
-        mixins.CreateModelMixin,
-        mixins.RetrieveModelMixin,
-        mixins.UpdateModelMixin,
-        mixins.ListModelMixin,
-        mixins.DestroyModelMixin,
-        viewsets.GenericViewSet):
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
 
     serializer_class = serializers.RadioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        common_permissions.OwnerPermission,
+    ]
     filter_class = filtersets.RadioFilter
+    owner_field = "user"
+    owner_checks = ["write"]
 
     def get_queryset(self):
+        queryset = models.Radio.objects.all()
         query = Q(is_public=True)
         if self.request.user.is_authenticated:
             query |= Q(user=self.request.user)
-        return models.Radio.objects.filter(query)
+        return queryset.filter(query)
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
-        if serializer.instance.user != self.request.user:
-            raise Http404
         return serializer.save(user=self.request.user)
 
-    @detail_route(methods=['get'])
+    @detail_route(methods=["get"])
     def tracks(self, request, *args, **kwargs):
         radio = self.get_object()
         tracks = radio.get_candidates().for_nested_serialization()
@@ -52,36 +50,33 @@ class RadioViewSet(
             serializer = TrackSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-    @list_route(methods=['get'])
+    @list_route(methods=["get"])
     def filters(self, request, *args, **kwargs):
         serializer = serializers.FilterSerializer(
-            filters.registry.exposed_filters, many=True)
+            filters.registry.exposed_filters, many=True
+        )
         return Response(serializer.data)
 
-    @list_route(methods=['post'])
+    @list_route(methods=["post"])
     def validate(self, request, *args, **kwargs):
         try:
-            f_list = request.data['filters']
+            f_list = request.data["filters"]
         except KeyError:
-            return Response(
-                {'error': 'You must provide a filters list'}, status=400)
-        data = {
-            'filters': []
-        }
+            return Response({"error": "You must provide a filters list"}, status=400)
+        data = {"filters": []}
         for f in f_list:
             results = filters.test(f)
-            if results['candidates']['sample']:
-                qs = results['candidates']['sample'].for_nested_serialization()
-                results['candidates']['sample'] = TrackSerializer(
-                    qs, many=True).data
-            data['filters'].append(results)
+            if results["candidates"]["sample"]:
+                qs = results["candidates"]["sample"].for_nested_serialization()
+                results["candidates"]["sample"] = TrackSerializer(qs, many=True).data
+            data["filters"].append(results)
 
         return Response(data)
 
 
-class RadioSessionViewSet(mixins.CreateModelMixin,
-                          mixins.RetrieveModelMixin,
-                          viewsets.GenericViewSet):
+class RadioSessionViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
 
     serializer_class = serializers.RadioSessionSerializer
     queryset = models.RadioSession.objects.all()
@@ -93,12 +88,11 @@ class RadioSessionViewSet(mixins.CreateModelMixin,
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['user'] = self.request.user
+        context["user"] = self.request.user
         return context
 
 
-class RadioSessionTrackViewSet(mixins.CreateModelMixin,
-                               viewsets.GenericViewSet):
+class RadioSessionTrackViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.RadioSessionTrackSerializer
     queryset = models.RadioSessionTrack.objects.all()
     permission_classes = [permissions.IsAuthenticated]
@@ -106,20 +100,24 @@ class RadioSessionTrackViewSet(mixins.CreateModelMixin,
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        session = serializer.validated_data['session']
+        session = serializer.validated_data["session"]
         try:
             assert request.user == session.user
         except AssertionError:
             return Response(status=status.HTTP_403_FORBIDDEN)
-        track = session.radio.pick()
-        session_track = session.session_tracks.all().latest('id')
+        session.radio.pick()
+        session_track = session.session_tracks.all().latest("id")
         # self.perform_create(serializer)
         # dirty override here, since we use a different serializer for creation and detail
-        serializer = self.serializer_class(instance=session_track, context=self.get_serializer_context())
+        serializer = self.serializer_class(
+            instance=session_track, context=self.get_serializer_context()
+        )
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action == 'create':
+        if self.action == "create":
             return serializers.RadioSessionTrackSerializerCreate
         return super().get_serializer_class(*args, **kwargs)

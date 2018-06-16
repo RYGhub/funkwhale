@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import os
 
 from django.db import migrations, models
-from funkwhale_api.common.utils import rename_file
 
 
 def rename_files(apps, schema_editor):
@@ -47,15 +45,13 @@ def rewind(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0010_auto_20160920_1742'),
-    ]
+    dependencies = [("music", "0010_auto_20160920_1742")]
 
     operations = [
         migrations.AlterField(
-            model_name='trackfile',
-            name='audio_file',
-            field=models.FileField(upload_to='tracks/%Y/%m/%d', max_length=255),
+            model_name="trackfile",
+            name="audio_file",
+            field=models.FileField(upload_to="tracks/%Y/%m/%d", max_length=255),
         ),
         migrations.RunPython(rename_files, rewind),
     ]

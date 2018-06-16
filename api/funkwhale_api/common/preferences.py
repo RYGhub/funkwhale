@@ -1,8 +1,6 @@
-from django.conf import settings
 from django import forms
-
-from dynamic_preferences import serializers
-from dynamic_preferences import types
+from django.conf import settings
+from dynamic_preferences import serializers, types
 from dynamic_preferences.registries import global_preferences_registry
 
 
@@ -17,7 +15,7 @@ def get(pref):
 
 
 class StringListSerializer(serializers.BaseSerializer):
-    separator = ','
+    separator = ","
     sort = True
 
     @classmethod
@@ -27,8 +25,8 @@ class StringListSerializer(serializers.BaseSerializer):
 
         if type(value) not in [list, tuple]:
             raise cls.exception(
-                "Cannot serialize, value {} is not a list or a tuple".format(
-                    value))
+                "Cannot serialize, value {} is not a list or a tuple".format(value)
+            )
 
         if cls.sort:
             value = sorted(value)
@@ -38,7 +36,7 @@ class StringListSerializer(serializers.BaseSerializer):
     def to_python(cls, value, **kwargs):
         if not value:
             return []
-        return value.split(',')
+        return value.split(",")
 
 
 class StringListPreference(types.BasePreferenceType):
@@ -47,5 +45,5 @@ class StringListPreference(types.BasePreferenceType):
 
     def get_api_additional_data(self):
         d = super(StringListPreference, self).get_api_additional_data()
-        d['choices'] = self.get('choices')
+        d["choices"] = self.get("choices")
         return d
