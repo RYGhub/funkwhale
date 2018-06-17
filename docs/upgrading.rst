@@ -64,9 +64,9 @@ The following example assume your setup match :ref:`frontend-setup`.
     # this assumes you want to upgrade to version "|version|"
     export FUNKWHALE_VERSION="|version|"
     cd /srv/funkwhale
-    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
-    unzip -o front.zip
-    rm front.zip
+    sudo -u funkwhale curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
+    sudo -u funkwhale unzip -o front.zip
+    sudo -u funkwhale rm front.zip
 
 Upgrading the API
 ^^^^^^^^^^^^^^^^^
@@ -76,33 +76,33 @@ match what is described in :doc:`debian`:
 
 .. parsed-literal::
 
-    # stop the services
-    sudo systemctl stop funkwhale.target
-
     # this assumes you want to upgrade to version "|version|"
     export FUNKWALE_VERSION="|version|"
     cd /srv/funkwhale
 
     # download more recent API files
-    curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWALE_VERSION/download?job=build_api"
-    unzip "api-$FUNKWALE_VERSION.zip" -d extracted
-    rm -rf api/ && mv extracted/api .
-    rm -rf extracted
+    sudo -u funkwhale curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWALE_VERSION/download?job=build_api"
+    sudo -u funkwhale unzip "api-$FUNKWALE_VERSION.zip" -d extracted
+    sudo -u funkwhale rm -rf api/ && mv extracted/api .
+    sudo -u funkwhale rm -rf extracted
 
     # update os dependencies
     sudo api/install_os_dependencies.sh install
     # update python dependencies
     source /srv/funkwhale/load_env
-    source /srv/funkwhale/virtualenv/bin/activate
-    pip install -r api/requirements.txt
+    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/pip install -r api/requirements.txt
+
+    # collect static files
+    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py collectstatic --no-input
+
+    # stop the services
+    sudo systemctl stop funkwhale.target
 
     # apply database migrations
-    python api/manage.py migrate
-    # collect static files
-    python api/manage.py collectstatic --no-input
+    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py migrate
 
     # restart the services
-    sudo systemctl restart funkwhale.target
+    sudo systemctl start funkwhale.target
 
 .. warning::
 
