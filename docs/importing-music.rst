@@ -76,6 +76,39 @@ configuration options to ensure the webserver can serve them properly:
 
     Thus, be especially careful when you manipulate the source files.
 
+We recommend you symlink all your music directories into ``/srv/funkwhale/data/music``
+and run the `import_files` command from that directory. This will make it possible
+to use multiple music music directories, without any additional configuration
+on the webserver side.
+
+For instance, if you have a NFS share with your music mounted at ``/media/mynfsshare``,
+you can create a symlink like this::
+
+    ln -s /media/mynfsshare /srv/funkwhale/data/music/nfsshare
+
+And import music from this share with this command::
+
+    python api/manage.py import_files "/srv/funkwhale/data/music/nfsshare/**/*.ogg" --recursive --noinput --in-place
+
+On docker setups, it will require a bit more work, because while the ``/srv/funkwhale/data/music`` is mounted
+in containers, symlinked directories are not. To fix that, in your ``docker-compose.yml`` file, ensure each symlinked
+directory is mounted as a volume as well::
+
+    celeryworker:
+      volumes:
+      - ./data/music:/music:ro
+      - ./data/media:/app/funkwhale_api/media
+      # add your symlinked dirs here
+      - /media/nfsshare:/media/nfsshare:ro
+
+    api:
+      volumes:
+      - ./data/music:/music:ro
+      - ./data/media:/app/funkwhale_api/media
+      # add your symlinked dirs here
+      - /media/nfsshare:/media/nfsshare:ro
+
+
 Album covers
 ^^^^^^^^^^^^
 
