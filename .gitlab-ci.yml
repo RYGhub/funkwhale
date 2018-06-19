@@ -20,7 +20,7 @@ black:
   before_script:
     - pip install black
   script:
-    - black --check --diff api/
+    - black --exclude "/(\.git|\.hg|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|migrations)/" --check --diff api/
 
 flake8:
   image: python:3.6
