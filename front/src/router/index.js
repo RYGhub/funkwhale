@@ -31,6 +31,8 @@ import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
+import AdminUsersBase from '@/views/admin/users/Base'
+import AdminUsersList from '@/views/admin/users/UsersList'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -177,6 +179,17 @@ export default new Router({
           path: 'files',
           name: 'manage.library.files',
           component: AdminLibraryFilesList
+        }
+      ]
+    },
+    {
+      path: '/manage/users',
+      component: AdminUsersBase,
+      children: [
+        {
+          path: '',
+          name: 'manage.users.list',
+          component: AdminUsersList
         }
       ]
     },
