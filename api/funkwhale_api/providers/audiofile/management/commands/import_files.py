@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = "Import audio files mathinc given glob pattern"
 
     def add_arguments(self, parser):
-        parser.add_argument("path", type=str)
+        parser.add_argument("path", nargs="+", type=str)
         parser.add_argument(
             "--recursive",
             action="store_true",
@@ -65,10 +65,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         glob_kwargs = {}
+        matching = []
         if options["recursive"]:
             glob_kwargs["recursive"] = True
         try:
-            matching = sorted(glob.glob(options["path"], **glob_kwargs))
+            for import_path in options["path"]:
+                matching += glob.glob(import_path, **glob_kwargs)
+            matching = sorted(list(set(matching)))
         except TypeError:
             raise Exception("You need Python 3.5 to use the --recursive flag")
 
@@ -109,7 +112,7 @@ class Command(BaseCommand):
                     "No superuser available, please provide a --username"
                 )
 
-        filtered = self.filter_matching(matching, options)
+        filtered = self.filter_matching(matching)
         self.stdout.write("Import summary:")
         self.stdout.write(
             "- {} files found matching this pattern: {}".format(
@@ -153,7 +156,7 @@ class Command(BaseCommand):
             "For details, please refer to import batch #{}".format(batch.pk)
         )
 
-    def filter_matching(self, matching, options):
+    def filter_matching(self, matching):
         sources = ["file://{}".format(p) for p in matching]
         # we skip reimport for path that are already found
         # as a TrackFile.source
