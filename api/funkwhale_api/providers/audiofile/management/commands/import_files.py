@@ -56,6 +56,16 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            "--update",
+            action="store_true",
+            dest="update",
+            default=False,
+            help=(
+                "Use this flag to replace duplicates (tracks with same "
+                "musicbrainz mbid) on import with their newest version."
+            ),
+        )
+        parser.add_argument(
             "--noinput",
             "--no-input",
             action="store_false",
