@@ -1,5 +1,6 @@
 import factory
 from django.contrib.auth.models import Permission
+from django.utils import timezone
 
 from funkwhale_api.factories import ManyToManyFromList, registry
 
@@ -29,6 +30,17 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
+class InvitationFactory(factory.django.DjangoModelFactory):
+    owner = factory.LazyFunction(lambda: UserFactory())
+
+    class Meta:
+        model = "users.Invitation"
+
+    class Params:
+        expired = factory.Trait(expiration_date=factory.LazyFunction(timezone.now))
+
+
+@registry.register
 class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: "user-{0}".format(n))
     email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
@@ -39,6 +51,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "users.User"
         django_get_or_create = ("username",)
+
+    class Params:
+        invited = factory.Trait(invitation=factory.SubFactory(InvitationFactory))
 
     @factory.post_generation
     def perms(self, create, extracted, **kwargs):
