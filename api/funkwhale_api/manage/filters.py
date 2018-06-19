@@ -1,4 +1,3 @@
-
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
@@ -37,3 +36,11 @@ class ManageUserFilterSet(filters.FilterSet):
             "permission_settings",
             "permission_federation",
         ]
+
+
+class ManageInvitationFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(search_fields=["owner__username", "code", "owner__email"])
+
+    class Meta:
+        model = users_models.Invitation
+        fields = ["q"]

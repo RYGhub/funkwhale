@@ -7,6 +7,7 @@ library_router = routers.SimpleRouter()
 library_router.register(r"track-files", views.ManageTrackFileViewSet, "track-files")
 users_router = routers.SimpleRouter()
 users_router.register(r"users", views.ManageUserViewSet, "users")
+users_router.register(r"invitations", views.ManageInvitationViewSet, "invitations")
 
 urlpatterns = [
     url(r"^library/", include((library_router.urls, "instance"), namespace="library")),

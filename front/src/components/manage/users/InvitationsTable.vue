@@ -4,7 +4,7 @@
       <div class="fields">
         <div class="ui field">
           <label>{{ $t('Search') }}</label>
-          <input type="text" v-model="search" placeholder="Search by username, email, name..." />
+          <input type="text" v-model="search" placeholder="Search by username, email, code..." />
         </div>
         <div class="field">
           <i18next tag="label" path="Ordering"/>
@@ -32,44 +32,32 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
-        :action-url="'manage/library/track-files/action/'"
+        :action-url="'manage/users/invitations/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Username') }}</th>
-          <th>{{ $t('Email') }}</th>
-          <th>{{ $t('Account status') }}</th>
-          <th>{{ $t('Sign-up') }}</th>
-          <th>{{ $t('Last activity') }}</th>
-          <th>{{ $t('Permissions') }}</th>
+          <th>{{ $t('Owner') }}</th>
           <th>{{ $t('Status') }}</th>
+          <th>{{ $t('Creation date') }}</th>
+          <th>{{ $t('Expiration date') }}</th>
+          <th>{{ $t('Code') }}</th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
+            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.owner.username }}</router-link>
           </td>
           <td>
-            <span>{{ scope.obj.email }}</span>
+            <span v-if="scope.obj.users.length > 0" class="ui green basic label">{{ $t('Used') }}</span>
+            <span v-else-if="scope.obj.expiration_date < new Date()" class="ui red basic label">{{ $t('Expired') }}</span>
+            <span v-else class="ui basic label">{{ $t('Not used') }}</span>
           </td>
           <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label">{{ $t('Active') }}</span>
-            <span v-else class="ui basic grey label">{{ $t('Inactive') }}</span>
+            <human-date :date="scope.obj.creation_date"></human-date>
           </td>
           <td>
-            <human-date :date="scope.obj.date_joined"></human-date>
+            <human-date :date="scope.obj.expiration_date"></human-date>
           </td>
           <td>
-            <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else>{{ $t('N/A') }}</template>
-          </td>
-          <td>
-            <template v-for="p in permissions">
-              <span class="ui basic tiny label" v-if="scope.obj.permissions[p.code]">{{ p.label }}</span>
-            </template>
-          </td>
-          <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label">{{ $t('Admin') }}</span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label">{{ $t('Staff member') }}</span>
-            <span v-else class="ui basic label">{{ $t('regular user') }}</span>
+            {{ scope.obj.code.toUpperCase() }}
           </td>
         </template>
       </action-table>
@@ -109,7 +97,7 @@ export default {
     ActionTable
   },
   data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-date_joined')
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       time,
       isLoading: false,
@@ -120,9 +108,8 @@ export default {
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['date_joined', 'Sign-up date'],
-        ['last_activity', 'Last activity'],
-        ['username', 'Username']
+        ['expiration_date', 'Expiration date'],
+        ['creation_date', 'Creation date']
       ]
 
     }
@@ -141,7 +128,7 @@ export default {
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/manage/users/users/', {params: params}).then((response) => {
+      axios.get('/manage/users/invitations/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {
@@ -154,29 +141,6 @@ export default {
     }
   },
   computed: {
-    privacyLevels () {
-      return {}
-    },
-    permissions () {
-      return [
-        {
-          'code': 'upload',
-          'label': this.$t('Upload')
-        },
-        {
-          'code': 'library',
-          'label': this.$t('Library')
-        },
-        {
-          'code': 'federation',
-          'label': this.$t('Federation')
-        },
-        {
-          'code': 'settings',
-          'label': this.$t('Settings')
-        }
-      ]
-    },
     actionFilters () {
       var currentFilters = {
         q: this.search

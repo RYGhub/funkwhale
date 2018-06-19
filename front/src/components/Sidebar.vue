@@ -99,7 +99,7 @@
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['settings']"
-              :to="{path: '/manage/users'}">
+              :to="{name: 'manage.users.users.list'}">
               <i class="users icon"></i>{{ $t('Users') }}
             </router-link>
           </div>

@@ -78,6 +78,23 @@ class PermissionsSerializer(serializers.Serializer):
         return {"permissions": o}
 
 
+class ManageUserSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = users_models.User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "name",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "date_joined",
+            "last_activity",
+            "privacy_level",
+        )
+
+
 class ManageUserSerializer(serializers.ModelSerializer):
     permissions = PermissionsSerializer(source="*")
 
@@ -115,3 +132,23 @@ class ManageUserSerializer(serializers.ModelSerializer):
                 update_fields=["permission_{}".format(p) for p in permissions.keys()]
             )
         return instance
+
+
+class ManageInvitationSerializer(serializers.ModelSerializer):
+    users = ManageUserSimpleSerializer(many=True, required=False)
+    owner = ManageUserSimpleSerializer(required=False)
+    code = serializers.CharField(required=False, allow_null=True)
+
+    class Meta:
+        model = users_models.Invitation
+        fields = ("id", "owner", "code", "expiration_date", "creation_date", "users")
+        read_only_fields = ["id", "expiration_date", "owner", "creation_date", "users"]
+
+    def validate_code(self, value):
+        if not value:
+            return value
+        if users_models.Invitation.objects.filter(code=value.lower()).exists():
+            raise serializers.ValidationError(
+                "An invitation with this code already exists"
+            )
+        return value
