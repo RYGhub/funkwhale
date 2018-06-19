@@ -96,6 +96,12 @@
               :to="{path: '/manage/settings'}">
               <i class="settings icon"></i>{{ $t('Settings') }}
             </router-link>
+            <router-link
+              class="item"
+              v-if="$store.state.auth.availablePermissions['settings']"
+              :to="{path: '/manage/users'}">
+              <i class="users icon"></i>{{ $t('Users') }}
+            </router-link>
           </div>
         </div>
       </div>

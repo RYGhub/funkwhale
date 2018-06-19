@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import binascii
+import datetime
 import os
 import uuid
 
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -75,11 +77,13 @@ class User(AbstractUser):
         default=False,
     )
 
+    last_activity = models.DateTimeField(default=None, null=True, blank=True)
+
     def __str__(self):
         return self.username
 
-    def get_permissions(self):
-        defaults = preferences.get("users__default_permissions")
+    def get_permissions(self, defaults=None):
+        defaults = defaults or preferences.get("users__default_permissions")
         perms = {}
         for p in PERMISSIONS:
             v = (
@@ -89,6 +93,10 @@ class User(AbstractUser):
             )
             perms[p] = v
         return perms
+
+    @property
+    def all_permissions(self):
+        return self.get_permissions()
 
     def has_permissions(self, *perms, **kwargs):
         operator = kwargs.pop("operator", "and")
@@ -117,3 +125,16 @@ class User(AbstractUser):
 
     def get_activity_url(self):
         return settings.FUNKWHALE_URL + "/@{}".format(self.username)
+
+    def record_activity(self):
+        """
+        Simply update the last_activity field if current value is too old
+        than a threshold. This is useful to keep a track of inactive accounts.
+        """
+        current = self.last_activity
+        delay = 60 * 15  # fifteen minutes
+        now = timezone.now()
+
+        if current is None or current < now - datetime.timedelta(seconds=delay):
+            self.last_activity = now
+            self.save(update_fields=["last_activity"])

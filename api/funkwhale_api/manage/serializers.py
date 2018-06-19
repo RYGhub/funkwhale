@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import models as music_models
+from funkwhale_api.users import models as users_models
 
 from . import filters
 
@@ -67,3 +68,50 @@ class ManageTrackFileActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
+
+
+class PermissionsSerializer(serializers.Serializer):
+    def to_representation(self, o):
+        return o.get_permissions(defaults=self.context.get("default_permissions"))
+
+    def to_internal_value(self, o):
+        return {"permissions": o}
+
+
+class ManageUserSerializer(serializers.ModelSerializer):
+    permissions = PermissionsSerializer(source="*")
+
+    class Meta:
+        model = users_models.User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "name",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "date_joined",
+            "last_activity",
+            "permissions",
+            "privacy_level",
+        )
+        read_only_fields = [
+            "id",
+            "email",
+            "privacy_level",
+            "username",
+            "date_joined",
+            "last_activity",
+        ]
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        permissions = validated_data.pop("permissions", {})
+        if permissions:
+            for p, value in permissions.items():
+                setattr(instance, "permission_{}".format(p), value)
+            instance.save(
+                update_fields=["permission_{}".format(p) for p in permissions.keys()]
+            )
+        return instance

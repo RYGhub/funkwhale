@@ -61,7 +61,7 @@
         </th>
       </tr>
       <tr>
-        <th>
+        <th v-if="actions.length > 0">
           <div class="ui checkbox">
             <input
               type="checkbox"
@@ -75,7 +75,7 @@
     </thead>
     <tbody v-if="objectsData.count > 0">
       <tr v-for="(obj, index) in objectsData.results">
-        <td class="collapsing">
+        <td v-if="actions.length > 0" class="collapsing">
           <input
             type="checkbox"
             :disabled="checkable.indexOf(obj.id) === -1"
@@ -184,6 +184,9 @@ export default {
       })[0]
     },
     checkable () {
+      if (!this.currentAction) {
+        return []
+      }
       let objs = this.objectsData.results
       let filter = this.currentAction.filterCheckable
       if (filter) {

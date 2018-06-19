@@ -78,3 +78,20 @@ def test_has_permissions_and(args, perms, expected, factories):
 def test_has_permissions_or(args, perms, expected, factories):
     user = factories["users.User"](**args)
     assert user.has_permissions(*perms, operator="or") is expected
+
+
+def test_record_activity(factories, now):
+    user = factories["users.User"]()
+    assert user.last_activity is None
+
+    user.record_activity()
+
+    assert user.last_activity == now
+
+
+def test_record_activity_does_nothing_if_already(factories, now, mocker):
+    user = factories["users.User"](last_activity=now)
+    save = mocker.patch("funkwhale_api.users.models.User.save")
+    user.record_activity()
+
+    save.assert_not_called()
