@@ -2,19 +2,22 @@
   <div class="main pusher" v-title="'Sign Up'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><i18next path="Create a funkwhale account"/></h2>
+        <h2>{{ $t("Create a funkwhale account") }}</h2>
         <form
-          v-if="$store.state.instance.settings.users.registration_enabled.value"
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
+          <p class="ui message" v-if="!$store.state.instance.settings.users.registration_enabled.value">
+            {{ $t('Registration are closed on this instance, you will need an invitation code to signup.') }}
+          </p>
+
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><i18next path="We cannot create your account"/></div>
+            <div class="header">{{ $t("We cannot create your account") }}</div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <i18next tag="label" path="Username"/>
+            <label>{{ $t("Username") }}</label>
             <input
             ref="username"
             required
@@ -24,7 +27,7 @@
             v-model="username">
           </div>
           <div class="field">
-            <i18next tag="label" path="Email"/>
+            <label>{{ $t("Email") }}</label>
             <input
             ref="email"
             required
@@ -33,12 +36,22 @@
             v-model="email">
           </div>
           <div class="field">
-            <i18next tag="label" path="Password"/>
+            <label>{{ $t("Password") }}</label>
             <password-input v-model="password" />
           </div>
-          <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit"><i18next path="Create my account"/></button>
+          <div class="field">
+            <label v-if="!$store.state.instance.settings.users.registration_enabled.value">{{ $t("Invitation code") }}</label>
+            <label v-else>{{ $t("Invitation code (optional)") }}</label>
+            <input
+            :required="!$store.state.instance.settings.users.registration_enabled.value"
+            type="text"
+            :placeholder="$t('Enter your invitation code (case insensitive)')"
+            v-model="invitation">
+          </div>
+          <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit">
+            {{ $t("Create my account") }}
+          </button>
         </form>
-        <i18next v-else tag="p" path="Registration is currently disabled on this instance, please try again later."/>
       </div>
     </div>
   </div>
@@ -51,12 +64,12 @@ import logger from '@/logging'
 import PasswordInput from '@/components/forms/PasswordInput'
 
 export default {
-  name: 'login',
+  props: {
+    invitation: {type: String, required: false, default: null},
+    next: {type: String, default: '/'}
+  },
   components: {
     PasswordInput
-  },
-  props: {
-    next: {type: String, default: '/'}
   },
   data () {
     return {
@@ -85,7 +98,8 @@ export default {
         username: this.username,
         password1: this.password,
         password2: this.password,
-        email: this.email
+        email: this.email,
+        invitation: this.invitation
       }
       return axios.post('auth/registration/', payload).then(response => {
         logger.default.info('Successfully created account')

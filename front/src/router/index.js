@@ -96,7 +96,10 @@ export default new Router({
     {
       path: '/signup',
       name: 'signup',
-      component: Signup
+      component: Signup,
+      props: (route) => ({
+        invitation: route.query.invitation
+      })
     },
     {
       path: '/logout',

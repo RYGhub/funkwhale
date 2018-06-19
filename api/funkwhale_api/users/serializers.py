@@ -1,10 +1,33 @@
 from django.conf import settings
 from rest_auth.serializers import PasswordResetSerializer as PRS
+from rest_auth.registration.serializers import RegisterSerializer as RS
 from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
+
+
+class RegisterSerializer(RS):
+    invitation = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+
+    def validate_invitation(self, value):
+        if not value:
+            return
+
+        try:
+            return models.Invitation.objects.open().get(code=value.lower())
+        except models.Invitation.DoesNotExist:
+            raise serializers.ValidationError("Invalid invitation code")
+
+    def save(self, request):
+        user = super().save(request)
+        if self.validated_data.get("invitation"):
+            user.invitation = self.validated_data.get("invitation")
+            user.save(update_fields=["invitation"])
+        return user
 
 
 class UserActivitySerializer(activity_serializers.ModelSerializer):

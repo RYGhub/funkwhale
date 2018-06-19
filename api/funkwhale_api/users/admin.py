@@ -7,12 +7,12 @@ from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 
-from .models import User
+from . import models
 
 
 class MyUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
-        model = User
+        model = models.User
 
 
 class MyUserCreationForm(UserCreationForm):
@@ -22,7 +22,7 @@ class MyUserCreationForm(UserCreationForm):
     )
 
     class Meta(UserCreationForm.Meta):
-        model = User
+        model = models.User
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -33,7 +33,7 @@ class MyUserCreationForm(UserCreationForm):
         raise forms.ValidationError(self.error_messages["duplicate_username"])
 
 
-@admin.register(User)
+@admin.register(models.User)
 class UserAdmin(AuthUserAdmin):
     form = MyUserChangeForm
     add_form = MyUserCreationForm
@@ -74,3 +74,11 @@ class UserAdmin(AuthUserAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
         (_("Useless fields"), {"fields": ("user_permissions", "groups")}),
     )
+
+
+@admin.register(models.Invitation)
+class InvitationAdmin(admin.ModelAdmin):
+    list_select_related = True
+    list_display = ["owner", "code", "creation_date", "expiration_date"]
+    search_fields = ["owner__username", "code"]
+    readonly_fields = ["expiration_date", "code"]
