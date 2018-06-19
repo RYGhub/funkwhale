@@ -82,8 +82,8 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    def get_permissions(self):
-        defaults = preferences.get("users__default_permissions")
+    def get_permissions(self, defaults=None):
+        defaults = defaults or preferences.get("users__default_permissions")
         perms = {}
         for p in PERMISSIONS:
             v = (
