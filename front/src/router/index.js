@@ -32,6 +32,7 @@ import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
 import AdminUsersBase from '@/views/admin/users/Base'
+import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
@@ -190,6 +191,12 @@ export default new Router({
           path: '',
           name: 'manage.users.list',
           component: AdminUsersList
+        },
+        {
+          path: ':id',
+          name: 'manage.users.detail',
+          component: AdminUsersDetail,
+          props: true
         }
       ]
     },

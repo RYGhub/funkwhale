@@ -45,7 +45,7 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <span>{{ scope.obj.username }}</span>
+            <router-link :to="{name: 'manage.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
           </td>
           <td>
             <span>{{ scope.obj.email }}</span>

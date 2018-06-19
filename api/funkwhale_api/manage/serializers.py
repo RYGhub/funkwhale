@@ -70,8 +70,16 @@ class ManageTrackFileActionSerializer(common_serializers.ActionSerializer):
         return objects.delete()
 
 
+class PermissionsSerializer(serializers.Serializer):
+    def to_representation(self, o):
+        return o.get_permissions(defaults=self.context.get("default_permissions"))
+
+    def to_internal_value(self, o):
+        return {"permissions": o}
+
+
 class ManageUserSerializer(serializers.ModelSerializer):
-    permissions = serializers.SerializerMethodField()
+    permissions = PermissionsSerializer(source="*")
 
     class Meta:
         model = users_models.User
@@ -97,5 +105,13 @@ class ManageUserSerializer(serializers.ModelSerializer):
             "last_activity",
         ]
 
-    def get_permissions(self, o):
-        return o.get_permissions(defaults=self.context.get("default_permissions"))
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        permissions = validated_data.pop("permissions", {})
+        if permissions:
+            for p, value in permissions.items():
+                setattr(instance, "permission_{}".format(p), value)
+            instance.save(
+                update_fields=["permission_{}".format(p) for p in permissions.keys()]
+            )
+        return instance

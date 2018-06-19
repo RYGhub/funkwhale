@@ -94,6 +94,10 @@ class User(AbstractUser):
             perms[p] = v
         return perms
 
+    @property
+    def all_permissions(self):
+        return self.get_permissions()
+
     def has_permissions(self, *perms, **kwargs):
         operator = kwargs.pop("operator", "and")
         if operator not in ["and", "or"]:
