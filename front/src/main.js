@@ -86,11 +86,15 @@ axios.interceptors.response.use(function (response) {
   } else if (error.response.status === 500) {
     error.backendErrors.push('A server error occured')
   } else if (error.response.data) {
-    for (var field in error.response.data) {
-      if (error.response.data.hasOwnProperty(field)) {
-        error.response.data[field].forEach(e => {
-          error.backendErrors.push(e)
-        })
+    if (error.response.data.detail) {
+      error.backendErrors.push(error.response.data.detail)
+    } else {
+      for (var field in error.response.data) {
+        if (error.response.data.hasOwnProperty(field)) {
+          error.response.data[field].forEach(e => {
+            error.backendErrors.push(e)
+          })
+        }
       }
     }
   }
