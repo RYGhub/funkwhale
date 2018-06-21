@@ -146,7 +146,7 @@ class ManageInvitationSerializer(serializers.ModelSerializer):
     def validate_code(self, value):
         if not value:
             return value
-        if users_models.Invitation.objects.filter(code=value.lower()).exists():
+        if users_models.Invitation.objects.filter(code__iexact=value).exists():
             raise serializers.ValidationError(
                 "An invitation with this code already exists"
             )

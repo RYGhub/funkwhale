@@ -52,7 +52,7 @@ def test_can_disable_registration_view(preferences, api_client, db):
 
 def test_can_signup_with_invitation(preferences, factories, api_client):
     url = reverse("rest_register")
-    invitation = factories["users.Invitation"](code="hello")
+    invitation = factories["users.Invitation"](code="Hello")
     data = {
         "username": "test1",
         "email": "test1@test.com",

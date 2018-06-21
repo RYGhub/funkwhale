@@ -152,7 +152,7 @@ class User(AbstractUser):
 
 def generate_code(length=10):
     return "".join(
-        random.SystemRandom().choice(string.ascii_lowercase) for _ in range(length)
+        random.SystemRandom().choice(string.ascii_uppercase) for _ in range(length)
     )
 
 

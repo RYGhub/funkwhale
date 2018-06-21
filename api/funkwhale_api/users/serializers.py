@@ -18,7 +18,7 @@ class RegisterSerializer(RS):
             return
 
         try:
-            return models.Invitation.objects.open().get(code=value.lower())
+            return models.Invitation.objects.open().get(code__iexact=value)
         except models.Invitation.DoesNotExist:
             raise serializers.ValidationError("Invalid invitation code")
 
