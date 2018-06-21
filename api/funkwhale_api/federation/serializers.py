@@ -769,7 +769,7 @@ class CollectionSerializer(serializers.Serializer):
 
 
 class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
-    actions = [common_serializers.Action('import', allow_all=True)]
+    actions = [common_serializers.Action("import", allow_all=True)]
     filterset_class = filters.LibraryTrackFilter
 
     @transaction.atomic

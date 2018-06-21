@@ -70,7 +70,7 @@ def test_can_signup_with_invitation(preferences, factories, api_client):
 
 def test_can_signup_with_invitation_invalid(preferences, factories, api_client):
     url = reverse("rest_register")
-    invitation = factories["users.Invitation"](code="hello")
+    factories["users.Invitation"](code="hello")
     data = {
         "username": "test1",
         "email": "test1@test.com",
