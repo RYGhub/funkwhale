@@ -24,13 +24,13 @@ import RadioBuilder from '@/components/library/radios/Builder'
 import RadioDetail from '@/views/radios/Detail'
 import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
-import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
+import AdminLibraryRequestsList from '@/views/admin/library/RequestsList'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
@@ -184,6 +184,11 @@ export default new Router({
           path: 'files',
           name: 'manage.library.files',
           component: AdminLibraryFilesList
+        },
+        {
+          path: 'requests',
+          name: 'manage.library.requests',
+          component: AdminLibraryRequestsList
         }
       ]
     },
@@ -278,21 +283,7 @@ export default new Router({
           children: [
           ]
         },
-        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true },
-        {
-          path: 'requests/',
-          name: 'library.requests',
-          component: RequestsList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page,
-            defaultStatus: route.query.status || 'any'
-          }),
-          children: [
-          ]
-        }
+        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
       ]
     },
     { path: '*', component: PageNotFound }
