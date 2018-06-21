@@ -2,10 +2,10 @@ from rest_framework import serializers
 
 
 class Action(object):
-    def __init__(self, name, allow_all=False, filters=None):
+    def __init__(self, name, allow_all=False, qs_filter=None):
         self.name = name
         self.allow_all = allow_all
-        self.filters = filters or {}
+        self.qs_filter = qs_filter
 
     def __repr__(self):
         return "<Action {}>".format(self.name)
@@ -65,7 +65,6 @@ class ActionSerializer(serializers.Serializer):
                 "You cannot apply this action on all objects"
             )
         final_filters = data.get("filters", {}) or {}
-        final_filters.update(data["action"].filters)
         if self.filterset_class and final_filters:
             qs_filterset = self.filterset_class(final_filters, queryset=data["objects"])
             try:
@@ -73,6 +72,9 @@ class ActionSerializer(serializers.Serializer):
             except (AssertionError, TypeError):
                 raise serializers.ValidationError("Invalid filters")
             data["objects"] = qs_filterset.qs
+
+        if data["action"].qs_filter:
+            data["objects"] = data["action"].qs_filter(data["objects"])
 
         data["count"] = data["objects"].count()
         if data["count"] < 1:

@@ -10,6 +10,7 @@ from funkwhale_api.manage import serializers, views
         (views.ManageTrackFileViewSet, ["library"], "and"),
         (views.ManageUserViewSet, ["settings"], "and"),
         (views.ManageInvitationViewSet, ["settings"], "and"),
+        (views.ManageImportRequestViewSet, ["library"], "and"),
     ],
 )
 def test_permissions(assert_user_permission, view, permissions, operator):
@@ -63,3 +64,15 @@ def test_invitation_view_create(factories, superuser_api_client, mocker):
 
     assert response.status_code == 201
     assert superuser_api_client.user.invitations.latest("id") is not None
+
+
+def test_music_requests_view(factories, superuser_api_client, mocker):
+    invitations = factories["requests.ImportRequest"].create_batch(size=5)
+    qs = invitations[0].__class__.objects.order_by("-id")
+    url = reverse("api:v1:manage:requests:import-requests-list")
+
+    response = superuser_api_client.get(url, {"sort": "-id"})
+    expected = serializers.ManageImportRequestSerializer(qs, many=True).data
+
+    assert response.data["count"] == len(invitations)
+    assert response.data["results"] == expected

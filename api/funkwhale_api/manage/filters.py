@@ -2,6 +2,7 @@ from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.music import models as music_models
+from funkwhale_api.requests import models as requests_models
 from funkwhale_api.users import models as users_models
 
 
@@ -50,3 +51,13 @@ class ManageInvitationFilterSet(filters.FilterSet):
         if value is None:
             return queryset
         return queryset.open(value)
+
+
+class ManageImportRequestFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(
+        search_fields=["user__username", "albums", "artist_name", "comment"]
+    )
+
+    class Meta:
+        model = requests_models.ImportRequest
+        fields = ["q", "status"]
