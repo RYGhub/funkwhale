@@ -151,3 +151,12 @@ class ManageInvitationSerializer(serializers.ModelSerializer):
                 "An invitation with this code already exists"
             )
         return value
+
+
+class ManageInvitationActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageInvitationFilterSet
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()

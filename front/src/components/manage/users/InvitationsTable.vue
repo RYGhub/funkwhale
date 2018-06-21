@@ -7,7 +7,7 @@
           <input type="text" v-model="search" placeholder="Search by username, email, code..." />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label>{{ $t("Ordering") }}</label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,10 +15,11 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
-          <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">{{ $t('Ascending') }}</option>
-            <option value="-">{{ $t('Descending') }}</option>
+          <label>{{ $t("Status") }}</label>
+          <select class="ui dropdown" v-model="isOpen">
+            <option :value="null">{{ $t('All') }}</option>
+            <option :value="true">{{ $t('Open') }}</option>
+            <option :value="false">{{ $t('Expired/used') }}</option>
           </select>
         </div>
       </div>
@@ -47,7 +48,7 @@
           </td>
           <td>
             <span v-if="scope.obj.users.length > 0" class="ui green basic label">{{ $t('Used') }}</span>
-            <span v-else-if="scope.obj.expiration_date < new Date()" class="ui red basic label">{{ $t('Expired') }}</span>
+            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label">{{ $t('Expired') }}</span>
             <span v-else class="ui basic label">{{ $t('Not used') }}</span>
           </td>
           <td>
@@ -81,8 +82,8 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
 import _ from 'lodash'
-import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
@@ -99,12 +100,13 @@ export default {
   data () {
     let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
-      time,
+      moment,
       isLoading: false,
       result: null,
       page: 1,
       paginateBy: 50,
       search: '',
+      isOpen: null,
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
@@ -123,6 +125,7 @@ export default {
         'page': this.page,
         'page_size': this.paginateBy,
         'q': this.search,
+        'is_open': this.isOpen,
         'ordering': this.getOrderingAsString()
       }, this.filters)
       let self = this
@@ -153,11 +156,13 @@ export default {
     },
     actions () {
       return [
-        // {
-        //   name: 'delete',
-        //   label: this.$t('Delete'),
-        //   isDangerous: true
-        // }
+        {
+          name: 'delete',
+          label: this.$t('Delete'),
+          filterCheckable: (obj) => {
+            return obj.users.length === 0 && moment().isBefore(obj.expiration_date)
+          }
+        }
       ]
     }
   },
@@ -170,9 +175,15 @@ export default {
       this.fetchData()
     },
     ordering () {
+      this.page = 1
+      this.fetchData()
+    },
+    isOpen () {
+      this.page = 1
       this.fetchData()
     },
     orderingDirection () {
+      this.page = 1
       this.fetchData()
     }
   }

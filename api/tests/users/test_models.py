@@ -118,3 +118,12 @@ def test_can_filter_open_invitations(factories):
 
     assert models.Invitation.objects.count() == 3
     assert list(models.Invitation.objects.open()) == [okay]
+
+
+def test_can_filter_closed_invitations(factories):
+    factories["users.Invitation"]()
+    expired = factories["users.Invitation"](expired=True)
+    used = factories["users.User"](invited=True).invitation
+
+    assert models.Invitation.objects.count() == 3
+    assert list(models.Invitation.objects.open(False)) == [expired, used]

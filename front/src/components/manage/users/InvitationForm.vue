@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form v-if="!over" class="ui form" @submit.prevent="submit">
+    <form class="ui form" @submit.prevent="submit">
       <div v-if="errors.length > 0" class="ui negative message">
         <div class="header">{{ $t('Error while creating invitation') }}</div>
         <ul class="list">

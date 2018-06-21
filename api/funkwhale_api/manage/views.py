@@ -86,3 +86,13 @@ class ManageInvitationViewSet(
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    @list_route(methods=["post"])
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageInvitationActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)

@@ -40,7 +40,13 @@ class ManageUserFilterSet(filters.FilterSet):
 
 class ManageInvitationFilterSet(filters.FilterSet):
     q = fields.SearchFilter(search_fields=["owner__username", "code", "owner__email"])
+    is_open = filters.BooleanFilter(method="filter_is_open")
 
     class Meta:
         model = users_models.Invitation
-        fields = ["q"]
+        fields = ["q", "is_open"]
+
+    def filter_is_open(self, queryset, field_name, value):
+        if value is None:
+            return queryset
+        return queryset.open(value)

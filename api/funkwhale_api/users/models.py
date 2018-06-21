@@ -157,12 +157,13 @@ def generate_code(length=10):
 
 
 class InvitationQuerySet(models.QuerySet):
-    def open(self):
+    def open(self, include=True):
         now = timezone.now()
         qs = self.annotate(_users=models.Count("users"))
-        qs = qs.filter(_users=0)
-        qs = qs.exclude(expiration_date__lte=now)
-        return qs
+        query = models.Q(_users=0, expiration_date__gt=now)
+        if include:
+            return qs.filter(query)
+        return qs.exclude(query)
 
 
 class Invitation(models.Model):
