@@ -27,8 +27,8 @@ class MyUserCreationForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data["username"]
         try:
-            User.objects.get(username=username)
-        except User.DoesNotExist:
+            models.User.objects.get(username=username)
+        except models.User.DoesNotExist:
             return username
         raise forms.ValidationError(self.error_messages["duplicate_username"])
 
