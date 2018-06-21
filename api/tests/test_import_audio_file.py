@@ -103,6 +103,18 @@ def test_in_place_import_only_from_music_dir(factories, settings):
         )
 
 
+def test_import_with_multiple_argument(factories, mocker):
+    factories["users.User"](username="me")
+    path1 = os.path.join(DATA_DIR, "dummy_file.ogg")
+    path2 = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
+    mocked_filter = mocker.patch(
+        "funkwhale_api.providers.audiofile.management.commands.import_files.Command.filter_matching",
+        return_value=({"new": [], "skipped": []}),
+    )
+    call_command("import_files", path1, path2, username="me", interactive=False)
+    mocked_filter.assert_called_once_with([path1, path2])
+
+
 def test_import_files_creates_a_batch_and_job(factories, mocker):
     m = mocker.patch("funkwhale_api.music.tasks.import_job_run")
     user = factories["users.User"](username="me")
