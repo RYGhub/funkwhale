@@ -36,7 +36,7 @@
               <div class="count field">
                 <span v-if="selectAll">{{ $t('{% count %} on {% total %} selected', {count: objectsData.count, total: objectsData.count}) }}</span>
                 <span v-else>{{ $t('{% count %} on {% total %} selected', {count: checked.length, total: objectsData.count}) }}</span>
-                <template v-if="!currentAction.isDangerous && checkable.length === checked.length">
+                <template v-if="!currentAction.isDangerous && checkable.length > 0 && checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
                     {{ $t('Select all {% total %} elements', {total: objectsData.count}) }}
                   </a>
@@ -157,6 +157,7 @@ export default {
       let self = this
       self.actionLoading = true
       self.result = null
+      self.actionErrors = []
       let payload = {
         action: this.currentActionName,
         filters: this.filters

@@ -11,7 +11,7 @@ class TestActionFilterSet(django_filters.FilterSet):
 
 
 class TestSerializer(serializers.ActionSerializer):
-    actions = ["test"]
+    actions = [serializers.Action("test", allow_all=True)]
     filterset_class = TestActionFilterSet
 
     def handle_test(self, objects):
@@ -19,13 +19,23 @@ class TestSerializer(serializers.ActionSerializer):
 
 
 class TestDangerousSerializer(serializers.ActionSerializer):
-    actions = ["test", "test_dangerous"]
-    dangerous_actions = ["test_dangerous"]
+    actions = [
+        serializers.Action("test", allow_all=True),
+        serializers.Action("test_dangerous"),
+    ]
 
     def handle_test(self, objects):
         pass
 
     def handle_test_dangerous(self, objects):
+        pass
+
+
+class TestDeleteOnlyInactiveSerializer(serializers.ActionSerializer):
+    actions = [serializers.Action("test", allow_all=True, filters={"is_active": False})]
+    filterset_class = TestActionFilterSet
+
+    def handle_test(self, objects):
         pass
 
 
@@ -52,7 +62,7 @@ def test_action_serializers_objects_clean_ids(factories):
     data = {"objects": [user1.pk], "action": "test"}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
 
-    assert serializer.is_valid() is True
+    assert serializer.is_valid(raise_exception=True) is True
     assert list(serializer.validated_data["objects"]) == [user1]
 
 
@@ -63,7 +73,7 @@ def test_action_serializers_objects_clean_all(factories):
     data = {"objects": "all", "action": "test"}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
 
-    assert serializer.is_valid() is True
+    assert serializer.is_valid(raise_exception=True) is True
     assert list(serializer.validated_data["objects"]) == [user1, user2]
 
 
@@ -75,7 +85,7 @@ def test_action_serializers_save(factories, mocker):
     data = {"objects": "all", "action": "test"}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
 
-    assert serializer.is_valid() is True
+    assert serializer.is_valid(raise_exception=True) is True
     result = serializer.save()
     assert result == {"updated": 2, "action": "test", "result": {"hello": "world"}}
     handler.assert_called_once()
@@ -88,7 +98,7 @@ def test_action_serializers_filterset(factories):
     data = {"objects": "all", "action": "test", "filters": {"is_active": True}}
     serializer = TestSerializer(data, queryset=models.User.objects.all())
 
-    assert serializer.is_valid() is True
+    assert serializer.is_valid(raise_exception=True) is True
     assert list(serializer.validated_data["objects"]) == [user2]
 
 
@@ -109,9 +119,14 @@ def test_dangerous_actions_refuses_all(factories):
     assert "non_field_errors" in serializer.errors
 
 
-def test_dangerous_actions_refuses_not_listed(factories):
-    factories["users.User"]()
-    data = {"objects": "all", "action": "test"}
-    serializer = TestDangerousSerializer(data, queryset=models.User.objects.all())
+def test_action_serializers_can_require_filter(factories):
+    user1 = factories["users.User"](is_active=False)
+    factories["users.User"](is_active=True)
 
-    assert serializer.is_valid() is True
+    data = {"objects": "all", "action": "test"}
+    serializer = TestDeleteOnlyInactiveSerializer(
+        data, queryset=models.User.objects.all()
+    )
+
+    assert serializer.is_valid(raise_exception=True) is True
+    assert list(serializer.validated_data["objects"]) == [user1]

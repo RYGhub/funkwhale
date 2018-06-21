@@ -34,6 +34,7 @@ import AdminLibraryFilesList from '@/views/admin/library/FilesList'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
+import AdminInvitationsList from '@/views/admin/users/InvitationsList'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -96,7 +97,10 @@ export default new Router({
     {
       path: '/signup',
       name: 'signup',
-      component: Signup
+      component: Signup,
+      props: (route) => ({
+        invitation: route.query.invitation
+      })
     },
     {
       path: '/logout',
@@ -188,15 +192,20 @@ export default new Router({
       component: AdminUsersBase,
       children: [
         {
-          path: '',
-          name: 'manage.users.list',
+          path: 'users',
+          name: 'manage.users.users.list',
           component: AdminUsersList
         },
         {
-          path: ':id',
-          name: 'manage.users.detail',
+          path: 'users/:id',
+          name: 'manage.users.users.detail',
           component: AdminUsersDetail,
           props: true
+        },
+        {
+          path: 'invitations',
+          name: 'manage.users.invitations.list',
+          component: AdminInvitationsList
         }
       ]
     },

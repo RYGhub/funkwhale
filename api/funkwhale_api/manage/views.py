@@ -62,3 +62,37 @@ class ManageUserViewSet(
         context = super().get_serializer_context()
         context["default_permissions"] = preferences.get("users__default_permissions")
         return context
+
+
+class ManageInvitationViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        users_models.Invitation.objects.all()
+        .order_by("-id")
+        .prefetch_related("users")
+        .select_related("owner")
+    )
+    serializer_class = serializers.ManageInvitationSerializer
+    filter_class = filters.ManageInvitationFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["settings"]
+    ordering_fields = ["creation_date", "expiration_date"]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    @list_route(methods=["post"])
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageInvitationActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)

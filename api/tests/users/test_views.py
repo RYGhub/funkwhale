@@ -50,6 +50,39 @@ def test_can_disable_registration_view(preferences, api_client, db):
     assert response.status_code == 403
 
 
+def test_can_signup_with_invitation(preferences, factories, api_client):
+    url = reverse("rest_register")
+    invitation = factories["users.Invitation"](code="Hello")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+        "invitation": "hello",
+    }
+    preferences["users__registration_enabled"] = False
+    response = api_client.post(url, data)
+    assert response.status_code == 201
+    u = User.objects.get(email="test1@test.com")
+    assert u.username == "test1"
+    assert u.invitation == invitation
+
+
+def test_can_signup_with_invitation_invalid(preferences, factories, api_client):
+    url = reverse("rest_register")
+    factories["users.Invitation"](code="hello")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+        "invitation": "nope",
+    }
+    response = api_client.post(url, data)
+    assert response.status_code == 400
+    assert "invitation" in response.data
+
+
 def test_can_fetch_data_from_api(api_client, factories):
     url = reverse("api:v1:users:users-me")
     response = api_client.get(url)

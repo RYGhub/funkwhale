@@ -10,8 +10,11 @@ from . import models, serializers
 
 
 class RegisterView(BaseRegisterView):
+    serializer_class = serializers.RegisterSerializer
+
     def create(self, request, *args, **kwargs):
-        if not self.is_open_for_signup(request):
+        invitation_code = request.data.get("invitation")
+        if not invitation_code and not self.is_open_for_signup(request):
             r = {"detail": "Registration has been disabled"}
             return Response(r, status=403)
         return super().create(request, *args, **kwargs)
