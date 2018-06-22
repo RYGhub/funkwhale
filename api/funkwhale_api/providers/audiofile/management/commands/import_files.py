@@ -214,7 +214,9 @@ class Command(BaseCommand):
         return batch, errors
 
     def import_file(self, path, batch, import_handler, options):
-        job = batch.jobs.create(source="file://" + path)
+        job = batch.jobs.create(
+            source="file://" + path, replace_if_duplicate=options["replace"]
+        )
         if not options["in_place"]:
             name = os.path.basename(path)
             with open(path, "rb") as f:
