@@ -56,13 +56,14 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
-            "--update",
+            "--replace",
             action="store_true",
-            dest="update",
+            dest="replace",
             default=False,
             help=(
                 "Use this flag to replace duplicates (tracks with same "
-                "musicbrainz mbid) on import with their newest version."
+                "musicbrainz mbid, or same artist, album and title) on import "
+                "with their newest version."
             ),
         )
         parser.add_argument(
@@ -122,16 +123,23 @@ class Command(BaseCommand):
                     "No superuser available, please provide a --username"
                 )
 
-        filtered = self.filter_matching(matching)
+        if options["replace"]:
+            filtered = {"initial": matching, "skipped": [], "new": matching}
+            message = "- {} files to be replaced"
+            import_paths = matching
+        else:
+            filtered = self.filter_matching(matching)
+            message = "- {} files already found in database"
+            import_paths = filtered["new"]
+
         self.stdout.write("Import summary:")
         self.stdout.write(
             "- {} files found matching this pattern: {}".format(
                 len(matching), options["path"]
             )
         )
-        self.stdout.write(
-            "- {} files already found in database".format(len(filtered["skipped"]))
-        )
+        self.stdout.write(message.format(len(filtered["skipped"])))
+
         self.stdout.write("- {} new files".format(len(filtered["new"])))
 
         self.stdout.write(
@@ -151,12 +159,12 @@ class Command(BaseCommand):
             if input("".join(message)) != "yes":
                 raise CommandError("Import cancelled.")
 
-        batch, errors = self.do_import(filtered["new"], user=user, options=options)
+        batch, errors = self.do_import(import_paths, user=user, options=options)
         message = "Successfully imported {} tracks"
         if options["async"]:
             message = "Successfully launched import for {} tracks"
 
-        self.stdout.write(message.format(len(filtered["new"])))
+        self.stdout.write(message.format(len(import_paths)))
         if len(errors) > 0:
             self.stderr.write("{} tracks could not be imported:".format(len(errors)))
 

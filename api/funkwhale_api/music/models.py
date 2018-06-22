@@ -567,7 +567,7 @@ class ImportBatch(models.Model):
 
 class ImportJob(models.Model):
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
-    update_if_duplicate = models.BooleanField(default=False)
+    replace_if_duplicate = models.BooleanField(default=False)
     batch = models.ForeignKey(
         ImportBatch, related_name="jobs", on_delete=models.CASCADE
     )

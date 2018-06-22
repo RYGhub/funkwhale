@@ -80,10 +80,11 @@ def import_track_from_remote(library_track):
     )[0]
 
 
-def _do_import(import_job, replace=False, use_acoustid=False):
+def _do_import(import_job, use_acoustid=False):
     logger.info("[Import Job %s] starting job", import_job.pk)
     from_file = bool(import_job.audio_file)
     mbid = import_job.mbid
+    replace = import_job.replace_if_duplicate
     acoustid_track_id = None
     duration = None
     track = None
@@ -163,7 +164,7 @@ def _do_import(import_job, replace=False, use_acoustid=False):
             # no downloading, we hotlink
             pass
     elif not import_job.audio_file and not import_job.source.startswith("file://"):
-        # not an implace import, and we have a source, so let's download it
+        # not an inplace import, and we have a source, so let's download it
         logger.info("[Import Job %s] downloading audio file from remote", import_job.pk)
         track_file.download_file()
     elif not import_job.audio_file and import_job.source.startswith("file://"):
@@ -243,14 +244,14 @@ def get_cover_from_fs(dir_path):
 @celery.require_instance(
     models.ImportJob.objects.filter(status__in=["pending", "errored"]), "import_job"
 )
-def import_job_run(self, import_job, replace=False, use_acoustid=False):
+def import_job_run(self, import_job, use_acoustid=False):
     def mark_errored(exc):
         logger.error("[Import Job %s] Error during import: %s", import_job.pk, str(exc))
         import_job.status = "errored"
         import_job.save(update_fields=["status"])
 
     try:
-        tf = _do_import(import_job, replace, use_acoustid=use_acoustid)
+        tf = _do_import(import_job, use_acoustid=use_acoustid)
         return tf.pk if tf else None
     except Exception as exc:
         if not settings.DEBUG:
