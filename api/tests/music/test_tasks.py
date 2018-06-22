@@ -118,7 +118,7 @@ def test_run_import_skipping_accoustid(factories, mocker):
     path = os.path.join(DATA_DIR, "test.ogg")
     job = factories["music.FileImportJob"](audio_file__path=path)
     tasks.import_job_run(import_job_id=job.pk, use_acoustid=False)
-    m.assert_called_once_with(job, False, use_acoustid=False)
+    m.assert_called_once_with(job, use_acoustid=False)
 
 
 def test__do_import_skipping_accoustid(factories, mocker):
@@ -130,7 +130,7 @@ def test__do_import_skipping_accoustid(factories, mocker):
     path = os.path.join(DATA_DIR, "test.ogg")
     job = factories["music.FileImportJob"](mbid=None, audio_file__path=path)
     p = job.audio_file.path
-    tasks._do_import(job, replace=False, use_acoustid=False)
+    tasks._do_import(job, use_acoustid=False)
     m.assert_called_once_with(p)
 
 
@@ -144,8 +144,25 @@ def test__do_import_skipping_accoustid_if_no_key(factories, mocker, preferences)
     path = os.path.join(DATA_DIR, "test.ogg")
     job = factories["music.FileImportJob"](mbid=None, audio_file__path=path)
     p = job.audio_file.path
-    tasks._do_import(job, replace=False, use_acoustid=False)
+    tasks._do_import(job, use_acoustid=False)
     m.assert_called_once_with(p)
+
+
+def test__do_import_replace_if_duplicate(factories, mocker):
+    existing_file = factories["music.TrackFile"]()
+    existing_track = existing_file.track
+    path = os.path.join(DATA_DIR, "test.ogg")
+    mocker.patch(
+        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
+        return_value=existing_track,
+    )
+    job = factories["music.FileImportJob"](
+        replace_if_duplicate=True, audio_file__path=path
+    )
+    tasks._do_import(job)
+    with pytest.raises(existing_file.__class__.DoesNotExist):
+        existing_file.refresh_from_db()
+    assert existing_file.creation_date != job.track_file.creation_date
 
 
 def test_import_job_skip_if_already_exists(artists, albums, tracks, factories, mocker):
