@@ -136,8 +136,8 @@ def _do_import(import_job, use_acoustid=False):
 
     track_file = None
     if replace:
-        logger.info("[Import Job %s] replacing existing audio file", import_job.pk)
-        track_file = track.files.first()
+        logger.info("[Import Job %s] deleting existing audio file", import_job.pk)
+        track.files.all().delete()
     elif track.files.count() > 0:
         logger.info(
             "[Import Job %s] skipping, we already have a file for this track",
