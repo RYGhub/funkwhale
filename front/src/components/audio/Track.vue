@@ -4,7 +4,7 @@
     @error="errored"
     @loadeddata="loaded"
     @durationchange="updateDuration"
-    @timeupdate="updateProgress"
+    @timeupdate="updateProgressThrottled"
     @ended="ended"
     preload>
     <source
@@ -30,6 +30,7 @@ export default {
   },
   data () {
     return {
+      realTrack: this.track,
       sourceErrors: 0,
       isUpdatingTime: false
     }
@@ -43,7 +44,7 @@ export default {
       looping: state => state.player.looping
     }),
     srcs: function () {
-      let file = this.track.files[0]
+      let file = this.realTrack.files[0]
       if (!file) {
         this.$store.dispatch('player/trackErrored')
         return []
@@ -61,6 +62,9 @@ export default {
         })
       }
       return sources
+    },
+    updateProgressThrottled () {
+      return _.throttle(this.updateProgress, 250)
     }
   },
   methods: {
@@ -100,35 +104,50 @@ export default {
         }
       }
     },
-    updateProgress: _.throttle(function () {
+    updateProgress: function () {
       this.isUpdatingTime = true
       if (this.$refs.audio) {
         this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
       }
-    }, 250),
+    },
     ended: function () {
       let onlyTrack = this.$store.state.queue.tracks.length === 1
       if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
         this.setCurrentTime(0)
         this.$refs.audio.play()
       } else {
-        this.$store.dispatch('player/trackEnded', this.track)
+        this.$store.dispatch('player/trackEnded', this.realTrack)
       }
     },
     setCurrentTime (t) {
       if (t < 0 | t > this.duration) {
         return
       }
-      this.updateProgress(t)
+      if (t === this.$refs.audio.currentTime) {
+        return
+      }
+      if (t === 0) {
+        this.updateProgressThrottled.cancel()
+      }
       this.$refs.audio.currentTime = t
     }
   },
   watch: {
+    track: _.debounce(function (newValue) {
+      this.realTrack = newValue
+      this.setCurrentTime(0)
+      this.$refs.audio.load()
+    }, 1000, {leading: true, trailing: true}),
     playing: function (newValue) {
       if (newValue === true) {
         this.$refs.audio.play()
       } else {
         this.$refs.audio.pause()
+      }
+    },
+    '$store.state.queue.currentIndex' () {
+      if (this.$store.state.player.playing) {
+        this.$refs.audio.play()
       }
     },
     volume: function (newValue) {

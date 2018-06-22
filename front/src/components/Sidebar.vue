@@ -116,8 +116,8 @@
     </div>
     <div class="ui bottom attached tab" data-tab="queue">
       <table class="ui compact inverted very basic fixed single line unstackable table">
-        <draggable v-model="queue.tracks" element="tbody" @update="reorder">
-          <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
+        <draggable v-model="tracks" element="tbody" @update="reorder">
+          <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>
               <td class="center aligned">
                   <img class="ui mini image" v-if="track.album.cover" :src="$store.getters['instance/absoluteUrl'](track.album.cover)">
@@ -176,6 +176,7 @@ export default {
     return {
       selectedTab: 'library',
       backend: backend,
+      tracksChangeBuffer: null,
       isCollapsed: true,
       fetchInterval: null
     }
@@ -207,6 +208,14 @@ export default {
       return adminPermissions.filter(e => {
         return e
       }).length > 0
+    },
+    tracks: {
+      get () {
+        return this.$store.state.queue.tracks
+      },
+      set (value) {
+        this.tracksChangeBuffer = value
+      }
     }
   },
   methods: {
@@ -219,7 +228,7 @@ export default {
     },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {
-        oldIndex: event.oldIndex, newIndex: event.newIndex})
+        tracks: this.tracksChangeBuffer, oldIndex: event.oldIndex, newIndex: event.newIndex})
     },
     scrollToCurrent () {
       let current = $(this.$el).find('[data-tab="queue"] .active')[0]

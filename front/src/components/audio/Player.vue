@@ -1,16 +1,16 @@
 <template>
   <div class="ui inverted segment player-wrapper" :style="style">
     <div class="player">
-      <audio-track
-        ref="currentAudio"
-        v-if="renderAudio && currentTrack"
-        :key="currentTrack.id"
-        :is-current="true"
-        :start-time="$store.state.player.currentTime"
-        :autoplay="$store.state.player.playing"
-        :track="currentTrack">
-      </audio-track>
-
+      <keep-alive>
+        <audio-track
+          ref="currentAudio"
+          v-if="renderAudio && currentTrack"
+          :is-current="true"
+          :start-time="$store.state.player.currentTime"
+          :autoplay="$store.state.player.playing"
+          :track="currentTrack">
+        </audio-track>
+      </keep-alive>
       <div v-if="currentTrack" class="track-area ui unstackable items">
         <div class="ui inverted item">
           <div class="ui tiny image">

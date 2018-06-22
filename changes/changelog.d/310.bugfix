@@ -1,0 +1,1 @@
+Fixed current track restart/hiccup when shuffling queue, deleting track from queue or reordering (#310)
