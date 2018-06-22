@@ -32,7 +32,11 @@ class TestDangerousSerializer(serializers.ActionSerializer):
 
 
 class TestDeleteOnlyInactiveSerializer(serializers.ActionSerializer):
-    actions = [serializers.Action("test", allow_all=True, filters={"is_active": False})]
+    actions = [
+        serializers.Action(
+            "test", allow_all=True, qs_filter=lambda qs: qs.filter(is_active=False)
+        )
+    ]
     filterset_class = TestActionFilterSet
 
     def handle_test(self, objects):

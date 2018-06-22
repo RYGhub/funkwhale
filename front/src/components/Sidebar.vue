@@ -61,18 +61,13 @@
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['library']"
-              :to="{name: 'library.requests', query: {status: 'pending' }}">
-              <i class="download icon"></i>{{ $t('Import requests') }}
-              <div
-                :class="['ui', {'teal': notifications.importRequests > 0}, 'label']"
-                :title="$t('Pending import requests')">
-                {{ notifications.importRequests }}</div>
-            </router-link>
-            <router-link
-              class="item"
-              v-if="$store.state.auth.availablePermissions['library']"
               :to="{name: 'manage.library.files'}">
               <i class="book icon"></i>{{ $t('Library') }}
+              <div
+                :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
+                :title="$t('Pending import requests')">
+                {{ $store.state.ui.notifications.importRequests }}</div>
+
             </router-link>
             <router-link
               class="item"
@@ -86,9 +81,9 @@
               :to="{path: '/manage/federation/libraries'}">
               <i class="sitemap icon"></i>{{ $t('Federation') }}
               <div
-                :class="['ui', {'teal': notifications.federation > 0}, 'label']"
+                :class="['ui', {'teal': $store.state.ui.notifications.federation > 0}, 'label']"
                 :title="$t('Pending follow requests')">
-                {{ notifications.federation }}</div>
+                {{ $store.state.ui.notifications.federation }}</div>
             </router-link>
             <router-link
               class="item"
@@ -160,7 +155,6 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
-import axios from 'axios'
 
 import Player from '@/components/audio/Player'
 import Logo from '@/components/Logo'
@@ -183,11 +177,7 @@ export default {
       selectedTab: 'library',
       backend: backend,
       isCollapsed: true,
-      fetchInterval: null,
-      notifications: {
-        federation: 0,
-        importRequests: 0
-      }
+      fetchInterval: null
     }
   },
   mounted () {
@@ -224,26 +214,8 @@ export default {
       cleanTrack: 'queue/cleanTrack'
     }),
     fetchNotificationsCount () {
-      this.fetchFederationNotificationsCount()
-      this.fetchFederationImportRequestsCount()
-    },
-    fetchFederationNotificationsCount () {
-      if (!this.$store.state.auth.availablePermissions['federation']) {
-        return
-      }
-      let self = this
-      axios.get('federation/libraries/followers/', {params: {pending: true}}).then(response => {
-        self.notifications.federation = response.data.count
-      })
-    },
-    fetchFederationImportRequestsCount () {
-      if (!this.$store.state.auth.availablePermissions['library']) {
-        return
-      }
-      let self = this
-      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        self.notifications.importRequests = response.data.count
-      })
+      this.$store.dispatch('ui/fetchFederationNotificationsCount')
+      this.$store.dispatch('ui/fetchImportRequestsCount')
     },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {

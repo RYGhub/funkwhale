@@ -1,3 +1,4 @@
+import axios from 'axios'
 
 export default {
   namespaced: true,
@@ -5,7 +6,11 @@ export default {
     lastDate: new Date(),
     maxMessages: 100,
     messageDisplayDuration: 10000,
-    messages: []
+    messages: [],
+    notifications: {
+      federation: 0,
+      importRequests: 0
+    }
   },
   mutations: {
     computeLastDate: (state) => {
@@ -16,6 +21,27 @@ export default {
       if (state.messages.length > state.maxMessages) {
         state.messages.shift()
       }
+    },
+    notifications (state, {type, count}) {
+      state.notifications[type] = count
+    }
+  },
+  actions: {
+    fetchFederationNotificationsCount ({rootState, commit}) {
+      if (!rootState.auth.availablePermissions['federation']) {
+        return
+      }
+      axios.get('federation/libraries/followers/', {params: {pending: true}}).then(response => {
+        commit('notifications', {type: 'federation', count: response.data.count})
+      })
+    },
+    fetchImportRequestsCount ({rootState, commit}) {
+      if (!rootState.auth.availablePermissions['library']) {
+        return
+      }
+      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
+        commit('notifications', {type: 'importRequests', count: response.data.count})
+      })
     }
   }
 }
