@@ -11,7 +11,7 @@
             <tbody>
               <tr v-for="album in albums">
                 <td>
-                  <img class="ui mini image" v-if="album.cover" :src="backend.absoluteUrl(album.cover)">
+                  <img class="ui mini image" v-if="album.cover" :src="$store.getters['instance/absoluteUrl'](album.cover)">
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">

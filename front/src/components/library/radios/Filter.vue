@@ -63,7 +63,6 @@
 </template>
 <script>
 import axios from 'axios'
-import config from '@/config'
 import $ from 'jquery'
 import _ from 'lodash'
 
@@ -86,7 +85,7 @@ export default {
     return {
       checkResult: null,
       showCandidadesModal: false,
-      exclude: config.not
+      exclude: this.config.not
     }
   },
   mounted: function () {

@@ -43,8 +43,6 @@
 <script>
 import axios from 'axios'
 
-import backend from '@/audio/backend'
-
 export default {
   data () {
     return {
@@ -72,7 +70,7 @@ export default {
       })
     },
     getUrl (code) {
-      return backend.absoluteUrl(this.$router.resolve({name: 'signup', query: {invitation: code.toUpperCase()}}).href)
+      return this.$store.getters['instance/absoluteUrl'](this.$router.resolve({name: 'signup', query: {invitation: code.toUpperCase()}}).href)
     }
   }
 }

@@ -6,7 +6,7 @@ export default {
   namespaced: true,
   state: {
     maxEvents: 200,
-    instanceUrl: process.env.INSTANCE_URL,
+    instanceUrl: '/',
     events: [],
     settings: {
       instance: {

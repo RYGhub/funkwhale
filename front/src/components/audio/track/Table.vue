@@ -35,7 +35,7 @@
                 <pre>
 export PRIVATE_TOKEN="{{ $store.state.auth.token }}"
 <template v-for="track in tracks"><template v-if="track.files.length > 0">
-curl -G -o "{{ track.files[0].filename }}" <template v-if="$store.state.auth.authenticated">--header "Authorization: JWT $PRIVATE_TOKEN"</template> "{{ backend.absoluteUrl(track.files[0].path) }}"</template></template>
+curl -G -o "{{ track.files[0].filename }}" <template v-if="$store.state.auth.authenticated">--header "Authorization: JWT $PRIVATE_TOKEN"</template> "{{ $store.getters['instance/absoluteUrl'](track.files[0].path) }}"</template></template>
 </pre>
               </div>
             </div>

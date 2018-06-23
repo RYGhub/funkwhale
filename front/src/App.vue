@@ -39,7 +39,13 @@
                   <template v-else>{{ $t('Source code') }}</template>
                 </a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
-                <a  @click="switchInstance" class="item" target="_blank">{{ $t('Use another instance') }}</a>
+                <a @click="switchInstance" class="item" >
+                  {{ $t('Use another instance') }}
+                  <template v-if="$store.state.instance.instanceUrl !== '/'">
+                    <br>
+                    ({{ $store.state.instance.instanceUrl }})
+                  </template>
+                </a>
               </div>
             </div>
             <div class="ten wide column">

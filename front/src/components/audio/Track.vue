@@ -49,7 +49,7 @@ export default {
         return []
       }
       let sources = [
-        {type: file.mimetype, url: file.path}
+        {type: file.mimetype, url: this.$store.getters['instance/absoluteUrl'](file.path)}
       ]
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url

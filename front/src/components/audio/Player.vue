@@ -14,7 +14,7 @@
       <div v-if="currentTrack" class="track-area ui unstackable items">
         <div class="ui inverted item">
           <div class="ui tiny image">
-            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover" :src="Track.getCover(currentTrack)">
+            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover)">
             <img v-else src="../../assets/audio/default-cover.png">
           </div>
           <div class="middle aligned content">
@@ -143,7 +143,6 @@ import {mapState, mapGetters, mapActions} from 'vuex'
 import GlobalEvents from '@/components/utils/global-events'
 import ColorThief from '@/vendor/color-thief'
 
-import Track from '@/audio/track'
 import AudioTrack from '@/components/audio/Track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
@@ -162,7 +161,6 @@ export default {
       isShuffling: false,
       renderAudio: true,
       sliderVolume: this.volume,
-      Track: Track,
       defaultAmbiantColors: defaultAmbiantColors,
       ambiantColors: defaultAmbiantColors
     }

@@ -87,7 +87,7 @@ export default {
       if (!this.album.cover) {
         return ''
       }
-      return 'background-image: url(' + backend.absoluteUrl(this.album.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover) + ')'
     }
   },
   watch: {
