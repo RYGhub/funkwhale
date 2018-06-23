@@ -54,19 +54,16 @@ export default {
       state.events = value
     },
     instanceUrl: (state, value) => {
+      if (value && !value.endsWith('/')) {
+        value = value + '/'
+      }
       state.instanceUrl = value
       if (!value) {
         axios.defaults.baseURL = null
         return
       }
-      let apiUrl
       let suffix = 'api/v1/'
-      if (state.instanceUrl.endsWith('/')) {
-        apiUrl = state.instanceUrl + suffix
-      } else {
-        apiUrl = state.instanceUrl + '/' + suffix
-      }
-      axios.defaults.baseURL = apiUrl
+      axios.defaults.baseURL = state.instanceUrl + suffix
     }
   },
   getters: {
