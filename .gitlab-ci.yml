@@ -7,10 +7,52 @@ variables:
 
 
 stages:
+  - review
   - lint
   - test
   - build
   - deploy
+
+review:
+  stage: review
+  image: node:9
+  when: manual
+  allow_failure: true
+  before_script:
+    - cd front
+  script:
+    - yarn install
+    # this is to ensure we don't have any errors in the output,
+    # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
+    - INSTANCE_URL=$REVIEW_INSTANCE_URL yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
+    - mkdir -p /static/$CI_BUILD_REF_SLUG
+    - cp -r dist/* /static/$CI_BUILD_REF_SLUG
+  cache:
+    key: "$CI_PROJECT_ID__front_dependencies"
+    paths:
+      - front/node_modules
+      - front/yarn.lock
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    url: http://$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
+    on_stop: stop_review
+  only:
+    - branches@funkwhale/funkwhale
+  tags:
+    - funkwhale-review
+
+stop_review:
+  stage: review
+  script:
+    - rm -rf /static/$CI_BUILD_REF_SLUG/
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    action: stop
+  tags:
+    - funkwhale-review
 
 black:
   image: python:3.6
