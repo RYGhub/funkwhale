@@ -12,6 +12,42 @@ This document will guide you through common operations such as:
 - Writing unit tests to validate your work
 - Submit your work
 
+A quick path to contribute on the front-end
+-------------------------------------------
+
+The next sections of this document include a full installation guide to help
+you setup a local, development version of Funkwhale. If you only want to fix small things
+on the front-end, and don't want to manage a full development environment, there is anoter way.
+
+As the front-end can work with any Funkwhale server, you can work with the front-end only,
+and make it talk with an existing instance (like the demo one, or you own instance, if you have one).
+
+If even that is too much for you, you can also make your changes without any development environment,
+and open a merge request. We will be able to to review your work easily by spawning automatically a
+live version of your changes, thanks to Gitlab Review apps.
+
+Setup front-end only development environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Clone the repository::
+
+    git clone ssh://git@code.eliotberriot.com:2222/funkwhale/funkwhale.git
+    cd funkwhale
+    cd front
+
+2. Install [nodejs](https://nodejs.org/en/download/package-manager/) and [yarn](https://yarnpkg.com/lang/en/docs/install/#debian-stable)
+3. Install the dependencies::
+
+    yarn install
+
+4. Launch the development server::
+
+    # this will serve the front-end on http://localhost:8000
+    WEBPACK_DEVSERVER_PORT=8000 yarn dev
+
+5. Make the front-end talk with an existing server (like https://demo.funkwhale.audio),
+   by clicking on the corresponding link in the footer
+6. Start hacking!
 
 Setup your development environment
 ----------------------------------
