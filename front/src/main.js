@@ -15,7 +15,6 @@ import i18next from 'i18next'
 import i18nextFetch from 'i18next-fetch-backend'
 import VueI18Next from '@panter/vue-i18next'
 import store from './store'
-import config from './config'
 import { sync } from 'vuex-router-sync'
 import filters from '@/filters' // eslint-disable-line
 import globals from '@/components/globals' // eslint-disable-line
@@ -56,8 +55,6 @@ Vue.directive('title', {
     document.title = parts.join(' - ')
   }
 })
-
-axios.defaults.baseURL = config.API_URL
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   if (store.state.auth.token) {
@@ -104,7 +101,6 @@ axios.interceptors.response.use(function (response) {
   // Do something with response error
   return Promise.reject(error)
 })
-store.dispatch('auth/check')
 
 // i18n
 i18next

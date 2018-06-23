@@ -108,7 +108,6 @@ import time from '@/utils/time'
 import axios from 'axios'
 import url from '@/utils/url'
 import logger from '@/logging'
-import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
@@ -169,7 +168,7 @@ export default {
     },
     downloadUrl () {
       if (this.track.files.length > 0) {
-        let u = backend.absoluteUrl(this.track.files[0].path)
+        let u = this.$store.getters['instance/absoluteUrl'](this.track.files[0].path)
         if (this.$store.state.auth.authenticated) {
           u = url.updateQueryString(u, 'jwt', this.$store.state.auth.token)
         }
@@ -191,7 +190,7 @@ export default {
       if (!this.cover) {
         return ''
       }
-      return 'background-image: url(' + backend.absoluteUrl(this.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover) + ')'
     }
   },
   watch: {

@@ -127,7 +127,7 @@ export default {
       if (!this.cover) {
         return ''
       }
-      return 'background-image: url(' + backend.absoluteUrl(this.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover) + ')'
     }
   },
   watch: {

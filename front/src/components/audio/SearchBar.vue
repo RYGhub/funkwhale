@@ -11,10 +11,7 @@
 
 <script>
 import jQuery from 'jquery'
-import config from '@/config'
 import router from '@/router'
-
-const SEARCH_URL = config.API_URL + 'search?query={query}'
 
 export default {
   mounted () {
@@ -94,7 +91,7 @@ export default {
           })
           return {results: results}
         },
-        url: SEARCH_URL
+        url: this.$store.getters['instance/absoluteUrl']('search?query={query}')
       }
     })
   }

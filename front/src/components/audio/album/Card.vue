@@ -2,7 +2,7 @@
     <div class="ui card">
       <div class="content">
         <div class="right floated tiny ui image">
-          <img v-if="album.cover" v-lazy="backend.absoluteUrl(album.cover)">
+          <img v-if="album.cover" v-lazy="$store.getters['instance/absoluteUrl'](album.cover)">
           <img v-else src="../../../assets/audio/default-cover.png">
         </div>
         <div class="header">
