@@ -6,6 +6,7 @@ export default {
   namespaced: true,
   state: {
     maxEvents: 200,
+    instanceUrl: process.env.INSTANCE_URL,
     events: [],
     settings: {
       instance: {
@@ -51,9 +52,46 @@ export default {
     },
     events: (state, value) => {
       state.events = value
+    },
+    instanceUrl: (state, value) => {
+      state.instanceUrl = value
+      if (!value) {
+        axios.defaults.baseURL = null
+        return
+      }
+      let apiUrl
+      let suffix = 'api/v1/'
+      if (state.instanceUrl.endsWith('/')) {
+        apiUrl = state.instanceUrl + suffix
+      } else {
+        apiUrl = state.instanceUrl + '/' + suffix
+      }
+      axios.defaults.baseURL = apiUrl
+    }
+  },
+  getters: {
+    absoluteUrl: (state) => (relativeUrl) => {
+      if (relativeUrl.startsWith('http')) {
+        return relativeUrl
+      }
+      return state.instanceUrl + relativeUrl
     }
   },
   actions: {
+    setUrl ({commit, dispatch}, url) {
+      commit('instanceUrl', url)
+      let modules = [
+        'auth',
+        'favorites',
+        'player',
+        'playlists',
+        'queue',
+        'radios'
+      ]
+      modules.forEach(m => {
+        commit(`${m}/reset`, null, {root: true})
+      })
+    },
     // Send a request to the login URL and save the returned JWT
     fetchSettings ({commit}, payload) {
       return axios.get('instance/settings/').then(response => {

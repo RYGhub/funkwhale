@@ -1,44 +1,65 @@
 <template>
   <div id="app">
-    <sidebar></sidebar>
-    <service-messages v-if="messages.length > 0" />
-    <router-view :key="$route.fullPath"></router-view>
-    <div class="ui fitted divider"></div>
-    <div id="footer" class="ui vertical footer segment">
-      <div class="ui container">
-        <div class="ui stackable equal height stackable grid">
-          <div class="three wide column">
-            <i18next tag="h4" class="ui header" path="Links"></i18next>
-            <div class="ui link list">
-              <router-link class="item" to="/about">
-                <i18next path="About this instance" />
-              </router-link>
-              <a href="https://funkwhale.audio" class="item" target="_blank">{{ $t('Official website') }}</a>
-              <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $t('Documentation') }}</a>
-              <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
-                <template v-if="version">{{ $t('Source code ({% version %})', {version: version}) }}</template>
-                <template v-else>{{ $t('Source code') }}</template>
-              </a>
-              <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
+    <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
+      <div class="ui padded segment">
+        <h1 class="ui header">{{ $t('Choose your instance') }}</h1>
+        <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
+          <p>{{ $t('You need to select an instance in order to continue') }}</p>
+          <div class="ui action input">
+            <input type="text" v-model="instanceUrl">
+            <button type="submit" class="ui button">{{ $t('Submit') }}</button>
+          </div>
+          <p>{{ $t('Suggested choices') }}</p>
+          <div class="ui bulleted list">
+            <div class="ui item" v-for="url in suggestedInstances">
+              <a @click="instanceUrl = url">{{ url }}</a>
             </div>
           </div>
-          <div class="ten wide column">
-            <i18next tag="h4" class="ui header" path="About funkwhale" />
-            <p>
-              <i18next path="Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"/>
-            </p>
-            <p>
-              <i18next path="The funkwhale logo was kindly designed and provided by Francis Gading."/>
-            </p>
+        </form>
+      </div>
+    </div>
+    <template v-else>
+      <sidebar></sidebar>
+      <service-messages v-if="messages.length > 0" />
+      <router-view :key="$route.fullPath"></router-view>
+      <div class="ui fitted divider"></div>
+      <div id="footer" class="ui vertical footer segment">
+        <div class="ui container">
+          <div class="ui stackable equal height stackable grid">
+            <div class="three wide column">
+              <i18next tag="h4" class="ui header" path="Links"></i18next>
+              <div class="ui link list">
+                <router-link class="item" to="/about">
+                  <i18next path="About this instance" />
+                </router-link>
+                <a href="https://funkwhale.audio" class="item" target="_blank">{{ $t('Official website') }}</a>
+                <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $t('Documentation') }}</a>
+                <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
+                  <template v-if="version">{{ $t('Source code ({% version %})', {version: version}) }}</template>
+                  <template v-else>{{ $t('Source code') }}</template>
+                </a>
+                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
+                <a  @click="switchInstance" class="item" target="_blank">{{ $t('Use another instance') }}</a>
+              </div>
+            </div>
+            <div class="ten wide column">
+              <i18next tag="h4" class="ui header" path="About funkwhale" />
+              <p>
+                <i18next path="Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"/>
+              </p>
+              <p>
+                <i18next path="The funkwhale logo was kindly designed and provided by Francis Gading."/>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <raven
-      v-if="$store.state.instance.settings.raven.front_enabled.value"
-      :dsn="$store.state.instance.settings.raven.front_dsn.value">
-    </raven>
-    <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+      <raven
+        v-if="$store.state.instance.settings.raven.front_enabled.value"
+        :dsn="$store.state.instance.settings.raven.front_dsn.value">
+      </raven>
+      <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+    </template>
   </div>
 </template>
 
@@ -63,17 +84,22 @@ export default {
   },
   data () {
     return {
-      nodeinfo: null
+      nodeinfo: null,
+      instanceUrl: null
     }
   },
   created () {
-    this.$store.dispatch('instance/fetchSettings')
     let self = this
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
-    this.fetchNodeInfo()
+    if (this.$store.state.instance.instanceUrl) {
+      this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
+      this.$store.dispatch('auth/check')
+      this.$store.dispatch('instance/fetchSettings')
+      this.fetchNodeInfo()
+    }
   },
   methods: {
     fetchNodeInfo () {
@@ -81,17 +107,37 @@ export default {
       axios.get('instance/nodeinfo/2.0/').then(response => {
         self.nodeinfo = response.data
       })
+    },
+    switchInstance () {
+      let confirm = window.confirm(this.$t('This will erase your local data and disconnect you, do you want to continue?'))
+      if (confirm) {
+        this.$store.commit('instance/instanceUrl', null)
+      }
     }
   },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
     }),
+    suggestedInstances () {
+      let rootUrl = (
+        window.location.protocol + '//' + window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '')
+      )
+      let instances = [rootUrl, 'https://demo.funkwhale.audio']
+      return instances
+    },
     version () {
       if (!this.nodeinfo) {
         return null
       }
       return _.get(this.nodeinfo, 'software.version')
+    }
+  },
+  watch: {
+    '$store.state.instance.instanceUrl' () {
+      this.$store.dispatch('instance/fetchSettings')
+      this.fetchNodeInfo()
     }
   }
 }
@@ -116,6 +162,11 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.instance-chooser {
+  margin-top: 2em;
+}
+
 .main.pusher, .footer {
   @include media(">desktop") {
     margin-left: 350px !important;
@@ -173,7 +224,7 @@ html, body {
 .ui.icon.header .circular.icon {
   display: flex;
   justify-content: center;
-  
+
 }
 
 .segment-content .button{
