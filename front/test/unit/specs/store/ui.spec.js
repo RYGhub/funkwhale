@@ -1,7 +1,5 @@
 import store from '@/store/ui'
 
-import { testAction } from '../../utils'
-
 describe('store/ui', () => {
   describe('mutations', () => {
     it('addMessage', () => {
