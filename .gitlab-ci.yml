@@ -13,7 +13,7 @@ stages:
   - build
   - deploy
 
-review:
+review_front:
   stage: review
   image: node:9
   when: manual
@@ -25,31 +25,71 @@ review:
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - INSTANCE_URL=$REVIEW_INSTANCE_URL yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
-    - mkdir -p /static/$CI_BUILD_REF_SLUG
-    - cp -r dist/* /static/$CI_BUILD_REF_SLUG
+    - mkdir -p /static/front/$CI_BUILD_REF_SLUG
+    - cp -r dist/* /static/front/$CI_BUILD_REF_SLUG
   cache:
     key: "$CI_PROJECT_ID__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
   environment:
-    name: review/$CI_BUILD_REF_NAME
-    url: http://$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
-    on_stop: stop_review
+    name: review/front-$CI_BUILD_REF_NAME
+    url: http://front-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
+    on_stop: stop_front_review
   only:
     - branches@funkwhale/funkwhale
   tags:
     - funkwhale-review
 
-stop_review:
+stop_front_review:
   stage: review
   script:
-    - rm -rf /static/$CI_BUILD_REF_SLUG/
+    - rm -rf /static/front/$CI_BUILD_REF_SLUG/
   variables:
     GIT_STRATEGY: none
   when: manual
   environment:
-    name: review/$CI_BUILD_REF_NAME
+    name: review/front-$CI_BUILD_REF_NAME
+    action: stop
+  tags:
+    - funkwhale-review
+
+review_docs:
+  stage: review
+  image: python:3.6
+  when: manual
+  allow_failure: true
+  variables:
+    BUILD_PATH: "../public"
+  before_script:
+    - cd docs
+  cache:
+    key: "$CI_PROJECT_ID__sphinx"
+    paths:
+      - "$PIP_CACHE_DIR"
+  script:
+    - pip install sphinx
+    - ./build_docs.sh
+    - mkdir -p /static/docs/$CI_BUILD_REF_SLUG
+    - cp -r $CI_PROJECT_DIR/public/* /static/docs/$CI_BUILD_REF_SLUG
+  environment:
+    name: review/docs-$CI_BUILD_REF_NAME
+    url: http://docs-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
+    on_stop: stop_docs_review
+  only:
+    - branches@funkwhale/funkwhale
+  tags:
+    - funkwhale-review
+
+stop_docs_review:
+  stage: review
+  script:
+    - rm -rf /static/docs/$CI_BUILD_REF_SLUG/
+  variables:
+    GIT_STRATEGY: none
+  when: manual
+  environment:
+    name: review/docs-$CI_BUILD_REF_NAME
     action: stop
   tags:
     - funkwhale-review
@@ -168,6 +208,10 @@ pages:
   script:
     - pip install sphinx
     - ./build_docs.sh
+  cache:
+    key: "$CI_PROJECT_ID__sphinx"
+    paths:
+      - "$PIP_CACHE_DIR"
   artifacts:
     paths:
       - public
