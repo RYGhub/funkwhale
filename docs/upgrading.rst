@@ -77,12 +77,12 @@ match what is described in :doc:`debian`:
 .. parsed-literal::
 
     # this assumes you want to upgrade to version "|version|"
-    export FUNKWALE_VERSION="|version|"
+    export FUNKWHALE_VERSION="|version|"
     cd /srv/funkwhale
 
     # download more recent API files
-    sudo -u funkwhale curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWALE_VERSION/download?job=build_api"
-    sudo -u funkwhale unzip "api-$FUNKWALE_VERSION.zip" -d extracted
+    sudo -u funkwhale curl -L -o "api-$FUNKWHALE_VERSION.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWHALE_VERSION/download?job=build_api"
+    sudo -u funkwhale unzip "api-$FUNKWHALE_VERSION.zip" -d extracted
     sudo -u funkwhale rm -rf api/ && mv extracted/api .
     sudo -u funkwhale rm -rf extracted
 
