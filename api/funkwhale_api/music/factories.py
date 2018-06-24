@@ -89,7 +89,7 @@ class ImportJobFactory(factory.django.DjangoModelFactory):
     batch = factory.SubFactory(ImportBatchFactory)
     source = factory.Faker("url")
     mbid = factory.Faker("uuid4")
-    replace_if_duplicate = factory.Faker("boolean")
+    replace_if_duplicate = False
 
     class Meta:
         model = "music.ImportJob"
