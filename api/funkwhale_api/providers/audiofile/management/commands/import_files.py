@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = "Import audio files mathinc given glob pattern"
 
     def add_arguments(self, parser):
-        parser.add_argument("path", type=str)
+        parser.add_argument("path", nargs="+", type=str)
         parser.add_argument(
             "--recursive",
             action="store_true",
@@ -56,6 +56,17 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            "--replace",
+            action="store_true",
+            dest="replace",
+            default=False,
+            help=(
+                "Use this flag to replace duplicates (tracks with same "
+                "musicbrainz mbid, or same artist, album and title) on import "
+                "with their newest version."
+            ),
+        )
+        parser.add_argument(
             "--noinput",
             "--no-input",
             action="store_false",
@@ -65,10 +76,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         glob_kwargs = {}
+        matching = []
         if options["recursive"]:
             glob_kwargs["recursive"] = True
         try:
-            matching = sorted(glob.glob(options["path"], **glob_kwargs))
+            for import_path in options["path"]:
+                matching += glob.glob(import_path, **glob_kwargs)
+            matching = sorted(list(set(matching)))
         except TypeError:
             raise Exception("You need Python 3.5 to use the --recursive flag")
 
@@ -109,16 +123,23 @@ class Command(BaseCommand):
                     "No superuser available, please provide a --username"
                 )
 
-        filtered = self.filter_matching(matching, options)
+        if options["replace"]:
+            filtered = {"initial": matching, "skipped": [], "new": matching}
+            message = "- {} files to be replaced"
+            import_paths = matching
+        else:
+            filtered = self.filter_matching(matching)
+            message = "- {} files already found in database"
+            import_paths = filtered["new"]
+
         self.stdout.write("Import summary:")
         self.stdout.write(
             "- {} files found matching this pattern: {}".format(
                 len(matching), options["path"]
             )
         )
-        self.stdout.write(
-            "- {} files already found in database".format(len(filtered["skipped"]))
-        )
+        self.stdout.write(message.format(len(filtered["skipped"])))
+
         self.stdout.write("- {} new files".format(len(filtered["new"])))
 
         self.stdout.write(
@@ -138,12 +159,12 @@ class Command(BaseCommand):
             if input("".join(message)) != "yes":
                 raise CommandError("Import cancelled.")
 
-        batch, errors = self.do_import(filtered["new"], user=user, options=options)
+        batch, errors = self.do_import(import_paths, user=user, options=options)
         message = "Successfully imported {} tracks"
         if options["async"]:
             message = "Successfully launched import for {} tracks"
 
-        self.stdout.write(message.format(len(filtered["new"])))
+        self.stdout.write(message.format(len(import_paths)))
         if len(errors) > 0:
             self.stderr.write("{} tracks could not be imported:".format(len(errors)))
 
@@ -153,7 +174,7 @@ class Command(BaseCommand):
             "For details, please refer to import batch #{}".format(batch.pk)
         )
 
-    def filter_matching(self, matching, options):
+    def filter_matching(self, matching):
         sources = ["file://{}".format(p) for p in matching]
         # we skip reimport for path that are already found
         # as a TrackFile.source
@@ -193,7 +214,9 @@ class Command(BaseCommand):
         return batch, errors
 
     def import_file(self, path, batch, import_handler, options):
-        job = batch.jobs.create(source="file://" + path)
+        job = batch.jobs.create(
+            source="file://" + path, replace_if_duplicate=options["replace"]
+        )
         if not options["in_place"]:
             name = os.path.basename(path)
             with open(path, "rb") as f:

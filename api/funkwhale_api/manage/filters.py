@@ -1,8 +1,9 @@
-
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.music import models as music_models
+from funkwhale_api.requests import models as requests_models
+from funkwhale_api.users import models as users_models
 
 
 class ManageTrackFileFilterSet(filters.FilterSet):
@@ -18,3 +19,45 @@ class ManageTrackFileFilterSet(filters.FilterSet):
     class Meta:
         model = music_models.TrackFile
         fields = ["q", "track__album", "track__artist", "track", "library_track"]
+
+
+class ManageUserFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(search_fields=["username", "email", "name"])
+
+    class Meta:
+        model = users_models.User
+        fields = [
+            "q",
+            "is_active",
+            "privacy_level",
+            "is_staff",
+            "is_superuser",
+            "permission_upload",
+            "permission_library",
+            "permission_settings",
+            "permission_federation",
+        ]
+
+
+class ManageInvitationFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(search_fields=["owner__username", "code", "owner__email"])
+    is_open = filters.BooleanFilter(method="filter_is_open")
+
+    class Meta:
+        model = users_models.Invitation
+        fields = ["q", "is_open"]
+
+    def filter_is_open(self, queryset, field_name, value):
+        if value is None:
+            return queryset
+        return queryset.open(value)
+
+
+class ManageImportRequestFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(
+        search_fields=["user__username", "albums", "artist_name", "comment"]
+    )
+
+    class Meta:
+        model = requests_models.ImportRequest
+        fields = ["q", "status"]

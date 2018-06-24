@@ -7,6 +7,7 @@ import pytest
 import requests_mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
+from django.utils import timezone
 from django.test import client
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
@@ -250,3 +251,10 @@ def to_api_date():
         raise ValueError("Invalid value: {}".format(value))
 
     return inner
+
+
+@pytest.fixture()
+def now(mocker):
+    now = timezone.now()
+    mocker.patch("django.utils.timezone.now", return_value=now)
+    return now

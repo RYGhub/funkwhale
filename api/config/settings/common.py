@@ -146,6 +146,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "funkwhale_api.users.middleware.RecordActivityMiddleware",
 )
 
 # MIGRATIONS CONFIGURATION
@@ -459,4 +460,8 @@ MUSIC_DIRECTORY_PATH = env("MUSIC_DIRECTORY_PATH", default=None)
 # and we need to know it for it to serve stuff properly
 MUSIC_DIRECTORY_SERVE_PATH = env(
     "MUSIC_DIRECTORY_SERVE_PATH", default=MUSIC_DIRECTORY_PATH
+)
+
+USERS_INVITATION_EXPIRATION_DAYS = env.int(
+    "USERS_INVITATION_EXPIRATION_DAYS", default=14
 )

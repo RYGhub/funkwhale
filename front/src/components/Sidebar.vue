@@ -61,18 +61,13 @@
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['library']"
-              :to="{name: 'library.requests', query: {status: 'pending' }}">
-              <i class="download icon"></i>{{ $t('Import requests') }}
-              <div
-                :class="['ui', {'teal': notifications.importRequests > 0}, 'label']"
-                :title="$t('Pending import requests')">
-                {{ notifications.importRequests }}</div>
-            </router-link>
-            <router-link
-              class="item"
-              v-if="$store.state.auth.availablePermissions['library']"
               :to="{name: 'manage.library.files'}">
               <i class="book icon"></i>{{ $t('Library') }}
+              <div
+                :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
+                :title="$t('Pending import requests')">
+                {{ $store.state.ui.notifications.importRequests }}</div>
+
             </router-link>
             <router-link
               class="item"
@@ -86,15 +81,21 @@
               :to="{path: '/manage/federation/libraries'}">
               <i class="sitemap icon"></i>{{ $t('Federation') }}
               <div
-                :class="['ui', {'teal': notifications.federation > 0}, 'label']"
+                :class="['ui', {'teal': $store.state.ui.notifications.federation > 0}, 'label']"
                 :title="$t('Pending follow requests')">
-                {{ notifications.federation }}</div>
+                {{ $store.state.ui.notifications.federation }}</div>
             </router-link>
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['settings']"
               :to="{path: '/manage/settings'}">
               <i class="settings icon"></i>{{ $t('Settings') }}
+            </router-link>
+            <router-link
+              class="item"
+              v-if="$store.state.auth.availablePermissions['settings']"
+              :to="{name: 'manage.users.users.list'}">
+              <i class="users icon"></i>{{ $t('Users') }}
             </router-link>
           </div>
         </div>
@@ -115,11 +116,11 @@
     </div>
     <div class="ui bottom attached tab" data-tab="queue">
       <table class="ui compact inverted very basic fixed single line unstackable table">
-        <draggable v-model="queue.tracks" element="tbody" @update="reorder">
-          <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in queue.tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
+        <draggable v-model="tracks" element="tbody" @update="reorder">
+          <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>
               <td class="center aligned">
-                  <img class="ui mini image" v-if="track.album.cover" :src="backend.absoluteUrl(track.album.cover)">
+                  <img class="ui mini image" v-if="track.album.cover" :src="$store.getters['instance/absoluteUrl'](track.album.cover)">
                   <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
@@ -154,7 +155,6 @@
 
 <script>
 import {mapState, mapActions} from 'vuex'
-import axios from 'axios'
 
 import Player from '@/components/audio/Player'
 import Logo from '@/components/Logo'
@@ -176,12 +176,9 @@ export default {
     return {
       selectedTab: 'library',
       backend: backend,
+      tracksChangeBuffer: null,
       isCollapsed: true,
-      fetchInterval: null,
-      notifications: {
-        federation: 0,
-        importRequests: 0
-      }
+      fetchInterval: null
     }
   },
   mounted () {
@@ -211,6 +208,14 @@ export default {
       return adminPermissions.filter(e => {
         return e
       }).length > 0
+    },
+    tracks: {
+      get () {
+        return this.$store.state.queue.tracks
+      },
+      set (value) {
+        this.tracksChangeBuffer = value
+      }
     }
   },
   methods: {
@@ -218,30 +223,12 @@ export default {
       cleanTrack: 'queue/cleanTrack'
     }),
     fetchNotificationsCount () {
-      this.fetchFederationNotificationsCount()
-      this.fetchFederationImportRequestsCount()
-    },
-    fetchFederationNotificationsCount () {
-      if (!this.$store.state.auth.availablePermissions['federation']) {
-        return
-      }
-      let self = this
-      axios.get('federation/libraries/followers/', {params: {pending: true}}).then(response => {
-        self.notifications.federation = response.data.count
-      })
-    },
-    fetchFederationImportRequestsCount () {
-      if (!this.$store.state.auth.availablePermissions['library']) {
-        return
-      }
-      let self = this
-      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        self.notifications.importRequests = response.data.count
-      })
+      this.$store.dispatch('ui/fetchFederationNotificationsCount')
+      this.$store.dispatch('ui/fetchImportRequestsCount')
     },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {
-        oldIndex: event.oldIndex, newIndex: event.newIndex})
+        tracks: this.tracksChangeBuffer, oldIndex: event.oldIndex, newIndex: event.newIndex})
     },
     scrollToCurrent () {
       let current = $(this.$el).find('[data-tab="queue"] .active')[0]

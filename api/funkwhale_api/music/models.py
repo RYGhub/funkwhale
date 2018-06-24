@@ -539,7 +539,7 @@ class ImportBatch(models.Model):
         related_name="import_batches",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
 
     class Meta:
@@ -567,6 +567,7 @@ class ImportBatch(models.Model):
 
 class ImportJob(models.Model):
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
+    replace_if_duplicate = models.BooleanField(default=False)
     batch = models.ForeignKey(
         ImportBatch, related_name="jobs", on_delete=models.CASCADE
     )

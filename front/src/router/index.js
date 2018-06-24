@@ -24,13 +24,17 @@ import RadioBuilder from '@/components/library/radios/Builder'
 import RadioDetail from '@/views/radios/Detail'
 import BatchList from '@/components/library/import/BatchList'
 import BatchDetail from '@/components/library/import/BatchDetail'
-import RequestsList from '@/components/requests/RequestsList'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
+import AdminLibraryRequestsList from '@/views/admin/library/RequestsList'
+import AdminUsersBase from '@/views/admin/users/Base'
+import AdminUsersDetail from '@/views/admin/users/UsersDetail'
+import AdminUsersList from '@/views/admin/users/UsersList'
+import AdminInvitationsList from '@/views/admin/users/InvitationsList'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -93,7 +97,10 @@ export default new Router({
     {
       path: '/signup',
       name: 'signup',
-      component: Signup
+      component: Signup,
+      props: (route) => ({
+        invitation: route.query.invitation
+      })
     },
     {
       path: '/logout',
@@ -177,6 +184,33 @@ export default new Router({
           path: 'files',
           name: 'manage.library.files',
           component: AdminLibraryFilesList
+        },
+        {
+          path: 'requests',
+          name: 'manage.library.requests',
+          component: AdminLibraryRequestsList
+        }
+      ]
+    },
+    {
+      path: '/manage/users',
+      component: AdminUsersBase,
+      children: [
+        {
+          path: 'users',
+          name: 'manage.users.users.list',
+          component: AdminUsersList
+        },
+        {
+          path: 'users/:id',
+          name: 'manage.users.users.detail',
+          component: AdminUsersDetail,
+          props: true
+        },
+        {
+          path: 'invitations',
+          name: 'manage.users.invitations.list',
+          component: AdminInvitationsList
         }
       ]
     },
@@ -249,21 +283,7 @@ export default new Router({
           children: [
           ]
         },
-        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true },
-        {
-          path: 'requests/',
-          name: 'library.requests',
-          component: RequestsList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page,
-            defaultStatus: route.query.status || 'any'
-          }),
-          children: [
-          ]
-        }
+        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
       ]
     },
     { path: '*', component: PageNotFound }

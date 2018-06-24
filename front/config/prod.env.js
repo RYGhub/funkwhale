@@ -1,4 +1,5 @@
+let url = process.env.INSTANCE_URL || '/'
 module.exports = {
   NODE_ENV: '"production"',
-  BACKEND_URL: '"/"'
+  INSTANCE_URL: `"${url}"`
 }

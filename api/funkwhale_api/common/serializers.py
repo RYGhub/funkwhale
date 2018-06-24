@@ -1,6 +1,16 @@
 from rest_framework import serializers
 
 
+class Action(object):
+    def __init__(self, name, allow_all=False, qs_filter=None):
+        self.name = name
+        self.allow_all = allow_all
+        self.qs_filter = qs_filter
+
+    def __repr__(self):
+        return "<Action {}>".format(self.name)
+
+
 class ActionSerializer(serializers.Serializer):
     """
     A special serializer that can operate on a list of objects
@@ -11,19 +21,16 @@ class ActionSerializer(serializers.Serializer):
     objects = serializers.JSONField(required=True)
     filters = serializers.DictField(required=False)
     actions = None
-    filterset_class = None
-    # those are actions identifier where we don't want to allow the "all"
-    # selector because it's to dangerous. Like object deletion.
-    dangerous_actions = []
 
     def __init__(self, *args, **kwargs):
+        self.actions_by_name = {a.name: a for a in self.actions}
         self.queryset = kwargs.pop("queryset")
         if self.actions is None:
             raise ValueError(
                 "You must declare a list of actions on " "the serializer class"
             )
 
-        for action in self.actions:
+        for action in self.actions_by_name.keys():
             handler_name = "handle_{}".format(action)
             assert hasattr(self, handler_name), "{} miss a {} method".format(
                 self.__class__.__name__, handler_name
@@ -31,13 +38,14 @@ class ActionSerializer(serializers.Serializer):
         super().__init__(self, *args, **kwargs)
 
     def validate_action(self, value):
-        if value not in self.actions:
+        try:
+            return self.actions_by_name[value]
+        except KeyError:
             raise serializers.ValidationError(
                 "{} is not a valid action. Pick one of {}.".format(
-                    value, ", ".join(self.actions)
+                    value, ", ".join(self.actions_by_name.keys())
                 )
             )
-        return value
 
     def validate_objects(self, value):
         if value == "all":
@@ -51,20 +59,22 @@ class ActionSerializer(serializers.Serializer):
         )
 
     def validate(self, data):
-        dangerous = data["action"] in self.dangerous_actions
-        if dangerous and self.initial_data["objects"] == "all":
+        allow_all = data["action"].allow_all
+        if not allow_all and self.initial_data["objects"] == "all":
             raise serializers.ValidationError(
-                "This action is to dangerous to be applied to all objects"
+                "You cannot apply this action on all objects"
             )
-        if self.filterset_class and "filters" in data:
-            qs_filterset = self.filterset_class(
-                data["filters"], queryset=data["objects"]
-            )
+        final_filters = data.get("filters", {}) or {}
+        if self.filterset_class and final_filters:
+            qs_filterset = self.filterset_class(final_filters, queryset=data["objects"])
             try:
                 assert qs_filterset.form.is_valid()
             except (AssertionError, TypeError):
                 raise serializers.ValidationError("Invalid filters")
             data["objects"] = qs_filterset.qs
+
+        if data["action"].qs_filter:
+            data["objects"] = data["action"].qs_filter(data["objects"])
 
         data["count"] = data["objects"].count()
         if data["count"] < 1:
@@ -72,12 +82,12 @@ class ActionSerializer(serializers.Serializer):
         return data
 
     def save(self):
-        handler_name = "handle_{}".format(self.validated_data["action"])
+        handler_name = "handle_{}".format(self.validated_data["action"].name)
         handler = getattr(self, handler_name)
         result = handler(self.validated_data["objects"])
         payload = {
             "updated": self.validated_data["count"],
-            "action": self.validated_data["action"],
+            "action": self.validated_data["action"].name,
             "result": result,
         }
         return payload

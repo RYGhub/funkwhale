@@ -15,7 +15,6 @@ import i18next from 'i18next'
 import i18nextFetch from 'i18next-fetch-backend'
 import VueI18Next from '@panter/vue-i18next'
 import store from './store'
-import config from './config'
 import { sync } from 'vuex-router-sync'
 import filters from '@/filters' // eslint-disable-line
 import globals from '@/components/globals' // eslint-disable-line
@@ -56,8 +55,6 @@ Vue.directive('title', {
     document.title = parts.join(' - ')
   }
 })
-
-axios.defaults.baseURL = config.API_URL
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   if (store.state.auth.token) {
@@ -86,11 +83,15 @@ axios.interceptors.response.use(function (response) {
   } else if (error.response.status === 500) {
     error.backendErrors.push('A server error occured')
   } else if (error.response.data) {
-    for (var field in error.response.data) {
-      if (error.response.data.hasOwnProperty(field)) {
-        error.response.data[field].forEach(e => {
-          error.backendErrors.push(e)
-        })
+    if (error.response.data.detail) {
+      error.backendErrors.push(error.response.data.detail)
+    } else {
+      for (var field in error.response.data) {
+        if (error.response.data.hasOwnProperty(field)) {
+          error.response.data[field].forEach(e => {
+            error.backendErrors.push(e)
+          })
+        }
       }
     }
   }
@@ -100,7 +101,6 @@ axios.interceptors.response.use(function (response) {
   // Do something with response error
   return Promise.reject(error)
 })
-store.dispatch('auth/check')
 
 // i18n
 i18next

@@ -169,11 +169,11 @@ describe('store/queue', () => {
         payload: 2,
         params: {state: {currentIndex: 2}},
         expectedMutations: [
-          { type: 'splice', payload: {start: 2, size: 1} }
+          { type: 'splice', payload: {start: 2, size: 1} },
+          { type: 'currentIndex', payload: 2 }
         ],
         expectedActions: [
-          { type: 'player/stop', payload: null, options: {root: true} },
-          { type: 'currentIndex', payload: 2 }
+          { type: 'player/stop', payload: null, options: {root: true} }
         ]
       }, done)
     })
@@ -324,7 +324,6 @@ describe('store/queue', () => {
         action: store.actions.shuffle,
         params: {state: {currentIndex: 1, tracks: tracks}},
         expectedMutations: [
-          { type: 'player/currentTime', payload: 0, options: {root: true} },
           { type: 'tracks', payload: [] }
         ],
         expectedActions: [

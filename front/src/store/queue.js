@@ -31,9 +31,10 @@ export default {
     insert (state, {track, index}) {
       state.tracks.splice(index, 0, track)
     },
-    reorder (state, {oldIndex, newIndex}) {
+    reorder (state, {tracks, oldIndex, newIndex}) {
       // called when the user uses drag / drop to reorder
       // tracks in queue
+      state.tracks = tracks
       if (oldIndex === state.currentIndex) {
         state.currentIndex = newIndex
         return
@@ -102,7 +103,7 @@ export default {
       }
       if (current) {
         // we play next track, which now have the same index
-        dispatch('currentIndex', index)
+        commit('currentIndex', index)
       }
       if (state.currentIndex + 1 === state.tracks.length) {
         dispatch('radios/populateQueue', null, {root: true})
@@ -156,7 +157,6 @@ export default {
       let toKeep = state.tracks.slice(0, state.currentIndex + 1)
       let toShuffle = state.tracks.slice(state.currentIndex + 1)
       let shuffled = toKeep.concat(_.shuffle(toShuffle))
-      commit('player/currentTime', 0, {root: true})
       commit('tracks', [])
       let params = {tracks: shuffled}
       if (callback) {

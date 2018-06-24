@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 from funkwhale_api.users import models
@@ -78,3 +79,51 @@ def test_has_permissions_and(args, perms, expected, factories):
 def test_has_permissions_or(args, perms, expected, factories):
     user = factories["users.User"](**args)
     assert user.has_permissions(*perms, operator="or") is expected
+
+
+def test_record_activity(factories, now):
+    user = factories["users.User"]()
+    assert user.last_activity is None
+
+    user.record_activity()
+
+    assert user.last_activity == now
+
+
+def test_record_activity_does_nothing_if_already(factories, now, mocker):
+    user = factories["users.User"](last_activity=now)
+    save = mocker.patch("funkwhale_api.users.models.User.save")
+    user.record_activity()
+
+    save.assert_not_called()
+
+
+def test_invitation_generates_random_code_on_save(factories):
+    invitation = factories["users.Invitation"]()
+    assert len(invitation.code) >= 6
+
+
+def test_invitation_expires_after_delay(factories, settings):
+    delay = settings.USERS_INVITATION_EXPIRATION_DAYS
+    invitation = factories["users.Invitation"]()
+    assert invitation.expiration_date == (
+        invitation.creation_date + datetime.timedelta(days=delay)
+    )
+
+
+def test_can_filter_open_invitations(factories):
+    okay = factories["users.Invitation"]()
+    factories["users.Invitation"](expired=True)
+    factories["users.User"](invited=True)
+
+    assert models.Invitation.objects.count() == 3
+    assert list(models.Invitation.objects.open()) == [okay]
+
+
+def test_can_filter_closed_invitations(factories):
+    factories["users.Invitation"]()
+    expired = factories["users.Invitation"](expired=True)
+    used = factories["users.User"](invited=True).invitation
+
+    assert models.Invitation.objects.count() == 3
+    assert list(models.Invitation.objects.open(False)) == [expired, used]

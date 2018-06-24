@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from funkwhale_api.providers.audiofile import tasks
+from funkwhale_api.music.models import ImportJob
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 
@@ -101,6 +102,31 @@ def test_in_place_import_only_from_music_dir(factories, settings):
         call_command(
             "import_files", path, in_place=True, username="me", interactive=False
         )
+
+
+def test_import_with_multiple_argument(factories, mocker):
+    factories["users.User"](username="me")
+    path1 = os.path.join(DATA_DIR, "dummy_file.ogg")
+    path2 = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
+    mocked_filter = mocker.patch(
+        "funkwhale_api.providers.audiofile.management.commands.import_files.Command.filter_matching",
+        return_value=({"new": [], "skipped": []}),
+    )
+    call_command("import_files", path1, path2, username="me", interactive=False)
+    mocked_filter.assert_called_once_with([path1, path2])
+
+
+def test_import_with_replace_flag(factories, mocker):
+    factories["users.User"](username="me")
+    path = os.path.join(DATA_DIR, "dummy_file.ogg")
+    mocked_job_run = mocker.patch("funkwhale_api.music.tasks.import_job_run")
+    call_command("import_files", path, username="me", replace=True, interactive=False)
+    created_job = ImportJob.objects.latest("id")
+
+    assert created_job.replace_if_duplicate is True
+    mocked_job_run.assert_called_once_with(
+        import_job_id=created_job.id, use_acoustid=False
+    )
 
 
 def test_import_files_creates_a_batch_and_job(factories, mocker):
