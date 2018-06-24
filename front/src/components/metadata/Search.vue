@@ -116,7 +116,7 @@ export default {
       })[0]
     },
     searchUrl: function () {
-      return this.$store.getters['instance/absoluteUrl']('providers/musicbrainz/search/' + this.currentTypeObject.value + 's/?query={query}')
+      return this.$store.getters['instance/absoluteUrl']('api/v1/providers/musicbrainz/search/' + this.currentTypeObject.value + 's/?query={query}')
     },
     types: function () {
       return [
