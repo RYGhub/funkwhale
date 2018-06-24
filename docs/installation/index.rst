@@ -67,6 +67,11 @@ We also maintain an installation guide for Debian 9.
    systemd
 
 
+Funkwhale packages are available for the following platforms:
+
+- `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
+
+
 .. _frontend-setup:
 
 Frontend setup
