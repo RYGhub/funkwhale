@@ -91,7 +91,7 @@ export default {
           })
           return {results: results}
         },
-        url: this.$store.getters['instance/absoluteUrl']('search?query={query}')
+        url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }
     })
   }
