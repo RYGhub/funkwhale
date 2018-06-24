@@ -10,6 +10,83 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.15 (2018-06-24)
+-----------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Added admin interface to manage import requests (#190)
+- Added replace flag during import to replace already present tracks with a new
+  version of their track file (#222)
+- Funkwhale's front-end can now point to any instance (#327) Removed front-end
+  and back-end coupling
+- Management interface for users (#212)
+- New invite system (#248) New invite system
+
+
+Enhancements:
+
+- Added "TV" to the list of highlighted words during YouTube import (#154)
+- Command line import now accepts unlimited args (#242)
+
+
+Bugfixes:
+
+- Expose track files date in manage API (#307)
+- Fixed current track restart/hiccup when shuffling queue, deleting track from
+  queue or reordering (#310)
+- Include user's current private playlists on playlist list (#302)
+- Remove link to generic radios, since they don't have detail pages (#324)
+
+
+Documentation:
+
+- Document that Funkwhale may be installed with YunoHost (#325)
+- Documented a saner layout with symlinks for in-place imports (#254)
+- Upgrade documentation now use the correct user on non-docker setups (#265)
+
+
+Invite system
+^^^^^^^^^^^^^
+
+On closed instances, it has always been a little bit painful to create accounts
+by hand for new users. This release solve that by adding invitations.
+
+You can generate invitation codes via the "users" admin interface (you'll find a
+link in the sidebar). Those codes are valid for 14 days, and can be used once
+to create a new account on the instance, even if registrations are closed.
+
+By default, we generate a random code for invitations, but you can also use custom codes
+if you need to print them or make them fancier ;)
+
+Invitations generation and management requires the "settings" permission.
+
+
+Removed front-end and back-end coupling
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Eventhough Funkwhale's front-end has always been a Single Page Application,
+talking to an API, it was only able to talk to an API on the same domain.
+
+There was no real technical justification behind this (only lazyness), and it was
+also blocking interesting use cases:
+
+- Use multiple customized versions of the front-end with the same instance
+- Use a customized version of the front-end with multiple instances
+- Use a locally hosted front-end with a remote API, which is especially useful in development
+
+From now on, Funkwhale's front-end can connect to any Funkwhale server. You can
+change the server you are connecting to in the footer.
+
+Fixing this also unlocked a really interesting feature in our development/review workflow:
+by leveraging Gitlab CI and review apps, we are now able to deploy automatically live versions of
+a merge request, making it possible for anyone to review front-end changes easily, without
+the need to install a local environment.
+
+
 0.14.2 (2018-06-16)
 -------------------
 
