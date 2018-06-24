@@ -55,6 +55,7 @@ class ManageTrackFileSerializer(serializers.ModelSerializer):
             "track",
             "duration",
             "mimetype",
+            "creation_date",
             "bitrate",
             "size",
             "path",
