@@ -102,6 +102,7 @@ export default Vue.extend({
       importedUrl: '',
       warnings: [
         'live',
+        'tv',
         'full',
         'cover',
         'mix'
