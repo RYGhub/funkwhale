@@ -17,13 +17,13 @@ def get_privacy_field():
     )
 
 
-def privacy_level_query(user, lookup_field="privacy_level"):
+def privacy_level_query(user, lookup_field="privacy_level", user_field="user"):
     if user.is_anonymous:
         return models.Q(**{lookup_field: "everyone"})
 
     return models.Q(
-        **{"{}__in".format(lookup_field): ["followers", "instance", "everyone"]}
-    )
+        **{"{}__in".format(lookup_field): ["instance", "everyone"]}
+    ) | models.Q(**{lookup_field: "me", user_field: user})
 
 
 class SearchFilter(django_filters.CharFilter):

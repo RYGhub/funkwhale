@@ -71,6 +71,9 @@ export default {
       if (relativeUrl.startsWith('http')) {
         return relativeUrl
       }
+      if (state.instanceUrl.endsWith('/') && relativeUrl.startsWith('/')) {
+        relativeUrl = relativeUrl.slice(1)
+      }
       return state.instanceUrl + relativeUrl
     }
   },

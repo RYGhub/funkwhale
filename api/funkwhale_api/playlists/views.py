@@ -110,7 +110,9 @@ class PlaylistTrackViewSet(
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(
-                self.request.user, lookup_field="playlist__privacy_level"
+                self.request.user,
+                lookup_field="playlist__privacy_level",
+                user_field="playlist__user",
             )
         )
 

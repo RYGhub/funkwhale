@@ -12,7 +12,8 @@ from funkwhale_api.users.factories import UserFactory
         (AnonymousUser(), Q(privacy_level="everyone")),
         (
             UserFactory.build(pk=1),
-            Q(privacy_level__in=["followers", "instance", "everyone"]),
+            Q(privacy_level__in=["instance", "everyone"])
+            | Q(privacy_level="me", user=UserFactory.build(pk=1)),
         ),
     ],
 )

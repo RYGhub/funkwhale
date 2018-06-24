@@ -93,7 +93,7 @@ export default {
       let url = 'playlists/' + this.id + '/'
       axios.get(url).then((response) => {
         self.playlist = response.data
-        axios.get(url + 'tracks').then((response) => {
+        axios.get(url + 'tracks/').then((response) => {
           self.updatePlts(response.data.results)
         }).then(() => {
           self.isLoading = false
