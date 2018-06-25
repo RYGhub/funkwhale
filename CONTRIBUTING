@@ -82,7 +82,7 @@ Visit https://code.eliotberriot.com/funkwhale/funkwhale and clone the repository
 A note about branches
 ^^^^^^^^^^^^^^^^^^^^^
 
-Next release development occurs on the "develop" branch, and releases are made on the "master" branch. Therefor, when submitting Merge Requests, ensure you are merging on the develop branch.
+Next release development occurs on the "develop" branch, and releases are made on the "master" branch. Therefore, when submitting Merge Requests, ensure you are merging on the develop branch.
 
 
 Working with docker
