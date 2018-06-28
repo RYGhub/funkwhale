@@ -63,3 +63,15 @@ def test_auth_with_inactive_users(api_request, factories):
     authenticator = authentication.SubsonicAuthentication()
     with pytest.raises(exceptions.AuthenticationFailed):
         authenticator.authenticate(request)
+
+
+def test_auth_case_insensitive(api_request, factories):
+    user = factories["users.User"](username="Hello")
+    user.subsonic_api_token = "password"
+    user.save()
+    request = api_request.get("/", {"u": "hello", "p": "password"})
+
+    authenticator = authentication.SubsonicAuthentication()
+    u, _ = authenticator.authenticate(request)
+
+    assert user == u

@@ -19,7 +19,7 @@ def authenticate(username, password):
             password = password.replace("enc:", "", 1)
             password = binascii.unhexlify(password).decode("utf-8")
         user = User.objects.get(
-            username=username, is_active=True, subsonic_api_token=password
+            username__iexact=username, is_active=True, subsonic_api_token=password
         )
     except (User.DoesNotExist, binascii.Error):
         raise exceptions.AuthenticationFailed("Wrong username or password.")
