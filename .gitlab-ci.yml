@@ -63,12 +63,15 @@ review_docs:
     BUILD_PATH: "../public"
   before_script:
     - cd docs
+    - apt-get update
+    - apt-get install -y graphviz
+    - pip install sphinx
+
   cache:
     key: "$CI_PROJECT_ID__sphinx"
     paths:
       - "$PIP_CACHE_DIR"
   script:
-    - pip install sphinx
     - ./build_docs.sh
     - mkdir -p /static/docs/$CI_BUILD_REF_SLUG
     - cp -r $CI_PROJECT_DIR/public/* /static/docs/$CI_BUILD_REF_SLUG
@@ -205,8 +208,10 @@ pages:
     BUILD_PATH: "../public"
   before_script:
     - cd docs
-  script:
+    - apt-get update
+    - apt-get install -y graphviz
     - pip install sphinx
+  script:
     - ./build_docs.sh
   cache:
     key: "$CI_PROJECT_ID__sphinx"

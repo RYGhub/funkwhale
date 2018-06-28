@@ -72,7 +72,7 @@ Upgrading the API
 ^^^^^^^^^^^^^^^^^
 
 On non-docker, upgrade involves a few more commands. We assume your setup
-match what is described in :doc:`debian`:
+match what is described in :doc:`/installation/debian`:
 
 .. parsed-literal::
 

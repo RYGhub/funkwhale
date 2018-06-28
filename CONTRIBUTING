@@ -1,5 +1,5 @@
 Contribute to Funkwhale development
-==================================
+===================================
 
 First of all, thank you for your interest in the project! We really
 appreciate the fact that you're about to take some time to read this
@@ -111,7 +111,7 @@ Create it like this::
 
 
 Create docker network
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 Create the federation network::
 
