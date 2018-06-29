@@ -184,6 +184,7 @@ build_front:
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
+    - chmod -R 750 front/dist
   cache:
     key: "$CI_PROJECT_ID__front_dependencies"
     paths:
@@ -248,7 +249,9 @@ build_api:
     name: "api_${CI_COMMIT_REF_NAME}"
     paths:
       - api
-  script: echo Done!
+  script:
+    - chmod -R 750 api
+    - echo Done!
   only:
     - tags@funkwhale/funkwhale
     - master@funkwhale/funkwhale
