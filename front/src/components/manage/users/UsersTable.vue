@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
+          <label>{{ $gettext('Search') }}</label>
           <input type="text" v-model="search" placeholder="Search by username, email, name..." />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label>{{ $gettext('Ordering') }}</label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
+          <label>{{ $gettext('Ordering direction') }}</label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">{{ $t('Ascending') }}</option>
-            <option value="-">{{ $t('Descending') }}</option>
+            <option value="+">{{ $gettext('Ascending') }}</option>
+            <option value="-">{{ $gettext('Descending') }}</option>
           </select>
         </div>
       </div>
@@ -35,13 +35,13 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Username') }}</th>
-          <th>{{ $t('Email') }}</th>
-          <th>{{ $t('Account status') }}</th>
-          <th>{{ $t('Sign-up') }}</th>
-          <th>{{ $t('Last activity') }}</th>
-          <th>{{ $t('Permissions') }}</th>
-          <th>{{ $t('Status') }}</th>
+          <th>{{ $gettext('Username') }}</th>
+          <th>{{ $gettext('Email') }}</th>
+          <th>{{ $gettext('Account status') }}</th>
+          <th>{{ $gettext('Sign-up') }}</th>
+          <th>{{ $gettext('Last activity') }}</th>
+          <th>{{ $gettext('Permissions') }}</th>
+          <th>{{ $gettext('Status') }}</th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -51,15 +51,15 @@
             <span>{{ scope.obj.email }}</span>
           </td>
           <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label">{{ $t('Active') }}</span>
-            <span v-else class="ui basic grey label">{{ $t('Inactive') }}</span>
+            <span v-if="scope.obj.is_active" class="ui basic green label">{{ $gettext('Active') }}</span>
+            <span v-else class="ui basic grey label">{{ $gettext('Inactive') }}</span>
           </td>
           <td>
             <human-date :date="scope.obj.date_joined"></human-date>
           </td>
           <td>
             <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else>{{ $t('N/A') }}</template>
+            <template v-else>{{ $gettext('N/A') }}</template>
           </td>
           <td>
             <template v-for="p in permissions">
@@ -67,9 +67,9 @@
             </template>
           </td>
           <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label">{{ $t('Admin') }}</span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label">{{ $t('Staff member') }}</span>
-            <span v-else class="ui basic label">{{ $t('regular user') }}</span>
+            <span v-if="scope.obj.is_superuser" class="ui pink label">{{ $gettext('Admin') }}</span>
+            <span v-else-if="scope.obj.is_staff" class="ui purple label">{{ $gettext('Staff member') }}</span>
+            <span v-else class="ui basic label">{{ $gettext('regular user') }}</span>
           </td>
         </template>
       </action-table>
@@ -85,7 +85,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -161,19 +164,19 @@ export default {
       return [
         {
           'code': 'upload',
-          'label': this.$t('Upload')
+          'label': this.$gettext('Upload')
         },
         {
           'code': 'library',
-          'label': this.$t('Library')
+          'label': this.$gettext('Library')
         },
         {
           'code': 'federation',
-          'label': this.$t('Federation')
+          'label': this.$gettext('Federation')
         },
         {
           'code': 'settings',
-          'label': this.$t('Settings')
+          'label': this.$gettext('Settings')
         }
       ]
     },
@@ -191,7 +194,7 @@ export default {
       return [
         // {
         //   name: 'delete',
-        //   label: this.$t('Delete'),
+        //   label: this.$gettext('Delete'),
         //   isDangerous: true
         // }
       ]

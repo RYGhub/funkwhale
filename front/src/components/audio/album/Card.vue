@@ -10,10 +10,9 @@
         </div>
         <div class="meta">
           <span>
-            <i18next path="By {%0%}">
-              <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-              {{ album.artist.name }}</router-link>
-            </i18next>
+            <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+              <translate :translate-params="{artist: album.artist.name}">By %{ artist }</translate>
+            </router-link>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>
         <div class="description" v-if="mode === 'rich'">
@@ -39,23 +38,21 @@
           </table>
           <div class="center aligned segment" v-if="album.tracks.length > initialTracks">
             <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">
-              <i18next path="Show {%0%} more tracks">{{ album.tracks.length - initialTracks }}</i18next>
+              <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show 1 more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <i18next path="Collapse" />
+              {{ $gettext('Collapse') }}
             </em>
           </div>
         </div>
       </div>
       <div class="extra content">
         <play-button class="mini basic orange right floated" :tracks="album.tracks">
-          <i18next path="Play all"/>
+          {{ $gettext('Play all') }}
         </play-button>
         <span>
           <i class="music icon"></i>
-          <i18next path="{%0%} tracks">
-            {{ album.tracks.length }}
-          </i18next>
+          <translate :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">1 track</translate>
         </span>
       </div>
     </div>

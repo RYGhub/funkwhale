@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2><i18next path="Search for some music"/></h2>
+    <h2>{{ $gettext('Search for some music') }}</h2>
     <div :class="['ui', {'loading': isLoading }, 'search']">
       <div class="ui icon big input">
         <i class="search icon"></i>
@@ -8,22 +8,22 @@
       </div>
     </div>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><i18next path="Artists"/></h3>
+      <h3 class="ui title">{{ $gettext('Artists') }}</h3>
       <div v-if="results.artists.length > 0" class="ui stackable three column grid">
         <div class="column" :key="artist.id" v-for="artist in results.artists">
           <artist-card class="fluid" :artist="artist" ></artist-card>
         </div>
       </div>
-      <p v-else><i18next path="Sorry, we did not found any artist matching your query"/></p>
+      <p v-else>{{ $gettext('Sorry, we did not found any artist matching your query') }}</p>
     </template>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><i18next path="Albums"/></h3>
+      <h3 class="ui title">{{ $gettext('Albums') }}</h3>
       <div v-if="results.albums.length > 0" class="ui stackable three column grid">
         <div class="column" :key="album.id" v-for="album in results.albums">
           <album-card class="fluid" :album="album" ></album-card>
         </div>
       </div>
-      <p v-else><i18next path="Sorry, we did not found any album matching your query"/></p>
+      <p v-else>{{ $gettext('Sorry, we did not found any album matching your query') }}</p>
     </template>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <div v-title="'Federated tracks'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Browsing federated tracks') }}</h2>
+      <h2 class="ui header">{{ $gettext('Browsing federated tracks') }}</h2>
       <div class="ui hidden divider"></div>
       <library-track-table :show-library="true"></library-track-table>
     </div>

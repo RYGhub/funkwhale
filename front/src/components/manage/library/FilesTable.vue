@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
+          <label>{{ $gettext('Search') }}</label>
           <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label>{{ $gettext('Ordering') }}</label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
+          <label>{{ $gettext('Ordering direction') }}</label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+">Ascending</option>
             <option value="-">Descending</option>
@@ -35,14 +35,14 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Title') }}</th>
-          <th>{{ $t('Artist') }}</th>
-          <th>{{ $t('Album') }}</th>
-          <th>{{ $t('Import date') }}</th>
-          <th>{{ $t('Type') }}</th>
-          <th>{{ $t('Bitrate') }}</th>
-          <th>{{ $t('Duration') }}</th>
-          <th>{{ $t('Size') }}</th>
+          <th>{{ $gettext('Title') }}</th>
+          <th>{{ $gettext('Artist') }}</th>
+          <th>{{ $gettext('Album') }}</th>
+          <th>{{ $gettext('Import date') }}</th>
+          <th>{{ $gettext('Type') }}</th>
+          <th>{{ $gettext('Bitrate') }}</th>
+          <th>{{ $gettext('Duration') }}</th>
+          <th>{{ $gettext('Size') }}</th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -61,25 +61,25 @@
             {{ scope.obj.audio_mimetype }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            {{ $gettext('N/A') }}
           </td>
           <td v-if="scope.obj.bitrate">
             {{ scope.obj.bitrate | humanSize }}/s
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            {{ $gettext('N/A') }}
           </td>
           <td v-if="scope.obj.duration">
             {{ time.parse(scope.obj.duration) }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            {{ $gettext('N/A') }}
           </td>
           <td v-if="scope.obj.size">
             {{ scope.obj.size | humanSize }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            {{ $gettext('N/A') }}
           </td>
         </template>
       </action-table>
@@ -95,7 +95,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -178,10 +181,11 @@ export default {
       }
     },
     actions () {
+      let msg = this.$gettext('Delete')
       return [
         {
           name: 'delete',
-          label: this.$t('Delete'),
+          label: msg,
           isDangerous: true
         }
       ]

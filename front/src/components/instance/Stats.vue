@@ -2,26 +2,28 @@
   <div>
     <div v-if="stats" class="ui stackable two column grid">
       <div class="column">
-        <h3 class="ui left aligned header"><i18next path="User activity"/></h3>
+        <h3 class="ui left aligned header">
+          {{ $gettext('User activity') }}
+        </h3>
         <div v-if="stats" class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
               <i class="green user icon"></i>
               {{ stats.users }}
             </div>
-            <i18next tag="div" class="label" path="users"/>
+            <div class="label">{{ $gettext('users') }}</div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="orange sound icon"></i> {{ stats.listenings }}
             </div>
-            <i18next tag="div" class="label" path="tracks listened"/>
+            <div class="label">{{ $gettext('tracks listened') }}</div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="pink heart icon"></i> {{ stats.trackFavorites }}
             </div>
-            <i18next tag="div" class="label" path="Tracks favorited"/>
+            <div class="label">{{ $gettext('Tracks favorited') }}</div>
           </div>
         </div>
       </div>
@@ -32,25 +34,25 @@
             <div class="value">
               {{ parseInt(stats.musicDuration) }}
             </div>
-            <i18next tag="div" class="label" path="hours of music"/>
+            <div class="label">{{ $gettext('Hours of music') }}</div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.artists }}
             </div>
-            <i18next tag="div" class="label" path="Artists"/>
+            <div class="label">{{ $gettext('Artists') }}</div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.albums }}
             </div>
-            <i18next tag="div" class="label" path="Albums"/>
+            <div class="label">{{ $gettext('Albums') }}</div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.tracks }}
             </div>
-            <i18next tag="div" class="label" path="tracks"/>
+            <div class="label">{{ $gettext('tracks') }}</div>
           </div>
         </div>
       </div>

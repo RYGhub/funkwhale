@@ -4,7 +4,9 @@
       <a :href="getMusicbrainzUrl('artist', metadata.id)" target="_blank" title="View on MusicBrainz">{{ metadata.name }}</a>
     </h3>
     <form class="ui form" @submit.prevent="">
-      <h6 class="ui header"><i18next path="Filter album types"/></h6>
+      <h6 class="ui header">
+        {{ $gettext('Filter album types') }}
+      </h6>
       <div class="inline fields">
         <div class="field" v-for="t in availableReleaseTypes">
           <div class="ui checkbox">
@@ -13,7 +15,7 @@
           </div>
         </div>
         <div class="field">
-          <i18next tag="label" path="Query template"/>
+          <label>{{ $gettext('Query template') }}</label>
           <input v-model="customQueryTemplate" />
         </div>
       </div>

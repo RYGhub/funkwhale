@@ -1,30 +1,30 @@
 <template>
-  <div class="main pusher" v-title="$t('Confirm your email')">
+  <div class="main pusher" v-title="$gettext('Confirm your email')">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $t('Confirm your email') }}</h2>
+        <h2>{{ $gettext('Confirm your email') }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $t('Error while confirming your email') }}</div>
+            <div class="header">{{ $gettext('Error while confirming your email') }}</div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label>{{ $t('Confirmation code') }}</label>
+            <label>{{ $gettext('Confirmation code') }}</label>
             <input type="text" required v-model="key" />
           </div>
           <router-link :to="{path: '/login'}">
-            {{ $t('Back to login') }}
+            {{ $gettext('Back to login') }}
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            {{ $t('Confirm your email') }}</button>
+            {{ $gettext('Confirm your email') }}</button>
         </form>
         <div v-else class="ui positive message">
-          <div class="header">{{ $t('Email confirmed') }}</div>
-          <p>{{ $t('Your email address was confirmed, you can now use the service without limitations.') }}</p>
+          <div class="header">{{ $gettext('Email confirmed') }}</div>
+          <p>{{ $gettext('Your email address was confirmed, you can now use the service without limitations.') }}</p>
           <router-link :to="{name: 'login'}">
-            {{ $t('Proceed to login') }}
+            {{ $gettext('Proceed to login') }}
           </router-link>
         </div>
       </div>

@@ -6,7 +6,7 @@
     :type="passwordInputType"
     @input="$emit('input', $event.target.value)"
     :value="value">
-    <span @click="showPassword = !showPassword" :title="$t('Show/hide password')" class="ui icon button">
+    <span @click="showPassword = !showPassword" :title="$gettext('Show/hide password')" class="ui icon button">
       <i class="eye icon"></i>
     </span>
   </div>

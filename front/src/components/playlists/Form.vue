@@ -1,29 +1,29 @@
 <template>
   <form class="ui form" @submit.prevent="submit()">
-    <h4 v-if="title" class="ui header">{{ $t('Create a new playlist') }}</h4>
+    <h4 v-if="title" class="ui header">{{ $gettext('Create a new playlist') }}</h4>
     <div v-if="success" class="ui positive message">
       <div class="header">
         <template v-if="playlist">
-          {{ $t('Playlist updated') }}
+          {{ $gettext('Playlist updated') }}
         </template>
         <template v-else>
-          {{ $t('Playlist created') }}
+          {{ $gettext('Playlist created') }}
         </template>
       </div>
     </div>
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header">{{ $t('We cannot create the playlist') }}</div>
+      <div class="header">{{ $gettext('We cannot create the playlist') }}</div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div class="three fields">
       <div class="field">
-        <label>{{ $t('Playlist name') }}</label>
+        <label>{{ $gettext('Playlist name') }}</label>
         <input v-model="name" required type="text" placeholder="My awesome playlist" />
       </div>
       <div class="field">
-        <label>{{ $t('Playlist visibility') }}</label>
+        <label>{{ $gettext('Playlist visibility') }}</label>
         <select class="ui dropdown" v-model="privacyLevel">
           <option :value="c.value" v-for="c in privacyLevelChoices">{{ c.label }}</option>
         </select>
@@ -31,8 +31,8 @@
       <div class="field">
         <label>&nbsp;</label>
         <button :class="['ui', 'fluid', {'loading': isLoading}, 'button']" type="submit">
-          <template v-if="playlist">{{ $t('Update playlist') }}</template>
-          <template v-else>{{ $t('Create playlist') }}</template>
+          <template v-if="playlist">{{ $gettext('Update playlist') }}</template>
+          <template v-else>{{ $gettext('Create playlist') }}</template>
         </button>
       </div>
     </div>
@@ -73,15 +73,15 @@ export default {
       return [
         {
           value: 'me',
-          label: this.$t('Nobody except me')
+          label: this.$gettext('Nobody except me')
         },
         {
           value: 'instance',
-          label: this.$t('Everyone on this instance')
+          label: this.$gettext('Everyone on this instance')
         },
         {
           value: 'everyone',
-          label: this.$t('Everyone')
+          label: this.$gettext('Everyone')
         }
       ]
     }

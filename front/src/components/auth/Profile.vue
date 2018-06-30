@@ -9,17 +9,19 @@
           <i class="circular inverted user green icon"></i>
           <div class="content">
             {{ $store.state.auth.profile.username }}
-            <i18next class="sub header" path="Registered since {%0%}">{{ signupDate }}</i18next>
+            <div class="sub header" v-translate="{date: signupDate}">Registered since %{ date }</div>
           </div>
         </h2>
-        <div class="ui basic green label"><i18next path="This is you!"/></div>
+        <div class="ui basic green label">
+          {{ $gettext('This is you!') }}
+        </div>
         <div v-if="$store.state.auth.profile.is_staff" class="ui yellow label">
           <i class="star icon"></i>
-          <i18next path="Staff member"/>
+          {{ $gettext('Staff member') }}
         </div>
         <router-link class="ui tiny basic button" :to="{path: '/settings'}">
           <i class="setting icon"> </i>
-          <i18next path="Settings..."/>
+          {{ $gettext('Settings...') }}
         </router-link>
 
       </div>

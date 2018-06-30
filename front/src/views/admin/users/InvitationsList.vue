@@ -1,7 +1,7 @@
 <template>
-  <div v-title="$t('Invitations')">
+  <div v-title="$gettext('Invitations')">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Invitations') }}</h2>
+      <h2 class="ui header">{{ $gettext('Invitations') }}</h2>
       <invitation-form></invitation-form>
       <div class="ui hidden divider"></div>
       <invitations-table></invitations-table>

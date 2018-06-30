@@ -1,7 +1,7 @@
 <template>
-  <div v-title="$t('Import requests')">
+  <div v-title="$gettext('Import requests')">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Import requests') }}</h2>
+      <h2 class="ui header">{{ $gettext('Import requests') }}</h2>
       <div class="ui hidden divider"></div>
       <library-requests-table></library-requests-table>
     </div>

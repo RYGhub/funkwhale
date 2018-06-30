@@ -1,30 +1,30 @@
 <template>
   <div>
     <form v-if="!over" class="ui form" @submit.prevent="submit">
-      <p>{{ $t('Something\'s missing in the library? Let us know what you would like to listen!') }}</p>
+      <p>{{ $gettext('Something\'s missing in the library? Let us know what you would like to listen!') }}</p>
       <div class="required field">
-        <label>{{ $t('Artist name') }}</label>
+        <label>{{ $gettext('Artist name') }}</label>
         <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required maxlength="200">
       </div>
       <div class="field">
-        <label>{{ $t('Albums') }}</label>
-        <p>{{ $t('Leave this field empty if you\'re requesting the whole discography.') }}</p>
+        <label>{{ $gettext('Albums') }}</label>
+        <p>{{ $gettext('Leave this field empty if you\'re requesting the whole discography.') }}</p>
         <input v-model="currentAlbums" placeholder="The White Album, Thriller…" maxlength="2000">
       </div>
       <div class="field">
-        <label>{{ $t('Comment') }}</label>
+        <label>{{ $gettext('Comment') }}</label>
         <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed" maxlength="2000"></textarea>
       </div>
-      <button class="ui submit button" type="submit">{{ $t('Submit') }}</button>
+      <button class="ui submit button" type="submit">{{ $gettext('Submit') }}</button>
     </form>
     <div v-else class="ui success message">
       <div class="header">Request submitted!</div>
-      <p>{{ $t('We\'ve received your request, you\'ll get some groove soon ;)') }}</p>
-      <button @click="reset" class="ui button">{{ $t('Submit another request') }}</button>
+      <p>{{ $gettext('We\'ve received your request, you\'ll get some groove soon ;)') }}</p>
+      <button @click="reset" class="ui button">{{ $gettext('Submit another request') }}</button>
     </div>
     <div v-if="requests.length > 0">
       <div class="ui divider"></div>
-      <h3 class="ui header">{{ $t('Pending requests') }}</h3>
+      <h3 class="ui header">{{ $gettext('Pending requests') }}</h3>
       <div class="ui list">
         <div v-for="request in requests" class="item">
           <div class="content">

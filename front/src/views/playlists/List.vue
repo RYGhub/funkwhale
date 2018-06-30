@@ -1,21 +1,21 @@
 <template>
-  <div v-title="$t('Playlists')">
+  <div v-title="$gettext('Playlists')">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Browsing playlists') }}</h2>
+      <h2 class="ui header">{{ $gettext('Browsing playlists') }}</h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <template v-if="$store.state.auth.authenticated">
           <button
             @click="$store.commit('playlists/chooseTrack', null)"
-            class="ui basic green button">{{ $t('Manage your playlists') }}</button>
+            class="ui basic green button">{{ $gettext('Manage your playlists') }}</button>
           <div class="ui hidden divider"></div>
         </template>
         <div class="fields">
           <div class="field">
-            <label>{{ $t('Search') }}</label>
-            <input type="text" v-model="query" :placeholder="$t('Enter an playlist name...')"/>
+            <label>{{ $gettext('Search') }}</label>
+            <input type="text" v-model="query" :placeholder="$gettext('Enter an playlist name...')"/>
           </div>
           <div class="field">
-            <label>{{ $t('Ordering') }}</label>
+            <label>{{ $gettext('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -23,14 +23,14 @@
             </select>
           </div>
           <div class="field">
-            <label>{{ $t('Ordering direction') }}</label>
+            <label>{{ $gettext('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+">{{ $t('Ascending') }}</option>
-              <option value="-">{{ $t('Descending') }}</option>
+              <option value="+">{{ $gettext('Ascending') }}</option>
+              <option value="-">{{ $gettext('Descending') }}</option>
             </select>
           </div>
           <div class="field">
-            <label>{{ $t('Results per page') }}</label>
+            <label>{{ $gettext('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

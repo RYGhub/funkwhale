@@ -2,20 +2,20 @@
   <div class="main pusher" v-title="'Log In'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><i18next path="Log in to your Funkwhale account"/></h2>
+        <h2>{{ $gettext('Log in to your Funkwhale account') }}</h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="error" class="ui negative message">
-            <div class="header"><i18next path="We cannot log you in"/></div>
+            <div class="header">{{ $gettext('We cannot log you in') }}</div>
             <ul class="list">
-              <i18next tag="li" v-if="error == 'invalid_credentials'" path="Please double-check your username/password couple is correct"/>
-              <i18next tag="li" v-else path="An unknown error happend, this can mean the server is down or cannot be reached"/>
+              <li v-if="error == 'invalid_credentials'">{{ $gettext('Please double-check your username/password couple is correct') }}</li>
+              <li v-else>{{ $gettext('An unknown error happend, this can mean the server is down or cannot be reached') }}</li>
             </ul>
           </div>
           <div class="field">
             <label>
-              {{ $t('Username or email') }} |
+              {{ $gettext('Username or email') }} |
               <router-link :to="{path: '/signup'}">
-                {{ $t('Create an account') }}
+                {{ $gettext('Create an account') }}
               </router-link>
             </label>
             <input
@@ -30,15 +30,17 @@
           </div>
           <div class="field">
             <label>
-              {{ $t('Password') }} |
+              {{ $gettext('Password') }} |
               <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
-                {{ $t('Reset your password') }}
+                {{ $gettext('Reset your password') }}
               </router-link>
             </label>
             <password-input :index="2" required v-model="credentials.password" />
 
           </div>
-          <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit"><i18next path="Login"/></button>
+          <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
+            {{ $gettext('Login') }}
+          </button>
         </form>
       </div>
     </div>

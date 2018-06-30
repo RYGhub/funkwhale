@@ -42,7 +42,7 @@
       </span>
       <modal v-if="checkResult" :show.sync="showCandidadesModal">
         <div class="header">
-          <i18next path="Track matching filter"/>
+          {{ $gettext('Track matching filter') }}
         </div>
         <div class="content">
           <div class="description">
@@ -51,13 +51,13 @@
         </div>
         <div class="actions">
           <div class="ui black deny button">
-            <i18next path="Cancel"/>
+            {{ $gettext('Cancel') }}
           </div>
         </div>
       </modal>
     </td>
     <td>
-      <button @click="$emit('delete', index)" class="ui basic red button"><i18next path="Remove"/></button>
+      <button @click="$emit('delete', index)" class="ui basic red button">{{ $gettext('Remove') }}</button>
     </td>
   </tr>
 </template>

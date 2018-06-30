@@ -4,7 +4,9 @@
 
     <modal class="small" :show.sync="showModal">
       <div class="header">
-        <slot name="modal-header"><i18next path="Do you want to confirm this action?"/></slot>
+        <slot name="modal-header">
+          {{ $gettext('Do you want to confirm this action?') }}
+        </slot>
       </div>
       <div class="scrolling content">
         <div class="description">
@@ -12,9 +14,13 @@
         </div>
       </div>
       <div class="actions">
-        <div class="ui cancel button"><i18next path="Cancel"/></div>
+        <div class="ui cancel button">
+          {{ $gettext('Cancel') }}
+        </div>
         <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
-          <slot name="modal-confirm"><i18next path="Confirm"/></slot>
+          <slot name="modal-confirm">
+            {{ $gettext('Confirm') }}
+          </slot>
         </div>
       </div>
     </modal>

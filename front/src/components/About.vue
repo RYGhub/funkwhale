@@ -3,21 +3,23 @@
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <template v-if="instance.name.value">{{ $t('About {%instance%}', { instance: instance.name.value }) }}</template>
-            <template v-else="instance.name.value">{{ $t('About this instance') }}</template>
+            <template v-if="instance.name.value" :template-params="{instance: instance.name}">
+             About %{ instance }
+            </template>
+            <template v-else="instance.name.value">{{ $gettext('About this instance') }}</template>
         </h1>
         <stats></stats>
       </div>
     </div>
     <div class="ui vertical stripe segment">
       <p v-if="!instance.short_description.value && !instance.long_description.value">
-        {{ $t('Unfortunately, owners of this instance did not yet take the time to complete this page.') }}
+        {{ $gettext('Unfortunately, owners of this instance did not yet take the time to complete this page.') }}
       </p>
       <router-link
         class="ui button"
         v-if="$store.state.auth.availablePermissions['settings']"
         :to="{path: '/manage/settings', hash: 'instance'}">
-        <i class="pencil icon"></i>{{ $t('Edit instance info') }}
+        <i class="pencil icon"></i>{{ $gettext('Edit instance info') }}
       </router-link>
       <div
         v-if="instance.short_description.value"

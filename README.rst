@@ -26,4 +26,9 @@ Contribute
 ----------
 
 Contribution guidelines as well as development installation instructions
-are outlined in `CONTRIBUTING <CONTRIBUTING>`_
+are outlined in `CONTRIBUTING <CONTRIBUTING>`_.
+
+Translate
+^^^^^^^^^
+
+Translators willing to help can refer to `TRANSLATORS <TRANSLATORS>`_ for instructions.

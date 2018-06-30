@@ -1,15 +1,19 @@
 <template>
   <div v-title="'Artists'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header"><i18next path="Browsing artists"/></h2>
+      <h2 class="ui header">
+        {{ $gettext('Browsing artists') }}
+      </h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label><i18next path="Search"/></label>
+            <label>
+              {{ $gettext('Search') }}
+            </label>
             <input type="text" v-model="query" placeholder="Enter an artist name..."/>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering"/>
+            <label>{{ $gettext('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -17,14 +21,14 @@
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering direction"/>
+            <label>{{ $gettext('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">Ascending</option>
               <option value="-">Descending</option>
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Results per page"/>
+            <label>{{ $gettext('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

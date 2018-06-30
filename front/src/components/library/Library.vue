@@ -1,16 +1,24 @@
 <template>
   <div class="main library pusher">
     <div class="ui secondary pointing menu">
-      <router-link class="ui item" to="/library" exact><i18next path="Browse"/></router-link>
-      <router-link class="ui item" to="/library/artists" exact><i18next path="Artists"/></router-link>
-      <router-link class="ui item" to="/library/radios" exact><i18next path="Radios"/></router-link>
-      <router-link class="ui item" to="/library/playlists" exact><i18next path="Playlists"/></router-link>
+      <router-link class="ui item" to="/library" exact>
+        {{ $gettext('Browse') }}
+      </router-link>
+      <router-link class="ui item" to="/library/artists" exact>
+        {{ $gettext('Artists') }}
+      </router-link>
+      <router-link class="ui item" to="/library/radios" exact>
+        {{ $gettext('Radios') }}
+      </router-link>
+      <router-link class="ui item" to="/library/playlists" exact>
+        {{ $gettext('Playlists') }}
+      </router-link>
       <div class="ui secondary right menu">
         <router-link v-if="showImports" class="ui item" to="/library/import/launch" exact>
-          <i18next path="Import"/>
+          {{ $gettext('Import') }}
         </router-link>
         <router-link v-if="showImports" class="ui item" to="/library/import/batches">
-          <i18next path="Import batches"/>
+          {{ $gettext('Import batches') }}
         </router-link>
       </div>
     </div>

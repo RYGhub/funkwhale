@@ -2,16 +2,16 @@
   <div class="ui text container">
     <playlist-form @updated="$emit('playlist-updated', $event)" :title="false" :playlist="playlist"></playlist-form>
     <h3 class="ui top attached header">
-      {{ $t('Playlist editor') }}
+      {{ $gettext('Playlist editor') }}
     </h3>
     <div class="ui attached segment">
       <template v-if="status === 'loading'">
         <div class="ui active tiny inline loader"></div>
-        {{ $t('Syncing changes to server...') }}
+        {{ $gettext('Syncing changes to server...') }}
       </template>
       <template v-else-if="status === 'errored'">
         <i class="red close icon"></i>
-        {{ $t('An error occured while saving your changes') }}
+        {{ $gettext('An error occured while saving your changes') }}
         <div v-if="errors.length > 0" class="ui negative message">
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
@@ -19,7 +19,7 @@
         </div>
       </template>
       <template v-else-if="status === 'saved'">
-        <i class="green check icon"></i> {{ $t('Changes synced with server') }}
+        <i class="green check icon"></i> {{ $gettext('Changes synced with server') }}
       </template>
     </div>
     <div class="ui bottom attached segment">
@@ -29,14 +29,21 @@
         :class="['ui', {disabled: queueTracks.length === 0}, 'labeled', 'icon', 'button']"
         title="Copy tracks from current queue to playlist">
           <i class="plus icon"></i>
-          {{ $t('Insert from queue ({%count%} tracks)', { count: queueTracks.length }) }}
+          <translate
+            translate-plural="Insert from queue (%{ count } tracks)"
+            :translate-n="queueTracks.length"
+            :translate-params="{count: queueTracks.length}">
+            Insert from queue (%{ count } track)
+          </translate>
         </div>
 
       <dangerous-button :disabled="plts.length === 0" class="labeled right floated icon" color='yellow' :action="clearPlaylist">
-        <i class="eraser icon"></i> {{ $t('Clear playlist') }}
-        <p slot="modal-header">{{ $t('Do you want to clear the playlist "{%name%}"?', { name: playlist.name }) }}</p>
-        <p slot="modal-content">{{ $t('This will remove all tracks from this playlist and cannot be undone.') }}</p>
-        <p slot="modal-confirm">{{ $t('Clear playlist') }}</p>
+        <i class="eraser icon"></i> {{ $gettext('Clear playlist') }}
+        <p slot="modal-header">
+          <translate :translate-params="{playlist: playlist.name}">Do you want to clear the playlist "%{ playlist }"?</translate>
+        </p>
+        <p slot="modal-content">{{ $gettext('This will remove all tracks from this playlist and cannot be undone.') }}</p>
+        <p slot="modal-confirm">{{ $gettext('Clear playlist') }}</p>
       </dangerous-button>
       <div class="ui hidden divider"></div>
       <template v-if="plts.length > 0">

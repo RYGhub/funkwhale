@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
+          <label>{{ $gettext('Search') }}</label>
           <input type="text" v-model="search" placeholder="Search by username, email, code..." />
         </div>
         <div class="field">
-          <label>{{ $t("Ordering") }}</label>
+          <label>{{ $gettext("Ordering") }}</label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,11 +15,11 @@
           </select>
         </div>
         <div class="field">
-          <label>{{ $t("Status") }}</label>
+          <label>{{ $gettext("Status") }}</label>
           <select class="ui dropdown" v-model="isOpen">
-            <option :value="null">{{ $t('All') }}</option>
-            <option :value="true">{{ $t('Open') }}</option>
-            <option :value="false">{{ $t('Expired/used') }}</option>
+            <option :value="null">{{ $gettext('All') }}</option>
+            <option :value="true">{{ $gettext('Open') }}</option>
+            <option :value="false">{{ $gettext('Expired/used') }}</option>
           </select>
         </div>
       </div>
@@ -36,20 +36,20 @@
         :action-url="'manage/users/invitations/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Owner') }}</th>
-          <th>{{ $t('Status') }}</th>
-          <th>{{ $t('Creation date') }}</th>
-          <th>{{ $t('Expiration date') }}</th>
-          <th>{{ $t('Code') }}</th>
+          <th>{{ $gettext('Owner') }}</th>
+          <th>{{ $gettext('Status') }}</th>
+          <th>{{ $gettext('Creation date') }}</th>
+          <th>{{ $gettext('Expiration date') }}</th>
+          <th>{{ $gettext('Code') }}</th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
             <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.owner.username }}</router-link>
           </td>
           <td>
-            <span v-if="scope.obj.users.length > 0" class="ui green basic label">{{ $t('Used') }}</span>
-            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label">{{ $t('Expired') }}</span>
-            <span v-else class="ui basic label">{{ $t('Not used') }}</span>
+            <span v-if="scope.obj.users.length > 0" class="ui green basic label">{{ $gettext('Used') }}</span>
+            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label">{{ $gettext('Expired') }}</span>
+            <span v-else class="ui basic label">{{ $gettext('Not used') }}</span>
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
@@ -74,7 +74,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -155,10 +158,11 @@ export default {
       }
     },
     actions () {
+      let deleteLabel = this.$gettext('Delete')
       return [
         {
           name: 'delete',
-          label: this.$t('Delete'),
+          label: deleteLabel,
           filterCheckable: (obj) => {
             return obj.users.length === 0 && moment().isBefore(obj.expiration_date)
           }

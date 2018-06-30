@@ -11,15 +11,18 @@
       </div>
       <div class="meta">
         <i class="clock icon"></i>
-        <i18next path="Updated {%0%}">
-          <human-date :date="playlist.modification_date" />
-        </i18next>
+        <human-date :date="playlist.modification_date" />
       </div>
     </div>
     <div class="extra content">
       <span>
         <i class="sound icon"></i>
-        {{ $t('{%count%} tracks', { count: playlist.tracks_count }) }}
+        <translate
+          translate-plural="%{ count } tracks"
+          :translate-n="playlist.tracks_count"
+          :translate-params="{count: playlist.tracks_count}">
+          %{ count} track
+        </translate>
       </span>
       <play-button class="mini basic orange right floated" :playlist="playlist">Play all</play-button>
     </div>

@@ -2,30 +2,40 @@
   <div class="ui vertical stripe segment" v-title="'Radio Builder'">
     <div>
       <div>
-        <h2 class="ui header"><i18next path="Builder"/></h2>
-        <i18next tag="p" path="You can use this interface to build your own custom radio, which will play tracks according to your criteria"/>
+        <h2 class="ui header">
+          {{ $gettext('Builder') }}
+        </h2>
+        <p>{{ $gettext('You can use this interface to build your own custom radio, which will play tracks according to your criteria.') }}</p>
           <div class="ui form">
           <div class="inline fields">
             <div class="field">
-              <i18next tag="label" for="name" path="Radio name"/>
+              <label for="name">{{ $gettext('Radio name') }}</label>
               <input id="name" type="text" v-model="radioName" placeholder="My awesome radio" />
             </div>
             <div class="field">
               <input id="public" type="checkbox" v-model="isPublic" />
-              <i18next tag="label" for="public" path="Display publicly"/>
+              <label for="public">{{ $gettext('Display publicly') }}</label>
             </div>
-            <button :disabled="!canSave" @click="save" class="ui green button"><i18next path="Save"/></button>
+            <button :disabled="!canSave" @click="save" class="ui green button">
+              {{ $gettext('Save') }}
+            </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>
         <div class="ui form">
-          <p><i18next path="Add filters to customize your radio"/></p>
+          <p>
+            {{ $gettext('Add filters to customize your radio') }}
+          </p>
           <div class="inline field">
             <select class="ui dropdown" v-model="currentFilterType">
-              <option value=""><i18next path="Select a filter"/></option>
+              <option value="">
+                {{ $gettext('Select a filter') }}
+              </option>
               <option v-for="f in availableFilters" :value="f.type">{{ f.label }}</option>
             </select>
-            <button :disabled="!currentFilterType" @click="add" class="ui button"><i18next path="Add filter"/></button>
+            <button :disabled="!currentFilterType" @click="add" class="ui button">
+              {{ $gettext('Add filter') }}
+            </button>
           </div>
           <p v-if="currentFilter">
             {{ currentFilter.help_text }}
@@ -34,11 +44,11 @@
         <table class="ui table">
           <thead>
             <tr>
-              <i18next tag="th" class="two wide" path="Filter name"/>
-              <i18next tag="th" class="one wide" path="Exclude"/>
-              <i18next tag="th" class="six wide" path="Config"/>
-              <i18next tag="th" class="five wide" path="Candidates"/>
-              <i18next tag="th" class="two wide" path="Actions"/>
+              <th class="two wide">{{ $gettext('Filter name') }}</th>
+              <th class="one wide">{{ $gettext('Exclude') }}</th>
+              <th class="six wide">{{ $gettext('Config') }}</th>
+              <th class="five wide">{{ $gettext('Candidates') }}</th>
+              <th class="two wide">{{ $gettext('Actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -54,9 +64,13 @@
           </tbody>
         </table>
         <template v-if="checkResult">
-          <i18next tag="h3" class="ui header" path="{%0%} tracks matching combined filters">
-            {{ checkResult.candidates.count }}
-          </i18next>
+          <h3
+            class="ui header"
+            v-translate="{count: checkResult.candidates.count}"
+            :translate-n="checkResult.candidates.count"
+            translate-plural="%{ count } tracks matching combined filters">
+            %{ count } track matching combined filters
+          </h3>
           <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample"></track-table>
         </template>
       </div>
