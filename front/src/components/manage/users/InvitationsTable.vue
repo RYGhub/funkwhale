@@ -158,10 +158,11 @@ export default {
       }
     },
     actions () {
+      let deleteLabel = this.$gettext('Delete')
       return [
         {
           name: 'delete',
-          label: this.$gettext('Delete'),
+          label: deleteLabel,
           filterCheckable: (obj) => {
             return obj.users.length === 0 && moment().isBefore(obj.expiration_date)
           }

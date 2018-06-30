@@ -156,10 +156,11 @@ export default {
       }
     },
     actions () {
+      let msg = this.$gettext('Import')
       return [
         {
           name: 'import',
-          label: this.$gettext('Import'),
+          label: msg,
           filterCheckable: (obj) => { return obj.status === 'not_imported' }
         }
       ]

@@ -181,10 +181,11 @@ export default {
       }
     },
     actions () {
+      let msg = this.$gettext('Delete')
       return [
         {
           name: 'delete',
-          label: this.$gettext('Delete'),
+          label: msg,
           isDangerous: true
         }
       ]

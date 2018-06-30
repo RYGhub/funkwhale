@@ -180,12 +180,13 @@ export default {
         return
       }
       let self = this
+      let msg = this.$gettext('Queue shuffled!')
       this.isShuffling = true
       setTimeout(() => {
         self.$store.dispatch('queue/shuffle', () => {
           self.isShuffling = false
           self.$store.commit('ui/addMessage', {
-            content: self.$gettext('Queue shuffled!'),
+            content: msg,
             date: new Date()
           })
         })

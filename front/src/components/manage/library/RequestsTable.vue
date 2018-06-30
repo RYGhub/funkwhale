@@ -186,21 +186,25 @@ export default {
       }
     },
     actions () {
+      // somehow, extraction fails otherwise
+      let deleteLabel = this.$gettext('Delete')
+      let markImportedLabel = this.$gettext('Mark as imported')
+      let markClosedLabel = this.$gettext('Mark as closed')
       return [
         {
           name: 'delete',
-          label: this.$gettext('Delete'),
+          label: deleteLabel,
           isDangerous: true
         },
         {
           name: 'mark_imported',
-          label: this.$gettext('Mark as imported'),
+          label: markImportedLabel,
           filterCheckable: (obj) => { return ['pending', 'accepted'].indexOf(obj.status) > -1 },
           isDangerous: true
         },
         {
           name: 'mark_closed',
-          label: this.$gettext('Mark as closed'),
+          label: markClosedLabel,
           filterCheckable: (obj) => { return ['pending', 'accepted'].indexOf(obj.status) > -1 },
           isDangerous: true
         }
