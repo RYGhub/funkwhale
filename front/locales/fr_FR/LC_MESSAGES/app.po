@@ -8,59 +8,67 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-06-30 11:34+0200\n"
-"PO-Revision-Date: 2018-06-30 11:34+0200\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: fr\n"
+"PO-Revision-Date: 2018-06-30 09:41+0000\n"
+"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
+"front/fr/>\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 2.20\n"
 
 #: src/App.vue:51
 msgid "About Funkwhale"
-msgstr ""
+msgstr "À propos de Funkwhale"
 
 #: src/App.vue:53
 msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
 msgstr ""
+"Funkwhale est un projet libre, gratuit et open-source maintenu par des "
+"bénévoles. Vous pouvez nous aider à l'améliorer en nous remontant les bugs "
+"éventuels, en nous suggérant des améliorations et en en parlant autour de "
+"vous !"
 
 #: src/App.vue:29
 msgid "Links"
-msgstr ""
+msgstr "Liens"
 
 #: src/App.vue:38
 msgid "Source code"
-msgstr ""
+msgstr "Code source"
 
 #: src/App.vue:37
 msgid "Source code (%{version})"
-msgstr ""
+msgstr "Code source (version %{version})"
 
 #: src/App.vue:56
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
-msgstr ""
+msgstr "Le logo Funkwhale est une création de Francis Gading."
 
 #: src/App.vue:118
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr ""
+"Cette opération supprimera vos données locales et vous déconnectera, voulez-"
+"vous continuer ?"
 
 #: src/App.vue:5
 msgid "Choose your instance"
-msgstr ""
+msgstr "Choisissez votre instance"
 
 #: src/App.vue:7
 msgid "You need to select an instance in order to continue"
-msgstr ""
+msgstr "Vous devez choisir une instance pour continuer"
 
 #: src/App.vue:33
 msgid "About this instance"
-msgstr ""
+msgstr "À propos de cette instance"
 
 #: src/App.vue:36
 msgid "Documentation"
-msgstr ""
+msgstr "Documentation"
 
 #: src/App.vue:43
 msgid "Use another instance"
-msgstr ""
+msgstr "Se connecter sur une autre instance"
