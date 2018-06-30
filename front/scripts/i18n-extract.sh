@@ -14,6 +14,9 @@ xgettext --language=JavaScript --keyword=npgettext:1c,2,3 \
     --package-version=$(node -e "console.log(require('./package.json').version);") \
     --output $locales_dir/app.pot $js_sources
 
+# Fix broken files path/lines in pot
+sed -e 's|#: src/|#: front/src/|' -i $locales_dir/app.pot
+
 # Generate .po files for each available language.
 echo $locales
 for lang in $locales; do \

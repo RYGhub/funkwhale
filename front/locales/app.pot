@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-30 11:34+0200\n"
+"POT-Creation-Date: 2018-06-30 12:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,50 +17,54 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/App.vue:51
+#: front/src/App.vue:51
 msgid "About Funkwhale"
 msgstr ""
 
-#: src/App.vue:53
+#: front/src/App.vue:53
 msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
 msgstr ""
 
-#: src/App.vue:29
+#: front/src/App.vue:29
 msgid "Links"
 msgstr ""
 
-#: src/App.vue:38
+#: front/src/App.vue:60
+msgid "Options"
+msgstr ""
+
+#: front/src/App.vue:38
 msgid "Source code"
 msgstr ""
 
-#: src/App.vue:37
+#: front/src/App.vue:37
 msgid "Source code (%{version})"
 msgstr ""
 
-#: src/App.vue:56
+#: front/src/App.vue:56
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
 msgstr ""
 
-#: src/App.vue:118
+#: front/src/App.vue:130
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr ""
 
-#: src/App.vue:5
+#: front/src/App.vue:5
 msgid "Choose your instance"
 msgstr ""
 
-#: src/App.vue:7
+#: front/src/App.vue:7
 msgid "You need to select an instance in order to continue"
 msgstr ""
 
-#: src/App.vue:33
+#: front/src/App.vue:33
 msgid "About this instance"
 msgstr ""
 
-#: src/App.vue:36
+#: front/src/App.vue:36
 msgid "Documentation"
 msgstr ""
 
-#: src/App.vue:43
+#: front/src/App.vue:43
 msgid "Use another instance"
 msgstr ""
