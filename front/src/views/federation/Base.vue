@@ -3,16 +3,16 @@
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'federation.libraries.list'}">{{ $t('Libraries') }}</router-link>
+        :to="{name: 'federation.libraries.list'}">{{ $gettext('Libraries') }}</router-link>
       <router-link
         class="ui item"
-        :to="{name: 'federation.tracks.list'}">{{ $t('Tracks') }}</router-link>
+        :to="{name: 'federation.tracks.list'}">{{ $gettext('Tracks') }}</router-link>
         <div class="ui secondary right menu">
           <router-link
             class="ui item"
             :to="{name: 'federation.followers.list'}">
-            {{ $t('Followers') }}
-            <div class="ui teal label" :title="$t('Pending requests')">{{ requestsCount }}</div>
+            {{ $gettext('Followers') }}
+            <div class="ui teal label" :title="$gettext('Pending requests')">{{ requestsCount }}</div>
           </router-link>
         </div>
     </div>

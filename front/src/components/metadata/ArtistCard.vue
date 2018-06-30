@@ -16,7 +16,7 @@
                   {{ group['first-release-date'] }}
                 </td>
                 <td colspan="3">
-                  <a :href="getMusicbrainzUrl('release-group', group.id)" class="discrete link" target="_blank" :title="$t('View on MusicBrainz')">
+                  <a :href="getMusicbrainzUrl('release-group', group.id)" class="discrete link" target="_blank" :title="$gettext('View on MusicBrainz')">
                     {{ group.title }}
                   </a>
                 </td>

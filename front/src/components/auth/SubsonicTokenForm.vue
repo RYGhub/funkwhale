@@ -1,24 +1,24 @@
 <template>
   <form class="ui form" @submit.prevent="requestNewToken()">
-    <h2>{{ $t('Subsonic API password') }}</h2>
+    <h2>{{ $gettext('Subsonic API password') }}</h2>
     <p class="ui message" v-if="!subsonicEnabled">
-      {{ $t('The Subsonic API is not available on this Funkwhale instance.') }}
+      {{ $gettext('The Subsonic API is not available on this Funkwhale instance.') }}
     </p>
     <p>
-      {{ $t('Funkwhale is compatible with other music players that support the Subsonic API.') }}
-      {{ $t('You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance.') }}
+      {{ $gettext('Funkwhale is compatible with other music players that support the Subsonic API.') }}
+      {{ $gettext('You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance.') }}
     </p>
     <p>
-      {{ $t('However, accessing Funkwhale from those clients require a separate password you can set below.') }}
+      {{ $gettext('However, accessing Funkwhale from those clients require a separate password you can set below.') }}
     </p>
     <p><a href="https://docs.funkwhale.audio/users/apps.html#subsonic-compatible-clients" target="_blank">
-      {{ $t('Discover how to use Funkwhale from other apps') }}
+      {{ $gettext('Discover how to use Funkwhale from other apps') }}
     </a></p>
     <div v-if="success" class="ui positive message">
       <div class="header">{{ successMessage }}</div>
     </div>
     <div v-if="subsonicEnabled && errors.length > 0" class="ui negative message">
-      <div class="header">{{ $t('Error') }}</div>
+      <div class="header">{{ $gettext('Error') }}</div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
@@ -32,25 +32,25 @@
         color="grey"
         :class="['ui', {'loading': isLoading}, 'button']"
         :action="requestNewToken">
-        {{ $t('Request a new password') }}
-        <p slot="modal-header">{{ $t('Request a new Subsonic API password?') }}</p>
-        <p slot="modal-content">{{ $t('This will log you out from existing devices that use the current password.') }}</p>
-        <p slot="modal-confirm">{{ $t('Request a new password') }}</p>
+        {{ $gettext('Request a new password') }}
+        <p slot="modal-header">{{ $gettext('Request a new Subsonic API password?') }}</p>
+        <p slot="modal-content">{{ $gettext('This will log you out from existing devices that use the current password.') }}</p>
+        <p slot="modal-confirm">{{ $gettext('Request a new password') }}</p>
       </dangerous-button>
       <button
         v-else
         color="grey"
         :class="['ui', {'loading': isLoading}, 'button']"
-        @click="requestNewToken">{{ $t('Request a password') }}</button>
+        @click="requestNewToken">{{ $gettext('Request a password') }}</button>
         <dangerous-button
           v-if="token"
           color="yellow"
           :class="['ui', {'loading': isLoading}, 'button']"
           :action="disable">
-          {{ $t('Disable Subsonic access') }}
-          <p slot="modal-header">{{ $t('Disable Subsonic API access?') }}</p>
-          <p slot="modal-content">{{ $t('This will completely disable access to the Subsonic API using from account.') }}</p>
-          <p slot="modal-confirm">{{ $t('Disable access') }}</p>
+          {{ $gettext('Disable Subsonic access') }}
+          <p slot="modal-header">{{ $gettext('Disable Subsonic API access?') }}</p>
+          <p slot="modal-content">{{ $gettext('This will completely disable access to the Subsonic API using from account.') }}</p>
+          <p slot="modal-confirm">{{ $gettext('Disable access') }}</p>
         </dangerous-button>
     </template>
   </form>
@@ -92,7 +92,7 @@ export default {
       })
     },
     requestNewToken () {
-      this.successMessage = this.$t('Password updated')
+      this.successMessage = this.$gettext('Password updated')
       this.success = false
       this.errors = []
       this.isLoading = true
@@ -108,7 +108,7 @@ export default {
       })
     },
     disable () {
-      this.successMessage = this.$t('Access disabled')
+      this.successMessage = this.$gettext('Access disabled')
       this.success = false
       this.errors = []
       this.isLoading = true

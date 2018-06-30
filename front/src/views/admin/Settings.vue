@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="$t('Instance settings')">
+  <div class="main pusher"  v-title="$gettext('Instance settings')">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <div :class="['ui', {'loading': isLoading}, 'form']"></div>
@@ -13,7 +13,7 @@
           </div>
           <div class="four wide column">
             <div class="ui sticky vertical secondary menu">
-              <div class="header item">{{ $t('Sections') }}</div>
+              <div class="header item">{{ $gettext('Sections') }}</div>
               <a :class="['menu', {active: group.id === current}, 'item']"
                 @click.prevent="scrollTo(group.id)"
                 :href="'#' + group.id"
@@ -73,7 +73,7 @@ export default {
     groups () {
       return [
         {
-          label: this.$t('Instance information'),
+          label: this.$gettext('Instance information'),
           id: 'instance',
           settings: [
             'instance__name',
@@ -82,7 +82,7 @@ export default {
           ]
         },
         {
-          label: this.$t('Users'),
+          label: this.$gettext('Users'),
           id: 'users',
           settings: [
             'users__registration_enabled',
@@ -91,21 +91,21 @@ export default {
           ]
         },
         {
-          label: this.$t('Imports'),
+          label: this.$gettext('Imports'),
           id: 'imports',
           settings: [
             'providers_youtube__api_key'
           ]
         },
         {
-          label: this.$t('Playlists'),
+          label: this.$gettext('Playlists'),
           id: 'playlists',
           settings: [
             'playlists__max_tracks'
           ]
         },
         {
-          label: this.$t('Federation'),
+          label: this.$gettext('Federation'),
           id: 'federation',
           settings: [
             'federation__enabled',
@@ -116,14 +116,14 @@ export default {
           ]
         },
         {
-          label: this.$t('Subsonic'),
+          label: this.$gettext('Subsonic'),
           id: 'subsonic',
           settings: [
             'subsonic__enabled'
           ]
         },
         {
-          label: this.$t('Statistics'),
+          label: this.$gettext('Statistics'),
           id: 'statistics',
           settings: [
             'instance__nodeinfo_enabled',
@@ -132,7 +132,7 @@ export default {
           ]
         },
         {
-          label: this.$t('Error reporting'),
+          label: this.$gettext('Error reporting'),
           id: 'reporting',
           settings: [
             'raven__front_enabled',

@@ -11,22 +11,29 @@
             <div class="content">
               {{ artist.name }}
               <div class="sub header" v-if="albums">
-                {{ $t('{% track_count %} tracks in {% album_count %} albums', {track_count: totalTracks, album_count: albums.length})}}
+                <translate
+                  tag="div"
+                  translate-plural="%{ count } tracks in %{ albumsCount } albums"
+                  :translate-n="totalTracks"
+                  :translate-params="{count: totalTracks, albumsCount: albums.length}">
+                  %{ count } track in %{ albumsCount } albums
+                </translate>
               </div>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
-          </button>
-          <play-button class="orange" :artist="artist.id"><i18next path="Play all albums"/></play-button>
+          <play-button class="orange" :artist="artist.id">
+            {{ $gettext('Play all albums') }}
+          </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            <i18next path="Search on Wikipedia"/>
+            {{ $gettext('Search on Wikipedia') }}
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <i18next path="View on MusicBrainz"/>
+            {{ $gettext('View on MusicBrainz') }}
           </a>
         </div>
       </div>
@@ -34,7 +41,9 @@
         <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       </div>
       <div v-else-if="albums" class="ui vertical stripe segment">
-        <h2><i18next path="Albums by this artist"/></h2>
+        <h2>
+          {{ $gettext('Albums by this artist') }}
+        </h2>
         <div class="ui stackable doubling three column grid">
           <div class="column" :key="album.id" v-for="album in albums">
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>

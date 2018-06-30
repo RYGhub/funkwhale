@@ -9,13 +9,13 @@
       </h5>
       <div class="ui toggle checkbox">
         <input type="checkbox" v-model="enabled" />
-        <i18next tag="label" path="Import this track"/>
+        <label>{{ $gettext('Import this track') }}</label>
       </div>
     </div>
     <div class="three wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <i18next tag="label" path="Source"/>
+          <label>{{ $gettext('Source') }}</label>
           <select v-model="currentBackendId">
             <option v-for="backend in backends" :value="backend.id">
               {{ backend.label }}
@@ -28,10 +28,10 @@
         <button @click="currentResultIndex -= 1" class="ui basic tiny icon button" :disabled="currentResultIndex === 0">
           <i class="left arrow icon"></i>
         </button>
-        <i18next path="Result {%0%}/{%1%}">
-          {{ currentResultIndex + 1 }}
-          {{ results.length }}
-        </i18next>
+        {{ results.total }}
+        <translate :translate-params="{current: currentResultIndex + 1, total: results.length}">
+          Result %{ current }/%{ total }
+        </translate>
         <button @click="currentResultIndex += 1" class="ui basic tiny icon button" :disabled="currentResultIndex + 1 === results.length">
           <i class="right arrow icon"></i>
         </button>
@@ -40,9 +40,9 @@
     <div class="four wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <i18next tag="label" path="Search query"/>
+          <label>{{ $gettext('Search query') }}</label>
           <input type="text" v-model="query" />
-          <i18next tag="label" path="Imported URL"/>
+          <label>{{ $gettext('Imported URL') }}</label>
           <input type="text" v-model="importedUrl" />
         </div>
       </form>

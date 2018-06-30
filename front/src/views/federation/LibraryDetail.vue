@@ -19,18 +19,18 @@
             <tbody>
               <tr>
                 <td >
-                  {{ $t('Follow status') }}
-                  <span :data-tooltip="$t('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
+                  {{ $gettext('Follow status') }}
+                  <span :data-tooltip="$gettext('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <template v-if="object.follow.approved === null">
-                    <i class="loading icon"></i> {{ $t('Pending approval') }}
+                    <i class="loading icon"></i> {{ $gettext('Pending approval') }}
                   </template>
                   <template v-else-if="object.follow.approved === true">
-                    <i class="check icon"></i> {{ $t('Following') }}
+                    <i class="check icon"></i> {{ $gettext('Following') }}
                   </template>
                   <template v-else-if="object.follow.approved === false">
-                    <i class="x icon"></i> {{ $t('Not following') }}
+                    <i class="x icon"></i> {{ $gettext('Not following') }}
                   </template>
                 </td>
                 <td>
@@ -38,8 +38,8 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Federation') }}
-                  <span :data-tooltip="$t('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
+                  {{ $gettext('Federation') }}
+                  <span :data-tooltip="$gettext('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -54,8 +54,8 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Auto importing') }}
-                  <span :data-tooltip="$t('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
+                  {{ $gettext('Auto importing') }}
+                  <span :data-tooltip="$gettext('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -82,19 +82,24 @@
               </tr>
               -->
               <tr>
-                <td>{{ $t('Library size') }}</td>
+                <td>{{ $gettext('Library size') }}</td>
                 <td>
                   <template v-if="object.tracks_count">
-                    {{ $t('{%count%} tracks', { count: object.tracks_count }) }}
+                    <translate
+                      translate-plural="%{ count } tracks"
+                      :translate-n="object.tracks_count"
+                      :translate-params="{count: object.tracks_count}">
+                      %{ count } track
+                    </translate>
                   </template>
                   <template v-else>
-                    {{ $t('Unkwnown') }}
+                    {{ $gettext('Unkwnown') }}
                   </template>
                 </td>
                 <td></td>
               </tr>
               <tr>
-                <td>{{ $t('Last fetched') }}</td>
+                <td>{{ $gettext('Last fetched') }}</td>
                 <td>
                   <human-date v-if="object.fetched_date" :date="object.fetched_date"></human-date>
                   <template v-else>Never</template>
@@ -102,10 +107,10 @@
                     @click="scan"
                     v-if="!scanTrigerred"
                     :class="['ui', 'basic', {loading: isScanLoading}, 'button']">
-                    <i class="sync icon"></i> {{ $t('Trigger scan') }}
+                    <i class="sync icon"></i> {{ $gettext('Trigger scan') }}
                   </button>
                   <button v-else class="ui success button">
-                    <i class="check icon"></i> {{ $t('Scan triggered!') }}
+                    <i class="check icon"></i> {{ $gettext('Scan triggered!') }}
                   </button>
 
                 </td>
@@ -115,10 +120,10 @@
           </table>
         </div>
         <div class="ui hidden divider"></div>
-        <button @click="fetchData" class="ui basic button">{{ $t('Refresh') }}</button>
+        <button @click="fetchData" class="ui basic button">{{ $gettext('Refresh') }}</button>
       </div>
       <div class="ui vertical stripe segment">
-        <h2>{{ $t('Tracks available in this library') }}</h2>
+        <h2>{{ $gettext('Tracks available in this library') }}</h2>
         <library-track-table v-if="!isLoading" :filters="{library: id}"></library-track-table>
       </div>
     </template>

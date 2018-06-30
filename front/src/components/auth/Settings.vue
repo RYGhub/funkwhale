@@ -2,13 +2,17 @@
   <div class="main pusher" v-title="'Account Settings'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2 class="ui header"><i18next path="Account settings"/></h2>
+        <h2 class="ui header">
+          {{ $gettext('Account settings') }}
+        </h2>
         <form class="ui form" @submit.prevent="submitSettings()">
           <div v-if="settings.success" class="ui positive message">
-            <div class="header"><i18next path="Settings updated"/></div>
+            <div class="header">
+              {{ $gettext('Settings updated') }}
+            </div>
           </div>
           <div v-if="settings.errors.length > 0" class="ui negative message">
-            <i18next tag="div" class="header" path="We cannot save your settings"/>
+            <div class="header">{{ $gettext('We cannot save your settings') }}</div>
             <ul class="list">
               <li v-for="error in settings.errors">{{ error }}</li>
             </ul>
@@ -20,46 +24,52 @@
               <option :value="c.value" v-for="c in f.choices">{{ c.label }}</option>
             </select>
           </div>
-          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit"><i18next path="Update settings"/></button>
+          <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
+            {{ $gettext('Update settings') }}
+          </button>
         </form>
       </div>
       <div class="ui hidden divider"></div>
       <div class="ui small text container">
-        <h2 class="ui header"><i18next path="Change my password"/></h2>
+        <h2 class="ui header">
+          {{ $gettext('Change my password') }}
+        </h2>
         <div class="ui message">
-          {{ $t('Changing your password will also change your Subsonic API password if you have requested one.') }}
-          {{ $t('You will have to update your password on your clients that use this password.') }}
+          {{ $gettext('Changing your password will also change your Subsonic API password if you have requested one.') }}
+          {{ $gettext('You will have to update your password on your clients that use this password.') }}
         </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">
-            <div class="header"><i18next path="Cannot change your password"/></div>
+            <div class="header">
+              {{ $gettext('Cannot change your password') }}
+            </div>
             <ul class="list">
-              <i18next tag="li" v-if="passwordError == 'invalid_credentials'" path="Please double-check your password is correct"/>
+              <li v-if="passwordError == 'invalid_credentials'">{{ $gettext('Please double-check your password is correct') }}</li>
             </ul>
           </div>
           <div class="field">
-            <label><i18next path="Old password"/></label>
+            <label>{{ $gettext('Old password') }}</label>
             <password-input required v-model="old_password" />
 
           </div>
           <div class="field">
-            <label><i18next path="New password"/></label>
+            <label>{{ $gettext('New password') }}</label>
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button
             color="yellow"
             :class="['ui', {'loading': isLoading}, 'button']"
             :action="submitPassword">
-            {{ $t('Change password') }}
-            <p slot="modal-header">{{ $t('Change your password?') }}</p>
+            {{ $gettext('Change password') }}
+            <p slot="modal-header">{{ $gettext('Change your password?') }}</p>
             <div slot="modal-content">
-              <p>{{ $t("Changing your password will have the following consequences") }}</p>
+              <p>{{ $gettext("Changing your password will have the following consequences") }}</p>
               <ul>
-                <li>{{ $t('You will be logged out from this session and have to log out with the new one') }}</li>
-                <li>{{ $t('Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password') }}</li>
+                <li>{{ $gettext('You will be logged out from this session and have to log out with the new one') }}</li>
+                <li>{{ $gettext('Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password') }}</li>
               </ul>
             </div>
-            <p slot="modal-confirm">{{ $t('Disable access') }}</p>
+            <p slot="modal-confirm">{{ $gettext('Disable access') }}</p>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />

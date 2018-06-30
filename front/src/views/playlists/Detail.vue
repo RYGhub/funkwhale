@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="$t('Playlist')">
+    <div v-if="isLoading" class="ui vertical segment" v-title="$gettext('Playlist')">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment" v-title="playlist.name">
@@ -9,28 +9,33 @@
           <i class="circular inverted list yellow icon"></i>
           <div class="content">
             {{ playlist.name }}
-            <i18next tag="div" class="sub header" path="Playlist containing {%0%} tracks, by {%1%}">
-              {{ playlistTracks.length }}
-              <username :username="playlist.user.username"></username>
-            </i18next>
+            <translate
+              tag="div"
+              class="sub header"
+              translate-plural="Playlist containing %{ count } tracks, by %{ username }"
+              :translate-n="playlistTracks.length"
+              :translate-params="{count: playlistTracks.length, username: playlist.user.username}">
+              Playlist containing %{ count } track, by %{ username }
+            </translate>
           </div>
         </h2>
         <div class="ui hidden divider"></div>
-        </button>
-        <play-button class="orange" :tracks="tracks">{{ $t('Play all') }}</play-button>
+        <play-button class="orange" :tracks="tracks">{{ $gettext('Play all') }}</play-button>
         <button
           class="ui icon button"
           v-if="playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>
-          <template v-if="edit">{{ $t('End edition') }}</template>
-          <template v-else>{{ $t('Edit...') }}</template>
+          <template v-if="edit">{{ $gettext('End edition') }}</template>
+          <template v-else>{{ $gettext('Edit...') }}</template>
         </button>
-        <dangerous-button class="labeled icon" :action="deletePlaylist">
-          <i class="trash icon"></i> {{ $t('Delete') }}
-          <p slot="modal-header">{{ $t('Do you want to delete the playlist "{% playlist %}"?', {playlist: playlist.name}) }}</p>
-          <p slot="modal-content">{{ $t('This will completely delete this playlist and cannot be undone.') }}</p>
-          <p slot="modal-confirm">{{ $t('Delete playlist') }}</p>
+        <dangerous-button v-if="playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
+          <i class="trash icon"></i> {{ $gettext('Delete') }}
+          <p slot="modal-header">
+            <translate :translate-params="{playlist: playlist.name}">Do you want to delete the playlist "%{ playlist }"?</translate>
+          </p>
+          <p slot="modal-content">{{ $gettext('This will completely delete this playlist and cannot be undone.') }}</p>
+          <p slot="modal-confirm">{{ $gettext('Delete playlist') }}</p>
         </dangerous-button>
       </div>
     </div>

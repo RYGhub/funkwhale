@@ -4,9 +4,9 @@
       <tr>
         <th></th>
         <th></th>
-        <i18next tag="th" colspan="6" path="Title"/>
-        <i18next tag="th" colspan="6" path="Artist"/>
-        <i18next tag="th" colspan="6" path="Album"/>
+        <th colspan="6">{{ $gettext('Title') }}</th>
+        <th colspan="6">{{ $gettext('Artist') }}</th>
+        <th colspan="6">{{ $gettext('Album') }}</th>
         <th></th>
       </tr>
     </thead>
@@ -21,17 +21,17 @@
       <tr>
         <th colspan="3">
           <button @click="showDownloadModal = !showDownloadModal" class="ui basic button">
-            <i18next path="Download..."/>
+            {{ $gettext('Download') }}
           </button>
           <modal :show.sync="showDownloadModal">
-            <i18next tag="div" path="Download tracks" class="header" />
+            <div class="header">{{ $gettext('Download tracks') }}</div>
             <div class="content">
               <div class="description">
-                <i18next tag="p" path="There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as {%0%} to easily download a list of tracks.">
-                  <a href="https://curl.haxx.se/" target="_blank">cURL</a>
-                </i18next>
-                <i18next path="Simply copy paste the snippet below into a terminal to launch the download."/>
-                <i18next tag="div" class="ui warning message" path="Keep your PRIVATE_TOKEN secret as it gives access to your account."/>
+                <p>{{ $gettext('There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks.') }}</p>
+                {{ $gettext('Simply copy paste the snippet below into a terminal to launch the download.') }}
+                <div class="ui warning message">
+                  {{ $gettext('Keep your PRIVATE_TOKEN secret as it gives access to your account.') }}
+                </div>
                 <pre>
 export PRIVATE_TOKEN="{{ $store.state.auth.token }}"
 <template v-for="track in tracks"><template v-if="track.files.length > 0">
@@ -40,7 +40,7 @@ curl -G -o "{{ track.files[0].filename }}" <template v-if="$store.state.auth.aut
               </div>
             </div>
             <div class="actions">
-              <i18next tag="div" class="ui black deny button" path="Cancel" />
+              <div class="ui black deny button">{{ $gettext('Cancel') }}</div>
             </div>
           </modal>
         </th>

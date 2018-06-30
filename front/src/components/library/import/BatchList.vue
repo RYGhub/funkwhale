@@ -5,25 +5,25 @@
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $t('Search') }}</label>
+            <label>{{ $gettext('Search') }}</label>
             <input type="text" v-model="filters.search" placeholder="Search by submitter, source..." />
           </div>
           <div class="ui field">
-            <label>{{ $t('Status') }}</label>
+            <label>{{ $gettext('Status') }}</label>
             <select class="ui dropdown" v-model="filters.status">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'pending'">{{ $t('Pending') }}</option>
-              <option :value="'errored'">{{ $t('Errored') }}</option>
-              <option :value="'finished'">{{ $t('Success') }}</option>
+              <option :value="null">{{ $gettext('Any') }}</option>
+              <option :value="'pending'">{{ $gettext('Pending') }}</option>
+              <option :value="'errored'">{{ $gettext('Errored') }}</option>
+              <option :value="'finished'">{{ $gettext('Success') }}</option>
             </select>
           </div>
           <div class="ui field">
-            <label>{{ $t('Import source') }}</label>
+            <label>{{ $gettext('Import source') }}</label>
             <select class="ui dropdown" v-model="filters.source">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'shell'">{{ $t('CLI') }}</option>
-              <option :value="'api'">{{ $t('API') }}</option>
-              <option :value="'federation'">{{ $t('Federation') }}</option>
+              <option :value="null">{{ $gettext('Any') }}</option>
+              <option :value="'shell'">{{ $gettext('CLI') }}</option>
+              <option :value="'api'">{{ $gettext('API') }}</option>
+              <option :value="'federation'">{{ $gettext('Federation') }}</option>
             </select>
           </div>
         </div>
@@ -32,12 +32,12 @@
       <table v-if="result && result.results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $t('ID') }}</th>
-            <th>{{ $t('Launch date') }}</th>
-            <th>{{ $t('Jobs') }}</th>
-            <th>{{ $t('Status') }}</th>
-            <th>{{ $t('Source') }}</th>
-            <th>{{ $t('Submitted by') }}</th>
+            <th>{{ $gettext('ID') }}</th>
+            <th>{{ $gettext('Launch date') }}</th>
+            <th>{{ $gettext('Jobs') }}</th>
+            <th>{{ $gettext('Status') }}</th>
+            <th>{{ $gettext('Source') }}</th>
+            <th>{{ $gettext('Submitted by') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -71,7 +71,10 @@
               ></pagination>
             </th>
             <th v-if="result && result.results.length > 0">
-              {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((filters.page-1) * filters.paginateBy) + 1 , end: ((filters.page-1) * filters.paginateBy) + result.results.length, total: result.count})}}
+              <translate
+                :translate-params="{start: ((filters.page-1) * filters.paginateBy) + 1, end: ((filters.page-1) * filters.paginateBy) + result.results.length, total: result.count}">
+                Showing results %{ start }-%{ end } on %{ total }
+              </translate>
             <th>
             <th></th>
             <th></th>

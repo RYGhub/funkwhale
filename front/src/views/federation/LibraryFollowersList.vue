@@ -1,9 +1,9 @@
 <template>
   <div v-title="'Followers'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Browsing followers') }}</h2>
+      <h2 class="ui header">{{ $gettext('Browsing followers') }}</h2>
       <p>
-        {{ $t('Be careful when accepting follow requests, as it means the follower will have access to your entire library.') }}
+        {{ $gettext('Be careful when accepting follow requests, as it means the follower will have access to your entire library.') }}
       </p>
       <div class="ui hidden divider"></div>
       <library-follow-table></library-follow-table>

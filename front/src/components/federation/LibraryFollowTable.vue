@@ -8,7 +8,9 @@
         <div class="ui four wide inline field">
           <div class="ui checkbox">
             <input v-model="pending" type="checkbox">
-            <label><i18next path="Pending approval"/></label>
+            <label>
+              {{ $gettext('Pending approval') }}
+            </label>
           </div>
         </div>
       </div>
@@ -17,10 +19,10 @@
     <table v-if="result" class="ui very basic single line unstackable table">
       <thead>
         <tr>
-          <i18next tag="th" path="Actor"/>
-          <i18next tag="th" path="Creation date"/>
-          <i18next tag="th" path="Status"/>
-          <i18next tag="th" path="Actions"/>
+          <th>{{ $gettext('Actor') }}</th>
+          <th>{{ $gettext('Creation date') }}</th>
+          <th>{{ $gettext('Status') }}</th>
+          <th>{{ $gettext('Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -33,36 +35,49 @@
           </td>
           <td>
             <template v-if="follow.approved === true">
-              <i class="check icon"></i><i18next path="Approved"/>
+              <i class="check icon"></i>
+              {{ $gettext('Approved') }}
             </template>
             <template v-else-if="follow.approved === false">
-              <i class="x icon"></i><i18next path="Refused"/>
+              <i class="x icon"></i>
+              {{ $gettext('Refused') }}
             </template>
             <template v-else>
-              <i class="clock icon"></i><i18next path="Pending"/>
+              <i class="clock icon"></i>
+              {{ $gettext('Pending') }}
             </template>
           </td>
           <td>
             <dangerous-button v-if="follow.approved !== false" class="tiny basic labeled icon" color='red' @confirm="updateFollow(follow, false)">
-              <i class="x icon"></i><i18next path="Deny"/>
-              <p slot="modal-header"><i18next path="Deny access?"/></p>
-              <p slot="modal-content">
-                <i18next path="By confirming, {%0%}@{%1%} will be denied access to your library.">
-                  {{ follow.actor.preferred_username }}
-                  {{ follow.actor.domain }}
-                </i18next>
+              <i class="x icon"></i>
+              {{ $gettext('Deny') }}
+              <p slot="modal-header">
+                {{ $gettext('Deny access?') }}
               </p>
-              <p slot="modal-confirm"><i18next path="Deny"/></p>
+              <p slot="modal-content">
+                <translate
+                  :translate-params="{username: follow.actor.preferred_username + '@' + follow.actor.domain}">
+                  By confirming, %{ username } will be denied access to your library.
+                </translate>
+              </p>
+              <p slot="modal-confirm">
+                {{ $gettext('Deny') }}
+              </p>
             </dangerous-button>
             <dangerous-button v-if="follow.approved !== true" class="tiny basic labeled icon" color='green' @confirm="updateFollow(follow, true)">
-              <i class="check icon"></i> <i18next path="Approve"/>
-              <p slot="modal-header"><i18next path="Approve access?"/></p>
+              <i class="check icon"></i>
+              {{ $gettext('Approve') }}
+              <p slot="modal-header">
+                {{ $gettext('Approve access?') }}
+              </p>
               <p slot="modal-content">
-                <i18next path="By confirming, {%0%}@{%1%} will be granted access to your library.">
-                  {{ follow.actor.preferred_username }}
-                  {{ follow.actor.domain }}
-                </i18next>
-              <p slot="modal-confirm"><i18next path="Approve"/></p>
+                <translate
+                  :translate-params="{username: follow.actor.preferred_username + '@' + follow.actor.domain}">
+                  By confirming, %{ username } will be granted access to your library.
+                </translate>
+              <p slot="modal-confirm">
+                {{ $gettext('Approve') }}
+              </p>
             </dangerous-button>
           </td>
         </tr>
@@ -80,11 +95,10 @@
             ></pagination>
           </th>
           <th v-if="result && result.results.length > 0">
-            <i18next path="Showing results {%0%}-{%1%} on {%2%}">
-              {{ ((page-1) * paginateBy) + 1 }}
-              {{ ((page-1) * paginateBy) + result.results.length }}
-              {{ result.count }}
-            </i18next>
+            <translate
+              :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+              Showing results %{ start }-%{ end } on %{ total }
+            </translate>
           </th>
           <th></th>
           <th></th>

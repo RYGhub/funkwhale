@@ -2,8 +2,8 @@
   <div>
     <div v-if="batch" class="ui container">
       <div class="ui message">
-        {{ $t('Ensure your music files are properly tagged before uploading them.') }}
-        <a href="http://picard.musicbrainz.org/" target='_blank'>{{ $t('We recommend using Picard for that purpose.') }}</a>
+        {{ $gettext('Ensure your music files are properly tagged before uploading them.') }}
+        <a href="http://picard.musicbrainz.org/" target='_blank'>{{ $gettext('We recommend using Picard for that purpose.') }}</a>
       </div>
       <file-upload-widget
         :class="['ui', 'icon', 'left', 'floated', 'button']"
@@ -20,31 +20,30 @@
         @input-file="inputFile"
         ref="upload">
         <i class="upload icon"></i>
-        <i18next path="Select files to upload..."/>
+        {{ $gettext('Select files to upload...') }}
     </file-upload-widget>
       <button
         :class="['ui', 'right', 'floated', 'icon', {disabled: files.length === 0}, 'button']"
         v-if="!$refs.upload || !$refs.upload.active" @click.prevent="startUpload()">
         <i class="play icon" aria-hidden="true"></i>
-        <i18next path="Start Upload"/>
+        {{ $gettext('Start Upload') }}
       </button>
       <button type="button" class="ui right floated icon yellow button" v-else @click.prevent="$refs.upload.active = false">
         <i class="pause icon" aria-hidden="true"></i>
-        <i18next path="Stop Upload"/>
+        {{ $gettext('Stop Upload') }}
       </button>
     </div>
     <div class="ui hidden clearing divider"></div>
-    <i18next v-if="batch" path="Once all your files are uploaded, simply head over {%0%} to check the import status.">
-      <router-link :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">
-        <i18next path="import detail page"/>
-      </router-link>
-    </i18next>
+    <template v-if="batch">{{ $gettext('Once all your files are uploaded, simply click the following button to check the import status.') }}</template>
+    <router-link class="ui basic button" v-if="batch" :to="{name: 'library.import.batches.detail', params: {id: batch.id }}">
+      {{ $gettext('Import detail page') }}
+    </router-link>
     <table class="ui single line table">
       <thead>
         <tr>
-          <i18next tag="th" path="File name"/>
-          <i18next tag="th" path="Size"/>
-          <i18next tag="th" path="Status"/>
+          <th>{{ $gettext('File name') }}</th>
+          <th>{{ $gettext('Size') }}</th>
+          <th>{{ $gettext('Status') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -55,10 +54,10 @@
             <span v-if="file.error" class="ui red label">
               {{ file.error }}
             </span>
-            <i18next v-else-if="file.success" class="ui green label" path="Success"/>
-            <i18next v-else-if="file.active" class="ui yellow label" path="Uploading..."/>
+            <span v-else-if="file.success" class="ui green label">{{ $gettext('Success') }}</span>
+            <span v-else-if="file.active" class="ui yellow label">{{ $gettext('Uploading...') }}</span>
             <template v-else>
-              <i18next class="ui label" path="Pending"/>
+              <span class="ui label">{{ $gettext('Pending') }}</span>
               <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
             </template>
           </td>

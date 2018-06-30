@@ -8,7 +8,7 @@
         <tbody>
           <tr>
             <td>
-              <strong>{{ $t('Import batch') }}</strong>
+              <strong>{{ $gettext('Import batch') }}</strong>
             </td>
             <td>
               #{{ batch.id }}
@@ -16,7 +16,7 @@
           </tr>
           <tr>
             <td>
-              <strong>{{ $t('Launch date') }}</strong>
+              <strong>{{ $gettext('Launch date') }}</strong>
             </td>
             <td>
               <human-date :date="batch.creation_date"></human-date>
@@ -24,22 +24,22 @@
           </tr>
           <tr v-if="batch.user">
             <td>
-              <strong>{{ $t('Submitted by') }}</strong>
+              <strong>{{ $gettext('Submitted by') }}</strong>
             </td>
             <td>
               <username :username="batch.user.username" />
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Pending') }}</strong></td>
+            <td><strong>{{ $gettext('Pending') }}</strong></td>
             <td>{{ stats.pending }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Skipped') }}</strong></td>
+            <td><strong>{{ $gettext('Skipped') }}</strong></td>
             <td>{{ stats.skipped }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Errored') }}</strong></td>
+            <td><strong>{{ $gettext('Errored') }}</strong></td>
             <td>
               {{ stats.errored }}
               <button
@@ -47,12 +47,12 @@
                 v-if="stats.errored > 0"
                 class="ui tiny basic icon button">
                 <i class="redo icon" />
-                {{ $t('Rerun errored jobs')}}
+                {{ $gettext('Rerun errored jobs')}}
               </button>
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Finished') }}</strong></td>
+            <td><strong>{{ $gettext('Finished') }}</strong></td>
             <td>{{ stats.finished }}/{{ stats.count}}</td>
           </tr>
         </tbody>
@@ -60,17 +60,17 @@
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $t('Search') }}</label>
+            <label>{{ $gettext('Search') }}</label>
             <input type="text" v-model="jobFilters.search" placeholder="Search by source..." />
           </div>
           <div class="ui field">
-            <label>{{ $t('Status') }}</label>
+            <label>{{ $gettext('Status') }}</label>
             <select class="ui dropdown" v-model="jobFilters.status">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'pending'">{{ $t('Pending') }}</option>
-              <option :value="'errored'">{{ $t('Errored') }}</option>
-              <option :value="'finished'">{{ $t('Success') }}</option>
-              <option :value="'skipped'">{{ $t('Skipped') }}</option>
+              <option :value="null">{{ $gettext('Any') }}</option>
+              <option :value="'pending'">{{ $gettext('Pending') }}</option>
+              <option :value="'errored'">{{ $gettext('Errored') }}</option>
+              <option :value="'finished'">{{ $gettext('Success') }}</option>
+              <option :value="'skipped'">{{ $gettext('Skipped') }}</option>
             </select>
           </div>
         </div>
@@ -78,11 +78,11 @@
       <table v-if="jobResult" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $t('Job ID') }}</th>
-            <th>{{ $t('Recording MusicBrainz ID') }}</th>
-            <th>{{ $t('Source') }}</th>
-            <th>{{ $t('Status') }}</th>
-            <th>{{ $t('Track') }}</th>
+            <th>{{ $gettext('Job ID') }}</th>
+            <th>{{ $gettext('Recording MusicBrainz ID') }}</th>
+            <th>{{ $gettext('Source') }}</th>
+            <th>{{ $gettext('Status') }}</th>
+            <th>{{ $gettext('Track') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -103,7 +103,7 @@
                 <button
                   @click="rerun({batches: [], jobs: [job.id]})"
                   v-if="job.status === 'errored'"
-                  :title="$t('Rerun job')"
+                  :title="$gettext('Rerun job')"
                   class="ui tiny basic icon button">
                   <i class="redo icon" />
                 </button>
@@ -126,7 +126,10 @@
               ></pagination>
             </th>
             <th v-if="jobResult && jobResult.results.length > 0">
-              {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((jobFilters.page-1) * jobFilters.paginateBy) + 1 , end: ((jobFilters.page-1) * jobFilters.paginateBy) + jobResult.results.length, total: jobResult.count})}}
+              <translate
+                :translate-params="{start: ((jobFilters.page-1) * jobFilters.paginateBy) + 1, end: ((jobFilters.page-1) * jobFilters.paginateBy) + jobResult.results.length, total: jobResult.count}">
+                Showing results %{ start }-%{ end } on %{ total }
+              </translate>
             <th>
             <th></th>
             <th></th>

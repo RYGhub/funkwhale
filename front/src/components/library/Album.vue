@@ -10,30 +10,39 @@
             <i class="circular inverted sound yellow icon"></i>
             <div class="content">
               {{ album.title }}
-              <i18next tag="div" class="sub header" path="Album containing {%0%} tracks, by {%1%}">
-                {{ album.tracks.length }}
-                <router-link :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-                  {{ album.artist.name }}
-                </router-link>
-              </i18next>
+              <translate
+                tag="div"
+                translate-plural="Album containing %{ count } tracks, by %{ artist }"
+                :translate-n="album.tracks.length"
+                :translate-params="{count: album.tracks.length, artist: album.artist.name}">
+                Album containing %{ count } track, by %{ artist }
+              </translate>
+            </div>
+            <div class="ui basic buttons">
+              <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+                {{ $gettext('Artist page') }}
+              </router-link>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
-          </button>
-          <play-button class="orange" :tracks="album.tracks"><i18next path="Play all"/></play-button>
+          <play-button class="orange" :tracks="album.tracks">
+            {{ $gettext('Play all') }}
+          </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            <i18next path="Search on Wikipedia"/>
+            {{ $gettext('Search on Wikipedia') }}
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <i18next path="View on MusicBrainz"/>
+            {{ $gettext('View on MusicBrainz') }}
           </a>
         </div>
       </div>
       <div class="ui vertical stripe segment">
-        <h2><i18next path="Tracks"/></h2>
+        <h2>
+          {{ $gettext('Tracks') }}
+        </h2>
         <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
     </template>

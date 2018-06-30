@@ -11,13 +11,15 @@
         <span
           @click="collapsed = false"
           v-if="truncated && collapsed"
-          class="expand"
-          path="Expand"/>
-        <i18next
+          class="expand">
+          {{ $gettext('Expand') }}
+        </span>
+        <span
           @click="collapsed = true"
           v-if="truncated && !collapsed"
-          class="collapse"
-          path="Collapse"/>
+          class="collapse">
+          {{ $gettext('Collapse') }}
+        </span>
       </div>
     </div>
   </div>

@@ -54,7 +54,7 @@ Vue.use(GetTextPlugin, {
     }
   },
   translations: translations,
-  silent: true
+  silent: false
 })
 
 Vue.use(VueI18Next)

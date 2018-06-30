@@ -1,19 +1,19 @@
 <template>
   <div :title="title" :class="['ui', {'tiny': discrete}, 'buttons']">
     <button
-      :title="$t('Add to current queue')"
+      :title="$gettext('Add to current queue')"
       @click="addNext(true)"
       :disabled="!playable"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
       <i class="ui play icon"></i>
-      <template v-if="!discrete"><slot><i18next path="Play"/></slot></template>
+      <template v-if="!discrete"><slot>{{ $gettext('Play') }}</slot></template>
     </button>
     <div v-if="!discrete" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', 'icon', 'button']">
       <i class="dropdown icon"></i>
       <div class="menu">
-        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i><i18next path="Add to queue"/></div>
-        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i><i18next path="Play next"/></div>
-        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i><i18next path="Play now"/></div>
+        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i>{{ $gettext('Add to queue') }}</div>
+        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i>{{ $gettext('Play next') }}</div>
+        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i>{{ $gettext('Play now') }}</div>
       </div>
     </div>
   </div>
@@ -44,10 +44,10 @@ export default {
   computed: {
     title () {
       if (this.playable) {
-        return this.$t('Play immediatly')
+        return this.$gettext('Play immediatly')
       } else {
         if (this.track) {
-          return this.$t('This track is not imported and cannot be played')
+          return this.$gettext('This track is not imported and cannot be played')
         }
       }
     },
@@ -142,8 +142,9 @@ export default {
       if (tracks.length < 1) {
         return
       }
+      let msg = this.$ngettext('%{ count } track was added to your queue', '%{ count } tracks were added to your queue', tracks.length)
       this.$store.commit('ui/addMessage', {
-        content: this.$t('{% tracks %} tracks were added to your queue.', {tracks: tracks.length}),
+        content: this.$gettextInterpolate(msg, {count: tracks.length}),
         date: new Date()
       })
     }

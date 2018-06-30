@@ -2,13 +2,18 @@
   <div class="main pusher" v-title="'Your Favorites'">
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader"><i18next path="Loading your favorites..."/></div>
+        <div class="ui text loader">
+          {{ $gettext('Loading your favorites...') }}
+        </div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
         <i class="circular inverted heart pink icon"></i>
-        <i18next path="{%0%} favorites">
-          {{ $store.state.favorites.count }}
-        </i18next>
+        <translate
+          translate-plural="%{ count } favorites"
+          :translate-n="$store.state.favorites.count"
+          :translate-params="{count: $store.state.favorites.count}">
+          1 favorite
+        </translate>
       </h2>
       <radio-button type="favorites"></radio-button>
     </div>
@@ -16,7 +21,7 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <i18next tag="label" path="Ordering"/>
+            <label>{{ $gettext('Ordering') }}</label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -24,14 +29,14 @@
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering direction"/>
+            <label>{{ $gettext('Ordering direction') }}</label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+"><i18next path="Ascending"/></option>
-              <option value="-"><i18next path="Descending"/></option>
+              <option value="+">{{ $gettext('Ascending') }}</option>
+              <option value="-">{{ $gettext('Descending') }}</option>
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Results per page"/>
+            <label>{{ $gettext('Results per page') }}</label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

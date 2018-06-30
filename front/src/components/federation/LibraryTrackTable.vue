@@ -3,16 +3,16 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
+          <label>{{ $gettext('Search') }}</label>
           <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
         </div>
         <div class="ui field">
-          <label>{{ $t('Import status') }}</label>
+          <label>{{ $gettext('Import status') }}</label>
           <select class="ui dropdown" v-model="importedFilter">
-            <option :value="null">{{ $t('Any') }}</option>
-            <option :value="'imported'">{{ $t('Imported') }}</option>
-            <option :value="'not_imported'">{{ $t('Not imported') }}</option>
-            <option :value="'import_pending'">{{ $t('Import pending') }}</option>
+            <option :value="null">{{ $gettext('Any') }}</option>
+            <option :value="'imported'">{{ $gettext('Imported') }}</option>
+            <option :value="'not_imported'">{{ $gettext('Not imported') }}</option>
+            <option :value="'import_pending'">{{ $gettext('Import pending') }}</option>
           </select>
         </div>
       </div>
@@ -29,25 +29,28 @@
         :action-url="'federation/library-tracks/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Status') }}</th>
-          <th>{{ $t('Title') }}</th>
-          <th>{{ $t('Artist') }}</th>
-          <th>{{ $t('Album') }}</th>
-          <th>{{ $t('Published date') }}</th>
-          <th v-if="showLibrary">{{ $t('Library') }}</th>
+          <th>{{ $gettext('Status') }}</th>
+          <th>{{ $gettext('Title') }}</th>
+          <th>{{ $gettext('Artist') }}</th>
+          <th>{{ $gettext('Album') }}</th>
+          <th>{{ $gettext('Published date') }}</th>
+          <th v-if="showLibrary">{{ $gettext('Library') }}</th>
         </template>
         <template slot="action-success-footer" slot-scope="scope">
           <router-link
             v-if="scope.result.action === 'import'"
             :to="{name: 'library.import.batches.detail', params: {id: scope.result.result.batch.id }}">
-            {{ $t('Import #{% id %} launched', {id: scope.result.result.batch.id}) }}
+            <translate
+              :translate-params="{id: scope.result.result.batch.id}">
+              Import #%{ id } launched
+            </translate>
           </router-link>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <span v-if="scope.obj.status === 'imported'" class="ui basic green label">{{ $t('In library') }}</span>
-            <span v-else-if="scope.obj.status === 'import_pending'" class="ui basic yellow label">{{ $t('Import pending') }}</span>
-            <span v-else class="ui basic label">{{ $t('Not imported') }}</span>
+            <span v-if="scope.obj.status === 'imported'" class="ui basic green label">{{ $gettext('In library') }}</span>
+            <span v-else-if="scope.obj.status === 'import_pending'" class="ui basic yellow label">{{ $gettext('Import pending') }}</span>
+            <span v-else class="ui basic label">{{ $gettext('Not imported') }}</span>
           </td>
           <td>
             <span :title="scope.obj.title">{{ scope.obj.title|truncate(30) }}</span>
@@ -78,7 +81,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -153,7 +159,7 @@ export default {
       return [
         {
           name: 'import',
-          label: this.$t('Import'),
+          label: this.$gettext('Import'),
           filterCheckable: (obj) => { return obj.status === 'not_imported' }
         }
       ]

@@ -13,39 +13,42 @@
     </div>
     <div class="content">
       <span class="right floated" v-if="following">
-        <i class="check icon"></i><i18next path="Following"/>
+        <i class="check icon"></i>{{ $gettext('Following') }}
       </span>
       <span class="right floated" v-else-if="manuallyApprovesFollowers">
-        <i class="lock icon"></i><i18next path="Followers only"/>
+        <i class="lock icon"></i>{{ $gettext('Followers only') }}
       </span>
       <span class="right floated" v-else>
-        <i class="open lock icon"></i><i18next path="Open"/>
+        <i class="open lock icon"></i>{{ $gettext('Open') }}
       </span>
       <span v-if="totalItems">
         <i class="music icon"></i>
-        <i18next path="{%0%} tracks">
-          {{ totalItems }}
-        </i18next>
+        <translate
+          translate-plural="%{ count } tracks"
+          :translate-n="totalItems"
+          :translate-params="{count: totalItems}">
+          1 track
+        </translate>
       </span>
     </div>
     <div class="extra content">
       <template v-if="awaitingApproval">
         <i class="clock icon"></i>
-        <i18next path="Follow request pending approval"/>
+        {{ $gettext('Follow request pending approval') }}
       </template>
       <div
         v-if="!library"
         @click="follow"
         :disabled="isLoading"
         :class="['ui', 'basic', {loading: isLoading}, 'green', 'button']">
-        <i18next v-if="manuallyApprovesFollowers" path="Send a follow request"/>
-        <i18next v-else path="Follow"/>
+        <translate v-if="manuallyApprovesFollowers">Send a follow request</translate>
+        <translate v-else>Follow</translate>
       </div>
       <router-link
         v-else
         class="ui basic button"
         :to="{name: 'federation.libraries.detail', params: {id: library.uuid }}">
-        <i18next path="Detail"/>
+        {{ $gettext('Detail') }}
       </router-link>
     </div>
   </div>

@@ -1,33 +1,37 @@
 <template>
   <modal @update:show="update" :show="$store.state.playlists.showModal">
     <div class="header">
-      {{ $t('Manage playlists') }}
+      {{ $gettext('Manage playlists') }}
     </div>
     <div class="scrolling content">
       <div class="description">
         <template v-if="track">
-          <h4 class="ui header">{{ $t('Current track') }}</h4>
-          <div v-html='trackDisplay'></div>
+          <h4 class="ui header">{{ $gettext('Current track') }}</h4>
+          <div
+            v-translate="{artist: track.artist.name, title: track.title}"
+            :template-params="{artist: track.artist.name, title: track.title}">
+            "%{ title }", by %{ artist }
+          </div>
           <div class="ui divider"></div>
         </template>
 
         <playlist-form></playlist-form>
         <div class="ui divider"></div>
         <div v-if="errors.length > 0" class="ui negative message">
-          <div class="header">{{ $t('We cannot add the track to a playlist') }}</div>
+          <div class="header">{{ $gettext('We cannot add the track to a playlist') }}</div>
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
         </div>
-        <h4 class="ui header">{{ $t('Available playlists') }}</h4>
+        <h4 class="ui header">{{ $gettext('Available playlists') }}</h4>
         <table class="ui unstackable very basic table">
           <thead>
             <tr>
               <th></th>
-              <th>{{ $t('Name') }}</th>
-              <th class="sorted descending">{{ $t('Last modification') }}</th>
-              <th>{{ $t('Tracks') }}</th>
+              <th>{{ $gettext('Name') }}</th>
+              <th class="sorted descending">{{ $gettext('Last modification') }}</th>
+              <th>{{ $gettext('Tracks') }}</th>
               <th></th>
             </tr>
           </thead>
@@ -46,9 +50,9 @@
                 <div
                   v-if="track"
                   class="ui green icon basic small right floated button"
-                  :title="$t('Add to this playlist')"
+                  :title="$gettext('Add to this playlist')"
                   @click="addToPlaylist(playlist.id)">
-                  <i class="plus icon"></i> {{ $t('Add track') }}
+                  <i class="plus icon"></i> {{ $gettext('Add track') }}
                 </div>
               </td>
             </tr>
@@ -57,7 +61,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button">{{ $t('Cancel') }}</div>
+      <div class="ui cancel button">{{ $gettext('Cancel') }}</div>
     </div>
   </modal>
 </template>
@@ -110,12 +114,6 @@ export default {
       let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])
       p.reverse()
       return p
-    },
-    trackDisplay () {
-      return this.$t('"{%title%}" by {%artist%}', {
-        title: this.track.title,
-        artist: this.track.artist.name }
-      )
     }
   },
   watch: {
