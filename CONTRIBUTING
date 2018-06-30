@@ -289,8 +289,9 @@ Typical workflow for a contribution
 Internationalization
 --------------------
 
+We're using https://github.com/Polyconseil/vue-gettext to manage i18n in the project.
 When working on the front-end, any end-user string should be translated
-using either ``<i18next path="yourstring">`` or the ``$t('yourstring')``
+using either ``<translate>yourstring</translate>`` or ``$gettext('yourstring')``
 function.
 
 Extraction is done by calling ``yarn run i18n-extract``, which
