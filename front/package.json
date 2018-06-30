@@ -5,8 +5,8 @@
   "author": "Eliot Berriot <contact@eliotberriot.com>",
   "private": true,
   "scripts": {
-    "dev": "node build/dev-server.js",
-    "start": "node build/dev-server.js",
+    "dev": "scripts/i18n-compile.sh && node build/dev-server.js",
+    "start": "scripts/i18n-compile.sh && node build/dev-server.js",
     "build": "node build/build.js",
     "i18n-extract": "scripts/i18n-extract.sh",
     "i18n-compile": "scripts/i18n-compile.sh",

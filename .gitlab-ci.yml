@@ -22,6 +22,7 @@ review_front:
     - cd front
   script:
     - yarn install
+    - yarn run i18n-compile
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - INSTANCE_URL=$REVIEW_INSTANCE_URL yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
@@ -179,7 +180,6 @@ build_front:
 
   script:
     - yarn install
-    - yarn run i18n-extract
     - yarn run i18n-compile
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
