@@ -15,7 +15,11 @@ import i18next from 'i18next'
 import i18nextFetch from 'i18next-fetch-backend'
 import VueI18Next from '@panter/vue-i18next'
 import store from './store'
+import GetTextPlugin from 'vue-gettext'
 import { sync } from 'vuex-router-sync'
+import translations from './translations.json'
+import locales from '@/locales'
+
 import filters from '@/filters' // eslint-disable-line
 import globals from '@/components/globals' // eslint-disable-line
 
@@ -28,6 +32,26 @@ window.$ = window.jQuery = require('jquery')
 // require('./semantic/semantic.css')
 require('semantic-ui-css/semantic.js')
 require('masonry-layout')
+
+Vue.use(GetTextPlugin, {
+  availableLanguages: (function () {
+    let l = {}
+    locales.locales.forEach(c => {
+      l[c.code] = c.label
+    })
+    return l
+  })(),
+  defaultLanguage: 'en_US',
+  languageVmMixin: {
+    computed: {
+      currentKebabCase: function () {
+        return this.current.toLowerCase().replace('_', '-')
+      }
+    }
+  },
+  translations: translations,
+  silent: true
+})
 
 Vue.use(VueI18Next)
 Vue.use(VueMasonryPlugin)
