@@ -2,14 +2,14 @@
   <div id="app">
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
-        <h1 class="ui header">{{ $t('Choose your instance') }}</h1>
+        <h1 class="ui header">{{ $gettext('Choose your instance') }}</h1>
         <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
-          <p>{{ $t('You need to select an instance in order to continue') }}</p>
+          <p>{{ $gettext('You need to select an instance in order to continue') }}</p>
           <div class="ui action input">
             <input type="text" v-model="instanceUrl">
-            <button type="submit" class="ui button">{{ $t('Submit') }}</button>
+            <button type="submit" class="ui button">{{ $gettext('Submit') }}</button>
           </div>
-          <p>{{ $t('Suggested choices') }}</p>
+          <p>{{ $gettext('Suggested choices') }}</p>
           <div class="ui bulleted list">
             <div class="ui item" v-for="url in suggestedInstances">
               <a @click="instanceUrl = url">{{ url }}</a>
@@ -27,20 +27,20 @@
         <div class="ui container">
           <div class="ui stackable equal height stackable grid">
             <div class="three wide column">
-              <i18next tag="h4" class="ui header" path="Links"></i18next>
+              <h4 v-translate class="ui header">Links</h4>
               <div class="ui link list">
                 <router-link class="item" to="/about">
-                  <i18next path="About this instance" />
+                  {{ $gettext('About this instance') }}
                 </router-link>
-                <a href="https://funkwhale.audio" class="item" target="_blank">{{ $t('Official website') }}</a>
-                <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $t('Documentation') }}</a>
+                <a href="https://funkwhale.audio" class="item" target="_blank">{{ $gettext('Official website') }}</a>
+                <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $gettext('Documentation') }}</a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
-                  <template v-if="version">{{ $t('Source code ({% version %})', {version: version}) }}</template>
-                  <template v-else>{{ $t('Source code') }}</template>
+                  <translate :translate-params="{version: version}" v-if="version">Source code (%{version})</translate>
+                  <translate v-else>Source code</translate>
                 </a>
-                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
+                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $gettext('Issue tracker') }}</a>
                 <a @click="switchInstance" class="item" >
-                  {{ $t('Use another instance') }}
+                  {{ $gettext('Use another instance') }}
                   <template v-if="$store.state.instance.instanceUrl !== '/'">
                     <br>
                     ({{ $store.state.instance.instanceUrl }})
@@ -49,12 +49,12 @@
               </div>
             </div>
             <div class="ten wide column">
-              <i18next tag="h4" class="ui header" path="About funkwhale" />
+              <h4 v-translate class="ui header">About Funkwhale</h4>
               <p>
-                <i18next path="Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"/>
+                <translate>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</translate>
               </p>
               <p>
-                <i18next path="The funkwhale logo was kindly designed and provided by Francis Gading."/>
+                <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default {
       })
     },
     switchInstance () {
-      let confirm = window.confirm(this.$t('This will erase your local data and disconnect you, do you want to continue?'))
+      let confirm = window.confirm(this.$gettext('This will erase your local data and disconnect you, do you want to continue?'))
       if (confirm) {
         this.$store.commit('instance/instanceUrl', null)
       }
