@@ -91,3 +91,5 @@ data/
 po/*.po
 docs/swagger
 _build
+front/src/translations.json
+front/locales/*.pot
