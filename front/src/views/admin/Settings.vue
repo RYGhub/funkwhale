@@ -71,15 +71,15 @@ export default {
   },
   computed: {
     groups () {
-        // somehow, extraction fails if in the return block directly
-        let instanceLabel = this.$gettext('Instance information')
-        let usersLabel = this.$gettext('Users')
-        let importsLabel = this.$gettext('Imports')
-        let playlistsLabel = this.$gettext('Playlists')
-        let federationLabel = this.$gettext('Federation')
-        let subsonicLabel = this.$gettext('Subsonic')
-        let statisticsLabel = this.$gettext('Statistics')
-        let errorLabel = this.$gettext('Error reporting')
+      // somehow, extraction fails if in the return block directly
+      let instanceLabel = this.$gettext('Instance information')
+      let usersLabel = this.$gettext('Users')
+      let importsLabel = this.$gettext('Imports')
+      let playlistsLabel = this.$gettext('Playlists')
+      let federationLabel = this.$gettext('Federation')
+      let subsonicLabel = this.$gettext('Subsonic')
+      let statisticsLabel = this.$gettext('Statistics')
+      let errorLabel = this.$gettext('Error reporting')
       return [
         {
           label: instanceLabel,

@@ -19,6 +19,8 @@ review_front:
   when: manual
   allow_failure: true
   before_script:
+    - apt-get update
+    - apt-get install jq -y
     - cd front
   script:
     - yarn install
@@ -176,8 +178,9 @@ build_front:
   stage: build
   image: node:9
   before_script:
+    - apt-get update
+    - apt-get install jq -y
     - cd front
-
   script:
     - yarn install
     - yarn run i18n-compile
