@@ -57,6 +57,18 @@
                 <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
               </p>
             </div>
+            <div class="three wide column">
+              <h4 v-translate class="ui header">Options</h4>
+              <div class="ui form">
+                <div class="ui field">
+                  <label>{{ $gettext('Change language') }}</label>
+                  <select class="ui dropdown" v-model="$language.current">
+                    <option v-for="(language, key) in $language.available" :value="key">{{ language }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -144,6 +156,9 @@ export default {
     '$store.state.instance.instanceUrl' () {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
+    },
+    '$language.current' (newValue) {
+      this.$store.commit('ui/currentLanguage', newValue)
     }
   }
 }

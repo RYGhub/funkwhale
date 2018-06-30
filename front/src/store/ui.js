@@ -3,6 +3,7 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: {
+    currentLanguage: 'en_US',
     lastDate: new Date(),
     maxMessages: 100,
     messageDisplayDuration: 10000,
@@ -13,6 +14,9 @@ export default {
     }
   },
   mutations: {
+    currentLanguage: (state, value) => {
+      state.currentLanguage = value
+    },
     computeLastDate: (state) => {
       state.lastDate = new Date()
     },

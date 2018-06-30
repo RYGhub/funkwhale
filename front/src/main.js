@@ -32,16 +32,20 @@ window.$ = window.jQuery = require('jquery')
 // require('./semantic/semantic.css')
 require('semantic-ui-css/semantic.js')
 require('masonry-layout')
-
+let availableLanguages = (function () {
+  let l = {}
+  locales.locales.forEach(c => {
+    l[c.code] = c.label
+  })
+  return l
+})()
+let defaultLanguage = 'en_US'
+if (availableLanguages[store.state.ui.currentLanguage]) {
+  defaultLanguage = store.state.ui.currentLanguage
+}
 Vue.use(GetTextPlugin, {
-  availableLanguages: (function () {
-    let l = {}
-    locales.locales.forEach(c => {
-      l[c.code] = c.label
-    })
-    return l
-  })(),
-  defaultLanguage: 'en_US',
+  availableLanguages: availableLanguages,
+  defaultLanguage: defaultLanguage,
   languageVmMixin: {
     computed: {
       currentKebabCase: function () {
