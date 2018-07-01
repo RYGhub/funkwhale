@@ -12,13 +12,13 @@
           @click="collapsed = false"
           v-if="truncated && collapsed"
           class="expand">
-          {{ $gettext('Expand') }}
+          <translate>Expand</translate>
         </span>
         <span
           @click="collapsed = true"
           v-if="truncated && !collapsed"
           class="collapse">
-          {{ $gettext('Collapse') }}
+          <translate>Collapse</translate>
         </span>
       </div>
     </div>

@@ -13,13 +13,13 @@
     </div>
     <div class="content">
       <span class="right floated" v-if="following">
-        <i class="check icon"></i>{{ $gettext('Following') }}
+        <i class="check icon"></i><translate>Following</translate>
       </span>
       <span class="right floated" v-else-if="manuallyApprovesFollowers">
-        <i class="lock icon"></i>{{ $gettext('Followers only') }}
+        <i class="lock icon"></i><translate>Followers only</translate>
       </span>
       <span class="right floated" v-else>
-        <i class="open lock icon"></i>{{ $gettext('Open') }}
+        <i class="open lock icon"></i><translate>Open</translate>
       </span>
       <span v-if="totalItems">
         <i class="music icon"></i>
@@ -34,7 +34,7 @@
     <div class="extra content">
       <template v-if="awaitingApproval">
         <i class="clock icon"></i>
-        {{ $gettext('Follow request pending approval') }}
+        <translate>Follow request pending approval</translate>
       </template>
       <div
         v-if="!library"
@@ -48,7 +48,7 @@
         v-else
         class="ui basic button"
         :to="{name: 'federation.libraries.detail', params: {id: library.uuid }}">
-        {{ $gettext('Detail') }}
+        <translate>Detail</translate>
       </router-link>
     </div>
   </div>

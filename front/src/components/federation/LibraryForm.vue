@@ -1,14 +1,14 @@
 <template>
   <form class="ui form" @submit.prevent="fetchInstanceInfo">
     <h3 class="ui header">
-      {{ $gettext('Federate with a new instance') }}
+      <translate>Federate with a new instance</translate>
     </h3>
     <p>
-      {{ $gettext('Use this form to scan an instance and setup federation.') }}
+      <translate>Use this form to scan an instance and setup federation.</translate>
     </p>
     <div v-if="errors.length > 0 || scanErrors.length > 0" class="ui negative message">
       <div class="header">
-        {{ $gettext('Error while scanning library') }}
+        <translate>Error while scanning library</translate>
       </div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
@@ -18,7 +18,7 @@
     <div class="ui two fields">
       <div class="ui field">
         <label>
-          {{ $gettext('Library name') }}
+          <translate>Library name</translate>
         </label>
         <input v-model="libraryUsername" type="text" placeholder="library@demo.funkwhale.audio" />
       </div>
@@ -29,7 +29,7 @@
           :disabled="isLoading"
           :class="['ui', 'icon', {loading: isLoading}, 'button']">
           <i class="search icon"></i>
-          {{ $gettext('Launch scan') }}
+          <translate>Launch scan</translate>
         </button>
       </div>
     </div>

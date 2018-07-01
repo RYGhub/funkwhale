@@ -9,7 +9,7 @@
           <div class="ui checkbox">
             <input v-model="pending" type="checkbox">
             <label>
-              {{ $gettext('Pending approval') }}
+              <translate>Pending approval</translate>
             </label>
           </div>
         </div>
@@ -36,23 +36,23 @@
           <td>
             <template v-if="follow.approved === true">
               <i class="check icon"></i>
-              {{ $gettext('Approved') }}
+              <translate>Approved</translate>
             </template>
             <template v-else-if="follow.approved === false">
               <i class="x icon"></i>
-              {{ $gettext('Refused') }}
+              <translate>Refused</translate>
             </template>
             <template v-else>
               <i class="clock icon"></i>
-              {{ $gettext('Pending') }}
+              <translate>Pending</translate>
             </template>
           </td>
           <td>
             <dangerous-button v-if="follow.approved !== false" class="tiny basic labeled icon" color='red' @confirm="updateFollow(follow, false)">
               <i class="x icon"></i>
-              {{ $gettext('Deny') }}
+              <translate>Deny</translate>
               <p slot="modal-header">
-                {{ $gettext('Deny access?') }}
+                <translate>Deny access?</translate>
               </p>
               <p slot="modal-content">
                 <translate
@@ -61,14 +61,14 @@
                 </translate>
               </p>
               <p slot="modal-confirm">
-                {{ $gettext('Deny') }}
+                <translate>Deny</translate>
               </p>
             </dangerous-button>
             <dangerous-button v-if="follow.approved !== true" class="tiny basic labeled icon" color='green' @confirm="updateFollow(follow, true)">
               <i class="check icon"></i>
-              {{ $gettext('Approve') }}
+              <translate>Approve</translate>
               <p slot="modal-header">
-                {{ $gettext('Approve access?') }}
+                <translate>Approve access?</translate>
               </p>
               <p slot="modal-content">
                 <translate
@@ -76,7 +76,7 @@
                   By confirming, %{ username } will be granted access to your library.
                 </translate>
               <p slot="modal-confirm">
-                {{ $gettext('Approve') }}
+                <translate>Approve</translate>
               </p>
             </dangerous-button>
           </td>

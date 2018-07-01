@@ -2,12 +2,12 @@
   <div id="app">
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
-        <h1 class="ui header">{{ $gettext('Choose your instance') }}</h1>
+        <h1 class="ui header"><translate>Choose your instance</translate></h1>
         <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
-          <p>{{ $gettext('You need to select an instance in order to continue') }}</p>
+          <p><translate>You need to select an instance in order to continue</translate></p>
           <div class="ui action input">
             <input type="text" v-model="instanceUrl">
-            <button type="submit" class="ui button">{{ $gettext('Submit') }}</button>
+            <button type="submit" class="ui button"><translate>Submit</translate></button>
           </div>
           <p>{{ $gettext('Suggested choices') }}</p>
           <div class="ui bulleted list">
@@ -30,17 +30,17 @@
               <h4 v-translate class="ui header">Links</h4>
               <div class="ui link list">
                 <router-link class="item" to="/about">
-                  {{ $gettext('About this instance') }}
+                  <translate>About this instance</translate>
                 </router-link>
-                <a href="https://funkwhale.audio" class="item" target="_blank">{{ $gettext('Official website') }}</a>
-                <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $gettext('Documentation') }}</a>
+                <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
+                <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
                   <translate :translate-params="{version: version}" v-if="version">Source code (%{version})</translate>
                   <translate v-else>Source code</translate>
                 </a>
-                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $gettext('Issue tracker') }}</a>
+                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
                 <a @click="switchInstance" class="item" >
-                  {{ $gettext('Use another instance') }}
+                  <translate>Use another instance</translate>
                   <template v-if="$store.state.instance.instanceUrl !== '/'">
                     <br>
                     ({{ $store.state.instance.instanceUrl }})

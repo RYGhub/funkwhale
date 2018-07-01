@@ -5,7 +5,7 @@
     </h3>
     <form class="ui form" @submit.prevent="">
       <h6 class="ui header">
-        {{ $gettext('Filter album types') }}
+        <translate>Filter album types</translate>
       </h6>
       <div class="inline fields">
         <div class="field" v-for="t in availableReleaseTypes">
@@ -15,7 +15,7 @@
           </div>
         </div>
         <div class="field">
-          <label>{{ $gettext('Query template') }}</label>
+          <label><translate>Query template</translate></label>
           <input v-model="customQueryTemplate" />
         </div>
       </div>

@@ -7,7 +7,7 @@
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
           <p class="ui message" v-if="!$store.state.instance.settings.users.registration_enabled.value">
-            {{ $gettext('Registration are closed on this instance, you will need an invitation code to signup.') }}
+            <translate>Registration are closed on this instance, you will need an invitation code to signup.</translate>
           </p>
 
           <div v-if="errors.length > 0" class="ui negative message">

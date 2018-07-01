@@ -40,7 +40,7 @@ curl -G -o "{{ track.files[0].filename }}" <template v-if="$store.state.auth.aut
               </div>
             </div>
             <div class="actions">
-              <div class="ui black deny button">{{ $gettext('Cancel') }}</div>
+              <div class="ui black deny button"><translate>Cancel</translate></div>
             </div>
           </modal>
         </th>

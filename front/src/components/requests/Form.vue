@@ -1,30 +1,30 @@
 <template>
   <div>
     <form v-if="!over" class="ui form" @submit.prevent="submit">
-      <p>{{ $gettext('Something\'s missing in the library? Let us know what you would like to listen!') }}</p>
+      <p><translate>Something's missing in the library? Let us know what you would like to listen!</translate></p>
       <div class="required field">
-        <label>{{ $gettext('Artist name') }}</label>
+        <label><translate>Artist name</translate></label>
         <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required maxlength="200">
       </div>
       <div class="field">
-        <label>{{ $gettext('Albums') }}</label>
-        <p>{{ $gettext('Leave this field empty if you\'re requesting the whole discography.') }}</p>
+        <label><translate>Albums</translate></label>
+        <p><translate>Leave this field empty if you're requesting the whole discography.</translate></p>
         <input v-model="currentAlbums" placeholder="The White Album, Thriller…" maxlength="2000">
       </div>
       <div class="field">
-        <label>{{ $gettext('Comment') }}</label>
+        <label><translate>Comment</translate></label>
         <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed" maxlength="2000"></textarea>
       </div>
-      <button class="ui submit button" type="submit">{{ $gettext('Submit') }}</button>
+      <button class="ui submit button" type="submit"><translate>Submit</translate></button>
     </form>
     <div v-else class="ui success message">
       <div class="header">Request submitted!</div>
-      <p>{{ $gettext('We\'ve received your request, you\'ll get some groove soon ;)') }}</p>
-      <button @click="reset" class="ui button">{{ $gettext('Submit another request') }}</button>
+      <p><translate>We've received your request, you'll get some groove soon ;)</translate></p>
+      <button @click="reset" class="ui button"><translate>Submit another request</translate></button>
     </div>
     <div v-if="requests.length > 0">
       <div class="ui divider"></div>
-      <h3 class="ui header">{{ $gettext('Pending requests') }}</h3>
+      <h3 class="ui header"><translate>Pending requests</translate></h3>
       <div class="ui list">
         <div v-for="request in requests" class="item">
           <div class="content">

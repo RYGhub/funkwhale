@@ -2,20 +2,20 @@
   <div v-title="'Radios'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">
-        {{ $gettext('Browsing radios') }}
+        <translate>Browsing radios</translate>
       </h2>
       <router-link class="ui green basic button" to="/library/radios/build" exact>
-        {{ $gettext('Create your own radio') }}
+        <translate>Create your own radio</translate>
       </router-link>
       <div class="ui hidden divider"></div>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>{{ $gettext('Search') }}</label>
+            <label><translate>Search</translate></label>
             <input type="text" v-model="query" placeholder="Enter a radio name..."/>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering') }}</label>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -23,18 +23,18 @@
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering direction') }}</label>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">
-                {{ $gettext('Ascending') }}
+                <translate>Ascending</translate>
               </option>
               <option value="-">
-                {{ $gettext('Descending') }}
+                <translate>Descending</translate>
               </option>
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Results per page') }}</label>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

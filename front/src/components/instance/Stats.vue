@@ -3,7 +3,7 @@
     <div v-if="stats" class="ui stackable two column grid">
       <div class="column">
         <h3 class="ui left aligned header">
-          {{ $gettext('User activity') }}
+          <translate>User activity</translate>
         </h3>
         <div v-if="stats" class="ui mini horizontal statistics">
           <div class="statistic">
@@ -11,19 +11,19 @@
               <i class="green user icon"></i>
               {{ stats.users }}
             </div>
-            <div class="label">{{ $gettext('users') }}</div>
+            <div class="label"><translate>users</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="orange sound icon"></i> {{ stats.listenings }}
             </div>
-            <div class="label">{{ $gettext('tracks listened') }}</div>
+            <div class="label"><translate>tracks listened</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="pink heart icon"></i> {{ stats.trackFavorites }}
             </div>
-            <div class="label">{{ $gettext('Tracks favorited') }}</div>
+            <div class="label"><translate>Tracks favorited</translate></div>
           </div>
         </div>
       </div>
@@ -34,25 +34,25 @@
             <div class="value">
               {{ parseInt(stats.musicDuration) }}
             </div>
-            <div class="label">{{ $gettext('Hours of music') }}</div>
+            <div class="label"><translate>Hours of music</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.artists }}
             </div>
-            <div class="label">{{ $gettext('Artists') }}</div>
+            <div class="label"><translate>Artists</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.albums }}
             </div>
-            <div class="label">{{ $gettext('Albums') }}</div>
+            <div class="label"><translate>Albums</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.tracks }}
             </div>
-            <div class="label">{{ $gettext('tracks') }}</div>
+            <div class="label"><translate>tracks</translate></div>
           </div>
         </div>
       </div>

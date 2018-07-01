@@ -2,10 +2,10 @@
   <div class="main pusher" v-title="'Log In'">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $gettext('Log in to your Funkwhale account') }}</h2>
+        <h2><translate>Log in to your Funkwhale account</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="error" class="ui negative message">
-            <div class="header">{{ $gettext('We cannot log you in') }}</div>
+            <div class="header"><translate>We cannot log you in</translate></div>
             <ul class="list">
               <li v-if="error == 'invalid_credentials'">{{ $gettext('Please double-check your username/password couple is correct') }}</li>
               <li v-else>{{ $gettext('An unknown error happend, this can mean the server is down or cannot be reached') }}</li>
@@ -13,9 +13,9 @@
           </div>
           <div class="field">
             <label>
-              {{ $gettext('Username or email') }} |
+              <translate>Username or email</translate> |
               <router-link :to="{path: '/signup'}">
-                {{ $gettext('Create an account') }}
+                <translate>Create an account</translate>
               </router-link>
             </label>
             <input
@@ -30,9 +30,9 @@
           </div>
           <div class="field">
             <label>
-              {{ $gettext('Password') }} |
+              <translate>Password</translate> |
               <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
-                {{ $gettext('Reset your password') }}
+                <translate>Reset your password</translate>
               </router-link>
             </label>
             <password-input :index="2" required v-model="credentials.password" />

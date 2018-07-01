@@ -2,23 +2,23 @@
   <div class="main library pusher">
     <div class="ui secondary pointing menu">
       <router-link class="ui item" to="/library" exact>
-        {{ $gettext('Browse') }}
+        <translate>Browse</translate>
       </router-link>
       <router-link class="ui item" to="/library/artists" exact>
-        {{ $gettext('Artists') }}
+        <translate>Artists</translate>
       </router-link>
       <router-link class="ui item" to="/library/radios" exact>
-        {{ $gettext('Radios') }}
+        <translate>Radios</translate>
       </router-link>
       <router-link class="ui item" to="/library/playlists" exact>
-        {{ $gettext('Playlists') }}
+        <translate>Playlists</translate>
       </router-link>
       <div class="ui secondary right menu">
         <router-link v-if="showImports" class="ui item" to="/library/import/launch" exact>
-          {{ $gettext('Import') }}
+          <translate>Import</translate>
         </router-link>
         <router-link v-if="showImports" class="ui item" to="/library/import/batches">
-          {{ $gettext('Import batches') }}
+          <translate>Import batches</translate>
         </router-link>
       </div>
     </div>

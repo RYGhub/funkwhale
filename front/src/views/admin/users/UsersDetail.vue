@@ -19,7 +19,7 @@
             <tbody>
               <tr>
                 <td>
-                  {{ $gettext('Name') }}
+                  <translate>Name</translate>
                 </td>
                 <td>
                   {{ object.name }}
@@ -27,7 +27,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Email address') }}
+                  <translate>Email address</translate>
                 </td>
                 <td>
                   {{ object.email }}
@@ -35,7 +35,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Sign-up') }}
+                  <translate>Sign-up</translate>
                 </td>
                 <td>
                   <human-date :date="object.date_joined"></human-date>
@@ -43,16 +43,16 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Last activity') }}
+                  <translate>Last activity</translate>
                 </td>
                 <td>
                   <human-date v-if="object.last_activity" :date="object.last_activity"></human-date>
-                  <template v-else>{{ $gettext('N/A') }}</template>
+                  <template v-else><translate>N/A</translate></template>
                 </td>
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Account active') }}
+                  <translate>Account active</translate>
                   <span :data-tooltip="$gettext('Determine if the user account is active or not. Inactive users cannot login or user the service.')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
@@ -66,7 +66,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Permissions') }}
+                  <translate>Permissions</translate>
                 </td>
                 <td>
                   <select
@@ -82,7 +82,7 @@
           </table>
         </div>
         <div class="ui hidden divider"></div>
-        <button @click="fetchData" class="ui basic button">{{ $gettext('Refresh') }}</button>
+        <button @click="fetchData" class="ui basic button"><translate>Refresh</translate></button>
       </div>
     </template>
   </div>

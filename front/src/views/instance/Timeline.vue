@@ -2,10 +2,10 @@
   <div class="main pusher" v-title="'Instance Timeline'">
     <div class="ui vertical center aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader">{{ $gettext('Loading timeline...') }}</div>
+        <div class="ui text loader"><translate>Loading timeline...</translate></div>
       </div>
       <div v-else class="ui text container">
-        <h1 class="ui header">{{ $gettext('Recent activity on this instance') }}</h1>
+        <h1 class="ui header"><translate>Recent activity on this instance</translate></h1>
         <div class="ui feed">
           <component
             class="event"

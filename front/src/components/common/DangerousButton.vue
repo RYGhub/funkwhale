@@ -5,7 +5,7 @@
     <modal class="small" :show.sync="showModal">
       <div class="header">
         <slot name="modal-header">
-          {{ $gettext('Do you want to confirm this action?') }}
+          <translate>Do you want to confirm this action?</translate>
         </slot>
       </div>
       <div class="scrolling content">
@@ -15,11 +15,11 @@
       </div>
       <div class="actions">
         <div class="ui cancel button">
-          {{ $gettext('Cancel') }}
+          <translate>Cancel</translate>
         </div>
         <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
           <slot name="modal-confirm">
-            {{ $gettext('Confirm') }}
+            <translate>Confirm</translate>
           </slot>
         </div>
       </div>

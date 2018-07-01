@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $gettext('Search') }}</label>
+          <label><translate>Search</translate></label>
           <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering') }}</label>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering direction') }}</label>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+">Ascending</option>
             <option value="-">Descending</option>
@@ -35,14 +35,14 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $gettext('Title') }}</th>
-          <th>{{ $gettext('Artist') }}</th>
-          <th>{{ $gettext('Album') }}</th>
-          <th>{{ $gettext('Import date') }}</th>
-          <th>{{ $gettext('Type') }}</th>
-          <th>{{ $gettext('Bitrate') }}</th>
-          <th>{{ $gettext('Duration') }}</th>
-          <th>{{ $gettext('Size') }}</th>
+          <th><translate>Title</translate></th>
+          <th><translate>Artist</translate></th>
+          <th><translate>Album</translate></th>
+          <th><translate>Import date</translate></th>
+          <th><translate>Type</translate></th>
+          <th><translate>Bitrate</translate></th>
+          <th><translate>Duration</translate></th>
+          <th><translate>Size</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -61,25 +61,25 @@
             {{ scope.obj.audio_mimetype }}
           </td>
           <td v-else>
-            {{ $gettext('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.bitrate">
             {{ scope.obj.bitrate | humanSize }}/s
           </td>
           <td v-else>
-            {{ $gettext('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.duration">
             {{ time.parse(scope.obj.duration) }}
           </td>
           <td v-else>
-            {{ $gettext('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.size">
             {{ scope.obj.size | humanSize }}
           </td>
           <td v-else>
-            {{ $gettext('N/A') }}
+            <translate>N/A</translate>
           </td>
         </template>
       </action-table>

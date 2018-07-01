@@ -41,14 +41,14 @@
               <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show 1 more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              {{ $gettext('Collapse') }}
+              <translate>Collapse</translate>
             </em>
           </div>
         </div>
       </div>
       <div class="extra content">
         <play-button class="mini basic orange right floated" :tracks="album.tracks">
-          {{ $gettext('Play all') }}
+          <translate>Play all</translate>
         </play-button>
         <span>
           <i class="music icon"></i>

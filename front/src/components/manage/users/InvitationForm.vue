@@ -2,7 +2,7 @@
   <div>
     <form class="ui form" @submit.prevent="submit">
       <div v-if="errors.length > 0" class="ui negative message">
-        <div class="header">{{ $gettext('Error while creating invitation') }}</div>
+        <div class="header"><translate>Error while creating invitation</translate></div>
         <ul class="list">
           <li v-for="error in errors">{{ error }}</li>
         </ul>
@@ -14,7 +14,7 @@
         </div>
         <div class="ui field">
           <button :class="['ui', {loading: isLoading}, 'button']" :disabled="isLoading" type="submit">
-            {{ $gettext('Get a new invitation') }}
+            <translate>Get a new invitation</translate>
           </button>
         </div>
       </div>
@@ -24,8 +24,8 @@
       <table class="ui ui basic table">
         <thead>
           <tr>
-            <th>{{ $gettext('Code') }}</th>
-            <th>{{ $gettext('Share link') }}</th>
+            <th><translate>Code</translate></th>
+            <th><translate>Share link</translate></th>
           </tr>
         </thead>
         <tbody>
@@ -35,7 +35,7 @@
           </tr>
         </tbody>
       </table>
-      <button class="ui basic button" @click="invitations = []">{{ $gettext('Clear') }}</button>
+      <button class="ui basic button" @click="invitations = []"><translate>Clear</translate></button>
     </div>
   </div>
 </template>

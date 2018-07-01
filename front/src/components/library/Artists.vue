@@ -2,18 +2,18 @@
   <div v-title="'Artists'">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">
-        {{ $gettext('Browsing artists') }}
+        <translate>Browsing artists</translate>
       </h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
             <label>
-              {{ $gettext('Search') }}
+              <translate>Search</translate>
             </label>
             <input type="text" v-model="query" placeholder="Enter an artist name..."/>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering') }}</label>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -21,14 +21,14 @@
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering direction') }}</label>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">Ascending</option>
               <option value="-">Descending</option>
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Results per page') }}</label>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

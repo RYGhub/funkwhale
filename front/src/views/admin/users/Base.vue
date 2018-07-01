@@ -3,10 +3,10 @@
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.users.users.list'}">{{ $gettext('Users') }}</router-link>
+        :to="{name: 'manage.users.users.list'}"><translate>Users</translate></router-link>
       <router-link
         class="ui item"
-        :to="{name: 'manage.users.invitations.list'}">{{ $gettext('Invitations') }}</router-link>
+        :to="{name: 'manage.users.invitations.list'}"><translate>Invitations</translate></router-link>
     </div>
     <router-view :key="$route.fullPath"></router-view>
   </div>

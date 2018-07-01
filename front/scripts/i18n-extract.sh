@@ -12,7 +12,8 @@ xgettext --language=JavaScript --keyword=npgettext:1c,2,3 \
     --from-code=utf-8 --join-existing --no-wrap \
     --package-name=$(node -e "console.log(require('./package.json').name);") \
     --package-version=$(node -e "console.log(require('./package.json').version);") \
-    --output $locales_dir/app.pot $js_sources
+    --output $locales_dir/app.pot $js_sources \
+    --no-wrap
 
 # Fix broken files path/lines in pot
 sed -e 's|#: src/|#: front/src/|' -i $locales_dir/app.pot
@@ -23,6 +24,6 @@ for lang in $locales; do \
     po_file=$locales_dir/$lang/LC_MESSAGES/app.po; \
     echo "msgmerge --update $po_file "; \
     mkdir -p $(dirname $po_file); \
-    [ -f $po_file ] && msgmerge --lang=$lang --update $po_file $locales_dir/app.pot || msginit --no-translator --locale=$lang --input=$locales_dir/app.pot --output-file=$po_file; \
+    [ -f $po_file ] && msgmerge --lang=$lang --update $po_file $locales_dir/app.pot --no-wrap || msginit --no-wrap --no-translator --locale=$lang --input=$locales_dir/app.pot --output-file=$po_file; \
     msgattrib --no-wrap --no-obsolete -o $po_file $po_file; \
 done;

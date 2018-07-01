@@ -8,7 +8,7 @@
         <tbody>
           <tr>
             <td>
-              <strong>{{ $gettext('Import batch') }}</strong>
+              <strong><translate>Import batch</translate></strong>
             </td>
             <td>
               #{{ batch.id }}
@@ -16,7 +16,7 @@
           </tr>
           <tr>
             <td>
-              <strong>{{ $gettext('Launch date') }}</strong>
+              <strong><translate>Launch date</translate></strong>
             </td>
             <td>
               <human-date :date="batch.creation_date"></human-date>
@@ -24,22 +24,22 @@
           </tr>
           <tr v-if="batch.user">
             <td>
-              <strong>{{ $gettext('Submitted by') }}</strong>
+              <strong><translate>Submitted by</translate></strong>
             </td>
             <td>
               <username :username="batch.user.username" />
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $gettext('Pending') }}</strong></td>
+            <td><strong><translate>Pending</translate></strong></td>
             <td>{{ stats.pending }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $gettext('Skipped') }}</strong></td>
+            <td><strong><translate>Skipped</translate></strong></td>
             <td>{{ stats.skipped }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $gettext('Errored') }}</strong></td>
+            <td><strong><translate>Errored</translate></strong></td>
             <td>
               {{ stats.errored }}
               <button
@@ -52,7 +52,7 @@
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $gettext('Finished') }}</strong></td>
+            <td><strong><translate>Finished</translate></strong></td>
             <td>{{ stats.finished }}/{{ stats.count}}</td>
           </tr>
         </tbody>
@@ -60,17 +60,17 @@
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $gettext('Search') }}</label>
+            <label><translate>Search</translate></label>
             <input type="text" v-model="jobFilters.search" placeholder="Search by source..." />
           </div>
           <div class="ui field">
-            <label>{{ $gettext('Status') }}</label>
+            <label><translate>Status</translate></label>
             <select class="ui dropdown" v-model="jobFilters.status">
-              <option :value="null">{{ $gettext('Any') }}</option>
-              <option :value="'pending'">{{ $gettext('Pending') }}</option>
-              <option :value="'errored'">{{ $gettext('Errored') }}</option>
-              <option :value="'finished'">{{ $gettext('Success') }}</option>
-              <option :value="'skipped'">{{ $gettext('Skipped') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'pending'"><translate>Pending</translate></option>
+              <option :value="'errored'"><translate>Errored</translate></option>
+              <option :value="'finished'"><translate>Success</translate></option>
+              <option :value="'skipped'"><translate>Skipped</translate></option>
             </select>
           </div>
         </div>
@@ -78,11 +78,11 @@
       <table v-if="jobResult" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $gettext('Job ID') }}</th>
-            <th>{{ $gettext('Recording MusicBrainz ID') }}</th>
-            <th>{{ $gettext('Source') }}</th>
-            <th>{{ $gettext('Status') }}</th>
-            <th>{{ $gettext('Track') }}</th>
+            <th><translate>Job ID</translate></th>
+            <th><translate>Recording MusicBrainz ID</translate></th>
+            <th><translate>Source</translate></th>
+            <th><translate>Status</translate></th>
+            <th><translate>Track</translate></th>
           </tr>
         </thead>
         <tbody>

@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $gettext('Search') }}</label>
+          <label><translate>Search</translate></label>
           <input type="text" v-model="search" placeholder="Search by username, email, name..." />
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering') }}</label>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering direction') }}</label>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">{{ $gettext('Ascending') }}</option>
-            <option value="-">{{ $gettext('Descending') }}</option>
+            <option value="+"><translate>Ascending</translate></option>
+            <option value="-"><translate>Descending</translate></option>
           </select>
         </div>
       </div>
@@ -35,13 +35,13 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $gettext('Username') }}</th>
-          <th>{{ $gettext('Email') }}</th>
-          <th>{{ $gettext('Account status') }}</th>
-          <th>{{ $gettext('Sign-up') }}</th>
-          <th>{{ $gettext('Last activity') }}</th>
-          <th>{{ $gettext('Permissions') }}</th>
-          <th>{{ $gettext('Status') }}</th>
+          <th><translate>Username</translate></th>
+          <th><translate>Email</translate></th>
+          <th><translate>Account status</translate></th>
+          <th><translate>Sign-up</translate></th>
+          <th><translate>Last activity</translate></th>
+          <th><translate>Permissions</translate></th>
+          <th><translate>Status</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -59,7 +59,7 @@
           </td>
           <td>
             <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else>{{ $gettext('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <template v-for="p in permissions">
@@ -67,9 +67,9 @@
             </template>
           </td>
           <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label">{{ $gettext('Admin') }}</span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label">{{ $gettext('Staff member') }}</span>
-            <span v-else class="ui basic label">{{ $gettext('regular user') }}</span>
+            <span v-if="scope.obj.is_superuser" class="ui pink label"><translate>Admin</translate></span>
+            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate>Staff member</translate></span>
+            <span v-else class="ui basic label"><translate>regular user</translate></span>
           </td>
         </template>
       </action-table>

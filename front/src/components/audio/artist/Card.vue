@@ -31,7 +31,7 @@
               <translate :translate-params="{count: artist.albums.length - initialAlbums}" :translate-n="artist.albums.length - initialAlbums" translate-plural="Show %{ count } more albums">Show 1 more album</translate>
             </em>
             <em v-else @click="showAllAlbums = false" class="expand">
-              {{ $gettext('Collapse') }}
+              <translate>Collapse</translate>
             </em>
           </div>
         </div>
@@ -42,7 +42,7 @@
             <translate :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
         </span>
         <play-button class="mini basic orange right floated" :artist="artist.id">
-          {{ $gettext('Play all') }}
+          <translate>Play all</translate>
         </play-button>
       </div>
     </div>
