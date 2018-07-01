@@ -88,7 +88,7 @@ Default: ``Funkwhale <noreply@yourdomain>``
 Default: ``None``
 
 The path on your server where Funwkhale can import files using :ref:`in-place import
-<in-place-import>`. It must be readable by the webserver and funkwhale
+<in-place-import>`. It must be readable by the webserver and Funkwhale
 api and worker processes.
 
 On docker installations, we recommend you use the default of ``/music``

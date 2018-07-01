@@ -14,7 +14,7 @@ Funkwhale requires a PostgreSQL database to work properly. Please refer
 to the `PostgreSQL documentation <https://www.postgresql.org/download/>`_
 for installation instructions specific to your os.
 
-On debian-like systems, you would install the database server like this:
+On Debian-like systems, you would install the database server like this:
 
 .. code-block:: shell
 
@@ -52,7 +52,7 @@ you should now be able to open a postgresql shell:
 
 Unless you give a superuser access to the database user, you should also
 enable some extensions on your database server, as those are required
-for funkwhale to work properly:
+for Funkwhale to work properly:
 
 .. code-block:: shell
 
@@ -68,7 +68,7 @@ Funkwhale also requires a cache server:
   queries
 - To handle asynchronous tasks such as music import
 
-On debian-like distributions, a redis package is available, and you can
+On Debian-like distributions, a redis package is available, and you can
 install it:
 
 .. code-block:: shell

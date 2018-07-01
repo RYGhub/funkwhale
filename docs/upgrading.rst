@@ -1,4 +1,4 @@
-Upgrading your funkwhale instance to a newer version
+Upgrading your Funkwhale instance to a newer version
 ====================================================
 
 .. note::
@@ -7,7 +7,7 @@ Upgrading your funkwhale instance to a newer version
     the database and the media files.
 
     We're commited to make upgrade as easy and straightforward as possible,
-    however, funkwhale is still in development and you'll be safer with a backup.
+    however, Funkwhale is still in development and you'll be safer with a backup.
 
 
 Reading the release notes

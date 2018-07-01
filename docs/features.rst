@@ -9,7 +9,7 @@ Funkwhale is a web based music server. It is similar in term of goals and featur
 A social platform
 ------------------
 
-However, funkwhale is better-suited for small to medium communities and was designed to be not only a music server and player, but also a place to socialize around music and discover new content. While some of these features are not currently implemented, our roadmap includes:
+However, Funkwhale is better-suited for small to medium communities and was designed to be not only a music server and player, but also a place to socialize around music and discover new content. While some of these features are not currently implemented, our roadmap includes:
 
 - Radios, to discover the music of a given user, artist, genre...
 - Playlists

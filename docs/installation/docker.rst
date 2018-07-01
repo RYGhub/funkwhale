@@ -1,7 +1,7 @@
 Docker installation
 ====================
 
-Docker is the easiest way to get a funkwhale instance up and running.
+Docker is the easiest way to get a Funkwhale instance up and running.
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://github.com/docker/compose/releases>`_ installed.
 

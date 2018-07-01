@@ -8,8 +8,8 @@ Debian installation
 External dependencies
 ---------------------
 
-The guides will focus on installing funkwhale-specific components and
-dependencies. However, funkwhale requires a
+The guides will focus on installing Funkwhale-specific components and
+dependencies. However, Funkwhale requires a
 :doc:`few external dependencies <./external_dependencies>` for which
 documentation is outside of this document scope.
 
@@ -28,7 +28,7 @@ default on system. You can install them using:
 Layout
 -------
 
-All funkwhale-related files will be located under ``/srv/funkwhale`` apart
+All Funkwhale-related files will be located under ``/srv/funkwhale`` apart
 from database files and a few configuration files. We will also have a
 dedicated ``funkwhale`` user to launch the processes we need and own those files.
 
@@ -57,7 +57,7 @@ Now let's setup our directory layout. Here is how it will look like::
     ├── api         # api code of your instance
     ├── data        # persistent data, such as music files
     ├── front       # frontend files for the web user interface
-    └── virtualenv  # python dependencies for funkwhale
+    └── virtualenv  # python dependencies for Funkwhale
 
 Create the aforementionned directories:
 
@@ -67,7 +67,7 @@ Create the aforementionned directories:
 
 The ``virtualenv`` directory is a bit special and will be created separately.
 
-Download latest funkwhale release
+Download latest Funkwhale release
 ----------------------------------
 
 Funkwhale is splitted in two components:
@@ -79,7 +79,7 @@ Those components are packaged in subsequent releases, such as 0.1, 0.2, etc.
 You can browse the :doc:`changelog </changelog>` for a list of available releases
 and pick the one you want to install, usually the latest one should be okay.
 
-In this guide, we'll assume you want to install the latest version of funkwhale,
+In this guide, we'll assume you want to install the latest version of Funkwhale,
 which is |version|:
 
 First, we'll download the latest api release.
@@ -113,7 +113,7 @@ First, switch to the api directory:
 
     cd api
 
-A few OS packages are required in order to run funkwhale. The list is available
+A few OS packages are required in order to run Funkwhale. The list is available
 in ``api/requirements.apt`` or by running
 ``./install_os_dependencies.sh list``.
 
@@ -178,7 +178,7 @@ Finally, install the python dependencies:
 Environment file
 ----------------
 
-You can now start to configure funkwhale. The main way to achieve that is by
+You can now start to configure Funkwhale. The main way to achieve that is by
 adding an environment file that will host settings that are relevant to your
 installation.
 

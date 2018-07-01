@@ -96,17 +96,17 @@ Files for the web frontend are purely static and can simply be downloaded, unzip
 Reverse proxy
 --------------
 
-In order to make funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy.
+In order to make Funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy.
 
 Nginx
 ^^^^^
 
-Ensure you have a recent version of nginx on your server. On debian-like system, you would have to run the following:
+Ensure you have a recent version of nginx on your server. On Debian-like system, you would have to run the following:
 
 .. code-block:: bash
 
-    apt-get update
-    apt-get install nginx
+    sudo apt-get update
+    sudo apt-get install nginx
 
 Then, download our sample virtualhost file and proxy conf:
 
@@ -132,7 +132,7 @@ Apache2
 Ensure you have a recent version of apache2 installed on your server.
 You'll also need the following dependencies::
 
-   apt install libapache2-mod-xsendfile
+   sudo apt-get install libapache2-mod-xsendfile
 
 Then, download our sample virtualhost file:
 

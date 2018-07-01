@@ -1,10 +1,10 @@
 Systemd configuration
 ----------------------
 
-Systemd offers a convenient way to manage your funkwhale instance if you're
+Systemd offers a convenient way to manage your Funkwhale instance if you're
 not using docker.
 
-We'll see how to setup systemd to proprely start a funkwhale instance.
+We'll see how to setup systemd to proprely start a Funkwhale instance.
 
 First, download the sample unitfiles:
 
@@ -17,9 +17,9 @@ First, download the sample unitfiles:
 
 This will download three unitfiles:
 
-- ``funkwhale-server.service`` to launch the funkwhale web server
-- ``funkwhale-worker.service`` to launch the funkwhale task worker
-- ``funkwhale-beat.service`` to launch the funkwhale task beat (this is for recurring tasks)
+- ``funkwhale-server.service`` to launch the Funkwhale web server
+- ``funkwhale-worker.service`` to launch the Funkwhale task worker
+- ``funkwhale-beat.service`` to launch the Funkwhale task beat (this is for recurring tasks)
 - ``funkwhale.target`` to easily stop and start all of the services at once
 
 You can of course review and edit them to suit your deployment scenario
