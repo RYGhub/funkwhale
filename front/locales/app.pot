@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-01 15:30+0200\n"
+"POT-Creation-Date: 2018-07-01 18:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1187,6 +1187,10 @@ msgstr ""
 msgid "Owner"
 msgstr ""
 
+#: front/src/components/PageNotFound.vue:7
+msgid "Page not found!"
+msgstr ""
+
 #: front/src/components/auth/Login.vue:32
 msgid "Password"
 msgstr ""
@@ -1836,10 +1840,6 @@ msgstr ""
 msgid "Welcome on Funkwhale"
 msgstr ""
 
-#: front/src/components/PageNotFound.vue:7
-msgid "Whale') }}"
-msgstr ""
-
 #: front/src/components/Home.vue:24
 msgid "Why funkwhale?"
 msgstr ""
@@ -1932,10 +1932,6 @@ msgstr[1] ""
 
 #: front/src/components/audio/track/Table.vue:30
 msgid "There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks."
-msgstr ""
-
-#: front/src/components/PageNotFound.vue:8
-msgid "Page not found!</translate>"
 msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:55

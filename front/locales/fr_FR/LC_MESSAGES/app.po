@@ -7,11 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-01 15:30+0200\n"
+"POT-Creation-Date: 2018-07-01 18:34+0200\n"
 "PO-Revision-Date: 2018-07-01 14:45+0000\n"
 "Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
-"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
-"front/fr/>\n"
+"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -109,9 +108,7 @@ msgstr "Accès désactivé"
 
 #: front/src/components/Home.vue:109
 msgid "Access your music from a clean interface that focus on what really matters"
-msgstr ""
-"Accédez à votre musique depuis une interface épurée, adaptée à ce qui compte "
-"vraiment"
+msgstr "Accédez à votre musique depuis une interface épurée, adaptée à ce qui compte vraiment"
 
 #: front/src/views/admin/users/UsersDetail.vue:54
 msgid "Account active"
@@ -303,9 +300,7 @@ msgstr "Retour à la page de connexion"
 
 #: front/src/views/federation/LibraryFollowersList.vue:5
 msgid "Be careful when accepting follow requests, as it means the follower will have access to your entire library."
-msgstr ""
-"Soyez prudent·es en acceptant les demandes d'abonnements, car vos abonné·es "
-"pourront accéder à l'intégralité de votre bibliothèque."
+msgstr "Soyez prudent·es en acceptant les demandes d'abonnements, car vos abonné·es pourront accéder à l'intégralité de votre bibliothèque."
 
 #: front/src/components/library/Track.vue:80
 #: front/src/components/manage/library/FilesTable.vue:42
@@ -397,9 +392,7 @@ msgstr "Changements synchronisés avec le serveur"
 
 #: front/src/components/auth/Settings.vue:37
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
-msgstr ""
-"La mise à jour de votre mot de passe impactera également le mot de passe de "
-"l'API Subsonic si vous en avez demandé un."
+msgstr "La mise à jour de votre mot de passe impactera également le mot de passe de l'API Subsonic si vous en avez demandé un."
 
 #: front/src/App.vue:4
 msgid "Choose your instance"
@@ -1247,6 +1240,11 @@ msgstr "Direction"
 msgid "Owner"
 msgstr "Propriétaire"
 
+#: front/src/components/PageNotFound.vue:7
+#, fuzzy
+msgid "Page not found!"
+msgstr "Page non trouvée !"
+
 #: front/src/components/auth/Login.vue:32
 msgid "Password"
 msgstr "Mot de passe"
@@ -1932,10 +1930,6 @@ msgstr "Nous avons bien reçu votre requête, vous aurez bientôt de nos nouvell
 msgid "Welcome on Funkwhale"
 msgstr "Bienvenue sur Funkwhale"
 
-#: front/src/components/PageNotFound.vue:7
-msgid "Whale') }}"
-msgstr ""
-
 #: front/src/components/Home.vue:24
 msgid "Why funkwhale?"
 msgstr "Pourquoi Funkwhale ?"
@@ -2030,11 +2024,6 @@ msgstr[1] "%{ count } pistes ont été ajoutées à votre queue"
 #: front/src/components/audio/track/Table.vue:30
 msgid "There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks."
 msgstr "Il n'est pas possible pour le moment de télécharger un ensemble de pistes sous forme d'archive. Cependant, vous pouvez utiliser un outil en ligne de commande tel que cURL pour télécharger facilement une liste de pistes."
-
-#: front/src/components/PageNotFound.vue:8
-#, fuzzy
-msgid "Page not found!</translate>"
-msgstr "Page non trouvée !"
 
 #: front/src/components/manage/users/UsersTable.vue:55
 #, fuzzy
