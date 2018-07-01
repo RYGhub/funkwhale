@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="username + ''s Profile'">
+  <div class="main pusher" v-title="username + '\'s Profile'">
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
