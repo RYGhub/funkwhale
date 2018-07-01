@@ -280,7 +280,7 @@ Typical workflow for a contribution
 3. Create a dedicated branch for your work ``42-awesome-fix``. It is good practice to prefix your branch name with the ID of the issue you are solving.
 4. Work on your stuff
 5. Commit small, atomic changes to make it easier to review your contribution
-6. Add a changelog fragment to summarize your changes: ``echo "Implemented awesome stuff (#42)" > changes/changelog.d/42.feature"``
+6. Add a changelog fragment to summarize your changes: ``echo "Implemented awesome stuff (#42)" > changes/changelog.d/42.feature``
 7. Push your branch
 8. Create your merge request
 9. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
