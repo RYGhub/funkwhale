@@ -1,15 +1,10 @@
-# French translations for front package.
-# Copyright (C) 2018 THE front'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the front package.
-# Automatically generated, 2018.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: front 1.0.0\n"
+"Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-01 18:34+0200\n"
-"PO-Revision-Date: 2018-07-01 14:45+0000\n"
-"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"POT-Creation-Date: 2018-07-01 19:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
@@ -180,6 +175,7 @@ msgstr "Admin"
 msgid "Administration"
 msgstr "Administration"
 
+#: front/src/components/audio/SearchBar.vue:19
 #: front/src/components/federation/LibraryTrackTable.vue:34
 #: front/src/components/manage/library/FilesTable.vue:39
 #: front/src/components/metadata/Search.vue:129
@@ -251,6 +247,7 @@ msgstr "Approuvé"
 msgid "Are you sure you want to log out?"
 msgstr "Êtes-vous sur de vouloir vous déconnecter ?"
 
+#: front/src/components/audio/SearchBar.vue:18
 #: front/src/components/federation/LibraryTrackTable.vue:33
 #: front/src/components/manage/library/FilesTable.vue:38
 #: front/src/components/manage/library/RequestsTable.vue:49
@@ -827,9 +824,7 @@ msgstr "Heures de musique"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:11
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
-msgstr ""
-"Cependant, accéder à Funkwhale depuis ces clients requiert un mot de passe "
-"distinct que vous pouvez configurer ci-dessous."
+msgstr "Cependant, accéder à Funkwhale depuis ces clients requiert un mot de passe distinct que vous pouvez configurer ci-dessous."
 
 #: front/src/components/library/import/BatchList.vue:34
 msgid "ID"
@@ -837,10 +832,7 @@ msgstr "ID"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:24
 msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
-msgstr ""
-"Si l'adresse email que vous avez fournie est valide et associée à un compte "
-"utilisateur, vous allez recevoir un email contenant les instructions de "
-"réinitialisation au cours des prochaines minutes."
+msgstr "Si l'adresse email que vous avez fournie est valide et associée à un compte utilisateur, vous allez recevoir un email contenant les instructions de réinitialisation au cours des prochaines minutes."
 
 #: front/src/components/federation/LibraryTrackTable.vue:159
 #: front/src/components/library/Library.vue:17
@@ -1147,9 +1139,7 @@ msgstr "Non"
 
 #: front/src/components/Home.vue:103
 msgid "No add-ons, no plugins : you only need a web library"
-msgstr ""
-"Pas d'addons ou d'extension à installer, il vous suffit d'une bibliothèque "
-"sur le web"
+msgstr "Pas d'addons ou d'extension à installer, il vous suffit d'une bibliothèque sur le web"
 
 #: front/src/components/library/Track.vue:102
 msgid "No lyrics available for this track."
@@ -1384,9 +1374,7 @@ msgstr "Inscrit·e depuis le %{ date }"
 
 #: front/src/components/auth/Signup.vue:9
 msgid "Registration are closed on this instance, you will need an invitation code to signup."
-msgstr ""
-"Les inscriptions sont fermées sur cette instance, vous aurez besoin d'un "
-"code d'invitation pour vous inscrire."
+msgstr "Les inscriptions sont fermées sur cette instance, vous aurez besoin d'un code d'invitation pour vous inscrire."
 
 #: front/src/components/manage/users/UsersTable.vue:71
 msgid "regular user"
@@ -1567,9 +1555,7 @@ msgstr "Ignoré"
 
 #: front/src/components/requests/Form.vue:3
 msgid "Something's missing in the library? Let us know what you would like to listen!"
-msgstr ""
-"Quelque chose manque dans la bibliothèque ? Dîtes nous ce que vous voulez "
-"écouter !"
+msgstr "Quelque chose manque dans la bibliothèque ? Dîtes nous ce que vous voulez écouter !"
 
 #: front/src/components/audio/Search.vue:25
 msgid "Sorry, we did not found any album matching your query"
@@ -1577,8 +1563,7 @@ msgstr "Désolé, nous n'avons trouvé aucun album correspondant à votre recher
 
 #: front/src/components/audio/Search.vue:16
 msgid "Sorry, we did not found any artist matching your query"
-msgstr ""
-"Désolé, nous n'avons trouver aucun·a artiste correspondant à votre recherche"
+msgstr "Désolé, nous n'avons trouver aucun·a artiste correspondant à votre recherche"
 
 #: front/src/components/library/import/BatchDetail.vue:82
 #: front/src/components/library/import/BatchList.vue:38
@@ -1669,9 +1654,7 @@ msgstr "Synchronisation des changements avec le serveur..."
 
 #: front/src/components/Home.vue:26
 msgid "That's simple: we loved Grooveshark and we want to build something even better."
-msgstr ""
-"C'est simple : nous adorions Grooveshark et nous voulions construire quelque "
-"chose d'encore mieux."
+msgstr "C'est simple : nous adorions Grooveshark et nous voulions construire quelque chose d'encore mieux."
 
 #: front/src/App.vue:56
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
@@ -1679,9 +1662,7 @@ msgstr "Le logo de Funkwhale a été généreusement dessiné et fourni par Fran
 
 #: front/src/components/Home.vue:124
 msgid "The plaform is free and open-source, you can install it and modify it without worries"
-msgstr ""
-"La plateforme est gratuite et open-source, vous pouvez l'installer et la "
-"modifier sans restrictions"
+msgstr "La plateforme est gratuite et open-source, vous pouvez l'installer et la modifier sans restrictions"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:4
 msgid "The Subsonic API is not available on this Funkwhale instance."
@@ -1701,8 +1682,7 @@ msgstr "Cette piste n'est pas importée et ne peut pas être jouée"
 
 #: front/src/views/playlists/Detail.vue:36
 msgid "This will completely delete this playlist and cannot be undone."
-msgstr ""
-"Cela supprimera définitivement cette playlist et ne pourra pas être annulé."
+msgstr "Cela supprimera définitivement cette playlist et ne pourra pas être annulé."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:51
 msgid "This will completely disable access to the Subsonic API using from account."
@@ -1714,9 +1694,7 @@ msgstr "Cela va effacer vos données locales et vous déconnecter, voulez-vous c
 
 #: front/src/components/auth/SubsonicTokenForm.vue:36
 msgid "This will log you out from existing devices that use the current password."
-msgstr ""
-"Cela vous déconnectera sur l'ensemble de vos appareils utilisant ce mot de "
-"passe."
+msgstr "Cela vous déconnectera sur l'ensemble de vos appareils utilisant ce mot de passe."
 
 #: front/src/components/playlists/Editor.vue:44
 msgid "This will remove all tracks from this playlist and cannot be undone."
@@ -1728,6 +1706,7 @@ msgstr "Cela supprimera toutes les pistes de la playlist et ne pourra pas être 
 msgid "Title"
 msgstr "Titre"
 
+#: front/src/components/audio/SearchBar.vue:20
 #: front/src/components/library/import/BatchDetail.vue:84
 #: front/src/components/metadata/Search.vue:133
 msgid "Track"
@@ -1814,16 +1793,11 @@ msgstr "Utiliser une autre instance"
 
 #: front/src/views/auth/PasswordReset.vue:12
 msgid "Use this form to request a password reset. We will send an email to the given address with instructions to reset your password."
-msgstr ""
-"Utilisez ce formulaire pour demander à réinitialiser votre mot de passe. "
-"Vous recevrez un email à l'adresse indiquée contenant les instructions de "
-"réinitialisation."
+msgstr "Utilisez ce formulaire pour demander à réinitialiser votre mot de passe. Vous recevrez un email à l'adresse indiquée contenant les instructions de réinitialisation."
 
 #: front/src/components/federation/LibraryForm.vue:6
 msgid "Use this form to scan an instance and setup federation."
-msgstr ""
-"Utilisez ce formulaire pour scanner le catalogue d'une instance et mettre en "
-"place la fédération."
+msgstr "Utilisez ce formulaire pour scanner le catalogue d'une instance et mettre en place la fédération."
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgid "Used"
@@ -1894,8 +1868,7 @@ msgstr "Désolé, la page demandée n’existe pas :"
 
 #: front/src/components/requests/Form.vue:21
 msgid "We've received your request, you'll get some groove soon ;)"
-msgstr ""
-"Nous avons bien reçu votre requête, vous aurez bientôt de nos nouvelles ;)"
+msgstr "Nous avons bien reçu votre requête, vous aurez bientôt de nos nouvelles ;)"
 
 #: front/src/components/Home.vue:5
 msgid "Welcome on Funkwhale"
@@ -1919,21 +1892,15 @@ msgstr "Vous êtes actuellement connecté·e en tant que %{ username }"
 
 #: front/src/components/library/import/Main.vue:111
 msgid "You can also skip this step and enter metadata manually."
-msgstr ""
-"Vous pouvez également sauter cette étape et entrer les métadonnées "
-"manuellement."
+msgstr "Vous pouvez également sauter cette étape et entrer les métadonnées manuellement."
 
 #: front/src/components/Home.vue:136
 msgid "You can invite friends and family to your instance so they can enjoy your music"
-msgstr ""
-"Vous pouvez inviter vos ami·es et votre famille sur votre instance pour "
-"qu'ils·elles puissent profiter de votre musique"
+msgstr "Vous pouvez inviter vos ami·es et votre famille sur votre instance pour qu'ils·elles puissent profiter de votre musique"
 
 #: front/src/components/library/radios/Builder.vue:7
 msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
-msgstr ""
-"Vous pouvez utiliser cette interface pour réaliser votre propre radio "
-"personnalisée, qui jouera les pistes correspondant aux critères indiqués."
+msgstr "Vous pouvez utiliser cette interface pour réaliser votre propre radio personnalisée, qui jouera les pistes correspondant aux critères indiqués."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:8
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
@@ -1953,9 +1920,7 @@ msgstr "Vous allez être déconnecté de cette session et vous allez devoir vous
 
 #: front/src/components/auth/Settings.vue:38
 msgid "You will have to update your password on your clients that use this password."
-msgstr ""
-"Vous devrez mettre à jour votre mot de passe sur l'ensemble des clients "
-"utilisant ce mot de passe."
+msgstr "Vous devrez mettre à jour votre mot de passe sur l'ensemble des clients utilisant ce mot de passe."
 
 #: front/src/components/library/import/Main.vue:103
 msgid "You will import:"
@@ -1975,10 +1940,7 @@ msgstr "Votre mot de passe a été mis à jour avec succès."
 
 #: front/src/components/auth/Settings.vue:68
 msgid "Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password"
-msgstr ""
-"Votre mot de passe Subsonic sera remplacé par un nouveau mot de passe "
-"aléatoire, ce qui vous déconnectera de tous les appareils utilisant l'ancien "
-"mot de passe"
+msgstr "Votre mot de passe Subsonic sera remplacé par un nouveau mot de passe aléatoire, ce qui vous déconnectera de tous les appareils utilisant l'ancien mot de passe"
 
 #: front/src/components/auth/Signup.vue:5
 msgid "Create a funkwhale account"
@@ -2012,6 +1974,4 @@ msgstr "Actif"
 
 #: front/src/components/common/ActionTable.vue:38
 msgid "This may affect a lot of elements, please double check this is really what you want."
-msgstr ""
-"Cette opération peut affecter de nombreux éléments, merci de vérifier que "
-"c'est bien ce que vous souhaitez."
+msgstr "Cette opération peut affecter de nombreux éléments, merci de vérifier que c'est bien ce que vous souhaitez."
