@@ -52,7 +52,7 @@ you should now be able to open a postgresql shell:
 
 Unless you give a superuser access to the database user, you should also
 enable some extensions on your database server, as those are required
-for funkwhale to work properly:
+for Funkwhale to work properly:
 
 .. code-block:: shell
 

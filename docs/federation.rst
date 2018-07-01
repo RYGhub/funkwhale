@@ -22,7 +22,7 @@ Acquire music via federation
 ----------------------------
 
 Instance libraries are protected by default. To access another instance
-library, you have to follow it. Each funkwhale instance gets a dedicated
+library, you have to follow it. Each Funkwhale instance gets a dedicated
 ActivityPub Actor you can follow via the username "library@yourinstance.domain".
 
 When submitted, a follow request will be sent to

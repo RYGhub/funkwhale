@@ -96,7 +96,7 @@ Files for the web frontend are purely static and can simply be downloaded, unzip
 Reverse proxy
 --------------
 
-In order to make funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy.
+In order to make Funkwhale accessible from outside your server and to play nicely with other applications on your machine, you should configure a reverse proxy.
 
 Nginx
 ^^^^^
