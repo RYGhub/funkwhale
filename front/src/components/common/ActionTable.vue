@@ -6,7 +6,7 @@
           <div class="ui small form">
             <div class="ui inline fields">
               <div class="field">
-                <label>{{ $gettext('Actions') }}</label>
+                <label><translate>Actions</translate></label>
                 <select class="ui dropdown" v-model="currentActionName">
                   <option v-for="action in actions" :value="action.name">
                     {{ action.label }}
@@ -19,13 +19,13 @@
                   @click="launchAction"
                   :disabled="checked.length === 0"
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
-                  {{ $gettext('Go') }}</div>
+                  <translate>Go</translate></div>
                 <dangerous-button
                   v-else-if="!currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
-                  {{ $gettext('Go') }}
+                  <translate>Go</translate>
                   <p slot="modal-header">
                     <translate
                       :translate-n="objectsData.count"
@@ -37,7 +37,7 @@
                   <p slot="modal-content">
                     {{ $gettext('This may affect a lot of elements, please double check this is really what you want.')}}
                   </p>
-                  <p slot="modal-confirm">{{ $gettext('Launch') }}</p>
+                  <p slot="modal-confirm"><translate>Launch</translate></p>
                 </dangerous-button>
               </div>
               <div class="count field">
@@ -67,13 +67,13 @@
                     </translate>
                   </a>
                   <a @click="selectAll = false" v-else>
-                    {{ $gettext('Select only current page') }}
+                    <translate>Select only current page</translate>
                   </a>
                 </template>
               </div>
             </div>
             <div v-if="actionErrors.length > 0" class="ui negative message">
-              <div class="header">{{ $gettext('Error while applying action') }}</div>
+              <div class="header"><translate>Error while applying action</translate></div>
               <ul class="list">
                 <li v-for="error in actionErrors">{{ error }}</li>
               </ul>

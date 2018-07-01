@@ -7,7 +7,7 @@
       <div class="ui stackable three column grid">
         <div class="column">
           <h2 class="ui header">
-            {{ $gettext('Latest artists') }}
+            <translate>Latest artists</translate>
           </h2>
           <div :class="['ui', {'active': isLoadingArtists}, 'inline', 'loader']"></div>
           <div v-if="artists.length > 0" v-for="artist in artists.slice(0, 3)" :key="artist.id" class="ui cards">
@@ -16,7 +16,7 @@
         </div>
         <div class="column">
           <h2 class="ui header">
-            {{ $gettext('Radios') }}
+            <translate>Radios</translate>
           </h2>
           <radio-card :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
@@ -24,7 +24,7 @@
         </div>
         <div class="column">
           <h2 class="ui header">
-            {{ $gettext('Music requests') }}
+            <translate>Music requests</translate>
           </h2>
           <request-form v-if="$store.state.auth.authenticated"></request-form>
         </div>

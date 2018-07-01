@@ -3,15 +3,15 @@
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'federation.libraries.list'}">{{ $gettext('Libraries') }}</router-link>
+        :to="{name: 'federation.libraries.list'}"><translate>Libraries</translate></router-link>
       <router-link
         class="ui item"
-        :to="{name: 'federation.tracks.list'}">{{ $gettext('Tracks') }}</router-link>
+        :to="{name: 'federation.tracks.list'}"><translate>Tracks</translate></router-link>
         <div class="ui secondary right menu">
           <router-link
             class="ui item"
             :to="{name: 'federation.followers.list'}">
-            {{ $gettext('Followers') }}
+            <translate>Followers</translate>
             <div class="ui teal label" :title="$gettext('Pending requests')">{{ requestsCount }}</div>
           </router-link>
         </div>

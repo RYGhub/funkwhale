@@ -3,11 +3,11 @@
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.library.files'}">{{ $gettext('Files') }}</router-link>
+        :to="{name: 'manage.library.files'}"><translate>Files</translate></router-link>
       <router-link
         class="ui item"
         :to="{name: 'manage.library.requests'}">
-          {{ $gettext('Import requests') }}
+          <translate>Import requests</translate>
           <div
             :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
             :title="$gettext('Pending import requests')">

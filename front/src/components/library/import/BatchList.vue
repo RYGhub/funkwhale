@@ -5,25 +5,25 @@
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $gettext('Search') }}</label>
+            <label><translate>Search</translate></label>
             <input type="text" v-model="filters.search" placeholder="Search by submitter, source..." />
           </div>
           <div class="ui field">
-            <label>{{ $gettext('Status') }}</label>
+            <label><translate>Status</translate></label>
             <select class="ui dropdown" v-model="filters.status">
-              <option :value="null">{{ $gettext('Any') }}</option>
-              <option :value="'pending'">{{ $gettext('Pending') }}</option>
-              <option :value="'errored'">{{ $gettext('Errored') }}</option>
-              <option :value="'finished'">{{ $gettext('Success') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'pending'"><translate>Pending</translate></option>
+              <option :value="'errored'"><translate>Errored</translate></option>
+              <option :value="'finished'"><translate>Success</translate></option>
             </select>
           </div>
           <div class="ui field">
-            <label>{{ $gettext('Import source') }}</label>
+            <label><translate>Import source</translate></label>
             <select class="ui dropdown" v-model="filters.source">
-              <option :value="null">{{ $gettext('Any') }}</option>
-              <option :value="'shell'">{{ $gettext('CLI') }}</option>
-              <option :value="'api'">{{ $gettext('API') }}</option>
-              <option :value="'federation'">{{ $gettext('Federation') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'shell'"><translate>CLI</translate></option>
+              <option :value="'api'"><translate>API</translate></option>
+              <option :value="'federation'"><translate>Federation</translate></option>
             </select>
           </div>
         </div>
@@ -32,12 +32,12 @@
       <table v-if="result && result.results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $gettext('ID') }}</th>
-            <th>{{ $gettext('Launch date') }}</th>
-            <th>{{ $gettext('Jobs') }}</th>
-            <th>{{ $gettext('Status') }}</th>
-            <th>{{ $gettext('Source') }}</th>
-            <th>{{ $gettext('Submitted by') }}</th>
+            <th><translate>ID</translate></th>
+            <th><translate>Launch date</translate></th>
+            <th><translate>Jobs</translate></th>
+            <th><translate>Status</translate></th>
+            <th><translate>Source</translate></th>
+            <th><translate>Submitted by</translate></th>
           </tr>
         </thead>
         <tbody>

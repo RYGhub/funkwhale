@@ -42,7 +42,7 @@
       </span>
       <modal v-if="checkResult" :show.sync="showCandidadesModal">
         <div class="header">
-          {{ $gettext('Track matching filter') }}
+          <translate>Track matching filter</translate>
         </div>
         <div class="content">
           <div class="description">
@@ -51,13 +51,13 @@
         </div>
         <div class="actions">
           <div class="ui black deny button">
-            {{ $gettext('Cancel') }}
+            <translate>Cancel</translate>
           </div>
         </div>
       </modal>
     </td>
     <td>
-      <button @click="$emit('delete', index)" class="ui basic red button">{{ $gettext('Remove') }}</button>
+      <button @click="$emit('delete', index)" class="ui basic red button"><translate>Remove</translate></button>
     </td>
   </tr>
 </template>

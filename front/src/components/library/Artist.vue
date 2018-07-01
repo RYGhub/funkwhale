@@ -24,16 +24,16 @@
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
           <play-button class="orange" :artist="artist.id">
-            {{ $gettext('Play all albums') }}
+            <translate>Play all albums</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            {{ $gettext('Search on Wikipedia') }}
+            <translate>Search on Wikipedia</translate>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            {{ $gettext('View on MusicBrainz') }}
+            <translate>View on MusicBrainz</translate>
           </a>
         </div>
       </div>
@@ -42,7 +42,7 @@
       </div>
       <div v-else-if="albums" class="ui vertical stripe segment">
         <h2>
-          {{ $gettext('Albums by this artist') }}
+          <translate>Albums by this artist</translate>
         </h2>
         <div class="ui stackable doubling three column grid">
           <div class="column" :key="album.id" v-for="album in albums">

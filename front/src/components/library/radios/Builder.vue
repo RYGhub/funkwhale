@@ -3,38 +3,38 @@
     <div>
       <div>
         <h2 class="ui header">
-          {{ $gettext('Builder') }}
+          <translate>Builder</translate>
         </h2>
-        <p>{{ $gettext('You can use this interface to build your own custom radio, which will play tracks according to your criteria.') }}</p>
+        <p><translate>You can use this interface to build your own custom radio, which will play tracks according to your criteria.</translate></p>
           <div class="ui form">
           <div class="inline fields">
             <div class="field">
-              <label for="name">{{ $gettext('Radio name') }}</label>
+              <label for="name"><translate>Radio name</translate></label>
               <input id="name" type="text" v-model="radioName" placeholder="My awesome radio" />
             </div>
             <div class="field">
               <input id="public" type="checkbox" v-model="isPublic" />
-              <label for="public">{{ $gettext('Display publicly') }}</label>
+              <label for="public"><translate>Display publicly</translate></label>
             </div>
             <button :disabled="!canSave" @click="save" class="ui green button">
-              {{ $gettext('Save') }}
+              <translate>Save</translate>
             </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>
         <div class="ui form">
           <p>
-            {{ $gettext('Add filters to customize your radio') }}
+            <translate>Add filters to customize your radio</translate>
           </p>
           <div class="inline field">
             <select class="ui dropdown" v-model="currentFilterType">
               <option value="">
-                {{ $gettext('Select a filter') }}
+                <translate>Select a filter</translate>
               </option>
               <option v-for="f in availableFilters" :value="f.type">{{ f.label }}</option>
             </select>
             <button :disabled="!currentFilterType" @click="add" class="ui button">
-              {{ $gettext('Add filter') }}
+              <translate>Add filter</translate>
             </button>
           </div>
           <p v-if="currentFilter">
@@ -44,11 +44,11 @@
         <table class="ui table">
           <thead>
             <tr>
-              <th class="two wide">{{ $gettext('Filter name') }}</th>
-              <th class="one wide">{{ $gettext('Exclude') }}</th>
-              <th class="six wide">{{ $gettext('Config') }}</th>
-              <th class="five wide">{{ $gettext('Candidates') }}</th>
-              <th class="two wide">{{ $gettext('Actions') }}</th>
+              <th class="two wide"><translate>Filter name</translate></th>
+              <th class="one wide"><translate>Exclude</translate></th>
+              <th class="six wide"><translate>Config</translate></th>
+              <th class="five wide"><translate>Candidates</translate></th>
+              <th class="two wide"><translate>Actions</translate></th>
             </tr>
           </thead>
           <tbody>

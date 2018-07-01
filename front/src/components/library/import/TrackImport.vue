@@ -9,13 +9,13 @@
       </h5>
       <div class="ui toggle checkbox">
         <input type="checkbox" v-model="enabled" />
-        <label>{{ $gettext('Import this track') }}</label>
+        <label><translate>Import this track</translate></label>
       </div>
     </div>
     <div class="three wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <label>{{ $gettext('Source') }}</label>
+          <label><translate>Source</translate></label>
           <select v-model="currentBackendId">
             <option v-for="backend in backends" :value="backend.id">
               {{ backend.label }}
@@ -40,9 +40,9 @@
     <div class="four wide column" v-if="enabled">
       <form class="ui mini form" @submit.prevent="">
         <div class="field">
-          <label>{{ $gettext('Search query') }}</label>
+          <label><translate>Search query</translate></label>
           <input type="text" v-model="query" />
-          <label>{{ $gettext('Imported URL') }}</label>
+          <label><translate>Imported URL</translate></label>
           <input type="text" v-model="importedUrl" />
         </div>
       </form>

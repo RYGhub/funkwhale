@@ -3,16 +3,16 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $gettext('Search') }}</label>
+          <label><translate>Search</translate></label>
           <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
         </div>
         <div class="ui field">
-          <label>{{ $gettext('Import status') }}</label>
+          <label><translate>Import status</translate></label>
           <select class="ui dropdown" v-model="importedFilter">
-            <option :value="null">{{ $gettext('Any') }}</option>
-            <option :value="'imported'">{{ $gettext('Imported') }}</option>
-            <option :value="'not_imported'">{{ $gettext('Not imported') }}</option>
-            <option :value="'import_pending'">{{ $gettext('Import pending') }}</option>
+            <option :value="null"><translate>Any</translate></option>
+            <option :value="'imported'"><translate>Imported</translate></option>
+            <option :value="'not_imported'"><translate>Not imported</translate></option>
+            <option :value="'import_pending'"><translate>Import pending</translate></option>
           </select>
         </div>
       </div>
@@ -29,12 +29,12 @@
         :action-url="'federation/library-tracks/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $gettext('Status') }}</th>
-          <th>{{ $gettext('Title') }}</th>
-          <th>{{ $gettext('Artist') }}</th>
-          <th>{{ $gettext('Album') }}</th>
-          <th>{{ $gettext('Published date') }}</th>
-          <th v-if="showLibrary">{{ $gettext('Library') }}</th>
+          <th><translate>Status</translate></th>
+          <th><translate>Title</translate></th>
+          <th><translate>Artist</translate></th>
+          <th><translate>Album</translate></th>
+          <th><translate>Published date</translate></th>
+          <th v-if="showLibrary"><translate>Library</translate></th>
         </template>
         <template slot="action-success-footer" slot-scope="scope">
           <router-link
@@ -48,9 +48,9 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <span v-if="scope.obj.status === 'imported'" class="ui basic green label">{{ $gettext('In library') }}</span>
-            <span v-else-if="scope.obj.status === 'import_pending'" class="ui basic yellow label">{{ $gettext('Import pending') }}</span>
-            <span v-else class="ui basic label">{{ $gettext('Not imported') }}</span>
+            <span v-if="scope.obj.status === 'imported'" class="ui basic green label"><translate>In library</translate></span>
+            <span v-else-if="scope.obj.status === 'import_pending'" class="ui basic yellow label"><translate>Import pending</translate></span>
+            <span v-else class="ui basic label"><translate>Not imported</translate></span>
           </td>
           <td>
             <span :title="scope.obj.title">{{ scope.obj.title|truncate(30) }}</span>

@@ -12,7 +12,7 @@
       <div class="sub header">
         <div class="ui toggle checkbox">
           <input type="checkbox" v-model="enabled" />
-          <label>{{ $gettext('Import this release') }}</label>
+          <label><translate>Import this release</translate></label>
         </div>
       </div>
     </h3>

@@ -2,34 +2,34 @@
   <div class="main pusher" v-title="$gettext('Change your password')">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $gettext('Change your password') }}</h2>
+        <h2><translate>Change your password</translate></h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $gettext('Error while changing your password') }}</div>
+            <div class="header"><translate>Error while changing your password</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <template v-if="token && uid">
             <div class="field">
-              <label>{{ $gettext('New password') }}</label>
+              <label><translate>New password</translate></label>
               <password-input v-model="newPassword" />
             </div>
             <router-link :to="{path: '/login'}">
-              {{ $gettext('Back to login') }}
+              <translate>Back to login</translate>
             </router-link>
             <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-              {{ $gettext('Update your password') }}</button>
+              <translate>Update your password</translate></button>
           </template>
           <template v-else>
-            <p>{{ $gettext('If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes.') }}</p>
+            <p><translate>If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes.</translate></p>
           </template>
         </form>
         <div v-else class="ui positive message">
-          <div class="header">{{ $gettext('Password updated successfully') }}</div>
-          <p>{{ $gettext('Your password has been updated successfully.') }}</p>
+          <div class="header"><translate>Password updated successfully</translate></div>
+          <p><translate>Your password has been updated successfully.</translate></p>
           <router-link :to="{name: 'login'}">
-            {{ $gettext('Proceed to login') }}
+            <translate>Proceed to login</translate>
           </router-link>
         </div>
       </div>

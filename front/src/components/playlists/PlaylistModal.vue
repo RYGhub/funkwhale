@@ -1,12 +1,12 @@
 <template>
   <modal @update:show="update" :show="$store.state.playlists.showModal">
     <div class="header">
-      {{ $gettext('Manage playlists') }}
+      <translate>Manage playlists</translate>
     </div>
     <div class="scrolling content">
       <div class="description">
         <template v-if="track">
-          <h4 class="ui header">{{ $gettext('Current track') }}</h4>
+          <h4 class="ui header"><translate>Current track</translate></h4>
           <div
             v-translate="{artist: track.artist.name, title: track.title}"
             :template-params="{artist: track.artist.name, title: track.title}">
@@ -18,20 +18,20 @@
         <playlist-form></playlist-form>
         <div class="ui divider"></div>
         <div v-if="errors.length > 0" class="ui negative message">
-          <div class="header">{{ $gettext('We cannot add the track to a playlist') }}</div>
+          <div class="header"><translate>We cannot add the track to a playlist</translate></div>
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
         </div>
-        <h4 class="ui header">{{ $gettext('Available playlists') }}</h4>
+        <h4 class="ui header"><translate>Available playlists</translate></h4>
         <table class="ui unstackable very basic table">
           <thead>
             <tr>
               <th></th>
-              <th>{{ $gettext('Name') }}</th>
-              <th class="sorted descending">{{ $gettext('Last modification') }}</th>
-              <th>{{ $gettext('Tracks') }}</th>
+              <th><translate>Name</translate></th>
+              <th class="sorted descending"><translate>Last modification</translate></th>
+              <th><translate>Tracks</translate></th>
               <th></th>
             </tr>
           </thead>
@@ -52,7 +52,7 @@
                   class="ui green icon basic small right floated button"
                   :title="$gettext('Add to this playlist')"
                   @click="addToPlaylist(playlist.id)">
-                  <i class="plus icon"></i> {{ $gettext('Add track') }}
+                  <i class="plus icon"></i> <translate>Add track</translate>
                 </div>
               </td>
             </tr>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button">{{ $gettext('Cancel') }}</div>
+      <div class="ui cancel button"><translate>Cancel</translate></div>
     </div>
   </modal>
 </template>

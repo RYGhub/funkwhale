@@ -20,22 +20,22 @@
           </div>
         </h2>
         <div class="ui hidden divider"></div>
-        <play-button class="orange" :tracks="tracks">{{ $gettext('Play all') }}</play-button>
+        <play-button class="orange" :tracks="tracks"><translate>Play all</translate></play-button>
         <button
           class="ui icon button"
           v-if="playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>
-          <template v-if="edit">{{ $gettext('End edition') }}</template>
-          <template v-else>{{ $gettext('Edit...') }}</template>
+          <template v-if="edit"><translate>End edition</translate></template>
+          <template v-else><translate>Edit...</translate></template>
         </button>
         <dangerous-button v-if="playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
-          <i class="trash icon"></i> {{ $gettext('Delete') }}
+          <i class="trash icon"></i> <translate>Delete</translate>
           <p slot="modal-header">
             <translate :translate-params="{playlist: playlist.name}">Do you want to delete the playlist "%{ playlist }"?</translate>
           </p>
-          <p slot="modal-content">{{ $gettext('This will completely delete this playlist and cannot be undone.') }}</p>
-          <p slot="modal-confirm">{{ $gettext('Delete playlist') }}</p>
+          <p slot="modal-content"><translate>This will completely delete this playlist and cannot be undone.</translate></p>
+          <p slot="modal-confirm"><translate>Delete playlist</translate></p>
         </dangerous-button>
       </div>
     </div>

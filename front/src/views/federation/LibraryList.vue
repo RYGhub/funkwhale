@@ -1,22 +1,22 @@
 <template>
   <div v-title="'Libraries'">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $gettext('Browsing libraries') }}</h2>
+      <h2 class="ui header"><translate>Browsing libraries</translate></h2>
       <router-link
         class="ui basic green button"
         :to="{name: 'federation.libraries.scan'}">
         <i class="plus icon"></i>
-        {{ $gettext('Add a new library') }}
+        <translate>Add a new library</translate>
       </router-link>
       <div class="ui hidden divider"></div>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>{{ $gettext('Search') }}</label>
+            <label><translate>Search</translate></label>
             <input class="search" type="text" v-model="query" placeholder="Enter an library domain name..."/>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering') }}</label>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -24,14 +24,14 @@
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering direction') }}</label>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+">{{ $gettext('Ascending') }}</option>
-              <option value="-">{{ $gettext('Descending') }}</option>
+              <option value="+"><translate>Ascending</translate></option>
+              <option value="-"><translate>Descending</translate></option>
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Results per page') }}</label>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

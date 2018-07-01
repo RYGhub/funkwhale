@@ -19,18 +19,18 @@
             <tbody>
               <tr>
                 <td >
-                  {{ $gettext('Follow status') }}
+                  <translate>Follow status</translate>
                   <span :data-tooltip="$gettext('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <template v-if="object.follow.approved === null">
-                    <i class="loading icon"></i> {{ $gettext('Pending approval') }}
+                    <i class="loading icon"></i> <translate>Pending approval</translate>
                   </template>
                   <template v-else-if="object.follow.approved === true">
-                    <i class="check icon"></i> {{ $gettext('Following') }}
+                    <i class="check icon"></i> <translate>Following</translate>
                   </template>
                   <template v-else-if="object.follow.approved === false">
-                    <i class="x icon"></i> {{ $gettext('Not following') }}
+                    <i class="x icon"></i> <translate>Not following</translate>
                   </template>
                 </td>
                 <td>
@@ -38,7 +38,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Federation') }}
+                  <translate>Federation</translate>
                   <span :data-tooltip="$gettext('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
@@ -54,7 +54,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $gettext('Auto importing') }}
+                  <translate>Auto importing</translate>
                   <span :data-tooltip="$gettext('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
                 </td>
                 <td>
@@ -82,7 +82,7 @@
               </tr>
               -->
               <tr>
-                <td>{{ $gettext('Library size') }}</td>
+                <td><translate>Library size</translate></td>
                 <td>
                   <template v-if="object.tracks_count">
                     <translate
@@ -93,13 +93,13 @@
                     </translate>
                   </template>
                   <template v-else>
-                    {{ $gettext('Unkwnown') }}
+                    <translate>Unkwnown</translate>
                   </template>
                 </td>
                 <td></td>
               </tr>
               <tr>
-                <td>{{ $gettext('Last fetched') }}</td>
+                <td><translate>Last fetched</translate></td>
                 <td>
                   <human-date v-if="object.fetched_date" :date="object.fetched_date"></human-date>
                   <template v-else>Never</template>
@@ -107,10 +107,10 @@
                     @click="scan"
                     v-if="!scanTrigerred"
                     :class="['ui', 'basic', {loading: isScanLoading}, 'button']">
-                    <i class="sync icon"></i> {{ $gettext('Trigger scan') }}
+                    <i class="sync icon"></i> <translate>Trigger scan</translate>
                   </button>
                   <button v-else class="ui success button">
-                    <i class="check icon"></i> {{ $gettext('Scan triggered!') }}
+                    <i class="check icon"></i> <translate>Scan triggered!</translate>
                   </button>
 
                 </td>
@@ -120,10 +120,10 @@
           </table>
         </div>
         <div class="ui hidden divider"></div>
-        <button @click="fetchData" class="ui basic button">{{ $gettext('Refresh') }}</button>
+        <button @click="fetchData" class="ui basic button"><translate>Refresh</translate></button>
       </div>
       <div class="ui vertical stripe segment">
-        <h2>{{ $gettext('Tracks available in this library') }}</h2>
+        <h2><translate>Tracks available in this library</translate></h2>
         <library-track-table v-if="!isLoading" :filters="{library: id}"></library-track-table>
       </div>
     </template>

@@ -3,7 +3,7 @@
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">
-          {{ $gettext('Loading your favorites...') }}
+          <translate>Loading your favorites...</translate>
         </div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
@@ -21,7 +21,7 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label>{{ $gettext('Ordering') }}</label>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -29,14 +29,14 @@
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Ordering direction') }}</label>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+">{{ $gettext('Ascending') }}</option>
-              <option value="-">{{ $gettext('Descending') }}</option>
+              <option value="+"><translate>Ascending</translate></option>
+              <option value="-"><translate>Descending</translate></option>
             </select>
           </div>
           <div class="field">
-            <label>{{ $gettext('Results per page') }}</label>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

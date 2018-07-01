@@ -4,7 +4,7 @@
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
-    {{ $gettext('Add to playlist...') }}
+    <translate>Add to playlist...</translate>
   </button>
   <i
     v-else

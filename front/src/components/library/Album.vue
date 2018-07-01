@@ -20,28 +20,28 @@
             </div>
             <div class="ui basic buttons">
               <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-                {{ $gettext('Artist page') }}
+                <translate>Artist page</translate>
               </router-link>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
           <play-button class="orange" :tracks="album.tracks">
-            {{ $gettext('Play all') }}
+            <translate>Play all</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            {{ $gettext('Search on Wikipedia') }}
+            <translate>Search on Wikipedia</translate>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            {{ $gettext('View on MusicBrainz') }}
+            <translate>View on MusicBrainz</translate>
           </a>
         </div>
       </div>
       <div class="ui vertical stripe segment">
         <h2>
-          {{ $gettext('Tracks') }}
+          <translate>Tracks</translate>
         </h2>
         <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
       </div>

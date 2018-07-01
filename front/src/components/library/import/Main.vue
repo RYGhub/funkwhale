@@ -4,30 +4,30 @@
       <div class="ui top three attached ordered steps">
         <a @click="currentStep = 0" :class="['step', {'active': currentStep === 0}, {'completed': currentStep > 0}]">
           <div class="content">
-            <div class="title">{{ $gettext('Import source') }}</div>
-            <div class="description">{{ $gettext('Uploaded files or external source') }}</div>
+            <div class="title"><translate>Import source</translate></div>
+            <div class="description"><translate>Uploaded files or external source</translate></div>
           </div>
         </a>
         <a @click="currentStep = 1" :class="['step', {'active': currentStep === 1}, {'completed': currentStep > 1}]">
           <div class="content">
-            <div class="title">{{ $gettext('Metadata') }}</div>
-            <div class="description">{{ $gettext('Grab corresponding metadata') }}</div>
+            <div class="title"><translate>Metadata</translate></div>
+            <div class="description"><translate>Grab corresponding metadata</translate></div>
           </div>
         </a>
         <a @click="currentStep = 2" :class="['step', {'active': currentStep === 2}, {'completed': currentStep > 2}]">
           <div class="content">
-            <div class="title">{{ $gettext('Music') }}</div>
-            <div class="description">{{ $gettext('Select relevant sources or files for import') }}</div>
+            <div class="title"><translate>Music</translate></div>
+            <div class="description"><translate>Select relevant sources or files for import</translate></div>
           </div>
         </a>
       </div>
       <div class="ui hidden divider"></div>
       <div class="ui centered buttons">
         <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i>
-          {{ $gettext('Previous step') }}
+          <translate>Previous step</translate>
         </button>
         <button @click="nextStep()" v-if="currentStep < 2" class="ui icon button">
-          {{ $gettext('Next step') }}
+          <translate>Next step</translate>
           <i class="right arrow icon"></i>
         </button>
         <button
@@ -57,13 +57,13 @@
       <div class="ui hidden divider"></div>
       <div class="ui attached segment">
         <template v-if="currentStep === 0">
-          <p>{{ $gettext('First, choose where you want to import the music from') }}</p>
+          <p><translate>First, choose where you want to import the music from</translate></p>
           <form class="ui form">
             <div class="field">
               <div class="ui radio checkbox">
                 <input type="radio" id="external" value="external" v-model="currentSource">
                 <label for="external">
-                  {{ $gettext('External source. Supported backends') }}
+                  <translate>External source. Supported backends</translate>
                   <div v-for="backend in backends" class="ui basic label">
                     <i v-if="backend.icon" :class="[backend.icon, 'icon']"></i>
                     {{ backend.label }}
@@ -74,7 +74,7 @@
             <div class="field">
               <div class="ui radio checkbox">
                 <input type="radio" id="upload" value="upload" v-model="currentSource">
-                <label for="upload">{{ $gettext('File upload') }}</label>
+                <label for="upload"><translate>File upload</translate></label>
               </div>
             </div>
           </form>
@@ -83,7 +83,7 @@
           <div class="column">
             <form class="ui form" @submit.prevent="">
               <div class="field">
-                <label>{{ $gettext('Search an entity you want to import:') }}</label>
+                <label><translate>Search an entity you want to import:</translate></label>
                 <metadata-search
                   :mb-type="mbType"
                   :mb-id="mbId"
@@ -91,17 +91,17 @@
                   @type-changed="updateType"></metadata-search>
               </div>
             </form>
-            <div class="ui horizontal divider">{{ $gettext('Or') }}</div>
+            <div class="ui horizontal divider"><translate>Or</translate></div>
             <form class="ui form" @submit.prevent="">
               <div class="field">
-                <label>{{ $gettext('Input a MusicBrainz ID manually:') }}</label>
+                <label><translate>Input a MusicBrainz ID manually:</translate></label>
                 <input type="text" v-model="currentId" />
               </div>
             </form>
             <div class="ui hidden divider"></div>
             <template v-if="currentType && currentId">
               <h4 class="ui header">
-                {{ $gettext('You will import:') }}
+                <translate>You will import:</translate>
               </h4>
               <component
                 :mbId="currentId"
@@ -109,7 +109,7 @@
                 @metadata-changed="this.updateMetadata"
                 ></component>
             </template>
-            <p>{{ $gettext('You can also skip this step and enter metadata manually.') }}</p>
+            <p><translate>You can also skip this step and enter metadata manually.</translate></p>
           </div>
           <div class="column">
             <h5 class="ui header">What is metadata?</h5>
@@ -145,9 +145,9 @@
     </div>
     <div class="ui vertical stripe segment" v-if="currentRequest">
       <h3 class="ui header">
-        {{ $gettext('Music request') }}
+        <translate>Music request</translate>
       </h3>
-      <p>{{ $gettext('This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled.') }}</p>
+      <p><translate>This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled.</translate></p>
       <request-card :request="currentRequest" :import-action="false"></request-card>
 
     </div>

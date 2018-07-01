@@ -2,17 +2,17 @@
   <div class="main pusher" v-title="$gettext('Reset your password')">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $gettext('Reset your password') }}</h2>
+        <h2><translate>Reset your password</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $gettext('Error while asking for a password reset') }}</div>
+            <div class="header"><translate>Error while asking for a password reset</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
-          <p>{{ $gettext('Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.') }}</p>
+          <p><translate>Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.</translate></p>
           <div class="field">
-            <label>{{ $gettext('Account\'s email') }}</label>
+            <label><translate>Account's email</translate></label>
             <input
               required
               ref="email"
@@ -22,10 +22,10 @@
               v-model="email">
           </div>
           <router-link :to="{path: '/login'}">
-            {{ $gettext('Back to login') }}
+            <translate>Back to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            {{ $gettext('Ask for a password reset') }}</button>
+            <translate>Ask for a password reset</translate></button>
         </form>
       </div>
     </div>

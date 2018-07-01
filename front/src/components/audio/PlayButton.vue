@@ -6,14 +6,14 @@
       :disabled="!playable"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
       <i class="ui play icon"></i>
-      <template v-if="!discrete"><slot>{{ $gettext('Play') }}</slot></template>
+      <template v-if="!discrete"><slot><translate>Play</translate></slot></template>
     </button>
     <div v-if="!discrete" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', 'icon', 'button']">
       <i class="dropdown icon"></i>
       <div class="menu">
-        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i>{{ $gettext('Add to queue') }}</div>
-        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i>{{ $gettext('Play next') }}</div>
-        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i>{{ $gettext('Play now') }}</div>
+        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i><translate>Add to queue</translate></div>
+        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i><translate>Play next</translate></div>
+        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i><translate>Play now</translate></div>
       </div>
     </div>
   </div>

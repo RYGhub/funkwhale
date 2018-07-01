@@ -3,7 +3,7 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $gettext('Search') }}</label>
+          <label><translate>Search</translate></label>
           <input type="text" v-model="search" placeholder="Search by username, email, code..." />
         </div>
         <div class="field">
@@ -17,9 +17,9 @@
         <div class="field">
           <label>{{ $gettext("Status") }}</label>
           <select class="ui dropdown" v-model="isOpen">
-            <option :value="null">{{ $gettext('All') }}</option>
-            <option :value="true">{{ $gettext('Open') }}</option>
-            <option :value="false">{{ $gettext('Expired/used') }}</option>
+            <option :value="null"><translate>All</translate></option>
+            <option :value="true"><translate>Open</translate></option>
+            <option :value="false"><translate>Expired/used</translate></option>
           </select>
         </div>
       </div>
@@ -36,20 +36,20 @@
         :action-url="'manage/users/invitations/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $gettext('Owner') }}</th>
-          <th>{{ $gettext('Status') }}</th>
-          <th>{{ $gettext('Creation date') }}</th>
-          <th>{{ $gettext('Expiration date') }}</th>
-          <th>{{ $gettext('Code') }}</th>
+          <th><translate>Owner</translate></th>
+          <th><translate>Status</translate></th>
+          <th><translate>Creation date</translate></th>
+          <th><translate>Expiration date</translate></th>
+          <th><translate>Code</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
             <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.owner.username }}</router-link>
           </td>
           <td>
-            <span v-if="scope.obj.users.length > 0" class="ui green basic label">{{ $gettext('Used') }}</span>
-            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label">{{ $gettext('Expired') }}</span>
-            <span v-else class="ui basic label">{{ $gettext('Not used') }}</span>
+            <span v-if="scope.obj.users.length > 0" class="ui green basic label"><translate>Used</translate></span>
+            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label"><translate>Expired</translate></span>
+            <span v-else class="ui basic label"><translate>Not used</translate></span>
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>

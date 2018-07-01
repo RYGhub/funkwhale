@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $gettext('Search') }}</label>
+          <label><translate>Search</translate></label>
           <input type="text" v-model="search" placeholder="Search by artist, username, comment..." />
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering') }}</label>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label>{{ $gettext('Ordering direction') }}</label>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+">Ascending</option>
             <option value="-">Descending</option>
@@ -24,11 +24,11 @@
         <div class="field">
           <label>{{ $gettext("Status") }}</label>
           <select class="ui dropdown" v-model="status">
-            <option :value="null">{{ $gettext('All') }}</option>
-            <option :value="'pending'">{{ $gettext('Pending') }}</option>
-            <option :value="'accepted'">{{ $gettext('Accepted') }}</option>
-            <option :value="'imported'">{{ $gettext('Imported') }}</option>
-            <option :value="'closed'">{{ $gettext('Closed') }}</option>
+            <option :value="null"><translate>All</translate></option>
+            <option :value="'pending'"><translate>Pending</translate></option>
+            <option :value="'accepted'"><translate>Accepted</translate></option>
+            <option :value="'imported'"><translate>Imported</translate></option>
+            <option :value="'closed'"><translate>Closed</translate></option>
           </select>
         </div>
       </div>
@@ -45,24 +45,24 @@
         :action-url="'manage/requests/import-requests/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $gettext('User') }}</th>
-          <th>{{ $gettext('Status') }}</th>
-          <th>{{ $gettext('Artist') }}</th>
-          <th>{{ $gettext('Albums') }}</th>
-          <th>{{ $gettext('Comment') }}</th>
-          <th>{{ $gettext('Creation date') }}</th>
-          <th>{{ $gettext('Import date') }}</th>
-          <th>{{ $gettext('Actions') }}</th>
+          <th><translate>User</translate></th>
+          <th><translate>Status</translate></th>
+          <th><translate>Artist</translate></th>
+          <th><translate>Albums</translate></th>
+          <th><translate>Comment</translate></th>
+          <th><translate>Creation date</translate></th>
+          <th><translate>Import date</translate></th>
+          <th><translate>Actions</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
             {{ scope.obj.user.username }}
           </td>
           <td>
-            <span class="ui green basic label" v-if="scope.obj.status === 'imported'">{{ $gettext('Imported') }}</span>
-            <span class="ui pink basic label" v-else-if="scope.obj.status === 'accepted'">{{ $gettext('Accepted') }}</span>
-            <span class="ui yellow basic label" v-else-if="scope.obj.status === 'pending'">{{ $gettext('Pending') }}</span>
-            <span class="ui red basic label" v-else-if="scope.obj.status === 'closed'">{{ $gettext('Closed') }}</span>
+            <span class="ui green basic label" v-if="scope.obj.status === 'imported'"><translate>Imported</translate></span>
+            <span class="ui pink basic label" v-else-if="scope.obj.status === 'accepted'"><translate>Accepted</translate></span>
+            <span class="ui yellow basic label" v-else-if="scope.obj.status === 'pending'"><translate>Pending</translate></span>
+            <span class="ui red basic label" v-else-if="scope.obj.status === 'closed'"><translate>Closed</translate></span>
           </td>
           <td>
             <span :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>

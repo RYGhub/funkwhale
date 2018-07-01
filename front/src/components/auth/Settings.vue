@@ -3,16 +3,16 @@
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2 class="ui header">
-          {{ $gettext('Account settings') }}
+          <translate>Account settings</translate>
         </h2>
         <form class="ui form" @submit.prevent="submitSettings()">
           <div v-if="settings.success" class="ui positive message">
             <div class="header">
-              {{ $gettext('Settings updated') }}
+              <translate>Settings updated</translate>
             </div>
           </div>
           <div v-if="settings.errors.length > 0" class="ui negative message">
-            <div class="header">{{ $gettext('We cannot save your settings') }}</div>
+            <div class="header"><translate>We cannot save your settings</translate></div>
             <ul class="list">
               <li v-for="error in settings.errors">{{ error }}</li>
             </ul>
@@ -25,26 +25,26 @@
             </select>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
-            {{ $gettext('Update settings') }}
+            <translate>Update settings</translate>
           </button>
         </form>
       </div>
       <div class="ui hidden divider"></div>
       <div class="ui small text container">
         <h2 class="ui header">
-          {{ $gettext('Change my password') }}
+          <translate>Change my password</translate>
         </h2>
         <div class="ui message">
-          {{ $gettext('Changing your password will also change your Subsonic API password if you have requested one.') }}
-          {{ $gettext('You will have to update your password on your clients that use this password.') }}
+          <translate>Changing your password will also change your Subsonic API password if you have requested one.</translate>
+          <translate>You will have to update your password on your clients that use this password.</translate>
         </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">
             <div class="header">
-              {{ $gettext('Cannot change your password') }}
+              <translate>Cannot change your password</translate>
             </div>
             <ul class="list">
-              <li v-if="passwordError == 'invalid_credentials'">{{ $gettext('Please double-check your password is correct') }}</li>
+              <li v-if="passwordError == 'invalid_credentials'"><translate>Please double-check your password is correct</translate></li>
             </ul>
           </div>
           <div class="field">
@@ -60,16 +60,16 @@
             color="yellow"
             :class="['ui', {'loading': isLoading}, 'button']"
             :action="submitPassword">
-            {{ $gettext('Change password') }}
-            <p slot="modal-header">{{ $gettext('Change your password?') }}</p>
+            <translate>Change password</translate>
+            <p slot="modal-header"><translate>Change your password?</translate></p>
             <div slot="modal-content">
               <p>{{ $gettext("Changing your password will have the following consequences") }}</p>
               <ul>
-                <li>{{ $gettext('You will be logged out from this session and have to log out with the new one') }}</li>
-                <li>{{ $gettext('Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password') }}</li>
+                <li><translate>You will be logged out from this session and have to log out with the new one</translate></li>
+                <li><translate>Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
               </ul>
             </div>
-            <p slot="modal-confirm">{{ $gettext('Disable access') }}</p>
+            <p slot="modal-confirm"><translate>Disable access</translate></p>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />

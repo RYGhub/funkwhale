@@ -18,17 +18,17 @@
               <br>
               <div class="ui basic buttons">
                 <router-link class="ui button" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
-                  {{ $gettext('Album page') }}
+                  <translate>Album page</translate>
                 </router-link>
                 <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
-                  {{ $gettext('Artist page') }}
+                  <translate>Artist page</translate>
                 </router-link>
               </div>
             </div>
           </h2>
 
           <play-button class="orange" :track="track">
-            {{ $gettext('Play') }}
+            <translate>Play</translate>
           </play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
           <track-playlist-icon
@@ -38,53 +38,53 @@
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            {{ $gettext('Search on Wikipedia') }}
+            <translate>Search on Wikipedia</translate>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            {{ $gettext('View on MusicBrainz') }}
+            <translate>View on MusicBrainz</translate>
           </a>
           <a v-if="downloadUrl" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
-            {{ $gettext('Download') }}
+            <translate>Download</translate>
           </a>
         </div>
       </div>
       <div v-if="file" class="ui vertical stripe center aligned segment">
-        <h2 class="ui header">{{ $gettext('Track information') }}</h2>
+        <h2 class="ui header"><translate>Track information</translate></h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
             <tr>
               <td>
-                {{ $gettext('Duration') }}
+                <translate>Duration</translate>
               </td>
               <td v-if="file.duration">
                 {{ time.parse(file.duration) }}
               </td>
               <td v-else>
-                {{ $gettext('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                {{ $gettext('Size') }}
+                <translate>Size</translate>
               </td>
               <td v-if="file.size">
                 {{ file.size | humanSize }}
               </td>
               <td v-else>
-                {{ $gettext('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                {{ $gettext('Bitrate') }}
+                <translate>Bitrate</translate>
               </td>
               <td v-if="file.bitrate">
                 {{ file.bitrate | humanSize }}/s
               </td>
               <td v-else>
-                {{ $gettext('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
           </tbody>
@@ -92,7 +92,7 @@
       </div>
       <div class="ui vertical stripe center aligned segment">
         <h2>
-          {{ $gettext('Lyrics') }}
+          <translate>Lyrics</translate>
         </h2>
         <div v-if="isLoadingLyrics" class="ui vertical segment">
           <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
@@ -100,10 +100,10 @@
         <div v-if="lyrics" v-html="lyrics.content_rendered">
         </div>
         <template v-if="!isLoadingLyrics & !lyrics">
-          <p>{{ $gettext('No lyrics available for this track.') }}</p>
+          <p><translate>No lyrics available for this track.</translate></p>
           <a class="ui button" target="_blank" :href="lyricsSearchUrl">
             <i class="search icon"></i>
-            {{ $gettext('Search on lyrics.wikia.com') }}
+            <translate>Search on lyrics.wikia.com</translate>
           </a>
         </template>
       </div>
