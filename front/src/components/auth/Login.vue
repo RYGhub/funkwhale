@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Log In'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Log in to your Funkwhale account</translate></h2>
@@ -24,7 +24,7 @@
             required
             type="text"
             autofocus
-            placeholder="Enter your username or email"
+            :placeholder="labels.usernamePlaceholder"
             v-model="credentials.username"
             >
           </div>
@@ -71,6 +71,16 @@ export default {
   },
   mounted () {
     this.$refs.username.focus()
+  },
+  computed: {
+    labels () {
+      let usernamePlaceholder = this.$gettext('Enter your username or email')
+      let title = this.$gettext('Log In')
+      return {
+        usernamePlaceholder,
+        title
+      }
+    }
   },
   methods: {
     submit () {

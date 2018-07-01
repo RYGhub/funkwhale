@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Account Settings'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2 class="ui header">
@@ -63,7 +63,7 @@
             <translate>Change password</translate>
             <p slot="modal-header"><translate>Change your password?</translate></p>
             <div slot="modal-content">
-              <p>{{ $gettext("Changing your password will have the following consequences") }}</p>
+              <p><translate>Changing your password will have the following consequences</translate></p>
               <ul>
                 <li><translate>You will be logged out from this session and have to log out with the new one</translate></li>
                 <li><translate>Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
@@ -175,6 +175,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Account Settings')
+      }
+    },
     orderedSettingsFields () {
       let self = this
       return this.settings.order.map(id => {

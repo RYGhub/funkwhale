@@ -4,21 +4,21 @@
       <p><translate>Something's missing in the library? Let us know what you would like to listen!</translate></p>
       <div class="required field">
         <label><translate>Artist name</translate></label>
-        <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required maxlength="200">
+        <input v-model="currentArtistName" :placeholder="labels.artistNamePlaceholder" required maxlength="200">
       </div>
       <div class="field">
         <label><translate>Albums</translate></label>
         <p><translate>Leave this field empty if you're requesting the whole discography.</translate></p>
-        <input v-model="currentAlbums" placeholder="The White Album, Thriller…" maxlength="2000">
+        <input v-model="currentAlbums" :placeholder="labels.albumTitlePlaceholder" maxlength="2000">
       </div>
       <div class="field">
         <label><translate>Comment</translate></label>
-        <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed" maxlength="2000"></textarea>
+        <textarea v-model="currentComment" rows="3" :placeholder="comentPlaceholder" maxlength="2000"></textarea>
       </div>
       <button class="ui submit button" type="submit"><translate>Submit</translate></button>
     </form>
     <div v-else class="ui success message">
-      <div class="header">Request submitted!</div>
+      <div class="header"><translate>Request submitted!</translate></div>
       <p><translate>We've received your request, you'll get some groove soon ;)</translate></p>
       <button @click="reset" class="ui button"><translate>Submit another request</translate></button>
     </div>
@@ -66,6 +66,18 @@ export default {
       isLoading: false,
       over: false,
       requests: []
+    }
+  },
+  computed: {
+    labels () {
+      let artistNamePlaceholder = this.$gettext('The Beatles, Mickael Jackson…')
+      let albumTitlePlaceholder = this.$gettext('The White Album, Thriller…')
+      let commentPlaceholder = this.$gettext('Use this comment box to add details to your request if needed')
+      return {
+        artistNamePlaceholder,
+        albumTitlePlaceholder,
+        commentPlaceholder
+      }
     }
   },
   methods: {

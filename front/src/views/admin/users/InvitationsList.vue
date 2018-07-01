@@ -1,5 +1,5 @@
 <template>
-  <div v-title="$gettext('Invitations')">
+  <div v-title="labels.invitations">
     <div class="ui vertical stripe segment">
       <h2 class="ui header"><translate>Invitations</translate></h2>
       <invitation-form></invitation-form>
@@ -17,6 +17,13 @@ export default {
   components: {
     InvitationForm,
     InvitationsTable
+  },
+  computed: {
+    labels () {
+      return {
+        invitations: this.$gettext('Invitations')
+      }
+    }
   }
 }
 </script>

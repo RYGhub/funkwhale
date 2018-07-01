@@ -70,7 +70,7 @@
               <i class="book icon"></i><translate>Library</translate>
               <div
                 :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
-                :title="$gettext('Pending import requests')">
+                :title="labels.pendingRequests">
                 {{ $store.state.ui.notifications.importRequests }}</div>
 
             </router-link>
@@ -87,7 +87,7 @@
               <i class="sitemap icon"></i><translate>Federation</translate>
               <div
                 :class="['ui', {'teal': $store.state.ui.notifications.federation > 0}, 'label']"
-                :title="$gettext('Pending follow requests')">
+                :title="labels.pendingFollows">
                 {{ $store.state.ui.notifications.federation }}</div>
             </router-link>
             <router-link
@@ -211,6 +211,14 @@ export default {
       queue: state => state.queue,
       url: state => state.route.path
     }),
+    labels () {
+      let pendingRequests = this.$gettext('Pending import requests')
+      let pendingFollows = this.$gettext('Pending follow requests')
+      return {
+        pendingRequests,
+        pendingFollows
+      }
+    },
     showAdmin () {
       let adminPermissions = [
         this.$store.state.auth.availablePermissions['federation'],

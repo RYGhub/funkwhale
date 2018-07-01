@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="'Federation'">
+  <div class="main pusher"  v-title="labels.title">
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
@@ -12,7 +12,7 @@
             class="ui item"
             :to="{name: 'federation.followers.list'}">
             <translate>Followers</translate>
-            <div class="ui teal label" :title="$gettext('Pending requests')">{{ requestsCount }}</div>
+            <div class="ui teal label" :title="labels.pendingRequests">{{ requestsCount }}</div>
           </router-link>
         </div>
     </div>
@@ -29,6 +29,16 @@ export default {
   },
   created () {
     this.fetchRequestsCount()
+  },
+  computed: {
+    labels () {
+      let title = this.$gettext('Federation')
+      let pendingRequests = this.$gettext('Pending requests')
+      return {
+        title,
+        pendingRequests
+      }
+    }
   },
   methods: {
     fetchRequestsCount () {

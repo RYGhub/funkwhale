@@ -27,7 +27,7 @@
         @click="insertMany(queueTracks)"
         :disabled="queueTracks.length === 0"
         :class="['ui', {disabled: queueTracks.length === 0}, 'labeled', 'icon', 'button']"
-        title="Copy tracks from current queue to playlist">
+        :title="labels.copyTitle">
           <i class="plus icon"></i>
           <translate
             translate-plural="Insert from queue (%{ count } tracks)"
@@ -47,7 +47,7 @@
       </dangerous-button>
       <div class="ui hidden divider"></div>
       <template v-if="plts.length > 0">
-        <p>Drag and drop rows to reorder tracks in the playlist</p>
+        <p><translate>Drag and drop rows to reorder tracks in the playlist</translate></p>
         <table class="ui compact very basic fixed single line unstackable table">
           <draggable v-model="plts" element="tbody" @update="reorder">
             <tr v-for="(plt, index) in plts" :key="plt.id">
@@ -158,6 +158,11 @@ export default {
     ...mapState({
       queueTracks: state => state.queue.tracks
     }),
+    labels () {
+      return {
+        copyTitle: this.$gettext('Copy tracks from current queue to playlist')
+      }
+    },
     status () {
       if (this.isLoading) {
         return 'loading'

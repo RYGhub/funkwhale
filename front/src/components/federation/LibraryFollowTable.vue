@@ -3,7 +3,7 @@
     <div class="ui form">
       <div class="fields">
         <div class="ui six wide field">
-          <input type="text" v-model="search" placeholder="Search by username, domain..." />
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="ui four wide inline field">
           <div class="ui checkbox">
@@ -133,6 +133,13 @@ export default {
   },
   created () {
     this.fetchData()
+  },
+  computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by username, domain...')
+      }
+    }
   },
   methods: {
     fetchData () {

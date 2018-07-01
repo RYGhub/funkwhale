@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="$gettext('Change your password')">
+  <div class="main pusher" v-title="labels.changePassword">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Change your password</translate></h2>
@@ -54,6 +54,13 @@ export default {
       token: this.defaultToken,
       uid: this.defaultUid,
       success: false
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        changePassword: this.$gettext('Change your password')
+      }
     }
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Libraries'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <h2 class="ui header"><translate>Browsing libraries</translate></h2>
       <router-link
@@ -13,7 +13,7 @@
         <div class="fields">
           <div class="field">
             <label><translate>Search</translate></label>
-            <input class="search" type="text" v-model="query" placeholder="Enter an library domain name..."/>
+            <input class="search" type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
             <label><translate>Ordering</translate></label>
@@ -116,6 +116,16 @@ export default {
   mounted () {
     $('.ui.dropdown').dropdown()
     $(this.$el).find('.field .search').focus()
+  },
+  computed: {
+    labels () {
+      let searchPlaceholder = this.$gettext('Enter an library domain name...')
+      let title = this.$gettext('Libraries')
+      return {
+        searchPlaceholder,
+        title
+      }
+    }
   },
   methods: {
     updateQueryString: _.debounce(function () {

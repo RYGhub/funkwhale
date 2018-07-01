@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="column">
-        <h3 class="ui left aligned header">Library</h3>
+        <h3 class="ui left aligned header"><translate>Library</translate></h3>
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">

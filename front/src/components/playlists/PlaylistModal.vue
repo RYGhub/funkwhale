@@ -50,7 +50,7 @@
                 <div
                   v-if="track"
                   class="ui green icon basic small right floated button"
-                  :title="$gettext('Add to this playlist')"
+                  :title="labels.addToPlaylist"
                   @click="addToPlaylist(playlist.id)">
                   <i class="plus icon"></i> <translate>Add track</translate>
                 </div>
@@ -110,6 +110,11 @@ export default {
       playlists: state => state.playlists.playlists,
       track: state => state.playlists.modalTrack
     }),
+    labels () {
+      return {
+        addToPlaylist: this.$gettext('Add to this playlist')
+      }
+    },
     sortedPlaylists () {
       let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])
       p.reverse()

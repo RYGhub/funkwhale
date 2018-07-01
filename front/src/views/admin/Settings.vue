@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="$gettext('Instance settings')">
+  <div class="main pusher"  v-title="labels.settings">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <div :class="['ui', {'loading': isLoading}, 'form']"></div>
@@ -70,6 +70,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        settings: this.$gettext('Instance settings')
+      }
+    },
     groups () {
       // somehow, extraction fails if in the return block directly
       let instanceLabel = this.$gettext('Instance information')

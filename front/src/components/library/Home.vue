@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Home'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <search :autofocus="true"></search>
     </div>
@@ -59,6 +59,13 @@ export default {
   },
   created () {
     this.fetchArtists()
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Home')
+      }
+    }
   },
   methods: {
     fetchArtists () {

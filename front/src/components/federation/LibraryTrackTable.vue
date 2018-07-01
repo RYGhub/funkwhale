@@ -4,7 +4,7 @@
       <div class="fields">
         <div class="ui field">
           <label><translate>Search</translate></label>
-          <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="ui field">
           <label><translate>Import status</translate></label>
@@ -145,6 +145,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by title, artist, domain...')
+      }
+    },
     actionFilters () {
       var currentFilters = {
         q: this.search

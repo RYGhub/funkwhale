@@ -1,7 +1,7 @@
 <template>
   <div :title="title" :class="['ui', {'tiny': discrete}, 'buttons']">
     <button
-      :title="$gettext('Add to current queue')"
+      :title="labels.addToQueue"
       @click="addNext(true)"
       :disabled="!playable"
       :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
@@ -42,6 +42,11 @@ export default {
     jQuery(this.$el).find('.ui.dropdown').dropdown()
   },
   computed: {
+    labels () {
+      return {
+        addToQueue: this.$gettext('Add to current queue')
+      }
+    },
     title () {
       if (this.playable) {
         return this.$gettext('Play immediatly')

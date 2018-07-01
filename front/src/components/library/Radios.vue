@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Radios'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <h2 class="ui header">
         <translate>Browsing radios</translate>
@@ -12,7 +12,7 @@
         <div class="fields">
           <div class="field">
             <label><translate>Search</translate></label>
-            <input type="text" v-model="query" placeholder="Enter a radio name..."/>
+            <input type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
             <label><translate>Ordering</translate></label>
@@ -118,6 +118,16 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+  },
+  computed: {
+    labels () {
+      let searchPlaceholder = this.$gettext('Enter a radio name...')
+      let title = this.$gettext('Radios')
+      return {
+        searchPlaceholder,
+        title
+      }
+    }
   },
   methods: {
     updateQueryString: _.debounce(function () {

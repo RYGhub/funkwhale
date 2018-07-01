@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="'Manage library'">
+  <div class="main pusher"  v-title="labels.title">
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
@@ -10,7 +10,7 @@
           <translate>Import requests</translate>
           <div
             :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
-            :title="$gettext('Pending import requests')">
+            :title="labels.pendingRequests">
             {{ $store.state.ui.notifications.importRequests }}</div>
           </router-link>
     </div>
@@ -19,7 +19,18 @@
 </template>
 
 <script>
-export default {}
+export default {
+  computed: {
+    labels () {
+      let title = this.$gettext('Manage library')
+      let pendingRequests = this.$gettext('Pending import requests')
+      return {
+        title,
+        pendingRequests
+      }
+    }
+  }
+}
 </script>
 
 <style lang="scss">

@@ -10,7 +10,7 @@
     v-else
     @click="$store.commit('playlists/chooseTrack', track)"
     :class="['playlist-icon', 'list', 'link', 'icon']"
-    :title="$gettext('Add to playlist...')">
+    :title="labels.addToPlaylist">
   </i>
 </template>
 
@@ -24,6 +24,13 @@ export default {
   data () {
     return {
       showModal: false
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        addToPlaylist: this.$gettext('Add to playlist...')
+      }
     }
   }
 }

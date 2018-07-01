@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Welcome'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
@@ -146,9 +146,12 @@
 <script>
 
 export default {
-  name: 'home',
-  data () {
-    return {}
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Welcome')
+      }
+    }
   }
 }
 </script>

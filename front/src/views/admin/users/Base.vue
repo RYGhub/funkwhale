@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="$gettext('Manage users')">
+  <div class="main pusher"  v-title="labels.manageUsers">
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
@@ -13,7 +13,15 @@
 </template>
 
 <script>
-export default {}
+export default {
+  computed: {
+    labels () {
+      return {
+        manageUsers: this.$gettext('Manage users')
+      }
+    }
+  }
+}
 </script>
 
 <style lang="scss">

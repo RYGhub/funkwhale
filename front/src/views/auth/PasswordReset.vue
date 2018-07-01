@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="$gettext('Reset your password')">
+  <div class="main pusher" v-title="labels.reset">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Reset your password</translate></h2>
@@ -18,7 +18,7 @@
               ref="email"
               type="email"
               autofocus
-              :placeholder="$gettext('Input the email address binded to your account')"
+              :placeholder="labels.placeholder"
               v-model="email">
           </div>
           <router-link :to="{path: '/login'}">
@@ -46,6 +46,16 @@ export default {
   },
   mounted () {
     this.$refs.email.focus()
+  },
+  computed: {
+    labels () {
+      let reset = this.$gettext('Reset your password')
+      let placeholder = this.$gettext('Input the email address binded to your account')
+      return {
+        reset,
+        placeholder
+      }
+    }
   },
   methods: {
     submit () {

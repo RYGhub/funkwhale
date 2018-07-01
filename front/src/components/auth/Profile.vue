@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="username + '\'s Profile'">
+  <div class="main pusher" v-title="labels.usernameProfile">
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
@@ -39,6 +39,13 @@ export default {
     this.$store.dispatch('auth/fetchProfile')
   },
   computed: {
+    labels () {
+      let msg = this.$gettext('%{ username }\'s profile')
+      let usernameProfile = this.$gettextInterpolate(msg, {username: this.username})
+      return {
+        usernameProfile
+      }
+    },
     signupDate () {
       let d = new Date(this.$store.state.auth.profile.date_joined)
       return dateFormat(d, 'longDate')

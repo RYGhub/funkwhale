@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Log Out'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2>
@@ -14,7 +14,13 @@
 
 <script>
 export default {
-  name: 'logout'
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Log Out')
+      }
+    }
+  }
 }
 </script>
 

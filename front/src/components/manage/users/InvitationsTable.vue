@@ -4,10 +4,10 @@
       <div class="fields">
         <div class="ui field">
           <label><translate>Search</translate></label>
-          <input type="text" v-model="search" placeholder="Search by username, email, code..." />
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label>{{ $gettext("Ordering") }}</label>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label>{{ $gettext("Status") }}</label>
+          <label><translate>Status</translate></label>
           <select class="ui dropdown" v-model="isOpen">
             <option :value="null"><translate>All</translate></option>
             <option :value="true"><translate>Open</translate></option>
@@ -147,6 +147,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by username, email, code...')
+      }
+    },
     actionFilters () {
       var currentFilters = {
         q: this.search

@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Instance Timeline'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader"><translate>Loading timeline...</translate></div>
@@ -51,7 +51,12 @@ export default {
   computed: {
     ...mapState({
       events: state => state.instance.events
-    })
+    }),
+    labels () {
+      return {
+        title: this.$gettext('Instance Timeline')
+      }
+    }
   },
   methods: {
     fetchEvents () {
