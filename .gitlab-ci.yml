@@ -40,7 +40,7 @@ review_front:
     url: http://front-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
     on_stop: stop_front_review
   only:
-    - branches@funkwhale/funkwhale
+    - branches
   tags:
     - funkwhale-review
 
@@ -51,6 +51,8 @@ stop_front_review:
   variables:
     GIT_STRATEGY: none
   when: manual
+  only:
+    - branches
   environment:
     name: review/front-$CI_BUILD_REF_NAME
     action: stop
@@ -83,7 +85,7 @@ review_docs:
     url: http://docs-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
     on_stop: stop_docs_review
   only:
-    - branches@funkwhale/funkwhale
+    - branches
   tags:
     - funkwhale-review
 
@@ -94,6 +96,8 @@ stop_docs_review:
   variables:
     GIT_STRATEGY: none
   when: manual
+  only:
+    - branches
   environment:
     name: review/docs-$CI_BUILD_REF_NAME
     action: stop
@@ -140,7 +144,8 @@ test_api:
     FUNKWHALE_URL: "https://funkwhale.ci"
     CACHEOPS_ENABLED: "false"
     DJANGO_SETTINGS_MODULE: config.settings.local
-
+  only:
+    - branches
   before_script:
     - cd api
     - pip install -r requirements/base.txt
@@ -157,7 +162,8 @@ test_front:
   image: node:9
   before_script:
     - cd front
-
+  only:
+    - branches
   script:
     - yarn install
     - yarn run unit
