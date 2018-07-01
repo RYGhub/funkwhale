@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="'Library'">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="object">
@@ -20,7 +20,7 @@
               <tr>
                 <td >
                   <translate>Follow status</translate>
-                  <span :data-tooltip="$gettext('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
+                  <span :data-tooltip="labels.statusTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <template v-if="object.follow.approved === null">
@@ -39,7 +39,7 @@
               <tr>
                 <td>
                   <translate>Federation</translate>
-                  <span :data-tooltip="$gettext('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
+                  <span :data-tooltip="labels.federationTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -55,7 +55,7 @@
               <tr>
                 <td>
                   <translate>Auto importing</translate>
-                  <span :data-tooltip="$gettext('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
+                  <span :data-tooltip="labels.autoImportTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -69,7 +69,7 @@
               </tr>
               <!-- Disabled until properly implemented on the backend
               <tr>
-                <td>File mirroring</td>
+                <td><translate>File mirroring</translate></td>
                 <td>
                   <div class="ui toggle checkbox">
                     <input
@@ -190,6 +190,18 @@ export default {
     }
   },
   computed: {
+    labels () {
+      let title = this.$gettext('Library')
+      let statusTooltip = this.$gettext('This indicate if the remote library granted you access')
+      let federationTooltip = this.$gettext('Use this flag to enable/disable federation with this library')
+      let autoImportTooltip = this.$gettext('When enabled, auto importing will automatically import new tracks published in this library')
+      return {
+        title,
+        statusTooltip,
+        federationTooltip,
+        autoImportTooltip
+      }
+    },
     libraryUsername () {
       let actor = this.object.actor
       return `${actor.preferred_username}@${actor.domain}`

@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Your Favorites'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">
@@ -102,6 +102,13 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Your Favorites')
+      }
+    }
   },
   methods: {
     updateQueryString: function () {

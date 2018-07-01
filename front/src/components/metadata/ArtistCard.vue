@@ -6,7 +6,7 @@
       </div>
       <template v-if="data.id">
         <div class="header">
-          <a :href="getMusicbrainzUrl('artist', data.id)" target="_blank" title="View on MusicBrainz">{{ data.name }}</a>
+          <a :href="getMusicbrainzUrl('artist', data.id)" target="_blank" :title="labels.musicbrainz">{{ data.name }}</a>
         </div>
         <div class="description">
           <table class="ui very basic fixed single line compact table">
@@ -16,7 +16,7 @@
                   {{ group['first-release-date'] }}
                 </td>
                 <td colspan="3">
-                  <a :href="getMusicbrainzUrl('release-group', group.id)" class="discrete link" target="_blank" :title="$gettext('View on MusicBrainz')">
+                  <a :href="getMusicbrainzUrl('release-group', group.id)" class="discrete link" target="_blank" :title="labels.musicbrainz">
                     {{ group.title }}
                   </a>
                 </td>
@@ -44,6 +44,11 @@ export default Vue.extend({
     }
   },
   computed: {
+    labels () {
+      return {
+        musicbrainz: this.$gettext('View on MusicBrainz')
+      }
+    },
     type () {
       return 'artist'
     },

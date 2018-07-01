@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Followers'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <h2 class="ui header"><translate>Browsing followers</translate></h2>
       <p>
@@ -17,6 +17,13 @@ import LibraryFollowTable from '@/components/federation/LibraryFollowTable'
 export default {
   components: {
     LibraryFollowTable
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Followers')
+      }
+    }
   }
 }
 </script>

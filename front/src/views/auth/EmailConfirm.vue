@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="$gettext('Confirm your email')">
+  <div class="main pusher" v-title="labels.confirm">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Confirm your email</translate></h2>
@@ -43,6 +43,13 @@ export default {
       errors: [],
       key: this.defaultKey,
       success: false
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        confirm: this.$gettext('Confirm your email')
+      }
     }
   },
   methods: {

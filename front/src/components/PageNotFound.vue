@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="'Page Not Found'">
+  <div class="main pusher" :v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
@@ -25,6 +25,13 @@ export default {
   data: function () {
     return {
       path: window.location.href
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Page Not Found')
+      }
     }
   }
 }

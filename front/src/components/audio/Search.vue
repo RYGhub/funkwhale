@@ -4,7 +4,7 @@
     <div :class="['ui', {'loading': isLoading }, 'search']">
       <div class="ui icon big input">
         <i class="search icon"></i>
-        <input ref="search" class="prompt" placeholder="Artist, album, track..." v-model.trim="query" type="text" />
+        <input ref="search" class="prompt" :placeholder="labels.searchPlaceholder" v-model.trim="query" type="text" />
       </div>
     </div>
     <template v-if="query.length > 0">
@@ -58,6 +58,13 @@ export default {
       this.$refs.search.focus()
     }
     this.search()
+  },
+  computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Artist, album, track...')
+      }
+    }
   },
   methods: {
     search: _.debounce(function () {

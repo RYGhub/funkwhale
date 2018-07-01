@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3 class="ui dividing block header">
-      <a :href="getMusicbrainzUrl('artist', metadata.id)" target="_blank" title="View on MusicBrainz">{{ metadata.name }}</a>
+      <a :href="getMusicbrainzUrl('artist', metadata.id)" target="_blank" :title="labels.viewOnMusicbrainz">{{ metadata.name }}</a>
     </h3>
     <form class="ui form" @submit.prevent="">
       <h6 class="ui header">
@@ -126,6 +126,11 @@ export default Vue.extend({
     }
   },
   computed: {
+    labels () {
+      return {
+        viewOnMusicbrainz: this.$gettext('View on MusicBrainz')
+      }
+    },
     type () {
       return 'artist'
     },

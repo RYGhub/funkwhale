@@ -1,8 +1,8 @@
 <template>
-  <div class="main pusher" v-title="'Sign Up'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $gettext("Create a funkwhale account") }}</h2>
+        <h2><translate>Create a funkwhale account</translate></h2>
         <form
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
@@ -11,45 +11,45 @@
           </p>
 
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $gettext("We cannot create your account") }}</div>
+            <div class="header"><translate>We cannot create your account</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label>{{ $gettext("Username") }}</label>
+            <label><translate>Username</translate></label>
             <input
             ref="username"
             required
             type="text"
             autofocus
-            placeholder="Enter your username"
+            :placeholder="labels.usernamePlaceholder"
             v-model="username">
           </div>
           <div class="field">
-            <label>{{ $gettext("Email") }}</label>
+            <label><translate>Email</translate></label>
             <input
             ref="email"
             required
             type="email"
-            placeholder="Enter your email"
+            :placeholder="labels.emailPlaceholder"
             v-model="email">
           </div>
           <div class="field">
-            <label>{{ $gettext("Password") }}</label>
+            <label><translate>Password</translate></label>
             <password-input v-model="password" />
           </div>
           <div class="field">
-            <label v-if="!$store.state.instance.settings.users.registration_enabled.value">{{ $gettext("Invitation code") }}</label>
-            <label v-else>{{ $gettext("Invitation code (optional)") }}</label>
+            <label v-if="!$store.state.instance.settings.users.registration_enabled.value"><translate>Invitation code</translate></label>
+            <label v-else><translate>Invitation code (optional)</translate></label>
             <input
             :required="!$store.state.instance.settings.users.registration_enabled.value"
             type="text"
-            :placeholder="$gettext('Enter your invitation code (case insensitive)')"
+            :placeholder="labels.placeholder"
             v-model="invitation">
           </div>
           <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit">
-            {{ $gettext("Create my account") }}
+            <translate>Create my account</translate>
           </button>
         </form>
       </div>
@@ -88,6 +88,20 @@ export default {
         self.isLoadingInstanceSetting = false
       }
     })
+  },
+  computed: {
+    labels () {
+      let title = this.$gettext('Sign Up')
+      let placeholder = this.$gettext('Enter your invitation code (case insensitive)')
+      let usernamePlaceholder = this.$gettext('Enter your username')
+      let emailPlaceholder = this.$gettext('Enter your email')
+      return {
+        title,
+        usernamePlaceholder,
+        emailPlaceholder,
+        placeholder
+      }
+    }
   },
   methods: {
     submit () {

@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical stripe segment" v-title="'Radio Builder'">
+  <div class="ui vertical stripe segment" v-title="labels.title">
     <div>
       <div>
         <h2 class="ui header">
@@ -10,7 +10,7 @@
           <div class="inline fields">
             <div class="field">
               <label for="name"><translate>Radio name</translate></label>
-              <input id="name" type="text" v-model="radioName" placeholder="My awesome radio" />
+              <input id="name" type="text" v-model="radioName" :placeholder="labels.placeholder" />
             </div>
             <div class="field">
               <input id="public" type="checkbox" v-model="isPublic" />
@@ -201,6 +201,14 @@ export default {
     }
   },
   computed: {
+    labels () {
+      let title = this.$gettext('Radio Builder')
+      let placeholder = this.$gettext('My awesome radio')
+      return {
+        title,
+        placeholder
+      }
+    },
     canSave: function () {
       return (
         this.radioName.length > 0 && this.checkErrors.length === 0

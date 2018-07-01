@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="$gettext('Playlist')">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.playlist">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment" v-title="playlist.name">
@@ -47,7 +47,7 @@
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
-        <h2>Tracks</h2>
+        <h2><translate>Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
     </div>
@@ -82,6 +82,13 @@ export default {
   },
   created: function () {
     this.fetch()
+  },
+  computed: {
+    labels () {
+      return {
+        playlist: this.$gettext('Playlist')
+      }
+    }
   },
   methods: {
     updatePlts (v) {

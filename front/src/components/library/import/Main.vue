@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Import Music'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui top three attached ordered steps">
         <a @click="currentStep = 0" :class="['step', {'active': currentStep === 0}, {'completed': currentStep > 0}]">
@@ -112,7 +112,7 @@
             <p><translate>You can also skip this step and enter metadata manually.</translate></p>
           </div>
           <div class="column">
-            <h5 class="ui header">What is metadata?</h5>
+            <h5 class="ui header"><translate>What is metadata?</translate></h5>
             <template v-translate>
               Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the
               <a href="https://musicbrainz.org" target="_blank">
@@ -262,6 +262,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Import Music')
+      }
+    },
     metadataComponent () {
       if (this.currentType === 'artist') {
         return 'ArtistCard'

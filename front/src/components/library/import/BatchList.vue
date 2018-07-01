@@ -1,12 +1,12 @@
 <template>
-  <div v-title="'Import Batches'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div v-if="isLoading" :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
             <label><translate>Search</translate></label>
-            <input type="text" v-model="filters.search" placeholder="Search by submitter, source..." />
+            <input type="text" v-model="filters.search" :placeholder="labels.searchPlaceholder" />
           </div>
           <div class="ui field">
             <label><translate>Status</translate></label>
@@ -110,6 +110,16 @@ export default {
   },
   created () {
     this.fetchData()
+  },
+  computed: {
+    labels () {
+      let searchPlaceholder = this.$gettext('Search by submitter, source...')
+      let title = this.$gettext('Import Batches')
+      return {
+        searchPlaceholder,
+        title
+      }
+    }
   },
   methods: {
     fetchData () {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="'Track'">
+    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
@@ -169,6 +169,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Track')
+      }
+    },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.track.title + ' ' + this.track.artist.name
     },

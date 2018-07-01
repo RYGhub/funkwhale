@@ -20,7 +20,7 @@
     <div class="three fields">
       <div class="field">
         <label><translate>Playlist name</translate></label>
-        <input v-model="name" required type="text" placeholder="My awesome playlist" />
+        <input v-model="name" required type="text" :placeholder="labels.placeholder" />
       </div>
       <div class="field">
         <label><translate>Playlist visibility</translate></label>
@@ -69,6 +69,11 @@ export default {
     return d
   },
   computed: {
+    labels () {
+      return {
+        placeholder: this.$gettext('My awesome playlist')
+      }
+    },
     privacyLevelChoices: function () {
       return [
         {

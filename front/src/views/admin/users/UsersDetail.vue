@@ -53,7 +53,7 @@
               <tr>
                 <td>
                   <translate>Account active</translate>
-                  <span :data-tooltip="$gettext('Determine if the user account is active or not. Inactive users cannot login or user the service.')"><i class="question circle icon"></i></span>
+                  <span :data-tooltip="labels.inactive"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -141,6 +141,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or user the service.')
+      }
+    },
     allPermissions () {
       return [
         {

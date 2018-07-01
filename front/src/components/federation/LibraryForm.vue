@@ -20,7 +20,7 @@
         <label>
           <translate>Library name</translate>
         </label>
-        <input v-model="libraryUsername" type="text" placeholder="library@demo.funkwhale.audio" />
+        <input v-model="libraryUsername" type="text" :placeholder="labels.namePlaceholder" />
       </div>
       <div class="ui field">
         <label>&nbsp;</label>
@@ -91,6 +91,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        namePlaceholder: this.$gettext('library@demo.funkwhale.audio')
+      }
+    },
     scanErrors () {
       let errors = []
       if (!this.result) {

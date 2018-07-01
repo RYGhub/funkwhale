@@ -12,7 +12,7 @@
     </div>
     <div class="ui fluid search">
       <div class="ui icon input">
-        <input class="prompt" :placeholder="$gettext('Enter your search query...')" type="text">
+        <input class="prompt" :placeholder="labels.placeholder" type="text">
         <i class="search icon"></i>
       </div>
       <div class="results"></div>
@@ -109,6 +109,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        placeholder: this.$gettext('Enter your search query...')
+      }
+    },
     currentTypeObject: function () {
       let self = this
       return this.types.filter(t => {

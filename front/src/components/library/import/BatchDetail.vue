@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Import Batch #' + id">
+  <div v-title="labels.title">
     <div v-if="isLoading && !batch" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
@@ -47,7 +47,7 @@
                 v-if="stats.errored > 0"
                 class="ui tiny basic icon button">
                 <i class="redo icon" />
-                {{ $gettext('Rerun errored jobs')}}
+                <translate>Rerun errored jobs</translate>
               </button>
             </td>
           </tr>
@@ -61,7 +61,7 @@
         <div class="fields">
           <div class="ui field">
             <label><translate>Search</translate></label>
-            <input type="text" v-model="jobFilters.search" placeholder="Search by source..." />
+            <input type="text" v-model="jobFilters.search" :placeholder="labels.searchPlaceholder" />
           </div>
           <div class="ui field">
             <label><translate>Status</translate></label>
@@ -103,7 +103,7 @@
                 <button
                   @click="rerun({batches: [], jobs: [job.id]})"
                   v-if="job.status === 'errored'"
-                  :title="$gettext('Rerun job')"
+                  :title="labels.rerun"
                   class="ui tiny basic icon button">
                   <i class="redo icon" />
                 </button>
@@ -178,6 +178,19 @@ export default {
   destroyed () {
     if (this.timeout) {
       clearTimeout(this.timeout)
+    }
+  },
+  computed: {
+    labels () {
+      let msg = this.$gettext('Import Batch #%{ id }')
+      let title = this.$gettextInterpolate(msg, {id: this.id})
+      let rerun = this.$gettext('Rerun job')
+      let searchPlaceholder = this.$gettext('Search by source...')
+      return {
+        title,
+        searchPlaceholder,
+        rerun
+      }
     }
   },
   methods: {

@@ -6,10 +6,10 @@
       </div>
       <template v-if="data.id">
         <div class="header">
-          <a :href="getMusicbrainzUrl('release', data.id)" target="_blank" title="View on MusicBrainz">{{ data.title }}</a>
+          <a :href="getMusicbrainzUrl('release', data.id)" target="_blank" :title="labels.musicbrainz">{{ data.title }}</a>
         </div>
         <div class="meta">
-          <a :href="getMusicbrainzUrl('artist', data['artist-credit'][0]['artist']['id'])" target="_blank" title="View on MusicBrainz">{{ data['artist-credit-phrase'] }}</a>
+          <a :href="getMusicbrainzUrl('artist', data['artist-credit'][0]['artist']['id'])" target="_blank" :title="labels.musicbrainz">{{ data['artist-credit-phrase'] }}</a>
         </div>
         <div class="description">
           <table class="ui very basic fixed single line compact table">
@@ -19,7 +19,7 @@
                   {{ track.position }}
                 </td>
                 <td colspan="3">
-                  <a :href="getMusicbrainzUrl('recording', track.id)" class="discrete link" target="_blank" :title="$gettext('View on MusicBrainz')">
+                  <a :href="getMusicbrainzUrl('recording', track.id)" class="discrete link" target="_blank" :title="labels.musicbrainz">
                     {{ track.recording.title }}
                   </a>
                 </td>
@@ -48,6 +48,11 @@ export default Vue.extend({
     }
   },
   computed: {
+    labels () {
+      return {
+        musicbrainz: this.$gettext('View on MusicBrainz')
+      }
+    },
     type () {
       return 'release'
     },

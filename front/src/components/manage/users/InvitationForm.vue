@@ -9,8 +9,8 @@
       </div>
       <div class="inline fields">
         <div class="ui field">
-          <label>{{ $gettext('Invitation code')}}</label>
-          <input type="text" v-model="code" :placeholder="$gettext('Leave empty for a random code')" />
+          <label><translate>Invitation code</translate></label>
+          <input type="text" v-model="code" :placeholder="labels.placeholder" />
         </div>
         <div class="ui field">
           <button :class="['ui', {loading: isLoading}, 'button']" :disabled="isLoading" type="submit">
@@ -50,6 +50,13 @@ export default {
       code: null,
       invitations: [],
       errors: []
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        placeholder: this.$gettext('Leave empty for a random code')
+      }
     }
   },
   methods: {

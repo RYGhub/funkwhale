@@ -35,7 +35,7 @@
                     </translate>
                   </p>
                   <p slot="modal-content">
-                    {{ $gettext('This may affect a lot of elements, please double check this is really what you want.')}}
+                    <translate>This may affect a lot of elements, please double check this is really what you want.</translate>
                   </p>
                   <p slot="modal-confirm"><translate>Launch</translate></p>
                 </dangerous-button>

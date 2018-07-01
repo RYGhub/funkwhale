@@ -1,5 +1,5 @@
 <template>
-  <div v-title="$gettext('Playlists')">
+  <div v-title="labels.playlists">
     <div class="ui vertical stripe segment">
       <h2 class="ui header"><translate>Browsing playlists</translate></h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
@@ -12,7 +12,7 @@
         <div class="fields">
           <div class="field">
             <label><translate>Search</translate></label>
-            <input type="text" v-model="query" :placeholder="$gettext('Enter an playlist name...')"/>
+            <input type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
             <label><translate>Ordering</translate></label>
@@ -97,6 +97,16 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+  },
+  computed: {
+    labels () {
+      let playlists = this.$gettext('Playlists')
+      let searchPlaceholder = this.$gettext('Enter an playlist name...')
+      return {
+        playlists,
+        searchPlaceholder
+      }
+    }
   },
   methods: {
     updateQueryString: _.debounce(function () {

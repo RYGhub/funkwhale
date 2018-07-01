@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="'Artist'">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="artist">
@@ -103,6 +103,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Artist')
+      }
+    },
     totalTracks () {
       return this.albums.map((album) => {
         return album.tracks.length

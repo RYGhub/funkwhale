@@ -24,7 +24,7 @@
           %{ count} track
         </translate>
       </span>
-      <play-button class="mini basic orange right floated" :playlist="playlist">Play all</play-button>
+      <play-button class="mini basic orange right floated" :playlist="playlist"><translate>Play all</translate></play-button>
     </div>
   </div>
 </template>

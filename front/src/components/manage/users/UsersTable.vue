@@ -4,7 +4,7 @@
       <div class="fields">
         <div class="ui field">
           <label><translate>Search</translate></label>
-          <input type="text" v-model="search" placeholder="Search by username, email, name..." />
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
           <label><translate>Ordering</translate></label>
@@ -157,6 +157,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by username, email, name...')
+      }
+    },
     privacyLevels () {
       return {}
     },
