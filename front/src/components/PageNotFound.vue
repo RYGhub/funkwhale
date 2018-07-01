@@ -5,7 +5,7 @@
         <h1 class="ui huge header">
           <i class="warning icon"></i>
           <div class="content">
-            <strike><translate>Whale') }}</strike> {{ $gettext('Page not found!</translate>
+            <translate>Page not found!</translate>
           </div>
         </h1>
         <p><translate>We're sorry, the page you asked for does not exist:</translate></p>
