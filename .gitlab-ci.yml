@@ -193,7 +193,7 @@ build_front:
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
-    - chmod -R 750 front/dist
+    - chmod -R 750 dist
   cache:
     key: "$CI_PROJECT_ID__front_dependencies"
     paths:
