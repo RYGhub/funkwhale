@@ -19,8 +19,8 @@ review_front:
   when: manual
   allow_failure: true
   before_script:
-    - apt-get update
-    - apt-get install jq -y
+    - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    - chmod +x /usr/local/bin/jq
     - cd front
   script:
     - yarn install
@@ -178,8 +178,8 @@ build_front:
   stage: build
   image: node:9
   before_script:
-    - apt-get update
-    - apt-get install jq -y
+    - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    - chmod +x /usr/local/bin/jq
     - cd front
   script:
     - yarn install
