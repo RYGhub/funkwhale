@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-01 15:30+0200\n"
-"PO-Revision-Date: 2018-07-01 13:57+0000\n"
+"PO-Revision-Date: 2018-07-01 14:45+0000\n"
 "Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
@@ -589,12 +589,11 @@ msgstr "Durée"
 
 #: front/src/components/Home.vue:96
 msgid "Easy to use"
-msgstr ""
+msgstr "Simple à utiliser"
 
 #: front/src/components/About.vue:21
-#, fuzzy
 msgid "Edit instance info"
-msgstr "Informations relatives à cette instance"
+msgstr "Éditer les informations de cette instance"
 
 #: front/src/components/radios/Card.vue:20 src/views/playlists/Detail.vue:29
 msgid "Edit..."
