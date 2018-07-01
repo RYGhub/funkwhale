@@ -101,7 +101,7 @@ In order to make funkwhale accessible from outside your server and to play nicel
 Nginx
 ^^^^^
 
-Ensure you have a recent version of nginx on your server. On debian-like system, you would have to run the following:
+Ensure you have a recent version of nginx on your server. On Debian-like system, you would have to run the following:
 
 .. code-block:: bash
 
