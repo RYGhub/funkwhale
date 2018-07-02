@@ -113,9 +113,10 @@ First, switch to the api directory:
 
     cd api
 
-A few OS packages are required in order to run Funkwhale. The list is available
-in ``api/requirements.apt`` or by running
-``./install_os_dependencies.sh list``.
+A few OS packages are required in order to run Funkwhale. On Debian-like
+ systems, the list is available in ``api/requirements.apt`` or by running
+``./install_os_dependencies.sh list`` and in ``api/requirements.pac`` on
+Arch.
 
 .. note::
 
