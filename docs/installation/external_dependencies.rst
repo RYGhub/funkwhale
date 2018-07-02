@@ -20,6 +20,14 @@ On Debian-like systems, you would install the database server like this:
 
     sudo apt-get install postgresql postgresql-contrib
 
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    sudo pacman -S postgresql
+
+On Arch, you'll also need to initialize the database. See `the Arch Linux wiki <https://wiki.archlinux.org/index.php/Postgresql#Initial_configuration>`_.
+
 The remaining steps are heavily inspired from `this Digital Ocean guide <https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04>`_.
 
 Open a database shell:
@@ -74,5 +82,11 @@ install it:
 .. code-block:: shell
 
     sudo apt-get install redis-server
+
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    sudo pacman -S redis
 
 This should be enough to have your redis server set up.
