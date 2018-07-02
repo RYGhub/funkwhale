@@ -1,9 +1,9 @@
-Debian installation
-===================
+Debian and Arch Linux installation
+==================================
 
 .. note::
 
-    This guide targets Debian 9 (Stretch), which is the latest Debian.
+    This guide targets Debian 9 (Stretch), which is the latest Debian, as well as Arch Linux.
 
 External dependencies
 ---------------------
@@ -17,13 +17,18 @@ Install utilities
 -----------------
 
 You'll need a few utilities during this guide that are not always present by
-default on system. You can install them using:
+default on system. On Debian-like systems, you can install them using:
 
 .. code-block:: shell
 
     sudo apt-get update
     sudo apt-get install curl python3-pip python3-venv git unzip
 
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    sudo pacman -S curl python-pip python-virtualenv git unzip
 
 Layout
 -------
@@ -125,9 +130,17 @@ Arch.
 
 You can install those packages all at once:
 
+On Debian-like systems:
+
 .. code-block:: shell
 
     ./install_os_dependencies.sh install
+
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    pacman -S $(cat api/requirements.pac)
 
 From now on you can switch back to the funkwhale user.
 
@@ -144,7 +157,7 @@ To avoid collisions with other software on your system, Python dependencies
 will be installed in a dedicated
 `virtualenv <https://docs.python.org/3/library/venv.html>`_.
 
-First, create the virtualenv:
+First, create the virtualenv and install wheel:
 
 .. code-block:: shell
 
@@ -171,7 +184,7 @@ Finally, install the python dependencies:
 
 .. important::
 
-    further commands involving python should always be run after you activated
+    Further commands involving python should always be run after you activated
     the virtualenv, as described earlier, otherwise those commands will raise
     errors
 
