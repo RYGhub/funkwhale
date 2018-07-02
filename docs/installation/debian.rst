@@ -148,6 +148,7 @@ First, create the virtualenv:
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
+    pip install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -165,7 +166,6 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
-    pip install wheel
     pip install -r api/requirements.txt
 
 .. important::
