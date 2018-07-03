@@ -1,9 +1,9 @@
-Debian installation
-===================
+Debian and Arch Linux installation
+==================================
 
 .. note::
 
-    This guide targets Debian 9 (Stretch), which is the latest Debian.
+    This guide targets Debian 9 (Stretch), which is the latest Debian, as well as Arch Linux.
 
 External dependencies
 ---------------------
@@ -17,13 +17,18 @@ Install utilities
 -----------------
 
 You'll need a few utilities during this guide that are not always present by
-default on system. You can install them using:
+default on system. On Debian-like systems, you can install them using:
 
 .. code-block:: shell
 
     sudo apt-get update
     sudo apt-get install curl python3-pip python3-venv git unzip
 
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    sudo pacman -S curl python-pip python-virtualenv git unzip
 
 Layout
 -------
@@ -41,7 +46,7 @@ Create the user and the directory:
 
 .. code-block:: shell
 
-    sudo adduser --system --home /srv/funkwhale funkwhale
+    sudo useradd -r -s /usr/bin/nologin -d /srv/funkwhale -m funkwhale
     cd /srv/funkwhale
 
 Log in as the newly created user from now on:
@@ -113,9 +118,10 @@ First, switch to the api directory:
 
     cd api
 
-A few OS packages are required in order to run Funkwhale. The list is available
-in ``api/requirements.apt`` or by running
-``./install_os_dependencies.sh list``.
+A few OS packages are required in order to run Funkwhale. On Debian-like
+ systems, the list is available in ``api/requirements.apt`` or by running
+``./install_os_dependencies.sh list`` and in ``api/requirements.pac`` on
+Arch.
 
 .. note::
 
@@ -124,9 +130,17 @@ in ``api/requirements.apt`` or by running
 
 You can install those packages all at once:
 
+On Debian-like systems:
+
 .. code-block:: shell
 
     ./install_os_dependencies.sh install
+
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    pacman -S $(cat api/requirements.pac)
 
 From now on you can switch back to the funkwhale user.
 
@@ -143,11 +157,12 @@ To avoid collisions with other software on your system, Python dependencies
 will be installed in a dedicated
 `virtualenv <https://docs.python.org/3/library/venv.html>`_.
 
-First, create the virtualenv:
+First, create the virtualenv and install wheel:
 
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
+    pip install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -165,12 +180,11 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
-    pip install wheel
     pip install -r api/requirements.txt
 
 .. important::
 
-    further commands involving python should always be run after you activated
+    Further commands involving python should always be run after you activated
     the virtualenv, as described earlier, otherwise those commands will raise
     errors
 

@@ -56,7 +56,7 @@ Available installation methods
 -------------------------------
 
 Docker is the recommended and easiest way to setup your Funkwhale instance.
-We also maintain an installation guide for Debian 9.
+We also maintain an installation guide for Debian 9 and Arch Linux.
 
 .. toctree::
    :maxdepth: 1
@@ -108,6 +108,12 @@ Ensure you have a recent version of nginx on your server. On Debian-like system,
     sudo apt-get update
     sudo apt-get install nginx
 
+On Arch Linux and its derivatives:
+
+.. code-block:: bash
+
+    sudo pacman -S nginx
+
 Then, download our sample virtualhost file and proxy conf:
 
 .. parsed-literal::
@@ -129,7 +135,12 @@ If everything is fine, you can restart your nginx server with ``service nginx re
 Apache2
 ^^^^^^^
 
-Ensure you have a recent version of apache2 installed on your server.
+.. note::
+
+    These instructions are for Debian only.
+    For Arch Linux please refer to the `Arch Linux wiki <https://wiki.archlinux.org/index.php/Apache>`_.
+
+Ensure you have a recent version of Apache2 installed on your server.
 You'll also need the following dependencies::
 
    sudo apt-get install libapache2-mod-xsendfile
