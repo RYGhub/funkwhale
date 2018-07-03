@@ -1,7 +1,7 @@
 import django_filters
 from django.db import models
 
-from funkwhale_api.music import utils
+from . import search
 
 PRIVACY_LEVEL_CHOICES = [
     ("me", "Only me"),
@@ -34,5 +34,17 @@ class SearchFilter(django_filters.CharFilter):
     def filter(self, qs, value):
         if not value:
             return qs
-        query = utils.get_query(value, self.search_fields)
+        query = search.get_query(value, self.search_fields)
         return qs.filter(query)
+
+
+class SmartSearchFilter(django_filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        self.config = kwargs.pop("config")
+        super().__init__(*args, **kwargs)
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+        cleaned = self.config.clean(value)
+        return search.apply(qs, cleaned)
