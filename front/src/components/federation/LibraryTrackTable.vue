@@ -2,7 +2,7 @@
   <div>
     <div class="ui inline form">
       <div class="fields">
-        <div class="ui field">
+        <div class="ui six wide field">
           <label><translate>Search</translate></label>
           <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
@@ -56,16 +56,16 @@
             <span :title="scope.obj.title">{{ scope.obj.title|truncate(30) }}</span>
           </td>
           <td>
-            <span :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>
+            <span class="discrete link" @click="updateSearch({key: 'artist', value: scope.obj.artist_name})" :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>
           </td>
           <td>
-            <span :title="scope.obj.album_title">{{ scope.obj.album_title|truncate(20) }}</span>
+            <span class="discrete link" @click="updateSearch({key: 'album', value: scope.obj.album_title})" :title="scope.obj.album_title">{{ scope.obj.album_title|truncate(20) }}</span>
           </td>
           <td>
             <human-date :date="scope.obj.published_date"></human-date>
           </td>
           <td v-if="showLibrary">
-            {{ scope.obj.library.actor.domain }}
+            <span class="discrete link" @click="updateSearch({key: 'domain', value: scope.obj.library.actor.domain})">{{ scope.obj.library.actor.domain }}</span>
           </td>
         </template>
       </action-table>
@@ -120,6 +120,12 @@ export default {
     this.fetchData()
   },
   methods: {
+    updateSearch ({key, value}) {
+      if (value.indexOf(' ') > -1) {
+        value = `"${value}"`
+      }
+      this.search = `${key}:${value}`
+    },
     fetchData () {
       let params = _.merge({
         'page': this.page,

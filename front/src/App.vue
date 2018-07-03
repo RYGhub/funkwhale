@@ -236,6 +236,7 @@ html, body {
 
 .discrete.link {
     color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
 }
 
 .floated.buttons .button ~ .dropdown {
