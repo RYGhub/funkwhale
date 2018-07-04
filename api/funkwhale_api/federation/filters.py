@@ -1,6 +1,7 @@
 import django_filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import search
 
 from . import models
 
@@ -23,8 +24,21 @@ class LibraryFilter(django_filters.FilterSet):
 class LibraryTrackFilter(django_filters.FilterSet):
     library = django_filters.CharFilter("library__uuid")
     status = django_filters.CharFilter(method="filter_status")
-    q = fields.SearchFilter(
-        search_fields=["artist_name", "title", "album_title", "library__actor__domain"]
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "domain": {"to": "library__actor__domain"},
+                "artist": {"to": "artist_name"},
+                "album": {"to": "album_title"},
+                "title": {"to": "title"},
+            },
+            filter_fields={
+                "domain": {"to": "library__actor__domain"},
+                "artist": {"to": "artist_name__iexact"},
+                "album": {"to": "album_title__iexact"},
+                "title": {"to": "title__iexact"},
+            },
+        )
     )
 
     def filter_status(self, queryset, field_name, value):
