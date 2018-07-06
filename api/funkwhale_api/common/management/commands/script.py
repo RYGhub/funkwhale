@@ -50,7 +50,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(name))
             self.stdout.write("")
             for line in script["help"].splitlines():
-                self.stdout.write("     {}".format(line))
+                self.stdout.write("     {}".format(line))
         self.stdout.write("")
 
     def get_scripts(self):

@@ -48,12 +48,12 @@
             </ul>
           </div>
           <div class="field">
-            <label>{{ $gettext('Old password') }}</label>
+            <label><translate>Old password</translate></label>
             <password-input required v-model="old_password" />
 
           </div>
           <div class="field">
-            <label>{{ $gettext('New password') }}</label>
+            <label><translate>New password</translate></label>
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button

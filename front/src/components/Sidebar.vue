@@ -47,7 +47,7 @@
         <div class="item">
           <div class="header"><translate>Music</translate></div>
           <div class="menu">
-            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i><translate>Browse library</translate></router-link>
+            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"></i><translate>Browse library</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i><translate>Favorites</translate></router-link>
             <a
               @click="$store.commit('playlists/chooseTrack', null)"

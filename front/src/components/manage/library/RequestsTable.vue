@@ -69,24 +69,24 @@
           </td>
           <td>
             <span v-if="scope.obj.albums" :title="scope.obj.albums">{{ scope.obj.albums|truncate(30) }}</span>
-            <template v-else>{{ $gettext('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <span v-if="scope.obj.comment" :title="scope.obj.comment">{{ scope.obj.comment|truncate(30) }}</span>
-            <template v-else>{{ $gettext('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
           </td>
           <td>
             <human-date v-if="scope.obj.imported_date" :date="scope.obj.creation_date"></human-date>
-            <template v-else>{{ $gettext('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <router-link
               class="ui tiny basic button"
               :to="{name: 'library.import.launch', query: {request: scope.obj.id}}"
-              v-if="scope.obj.status === 'pending'">{{ $gettext('Create import') }}</router-link>
+              v-if="scope.obj.status === 'pending'"><translate>Create import</translate></router-link>
           </td>
         </template>
       </action-table>

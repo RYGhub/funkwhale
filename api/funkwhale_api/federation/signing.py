@@ -13,7 +13,7 @@ from . import exceptions, utils
 
 logger = logging.getLogger(__name__)
 
-#  the request Date should be between now - 30s and now + 30s
+#  the request Date should be between now - 30s and now + 30s
 DATE_HEADER_VALID_FOR = 30
 
 

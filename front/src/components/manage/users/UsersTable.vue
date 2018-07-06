@@ -45,14 +45,14 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
+            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
           </td>
           <td>
-            <span>{{ scope.obj.email }}</span>
+            <span>{{ scope.obj.email }}</span>
           </td>
           <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label">{{ $gettext('Active') }}</span>
-            <span v-else class="ui basic grey label">{{ $gettext('Inactive') }}</span>
+            <span v-if="scope.obj.is_active" class="ui basic green label"><translate>Active</translate></span>
+            <span v-else class="ui basic grey label"><translate>Inactive</translate></span>
           </td>
           <td>
             <human-date :date="scope.obj.date_joined"></human-date>
