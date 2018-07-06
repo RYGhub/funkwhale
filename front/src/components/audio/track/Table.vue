@@ -4,9 +4,9 @@
       <tr>
         <th></th>
         <th></th>
-        <th colspan="6">{{ $gettext('Title') }}</th>
-        <th colspan="6">{{ $gettext('Artist') }}</th>
-        <th colspan="6">{{ $gettext('Album') }}</th>
+        <th colspan="6"><translate>Title</translate></th>
+        <th colspan="6"><translate>Artist</translate></th>
+        <th colspan="6"><translate>Album</translate></th>
         <th></th>
       </tr>
     </thead>
@@ -21,16 +21,16 @@
       <tr>
         <th colspan="3">
           <button @click="showDownloadModal = !showDownloadModal" class="ui basic button">
-            {{ $gettext('Download') }}
+             <translate>Download</translate>
           </button>
           <modal :show.sync="showDownloadModal">
-            <div class="header">{{ $gettext('Download tracks') }}</div>
+            <div class="header"><translate>Download tracks</translate></div>
             <div class="content">
               <div class="description">
-                <p>{{ $gettext('There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks.') }}</p>
-                {{ $gettext('Simply copy paste the snippet below into a terminal to launch the download.') }}
+                <p><translate>There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks.</translate></p>
+                 <translate>Simply copy paste the snippet below into a terminal to launch the download.</translate>
                 <div class="ui warning message">
-                  {{ $gettext('Keep your PRIVATE_TOKEN secret as it gives access to your account.') }}
+                   <translate>Keep your PRIVATE_TOKEN secret as it gives access to your account.</translate>
                 </div>
                 <pre>
 export PRIVATE_TOKEN="{{ $store.state.auth.token }}"

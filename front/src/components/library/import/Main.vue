@@ -50,7 +50,7 @@
           :class="['ui', 'positive', 'icon', {'disabled': !importBatch}, 'button']"
           :disabled="!importBatch"
           >
-            {{ $gettext('Finish import' )}}
+            <translate>Finish import</translate>
             <i class="check icon"></i>
           </button>
       </div>

@@ -9,7 +9,7 @@
             <input type="text" v-model="instanceUrl">
             <button type="submit" class="ui button"><translate>Submit</translate></button>
           </div>
-          <p>{{ $gettext('Suggested choices') }}</p>
+          <p><translate>Suggested choices</translate></p>
           <div class="ui bulleted list">
             <div class="ui item" v-for="url in suggestedInstances">
               <a @click="instanceUrl = url">{{ url }}</a>
@@ -61,7 +61,7 @@
               <h4 v-translate class="ui header">Options</h4>
               <div class="ui form">
                 <div class="ui field">
-                  <label>{{ $gettext('Change language') }}</label>
+                  <label><translate>Change language</translate></label>
                   <select class="ui dropdown" v-model="$language.current">
                     <option v-for="(language, key) in $language.available" :value="key">{{ language }}</option>
                   </select>

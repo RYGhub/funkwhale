@@ -19,10 +19,10 @@
     <table v-if="result" class="ui very basic single line unstackable table">
       <thead>
         <tr>
-          <th>{{ $gettext('Actor') }}</th>
-          <th>{{ $gettext('Creation date') }}</th>
-          <th>{{ $gettext('Status') }}</th>
-          <th>{{ $gettext('Actions') }}</th>
+          <th><translate>Actor</translate></th>
+          <th><translate>Creation date</translate></th>
+          <th><translate>Status</translate></th>
+          <th><translate>Actions</translate></th>
         </tr>
       </thead>
       <tbody>

@@ -7,8 +7,8 @@
           <div v-if="error" class="ui negative message">
             <div class="header"><translate>We cannot log you in</translate></div>
             <ul class="list">
-              <li v-if="error == 'invalid_credentials'">{{ $gettext('Please double-check your username/password couple is correct') }}</li>
-              <li v-else>{{ $gettext('An unknown error happend, this can mean the server is down or cannot be reached') }}</li>
+              <li v-if="error == 'invalid_credentials'"><translate>Please double-check your username/password couple is correct</translate></li>
+              <li v-else><translate>An unknown error happend, this can mean the server is down or cannot be reached</translate></li>
             </ul>
           </div>
           <div class="field">
@@ -39,7 +39,7 @@
 
           </div>
           <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            {{ $gettext('Login') }}
+             <translate>Login</translate>
           </button>
         </form>
       </div>

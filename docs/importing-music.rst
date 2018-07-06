@@ -98,14 +98,14 @@ directory is mounted as a volume as well::
       volumes:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media
-      # add your symlinked dirs here
+      # add your symlinked dirs here
       - /media/nfsshare:/media/nfsshare:ro
 
     api:
       volumes:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media
-      # add your symlinked dirs here
+      # add your symlinked dirs here
       - /media/nfsshare:/media/nfsshare:ro
 
 

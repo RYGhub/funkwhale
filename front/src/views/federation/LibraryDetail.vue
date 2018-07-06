@@ -93,7 +93,7 @@
                     </translate>
                   </template>
                   <template v-else>
-                    <translate>Unkwnown</translate>
+                    <translate>Unknown</translate>
                   </template>
                 </td>
                 <td></td>

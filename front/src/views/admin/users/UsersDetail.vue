@@ -143,7 +143,7 @@ export default {
   computed: {
     labels () {
       return {
-        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or user the service.')
+        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or use the service.')
       }
     },
     allPermissions () {
