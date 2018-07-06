@@ -12,6 +12,10 @@ export default {
     {
       "code": "fr_FR",
       "label": "Français"
+    },
+    {
+      "code": "pl",
+      "label": "Polszczyzna"
     }
   ]
 }
