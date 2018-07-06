@@ -15,6 +15,21 @@
             <option :value="'import_pending'"><translate>Import pending</translate></option>
           </select>
         </div>
+        <div class="field">
+          <label><translate>Ordering</translate></label>
+          <select class="ui dropdown" v-model="ordering">
+            <option v-for="option in orderingOptions" :value="option[0]">
+              {{ option[1] }}
+            </option>
+          </select>
+        </div>
+        <div class="field">
+          <label><translate>Ordering direction</translate></label>
+          <select class="ui dropdown" v-model="orderingDirection">
+            <option value="+"><translate>Ascending</translate></option>
+            <option value="-"><translate>Descending</translate></option>
+          </select>
+        </div>
       </div>
     </div>
     <div class="dimmable">
@@ -96,8 +111,10 @@ import _ from 'lodash'
 
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
+import OrderingMixin from '@/components/mixins/Ordering'
 
 export default {
+  mixins: [OrderingMixin],
   props: {
     filters: {type: Object, required: false},
     showLibrary: {type: Boolean, default: false}
@@ -113,7 +130,15 @@ export default {
       page: 1,
       paginateBy: 25,
       search: '',
-      importedFilter: null
+      importedFilter: null,
+      orderingDirection: '-',
+      ordering: 'published_date',
+      orderingOptions: [
+        ['published_date', 'Published date'],
+        ['title', 'Title'],
+        ['album_title', 'Album title'],
+        ['artist_name', 'Artist name']
+      ]
     }
   },
   created () {
@@ -130,6 +155,7 @@ export default {
       let params = _.merge({
         'page': this.page,
         'page_size': this.paginateBy,
+        'ordering': this.getOrderingAsString(),
         'q': this.search
       }, this.filters)
       if (this.importedFilter !== null) {
@@ -178,6 +204,14 @@ export default {
     }
   },
   watch: {
+    orderingDirection: function () {
+      this.page = 1
+      this.fetchData()
+    },
+    ordering: function () {
+      this.page = 1
+      this.fetchData()
+    },
     search (newValue) {
       this.page = 1
       this.fetchData()

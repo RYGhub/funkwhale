@@ -171,6 +171,7 @@ class LibraryTrackFactory(factory.DjangoModelFactory):
     audio_url = factory.Faker("url")
     audio_mimetype = "audio/ogg"
     metadata = factory.SubFactory(LibraryTrackMetadataFactory)
+    published_date = factory.LazyFunction(timezone.now)
 
     class Meta:
         model = models.LibraryTrack
