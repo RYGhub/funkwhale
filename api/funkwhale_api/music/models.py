@@ -319,9 +319,10 @@ class Track(APIModelMixin):
         "mbid": {"musicbrainz_field_name": "id"},
         "title": {"musicbrainz_field_name": "title"},
         "artist": {
-            # we use the artist from the release to avoid #237
-            "musicbrainz_field_name": "release-list",
-            "converter": get_artist,
+            "musicbrainz_field_name": "artist-credit",
+            "converter": lambda v: Artist.get_or_create_from_api(
+                mbid=v[0]["artist"]["id"]
+            )[0],
         },
         "album": {"musicbrainz_field_name": "release-list", "converter": import_album},
     }
@@ -389,19 +390,37 @@ class Track(APIModelMixin):
         tracks = [t for m in data["release"]["medium-list"] for t in m["track-list"]]
         track_data = None
         for track in tracks:
-            if track["recording"]["id"] == mbid:
+            if track["recording"]["id"] == str(mbid):
                 track_data = track
                 break
         if not track_data:
             raise ValueError("No track found matching this ID")
 
+        track_artist_mbid = None
+        for ac in track_data["recording"]["artist-credit"]:
+            try:
+                ac_mbid = ac["artist"]["id"]
+            except TypeError:
+                # it's probably a string, like "feat."
+                continue
+
+            if ac_mbid == str(album.artist.mbid):
+                continue
+
+            track_artist_mbid = ac_mbid
+            break
+        track_artist_mbid = track_artist_mbid or album.artist.mbid
+        if track_artist_mbid == str(album.artist.mbid):
+            track_artist = album.artist
+        else:
+            track_artist = Artist.get_or_create_from_api(track_artist_mbid)[0]
         return cls.objects.update_or_create(
             mbid=mbid,
             defaults={
                 "position": int(track["position"]),
                 "title": track["recording"]["title"],
                 "album": album,
-                "artist": album.artist,
+                "artist": track_artist,
             },
         )
 

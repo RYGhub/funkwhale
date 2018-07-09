@@ -43,7 +43,7 @@ def test_album_track_serializer(factories, to_api_date):
 
     expected = {
         "id": track.id,
-        "artist": track.artist.id,
+        "artist": serializers.ArtistSimpleSerializer(track.artist).data,
         "album": track.album.id,
         "mbid": str(track.mbid),
         "title": track.title,

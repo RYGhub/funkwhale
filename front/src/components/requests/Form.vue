@@ -13,7 +13,7 @@
       </div>
       <div class="field">
         <label><translate>Comment</translate></label>
-        <textarea v-model="currentComment" rows="3" :placeholder="comentPlaceholder" maxlength="2000"></textarea>
+        <textarea v-model="currentComment" rows="3" :placeholder="labels.commentPlaceholder" maxlength="2000"></textarea>
       </div>
       <button class="ui submit button" type="submit"><translate>Submit</translate></button>
     </form>
