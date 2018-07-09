@@ -3,12 +3,19 @@ def load(model, *args, **kwargs):
     return importer.load(*args, **kwargs)
 
 
+EXCLUDE_VALIDATION = {"Track": ["artist"]}
+
+
 class Importer(object):
     def __init__(self, model):
         self.model = model
 
     def load(self, cleaned_data, raw_data, import_hooks):
         mbid = cleaned_data.pop("mbid")
+        # let's validate data, just in case
+        instance = self.model(**cleaned_data)
+        exclude = EXCLUDE_VALIDATION.get(self.model.__name__, [])
+        instance.full_clean(exclude=["mbid", "uuid"] + exclude)
         m = self.model.objects.update_or_create(mbid=mbid, defaults=cleaned_data)[0]
         for hook in import_hooks:
             hook(m, cleaned_data, raw_data)
