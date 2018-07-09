@@ -60,8 +60,15 @@ class TrackFileSerializer(serializers.ModelSerializer):
         return url
 
 
+class ArtistSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Artist
+        fields = ("id", "mbid", "name", "creation_date")
+
+
 class AlbumTrackSerializer(serializers.ModelSerializer):
     files = TrackFileSerializer(many=True, read_only=True)
+    artist = ArtistSimpleSerializer(read_only=True)
 
     class Meta:
         model = models.Track
@@ -75,12 +82,6 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "files",
             "position",
         )
-
-
-class ArtistSimpleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Artist
-        fields = ("id", "mbid", "name", "creation_date")
 
 
 class AlbumSerializer(serializers.ModelSerializer):

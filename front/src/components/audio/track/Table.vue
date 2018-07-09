@@ -14,6 +14,7 @@
       <track-row
         :display-position="displayPosition"
         :track="track"
+        :artist="artist"
         :key="index + '-' + track.id"
         v-for="(track, index) in tracks"></track-row>
     </tbody>
@@ -63,6 +64,7 @@ import Modal from '@/components/semantic/Modal'
 export default {
   props: {
     tracks: {type: Array, required: true},
+    artist: {type: Object, required: false},
     displayPosition: {type: Boolean, default: false}
   },
   components: {

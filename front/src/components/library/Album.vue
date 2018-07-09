@@ -43,7 +43,7 @@
         <h2>
           <translate>Tracks</translate>
         </h2>
-        <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
+        <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
     </template>
   </div>

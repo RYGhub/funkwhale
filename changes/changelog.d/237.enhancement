@@ -1,0 +1,11 @@
+Store track artist and album artist separately (#237)
+
+Better handling of tracks with a different artist than the album artist
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some tracks involve a different artist than the album artist (e.g. a featuring)
+and Funkwhale has been known to do weird things when importing such tracks, resulting
+in albums that contained a single track, for instance.
+
+The situation should be improved with this release, as Funkwhale is now able to
+store separately the track and album artist, and display it properly in the interface.

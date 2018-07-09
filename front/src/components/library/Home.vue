@@ -72,7 +72,8 @@ export default {
       var self = this
       this.isLoadingArtists = true
       let params = {
-        ordering: '-creation_date'
+        ordering: '-creation_date',
+        listenable: true
       }
       let url = ARTISTS_URL
       logger.default.time('Loading latest artists')

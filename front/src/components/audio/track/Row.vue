@@ -16,9 +16,18 @@
       </router-link>
     </td>
     <td colspan="6">
-      <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+      <router-link v-if="track.artist.id === albumArtist.id" class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
         {{ track.artist.name }}
       </router-link>
+      <template v-else>
+        <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: albumArtist.id }}">
+          {{ albumArtist.name }}
+        </router-link>
+         /
+         <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+          {{ track.artist.name }}
+        </router-link>
+      </template>
     </td>
     <td colspan="6">
       <router-link class="album discrete link" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
@@ -35,8 +44,6 @@
 </template>
 
 <script>
-import backend from '@/audio/backend'
-
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 import PlayButton from '@/components/audio/PlayButton'
@@ -44,6 +51,7 @@ import PlayButton from '@/components/audio/PlayButton'
 export default {
   props: {
     track: {type: Object, required: true},
+    artist: {type: Object, required: false},
     displayPosition: {type: Boolean, default: false}
   },
   components: {
@@ -51,9 +59,13 @@ export default {
     TrackPlaylistIcon,
     PlayButton
   },
-  data () {
-    return {
-      backend: backend
+  computed: {
+    albumArtist () {
+      if (this.artist) {
+        return this.artist
+      } else {
+        return this.track.album.artist
+      }
     }
   }
 }

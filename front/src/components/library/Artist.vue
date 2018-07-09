@@ -15,7 +15,7 @@
                   tag="div"
                   translate-plural="%{ count } tracks in %{ albumsCount } albums"
                   :translate-n="totalTracks"
-                  :translate-params="{count: totalTracks, albumsCount: albums.length}">
+                  :translate-params="{count: totalTracks, albumsCount: totalAlbums}">
                   %{ count } track in %{ albumsCount } albums
                 </translate>
               </div>
@@ -40,7 +40,7 @@
       <div v-if="isLoadingAlbums" class="ui vertical stripe segment">
         <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       </div>
-      <div v-else-if="albums" class="ui vertical stripe segment">
+      <div v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
         <h2>
           <translate>Albums by this artist</translate>
         </h2>
@@ -50,33 +50,41 @@
           </div>
         </div>
       </div>
+      <div v-if="tracks.length > 0" class="ui vertical stripe segment">
+        <h2>
+          <translate>Tracks by this artist</translate>
+        </h2>
+        <track-table :display-position="true" :tracks="tracks"></track-table>
+      </div>
     </template>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import axios from 'axios'
 import logger from '@/logging'
 import backend from '@/audio/backend'
 import AlbumCard from '@/components/audio/album/Card'
 import RadioButton from '@/components/radios/Button'
 import PlayButton from '@/components/audio/PlayButton'
-
-const FETCH_URL = 'artists/'
+import TrackTable from '@/components/audio/track/Table'
 
 export default {
   props: ['id'],
   components: {
     AlbumCard,
     RadioButton,
-    PlayButton
+    PlayButton,
+    TrackTable
   },
   data () {
     return {
       isLoading: true,
       isLoadingAlbums: true,
       artist: null,
-      albums: null
+      albums: null,
+      tracks: []
     }
   },
   created () {
@@ -86,14 +94,17 @@ export default {
     fetchData () {
       var self = this
       this.isLoading = true
-      let url = FETCH_URL + this.id + '/'
       logger.default.debug('Fetching artist "' + this.id + '"')
-      axios.get(url).then((response) => {
+      axios.get('tracks/', {params: {artist: this.id}}).then((response) => {
+        self.tracks = response.data.results
+      })
+      axios.get('artists/' + this.id + '/').then((response) => {
         self.artist = response.data
         self.isLoading = false
         self.isLoadingAlbums = true
         axios.get('albums/', {params: {artist: this.id, ordering: '-release_date'}}).then((response) => {
-          self.albums = JSON.parse(JSON.stringify(response.data.results)).map((album) => {
+          let parsed = JSON.parse(JSON.stringify(response.data.results))
+          self.albums = parsed.map((album) => {
             return backend.Album.clean(album)
           })
 
@@ -108,12 +119,21 @@ export default {
         title: this.$gettext('Artist')
       }
     },
+    totalAlbums () {
+      let trackAlbums = _.uniqBy(this.tracks, (t) => {
+        return t.album.id
+      })
+      return this.albums.length + trackAlbums.length
+    },
     totalTracks () {
+      if (this.albums.length === 0) {
+        return 0 + this.tracks.length
+      }
       return this.albums.map((album) => {
         return album.tracks.length
       }).reduce((a, b) => {
         return a + b
-      })
+      }) + this.tracks.length
     },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.artist.name

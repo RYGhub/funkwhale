@@ -44,6 +44,7 @@ def test_import_album_stores_release_group(factories):
 
 def test_import_track_from_release(factories, mocker):
     album = factories["music.Album"](mbid="430347cb-0879-3113-9fde-c75b658c298e")
+    artist = factories["music.Artist"](mbid="a5211c65-2465-406b-93ec-213588869dc1")
     album_data = {
         "release": {
             "id": album.mbid,
@@ -64,6 +65,9 @@ def test_import_track_from_release(factories, mocker):
                                 "id": "2109e376-132b-40ad-b993-2bb6812e19d4",
                                 "title": "Teen Age Riot",
                                 "length": "417973",
+                                "artist-credit": [
+                                    {"artist": {"id": artist.mbid, "name": artist.name}}
+                                ],
                             },
                             "track_or_recording_length": "417973",
                         }
@@ -84,8 +88,64 @@ def test_import_track_from_release(factories, mocker):
     assert track.title == track_data["recording"]["title"]
     assert track.mbid == track_data["recording"]["id"]
     assert track.album == album
-    assert track.artist == album.artist
+    assert track.artist == artist
     assert track.position == int(track_data["position"])
+
+
+def test_import_track_with_different_artist_than_release(factories, mocker):
+    album = factories["music.Album"](mbid="430347cb-0879-3113-9fde-c75b658c298e")
+    recording_data = {
+        "recording": {
+            "id": "94ab07eb-bdf3-4155-b471-ba1dc85108bf",
+            "title": "Flaming Red Hair",
+            "length": "159000",
+            "artist-credit": [
+                {
+                    "artist": {
+                        "id": "a5211c65-2465-406b-93ec-213588869dc1",
+                        "name": "Plan 9",
+                        "sort-name": "Plan 9",
+                        "disambiguation": "New Zealand group",
+                    }
+                }
+            ],
+            "release-list": [
+                {
+                    "id": album.mbid,
+                    "title": "The Lord of the Rings: The Fellowship of the Ring - The Complete Recordings",
+                    "status": "Official",
+                    "quality": "normal",
+                    "text-representation": {"language": "eng", "script": "Latn"},
+                    "artist-credit": [
+                        {
+                            "artist": {
+                                "id": "9b58672a-e68e-4972-956e-a8985a165a1f",
+                                "name": "Howard Shore",
+                                "sort-name": "Shore, Howard",
+                            }
+                        }
+                    ],
+                    "date": "2005-12-13",
+                    "country": "US",
+                    "release-event-count": 1,
+                    "barcode": "093624945420",
+                    "artist-credit-phrase": "Howard Shore",
+                }
+            ],
+            "release-count": 3,
+            "artist-credit-phrase": "Plan 9",
+        }
+    }
+    artist = factories["music.Artist"](mbid="a5211c65-2465-406b-93ec-213588869dc1")
+    mocker.patch(
+        "funkwhale_api.musicbrainz.api.recordings.get", return_value=recording_data
+    )
+
+    track = models.Track.get_or_create_from_api(recording_data["recording"]["id"])[0]
+    assert track.title == recording_data["recording"]["title"]
+    assert track.mbid == recording_data["recording"]["id"]
+    assert track.album == album
+    assert track.artist == artist
 
 
 def test_import_job_is_bound_to_track_file(factories, mocker):
