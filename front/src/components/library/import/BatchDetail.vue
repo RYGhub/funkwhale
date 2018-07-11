@@ -117,7 +117,7 @@
           <tr>
             <th>
               <pagination
-              v-if="jobResult && jobResult.results.length > 0"
+              v-if="jobResult && jobResult.count > jobFilters.paginateBy"
               @page-changed="selectPage"
               :compact="true"
               :current="jobFilters.page"

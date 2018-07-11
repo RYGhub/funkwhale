@@ -63,7 +63,7 @@
       </div>
       <div class="ui center aligned basic segment">
         <pagination
-          v-if="result && result.results.length > 0"
+          v-if="result && result.count > paginateBy"
           @page-changed="selectPage"
           :current="page"
           :paginate-by="paginateBy"
