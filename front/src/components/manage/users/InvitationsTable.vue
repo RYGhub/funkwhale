@@ -65,7 +65,7 @@
     </div>
     <div>
       <pagination
-        v-if="result && result.results.length > 0"
+        v-if="result && result.count > paginateBy"
         @page-changed="selectPage"
         :compact="true"
         :current="page"
