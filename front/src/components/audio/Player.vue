@@ -60,27 +60,31 @@
           :title="labels.previousTrack"
           class="two wide column control"
           :disabled="emptyQueue">
-            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'big', 'icon']"></i>
+            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
         </div>
         <div
           v-if="!playing"
           :title="labels.play"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
         </div>
         <div
           v-else
           :title="labels.pause"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
         </div>
         <div
           :title="labels.next"
           class="two wide column control"
           :disabled="!hasNext">
-            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
+            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
         </div>
-        <div class="two wide column control volume-control">
+        <div
+          class="wide column control volume-control"
+          v-on:mouseover="showVolume = true"
+          v-on:mouseleave="showVolume = false"
+          v-bind:class="{ active : showVolume }">
           <i
             :title="labels.unmute"
             @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
@@ -90,9 +94,15 @@
           <i
             :title="labels.mute"
             @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
-          <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
+          <input
+            type="range"
+            step="0.05"
+            min="0"
+            max="1"
+            v-model="sliderVolume"
+            v-if="showVolume" />
         </div>
-        <div class="two wide column control looping">
+        <div class="two wide column control looping" v-if="!showVolume">
           <i
             :title="labels.loopingDisabled"
             v-if="looping === 0"
@@ -118,14 +128,16 @@
         <div
           :disabled="queue.tracks.length === 0"
           :title="labels.shuffle"
+          v-if="!showVolume"
           class="two wide column control">
           <div v-if="isShuffling" class="ui inline shuffling inverted small active loader"></div>
           <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
-        <div class="one wide column"></div>
+        <div class="one wide column" v-if="!showVolume"></div>
         <div
           :disabled="queue.tracks.length === 0"
           :title="labels.clear"
+          v-if="!showVolume"
           class="two wide column control">
           <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
@@ -168,6 +180,7 @@ export default {
       renderAudio: true,
       sliderVolume: this.volume,
       defaultAmbiantColors: defaultAmbiantColors,
+      showVolume: false,
       ambiantColors: defaultAmbiantColors
     }
   },
@@ -370,16 +383,16 @@ export default {
 }
 .volume-control {
   position: relative;
+  width: 12.5% !important;
   .icon {
     // margin: 0;
   }
   [type="range"] {
-    max-width: 100%;
+    max-width: 70%;
     position: absolute;
-    bottom: 5px;
-    left: 10%;
+    bottom: 1.1rem;
+    left: 25%;
     cursor: pointer;
-    display: none;
   }
   input[type=range] {
     -webkit-appearance: none;
@@ -390,22 +403,29 @@ export default {
   input[type=range]::-webkit-slider-runnable-track {
     cursor: pointer;
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-webkit-slider-thumb {
     background: white;
     cursor: pointer;
     -webkit-appearance: none;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]:focus::-webkit-slider-runnable-track {
     background: #white;
+    opacity: 0.3;
   }
   input[type=range]::-moz-range-track {
     cursor: pointer;
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-moz-range-thumb {
     background: white;
     cursor: pointer;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]::-ms-track {
     cursor: pointer;
@@ -415,13 +435,17 @@ export default {
   }
   input[type=range]::-ms-fill-lower {
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-ms-fill-upper {
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-ms-thumb {
     background: white;
     cursor: pointer;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]:focus::-ms-fill-lower {
     background: white;
@@ -429,11 +453,10 @@ export default {
   input[type=range]:focus::-ms-fill-upper {
     background: #white;
   }
-  &:hover {
-    [type="range"] {
-      display: block;
-    }
-  }
+}
+
+.active.volume-control {
+  width: 60% !important;
 }
 
 .looping.control {
