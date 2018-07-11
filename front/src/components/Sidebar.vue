@@ -372,6 +372,9 @@ $sidebar-color: #3d3e3f;
   tr {
     cursor: pointer;
   }
+  td:nth-child(2) {
+    width: 55px;
+  }
 }
 .tab[data-tab="library"] {
   flex-direction: column;
@@ -413,6 +416,10 @@ $sidebar-color: #3d3e3f;
 
 .ui.message.black {
   background: $sidebar-color;
+}
+
+.ui.mini.image {
+  width: 100%;
 }
 </style>
 
