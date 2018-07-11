@@ -421,6 +421,9 @@ export default {
     background: white;
     opacity: 0.3;
   }
+  input[type=range]::-moz-focus-outer {
+    border: 0;
+  }
   input[type=range]::-moz-range-thumb {
     background: white;
     cursor: pointer;
