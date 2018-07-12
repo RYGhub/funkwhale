@@ -106,6 +106,20 @@ Then we'll download the frontend files:
     mv extracted/front .
     rm -rf extracted
 
+.. note::
+
+    You can also choose to get the code directly from the git repo. In this
+    case, run
+
+        cd /srv
+        rm -r funkwhale
+        git clone https://code.eliotverriot.com/funkwhale/funkwhale funkwhale
+        cd funkwale
+
+    You will still need to get the frontend files as specified before, because
+    we're not going to build them.
+
+
 You can leave the ZIP archives in the directory, this will help you know
 which version you've installed next time you want to upgrade your installation.
 
@@ -190,6 +204,13 @@ Download the sample environment file:
 .. parsed-literal::
 
     curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
+
+.. note::
+
+    if you used git to get the latest version of the code earlier, you can instead do
+
+        cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
+
 
 You can then edit it: the file is heavily commented, and the most relevant
 configuration options are mentioned at the top of the file.
