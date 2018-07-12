@@ -130,7 +130,7 @@
           :title="labels.shuffle"
           v-if="!showVolume"
           class="two wide column control">
-          <div v-if="isShuffling" class="ui inline shuffling inverted small active loader"></div>
+          <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
           <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
         <div class="one wide column" v-if="!showVolume"></div>
@@ -195,7 +195,8 @@ export default {
       updateProgress: 'player/updateProgress'
     }),
     shuffle () {
-      if (this.isShuffling) {
+      let disabled = this.queue.tracks.length === 0
+      if (this.isShuffling || disabled) {
         return
       }
       let self = this
