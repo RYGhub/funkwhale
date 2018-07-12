@@ -162,7 +162,7 @@ First, create the virtualenv and install wheel:
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
-    pip install wheel
+    pip3 install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -180,7 +180,7 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
-    pip install -r api/requirements.txt
+    pip3 install -r api/requirements.txt
 
 .. important::
 
@@ -244,7 +244,7 @@ You should now be able to import the initial database structure:
 
 .. code-block:: shell
 
-    python api/manage.py migrate
+    python3 api/manage.py migrate
 
 This will create the required tables and rows.
 
@@ -269,23 +269,23 @@ You can then create your first user account:
 
 .. code-block:: shell
 
-    python api/manage.py createsuperuser
+    python3 api/manage.py createsuperuser
 
 If you ever want to change a user's password from the command line, just run:
 
 .. code-block:: shell
 
-    python api/manage.py changepassword <user>
+    python3 api/manage.py changepassword <user>
 
 Collect static files
 --------------------
 
 Static files are the static assets used by the API server (icon PNGs, CSS, etc.).
-We need to collect them explicitely, so they can be served by the webserver:
+We need to collect them explicitly, so they can be served by the webserver:
 
 .. code-block:: shell
 
-    python api/manage.py collectstatic
+    python3 api/manage.py collectstatic
 
 This should populate the directory you choose for the ``STATIC_ROOT`` variable
 in your ``.env`` file.
