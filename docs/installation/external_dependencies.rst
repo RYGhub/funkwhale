@@ -45,14 +45,24 @@ Create the project database and user:
     CREATE USER funkwhale;
     GRANT ALL PRIVILEGES ON DATABASE funkwhale TO funkwhale;
 
-Assuming you already have :ref:`created your funkwhale user <create-funkwhale-user>`,
-you should now be able to open a postgresql shell:
-
 .. warning::
 
-    It's importing that you use utf-8 encoding for your database,
+    It's important that you use utf-8 encoding for your database,
     otherwise you'll end up with errors and crashes later on when dealing
     with music metedata that contains non-ascii chars.
+
+
+On Debian you will also need to allow the funkwhale unix user to access the database:
+
+.. code-block:: shell
+
+    cat | sudo tee -a /etc/postgresql/9.5/main/pg_hba.conf << EOF
+    local   all             funkwhale                               peer
+    EOF
+    sudo systemctl restart postgresql
+
+Assuming you already have :ref:`created your funkwhale user <create-funkwhale-user>`,
+you should now be able to open a postgresql shell:
 
 .. code-block:: shell
 
