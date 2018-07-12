@@ -119,30 +119,19 @@ First, switch to the api directory:
     cd api
 
 A few OS packages are required in order to run Funkwhale. On Debian-like
- systems, the list is available in ``api/requirements.apt`` or by running
-``./install_os_dependencies.sh list`` and in ``api/requirements.pac`` on
-Arch.
-
-.. note::
-
-    Ensure you are running the next commands as root or using sudo
-    (and not as the funkwhale) user.
-
-You can install those packages all at once:
-
-On Debian-like systems:
+systems, they can be installed with
 
 .. code-block:: shell
 
-    ./install_os_dependencies.sh install
+    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
 
-On Arch Linux and its derivatives:
+On Arch, run
 
 .. code-block:: shell
 
     pacman -S $(cat api/requirements.pac)
 
-From now on you can switch back to the funkwhale user.
+From now on, you should use the funkwhale user for all commands.
 
 Python dependencies
 --------------------
