@@ -192,7 +192,7 @@ Download the sample environment file:
     curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
 
 You can then edit it: the file is heavily commented, and the most relevant
-configuration options are mentionned at the top of the file.
+configuration options are mentioned at the top of the file.
 
 Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
 how you configured your PostgreSQL and Redis servers in
@@ -201,30 +201,15 @@ how you configured your PostgreSQL and Redis servers in
 
 When you want to run command on the API server, such as to create the
 database or compile static files, you have to ensure you source
-the environment variables.
+the environment variables in that file.
 
 This can be done like this::
 
     export $(cat config/.env | grep -v ^# | xargs)
 
-The easier thing to do is to store this in a script::
-
-    cat > /srv/funkwhale/load_env <<'EOL'
-    #!/bin/bash
-    export $(cat /srv/funkwhale/config/.env | grep -v ^# | xargs)
-    EOL
-    chmod +x /srv/funkwhale/load_env
-
-You should now be able to run the following to populate your environment
-variables easily:
-
-.. code-block:: shell
-
-    source /srv/funkwhale/load_env
-
 .. note::
 
-    Remember to source ``load_env`` whenever you edit your .env file.
+    Remember to reload these variables whenever you edit your .env file.
 
 Database setup
 ---------------
