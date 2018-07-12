@@ -14,7 +14,7 @@ However, Funkwhale is better-suited for small to medium communities and was desi
 - Radios, to discover the music of a given user, artist, genre...
 - Playlists
 - Favorites
-- Broadcasts, as they existed in Grooveshark, for exemple
+- Broadcasts, as they existed in Grooveshark, for example
 - Recommendations
 
 Music acquisition
