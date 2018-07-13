@@ -32,6 +32,39 @@
       <div class="ui hidden divider"></div>
       <div class="ui small text container">
         <h2 class="ui header">
+          <translate>Avatar</translate>
+        </h2>
+        <div class="ui form">
+          <div v-if="avatarErrors.length > 0" class="ui negative message">
+            <div class="header"><translate>We cannot save your avatar</translate></div>
+            <ul class="list">
+              <li v-for="error in avatarErrors">{{ error }}</li>
+            </ul>
+          </div>
+          <div class="ui stackable grid">
+            <div class="ui ten wide column">
+              <h3 class="ui header"><translate>Upload a new avatar</translate></h3>
+              <p><translate>PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
+              <input class="ui input" ref="avatar" type="file" />
+              <div class="ui hidden divider"></div>
+              <button @click="submitAvatar" :class="['ui', {'loading': isLoadingAvatar}, 'button']">
+                <translate>Update avatar</translate>
+              </button>
+            </div>
+            <div class="ui six wide column">
+              <h3 class="ui header"><translate>Current avatar</translate></h3>
+              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" :src="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
+              <div class="ui hidden divider"></div>
+              <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
+                <translate>Remove avatar</translate>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui hidden divider"></div>
+      <div class="ui small text container">
+        <h2 class="ui header">
           <translate>Change my password</translate>
         </h2>
         <div class="ui message">
@@ -97,8 +130,12 @@ export default {
       // properties that will be used in it
       old_password: '',
       new_password: '',
+      currentAvatar: this.$store.state.auth.profile.avatar,
       passwordError: '',
       isLoading: false,
+      isLoadingAvatar: false,
+      avatarErrors: [],
+      avatar: null,
       settings: {
         success: false,
         errors: [],
@@ -145,6 +182,46 @@ export default {
         logger.default.error('Error while updating settings')
         self.isLoading = false
         self.settings.errors = error.backendErrors
+      })
+    },
+    submitAvatar () {
+      this.isLoadingAvatar = true
+      this.avatarErrors = []
+      let self = this
+      this.avatar = this.$refs.avatar.files[0]
+      let formData = new FormData()
+      formData.append('avatar', this.avatar)
+      axios.patch(
+        `users/users/${this.$store.state.auth.username}/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      ).then(response => {
+        this.isLoadingAvatar = false
+        self.currentAvatar = response.data.avatar
+        self.$store.commit('auth/avatar', self.currentAvatar)
+      }, error => {
+        self.isLoadingAvatar = false
+        self.avatarErrors = error.backendErrors
+      })
+    },
+    removeAvatar () {
+      this.isLoadingAvatar = true
+      let self = this
+      this.avatar = null
+      axios.patch(
+        `users/users/${this.$store.state.auth.username}/`,
+        {avatar: null}
+      ).then(response => {
+        this.isLoadingAvatar = false
+        self.currentAvatar = {}
+        self.$store.commit('auth/avatar', self.currentAvatar)
+      }, error => {
+        self.isLoadingAvatar = false
+        self.avatarErrors = error.backendErrors
       })
     },
     submitPassword () {

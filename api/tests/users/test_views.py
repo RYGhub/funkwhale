@@ -235,3 +235,17 @@ def test_user_cannot_patch_another_user(method, logged_in_api_client, factories)
     response = handler(url, payload)
 
     assert response.status_code == 403
+
+
+def test_user_can_patch_their_own_avatar(logged_in_api_client, avatar):
+    user = logged_in_api_client.user
+    url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
+    content = avatar.read()
+    avatar.seek(0)
+    payload = {"avatar": avatar}
+    response = logged_in_api_client.patch(url, payload)
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+
+    assert user.avatar.read() == content

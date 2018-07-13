@@ -1,4 +1,7 @@
 import datetime
+import io
+import PIL
+import random
 import shutil
 import tempfile
 
@@ -258,3 +261,14 @@ def now(mocker):
     now = timezone.now()
     mocker.patch("django.utils.timezone.now", return_value=now)
     return now
+
+
+@pytest.fixture()
+def avatar():
+    i = PIL.Image.new("RGBA", (400, 400), random.choice(["red", "blue", "yellow"]))
+    f = io.BytesIO()
+    i.save(f, "png")
+    f.name = "avatar.png"
+    f.seek(0)
+    yield f
+    f.close()
