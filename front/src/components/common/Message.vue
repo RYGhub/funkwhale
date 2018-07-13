@@ -12,9 +12,6 @@ import $ from 'jquery'
 export default {
   mounted () {
     let self = this
-    $(this.$el).find('.close.icon').on('click', function () {
-      $(self.$el).transition('fade', 125)
-    })
     $(this.$el).on('click', function () {
       $(self.$el).transition('fade', 125)
     })
