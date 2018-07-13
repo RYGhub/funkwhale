@@ -113,8 +113,12 @@ Then we'll download the frontend files:
 
         cd /srv
         rm -r funkwhale
-        git clone https://code.eliotverriot.com/funkwhale/funkwhale funkwhale
-        cd funkwale
+        git clone https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        cd funkwhale
+
+    You'll also need to re-create the folders we make earlier:
+
+        mkdir -p config data/static data/media data/music front
 
     You will still need to get the frontend files as specified before, because
     we're not going to build them.
@@ -183,7 +187,7 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
-    pip3 install -r api/requirements.txt
+    pip install -r api/requirements.txt
 
 .. important::
 
@@ -239,7 +243,7 @@ You should now be able to import the initial database structure:
 
 .. code-block:: shell
 
-    python3 api/manage.py migrate
+    python api/manage.py migrate
 
 This will create the required tables and rows.
 
@@ -264,13 +268,13 @@ You can then create your first user account:
 
 .. code-block:: shell
 
-    python3 api/manage.py createsuperuser
+    python api/manage.py createsuperuser
 
 If you ever want to change a user's password from the command line, just run:
 
 .. code-block:: shell
 
-    python3 api/manage.py changepassword <user>
+    python api/manage.py changepassword <user>
 
 Collect static files
 --------------------
@@ -280,7 +284,7 @@ We need to collect them explicitly, so they can be served by the webserver:
 
 .. code-block:: shell
 
-    python3 api/manage.py collectstatic
+    python api/manage.py collectstatic
 
 This should populate the directory you choose for the ``STATIC_ROOT`` variable
 in your ``.env`` file.
