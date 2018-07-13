@@ -3,6 +3,8 @@ from rest_auth.serializers import PasswordResetSerializer as PRS
 from rest_auth.registration.serializers import RegisterSerializer as RS
 from rest_framework import serializers
 
+from versatileimagefield.serializers import VersatileImageFieldSerializer
+
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
@@ -49,15 +51,29 @@ class UserBasicSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "name", "date_joined"]
 
 
+avatar_field = VersatileImageFieldSerializer(
+    allow_null=True,
+    sizes=[
+        ("original", "url"),
+        ("square_crop", "crop__400x400"),
+        ("medium_square_crop", "crop__200x200"),
+        ("small_square_crop", "crop__50x50"),
+    ],
+)
+
+
 class UserWriteSerializer(serializers.ModelSerializer):
+    avatar = avatar_field
+
     class Meta:
         model = models.User
-        fields = ["name", "privacy_level"]
+        fields = ["name", "privacy_level", "avatar"]
 
 
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
+    avatar = avatar_field
 
     class Meta:
         model = models.User
@@ -71,6 +87,7 @@ class UserReadSerializer(serializers.ModelSerializer):
             "permissions",
             "date_joined",
             "privacy_level",
+            "avatar",
         ]
 
     def get_permissions(self, o):

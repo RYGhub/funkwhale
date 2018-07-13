@@ -1,5 +1,9 @@
+from django.utils.deconstruct import deconstructible
+
 import os
 import shutil
+import uuid
+
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from django.db import transaction
@@ -41,3 +45,22 @@ def set_query_parameter(url, **kwargs):
     new_query_string = urlencode(query_params, doseq=True)
 
     return urlunsplit((scheme, netloc, path, new_query_string, fragment))
+
+
+@deconstructible
+class ChunkedPath(object):
+    def __init__(self, root, preserve_file_name=True):
+        self.root = root
+        self.preserve_file_name = preserve_file_name
+
+    def __call__(self, instance, filename):
+        uid = str(uuid.uuid4())
+        chunk_size = 2
+        chunks = [uid[i : i + chunk_size] for i in range(0, len(uid), chunk_size)]
+        if self.preserve_file_name:
+            parts = chunks[:3] + [filename]
+        else:
+            ext = os.path.splitext(filename)[1][1:].lower()
+            new_filename = "".join(chunks[3:]) + ".{}".format(ext)
+            parts = chunks[:3] + [new_filename]
+        return os.path.join(self.root, *parts)

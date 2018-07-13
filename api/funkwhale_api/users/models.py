@@ -16,7 +16,11 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from versatileimagefield.fields import VersatileImageField
+
 from funkwhale_api.common import fields, preferences
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import validators as common_validators
 
 
 def get_token():
@@ -37,6 +41,9 @@ PERMISSIONS_CONFIGURATION = {
 }
 
 PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
+
+
+get_file_path = common_utils.ChunkedPath("users/avatars", preserve_file_name=False)
 
 
 @python_2_unicode_compatible
@@ -87,6 +94,19 @@ class User(AbstractUser):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+    avatar = VersatileImageField(
+        upload_to=get_file_path,
+        null=True,
+        blank=True,
+        max_length=150,
+        validators=[
+            common_validators.ImageDimensionsValidator(min_width=50, min_height=50),
+            common_validators.FileValidator(
+                allowed_extensions=["png", "jpg", "jpeg", "gif"],
+                max_size=1024 * 1024 * 2,
+            ),
+        ],
     )
 
     def __str__(self):

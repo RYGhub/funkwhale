@@ -94,6 +94,7 @@ THIRD_PARTY_APPS = (
     "django_filters",
     "cacheops",
     "django_cleanup",
+    "versatileimagefield",
 )
 
 
@@ -449,6 +450,7 @@ ACCOUNT_USERNAME_BLACKLIST = [
     "superuser",
     "staff",
     "service",
+    "me",
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)
