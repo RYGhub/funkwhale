@@ -118,7 +118,7 @@ export default {
           ordering: this.getOrderingAsString()
         }
       })
-    }, 500),
+    }, 250),
     fetchData: _.debounce(function () {
       var self = this
       this.isLoading = true

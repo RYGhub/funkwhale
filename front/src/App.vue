@@ -32,6 +32,9 @@
                 <router-link class="item" to="/about">
                   <translate>About this instance</translate>
                 </router-link>
+                <router-link class="item" :to="{name: 'library.request'}">
+                  <translate>Request music</translate>
+                </router-link>
                 <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
                 <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">

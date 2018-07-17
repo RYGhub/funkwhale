@@ -65,7 +65,7 @@ import PasswordInput from '@/components/forms/PasswordInput'
 
 export default {
   props: {
-    invitation: {type: String, required: false, default: null},
+    defaultInvitation: {type: String, required: false, default: null},
     next: {type: String, default: '/'}
   },
   components: {
@@ -78,7 +78,8 @@ export default {
       password: '',
       isLoadingInstanceSetting: true,
       errors: [],
-      isLoading: false
+      isLoading: false,
+      invitation: this.defaultInvitation
     }
   },
   created () {

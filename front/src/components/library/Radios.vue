@@ -4,6 +4,22 @@
       <h2 class="ui header">
         <translate>Browsing radios</translate>
       </h2>
+      <div class="ui hidden divider"></div>
+      <div class="ui row">
+        <h3 class="ui header">
+          <translate>Instance radios</translate>
+        </h3>
+        <div class="ui cards">
+          <radio-card :type="'favorites'"></radio-card>
+          <radio-card :type="'random'"></radio-card>
+          <radio-card :type="'less-listened'"></radio-card>
+        </div>
+      </div>
+
+      <div class="ui hidden divider"></div>
+      <h3 class="ui header">
+        <translate>User radios</translate>
+      </h3>
       <router-link class="ui green basic button" to="/library/radios/build" exact>
         <translate>Create your own radio</translate>
       </router-link>

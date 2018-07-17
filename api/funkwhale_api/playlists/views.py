@@ -24,6 +24,8 @@ class PlaylistViewSet(
         models.Playlist.objects.all()
         .select_related("user")
         .annotate(tracks_count=Count("playlist_tracks"))
+        .with_covers()
+        .with_duration()
     )
     permission_classes = [
         permissions.ConditionalAuthentication,
