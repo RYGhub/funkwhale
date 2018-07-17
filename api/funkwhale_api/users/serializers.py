@@ -45,12 +45,6 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
-class UserBasicSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.User
-        fields = ["id", "username", "name", "date_joined"]
-
-
 avatar_field = VersatileImageFieldSerializer(
     allow_null=True,
     sizes=[
@@ -60,6 +54,14 @@ avatar_field = VersatileImageFieldSerializer(
         ("small_square_crop", "crop__50x50"),
     ],
 )
+
+
+class UserBasicSerializer(serializers.ModelSerializer):
+    avatar = avatar_field
+
+    class Meta:
+        model = models.User
+        fields = ["id", "username", "name", "date_joined", "avatar"]
 
 
 class UserWriteSerializer(serializers.ModelSerializer):

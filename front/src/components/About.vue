@@ -3,10 +3,10 @@
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <template v-if="instance.name.value" :template-params="{instance: instance.name}">
+            <translate v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
              About %{ instance }
-            </template>
-            <template v-else="instance.name.value"><translate>About this instance</translate></template>
+            </translate>
+            <translate v-else>About this instance</translate>
         </h1>
         <stats></stats>
       </div>

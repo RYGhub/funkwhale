@@ -5,7 +5,7 @@
     </td>
     <td>
       <img class="ui mini image" v-if="track.album.cover" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover)">
-      <img class="ui mini image" v-else src="../../..//assets/audio/default-cover.png">
+      <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
     </td>
     <td colspan="6">
       <router-link class="track" :to="{name: 'library.tracks.detail', params: {id: track.id }}">

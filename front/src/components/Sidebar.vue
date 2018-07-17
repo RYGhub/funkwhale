@@ -2,7 +2,7 @@
 <div :class="['ui', 'vertical', 'left', 'visible', 'wide', {'collapsed': isCollapsed}, 'sidebar',]">
   <div class="ui inverted segment header-wrapper">
     <search-bar @search="isCollapsed = false">
-      <router-link :title="'Funkwhale'" :to="{name: 'index'}">
+      <router-link :title="'Funkwhale'" :to="{name: logoUrl}">
         <i class="logo bordered inverted orange big icon">
           <logo class="logo"></logo>
         </i>
@@ -39,7 +39,7 @@
               <translate :translate-params="{username: $store.state.auth.username}">
                 Logged in as %{ username }
               </translate>
-              <img class="ui avatar right floated circular mini image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
+              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
             <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
@@ -237,6 +237,13 @@ export default {
       set (value) {
         this.tracksChangeBuffer = value
       }
+    },
+    logoUrl () {
+      if (this.$store.state.auth.authenticated) {
+        return 'library.index'
+      } else {
+        return 'index'
+      }
     }
   },
   methods: {
@@ -433,8 +440,9 @@ $sidebar-color: #3d3e3f;
     }
   }
 }
-.avatar {
+.ui.tiny.avatar.image {
   position: relative;
   top: -0.5em;
+  width: 3em;
 }
 </style>

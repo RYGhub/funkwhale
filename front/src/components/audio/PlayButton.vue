@@ -1,22 +1,23 @@
 <template>
-  <div :title="title" :class="['ui', {'tiny': discrete}, 'buttons']">
+  <span :title="title" :class="['ui', {'tiny': discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
     <button
+      v-if="!dropdownOnly"
       :title="labels.addToQueue"
       @click="addNext(true)"
       :disabled="!playable"
-      :class="['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}, 'button']">
-      <i class="ui play icon"></i>
-      <template v-if="!discrete"><slot><translate>Play</translate></slot></template>
+      :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
+      <i :class="[playIconClass, 'icon']"></i>
+      <template v-if="!discrete && !iconOnly"><slot><translate>Play</translate></slot></template>
     </button>
-    <div v-if="!discrete" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', 'icon', 'button']">
-      <i class="dropdown icon"></i>
+    <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
+      <i :class="dropdownIconClasses.concat(['icon'])"></i>
       <div class="menu">
         <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i><translate>Add to queue</translate></div>
         <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i><translate>Play next</translate></div>
         <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i><translate>Play now</translate></div>
       </div>
     </div>
-  </div>
+  </span>
 </template>
 
 <script>
@@ -28,8 +29,13 @@ export default {
     // we can either have a single or multiple tracks to play when clicked
     tracks: {type: Array, required: false},
     track: {type: Object, required: false},
+    dropdownIconClasses: {type: Array, required: false, default: () => { return ['dropdown'] }},
+    playIconClass: {type: String, required: false, default: 'play icon'},
+    buttonClasses: {type: Array, required: false, default: () => { return ['button'] }},
     playlist: {type: Object, required: false},
     discrete: {type: Boolean, default: false},
+    dropdownOnly: {type: Boolean, default: false},
+    iconOnly: {type: Boolean, default: false},
     artist: {type: Number, required: false},
     album: {type: Number, required: false}
   },

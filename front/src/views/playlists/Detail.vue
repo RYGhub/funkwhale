@@ -9,14 +9,15 @@
           <i class="circular inverted list yellow icon"></i>
           <div class="content">
             {{ playlist.name }}
-            <translate
-              tag="div"
-              class="sub header"
-              translate-plural="Playlist containing %{ count } tracks, by %{ username }"
-              :translate-n="playlistTracks.length"
-              :translate-params="{count: playlistTracks.length, username: playlist.user.username}">
-              Playlist containing %{ count } track, by %{ username }
-            </translate>
+            <div class="sub header">
+              <translate
+                translate-plural="Playlist containing %{ count } tracks, by %{ username }"
+                :translate-n="playlistTracks.length"
+                :translate-params="{count: playlistTracks.length, username: playlist.user.username}">
+                Playlist containing %{ count } track, by %{ username }
+              </translate><br>
+              <duration :seconds="playlist.duration" />
+            </div>
           </div>
         </h2>
         <div class="ui hidden divider"></div>
