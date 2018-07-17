@@ -2,7 +2,7 @@ Optimizing your Funkwhale instance
 ==================================
 
 Depending on your requirements, you may want to reduce as much as possible
-Funkwhale's footprint.
+Funkwhale's memory footprint.
 
 Reduce workers concurrency
 --------------------------
@@ -14,9 +14,9 @@ memory usage.
 You can control this behaviour using the ``--concurrency`` flag.
 For instance, setting ``--concurrency=1`` will spawn only one worker.
 
-This flag should be appended after the ``celery -A funkwhale_api.taskapp worker``
-command in your :file:`docker-compose.yml` file if your using Docker, or in your
-:file:`/etc/systemd/system/funkwhale-worker.service` otherwise.
+This flag should be appended after the ``celery -A funkwhale_api.taskapp
+worker`` command in your :file:`docker-compose.yml` file if your using Docker,
+or in your :file:`/etc/systemd/system/funkwhale-worker.service` otherwise.
 
 .. note::
 
@@ -33,5 +33,5 @@ Using the ``solo`` pool type should reduce your memory consumption.
 You can control this behaviour using the ``--pool=solo`` flag.
 
 This flag should be appended after the ``celery -A funkwhale_api.taskapp worker``
-command in your :file:`docker-compose.yml` file if your using Docker, or in your
-:file:`/etc/systemd/system/funkwhale-worker.service` otherwise.
+command in your :file:`docker-compose.yml` file if you're using Docker, or in
+your :file:`/etc/systemd/system/funkwhale-worker.service` otherwise.

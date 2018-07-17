@@ -106,6 +106,24 @@ Then we'll download the frontend files:
     mv extracted/front .
     rm -rf extracted
 
+.. note::
+
+    You can also choose to get the code directly from the git repo. In this
+    case, run
+
+        cd /srv
+        rm -r funkwhale
+        git clone https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        cd funkwhale
+
+    You'll also need to re-create the folders we make earlier:
+
+        mkdir -p config data/static data/media data/music front
+
+    You will still need to get the frontend files as specified before, because
+    we're not going to build them.
+
+
 You can leave the ZIP archives in the directory, this will help you know
 which version you've installed next time you want to upgrade your installation.
 
@@ -119,30 +137,19 @@ First, switch to the api directory:
     cd api
 
 A few OS packages are required in order to run Funkwhale. On Debian-like
- systems, the list is available in ``api/requirements.apt`` or by running
-``./install_os_dependencies.sh list`` and in ``api/requirements.pac`` on
-Arch.
-
-.. note::
-
-    Ensure you are running the next commands as root or using sudo
-    (and not as the funkwhale) user.
-
-You can install those packages all at once:
-
-On Debian-like systems:
+systems, they can be installed with
 
 .. code-block:: shell
 
-    ./install_os_dependencies.sh install
+    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
 
-On Arch Linux and its derivatives:
+On Arch, run
 
 .. code-block:: shell
 
     pacman -S $(cat api/requirements.pac)
 
-From now on you can switch back to the funkwhale user.
+From now on, you should use the funkwhale user for all commands.
 
 Python dependencies
 --------------------
@@ -162,7 +169,7 @@ First, create the virtualenv and install wheel:
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
-    pip install wheel
+    pip3 install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -202,8 +209,15 @@ Download the sample environment file:
 
     curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
 
+.. note::
+
+    if you used git to get the latest version of the code earlier, you can instead do
+
+        cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
+
+
 You can then edit it: the file is heavily commented, and the most relevant
-configuration options are mentionned at the top of the file.
+configuration options are mentioned at the top of the file.
 
 Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
 how you configured your PostgreSQL and Redis servers in
@@ -212,30 +226,15 @@ how you configured your PostgreSQL and Redis servers in
 
 When you want to run command on the API server, such as to create the
 database or compile static files, you have to ensure you source
-the environment variables.
+the environment variables in that file.
 
 This can be done like this::
 
     export $(cat config/.env | grep -v ^# | xargs)
 
-The easier thing to do is to store this in a script::
-
-    cat > /srv/funkwhale/load_env <<'EOL'
-    #!/bin/bash
-    export $(cat /srv/funkwhale/config/.env | grep -v ^# | xargs)
-    EOL
-    chmod +x /srv/funkwhale/load_env
-
-You should now be able to run the following to populate your environment
-variables easily:
-
-.. code-block:: shell
-
-    source /srv/funkwhale/load_env
-
 .. note::
 
-    Remember to source ``load_env`` whenever you edit your .env file.
+    Remember to reload these variables whenever you edit your .env file.
 
 Database setup
 ---------------
@@ -281,7 +280,7 @@ Collect static files
 --------------------
 
 Static files are the static assets used by the API server (icon PNGs, CSS, etc.).
-We need to collect them explicitely, so they can be served by the webserver:
+We need to collect them explicitly, so they can be served by the webserver:
 
 .. code-block:: shell
 
