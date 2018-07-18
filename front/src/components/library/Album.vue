@@ -4,7 +4,7 @@
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="album">
-      <div :class="['ui', 'head', {'with-background': album.cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
+      <div :class="['ui', 'head', {'with-background': album.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted sound yellow icon"></i>
@@ -98,10 +98,10 @@ export default {
       return 'https://musicbrainz.org/release/' + this.album.mbid
     },
     headerStyle () {
-      if (!this.album.cover) {
+      if (!this.album.cover.original) {
         return ''
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover.original) + ')'
     }
   },
   watch: {

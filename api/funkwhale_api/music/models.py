@@ -15,7 +15,9 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
+
 from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import downloader, musicbrainz
 from funkwhale_api.federation import utils as federation_utils
@@ -641,3 +643,13 @@ def update_request_status(sender, instance, created, **kwargs):
         # let's mark the request as imported since the import is over
         instance.import_request.status = "imported"
         return instance.import_request.save(update_fields=["status"])
+
+
+@receiver(models.signals.post_save, sender=Album)
+def warm_album_covers(sender, instance, **kwargs):
+    if not instance.cover:
+        return
+    album_covers_warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"
+    )
+    num_created, failed_to_create = album_covers_warmer.warm()

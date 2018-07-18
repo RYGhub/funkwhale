@@ -3,9 +3,11 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'large', 'angle up', 'icon']">
+    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle up', 'icon']">
     </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'large', 'angle down', 'icon']">
+    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle down', 'icon']">
+    </i>
+    <i @click="fetchData(url)" :class="['ui', 'circular', 'medium', 'refresh', 'icon']">
     </i>
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
@@ -75,3 +77,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.refresh.icon {
+  float: right;
+}
+</style>

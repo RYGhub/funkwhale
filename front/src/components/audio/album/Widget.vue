@@ -3,9 +3,9 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'large', 'angle left', 'icon']">
+    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle left', 'icon']">
     </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'large', 'angle right', 'icon']">
+    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle right', 'icon']">
     </i>
     <div class="ui hidden divider"></div>
     <div class="ui five cards">
@@ -13,7 +13,7 @@
         <div class="ui loader"></div>
       </div>
       <div class="card" v-for="album in albums" :key="album.id">
-        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover}]" :style="getImageStyle(album)">
+        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" :style="getImageStyle(album)">
           <play-button class="play-overlay" :icon-only="true" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
         </div>
         <div class="content">
@@ -92,8 +92,8 @@ export default {
     getImageStyle (album) {
       let url = '../../../assets/audio/default-cover.png'
 
-      if (album.cover) {
-        url = this.$store.getters['instance/absoluteUrl'](album.cover)
+      if (album.cover.original) {
+        url = this.$store.getters['instance/absoluteUrl'](album.cover.medium_square_crop)
       } else {
         return {}
       }

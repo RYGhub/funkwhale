@@ -18,7 +18,11 @@ class TrackFavoriteViewSet(
 ):
 
     serializer_class = serializers.UserTrackFavoriteSerializer
-    queryset = models.TrackFavorite.objects.all()
+    queryset = (
+        models.TrackFavorite.objects.all()
+        .select_related("track__artist", "track__album__artist", "user")
+        .prefetch_related("track__files")
+    )
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
