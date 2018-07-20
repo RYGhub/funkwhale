@@ -194,6 +194,7 @@ html, body {
 .main.pusher, .footer {
   @include media(">desktop") {
     margin-left: 350px !important;
+    margin-top: 50px;
   }
   transform: none !important;
 }
