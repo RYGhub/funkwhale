@@ -15,7 +15,7 @@
         accept="audio/*"
         v-model="files"
         name="audio_file"
-        :thread="3"
+        :thread="1"
         @input-filter="inputFilter"
         @input-file="inputFile"
         ref="upload">
