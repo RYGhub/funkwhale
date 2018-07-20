@@ -1,6 +1,7 @@
 from django.db.models import Q
 from rest_framework import serializers
 from taggit.models import Tag
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.users.serializers import UserBasicSerializer
@@ -8,8 +9,12 @@ from funkwhale_api.users.serializers import UserBasicSerializer
 from . import models, tasks
 
 
+cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+
+
 class ArtistAlbumSerializer(serializers.ModelSerializer):
     tracks_count = serializers.SerializerMethodField()
+    cover = cover_field
 
     class Meta:
         model = models.Album
@@ -87,6 +92,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.SerializerMethodField()
     artist = ArtistSimpleSerializer(read_only=True)
+    cover = cover_field
 
     class Meta:
         model = models.Album
@@ -111,6 +117,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 class TrackAlbumSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
+    cover = cover_field
 
     class Meta:
         model = models.Album
@@ -156,6 +163,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class SimpleAlbumSerializer(serializers.ModelSerializer):
+    cover = cover_field
+
     class Meta:
         model = models.Album
         fields = ("id", "mbid", "title", "release_date", "cover")

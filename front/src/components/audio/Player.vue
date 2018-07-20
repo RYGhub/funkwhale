@@ -14,7 +14,7 @@
       <div v-if="currentTrack" class="track-area ui unstackable items">
         <div class="ui inverted item">
           <div class="ui tiny image">
-            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover)">
+            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
             <img v-else src="../../assets/audio/default-cover.png">
           </div>
           <div class="middle aligned content">

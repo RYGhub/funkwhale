@@ -12,7 +12,12 @@ def test_artist_album_serializer(factories, to_api_date):
         "artist": album.artist.id,
         "creation_date": to_api_date(album.creation_date),
         "tracks_count": 1,
-        "cover": album.cover.url,
+        "cover": {
+            "original": album.cover.url,
+            "square_crop": album.cover.crop["400x400"].url,
+            "medium_square_crop": album.cover.crop["200x200"].url,
+            "small_square_crop": album.cover.crop["50x50"].url,
+        },
         "release_date": to_api_date(album.release_date),
     }
     serializer = serializers.ArtistAlbumSerializer(album)
@@ -83,7 +88,12 @@ def test_album_serializer(factories, to_api_date):
         "title": album.title,
         "artist": serializers.ArtistSimpleSerializer(album.artist).data,
         "creation_date": to_api_date(album.creation_date),
-        "cover": album.cover.url,
+        "cover": {
+            "original": album.cover.url,
+            "square_crop": album.cover.crop["400x400"].url,
+            "medium_square_crop": album.cover.crop["200x200"].url,
+            "small_square_crop": album.cover.crop["50x50"].url,
+        },
         "release_date": to_api_date(album.release_date),
         "tracks": serializers.AlbumTrackSerializer([track2, track1], many=True).data,
     }

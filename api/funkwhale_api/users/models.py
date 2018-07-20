@@ -11,12 +11,14 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api.common import fields, preferences
 from funkwhale_api.common import utils as common_utils
@@ -205,3 +207,13 @@ class Invitation(models.Model):
             )
 
         return super().save(**kwargs)
+
+
+@receiver(models.signals.post_save, sender=User)
+def warm_user_avatar(sender, instance, **kwargs):
+    if not instance.avatar:
+        return
+    user_avatar_warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
+    )
+    num_created, failed_to_create = user_avatar_warmer.warm()

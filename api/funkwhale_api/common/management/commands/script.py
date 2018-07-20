@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         name = options["script_name"]
         if not name:
-            self.show_help()
+            return self.show_help()
 
         available_scripts = self.get_scripts()
         try:

@@ -471,3 +471,13 @@ MUSIC_DIRECTORY_SERVE_PATH = env(
 USERS_INVITATION_EXPIRATION_DAYS = env.int(
     "USERS_INVITATION_EXPIRATION_DAYS", default=14
 )
+
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "square": [
+        ("original", "url"),
+        ("square_crop", "crop__400x400"),
+        ("medium_square_crop", "crop__200x200"),
+        ("small_square_crop", "crop__50x50"),
+    ]
+}
+VERSATILEIMAGEFIELD_SETTINGS = {"create_images_on_demand": False}

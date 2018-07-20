@@ -3,9 +3,11 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'large', 'angle up', 'icon']">
+    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle up', 'icon']">
     </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'large', 'angle down', 'icon']">
+    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle down', 'icon']">
+    </i>
+    <i @click="fetchData(url)" :class="['ui', 'circular', 'medium', 'refresh', 'icon']">
     </i>
     <div class="ui divided unstackable items">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -13,7 +15,7 @@
       </div>
       <div class="item" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
-          <img v-if="object.track.album.cover" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover)">
+          <img v-if="object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
           <img v-else src="../../../assets/audio/default-cover.png">
           <play-button class="play-overlay" :icon-only="true" :button-classes="['ui', 'circular', 'tiny', 'orange', 'icon', 'button']" :track="object.track"></play-button>
         </div>
@@ -120,5 +122,8 @@ export default {
     top: 2.5em;
     left: 2.5em;
   }
+}
+.refresh.icon {
+  float: right;
 }
 </style>

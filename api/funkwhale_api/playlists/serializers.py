@@ -107,7 +107,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
         covers = []
         max_covers = 5
         for plt in plts:
-            url = plt.track.album.cover.url
+            url = plt.track.album.cover.crop["200x200"].url
             if url in covers:
                 continue
             covers.append(url)

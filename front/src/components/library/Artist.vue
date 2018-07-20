@@ -158,10 +158,10 @@ export default {
       })[0]
     },
     headerStyle () {
-      if (!this.cover) {
+      if (!this.cover.original) {
         return ''
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover.original) + ')'
     }
   },
   watch: {

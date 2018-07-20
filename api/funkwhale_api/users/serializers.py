@@ -45,15 +45,7 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
-avatar_field = VersatileImageFieldSerializer(
-    allow_null=True,
-    sizes=[
-        ("original", "url"),
-        ("square_crop", "crop__400x400"),
-        ("medium_square_crop", "crop__200x200"),
-        ("small_square_crop", "crop__50x50"),
-    ],
-)
+avatar_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
 
 
 class UserBasicSerializer(serializers.ModelSerializer):

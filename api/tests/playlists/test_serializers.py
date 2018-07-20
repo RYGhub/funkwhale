@@ -80,11 +80,11 @@ def test_playlist_serializer_include_covers(factories, api_request):
     qs = playlist.__class__.objects.with_covers().with_tracks_count()
 
     expected = [
-        request.build_absolute_uri(t1.album.cover.url),
-        request.build_absolute_uri(t2.album.cover.url),
-        request.build_absolute_uri(t4.album.cover.url),
-        request.build_absolute_uri(t5.album.cover.url),
-        request.build_absolute_uri(t6.album.cover.url),
+        request.build_absolute_uri(t1.album.cover.crop["200x200"].url),
+        request.build_absolute_uri(t2.album.cover.crop["200x200"].url),
+        request.build_absolute_uri(t4.album.cover.crop["200x200"].url),
+        request.build_absolute_uri(t5.album.cover.crop["200x200"].url),
+        request.build_absolute_uri(t6.album.cover.crop["200x200"].url),
     ]
 
     serializer = serializers.PlaylistSerializer(qs.get(), context={"request": request})

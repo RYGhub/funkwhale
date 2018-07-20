@@ -133,7 +133,7 @@
           <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>
               <td class="center aligned">
-                  <img class="ui mini image" v-if="track.album.cover" :src="$store.getters['instance/absoluteUrl'](track.album.cover)">
+                  <img class="ui mini image" v-if="track.album.cover && track.album.cover.original" :src="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
                   <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
