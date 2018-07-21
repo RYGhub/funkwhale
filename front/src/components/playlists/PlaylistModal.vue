@@ -7,15 +7,15 @@
       <div class="description">
         <template v-if="track">
           <h4 class="ui header"><translate>Current track</translate></h4>
-          <div
+          <translate
             v-translate="{artist: track.artist.name, title: track.title}"
-            :template-params="{artist: track.artist.name, title: track.title}">
+            :translate-params="{artist: track.artist.name, title: track.title}">
             "%{ title }", by %{ artist }
-          </div>
+          </translate>
           <div class="ui divider"></div>
         </template>
 
-        <playlist-form></playlist-form>
+        <playlist-form :key="formKey"></playlist-form>
         <div class="ui divider"></div>
         <div v-if="errors.length > 0" class="ui negative message">
           <div class="header"><translate>We cannot add the track to a playlist</translate></div>
@@ -82,6 +82,7 @@ export default {
   },
   data () {
     return {
+      formKey: String(new Date()),
       errors: []
     }
   },
@@ -124,6 +125,9 @@ export default {
   watch: {
     '$store.state.route.path' () {
       this.$store.commit('playlists/showModal', false)
+    },
+    '$store.state.playlists.showModal' () {
+      this.formKey = String(new Date())
     }
   }
 }
