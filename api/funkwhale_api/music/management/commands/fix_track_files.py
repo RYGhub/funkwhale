@@ -1,4 +1,3 @@
-import cacheops
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
@@ -24,7 +23,6 @@ class Command(BaseCommand):
         self.fix_mimetypes(**options)
         self.fix_file_data(**options)
         self.fix_file_size(**options)
-        cacheops.invalidate_model(models.TrackFile)
 
     @transaction.atomic
     def fix_mimetypes(self, dry_run, **kwargs):
