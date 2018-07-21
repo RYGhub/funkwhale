@@ -143,7 +143,6 @@ test_api:
     DJANGO_ALLOWED_HOSTS: "localhost"
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
     FUNKWHALE_URL: "https://funkwhale.ci"
-    CACHEOPS_ENABLED: "false"
     DJANGO_SETTINGS_MODULE: config.settings.local
   only:
     - branches

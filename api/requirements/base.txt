@@ -58,7 +58,6 @@ python-magic==0.4.15
 ffmpeg-python==0.1.10
 channels>=2,<2.1
 channels_redis>=2.1,<2.2
-django-cacheops>=4,<4.1
 
 daphne==2.0.4
 cryptography>=2,<3
