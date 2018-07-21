@@ -6,7 +6,17 @@
           <translate>Builder</translate>
         </h2>
         <p><translate>You can use this interface to build your own custom radio, which will play tracks according to your criteria.</translate></p>
-          <div class="ui form">
+        <div class="ui form">
+          <div v-if="success" class="ui positive message">
+            <div class="header">
+              <template v-if="radioName">
+                <translate>Radio updated</translate>
+              </template>
+              <template v-else>
+                <translate>Radio created</translate>
+              </template>
+            </div>
+          </div>
           <div class="inline fields">
             <div class="field">
               <label for="name"><translate>Radio name</translate></label>
@@ -16,7 +26,7 @@
               <input id="public" type="checkbox" v-model="isPublic" />
               <label for="public"><translate>Display publicly</translate></label>
             </div>
-            <button :disabled="!canSave" @click="save" class="ui green button">
+            <button :disabled="!canSave" @click="save" :class="['ui', 'green', {loading: isLoading}, 'button']">
               <translate>Save</translate>
             </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
@@ -96,6 +106,8 @@ export default {
   },
   data: function () {
     return {
+      isLoading: false,
+      success: false,
       availableFilters: [],
       currentFilterType: null,
       filters: [],
@@ -141,6 +153,7 @@ export default {
     },
     fetch: function () {
       let self = this
+      self.isLoading = true
       let url = 'radios/radios/' + this.id + '/'
       axios.get(url).then((response) => {
         self.filters = response.data.config.map(f => {
@@ -152,6 +165,7 @@ export default {
         })
         self.radioName = response.data.name
         self.isPublic = response.data.is_public
+        self.isLoading = false
       })
     },
     fetchCandidates: function () {
@@ -173,6 +187,9 @@ export default {
     },
     save: function () {
       let self = this
+      self.success = false
+      self.isLoading = true
+
       let final = this.filters.map(f => {
         let c = _.clone(f.config)
         c.type = f.filter.type
@@ -186,10 +203,14 @@ export default {
       if (this.id) {
         let url = 'radios/radios/' + this.id + '/'
         axios.put(url, final).then((response) => {
+          self.isLoading = false
+          self.success = true
         })
       } else {
         let url = 'radios/radios/'
         axios.post(url, final).then((response) => {
+          self.success = true
+          self.isLoading = false
           self.$router.push({
             name: 'library.radios.detail',
             params: {
