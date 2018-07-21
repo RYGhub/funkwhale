@@ -107,6 +107,13 @@ class PlaylistSerializer(serializers.ModelSerializer):
         covers = []
         max_covers = 5
         for plt in plts:
+            if not hasattr(plt.track.album.cover, "crop"):
+                # In some rare situations, we end up with the following stack strace:
+                # AttributeError: 'VersatileImageFieldFile' object has no attribute 'crop'
+                # I tend to thing our complex prefetch logic is troubling for versatile
+                # image field, so wi initialize the missing attribute by hand, cf
+                # https://github.com/respondcreate/django-versatileimagefield/blob/1.9/versatileimagefield/mixins.py#L108
+                plt.track.album.cover.build_filters_and_sizers((0.5, 0, 5), False)
             url = plt.track.album.cover.crop["200x200"].url
             if url in covers:
                 continue
