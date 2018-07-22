@@ -2,11 +2,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-17 19:29+0200\n"
+"POT-Creation-Date: 2018-07-22 14:12+0200\n"
 "PO-Revision-Date: 2018-07-21 21:30+0000\n"
 "Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
-"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
-"front/fr/>\n"
+"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +45,7 @@ msgid_plural "%{ count } tracks in %{ albumsCount } albums"
 msgstr[0] "%{ count } piste dans %{ albumsCount } albums"
 msgstr[1] "%{ count } pistes dans %{ albumsCount } albums"
 
-#: front/src/components/library/radios/Builder.vue:66
+#: front/src/components/library/radios/Builder.vue:76
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } piste correspondant aux filtres sélectionnés"
@@ -150,7 +149,7 @@ msgstr[1] "L'action %{ action } a été lancée avec succès sur %{ count } él�
 
 #: front/src/components/common/ActionTable.vue:8
 #: front/src/components/federation/LibraryFollowTable.vue:24
-#: front/src/components/library/radios/Builder.vue:50
+#: front/src/components/library/radios/Builder.vue:60
 #: front/src/components/manage/library/RequestsTable.vue:54
 msgid "Actions"
 msgstr "Actions"
@@ -172,11 +171,11 @@ msgstr "Acteur"
 msgid "Add a new library"
 msgstr "Ajouter une nouvelle bibliothèque"
 
-#: front/src/components/library/radios/Builder.vue:36
+#: front/src/components/library/radios/Builder.vue:46
 msgid "Add filter"
 msgstr "Ajouter des filtres"
 
-#: front/src/components/library/radios/Builder.vue:26
+#: front/src/components/library/radios/Builder.vue:36
 msgid "Add filters to customize your radio"
 msgstr "Ajouter des filtres pour personnaliser votre radio"
 
@@ -198,7 +197,7 @@ msgstr "Ajouter à une playlist..."
 msgid "Add to queue"
 msgstr "Ajouter à la queue"
 
-#: front/src/components/playlists/PlaylistModal.vue:115
+#: front/src/components/playlists/PlaylistModal.vue:116
 msgid "Add to this playlist"
 msgstr "Ajouter à cette playlist"
 
@@ -261,9 +260,7 @@ msgstr "Une erreur s'est produite pendant l'enregistrement de vos modifications"
 
 #: front/src/components/auth/Login.vue:10
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
-msgstr ""
-"Une erreur inconnue a été rencontrée, ce qui peut signifier que le serveur "
-"est en panne ou n’a pas pu être atteint"
+msgstr "Une erreur inconnue a été rencontrée, ce qui peut signifier que le serveur est en panne ou n’a pas pu être atteint"
 
 #: front/src/components/federation/LibraryTrackTable.vue:11
 #: front/src/components/library/import/BatchDetail.vue:68
@@ -420,7 +417,7 @@ msgstr "Si vous confirmez, %{ username } se verra accorder l'accès à votre bit
 msgid "Cancel"
 msgstr "Annuler"
 
-#: front/src/components/library/radios/Builder.vue:49
+#: front/src/components/library/radios/Builder.vue:59
 msgid "Candidates"
 msgstr "Pistes candidates"
 
@@ -511,7 +508,7 @@ msgstr "Réduire"
 msgid "Comment"
 msgstr "Commentaire"
 
-#: front/src/components/library/radios/Builder.vue:48
+#: front/src/components/library/radios/Builder.vue:58
 msgid "Config"
 msgstr "Configuration"
 
@@ -621,9 +618,7 @@ msgstr "Détail"
 
 #: front/src/views/admin/users/UsersDetail.vue:146
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
-msgstr ""
-"Détermine si le compte utilisateur est actif ou non. Les comptes inactifs ne "
-"peuvent pas se connecter ou utiliser le service."
+msgstr "Détermine si le compte utilisateur est actif ou non. Les comptes inactifs ne peuvent pas se connecter ou utiliser le service."
 
 #: front/src/components/auth/Settings.vue:104
 #: front/src/components/auth/SubsonicTokenForm.vue:52
@@ -642,7 +637,7 @@ msgstr "Désactiver l'accès à l'API Subsonic ?"
 msgid "Discover how to use Funkwhale from other apps"
 msgstr "Découvrez comment utiliser Funkwhale sur d'autres applications"
 
-#: front/src/components/library/radios/Builder.vue:16
+#: front/src/components/library/radios/Builder.vue:26
 msgid "Display publicly"
 msgstr "Afficher publiquement"
 
@@ -659,7 +654,8 @@ msgid "Do you want to delete the playlist \"%{ playlist }\"?"
 msgstr "Voulez-vous supprimer la playlist \"%{ playlist }\" ?"
 
 #: front/src/views/radios/Detail.vue:26
-msgid "Do you want to delete the radio \"{{ radio }}\"?"
+#, fuzzy
+msgid "Do you want to delete the radio \"%{ radio }\"?"
 msgstr "Voulez-vous supprimer la radio \"%{ radio }\" ?"
 
 #: front/src/components/common/ActionTable.vue:29
@@ -813,7 +809,7 @@ msgstr "Tout le monde"
 msgid "Everyone on this instance"
 msgstr "Tout le monde sur cette instance"
 
-#: front/src/components/library/radios/Builder.vue:47
+#: front/src/components/library/radios/Builder.vue:57
 msgid "Exclude"
 msgstr "Exclure"
 
@@ -880,7 +876,7 @@ msgstr "Fichiers"
 msgid "Filter album types"
 msgstr "Filtrer le type d'album"
 
-#: front/src/components/library/radios/Builder.vue:46
+#: front/src/components/library/radios/Builder.vue:56
 msgid "Filter name"
 msgstr "Nom du filtre"
 
@@ -986,6 +982,10 @@ msgstr "Retourner à la page d'accueil"
 #: front/src/components/library/import/Main.vue:13
 msgid "Grab corresponding metadata"
 msgstr "Récupérer les métadonnées correspondantes"
+
+#: front/src/App.vue:74
+msgid "Help us translate Funkwhale"
+msgstr ""
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
@@ -1176,9 +1176,7 @@ msgstr "Gardez une trace de vos chansons favorites"
 
 #: front/src/components/audio/track/Table.vue:33
 msgid "Keep your PRIVATE_TOKEN secret as it gives access to your account."
-msgstr ""
-"Gardez votre PRIVATE_TOKEN secret étant donné qu'il permet l'accès à votre "
-"compte."
+msgstr "Gardez votre PRIVATE_TOKEN secret étant donné qu'il permet l'accès à votre compte."
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/views/admin/users/UsersDetail.vue:45
@@ -1362,7 +1360,7 @@ msgstr "Mon compte"
 msgid "My awesome playlist"
 msgstr "Ma playlist d'enfer"
 
-#: front/src/components/library/radios/Builder.vue:206
+#: front/src/components/library/radios/Builder.vue:227
 msgid "My awesome radio"
 msgstr "Ma radio d'enfer"
 
@@ -1658,12 +1656,22 @@ msgstr "La queue a été mélangée !"
 msgid "Radio"
 msgstr "Radio"
 
-#: front/src/components/library/radios/Builder.vue:205
+#: front/src/components/library/radios/Builder.vue:226
 msgid "Radio Builder"
 msgstr "Éditeur de radio"
 
-#: front/src/components/library/radios/Builder.vue:11
+#: front/src/components/library/radios/Builder.vue:15
+#, fuzzy
+msgid "Radio created"
+msgstr "Nom de la radio"
+
+#: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
+msgstr "Nom de la radio"
+
+#: front/src/components/library/radios/Builder.vue:12
+#, fuzzy
+msgid "Radio updated"
 msgstr "Nom de la radio"
 
 #: front/src/components/library/Library.vue:10
@@ -1776,7 +1784,7 @@ msgid "Results per page"
 msgstr "Résultats par page"
 
 #: front/src/components/admin/SettingsGroup.vue:63
-#: front/src/components/library/radios/Builder.vue:19
+#: front/src/components/library/radios/Builder.vue:29
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -1857,7 +1865,7 @@ msgstr "Recherche"
 msgid "Sections"
 msgstr "Sections"
 
-#: front/src/components/library/radios/Builder.vue:31
+#: front/src/components/library/radios/Builder.vue:41
 msgid "Select a filter"
 msgstr "Sélectionner un filtre"
 
@@ -1947,8 +1955,7 @@ msgstr "Inscription"
 
 #: front/src/components/audio/track/Table.vue:31
 msgid "Simply copy paste the snippet below into a terminal to launch the download."
-msgstr ""
-"Copiez le texte ci-dessous dans un terminal pour lancer le téléchargement."
+msgstr "Copiez le texte ci-dessous dans un terminal pour lancer le téléchargement."
 
 #: front/src/components/library/Track.vue:69
 #: front/src/components/library/import/FileUpload.vue:44
@@ -2126,7 +2133,7 @@ msgstr "Cela supprimera définitivement cette radio et ne pourra pas être annul
 msgid "This will completely disable access to the Subsonic API using from account."
 msgstr "Cela désactivera complétement l'accès à l'API Subsonic depuis votre compte."
 
-#: front/src/App.vue:133
+#: front/src/App.vue:137
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr "Cela va effacer vos données locales et vous déconnecter, voulez-vous continuer ?"
 
@@ -2409,9 +2416,7 @@ msgstr "Vous devez choisir une instance pour continuer"
 
 #: front/src/components/auth/Settings.vue:100
 msgid "You will be logged out from this session and have to log in with the new one"
-msgstr ""
-"Vous allez être déconnecté⋅e de cette session et vous allez devoir vous "
-"connecter avec votre nouveau mot de passe"
+msgstr "Vous allez être déconnecté⋅e de cette session et vous allez devoir vous connecter avec votre nouveau mot de passe"
 
 #: front/src/components/auth/Settings.vue:71
 msgid "You will have to update your password on your clients that use this password."
