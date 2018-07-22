@@ -232,7 +232,7 @@ In the end, the ``volumes`` directives of your containers should look like that:
 
 
 Removed Cacheops dependency
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We removed one of our dependency named django-cacheops. It was unly used in a few places,
 and not playing nice with other dependencies.
