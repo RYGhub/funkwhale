@@ -53,10 +53,13 @@ export default {
     toggle ({getters, dispatch}, id) {
       dispatch('set', {id, value: !getters['isFavorite'](id)})
     },
-    fetch ({dispatch, state, commit}, url) {
+    fetch ({dispatch, state, commit, rootState}, url) {
       // will fetch favorites by batches from API to have them locally
+      let params = {
+        user: rootState.auth.profile.id
+      }
       url = url || 'favorites/tracks/'
-      return axios.get(url).then((response) => {
+      return axios.get(url, {params: params}).then((response) => {
         logger.default.info('Fetched a batch of ' + response.data.results.length + ' favorites')
         response.data.results.forEach(result => {
           commit('track', {id: result.track, value: true})

@@ -11,7 +11,7 @@
         <translate
           translate-plural="%{ count } favorites"
           :translate-n="$store.state.favorites.count"
-          :translate-params="{count: $store.state.favorites.count}">
+          :translate-params="{count: results.count}">
           1 favorite
         </translate>
       </h2>
