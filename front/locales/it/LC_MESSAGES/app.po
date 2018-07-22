@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-01 22:09+0200\n"
-"PO-Revision-Date: 2018-07-11 17:15+0000\n"
+"PO-Revision-Date: 2018-07-19 10:49+0000\n"
 "Last-Translator: Sylke Vicious <silkevicious@tuta.io>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -876,11 +876,11 @@ msgstr ""
 
 #: front/src/components/activity/Like.vue:12 src/components/activity/Listen.vue:12
 msgid "from %{ album } by %{ artist }"
-msgstr ""
+msgstr "da %{ album } di %{ artist }"
 
 #: front/src/components/library/Track.vue:13
 msgid "From album %{ album } by %{ artist }"
-msgstr ""
+msgstr "Dall'album %{ album } di %{ artist }"
 
 #: front/src/App.vue:53
 msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
@@ -892,7 +892,7 @@ msgstr ""
 
 #: front/src/components/Home.vue:98
 msgid "Funkwhale is dead simple to use."
-msgstr ""
+msgstr "Funkwhale è semplicissimo da usare."
 
 #: front/src/components/Home.vue:39
 msgid "Funkwhale is designed to make it easy to listen to music you like, or to discover new artists."
@@ -908,11 +908,11 @@ msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:16
 msgid "Get a new invitation"
-msgstr ""
+msgstr "Ottieni un nuovo invito"
 
 #: front/src/components/Home.vue:13
 msgid "Get me to the library"
-msgstr ""
+msgstr "Portami alla libreria"
 
 #: front/src/components/Home.vue:77
 msgid ""
@@ -925,11 +925,11 @@ msgstr ""
 #: front/src/components/common/ActionTable.vue:21
 #: front/src/components/common/ActionTable.vue:27
 msgid "Go"
-msgstr ""
+msgstr "Vai"
 
 #: front/src/components/PageNotFound.vue:14
 msgid "Go to home page"
-msgstr ""
+msgstr "Vai alla pagina iniziale"
 
 #: front/src/components/library/import/Main.vue:13
 msgid "Grab corresponding metadata"
@@ -937,11 +937,11 @@ msgstr ""
 
 #: front/src/components/library/Home.vue:66
 msgid "Home"
-msgstr ""
+msgstr "Pagina Iniziale"
 
 #: front/src/components/instance/Stats.vue:36
 msgid "Hours of music"
-msgstr ""
+msgstr "Ore di musica"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:11
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
