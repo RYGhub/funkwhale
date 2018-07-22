@@ -14,6 +14,11 @@ def get(pref):
     return manager[pref]
 
 
+def set(pref, value):
+    manager = global_preferences_registry.manager()
+    manager[pref] = value
+
+
 class StringListSerializer(serializers.BaseSerializer):
     separator = ","
     sort = True
