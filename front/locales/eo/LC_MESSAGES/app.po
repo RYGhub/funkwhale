@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-22 12:36+0000\n"
+"PO-Revision-Date: 2018-07-22 15:50+0000\n"
 "Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
 "Language-Team: none\n"
 "Language: eo\n"
@@ -747,109 +747,109 @@ msgstr ""
 
 #: front/src/components/auth/Signup.vue:98
 msgid "Enter your email"
-msgstr "Tajpu vian retpostadreson"
+msgstr "Tajpu vian retadreson"
 
 #: front/src/components/auth/Signup.vue:96
 msgid "Enter your invitation code (case insensitive)"
-msgstr ""
+msgstr "Tajpu vian invitkodon (usklecoblindan)"
 
 #: front/src/components/metadata/Search.vue:114
 msgid "Enter your search query..."
-msgstr ""
+msgstr "Tajpu vian serĉon…"
 
 #: front/src/components/auth/Signup.vue:97
 msgid "Enter your username"
-msgstr ""
+msgstr "Tajpu vian uzantnomon"
 
 #: front/src/components/auth/Login.vue:77
 msgid "Enter your username or email"
-msgstr ""
+msgstr "Tajpu vian uzantnomon aŭ retadreson"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:20
 msgid "Error"
-msgstr ""
+msgstr "Eraro"
 
 #: front/src/views/admin/Settings.vue:87
 msgid "Error reporting"
-msgstr ""
+msgstr "Eraroraportado"
 
 #: front/src/components/common/ActionTable.vue:75
 msgid "Error while applying action"
-msgstr ""
+msgstr "Eraro kiam ruli akton"
 
 #: front/src/views/auth/PasswordReset.vue:7
 msgid "Error while asking for a password reset"
-msgstr ""
+msgstr "Eraro kiam demandi renuligadon de pasvorto"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgid "Error while changing your password"
-msgstr ""
+msgstr "Eraro kiam ŝanĝi vian pasvorton"
 
 #: front/src/views/auth/EmailConfirm.vue:7
 msgid "Error while confirming your email"
-msgstr ""
+msgstr "Eraro kiam konfirmi vian retadreson"
 
 #: front/src/components/manage/users/InvitationForm.vue:4
 msgid "Error while creating invitation"
-msgstr ""
+msgstr "Eraro kiam krei inviton"
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgid "Error while saving settings"
-msgstr ""
+msgstr "Eraro kiam konservi preferojn"
 
 #: front/src/components/federation/LibraryForm.vue:10
 msgid "Error while scanning library"
-msgstr ""
+msgstr "Eraro kiam skani muzikejon"
 
 #: front/src/components/library/import/BatchDetail.vue:41
 #: front/src/components/library/import/BatchDetail.vue:70
 #: front/src/components/library/import/BatchList.vue:15
 msgid "Errored"
-msgstr ""
+msgstr "Eraris"
 
 #: front/src/components/playlists/Form.vue:89
 msgid "Everyone"
-msgstr ""
+msgstr "Ĉiu"
 
 #: front/src/components/playlists/Form.vue:85
 msgid "Everyone on this instance"
-msgstr ""
+msgstr "Ĉiu en ĉi-tiu instanco"
 
 #: front/src/components/library/radios/Builder.vue:57
 msgid "Exclude"
-msgstr ""
+msgstr "Ekskluzivi"
 
 #: front/src/components/discussion/Comment.vue:14
 msgid "Expand"
-msgstr ""
+msgstr "Grandigi"
 
 #: front/src/components/manage/users/InvitationsTable.vue:41
 msgid "Expiration date"
-msgstr ""
+msgstr "Fortempiĝa dato"
 
 #: front/src/components/manage/users/InvitationsTable.vue:50
 msgid "Expired"
-msgstr ""
+msgstr "Fortempiĝis"
 
 #: front/src/components/manage/users/InvitationsTable.vue:21
 msgid "Expired/used"
-msgstr ""
+msgstr "Fortempiĝis aŭ uzantiĝis"
 
 #: front/src/components/library/import/Main.vue:65
 msgid "External source. Supported backends"
-msgstr ""
+msgstr "Ekstera fonto. Kompateblaj servicoj"
 
 #: front/src/components/Sidebar.vue:51
 msgid "Favorites"
-msgstr ""
+msgstr "Stelumoj"
 
 #: front/src/components/federation/LibraryForm.vue:3
 msgid "Federate with a new instance"
-msgstr ""
+msgstr "Federi kun nova instanco"
 
 #: front/src/views/federation/LibraryTrackList.vue:21
 msgid "Federated tracks"
-msgstr ""
+msgstr "Federataj kantoj"
 
 #: front/src/components/Sidebar.vue:87
 #: src/components/library/import/BatchList.vue:25
@@ -859,28 +859,28 @@ msgstr ""
 #: front/src/views/federation/Base.vue:35
 #: src/views/federation/LibraryDetail.vue:40
 msgid "Federation"
-msgstr ""
+msgstr "Federo"
 
 #: front/src/views/federation/LibraryDetail.vue:3
 msgid "File mirroring"
-msgstr ""
+msgstr "Dosierospegulado"
 
 #: front/src/components/library/import/FileUpload.vue:43
 msgid "File name"
-msgstr ""
+msgstr "Nomo de la dosiero"
 
 #: front/src/components/library/import/Main.vue:76
 msgid "File upload"
-msgstr ""
+msgstr "Dosiero alŝutado"
 
 #: front/src/views/admin/library/Base.vue:5
 #: src/views/admin/library/FilesList.vue:21
 msgid "Files"
-msgstr ""
+msgstr "Dosieroj"
 
 #: front/src/components/library/import/ArtistImport.vue:7
 msgid "Filter album types"
-msgstr ""
+msgstr "Filtri albumtipoj"
 
 #: front/src/components/library/radios/Builder.vue:56
 msgid "Filter name"
