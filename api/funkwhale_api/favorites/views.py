@@ -7,7 +7,7 @@ from funkwhale_api.activity import record
 from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
 
-from . import models, serializers
+from . import filters, models, serializers
 
 
 class TrackFavoriteViewSet(
@@ -17,6 +17,7 @@ class TrackFavoriteViewSet(
     viewsets.GenericViewSet,
 ):
 
+    filter_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
     queryset = (
         models.TrackFavorite.objects.all()
