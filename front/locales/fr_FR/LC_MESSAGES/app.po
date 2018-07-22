@@ -3,15 +3,16 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-07-01 22:13+0200\n"
-"Last-Translator: \n"
-"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
+"PO-Revision-Date: 2018-07-21 21:30+0000\n"
+"Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
+"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
+"front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Weblate 2.20\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgid "\"%{ title }\", by %{ artist }"
@@ -59,11 +60,11 @@ msgstr[1] "%{ count } pistes"
 
 #: front/src/components/common/Duration.vue:2
 msgid "%{ hours } h %{ minutes } min"
-msgstr ""
+msgstr "%{hours} h %{minutes} min"
 
 #: front/src/components/common/Duration.vue:5
 msgid "%{ minutes } min"
-msgstr ""
+msgstr "%{minutes} min"
 
 #: front/src/components/activity/Like.vue:7
 msgid "%{ user } favorited a track"
@@ -97,9 +98,8 @@ msgstr[0] "1 piste"
 msgstr[1] "%{ count } pistes"
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgid "About %{ instance }"
-msgstr "A propos de cette instance"
+msgstr "À propos de cette instance"
 
 #: front/src/App.vue:54
 msgid "About Funkwhale"
@@ -166,7 +166,7 @@ msgstr "Activité"
 
 #: front/src/components/federation/LibraryFollowTable.vue:21
 msgid "Actor"
-msgstr ""
+msgstr "Acteur"
 
 #: front/src/views/federation/LibraryList.vue:8
 msgid "Add a new library"
@@ -262,6 +262,8 @@ msgstr "Une erreur s'est produite pendant l'enregistrement de vos modifications"
 #: front/src/components/auth/Login.vue:10
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
 msgstr ""
+"Une erreur inconnue a été rencontrée, ce qui peut signifier que le serveur "
+"est en panne ou n’a pas pu être atteint"
 
 #: front/src/components/federation/LibraryTrackTable.vue:11
 #: front/src/components/library/import/BatchDetail.vue:68
@@ -347,7 +349,7 @@ msgstr "Playlists disponibles"
 
 #: front/src/components/auth/Settings.vue:34
 msgid "Avatar"
-msgstr ""
+msgstr "Avatar"
 
 #: front/src/views/auth/EmailConfirm.vue:17 src/views/auth/PasswordReset.vue:24
 #: front/src/views/auth/PasswordResetConfirm.vue:18
@@ -428,7 +430,7 @@ msgstr "Mot de passe ne peut pas être changé"
 
 #: front/src/App.vue:66
 msgid "Change language"
-msgstr ""
+msgstr "Changer de langue"
 
 #: front/src/components/auth/Settings.vue:67
 msgid "Change my password"
@@ -570,9 +572,8 @@ msgid "Creation date"
 msgstr "Date de création"
 
 #: front/src/components/auth/Settings.vue:54
-#, fuzzy
 msgid "Current avatar"
-msgstr "Piste actuelle"
+msgstr "Avatar actuel"
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgid "Current track"
@@ -619,9 +620,10 @@ msgid "Detail"
 msgstr "Détail"
 
 #: front/src/views/admin/users/UsersDetail.vue:146
-#, fuzzy
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
-msgstr "Détermine si le compte utilisateur est actif ou non. Les comptes inactifs ne peuvent pas se connecter ou utiliser le service."
+msgstr ""
+"Détermine si le compte utilisateur est actif ou non. Les comptes inactifs ne "
+"peuvent pas se connecter ou utiliser le service."
 
 #: front/src/components/auth/Settings.vue:104
 #: front/src/components/auth/SubsonicTokenForm.vue:52
@@ -680,7 +682,6 @@ msgid "Download"
 msgstr "Télécharger"
 
 #: front/src/components/audio/track/Table.vue:27
-#, fuzzy
 msgid "Download tracks"
 msgstr "Télécharger"
 
@@ -885,7 +886,7 @@ msgstr "Nom du filtre"
 
 #: front/src/components/library/import/Main.vue:52
 msgid "Finish import"
-msgstr ""
+msgstr "Terminer l'import"
 
 #: front/src/components/library/import/BatchDetail.vue:54
 msgid "Finished"
@@ -1131,9 +1132,8 @@ msgid "Instance information"
 msgstr "Informations relatives à cette instance"
 
 #: front/src/components/library/Radios.vue:9
-#, fuzzy
 msgid "Instance radios"
-msgstr "Informations relatives à cette instance"
+msgstr "Radios de l'instance"
 
 #: front/src/views/admin/Settings.vue:75
 msgid "Instance settings"
@@ -1177,6 +1177,8 @@ msgstr "Gardez une trace de vos chansons favorites"
 #: front/src/components/audio/track/Table.vue:33
 msgid "Keep your PRIVATE_TOKEN secret as it gives access to your account."
 msgstr ""
+"Gardez votre PRIVATE_TOKEN secret étant donné qu'il permet l'accès à votre "
+"compte."
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/views/admin/users/UsersDetail.vue:45
@@ -1435,9 +1437,8 @@ msgid "Official website"
 msgstr "Site officiel"
 
 #: front/src/components/auth/Settings.vue:83
-#, fuzzy
 msgid "Old password"
-msgstr "Nouveau mot de passe"
+msgstr "Ancien mot de passe"
 
 #: front/src/components/library/import/FileUpload.vue:36
 msgid "Once all your files are uploaded, simply click the following button to check the import status."
@@ -1622,7 +1623,7 @@ msgstr "Merci de vérifier que votre nom d'utilisateur et mot de passe sont corr
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr ""
+msgstr "PNG, GIF ou JPG. 2Mb au plus. L'image sera réduite à 400×400 pixels."
 
 #: front/src/components/library/import/Main.vue:26
 msgid "Previous step"
@@ -1676,17 +1677,15 @@ msgstr "Activité récente sur cette instance"
 
 #: front/src/components/library/Home.vue:24
 msgid "Recently added"
-msgstr ""
+msgstr "Ajoutés récemment"
 
 #: front/src/components/library/Home.vue:11
-#, fuzzy
 msgid "Recently favorited"
-msgstr "Dans les favoris"
+msgstr "Ajoutées à vos favoris récemment"
 
 #: front/src/components/library/Home.vue:6
-#, fuzzy
 msgid "Recently listened"
-msgstr "pistes écoutées"
+msgstr "Écoutées récemment"
 
 #: front/src/components/library/import/BatchDetail.vue:81
 msgid "Recording MusicBrainz ID"
@@ -1718,9 +1717,8 @@ msgid "Remove"
 msgstr "Retirer"
 
 #: front/src/components/auth/Settings.vue:58
-#, fuzzy
 msgid "Remove avatar"
-msgstr "Retirer"
+msgstr "Supprimer mon avatar"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:19
 msgid "Remove from favorites"
@@ -1740,15 +1738,13 @@ msgid "Request a password"
 msgstr "Demander un mot de passe"
 
 #: front/src/App.vue:35
-#, fuzzy
 msgid "Request music"
-msgstr "Requête envoyée"
+msgstr "Demandes de musique"
 
 #: front/src/views/library/MusicRequest.vue:4
 #: src/views/library/MusicRequest.vue:21
-#, fuzzy
 msgid "Request some music"
-msgstr "Heures de musique"
+msgstr "Demandez de la musique"
 
 #: front/src/components/requests/Form.vue:20
 msgid "Request submitted!"
@@ -1952,6 +1948,7 @@ msgstr "Inscription"
 #: front/src/components/audio/track/Table.vue:31
 msgid "Simply copy paste the snippet below into a terminal to launch the download."
 msgstr ""
+"Copiez le texte ci-dessous dans un terminal pour lancer le téléchargement."
 
 #: front/src/components/library/Track.vue:69
 #: front/src/components/library/import/FileUpload.vue:44
@@ -2063,7 +2060,7 @@ msgstr "Succès"
 
 #: front/src/App.vue:11
 msgid "Suggested choices"
-msgstr ""
+msgstr "Suggestions"
 
 #: front/src/components/playlists/Editor.vue:9
 msgid "Syncing changes to server..."
@@ -2178,9 +2175,8 @@ msgid "Tracks available in this library"
 msgstr "Pistes disponibles dans cette bibliothèque"
 
 #: front/src/components/library/Artist.vue:54
-#, fuzzy
 msgid "Tracks by this artist"
-msgstr "Albums de cet·te artiste"
+msgstr "Pistes par cet⋅te artiste"
 
 #: front/src/components/instance/Stats.vue:25
 msgid "Tracks favorited"
@@ -2203,7 +2199,6 @@ msgid "Unfortunately, owners of this instance did not yet take the time to compl
 msgstr "Malheureusement, les gestionnaires de cette instance n'ont pas encore pris le temps de compléter cette page."
 
 #: front/src/views/federation/LibraryDetail.vue:95
-#, fuzzy
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -2216,9 +2211,8 @@ msgid "Unmute"
 msgstr "Réactiver le son"
 
 #: front/src/components/auth/Settings.vue:50
-#, fuzzy
 msgid "Update avatar"
-msgstr "Mettre à jour la playlist"
+msgstr "Mettre à jour l'avatar"
 
 #: front/src/components/playlists/Form.vue:33
 msgid "Update playlist"
@@ -2239,7 +2233,7 @@ msgstr "Envoi"
 
 #: front/src/components/auth/Settings.vue:45
 msgid "Upload a new avatar"
-msgstr ""
+msgstr "Envoyer un nouvel avatar"
 
 #: front/src/components/library/import/Main.vue:7
 msgid "Uploaded files or external source"
@@ -2282,9 +2276,8 @@ msgid "User activity"
 msgstr "Activité des utilisateur·ice·s"
 
 #: front/src/components/library/Radios.vue:20
-#, fuzzy
 msgid "User radios"
-msgstr "Utilisateur·ice·s"
+msgstr "Radios des utilisateur·ice·s"
 
 #: front/src/components/auth/Signup.vue:19
 #: front/src/components/manage/users/UsersTable.vue:37
@@ -2331,9 +2324,8 @@ msgid "We cannot log you in"
 msgstr "Erreur lors de la connexion"
 
 #: front/src/components/auth/Settings.vue:38
-#, fuzzy
 msgid "We cannot save your avatar"
-msgstr "Nous ne pouvons pas enregistrer vos paramètres"
+msgstr "Nous ne pouvons pas enregistrer votre avatar"
 
 #: front/src/components/auth/Settings.vue:14
 msgid "We cannot save your settings"
@@ -2416,9 +2408,10 @@ msgid "You need to select an instance in order to continue"
 msgstr "Vous devez choisir une instance pour continuer"
 
 #: front/src/components/auth/Settings.vue:100
-#, fuzzy
 msgid "You will be logged out from this session and have to log in with the new one"
-msgstr "Vous allez être déconnecté de cette session et vous allez devoir vous connecter avec votre nouveau mot de passe"
+msgstr ""
+"Vous allez être déconnecté⋅e de cette session et vous allez devoir vous "
+"connecter avec votre nouveau mot de passe"
 
 #: front/src/components/auth/Settings.vue:71
 msgid "You will have to update your password on your clients that use this password."
