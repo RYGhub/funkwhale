@@ -198,6 +198,38 @@ html, body {
   }
   transform: none !important;
 }
+
+
+.main.pusher > .ui.secondary.menu {
+  margin-left: 0;
+  margin-right: 0;
+  border: none;
+  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
+  .ui.item {
+    border: none;
+    border-bottom-style: none;
+    margin-bottom: 0px;
+    &.active {
+      box-shadow: inset 0px -2px 0px 0px #000;
+    }
+  }
+  @include media(">tablet") {
+    padding: 0 2.5rem;
+  }
+  @include media(">desktop") {
+    position: fixed;
+    left: 350px;
+    right: 0px;
+    top: 0px;
+    z-index: 1;
+  }
+  background-color: white;
+  .item {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
+}
+
 .service-messages {
   position: fixed;
   bottom: 1em;
