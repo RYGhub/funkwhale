@@ -2,17 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-17 19:29+0200\n"
+"POT-Creation-Date: 2018-07-22 14:12+0200\n"
 "PO-Revision-Date: 2018-07-22 11:58+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
-"funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: Weblate 2.20\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -59,7 +57,7 @@ msgstr[3] ""
 msgstr[4] "%{ count } مَقاطِع في %{ albumsCount } ألبومات"
 msgstr[5] "%{ count } مَقاطِع في %{ albumsCount } ألبومات"
 
-#: front/src/components/library/radios/Builder.vue:66
+#: front/src/components/library/radios/Builder.vue:76
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] ""
@@ -188,7 +186,7 @@ msgstr[5] ""
 
 #: front/src/components/common/ActionTable.vue:8
 #: front/src/components/federation/LibraryFollowTable.vue:24
-#: front/src/components/library/radios/Builder.vue:50
+#: front/src/components/library/radios/Builder.vue:60
 #: front/src/components/manage/library/RequestsTable.vue:54
 msgid "Actions"
 msgstr "الإجراءات"
@@ -209,11 +207,11 @@ msgstr ""
 msgid "Add a new library"
 msgstr "إضافة مكتبة جديدة"
 
-#: front/src/components/library/radios/Builder.vue:36
+#: front/src/components/library/radios/Builder.vue:46
 msgid "Add filter"
 msgstr "إضافة عامل تصفية"
 
-#: front/src/components/library/radios/Builder.vue:26
+#: front/src/components/library/radios/Builder.vue:36
 msgid "Add filters to customize your radio"
 msgstr "قم بإضافة عوامل تصفية لتخصيص إذاعتك"
 
@@ -235,7 +233,7 @@ msgstr "إضافة إلى قائمة المقاطع الموسيقية …"
 msgid "Add to queue"
 msgstr "أضِف إلى قائمة الانتظار"
 
-#: front/src/components/playlists/PlaylistModal.vue:115
+#: front/src/components/playlists/PlaylistModal.vue:116
 msgid "Add to this playlist"
 msgstr "أضفه إلى قائمة التشغيل هذه"
 
@@ -463,7 +461,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "إلغاء"
 
-#: front/src/components/library/radios/Builder.vue:49
+#: front/src/components/library/radios/Builder.vue:59
 msgid "Candidates"
 msgstr ""
 
@@ -554,7 +552,7 @@ msgstr ""
 msgid "Comment"
 msgstr "تعليق"
 
-#: front/src/components/library/radios/Builder.vue:48
+#: front/src/components/library/radios/Builder.vue:58
 msgid "Config"
 msgstr ""
 
@@ -684,7 +682,7 @@ msgstr "تعطيل النفاذ عبر واجهة برمجة التطبيقات 
 msgid "Discover how to use Funkwhale from other apps"
 msgstr "إكتشف كيفية استخدام فانك وايل Funkwhale عبر التطبيقات الأخرى"
 
-#: front/src/components/library/radios/Builder.vue:16
+#: front/src/components/library/radios/Builder.vue:26
 msgid "Display publicly"
 msgstr "إعرضها للعامة"
 
@@ -701,7 +699,8 @@ msgid "Do you want to delete the playlist \"%{ playlist }\"?"
 msgstr "متأكّد مِن أنك تريد حذف قائمة المَقاطِع الموسيقية \"%{ playlist }\" ؟"
 
 #: front/src/views/radios/Detail.vue:26
-msgid "Do you want to delete the radio \"{{ radio }}\"?"
+#, fuzzy
+msgid "Do you want to delete the radio \"%{ radio }\"?"
 msgstr "أتريد حقا حذف إذاعة \"{{ radio }}\" ؟"
 
 #: front/src/components/common/ActionTable.vue:29
@@ -859,7 +858,7 @@ msgstr "الجميع"
 msgid "Everyone on this instance"
 msgstr "كل مَن هم على مثيل الخادوم هذا"
 
-#: front/src/components/library/radios/Builder.vue:47
+#: front/src/components/library/radios/Builder.vue:57
 msgid "Exclude"
 msgstr "إستثني"
 
@@ -926,7 +925,7 @@ msgstr "الملفّات"
 msgid "Filter album types"
 msgstr "تصفية نوع الألبومات"
 
-#: front/src/components/library/radios/Builder.vue:46
+#: front/src/components/library/radios/Builder.vue:56
 msgid "Filter name"
 msgstr "إسم عامل التصفية"
 
@@ -1033,6 +1032,10 @@ msgstr "إنتقل إلى الصفحة الرئيسية"
 #: front/src/components/library/import/Main.vue:13
 msgid "Grab corresponding metadata"
 msgstr "جلب البيانات الوصفية ذات الصّلة"
+
+#: front/src/App.vue:74
+msgid "Help us translate Funkwhale"
+msgstr ""
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
@@ -1412,7 +1415,7 @@ msgstr "حسابي"
 msgid "My awesome playlist"
 msgstr "قائمتي الرائعة للمَقاطِع الموسيقية"
 
-#: front/src/components/library/radios/Builder.vue:206
+#: front/src/components/library/radios/Builder.vue:227
 msgid "My awesome radio"
 msgstr "إذاعتي الرائعة"
 
@@ -1712,12 +1715,22 @@ msgstr "تم خلط قائمة الإنتظار !"
 msgid "Radio"
 msgstr "الإذاعة"
 
-#: front/src/components/library/radios/Builder.vue:205
+#: front/src/components/library/radios/Builder.vue:226
 msgid "Radio Builder"
 msgstr "مُنشِئ الإذاعات و الراديو"
 
-#: front/src/components/library/radios/Builder.vue:11
+#: front/src/components/library/radios/Builder.vue:15
+#, fuzzy
+msgid "Radio created"
+msgstr "إسم الإذاعة"
+
+#: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
+msgstr "إسم الإذاعة"
+
+#: front/src/components/library/radios/Builder.vue:12
+#, fuzzy
+msgid "Radio updated"
 msgstr "إسم الإذاعة"
 
 #: front/src/components/library/Library.vue:10
@@ -1787,9 +1800,7 @@ msgstr "طلب كلمة سرية جديدة"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:35
 msgid "Request a new Subsonic API password?"
-msgstr ""
-"متأكد مِن أنك تريد إعادة طلب كلمة سرية جديدة لواجهة برمجة تطبيقات صاب سونيك "
-"API ؟"
+msgstr "متأكد مِن أنك تريد إعادة طلب كلمة سرية جديدة لواجهة برمجة تطبيقات صاب سونيك API ؟"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:43
 msgid "Request a password"
@@ -1834,7 +1845,7 @@ msgid "Results per page"
 msgstr "عدد نتائج البحث في كل صفحة"
 
 #: front/src/components/admin/SettingsGroup.vue:63
-#: front/src/components/library/radios/Builder.vue:19
+#: front/src/components/library/radios/Builder.vue:29
 msgid "Save"
 msgstr "احفظ"
 
@@ -1915,7 +1926,7 @@ msgstr "البحث"
 msgid "Sections"
 msgstr "الأقسام"
 
-#: front/src/components/library/radios/Builder.vue:31
+#: front/src/components/library/radios/Builder.vue:41
 msgid "Select a filter"
 msgstr "إختيار عامل تصفية"
 
@@ -2195,7 +2206,7 @@ msgstr "سوف يؤدي ذلك إلى الحذف الكُلّي لهذه الإ�
 msgid "This will completely disable access to the Subsonic API using from account."
 msgstr ""
 
-#: front/src/App.vue:133
+#: front/src/App.vue:137
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr "ذلك سوف يؤدي إلى حذف بياناتك المحلية نهائيا و إخراجك. أمتأكد أنك ترغب في المواصلة ؟"
 

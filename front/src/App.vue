@@ -70,6 +70,10 @@
                   </select>
                 </div>
               </div>
+              <br>
+              <a target="_blank" href="https://translate.funkwhale.audio/engage/funkwhale/">
+                <translate>Help us translate Funkwhale</translate>
+              </a>
             </div>
 
           </div>

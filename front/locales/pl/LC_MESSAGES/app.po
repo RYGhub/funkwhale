@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-17 19:29+0200\n"
+"POT-Creation-Date: 2018-07-22 14:12+0200\n"
 "PO-Revision-Date: 2018-07-20 19:03+0000\n"
 "Last-Translator: Marcin Mikołajczak <me@m4sk.in>\n"
 "Language-Team: \n"
@@ -15,8 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 2.20\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -54,7 +53,7 @@ msgstr[0] "%{ count } utwór w %{ albumsCount } albumach"
 msgstr[1] "%{ count } utwory w %{ albumsCount } albumach"
 msgstr[2] "%{ count } utworow w %{ albumsCount } albumach"
 
-#: front/src/components/library/radios/Builder.vue:66
+#: front/src/components/library/radios/Builder.vue:76
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } utwór zgodny z wybranymi filtrami"
@@ -164,7 +163,7 @@ msgstr[2] "Działanie %{ action } zostało rozpoczęte pomyślnie na %{ count } 
 
 #: front/src/components/common/ActionTable.vue:8
 #: front/src/components/federation/LibraryFollowTable.vue:24
-#: front/src/components/library/radios/Builder.vue:50
+#: front/src/components/library/radios/Builder.vue:60
 #: front/src/components/manage/library/RequestsTable.vue:54
 msgid "Actions"
 msgstr "Działania"
@@ -185,11 +184,11 @@ msgstr "Aktor"
 msgid "Add a new library"
 msgstr "Dodaj nową bibliotekę"
 
-#: front/src/components/library/radios/Builder.vue:36
+#: front/src/components/library/radios/Builder.vue:46
 msgid "Add filter"
 msgstr "Dodaj filtr"
 
-#: front/src/components/library/radios/Builder.vue:26
+#: front/src/components/library/radios/Builder.vue:36
 msgid "Add filters to customize your radio"
 msgstr "Dodaj filtry aby dostosować swoje radio"
 
@@ -211,7 +210,7 @@ msgstr "Dodaj do playlisty…"
 msgid "Add to queue"
 msgstr "Dodaj do kolejki"
 
-#: front/src/components/playlists/PlaylistModal.vue:115
+#: front/src/components/playlists/PlaylistModal.vue:116
 msgid "Add to this playlist"
 msgstr "Dodaj do tej playlisty"
 
@@ -433,7 +432,7 @@ msgstr "Po potwierdzeniu %{ username } uzyska dostęp do Twojej biblioteki."
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: front/src/components/library/radios/Builder.vue:49
+#: front/src/components/library/radios/Builder.vue:59
 msgid "Candidates"
 msgstr "Kandydaci"
 
@@ -524,7 +523,7 @@ msgstr "Zwiń"
 msgid "Comment"
 msgstr "Komentarz"
 
-#: front/src/components/library/radios/Builder.vue:48
+#: front/src/components/library/radios/Builder.vue:58
 msgid "Config"
 msgstr "Konfiguracja"
 
@@ -653,7 +652,7 @@ msgstr "Wyłączyć dostęp do API Subsonic?"
 msgid "Discover how to use Funkwhale from other apps"
 msgstr "Odkryj, jak korzystać z Funkwhale z innych aplikacji"
 
-#: front/src/components/library/radios/Builder.vue:16
+#: front/src/components/library/radios/Builder.vue:26
 msgid "Display publicly"
 msgstr "Wyświetlaj publicznie"
 
@@ -670,7 +669,8 @@ msgid "Do you want to delete the playlist \"%{ playlist }\"?"
 msgstr "Czy chcesz usunąć listę odtwarzania „%{ playlist }”?"
 
 #: front/src/views/radios/Detail.vue:26
-msgid "Do you want to delete the radio \"{{ radio }}\"?"
+#, fuzzy
+msgid "Do you want to delete the radio \"%{ radio }\"?"
 msgstr "Czy chcesz usunąć radio „{{ radio }}”?"
 
 #: front/src/components/common/ActionTable.vue:29
@@ -825,7 +825,7 @@ msgstr "Wszyscy"
 msgid "Everyone on this instance"
 msgstr "Wszyscy na tej instancji"
 
-#: front/src/components/library/radios/Builder.vue:47
+#: front/src/components/library/radios/Builder.vue:57
 msgid "Exclude"
 msgstr "Wyłącz"
 
@@ -892,7 +892,7 @@ msgstr "Pliki"
 msgid "Filter album types"
 msgstr "Filtruj rodzaje albumów"
 
-#: front/src/components/library/radios/Builder.vue:46
+#: front/src/components/library/radios/Builder.vue:56
 msgid "Filter name"
 msgstr "Filtruj nazwę"
 
@@ -999,6 +999,10 @@ msgstr "Przejdź na stronę główną"
 #: front/src/components/library/import/Main.vue:13
 msgid "Grab corresponding metadata"
 msgstr "Uzyskaj odpowiednie metadane"
+
+#: front/src/App.vue:74
+msgid "Help us translate Funkwhale"
+msgstr ""
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
@@ -1376,7 +1380,7 @@ msgstr "Moje konto"
 msgid "My awesome playlist"
 msgstr "Moja wspaniała playlista"
 
-#: front/src/components/library/radios/Builder.vue:206
+#: front/src/components/library/radios/Builder.vue:227
 msgid "My awesome radio"
 msgstr "Moje wspaniałe radio"
 
@@ -1638,8 +1642,7 @@ msgstr "Sprawdź dwukrotnie, czy połączenie nazwy użytkownika i hasła jest p
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr ""
-"PNG, GIF lub JPG. Maksymalnie 2MB. Zostanie pomniejszony do 400x400 pikseli."
+msgstr "PNG, GIF lub JPG. Maksymalnie 2MB. Zostanie pomniejszony do 400x400 pikseli."
 
 #: front/src/components/library/import/Main.vue:26
 msgid "Previous step"
@@ -1674,12 +1677,22 @@ msgstr "Wymieszano kolejkę!"
 msgid "Radio"
 msgstr "Radio"
 
-#: front/src/components/library/radios/Builder.vue:205
+#: front/src/components/library/radios/Builder.vue:226
 msgid "Radio Builder"
 msgstr "Tworzenie radia"
 
-#: front/src/components/library/radios/Builder.vue:11
+#: front/src/components/library/radios/Builder.vue:15
+#, fuzzy
+msgid "Radio created"
+msgstr "Nazwa radia"
+
+#: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
+msgstr "Nazwa radia"
+
+#: front/src/components/library/radios/Builder.vue:12
+#, fuzzy
+msgid "Radio updated"
 msgstr "Nazwa radia"
 
 #: front/src/components/library/Library.vue:10
@@ -1792,7 +1805,7 @@ msgid "Results per page"
 msgstr "Wyniki na stronę"
 
 #: front/src/components/admin/SettingsGroup.vue:63
-#: front/src/components/library/radios/Builder.vue:19
+#: front/src/components/library/radios/Builder.vue:29
 msgid "Save"
 msgstr "Zapisz"
 
@@ -1873,7 +1886,7 @@ msgstr "Kryterium wyszukiwania"
 msgid "Sections"
 msgstr "Sekcje"
 
-#: front/src/components/library/radios/Builder.vue:31
+#: front/src/components/library/radios/Builder.vue:41
 msgid "Select a filter"
 msgstr "Zaznacz filtr"
 
@@ -2144,7 +2157,7 @@ msgstr "To bezpowrotnie usunie radio."
 msgid "This will completely disable access to the Subsonic API using from account."
 msgstr "To całkowicie wyłączy dostęp do API Subsonic z tego konta."
 
-#: front/src/App.vue:133
+#: front/src/App.vue:137
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr "To wyczyści Twoje lokalne dane i rozłączy Cię, czy chcesz kontynuować?"
 
