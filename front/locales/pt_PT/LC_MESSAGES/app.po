@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-07-22 11:58+0000\n"
+"PO-Revision-Date: 2018-07-22 12:36+0000\n"
 "Last-Translator: troll <my_name_is_troll@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -28,7 +28,7 @@ msgstr ""
 
 #: front/src/components/Sidebar.vue:22
 msgid "(empty)"
-msgstr ""
+msgstr "(vazio)"
 
 #: front/src/components/common/ActionTable.vue:43
 #: front/src/components/common/ActionTable.vue:51
@@ -40,34 +40,36 @@ msgstr[1] ""
 #: front/src/components/Sidebar.vue:116 src/views/federation/LibraryDetail.vue:87
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } tema"
+msgstr[1] "%{ count } temas"
 
 #: front/src/components/library/Artist.vue:13
 msgid "%{ count } track in %{ albumsCount } albums"
 msgid_plural "%{ count } tracks in %{ albumsCount } albums"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } tema em %{ albumsCount } álbuns"
+msgstr[1] "%{ count } temas em %{ albumsCount } álbuns"
 
 #: front/src/components/library/radios/Builder.vue:66
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } tema corresponde aos filtros selecionados"
+msgstr[1] "%{ count } temas correspondem aos filtros selecionados"
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count} tema"
+msgstr[1] "%{ count } temas"
 
 #: front/src/components/common/Duration.vue:2
+#, fuzzy
 msgid "%{ hours } h %{ minutes } min"
-msgstr ""
+msgstr "%{ hours } h %{ minutes } min"
 
 #: front/src/components/common/Duration.vue:5
+#, fuzzy
 msgid "%{ minutes } min"
-msgstr ""
+msgstr "%{ minutes } min"
 
 #: front/src/components/activity/Like.vue:7
 msgid "%{ user } favorited a track"

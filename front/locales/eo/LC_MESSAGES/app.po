@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-21 21:30+0000\n"
+"PO-Revision-Date: 2018-07-22 12:36+0000\n"
 "Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
 "Language-Team: none\n"
 "Language: eo\n"
@@ -666,75 +666,76 @@ msgstr "Ĉu vi volas forigi la \"%{playlist}\" ludliston?"
 #: front/src/components/common/ActionTable.vue:29
 msgid "Do you want to launch %{ action } on %{ count } element?"
 msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ĉu vi volas komenci %{action} por %{count} ero?"
+msgstr[1] "Ĉu vi volas komenci %{action} por %{count} eroj?"
 
 #: front/src/components/Sidebar.vue:113
 msgid "Do you want to restore your previous queue?"
-msgstr ""
+msgstr "Ĉu vi volas reŝargi vian antaŭan atendovicon?"
 
 #: front/src/App.vue:38
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentaro"
 
 #: front/src/components/audio/track/Table.vue:24
 #: src/components/library/Track.vue:48
 msgid "Download"
-msgstr ""
+msgstr "Elŝuti"
 
 #: front/src/components/audio/track/Table.vue:27
 msgid "Download tracks"
-msgstr ""
+msgstr "Elŝuti kantojn"
 
 #: front/src/components/playlists/Editor.vue:49
 msgid "Drag and drop rows to reorder tracks in the playlist"
-msgstr ""
+msgstr "Treni kaj guti horizontaloj por reordigi kantojn en la ludlisto"
 
 #: front/src/components/library/Track.vue:58
 #: front/src/components/manage/library/FilesTable.vue:43
 msgid "Duration"
-msgstr ""
+msgstr "Daŭro"
 
 #: front/src/components/Home.vue:96
 msgid "Easy to use"
-msgstr ""
+msgstr "Facila uzo"
 
 #: front/src/components/About.vue:21
 msgid "Edit instance info"
-msgstr ""
+msgstr "Redakti informoj de instanco"
 
 #: front/src/components/radios/Card.vue:20 src/views/playlists/Detail.vue:30
 msgid "Edit..."
-msgstr ""
+msgstr "Redakti…"
 
 #: front/src/components/auth/Signup.vue:29
 #: front/src/components/manage/users/UsersTable.vue:38
 msgid "Email"
-msgstr ""
+msgstr "Retmesaĝo"
 
 #: front/src/views/admin/users/UsersDetail.vue:29
 msgid "Email address"
-msgstr ""
+msgstr "Retadreso"
 
 #: front/src/views/auth/EmailConfirm.vue:23
 msgid "Email confirmed"
-msgstr ""
+msgstr "Konfirmis retadreso"
 
 #: front/src/views/playlists/Detail.vue:29
 msgid "End edition"
-msgstr ""
+msgstr "Fini redakto"
 
 #: front/src/components/library/import/FileUpload.vue:4
 msgid "Ensure your music files are properly tagged before uploading them."
 msgstr ""
+"Zorgu ke viajn muzikdosierojn estas korekte etikedanta antaŭ alŝutis ilin."
 
 #: front/src/components/library/Radios.vue:140
 msgid "Enter a radio name..."
-msgstr ""
+msgstr "Tajpu nomon de radio…"
 
 #: front/src/components/library/Artists.vue:118
 msgid "Enter an artist name..."
-msgstr ""
+msgstr "Tajpu nomon de artisto…"
 
 #: front/src/views/federation/LibraryList.vue:122
 msgid "Enter an library domain name..."
@@ -746,7 +747,7 @@ msgstr ""
 
 #: front/src/components/auth/Signup.vue:98
 msgid "Enter your email"
-msgstr ""
+msgstr "Tajpu vian retpostadreson"
 
 #: front/src/components/auth/Signup.vue:96
 msgid "Enter your invitation code (case insensitive)"
