@@ -119,7 +119,7 @@ export default {
   },
   computed: {
     labels () {
-      let searchPlaceholder = this.$gettext('Enter an library domain name...')
+      let searchPlaceholder = this.$gettext('Enter a library domain name...')
       let title = this.$gettext('Libraries')
       return {
         searchPlaceholder,
