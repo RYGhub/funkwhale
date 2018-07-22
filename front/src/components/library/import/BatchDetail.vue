@@ -44,7 +44,7 @@
               {{ stats.errored }}
               <button
                 @click="rerun({batches: [batch.id], jobs: []})"
-                v-if="stats.errored > 0"
+                v-if="stats.errored > 0 || stats.pending > 0"
                 class="ui tiny basic icon button">
                 <i class="redo icon" />
                 <translate>Rerun errored jobs</translate>
@@ -102,7 +102,7 @@
                 {{ job.status }}</span>
                 <button
                   @click="rerun({batches: [], jobs: [job.id]})"
-                  v-if="job.status === 'errored'"
+                  v-if="['errored', 'pending'].indexOf(job.status) > -1"
                   :title="labels.rerun"
                   class="ui tiny basic icon button">
                   <i class="redo icon" />
