@@ -23,17 +23,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../../style/vendor/media';
-
-.main.pusher > .ui.secondary.menu {
-  @include media(">tablet") {
-    margin: 0 2.5rem;
-  }
-  .item {
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-  }
-}
-</style>
