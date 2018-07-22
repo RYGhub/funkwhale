@@ -93,6 +93,8 @@ import axios from 'axios'
 import _ from 'lodash'
 import {mapState} from 'vuex'
 
+import translations from '@/translations'
+
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
 import ServiceMessages from '@/components/ServiceMessages'
@@ -115,6 +117,7 @@ export default {
   },
   created () {
     let self = this
+    this.autodetectLanguage()
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
@@ -137,6 +140,21 @@ export default {
       let confirm = window.confirm(this.$gettext('This will erase your local data and disconnect you, do you want to continue?'))
       if (confirm) {
         this.$store.commit('instance/instanceUrl', null)
+      }
+    },
+    autodetectLanguage () {
+      let userLanguage = navigator.language || navigator.userLanguage
+      let available = _.keys(translations)
+      let matching = available.filter((a) => {
+        return userLanguage.replace('-', '_') === a
+      })
+      let almostMatching = available.filter((a) => {
+        return userLanguage.replace('-', '_').split('_')[0] === a.split('_')[0]
+      })
+      if (matching.length > 0) {
+        this.$language.current = matching[0]
+      } else if (almostMatching.length > 0) {
+        this.$language.current = almostMatching[0]
       }
     }
   },
