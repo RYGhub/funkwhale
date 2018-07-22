@@ -20,6 +20,11 @@ TYPE_CHOICES = [
 ]
 
 
+class ActorQuerySet(models.QuerySet):
+    def local(self, include=True):
+        return self.exclude(user__isnull=include)
+
+
 class Actor(models.Model):
     ap_type = "Actor"
 
@@ -46,6 +51,8 @@ class Actor(models.Model):
         through_fields=("target", "actor"),
         related_name="following",
     )
+
+    objects = ActorQuerySet.as_manager()
 
     class Meta:
         unique_together = ["domain", "preferred_username"]

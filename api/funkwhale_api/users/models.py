@@ -23,6 +23,9 @@ from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 from funkwhale_api.common import fields, preferences
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import validators as common_validators
+from funkwhale_api.federation import keys
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 
 
 def get_token():
@@ -109,6 +112,13 @@ class User(AbstractUser):
                 max_size=1024 * 1024 * 2,
             ),
         ],
+    )
+    actor = models.OneToOneField(
+        "federation.Actor",
+        related_name="user",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -207,6 +217,34 @@ class Invitation(models.Model):
             )
 
         return super().save(**kwargs)
+
+
+def create_actor(user):
+    username = user.username
+    private, public = keys.get_key_pair()
+    args = {
+        "preferred_username": username,
+        "domain": settings.FEDERATION_HOSTNAME,
+        "type": "Person",
+        "name": username,
+        "manually_approves_followers": False,
+        "url": federation_utils.full_url(
+            reverse("federation:actors-detail", kwargs={"user__username": username})
+        ),
+        "shared_inbox_url": federation_utils.full_url(
+            reverse("federation:actors-inbox", kwargs={"user__username": username})
+        ),
+        "inbox_url": federation_utils.full_url(
+            reverse("federation:actors-inbox", kwargs={"user__username": username})
+        ),
+        "outbox_url": federation_utils.full_url(
+            reverse("federation:actors-outbox", kwargs={"user__username": username})
+        ),
+    }
+    args["private_key"] = private.decode("utf-8")
+    args["public_key"] = public.decode("utf-8")
+
+    return federation_models.Actor.objects.create(**args)
 
 
 @receiver(models.signals.post_save, sender=User)

@@ -29,6 +29,9 @@ class RegisterSerializer(RS):
         if self.validated_data.get("invitation"):
             user.invitation = self.validated_data.get("invitation")
             user.save(update_fields=["invitation"])
+        user.actor = models.create_actor(user)
+        user.save(update_fields=["actor"])
+
         return user
 
 

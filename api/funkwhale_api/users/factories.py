@@ -4,6 +4,8 @@ from django.utils import timezone
 
 from funkwhale_api.factories import ManyToManyFromList, registry
 
+from . import models
+
 
 @registry.register
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -47,6 +49,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.PostGenerationMethodCall("set_password", "test")
     subsonic_api_token = None
     groups = ManyToManyFromList("groups")
+    avatar = factory.django.ImageField()
 
     class Meta:
         model = "users.User"
@@ -70,6 +73,14 @@ class UserFactory(factory.django.DjangoModelFactory):
             ]
             # A list of permissions were passed in, use them
             self.user_permissions.add(*perms)
+
+    @factory.post_generation
+    def with_actor(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        self.actor = models.create_actor(self)
+        self.save(update_fields=["actor"])
+        return self.actor
 
 
 @registry.register(name="users.SuperUser")
