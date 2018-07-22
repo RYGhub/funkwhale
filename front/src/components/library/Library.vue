@@ -42,7 +42,7 @@ export default {
 
 .library.pusher > .ui.secondary.menu {
   @include media(">tablet") {
-    margin: 0 2.5rem;
+    padding: 0 2.5rem;
   }
   .item {
     padding-top: 1.5em;
@@ -75,7 +75,30 @@ export default {
 
     }
   }
+}
 
+.ui.secondary.pointing.menu {
+  border: none;
+  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
+  .ui.item {
+    border: none;
+    border-bottom-style: none;
+    margin-bottom: 0px;
+    &.active {
+      box-shadow: inset 0px -2px 0px 0px #000;
+    }
+  }
+}
+
+.secondary.pointing.menu {
+  @include media(">desktop") {
+    position: fixed;
+    left: 350px;
+    right: 0px;
+    top: 0px;
+    z-index: 1;
+  }
+  background-color: white;
 }
 
 </style>
