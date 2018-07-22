@@ -302,6 +302,7 @@ SESSION_COOKIE_HTTPONLY = False
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_USERNAME_VALIDATORS = "funkwhale_api.users.serializers.username_validators"
 
 # Custom user app defaults
 # Select the correct user model
@@ -432,6 +433,7 @@ PLAYLISTS_MAX_TRACKS = env.int("PLAYLISTS_MAX_TRACKS", default=250)
 ACCOUNT_USERNAME_BLACKLIST = [
     "funkwhale",
     "library",
+    "instance",
     "test",
     "status",
     "root",
