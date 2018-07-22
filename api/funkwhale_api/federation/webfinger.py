@@ -3,7 +3,7 @@ from django.conf import settings
 
 from funkwhale_api.common import session
 
-from . import actors, serializers
+from . import serializers
 
 VALID_RESOURCE_TYPES = ["acct"]
 
@@ -31,9 +31,6 @@ def clean_acct(acct_string, ensure_local=True):
 
     if ensure_local and hostname.lower() != settings.FEDERATION_HOSTNAME:
         raise forms.ValidationError("Invalid hostname {}".format(hostname))
-
-    if ensure_local and username not in actors.SYSTEM_ACTORS:
-        raise forms.ValidationError("Invalid username")
 
     return username, hostname
 

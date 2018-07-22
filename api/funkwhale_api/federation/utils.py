@@ -5,6 +5,8 @@ def full_url(path):
     """
     Given a relative path, return a full url usable for federation purpose
     """
+    if path.startswith("http://") or path.startswith("https://"):
+        return path
     root = settings.FUNKWHALE_URL
     if path.startswith("/") and root.endswith("/"):
         return root + path[1:]

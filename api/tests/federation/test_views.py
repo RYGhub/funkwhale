@@ -417,3 +417,28 @@ def test_library_track_action_import(factories, superuser_api_client, mocker):
     for i, job in enumerate(batch.jobs.all()):
         assert job.library_track == imported_lts[i]
     mocked_run.assert_called_once_with(import_batch_id=batch.pk)
+
+
+def test_local_actor_detail(factories, api_client):
+    user = factories["users.User"](with_actor=True)
+    url = reverse("federation:actors-detail", kwargs={"user__username": user.username})
+    serializer = serializers.ActorSerializer(user.actor)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializer.data
+
+
+def test_wellknown_webfinger_local(factories, api_client, settings, mocker):
+    user = factories["users.User"](with_actor=True)
+    url = reverse("federation:well-known-webfinger")
+    response = api_client.get(
+        url,
+        data={"resource": "acct:{}".format(user.actor.webfinger_subject)},
+        HTTP_ACCEPT="application/jrd+json",
+    )
+    serializer = serializers.ActorWebfingerSerializer(user.actor)
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == "application/jrd+json"
+    assert response.data == serializer.data

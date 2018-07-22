@@ -681,3 +681,56 @@ def test_tapi_library_track_serializer_import_pending(factories):
     serializer = serializers.APILibraryTrackSerializer(lt)
 
     assert serializer.get_status(lt) == "import_pending"
+
+
+def test_local_actor_serializer_to_ap(factories):
+    expected = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+        "id": "https://test.federation/user",
+        "type": "Person",
+        "following": "https://test.federation/user/following",
+        "followers": "https://test.federation/user/followers",
+        "inbox": "https://test.federation/user/inbox",
+        "outbox": "https://test.federation/user/outbox",
+        "preferredUsername": "user",
+        "name": "Real User",
+        "summary": "Hello world",
+        "manuallyApprovesFollowers": False,
+        "publicKey": {
+            "id": "https://test.federation/user#main-key",
+            "owner": "https://test.federation/user",
+            "publicKeyPem": "yolo",
+        },
+        "endpoints": {"sharedInbox": "https://test.federation/inbox"},
+    }
+    ac = models.Actor.objects.create(
+        url=expected["id"],
+        inbox_url=expected["inbox"],
+        outbox_url=expected["outbox"],
+        shared_inbox_url=expected["endpoints"]["sharedInbox"],
+        followers_url=expected["followers"],
+        following_url=expected["following"],
+        public_key=expected["publicKey"]["publicKeyPem"],
+        preferred_username=expected["preferredUsername"],
+        name=expected["name"],
+        domain="test.federation",
+        summary=expected["summary"],
+        type="Person",
+        manually_approves_followers=False,
+    )
+    user = factories["users.User"]()
+    user.actor = ac
+    user.save()
+    ac.refresh_from_db()
+    expected["icon"] = {
+        "type": "Image",
+        "mediaType": "image/jpeg",
+        "url": utils.full_url(user.avatar.crop["400x400"].url),
+    }
+    serializer = serializers.ActorSerializer(ac)
+
+    assert serializer.data == expected
