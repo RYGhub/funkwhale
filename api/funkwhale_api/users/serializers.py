@@ -1,13 +1,31 @@
+import re
+
 from django.conf import settings
+from django.core import validators
+from django.utils.deconstruct import deconstructible
+from django.utils.translation import gettext_lazy as _
+
 from rest_auth.serializers import PasswordResetSerializer as PRS
 from rest_auth.registration.serializers import RegisterSerializer as RS
 from rest_framework import serializers
-
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
+
+
+@deconstructible
+class ASCIIUsernameValidator(validators.RegexValidator):
+    regex = r"^[\w]+$"
+    message = _(
+        "Enter a valid username. This value may contain only English letters, "
+        "numbers, and _ characters."
+    )
+    flags = re.ASCII
+
+
+username_validators = [ASCIIUsernameValidator()]
 
 
 class RegisterSerializer(RS):

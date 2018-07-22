@@ -20,6 +20,22 @@ def test_can_create_user_via_api(preferences, api_client, db):
     assert u.username == "test1"
 
 
+@pytest.mark.parametrize("username", ["wrong.name", "wrong-name", "éaeu", "wrong name"])
+def test_username_only_accepts_letters_and_underscores(
+    username, preferences, api_client, db
+):
+    url = reverse("rest_register")
+    data = {
+        "username": username,
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+    }
+    preferences["users__registration_enabled"] = True
+    response = api_client.post(url, data)
+    assert response.status_code == 400
+
+
 def test_can_restrict_usernames(settings, preferences, db, api_client):
     url = reverse("rest_register")
     preferences["users__registration_enabled"] = True

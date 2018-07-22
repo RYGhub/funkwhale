@@ -34,6 +34,7 @@ class FederationMixin(object):
 
 class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "user__username"
+    lookup_value_regex = ".*"
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
