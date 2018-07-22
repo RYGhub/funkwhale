@@ -11,7 +11,7 @@
             <tbody>
               <tr v-for="album in albums">
                 <td>
-                  <img class="ui mini image" v-if="album.cover" :src="$store.getters['instance/absoluteUrl'](album.cover)">
+                  <img class="ui mini image" v-if="album.cover.original" :src="$store.getters['instance/absoluteUrl'](album.cover.small_square_crop)">
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">
@@ -28,12 +28,10 @@
           </table>
           <div class="center aligned segment" v-if="artist.albums.length > initialAlbums">
             <em v-if="!showAllAlbums" @click="showAllAlbums = true" class="expand">
-              <i18next path="Show {%0%} more albums">
-                {{ artist.albums.length - initialAlbums }}
-              </i18next>
+              <translate :translate-params="{count: artist.albums.length - initialAlbums}" :translate-n="artist.albums.length - initialAlbums" translate-plural="Show %{ count } more albums">Show 1 more album</translate>
             </em>
             <em v-else @click="showAllAlbums = false" class="expand">
-              <i18next path="Collapse"/>
+              <translate>Collapse</translate>
             </em>
           </div>
         </div>
@@ -41,12 +39,10 @@
     <div class="extra content">
         <span>
           <i class="sound icon"></i>
-          <i18next path="{%0%} albums">
-            {{ artist.albums.length }}
-          </i18next>
+            <translate :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
         </span>
         <play-button class="mini basic orange right floated" :artist="artist.id">
-          <i18next path="Play all"/>
+          <translate>Play all</translate>
         </play-button>
       </div>
     </div>

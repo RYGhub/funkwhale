@@ -5,6 +5,7 @@ import requests
 import requests_http_signature
 from django.conf import settings
 from django.utils import timezone
+from django.utils.http import http_date
 
 from funkwhale_api.factories import registry
 
@@ -39,7 +40,7 @@ class SignedRequestFactory(factory.Factory):
         default_headers = {
             "User-Agent": "Test",
             "Host": "test.host",
-            "Date": "Right now",
+            "Date": http_date(timezone.now().timestamp()),
             "Content-Type": "application/activity+json",
         }
         if extracted:
@@ -170,6 +171,7 @@ class LibraryTrackFactory(factory.DjangoModelFactory):
     audio_url = factory.Faker("url")
     audio_mimetype = "audio/ogg"
     metadata = factory.SubFactory(LibraryTrackMetadataFactory)
+    published_date = factory.LazyFunction(timezone.now)
 
     class Meta:
         model = models.LibraryTrack

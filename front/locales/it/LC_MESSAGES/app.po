@@ -1,0 +1,2461 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the front package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: front 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-07-22 14:12+0200\n"
+"PO-Revision-Date: 2018-07-19 10:49+0000\n"
+"Last-Translator: Sylke Vicious <silkevicious@tuta.io>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2.20\n"
+
+#: front/src/components/playlists/PlaylistModal.vue:9
+msgid "\"%{ title }\", by %{ artist }"
+msgstr "\"%{ title }\", di %{ artist }"
+
+#: front/src/components/Sidebar.vue:24
+msgid "(%{ index } of %{ length })"
+msgstr "(%{ index } su %{ length })"
+
+#: front/src/components/Sidebar.vue:22
+msgid "(empty)"
+msgstr "(vuoto)"
+
+#: front/src/components/common/ActionTable.vue:43
+#: front/src/components/common/ActionTable.vue:51
+msgid "%{ count } on %{ total } selected"
+msgid_plural "%{ count } on %{ total } selected"
+msgstr[0] "%{ count } su %{ total } selezionato"
+msgstr[1] "%{ count } su %{ total } selezionati"
+
+#: front/src/components/Sidebar.vue:116
+#: src/views/federation/LibraryDetail.vue:87
+msgid "%{ count } track"
+msgid_plural "%{ count } tracks"
+msgstr[0] "%{ count } traccia"
+msgstr[1] "%{ count } tracce"
+
+#: front/src/components/library/Artist.vue:13
+msgid "%{ count } track in %{ albumsCount } albums"
+msgid_plural "%{ count } tracks in %{ albumsCount } albums"
+msgstr[0] "%{ count } traccia in %{ albumsCount } album"
+msgstr[1] "%{ count } tracce in %{ albumsCount } album"
+
+#: front/src/components/library/radios/Builder.vue:76
+msgid "%{ count } track matching combined filters"
+msgid_plural "%{ count } tracks matching combined filters"
+msgstr[0] "%{ count } traccia corrisponde ai filtri combinati"
+msgstr[1] "%{ count } tracce corrispondono ai filtri combinati"
+
+#: front/src/components/playlists/Card.vue:18
+msgid "%{ count} track"
+msgid_plural "%{ count } tracks"
+msgstr[0] "%{ count} traccia"
+msgstr[1] "%{ count} tracce"
+
+#: front/src/components/common/Duration.vue:2
+msgid "%{ hours } h %{ minutes } min"
+msgstr ""
+
+#: front/src/components/common/Duration.vue:5
+msgid "%{ minutes } min"
+msgstr ""
+
+#: front/src/components/activity/Like.vue:7
+msgid "%{ user } favorited a track"
+msgstr "a %{ user } piace una traccia"
+
+#: front/src/components/activity/Listen.vue:7
+msgid "%{ user } listened to a track"
+msgstr "%{ user } ha ascoltato una traccia"
+
+#: front/src/components/auth/Profile.vue:49
+msgid "%{ username }'s profile"
+msgstr "Profilo di %{ username }"
+
+#: front/src/components/audio/artist/Card.vue:41
+msgid "1 album"
+msgid_plural "%{ count } albums"
+msgstr[0] "1 album"
+msgstr[1] "%{ count } album"
+
+#: front/src/components/favorites/List.vue:10
+msgid "1 favorite"
+msgid_plural "%{ count } favorites"
+msgstr[0] "1 mi piace"
+msgstr[1] "%{ count } mi piace"
+
+#: front/src/components/audio/album/Card.vue:54
+#: front/src/components/federation/LibraryCard.vue:25
+msgid "1 track"
+msgid_plural "%{ count } tracks"
+msgstr[0] "1 traccia"
+msgstr[1] "%{ count } tracce"
+
+#: front/src/components/About.vue:5
+#, fuzzy
+msgid "About %{ instance }"
+msgstr "A proposito di questa istanza"
+
+#: front/src/App.vue:54
+msgid "About Funkwhale"
+msgstr "A proposito di Funkwhale"
+
+#: front/src/App.vue:32 src/components/About.vue:8 src/components/About.vue:55
+msgid "About this instance"
+msgstr "A proposito di questa istanza"
+
+#: front/src/components/manage/library/RequestsTable.vue:28
+#: front/src/components/manage/library/RequestsTable.vue:62
+msgid "Accepted"
+msgstr "Accettato"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:111
+msgid "Access disabled"
+msgstr "Accesso disabilitato"
+
+#: front/src/components/Home.vue:109
+msgid "Access your music from a clean interface that focus on what really matters"
+msgstr "Accedi alla tua musica da un'interfaccia pulita che si focalizza su quello che conta davvero"
+
+#: front/src/views/admin/users/UsersDetail.vue:54
+msgid "Account active"
+msgstr "Account attivo"
+
+#: front/src/components/auth/Settings.vue:5
+msgid "Account settings"
+msgstr "Impostazioni dell'account"
+
+#: front/src/components/auth/Settings.vue:257
+msgid "Account Settings"
+msgstr "Impostazioni dell'account"
+
+#: front/src/components/manage/users/UsersTable.vue:39
+msgid "Account status"
+msgstr "Stato dell'account"
+
+#: front/src/views/auth/PasswordReset.vue:14
+msgid "Account's email"
+msgstr "Email dell'account"
+
+#: front/src/components/common/ActionTable.vue:82
+msgid "Action %{ action } was launched successfully on %{ count } element"
+msgid_plural "Action %{ action } was launched successfully on %{ count } elements"
+msgstr[0] "L'azione %{ action } è stata lanciata con successo su %{ count } elemento"
+msgstr[1] "L'azione %{ action } è stata lanciata con successo su %{ count } elementi"
+
+#: front/src/components/common/ActionTable.vue:8
+#: front/src/components/federation/LibraryFollowTable.vue:24
+#: front/src/components/library/radios/Builder.vue:60
+#: front/src/components/manage/library/RequestsTable.vue:54
+msgid "Actions"
+msgstr "Azioni"
+
+#: front/src/components/manage/users/UsersTable.vue:53
+#, fuzzy
+msgid "Active"
+msgstr "Attività"
+
+#: front/src/components/Sidebar.vue:60
+msgid "Activity"
+msgstr "Attività"
+
+#: front/src/components/federation/LibraryFollowTable.vue:21
+msgid "Actor"
+msgstr ""
+
+#: front/src/views/federation/LibraryList.vue:8
+msgid "Add a new library"
+msgstr "Aggiungi una nuova libreria"
+
+#: front/src/components/library/radios/Builder.vue:46
+msgid "Add filter"
+msgstr "Aggiungi filtro"
+
+#: front/src/components/library/radios/Builder.vue:36
+msgid "Add filters to customize your radio"
+msgstr "Aggiungi filtri per personalizzare la tua radio"
+
+#: front/src/components/audio/PlayButton.vue:53
+msgid "Add to current queue"
+msgstr "Aggiungi alla coda corrente"
+
+#: front/src/components/favorites/TrackFavoriteIcon.vue:4
+#: front/src/components/favorites/TrackFavoriteIcon.vue:21
+msgid "Add to favorites"
+msgstr "Aggiungi ai preferiti"
+
+#: front/src/components/playlists/TrackPlaylistIcon.vue:6
+#: front/src/components/playlists/TrackPlaylistIcon.vue:32
+msgid "Add to playlist..."
+msgstr "Aggiungi alla playlist..."
+
+#: front/src/components/audio/PlayButton.vue:14
+msgid "Add to queue"
+msgstr "Aggiungi alla coda"
+
+#: front/src/components/playlists/PlaylistModal.vue:116
+msgid "Add to this playlist"
+msgstr "Aggiungi a questa playlist"
+
+#: front/src/components/playlists/PlaylistModal.vue:54
+msgid "Add track"
+msgstr "Aggiungi traccia"
+
+#: front/src/components/manage/users/UsersTable.vue:69
+msgid "Admin"
+msgstr "Amministratore"
+
+#: front/src/components/Sidebar.vue:64
+msgid "Administration"
+msgstr "Amministrazione"
+
+#: front/src/components/audio/SearchBar.vue:26
+#: src/components/audio/track/Table.vue:8
+#: front/src/components/federation/LibraryTrackTable.vue:49
+#: front/src/components/library/Album.vue:91
+#: front/src/components/manage/library/FilesTable.vue:39
+#: front/src/components/metadata/Search.vue:134
+msgid "Album"
+msgstr "Album"
+
+#: front/src/components/library/import/ReleaseImport.vue:3
+msgid "Album %{ title } (%{ count } track) by %{ artist }"
+msgid_plural "Album %{ title } (%{ count } tracks) by %{ artist }"
+msgstr[0] "Album %{ title } (%{ count } traccia) di %{ artist }"
+msgstr[1] "Album %{ title } (%{ count } tracce) di %{ artist }"
+
+#: front/src/components/library/Album.vue:12
+msgid "Album containing %{ count } track, by %{ artist }"
+msgid_plural "Album containing %{ count } tracks, by %{ artist }"
+msgstr[0] "Album contenente %{ count } traccia, di %{ artist }"
+msgstr[1] "Album contenente %{ count } tracce, di %{ artist }"
+
+#: front/src/components/library/Track.vue:20
+msgid "Album page"
+msgstr "Pagina dell'album"
+
+#: front/src/components/audio/Search.vue:19
+#: src/components/instance/Stats.vue:48
+#: front/src/components/manage/library/RequestsTable.vue:50
+#: front/src/components/requests/Form.vue:9
+msgid "Albums"
+msgstr "Albums"
+
+#: front/src/components/library/Artist.vue:44
+msgid "Albums by this artist"
+msgstr "Albums di questo artista"
+
+#: front/src/components/manage/library/RequestsTable.vue:26
+#: front/src/components/manage/users/InvitationsTable.vue:19
+msgid "All"
+msgstr "Tutto"
+
+#: front/src/components/playlists/Editor.vue:13
+msgid "An error occured while saving your changes"
+msgstr "C'è stato un errore durante il salvataggio delle tue modifiche"
+
+#: front/src/components/auth/Login.vue:10
+msgid "An unknown error happend, this can mean the server is down or cannot be reached"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:11
+#: front/src/components/library/import/BatchDetail.vue:68
+#: front/src/components/library/import/BatchList.vue:13
+#: front/src/components/library/import/BatchList.vue:22
+msgid "Any"
+msgstr "Qualsiasi"
+
+#: front/src/components/library/import/BatchList.vue:24
+msgid "API"
+msgstr "API"
+
+#: front/src/components/federation/LibraryFollowTable.vue:68
+#: front/src/components/federation/LibraryFollowTable.vue:78
+msgid "Approve"
+msgstr "Approva"
+
+#: front/src/components/federation/LibraryFollowTable.vue:70
+msgid "Approve access?"
+msgstr "Approvi l'accesso?"
+
+#: front/src/components/federation/LibraryFollowTable.vue:38
+msgid "Approved"
+msgstr "Approvato"
+
+#: front/src/components/auth/Logout.vue:5
+msgid "Are you sure you want to log out?"
+msgstr "Sei sicuro di volerti disconnettere?"
+
+#: front/src/components/audio/SearchBar.vue:25
+#: src/components/audio/track/Table.vue:7
+#: front/src/components/federation/LibraryTrackTable.vue:48
+#: front/src/components/library/Artist.vue:119
+#: front/src/components/manage/library/FilesTable.vue:38
+#: front/src/components/manage/library/RequestsTable.vue:49
+#: front/src/components/metadata/Search.vue:130
+msgid "Artist"
+msgstr "Artista"
+
+#: front/src/components/requests/Form.vue:5
+msgid "Artist name"
+msgstr "Nome dell'artista"
+
+#: front/src/components/library/Album.vue:22
+#: src/components/library/Track.vue:23
+msgid "Artist page"
+msgstr "Pagina dell'artista"
+
+#: front/src/components/audio/Search.vue:65
+msgid "Artist, album, track..."
+msgstr "Artista, album, traccia..."
+
+#: front/src/components/audio/Search.vue:10
+#: src/components/instance/Stats.vue:42
+#: front/src/components/library/Artists.vue:119
+#: src/components/library/Library.vue:7
+msgid "Artists"
+msgstr "Artisti"
+
+#: front/src/components/favorites/List.vue:33
+#: front/src/components/federation/LibraryTrackTable.vue:28
+#: front/src/components/library/Artists.vue:25
+#: src/components/library/Radios.vue:44
+#: front/src/components/manage/library/FilesTable.vue:19
+#: front/src/components/manage/library/RequestsTable.vue:19
+#: front/src/components/manage/users/UsersTable.vue:19
+#: front/src/views/federation/LibraryList.vue:28
+#: src/views/playlists/List.vue:27
+msgid "Ascending"
+msgstr "Crescente"
+
+#: front/src/views/auth/PasswordReset.vue:27
+msgid "Ask for a password reset"
+msgstr "Chiedi un reset della password"
+
+#: front/src/views/federation/LibraryDetail.vue:56
+msgid "Auto importing"
+msgstr "Auto importazione"
+
+#: front/src/components/playlists/PlaylistModal.vue:26
+msgid "Available playlists"
+msgstr "Playlist disponibili"
+
+#: front/src/components/auth/Settings.vue:34
+msgid "Avatar"
+msgstr ""
+
+#: front/src/views/auth/EmailConfirm.vue:17 src/views/auth/PasswordReset.vue:24
+#: front/src/views/auth/PasswordResetConfirm.vue:18
+msgid "Back to login"
+msgstr "Torna alla pagina di accesso"
+
+#: front/src/views/federation/LibraryFollowersList.vue:5
+msgid "Be careful when accepting follow requests, as it means the follower will have access to your entire library."
+msgstr "Fai attenzione quando accetti le richieste di seguirti, perchè significa che quell'utente avrà accesso a tutta la tua libreria."
+
+#: front/src/components/library/Track.vue:80
+#: front/src/components/manage/library/FilesTable.vue:42
+msgid "Bitrate"
+msgstr "Bitrate"
+
+#: front/src/components/Sidebar.vue:18 src/components/library/Library.vue:4
+msgid "Browse"
+msgstr "Sfoglia"
+
+#: front/src/components/Sidebar.vue:50
+msgid "Browse library"
+msgstr "Sfoglia libreria"
+
+#: front/src/components/library/Artists.vue:4
+msgid "Browsing artists"
+msgstr "Sfogliando artisti"
+
+#: front/src/views/federation/LibraryTrackList.vue:3
+msgid "Browsing federated tracks"
+msgstr "Sfogliando tracce federate"
+
+#: front/src/views/federation/LibraryFollowersList.vue:3
+msgid "Browsing followers"
+msgstr "Sfogliando followers"
+
+#: front/src/views/federation/LibraryList.vue:3
+msgid "Browsing libraries"
+msgstr "Sfogliando librerie"
+
+#: front/src/views/playlists/List.vue:3
+msgid "Browsing playlists"
+msgstr "Sfogliando playlists"
+
+#: front/src/components/library/Radios.vue:4
+msgid "Browsing radios"
+msgstr "Sfogliando radio"
+
+#: front/src/components/library/radios/Builder.vue:5
+msgid "Builder"
+msgstr "Crea"
+
+#: front/src/components/audio/album/Card.vue:13
+msgid "By %{ artist }"
+msgstr "Di %{ artist }"
+
+#: front/src/components/federation/LibraryFollowTable.vue:57
+msgid "By confirming, %{ username } will be denied access to your library."
+msgstr "Confermando, a %{ username } sarà negato l'accesso alla tua libreria."
+
+#: front/src/components/federation/LibraryFollowTable.vue:73
+msgid "By confirming, %{ username } will be granted access to your library."
+msgstr "Confermando, a %{ username } sarà consentito l'accesso alla tua libreria."
+
+#: front/src/components/audio/track/Table.vue:43
+#: front/src/components/common/DangerousButton.vue:17
+#: front/src/components/library/radios/Filter.vue:53
+#: front/src/components/playlists/PlaylistModal.vue:63
+msgid "Cancel"
+msgstr "Annulla"
+
+#: front/src/components/library/radios/Builder.vue:59
+msgid "Candidates"
+msgstr "Candidati"
+
+#: front/src/components/auth/Settings.vue:76
+msgid "Cannot change your password"
+msgstr "Non puoi cambiare la tua password"
+
+#: front/src/App.vue:66
+msgid "Change language"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:67
+msgid "Change my password"
+msgstr "Cambia la mia password"
+
+#: front/src/components/auth/Settings.vue:95
+msgid "Change password"
+msgstr "Cambia password"
+
+#: front/src/views/auth/PasswordResetConfirm.vue:4
+#: front/src/views/auth/PasswordResetConfirm.vue:62
+msgid "Change your password"
+msgstr "Cambia la tua password"
+
+#: front/src/components/auth/Settings.vue:96
+msgid "Change your password?"
+msgstr "Cambiare la tua password?"
+
+#: front/src/components/playlists/Editor.vue:21
+msgid "Changes synced with server"
+msgstr "Modifiche sincronizzate con il server"
+
+#: front/src/components/auth/Settings.vue:70
+msgid "Changing your password will also change your Subsonic API password if you have requested one."
+msgstr "Cambiando la tua password cambierà anche la password della API Subsonic se ne hai richiesta una."
+
+#: front/src/components/auth/Settings.vue:98
+msgid "Changing your password will have the following consequences"
+msgstr "Cambiare la tua password avrà queste conseguenze"
+
+#: front/src/App.vue:4
+msgid "Choose your instance"
+msgstr "Scegli la tua istanza"
+
+#: front/src/components/Home.vue:64
+msgid "Clean library"
+msgstr "Pulisci libreria"
+
+#: front/src/components/manage/users/InvitationForm.vue:37
+msgid "Clear"
+msgstr "Pulisci"
+
+#: front/src/components/playlists/Editor.vue:40
+#: front/src/components/playlists/Editor.vue:45
+msgid "Clear playlist"
+msgstr "Pulisci playlist"
+
+#: front/src/components/audio/Player.vue:270
+msgid "Clear your queue"
+msgstr "Pulisci la tua coda"
+
+#: front/src/components/library/import/BatchList.vue:23
+msgid "CLI"
+msgstr "CLI"
+
+#: front/src/components/Home.vue:44
+msgid "Click once, listen for hours using built-in radios"
+msgstr "Clicca una volta, ascolta per ore utilizzando le radio integrate"
+
+#: front/src/components/manage/library/RequestsTable.vue:30
+#: front/src/components/manage/library/RequestsTable.vue:64
+msgid "Closed"
+msgstr "Chiuso"
+
+#: front/src/components/manage/users/InvitationForm.vue:26
+#: front/src/components/manage/users/InvitationsTable.vue:42
+msgid "Code"
+msgstr "Codice"
+
+#: front/src/components/audio/album/Card.vue:43
+#: front/src/components/audio/artist/Card.vue:33
+#: front/src/components/discussion/Comment.vue:20
+msgid "Collapse"
+msgstr "Riduci"
+
+#: front/src/components/manage/library/RequestsTable.vue:51
+#: front/src/components/requests/Form.vue:14
+msgid "Comment"
+msgstr "Commenta"
+
+#: front/src/components/library/radios/Builder.vue:58
+msgid "Config"
+msgstr "Configurazione"
+
+#: front/src/components/common/DangerousButton.vue:21
+msgid "Confirm"
+msgstr "Conferma"
+
+#: front/src/views/auth/EmailConfirm.vue:4 src/views/auth/EmailConfirm.vue:20
+#: front/src/views/auth/EmailConfirm.vue:51
+msgid "Confirm your email"
+msgstr "Conferma la tua email"
+
+#: front/src/views/auth/EmailConfirm.vue:13
+msgid "Confirmation code"
+msgstr "Codice di conferma"
+
+#: front/src/components/playlists/Editor.vue:163
+msgid "Copy tracks from current queue to playlist"
+msgstr "Copia tracce dalla tua coda corrente alla playlist"
+
+#: front/src/components/Home.vue:88
+msgid "Covers, lyrics, our goal is to have them all ;)"
+msgstr "Copertine, testi, il nostro obbiettivo è averli tutti ;)"
+
+#: front/src/components/auth/Signup.vue:4
+msgid "Create a funkwhale account"
+msgstr "Crea un account funkwhale"
+
+#: front/src/components/playlists/Form.vue:2
+msgid "Create a new playlist"
+msgstr "Crea una nuova playlist"
+
+#: front/src/components/auth/Login.vue:17
+msgid "Create an account"
+msgstr "Crea un account"
+
+#: front/src/components/manage/library/RequestsTable.vue:88
+#: front/src/components/requests/Card.vue:25
+msgid "Create import"
+msgstr "Crea importazione"
+
+#: front/src/components/auth/Signup.vue:51
+msgid "Create my account"
+msgstr "Crea il mio account"
+
+#: front/src/components/playlists/Form.vue:34
+msgid "Create playlist"
+msgstr "Crea playlist"
+
+#: front/src/components/library/Radios.vue:23
+msgid "Create your own radio"
+msgstr "Crea la tua radio"
+
+#: front/src/components/federation/LibraryFollowTable.vue:22
+#: front/src/components/manage/library/RequestsTable.vue:52
+#: front/src/components/manage/users/InvitationsTable.vue:40
+msgid "Creation date"
+msgstr "Data di creazione"
+
+#: front/src/components/auth/Settings.vue:54
+#, fuzzy
+msgid "Current avatar"
+msgstr "Traccia corrente"
+
+#: front/src/components/playlists/PlaylistModal.vue:8
+msgid "Current track"
+msgstr "Traccia corrente"
+
+#: front/src/components/manage/library/FilesTable.vue:189
+#: front/src/components/manage/library/RequestsTable.vue:195
+#: front/src/components/manage/users/InvitationsTable.vue:166
+#: front/src/views/playlists/Detail.vue:33
+msgid "Delete"
+msgstr "Elimina"
+
+#: front/src/views/playlists/Detail.vue:38
+msgid "Delete playlist"
+msgstr "Elimina playlist"
+
+#: front/src/views/radios/Detail.vue:28
+msgid "Delete radio"
+msgstr "Elimina radio"
+
+#: front/src/components/federation/LibraryFollowTable.vue:52
+#: front/src/components/federation/LibraryFollowTable.vue:63
+msgid "Deny"
+msgstr "Nega"
+
+#: front/src/components/federation/LibraryFollowTable.vue:54
+msgid "Deny access?"
+msgstr "Negare accesso?"
+
+#: front/src/components/favorites/List.vue:34
+#: front/src/components/federation/LibraryTrackTable.vue:29
+#: front/src/components/library/Artists.vue:26
+#: src/components/library/Radios.vue:47
+#: front/src/components/manage/library/FilesTable.vue:20
+#: front/src/components/manage/library/RequestsTable.vue:20
+#: front/src/components/manage/users/UsersTable.vue:20
+#: front/src/views/federation/LibraryList.vue:29
+#: src/views/playlists/List.vue:28
+msgid "Descending"
+msgstr "Decrescente"
+
+#: front/src/components/federation/LibraryCard.vue:50
+msgid "Detail"
+msgstr "Dettaglio"
+
+#: front/src/views/admin/users/UsersDetail.vue:146
+#, fuzzy
+msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
+msgstr "Determina se un account utente è attivo o meno. Gli utenti inattivi non possono accedere o utilizzare il servizio."
+
+#: front/src/components/auth/Settings.vue:104
+#: front/src/components/auth/SubsonicTokenForm.vue:52
+msgid "Disable access"
+msgstr "Disabilita accesso"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:49
+msgid "Disable Subsonic access"
+msgstr "Disabilita accesso Subsonic"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:50
+msgid "Disable Subsonic API access?"
+msgstr "Disabilitare l'accesso alle API Subsonic?"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:14
+msgid "Discover how to use Funkwhale from other apps"
+msgstr "Scopri come utilizzare Funkwhale attraverso altre app"
+
+#: front/src/components/library/radios/Builder.vue:26
+msgid "Display publicly"
+msgstr "Mostra pubblicamente"
+
+#: front/src/components/playlists/Editor.vue:42
+msgid "Do you want to clear the playlist \"%{ playlist }\"?"
+msgstr "Vuoi pulire la playlist \"%{ playlist }\"?"
+
+#: front/src/components/common/DangerousButton.vue:7
+msgid "Do you want to confirm this action?"
+msgstr "Vuoi confermare questa azione?"
+
+#: front/src/views/playlists/Detail.vue:35
+msgid "Do you want to delete the playlist \"%{ playlist }\"?"
+msgstr "Vuoi eliminare la playlist \"%{ playlist }\"?"
+
+#: front/src/views/radios/Detail.vue:26
+#, fuzzy
+msgid "Do you want to delete the radio \"%{ radio }\"?"
+msgstr "Vuoi eliminare la radio \"{{ radio }}\"?"
+
+#: front/src/components/common/ActionTable.vue:29
+msgid "Do you want to launch %{ action } on %{ count } element?"
+msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/Sidebar.vue:113
+msgid "Do you want to restore your previous queue?"
+msgstr "Vuoi ripristinare la tua coda precedente?"
+
+#: front/src/App.vue:38
+msgid "Documentation"
+msgstr "Documentazione"
+
+#: front/src/components/audio/track/Table.vue:24
+#: src/components/library/Track.vue:48
+msgid "Download"
+msgstr "Scarica"
+
+#: front/src/components/audio/track/Table.vue:27
+#, fuzzy
+msgid "Download tracks"
+msgstr "Scarica"
+
+#: front/src/components/playlists/Editor.vue:49
+msgid "Drag and drop rows to reorder tracks in the playlist"
+msgstr "Trascina e rilascia righe per riordinare le tracce nella playlist"
+
+#: front/src/components/library/Track.vue:58
+#: front/src/components/manage/library/FilesTable.vue:43
+msgid "Duration"
+msgstr "Durata"
+
+#: front/src/components/Home.vue:96
+msgid "Easy to use"
+msgstr "Facile da utilizzare"
+
+#: front/src/components/About.vue:21
+msgid "Edit instance info"
+msgstr "Modifica le info dell'istanza"
+
+#: front/src/components/radios/Card.vue:20 src/views/playlists/Detail.vue:30
+msgid "Edit..."
+msgstr "Modifica..."
+
+#: front/src/components/auth/Signup.vue:29
+#: front/src/components/manage/users/UsersTable.vue:38
+msgid "Email"
+msgstr "Email"
+
+#: front/src/views/admin/users/UsersDetail.vue:29
+msgid "Email address"
+msgstr "Indirizzo email"
+
+#: front/src/views/auth/EmailConfirm.vue:23
+msgid "Email confirmed"
+msgstr "Email confermata"
+
+#: front/src/views/playlists/Detail.vue:29
+msgid "End edition"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:4
+msgid "Ensure your music files are properly tagged before uploading them."
+msgstr "Assicurati che i tuoi files musicali siano taggati in modo corretto prima di caricarli."
+
+#: front/src/components/library/Radios.vue:140
+msgid "Enter a radio name..."
+msgstr "Inserisci un nome di una radio..."
+
+#: front/src/components/library/Artists.vue:118
+msgid "Enter an artist name..."
+msgstr "Inserisci il nome di un artista..."
+
+#: front/src/views/federation/LibraryList.vue:122
+msgid "Enter an library domain name..."
+msgstr "Inserisci il nome del dominio di una libreria..."
+
+#: front/src/views/playlists/List.vue:104
+msgid "Enter an playlist name..."
+msgstr "Inserisci il nome di una playlist..."
+
+#: front/src/components/auth/Signup.vue:98
+msgid "Enter your email"
+msgstr "Inserisci la tua email"
+
+#: front/src/components/auth/Signup.vue:96
+msgid "Enter your invitation code (case insensitive)"
+msgstr "Inserisci il tuo codice di invito (non tiene conto di maiuscole o minuscole)"
+
+#: front/src/components/metadata/Search.vue:114
+msgid "Enter your search query..."
+msgstr "Inserisci i tuoi criteri di ricerca..."
+
+#: front/src/components/auth/Signup.vue:97
+msgid "Enter your username"
+msgstr "Inserisci il tuo nome utente"
+
+#: front/src/components/auth/Login.vue:77
+msgid "Enter your username or email"
+msgstr "Inserisci il tuo nome utente o l'email"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:20
+msgid "Error"
+msgstr "Errore"
+
+#: front/src/views/admin/Settings.vue:87
+msgid "Error reporting"
+msgstr "Segnalazione errore"
+
+#: front/src/components/common/ActionTable.vue:75
+msgid "Error while applying action"
+msgstr "Errore durante l'esecuzione dell'azione"
+
+#: front/src/views/auth/PasswordReset.vue:7
+msgid "Error while asking for a password reset"
+msgstr "Errore durante la richiesta di un reset della password"
+
+#: front/src/views/auth/PasswordResetConfirm.vue:7
+msgid "Error while changing your password"
+msgstr "Errore durante la modifica della password"
+
+#: front/src/views/auth/EmailConfirm.vue:7
+msgid "Error while confirming your email"
+msgstr "Errore durante la conferma della tua email"
+
+#: front/src/components/manage/users/InvitationForm.vue:4
+msgid "Error while creating invitation"
+msgstr "Errore durante la creazione dell'invito"
+
+#: front/src/components/admin/SettingsGroup.vue:5
+msgid "Error while saving settings"
+msgstr "Errore durante il salvataggio delle impostazioni"
+
+#: front/src/components/federation/LibraryForm.vue:10
+msgid "Error while scanning library"
+msgstr "Errore durante la scansione della libreria"
+
+#: front/src/components/library/import/BatchDetail.vue:41
+#: front/src/components/library/import/BatchDetail.vue:70
+#: front/src/components/library/import/BatchList.vue:15
+msgid "Errored"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:89
+msgid "Everyone"
+msgstr "Tutti"
+
+#: front/src/components/playlists/Form.vue:85
+msgid "Everyone on this instance"
+msgstr "Tutti su questa istanza"
+
+#: front/src/components/library/radios/Builder.vue:57
+msgid "Exclude"
+msgstr "Escludi"
+
+#: front/src/components/discussion/Comment.vue:14
+msgid "Expand"
+msgstr "Espandi"
+
+#: front/src/components/manage/users/InvitationsTable.vue:41
+msgid "Expiration date"
+msgstr "Data di scadenza"
+
+#: front/src/components/manage/users/InvitationsTable.vue:50
+msgid "Expired"
+msgstr "Scaduto"
+
+#: front/src/components/manage/users/InvitationsTable.vue:21
+msgid "Expired/used"
+msgstr "Scaduto/utilizzato"
+
+#: front/src/components/library/import/Main.vue:65
+msgid "External source. Supported backends"
+msgstr "Sorgente esterna. Supporta backends"
+
+#: front/src/components/Sidebar.vue:51
+msgid "Favorites"
+msgstr "Preferiti"
+
+#: front/src/components/federation/LibraryForm.vue:3
+msgid "Federate with a new instance"
+msgstr "Unisciti ad una nuova istanza"
+
+#: front/src/views/federation/LibraryTrackList.vue:21
+msgid "Federated tracks"
+msgstr "Tracce federate"
+
+#: front/src/components/Sidebar.vue:87
+#: src/components/library/import/BatchList.vue:25
+#: front/src/components/manage/users/UsersTable.vue:180
+#: front/src/views/admin/Settings.vue:84
+#: src/views/admin/users/UsersDetail.vue:161
+#: front/src/views/federation/Base.vue:35
+#: src/views/federation/LibraryDetail.vue:40
+msgid "Federation"
+msgstr "Federazione"
+
+#: front/src/views/federation/LibraryDetail.vue:3
+msgid "File mirroring"
+msgstr "Mirroring dei file"
+
+#: front/src/components/library/import/FileUpload.vue:43
+msgid "File name"
+msgstr "Nome file"
+
+#: front/src/components/library/import/Main.vue:76
+msgid "File upload"
+msgstr "Carica file"
+
+#: front/src/views/admin/library/Base.vue:5
+#: src/views/admin/library/FilesList.vue:21
+msgid "Files"
+msgstr "Files"
+
+#: front/src/components/library/import/ArtistImport.vue:7
+msgid "Filter album types"
+msgstr "Filtra tipi di album"
+
+#: front/src/components/library/radios/Builder.vue:56
+msgid "Filter name"
+msgstr "Filtra nome"
+
+#: front/src/components/library/import/Main.vue:52
+msgid "Finish import"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:54
+msgid "Finished"
+msgstr "Finito"
+
+#: front/src/components/library/import/Main.vue:59
+msgid "First, choose where you want to import the music from"
+msgstr "Prima, scegli da dove vuoi importare la musica"
+
+#: front/src/components/federation/LibraryCard.vue:44
+msgid "Follow"
+msgstr "Segui"
+
+#: front/src/components/federation/LibraryCard.vue:36
+msgid "Follow request pending approval"
+msgstr "Richiesta di seguire in attesa di approvazione"
+
+#: front/src/views/federation/LibraryDetail.vue:21
+msgid "Follow status"
+msgstr "Stato di segui"
+
+#: front/src/views/federation/Base.vue:13
+#: front/src/views/federation/LibraryFollowersList.vue:24
+msgid "Followers"
+msgstr "Seguito da"
+
+#: front/src/components/federation/LibraryCard.vue:18
+msgid "Followers only"
+msgstr "Solo chi segue"
+
+#: front/src/components/federation/LibraryCard.vue:15
+#: front/src/views/federation/LibraryDetail.vue:29
+msgid "Following"
+msgstr ""
+
+#: front/src/components/activity/Like.vue:12
+#: src/components/activity/Listen.vue:12
+msgid "from %{ album } by %{ artist }"
+msgstr "da %{ album } di %{ artist }"
+
+#: front/src/components/library/Track.vue:13
+msgid "From album %{ album } by %{ artist }"
+msgstr "Dall'album %{ album } di %{ artist }"
+
+#: front/src/App.vue:56
+msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:7
+msgid "Funkwhale is compatible with other music players that support the Subsonic API."
+msgstr ""
+
+#: front/src/components/Home.vue:98
+msgid "Funkwhale is dead simple to use."
+msgstr "Funkwhale è semplicissimo da usare."
+
+#: front/src/components/Home.vue:39
+msgid "Funkwhale is designed to make it easy to listen to music you like, or to discover new artists."
+msgstr ""
+
+#: front/src/components/Home.vue:119
+msgid "Funkwhale is free and gives you control on your music."
+msgstr ""
+
+#: front/src/components/Home.vue:66
+msgid "Funkwhale takes care of handling your music"
+msgstr ""
+
+#: front/src/components/manage/users/InvitationForm.vue:16
+msgid "Get a new invitation"
+msgstr "Ottieni un nuovo invito"
+
+#: front/src/components/Home.vue:13
+msgid "Get me to the library"
+msgstr "Portami alla libreria"
+
+#: front/src/components/Home.vue:77
+msgid ""
+"Get quality metadata about your music thanks to\n"
+"              <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
+"                MusicBrainz\n"
+"              </a>"
+msgstr ""
+
+#: front/src/components/common/ActionTable.vue:21
+#: front/src/components/common/ActionTable.vue:27
+msgid "Go"
+msgstr "Vai"
+
+#: front/src/components/PageNotFound.vue:14
+msgid "Go to home page"
+msgstr "Vai alla pagina iniziale"
+
+#: front/src/components/library/import/Main.vue:13
+msgid "Grab corresponding metadata"
+msgstr ""
+
+#: front/src/App.vue:74
+msgid "Help us translate Funkwhale"
+msgstr ""
+
+#: front/src/components/library/Home.vue:65
+msgid "Home"
+msgstr "Pagina Iniziale"
+
+#: front/src/components/instance/Stats.vue:36
+msgid "Hours of music"
+msgstr "Ore di musica"
+
+#: front/src/components/auth/SubsonicTokenForm.vue:11
+msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
+msgstr ""
+
+#: front/src/components/library/import/BatchList.vue:34
+msgid "ID"
+msgstr ""
+
+#: front/src/views/auth/PasswordResetConfirm.vue:24
+msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:196
+#: front/src/components/library/Library.vue:17
+msgid "Import"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:57
+msgid "Import #%{ id } launched"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:38
+msgid "Import %{ count } track"
+msgid_plural "Import %{ count } tracks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/library/import/BatchDetail.vue:10
+msgid "Import batch"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:185
+msgid "Import Batch #%{ id }"
+msgstr ""
+
+#: front/src/components/library/Library.vue:20
+msgid "Import batches"
+msgstr ""
+
+#: front/src/components/library/import/BatchList.vue:117
+msgid "Import Batches"
+msgstr ""
+
+#: front/src/components/manage/library/FilesTable.vue:40
+#: front/src/components/manage/library/RequestsTable.vue:53
+msgid "Import date"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:38
+msgid "Import detail page"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:81
+msgid "Import music"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:267
+msgid "Import Music"
+msgstr ""
+
+#: front/src/components/Home.vue:71
+msgid "Import music from various platforms, such as YouTube or SoundCloud"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:14
+#: front/src/components/federation/LibraryTrackTable.vue:66
+msgid "Import pending"
+msgstr ""
+
+#: front/src/views/admin/library/Base.vue:9
+#: front/src/views/admin/library/RequestsList.vue:3
+#: front/src/views/admin/library/RequestsList.vue:21
+msgid "Import requests"
+msgstr ""
+
+#: front/src/components/library/import/BatchList.vue:20
+#: front/src/components/library/import/Main.vue:6
+msgid "Import source"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:9
+msgid "Import status"
+msgstr ""
+
+#: front/src/components/library/import/ReleaseImport.vue:14
+msgid "Import this release"
+msgstr ""
+
+#: front/src/components/library/import/TrackImport.vue:11
+msgid "Import this track"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:12
+#: front/src/components/manage/library/RequestsTable.vue:29
+#: front/src/components/manage/library/RequestsTable.vue:61
+msgid "Imported"
+msgstr ""
+
+#: front/src/components/library/import/TrackImport.vue:44
+msgid "Imported URL"
+msgstr ""
+
+#: front/src/views/admin/Settings.vue:82
+msgid "Imports"
+msgstr ""
+
+#: front/src/components/favorites/TrackFavoriteIcon.vue:3
+msgid "In favorites"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:65
+msgid "In library"
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:54
+msgid "Inactive"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:96
+msgid "Input a MusicBrainz ID manually:"
+msgstr ""
+
+#: front/src/views/auth/PasswordReset.vue:53
+msgid "Input the email address binded to your account"
+msgstr ""
+
+#: front/src/components/playlists/Editor.vue:31
+msgid "Insert from queue (%{ count } track)"
+msgid_plural "Insert from queue (%{ count } tracks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/views/admin/Settings.vue:80
+msgid "Instance information"
+msgstr ""
+
+#: front/src/components/library/Radios.vue:9
+#, fuzzy
+msgid "Instance radios"
+msgstr "Modifica le info dell'istanza"
+
+#: front/src/views/admin/Settings.vue:75
+msgid "Instance settings"
+msgstr ""
+
+#: front/src/views/instance/Timeline.vue:57
+msgid "Instance Timeline"
+msgstr ""
+
+#: front/src/components/auth/Signup.vue:42
+#: front/src/components/manage/users/InvitationForm.vue:11
+msgid "Invitation code"
+msgstr ""
+
+#: front/src/components/auth/Signup.vue:43
+msgid "Invitation code (optional)"
+msgstr ""
+
+#: front/src/views/admin/users/Base.vue:8
+#: src/views/admin/users/InvitationsList.vue:3
+#: front/src/views/admin/users/InvitationsList.vue:24
+msgid "Invitations"
+msgstr ""
+
+#: front/src/App.vue:43
+msgid "Issue tracker"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:80
+msgid "Job ID"
+msgstr ""
+
+#: front/src/components/library/import/BatchList.vue:36
+msgid "Jobs"
+msgstr ""
+
+#: front/src/components/Home.vue:50
+msgid "Keep a track of your favorite songs"
+msgstr ""
+
+#: front/src/components/audio/track/Table.vue:33
+msgid "Keep your PRIVATE_TOKEN secret as it gives access to your account."
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:41
+#: front/src/views/admin/users/UsersDetail.vue:45
+msgid "Last activity"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:101
+msgid "Last fetched"
+msgstr ""
+
+#: front/src/components/playlists/PlaylistModal.vue:32
+msgid "Last modification"
+msgstr ""
+
+#: front/src/components/common/ActionTable.vue:39
+msgid "Launch"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:18
+#: front/src/components/library/import/BatchList.vue:35
+msgid "Launch date"
+msgstr ""
+
+#: front/src/components/federation/LibraryForm.vue:31
+msgid "Launch scan"
+msgstr ""
+
+#: front/src/components/Home.vue:10
+msgid "Learn more about this instance"
+msgstr ""
+
+#: front/src/components/manage/users/InvitationForm.vue:58
+msgid "Leave empty for a random code"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:10
+msgid "Leave this field empty if you're requesting the whole discography."
+msgstr ""
+
+#: front/src/views/federation/Base.vue:5
+#: src/views/federation/LibraryList.vue:123
+msgid "Libraries"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:70
+#: front/src/components/federation/LibraryTrackTable.vue:51
+#: front/src/components/instance/Stats.vue:30
+#: front/src/components/manage/users/UsersTable.vue:176
+#: front/src/views/admin/users/UsersDetail.vue:157
+#: front/src/views/federation/LibraryDetail.vue:194
+msgid "Library"
+msgstr ""
+
+#: front/src/views/admin/library/FilesList.vue:3
+msgid "Library files"
+msgstr ""
+
+#: front/src/components/federation/LibraryForm.vue:20
+msgid "Library name"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:84
+msgid "Library size"
+msgstr ""
+
+#: front/src/components/federation/LibraryForm.vue:96
+msgid "library@demo.funkwhale.audio"
+msgstr ""
+
+#: front/src/App.vue:29
+msgid "Links"
+msgstr ""
+
+#: front/src/views/instance/Timeline.vue:4
+msgid "Loading timeline..."
+msgstr ""
+
+#: front/src/components/favorites/List.vue:5
+msgid "Loading your favorites..."
+msgstr ""
+
+#: front/src/components/auth/Login.vue:78
+msgid "Log In"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:4
+msgid "Log in to your Funkwhale account"
+msgstr ""
+
+#: front/src/components/auth/Logout.vue:20
+msgid "Log Out"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:38
+msgid "Logged in as %{ username }"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:44 src/components/auth/Login.vue:41
+msgid "Login"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:43
+msgid "Logout"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:266
+msgid "Looping disabled. Click to switch to single-track looping."
+msgstr ""
+
+#: front/src/components/audio/Player.vue:267
+msgid "Looping on a single track. Click to switch to whole queue looping."
+msgstr ""
+
+#: front/src/components/audio/Player.vue:268
+msgid "Looping on whole queue. Click to disable looping."
+msgstr ""
+
+#: front/src/components/library/Track.vue:94
+msgid "Lyrics"
+msgstr ""
+
+#: front/src/views/admin/library/Base.vue:25
+msgid "Manage library"
+msgstr ""
+
+#: front/src/components/playlists/PlaylistModal.vue:3
+msgid "Manage playlists"
+msgstr ""
+
+#: front/src/views/admin/users/Base.vue:20
+msgid "Manage users"
+msgstr ""
+
+#: front/src/views/playlists/List.vue:8
+msgid "Manage your playlists"
+msgstr ""
+
+#: front/src/components/manage/library/RequestsTable.vue:197
+msgid "Mark as closed"
+msgstr ""
+
+#: front/src/components/manage/library/RequestsTable.vue:196
+msgid "Mark as imported"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:12
+msgid "Metadata"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:115
+msgid ""
+"Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the\n"
+"            <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
+"              MusicBrainz\n"
+"            </a>\n"
+"            project, which you can think about as the Wikipedia of music."
+msgstr ""
+
+#: front/src/components/Sidebar.vue:48
+#: src/components/library/import/Main.vue:18
+msgid "Music"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:147
+msgid "Music request"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:265
+msgid "Mute"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:34
+msgid "My account"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:74
+msgid "My awesome playlist"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:227
+msgid "My awesome radio"
+msgstr ""
+
+#: front/src/components/library/Track.vue:64
+#: src/components/library/Track.vue:75
+#: front/src/components/library/Track.vue:86
+#: front/src/components/manage/library/FilesTable.vue:63
+#: front/src/components/manage/library/FilesTable.vue:69
+#: front/src/components/manage/library/FilesTable.vue:75
+#: front/src/components/manage/library/FilesTable.vue:81
+#: front/src/components/manage/library/RequestsTable.vue:71
+#: front/src/components/manage/library/RequestsTable.vue:75
+#: front/src/components/manage/library/RequestsTable.vue:82
+#: front/src/components/manage/users/UsersTable.vue:61
+#: front/src/views/admin/users/UsersDetail.vue:49
+msgid "N/A"
+msgstr ""
+
+#: front/src/components/playlists/PlaylistModal.vue:31
+#: front/src/views/admin/users/UsersDetail.vue:21
+msgid "Name"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:88
+#: front/src/views/auth/PasswordResetConfirm.vue:14
+msgid "New password"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:158
+msgid "New tracks will be appended here automatically."
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:29
+msgid "Next step"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:263
+msgid "Next track"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:125
+msgid "No"
+msgstr ""
+
+#: front/src/components/Home.vue:103
+msgid "No add-ons, no plugins : you only need a web library"
+msgstr ""
+
+#: front/src/components/library/Track.vue:102
+msgid "No lyrics available for this track."
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:81
+msgid "Nobody except me"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:32
+msgid "Not following"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:13
+#: front/src/components/federation/LibraryTrackTable.vue:67
+msgid "Not imported"
+msgstr ""
+
+#: front/src/components/manage/users/InvitationsTable.vue:51
+msgid "Not used"
+msgstr ""
+
+#: front/src/App.vue:37
+msgid "Official website"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:83
+#, fuzzy
+msgid "Old password"
+msgstr "Cambia password"
+
+#: front/src/components/library/import/FileUpload.vue:36
+msgid "Once all your files are uploaded, simply click the following button to check the import status."
+msgstr ""
+
+#: front/src/components/federation/LibraryCard.vue:21
+#: front/src/components/manage/users/InvitationsTable.vue:20
+msgid "Open"
+msgstr ""
+
+#: front/src/App.vue:63
+msgid "Options"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:93
+msgid "Or"
+msgstr ""
+
+#: front/src/components/favorites/List.vue:23
+#: front/src/components/federation/LibraryTrackTable.vue:18
+#: front/src/components/library/Artists.vue:15
+#: src/components/library/Radios.vue:33
+#: front/src/components/manage/library/FilesTable.vue:9
+#: front/src/components/manage/library/RequestsTable.vue:9
+#: front/src/components/manage/users/InvitationsTable.vue:9
+#: front/src/components/manage/users/UsersTable.vue:9
+#: front/src/views/federation/LibraryList.vue:18
+#: src/views/playlists/List.vue:17
+msgid "Ordering"
+msgstr ""
+
+#: front/src/components/favorites/List.vue:31
+#: front/src/components/federation/LibraryTrackTable.vue:26
+#: front/src/components/library/Artists.vue:23
+#: src/components/library/Radios.vue:41
+#: front/src/components/manage/library/FilesTable.vue:17
+#: front/src/components/manage/library/RequestsTable.vue:17
+#: front/src/components/manage/users/UsersTable.vue:17
+#: front/src/views/federation/LibraryList.vue:26
+#: src/views/playlists/List.vue:25
+msgid "Ordering direction"
+msgstr ""
+
+#: front/src/components/manage/users/InvitationsTable.vue:38
+msgid "Owner"
+msgstr ""
+
+#: front/src/components/PageNotFound.vue:33
+msgid "Page Not Found"
+msgstr ""
+
+#: front/src/components/PageNotFound.vue:7
+msgid "Page not found!"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:32 src/components/auth/Signup.vue:38
+msgid "Password"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:95
+msgid "Password updated"
+msgstr ""
+
+#: front/src/views/auth/PasswordResetConfirm.vue:28
+msgid "Password updated successfully"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:262
+msgid "Pause track"
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:46
+#: front/src/components/library/import/BatchDetail.vue:33
+#: front/src/components/library/import/BatchDetail.vue:69
+#: front/src/components/library/import/BatchList.vue:14
+#: front/src/components/library/import/FileUpload.vue:59
+#: front/src/components/manage/library/RequestsTable.vue:27
+#: front/src/components/manage/library/RequestsTable.vue:63
+msgid "Pending"
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:11
+#: front/src/views/federation/LibraryDetail.vue:26
+msgid "Pending approval"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:217
+msgid "Pending follow requests"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:216 src/views/admin/library/Base.vue:26
+msgid "Pending import requests"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:26 src/views/federation/Base.vue:36
+msgid "Pending requests"
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:42
+#: front/src/views/admin/users/UsersDetail.vue:68
+msgid "Permissions"
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:9
+#: src/components/library/Track.vue:30
+msgid "Play"
+msgstr ""
+
+#: front/src/components/audio/album/Card.vue:50
+#: front/src/components/audio/artist/Card.vue:44
+#: src/components/library/Album.vue:28 front/src/views/playlists/Detail.vue:23
+msgid "Play all"
+msgstr ""
+
+#: front/src/components/library/Artist.vue:26
+msgid "Play all albums"
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:58
+msgid "Play immediatly"
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:15
+msgid "Play next"
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:16
+msgid "Play now"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:261
+msgid "Play track"
+msgstr ""
+
+#: front/src/views/playlists/Detail.vue:90
+msgid "Playlist"
+msgstr ""
+
+#: front/src/views/playlists/Detail.vue:12
+msgid "Playlist containing %{ count } track, by %{ username }"
+msgid_plural "Playlist containing %{ count } tracks, by %{ username }"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/playlists/Form.vue:9
+msgid "Playlist created"
+msgstr ""
+
+#: front/src/components/playlists/Editor.vue:4
+msgid "Playlist editor"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:21
+msgid "Playlist name"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:6
+msgid "Playlist updated"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:25
+msgid "Playlist visibility"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:56 src/components/library/Home.vue:16
+#: front/src/components/library/Library.vue:13 src/views/admin/Settings.vue:83
+#: front/src/views/playlists/List.vue:103
+msgid "Playlists"
+msgstr ""
+
+#: front/src/components/Home.vue:56
+msgid "Playlists? We got them"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:79
+msgid "Please double-check your password is correct"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:9
+msgid "Please double-check your username/password couple is correct"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:46
+msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:26
+msgid "Previous step"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:260
+msgid "Previous track"
+msgstr ""
+
+#: front/src/views/auth/EmailConfirm.vue:26
+#: front/src/views/auth/PasswordResetConfirm.vue:31
+msgid "Proceed to login"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:50
+msgid "Published date"
+msgstr ""
+
+#: front/src/components/library/import/ArtistImport.vue:17
+msgid "Query template"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:20
+msgid "Queue"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:203
+msgid "Queue shuffled!"
+msgstr ""
+
+#: front/src/views/radios/Detail.vue:80
+msgid "Radio"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:226
+msgid "Radio Builder"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:15
+msgid "Radio created"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:21
+msgid "Radio name"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:12
+#, fuzzy
+msgid "Radio updated"
+msgstr "Data di creazione"
+
+#: front/src/components/library/Library.vue:10
+#: src/components/library/Radios.vue:141
+msgid "Radios"
+msgstr ""
+
+#: front/src/views/instance/Timeline.vue:7
+msgid "Recent activity on this instance"
+msgstr ""
+
+#: front/src/components/library/Home.vue:24
+msgid "Recently added"
+msgstr ""
+
+#: front/src/components/library/Home.vue:11
+#, fuzzy
+msgid "Recently favorited"
+msgstr "1 mi piace"
+
+#: front/src/components/library/Home.vue:6
+msgid "Recently listened"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:81
+msgid "Recording MusicBrainz ID"
+msgstr ""
+
+#: front/src/views/admin/users/UsersDetail.vue:84
+#: front/src/views/federation/LibraryDetail.vue:122
+msgid "Refresh"
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:42
+msgid "Refused"
+msgstr ""
+
+#: front/src/components/auth/Profile.vue:12
+msgid "Registered since %{ date }"
+msgstr ""
+
+#: front/src/components/auth/Signup.vue:9
+msgid "Registration are closed on this instance, you will need an invitation code to signup."
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:71
+msgid "regular user"
+msgstr ""
+
+#: front/src/components/library/radios/Filter.vue:59
+msgid "Remove"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:58
+msgid "Remove avatar"
+msgstr ""
+
+#: front/src/components/favorites/TrackFavoriteIcon.vue:19
+msgid "Remove from favorites"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:34
+#: front/src/components/auth/SubsonicTokenForm.vue:37
+msgid "Request a new password"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:35
+msgid "Request a new Subsonic API password?"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:43
+msgid "Request a password"
+msgstr ""
+
+#: front/src/App.vue:35
+msgid "Request music"
+msgstr ""
+
+#: front/src/views/library/MusicRequest.vue:4
+#: src/views/library/MusicRequest.vue:21
+#, fuzzy
+msgid "Request some music"
+msgstr "Ore di musica"
+
+#: front/src/components/requests/Form.vue:20
+msgid "Request submitted!"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:49
+msgid "Rerun errored jobs"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:187
+msgid "Rerun job"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:34 src/views/auth/PasswordReset.vue:4
+#: front/src/views/auth/PasswordReset.vue:52
+msgid "Reset your password"
+msgstr ""
+
+#: front/src/components/library/import/TrackImport.vue:31
+msgid "Result %{ current }/%{ total }"
+msgstr ""
+
+#: front/src/components/favorites/List.vue:38
+#: src/components/library/Artists.vue:30
+#: front/src/components/library/Radios.vue:52
+#: src/views/federation/LibraryList.vue:33
+#: front/src/views/playlists/List.vue:32
+msgid "Results per page"
+msgstr ""
+
+#: front/src/components/admin/SettingsGroup.vue:63
+#: front/src/components/library/radios/Builder.vue:29
+msgid "Save"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:112
+msgid "Scan triggered!"
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:5
+#: front/src/components/library/Artists.vue:10
+#: src/components/library/Radios.vue:29
+#: front/src/components/library/import/BatchDetail.vue:62
+#: front/src/components/library/import/BatchList.vue:7
+#: front/src/components/manage/library/FilesTable.vue:5
+#: front/src/components/manage/library/RequestsTable.vue:5
+#: front/src/components/manage/users/InvitationsTable.vue:5
+#: front/src/components/manage/users/UsersTable.vue:5
+#: front/src/views/federation/LibraryList.vue:14
+#: src/views/playlists/List.vue:13
+msgid "Search"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:85
+msgid "Search an entity you want to import:"
+msgstr ""
+
+#: front/src/components/manage/library/RequestsTable.vue:180
+msgid "Search by artist, username, comment..."
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:188
+msgid "Search by source..."
+msgstr ""
+
+#: front/src/components/library/import/BatchList.vue:116
+msgid "Search by submitter, source..."
+msgstr ""
+
+#: front/src/components/federation/LibraryTrackTable.vue:182
+#: front/src/components/manage/library/FilesTable.vue:175
+msgid "Search by title, artist, domain..."
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:140
+msgid "Search by username, domain..."
+msgstr ""
+
+#: front/src/components/manage/users/InvitationsTable.vue:152
+msgid "Search by username, email, code..."
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:162
+msgid "Search by username, email, name..."
+msgstr ""
+
+#: front/src/components/audio/SearchBar.vue:20
+msgid "Search for artists, albums, tracks..."
+msgstr ""
+
+#: front/src/components/audio/Search.vue:2
+msgid "Search for some music"
+msgstr ""
+
+#: front/src/components/library/Track.vue:105
+msgid "Search on lyrics.wikia.com"
+msgstr ""
+
+#: front/src/components/library/Album.vue:33
+#: src/components/library/Artist.vue:31
+#: front/src/components/library/Track.vue:40
+msgid "Search on Wikipedia"
+msgstr ""
+
+#: front/src/components/library/import/TrackImport.vue:42
+msgid "Search query"
+msgstr ""
+
+#: front/src/views/admin/Settings.vue:15
+msgid "Sections"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:41
+msgid "Select a filter"
+msgstr ""
+
+#: front/src/components/common/ActionTable.vue:61
+msgid "Select all %{ total } elements"
+msgid_plural "Select all %{ total } elements"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/library/import/FileUpload.vue:22
+msgid "Select files to upload..."
+msgstr ""
+
+#: front/src/components/common/ActionTable.vue:69
+msgid "Select only current page"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:19
+msgid "Select relevant sources or files for import"
+msgstr ""
+
+#: front/src/components/federation/LibraryCard.vue:43
+msgid "Send a follow request"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:97
+#: src/components/manage/users/UsersTable.vue:184
+#: front/src/views/admin/users/UsersDetail.vue:165
+msgid "Settings"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:10
+msgid "Settings updated"
+msgstr ""
+
+#: front/src/components/admin/SettingsGroup.vue:11
+msgid "Settings updated successfully."
+msgstr ""
+
+#: front/src/components/auth/Profile.vue:24
+msgid "Settings..."
+msgstr ""
+
+#: front/src/components/manage/users/InvitationForm.vue:27
+msgid "Share link"
+msgstr ""
+
+#: front/src/components/audio/artist/Card.vue:30
+msgid "Show 1 more album"
+msgid_plural "Show %{ count } more albums"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/audio/album/Card.vue:40
+msgid "Show 1 more track"
+msgid_plural "Show %{ count } more tracks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: front/src/components/forms/PasswordInput.vue:25
+msgid "Show/hide password"
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:97
+#: front/src/components/federation/LibraryTrackTable.vue:98
+#: front/src/components/library/import/BatchDetail.vue:128
+#: front/src/components/library/import/BatchList.vue:73
+#: front/src/components/manage/library/FilesTable.vue:97
+#: front/src/components/manage/library/RequestsTable.vue:104
+#: front/src/components/manage/users/InvitationsTable.vue:76
+#: front/src/components/manage/users/UsersTable.vue:87
+msgid "Showing results %{ start }-%{ end } on %{ total }"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:269
+msgid "Shuffle your queue"
+msgstr ""
+
+#: front/src/components/auth/Signup.vue:95
+msgid "Sign Up"
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:40
+#: front/src/views/admin/users/UsersDetail.vue:37
+msgid "Sign-up"
+msgstr ""
+
+#: front/src/components/audio/track/Table.vue:31
+msgid "Simply copy paste the snippet below into a terminal to launch the download."
+msgstr ""
+
+#: front/src/components/library/Track.vue:69
+#: front/src/components/library/import/FileUpload.vue:44
+#: front/src/components/manage/library/FilesTable.vue:44
+msgid "Size"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:37
+#: front/src/components/library/import/BatchDetail.vue:72
+msgid "Skipped"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:3
+msgid "Something's missing in the library? Let us know what you would like to listen!"
+msgstr ""
+
+#: front/src/components/audio/Search.vue:25
+msgid "Sorry, we did not found any album matching your query"
+msgstr ""
+
+#: front/src/components/audio/Search.vue:16
+msgid "Sorry, we did not found any artist matching your query"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:82
+#: front/src/components/library/import/BatchList.vue:38
+#: front/src/components/library/import/TrackImport.vue:17
+msgid "Source"
+msgstr ""
+
+#: front/src/App.vue:41
+msgid "Source code"
+msgstr ""
+
+#: front/src/App.vue:40
+msgid "Source code (%{version})"
+msgstr ""
+
+#: front/src/components/auth/Profile.vue:20
+#: front/src/components/manage/users/UsersTable.vue:70
+msgid "Staff member"
+msgstr ""
+
+#: front/src/components/radios/Button.vue:4
+msgid "Start"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:28
+msgid "Start Upload"
+msgstr ""
+
+#: front/src/views/admin/Settings.vue:86
+msgid "Statistics"
+msgstr ""
+
+#: front/src/components/federation/LibraryFollowTable.vue:23
+#: front/src/components/federation/LibraryTrackTable.vue:46
+#: front/src/components/library/import/BatchDetail.vue:66
+#: front/src/components/library/import/BatchDetail.vue:83
+#: front/src/components/library/import/BatchList.vue:11
+#: front/src/components/library/import/BatchList.vue:37
+#: front/src/components/library/import/FileUpload.vue:45
+#: front/src/components/manage/library/RequestsTable.vue:24
+#: front/src/components/manage/library/RequestsTable.vue:48
+#: front/src/components/manage/users/InvitationsTable.vue:17
+#: front/src/components/manage/users/InvitationsTable.vue:39
+#: front/src/components/manage/users/UsersTable.vue:43
+msgid "Status"
+msgstr ""
+
+#: front/src/components/radios/Button.vue:3
+msgid "Stop"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:159
+msgid "Stop radio"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:32
+msgid "Stop Upload"
+msgstr ""
+
+#: front/src/App.vue:9 src/components/requests/Form.vue:17
+msgid "Submit"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:22
+msgid "Submit another request"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:26
+#: front/src/components/library/import/BatchList.vue:39
+msgid "Submitted by"
+msgstr ""
+
+#: front/src/views/admin/Settings.vue:85
+msgid "Subsonic"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:2
+msgid "Subsonic API password"
+msgstr ""
+
+#: front/src/components/library/import/BatchDetail.vue:71
+#: front/src/components/library/import/BatchList.vue:16
+#: front/src/components/library/import/FileUpload.vue:56
+msgid "Success"
+msgstr ""
+
+#: front/src/App.vue:11
+msgid "Suggested choices"
+msgstr ""
+
+#: front/src/components/playlists/Editor.vue:9
+msgid "Syncing changes to server..."
+msgstr ""
+
+#: front/src/components/Home.vue:26
+msgid "That's simple: we loved Grooveshark and we want to build something even better."
+msgstr ""
+
+#: front/src/components/requests/Form.vue:73
+msgid "The Beatles, Mickael Jackson…"
+msgstr ""
+
+#: front/src/App.vue:59
+msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
+msgstr ""
+
+#: front/src/components/Home.vue:124
+msgid "The plaform is free and open-source, you can install it and modify it without worries"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:4
+msgid "The Subsonic API is not available on this Funkwhale instance."
+msgstr ""
+
+#: front/src/components/requests/Form.vue:74
+msgid "The White Album, Thriller…"
+msgstr ""
+
+#: front/src/components/audio/track/Table.vue:30
+msgid "There is currently no way to download directly multiple tracks from funkwhale as a ZIP archive. However, you can use a command line tools such as cURL to easily download a list of tracks."
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:149
+msgid "This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled."
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:195
+msgid "This indicate if the remote library granted you access"
+msgstr ""
+
+#: front/src/components/auth/Profile.vue:16
+msgid "This is you!"
+msgstr ""
+
+#: front/src/components/common/ActionTable.vue:37
+msgid "This may affect a lot of elements, please double check this is really what you want."
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:61
+msgid "This track is not imported and cannot be played"
+msgstr ""
+
+#: front/src/views/playlists/Detail.vue:37
+msgid "This will completely delete this playlist and cannot be undone."
+msgstr ""
+
+#: front/src/views/radios/Detail.vue:27
+msgid "This will completely delete this radio and cannot be undone."
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:51
+msgid "This will completely disable access to the Subsonic API using from account."
+msgstr ""
+
+#: front/src/App.vue:137
+msgid "This will erase your local data and disconnect you, do you want to continue?"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:36
+msgid "This will log you out from existing devices that use the current password."
+msgstr ""
+
+#: front/src/components/playlists/Editor.vue:44
+msgid "This will remove all tracks from this playlist and cannot be undone."
+msgstr ""
+
+#: front/src/components/audio/track/Table.vue:6
+#: front/src/components/federation/LibraryTrackTable.vue:47
+#: front/src/components/manage/library/FilesTable.vue:37
+msgid "Title"
+msgstr ""
+
+#: front/src/components/audio/SearchBar.vue:27
+#: src/components/library/Track.vue:174
+#: front/src/components/library/import/BatchDetail.vue:84
+#: front/src/components/metadata/Search.vue:138
+msgid "Track"
+msgstr ""
+
+#: front/src/components/library/Track.vue:53
+msgid "Track information"
+msgstr ""
+
+#: front/src/components/library/radios/Filter.vue:44
+msgid "Track matching filter"
+msgstr ""
+
+#: front/src/components/instance/Stats.vue:54
+msgid "tracks"
+msgstr ""
+
+#: front/src/components/library/Album.vue:43
+#: front/src/components/playlists/PlaylistModal.vue:33
+#: front/src/views/federation/Base.vue:8 src/views/playlists/Detail.vue:50
+#: front/src/views/radios/Detail.vue:34
+msgid "Tracks"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:125
+msgid "Tracks available in this library"
+msgstr ""
+
+#: front/src/components/library/Artist.vue:54
+#, fuzzy
+msgid "Tracks by this artist"
+msgstr "Albums di questo artista"
+
+#: front/src/components/instance/Stats.vue:25
+msgid "Tracks favorited"
+msgstr ""
+
+#: front/src/components/instance/Stats.vue:19
+msgid "tracks listened"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:109
+msgid "Trigger scan"
+msgstr ""
+
+#: front/src/components/manage/library/FilesTable.vue:41
+msgid "Type"
+msgstr ""
+
+#: front/src/components/About.vue:15
+msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:95
+msgid "Unknown"
+msgstr ""
+
+#: front/src/components/Home.vue:37
+msgid "Unlimited music"
+msgstr ""
+
+#: front/src/components/audio/Player.vue:264
+msgid "Unmute"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:50
+msgid "Update avatar"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:33
+msgid "Update playlist"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:27
+msgid "Update settings"
+msgstr ""
+
+#: front/src/views/auth/PasswordResetConfirm.vue:21
+msgid "Update your password"
+msgstr ""
+
+#: front/src/components/manage/users/UsersTable.vue:172
+#: front/src/views/admin/users/UsersDetail.vue:153
+msgid "Upload"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:45
+msgid "Upload a new avatar"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:7
+msgid "Uploaded files or external source"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:57
+msgid "Uploading..."
+msgstr ""
+
+#: front/src/App.vue:45
+msgid "Use another instance"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:75
+msgid "Use this comment box to add details to your request if needed"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:196
+msgid "Use this flag to enable/disable federation with this library"
+msgstr ""
+
+#: front/src/views/auth/PasswordReset.vue:12
+msgid "Use this form to request a password reset. We will send an email to the given address with instructions to reset your password."
+msgstr ""
+
+#: front/src/components/federation/LibraryForm.vue:6
+msgid "Use this form to scan an instance and setup federation."
+msgstr ""
+
+#: front/src/components/manage/users/InvitationsTable.vue:49
+msgid "Used"
+msgstr ""
+
+#: front/src/components/manage/library/RequestsTable.vue:47
+msgid "User"
+msgstr ""
+
+#: front/src/components/instance/Stats.vue:5
+msgid "User activity"
+msgstr ""
+
+#: front/src/components/library/Radios.vue:20
+#, fuzzy
+msgid "User radios"
+msgstr "Sfogliando radio"
+
+#: front/src/components/auth/Signup.vue:19
+#: front/src/components/manage/users/UsersTable.vue:37
+msgid "Username"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:15
+msgid "Username or email"
+msgstr ""
+
+#: front/src/components/instance/Stats.vue:13
+msgid "users"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:103 src/views/admin/Settings.vue:81
+#: front/src/views/admin/users/Base.vue:5 src/views/admin/users/UsersList.vue:3
+#: front/src/views/admin/users/UsersList.vue:21
+msgid "Users"
+msgstr ""
+
+#: front/src/components/library/Album.vue:37
+#: src/components/library/Artist.vue:35
+#: front/src/components/library/Track.vue:44
+#: front/src/components/library/import/ArtistImport.vue:131
+#: front/src/components/metadata/ArtistCard.vue:49
+#: front/src/components/metadata/ReleaseCard.vue:53
+msgid "View on MusicBrainz"
+msgstr ""
+
+#: front/src/components/playlists/PlaylistModal.vue:20
+msgid "We cannot add the track to a playlist"
+msgstr ""
+
+#: front/src/components/playlists/Form.vue:14
+msgid "We cannot create the playlist"
+msgstr ""
+
+#: front/src/components/auth/Signup.vue:13
+msgid "We cannot create your account"
+msgstr ""
+
+#: front/src/components/auth/Login.vue:7
+msgid "We cannot log you in"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:38
+#, fuzzy
+msgid "We cannot save your avatar"
+msgstr "Non puoi cambiare la tua password"
+
+#: front/src/components/auth/Settings.vue:14
+msgid "We cannot save your settings"
+msgstr ""
+
+#: front/src/components/Home.vue:130
+msgid "We do not track you or bother you with ads"
+msgstr ""
+
+#: front/src/components/library/import/FileUpload.vue:5
+msgid "We recommend using Picard for that purpose."
+msgstr ""
+
+#: front/src/components/Home.vue:7
+msgid "We think listening to music should be simple."
+msgstr ""
+
+#: front/src/components/PageNotFound.vue:10
+msgid "We're sorry, the page you asked for does not exist:"
+msgstr ""
+
+#: front/src/components/requests/Form.vue:21
+msgid "We've received your request, you'll get some groove soon ;)"
+msgstr ""
+
+#: front/src/components/Home.vue:152
+msgid "Welcome"
+msgstr ""
+
+#: front/src/components/Home.vue:5
+msgid "Welcome on Funkwhale"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:114
+msgid "What is metadata?"
+msgstr ""
+
+#: front/src/views/federation/LibraryDetail.vue:197
+msgid "When enabled, auto importing will automatically import new tracks published in this library"
+msgstr ""
+
+#: front/src/components/Home.vue:24
+msgid "Why funkwhale?"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:124
+msgid "Yes"
+msgstr ""
+
+#: front/src/components/auth/Logout.vue:8
+msgid "Yes, log me out!"
+msgstr ""
+
+#: front/src/components/auth/Logout.vue:7
+msgid "You are currently logged in as %{ username }"
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:111
+msgid "You can also skip this step and enter metadata manually."
+msgstr ""
+
+#: front/src/components/Home.vue:136
+msgid "You can invite friends and family to your instance so they can enjoy your music"
+msgstr ""
+
+#: front/src/components/library/radios/Builder.vue:7
+msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:8
+msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
+msgstr ""
+
+#: front/src/components/Sidebar.vue:156
+msgid "You have a radio playing"
+msgstr ""
+
+#: front/src/App.vue:6
+msgid "You need to select an instance in order to continue"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:100
+msgid "You will be logged out from this session and have to log in with the new one"
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:71
+msgid "You will have to update your password on your clients that use this password."
+msgstr ""
+
+#: front/src/components/library/import/Main.vue:103
+msgid "You will import:"
+msgstr ""
+
+#: front/src/views/auth/EmailConfirm.vue:24
+msgid "Your email address was confirmed, you can now use the service without limitations."
+msgstr ""
+
+#: front/src/components/favorites/List.vue:109
+msgid "Your Favorites"
+msgstr ""
+
+#: front/src/components/Home.vue:117
+msgid "Your music, your way"
+msgstr ""
+
+#: front/src/views/auth/PasswordResetConfirm.vue:29
+msgid "Your password has been updated successfully."
+msgstr ""
+
+#: front/src/components/auth/Settings.vue:101
+msgid "Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password"
+msgstr ""
+
+#: front/src/components/audio/PlayButton.vue:156
+msgid "%{ count } track was added to your queue"
+msgid_plural "%{ count } tracks were added to your queue"
+msgstr[0] ""
+msgstr[1] ""

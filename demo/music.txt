@@ -1,8 +1,0 @@
-# You can get a pretty list of open music here: https://archive.org/details/jamendo-albums
-https://archive.org/compress/jamendo-069098/formats=OGG%20VORBIS&file=/jamendo-069098.zip
-https://archive.org/compress/jamendo-001144/formats=OGG%20VORBIS&file=/jamendo-001144.zip
-https://archive.org/compress/jamendo-027690/formats=OGG%20VORBIS&file=/jamendo-027690.zip
-https://archive.org/compress/jamendo-001469/formats=OGG%20VORBIS&file=/jamendo-001469.zip
-https://archive.org/compress/jamendo-106323/formats=OGG%20VORBIS&file=/jamendo-106323.zip
-https://archive.org/compress/jamendo-071149/formats=OGG%20VORBIS&file=/jamendo-071149.zip
-https://archive.org/compress/jamendo-085030/formats=OGG%20VORBIS&file=/jamendo-085030.zip

@@ -88,7 +88,7 @@ Default: ``Funkwhale <noreply@yourdomain>``
 Default: ``None``
 
 The path on your server where Funwkhale can import files using :ref:`in-place import
-<in-place-import>`. It must be readable by the webserver and funkwhale
+<in-place-import>`. It must be readable by the webserver and Funkwhale
 api and worker processes.
 
 On docker installations, we recommend you use the default of ``/music``
@@ -123,6 +123,16 @@ Then, the value of :ref:`setting-MUSIC_DIRECTORY_SERVE_PATH` should be
 On non-docker setup, you don't need to configure this setting.
 
 .. note:: This path should not include any trailing slash
+
+.. _setting-REVERSE_PROXY_TYPE:
+
+``REVERSE_PROXY_TYPE``
+^^^^^^^^^^^^^^^^^^^^^^
+
+Default: ``nginx``
+
+The type of reverse-proxy behind which Funkwhale is served. Either ``apache2``
+or ``nginx``. This is only used if you are using in-place import.
 
 User permissions
 ----------------

@@ -37,6 +37,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
 
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     album = factories["music.Album"]()
+    artist = factories["music.Artist"]()
     mocker.patch(
         "funkwhale_api.music.models.Album.get_or_create_from_api",
         return_value=(album, True),
@@ -55,6 +56,9 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
                             "recording": {
                                 "id": "2109e376-132b-40ad-b993-2bb6812e19d4",
                                 "title": "Teen Age Riot",
+                                "artist-credit": [
+                                    {"artist": {"id": artist.mbid, "name": artist.name}}
+                                ],
                             },
                         }
                     ],
@@ -79,7 +83,7 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     assert track.mbid == track_data["recording"]["id"]
     assert track.position == 4
     assert track.album == album
-    assert track.artist == album.artist
+    assert track.artist == artist
 
 
 def test_management_command_requires_a_valid_username(factories, mocker):

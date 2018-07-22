@@ -23,7 +23,7 @@
       <button
         @click="createImport"
         v-if="request.status === 'pending' && importAction && $store.state.auth.availablePermissions['library']"
-        class="ui mini basic green right floated button">{{ $t('Create import') }}</button>
+        class="ui mini basic green right floated button"><translate>Create import</translate></button>
 
     </div>
   </div>

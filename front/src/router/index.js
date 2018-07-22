@@ -35,6 +35,7 @@ import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
+import MusicRequest from '@/views/library/MusicRequest'
 import FederationBase from '@/views/federation/Base'
 import FederationScan from '@/views/federation/Scan'
 import FederationLibraryDetail from '@/views/federation/LibraryDetail'
@@ -218,7 +219,12 @@ export default new Router({
       path: '/library',
       component: Library,
       children: [
-        { path: '', component: LibraryHome },
+        { path: '', component: LibraryHome, name: 'library.index' },
+        {
+          path: 'requests/',
+          name: 'library.request',
+          component: MusicRequest
+        },
         {
           path: 'artists/',
           name: 'library.artists.browse',

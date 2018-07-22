@@ -19,7 +19,7 @@
             <tbody>
               <tr>
                 <td>
-                  {{ $t('Name') }}
+                  <translate>Name</translate>
                 </td>
                 <td>
                   {{ object.name }}
@@ -27,7 +27,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Email address') }}
+                  <translate>Email address</translate>
                 </td>
                 <td>
                   {{ object.email }}
@@ -35,7 +35,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Sign-up') }}
+                  <translate>Sign-up</translate>
                 </td>
                 <td>
                   <human-date :date="object.date_joined"></human-date>
@@ -43,17 +43,17 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Last activity') }}
+                  <translate>Last activity</translate>
                 </td>
                 <td>
                   <human-date v-if="object.last_activity" :date="object.last_activity"></human-date>
-                  <template v-else>{{ $t('N/A') }}</template>
+                  <template v-else><translate>N/A</translate></template>
                 </td>
               </tr>
               <tr>
                 <td>
-                  {{ $t('Account active') }}
-                  <span :data-tooltip="$t('Determine if the user account is active or not. Inactive users cannot login or user the service.')"><i class="question circle icon"></i></span>
+                  <translate>Account active</translate>
+                  <span :data-tooltip="labels.inactive"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -66,7 +66,7 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Permissions') }}
+                  <translate>Permissions</translate>
                 </td>
                 <td>
                   <select
@@ -82,7 +82,7 @@
           </table>
         </div>
         <div class="ui hidden divider"></div>
-        <button @click="fetchData" class="ui basic button">{{ $t('Refresh') }}</button>
+        <button @click="fetchData" class="ui basic button"><translate>Refresh</translate></button>
       </div>
     </template>
   </div>
@@ -141,23 +141,28 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or use the service.')
+      }
+    },
     allPermissions () {
       return [
         {
           'code': 'upload',
-          'label': this.$t('Upload')
+          'label': this.$gettext('Upload')
         },
         {
           'code': 'library',
-          'label': this.$t('Library')
+          'label': this.$gettext('Library')
         },
         {
           'code': 'federation',
-          'label': this.$t('Federation')
+          'label': this.$gettext('Federation')
         },
         {
           'code': 'settings',
-          'label': this.$t('Settings')
+          'label': this.$gettext('Settings')
         }
       ]
     }

@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         name = options["script_name"]
         if not name:
-            self.show_help()
+            return self.show_help()
 
         available_scripts = self.get_scripts()
         try:
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(name))
             self.stdout.write("")
             for line in script["help"].splitlines():
-                self.stdout.write("     {}".format(line))
+                self.stdout.write("     {}".format(line))
         self.stdout.write("")
 
     def get_scripts(self):

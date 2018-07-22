@@ -1,6 +1,8 @@
 import logging
+import mimetypes
 import urllib.parse
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import transaction
 from rest_framework import serializers
@@ -63,6 +65,15 @@ class ActorSerializer(serializers.Serializer):
         ret["endpoints"] = {}
         if instance.shared_inbox_url:
             ret["endpoints"]["sharedInbox"] = instance.shared_inbox_url
+        try:
+            if instance.user.avatar:
+                ret["icon"] = {
+                    "type": "Image",
+                    "mediaType": mimetypes.guess_type(instance.user.avatar.path)[0],
+                    "url": utils.full_url(instance.user.avatar.crop["400x400"].url),
+                }
+        except ObjectDoesNotExist:
+            pass
         return ret
 
     def prepare_missing_fields(self):

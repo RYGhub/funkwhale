@@ -1,23 +1,25 @@
 <template>
-  <div class="main pusher" v-title="'About This Instance'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <template v-if="instance.name.value">{{ $t('About {%instance%}', { instance: instance.name.value }) }}</template>
-            <template v-else="instance.name.value">{{ $t('About this instance') }}</template>
+            <translate v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
+             About %{ instance }
+            </translate>
+            <translate v-else>About this instance</translate>
         </h1>
         <stats></stats>
       </div>
     </div>
     <div class="ui vertical stripe segment">
       <p v-if="!instance.short_description.value && !instance.long_description.value">
-        {{ $t('Unfortunately, owners of this instance did not yet take the time to complete this page.') }}
+        <translate>Unfortunately, owners of this instance did not yet take the time to complete this page.</translate>
       </p>
       <router-link
         class="ui button"
         v-if="$store.state.auth.availablePermissions['settings']"
         :to="{path: '/manage/settings', hash: 'instance'}">
-        <i class="pencil icon"></i>{{ $t('Edit instance info') }}
+        <i class="pencil icon"></i><translate>Edit instance info</translate>
       </router-link>
       <div
         v-if="instance.short_description.value"
@@ -47,7 +49,12 @@ export default {
   computed: {
     ...mapState({
       instance: state => state.instance.settings.instance
-    })
+    }),
+    labels () {
+      return {
+        title: this.$gettext('About this instance')
+      }
+    }
   }
 }
 </script>

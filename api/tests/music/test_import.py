@@ -1,10 +1,15 @@
 import json
 import os
+import pytest
+import uuid
 
+from django import forms
 from django.urls import reverse
 
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import serializers as federation_serializers
+from funkwhale_api.music import importers
+from funkwhale_api.music import models
 from funkwhale_api.music import tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -237,3 +242,9 @@ def test__do_import_in_place_mbid(factories, tmpfile):
     assert bool(tf.audio_file) is False
     assert tf.source == "file://{}".format(path)
     assert tf.mimetype == "audio/ogg"
+
+
+def test_importer_cleans():
+    importer = importers.Importer(models.Artist)
+    with pytest.raises(forms.ValidationError):
+        importer.load({"name": "", "mbid": uuid.uuid4()}, {}, [])

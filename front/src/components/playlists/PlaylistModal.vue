@@ -1,33 +1,37 @@
 <template>
   <modal @update:show="update" :show="$store.state.playlists.showModal">
     <div class="header">
-      {{ $t('Manage playlists') }}
+      <translate>Manage playlists</translate>
     </div>
     <div class="scrolling content">
       <div class="description">
         <template v-if="track">
-          <h4 class="ui header">{{ $t('Current track') }}</h4>
-          <div v-html='trackDisplay'></div>
+          <h4 class="ui header"><translate>Current track</translate></h4>
+          <translate
+            v-translate="{artist: track.artist.name, title: track.title}"
+            :translate-params="{artist: track.artist.name, title: track.title}">
+            "%{ title }", by %{ artist }
+          </translate>
           <div class="ui divider"></div>
         </template>
 
-        <playlist-form></playlist-form>
+        <playlist-form :key="formKey"></playlist-form>
         <div class="ui divider"></div>
         <div v-if="errors.length > 0" class="ui negative message">
-          <div class="header">{{ $t('We cannot add the track to a playlist') }}</div>
+          <div class="header"><translate>We cannot add the track to a playlist</translate></div>
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
         </div>
-        <h4 class="ui header">{{ $t('Available playlists') }}</h4>
+        <h4 class="ui header"><translate>Available playlists</translate></h4>
         <table class="ui unstackable very basic table">
           <thead>
             <tr>
               <th></th>
-              <th>{{ $t('Name') }}</th>
-              <th class="sorted descending">{{ $t('Last modification') }}</th>
-              <th>{{ $t('Tracks') }}</th>
+              <th><translate>Name</translate></th>
+              <th class="sorted descending"><translate>Last modification</translate></th>
+              <th><translate>Tracks</translate></th>
               <th></th>
             </tr>
           </thead>
@@ -46,9 +50,9 @@
                 <div
                   v-if="track"
                   class="ui green icon basic small right floated button"
-                  :title="$t('Add to this playlist')"
+                  :title="labels.addToPlaylist"
                   @click="addToPlaylist(playlist.id)">
-                  <i class="plus icon"></i> {{ $t('Add track') }}
+                  <i class="plus icon"></i> <translate>Add track</translate>
                 </div>
               </td>
             </tr>
@@ -57,7 +61,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button">{{ $t('Cancel') }}</div>
+      <div class="ui cancel button"><translate>Cancel</translate></div>
     </div>
   </modal>
 </template>
@@ -78,6 +82,7 @@ export default {
   },
   data () {
     return {
+      formKey: String(new Date()),
       errors: []
     }
   },
@@ -106,21 +111,23 @@ export default {
       playlists: state => state.playlists.playlists,
       track: state => state.playlists.modalTrack
     }),
+    labels () {
+      return {
+        addToPlaylist: this.$gettext('Add to this playlist')
+      }
+    },
     sortedPlaylists () {
       let p = _.sortBy(this.playlists, [(e) => { return e.modification_date }])
       p.reverse()
       return p
-    },
-    trackDisplay () {
-      return this.$t('"{%title%}" by {%artist%}', {
-        title: this.track.title,
-        artist: this.track.artist.name }
-      )
     }
   },
   watch: {
     '$store.state.route.path' () {
       this.$store.commit('playlists/showModal', false)
+    },
+    '$store.state.playlists.showModal' () {
+      this.formKey = String(new Date())
     }
   }
 }

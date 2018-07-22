@@ -14,7 +14,7 @@
       <div v-if="currentTrack" class="track-area ui unstackable items">
         <div class="ui inverted item">
           <div class="ui tiny image">
-            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover)">
+            <img ref="cover" @load="updateBackground" v-if="currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
             <img v-else src="../../assets/audio/default-cover.png">
           </div>
           <div class="middle aligned content">
@@ -57,44 +57,60 @@
 
       <div class="two wide column controls ui grid">
         <div
-          :title="$t('Previous track')"
+          :title="labels.previousTrack"
           class="two wide column control"
           :disabled="emptyQueue">
-            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'big', 'icon']"></i>
+            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
         </div>
         <div
           v-if="!playing"
-          :title="$t('Play track')"
+          :title="labels.play"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
         </div>
         <div
           v-else
-          :title="$t('Pause track')"
+          :title="labels.pause"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'big', 'icon']"></i>
+            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
         </div>
         <div
-          :title="$t('Next track')"
+          :title="labels.next"
           class="two wide column control"
           :disabled="!hasNext">
-            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'big', 'icon']" ></i>
+            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
         </div>
-        <div class="two wide column control volume-control">
-          <i :title="$t('Unmute')" @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
-          <i :title="$t('Mute')" @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
-          <i :title="$t('Mute')" @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
-          <input type="range" step="0.05" min="0" max="1" v-model="sliderVolume" />
-        </div>
-        <div class="two wide column control looping">
+        <div
+          class="wide column control volume-control"
+          v-on:mouseover="showVolume = true"
+          v-on:mouseleave="showVolume = false"
+          v-bind:class="{ active : showVolume }">
           <i
-            :title="$t('Looping disabled. Click to switch to single-track looping.')"
+            :title="labels.unmute"
+            @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
+          <i
+            :title="labels.mute"
+            @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
+          <i
+            :title="labels.mute"
+            @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
+          <input
+            type="range"
+            step="0.05"
+            min="0"
+            max="1"
+            v-model="sliderVolume"
+            v-if="showVolume" />
+        </div>
+        <div class="two wide column control looping" v-if="!showVolume">
+          <i
+            :title="labels.loopingDisabled"
             v-if="looping === 0"
             @click="$store.commit('player/looping', 1)"
             :disabled="!currentTrack"
             :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
           <i
-            :title="$t('Looping on a single track. Click to switch to whole queue looping.')"
+            :title="labels.loopingSingle"
             v-if="looping === 1"
             @click="$store.commit('player/looping', 2)"
             :disabled="!currentTrack"
@@ -102,7 +118,7 @@
             <span class="ui circular tiny orange label">1</span>
           </i>
           <i
-            :title="$t('Looping on whole queue. Click to disable looping.')"
+            :title="labels.loopingWhole"
             v-if="looping === 2"
             @click="$store.commit('player/looping', 0)"
             :disabled="!currentTrack"
@@ -111,15 +127,17 @@
         </div>
         <div
           :disabled="queue.tracks.length === 0"
-          :title="$t('Shuffle your queue')"
+          :title="labels.shuffle"
+          v-if="!showVolume"
           class="two wide column control">
-          <div v-if="isShuffling" class="ui inline shuffling inverted small active loader"></div>
+          <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
           <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
-        <div class="one wide column"></div>
+        <div class="one wide column" v-if="!showVolume"></div>
         <div
           :disabled="queue.tracks.length === 0"
-          :title="$t('Clear your queue')"
+          :title="labels.clear"
+          v-if="!showVolume"
           class="two wide column control">
           <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </div>
@@ -162,6 +180,7 @@ export default {
       renderAudio: true,
       sliderVolume: this.volume,
       defaultAmbiantColors: defaultAmbiantColors,
+      showVolume: false,
       ambiantColors: defaultAmbiantColors
     }
   },
@@ -176,16 +195,18 @@ export default {
       updateProgress: 'player/updateProgress'
     }),
     shuffle () {
-      if (this.isShuffling) {
+      let disabled = this.queue.tracks.length === 0
+      if (this.isShuffling || disabled) {
         return
       }
       let self = this
+      let msg = this.$gettext('Queue shuffled!')
       this.isShuffling = true
       setTimeout(() => {
         self.$store.dispatch('queue/shuffle', () => {
           self.isShuffling = false
           self.$store.commit('ui/addMessage', {
-            content: self.$t('Queue shuffled!'),
+            content: msg,
             date: new Date()
           })
         })
@@ -235,6 +256,32 @@ export default {
       currentTimeFormatted: 'player/currentTimeFormatted',
       progress: 'player/progress'
     }),
+    labels () {
+      let previousTrack = this.$gettext('Previous track')
+      let play = this.$gettext('Play track')
+      let pause = this.$gettext('Pause track')
+      let next = this.$gettext('Next track')
+      let unmute = this.$gettext('Unmute')
+      let mute = this.$gettext('Mute')
+      let loopingDisabled = this.$gettext('Looping disabled. Click to switch to single-track looping.')
+      let loopingSingle = this.$gettext('Looping on a single track. Click to switch to whole queue looping.')
+      let loopingWhole = this.$gettext('Looping on whole queue. Click to disable looping.')
+      let shuffle = this.$gettext('Shuffle your queue')
+      let clear = this.$gettext('Clear your queue')
+      return {
+        previousTrack,
+        play,
+        pause,
+        next,
+        unmute,
+        mute,
+        loopingDisabled,
+        loopingSingle,
+        loopingWhole,
+        shuffle,
+        clear
+      }
+    },
     style: function () {
       let style = {
         'background': this.ambiantGradiant
@@ -337,16 +384,16 @@ export default {
 }
 .volume-control {
   position: relative;
+  width: 12.5% !important;
   .icon {
     // margin: 0;
   }
   [type="range"] {
-    max-width: 100%;
+    max-width: 70%;
     position: absolute;
-    bottom: 5px;
-    left: 10%;
+    bottom: 1.1rem;
+    left: 25%;
     cursor: pointer;
-    display: none;
   }
   input[type=range] {
     -webkit-appearance: none;
@@ -357,22 +404,32 @@ export default {
   input[type=range]::-webkit-slider-runnable-track {
     cursor: pointer;
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-webkit-slider-thumb {
     background: white;
     cursor: pointer;
     -webkit-appearance: none;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]:focus::-webkit-slider-runnable-track {
     background: #white;
+    opacity: 0.3;
   }
   input[type=range]::-moz-range-track {
     cursor: pointer;
     background: white;
+    opacity: 0.3;
+  }
+  input[type=range]::-moz-focus-outer {
+    border: 0;
   }
   input[type=range]::-moz-range-thumb {
     background: white;
     cursor: pointer;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]::-ms-track {
     cursor: pointer;
@@ -382,13 +439,17 @@ export default {
   }
   input[type=range]::-ms-fill-lower {
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-ms-fill-upper {
     background: white;
+    opacity: 0.3;
   }
   input[type=range]::-ms-thumb {
     background: white;
     cursor: pointer;
+    border-radius: 3px;
+    width: 10px;
   }
   input[type=range]:focus::-ms-fill-lower {
     background: white;
@@ -396,11 +457,10 @@ export default {
   input[type=range]:focus::-ms-fill-upper {
     background: #white;
   }
-  &:hover {
-    [type="range"] {
-      display: block;
-    }
-  }
+}
+
+.active.volume-control {
+  width: 60% !important;
 }
 
 .looping.control {

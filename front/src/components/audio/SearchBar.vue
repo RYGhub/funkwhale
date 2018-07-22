@@ -1,7 +1,7 @@
 <template>
   <div class="ui fluid category search">
     <slot></slot><div class="ui icon input">
-      <input class="prompt" placeholder="Search for artists, albums, tracks..." type="text">
+      <input class="prompt" :placeholder="labels.placeholder" type="text">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
@@ -14,7 +14,17 @@ import jQuery from 'jquery'
 import router from '@/router'
 
 export default {
+  computed: {
+    labels () {
+      return {
+        placeholder: this.$gettext('Search for artists, albums, tracks...')
+      }
+    }
+  },
   mounted () {
+    let artistLabel = this.$gettext('Artist')
+    let albumLabel = this.$gettext('Album')
+    let trackLabel = this.$gettext('Track')
     let self = this
     jQuery(this.$el).search({
       type: 'category',
@@ -39,7 +49,7 @@ export default {
             {
               code: 'artists',
               route: 'library.artists.detail',
-              name: 'Artist',
+              name: artistLabel,
               getTitle (r) {
                 return r.name
               },
@@ -50,7 +60,7 @@ export default {
             {
               code: 'albums',
               route: 'library.albums.detail',
-              name: 'Album',
+              name: albumLabel,
               getTitle (r) {
                 return r.title
               },
@@ -61,7 +71,7 @@ export default {
             {
               code: 'tracks',
               route: 'library.tracks.detail',
-              name: 'Track',
+              name: trackLabel,
               getTitle (r) {
                 return r.title
               },

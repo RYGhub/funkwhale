@@ -11,13 +11,15 @@
         <span
           @click="collapsed = false"
           v-if="truncated && collapsed"
-          class="expand"
-          path="Expand"/>
-        <i18next
+          class="expand">
+          <translate>Expand</translate>
+        </span>
+        <span
           @click="collapsed = true"
           v-if="truncated && !collapsed"
-          class="collapse"
-          path="Collapse"/>
+          class="collapse">
+          <translate>Collapse</translate>
+        </span>
       </div>
     </div>
   </div>

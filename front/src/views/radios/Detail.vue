@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="'Radio'">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <div v-if="!isLoading && radio" class="ui head vertical center aligned stripe segment" v-title="radio.name">
@@ -24,15 +24,15 @@
           </router-link>
           <dangerous-button class="labeled icon" :action="deleteRadio">
             <i class="trash icon"></i> Delete
-            <p slot="modal-header">Do you want to delete the radio "{{ radio.name }}"?</p>
-            <p slot="modal-content">This will completely delete this radio and cannot be undone.</p>
-            <p slot="modal-confirm">Delete radio</p>
+            <p slot="modal-header"><translate :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</translate></p>
+            <p slot="modal-content"><translate>This will completely delete this radio and cannot be undone.</translate></p>
+            <p slot="modal-confirm"><translate>Delete radio</translate></p>
           </dangerous-button>
         </template>
       </div>
     </div>
     <div class="ui vertical stripe segment">
-      <h2>Tracks</h2>
+      <h2><translate>Tracks</translate></h2>
       <track-table :tracks="tracks"></track-table>
       <div class="ui center aligned basic segment">
         <pagination
@@ -73,6 +73,13 @@ export default {
   },
   created: function () {
     this.fetch()
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Radio')
+      }
+    }
   },
   methods: {
     selectPage: function (page) {

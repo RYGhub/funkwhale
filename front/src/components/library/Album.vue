@@ -1,40 +1,49 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="'Album'">
+    <div v-if="isLoading" class="ui vertical segment" v-title="">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="album">
-      <div :class="['ui', 'head', {'with-background': album.cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
+      <div :class="['ui', 'head', {'with-background': album.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted sound yellow icon"></i>
             <div class="content">
               {{ album.title }}
-              <i18next tag="div" class="sub header" path="Album containing {%0%} tracks, by {%1%}">
-                {{ album.tracks.length }}
-                <router-link :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-                  {{ album.artist.name }}
-                </router-link>
-              </i18next>
+              <translate
+                tag="div"
+                translate-plural="Album containing %{ count } tracks, by %{ artist }"
+                :translate-n="album.tracks.length"
+                :translate-params="{count: album.tracks.length, artist: album.artist.name}">
+                Album containing %{ count } track, by %{ artist }
+              </translate>
+            </div>
+            <div class="ui basic buttons">
+              <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+                <translate>Artist page</translate>
+              </router-link>
             </div>
           </h2>
           <div class="ui hidden divider"></div>
-          </button>
-          <play-button class="orange" :tracks="album.tracks"><i18next path="Play all"/></play-button>
+          <play-button class="orange" :tracks="album.tracks">
+            <translate>Play all</translate>
+          </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            <i18next path="Search on Wikipedia"/>
+            <translate>Search on Wikipedia</translate>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <i18next path="View on MusicBrainz"/>
+            <translate>View on MusicBrainz</translate>
           </a>
         </div>
       </div>
       <div class="ui vertical stripe segment">
-        <h2><i18next path="Tracks"/></h2>
-        <track-table v-if="album" :display-position="true" :tracks="album.tracks"></track-table>
+        <h2>
+          <translate>Tracks</translate>
+        </h2>
+        <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
     </template>
   </div>
@@ -77,6 +86,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Album')
+      }
+    },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.album.title + ' ' + this.album.artist.name
     },
@@ -84,10 +98,10 @@ export default {
       return 'https://musicbrainz.org/release/' + this.album.mbid
     },
     headerStyle () {
-      if (!this.album.cover) {
+      if (!this.album.cover.original) {
         return ''
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover) + ')'
+      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover.original) + ')'
     }
   },
   watch: {

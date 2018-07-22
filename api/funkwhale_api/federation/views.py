@@ -32,6 +32,24 @@ class FederationMixin(object):
         return super().dispatch(request, *args, **kwargs)
 
 
+class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    lookup_field = "user__username"
+    lookup_value_regex = ".*"
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    queryset = models.Actor.objects.local().select_related("user")
+    serializer_class = serializers.ActorSerializer
+
+    @detail_route(methods=["get", "post"])
+    def inbox(self, request, *args, **kwargs):
+        return response.Response({}, status=200)
+
+    @detail_route(methods=["get", "post"])
+    def outbox(self, request, *args, **kwargs):
+        return response.Response({}, status=200)
+
+
 class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
     lookup_field = "actor"
     lookup_value_regex = "[a-z]*"
@@ -100,6 +118,8 @@ class WellKnownViewSet(viewsets.GenericViewSet):
             resource_type, resource = webfinger.clean_resource(request.GET["resource"])
             cleaner = getattr(webfinger, "clean_{}".format(resource_type))
             result = cleaner(resource)
+            handler = getattr(self, "handler_{}".format(resource_type))
+            data = handler(result)
         except forms.ValidationError as e:
             return response.Response({"errors": {"resource": e.message}}, status=400)
         except KeyError:
@@ -107,14 +127,19 @@ class WellKnownViewSet(viewsets.GenericViewSet):
                 {"errors": {"resource": "This field is required"}}, status=400
             )
 
-        handler = getattr(self, "handler_{}".format(resource_type))
-        data = handler(result)
-
         return response.Response(data)
 
     def handler_acct(self, clean_result):
         username, hostname = clean_result
-        actor = actors.SYSTEM_ACTORS[username].get_actor_instance()
+
+        if username in actors.SYSTEM_ACTORS:
+            actor = actors.SYSTEM_ACTORS[username].get_actor_instance()
+        else:
+            try:
+                actor = models.Actor.objects.local().get(user__username=username)
+            except models.Actor.DoesNotExist:
+                raise forms.ValidationError("Invalid username")
+
         return serializers.ActorWebfingerSerializer(actor).data
 
 

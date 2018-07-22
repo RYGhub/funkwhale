@@ -1,12 +1,13 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import list_route
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from funkwhale_api.activity import record
-from funkwhale_api.common.permissions import ConditionalAuthentication
+from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
 
-from . import models, serializers
+from . import filters, models, serializers
 
 
 class TrackFavoriteViewSet(
@@ -16,9 +17,24 @@ class TrackFavoriteViewSet(
     viewsets.GenericViewSet,
 ):
 
+    filter_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
-    queryset = models.TrackFavorite.objects.all()
-    permission_classes = [ConditionalAuthentication]
+    queryset = (
+        models.TrackFavorite.objects.all()
+        .select_related("track__artist", "track__album__artist", "user")
+        .prefetch_related("track__files")
+    )
+    permission_classes = [
+        permissions.ConditionalAuthentication,
+        permissions.OwnerPermission,
+        IsAuthenticatedOrReadOnly,
+    ]
+    owner_checks = ["write"]
+
+    def get_serializer_class(self):
+        if self.request.method.lower() in ["head", "get", "options"]:
+            return serializers.UserTrackFavoriteSerializer
+        return serializers.UserTrackFavoriteWriteSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -32,7 +48,10 @@ class TrackFavoriteViewSet(
         )
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        queryset = super().get_queryset()
+        return queryset.filter(
+            fields.privacy_level_query(self.request.user, "user__privacy_level")
+        )
 
     def perform_create(self, serializer):
         track = Track.objects.get(pk=serializer.data["track"])

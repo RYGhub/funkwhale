@@ -61,6 +61,22 @@ Then, when using a client, you'll have to input some information about your serv
 In your client configuration, please double check the "ID3" or "Browse with tags"
 setting is enabled.
 
+Ultrasonic (Android)
+^^^^^^^^^^^^^^^^^^^^
+
+- Price: free
+- F-Droid: https://f-droid.org/en/packages/org.moire.ultrasonic/
+- Google Play: https://play.google.com/store/apps/details?id=org.moire.ultrasonic
+- Sources: https://github.com/ultrasonic/ultrasonic
+
+
+Ultrasonic is a full-featured Subsonic client with Playlists, Stars, Search,
+Offline mode, etc.
+
+It's one of the recommended Android client to use with Funkwhale, as we are doing
+our Android tests on this one.
+
+
 DSub (Android)
 ^^^^^^^^^^^^^^
 
@@ -76,7 +92,7 @@ DSub is a full-featured Subsonic client that works great, and has a lot of featu
 - Search
 - Offline cache (with configurable size, playlist download, queue prefetching, etc.)
 
-It's the recommended Android client to use with Funkwhale, as we are doing
+It's one of the recommended Android client to use with Funkwhale, as we are doing
 our Android tests on this one.
 
 Clementine (Desktop)

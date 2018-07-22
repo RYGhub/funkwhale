@@ -1,7 +1,7 @@
 <template>
-  <div v-title="$t('Invitations')">
+  <div v-title="labels.invitations">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Invitations') }}</h2>
+      <h2 class="ui header"><translate>Invitations</translate></h2>
       <invitation-form></invitation-form>
       <div class="ui hidden divider"></div>
       <invitations-table></invitations-table>
@@ -17,6 +17,13 @@ export default {
   components: {
     InvitationForm,
     InvitationsTable
+  },
+  computed: {
+    labels () {
+      return {
+        invitations: this.$gettext('Invitations')
+      }
+    }
   }
 }
 </script>

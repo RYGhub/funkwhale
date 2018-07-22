@@ -4,7 +4,8 @@ variables:
   IMAGE_LATEST: $IMAGE_NAME:latest
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
   PYTHONDONTWRITEBYTECODE: "true"
-
+  REVIEW_DOMAIN: preview.funkwhale.audio
+  REVIEW_INSTANCE_URL: https://demo.funkwhale.audio
 
 stages:
   - review
@@ -19,37 +20,42 @@ review_front:
   when: manual
   allow_failure: true
   before_script:
+    - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    - chmod +x /usr/local/bin/jq
     - cd front
   script:
     - yarn install
+    - yarn run i18n-compile
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - INSTANCE_URL=$REVIEW_INSTANCE_URL yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
-    - mkdir -p /static/front/$CI_BUILD_REF_SLUG
-    - cp -r dist/* /static/front/$CI_BUILD_REF_SLUG
+    - mkdir -p /static/front/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
+    - cp -r dist/* /static/front/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
   cache:
-    key: "$CI_PROJECT_ID__front_dependencies"
+    key: "funkwhale__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
   environment:
-    name: review/front-$CI_BUILD_REF_NAME
-    url: http://front-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
+    name: review/front/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
+    url: http://front-$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
     on_stop: stop_front_review
   only:
-    - branches@funkwhale/funkwhale
+    - branches
   tags:
     - funkwhale-review
 
 stop_front_review:
   stage: review
   script:
-    - rm -rf /static/front/$CI_BUILD_REF_SLUG/
+    - rm -rf /static/front/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG/
   variables:
     GIT_STRATEGY: none
   when: manual
+  only:
+    - branches
   environment:
-    name: review/front-$CI_BUILD_REF_NAME
+    name: review/front/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
     action: stop
   tags:
     - funkwhale-review
@@ -63,33 +69,38 @@ review_docs:
     BUILD_PATH: "../public"
   before_script:
     - cd docs
+    - apt-get update
+    - apt-get install -y graphviz
+    - pip install sphinx
+
   cache:
     key: "$CI_PROJECT_ID__sphinx"
     paths:
       - "$PIP_CACHE_DIR"
   script:
-    - pip install sphinx
     - ./build_docs.sh
-    - mkdir -p /static/docs/$CI_BUILD_REF_SLUG
-    - cp -r $CI_PROJECT_DIR/public/* /static/docs/$CI_BUILD_REF_SLUG
+    - mkdir -p /static/docs/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
+    - cp -r $CI_PROJECT_DIR/public/* /static/docs/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
   environment:
-    name: review/docs-$CI_BUILD_REF_NAME
-    url: http://docs-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
+    name: review/docs/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
+    url: http://docs-$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG.$REVIEW_DOMAIN
     on_stop: stop_docs_review
   only:
-    - branches@funkwhale/funkwhale
+    - branches
   tags:
     - funkwhale-review
 
 stop_docs_review:
   stage: review
   script:
-    - rm -rf /static/docs/$CI_BUILD_REF_SLUG/
+    - rm -rf /static/docs/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG/
   variables:
     GIT_STRATEGY: none
   when: manual
+  only:
+    - branches
   environment:
-    name: review/docs-$CI_BUILD_REF_NAME
+    name: review/docs/$CI_PROJECT_PATH_SLUG-$CI_BUILD_REF_SLUG
     action: stop
   tags:
     - funkwhale-review
@@ -132,9 +143,9 @@ test_api:
     DJANGO_ALLOWED_HOSTS: "localhost"
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
     FUNKWHALE_URL: "https://funkwhale.ci"
-    CACHEOPS_ENABLED: "false"
     DJANGO_SETTINGS_MODULE: config.settings.local
-
+  only:
+    - branches
   before_script:
     - cd api
     - pip install -r requirements/base.txt
@@ -151,12 +162,13 @@ test_front:
   image: node:9
   before_script:
     - cd front
-
+  only:
+    - branches
   script:
     - yarn install
     - yarn run unit
   cache:
-    key: "$CI_PROJECT_ID__front_dependencies"
+    key: "funkwhale__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
@@ -172,17 +184,18 @@ build_front:
   stage: build
   image: node:9
   before_script:
+    - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    - chmod +x /usr/local/bin/jq
     - cd front
-
   script:
     - yarn install
-    - yarn run i18n-extract
     - yarn run i18n-compile
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
     - yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
+    - chmod -R 750 dist
   cache:
-    key: "$CI_PROJECT_ID__front_dependencies"
+    key: "funkwhale__front_dependencies"
     paths:
       - front/node_modules
       - front/yarn.lock
@@ -205,8 +218,10 @@ pages:
     BUILD_PATH: "../public"
   before_script:
     - cd docs
-  script:
+    - apt-get update
+    - apt-get install -y graphviz
     - pip install sphinx
+  script:
     - ./build_docs.sh
   cache:
     key: "$CI_PROJECT_ID__sphinx"
@@ -243,7 +258,9 @@ build_api:
     name: "api_${CI_COMMIT_REF_NAME}"
     paths:
       - api
-  script: echo Done!
+  script:
+    - chmod -R 750 api
+    - echo Done!
   only:
     - tags@funkwhale/funkwhale
     - master@funkwhale/funkwhale

@@ -1,7 +1,7 @@
 <template>
-  <div v-title="'Files'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header">{{ $t('Library files') }}</h2>
+      <h2 class="ui header"><translate>Library files</translate></h2>
       <div class="ui hidden divider"></div>
       <library-files-table :show-library="true"></library-files-table>
     </div>
@@ -14,6 +14,13 @@ import LibraryFilesTable from '@/components/manage/library/FilesTable'
 export default {
   components: {
     LibraryFilesTable
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Files')
+      }
+    }
   }
 }
 </script>

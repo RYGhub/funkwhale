@@ -1,31 +1,31 @@
 <template>
-  <div class="main pusher" v-title="$t('Reset your password')">
+  <div class="main pusher" v-title="labels.reset">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $t('Reset your password') }}</h2>
+        <h2><translate>Reset your password</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $t('Error while asking for a password reset') }}</div>
+            <div class="header"><translate>Error while asking for a password reset</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
-          <p>{{ $t('Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.') }}</p>
+          <p><translate>Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.</translate></p>
           <div class="field">
-            <label>{{ $t('Account\'s email') }}</label>
+            <label><translate>Account's email</translate></label>
             <input
               required
               ref="email"
               type="email"
               autofocus
-              :placeholder="$t('Input the email address binded to your account')"
+              :placeholder="labels.placeholder"
               v-model="email">
           </div>
           <router-link :to="{path: '/login'}">
-            {{ $t('Back to login') }}
+            <translate>Back to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            {{ $t('Ask for a password reset') }}</button>
+            <translate>Ask for a password reset</translate></button>
         </form>
       </div>
     </div>
@@ -46,6 +46,16 @@ export default {
   },
   mounted () {
     this.$refs.email.focus()
+  },
+  computed: {
+    labels () {
+      let reset = this.$gettext('Reset your password')
+      let placeholder = this.$gettext('Input the email address binded to your account')
+      return {
+        reset,
+        placeholder
+      }
+    }
   },
   methods: {
     submit () {

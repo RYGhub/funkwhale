@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
-          <input type="text" v-model="search" placeholder="Search by artist, username, comment..." />
+          <label><translate>Search</translate></label>
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,20 +15,20 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">Ascending</option>
-            <option value="-">Descending</option>
+            <option value="+"><translate>Ascending</translate></option>
+            <option value="-"><translate>Descending</translate></option>
           </select>
         </div>
         <div class="field">
-          <label>{{ $t("Status") }}</label>
+          <label><translate>Status</translate></label>
           <select class="ui dropdown" v-model="status">
-            <option :value="null">{{ $t('All') }}</option>
-            <option :value="'pending'">{{ $t('Pending') }}</option>
-            <option :value="'accepted'">{{ $t('Accepted') }}</option>
-            <option :value="'imported'">{{ $t('Imported') }}</option>
-            <option :value="'closed'">{{ $t('Closed') }}</option>
+            <option :value="null"><translate>All</translate></option>
+            <option :value="'pending'"><translate>Pending</translate></option>
+            <option :value="'accepted'"><translate>Accepted</translate></option>
+            <option :value="'imported'"><translate>Imported</translate></option>
+            <option :value="'closed'"><translate>Closed</translate></option>
           </select>
         </div>
       </div>
@@ -45,55 +45,55 @@
         :action-url="'manage/requests/import-requests/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('User') }}</th>
-          <th>{{ $t('Status') }}</th>
-          <th>{{ $t('Artist') }}</th>
-          <th>{{ $t('Albums') }}</th>
-          <th>{{ $t('Comment') }}</th>
-          <th>{{ $t('Creation date') }}</th>
-          <th>{{ $t('Import date') }}</th>
-          <th>{{ $t('Actions') }}</th>
+          <th><translate>User</translate></th>
+          <th><translate>Status</translate></th>
+          <th><translate>Artist</translate></th>
+          <th><translate>Albums</translate></th>
+          <th><translate>Comment</translate></th>
+          <th><translate>Creation date</translate></th>
+          <th><translate>Import date</translate></th>
+          <th><translate>Actions</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
             {{ scope.obj.user.username }}
           </td>
           <td>
-            <span class="ui green basic label" v-if="scope.obj.status === 'imported'">{{ $t('Imported') }}</span>
-            <span class="ui pink basic label" v-else-if="scope.obj.status === 'accepted'">{{ $t('Accepted') }}</span>
-            <span class="ui yellow basic label" v-else-if="scope.obj.status === 'pending'">{{ $t('Pending') }}</span>
-            <span class="ui red basic label" v-else-if="scope.obj.status === 'closed'">{{ $t('Closed') }}</span>
+            <span class="ui green basic label" v-if="scope.obj.status === 'imported'"><translate>Imported</translate></span>
+            <span class="ui pink basic label" v-else-if="scope.obj.status === 'accepted'"><translate>Accepted</translate></span>
+            <span class="ui yellow basic label" v-else-if="scope.obj.status === 'pending'"><translate>Pending</translate></span>
+            <span class="ui red basic label" v-else-if="scope.obj.status === 'closed'"><translate>Closed</translate></span>
           </td>
           <td>
             <span :title="scope.obj.artist_name">{{ scope.obj.artist_name|truncate(30) }}</span>
           </td>
           <td>
             <span v-if="scope.obj.albums" :title="scope.obj.albums">{{ scope.obj.albums|truncate(30) }}</span>
-            <template v-else>{{ $t('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <span v-if="scope.obj.comment" :title="scope.obj.comment">{{ scope.obj.comment|truncate(30) }}</span>
-            <template v-else>{{ $t('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
           </td>
           <td>
             <human-date v-if="scope.obj.imported_date" :date="scope.obj.creation_date"></human-date>
-            <template v-else>{{ $t('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <router-link
               class="ui tiny basic button"
               :to="{name: 'library.import.launch', query: {request: scope.obj.id}}"
-              v-if="scope.obj.status === 'pending'">{{ $t('Create import') }}</router-link>
+              v-if="scope.obj.status === 'pending'"><translate>Create import</translate></router-link>
           </td>
         </template>
       </action-table>
     </div>
     <div>
       <pagination
-        v-if="result && result.results.length > 0"
+        v-if="result && result.count > paginateBy"
         @page-changed="selectPage"
         :compact="true"
         :current="page"
@@ -102,7 +102,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -172,6 +175,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by artist, username, comment...')
+      }
+    },
     actionFilters () {
       var currentFilters = {
         q: this.search
@@ -183,21 +191,25 @@ export default {
       }
     },
     actions () {
+      // somehow, extraction fails otherwise
+      let deleteLabel = this.$gettext('Delete')
+      let markImportedLabel = this.$gettext('Mark as imported')
+      let markClosedLabel = this.$gettext('Mark as closed')
       return [
         {
           name: 'delete',
-          label: this.$t('Delete'),
+          label: deleteLabel,
           isDangerous: true
         },
         {
           name: 'mark_imported',
-          label: this.$t('Mark as imported'),
+          label: markImportedLabel,
           filterCheckable: (obj) => { return ['pending', 'accepted'].indexOf(obj.status) > -1 },
           isDangerous: true
         },
         {
           name: 'mark_closed',
-          label: this.$t('Mark as closed'),
+          label: markClosedLabel,
           filterCheckable: (obj) => { return ['pending', 'accepted'].indexOf(obj.status) > -1 },
           isDangerous: true
         }

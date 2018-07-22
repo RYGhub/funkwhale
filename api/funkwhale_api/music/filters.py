@@ -6,19 +6,9 @@ from funkwhale_api.common import fields
 from . import models
 
 
-class ListenableMixin(filters.FilterSet):
-    listenable = filters.BooleanFilter(name="_", method="filter_listenable")
-
-    def filter_listenable(self, queryset, name, value):
-        queryset = queryset.annotate(files_count=Count("tracks__files"))
-        if value:
-            return queryset.filter(files_count__gt=0)
-        else:
-            return queryset.filter(files_count=0)
-
-
-class ArtistFilter(ListenableMixin):
+class ArtistFilter(filters.FilterSet):
     q = fields.SearchFilter(search_fields=["name"])
+    listenable = filters.BooleanFilter(name="_", method="filter_listenable")
 
     class Meta:
         model = models.Artist
@@ -26,6 +16,13 @@ class ArtistFilter(ListenableMixin):
             "name": ["exact", "iexact", "startswith", "icontains"],
             "listenable": "exact",
         }
+
+    def filter_listenable(self, queryset, name, value):
+        queryset = queryset.annotate(files_count=Count("albums__tracks__files"))
+        if value:
+            return queryset.filter(files_count__gt=0)
+        else:
+            return queryset.filter(files_count=0)
 
 
 class TrackFilter(filters.FilterSet):
@@ -72,10 +69,17 @@ class ImportJobFilter(filters.FilterSet):
         }
 
 
-class AlbumFilter(ListenableMixin):
+class AlbumFilter(filters.FilterSet):
     listenable = filters.BooleanFilter(name="_", method="filter_listenable")
     q = fields.SearchFilter(search_fields=["title", "artist__name" "source"])
 
     class Meta:
         model = models.Album
         fields = ["listenable", "q", "artist"]
+
+    def filter_listenable(self, queryset, name, value):
+        queryset = queryset.annotate(files_count=Count("tracks__files"))
+        if value:
+            return queryset.filter(files_count__gt=0)
+        else:
+            return queryset.filter(files_count=0)

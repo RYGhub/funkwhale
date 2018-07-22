@@ -47,6 +47,11 @@ export default {
     username: (state, value) => {
       state.username = value
     },
+    avatar: (state, value) => {
+      if (state.profile) {
+        state.profile.avatar = value
+      }
+    },
     token: (state, value) => {
       state.token = value
       if (value) {

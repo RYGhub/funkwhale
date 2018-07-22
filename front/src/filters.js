@@ -28,6 +28,16 @@ export function ago (date) {
 
 Vue.filter('ago', ago)
 
+export function secondsToObject (seconds) {
+  let m = moment.duration(seconds, 'seconds')
+  return {
+    minutes: m.minutes(),
+    hours: parseInt(m.asHours())
+  }
+}
+
+Vue.filter('secondsToObject', secondsToObject)
+
 export function momentFormat (date, format) {
   format = format || 'lll'
   return moment(date).format(format)

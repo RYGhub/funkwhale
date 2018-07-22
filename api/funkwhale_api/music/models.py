@@ -15,7 +15,9 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
+
 from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import downloader, musicbrainz
 from funkwhale_api.federation import utils as federation_utils
@@ -319,9 +321,10 @@ class Track(APIModelMixin):
         "mbid": {"musicbrainz_field_name": "id"},
         "title": {"musicbrainz_field_name": "title"},
         "artist": {
-            # we use the artist from the release to avoid #237
-            "musicbrainz_field_name": "release-list",
-            "converter": get_artist,
+            "musicbrainz_field_name": "artist-credit",
+            "converter": lambda v: Artist.get_or_create_from_api(
+                mbid=v[0]["artist"]["id"]
+            )[0],
         },
         "album": {"musicbrainz_field_name": "release-list", "converter": import_album},
     }
@@ -389,19 +392,37 @@ class Track(APIModelMixin):
         tracks = [t for m in data["release"]["medium-list"] for t in m["track-list"]]
         track_data = None
         for track in tracks:
-            if track["recording"]["id"] == mbid:
+            if track["recording"]["id"] == str(mbid):
                 track_data = track
                 break
         if not track_data:
             raise ValueError("No track found matching this ID")
 
+        track_artist_mbid = None
+        for ac in track_data["recording"]["artist-credit"]:
+            try:
+                ac_mbid = ac["artist"]["id"]
+            except TypeError:
+                # it's probably a string, like "feat."
+                continue
+
+            if ac_mbid == str(album.artist.mbid):
+                continue
+
+            track_artist_mbid = ac_mbid
+            break
+        track_artist_mbid = track_artist_mbid or album.artist.mbid
+        if track_artist_mbid == str(album.artist.mbid):
+            track_artist = album.artist
+        else:
+            track_artist = Artist.get_or_create_from_api(track_artist_mbid)[0]
         return cls.objects.update_or_create(
             mbid=mbid,
             defaults={
                 "position": int(track["position"]),
                 "title": track["recording"]["title"],
                 "album": album,
-                "artist": album.artist,
+                "artist": track_artist,
             },
         )
 
@@ -622,3 +643,13 @@ def update_request_status(sender, instance, created, **kwargs):
         # let's mark the request as imported since the import is over
         instance.import_request.status = "imported"
         return instance.import_request.save(update_fields=["status"])
+
+
+@receiver(models.signals.post_save, sender=Album)
+def warm_album_covers(sender, instance, **kwargs):
+    if not instance.cover:
+        return
+    album_covers_warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"
+    )
+    num_created, failed_to_create = album_covers_warmer.warm()

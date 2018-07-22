@@ -51,12 +51,6 @@ CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 
 # END SITE CONFIGURATION
 
-# STORAGE CONFIGURATION
-# ------------------------------------------------------------------------------
-# Uploaded Media Files
-# ------------------------
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-
 # Static Assets
 # ------------------------
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"

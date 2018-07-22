@@ -1,29 +1,29 @@
 <template>
   <div>
-    <h2><i18next path="Search for some music"/></h2>
+    <h2><translate>Search for some music</translate></h2>
     <div :class="['ui', {'loading': isLoading }, 'search']">
       <div class="ui icon big input">
         <i class="search icon"></i>
-        <input ref="search" class="prompt" placeholder="Artist, album, track..." v-model.trim="query" type="text" />
+        <input ref="search" class="prompt" :placeholder="labels.searchPlaceholder" v-model.trim="query" type="text" />
       </div>
     </div>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><i18next path="Artists"/></h3>
+      <h3 class="ui title"><translate>Artists</translate></h3>
       <div v-if="results.artists.length > 0" class="ui stackable three column grid">
         <div class="column" :key="artist.id" v-for="artist in results.artists">
           <artist-card class="fluid" :artist="artist" ></artist-card>
         </div>
       </div>
-      <p v-else><i18next path="Sorry, we did not found any artist matching your query"/></p>
+      <p v-else><translate>Sorry, we did not found any artist matching your query</translate></p>
     </template>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><i18next path="Albums"/></h3>
+      <h3 class="ui title"><translate>Albums</translate></h3>
       <div v-if="results.albums.length > 0" class="ui stackable three column grid">
         <div class="column" :key="album.id" v-for="album in results.albums">
           <album-card class="fluid" :album="album" ></album-card>
         </div>
       </div>
-      <p v-else><i18next path="Sorry, we did not found any album matching your query"/></p>
+      <p v-else><translate>Sorry, we did not found any album matching your query</translate></p>
     </template>
   </div>
 </template>
@@ -58,6 +58,13 @@ export default {
       this.$refs.search.focus()
     }
     this.search()
+  },
+  computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Artist, album, track...')
+      }
+    }
   },
   methods: {
     search: _.debounce(function () {

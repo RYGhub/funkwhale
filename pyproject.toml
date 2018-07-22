@@ -33,6 +33,11 @@
         showcontent = true
 
     [[tool.towncrier.type]]
+        directory = "i18n"
+        name = "i18n"
+        showcontent = true
+
+    [[tool.towncrier.type]]
         directory = "misc"
         name = "Other"
         showcontent = true

@@ -1,15 +1,15 @@
-Debian installation
-===================
+Debian and Arch Linux installation
+==================================
 
 .. note::
 
-    This guide targets Debian 9 (Stretch), which is the latest Debian.
+    This guide targets Debian 9 (Stretch), which is the latest Debian, as well as Arch Linux.
 
 External dependencies
 ---------------------
 
-The guides will focus on installing funkwhale-specific components and
-dependencies. However, funkwhale requires a
+The guides will focus on installing Funkwhale-specific components and
+dependencies. However, Funkwhale requires a
 :doc:`few external dependencies <./external_dependencies>` for which
 documentation is outside of this document scope.
 
@@ -17,18 +17,23 @@ Install utilities
 -----------------
 
 You'll need a few utilities during this guide that are not always present by
-default on system. You can install them using:
+default on system. On Debian-like systems, you can install them using:
 
 .. code-block:: shell
 
     sudo apt-get update
     sudo apt-get install curl python3-pip python3-venv git unzip
 
+On Arch Linux and its derivatives:
+
+.. code-block:: shell
+
+    sudo pacman -S curl python-pip python-virtualenv git unzip
 
 Layout
 -------
 
-All funkwhale-related files will be located under ``/srv/funkwhale`` apart
+All Funkwhale-related files will be located under ``/srv/funkwhale`` apart
 from database files and a few configuration files. We will also have a
 dedicated ``funkwhale`` user to launch the processes we need and own those files.
 
@@ -41,7 +46,7 @@ Create the user and the directory:
 
 .. code-block:: shell
 
-    sudo adduser --system --home /srv/funkwhale funkwhale
+    sudo useradd -r -s /usr/bin/nologin -d /srv/funkwhale -m funkwhale
     cd /srv/funkwhale
 
 Log in as the newly created user from now on:
@@ -57,7 +62,7 @@ Now let's setup our directory layout. Here is how it will look like::
     ├── api         # api code of your instance
     ├── data        # persistent data, such as music files
     ├── front       # frontend files for the web user interface
-    └── virtualenv  # python dependencies for funkwhale
+    └── virtualenv  # python dependencies for Funkwhale
 
 Create the aforementionned directories:
 
@@ -67,7 +72,7 @@ Create the aforementionned directories:
 
 The ``virtualenv`` directory is a bit special and will be created separately.
 
-Download latest funkwhale release
+Download latest Funkwhale release
 ----------------------------------
 
 Funkwhale is splitted in two components:
@@ -79,7 +84,7 @@ Those components are packaged in subsequent releases, such as 0.1, 0.2, etc.
 You can browse the :doc:`changelog </changelog>` for a list of available releases
 and pick the one you want to install, usually the latest one should be okay.
 
-In this guide, we'll assume you want to install the latest version of funkwhale,
+In this guide, we'll assume you want to install the latest version of Funkwhale,
 which is |version|:
 
 First, we'll download the latest api release.
@@ -101,6 +106,24 @@ Then we'll download the frontend files:
     mv extracted/front .
     rm -rf extracted
 
+.. note::
+
+    You can also choose to get the code directly from the git repo. In this
+    case, run
+
+        cd /srv
+        rm -r funkwhale
+        git clone https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        cd funkwhale
+
+    You'll also need to re-create the folders we make earlier:
+
+        mkdir -p config data/static data/media data/music front
+
+    You will still need to get the frontend files as specified before, because
+    we're not going to build them.
+
+
 You can leave the ZIP archives in the directory, this will help you know
 which version you've installed next time you want to upgrade your installation.
 
@@ -113,22 +136,20 @@ First, switch to the api directory:
 
     cd api
 
-A few OS packages are required in order to run funkwhale. The list is available
-in ``api/requirements.apt`` or by running
-``./install_os_dependencies.sh list``.
-
-.. note::
-
-    Ensure you are running the next commands as root or using sudo
-    (and not as the funkwhale) user.
-
-You can install those packages all at once:
+A few OS packages are required in order to run Funkwhale. On Debian-like
+systems, they can be installed with
 
 .. code-block:: shell
 
-    ./install_os_dependencies.sh install
+    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
 
-From now on you can switch back to the funkwhale user.
+On Arch, run
+
+.. code-block:: shell
+
+    pacman -S $(cat api/requirements.pac)
+
+From now on, you should use the funkwhale user for all commands.
 
 Python dependencies
 --------------------
@@ -143,11 +164,12 @@ To avoid collisions with other software on your system, Python dependencies
 will be installed in a dedicated
 `virtualenv <https://docs.python.org/3/library/venv.html>`_.
 
-First, create the virtualenv:
+First, create the virtualenv and install wheel:
 
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
+    pip3 install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -165,12 +187,11 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
-    pip install wheel
     pip install -r api/requirements.txt
 
 .. important::
 
-    further commands involving python should always be run after you activated
+    Further commands involving python should always be run after you activated
     the virtualenv, as described earlier, otherwise those commands will raise
     errors
 
@@ -178,7 +199,7 @@ Finally, install the python dependencies:
 Environment file
 ----------------
 
-You can now start to configure funkwhale. The main way to achieve that is by
+You can now start to configure Funkwhale. The main way to achieve that is by
 adding an environment file that will host settings that are relevant to your
 installation.
 
@@ -188,8 +209,15 @@ Download the sample environment file:
 
     curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
 
+.. note::
+
+    if you used git to get the latest version of the code earlier, you can instead do
+
+        cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
+
+
 You can then edit it: the file is heavily commented, and the most relevant
-configuration options are mentionned at the top of the file.
+configuration options are mentioned at the top of the file.
 
 Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
 how you configured your PostgreSQL and Redis servers in
@@ -198,30 +226,15 @@ how you configured your PostgreSQL and Redis servers in
 
 When you want to run command on the API server, such as to create the
 database or compile static files, you have to ensure you source
-the environment variables.
+the environment variables in that file.
 
 This can be done like this::
 
     export $(cat config/.env | grep -v ^# | xargs)
 
-The easier thing to do is to store this in a script::
-
-    cat > /srv/funkwhale/load_env <<'EOL'
-    #!/bin/bash
-    export $(cat /srv/funkwhale/config/.env | grep -v ^# | xargs)
-    EOL
-    chmod +x /srv/funkwhale/load_env
-
-You should now be able to run the following to populate your environment
-variables easily:
-
-.. code-block:: shell
-
-    source /srv/funkwhale/load_env
-
 .. note::
 
-    Remember to source ``load_env`` whenever you edit your .env file.
+    Remember to reload these variables whenever you edit your .env file.
 
 Database setup
 ---------------
@@ -267,7 +280,7 @@ Collect static files
 --------------------
 
 Static files are the static assets used by the API server (icon PNGs, CSS, etc.).
-We need to collect them explicitely, so they can be served by the webserver:
+We need to collect them explicitly, so they can be served by the webserver:
 
 .. code-block:: shell
 

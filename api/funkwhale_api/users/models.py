@@ -11,12 +11,21 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
+
 from funkwhale_api.common import fields, preferences
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import validators as common_validators
+from funkwhale_api.federation import keys
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 
 
 def get_token():
@@ -37,6 +46,9 @@ PERMISSIONS_CONFIGURATION = {
 }
 
 PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
+
+
+get_file_path = common_utils.ChunkedPath("users/avatars", preserve_file_name=False)
 
 
 @python_2_unicode_compatible
@@ -87,6 +99,26 @@ class User(AbstractUser):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+    avatar = VersatileImageField(
+        upload_to=get_file_path,
+        null=True,
+        blank=True,
+        max_length=150,
+        validators=[
+            common_validators.ImageDimensionsValidator(min_width=50, min_height=50),
+            common_validators.FileValidator(
+                allowed_extensions=["png", "jpg", "jpeg", "gif"],
+                max_size=1024 * 1024 * 2,
+            ),
+        ],
+    )
+    actor = models.OneToOneField(
+        "federation.Actor",
+        related_name="user",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -185,3 +217,41 @@ class Invitation(models.Model):
             )
 
         return super().save(**kwargs)
+
+
+def create_actor(user):
+    username = user.username
+    private, public = keys.get_key_pair()
+    args = {
+        "preferred_username": username,
+        "domain": settings.FEDERATION_HOSTNAME,
+        "type": "Person",
+        "name": username,
+        "manually_approves_followers": False,
+        "url": federation_utils.full_url(
+            reverse("federation:actors-detail", kwargs={"user__username": username})
+        ),
+        "shared_inbox_url": federation_utils.full_url(
+            reverse("federation:actors-inbox", kwargs={"user__username": username})
+        ),
+        "inbox_url": federation_utils.full_url(
+            reverse("federation:actors-inbox", kwargs={"user__username": username})
+        ),
+        "outbox_url": federation_utils.full_url(
+            reverse("federation:actors-outbox", kwargs={"user__username": username})
+        ),
+    }
+    args["private_key"] = private.decode("utf-8")
+    args["public_key"] = public.decode("utf-8")
+
+    return federation_models.Actor.objects.create(**args)
+
+
+@receiver(models.signals.post_save, sender=User)
+def warm_user_avatar(sender, instance, **kwargs):
+    if not instance.avatar:
+        return
+    user_avatar_warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
+    )
+    num_created, failed_to_create = user_avatar_warmer.warm()

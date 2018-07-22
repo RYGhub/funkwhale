@@ -1,4 +1,3 @@
-import os
 import tempfile
 import uuid
 
@@ -9,6 +8,7 @@ from django.db import models
 from django.utils import timezone
 
 from funkwhale_api.common import session
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.music import utils as music_utils
 
 TYPE_CHOICES = [
@@ -18,6 +18,11 @@ TYPE_CHOICES = [
     ("Organization", "Organization"),
     ("Service", "Service"),
 ]
+
+
+class ActorQuerySet(models.QuerySet):
+    def local(self, include=True):
+        return self.exclude(user__isnull=include)
 
 
 class Actor(models.Model):
@@ -46,6 +51,8 @@ class Actor(models.Model):
         through_fields=("target", "actor"),
         related_name="following",
     )
+
+    objects = ActorQuerySet.as_manager()
 
     class Meta:
         unique_together = ["domain", "preferred_username"]
@@ -141,12 +148,7 @@ class Library(models.Model):
     )
 
 
-def get_file_path(instance, filename):
-    uid = str(uuid.uuid4())
-    chunk_size = 2
-    chunks = [uid[i : i + chunk_size] for i in range(0, len(uid), chunk_size)]
-    parts = chunks[:3] + [filename]
-    return os.path.join("federation_cache", *parts)
+get_file_path = common_utils.ChunkedPath("federation_cache")
 
 
 class LibraryTrack(models.Model):

@@ -1,18 +1,18 @@
 <template>
-  <div class="main pusher"  v-title="'Federation'">
+  <div class="main pusher"  v-title="labels.title">
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'federation.libraries.list'}">{{ $t('Libraries') }}</router-link>
+        :to="{name: 'federation.libraries.list'}"><translate>Libraries</translate></router-link>
       <router-link
         class="ui item"
-        :to="{name: 'federation.tracks.list'}">{{ $t('Tracks') }}</router-link>
+        :to="{name: 'federation.tracks.list'}"><translate>Tracks</translate></router-link>
         <div class="ui secondary right menu">
           <router-link
             class="ui item"
             :to="{name: 'federation.followers.list'}">
-            {{ $t('Followers') }}
-            <div class="ui teal label" :title="$t('Pending requests')">{{ requestsCount }}</div>
+            <translate>Followers</translate>
+            <div class="ui teal label" :title="labels.pendingRequests">{{ requestsCount }}</div>
           </router-link>
         </div>
     </div>
@@ -30,6 +30,16 @@ export default {
   created () {
     this.fetchRequestsCount()
   },
+  computed: {
+    labels () {
+      let title = this.$gettext('Federation')
+      let pendingRequests = this.$gettext('Pending requests')
+      return {
+        title,
+        pendingRequests
+      }
+    }
+  },
   methods: {
     fetchRequestsCount () {
       let self = this
@@ -40,16 +50,3 @@ export default {
   }
 }
 </script>
-<style lang="scss">
-@import '../../style/vendor/media';
-
-.main.pusher > .ui.secondary.menu {
-  @include media(">tablet") {
-    margin: 0 2.5rem;
-  }
-  .item {
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-  }
-}
-</style>

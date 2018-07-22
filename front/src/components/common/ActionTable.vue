@@ -6,7 +6,7 @@
           <div class="ui small form">
             <div class="ui inline fields">
               <div class="field">
-                <label>{{ $t('Actions') }}</label>
+                <label><translate>Actions</translate></label>
                 <select class="ui dropdown" v-model="currentActionName">
                   <option v-for="action in actions" :value="action.name">
                     {{ action.label }}
@@ -19,41 +19,75 @@
                   @click="launchAction"
                   :disabled="checked.length === 0"
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
-                  {{ $t('Go') }}</div>
+                  <translate>Go</translate></div>
                 <dangerous-button
                   v-else-if="!currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
-                  {{ $t('Go') }}
-                  <p slot="modal-header">{{ $t('Do you want to launch action "{% action %}" on {% total %} elements?', {action: currentActionName, total: objectsData.count}) }}
-                  <p slot="modal-content">
-                    {{ $t('This may affect a lot of elements, please double check this is really what you want.')}}
+                  <translate>Go</translate>
+                  <p slot="modal-header">
+                    <translate
+                      :translate-n="objectsData.count"
+                      :translate-params="{count: objectsData.count, action: currentActionName}"
+                      translate-plural="Do you want to launch %{ action } on %{ count } elements?">
+                      Do you want to launch %{ action } on %{ count } element?
+                    </translate>
                   </p>
-                  <p slot="modal-confirm">{{ $t('Launch') }}</p>
+                  <p slot="modal-content">
+                    <translate>This may affect a lot of elements, please double check this is really what you want.</translate>
+                  </p>
+                  <p slot="modal-confirm"><translate>Launch</translate></p>
                 </dangerous-button>
               </div>
               <div class="count field">
-                <span v-if="selectAll">{{ $t('{% count %} on {% total %} selected', {count: objectsData.count, total: objectsData.count}) }}</span>
-                <span v-else>{{ $t('{% count %} on {% total %} selected', {count: checked.length, total: objectsData.count}) }}</span>
+                <translate
+                  tag="span"
+                  v-if="selectAll"
+                  :translate-n="objectsData.count"
+                  :translate-params="{count: objectsData.count, total: objectsData.count}"
+                  translate-plural="%{ count } on %{ total } selected">
+                  %{ count } on %{ total } selected
+                </translate>
+                <translate
+                  tag="span"
+                  v-else
+                  :translate-n="checked.length"
+                  :translate-params="{count: checked.length, total: objectsData.count}"
+                  translate-plural="%{ count } on %{ total } selected">
+                  %{ count } on %{ total } selected
+                </translate>
                 <template v-if="!currentAction.isDangerous && checkable.length > 0 && checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
-                    {{ $t('Select all {% total %} elements', {total: objectsData.count}) }}
+                    <translate
+                      :translate-n="objectsData.count"
+                      :translate-params="{total: objectsData.count}"
+                      translate-plural="Select all %{ total } elements">
+                      Select all %{ total } elements
+                    </translate>
                   </a>
                   <a @click="selectAll = false" v-else>
-                    {{ $t('Select only current page') }}
+                    <translate>Select only current page</translate>
                   </a>
                 </template>
               </div>
             </div>
             <div v-if="actionErrors.length > 0" class="ui negative message">
-              <div class="header">{{ $t('Error while applying action') }}</div>
+              <div class="header"><translate>Error while applying action</translate></div>
               <ul class="list">
                 <li v-for="error in actionErrors">{{ error }}</li>
               </ul>
             </div>
             <div v-if="actionResult" class="ui positive message">
-              <p>{{ $t('Action {% action %} was launched successfully on {% count %} objects.', {action: actionResult.action, count: actionResult.updated}) }}</p>
+              <p>
+                <translate
+                  :translate-n="actionResult.updated"
+                  :translate-params="{count: actionResult.updated, action: actionResult.action}"
+                  translate-plural="Action %{ action } was launched successfully on %{ count } elements">
+                  Action %{ action } was launched successfully on %{ count } element
+                </translate>
+              </p>
+
               <slot name="action-success-footer" :result="actionResult">
               </slot>
             </div>
@@ -81,7 +115,6 @@
             :disabled="checkable.indexOf(obj.id) === -1"
             @click="toggleCheck($event, obj.id, index)"
             :checked="checked.indexOf(obj.id) > -1"><label>&nbsp;</label>
-          </div>
         </td>
         <slot name="row-cells" :obj="obj"></slot>
       </tr>

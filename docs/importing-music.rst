@@ -4,8 +4,8 @@ Importing music
 From music directory on the server
 ----------------------------------
 
-You can import music files in funkwhale assuming they are located on the server
-and readable by the funkwhale application. Your music files should contain at
+You can import music files in Funkwhale assuming they are located on the server
+and readable by the Funkwhale application. Your music files should contain at
 least an ``artist``, ``album`` and ``title`` tags, but we recommend you tag
 it extensively using a proper tool, such as Beets or Musicbrainz Picard.
 
@@ -59,7 +59,7 @@ to import and don't want to double your disk usage.
 The CLI importer supports an additional ``--in-place`` option that triggers the
 following behaviour during import:
 
-1. Imported files are not store in funkwhale anymore
+1. Imported files are not store in Funkwhale anymore
 2. Instead, Funkwhale will store the file path and use it to serve the music
 
 Because those files are not managed by Funkwhale, we offer additional
@@ -98,14 +98,14 @@ directory is mounted as a volume as well::
       volumes:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media
-      # add your symlinked dirs here
+      # add your symlinked dirs here
       - /media/nfsshare:/media/nfsshare:ro
 
     api:
       volumes:
       - ./data/music:/music:ro
       - ./data/media:/app/funkwhale_api/media
-      # add your symlinked dirs here
+      # add your symlinked dirs here
       - /media/nfsshare:/media/nfsshare:ro
 
 

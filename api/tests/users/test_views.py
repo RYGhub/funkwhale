@@ -20,6 +20,22 @@ def test_can_create_user_via_api(preferences, api_client, db):
     assert u.username == "test1"
 
 
+@pytest.mark.parametrize("username", ["wrong.name", "wrong-name", "éaeu", "wrong name"])
+def test_username_only_accepts_letters_and_underscores(
+    username, preferences, api_client, db
+):
+    url = reverse("rest_register")
+    data = {
+        "username": username,
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+    }
+    preferences["users__registration_enabled"] = True
+    response = api_client.post(url, data)
+    assert response.status_code == 400
+
+
 def test_can_restrict_usernames(settings, preferences, db, api_client):
     url = reverse("rest_register")
     preferences["users__registration_enabled"] = True
@@ -235,3 +251,39 @@ def test_user_cannot_patch_another_user(method, logged_in_api_client, factories)
     response = handler(url, payload)
 
     assert response.status_code == 403
+
+
+def test_user_can_patch_their_own_avatar(logged_in_api_client, avatar):
+    user = logged_in_api_client.user
+    url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
+    content = avatar.read()
+    avatar.seek(0)
+    payload = {"avatar": avatar}
+    response = logged_in_api_client.patch(url, payload)
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+
+    assert user.avatar.read() == content
+
+
+def test_creating_user_creates_actor_as_well(
+    api_client, factories, mocker, preferences
+):
+    actor = factories["federation.Actor"]()
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+    }
+    preferences["users__registration_enabled"] = True
+    mocker.patch("funkwhale_api.users.models.create_actor", return_value=actor)
+    response = api_client.post(url, data)
+
+    assert response.status_code == 201
+
+    user = User.objects.get(username="test1")
+
+    assert user.actor == actor

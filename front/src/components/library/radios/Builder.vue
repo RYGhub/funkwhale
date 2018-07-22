@@ -1,31 +1,51 @@
 <template>
-  <div class="ui vertical stripe segment" v-title="'Radio Builder'">
+  <div class="ui vertical stripe segment" v-title="labels.title">
     <div>
       <div>
-        <h2 class="ui header"><i18next path="Builder"/></h2>
-        <i18next tag="p" path="You can use this interface to build your own custom radio, which will play tracks according to your criteria"/>
-          <div class="ui form">
+        <h2 class="ui header">
+          <translate>Builder</translate>
+        </h2>
+        <p><translate>You can use this interface to build your own custom radio, which will play tracks according to your criteria.</translate></p>
+        <div class="ui form">
+          <div v-if="success" class="ui positive message">
+            <div class="header">
+              <template v-if="radioName">
+                <translate>Radio updated</translate>
+              </template>
+              <template v-else>
+                <translate>Radio created</translate>
+              </template>
+            </div>
+          </div>
           <div class="inline fields">
             <div class="field">
-              <i18next tag="label" for="name" path="Radio name"/>
-              <input id="name" type="text" v-model="radioName" placeholder="My awesome radio" />
+              <label for="name"><translate>Radio name</translate></label>
+              <input id="name" type="text" v-model="radioName" :placeholder="labels.placeholder" />
             </div>
             <div class="field">
               <input id="public" type="checkbox" v-model="isPublic" />
-              <i18next tag="label" for="public" path="Display publicly"/>
+              <label for="public"><translate>Display publicly</translate></label>
             </div>
-            <button :disabled="!canSave" @click="save" class="ui green button"><i18next path="Save"/></button>
+            <button :disabled="!canSave" @click="save" :class="['ui', 'green', {loading: isLoading}, 'button']">
+              <translate>Save</translate>
+            </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>
         <div class="ui form">
-          <p><i18next path="Add filters to customize your radio"/></p>
+          <p>
+            <translate>Add filters to customize your radio</translate>
+          </p>
           <div class="inline field">
             <select class="ui dropdown" v-model="currentFilterType">
-              <option value=""><i18next path="Select a filter"/></option>
+              <option value="">
+                <translate>Select a filter</translate>
+              </option>
               <option v-for="f in availableFilters" :value="f.type">{{ f.label }}</option>
             </select>
-            <button :disabled="!currentFilterType" @click="add" class="ui button"><i18next path="Add filter"/></button>
+            <button :disabled="!currentFilterType" @click="add" class="ui button">
+              <translate>Add filter</translate>
+            </button>
           </div>
           <p v-if="currentFilter">
             {{ currentFilter.help_text }}
@@ -34,11 +54,11 @@
         <table class="ui table">
           <thead>
             <tr>
-              <i18next tag="th" class="two wide" path="Filter name"/>
-              <i18next tag="th" class="one wide" path="Exclude"/>
-              <i18next tag="th" class="six wide" path="Config"/>
-              <i18next tag="th" class="five wide" path="Candidates"/>
-              <i18next tag="th" class="two wide" path="Actions"/>
+              <th class="two wide"><translate>Filter name</translate></th>
+              <th class="one wide"><translate>Exclude</translate></th>
+              <th class="six wide"><translate>Config</translate></th>
+              <th class="five wide"><translate>Candidates</translate></th>
+              <th class="two wide"><translate>Actions</translate></th>
             </tr>
           </thead>
           <tbody>
@@ -54,9 +74,13 @@
           </tbody>
         </table>
         <template v-if="checkResult">
-          <i18next tag="h3" class="ui header" path="{%0%} tracks matching combined filters">
-            {{ checkResult.candidates.count }}
-          </i18next>
+          <h3
+            class="ui header"
+            v-translate="{count: checkResult.candidates.count}"
+            :translate-n="checkResult.candidates.count"
+            translate-plural="%{ count } tracks matching combined filters">
+            %{ count } track matching combined filters
+          </h3>
           <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample"></track-table>
         </template>
       </div>
@@ -82,6 +106,8 @@ export default {
   },
   data: function () {
     return {
+      isLoading: false,
+      success: false,
       availableFilters: [],
       currentFilterType: null,
       filters: [],
@@ -127,6 +153,7 @@ export default {
     },
     fetch: function () {
       let self = this
+      self.isLoading = true
       let url = 'radios/radios/' + this.id + '/'
       axios.get(url).then((response) => {
         self.filters = response.data.config.map(f => {
@@ -138,6 +165,7 @@ export default {
         })
         self.radioName = response.data.name
         self.isPublic = response.data.is_public
+        self.isLoading = false
       })
     },
     fetchCandidates: function () {
@@ -159,6 +187,9 @@ export default {
     },
     save: function () {
       let self = this
+      self.success = false
+      self.isLoading = true
+
       let final = this.filters.map(f => {
         let c = _.clone(f.config)
         c.type = f.filter.type
@@ -172,10 +203,14 @@ export default {
       if (this.id) {
         let url = 'radios/radios/' + this.id + '/'
         axios.put(url, final).then((response) => {
+          self.isLoading = false
+          self.success = true
         })
       } else {
         let url = 'radios/radios/'
         axios.post(url, final).then((response) => {
+          self.success = true
+          self.isLoading = false
           self.$router.push({
             name: 'library.radios.detail',
             params: {
@@ -187,6 +222,14 @@ export default {
     }
   },
   computed: {
+    labels () {
+      let title = this.$gettext('Radio Builder')
+      let placeholder = this.$gettext('My awesome radio')
+      return {
+        title,
+        placeholder
+      }
+    },
     canSave: function () {
       return (
         this.radioName.length > 0 && this.checkErrors.length === 0

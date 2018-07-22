@@ -2,14 +2,14 @@
   <div id="app">
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
-        <h1 class="ui header">{{ $t('Choose your instance') }}</h1>
+        <h1 class="ui header"><translate>Choose your instance</translate></h1>
         <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
-          <p>{{ $t('You need to select an instance in order to continue') }}</p>
+          <p><translate>You need to select an instance in order to continue</translate></p>
           <div class="ui action input">
             <input type="text" v-model="instanceUrl">
-            <button type="submit" class="ui button">{{ $t('Submit') }}</button>
+            <button type="submit" class="ui button"><translate>Submit</translate></button>
           </div>
-          <p>{{ $t('Suggested choices') }}</p>
+          <p><translate>Suggested choices</translate></p>
           <div class="ui bulleted list">
             <div class="ui item" v-for="url in suggestedInstances">
               <a @click="instanceUrl = url">{{ url }}</a>
@@ -27,20 +27,23 @@
         <div class="ui container">
           <div class="ui stackable equal height stackable grid">
             <div class="three wide column">
-              <i18next tag="h4" class="ui header" path="Links"></i18next>
+              <h4 v-translate class="ui header">Links</h4>
               <div class="ui link list">
                 <router-link class="item" to="/about">
-                  <i18next path="About this instance" />
+                  <translate>About this instance</translate>
                 </router-link>
-                <a href="https://funkwhale.audio" class="item" target="_blank">{{ $t('Official website') }}</a>
-                <a href="https://docs.funkwhale.audio" class="item" target="_blank">{{ $t('Documentation') }}</a>
+                <router-link class="item" :to="{name: 'library.request'}">
+                  <translate>Request music</translate>
+                </router-link>
+                <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
+                <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
-                  <template v-if="version">{{ $t('Source code ({% version %})', {version: version}) }}</template>
-                  <template v-else>{{ $t('Source code') }}</template>
+                  <translate :translate-params="{version: version}" v-if="version">Source code (%{version})</translate>
+                  <translate v-else>Source code</translate>
                 </a>
-                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank">{{ $t('Issue tracker') }}</a>
+                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
                 <a @click="switchInstance" class="item" >
-                  {{ $t('Use another instance') }}
+                  <translate>Use another instance</translate>
                   <template v-if="$store.state.instance.instanceUrl !== '/'">
                     <br>
                     ({{ $store.state.instance.instanceUrl }})
@@ -49,14 +52,30 @@
               </div>
             </div>
             <div class="ten wide column">
-              <i18next tag="h4" class="ui header" path="About funkwhale" />
+              <h4 v-translate class="ui header">About Funkwhale</h4>
               <p>
-                <i18next path="Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"/>
+                <translate>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</translate>
               </p>
               <p>
-                <i18next path="The funkwhale logo was kindly designed and provided by Francis Gading."/>
+                <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
               </p>
             </div>
+            <div class="three wide column">
+              <h4 v-translate class="ui header">Options</h4>
+              <div class="ui form">
+                <div class="ui field">
+                  <label><translate>Change language</translate></label>
+                  <select class="ui dropdown" v-model="$language.current">
+                    <option v-for="(language, key) in $language.available" :value="key">{{ language }}</option>
+                  </select>
+                </div>
+              </div>
+              <br>
+              <a target="_blank" href="https://translate.funkwhale.audio/engage/funkwhale/">
+                <translate>Help us translate Funkwhale</translate>
+              </a>
+            </div>
+
           </div>
         </div>
       </div>
@@ -73,6 +92,8 @@
 import axios from 'axios'
 import _ from 'lodash'
 import {mapState} from 'vuex'
+
+import translations from '@/translations'
 
 import Sidebar from '@/components/Sidebar'
 import Raven from '@/components/Raven'
@@ -96,6 +117,7 @@ export default {
   },
   created () {
     let self = this
+    this.autodetectLanguage()
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
@@ -115,9 +137,24 @@ export default {
       })
     },
     switchInstance () {
-      let confirm = window.confirm(this.$t('This will erase your local data and disconnect you, do you want to continue?'))
+      let confirm = window.confirm(this.$gettext('This will erase your local data and disconnect you, do you want to continue?'))
       if (confirm) {
         this.$store.commit('instance/instanceUrl', null)
+      }
+    },
+    autodetectLanguage () {
+      let userLanguage = navigator.language || navigator.userLanguage
+      let available = _.keys(translations)
+      let matching = available.filter((a) => {
+        return userLanguage.replace('-', '_') === a
+      })
+      let almostMatching = available.filter((a) => {
+        return userLanguage.replace('-', '_').split('_')[0] === a.split('_')[0]
+      })
+      if (matching.length > 0) {
+        this.$language.current = matching[0]
+      } else if (almostMatching.length > 0) {
+        this.$language.current = almostMatching[0]
       }
     }
   },
@@ -144,6 +181,9 @@ export default {
     '$store.state.instance.instanceUrl' () {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
+    },
+    '$language.current' (newValue) {
+      this.$store.commit('ui/currentLanguage', newValue)
     }
   }
 }
@@ -176,9 +216,42 @@ html, body {
 .main.pusher, .footer {
   @include media(">desktop") {
     margin-left: 350px !important;
+    margin-top: 50px;
   }
   transform: none !important;
 }
+
+
+.main.pusher > .ui.secondary.menu {
+  margin-left: 0;
+  margin-right: 0;
+  border: none;
+  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
+  .ui.item {
+    border: none;
+    border-bottom-style: none;
+    margin-bottom: 0px;
+    &.active {
+      box-shadow: inset 0px -2px 0px 0px #000;
+    }
+  }
+  @include media(">tablet") {
+    padding: 0 2.5rem;
+  }
+  @include media(">desktop") {
+    position: fixed;
+    left: 350px;
+    right: 0px;
+    top: 0px;
+    z-index: 1;
+  }
+  background-color: white;
+  .item {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
+}
+
 .service-messages {
   position: fixed;
   bottom: 1em;
@@ -221,6 +294,7 @@ html, body {
 
 .discrete.link {
     color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
 }
 
 .floated.buttons .button ~ .dropdown {

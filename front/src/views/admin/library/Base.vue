@@ -1,16 +1,16 @@
 <template>
-  <div class="main pusher"  v-title="'Manage library'">
+  <div class="main pusher"  v-title="labels.title">
     <div class="ui secondary pointing menu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.library.files'}">{{ $t('Files') }}</router-link>
+        :to="{name: 'manage.library.files'}"><translate>Files</translate></router-link>
       <router-link
         class="ui item"
         :to="{name: 'manage.library.requests'}">
-          {{ $t('Import requests') }}
+          <translate>Import requests</translate>
           <div
             :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
-            :title="$t('Pending import requests')">
+            :title="labels.pendingRequests">
             {{ $store.state.ui.notifications.importRequests }}</div>
           </router-link>
     </div>
@@ -19,19 +19,16 @@
 </template>
 
 <script>
-export default {}
-</script>
-
-<style lang="scss">
-@import '../../../style/vendor/media';
-
-.main.pusher > .ui.secondary.menu {
-  @include media(">tablet") {
-    margin: 0 2.5rem;
-  }
-  .item {
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
+export default {
+  computed: {
+    labels () {
+      let title = this.$gettext('Manage library')
+      let pendingRequests = this.$gettext('Pending import requests')
+      return {
+        title,
+        pendingRequests
+      }
+    }
   }
 }
-</style>
+</script>

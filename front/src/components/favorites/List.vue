@@ -1,14 +1,19 @@
 <template>
-  <div class="main pusher" v-title="'Your Favorites'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader"><i18next path="Loading your favorites..."/></div>
+        <div class="ui text loader">
+          <translate>Loading your favorites...</translate>
+        </div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
         <i class="circular inverted heart pink icon"></i>
-        <i18next path="{%0%} favorites">
-          {{ $store.state.favorites.count }}
-        </i18next>
+        <translate
+          translate-plural="%{ count } favorites"
+          :translate-n="$store.state.favorites.count"
+          :translate-params="{count: results.count}">
+          1 favorite
+        </translate>
       </h2>
       <radio-button type="favorites"></radio-button>
     </div>
@@ -16,7 +21,7 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <i18next tag="label" path="Ordering"/>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -24,14 +29,14 @@
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering direction"/>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+"><i18next path="Ascending"/></option>
-              <option value="-"><i18next path="Descending"/></option>
+              <option value="+"><translate>Ascending</translate></option>
+              <option value="-"><translate>Descending</translate></option>
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Results per page"/>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -44,7 +49,7 @@
       <track-table v-if="results" :tracks="results.results"></track-table>
       <div class="ui center aligned basic segment">
         <pagination
-          v-if="results && results.count > 0"
+          v-if="results && results.count > paginateBy"
           @page-changed="selectPage"
           :current="page"
           :paginate-by="paginateBy"
@@ -97,6 +102,13 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Your Favorites')
+      }
+    }
   },
   methods: {
     updateQueryString: function () {

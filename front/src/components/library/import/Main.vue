@@ -1,37 +1,47 @@
 <template>
-  <div v-title="'Import Music'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui top three attached ordered steps">
         <a @click="currentStep = 0" :class="['step', {'active': currentStep === 0}, {'completed': currentStep > 0}]">
           <div class="content">
-            <i18next tag="div" class="title" path="Import source"/>
-            <i18next tag="div" class="description" path="Uploaded files or external source"/>
+            <div class="title"><translate>Import source</translate></div>
+            <div class="description"><translate>Uploaded files or external source</translate></div>
           </div>
         </a>
         <a @click="currentStep = 1" :class="['step', {'active': currentStep === 1}, {'completed': currentStep > 1}]">
           <div class="content">
-            <i18next tag="div" class="title" path="Metadata"/>
-            <i18next tag="div" class="description" path="Grab corresponding metadata"/>
+            <div class="title"><translate>Metadata</translate></div>
+            <div class="description"><translate>Grab corresponding metadata</translate></div>
           </div>
         </a>
         <a @click="currentStep = 2" :class="['step', {'active': currentStep === 2}, {'completed': currentStep > 2}]">
           <div class="content">
-            <i18next tag="div" class="title" path="Music"/>
-            <i18next tag="div" class="description" path="Select relevant sources or files for import"/>
+            <div class="title"><translate>Music</translate></div>
+            <div class="description"><translate>Select relevant sources or files for import</translate></div>
           </div>
         </a>
       </div>
       <div class="ui hidden divider"></div>
       <div class="ui centered buttons">
-        <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i><i18next path="Previous step"/></button>
-        <button @click="nextStep()" v-if="currentStep < 2" class="ui icon button"><i18next path="Next step"/><i class="right arrow icon"></i></button>
+        <button @click="currentStep -= 1" :disabled="currentStep === 0" class="ui icon button"><i class="left arrow icon"></i>
+          <translate>Previous step</translate>
+        </button>
+        <button @click="nextStep()" v-if="currentStep < 2" class="ui icon button">
+          <translate>Next step</translate>
+          <i class="right arrow icon"></i>
+        </button>
         <button
           @click="$refs.import.launchImport()"
           v-if="currentStep === 2 && currentSource != 'upload'"
           :class="['ui', 'positive', 'icon', {'loading': isImporting}, 'button']"
           :disabled="isImporting || importData.count === 0"
           >
-            <i18next path="Import {%0%} tracks">{{ importData.count }}</i18next>
+            <translate
+              :translate-params="{count: importData.count || 0}"
+              :translate-n="importData.count || 0"
+              translate-plural="Import %{ count } tracks">
+              Import %{ count } track
+            </translate>
             <i class="check icon"></i>
           </button>
         <button
@@ -40,20 +50,20 @@
           :class="['ui', 'positive', 'icon', {'disabled': !importBatch}, 'button']"
           :disabled="!importBatch"
           >
-            {{ $t('Finish import' )}}
+            <translate>Finish import</translate>
             <i class="check icon"></i>
           </button>
       </div>
       <div class="ui hidden divider"></div>
       <div class="ui attached segment">
         <template v-if="currentStep === 0">
-          <i18next tag="p" path="First, choose where you want to import the music from"/>
+          <p><translate>First, choose where you want to import the music from</translate></p>
           <form class="ui form">
             <div class="field">
               <div class="ui radio checkbox">
                 <input type="radio" id="external" value="external" v-model="currentSource">
                 <label for="external">
-                  <i18next path="External source. Supported backends"/>
+                  <translate>External source. Supported backends</translate>
                   <div v-for="backend in backends" class="ui basic label">
                     <i v-if="backend.icon" :class="[backend.icon, 'icon']"></i>
                     {{ backend.label }}
@@ -64,7 +74,7 @@
             <div class="field">
               <div class="ui radio checkbox">
                 <input type="radio" id="upload" value="upload" v-model="currentSource">
-                <i18next tag="label" for="upload" path="File upload" />
+                <label for="upload"><translate>File upload</translate></label>
               </div>
             </div>
           </form>
@@ -73,7 +83,7 @@
           <div class="column">
             <form class="ui form" @submit.prevent="">
               <div class="field">
-                <i18next tag="label" path="Search an entity you want to import:"/>
+                <label><translate>Search an entity you want to import:</translate></label>
                 <metadata-search
                   :mb-type="mbType"
                   :mb-id="mbId"
@@ -81,29 +91,35 @@
                   @type-changed="updateType"></metadata-search>
               </div>
             </form>
-            <i18next tag="div" class="ui horizontal divider" path="Or"/>
+            <div class="ui horizontal divider"><translate>Or</translate></div>
             <form class="ui form" @submit.prevent="">
               <div class="field">
-                <i18next tag="label" path="Input a MusicBrainz ID manually:"/>
+                <label><translate>Input a MusicBrainz ID manually:</translate></label>
                 <input type="text" v-model="currentId" />
               </div>
             </form>
             <div class="ui hidden divider"></div>
             <template v-if="currentType && currentId">
-              <h4 class="ui header"><i18next path="You will import:"/></h4>
+              <h4 class="ui header">
+                <translate>You will import:</translate>
+              </h4>
               <component
                 :mbId="currentId"
                 :is="metadataComponent"
                 @metadata-changed="this.updateMetadata"
                 ></component>
             </template>
-            <i18next tag="p" path="You can also skip this step and enter metadata manually."/>
+            <p><translate>You can also skip this step and enter metadata manually.</translate></p>
           </div>
           <div class="column">
-            <h5 class="ui header">What is metadata?</h5>
-            <i18next tag="p" path="Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the {%0%} project, which you can think about as the Wikipedia of music.">
-              <a href="http://musicbrainz.org/" target="_blank">MusicBrainz</a>
-            </i18next>
+            <h5 class="ui header"><translate>What is metadata?</translate></h5>
+            <template v-translate>
+              Metadata is the data related to the music you want to import. This includes all the information about the artists, albums and tracks. In order to have a high quality library, it is recommended to grab data from the
+              <a href="https://musicbrainz.org" target="_blank">
+                MusicBrainz
+              </a>
+              project, which you can think about as the Wikipedia of music.
+            </template>
           </div>
         </div>
         <div v-if="currentStep === 2">
@@ -128,8 +144,10 @@
       </div>
     </div>
     <div class="ui vertical stripe segment" v-if="currentRequest">
-      <h3 class="ui header"><i18next path="Music request"/></h3>
-      <i18next tag="p" path="This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled."/>
+      <h3 class="ui header">
+        <translate>Music request</translate>
+      </h3>
+      <p><translate>This import will be associated with the music request below. After the import is finished, the request will be marked as fulfilled.</translate></p>
       <request-card :request="currentRequest" :import-action="false"></request-card>
 
     </div>
@@ -244,6 +262,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Import Music')
+      }
+    },
     metadataComponent () {
       if (this.currentType === 'artist') {
         return 'ArtistCard'

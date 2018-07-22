@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
-          <input type="text" v-model="search" placeholder="Search by username, email, name..." />
+          <label><translate>Search</translate></label>
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">{{ $t('Ascending') }}</option>
-            <option value="-">{{ $t('Descending') }}</option>
+            <option value="+"><translate>Ascending</translate></option>
+            <option value="-"><translate>Descending</translate></option>
           </select>
         </div>
       </div>
@@ -35,31 +35,31 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Username') }}</th>
-          <th>{{ $t('Email') }}</th>
-          <th>{{ $t('Account status') }}</th>
-          <th>{{ $t('Sign-up') }}</th>
-          <th>{{ $t('Last activity') }}</th>
-          <th>{{ $t('Permissions') }}</th>
-          <th>{{ $t('Status') }}</th>
+          <th><translate>Username</translate></th>
+          <th><translate>Email</translate></th>
+          <th><translate>Account status</translate></th>
+          <th><translate>Sign-up</translate></th>
+          <th><translate>Last activity</translate></th>
+          <th><translate>Permissions</translate></th>
+          <th><translate>Status</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
+            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
           </td>
           <td>
-            <span>{{ scope.obj.email }}</span>
+            <span>{{ scope.obj.email }}</span>
           </td>
           <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label">{{ $t('Active') }}</span>
-            <span v-else class="ui basic grey label">{{ $t('Inactive') }}</span>
+            <span v-if="scope.obj.is_active" class="ui basic green label"><translate>Active</translate></span>
+            <span v-else class="ui basic grey label"><translate>Inactive</translate></span>
           </td>
           <td>
             <human-date :date="scope.obj.date_joined"></human-date>
           </td>
           <td>
             <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else>{{ $t('N/A') }}</template>
+            <template v-else><translate>N/A</translate></template>
           </td>
           <td>
             <template v-for="p in permissions">
@@ -67,16 +67,16 @@
             </template>
           </td>
           <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label">{{ $t('Admin') }}</span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label">{{ $t('Staff member') }}</span>
-            <span v-else class="ui basic label">{{ $t('regular user') }}</span>
+            <span v-if="scope.obj.is_superuser" class="ui pink label"><translate>Admin</translate></span>
+            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate>Staff member</translate></span>
+            <span v-else class="ui basic label"><translate>regular user</translate></span>
           </td>
         </template>
       </action-table>
     </div>
     <div>
       <pagination
-        v-if="result && result.results.length > 0"
+        v-if="result && result.count > paginateBy"
         @page-changed="selectPage"
         :compact="true"
         :current="page"
@@ -85,7 +85,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -154,6 +157,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by username, email, name...')
+      }
+    },
     privacyLevels () {
       return {}
     },
@@ -161,19 +169,19 @@ export default {
       return [
         {
           'code': 'upload',
-          'label': this.$t('Upload')
+          'label': this.$gettext('Upload')
         },
         {
           'code': 'library',
-          'label': this.$t('Library')
+          'label': this.$gettext('Library')
         },
         {
           'code': 'federation',
-          'label': this.$t('Federation')
+          'label': this.$gettext('Federation')
         },
         {
           'code': 'settings',
-          'label': this.$t('Settings')
+          'label': this.$gettext('Settings')
         }
       ]
     },
@@ -191,7 +199,7 @@ export default {
       return [
         // {
         //   name: 'delete',
-        //   label: this.$t('Delete'),
+        //   label: this.$gettext('Delete'),
         //   isDangerous: true
         // }
       ]

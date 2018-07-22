@@ -92,8 +92,8 @@ THIRD_PARTY_APPS = (
     "rest_auth.registration",
     "dynamic_preferences",
     "django_filters",
-    "cacheops",
     "django_cleanup",
+    "versatileimagefield",
 )
 
 
@@ -302,6 +302,7 @@ SESSION_COOKIE_HTTPONLY = False
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_USERNAME_VALIDATORS = "funkwhale_api.users.serializers.username_validators"
 
 # Custom user app defaults
 # Select the correct user model
@@ -420,15 +421,6 @@ PROTECT_FILES_PATH = env("PROTECT_FILES_PATH", default="/_protected")
 # use this setting to tweak for how long you want to cache
 # musicbrainz results. (value is in seconds)
 MUSICBRAINZ_CACHE_DURATION = env.int("MUSICBRAINZ_CACHE_DURATION", default=300)
-CACHEOPS_REDIS = env("CACHE_URL", default=CACHE_DEFAULT)
-CACHEOPS_ENABLED = env.bool("CACHEOPS_ENABLED", default=True)
-CACHEOPS = {
-    "music.artist": {"ops": "all", "timeout": 60 * 60},
-    "music.album": {"ops": "all", "timeout": 60 * 60},
-    "music.track": {"ops": "all", "timeout": 60 * 60},
-    "music.trackfile": {"ops": "all", "timeout": 60 * 60},
-    "taggit.tag": {"ops": "all", "timeout": 60 * 60},
-}
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
@@ -441,6 +433,7 @@ PLAYLISTS_MAX_TRACKS = env.int("PLAYLISTS_MAX_TRACKS", default=250)
 ACCOUNT_USERNAME_BLACKLIST = [
     "funkwhale",
     "library",
+    "instance",
     "test",
     "status",
     "root",
@@ -449,6 +442,11 @@ ACCOUNT_USERNAME_BLACKLIST = [
     "superuser",
     "staff",
     "service",
+    "me",
+    "ghost",
+    "_",
+    "hello",
+    "contact",
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)
@@ -465,3 +463,13 @@ MUSIC_DIRECTORY_SERVE_PATH = env(
 USERS_INVITATION_EXPIRATION_DAYS = env.int(
     "USERS_INVITATION_EXPIRATION_DAYS", default=14
 )
+
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "square": [
+        ("original", "url"),
+        ("square_crop", "crop__400x400"),
+        ("medium_square_crop", "crop__200x200"),
+        ("small_square_crop", "crop__50x50"),
+    ]
+}
+VERSATILEIMAGEFIELD_SETTINGS = {"create_images_on_demand": False}

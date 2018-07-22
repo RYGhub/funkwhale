@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="'Library'">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="object">
@@ -19,18 +19,18 @@
             <tbody>
               <tr>
                 <td >
-                  {{ $t('Follow status') }}
-                  <span :data-tooltip="$t('This indicate if the remote library granted you access')"><i class="question circle icon"></i></span>
+                  <translate>Follow status</translate>
+                  <span :data-tooltip="labels.statusTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <template v-if="object.follow.approved === null">
-                    <i class="loading icon"></i> {{ $t('Pending approval') }}
+                    <i class="loading icon"></i> <translate>Pending approval</translate>
                   </template>
                   <template v-else-if="object.follow.approved === true">
-                    <i class="check icon"></i> {{ $t('Following') }}
+                    <i class="check icon"></i> <translate>Following</translate>
                   </template>
                   <template v-else-if="object.follow.approved === false">
-                    <i class="x icon"></i> {{ $t('Not following') }}
+                    <i class="x icon"></i> <translate>Not following</translate>
                   </template>
                 </td>
                 <td>
@@ -38,8 +38,8 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Federation') }}
-                  <span :data-tooltip="$t('Use this flag to enable/disable federation with this library')"><i class="question circle icon"></i></span>
+                  <translate>Federation</translate>
+                  <span :data-tooltip="labels.federationTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -54,8 +54,8 @@
               </tr>
               <tr>
                 <td>
-                  {{ $t('Auto importing') }}
-                  <span :data-tooltip="$t('When enabled, auto importing will automatically import new tracks published in this library')"><i class="question circle icon"></i></span>
+                  <translate>Auto importing</translate>
+                  <span :data-tooltip="labels.autoImportTooltip"><i class="question circle icon"></i></span>
                 </td>
                 <td>
                   <div class="ui toggle checkbox">
@@ -69,7 +69,7 @@
               </tr>
               <!-- Disabled until properly implemented on the backend
               <tr>
-                <td>File mirroring</td>
+                <td><translate>File mirroring</translate></td>
                 <td>
                   <div class="ui toggle checkbox">
                     <input
@@ -82,19 +82,24 @@
               </tr>
               -->
               <tr>
-                <td>{{ $t('Library size') }}</td>
+                <td><translate>Library size</translate></td>
                 <td>
                   <template v-if="object.tracks_count">
-                    {{ $t('{%count%} tracks', { count: object.tracks_count }) }}
+                    <translate
+                      translate-plural="%{ count } tracks"
+                      :translate-n="object.tracks_count"
+                      :translate-params="{count: object.tracks_count}">
+                      %{ count } track
+                    </translate>
                   </template>
                   <template v-else>
-                    {{ $t('Unkwnown') }}
+                    <translate>Unknown</translate>
                   </template>
                 </td>
                 <td></td>
               </tr>
               <tr>
-                <td>{{ $t('Last fetched') }}</td>
+                <td><translate>Last fetched</translate></td>
                 <td>
                   <human-date v-if="object.fetched_date" :date="object.fetched_date"></human-date>
                   <template v-else>Never</template>
@@ -102,10 +107,10 @@
                     @click="scan"
                     v-if="!scanTrigerred"
                     :class="['ui', 'basic', {loading: isScanLoading}, 'button']">
-                    <i class="sync icon"></i> {{ $t('Trigger scan') }}
+                    <i class="sync icon"></i> <translate>Trigger scan</translate>
                   </button>
                   <button v-else class="ui success button">
-                    <i class="check icon"></i> {{ $t('Scan triggered!') }}
+                    <i class="check icon"></i> <translate>Scan triggered!</translate>
                   </button>
 
                 </td>
@@ -115,10 +120,10 @@
           </table>
         </div>
         <div class="ui hidden divider"></div>
-        <button @click="fetchData" class="ui basic button">{{ $t('Refresh') }}</button>
+        <button @click="fetchData" class="ui basic button"><translate>Refresh</translate></button>
       </div>
       <div class="ui vertical stripe segment">
-        <h2>{{ $t('Tracks available in this library') }}</h2>
+        <h2><translate>Tracks available in this library</translate></h2>
         <library-track-table v-if="!isLoading" :filters="{library: id}"></library-track-table>
       </div>
     </template>
@@ -185,6 +190,18 @@ export default {
     }
   },
   computed: {
+    labels () {
+      let title = this.$gettext('Library')
+      let statusTooltip = this.$gettext('This indicate if the remote library granted you access')
+      let federationTooltip = this.$gettext('Use this flag to enable/disable federation with this library')
+      let autoImportTooltip = this.$gettext('When enabled, auto importing will automatically import new tracks published in this library')
+      return {
+        title,
+        statusTooltip,
+        federationTooltip,
+        autoImportTooltip
+      }
+    },
     libraryUsername () {
       let actor = this.object.actor
       return `${actor.preferred_username}@${actor.domain}`

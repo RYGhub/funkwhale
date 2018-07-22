@@ -82,9 +82,30 @@ class Command(BaseCommand):
         try:
             for import_path in options["path"]:
                 matching += glob.glob(import_path, **glob_kwargs)
-            matching = sorted(list(set(matching)))
+            raw_matching = sorted(list(set(matching)))
         except TypeError:
             raise Exception("You need Python 3.5 to use the --recursive flag")
+
+        matching = []
+        for m in raw_matching:
+            # In some situations, the path is encoded incorrectly on the filesystem
+            # so we filter out faulty paths and display a warning to the user.
+            # see https://code.eliotberriot.com/funkwhale/funkwhale/issues/138
+            try:
+                m.encode("utf-8")
+                matching.append(m)
+            except UnicodeEncodeError:
+                try:
+                    previous = matching[-1]
+                except IndexError:
+                    previous = None
+                self.stderr.write(
+                    self.style.WARNING(
+                        "[warning] Ignoring undecodable path. Previous ok file was {}".format(
+                            previous
+                        )
+                    )
+                )
 
         if options["in_place"]:
             self.stdout.write(

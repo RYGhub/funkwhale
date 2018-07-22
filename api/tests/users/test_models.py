@@ -1,7 +1,10 @@
 import datetime
 import pytest
 
+from django.urls import reverse
+
 from funkwhale_api.users import models
+from funkwhale_api.federation import utils as federation_utils
 
 
 def test__str__(factories):
@@ -126,4 +129,27 @@ def test_can_filter_closed_invitations(factories):
     used = factories["users.User"](invited=True).invitation
 
     assert models.Invitation.objects.count() == 3
-    assert list(models.Invitation.objects.open(False)) == [expired, used]
+    assert list(models.Invitation.objects.order_by("id").open(False)) == [expired, used]
+
+
+def test_creating_actor_from_user(factories, settings):
+    user = factories["users.User"]()
+    actor = models.create_actor(user)
+
+    assert actor.preferred_username == user.username
+    assert actor.domain == settings.FEDERATION_HOSTNAME
+    assert actor.type == "Person"
+    assert actor.name == user.username
+    assert actor.manually_approves_followers is False
+    assert actor.url == federation_utils.full_url(
+        reverse("federation:actors-detail", kwargs={"user__username": user.username})
+    )
+    assert actor.shared_inbox_url == federation_utils.full_url(
+        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+    )
+    assert actor.inbox_url == federation_utils.full_url(
+        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+    )
+    assert actor.outbox_url == federation_utils.full_url(
+        reverse("federation:actors-outbox", kwargs={"user__username": user.username})
+    )

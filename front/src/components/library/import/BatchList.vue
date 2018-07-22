@@ -1,29 +1,29 @@
 <template>
-  <div v-title="'Import Batches'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div v-if="isLoading" :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $t('Search') }}</label>
-            <input type="text" v-model="filters.search" placeholder="Search by submitter, source..." />
+            <label><translate>Search</translate></label>
+            <input type="text" v-model="filters.search" :placeholder="labels.searchPlaceholder" />
           </div>
           <div class="ui field">
-            <label>{{ $t('Status') }}</label>
+            <label><translate>Status</translate></label>
             <select class="ui dropdown" v-model="filters.status">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'pending'">{{ $t('Pending') }}</option>
-              <option :value="'errored'">{{ $t('Errored') }}</option>
-              <option :value="'finished'">{{ $t('Success') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'pending'"><translate>Pending</translate></option>
+              <option :value="'errored'"><translate>Errored</translate></option>
+              <option :value="'finished'"><translate>Success</translate></option>
             </select>
           </div>
           <div class="ui field">
-            <label>{{ $t('Import source') }}</label>
+            <label><translate>Import source</translate></label>
             <select class="ui dropdown" v-model="filters.source">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'shell'">{{ $t('CLI') }}</option>
-              <option :value="'api'">{{ $t('API') }}</option>
-              <option :value="'federation'">{{ $t('Federation') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'shell'"><translate>CLI</translate></option>
+              <option :value="'api'"><translate>API</translate></option>
+              <option :value="'federation'"><translate>Federation</translate></option>
             </select>
           </div>
         </div>
@@ -32,12 +32,12 @@
       <table v-if="result && result.results.length > 0" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $t('ID') }}</th>
-            <th>{{ $t('Launch date') }}</th>
-            <th>{{ $t('Jobs') }}</th>
-            <th>{{ $t('Status') }}</th>
-            <th>{{ $t('Source') }}</th>
-            <th>{{ $t('Submitted by') }}</th>
+            <th><translate>ID</translate></th>
+            <th><translate>Launch date</translate></th>
+            <th><translate>Jobs</translate></th>
+            <th><translate>Status</translate></th>
+            <th><translate>Source</translate></th>
+            <th><translate>Submitted by</translate></th>
           </tr>
         </thead>
         <tbody>
@@ -62,7 +62,7 @@
           <tr>
             <th>
               <pagination
-              v-if="result && result.results.length > 0"
+              v-if="result && result.count > filters.paginateBy"
               @page-changed="selectPage"
               :compact="true"
               :current="filters.page"
@@ -71,7 +71,10 @@
               ></pagination>
             </th>
             <th v-if="result && result.results.length > 0">
-              {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((filters.page-1) * filters.paginateBy) + 1 , end: ((filters.page-1) * filters.paginateBy) + result.results.length, total: result.count})}}
+              <translate
+                :translate-params="{start: ((filters.page-1) * filters.paginateBy) + 1, end: ((filters.page-1) * filters.paginateBy) + result.results.length, total: result.count}">
+                Showing results %{ start }-%{ end } on %{ total }
+              </translate>
             <th>
             <th></th>
             <th></th>
@@ -107,6 +110,16 @@ export default {
   },
   created () {
     this.fetchData()
+  },
+  computed: {
+    labels () {
+      let searchPlaceholder = this.$gettext('Search by submitter, source...')
+      let title = this.$gettext('Import Batches')
+      return {
+        searchPlaceholder,
+        title
+      }
+    }
   },
   methods: {
     fetchData () {

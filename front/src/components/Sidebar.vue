@@ -2,7 +2,7 @@
 <div :class="['ui', 'vertical', 'left', 'visible', 'wide', {'collapsed': isCollapsed}, 'sidebar',]">
   <div class="ui inverted segment header-wrapper">
     <search-bar @search="isCollapsed = false">
-      <router-link :title="'Funkwhale'" :to="{name: 'index'}">
+      <router-link :title="'Funkwhale'" :to="{name: logoUrl}">
         <i class="logo bordered inverted orange big icon">
           <logo class="logo"></logo>
         </i>
@@ -16,15 +16,15 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" @click="selectedTab = 'library'" data-tab="library">Browse</a>
+      <a class="active item" @click="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
       <a class="item" @click="selectedTab = 'queue'" data-tab="queue">
-        {{ $t('Queue') }}
+        <translate>Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
-           {{ $t('(empty)') }}
+           <translate>(empty)</translate>
          </template>
-         <template v-else>
-           {{ $t('({%index%} of {%length%})', { index: queue.currentIndex + 1, length: queue.tracks.length }) }}
-         </template>
+         <translate v-else :translate-params="{index: queue.currentIndex + 1, length: queue.tracks.length}">
+          (%{ index } of %{ length })
+         </translate>
       </a>
     </div>
   </div>
@@ -32,40 +32,46 @@
     <div class="ui bottom attached active tab" data-tab="library">
       <div class="ui inverted vertical large fluid menu">
         <div class="item">
-          <div class="header">{{ $t('My account') }}</div>
+          <div class="header"><translate>My account</translate></div>
           <div class="menu">
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}"><i class="user icon"></i>{{ $t('Logged in as {%name%}', { name: $store.state.auth.username }) }}</router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i>{{ $t('Logout') }}</router-link>
-            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i>{{ $t('Login') }}</router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}">
+              <i class="user icon"></i>
+              <translate :translate-params="{username: $store.state.auth.username}">
+                Logged in as %{ username }
+              </translate>
+              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
+            </router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
+            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
           </div>
         </div>
         <div class="item">
-          <div class="header">{{ $t('Music') }}</div>
+          <div class="header"><translate>Music</translate></div>
           <div class="menu">
-            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"> </i>{{ $t('Browse library') }}</router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i>{{ $t('Favorites') }}</router-link>
+            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"></i><translate>Browse library</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i><translate>Favorites</translate></router-link>
             <a
               @click="$store.commit('playlists/chooseTrack', null)"
               v-if="$store.state.auth.authenticated"
               class="item">
-              <i class="list icon"></i>{{ $t('Playlists') }}
+              <i class="list icon"></i><translate>Playlists</translate>
             </a>
             <router-link
               v-if="$store.state.auth.authenticated"
-              class="item" :to="{path: '/activity'}"><i class="bell icon"></i>{{ $t('Activity') }}</router-link>
+              class="item" :to="{path: '/activity'}"><i class="bell icon"></i><translate>Activity</translate></router-link>
           </div>
         </div>
         <div class="item" v-if="showAdmin">
-          <div class="header">{{ $t('Administration') }}</div>
+          <div class="header"><translate>Administration</translate></div>
           <div class="menu">
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['library']"
               :to="{name: 'manage.library.files'}">
-              <i class="book icon"></i>{{ $t('Library') }}
+              <i class="book icon"></i><translate>Library</translate>
               <div
                 :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
-                :title="$t('Pending import requests')">
+                :title="labels.pendingRequests">
                 {{ $store.state.ui.notifications.importRequests }}</div>
 
             </router-link>
@@ -73,29 +79,29 @@
               class="item"
               v-else-if="$store.state.auth.availablePermissions['upload']"
               to="/library/import/launch">
-              <i class="download icon"></i>{{ $t('Import music') }}
+              <i class="download icon"></i><translate>Import music</translate>
             </router-link>
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['federation']"
               :to="{path: '/manage/federation/libraries'}">
-              <i class="sitemap icon"></i>{{ $t('Federation') }}
+              <i class="sitemap icon"></i><translate>Federation</translate>
               <div
                 :class="['ui', {'teal': $store.state.ui.notifications.federation > 0}, 'label']"
-                :title="$t('Pending follow requests')">
+                :title="labels.pendingFollows">
                 {{ $store.state.ui.notifications.federation }}</div>
             </router-link>
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['settings']"
               :to="{path: '/manage/settings'}">
-              <i class="settings icon"></i>{{ $t('Settings') }}
+              <i class="settings icon"></i><translate>Settings</translate>
             </router-link>
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['settings']"
               :to="{name: 'manage.users.users.list'}">
-              <i class="users icon"></i>{{ $t('Users') }}
+              <i class="users icon"></i><translate>Users</translate>
             </router-link>
           </div>
         </div>
@@ -105,12 +111,19 @@
       <i class="history icon"></i>
       <div class="content">
         <div class="header">
-          {{ $t('Do you want to restore your previous queue?') }}
+          <translate>Do you want to restore your previous queue?</translate>
         </div>
-        <p>{{ $t('{%count%} tracks', { count: queue.previousQueue.tracks.length }) }}</p>
+        <p>
+          <translate
+            translate-plural="%{ count } tracks"
+            :translate-n="queue.previousQueue.tracks.length"
+            :translate-params="{count: queue.previousQueue.tracks.length}">
+            %{ count } track
+          </translate>
+        </p>
         <div class="ui two buttons">
-          <div @click="queue.restore()" class="ui basic inverted green button">{{ $t('Yes') }}</div>
-          <div @click="queue.removePrevious()" class="ui basic inverted red button">{{ $t('No') }}</div>
+          <div @click="queue.restore()" class="ui basic inverted green button"><translate>Yes</translate></div>
+          <div @click="queue.removePrevious()" class="ui basic inverted red button"><translate>No</translate></div>
         </div>
       </div>
     </div>
@@ -120,7 +133,7 @@
           <tr @click="$store.dispatch('queue/currentIndex', index)" v-for="(track, index) in tracks" :key="index" :class="[{'active': index === queue.currentIndex}]">
               <td class="right aligned">{{ index + 1}}</td>
               <td class="center aligned">
-                  <img class="ui mini image" v-if="track.album.cover" :src="$store.getters['instance/absoluteUrl'](track.album.cover)">
+                  <img class="ui mini image" v-if="track.album.cover && track.album.cover.original" :src="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
                   <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
@@ -141,10 +154,10 @@
       <div v-if="$store.state.radios.running" class="ui black message">
         <div class="content">
           <div class="header">
-            <i class="feed icon"></i> {{ $t('You have a radio playing') }}
+            <i class="feed icon"></i> <translate>You have a radio playing</translate>
           </div>
-          <p>{{ $t('New tracks will be appended here automatically.') }}</p>
-          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button">{{ $t('Stop radio') }}</div>
+          <p><translate>New tracks will be appended here automatically.</translate></p>
+          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button"><translate>Stop radio</translate></div>
         </div>
       </div>
     </div>
@@ -199,6 +212,14 @@ export default {
       queue: state => state.queue,
       url: state => state.route.path
     }),
+    labels () {
+      let pendingRequests = this.$gettext('Pending import requests')
+      let pendingFollows = this.$gettext('Pending follow requests')
+      return {
+        pendingRequests,
+        pendingFollows
+      }
+    },
     showAdmin () {
       let adminPermissions = [
         this.$store.state.auth.availablePermissions['federation'],
@@ -215,6 +236,13 @@ export default {
       },
       set (value) {
         this.tracksChangeBuffer = value
+      }
+    },
+    logoUrl () {
+      if (this.$store.state.auth.authenticated) {
+        return 'library.index'
+      } else {
+        return 'index'
       }
     }
   },
@@ -352,6 +380,9 @@ $sidebar-color: #3d3e3f;
   tr {
     cursor: pointer;
   }
+  td:nth-child(2) {
+    width: 55px;
+  }
 }
 .tab[data-tab="library"] {
   flex-direction: column;
@@ -394,6 +425,10 @@ $sidebar-color: #3d3e3f;
 .ui.message.black {
   background: $sidebar-color;
 }
+
+.ui.mini.image {
+  width: 100%;
+}
 </style>
 
 <style lang="scss">
@@ -404,5 +439,10 @@ $sidebar-color: #3d3e3f;
       border-radius: 0;
     }
   }
+}
+.ui.tiny.avatar.image {
+  position: relative;
+  top: -0.5em;
+  width: 3em;
 }
 </style>

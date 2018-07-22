@@ -1,30 +1,30 @@
 <template>
   <div>
     <form v-if="!over" class="ui form" @submit.prevent="submit">
-      <p>{{ $t('Something\'s missing in the library? Let us know what you would like to listen!') }}</p>
+      <p><translate>Something's missing in the library? Let us know what you would like to listen!</translate></p>
       <div class="required field">
-        <label>{{ $t('Artist name') }}</label>
-        <input v-model="currentArtistName" placeholder="The Beatles, Mickael Jackson…" required maxlength="200">
+        <label><translate>Artist name</translate></label>
+        <input v-model="currentArtistName" :placeholder="labels.artistNamePlaceholder" required maxlength="200">
       </div>
       <div class="field">
-        <label>{{ $t('Albums') }}</label>
-        <p>{{ $t('Leave this field empty if you\'re requesting the whole discography.') }}</p>
-        <input v-model="currentAlbums" placeholder="The White Album, Thriller…" maxlength="2000">
+        <label><translate>Albums</translate></label>
+        <p><translate>Leave this field empty if you're requesting the whole discography.</translate></p>
+        <input v-model="currentAlbums" :placeholder="labels.albumTitlePlaceholder" maxlength="2000">
       </div>
       <div class="field">
-        <label>{{ $t('Comment') }}</label>
-        <textarea v-model="currentComment" rows="3" placeholder="Use this comment box to add details to your request if needed" maxlength="2000"></textarea>
+        <label><translate>Comment</translate></label>
+        <textarea v-model="currentComment" rows="3" :placeholder="labels.commentPlaceholder" maxlength="2000"></textarea>
       </div>
-      <button class="ui submit button" type="submit">{{ $t('Submit') }}</button>
+      <button class="ui submit button" type="submit"><translate>Submit</translate></button>
     </form>
     <div v-else class="ui success message">
-      <div class="header">Request submitted!</div>
-      <p>{{ $t('We\'ve received your request, you\'ll get some groove soon ;)') }}</p>
-      <button @click="reset" class="ui button">{{ $t('Submit another request') }}</button>
+      <div class="header"><translate>Request submitted!</translate></div>
+      <p><translate>We've received your request, you'll get some groove soon ;)</translate></p>
+      <button @click="reset" class="ui button"><translate>Submit another request</translate></button>
     </div>
     <div v-if="requests.length > 0">
       <div class="ui divider"></div>
-      <h3 class="ui header">{{ $t('Pending requests') }}</h3>
+      <h3 class="ui header"><translate>Pending requests</translate></h3>
       <div class="ui list">
         <div v-for="request in requests" class="item">
           <div class="content">
@@ -66,6 +66,18 @@ export default {
       isLoading: false,
       over: false,
       requests: []
+    }
+  },
+  computed: {
+    labels () {
+      let artistNamePlaceholder = this.$gettext('The Beatles, Mickael Jackson…')
+      let albumTitlePlaceholder = this.$gettext('The White Album, Thriller…')
+      let commentPlaceholder = this.$gettext('Use this comment box to add details to your request if needed')
+      return {
+        artistNamePlaceholder,
+        albumTitlePlaceholder,
+        commentPlaceholder
+      }
     }
   },
   methods: {

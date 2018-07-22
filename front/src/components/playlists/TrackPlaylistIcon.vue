@@ -4,13 +4,13 @@
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
-    {{ $t('Add to playlist...') }}
+    <translate>Add to playlist...</translate>
   </button>
   <i
     v-else
     @click="$store.commit('playlists/chooseTrack', track)"
     :class="['playlist-icon', 'list', 'link', 'icon']"
-    :title="$t('Add to playlist...')">
+    :title="labels.addToPlaylist">
   </i>
 </template>
 
@@ -24,6 +24,13 @@ export default {
   data () {
     return {
       showModal: false
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        addToPlaylist: this.$gettext('Add to playlist...')
+      }
     }
   }
 }

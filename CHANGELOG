@@ -4,11 +4,244 @@ Changelog
 You can subscribe to release announcements by:
 
 - Following `funkwhale@mastodon.eliotberriot.com <https://mastodon.eliotberriot.com/@funkwhale>`_ on Mastodon
-- Subscribing to the following Atom feed: https://code.eliotberriot.com/funkwhale/funkwhale/commits/develop?format=atom&search=tag
+- Subscribing to the following Atom feed: https://code.eliotberriot.com/funkwhale/funkwhale/commits/develop?format=atom&search=Merge+tag
 
 This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.html.
 
 .. towncrier
+
+0.16 (unreleased)
+-----------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Complete redesign of the library home and playlist pages (#284)
+- Expose ActivityPub actors for users (#317)
+- Implemented a basic but functionnal Github-like search on federated tracks
+  list (#344)
+- Internationalized interface as well as translations for Arabic, French,
+  Esperanto, Italian, Occitan, Polish, Portuguese and Swedish (#161, #167)
+- Users can now upload an avatar in their settings page (#257)
+
+
+Enhancements:
+
+- Added feedback when creating/updating radio (#302)
+- Apply restrictions to username characters during signup
+- Autoselect best language based on browser configuration (#386)
+- Can now order tracks on federated track list (#326)
+- Can now relaunch pending import jobs from the web interface (#323)
+- Ensure we do not display pagination on single pages (#334)
+- Ensure we have sane defaults for MEDIA_ROOT, STATIC_ROOT and
+  MUSIC_DIRECTORY_PATH in the deployment .env file (#350)
+- Make some space for the volume slider to allow precise control (#318)
+- Removed django-cacheops dependency
+- Store track artist and album artist separately (#237) Better handling of
+  tracks with a different artist than the album artist
+- The navigation bar of Library is now fixed (#375)
+- Use thumbnails for avatars and covers to reduce bandwidth
+
+
+Bugfixes:
+
+- Ensure 750 permissions on CI artifacts (#332)
+- Ensure images are not cropped in queue (#337)
+- Ensure we do not import artists with empty names (#351)
+- Fix notifications not closing when clicking on the cross (#366)
+- Fix the most annoying offset in the whole fediverse (#369)
+- Fixed persistent message in playlist modal (#304)
+- Fixed unfiltered results in favorites API (#384)
+- Raise a warning instead of crashing when getting a broken path in file import
+  (#138)
+- Remove parallelization of uploads during import to avoid crashing small
+  servers (#382)
+- Subsonic API login is now case insensitive (#339)
+- Validate Date header in HTTP Signatures (#328)
+
+
+Documentation:
+
+- Added troubleshotting and technical overview documentation (#256)
+- Arch Linux installation steps
+- Document that users can use Ultrasonic on Android (#316)
+- Fixed a couple of typos
+- Some cosmetic improvements to the doc
+
+
+i18n:
+
+- Arabic translation (!302)
+- Polish translation (!304)
+
+
+Library home and playlist page overhaul
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The library home page have been completely redesigned to include:
+
+- other users activity (listenings, playlists and favorites)
+- recently imported albums
+
+We think this new version showcases more music in a more useful way, let us know
+what you think about it!
+
+The playlist page have been updated as well.
+
+
+Internationalized interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+After months of work, we're proud to announce our interface is now ready
+for internationalization.
+
+Translators have already started the work of translating Funkwhale in 8 different languages,
+and we're ready to add more as needed.
+
+You can easily get involved at https://translate.funkwhale.audio/engage/funkwhale/
+
+
+Better handling of tracks with a different artist than the album artist
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some tracks involve a different artist than the album artist (e.g. a featuring)
+and Funkwhale has been known to do weird things when importing such tracks, resulting
+in albums that contained a single track, for instance.
+
+The situation should be improved with this release, as Funkwhale is now able to
+store separately the track and album artist, and display it properly in the interface.
+
+
+Users now have an ActivityPub Actor [Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In the process of implementing federation for user activity such as listening
+history, we are now making user profiles (a.k.a. ActivityPub actors) available through federation.
+
+This does not means the federation is working, but this is a needed step to implement it.
+
+Those profiles will be created automatically for new users, but you have to run a command
+to create them for existing users.
+
+On docker setups::
+
+    docker-compose run --rm api python manage.py script create_actors --no-input
+
+On non-docker setups::
+
+    python manage.py script create_actors --no-input
+
+This should only take a few seconds to run. It is safe to interrupt the process or rerun it multiple times.
+
+
+Image thumbnails [Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To reduce bandwidth usage on slow or limited connexions and improve performance
+in general, we now use smaller images in the front-end. For instance, if you have
+an album cover with a 1000x1000 pixel size, we will create smaller
+versions of this image (50x50, 200x200, 400x400) and reference those resized version
+when we don't actually need the original image.
+
+Thumbnail will be created automatically for new objects, however, you have
+to launch a manual command to deal with existing ones.
+
+On docker setups::
+
+    docker-compose run --rm api python manage.py script create_image_variations --no-input
+
+On non-docker setups::
+
+    python manage.py script create_image_variations --no-input
+
+This should be quite fast but may take up to a few minutes depending on the number
+of albums you have in database. It is safe to interrupt the process or rerun it multiple times.
+
+
+Improved search on federated tracks list
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Having a powerful but easy-to-use search is important but difficult to achieve, especially
+if you do not want to have a real complex search interface.
+
+Github does a pretty good job with that, using a structured but simple query system
+(See https://help.github.com/articles/searching-issues-and-pull-requests/#search-only-issues-or-pull-requests).
+
+This release implements a limited but working subset of this query system. You can use it only on the federated
+tracks list (/manage/federation/tracks) at the moment, but depending on feedback it will be rolled-out on other pages as well.
+
+This is the type of query you can run:
+
+- ``hello world``: search for "hello" and "world" in all the available fields
+- ``hello in:artist`` search for results where artist name is "hello"
+- ``spring in:artist,album`` search for results where artist name or album title contain "spring"
+- ``artist:hello`` search for results where artist name equals "hello"
+- ``artist:"System of a Down" domain:instance.funkwhale`` search for results where artist name equals "System of a Down" and inside "instance.funkwhale" library
+
+
+Ensure MEDIA_ROOT, STATIC_ROOT and MUSIC_DIRECTORY_* are set explicitely [Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In our default .env file, MEDIA_ROOT and STATIC_ROOT were commented by default, causing
+some deployment issues on non-docker setups when people forgot to uncomment them.
+
+From now on, those variables are uncommented, and will also be used on docker setups
+to mount the volumes automatically in the docker-compose.yml file. This has been a source
+of headache as well in some deployments, where you had to update both the .env file and
+the compose file.
+
+This also applies to in-place paths (MUSIC_DIRECTORY_PATH and MUSIC_DIRECTORY_SERVE_PATH),
+whose values are now used directly to set up the proper Docker volumes.
+
+This will only affect new deployments though. If you want to benefit from this on an
+existing instance, do a backup of your ``.env`` and ``docker-compose.yml`` files and apply the following changes:
+
+- Ensure ``MEDIA_ROOT`` is uncommented in your .env file and match the absolute path where media files are stored
+  on your host (``/srv/funkwhale/data/media`` by default)
+- Ensure ``STATIC_ROOT`` is uncommented in your .env file and match the absolute path where static files are stored
+  on your host (``/srv/funkwhale/data/static`` by default)
+- If you use in-place import:
+    - Ensure MUSIC_DIRECTORY_PATH is uncommented and set to ``/music``
+    - Ensure MUSIC_DIRECTORY_SERVE_PATH is uncommented and set to the absolute path on your host were your music files
+      are stored (``/srv/funkwhale/data/music`` by default)
+- Edit your docker-compose.yml file to reflect the changes:
+    - Search for volumes (there should be two occurences) that contains ``/app/funkwhale_api/media`` on the right side, and
+      replace the whole line with ``- "${MEDIA_ROOT}:${MEDIA_ROOT}"``
+    - Search for a volume that contains ``/app/staticfiles`` on the right side, and
+      replace the whole line with ``- "${STATIC_ROOT}:${STATIC_ROOT}"``
+    - If you use in-place import, search for volumes (there should be two occurences) that contains ``/music:ro`` on the right side, and
+      replace the whole line with ``- "${MUSIC_DIRECTORY_SERVE_PATH}:${MUSIC_DIRECTORY_PATH}:ro"``
+
+In the end, the ``volumes`` directives of your containers should look like that::
+
+    ...
+    celeryworker
+      volumes:
+        - "${MUSIC_DIRECTORY_SERVE_PATH}:${MUSIC_DIRECTORY_PATH}:ro"
+        - "${MEDIA_ROOT}:${MEDIA_ROOT}"
+    ...
+    api:
+      volumes:
+        - "${MUSIC_DIRECTORY_SERVE_PATH}:${MUSIC_DIRECTORY_PATH}:ro"
+        - "${MEDIA_ROOT}:${MEDIA_ROOT}"
+        - "${STATIC_ROOT}:${STATIC_ROOT}"
+        - ./front/dist:/frontend
+    ...
+
+
+Removed Cacheops dependency
+---------------------------
+
+We removed one of our dependency named django-cacheops. It was unly used in a few places,
+and not playing nice with other dependencies.
+
+You can safely remove this dependency in your environment with ``pip uninstall django-cacheops`` if you're
+not using docker.
+
+You can also safely remove any ``CACHEOPS_ENABLED`` setting from your environment file.
+
 
 0.15 (2018-06-24)
 -----------------
@@ -1346,7 +1579,7 @@ Basic transcoding is now available to/from the following formats : ogg and mp3.
 
 This relies internally on FFMPEG and can put some load on your server.
 It's definitely recommended you setup some caching for the transcoded files
-at your webserver level. Check the the exemple nginx file at deploy/nginx.conf
+at your webserver level. Check the the exemple nginx file at deploy/nginx.conf
 for an implementation.
 
 On the frontend, usage of transcoding should be transparent in the player.

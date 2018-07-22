@@ -1,11 +1,31 @@
+import re
+
 from django.conf import settings
+from django.core import validators
+from django.utils.deconstruct import deconstructible
+from django.utils.translation import gettext_lazy as _
+
 from rest_auth.serializers import PasswordResetSerializer as PRS
 from rest_auth.registration.serializers import RegisterSerializer as RS
 from rest_framework import serializers
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 
 from . import models
+
+
+@deconstructible
+class ASCIIUsernameValidator(validators.RegexValidator):
+    regex = r"^[\w]+$"
+    message = _(
+        "Enter a valid username. This value may contain only English letters, "
+        "numbers, and _ characters."
+    )
+    flags = re.ASCII
+
+
+username_validators = [ASCIIUsernameValidator()]
 
 
 class RegisterSerializer(RS):
@@ -27,6 +47,9 @@ class RegisterSerializer(RS):
         if self.validated_data.get("invitation"):
             user.invitation = self.validated_data.get("invitation")
             user.save(update_fields=["invitation"])
+        user.actor = models.create_actor(user)
+        user.save(update_fields=["actor"])
+
         return user
 
 
@@ -43,21 +66,29 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
+avatar_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+
+
 class UserBasicSerializer(serializers.ModelSerializer):
+    avatar = avatar_field
+
     class Meta:
         model = models.User
-        fields = ["id", "username", "name", "date_joined"]
+        fields = ["id", "username", "name", "date_joined", "avatar"]
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
+    avatar = avatar_field
+
     class Meta:
         model = models.User
-        fields = ["name", "privacy_level"]
+        fields = ["name", "privacy_level", "avatar"]
 
 
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
+    avatar = avatar_field
 
     class Meta:
         model = models.User
@@ -71,6 +102,7 @@ class UserReadSerializer(serializers.ModelSerializer):
             "permissions",
             "date_joined",
             "privacy_level",
+            "avatar",
         ]
 
     def get_permissions(self, o):

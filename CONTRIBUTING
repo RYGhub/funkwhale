@@ -1,5 +1,5 @@
 Contribute to Funkwhale development
-==================================
+===================================
 
 First of all, thank you for your interest in the project! We really
 appreciate the fact that you're about to take some time to read this
@@ -82,7 +82,7 @@ Visit https://code.eliotberriot.com/funkwhale/funkwhale and clone the repository
 A note about branches
 ^^^^^^^^^^^^^^^^^^^^^
 
-Next release development occurs on the "develop" branch, and releases are made on the "master" branch. Therefor, when submitting Merge Requests, ensure you are merging on the develop branch.
+Next release development occurs on the "develop" branch, and releases are made on the "master" branch. Therefore, when submitting Merge Requests, ensure you are merging on the develop branch.
 
 
 Working with docker
@@ -111,7 +111,7 @@ Create it like this::
 
 
 Create docker network
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 Create the federation network::
 
@@ -280,7 +280,7 @@ Typical workflow for a contribution
 3. Create a dedicated branch for your work ``42-awesome-fix``. It is good practice to prefix your branch name with the ID of the issue you are solving.
 4. Work on your stuff
 5. Commit small, atomic changes to make it easier to review your contribution
-6. Add a changelog fragment to summarize your changes: ``echo "Implemented awesome stuff (#42)" > changes/changelog.d/42.feature"``
+6. Add a changelog fragment to summarize your changes: ``echo "Implemented awesome stuff (#42)" > changes/changelog.d/42.feature``
 7. Push your branch
 8. Create your merge request
 9. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
@@ -289,8 +289,9 @@ Typical workflow for a contribution
 Internationalization
 --------------------
 
+We're using https://github.com/Polyconseil/vue-gettext to manage i18n in the project.
 When working on the front-end, any end-user string should be translated
-using either ``<i18next path="yourstring">`` or the ``$t('yourstring')``
+using either ``<translate>yourstring</translate>`` or ``$gettext('yourstring')``
 function.
 
 Extraction is done by calling ``yarn run i18n-extract``, which

@@ -1,17 +1,18 @@
 <template>
-  <div class="main pusher" v-title="'Page Not Found'">
+  <div class="main pusher" :v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
           <i class="warning icon"></i>
           <div class="content">
-            <strike>{{ $t('Whale') }}</strike> {{ $t('Page not found!') }}
+            <translate>Page not found!</translate>
           </div>
         </h1>
-        <p>{{ $t('We\'re sorry, the page you asked for does not exists.') }}</p>
-        <i18next path="Requested URL: {%0%}"><a :href="path">{{ path }}</a></i18next>
+        <p><translate>We're sorry, the page you asked for does not exist:</translate></p>
+        <a :href="path">{{ path }}</a>
+        <div class="ui hidden divider"></div>
         <router-link class="ui icon button" to="/">
-          {{ $t('Go to home page') }}
+          <translate>Go to home page</translate>
           <i class="right arrow icon"></i>
         </router-link>
       </div>
@@ -24,6 +25,13 @@ export default {
   data: function () {
     return {
       path: window.location.href
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Page Not Found')
+      }
     }
   }
 }

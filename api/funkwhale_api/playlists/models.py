@@ -3,11 +3,40 @@ from django.utils import timezone
 from rest_framework import exceptions
 
 from funkwhale_api.common import fields, preferences
+from funkwhale_api.music import models as music_models
 
 
 class PlaylistQuerySet(models.QuerySet):
     def with_tracks_count(self):
         return self.annotate(_tracks_count=models.Count("playlist_tracks"))
+
+    def with_duration(self):
+        return self.annotate(
+            duration=models.Sum("playlist_tracks__track__files__duration")
+        )
+
+    def with_covers(self):
+        album_prefetch = models.Prefetch(
+            "album", queryset=music_models.Album.objects.only("cover")
+        )
+        track_prefetch = models.Prefetch(
+            "track",
+            queryset=music_models.Track.objects.prefetch_related(album_prefetch).only(
+                "id", "album_id"
+            ),
+        )
+
+        plt_prefetch = models.Prefetch(
+            "playlist_tracks",
+            queryset=PlaylistTrack.objects.all()
+            .exclude(track__album__cover=None)
+            .exclude(track__album__cover="")
+            .order_by("index")
+            .only("id", "playlist_id", "track_id")
+            .prefetch_related(track_prefetch),
+            to_attr="plts_for_cover",
+        )
+        return self.prefetch_related(plt_prefetch)
 
 
 class Playlist(models.Model):

@@ -1,17 +1,17 @@
 <template>
-  <div class="main pusher" v-title="'Welcome'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-          {{ $t('Welcome on Funkwhale') }}
+          <translate>Welcome on Funkwhale</translate>
         </h1>
-        <p>{{ $t('We think listening to music should be simple.') }}</p>
+        <p><translate>We think listening to music should be simple.</translate></p>
         <router-link class="ui icon button" to="/about">
           <i class="info icon"></i>
-          {{ $t('Learn more about this instance') }}
+          <translate>Learn more about this instance</translate>
         </router-link>
         <router-link class="ui icon teal button" to="/library">
-          {{ $t('Get me to the library') }}
+          <translate>Get me to the library</translate>
           <i class="right arrow icon"></i>
         </router-link>
       </div>
@@ -22,9 +22,9 @@
           <div class="row">
             <div class="eight wide left floated column">
               <h2 class="ui header">
-                {{ $t('Why funkwhale?') }}
+                <translate>Why funkwhale?</translate>
               </h2>
-              <p>{{ $t('That\'s simple: we loved Grooveshark and we want to build something even better.') }}</p>
+              <p><translate>That's simple: we loved Grooveshark and we want to build something even better.</translate></p>
             </div>
             <div class="four wide left floated column">
               <img class="ui medium image" src="../assets/logo/logo.png" />
@@ -35,26 +35,26 @@
       <div class="ui middle aligned stackable text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          {{ $t('Unlimited music') }}
+          <translate>Unlimited music</translate>
         </h2>
-        <p>{{ $t('Funkwhale is designed to make it easy to listen to music you like, or to discover new artists.') }}</p>
+        <p><translate>Funkwhale is designed to make it easy to listen to music you like, or to discover new artists.</translate></p>
         <div class="ui list">
           <div class="item">
             <i class="sound icon"></i>
             <div class="content">
-              {{ $t('Click once, listen for hours using built-in radios') }}
+              <translate>Click once, listen for hours using built-in radios</translate>
             </div>
           </div>
           <div class="item">
             <i class="heart icon"></i>
             <div class="content">
-              {{ $t('Keep a track of your favorite songs') }}
+              <translate>Keep a track of your favorite songs</translate>
             </div>
           </div>
           <div class="item">
             <i class="list icon"></i>
             <div class="content">
-              {{ $t('Playlists? We got them') }}
+              <translate>Playlists? We got them</translate>
             </div>
           </div>
         </div>
@@ -62,28 +62,31 @@
       <div class="ui middle aligned stackable text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          {{ $t('Clean library') }}
+          <translate>Clean library</translate>
         </h2>
-        <p>{{ $t('Funkwhale takes care of handling your music') }}.</p>
+        <p><translate>Funkwhale takes care of handling your music</translate>.</p>
         <div class="ui list">
           <div class="item">
             <i class="download icon"></i>
             <div class="content">
-              {{ $t('Import music from various platforms, such as YouTube or SoundCloud') }}
+              <translate>Import music from various platforms, such as YouTube or SoundCloud</translate>
             </div>
           </div>
           <div class="item">
             <i class="tag icon"></i>
             <div class="content">
-              <i18next path="Get quality metadata about your music thanks to {%0%}">
-                <a href="https://musicbrainz.org" target="_blank">{{ $t('MusicBrainz') }}</a>
-              </i18next>
+              <template v-translate>
+                Get quality metadata about your music thanks to
+                <a href="https://musicbrainz.org" target="_blank">
+                  MusicBrainz
+                </a>
+              </template>
             </div>
           </div>
           <div class="item">
             <i class="plus icon"></i>
             <div class="content">
-              {{ $t('Covers, lyrics, our goal is to have them all ;)') }}
+              <translate>Covers, lyrics, our goal is to have them all ;)</translate>
             </div>
           </div>
         </div>
@@ -91,20 +94,20 @@
       <div class="ui middle aligned stackable text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          {{ $t('Easy to use') }}
+          <translate>Easy to use</translate>
         </h2>
-        <p>{{ $t('Funkwhale is dead simple to use.') }}</p>
+        <p><translate>Funkwhale is dead simple to use.</translate></p>
         <div class="ui list">
           <div class="item">
             <i class="book icon"></i>
             <div class="content">
-              {{ $t('No add-ons, no plugins : you only need a web library') }}
+              <translate>No add-ons, no plugins : you only need a web library</translate>
             </div>
           </div>
           <div class="item">
             <i class="wizard icon"></i>
             <div class="content">
-              {{ $t('Access your music from a clean interface that focus on what really matters') }}
+              <translate>Access your music from a clean interface that focus on what really matters</translate>
             </div>
           </div>
         </div>
@@ -112,26 +115,26 @@
       <div class="ui middle aligned stackable text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          {{ $t('Your music, your way') }}
+          <translate>Your music, your way</translate>
         </h2>
-        <p>{{ $t('Funkwhale is free and gives you control on your music.') }}</p>
+        <p><translate>Funkwhale is free and gives you control on your music.</translate></p>
         <div class="ui list">
           <div class="item">
             <i class="smile icon"></i>
             <div class="content">
-              {{ $t('The plaform is free and open-source, you can install it and modify it without worries') }}
+              <translate>The plaform is free and open-source, you can install it and modify it without worries</translate>
             </div>
           </div>
           <div class="item">
             <i class="protect icon"></i>
             <div class="content">
-              {{ $t('We do not track you or bother you with ads') }}
+              <translate>We do not track you or bother you with ads</translate>
             </div>
           </div>
           <div class="item">
             <i class="users icon"></i>
             <div class="content">
-              {{ $t('You can invite friends and family to your instance so they can enjoy your music') }}
+              <translate>You can invite friends and family to your instance so they can enjoy your music</translate>
             </div>
           </div>
         </div>
@@ -143,9 +146,12 @@
 <script>
 
 export default {
-  name: 'home',
-  data () {
-    return {}
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Welcome')
+      }
+    }
   }
 }
 </script>

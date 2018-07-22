@@ -1,16 +1,24 @@
 <template>
   <div class="main library pusher">
     <div class="ui secondary pointing menu">
-      <router-link class="ui item" to="/library" exact><i18next path="Browse"/></router-link>
-      <router-link class="ui item" to="/library/artists" exact><i18next path="Artists"/></router-link>
-      <router-link class="ui item" to="/library/radios" exact><i18next path="Radios"/></router-link>
-      <router-link class="ui item" to="/library/playlists" exact><i18next path="Playlists"/></router-link>
+      <router-link class="ui item" to="/library" exact>
+        <translate>Browse</translate>
+      </router-link>
+      <router-link class="ui item" to="/library/artists" exact>
+        <translate>Artists</translate>
+      </router-link>
+      <router-link class="ui item" to="/library/radios" exact>
+        <translate>Radios</translate>
+      </router-link>
+      <router-link class="ui item" to="/library/playlists" exact>
+        <translate>Playlists</translate>
+      </router-link>
       <div class="ui secondary right menu">
         <router-link v-if="showImports" class="ui item" to="/library/import/launch" exact>
-          <i18next path="Import"/>
+          <translate>Import</translate>
         </router-link>
         <router-link v-if="showImports" class="ui item" to="/library/import/batches">
-          <i18next path="Import batches"/>
+          <translate>Import batches</translate>
         </router-link>
       </div>
     </div>
@@ -31,16 +39,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 @import '../../style/vendor/media';
-
-.library.pusher > .ui.secondary.menu {
-  @include media(">tablet") {
-    margin: 0 2.5rem;
-  }
-  .item {
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-  }
-}
 
 .library {
   .ui.segment.head {
@@ -67,7 +65,7 @@ export default {
 
     }
   }
-
 }
+
 
 </style>

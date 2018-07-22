@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher"  v-title="$t('Instance settings')">
+  <div class="main pusher"  v-title="labels.settings">
     <div class="ui vertical stripe segment">
       <div class="ui text container">
         <div :class="['ui', {'loading': isLoading}, 'form']"></div>
@@ -13,7 +13,7 @@
           </div>
           <div class="four wide column">
             <div class="ui sticky vertical secondary menu">
-              <div class="header item">{{ $t('Sections') }}</div>
+              <div class="header item"><translate>Sections</translate></div>
               <a :class="['menu', {active: group.id === current}, 'item']"
                 @click.prevent="scrollTo(group.id)"
                 :href="'#' + group.id"
@@ -70,10 +70,24 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        settings: this.$gettext('Instance settings')
+      }
+    },
     groups () {
+      // somehow, extraction fails if in the return block directly
+      let instanceLabel = this.$gettext('Instance information')
+      let usersLabel = this.$gettext('Users')
+      let importsLabel = this.$gettext('Imports')
+      let playlistsLabel = this.$gettext('Playlists')
+      let federationLabel = this.$gettext('Federation')
+      let subsonicLabel = this.$gettext('Subsonic')
+      let statisticsLabel = this.$gettext('Statistics')
+      let errorLabel = this.$gettext('Error reporting')
       return [
         {
-          label: this.$t('Instance information'),
+          label: instanceLabel,
           id: 'instance',
           settings: [
             'instance__name',
@@ -82,7 +96,7 @@ export default {
           ]
         },
         {
-          label: this.$t('Users'),
+          label: usersLabel,
           id: 'users',
           settings: [
             'users__registration_enabled',
@@ -91,21 +105,21 @@ export default {
           ]
         },
         {
-          label: this.$t('Imports'),
+          label: importsLabel,
           id: 'imports',
           settings: [
             'providers_youtube__api_key'
           ]
         },
         {
-          label: this.$t('Playlists'),
+          label: playlistsLabel,
           id: 'playlists',
           settings: [
             'playlists__max_tracks'
           ]
         },
         {
-          label: this.$t('Federation'),
+          label: federationLabel,
           id: 'federation',
           settings: [
             'federation__enabled',
@@ -116,14 +130,14 @@ export default {
           ]
         },
         {
-          label: this.$t('Subsonic'),
+          label: subsonicLabel,
           id: 'subsonic',
           settings: [
             'subsonic__enabled'
           ]
         },
         {
-          label: this.$t('Statistics'),
+          label: statisticsLabel,
           id: 'statistics',
           settings: [
             'instance__nodeinfo_enabled',
@@ -132,7 +146,7 @@ export default {
           ]
         },
         {
-          label: this.$t('Error reporting'),
+          label: errorLabel,
           id: 'reporting',
           settings: [
             'raven__front_enabled',

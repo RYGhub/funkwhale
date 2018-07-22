@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label>{{ $t('Search') }}</label>
-          <input type="text" v-model="search" placeholder="Search by title, artist, domain..." />
+          <label><translate>Search</translate></label>
+          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering"/>
+          <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ option[1] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <i18next tag="label" path="Ordering direction"/>
+          <label><translate>Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+">Ascending</option>
-            <option value="-">Descending</option>
+            <option value="+"><translate>Ascending</translate></option>
+            <option value="-"><translate>Descending</translate></option>
           </select>
         </div>
       </div>
@@ -35,14 +35,14 @@
         :action-url="'manage/library/track-files/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th>{{ $t('Title') }}</th>
-          <th>{{ $t('Artist') }}</th>
-          <th>{{ $t('Album') }}</th>
-          <th>{{ $t('Import date') }}</th>
-          <th>{{ $t('Type') }}</th>
-          <th>{{ $t('Bitrate') }}</th>
-          <th>{{ $t('Duration') }}</th>
-          <th>{{ $t('Size') }}</th>
+          <th><translate>Title</translate></th>
+          <th><translate>Artist</translate></th>
+          <th><translate>Album</translate></th>
+          <th><translate>Import date</translate></th>
+          <th><translate>Type</translate></th>
+          <th><translate>Bitrate</translate></th>
+          <th><translate>Duration</translate></th>
+          <th><translate>Size</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -61,32 +61,32 @@
             {{ scope.obj.audio_mimetype }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.bitrate">
             {{ scope.obj.bitrate | humanSize }}/s
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.duration">
             {{ time.parse(scope.obj.duration) }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            <translate>N/A</translate>
           </td>
           <td v-if="scope.obj.size">
             {{ scope.obj.size | humanSize }}
           </td>
           <td v-else>
-            {{ $t('N/A') }}
+            <translate>N/A</translate>
           </td>
         </template>
       </action-table>
     </div>
     <div>
       <pagination
-        v-if="result && result.results.length > 0"
+        v-if="result && result.count > paginateBy"
         @page-changed="selectPage"
         :compact="true"
         :current="page"
@@ -95,7 +95,10 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((page-1) * paginateBy) + 1 , end: ((page-1) * paginateBy) + result.results.length, total: result.count})}}
+        <translate
+          :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
+          Showing results %{ start }-%{ end } on %{ total }
+        </translate>
       </span>
     </div>
   </div>
@@ -167,6 +170,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$gettext('Search by title, artist, domain...')
+      }
+    },
     actionFilters () {
       var currentFilters = {
         q: this.search
@@ -178,10 +186,11 @@ export default {
       }
     },
     actions () {
+      let msg = this.$gettext('Delete')
       return [
         {
           name: 'delete',
-          label: this.$t('Delete'),
+          label: msg,
           isDangerous: true
         }
       ]

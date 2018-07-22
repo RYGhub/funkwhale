@@ -1,5 +1,5 @@
 <template>
-  <div v-title="'Import Batch #' + id">
+  <div v-title="labels.title">
     <div v-if="isLoading && !batch" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
@@ -8,7 +8,7 @@
         <tbody>
           <tr>
             <td>
-              <strong>{{ $t('Import batch') }}</strong>
+              <strong><translate>Import batch</translate></strong>
             </td>
             <td>
               #{{ batch.id }}
@@ -16,7 +16,7 @@
           </tr>
           <tr>
             <td>
-              <strong>{{ $t('Launch date') }}</strong>
+              <strong><translate>Launch date</translate></strong>
             </td>
             <td>
               <human-date :date="batch.creation_date"></human-date>
@@ -24,35 +24,35 @@
           </tr>
           <tr v-if="batch.user">
             <td>
-              <strong>{{ $t('Submitted by') }}</strong>
+              <strong><translate>Submitted by</translate></strong>
             </td>
             <td>
               <username :username="batch.user.username" />
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Pending') }}</strong></td>
+            <td><strong><translate>Pending</translate></strong></td>
             <td>{{ stats.pending }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Skipped') }}</strong></td>
+            <td><strong><translate>Skipped</translate></strong></td>
             <td>{{ stats.skipped }}</td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Errored') }}</strong></td>
+            <td><strong><translate>Errored</translate></strong></td>
             <td>
               {{ stats.errored }}
               <button
                 @click="rerun({batches: [batch.id], jobs: []})"
-                v-if="stats.errored > 0"
+                v-if="stats.errored > 0 || stats.pending > 0"
                 class="ui tiny basic icon button">
                 <i class="redo icon" />
-                {{ $t('Rerun errored jobs')}}
+                <translate>Rerun errored jobs</translate>
               </button>
             </td>
           </tr>
           <tr v-if="stats">
-            <td><strong>{{ $t('Finished') }}</strong></td>
+            <td><strong><translate>Finished</translate></strong></td>
             <td>{{ stats.finished }}/{{ stats.count}}</td>
           </tr>
         </tbody>
@@ -60,17 +60,17 @@
       <div class="ui inline form">
         <div class="fields">
           <div class="ui field">
-            <label>{{ $t('Search') }}</label>
-            <input type="text" v-model="jobFilters.search" placeholder="Search by source..." />
+            <label><translate>Search</translate></label>
+            <input type="text" v-model="jobFilters.search" :placeholder="labels.searchPlaceholder" />
           </div>
           <div class="ui field">
-            <label>{{ $t('Status') }}</label>
+            <label><translate>Status</translate></label>
             <select class="ui dropdown" v-model="jobFilters.status">
-              <option :value="null">{{ $t('Any') }}</option>
-              <option :value="'pending'">{{ $t('Pending') }}</option>
-              <option :value="'errored'">{{ $t('Errored') }}</option>
-              <option :value="'finished'">{{ $t('Success') }}</option>
-              <option :value="'skipped'">{{ $t('Skipped') }}</option>
+              <option :value="null"><translate>Any</translate></option>
+              <option :value="'pending'"><translate>Pending</translate></option>
+              <option :value="'errored'"><translate>Errored</translate></option>
+              <option :value="'finished'"><translate>Success</translate></option>
+              <option :value="'skipped'"><translate>Skipped</translate></option>
             </select>
           </div>
         </div>
@@ -78,11 +78,11 @@
       <table v-if="jobResult" class="ui unstackable table">
         <thead>
           <tr>
-            <th>{{ $t('Job ID') }}</th>
-            <th>{{ $t('Recording MusicBrainz ID') }}</th>
-            <th>{{ $t('Source') }}</th>
-            <th>{{ $t('Status') }}</th>
-            <th>{{ $t('Track') }}</th>
+            <th><translate>Job ID</translate></th>
+            <th><translate>Recording MusicBrainz ID</translate></th>
+            <th><translate>Source</translate></th>
+            <th><translate>Status</translate></th>
+            <th><translate>Track</translate></th>
           </tr>
         </thead>
         <tbody>
@@ -102,8 +102,8 @@
                 {{ job.status }}</span>
                 <button
                   @click="rerun({batches: [], jobs: [job.id]})"
-                  v-if="job.status === 'errored'"
-                  :title="$t('Rerun job')"
+                  v-if="['errored', 'pending'].indexOf(job.status) > -1"
+                  :title="labels.rerun"
                   class="ui tiny basic icon button">
                   <i class="redo icon" />
                 </button>
@@ -117,7 +117,7 @@
           <tr>
             <th>
               <pagination
-              v-if="jobResult && jobResult.results.length > 0"
+              v-if="jobResult && jobResult.count > jobFilters.paginateBy"
               @page-changed="selectPage"
               :compact="true"
               :current="jobFilters.page"
@@ -126,7 +126,10 @@
               ></pagination>
             </th>
             <th v-if="jobResult && jobResult.results.length > 0">
-              {{ $t('Showing results {%start%}-{%end%} on {%total%}', {start: ((jobFilters.page-1) * jobFilters.paginateBy) + 1 , end: ((jobFilters.page-1) * jobFilters.paginateBy) + jobResult.results.length, total: jobResult.count})}}
+              <translate
+                :translate-params="{start: ((jobFilters.page-1) * jobFilters.paginateBy) + 1, end: ((jobFilters.page-1) * jobFilters.paginateBy) + jobResult.results.length, total: jobResult.count}">
+                Showing results %{ start }-%{ end } on %{ total }
+              </translate>
             <th>
             <th></th>
             <th></th>
@@ -175,6 +178,19 @@ export default {
   destroyed () {
     if (this.timeout) {
       clearTimeout(this.timeout)
+    }
+  },
+  computed: {
+    labels () {
+      let msg = this.$gettext('Import Batch #%{ id }')
+      let title = this.$gettextInterpolate(msg, {id: this.id})
+      let rerun = this.$gettext('Rerun job')
+      let searchPlaceholder = this.$gettext('Search by source...')
+      return {
+        title,
+        searchPlaceholder,
+        rerun
+      }
     }
   },
   methods: {

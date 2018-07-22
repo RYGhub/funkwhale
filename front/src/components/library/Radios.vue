@@ -1,19 +1,37 @@
 <template>
-  <div v-title="'Radios'">
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
-      <h2 class="ui header"><i18next path="Browsing radios"/></h2>
+      <h2 class="ui header">
+        <translate>Browsing radios</translate>
+      </h2>
+      <div class="ui hidden divider"></div>
+      <div class="ui row">
+        <h3 class="ui header">
+          <translate>Instance radios</translate>
+        </h3>
+        <div class="ui cards">
+          <radio-card :type="'favorites'"></radio-card>
+          <radio-card :type="'random'"></radio-card>
+          <radio-card :type="'less-listened'"></radio-card>
+        </div>
+      </div>
+
+      <div class="ui hidden divider"></div>
+      <h3 class="ui header">
+        <translate>User radios</translate>
+      </h3>
       <router-link class="ui green basic button" to="/library/radios/build" exact>
-        <i18next path="Create your own radio"/>
+        <translate>Create your own radio</translate>
       </router-link>
       <div class="ui hidden divider"></div>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <i18next tag="label" path="Search"/>
-            <input type="text" v-model="query" placeholder="Enter a radio name..."/>
+            <label><translate>Search</translate></label>
+            <input type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering"/>
+            <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ option[1] }}
@@ -21,14 +39,18 @@
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Ordering direction"/>
+            <label><translate>Ordering direction</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+"><i18next path="Ascending"/></option>
-              <option value="-"><i18next path="Descending"/></option>
+              <option value="+">
+                <translate>Ascending</translate>
+              </option>
+              <option value="-">
+                <translate>Descending</translate>
+              </option>
             </select>
           </div>
           <div class="field">
-            <i18next tag="label" path="Results per page"/>
+            <label><translate>Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -57,7 +79,7 @@
       </div>
       <div class="ui center aligned basic segment">
         <pagination
-          v-if="result && result.results.length > 0"
+          v-if="result && result.count > paginateBy"
           @page-changed="selectPage"
           :current="page"
           :paginate-by="paginateBy"
@@ -112,6 +134,16 @@ export default {
   },
   mounted () {
     $('.ui.dropdown').dropdown()
+  },
+  computed: {
+    labels () {
+      let searchPlaceholder = this.$gettext('Enter a radio name...')
+      let title = this.$gettext('Radios')
+      return {
+        searchPlaceholder,
+        title
+      }
+    }
   },
   methods: {
     updateQueryString: _.debounce(function () {

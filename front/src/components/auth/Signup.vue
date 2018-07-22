@@ -1,55 +1,55 @@
 <template>
-  <div class="main pusher" v-title="'Sign Up'">
+  <div class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2>{{ $t("Create a funkwhale account") }}</h2>
+        <h2><translate>Create a funkwhale account</translate></h2>
         <form
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
           <p class="ui message" v-if="!$store.state.instance.settings.users.registration_enabled.value">
-            {{ $t('Registration are closed on this instance, you will need an invitation code to signup.') }}
+            <translate>Registration are closed on this instance, you will need an invitation code to signup.</translate>
           </p>
 
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header">{{ $t("We cannot create your account") }}</div>
+            <div class="header"><translate>We cannot create your account</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label>{{ $t("Username") }}</label>
+            <label><translate>Username</translate></label>
             <input
             ref="username"
             required
             type="text"
             autofocus
-            placeholder="Enter your username"
+            :placeholder="labels.usernamePlaceholder"
             v-model="username">
           </div>
           <div class="field">
-            <label>{{ $t("Email") }}</label>
+            <label><translate>Email</translate></label>
             <input
             ref="email"
             required
             type="email"
-            placeholder="Enter your email"
+            :placeholder="labels.emailPlaceholder"
             v-model="email">
           </div>
           <div class="field">
-            <label>{{ $t("Password") }}</label>
+            <label><translate>Password</translate></label>
             <password-input v-model="password" />
           </div>
           <div class="field">
-            <label v-if="!$store.state.instance.settings.users.registration_enabled.value">{{ $t("Invitation code") }}</label>
-            <label v-else>{{ $t("Invitation code (optional)") }}</label>
+            <label v-if="!$store.state.instance.settings.users.registration_enabled.value"><translate>Invitation code</translate></label>
+            <label v-else><translate>Invitation code (optional)</translate></label>
             <input
             :required="!$store.state.instance.settings.users.registration_enabled.value"
             type="text"
-            :placeholder="$t('Enter your invitation code (case insensitive)')"
+            :placeholder="labels.placeholder"
             v-model="invitation">
           </div>
           <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit">
-            {{ $t("Create my account") }}
+            <translate>Create my account</translate>
           </button>
         </form>
       </div>
@@ -65,7 +65,7 @@ import PasswordInput from '@/components/forms/PasswordInput'
 
 export default {
   props: {
-    invitation: {type: String, required: false, default: null},
+    defaultInvitation: {type: String, required: false, default: null},
     next: {type: String, default: '/'}
   },
   components: {
@@ -78,7 +78,8 @@ export default {
       password: '',
       isLoadingInstanceSetting: true,
       errors: [],
-      isLoading: false
+      isLoading: false,
+      invitation: this.defaultInvitation
     }
   },
   created () {
@@ -88,6 +89,20 @@ export default {
         self.isLoadingInstanceSetting = false
       }
     })
+  },
+  computed: {
+    labels () {
+      let title = this.$gettext('Sign Up')
+      let placeholder = this.$gettext('Enter your invitation code (case insensitive)')
+      let usernamePlaceholder = this.$gettext('Enter your username')
+      let emailPlaceholder = this.$gettext('Enter your email')
+      return {
+        title,
+        usernamePlaceholder,
+        emailPlaceholder,
+        placeholder
+      }
+    }
   },
   methods: {
     submit () {

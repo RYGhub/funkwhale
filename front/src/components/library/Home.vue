@@ -1,26 +1,29 @@
 <template>
-  <div v-title="'Home'">
-    <div class="ui vertical stripe segment">
-      <search :autofocus="true"></search>
-    </div>
+  <div v-title="labels.title">
     <div class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
-          <h2 class="ui header"><i18next path="Latest artists"/></h2>
-          <div :class="['ui', {'active': isLoadingArtists}, 'inline', 'loader']"></div>
-          <div v-if="artists.length > 0" v-for="artist in artists.slice(0, 3)" :key="artist.id" class="ui cards">
-            <artist-card :artist="artist"></artist-card>
-          </div>
+          <track-widget :url="'history/listenings/'" :filters="{scope: 'user', ordering: '-creation_date'}">
+            <template slot="title"><translate>Recently listened</translate></template>
+          </track-widget>
         </div>
         <div class="column">
-          <h2 class="ui header"><i18next path="Radios"/></h2>
-          <radio-card :type="'favorites'"></radio-card>
-          <radio-card :type="'random'"></radio-card>
-          <radio-card :type="'less-listened'"></radio-card>
+          <track-widget :url="'favorites/tracks/'" :filters="{scope: 'user', ordering: '-creation_date'}">
+            <template slot="title"><translate>Recently favorited</translate></template>
+          </track-widget>
         </div>
         <div class="column">
-          <h2 class="ui header"><i18next path="Music requests"/></h2>
-          <request-form v-if="$store.state.auth.authenticated"></request-form>
+          <playlist-widget :url="'playlists/'" :filters="{scope: 'user', listenable: true, ordering: '-creation_date'}">
+            <template slot="title"><translate>Playlists</translate></template>
+          </playlist-widget>
+        </div>
+      </div>
+      <div class="ui section hidden divider"></div>
+      <div class="ui grid">
+        <div class="ui row">
+          <album-widget :filters="{ordering: '-creation_date'}">
+            <template slot="title"><translate>Recently added</translate></template>
+          </album-widget>
         </div>
       </div>
     </div>
@@ -32,8 +35,9 @@ import axios from 'axios'
 import Search from '@/components/audio/Search'
 import logger from '@/logging'
 import ArtistCard from '@/components/audio/artist/Card'
-import RadioCard from '@/components/radios/Card'
-import RequestForm from '@/components/requests/Form'
+import TrackWidget from '@/components/audio/track/Widget'
+import AlbumWidget from '@/components/audio/album/Widget'
+import PlaylistWidget from '@/components/playlists/Widget'
 
 const ARTISTS_URL = 'artists/'
 
@@ -42,8 +46,9 @@ export default {
   components: {
     Search,
     ArtistCard,
-    RadioCard,
-    RequestForm
+    TrackWidget,
+    AlbumWidget,
+    PlaylistWidget
   },
   data () {
     return {
@@ -54,12 +59,20 @@ export default {
   created () {
     this.fetchArtists()
   },
+  computed: {
+    labels () {
+      return {
+        title: this.$gettext('Home')
+      }
+    }
+  },
   methods: {
     fetchArtists () {
       var self = this
       this.isLoadingArtists = true
       let params = {
-        ordering: '-creation_date'
+        ordering: '-creation_date',
+        listenable: true
       }
       let url = ARTISTS_URL
       logger.default.time('Loading latest artists')

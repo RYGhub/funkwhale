@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="'Track'">
+    <div v-if="isLoadingTrack" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
@@ -11,18 +11,25 @@
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                <i18next path="From album {%0%} by {%1%}">
-                  <router-link :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
-                    {{ track.album.title }}
-                  </router-link><router-link :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
-                    {{ track.artist.name }}
-                  </router-link>
-                </i18next>
+                <translate :translate-params="{album: track.album.title, artist: track.artist.name}">
+                  From album %{ album } by %{ artist }
+                </translate>
+              </div>
+              <br>
+              <div class="ui basic buttons">
+                <router-link class="ui button" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
+                  <translate>Album page</translate>
+                </router-link>
+                <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+                  <translate>Artist page</translate>
+                </router-link>
               </div>
             </div>
           </h2>
 
-          <play-button class="orange" :track="track"><i18next path="Play"/></play-button>
+          <play-button class="orange" :track="track">
+            <translate>Play</translate>
+          </play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
           <track-playlist-icon
             :button="true"
@@ -31,70 +38,72 @@
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
-            <i18next path="Search on Wikipedia"/>
+            <translate>Search on Wikipedia</translate>
           </a>
           <a :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <i18next path="View on MusicBrainz"/>
+            <translate>View on MusicBrainz</translate>
           </a>
           <a v-if="downloadUrl" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
-            <i18next path="Download"/>
+            <translate>Download</translate>
           </a>
         </div>
       </div>
       <div v-if="file" class="ui vertical stripe center aligned segment">
-        <h2 class="ui header">{{ $t('Track information') }}</h2>
+        <h2 class="ui header"><translate>Track information</translate></h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
             <tr>
               <td>
-                {{ $t('Duration') }}
+                <translate>Duration</translate>
               </td>
               <td v-if="file.duration">
                 {{ time.parse(file.duration) }}
               </td>
               <td v-else>
-                {{ $t('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                {{ $t('Size') }}
+                <translate>Size</translate>
               </td>
               <td v-if="file.size">
                 {{ file.size | humanSize }}
               </td>
               <td v-else>
-                {{ $t('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                {{ $t('Bitrate') }}
+                <translate>Bitrate</translate>
               </td>
               <td v-if="file.bitrate">
                 {{ file.bitrate | humanSize }}/s
               </td>
               <td v-else>
-                {{ $t('N/A') }}
+                <translate>N/A</translate>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="ui vertical stripe center aligned segment">
-        <h2><i18next path="Lyrics"/></h2>
+        <h2>
+          <translate>Lyrics</translate>
+        </h2>
         <div v-if="isLoadingLyrics" class="ui vertical segment">
           <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
         </div>
         <div v-if="lyrics" v-html="lyrics.content_rendered">
         </div>
         <template v-if="!isLoadingLyrics & !lyrics">
-          <i18next tag="p" path="No lyrics available for this track."/>
+          <p><translate>No lyrics available for this track.</translate></p>
           <a class="ui button" target="_blank" :href="lyricsSearchUrl">
             <i class="search icon"></i>
-            <i18next path="Search on lyrics.wikia.com"/>
+            <translate>Search on lyrics.wikia.com</translate>
           </a>
         </template>
       </div>
@@ -160,6 +169,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        title: this.$gettext('Track')
+      }
+    },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.track.title + ' ' + this.track.artist.name
     },

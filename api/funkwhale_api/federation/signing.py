@@ -1,4 +1,10 @@
+import datetime
 import logging
+import pytz
+
+from django import forms
+from django.utils import timezone
+from django.utils.http import parse_http_date
 
 import requests
 import requests_http_signature
@@ -7,8 +13,33 @@ from . import exceptions, utils
 
 logger = logging.getLogger(__name__)
 
+#  the request Date should be between now - 30s and now + 30s
+DATE_HEADER_VALID_FOR = 30
+
+
+def verify_date(raw_date):
+    if not raw_date:
+        raise forms.ValidationError("Missing date header")
+
+    try:
+        ts = parse_http_date(raw_date)
+    except ValueError as e:
+        raise forms.ValidationError(str(e))
+    dt = datetime.datetime.utcfromtimestamp(ts)
+    dt = dt.replace(tzinfo=pytz.utc)
+    delta = datetime.timedelta(seconds=DATE_HEADER_VALID_FOR)
+    now = timezone.now()
+    if dt < now - delta or dt > now + delta:
+        raise forms.ValidationError(
+            "Request Date is too far in the future or in the past"
+        )
+
+    return dt
+
 
 def verify(request, public_key):
+    verify_date(request.headers.get("Date"))
+
     return requests_http_signature.HTTPSignatureAuth.verify(
         request, key_resolver=lambda **kwargs: public_key, use_auth_header=False
     )

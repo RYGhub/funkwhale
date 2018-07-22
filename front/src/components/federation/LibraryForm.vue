@@ -1,9 +1,15 @@
 <template>
   <form class="ui form" @submit.prevent="fetchInstanceInfo">
-    <h3 class="ui header"><i18next path="Federate with a new instance"/></h3>
-    <p><i18next path="Use this form to scan an instance and setup federation."/></p>
+    <h3 class="ui header">
+      <translate>Federate with a new instance</translate>
+    </h3>
+    <p>
+      <translate>Use this form to scan an instance and setup federation.</translate>
+    </p>
     <div v-if="errors.length > 0 || scanErrors.length > 0" class="ui negative message">
-      <div class="header"><i18next path="Error while scanning library"/></div>
+      <div class="header">
+        <translate>Error while scanning library</translate>
+      </div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
         <li v-for="error in scanErrors">{{ error }}</li>
@@ -11,8 +17,10 @@
     </div>
     <div class="ui two fields">
       <div class="ui field">
-        <label><i18next path="Library name"/></label>
-        <input v-model="libraryUsername" type="text" placeholder="library@demo.funkwhale.audio" />
+        <label>
+          <translate>Library name</translate>
+        </label>
+        <input v-model="libraryUsername" type="text" :placeholder="labels.namePlaceholder" />
       </div>
       <div class="ui field">
         <label>&nbsp;</label>
@@ -21,7 +29,7 @@
           :disabled="isLoading"
           :class="['ui', 'icon', {loading: isLoading}, 'button']">
           <i class="search icon"></i>
-          <i18next path="Launch scan"/>
+          <translate>Launch scan</translate>
         </button>
       </div>
     </div>
@@ -83,6 +91,11 @@ export default {
     }
   },
   computed: {
+    labels () {
+      return {
+        namePlaceholder: this.$gettext('library@demo.funkwhale.audio')
+      }
+    },
     scanErrors () {
       let errors = []
       if (!this.result) {
