@@ -1,0 +1,19 @@
+Fix Apache2 permission issue preventing `/media` folder from being served correctly (#389)
+
+
+Fix Apache2 configuration file for media block [Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The permission scope on the current Apache2 configuration file is too narrow, preventing thumbnails from being served.
+
+On Apache2 setups, you have to replace the following line::
+
+    <Directory /srv/funkwhale/data/media/albums>
+
+with::
+
+    <Directory /srv/funkwhale/data/media>
+
+You can now restart your server::
+
+    sudo systemctl restart apache2
