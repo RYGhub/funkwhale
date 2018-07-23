@@ -56,7 +56,8 @@ export default {
     fetch ({dispatch, state, commit, rootState}, url) {
       // will fetch favorites by batches from API to have them locally
       let params = {
-        user: rootState.auth.profile.id
+        user: rootState.auth.profile.id,
+        page_size: 50
       }
       url = url || 'favorites/tracks/'
       return axios.get(url, {params: params}).then((response) => {
