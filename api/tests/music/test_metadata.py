@@ -122,3 +122,11 @@ def test_mbid_clean_keeps_only_first(field_name):
     result = field.to_python("/".join([u1, u2]))
 
     assert str(result) == u1
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [("2017", datetime.date(2017, 1, 1)), ("2017-12-31", datetime.date(2017, 12, 31))],
+)
+def test_date_parsing(raw, expected):
+    assert metadata.get_date(raw) == expected

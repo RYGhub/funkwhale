@@ -1,4 +1,4 @@
-import arrow
+import pendulum
 import pytest
 from django.core.paginator import Paginator
 
@@ -492,7 +492,7 @@ def test_activity_pub_audio_serializer_to_library_track(factories):
     assert lt.title == audio["metadata"]["recording"]["title"]
     assert lt.artist_name == audio["metadata"]["artist"]["name"]
     assert lt.album_title == audio["metadata"]["release"]["title"]
-    assert lt.published_date == arrow.get(audio["published"])
+    assert lt.published_date == pendulum.parse(audio["published"])
 
 
 def test_activity_pub_audio_serializer_to_library_track_no_duplicate(factories):
