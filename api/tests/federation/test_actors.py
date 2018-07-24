@@ -1,4 +1,4 @@
-import arrow
+import pendulum
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -455,7 +455,7 @@ def test_library_actor_handle_create_audio(mocker, factories):
         assert lt.title == a["metadata"]["recording"]["title"]
         assert lt.artist_name == a["metadata"]["artist"]["name"]
         assert lt.album_title == a["metadata"]["release"]["title"]
-        assert lt.published_date == arrow.get(a["published"])
+        assert lt.published_date == pendulum.parse(a["published"])
 
 
 def test_library_actor_handle_create_audio_autoimport(mocker, factories):
@@ -494,7 +494,7 @@ def test_library_actor_handle_create_audio_autoimport(mocker, factories):
         assert lt.title == a["metadata"]["recording"]["title"]
         assert lt.artist_name == a["metadata"]["artist"]["name"]
         assert lt.album_title == a["metadata"]["release"]["title"]
-        assert lt.published_date == arrow.get(a["published"])
+        assert lt.published_date == pendulum.parse(a["published"])
 
     batch = music_models.ImportBatch.objects.latest("id")
 

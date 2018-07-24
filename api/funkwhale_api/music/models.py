@@ -1,11 +1,10 @@
-import datetime
 import os
 import shutil
 import tempfile
 import uuid
 
-import arrow
 import markdown
+import pendulum
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -125,9 +124,7 @@ def import_artist(v):
 
 
 def parse_date(v):
-    if len(v) == 4:
-        return datetime.date(int(v), 1, 1)
-    d = arrow.get(v).date()
+    d = pendulum.parse(v).date()
     return d
 
 

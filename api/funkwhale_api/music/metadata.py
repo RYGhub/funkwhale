@@ -1,5 +1,6 @@
-import arrow
+import datetime
 import mutagen
+import pendulum
 from django import forms
 
 NODEFAULT = object()
@@ -101,6 +102,11 @@ class FirstUUIDField(forms.UUIDField):
         return super().to_python(value)
 
 
+def get_date(value):
+    parsed = pendulum.parse(str(value))
+    return datetime.date(parsed.year, parsed.month, parsed.day)
+
+
 VALIDATION = {
     "musicbrainz_artistid": FirstUUIDField(),
     "musicbrainz_albumid": FirstUUIDField(),
@@ -118,7 +124,7 @@ CONF = {
             "title": {},
             "artist": {},
             "album": {},
-            "date": {"field": "date", "to_application": lambda v: arrow.get(v).date()},
+            "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
@@ -134,7 +140,7 @@ CONF = {
             "title": {},
             "artist": {},
             "album": {},
-            "date": {"field": "date", "to_application": lambda v: arrow.get(v).date()},
+            "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
             "musicbrainz_recordingid": {"field": "MusicBrainz Track Id"},
@@ -148,10 +154,7 @@ CONF = {
             "title": {"field": "TIT2"},
             "artist": {"field": "TPE1"},
             "album": {"field": "TALB"},
-            "date": {
-                "field": "TDRC",
-                "to_application": lambda v: arrow.get(str(v)).date(),
-            },
+            "date": {"field": "TDRC", "to_application": get_date},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
             "musicbrainz_recordingid": {
@@ -172,10 +175,7 @@ CONF = {
             "title": {},
             "artist": {},
             "album": {},
-            "date": {
-                "field": "date",
-                "to_application": lambda v: arrow.get(str(v)).date(),
-            },
+            "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
