@@ -1,24 +1,13 @@
 <template>
-  <audio
-    ref="audio"
-    @error="errored"
-    @loadeddata="loaded"
-    @durationchange="updateDuration"
-    @timeupdate="updateProgressThrottled"
-    @ended="ended"
-    preload>
-    <source
-      @error="sourceErrored"
-      v-for="src in srcs"
-      :src="src.url"
-      :type="src.type">
-  </audio>
+  <i />
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import url from '@/utils/url'
 import _ from 'lodash'
+import url from '@/utils/url'
+import {Howl} from 'howler'
+
 // import logger from '@/logging'
 
 export default {
@@ -30,10 +19,43 @@ export default {
   },
   data () {
     return {
-      realTrack: this.track,
       sourceErrors: 0,
-      isUpdatingTime: false
+      sound: null,
+      isUpdatingTime: false,
+      progressInterval: null
     }
+  },
+  mounted () {
+    let self = this
+    this.sound = new Howl({
+      src: this.srcs.map((s) => { return s.url }),
+      autoplay: false,
+      loop: false,
+      html5: true,
+      preload: true,
+      volume: this.volume,
+      onend: function () {
+        self.ended()
+      },
+      onunlock: function () {
+        if (this.$store.state.player.playing) {
+          self.sound.play()
+        }
+      },
+      onload: function () {
+        self.$store.commit('player/resetErrorCount')
+        self.$store.commit('player/duration', self.sound.duration())
+      }
+    })
+    if (this.autoplay) {
+      this.sound.play()
+      this.$store.commit('player/playing', true)
+      this.observeProgress(true)
+    }
+  },
+  destroyed () {
+    this.observeProgress(false)
+    this.sound.unload()
   },
   computed: {
     ...mapState({
@@ -44,7 +66,7 @@ export default {
       looping: state => state.player.looping
     }),
     srcs: function () {
-      let file = this.realTrack.files[0]
+      let file = this.track.files[0]
       if (!file) {
         this.$store.dispatch('player/trackErrored')
         return []
@@ -68,90 +90,58 @@ export default {
     }
   },
   methods: {
-    errored: function () {
-      let self = this
-      setTimeout(
-        () => { self.$store.dispatch('player/trackErrored') }
-      , 1000)
-    },
-    sourceErrored: function () {
-      this.sourceErrors += 1
-      if (this.sourceErrors >= this.srcs.length) {
-        // all sources failed
-        this.errored()
-      }
-    },
-    updateDuration: function (e) {
-      if (!this.$refs.audio) {
-        return
-      }
-      this.$store.commit('player/duration', this.$refs.audio.duration)
-    },
-    loaded: function () {
-      if (!this.$refs.audio) {
-        return
-      }
-      this.$refs.audio.volume = this.volume
-      this.$store.commit('player/resetErrorCount')
-      if (this.isCurrent) {
-        this.$store.commit('player/duration', this.$refs.audio.duration)
-        if (this.startTime) {
-          this.setCurrentTime(this.startTime)
-        }
-        if (this.autoplay) {
-          this.$store.commit('player/playing', true)
-          this.$refs.audio.play()
-        }
-      }
-    },
     updateProgress: function () {
       this.isUpdatingTime = true
-      if (this.$refs.audio) {
-        this.$store.dispatch('player/updateProgress', this.$refs.audio.currentTime)
+      if (this.sound && this.sound.state() === 'loaded') {
+        this.$store.dispatch('player/updateProgress', this.sound.seek())
       }
     },
-    ended: function () {
-      let onlyTrack = this.$store.state.queue.tracks.length === 1
-      if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
-        this.setCurrentTime(0)
-        this.$refs.audio.play()
+    observeProgress: function (enable) {
+      let self = this
+      if (enable) {
+        if (self.progressInterval) {
+          clearInterval(self.progressInterval)
+        }
+        self.progressInterval = setInterval(() => {
+          self.updateProgress()
+        }, 1000)
       } else {
-        this.$store.dispatch('player/trackEnded', this.realTrack)
+        clearInterval(self.progressInterval)
       }
     },
     setCurrentTime (t) {
       if (t < 0 | t > this.duration) {
         return
       }
-      if (t === this.$refs.audio.currentTime) {
+      if (t === this.sound.seek()) {
         return
       }
       if (t === 0) {
         this.updateProgressThrottled.cancel()
       }
-      this.$refs.audio.currentTime = t
+      this.sound.seek(t)
+    },
+    ended: function () {
+      let onlyTrack = this.$store.state.queue.tracks.length === 1
+      if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
+        this.sound.seek(0)
+        this.sound.play()
+      } else {
+        this.$store.dispatch('player/trackEnded', this.track)
+      }
     }
   },
   watch: {
-    track: _.debounce(function (newValue) {
-      this.realTrack = newValue
-      this.setCurrentTime(0)
-      this.$refs.audio.load()
-    }, 1000, {leading: true, trailing: true}),
     playing: function (newValue) {
       if (newValue === true) {
-        this.$refs.audio.play()
+        this.sound.play()
       } else {
-        this.$refs.audio.pause()
+        this.sound.pause()
       }
-    },
-    '$store.state.queue.currentIndex' () {
-      if (this.$store.state.player.playing) {
-        this.$refs.audio.play()
-      }
+      this.observeProgress(newValue)
     },
     volume: function (newValue) {
-      this.$refs.audio.volume = newValue
+      this.sound.volume(newValue)
     },
     currentTime (newValue) {
       if (!this.isUpdatingTime) {
