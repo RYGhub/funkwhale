@@ -126,6 +126,8 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
+store.dispatch('instance/fetchFrontSettings')
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

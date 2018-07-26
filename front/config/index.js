@@ -29,6 +29,9 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+      '/settings.json': {
+        target: 'http://127.0.0.1:8000/static/',
+      },
       '**': {
         target: 'http://nginx:6001',
         changeOrigin: true,

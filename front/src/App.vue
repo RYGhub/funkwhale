@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <!-- here, we display custom stylesheets, if any -->
+    <link v-for="url in customStylesheets" rel="stylesheet" property="stylesheet" :href="url" :key="url">
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
         <h1 class="ui header"><translate>Choose your instance</translate></h1>
@@ -175,6 +177,11 @@ export default {
         return null
       }
       return _.get(this.nodeinfo, 'software.version')
+    },
+    customStylesheets () {
+      if (this.$store.state.instance.frontSettings) {
+        return this.$store.state.instance.frontSettings.additionalStylesheets || []
+      }
     }
   },
   watch: {
