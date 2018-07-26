@@ -6,6 +6,7 @@ export default {
   namespaced: true,
   state: {
     maxEvents: 200,
+    frontSettings: {},
     instanceUrl: process.env.INSTANCE_URL,
     events: [],
     settings: {
@@ -52,6 +53,9 @@ export default {
     },
     events: (state, value) => {
       state.events = value
+    },
+    frontSettings: (state, value) => {
+      state.frontSettings = value
     },
     instanceUrl: (state, value) => {
       if (value && !value.endsWith('/')) {
@@ -109,6 +113,13 @@ export default {
         }
       }, response => {
         logger.default.error('Error while fetching settings', response.data)
+      })
+    },
+    fetchFrontSettings ({commit}) {
+      return axios.get('/settings.json').then(response => {
+        commit('frontSettings', response.data)
+      }, response => {
+        logger.default.error('Error when fetching front-end configuration (or no customization available)')
       })
     }
   }
