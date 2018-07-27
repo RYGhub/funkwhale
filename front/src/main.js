@@ -43,6 +43,10 @@ if (availableLanguages[store.state.ui.currentLanguage]) {
 Vue.use(GetTextPlugin, {
   availableLanguages: availableLanguages,
   defaultLanguage: defaultLanguage,
+  // cf https://github.com/Polyconseil/vue-gettext#configuration
+  // not recommended but this is fixing weird bugs with translation nodes
+  // not being updated when in v-if/v-else clauses
+  autoAddKeyAttributes: true,
   languageVmMixin: {
     computed: {
       currentKebabCase: function () {
