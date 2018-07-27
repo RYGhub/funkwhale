@@ -110,7 +110,7 @@ export default {
           resolve(self.tracks)
         } else if (self.playlist) {
           let url = 'playlists/' + self.playlist.id + '/'
-          axios.get(url + 'tracks').then((response) => {
+          axios.get(url + 'tracks/').then((response) => {
             resolve(response.data.results.map(plt => {
               return plt.track
             }))
