@@ -57,8 +57,8 @@
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
           </td>
-          <td v-if="scope.obj.audio_mimetype">
-            {{ scope.obj.audio_mimetype }}
+          <td v-if="scope.obj.mimetype">
+            {{ scope.obj.mimetype }}
           </td>
           <td v-else>
             <translate>N/A</translate>
