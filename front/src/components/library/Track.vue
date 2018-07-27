@@ -87,6 +87,17 @@
                 <translate>N/A</translate>
               </td>
             </tr>
+            <tr>
+              <td>
+                <translate>Type</translate>
+              </td>
+              <td v-if="file.mimetype">
+                {{ file.mimetype }}
+              </td>
+              <td v-else>
+                <translate>N/A</translate>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
