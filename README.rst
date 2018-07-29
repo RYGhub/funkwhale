@@ -26,7 +26,7 @@ Contribute
 ----------
 
 Contribution guidelines as well as development installation instructions
-are outlined in `CONTRIBUTING <CONTRIBUTING>`_.
+are outlined in `CONTRIBUTING <CONTRIBUTING.rst>`_.
 
 Translate
 ^^^^^^^^^
