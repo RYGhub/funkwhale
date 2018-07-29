@@ -32,7 +32,7 @@
     "semantic-ui-css": "^2.2.10",
     "showdown": "^1.8.6",
     "vue": "^2.5.16",
-    "vue-gettext": "^2.0.31",
+    "vue-gettext": "^2.1.0",
     "vue-lazyload": "^1.1.4",
     "vue-masonry": "^0.10.16",
     "vue-router": "^2.3.1",
