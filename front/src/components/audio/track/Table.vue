@@ -5,8 +5,9 @@
         <th></th>
         <th></th>
         <th colspan="6"><translate>Title</translate></th>
-        <th colspan="6"><translate>Artist</translate></th>
-        <th colspan="6"><translate>Album</translate></th>
+        <th colspan="4"><translate>Artist</translate></th>
+        <th colspan="4"><translate>Album</translate></th>
+        <th colspan="4"><translate>Duration</translate></th>
         <th></th>
       </tr>
     </thead>
