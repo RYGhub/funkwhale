@@ -250,7 +250,7 @@ html, body {
     left: 350px;
     right: 0px;
     top: 0px;
-    z-index: 1;
+    z-index: 2000;
   }
   background-color: white;
   .item {
