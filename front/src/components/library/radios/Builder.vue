@@ -17,12 +17,16 @@
               </template>
             </div>
           </div>
-          <div class="inline fields">
+          <div class="">
             <div class="field">
               <label for="name"><translate>Radio name</translate></label>
-              <input id="name" type="text" v-model="radioName" :placeholder="labels.placeholder" />
+              <input id="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
             </div>
             <div class="field">
+              <label for="description"><translate>Description</translate></label>
+              <textarea rows="2" id="description" type="text" v-model="radioDesc" :placeholder="labels.placeholder.description" />
+            </div>
+            <div class="inline field">
               <input id="public" type="checkbox" v-model="isPublic" />
               <label for="public"><translate>Display publicly</translate></label>
             </div>
@@ -113,6 +117,7 @@ export default {
       filters: [],
       checkResult: null,
       radioName: '',
+      radioDesc: '',
       isPublic: true
     }
   },
@@ -164,6 +169,7 @@ export default {
           }
         })
         self.radioName = response.data.name
+        self.radioDesc = response.data.description
         self.isPublic = response.data.is_public
         self.isLoading = false
       })
@@ -197,6 +203,7 @@ export default {
       })
       final = {
         'name': this.radioName,
+        'description': this.radioDesc,
         'is_public': this.isPublic,
         'config': final
       }
@@ -224,7 +231,10 @@ export default {
   computed: {
     labels () {
       let title = this.$gettext('Radio Builder')
-      let placeholder = this.$gettext('My awesome radio')
+      let placeholder = {
+        'name': this.$gettext('My awesome radio'),
+        'description': this.$gettext('My awesome description')
+      }
       return {
         title,
         placeholder
