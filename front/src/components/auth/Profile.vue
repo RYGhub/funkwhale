@@ -16,10 +16,13 @@
         <div class="ui basic green label">
           <translate>This is you!</translate>
         </div>
-        <div v-if="profile.is_staff" class="ui yellow label">
+        <a v-if="profile.is_staff"
+          class="ui yellow label"
+          :href="$store.getters['instance/absoluteUrl']('/api/admin')"
+          target="_blank">
           <i class="star icon"></i>
           <translate>Staff member</translate>
-        </div>
+        </a>
         <router-link class="ui tiny basic button" :to="{path: '/settings'}">
           <i class="setting icon"></i>
           <translate>Settings...</translate>
