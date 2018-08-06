@@ -3,9 +3,10 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-21 21:30+0000\n"
-"Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
-"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
+"PO-Revision-Date: 2018-07-30 16:28+0000\n"
+"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
+"front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -98,7 +99,7 @@ msgstr[1] "%{ count } pistes"
 
 #: front/src/components/About.vue:5
 msgid "About %{ instance }"
-msgstr "À propos de cette instance"
+msgstr "À propos de %{instance}"
 
 #: front/src/App.vue:54
 msgid "About Funkwhale"
@@ -155,9 +156,8 @@ msgid "Actions"
 msgstr "Actions"
 
 #: front/src/components/manage/users/UsersTable.vue:53
-#, fuzzy
 msgid "Active"
-msgstr "Activité"
+msgstr "Actif"
 
 #: front/src/components/Sidebar.vue:60
 msgid "Activity"
@@ -260,7 +260,9 @@ msgstr "Une erreur s'est produite pendant l'enregistrement de vos modifications"
 
 #: front/src/components/auth/Login.vue:10
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
-msgstr "Une erreur inconnue a été rencontrée, ce qui peut signifier que le serveur est en panne ou n’a pas pu être atteint"
+msgstr ""
+"Une erreur inconnue s'est produite, cela pourrait signifier que le serveur "
+"ne peut pas être accedé"
 
 #: front/src/components/federation/LibraryTrackTable.vue:11
 #: front/src/components/library/import/BatchDetail.vue:68
@@ -985,7 +987,7 @@ msgstr "Récupérer les métadonnées correspondantes"
 
 #: front/src/App.vue:74
 msgid "Help us translate Funkwhale"
-msgstr ""
+msgstr "Aidez nous à traduire Funkwhale"
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
@@ -1111,7 +1113,7 @@ msgstr "Dans la bibliothèque"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgid "Inactive"
-msgstr "Actif"
+msgstr "Inactif"
 
 #: front/src/components/library/import/Main.vue:96
 msgid "Input a MusicBrainz ID manually:"
@@ -1436,7 +1438,7 @@ msgstr "Site officiel"
 
 #: front/src/components/auth/Settings.vue:83
 msgid "Old password"
-msgstr "Ancien mot de passe"
+msgstr "Vieux mot de passe"
 
 #: front/src/components/library/import/FileUpload.vue:36
 msgid "Once all your files are uploaded, simply click the following button to check the import status."
@@ -1621,7 +1623,7 @@ msgstr "Merci de vérifier que votre nom d'utilisateur et mot de passe sont corr
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr "PNG, GIF ou JPG. 2Mb au plus. L'image sera réduite à 400×400 pixels."
+msgstr "PNG, GIF ou JPG. 2Mo au plus. L'image sera réduite à 400×400 pixels."
 
 #: front/src/components/library/import/Main.vue:26
 msgid "Previous step"
@@ -1661,18 +1663,16 @@ msgid "Radio Builder"
 msgstr "Éditeur de radio"
 
 #: front/src/components/library/radios/Builder.vue:15
-#, fuzzy
 msgid "Radio created"
-msgstr "Nom de la radio"
+msgstr "Radio créée"
 
 #: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
 msgstr "Nom de la radio"
 
 #: front/src/components/library/radios/Builder.vue:12
-#, fuzzy
 msgid "Radio updated"
-msgstr "Nom de la radio"
+msgstr "Radio à jour"
 
 #: front/src/components/library/Library.vue:10
 #: src/components/library/Radios.vue:141
@@ -1689,7 +1689,7 @@ msgstr "Ajoutés récemment"
 
 #: front/src/components/library/Home.vue:11
 msgid "Recently favorited"
-msgstr "Ajoutées à vos favoris récemment"
+msgstr "Récemment ajouté aux favoris"
 
 #: front/src/components/library/Home.vue:6
 msgid "Recently listened"
@@ -2297,7 +2297,7 @@ msgstr "Nom d'utilisateur ou email"
 
 #: front/src/components/instance/Stats.vue:13
 msgid "users"
-msgstr "tilisateur·ice·s"
+msgstr "utilisateur·rice·s"
 
 #: front/src/components/Sidebar.vue:103 src/views/admin/Settings.vue:81
 #: front/src/views/admin/users/Base.vue:5 src/views/admin/users/UsersList.vue:3
@@ -2352,7 +2352,7 @@ msgstr "Nous pensons que l'accès à la musique devrait être simple."
 
 #: front/src/components/PageNotFound.vue:10
 msgid "We're sorry, the page you asked for does not exist:"
-msgstr "Désolé, la page demandée n’existe pas :"
+msgstr "Désolé, la page demandée n’existe pas :"
 
 #: front/src/components/requests/Form.vue:21
 msgid "We've received your request, you'll get some groove soon ;)"
@@ -2368,7 +2368,7 @@ msgstr "Bienvenue sur Funkwhale"
 
 #: front/src/components/library/import/Main.vue:114
 msgid "What is metadata?"
-msgstr "Qu'est-ce que les métadonnées ?"
+msgstr "Qu'est-ce que les métadonnées ?"
 
 #: front/src/views/federation/LibraryDetail.vue:197
 msgid "When enabled, auto importing will automatically import new tracks published in this library"

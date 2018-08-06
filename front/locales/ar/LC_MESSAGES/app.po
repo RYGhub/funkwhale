@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-22 15:50+0000\n"
+"PO-Revision-Date: 2018-07-24 19:50+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
 "Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
 "funkwhale/front/ar/>\n"
@@ -81,19 +81,19 @@ msgstr[5] "%{ count } مَقاطِع"
 
 #: front/src/components/common/Duration.vue:2
 msgid "%{ hours } h %{ minutes } min"
-msgstr ""
+msgstr "%{ hours } سا %{ minutes } د"
 
 #: front/src/components/common/Duration.vue:5
 msgid "%{ minutes } min"
-msgstr ""
+msgstr "%{ minutes } د"
 
 #: front/src/components/activity/Like.vue:7
 msgid "%{ user } favorited a track"
-msgstr ""
+msgstr "أُعجِب %{ user } بمقطع"
 
 #: front/src/components/activity/Listen.vue:7
 msgid "%{ user } listened to a track"
-msgstr ""
+msgstr "قام %{ user } بالاستماع إلى مَقطَع"
 
 #: front/src/components/auth/Profile.vue:49
 msgid "%{ username }'s profile"
@@ -131,9 +131,8 @@ msgstr[4] "%{ count } مَقاطِع"
 msgstr[5] "%{ count } مَقاطِع"
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgid "About %{ instance }"
-msgstr "عن مثيل الخادوم هذا"
+msgstr "عن %{ instance }"
 
 #: front/src/App.vue:54
 msgid "About Funkwhale"
@@ -146,11 +145,11 @@ msgstr "عن مثيل الخادوم هذا"
 #: front/src/components/manage/library/RequestsTable.vue:28
 #: front/src/components/manage/library/RequestsTable.vue:62
 msgid "Accepted"
-msgstr ""
+msgstr "تم قبوله"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:111
 msgid "Access disabled"
-msgstr ""
+msgstr "عُطّل النفاذ"
 
 #: front/src/components/Home.vue:109
 msgid "Access your music from a clean interface that focus on what really matters"
@@ -502,7 +501,7 @@ msgstr ""
 
 #: front/src/components/auth/Settings.vue:98
 msgid "Changing your password will have the following consequences"
-msgstr ""
+msgstr "سوف ينجرّ ما يلي عند تعديل كلمتك السرية"
 
 #: front/src/App.vue:4
 msgid "Choose your instance"
@@ -615,9 +614,8 @@ msgid "Creation date"
 msgstr "تاريخ الإنشاء"
 
 #: front/src/components/auth/Settings.vue:54
-#, fuzzy
 msgid "Current avatar"
-msgstr "المَقطَع الحالي"
+msgstr "الصورة الرمزية الحالية"
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgid "Current track"
@@ -701,9 +699,8 @@ msgid "Do you want to delete the playlist \"%{ playlist }\"?"
 msgstr "متأكّد مِن أنك تريد حذف قائمة المَقاطِع الموسيقية \"%{ playlist }\" ؟"
 
 #: front/src/views/radios/Detail.vue:26
-#, fuzzy
 msgid "Do you want to delete the radio \"%{ radio }\"?"
-msgstr "أتريد حقا حذف إذاعة \"{{ radio }}\" ؟"
+msgstr "أتريد حقا حذف إذاعة \"%{ radio }\" ؟"
 
 #: front/src/components/common/ActionTable.vue:29
 msgid "Do you want to launch %{ action } on %{ count } element?"
@@ -908,7 +905,7 @@ msgstr "الفديرالية"
 
 #: front/src/views/federation/LibraryDetail.vue:3
 msgid "File mirroring"
-msgstr ""
+msgstr "النسخ المتماثل للملفات"
 
 #: front/src/components/library/import/FileUpload.vue:43
 msgid "File name"
@@ -1037,7 +1034,7 @@ msgstr "جلب البيانات الوصفية ذات الصّلة"
 
 #: front/src/App.vue:74
 msgid "Help us translate Funkwhale"
-msgstr ""
+msgstr "ساعدنا على ترجمة فانك وايل"
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
@@ -1192,9 +1189,8 @@ msgid "Instance information"
 msgstr "معلومات عن مثيل الخادوم"
 
 #: front/src/components/library/Radios.vue:9
-#, fuzzy
 msgid "Instance radios"
-msgstr "معلومات عن مثيل الخادوم"
+msgstr "إذاعات مثيل الخادوم"
 
 #: front/src/views/admin/Settings.vue:75
 msgid "Instance settings"
@@ -1395,6 +1391,13 @@ msgid ""
 "            </a>\n"
 "            project, which you can think about as the Wikipedia of music."
 msgstr ""
+"البيانات الوصفية هي الم البيانات المتعلقة بالموسيقى التي تريد استيرادها. و "
+"هي تحتوي على معلومات عن الفنانين و الألبومات و المَقاطِع الموسيقية. و بغرض "
+"إنشاء مكتبة بها جودة، يُستحسن جلب البيانات مِن \n"
+"            <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
+"              MusicBrainz\n"
+"            </a>\n"
+"            مشروع بمثابة ويكيبيديا للموسيقى."
 
 #: front/src/components/Sidebar.vue:48
 #: src/components/library/import/Main.vue:18
@@ -1498,6 +1501,8 @@ msgstr "الكلمة السرية الجديدة"
 #: front/src/components/library/import/FileUpload.vue:36
 msgid "Once all your files are uploaded, simply click the following button to check the import status."
 msgstr ""
+"حينما تتم عملية إرسال كافة ملفاتك، إضغط على الزر التالي للتحقق مِن حالة "
+"الإستيراد."
 
 #: front/src/components/federation/LibraryCard.vue:21
 #: front/src/components/manage/users/InvitationsTable.vue:20
@@ -1683,6 +1688,8 @@ msgstr "الرجاء التأكّد مِن صحة اسم المستخدِم و �
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
 msgstr ""
+"نسق PNG أو GIF أو JPG. الحجم الأقصى 2 ميغابيت. سيتم تغيير حجمها إلى 400×400 "
+"بكسل."
 
 #: front/src/components/library/import/Main.vue:26
 msgid "Previous step"
@@ -1722,18 +1729,16 @@ msgid "Radio Builder"
 msgstr "مُنشِئ الإذاعات و الراديو"
 
 #: front/src/components/library/radios/Builder.vue:15
-#, fuzzy
 msgid "Radio created"
-msgstr "إسم الإذاعة"
+msgstr "تم إنشاء الإذاعة"
 
 #: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
 msgstr "إسم الإذاعة"
 
 #: front/src/components/library/radios/Builder.vue:12
-#, fuzzy
 msgid "Radio updated"
-msgstr "إسم الإذاعة"
+msgstr "تم تحديث الإذاعة"
 
 #: front/src/components/library/Library.vue:10
 #: src/components/library/Radios.vue:141
@@ -1746,12 +1751,11 @@ msgstr "أحدث الأنشطة على مثيل الخادوم هذا"
 
 #: front/src/components/library/Home.vue:24
 msgid "Recently added"
-msgstr ""
+msgstr "تمت إضافتها مؤخرا"
 
 #: front/src/components/library/Home.vue:11
-#, fuzzy
 msgid "Recently favorited"
-msgstr "في المفضلة"
+msgstr "تمت إضافتها إلى المفضلة حديثا"
 
 #: front/src/components/library/Home.vue:6
 msgid "Recently listened"
@@ -1787,9 +1791,8 @@ msgid "Remove"
 msgstr "حذف"
 
 #: front/src/components/auth/Settings.vue:58
-#, fuzzy
 msgid "Remove avatar"
-msgstr "حذف"
+msgstr "حذف الصورة الرمزية"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:19
 msgid "Remove from favorites"
@@ -2257,9 +2260,8 @@ msgid "Tracks available in this library"
 msgstr "المَقاطِع المتوفّرة في هذه المكتبة"
 
 #: front/src/components/library/Artist.vue:54
-#, fuzzy
 msgid "Tracks by this artist"
-msgstr "مِن ألبومات هذا الفنان"
+msgstr "مَقاطِع لهذا الفنان"
 
 #: front/src/components/instance/Stats.vue:25
 msgid "Tracks favorited"
@@ -2275,7 +2277,7 @@ msgstr ""
 
 #: front/src/components/manage/library/FilesTable.vue:41
 msgid "Type"
-msgstr ""
+msgstr "النوع"
 
 #: front/src/components/About.vue:15
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
@@ -2294,9 +2296,8 @@ msgid "Unmute"
 msgstr "إلغاء الكتم"
 
 #: front/src/components/auth/Settings.vue:50
-#, fuzzy
 msgid "Update avatar"
-msgstr "تحديث قائمة المَقاطِع الموسيقية"
+msgstr "تحديث الصورة الرمزية"
 
 #: front/src/components/playlists/Form.vue:33
 msgid "Update playlist"
@@ -2317,7 +2318,7 @@ msgstr "أرسل"
 
 #: front/src/components/auth/Settings.vue:45
 msgid "Upload a new avatar"
-msgstr ""
+msgstr "إرسال صورة رمزية جديدة"
 
 #: front/src/components/library/import/Main.vue:7
 msgid "Uploaded files or external source"
@@ -2349,7 +2350,7 @@ msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgid "Used"
-msgstr ""
+msgstr "مُستخدَم"
 
 #: front/src/components/manage/library/RequestsTable.vue:47
 msgid "User"
@@ -2360,9 +2361,8 @@ msgid "User activity"
 msgstr "نشاط المستخدِم"
 
 #: front/src/components/library/Radios.vue:20
-#, fuzzy
 msgid "User radios"
-msgstr "المستخدِمون"
+msgstr "إذاعات المستخدِمين"
 
 #: front/src/components/auth/Signup.vue:19
 #: front/src/components/manage/users/UsersTable.vue:37
@@ -2394,24 +2394,23 @@ msgstr "إطّلع عليه على ميوزيك براينز"
 
 #: front/src/components/playlists/PlaylistModal.vue:20
 msgid "We cannot add the track to a playlist"
-msgstr ""
+msgstr "لا يمكننا إضافة المَقطَع إلى قائمة التشغيل"
 
 #: front/src/components/playlists/Form.vue:14
 msgid "We cannot create the playlist"
-msgstr ""
+msgstr "لا يمكننا إنشاء قائمة التشغيل"
 
 #: front/src/components/auth/Signup.vue:13
 msgid "We cannot create your account"
-msgstr ""
+msgstr "لا يمكننا إنشاء حسابك"
 
 #: front/src/components/auth/Login.vue:7
 msgid "We cannot log you in"
-msgstr ""
+msgstr "تعذر علينا تسجيل دخولك"
 
 #: front/src/components/auth/Settings.vue:38
-#, fuzzy
 msgid "We cannot save your avatar"
-msgstr "تعذّر علينا حفظ إعداداتك"
+msgstr "تعذّر علينا حفظ صورتك الرمزية"
 
 #: front/src/components/auth/Settings.vue:14
 msgid "We cannot save your settings"
@@ -2431,7 +2430,7 @@ msgstr "نعتقد أنّ الاستماع إلى الموسيقى ينبغي أ
 
 #: front/src/components/PageNotFound.vue:10
 msgid "We're sorry, the page you asked for does not exist:"
-msgstr ""
+msgstr "المعذرة، إنّ الصفحة التي قمت بطلبها غير موجودة :"
 
 #: front/src/components/requests/Form.vue:21
 msgid "We've received your request, you'll get some groove soon ;)"
@@ -2463,15 +2462,15 @@ msgstr "نعم"
 
 #: front/src/components/auth/Logout.vue:8
 msgid "Yes, log me out!"
-msgstr ""
+msgstr "نعم، أؤكد الخروج !"
 
 #: front/src/components/auth/Logout.vue:7
 msgid "You are currently logged in as %{ username }"
-msgstr ""
+msgstr "أنت متّصل حاليا بصفة %{ username }"
 
 #: front/src/components/library/import/Main.vue:111
 msgid "You can also skip this step and enter metadata manually."
-msgstr ""
+msgstr "يمكنك طبعًا تخطي هذه الخطوة و إدخال البيانات الوصفية يدويًا."
 
 #: front/src/components/Home.vue:136
 msgid "You can invite friends and family to your instance so they can enjoy your music"
@@ -2487,7 +2486,7 @@ msgstr ""
 
 #: front/src/components/Sidebar.vue:156
 msgid "You have a radio playing"
-msgstr ""
+msgstr "إنك تستمع إلى إذاعة"
 
 #: front/src/App.vue:6
 msgid "You need to select an instance in order to continue"
