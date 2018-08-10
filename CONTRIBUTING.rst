@@ -23,7 +23,7 @@ As the front-end can work with any Funkwhale server, you can work with the front
 and make it talk with an existing instance (like the demo one, or you own instance, if you have one).
 
 If even that is too much for you, you can also make your changes without any development environment,
-and open a merge request. We will be able to to review your work easily by spawning automatically a
+and open a merge request. We will be able to review your work easily by spawning automatically a
 live version of your changes, thanks to Gitlab Review apps.
 
 Setup front-end only development environment
