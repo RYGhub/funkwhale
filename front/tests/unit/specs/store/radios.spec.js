@@ -1,4 +1,6 @@
 var sinon = require('sinon')
+import {expect} from 'chai'
+
 import moxios from 'moxios'
 import store from '@/store/radios'
 import { testAction } from '../../utils'
@@ -7,7 +9,7 @@ describe('store/radios', () => {
   var sandbox
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   })
   afterEach(function () {
@@ -28,7 +30,7 @@ describe('store/radios', () => {
     })
   })
   describe('actions', () => {
-    it('start', (done) => {
+    it('start', () => {
       moxios.stubRequest('radios/sessions/', {
         status: 200,
         response: {id: 2}
@@ -51,23 +53,23 @@ describe('store/radios', () => {
         expectedActions: [
           { type: 'populateQueue' }
         ]
-      }, done)
+      })
     })
-    it('stop', (done) => {
-      testAction({
+    it('stop', () => {
+      return testAction({
         action: store.actions.stop,
         expectedMutations: [
           { type: 'current', payload: null },
           { type: 'running', payload: false }
         ]
-      }, done)
+      })
     })
-    it('populateQueue', (done) => {
+    it('populateQueue', () => {
       moxios.stubRequest('radios/tracks/', {
         status: 201,
         response: {track: {id: 1}}
       })
-      testAction({
+      return testAction({
         action: store.actions.populateQueue,
         params: {
           state: {running: true, current: {session: 1}},
@@ -77,17 +79,17 @@ describe('store/radios', () => {
         expectedActions: [
           { type: 'queue/append', payload: {track: {id: 1}}, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('populateQueue does nothing when not running', (done) => {
+    it('populateQueue does nothing when not running', () => {
       testAction({
         action: store.actions.populateQueue,
         params: {state: {running: false}},
         expectedActions: []
-      }, done)
+      })
     })
-    it('populateQueue does nothing when too much errors', (done) => {
-      testAction({
+    it('populateQueue does nothing when too much errors', () => {
+      return testAction({
         action: store.actions.populateQueue,
         payload: {test: 'track'},
         params: {
@@ -95,7 +97,7 @@ describe('store/radios', () => {
           state: {running: true}
         },
         expectedActions: []
-      }, done)
+      })
     })
   })
 })

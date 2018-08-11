@@ -1,4 +1,6 @@
 var sinon = require('sinon')
+import {expect} from 'chai'
+
 import _ from 'lodash'
 
 import store from '@/store/queue'
@@ -9,7 +11,7 @@ describe('store/queue', () => {
 
   beforeEach(function () {
     // Create a sandbox for the test
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
   })
 
   afterEach(function () {
@@ -83,7 +85,7 @@ describe('store/queue', () => {
     })
   })
   describe('actions', () => {
-    it('append at end', (done) => {
+    it('append at end', () => {
       testAction({
         action: store.actions.append,
         payload: {track: 4, skipPlay: true},
@@ -91,9 +93,9 @@ describe('store/queue', () => {
         expectedMutations: [
           { type: 'insert', payload: {track: 4, index: 3} }
         ]
-      }, done)
+      })
     })
-    it('append at index', (done) => {
+    it('append at index', () => {
       testAction({
         action: store.actions.append,
         payload: {track: 2, index: 1, skipPlay: true},
@@ -101,9 +103,9 @@ describe('store/queue', () => {
         expectedMutations: [
           { type: 'insert', payload: {track: 2, index: 1} }
         ]
-      }, done)
+      })
     })
-    it('append and play', (done) => {
+    it('append and play', () => {
       testAction({
         action: store.actions.append,
         payload: {track: 3},
@@ -114,9 +116,9 @@ describe('store/queue', () => {
         expectedActions: [
           { type: 'resume' }
         ]
-      }, done)
+      })
     })
-    it('appendMany', (done) => {
+    it('appendMany', () => {
       const tracks = [{title: 1}, {title: 2}]
       testAction({
         action: store.actions.appendMany,
@@ -127,9 +129,9 @@ describe('store/queue', () => {
           { type: 'append', payload: {track: tracks[1], index: 1, skipPlay: true} },
           { type: 'resume' }
         ]
-      }, done)
+      })
     })
-    it('appendMany at index', (done) => {
+    it('appendMany at index', () => {
       const tracks = [{title: 1}, {title: 2}]
       testAction({
         action: store.actions.appendMany,
@@ -140,34 +142,34 @@ describe('store/queue', () => {
           { type: 'append', payload: {track: tracks[1], index: 2, skipPlay: true} },
           { type: 'resume' }
         ]
-      }, done)
+      })
     })
-    it('cleanTrack after current', (done) => {
+    it('cleanTrack after current', () => {
       testAction({
         action: store.actions.cleanTrack,
         payload: 3,
-        params: {state: {currentIndex: 2}},
+        params: {state: {currentIndex: 2, tracks: []}},
         expectedMutations: [
           { type: 'splice', payload: {start: 3, size: 1} }
         ]
-      }, done)
+      })
     })
-    it('cleanTrack before current', (done) => {
+    it('cleanTrack before current', () => {
       testAction({
         action: store.actions.cleanTrack,
         payload: 1,
-        params: {state: {currentIndex: 2}},
+        params: {state: {currentIndex: 2, tracks: []}},
         expectedMutations: [
           { type: 'splice', payload: {start: 1, size: 1} },
           { type: 'currentIndex', payload: 1 }
         ]
-      }, done)
+      })
     })
-    it('cleanTrack current', (done) => {
+    it('cleanTrack current', () => {
       testAction({
         action: store.actions.cleanTrack,
         payload: 2,
-        params: {state: {currentIndex: 2}},
+        params: {state: {currentIndex: 2, tracks: []}},
         expectedMutations: [
           { type: 'splice', payload: {start: 2, size: 1} },
           { type: 'currentIndex', payload: 2 }
@@ -175,88 +177,88 @@ describe('store/queue', () => {
         expectedActions: [
           { type: 'player/stop', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('resume when ended', (done) => {
+    it('resume when ended', () => {
       testAction({
         action: store.actions.resume,
         params: {state: {ended: true}, rootState: {player: {errored: false}}},
         expectedActions: [
           { type: 'next' }
         ]
-      }, done)
+      })
     })
-    it('resume when errored', (done) => {
+    it('resume when errored', () => {
       testAction({
         action: store.actions.resume,
         params: {state: {ended: false}, rootState: {player: {errored: true}}},
         expectedActions: [
           { type: 'next' }
         ]
-      }, done)
+      })
     })
-    it('skip resume when not ended or not error', (done) => {
+    it('skip resume when not ended or not error', () => {
       testAction({
         action: store.actions.resume,
         params: {state: {ended: false}, rootState: {player: {errored: false}}},
         expectedActions: []
-      }, done)
+      })
     })
-    it('previous when at beginning', (done) => {
+    it('previous when at beginning', () => {
       testAction({
         action: store.actions.previous,
         params: {state: {currentIndex: 0}},
         expectedActions: [
           { type: 'currentIndex', payload: 0 }
         ]
-      }, done)
+      })
     })
-    it('previous after less than 3 seconds of playback', (done) => {
+    it('previous after less than 3 seconds of playback', () => {
       testAction({
         action: store.actions.previous,
         params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 1}}},
         expectedActions: [
           { type: 'currentIndex', payload: 0 }
         ]
-      }, done)
+      })
     })
-    it('previous after more than 3 seconds of playback', (done) => {
+    it('previous after more than 3 seconds of playback', () => {
       testAction({
         action: store.actions.previous,
         params: {state: {currentIndex: 1}, rootState: {player: {currentTime: 3}}},
         expectedActions: [
           { type: 'currentIndex', payload: 1 }
         ]
-      }, done)
+      })
     })
-    it('next on last track when looping on queue', (done) => {
+    it('next on last track when looping on queue', () => {
       testAction({
         action: store.actions.next,
         params: {state: {tracks: [1, 2], currentIndex: 1}, rootState: {player: {looping: 2}}},
         expectedActions: [
           { type: 'currentIndex', payload: 0 }
         ]
-      }, done)
+      })
     })
-    it('next track when last track', (done) => {
+    it('next track when last track', () => {
       testAction({
         action: store.actions.next,
         params: {state: {tracks: [1, 2], currentIndex: 1}, rootState: {player: {looping: 0}}},
         expectedMutations: [
           { type: 'ended', payload: true }
         ]
-      }, done)
+      })
     })
-    it('next track when not last track', (done) => {
+    it('next track when not last track', () => {
       testAction({
         action: store.actions.next,
         params: {state: {tracks: [1, 2], currentIndex: 0}, rootState: {player: {looping: 0}}},
         expectedActions: [
           { type: 'currentIndex', payload: 1 }
         ]
-      }, done)
+      })
     })
-    it('currentIndex', (done) => {
+    it('currentIndex', () => {
       testAction({
         action: store.actions.currentIndex,
         payload: 1,
@@ -268,9 +270,9 @@ describe('store/queue', () => {
           { type: 'player/errored', payload: false, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
-      }, done)
+      })
     })
-    it('currentIndex with radio and many tracks remaining', (done) => {
+    it('currentIndex with radio and many tracks remaining', () => {
       testAction({
         action: store.actions.currentIndex,
         payload: 1,
@@ -282,9 +284,9 @@ describe('store/queue', () => {
           { type: 'player/errored', payload: false, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
-      }, done)
+      })
     })
-    it('currentIndex with radio and less than two tracks remaining', (done) => {
+    it('currentIndex with radio and less than two tracks remaining', () => {
       testAction({
         action: store.actions.currentIndex,
         payload: 1,
@@ -299,9 +301,9 @@ describe('store/queue', () => {
         expectedActions: [
           { type: 'radios/populateQueue', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('clean', (done) => {
+    it('clean', () => {
       testAction({
         action: store.actions.clean,
         expectedMutations: [
@@ -313,9 +315,9 @@ describe('store/queue', () => {
           { type: 'player/stop', payload: null, options: {root: true} },
           { type: 'currentIndex', payload: -1 }
         ]
-      }, done)
+      })
     })
-    it('shuffle', (done) => {
+    it('shuffle', () => {
       let _shuffle = sandbox.stub(_, 'shuffle')
       let tracks = ['a', 'b', 'c', 'd', 'e']
       let shuffledTracks = ['e', 'd', 'c']
@@ -329,7 +331,7 @@ describe('store/queue', () => {
         expectedActions: [
           { type: 'appendMany', payload: {tracks: ['a', 'b'].concat(shuffledTracks)} }
         ]
-      }, done)
+      })
     })
   })
 })

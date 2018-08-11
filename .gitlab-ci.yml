@@ -156,7 +156,6 @@ test_api:
   tags:
     - docker
 
-
 test_front:
   stage: test
   image: node:9
@@ -166,7 +165,7 @@ test_front:
     - branches
   script:
     - yarn install
-    - yarn run unit
+    - yarn test:unit
   cache:
     key: "funkwhale__front_dependencies"
     paths:
@@ -178,7 +177,6 @@ test_front:
       - front/dist/
   tags:
     - docker
-
 
 build_front:
   stage: build
@@ -192,7 +190,7 @@ build_front:
     - yarn run i18n-compile
     # this is to ensure we don't have any errors in the output,
     # cf https://code.eliotberriot.com/funkwhale/funkwhale/issues/169
-    - yarn run build | tee /dev/stderr | (! grep -i 'ERROR in')
+    - yarn build | tee /dev/stderr | (! grep -i 'ERROR in')
     - chmod -R 750 dist
   cache:
     key: "funkwhale__front_dependencies"
@@ -209,7 +207,6 @@ build_front:
     - develop@funkwhale/funkwhale
   tags:
     - docker
-
 
 pages:
   stage: test

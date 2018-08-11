@@ -1,18 +1,14 @@
 {
   "name": "front",
-  "private": true,
   "version": "0.1.0",
-  "description": "Funkwhale front-end",
-  "author": "Eliot Berriot <contact@eliotberriot.com>",
+  "private": true,
   "scripts": {
     "serve": "scripts/i18n-compile.sh && vue-cli-service serve --port ${VUE_PORT:-8000} --host ${VUE_HOST:-0.0.0.0}",
     "build": "scripts/i18n-compile.sh && vue-cli-service build",
+    "lint": "vue-cli-service lint",
     "i18n-extract": "scripts/i18n-extract.sh",
     "i18n-compile": "scripts/i18n-compile.sh",
-    "test": "npm run unit && npm run e2e",
-    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
-    "unit-watch": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js",
-    "lint": "vue-cli-service lint"
+    "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -41,11 +37,17 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0",
     "@vue/cli-plugin-eslint": "^3.0.0",
+    "@vue/cli-plugin-unit-mocha": "^3.0.0",
     "@vue/cli-service": "^3.0.0",
+    "@vue/test-utils": "^1.0.0-beta.20",
+    "chai": "^4.1.2",
     "easygettext": "^2.6.3",
     "eslint-plugin-html": "^4.0.5",
+    "mocha": "^5.2.0",
+    "moxios": "^0.4.0",
     "node-sass": "^4.9.3",
     "sass-loader": "^7.1.0",
+    "sinon": "^6.1.5",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
@@ -84,5 +86,7 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "author": "Eliot Berriot <contact@eliotberriot.com>",
+  "description": "Funkwhale front-end"
 }

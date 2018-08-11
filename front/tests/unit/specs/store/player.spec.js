@@ -1,3 +1,5 @@
+import {expect} from 'chai'
+
 import store from '@/store/player'
 
 import { testAction } from '../../utils'
@@ -100,7 +102,7 @@ describe('store/player', () => {
     })
   })
   describe('actions', () => {
-    it('incrementVolume', (done) => {
+    it('incrementVolume', () => {
       testAction({
         action: store.actions.incrementVolume,
         payload: 0.2,
@@ -108,27 +110,27 @@ describe('store/player', () => {
         expectedMutations: [
           { type: 'volume', payload: 0.7 + 0.2 }
         ]
-      }, done)
+      })
     })
-    it('toggle play false', (done) => {
+    it('toggle play false', () => {
       testAction({
         action: store.actions.togglePlay,
         params: {state: {playing: false}},
         expectedMutations: [
           { type: 'playing', payload: true }
         ]
-      }, done)
+      })
     })
-    it('toggle play true', (done) => {
+    it('toggle play true', () => {
       testAction({
         action: store.actions.togglePlay,
         params: {state: {playing: true}},
         expectedMutations: [
           { type: 'playing', payload: false }
         ]
-      }, done)
+      })
     })
-    it('trackEnded', (done) => {
+    it('trackEnded', () => {
       testAction({
         action: store.actions.trackEnded,
         payload: {test: 'track'},
@@ -137,9 +139,9 @@ describe('store/player', () => {
           { type: 'trackListened', payload: {test: 'track'} },
           { type: 'queue/next', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('trackEnded calls populateQueue if last', (done) => {
+    it('trackEnded calls populateQueue if last', () => {
       testAction({
         action: store.actions.trackEnded,
         payload: {test: 'track'},
@@ -149,9 +151,9 @@ describe('store/player', () => {
           { type: 'radios/populateQueue', payload: null, options: {root: true} },
           { type: 'queue/next', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('trackErrored', (done) => {
+    it('trackErrored', () => {
       testAction({
         action: store.actions.trackErrored,
         payload: {test: 'track'},
@@ -163,16 +165,16 @@ describe('store/player', () => {
         expectedActions: [
           { type: 'queue/next', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('updateProgress', (done) => {
+    it('updateProgress', () => {
       testAction({
         action: store.actions.updateProgress,
         payload: 1,
         expectedMutations: [
           { type: 'currentTime', payload: 1 }
         ]
-      }, done)
+      })
     })
   })
 })

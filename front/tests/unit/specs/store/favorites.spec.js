@@ -1,3 +1,5 @@
+import {expect} from 'chai'
+
 import store from '@/store/favorites'
 
 import { testAction } from '../../utils'
@@ -28,7 +30,7 @@ describe('store/favorites', () => {
     })
   })
   describe('actions', () => {
-    it('toggle true', (done) => {
+    it('toggle true', () => {
       testAction({
         action: store.actions.toggle,
         payload: 1,
@@ -36,9 +38,9 @@ describe('store/favorites', () => {
         expectedActions: [
           { type: 'set', payload: {id: 1, value: true} }
         ]
-      }, done)
+      })
     })
-    it('toggle true', (done) => {
+    it('toggle true', () => {
       testAction({
         action: store.actions.toggle,
         payload: 1,
@@ -46,7 +48,7 @@ describe('store/favorites', () => {
         expectedActions: [
           { type: 'set', payload: {id: 1, value: false} }
         ]
-      }, done)
+      })
     })
   })
 })

@@ -466,12 +466,12 @@ Running tests
 
 To run the front-end test suite, use the following command::
 
-    docker-compose -f dev.yml run --rm front yarn run unit
+    docker-compose -f dev.yml run --rm front yarn test:unit
 
 We also support a "watch and test" mode were we continually relaunch
 tests when changes are recorded on the file system::
 
-    docker-compose -f dev.yml run --rm front yarn run unit-watch
+    docker-compose -f dev.yml run --rm front yarn test:unit -w
 
 The latter is especially useful when you are debugging failing tests.
 

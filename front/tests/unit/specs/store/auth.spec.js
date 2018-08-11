@@ -1,4 +1,6 @@
 var sinon = require('sinon')
+import {expect} from 'chai'
+
 import moxios from 'moxios'
 import store from '@/store/auth'
 
@@ -8,7 +10,7 @@ describe('store/auth', () => {
   var sandbox
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   })
   afterEach(function () {
@@ -84,7 +86,7 @@ describe('store/auth', () => {
     })
   })
   describe('actions', () => {
-    it('logout', (done) => {
+    it('logout', () => {
       testAction({
         action: store.actions.logout,
         params: {state: {}},
@@ -96,18 +98,18 @@ describe('store/auth', () => {
           { type: 'queue/reset', payload: null, options: {root: true} },
           { type: 'radios/reset', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('check jwt null', (done) => {
+    it('check jwt null', () => {
       testAction({
         action: store.actions.check,
         params: {state: {}},
         expectedMutations: [
           { type: 'authenticated', payload: false }
         ]
-      }, done)
+      })
     })
-    it('check jwt set', (done) => {
+    it('check jwt set', () => {
       testAction({
         action: store.actions.check,
         params: {state: {token: 'test', username: 'user'}},
@@ -118,9 +120,9 @@ describe('store/auth', () => {
           { type: 'fetchProfile' },
           { type: 'refreshToken' }
         ]
-      }, done)
+      })
     })
-    it('login success', (done) => {
+    it('login success', () => {
       moxios.stubRequest('token/', {
         status: 200,
         response: {
@@ -139,9 +141,9 @@ describe('store/auth', () => {
         expectedActions: [
           { type: 'fetchProfile' }
         ]
-      }, done)
+      })
     })
-    it('login error', (done) => {
+    it('login error', () => {
       moxios.stubRequest('token/', {
         status: 500,
         response: {
@@ -160,7 +162,7 @@ describe('store/auth', () => {
         done()
       })
     })
-    it('fetchProfile', (done) => {
+    it('fetchProfile', () => {
       const profile = {
         username: 'bob',
         permissions: {
@@ -183,9 +185,9 @@ describe('store/auth', () => {
           { type: 'favorites/fetch', payload: null, options: {root: true} },
           { type: 'playlists/fetchOwn', payload: null, options: {root: true} }
         ]
-      }, done)
+      })
     })
-    it('refreshToken', (done) => {
+    it('refreshToken', () => {
       moxios.stubRequest('token/refresh/', {
         status: 200,
         response: {token: 'newtoken'}
@@ -196,7 +198,7 @@ describe('store/auth', () => {
         expectedMutations: [
           { type: 'token', payload: 'newtoken' }
         ]
-      }, done)
+      })
     })
   })
 })

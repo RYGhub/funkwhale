@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 var sinon = require('sinon')
 import moxios from 'moxios'
 import store from '@/store/playlists'
@@ -8,7 +9,7 @@ describe('store/playlists', () => {
   var sandbox
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   })
   afterEach(function () {
@@ -24,13 +25,13 @@ describe('store/playlists', () => {
     })
   })
   describe('actions', () => {
-    it('fetchOwn does nothing with no user', (done) => {
+    it('fetchOwn does nothing with no user', () => {
       testAction({
         action: store.actions.fetchOwn,
         payload: null,
         params: {state: { playlists: [] }, rootState: {auth: {profile: {}}}},
         expectedMutations: []
-      }, done)
+      })
     })
   })
 })

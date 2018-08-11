@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 var sinon = require('sinon')
 import moxios from 'moxios'
 import store from '@/store/instance'
@@ -7,7 +8,7 @@ describe('store/instance', () => {
   var sandbox
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
+    sandbox = sinon.createSandbox()
     moxios.install()
   })
   afterEach(function () {
@@ -26,7 +27,7 @@ describe('store/instance', () => {
     })
   })
   describe('actions', () => {
-    it('fetchSettings', (done) => {
+    it('fetchSettings', () => {
       moxios.stubRequest('instance/settings/', {
         status: 200,
         response: [
@@ -64,7 +65,7 @@ describe('store/instance', () => {
             }
           }
         ]
-      }, done)
+      })
     })
   })
 })

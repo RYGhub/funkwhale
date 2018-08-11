@@ -1,3 +1,5 @@
+import {expect} from 'chai'
+
 import {truncate, markdown, ago, capitalize, year} from '@/filters'
 
 describe('filters', () => {
