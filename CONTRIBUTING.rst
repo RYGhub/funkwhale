@@ -43,7 +43,7 @@ Setup front-end only development environment
 4. Launch the development server::
 
     # this will serve the front-end on http://localhost:8000
-    WEBPACK_DEVSERVER_PORT=8000 yarn dev
+    VUE_PORT=8000 yarn serve
 
 5. Make the front-end talk with an existing server (like https://demo.funkwhale.audio),
    by clicking on the corresponding link in the footer
@@ -264,7 +264,7 @@ When working on federation with traefik, ensure you have this in your ``env``::
 
     # This will ensure we don't bind any port on the host, and thus enable
     # multiple instances of funkwhale to be spawned concurrently.
-    WEBPACK_DEVSERVER_PORT_BINDING=
+    VUE_PORT_BINDING=
     # This disable certificate verification
     EXTERNAL_REQUESTS_VERIFY_SSL=false
     # this ensure you don't have incorrect urls pointing to http resources

@@ -74,6 +74,7 @@ api/static
 api/.pytest_cache
 
 # Front
+oldfront/node_modules/
 front/static/translations
 front/node_modules/
 front/dist/
