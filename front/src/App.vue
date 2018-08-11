@@ -165,11 +165,7 @@ export default {
       messages: state => state.ui.messages
     }),
     suggestedInstances () {
-      let rootUrl = (
-        window.location.protocol + '//' + window.location.hostname +
-        (window.location.port ? ':' + window.location.port : '')
-      )
-      let instances = [rootUrl, 'https://demo.funkwhale.audio']
+      let instances = [this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio']
       return instances
     },
     version () {
