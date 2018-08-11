@@ -74,14 +74,15 @@ api/static
 api/.pytest_cache
 
 # Front
+oldfront/node_modules/
 front/static/translations
 front/node_modules/
 front/dist/
 front/npm-debug.log*
 front/yarn-debug.log*
 front/yarn-error.log*
-front/test/unit/coverage
-front/test/e2e/reports
+front/tests/unit/coverage
+front/tests/e2e/reports
 front/selenium-debug.log
 docs/_build
 
