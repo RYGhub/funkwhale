@@ -100,7 +100,7 @@ export default new Router({
       name: 'signup',
       component: Signup,
       props: (route) => ({
-        invitation: route.query.invitation
+        defaultInvitation: route.query.invitation
       })
     },
     {

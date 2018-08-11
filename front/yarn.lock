@@ -7522,9 +7522,9 @@ void-elements@^2.0.0, void-elements@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
 
-vue-gettext@^2.0.31:
-  version "2.0.31"
-  resolved "https://registry.yarnpkg.com/vue-gettext/-/vue-gettext-2.0.31.tgz#0f113bea6aed747e2a809ae4a0db83eaac0b07fc"
+vue-gettext@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/vue-gettext/-/vue-gettext-2.1.0.tgz#e4932037a8601412dd9f7d7d7a5d60c4bdb341d1"
 
 vue-hot-reload-api@^2.1.0:
   version "2.3.0"
