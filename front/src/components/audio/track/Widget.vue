@@ -10,9 +10,6 @@
     <i @click="fetchData(url)" :class="['ui', 'circular', 'medium', 'refresh', 'icon']">
     </i>
     <div class="ui divided unstackable items">
-      <div v-if="isLoading" class="ui inverted active dimmer">
-        <div class="ui loader"></div>
-      </div>
       <div class="item" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
           <img v-if="object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
@@ -44,6 +41,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="isLoading" class="ui inverted active dimmer">
+        <div class="ui loader"></div>
       </div>
     </div>
   </div>
@@ -125,5 +125,8 @@ export default {
 }
 .refresh.icon {
   float: right;
+}
+.ui.divided.items > .item:last-child {
+  padding-bottom: 1em !important;
 }
 </style>

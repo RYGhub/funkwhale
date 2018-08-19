@@ -54,7 +54,7 @@ export default {
     }
     &.with-background {
       .header {
-        &, .sub, a {
+        &, .sub {
           text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
           color: white !important;
         }

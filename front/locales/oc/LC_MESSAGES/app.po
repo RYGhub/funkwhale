@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-22 20:29+0000\n"
+"PO-Revision-Date: 2018-07-24 17:46+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -28,7 +28,7 @@ msgstr "(%{ index } sus %{ length })"
 
 #: front/src/components/Sidebar.vue:22
 msgid "(empty)"
-msgstr "(void)"
+msgstr "(voida)"
 
 #: front/src/components/common/ActionTable.vue:43
 #: front/src/components/common/ActionTable.vue:51
@@ -2364,7 +2364,7 @@ msgstr "Nom d’utilizaire o corrièl"
 
 #: front/src/components/instance/Stats.vue:13
 msgid "users"
-msgstr "utilizaire"
+msgstr "utilizaires"
 
 #: front/src/components/Sidebar.vue:103 src/views/admin/Settings.vue:81
 #: front/src/views/admin/users/Base.vue:5 src/views/admin/users/UsersList.vue:3

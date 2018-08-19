@@ -1,16 +1,15 @@
 <template>
   <div class="ui inverted segment player-wrapper" :style="style">
     <div class="player">
-      <keep-alive>
-        <audio-track
-          ref="currentAudio"
-          v-if="renderAudio && currentTrack"
-          :is-current="true"
-          :start-time="$store.state.player.currentTime"
-          :autoplay="$store.state.player.playing"
-          :track="currentTrack">
-        </audio-track>
-      </keep-alive>
+      <audio-track
+        ref="currentAudio"
+        v-if="currentTrack"
+        :is-current="true"
+        :start-time="$store.state.player.currentTime"
+        :autoplay="$store.state.player.playing"
+        :key="audioKey"
+        :track="currentTrack">
+      </audio-track>
       <div v-if="currentTrack" class="track-area ui unstackable items">
         <div class="ui inverted item">
           <div class="ui tiny image">
@@ -160,13 +159,13 @@
 import {mapState, mapGetters, mapActions} from 'vuex'
 import GlobalEvents from '@/components/utils/global-events'
 import ColorThief from '@/vendor/color-thief'
+import {Howl} from 'howler'
 
 import AudioTrack from '@/components/audio/Track'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 
 export default {
-  name: 'player',
   components: {
     TrackFavoriteIcon,
     TrackPlaylistIcon,
@@ -177,16 +176,28 @@ export default {
     let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
     return {
       isShuffling: false,
-      renderAudio: true,
       sliderVolume: this.volume,
       defaultAmbiantColors: defaultAmbiantColors,
       showVolume: false,
-      ambiantColors: defaultAmbiantColors
+      ambiantColors: defaultAmbiantColors,
+      audioKey: String(new Date()),
+      dummyAudio: null
     }
   },
   mounted () {
     // we trigger the watcher explicitely it does not work otherwise
     this.sliderVolume = this.volume
+    // this is needed to unlock audio playing under some browsers,
+    // cf https://github.com/goldfire/howler.js#mobilechrome-playback
+    // but we never actually load those audio files
+    this.dummyAudio = new Howl({
+      preload: false,
+      autoplay: false,
+      src: ['noop.webm', 'noop.mp3']
+    })
+  },
+  destroyed () {
+    this.dummyAudio.unload()
   },
   methods: {
     ...mapActions({
@@ -305,19 +316,11 @@ export default {
   },
   watch: {
     currentTrack (newValue) {
+      if (!this.isShuffling) {
+        this.audioKey = String(new Date())
+      }
       if (!newValue || !newValue.album.cover) {
         this.ambiantColors = this.defaultAmbiantColors
-      }
-    },
-    currentIndex (newValue, oldValue) {
-      if (newValue !== oldValue) {
-        // why this? to ensure the audio tag is deleted and fully
-        // rerendered, so we don't have any issues with cached position
-        // or whatever
-        this.renderAudio = false
-        this.$nextTick(() => {
-          this.renderAudio = true
-        })
       }
     },
     volume (newValue) {
@@ -385,9 +388,6 @@ export default {
 .volume-control {
   position: relative;
   width: 12.5% !important;
-  .icon {
-    // margin: 0;
-  }
   [type="range"] {
     max-width: 70%;
     position: absolute;
@@ -395,16 +395,11 @@ export default {
     left: 25%;
     cursor: pointer;
   }
-  input[type=range] {
-    -webkit-appearance: none;
-  }
   input[type=range]:focus {
     outline: none;
   }
   input[type=range]::-webkit-slider-runnable-track {
     cursor: pointer;
-    background: white;
-    opacity: 0.3;
   }
   input[type=range]::-webkit-slider-thumb {
     background: white;
@@ -412,10 +407,6 @@ export default {
     -webkit-appearance: none;
     border-radius: 3px;
     width: 10px;
-  }
-  input[type=range]:focus::-webkit-slider-runnable-track {
-    background: #white;
-    opacity: 0.3;
   }
   input[type=range]::-moz-range-track {
     cursor: pointer;
@@ -455,7 +446,7 @@ export default {
     background: white;
   }
   input[type=range]:focus::-ms-fill-upper {
-    background: #white;
+    background: white;
   }
 }
 

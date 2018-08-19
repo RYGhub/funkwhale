@@ -2,10 +2,18 @@ import axios from 'axios'
 import logger from '@/logging'
 import _ from 'lodash'
 
+function getDefaultUrl () {
+  return (
+    window.location.protocol + '//' + window.location.hostname +
+    (window.location.port ? ':' + window.location.port : '')
+  )
+}
+
 export default {
   namespaced: true,
   state: {
     maxEvents: 200,
+    frontSettings: {},
     instanceUrl: process.env.INSTANCE_URL,
     events: [],
     settings: {
@@ -53,6 +61,9 @@ export default {
     events: (state, value) => {
       state.events = value
     },
+    frontSettings: (state, value) => {
+      state.frontSettings = value
+    },
     instanceUrl: (state, value) => {
       if (value && !value.endsWith('/')) {
         value = value + '/'
@@ -67,6 +78,9 @@ export default {
     }
   },
   getters: {
+    defaultUrl: (state) => () => {
+      return getDefaultUrl()
+    },
     absoluteUrl: (state) => (relativeUrl) => {
       if (relativeUrl.startsWith('http')) {
         return relativeUrl
@@ -74,7 +88,9 @@ export default {
       if (state.instanceUrl.endsWith('/') && relativeUrl.startsWith('/')) {
         relativeUrl = relativeUrl.slice(1)
       }
-      return state.instanceUrl + relativeUrl
+
+      let instanceUrl = state.instanceUrl || getDefaultUrl()
+      return instanceUrl + relativeUrl
     }
   },
   actions: {
@@ -109,6 +125,13 @@ export default {
         }
       }, response => {
         logger.default.error('Error while fetching settings', response.data)
+      })
+    },
+    fetchFrontSettings ({commit}) {
+      return axios.get('/settings.json').then(response => {
+        commit('frontSettings', response.data)
+      }, response => {
+        logger.default.error('Error when fetching front-end configuration (or no customization available)')
       })
     }
   }

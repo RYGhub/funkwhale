@@ -344,9 +344,9 @@ CELERY_BROKER_URL = env(
 # Your common stuff: Below this line define 3rd party library settings
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
-CELERYBEAT_SCHEDULE = {
+CELERY_BEAT_SCHEDULE = {
     "federation.clean_music_cache": {
-        "task": "funkwhale_api.federation.tasks.clean_music_cache",
+        "task": "federation.clean_music_cache",
         "schedule": crontab(hour="*/2"),
         "options": {"expires": 60 * 2},
     }

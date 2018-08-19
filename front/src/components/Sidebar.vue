@@ -191,7 +191,8 @@ export default {
       backend: backend,
       tracksChangeBuffer: null,
       isCollapsed: true,
-      fetchInterval: null
+      fetchInterval: null,
+      showAdmin: this.getShowAdmin()
     }
   },
   mounted () {
@@ -220,16 +221,6 @@ export default {
         pendingFollows
       }
     },
-    showAdmin () {
-      let adminPermissions = [
-        this.$store.state.auth.availablePermissions['federation'],
-        this.$store.state.auth.availablePermissions['library'],
-        this.$store.state.auth.availablePermissions['upload']
-      ]
-      return adminPermissions.filter(e => {
-        return e
-      }).length > 0
-    },
     tracks: {
       get () {
         return this.$store.state.queue.tracks
@@ -250,6 +241,17 @@ export default {
     ...mapActions({
       cleanTrack: 'queue/cleanTrack'
     }),
+    getShowAdmin () {
+      let adminPermissions = [
+        this.$store.state.auth.availablePermissions['federation'],
+        this.$store.state.auth.availablePermissions['library'],
+        this.$store.state.auth.availablePermissions['upload']
+      ]
+      return adminPermissions.filter(e => {
+        return e
+      }).length > 0
+    },
+
     fetchNotificationsCount () {
       this.$store.dispatch('ui/fetchFederationNotificationsCount')
       this.$store.dispatch('ui/fetchImportRequestsCount')
@@ -289,6 +291,7 @@ export default {
     },
     '$store.state.auth.availablePermissions': {
       handler () {
+        this.showAdmin = this.getShowAdmin()
         this.fetchNotificationsCount()
       },
       deep: true

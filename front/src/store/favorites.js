@@ -56,13 +56,20 @@ export default {
     fetch ({dispatch, state, commit, rootState}, url) {
       // will fetch favorites by batches from API to have them locally
       let params = {
-        user: rootState.auth.profile.id
+        user: rootState.auth.profile.id,
+        page_size: 50,
+        ordering: '-creation_date'
       }
-      url = url || 'favorites/tracks/'
-      return axios.get(url, {params: params}).then((response) => {
+      let promise
+      if (url) {
+        promise = axios.get(url)
+      } else {
+        promise = axios.get('favorites/tracks/', {params: params})
+      }
+      return promise.then((response) => {
         logger.default.info('Fetched a batch of ' + response.data.results.length + ' favorites')
         response.data.results.forEach(result => {
-          commit('track', {id: result.track, value: true})
+          commit('track', {id: result.track.id, value: true})
         })
         if (response.data.next) {
           dispatch('fetch', response.data.next)

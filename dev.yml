@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   front:
@@ -8,22 +8,22 @@ services:
       - .env
     environment:
       - "HOST=0.0.0.0"
-      - "WEBPACK_DEVSERVER_PORT=${WEBPACK_DEVSERVER_PORT-8080}"
+      - "VUE_PORT=${VUE_PORT-8080}"
     ports:
-      - "${WEBPACK_DEVSERVER_PORT_BINDING-8080:}${WEBPACK_DEVSERVER_PORT-8080}"
+      - "${VUE_PORT_BINDING-8080:}${VUE_PORT-8080}"
     volumes:
-      - './front:/app'
-      - '/app/node_modules'
-      - './po:/po'
+      - "./front:/app"
+      - "/app/node_modules"
+      - "./po:/po"
     networks:
       - federation
       - internal
     labels:
       traefik.backend: "${COMPOSE_PROJECT_NAME-node1}"
       traefik.frontend.rule: "Host:${COMPOSE_PROJECT_NAME-node1}.funkwhale.test,${NODE_IP-127.0.0.1}"
-      traefik.enable: 'true'
-      traefik.federation.protocol: 'http'
-      traefik.federation.port: "${WEBPACK_DEVSERVER_PORT-8080}"
+      traefik.enable: "true"
+      traefik.federation.protocol: "http"
+      traefik.federation.port: "${VUE_PORT-8080}"
 
   postgres:
     env_file:
@@ -53,9 +53,9 @@ services:
       context: ./api
       dockerfile: docker/Dockerfile.test
     links:
-     - postgres
-     - redis
-    command: celery -A funkwhale_api.taskapp worker -l debug
+      - postgres
+      - redis
+    command: celery -A funkwhale_api.taskapp worker -l debug -B
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
@@ -98,7 +98,7 @@ services:
       - .env
     image: nginx
     environment:
-      - "WEBPACK_DEVSERVER_PORT=${WEBPACK_DEVSERVER_PORT-8080}"
+      - "VUE_PORT=${VUE_PORT-8080}"
       - "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME- }"
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
     links:
@@ -120,20 +120,20 @@ services:
     volumes:
       - ".:/app/"
     ports:
-      - '35730:35730'
-      - '8001:8001'
+      - "35730:35730"
+      - "8001:8001"
 
   api-docs:
     image: swaggerapi/swagger-ui
     environment:
       - "API_URL=/swagger.yml"
     ports:
-      - '8002:8080'
+      - "8002:8080"
     volumes:
       - "./docs/swagger.yml:/usr/share/nginx/html/swagger.yml"
 
 networks:
-  internal:
+  ? internal
   federation:
     external:
       name: federation

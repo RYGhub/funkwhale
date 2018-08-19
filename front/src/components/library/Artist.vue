@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
+  <div v-title="labels.title">
+    <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="artist">
@@ -102,7 +102,7 @@ export default {
         self.artist = response.data
         self.isLoading = false
         self.isLoadingAlbums = true
-        axios.get('albums/', {params: {artist: this.id, ordering: '-release_date'}}).then((response) => {
+        axios.get('albums/', {params: {artist: self.id, ordering: '-release_date'}}).then((response) => {
           let parsed = JSON.parse(JSON.stringify(response.data.results))
           self.albums = parsed.map((album) => {
             return backend.Album.clean(album)
@@ -158,7 +158,7 @@ export default {
       })[0]
     },
     headerStyle () {
-      if (!this.cover.original) {
+      if (!this.cover || !this.cover.original) {
         return ''
       }
       return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover.original) + ')'

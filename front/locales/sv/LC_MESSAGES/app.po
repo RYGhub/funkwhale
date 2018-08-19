@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-07-21 21:30+0000\n"
+"PO-Revision-Date: 2018-07-23 16:49+0000\n"
 "Last-Translator: Tim Stahel <gitlab@swedneck.xyz>\n"
 "Language-Team: none\n"
 "Language: sv\n"
@@ -459,11 +459,11 @@ msgstr ""
 
 #: front/src/components/auth/Settings.vue:98
 msgid "Changing your password will have the following consequences"
-msgstr ""
+msgstr "Ändring av lösenord har följande konsekvenser"
 
 #: front/src/App.vue:4
 msgid "Choose your instance"
-msgstr ""
+msgstr "Välj din instans"
 
 #: front/src/components/Home.vue:64
 msgid "Clean library"

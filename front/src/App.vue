@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <!-- here, we display custom stylesheets, if any -->
+    <link v-for="url in customStylesheets" rel="stylesheet" property="stylesheet" :href="url" :key="url">
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
         <h1 class="ui header"><translate>Choose your instance</translate></h1>
@@ -163,11 +165,7 @@ export default {
       messages: state => state.ui.messages
     }),
     suggestedInstances () {
-      let rootUrl = (
-        window.location.protocol + '//' + window.location.hostname +
-        (window.location.port ? ':' + window.location.port : '')
-      )
-      let instances = [rootUrl, 'https://demo.funkwhale.audio']
+      let instances = [this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio']
       return instances
     },
     version () {
@@ -175,6 +173,11 @@ export default {
         return null
       }
       return _.get(this.nodeinfo, 'software.version')
+    },
+    customStylesheets () {
+      if (this.$store.state.instance.frontSettings) {
+        return this.$store.state.instance.frontSettings.additionalStylesheets || []
+      }
     }
   },
   watch: {
@@ -243,7 +246,7 @@ html, body {
     left: 350px;
     right: 0px;
     top: 0px;
-    z-index: 1;
+    z-index: 2000;
   }
   background-color: white;
   .item {

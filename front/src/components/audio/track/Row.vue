@@ -15,7 +15,7 @@
         {{ track.title }}
       </router-link>
     </td>
-    <td colspan="6">
+    <td colspan="4">
       <router-link v-if="track.artist.id === albumArtist.id" class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
         {{ track.artist.name }}
       </router-link>
@@ -29,10 +29,16 @@
         </router-link>
       </template>
     </td>
-    <td colspan="6">
+    <td colspan="4">
       <router-link class="album discrete link" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
         {{ track.album.title }}
       </router-link>
+    </td>
+    <td colspan="4" v-if="file && file.duration">
+      {{ time.parse(file.duration) }}
+    </td>
+    <td colspan="4" v-else>
+      <translate>N/A</translate>
     </td>
     <td>
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
@@ -44,6 +50,8 @@
 </template>
 
 <script>
+
+import time from '@/utils/time'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
 import PlayButton from '@/components/audio/PlayButton'
@@ -59,6 +67,11 @@ export default {
     TrackPlaylistIcon,
     PlayButton
   },
+  data () {
+    return {
+      time
+    }
+  },
   computed: {
     albumArtist () {
       if (this.artist) {
@@ -66,6 +79,9 @@ export default {
       } else {
         return this.track.album.artist
       }
+    },
+    file () {
+      return this.track.files[0]
     }
   }
 }

@@ -32,3 +32,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+.ui.menu .item > .label {
+  position: absolute;
+  right: -2em;
+}
+
+</style>

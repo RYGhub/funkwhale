@@ -12,6 +12,7 @@ from funkwhale_api.federation import (
     views,
     webfinger,
 )
+from funkwhale_api.music import tasks as music_tasks
 
 
 @pytest.mark.parametrize(
@@ -398,7 +399,7 @@ def test_library_track_action_import(factories, superuser_api_client, mocker):
     lt2 = factories["federation.LibraryTrack"](library=lt1.library)
     lt3 = factories["federation.LibraryTrack"]()
     factories["federation.LibraryTrack"](library=lt3.library)
-    mocked_run = mocker.patch("funkwhale_api.music.tasks.import_batch_run.delay")
+    mocked_run = mocker.patch("funkwhale_api.common.utils.on_commit")
 
     payload = {
         "objects": "all",
@@ -416,7 +417,9 @@ def test_library_track_action_import(factories, superuser_api_client, mocker):
     assert batch.jobs.count() == 2
     for i, job in enumerate(batch.jobs.all()):
         assert job.library_track == imported_lts[i]
-    mocked_run.assert_called_once_with(import_batch_id=batch.pk)
+    mocked_run.assert_called_once_with(
+        music_tasks.import_batch_run.delay, import_batch_id=batch.pk
+    )
 
 
 def test_local_actor_detail(factories, api_client):

@@ -10,7 +10,82 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
-0.16 (unreleased)
+0.16.1 (2018-08-19)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Features:
+
+- Make funkwhale themable by loading external stylesheets (#456)
+
+Enhancements:
+
+- Add link to admin on "Staff member" button (#202)
+- Can now add a description to radios and better radio cards (#331)
+- Display track duration in track tables (#461)
+- More permissive default permissions for front-end files (#388)
+- Simpler configuration and toolchain for the front-end using vue-cli (!375)
+- Use Howler to manage audio instead of our own dirty/untested code (#392)
+
+
+Bugfixes:
+
+- Fix alignment issue on top bar in Admin tabs (#395)
+- Fix Apache2 permission issue preventing `/media` folder from being served
+  correctly (#389)
+- Fix loading on browse page lists causing them to go down, and dimming over
+  the top bar (#468)
+- Fixed (again): administration section not showing up in sidebar after login
+  (#245)
+- Fixed audio mimetype not showing up on track detail and list (#459)
+- Fixed broken audio playback on Chrome and invisible volume control (#390)
+- Fixed broken federation import on big imports due to missing transaction
+  logic (#397)
+- Fixed crash on artist pages when no cover is available (#457)
+- Fixed favorited status of tracks not appearing in interface (#398)
+- Fixed invitation code not prefilled in form when accessing invitation link
+  (#476)
+- Fixed typos in scheduled tasks configuration (#487)
+- Removed release date error in case of empty date (#478)
+- Removed white on white artist button on hover, on Album page (#393)
+- Smarter date parsing during import by replacing arrow with pendulum (#376)
+- Display public playlists properly for anonymous users (#488)
+
+
+i18n:
+
+- Added portuguese, spanish and german translations
+
+
+Custom themes for Funkwhale
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you ever wanted to give a custom look and feel to your instance, this is now possible.
+
+Check https://docs.funkwhale.audio/configuration.html#theming if you want to know more!
+
+
+Fix Apache2 configuration file for media block [Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The permission scope on the current Apache2 configuration file is too narrow, preventing thumbnails from being served.
+
+On Apache2 setups, you have to replace the following line::
+
+    <Directory /srv/funkwhale/data/media/albums>
+
+with::
+
+    <Directory /srv/funkwhale/data/media>
+
+You can now restart your server::
+
+    sudo systemctl restart apache2
+
+
+0.16 (2018-07-22)
 -----------------
 
 Upgrade instructions are available at
@@ -232,7 +307,7 @@ In the end, the ``volumes`` directives of your containers should look like that:
 
 
 Removed Cacheops dependency
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We removed one of our dependency named django-cacheops. It was unly used in a few places,
 and not playing nice with other dependencies.

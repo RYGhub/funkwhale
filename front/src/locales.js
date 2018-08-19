@@ -13,6 +13,14 @@ export default {
       "label": "Esperanto"
     },
     {
+      "code": "de",
+      "label": "Deutsch"
+    },
+    {
+      "code": "es",
+      "label": "Español"
+    },
+    {
       "code": "fr_FR",
       "label": "Français"
     },
@@ -27,6 +35,10 @@ export default {
     {
       "code": "pl",
       "label": "Polszczyzna"
+    },
+    {
+      "code": "pt_PT",
+      "label": "Português (Portugal)"
     }
   ]
 }
