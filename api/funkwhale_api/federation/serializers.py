@@ -796,6 +796,8 @@ class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
             jobs.append(job)
 
         music_models.ImportJob.objects.bulk_create(jobs)
-        music_tasks.import_batch_run.delay(import_batch_id=batch.pk)
+        funkwhale_utils.on_commit(
+            music_tasks.import_batch_run.delay, import_batch_id=batch.pk
+        )
 
         return {"batch": {"id": batch.pk}}
