@@ -55,7 +55,7 @@ services:
     links:
       - postgres
       - redis
-    command: celery -A funkwhale_api.taskapp worker -l debug
+    command: celery -A funkwhale_api.taskapp worker -l debug -B
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"

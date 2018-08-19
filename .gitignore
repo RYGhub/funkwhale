@@ -72,7 +72,7 @@ api/media
 api/staticfiles
 api/static
 api/.pytest_cache
-
+api/celerybeat-*
 # Front
 oldfront/node_modules/
 front/static/translations
