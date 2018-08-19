@@ -144,7 +144,7 @@ class AlbumQuerySet(models.QuerySet):
 class Album(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
-    release_date = models.DateField(null=True)
+    release_date = models.DateField(null=True, blank=True)
     release_group_id = models.UUIDField(null=True, blank=True)
     cover = VersatileImageField(
         upload_to="albums/covers/%Y/%m/%d", null=True, blank=True
