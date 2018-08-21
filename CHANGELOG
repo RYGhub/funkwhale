@@ -10,8 +10,24 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.16.3 (2018-08-21)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Bugfixes:
+
+- Fixed front-end not contacting the proper path on the API (!385)
+
+
 0.16.2 (2018-08-21)
 -------------------
+
+.. warning::
+
+  **This release is broken, do not use it. Upgrade to 0.16.3 or higher instead.**
+
 
 Upgrade instructions are available at
 https://docs.funkwhale.audio/upgrading.html
