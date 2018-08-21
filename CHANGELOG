@@ -10,6 +10,20 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.16.2 (2018-08-21)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/upgrading.html
+
+Bugfixes:
+
+- Ensure we always have a default api url set on first load to avoid displaying
+  the instance picker (#490)
+- Fixed CLI importer syntax error because of async reserved keyword usage
+  (#494)
+
+
 0.16.1 (2018-08-19)
 -------------------
 
