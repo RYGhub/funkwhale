@@ -127,6 +127,9 @@ export default {
     if (!this.$store.state.instance.instanceUrl) {
       let defaultInstanceUrl = process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
       this.$store.commit('instance/instanceUrl', defaultInstanceUrl)
+    } else {
+      // needed to trigger initialization of axios
+      this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
     }
     this.$store.dispatch('auth/check')
     this.$store.dispatch('instance/fetchSettings')
