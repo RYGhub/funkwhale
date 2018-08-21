@@ -14,7 +14,7 @@ export default {
   state: {
     maxEvents: 200,
     frontSettings: {},
-    instanceUrl: process.env.INSTANCE_URL,
+    instanceUrl: process.env.VUE_APP_INSTANCE_URL,
     events: [],
     settings: {
       instance: {
