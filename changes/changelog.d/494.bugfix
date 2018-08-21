@@ -1,0 +1,1 @@
+Fixed CLI importer syntax error because of async reserved keyword usage (#494)

@@ -216,8 +216,8 @@ class Command(BaseCommand):
             message = "{i}/{total} Launching import for {path}..."
 
         # we create an import batch binded to the user
-        async = options["async"]
-        import_handler = tasks.import_job_run.delay if async else tasks.import_job_run
+        async_ = options["async"]
+        import_handler = tasks.import_job_run.delay if async_ else tasks.import_job_run
         batch = user.imports.create(source="shell")
         errors = []
         for i, path in list(enumerate(paths)):
