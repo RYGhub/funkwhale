@@ -124,12 +124,13 @@ export default {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
-    if (this.$store.state.instance.instanceUrl) {
-      this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
-      this.$store.dispatch('auth/check')
-      this.$store.dispatch('instance/fetchSettings')
-      this.fetchNodeInfo()
+    if (!this.$store.state.instance.instanceUrl) {
+      let defaultInstanceUrl = process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
+      this.$store.commit('instance/instanceUrl', defaultInstanceUrl)
     }
+    this.$store.dispatch('auth/check')
+    this.$store.dispatch('instance/fetchSettings')
+    this.fetchNodeInfo()
   },
   methods: {
     fetchNodeInfo () {
