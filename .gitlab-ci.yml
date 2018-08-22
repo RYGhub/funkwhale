@@ -148,6 +148,8 @@ test_api:
     - branches
   before_script:
     - cd api
+    - apt-get update
+    - grep "^[^#;]" requirements.apt | grep -Fv "python3-dev" | xargs apt-get install -y --no-install-recommends
     - pip install -r requirements/base.txt
     - pip install -r requirements/local.txt
     - pip install -r requirements/test.txt

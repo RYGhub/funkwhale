@@ -424,7 +424,10 @@ def test_library_track_action_import(factories, superuser_api_client, mocker):
 
 def test_local_actor_detail(factories, api_client):
     user = factories["users.User"](with_actor=True)
-    url = reverse("federation:actors-detail", kwargs={"user__username": user.username})
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": user.actor.preferred_username},
+    )
     serializer = serializers.ActorSerializer(user.actor)
     response = api_client.get(url)
 
