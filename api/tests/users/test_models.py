@@ -133,23 +133,35 @@ def test_can_filter_closed_invitations(factories):
 
 
 def test_creating_actor_from_user(factories, settings):
-    user = factories["users.User"]()
+    user = factories["users.User"](username="Hello M. world")
     actor = models.create_actor(user)
 
-    assert actor.preferred_username == user.username
+    assert actor.preferred_username == "Hello_M_world"  # slugified
     assert actor.domain == settings.FEDERATION_HOSTNAME
     assert actor.type == "Person"
     assert actor.name == user.username
     assert actor.manually_approves_followers is False
     assert actor.url == federation_utils.full_url(
-        reverse("federation:actors-detail", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-detail",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
     assert actor.shared_inbox_url == federation_utils.full_url(
-        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-inbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
     assert actor.inbox_url == federation_utils.full_url(
-        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-inbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
     assert actor.outbox_url == federation_utils.full_url(
-        reverse("federation:actors-outbox", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-outbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )

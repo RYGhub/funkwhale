@@ -1,3 +1,5 @@
+import unicodedata
+import re
 from django.conf import settings
 
 
@@ -32,3 +34,21 @@ def clean_wsgi_headers(raw_headers):
         cleaned[cleaned_header] = value
 
     return cleaned
+
+
+def slugify_username(username):
+    """
+    Given a username such as "hello M. world", returns a username
+    suitable for federation purpose (hello_M_world).
+
+    Preserves the original case.
+
+    Code is borrowed from django's slugify function.
+    """
+
+    value = str(username)
+    value = (
+        unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    )
+    value = re.sub(r"[^\w\s-]", "", value).strip()
+    return re.sub(r"[-\s]+", "_", value)

@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from django_auth_ldap.backend import populate_user as ldap_populate_user
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
@@ -220,31 +221,37 @@ class Invitation(models.Model):
 
 
 def create_actor(user):
-    username = user.username
+    username = federation_utils.slugify_username(user.username)
     private, public = keys.get_key_pair()
     args = {
         "preferred_username": username,
         "domain": settings.FEDERATION_HOSTNAME,
         "type": "Person",
-        "name": username,
+        "name": user.username,
         "manually_approves_followers": False,
         "url": federation_utils.full_url(
-            reverse("federation:actors-detail", kwargs={"user__username": username})
+            reverse("federation:actors-detail", kwargs={"preferred_username": username})
         ),
         "shared_inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"user__username": username})
+            reverse("federation:actors-inbox", kwargs={"preferred_username": username})
         ),
         "inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"user__username": username})
+            reverse("federation:actors-inbox", kwargs={"preferred_username": username})
         ),
         "outbox_url": federation_utils.full_url(
-            reverse("federation:actors-outbox", kwargs={"user__username": username})
+            reverse("federation:actors-outbox", kwargs={"preferred_username": username})
         ),
     }
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
 
     return federation_models.Actor.objects.create(**args)
+
+
+@receiver(ldap_populate_user)
+def init_ldap_user(sender, user, ldap_user, **kwargs):
+    if not user.actor:
+        user.actor = create_actor(user)
 
 
 @receiver(models.signals.post_save, sender=User)
