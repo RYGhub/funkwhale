@@ -33,7 +33,7 @@ class FederationMixin(object):
 
 
 class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    lookup_field = "user__username"
+    lookup_field = "preferred_username"
     lookup_value_regex = ".*"
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
@@ -136,7 +136,7 @@ class WellKnownViewSet(viewsets.GenericViewSet):
             actor = actors.SYSTEM_ACTORS[username].get_actor_instance()
         else:
             try:
-                actor = models.Actor.objects.local().get(user__username=username)
+                actor = models.Actor.objects.local().get(preferred_username=username)
             except models.Actor.DoesNotExist:
                 raise forms.ValidationError("Invalid username")
 

@@ -65,3 +65,7 @@ cryptography>=2,<3
 # clone until the branch is merged and released upstream
 git+https://github.com/EliotBerriot/requests-http-signature.git@signature-header-support
 django-cleanup==2.1.0
+
+# for LDAP authentication
+python-ldap==3.1.0
+django-auth-ldap==1.7.0
