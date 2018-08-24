@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# PROVIDE: funkwhale_beat
+# REQUIRE: LOGIN postgresql nginx redis
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf to enable funkwhale_beat:
+# funkwhale_beat (bool):        Set it to "YES" to enable Funkwhale task beat.
+#                               Default is "NO".
+
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+
+. /etc/rc.subr
+
+desc="Funkwhale beat"
+name=funkwhale_beat
+rcvar=funkwhale_beat_enable
+
+load_rc_config $name
+
+: ${funkwhale_beat_enable:=NO}
+
+funkwhale_beat_chdir="/usr/local/www/funkwhale/api"
+funkwhale_beat_user=funkwhale
+funkwhale_beat_env=$(cat /usr/local/www/funkwhale/config/.env | grep -v ^# | xargs)
+pidfile="/var/run/funkwhale/${name##funkwhale_}.pid"
+command_interpreter="/usr/local/www/funkwhale/virtualenv/bin/python3"
+
+command="/usr/local/www/funkwhale/virtualenv/bin/celery"
+command_args="-A funkwhale_api.taskapp beat -l INFO \
+--pidfile=${pidfile} \
+>> /var/log/funkwhale/${name##funkwhale_}.log 2>&1 &"
+
+run_rc_command "$1"
