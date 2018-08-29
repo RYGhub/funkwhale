@@ -114,6 +114,22 @@ VALIDATION = {
 }
 
 CONF = {
+    "OggOpus": {
+        "getter": lambda f, k: f[k][0],
+        "fields": {
+            "track_number": {
+                "field": "TRACKNUMBER",
+                "to_application": convert_track_number,
+            },
+            "title": {},
+            "artist": {},
+            "album": {},
+            "date": {"field": "date", "to_application": get_date},
+            "musicbrainz_albumid": {},
+            "musicbrainz_artistid": {},
+            "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
+        },
+    },
     "OggVorbis": {
         "getter": lambda f, k: f[k][0],
         "fields": {
