@@ -103,6 +103,17 @@ def test_get_artist(f, db, logged_in_api_client, factories):
 
 
 @pytest.mark.parametrize("f", ["xml", "json"])
+def test_get_invalid_artist(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get-artist")
+    assert url.endswith("getArtist") is True
+    expected = {"error": {"code": 0, "message": 'For input string "asdf"'}}
+    response = logged_in_api_client.get(url, {"id": "asdf"})
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+@pytest.mark.parametrize("f", ["xml", "json"])
 def test_get_artist_info2(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-artist-info2")
     assert url.endswith("getArtistInfo2") is True

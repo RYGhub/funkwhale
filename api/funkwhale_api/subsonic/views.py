@@ -38,7 +38,7 @@ def find_object(queryset, model_field="pk", field="id", cast=int):
                 )
             try:
                 value = cast(raw_value)
-            except (TypeError, ValidationError):
+            except (ValueError, TypeError, ValidationError):
                 return response.Response(
                     {
                         "error": {
