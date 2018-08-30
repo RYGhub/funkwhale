@@ -130,6 +130,14 @@ class GetAlbumSerializer(serializers.Serializer):
         return payload
 
 
+class GetSongSerializer(serializers.Serializer):
+    def to_representation(self, track):
+        tf = track.files.all()
+        if not len(tf):
+            return {}
+        return get_track_data(track.album, track, tf[0])
+
+
 def get_starred_tracks_data(favorites):
     by_track_id = {f.track_id: f for f in favorites}
     tracks = (

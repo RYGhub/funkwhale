@@ -147,6 +147,15 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
+    @list_route(methods=["get", "post"], url_name="get_song", url_path="getSong")
+    @find_object(music_models.Track.objects.all())
+    def get_song(self, request, *args, **kwargs):
+        track = kwargs.pop("obj")
+        data = serializers.GetSongSerializer(track).data
+        payload = {"song": data}
+
+        return response.Response(payload, status=200)
+
     @list_route(
         methods=["get", "post"], url_name="get_artist_info2", url_path="getArtistInfo2"
     )

@@ -141,6 +141,20 @@ def test_get_album(f, db, logged_in_api_client, factories):
 
 
 @pytest.mark.parametrize("f", ["xml", "json"])
+def test_get_song(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get-song")
+    assert url.endswith("getSong") is True
+    artist = factories["music.Artist"]()
+    album = factories["music.Album"](artist=artist)
+    track = factories["music.Track"](album=album)
+    tf = factories["music.TrackFile"](track=track)
+    response = logged_in_api_client.get(url, {"f": f, "id": track.pk})
+
+    assert response.status_code == 200
+    assert response.data == {"song": serializers.get_track_data(track.album, track, tf)}
+
+
+@pytest.mark.parametrize("f", ["xml", "json"])
 def test_stream(f, db, logged_in_api_client, factories, mocker):
     url = reverse("api:subsonic-stream")
     mocked_serve = mocker.spy(music_views, "handle_serve")
