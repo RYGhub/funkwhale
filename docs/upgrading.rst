@@ -30,6 +30,11 @@ easy:
     # hardcode the targeted version your env file
     # (look for the FUNKWHALE_VERSION variable)
     nano .env
+    # Load your environment variables
+    source .env
+    # Download newest nginx configuration file
+    curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
     # Pull the new version containers
     docker-compose pull
     # Apply the database migrations
