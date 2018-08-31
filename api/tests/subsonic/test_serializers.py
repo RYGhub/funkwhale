@@ -6,6 +6,7 @@ def test_get_artists_serializer(factories):
     artist1 = factories["music.Artist"](name="eliot")
     artist2 = factories["music.Artist"](name="Ellena")
     artist3 = factories["music.Artist"](name="Rilay")
+    artist4 = factories["music.Artist"](name="")  # Shouldn't be serialised
 
     factories["music.Album"].create_batch(size=3, artist=artist1)
     factories["music.Album"].create_batch(size=2, artist=artist2)
@@ -28,7 +29,7 @@ def test_get_artists_serializer(factories):
     }
 
     queryset = artist1.__class__.objects.filter(
-        pk__in=[artist1.pk, artist2.pk, artist3.pk]
+        pk__in=[artist1.pk, artist2.pk, artist3.pk, artist4.pk]
     )
 
     assert serializers.GetArtistsSerializer(queryset).data == expected

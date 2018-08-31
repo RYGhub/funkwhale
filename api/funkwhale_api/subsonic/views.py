@@ -38,7 +38,7 @@ def find_object(queryset, model_field="pk", field="id", cast=int):
                 )
             try:
                 value = cast(raw_value)
-            except (TypeError, ValidationError):
+            except (ValueError, TypeError, ValidationError):
                 return response.Response(
                     {
                         "error": {
@@ -144,6 +144,15 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         artist = kwargs.pop("obj")
         data = serializers.GetArtistSerializer(artist).data
         payload = {"artist": data}
+
+        return response.Response(payload, status=200)
+
+    @list_route(methods=["get", "post"], url_name="get_song", url_path="getSong")
+    @find_object(music_models.Track.objects.all())
+    def get_song(self, request, *args, **kwargs):
+        track = kwargs.pop("obj")
+        data = serializers.GetSongSerializer(track).data
+        payload = {"song": data}
 
         return response.Response(payload, status=200)
 

@@ -24,7 +24,8 @@ class GetArtistsSerializer(serializers.Serializer):
 
         first_letter_mapping = collections.defaultdict(list)
         for artist in values:
-            first_letter_mapping[artist["name"][0].upper()].append(artist)
+            if artist["name"]:
+                first_letter_mapping[artist["name"][0].upper()].append(artist)
 
         for letter, artists in sorted(first_letter_mapping.items()):
             letter_data = {
@@ -127,6 +128,14 @@ class GetAlbumSerializer(serializers.Serializer):
 
         payload["song"] = get_song_list_data(tracks)
         return payload
+
+
+class GetSongSerializer(serializers.Serializer):
+    def to_representation(self, track):
+        tf = track.files.all()
+        if not len(tf):
+            return {}
+        return get_track_data(track.album, track, tf[0])
 
 
 def get_starred_tracks_data(favorites):
