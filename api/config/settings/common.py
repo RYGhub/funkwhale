@@ -487,6 +487,11 @@ PROTECT_FILES_PATH = env("PROTECT_FILES_PATH", default="/_protected")
 # musicbrainz results. (value is in seconds)
 MUSICBRAINZ_CACHE_DURATION = env.int("MUSICBRAINZ_CACHE_DURATION", default=300)
 
+# Use this setting to change the musicbrainz hostname, for instance to
+# use a mirror. The hostname can also contain a port number (so, e.g.,
+# "localhost:5000" is a valid name to set).
+MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
+
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
 CSRF_USE_SESSIONS = True
