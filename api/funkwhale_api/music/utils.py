@@ -54,7 +54,7 @@ def get_audio_file_data(f):
     if not data:
         return
     d = {}
-    d["bitrate"] = data.info.bitrate
+    d["bitrate"] = getattr(data.info, "bitrate", 0)
     d["length"] = data.info.length
 
     return d
