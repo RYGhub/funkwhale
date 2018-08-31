@@ -1,0 +1,128 @@
+Simplified and less error-prone nginx setup (#358)
+
+
+Simplified nginx setup [Docker: Manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We've received a lot of user feedback regarding our installation process,
+and it seems the proxy part is the one which is the most confusing and difficult.
+Unfortunately, this is also the one where errors and mistakes can completely break
+the application.
+
+To make things easier for everyone, we now offer a simplified deployment
+process for the reverse proxy part. This will make upgrade of the proxy configuration
+significantly easier on docker deployments.
+
+On non-docker instances, you have nothing to do.
+
+If you have a dockerized instance, here is the upgrade path.
+
+First, tweak your .env file::
+
+    # remove the FUNKWHALE_URL variable
+    # and add the next variables
+    FUNKWHALE_HOSTNAME=yourdomain.funkwhale
+    FUNKWHALE_PROTOCOL=https
+
+    # add the following variable, matching the path your app is deployed
+    # leaving the default should work fine if you deployed using the same
+    # paths as the documentation
+    FUNKWHALE_FRONTEND_PATH=/srv/funkwhale/front/dist
+
+Then, add the following block at the end of your docker-compose.yml file::
+
+    # existing services
+    api:
+        ...
+    celeryworker:
+        ...
+
+    # new service
+    nginx:
+      image: nginx
+      env_file:
+        - .env
+      environment:
+        # Override those variables in your .env file if needed
+        - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-30M}"
+      volumes:
+        - "./nginx/funkwhale.template:/etc/nginx/conf.d/funkwhale.template:ro"
+        - "./nginx/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro"
+        - "${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:${MUSIC_DIRECTORY_SERVE_PATH-/srv/funkwhale/data/music}:ro"
+        - "${MEDIA_ROOT}:${MEDIA_ROOT}:ro"
+        - "${STATIC_ROOT}:${STATIC_ROOT}:ro"
+        - "${FUNKWHALE_FRONTEND_PATH}:/frontend:ro"
+      ports:
+        # override those variables in your .env file if needed
+        - "${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}:80"
+      command: >
+          sh -c "envsubst \"`env | awk -F = '{printf \" $$%s\", $$1}'`\"
+          < /etc/nginx/conf.d/funkwhale.template
+          > /etc/nginx/conf.d/default.conf
+          && cat /etc/nginx/conf.d/default.conf
+          && nginx -g 'daemon off;'"
+      links:
+        - api
+
+By doing that, you'll enable a dockerized nginx that will automatically be
+configured to serve your Funkwhale instance.
+
+Download the required configuration files for the nginx container:
+
+.. parsed-literal::
+
+    cd /srv/funkwhale
+    mkdir nginx
+    curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+
+Update the funkwhale.conf configuration of your server's reverse-proxy::
+
+    # the file should match something like that, upgrade all variables
+    # between ${} to match the ones in your .env file,
+    # and your SSL configuration if you're not using let's encrypt
+    # The important thing is that you only have a single location block
+    # that proxies everything to your dockerized nginx.
+
+    sudo nano /etc/nginx/sites-enabled/funkwhale.conf
+    upstream fw {
+        # depending on your setup, you may want to udpate this
+        server ${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT};
+    }
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
+    server {
+        listen 80;
+        listen [::]:80;
+        server_name ${FUNKWHALE_HOSTNAME};
+        location / { return 301 https://$host$request_uri; }
+    }
+    server {
+        listen      443 ssl;
+        listen [::]:443 ssl;
+        server_name ${FUNKWHALE_HOSTNAME};
+
+        # TLS
+        ssl_protocols TLSv1.2;
+        ssl_ciphers HIGH:!MEDIUM:!LOW:!aNULL:!NULL:!SHA;
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+        ssl_certificate     /etc/letsencrypt/live/${FUNKWHALE_HOSTNAME}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/${FUNKWHALE_HOSTNAME}/privkey.pem;
+
+        # HSTS
+        add_header Strict-Transport-Security "max-age=31536000";
+
+        location / {
+            include /etc/nginx/funkwhale_proxy.conf;
+            proxy_pass   http://fw/;
+        }
+    }
+
+Check that your configuration is valid then reload:
+
+    sudo nginx -t
+    sudo systemctl reload nginx

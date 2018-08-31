@@ -12,6 +12,9 @@ mkdir -p $demo_path
 echo 'Downloading demo files...'
 curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker-compose.yml"
 curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/env.prod.sample"
+mkdir nginx
+curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker.nginx.template"
+curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/funkwhale_proxy.conf"
 
 mkdir data/
 curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$version/download?job=build_front"
@@ -23,6 +26,7 @@ echo "MUSIC_DIRECTORY_SERVE_PATH=$music_path" >> .env
 echo "MUSIC_DIRECTORY_PATH=$music_path" >> .env
 echo "MEDIA_ROOT=$demo_path/data/media/" >> .env
 echo "STATIC_ROOT=$demo_path/data/static/" >> .env
+echo "FUNKWHALE_FRONTEND_PATH=$demo_path/front/dist/" >> .env
 
 # /usr/local/bin/docker-compose pull
 /usr/local/bin/docker-compose up -d postgres redis

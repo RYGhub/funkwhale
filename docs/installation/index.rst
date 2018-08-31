@@ -114,16 +114,57 @@ On Arch Linux and its derivatives:
 
     sudo pacman -S nginx
 
-Then, download our sample virtualhost file and proxy conf:
+To avoid configuration errors at this level, we will generate an nginx configuration
+using your .env file. This will ensure your reverse-proxy configuration always
+match the application configuration and make upgrade/maintenance easier.
+
+On docker deployments, run the following commands::
 
 .. parsed-literal::
 
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+    # download the needed files
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
+
+    # create a final nginx configuration using the template based on your environment
+    set -a && source /srv/funkwhale/.env && set +a
+    envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
+        < /etc/nginx/sites-available/funkwhale.template \
+        > /etc/nginx/sites-available/funkwhale.conf
+
+On non-docker deployments, run the following commands::
+
+.. parsed-literal::
+
+    # download the needed files
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
+
+    # create a final nginx configuration using the template based on your environment
+    set -a && source /srv/funkwhale/config/.env && set +a
+    envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
+        < /etc/nginx/sites-available/funkwhale.template \
+        > /etc/nginx/sites-available/funkwhale.conf
+
+.. note::
+
+    The resulting file should not contain any variable such as ``${FUNKWHALE_HOSTNAME}``.
+    You can check that using this command::
+
+        grep '${' /etc/nginx/sites-available/funkwhale.conf
+
+.. note::
+
+    You can freely adapt the resulting file to your own needs, as we cannot
+    cover every use case with a single template, especially when it's related
+    to SSL configuration.
+
+Finally, enable the resulting configuration:
+
+.. code-block:: bash
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
-Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``.
-If everything is fine, you can restart your nginx server with ``service nginx restart``.
+Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``systemctl restart nginx``.
 
 .. warning::
 
