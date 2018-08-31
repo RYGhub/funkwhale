@@ -285,6 +285,62 @@ Typical workflow for a contribution
 8. Create your merge request
 9. Take a step back and enjoy, we're really grateful you did all of this and took the time to contribute!
 
+Changelog management
+--------------------
+
+To ensure we have extensive and well-structured changelog, any significant
+work such as closing an issue must include a changelog fragment. Small changes
+may include a changelog fragment as well but this is not mandatory. If you're not
+sure about what to do, do not panic, open your merge request normally and we'll
+figure everything during the review ;)
+
+Changelog fragments are text files that can contain one or multiple lines
+that describe the changes occuring in a bunch of commits. Those files reside
+in ``changes/changelog.d``.
+
+Content
+^^^^^^^
+
+A typical fragment looks like that:
+
+    Fixed broken audio player on Chrome 42 for ogg files (#567)
+
+If the work fixes one or more issues, the issue number should be included at the
+end of the fragment (``(#567)`` is the issue number in the previous example.
+
+If your work is not related to a specific issue, use the merge request
+identifier instead, like this:
+
+    Fixed a typo in landing page copy (!342)
+
+Naming
+^^^^^^
+
+Fragment files should respect the following naming pattern: ``changes/changelog.d/<name>.<category>``.
+Name can be anything describing your work, or simply the identifier of the issue number you are fixing.
+Category can be one of:
+
+- ``feature``: for new features
+- ``enhancement``: for enhancements on existing features
+- ``bugfix``: for bugfixes
+- ``doc``: for documentation
+- ``i18n``: for internationalization-related work
+- ``misc``: for anything else
+
+Shortcuts
+^^^^^^^^^
+
+Here is a shortcut you can use/adapt to easily create new fragments from command-line:
+
+.. code-block:: bash
+
+    issue="42"
+    content="Fixed an overflowing issue on small resolutions (#$issue)"
+    category="bugfix"
+    echo $content > changes/changelog.d/$issue.$category
+
+You can of course create fragments by hand in your text editor, or from Gitlab's
+interface as well.
 
 Internationalization
 --------------------
