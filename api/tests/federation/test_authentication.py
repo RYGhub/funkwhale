@@ -36,4 +36,4 @@ def test_authenticate(factories, mocker, api_request):
 
     assert user.is_anonymous is True
     assert actor.public_key == public.decode("utf-8")
-    assert actor.url == actor_url
+    assert actor.fid == actor_url

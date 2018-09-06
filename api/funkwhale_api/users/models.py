@@ -122,6 +122,8 @@ class User(AbstractUser):
         blank=True,
     )
 
+    upload_quota = models.PositiveIntegerField(null=True, blank=True)
+
     def __str__(self):
         return self.username
 
@@ -182,6 +184,32 @@ class User(AbstractUser):
             self.last_activity = now
             self.save(update_fields=["last_activity"])
 
+    def create_actor(self):
+        self.actor = create_actor(self)
+        self.save(update_fields=["actor"])
+        return self.actor
+
+    def get_upload_quota(self):
+        return self.upload_quota or preferences.get("users__upload_quota")
+
+    def get_quota_status(self):
+        data = self.actor.get_current_usage()
+        max_ = self.get_upload_quota()
+        return {
+            "max": max_,
+            "remaining": max(max_ - (data["total"] / 1000 / 1000), 0),
+            "current": data["total"] / 1000 / 1000,
+            "skipped": data["skipped"] / 1000 / 1000,
+            "pending": data["pending"] / 1000 / 1000,
+            "finished": data["finished"] / 1000 / 1000,
+            "errored": data["errored"] / 1000 / 1000,
+        }
+
+    def get_channels_groups(self):
+        groups = ["imports"]
+
+        return ["user.{}.{}".format(self.pk, g) for g in groups]
+
 
 def generate_code(length=10):
     return "".join(
@@ -229,7 +257,7 @@ def create_actor(user):
         "type": "Person",
         "name": user.username,
         "manually_approves_followers": False,
-        "url": federation_utils.full_url(
+        "fid": federation_utils.full_url(
             reverse("federation:actors-detail", kwargs={"preferred_username": username})
         ),
         "shared_inbox_url": federation_utils.full_url(

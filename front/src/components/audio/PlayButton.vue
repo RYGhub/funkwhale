@@ -37,7 +37,8 @@ export default {
     dropdownOnly: {type: Boolean, default: false},
     iconOnly: {type: Boolean, default: false},
     artist: {type: Number, required: false},
-    album: {type: Number, required: false}
+    album: {type: Number, required: false},
+    isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
     return {
@@ -60,21 +61,20 @@ export default {
         return this.$gettext('Play immediatly')
       } else {
         if (this.track) {
-          return this.$gettext('This track is not imported and cannot be played')
+          return this.$gettext('This track is not available in any library you have access to')
         }
       }
     },
     playable () {
+      if (this.isPlayable) {
+        return true
+      }
       if (this.track) {
-        return this.track.files.length > 0
+        return this.track.is_playable
       } else if (this.tracks) {
-        return this.tracks.length > 0
-      } else if (this.playlist) {
-        return true
-      } else if (this.artist) {
-        return true
-      } else if (this.album) {
-        return true
+        return this.tracks.filter((t) => {
+          return t.is_playable
+        }).length > 0
       }
       return false
     }
@@ -130,7 +130,7 @@ export default {
           self.isLoading = false
         }, 250)
         return tracks.filter(e => {
-          return e.files.length > 0
+          return e.is_playable === true
         })
       })
     },

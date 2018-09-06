@@ -1,5 +1,7 @@
+import contextlib
 import datetime
 import io
+import os
 import PIL
 import random
 import shutil
@@ -10,6 +12,7 @@ import pytest
 import requests_mock
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
+from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
 from dynamic_preferences.registries import global_preferences_registry
@@ -272,3 +275,38 @@ def avatar():
     f.seek(0)
     yield f
     f.close()
+
+
+@pytest.fixture()
+def audio_file():
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "music")
+    path = os.path.join(data_dir, "test.ogg")
+    assert os.path.exists(path)
+    with open(path, "rb") as f:
+        yield f
+
+
+@pytest.fixture()
+def uploaded_audio_file(audio_file):
+    yield uploadedfile.SimpleUploadedFile(
+        name=audio_file.name, content=audio_file.read()
+    )
+
+
+@pytest.fixture()
+def temp_signal(mocker):
+    """
+    Connect a temporary handler to a given signal. This is helpful to validate
+    a signal is dispatched properly, without mocking.
+    """
+
+    @contextlib.contextmanager
+    def connect(signal):
+        stub = mocker.stub()
+        signal.connect(stub)
+        try:
+            yield stub
+        finally:
+            signal.disconnect(stub)
+
+    return connect

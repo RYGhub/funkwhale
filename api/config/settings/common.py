@@ -126,7 +126,6 @@ LOCAL_APPS = (
     "funkwhale_api.history",
     "funkwhale_api.playlists",
     "funkwhale_api.providers.audiofile",
-    "funkwhale_api.providers.youtube",
     "funkwhale_api.providers.acoustid",
     "funkwhale_api.subsonic",
 )
@@ -280,7 +279,7 @@ MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR("media")))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = env("MEDIA_URL", default="/media/")
-
+FILE_UPLOAD_PERMISSIONS = 0o644
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
@@ -446,7 +445,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS",
         "funkwhale_api.common.authentication.BearerTokenHeaderAuth",
-        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
+        "funkwhale_api.common.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),

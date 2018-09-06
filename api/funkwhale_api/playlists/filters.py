@@ -8,7 +8,7 @@ from . import models
 
 class PlaylistFilter(filters.FilterSet):
     q = filters.CharFilter(name="_", method="filter_q")
-    listenable = filters.BooleanFilter(name="_", method="filter_listenable")
+    playable = filters.BooleanFilter(name="_", method="filter_playable")
 
     class Meta:
         model = models.Playlist
@@ -16,10 +16,10 @@ class PlaylistFilter(filters.FilterSet):
             "user": ["exact"],
             "name": ["exact", "icontains"],
             "q": "exact",
-            "listenable": "exact",
+            "playable": "exact",
         }
 
-    def filter_listenable(self, queryset, name, value):
+    def filter_playable(self, queryset, name, value):
         queryset = queryset.annotate(plts_count=Count("playlist_tracks"))
         if value:
             return queryset.filter(plts_count__gt=0)

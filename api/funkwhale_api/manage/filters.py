@@ -18,7 +18,7 @@ class ManageTrackFileFilterSet(filters.FilterSet):
 
     class Meta:
         model = music_models.TrackFile
-        fields = ["q", "track__album", "track__artist", "track", "library_track"]
+        fields = ["q", "track__album", "track__artist", "track"]
 
 
 class ManageUserFilterSet(filters.FilterSet):

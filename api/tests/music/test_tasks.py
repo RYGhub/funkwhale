@@ -1,227 +1,212 @@
+import datetime
 import os
-
 import pytest
+import uuid
 
-from funkwhale_api.music import tasks
+from django.core.paginator import Paginator
+
+from funkwhale_api.federation import serializers as federation_serializers
+from funkwhale_api.music import signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def test_set_acoustid_on_track_file(factories, mocker, preferences):
-    preferences["providers_acoustid__api_key"] = "test"
-    track_file = factories["music.TrackFile"](acoustid_track_id=None)
-    id = "e475bf79-c1ce-4441-bed7-1e33f226c0a2"
-    payload = {
-        "results": [
-            {
-                "id": id,
-                "recordings": [
-                    {
-                        "artists": [
-                            {
-                                "id": "9c6bddde-6228-4d9f-ad0d-03f6fcb19e13",
-                                "name": "Binärpilot",
-                            }
-                        ],
-                        "duration": 268,
-                        "id": "f269d497-1cc0-4ae4-a0c4-157ec7d73fcb",
-                        "title": "Bend",
-                    }
-                ],
-                "score": 0.860825,
-            }
-        ],
-        "status": "ok",
+# DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
+
+
+def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
+    metadata = {
+        "artist": ["Test artist"],
+        "album": ["Test album"],
+        "title": ["Test track"],
+        "TRACKNUMBER": ["4"],
+        "date": ["2012-08-15"],
     }
-    m = mocker.patch("acoustid.match", return_value=payload)
-    r = tasks.set_acoustid_on_track_file(track_file_id=track_file.pk)
-    track_file.refresh_from_db()
+    mocker.patch("mutagen.File", return_value=metadata)
+    mocker.patch(
+        "funkwhale_api.music.metadata.Metadata.get_file_type", return_value="OggVorbis"
+    )
+    track = tasks.import_track_data_from_file(os.path.join(DATA_DIR, "dummy_file.ogg"))
 
-    assert str(track_file.acoustid_track_id) == id
-    assert r == id
-    m.assert_called_once_with("test", track_file.audio_file.path, parse=False)
-
-
-def test_set_acoustid_on_track_file_required_high_score(factories, mocker):
-    track_file = factories["music.TrackFile"](acoustid_track_id=None)
-    payload = {"results": [{"score": 0.79}], "status": "ok"}
-    mocker.patch("acoustid.match", return_value=payload)
-    tasks.set_acoustid_on_track_file(track_file_id=track_file.pk)
-    track_file.refresh_from_db()
-
-    assert track_file.acoustid_track_id is None
+    assert track.title == metadata["title"][0]
+    assert track.mbid is None
+    assert track.position == 4
+    assert track.album.title == metadata["album"][0]
+    assert track.album.mbid is None
+    assert track.album.release_date == datetime.date(2012, 8, 15)
+    assert track.artist.name == metadata["artist"][0]
+    assert track.artist.mbid is None
 
 
-def test_import_batch_run(factories, mocker):
-    job = factories["music.ImportJob"]()
-    mocked_job_run = mocker.patch("funkwhale_api.music.tasks.import_job_run.delay")
-    tasks.import_batch_run(import_batch_id=job.batch.pk)
+def test_can_create_track_from_file_metadata_mbid(factories, mocker):
+    album = factories["music.Album"]()
+    artist = factories["music.Artist"]()
+    mocker.patch(
+        "funkwhale_api.music.models.Album.get_or_create_from_api",
+        return_value=(album, True),
+    )
 
-    mocked_job_run.assert_called_once_with(import_job_id=job.pk)
-
-
-@pytest.mark.skip("Acoustid is disabled")
-def test_import_job_can_run_with_file_and_acoustid(
-    artists, albums, tracks, preferences, factories, mocker
-):
-    preferences["providers_acoustid__api_key"] = "test"
-    path = os.path.join(DATA_DIR, "test.ogg")
-    mbid = "9968a9d6-8d92-4051-8f76-674e157b6eed"
-    acoustid_payload = {
-        "results": [
-            {
-                "id": "e475bf79-c1ce-4441-bed7-1e33f226c0a2",
-                "recordings": [{"duration": 268, "id": mbid}],
-                "score": 0.860825,
-            }
-        ],
-        "status": "ok",
+    album_data = {
+        "release": {
+            "id": album.mbid,
+            "medium-list": [
+                {
+                    "track-list": [
+                        {
+                            "id": "03baca8b-855a-3c05-8f3d-d3235287d84d",
+                            "position": "4",
+                            "number": "4",
+                            "recording": {
+                                "id": "2109e376-132b-40ad-b993-2bb6812e19d4",
+                                "title": "Teen Age Riot",
+                                "artist-credit": [
+                                    {"artist": {"id": artist.mbid, "name": artist.name}}
+                                ],
+                            },
+                        }
+                    ],
+                    "track-count": 1,
+                }
+            ],
+        }
     }
+    mocker.patch("funkwhale_api.musicbrainz.api.releases.get", return_value=album_data)
+    track_data = album_data["release"]["medium-list"][0]["track-list"][0]
+    metadata = {
+        "musicbrainz_albumid": [album.mbid],
+        "musicbrainz_trackid": [track_data["recording"]["id"]],
+    }
+    mocker.patch("mutagen.File", return_value=metadata)
     mocker.patch(
-        "funkwhale_api.music.utils.get_audio_file_data",
-        return_value={"bitrate": 42, "length": 43},
+        "funkwhale_api.music.metadata.Metadata.get_file_type", return_value="OggVorbis"
     )
+    track = tasks.import_track_data_from_file(os.path.join(DATA_DIR, "dummy_file.ogg"))
+
+    assert track.title == track_data["recording"]["title"]
+    assert track.mbid == track_data["recording"]["id"]
+    assert track.position == 4
+    assert track.album == album
+    assert track.artist == artist
+
+
+def test_track_file_import_mbid(now, factories, temp_signal):
+    track = factories["music.Track"]()
+    tf = factories["music.TrackFile"](
+        track=None, import_metadata={"track": {"mbid": track.mbid}}
+    )
+
+    with temp_signal(signals.track_file_import_status_updated) as handler:
+        tasks.import_track_file(track_file_id=tf.pk)
+
+    tf.refresh_from_db()
+
+    assert tf.track == track
+    assert tf.import_status == "finished"
+    assert tf.import_date == now
+    handler.assert_called_once_with(
+        track_file=tf,
+        old_status="pending",
+        new_status="finished",
+        sender=None,
+        signal=signals.track_file_import_status_updated,
+    )
+
+
+def test_track_file_import_get_audio_data(factories, mocker):
     mocker.patch(
-        "funkwhale_api.musicbrainz.api.artists.get",
-        return_value=artists["get"]["adhesive_wombat"],
+        "funkwhale_api.music.models.TrackFile.get_audio_data",
+        return_value={"size": 23, "duration": 42, "bitrate": 66},
     )
-    mocker.patch(
-        "funkwhale_api.musicbrainz.api.releases.get",
-        return_value=albums["get"]["marsupial"],
-    )
-    mocker.patch(
-        "funkwhale_api.musicbrainz.api.recordings.search",
-        return_value=tracks["search"]["8bitadventures"],
-    )
-    mocker.patch("acoustid.match", return_value=acoustid_payload)
-
-    job = factories["music.FileImportJob"](audio_file__path=path)
-    f = job.audio_file
-    tasks.import_job_run(import_job_id=job.pk)
-    job.refresh_from_db()
-
-    track_file = job.track_file
-
-    with open(path, "rb") as f:
-        assert track_file.audio_file.read() == f.read()
-    assert track_file.bitrate == 42
-    assert track_file.duration == 43
-    assert track_file.size == os.path.getsize(path)
-    # audio file is deleted from import job once persisted to audio file
-    assert not job.audio_file
-    assert job.status == "finished"
-    assert job.source == "file://"
-
-
-def test_run_import_skipping_accoustid(factories, mocker):
-    m = mocker.patch("funkwhale_api.music.tasks._do_import")
-    path = os.path.join(DATA_DIR, "test.ogg")
-    job = factories["music.FileImportJob"](audio_file__path=path)
-    tasks.import_job_run(import_job_id=job.pk, use_acoustid=False)
-    m.assert_called_once_with(job, use_acoustid=False)
-
-
-def test__do_import_skipping_accoustid(factories, mocker):
-    t = factories["music.Track"]()
-    m = mocker.patch(
-        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
-        return_value=t,
-    )
-    path = os.path.join(DATA_DIR, "test.ogg")
-    job = factories["music.FileImportJob"](mbid=None, audio_file__path=path)
-    p = job.audio_file.path
-    tasks._do_import(job, use_acoustid=False)
-    m.assert_called_once_with(p)
-
-
-def test__do_import_skipping_accoustid_if_no_key(factories, mocker, preferences):
-    preferences["providers_acoustid__api_key"] = ""
-    t = factories["music.Track"]()
-    m = mocker.patch(
-        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
-        return_value=t,
-    )
-    path = os.path.join(DATA_DIR, "test.ogg")
-    job = factories["music.FileImportJob"](mbid=None, audio_file__path=path)
-    p = job.audio_file.path
-    tasks._do_import(job, use_acoustid=False)
-    m.assert_called_once_with(p)
-
-
-def test__do_import_replace_if_duplicate(factories, mocker):
-    existing_file = factories["music.TrackFile"]()
-    existing_track = existing_file.track
-    path = os.path.join(DATA_DIR, "test.ogg")
-    mocker.patch(
-        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
-        return_value=existing_track,
-    )
-    job = factories["music.FileImportJob"](
-        replace_if_duplicate=True, audio_file__path=path
-    )
-    tasks._do_import(job)
-    with pytest.raises(existing_file.__class__.DoesNotExist):
-        existing_file.refresh_from_db()
-    assert existing_file.creation_date != job.track_file.creation_date
-
-
-def test_import_job_skip_if_already_exists(artists, albums, tracks, factories, mocker):
-    path = os.path.join(DATA_DIR, "test.ogg")
-    mbid = "9968a9d6-8d92-4051-8f76-674e157b6eed"
-    track_file = factories["music.TrackFile"](track__mbid=mbid)
-    mocker.patch(
-        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
-        return_value=track_file.track,
+    track = factories["music.Track"]()
+    tf = factories["music.TrackFile"](
+        track=None, import_metadata={"track": {"mbid": track.mbid}}
     )
 
-    job = factories["music.FileImportJob"](audio_file__path=path)
-    tasks.import_job_run(import_job_id=job.pk)
-    job.refresh_from_db()
+    tasks.import_track_file(track_file_id=tf.pk)
 
-    assert job.track_file is None
-    # audio file is deleted from import job once persisted to audio file
-    assert not job.audio_file
-    assert job.status == "skipped"
+    tf.refresh_from_db()
+    assert tf.size == 23
+    assert tf.duration == 42
+    assert tf.bitrate == 66
 
 
-def test_import_job_can_be_errored(factories, mocker, preferences):
-    path = os.path.join(DATA_DIR, "test.ogg")
-    mbid = "9968a9d6-8d92-4051-8f76-674e157b6eed"
-    factories["music.TrackFile"](track__mbid=mbid)
+def test_track_file_import_skip_existing_track_in_own_library(factories, temp_signal):
+    track = factories["music.Track"]()
+    library = factories["music.Library"]()
+    existing = factories["music.TrackFile"](
+        track=track,
+        import_status="finished",
+        library=library,
+        import_metadata={"track": {"mbid": track.mbid}},
+    )
+    duplicate = factories["music.TrackFile"](
+        track=track,
+        import_status="pending",
+        library=library,
+        import_metadata={"track": {"mbid": track.mbid}},
+    )
+    with temp_signal(signals.track_file_import_status_updated) as handler:
+        tasks.import_track_file(track_file_id=duplicate.pk)
 
-    class MyException(Exception):
-        pass
+    duplicate.refresh_from_db()
 
-    mocker.patch("funkwhale_api.music.tasks._do_import", side_effect=MyException())
+    assert duplicate.import_status == "skipped"
+    assert duplicate.import_details == {
+        "code": "already_imported_in_owned_libraries",
+        "duplicates": [str(existing.uuid)],
+    }
 
-    job = factories["music.FileImportJob"](audio_file__path=path, track_file=None)
-
-    with pytest.raises(MyException):
-        tasks.import_job_run(import_job_id=job.pk)
-
-    job.refresh_from_db()
-
-    assert job.track_file is None
-    assert job.status == "errored"
+    handler.assert_called_once_with(
+        track_file=duplicate,
+        old_status="pending",
+        new_status="skipped",
+        sender=None,
+        signal=signals.track_file_import_status_updated,
+    )
 
 
-def test__do_import_calls_update_album_cover_if_no_cover(factories, mocker):
-    path = os.path.join(DATA_DIR, "test.ogg")
+def test_track_file_import_track_uuid(now, factories):
+    track = factories["music.Track"]()
+    tf = factories["music.TrackFile"](
+        track=None, import_metadata={"track": {"uuid": track.uuid}}
+    )
+
+    tasks.import_track_file(track_file_id=tf.pk)
+
+    tf.refresh_from_db()
+
+    assert tf.track == track
+    assert tf.import_status == "finished"
+    assert tf.import_date == now
+
+
+def test_track_file_import_error(factories, now, temp_signal):
+    tf = factories["music.TrackFile"](import_metadata={"track": {"uuid": uuid.uuid4()}})
+    with temp_signal(signals.track_file_import_status_updated) as handler:
+        tasks.import_track_file(track_file_id=tf.pk)
+    tf.refresh_from_db()
+
+    assert tf.import_status == "errored"
+    assert tf.import_date == now
+    assert tf.import_details == {"error_code": "track_uuid_not_found"}
+    handler.assert_called_once_with(
+        track_file=tf,
+        old_status="pending",
+        new_status="errored",
+        sender=None,
+        signal=signals.track_file_import_status_updated,
+    )
+
+
+def test_track_file_import_updates_cover_if_no_cover(factories, mocker, now):
+    mocked_update = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
     album = factories["music.Album"](cover="")
     track = factories["music.Track"](album=album)
-
-    mocker.patch(
-        "funkwhale_api.providers.audiofile.tasks.import_track_data_from_path",
-        return_value=track,
+    tf = factories["music.TrackFile"](
+        track=None, import_metadata={"track": {"uuid": track.uuid}}
     )
-
-    mocked_update = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
-
-    job = factories["music.FileImportJob"](audio_file__path=path, track_file=None)
-
-    tasks.import_job_run(import_job_id=job.pk)
-
-    mocked_update.assert_called_once_with(album, track.files.first())
+    tasks.import_track_file(track_file_id=tf.pk)
+    mocked_update.assert_called_once_with(album, tf)
 
 
 def test_update_album_cover_mbid(factories, mocker):
@@ -263,3 +248,84 @@ def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, m
     mocked_get.assert_called_once_with(
         data={"mimetype": mimetype, "content": image_content}
     )
+
+
+def test_scan_library_fetches_page_and_calls_scan_page(now, mocker, factories, r_mock):
+    scan = factories["music.LibraryScan"]()
+    collection_conf = {
+        "actor": scan.library.actor,
+        "id": scan.library.fid,
+        "page_size": 10,
+        "items": range(10),
+    }
+    collection = federation_serializers.PaginatedCollectionSerializer(collection_conf)
+    scan_page = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
+    r_mock.get(collection_conf["id"], json=collection.data)
+    tasks.start_library_scan(library_scan_id=scan.pk)
+
+    scan_page.assert_called_once_with(
+        library_scan_id=scan.pk, page_url=collection.data["first"]
+    )
+    scan.refresh_from_db()
+
+    assert scan.status == "scanning"
+    assert scan.total_files == len(collection_conf["items"])
+    assert scan.modification_date == now
+
+
+def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_mock):
+    scan_page = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
+    import_tf = mocker.patch("funkwhale_api.music.tasks.import_track_file.delay")
+    scan = factories["music.LibraryScan"](status="scanning", total_files=5)
+    tfs = factories["music.TrackFile"].build_batch(size=5, library=scan.library)
+    for i, tf in enumerate(tfs):
+        tf.fid = "https://track.test/{}".format(i)
+
+    page_conf = {
+        "actor": scan.library.actor,
+        "id": scan.library.fid,
+        "page": Paginator(tfs, 3).page(1),
+        "item_serializer": federation_serializers.AudioSerializer,
+    }
+    page = federation_serializers.CollectionPageSerializer(page_conf)
+    r_mock.get(page.data["id"], json=page.data)
+
+    tasks.scan_library_page(library_scan_id=scan.pk, page_url=page.data["id"])
+
+    scan.refresh_from_db()
+    lts = list(scan.library.files.all().order_by("-creation_date"))
+
+    assert len(lts) == 3
+    for tf in tfs[:3]:
+        new_tf = scan.library.files.get(fid=tf.get_federation_id())
+        import_tf.assert_any_call(track_file_id=new_tf.pk)
+
+    assert scan.status == "scanning"
+    assert scan.processed_files == 3
+    assert scan.modification_date == now
+
+    scan_page.assert_called_once_with(
+        library_scan_id=scan.pk, page_url=page.data["next"]
+    )
+
+
+def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock):
+    patched_scan = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
+    scan = factories["music.LibraryScan"](status="scanning", total_files=5)
+    tfs = factories["music.TrackFile"].build_batch(size=5, library=scan.library)
+    page_conf = {
+        "actor": scan.library.actor,
+        "id": scan.library.fid,
+        "page": Paginator(tfs, 3).page(1),
+        "item_serializer": federation_serializers.AudioSerializer,
+    }
+    page = federation_serializers.CollectionPageSerializer(page_conf)
+    data = page.data
+    data["next"] = data["id"]
+    r_mock.get(page.data["id"], json=data)
+
+    tasks.scan_library_page(library_scan_id=scan.pk, page_url=data["id"])
+    patched_scan.assert_not_called()
+    scan.refresh_from_db()
+
+    assert scan.status == "finished"

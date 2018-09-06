@@ -58,3 +58,13 @@ def get_audio_file_data(f):
     d["length"] = data.info.length
 
     return d
+
+
+def get_actor_from_request(request):
+    actor = None
+    if hasattr(request, "actor"):
+        actor = request.actor
+    elif request.user.is_authenticated:
+        actor = request.user.actor
+
+    return actor

@@ -2,6 +2,8 @@ import os
 
 import pytest
 
+from django.utils import timezone
+
 from funkwhale_api.music import importers, models, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -148,29 +150,6 @@ def test_import_track_with_different_artist_than_release(factories, mocker):
     assert track.artist == artist
 
 
-def test_import_job_is_bound_to_track_file(factories, mocker):
-    track = factories["music.Track"]()
-    job = factories["music.ImportJob"](mbid=track.mbid)
-
-    mocker.patch("funkwhale_api.music.models.TrackFile.download_file")
-    tasks.import_job_run(import_job_id=job.pk)
-    job.refresh_from_db()
-    assert job.track_file.track == track
-
-
-@pytest.mark.parametrize("status", ["pending", "errored", "finished"])
-def test_saving_job_updates_batch_status(status, factories, mocker):
-    batch = factories["music.ImportBatch"]()
-
-    assert batch.status == "pending"
-
-    factories["music.ImportJob"](batch=batch, status=status)
-
-    batch.refresh_from_db()
-
-    assert batch.status == status
-
-
 @pytest.mark.parametrize(
     "extention,mimetype", [("ogg", "audio/ogg"), ("mp3", "audio/mpeg")]
 )
@@ -178,7 +157,7 @@ def test_audio_track_mime_type(extention, mimetype, factories):
 
     name = ".".join(["test", extention])
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    tf = factories["music.TrackFile"](audio_file__from_path=path, mimetype=None)
 
     assert tf.mimetype == mimetype
 
@@ -199,14 +178,6 @@ def test_track_get_file_size(factories):
     assert tf.get_file_size() == 297745
 
 
-def test_track_get_file_size_federation(factories):
-    tf = factories["music.TrackFile"](
-        federation=True, library_track__with_audio_file=True
-    )
-
-    assert tf.get_file_size() == tf.library_track.audio_file.size
-
-
 def test_track_get_file_size_in_place(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
@@ -221,3 +192,230 @@ def test_album_get_image_content(factories):
     album.refresh_from_db()
 
     assert album.cover.read() == b"test"
+
+
+def test_library(factories):
+    now = timezone.now()
+    actor = factories["federation.Actor"]()
+    library = factories["music.Library"](
+        name="Hello world", description="hello", actor=actor, privacy_level="instance"
+    )
+
+    assert library.creation_date >= now
+    assert library.files.count() == 0
+    assert library.uuid is not None
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_playable_by_correct_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    queryset = tf.library.files.playable_by(tf.library.actor)
+    match = tf in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_playable_by_instance_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    queryset = tf.library.files.playable_by(instance_actor)
+    match = tf in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_playable_by_anonymous(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    queryset = tf.library.files.playable_by(None)
+    match = tf in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_track_playable_by_correct_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"]()
+    queryset = models.Track.objects.playable_by(
+        tf.library.actor
+    ).annotate_playable_by_actor(tf.library.actor)
+    match = tf.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_track_playable_by_instance_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    queryset = models.Track.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = tf.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_track_playable_by_anonymous(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    queryset = models.Track.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = tf.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_album_playable_by_correct_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"]()
+
+    queryset = models.Album.objects.playable_by(
+        tf.library.actor
+    ).annotate_playable_by_actor(tf.library.actor)
+    match = tf.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_album_playable_by_instance_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    queryset = models.Album.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = tf.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_album_playable_by_anonymous(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    queryset = models.Album.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = tf.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_artist_playable_by_correct_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"]()
+
+    queryset = models.Artist.objects.playable_by(
+        tf.library.actor
+    ).annotate_playable_by_actor(tf.library.actor)
+    match = tf.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_artist_playable_by_instance_actor(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    queryset = models.Artist.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = tf.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_artist_playable_by_anonymous(privacy_level, expected, factories):
+    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    queryset = models.Artist.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = tf.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+def test_track_file_listen_url(factories):
+    tf = factories["music.TrackFile"]()
+    expected = tf.track.listen_url + "?file={}".format(tf.uuid)
+
+    assert tf.listen_url == expected
+
+
+def test_library_schedule_scan(factories, now, mocker):
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+    library = factories["music.Library"](files_count=5)
+
+    scan = library.schedule_scan()
+
+    assert scan.creation_date >= now
+    assert scan.status == "pending"
+    assert scan.library == library
+    assert scan.total_files == 5
+    assert scan.processed_files == 0
+    assert scan.errored_files == 0
+    assert scan.modification_date is None
+
+    on_commit.assert_called_once_with(
+        tasks.start_library_scan.delay, library_scan_id=scan.pk
+    )
+
+
+def test_library_schedule_scan_too_recent(factories, now):
+    scan = factories["music.LibraryScan"]()
+    result = scan.library.schedule_scan()
+
+    assert result is None
+    assert scan.library.scans.count() == 1
+
+
+def test_get_audio_data(factories):
+    tf = factories["music.TrackFile"]()
+
+    result = tf.get_audio_data()
+
+    assert result == {"duration": 229, "bitrate": 128000, "size": 3459481}
+
+
+@pytest.mark.skip(reason="Refactoring in progress")
+def test_library_viewable_by():
+    assert False
+
+
+def test_library_queryset_with_follows(factories):
+    library1 = factories["music.Library"]()
+    library2 = factories["music.Library"]()
+    follow = factories["federation.LibraryFollow"](target=library2)
+    qs = library1.__class__.objects.with_follows(follow.actor).order_by("pk")
+
+    l1 = list(qs)[0]
+    l2 = list(qs)[1]
+    assert l1._follows == []
+    assert l2._follows == [follow]

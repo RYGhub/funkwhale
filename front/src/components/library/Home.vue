@@ -13,7 +13,7 @@
           </track-widget>
         </div>
         <div class="column">
-          <playlist-widget :url="'playlists/'" :filters="{scope: 'user', listenable: true, ordering: '-creation_date'}">
+          <playlist-widget :url="'playlists/'" :filters="{scope: 'user', playable: true, ordering: '-creation_date'}">
             <template slot="title"><translate>Playlists</translate></template>
           </playlist-widget>
         </div>
@@ -21,7 +21,7 @@
       <div class="ui section hidden divider"></div>
       <div class="ui grid">
         <div class="ui row">
-          <album-widget :filters="{ordering: '-creation_date'}">
+          <album-widget :filters="{playable: true, ordering: '-creation_date'}">
             <template slot="title"><translate>Recently added</translate></template>
           </album-widget>
         </div>
@@ -72,7 +72,7 @@ export default {
       this.isLoadingArtists = true
       let params = {
         ordering: '-creation_date',
-        listenable: true
+        playable: true
       }
       let url = ARTISTS_URL
       logger.default.time('Loading latest artists')

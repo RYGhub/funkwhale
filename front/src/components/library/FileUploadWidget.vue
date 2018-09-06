@@ -19,7 +19,9 @@ export default {
           form.append(key, value)
         }
       }
-      form.append(this.name, file.file, file.file.filename || file.name)
+      let filename = file.file.filename || file.name
+      form.append('source', `upload://${filename}`)
+      form.append(this.name, file.file, filename)
       let xhr = new XMLHttpRequest()
       xhr.open('POST', file.postAction)
       xhr.setRequestHeader('Authorization', this.$store.getters['auth/header'])

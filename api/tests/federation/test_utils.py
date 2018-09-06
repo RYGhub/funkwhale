@@ -1,3 +1,4 @@
+from rest_framework import serializers
 import pytest
 
 from funkwhale_api.federation import utils
@@ -50,3 +51,41 @@ def test_extract_headers_from_meta():
         "User-Agent": "http.rb/3.0.0 (Mastodon/2.2.0; +https://mastodon.eliotberriot.com/)",
     }
     assert cleaned_headers == expected
+
+
+def test_retrieve(r_mock):
+    fid = "https://some.url"
+    m = r_mock.get(fid, json={"hello": "world"})
+    result = utils.retrieve(fid)
+
+    assert result == {"hello": "world"}
+    assert m.request_history[-1].headers["Accept"] == "application/activity+json"
+
+
+def test_retrieve_with_actor(r_mock, factories):
+    actor = factories["federation.Actor"]()
+    fid = "https://some.url"
+    m = r_mock.get(fid, json={"hello": "world"})
+    result = utils.retrieve(fid, actor=actor)
+
+    assert result == {"hello": "world"}
+    assert m.request_history[-1].headers["Accept"] == "application/activity+json"
+    assert m.request_history[-1].headers["Signature"] is not None
+
+
+def test_retrieve_with_queryset(factories):
+    actor = factories["federation.Actor"]()
+
+    assert utils.retrieve(actor.fid, queryset=actor.__class__)
+
+
+def test_retrieve_with_serializer(r_mock):
+    class S(serializers.Serializer):
+        def create(self, validated_data):
+            return {"persisted": "object"}
+
+    fid = "https://some.url"
+    r_mock.get(fid, json={"hello": "world"})
+    result = utils.retrieve(fid, serializer_class=S)
+
+    assert result == {"persisted": "object"}

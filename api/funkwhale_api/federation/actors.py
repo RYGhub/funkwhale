@@ -3,15 +3,11 @@ import logging
 import xml
 
 from django.conf import settings
-from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 
 from funkwhale_api.common import preferences, session
-from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.music import models as music_models
-from funkwhale_api.music import tasks as music_tasks
 
 from . import activity, keys, models, serializers, signing, utils
 
@@ -39,9 +35,9 @@ def get_actor_data(actor_url):
         raise ValueError("Invalid actor payload: {}".format(response.text))
 
 
-def get_actor(actor_url):
+def get_actor(fid):
     try:
-        actor = models.Actor.objects.get(url=actor_url)
+        actor = models.Actor.objects.get(fid=fid)
     except models.Actor.DoesNotExist:
         actor = None
     fetch_delta = datetime.timedelta(
@@ -50,7 +46,7 @@ def get_actor(actor_url):
     if actor and actor.last_fetch_date > timezone.now() - fetch_delta:
         # cache is hot, we can return as is
         return actor
-    data = get_actor_data(actor_url)
+    data = get_actor_data(fid)
     serializer = serializers.ActorSerializer(data=data)
     serializer.is_valid(raise_exception=True)
 
@@ -72,7 +68,7 @@ class SystemActor(object):
 
     def get_actor_instance(self):
         try:
-            return models.Actor.objects.get(url=self.get_actor_url())
+            return models.Actor.objects.get(fid=self.get_actor_id())
         except models.Actor.DoesNotExist:
             pass
         private, public = keys.get_key_pair()
@@ -83,7 +79,7 @@ class SystemActor(object):
         args["public_key"] = public.decode("utf-8")
         return models.Actor.objects.create(**args)
 
-    def get_actor_url(self):
+    def get_actor_id(self):
         return utils.full_url(
             reverse("federation:instance-actors-detail", kwargs={"actor": self.id})
         )
@@ -95,7 +91,7 @@ class SystemActor(object):
             "type": "Person",
             "name": name.format(host=settings.FEDERATION_HOSTNAME),
             "manually_approves_followers": True,
-            "url": self.get_actor_url(),
+            "fid": self.get_actor_id(),
             "shared_inbox_url": utils.full_url(
                 reverse("federation:instance-actors-inbox", kwargs={"actor": id})
             ),
@@ -178,89 +174,11 @@ class SystemActor(object):
         if ac["object"]["type"] != "Follow":
             return
 
-        if ac["object"]["actor"] != sender.url:
+        if ac["object"]["actor"] != sender.fid:
             # not the same actor, permission issue
             return
 
         self.handle_undo_follow(ac, sender)
-
-
-class LibraryActor(SystemActor):
-    id = "library"
-    name = "{host}'s library"
-    summary = "Bot account to federate with {host}'s library"
-    additional_attributes = {"manually_approves_followers": True}
-
-    def serialize(self):
-        data = super().serialize()
-        urls = data.setdefault("url", [])
-        urls.append(
-            {
-                "type": "Link",
-                "mediaType": "application/activity+json",
-                "name": "library",
-                "href": utils.full_url(reverse("federation:music:files-list")),
-            }
-        )
-        return data
-
-    @property
-    def manually_approves_followers(self):
-        return preferences.get("federation__music_needs_approval")
-
-    @transaction.atomic
-    def handle_create(self, ac, sender):
-        try:
-            remote_library = models.Library.objects.get(
-                actor=sender, federation_enabled=True
-            )
-        except models.Library.DoesNotExist:
-            logger.info("Skipping import, we're not following %s", sender.url)
-            return
-
-        if ac["object"]["type"] != "Collection":
-            return
-
-        if ac["object"]["totalItems"] <= 0:
-            return
-
-        try:
-            items = ac["object"]["items"]
-        except KeyError:
-            logger.warning("No items in collection!")
-            return
-
-        item_serializers = [
-            serializers.AudioSerializer(data=i, context={"library": remote_library})
-            for i in items
-        ]
-        now = timezone.now()
-        valid_serializers = []
-        for s in item_serializers:
-            if s.is_valid():
-                valid_serializers.append(s)
-            else:
-                logger.debug("Skipping invalid item %s, %s", s.initial_data, s.errors)
-
-        lts = []
-        for s in valid_serializers:
-            lts.append(s.save())
-
-        if remote_library.autoimport:
-            batch = music_models.ImportBatch.objects.create(source="federation")
-            for lt in lts:
-                if lt.creation_date < now:
-                    # track was already in the library, we do not trigger
-                    # an import
-                    continue
-                job = music_models.ImportJob.objects.create(
-                    batch=batch, library_track=lt, mbid=lt.mbid, source=lt.url
-                )
-                funkwhale_utils.on_commit(
-                    music_tasks.import_job_run.delay,
-                    import_job_id=job.pk,
-                    use_acoustid=False,
-                )
 
 
 class TestActor(SystemActor):
@@ -321,7 +239,7 @@ class TestActor(SystemActor):
                 {},
             ],
             "type": "Create",
-            "actor": test_actor.url,
+            "actor": test_actor.fid,
             "id": "{}/activity".format(reply_url),
             "published": now.isoformat(),
             "to": ac["actor"],
@@ -336,14 +254,14 @@ class TestActor(SystemActor):
                 "sensitive": False,
                 "url": reply_url,
                 "to": [ac["actor"]],
-                "attributedTo": test_actor.url,
+                "attributedTo": test_actor.fid,
                 "cc": [],
                 "attachment": [],
                 "tag": [
                     {
                         "type": "Mention",
                         "href": ac["actor"],
-                        "name": sender.mention_username,
+                        "name": sender.full_username,
                     }
                 ],
             },
@@ -359,7 +277,7 @@ class TestActor(SystemActor):
         )[0]
         activity.deliver(
             serializers.FollowSerializer(follow_back).data,
-            to=[follow_back.target.url],
+            to=[follow_back.target.fid],
             on_behalf_of=follow_back.actor,
         )
 
@@ -373,7 +291,7 @@ class TestActor(SystemActor):
             return
         undo = serializers.UndoFollowSerializer(follow).data
         follow.delete()
-        activity.deliver(undo, to=[sender.url], on_behalf_of=actor)
+        activity.deliver(undo, to=[sender.fid], on_behalf_of=actor)
 
 
-SYSTEM_ACTORS = {"library": LibraryActor(), "test": TestActor()}
+SYSTEM_ACTORS = {"test": TestActor()}

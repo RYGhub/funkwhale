@@ -1,4 +1,69 @@
+import collections
+
 from rest_framework import serializers
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.encoding import smart_text
+from django.utils.translation import ugettext_lazy as _
+
+
+class RelatedField(serializers.RelatedField):
+    default_error_messages = {
+        "does_not_exist": _("Object with {related_field_name}={value} does not exist."),
+        "invalid": _("Invalid value."),
+    }
+
+    def __init__(self, related_field_name, serializer, **kwargs):
+        self.related_field_name = related_field_name
+        self.serializer = serializer
+        self.filters = kwargs.pop("filters", None)
+        kwargs["queryset"] = kwargs.pop(
+            "queryset", self.serializer.Meta.model.objects.all()
+        )
+        super().__init__(**kwargs)
+
+    def get_filters(self, data):
+        filters = {self.related_field_name: data}
+        if self.filters:
+            filters.update(self.filters(self.context))
+        return filters
+
+    def to_internal_value(self, data):
+        try:
+            queryset = self.get_queryset()
+            filters = self.get_filters(data)
+            return queryset.get(**filters)
+        except ObjectDoesNotExist:
+            self.fail(
+                "does_not_exist",
+                related_field_name=self.related_field_name,
+                value=smart_text(data),
+            )
+        except (TypeError, ValueError):
+            self.fail("invalid")
+
+    def to_representation(self, obj):
+        return self.serializer.to_representation(obj)
+
+    def get_choices(self, cutoff=None):
+        queryset = self.get_queryset()
+        if queryset is None:
+            # Ensure that field.choices returns something sensible
+            # even when accessed with a read-only field.
+            return {}
+
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
+
+        return collections.OrderedDict(
+            [
+                (
+                    self.to_representation(item)[self.related_field_name],
+                    self.display_value(item),
+                )
+                for item in queryset
+            ]
+        )
 
 
 class Action(object):
@@ -21,6 +86,7 @@ class ActionSerializer(serializers.Serializer):
     objects = serializers.JSONField(required=True)
     filters = serializers.DictField(required=False)
     actions = None
+    pk_field = "pk"
 
     def __init__(self, *args, **kwargs):
         self.actions_by_name = {a.name: a for a in self.actions}
@@ -51,7 +117,9 @@ class ActionSerializer(serializers.Serializer):
         if value == "all":
             return self.queryset.all().order_by("id")
         if type(value) in [list, tuple]:
-            return self.queryset.filter(pk__in=value).order_by("id")
+            return self.queryset.filter(
+                **{"{}__in".format(self.pk_field): value}
+            ).order_by("id")
 
         raise serializers.ValidationError(
             "{} is not a valid value for objects. You must provide either a "

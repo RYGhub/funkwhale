@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper">
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
@@ -14,7 +14,7 @@
       </div>
       <div class="card" v-for="album in albums" :key="album.id">
         <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" :style="getImageStyle(album)">
-          <play-button class="play-overlay" :icon-only="true" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
+          <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
         </div>
         <div class="content">
           <router-link :title="album.title" :to="{name: 'library.albums.detail', params: {id: album.id}}">
@@ -116,6 +116,9 @@ export default {
   background-image: url('../../../assets/audio/default-cover.png') !important;
 }
 
+.wrapper {
+  width: 100%;
+}
 .ui.cards {
   justify-content: center;
 }
