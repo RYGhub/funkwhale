@@ -3,9 +3,12 @@ from rest_framework.decorators import list_route
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
+from django.db.models import Prefetch
+
 from funkwhale_api.activity import record
 from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
+from funkwhale_api.music import utils as music_utils
 
 from . import filters, models, serializers
 
@@ -19,11 +22,7 @@ class TrackFavoriteViewSet(
 
     filter_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
-    queryset = (
-        models.TrackFavorite.objects.all()
-        .select_related("track__artist", "track__album__artist", "user")
-        .prefetch_related("track__files")
-    )
+    queryset = models.TrackFavorite.objects.all().select_related("user")
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
@@ -49,9 +48,14 @@ class TrackFavoriteViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(
+        queryset = queryset.filter(
             fields.privacy_level_query(self.request.user, "user__privacy_level")
         )
+        tracks = Track.objects.annotate_playable_by_actor(
+            music_utils.get_actor_from_request(self.request)
+        ).select_related("artist", "album__artist")
+        queryset = queryset.prefetch_related(Prefetch("track", queryset=tracks))
+        return queryset
 
     def perform_create(self, serializer):
         track = Track.objects.get(pk=serializer.data["track"])

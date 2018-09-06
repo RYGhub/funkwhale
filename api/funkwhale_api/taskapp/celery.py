@@ -2,11 +2,15 @@
 from __future__ import absolute_import
 
 import functools
+import traceback as tb
 import os
-
-from celery import Celery
+import logging
+import celery.app.task
 from django.apps import AppConfig
 from django.conf import settings
+
+
+logger = logging.getLogger("celery")
 
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
@@ -14,8 +18,13 @@ if not settings.configured:
         "DJANGO_SETTINGS_MODULE", "config.settings.local"
     )  # pragma: no cover
 
+app = celery.Celery("funkwhale_api")
 
-app = Celery("funkwhale_api")
+
+@celery.signals.task_failure.connect
+def process_failure(sender, task_id, exception, args, kwargs, traceback, einfo, **kw):
+    print("[celery] Error during task {}: {}".format(task_id, einfo.exception))
+    tb.print_exc()
 
 
 class CeleryConfig(AppConfig):

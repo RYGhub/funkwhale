@@ -109,6 +109,16 @@ class UserReadSerializer(serializers.ModelSerializer):
         return o.get_permissions()
 
 
+class MeSerializer(UserReadSerializer):
+    quota_status = serializers.SerializerMethodField()
+
+    class Meta(UserReadSerializer.Meta):
+        fields = UserReadSerializer.Meta.fields + ["quota_status"]
+
+    def get_quota_status(self, o):
+        return o.get_quota_status() if o.actor else 0
+
+
 class PasswordResetSerializer(PRS):
     def get_email_options(self):
         return {"extra_email_context": {"funkwhale_url": settings.FUNKWHALE_URL}}

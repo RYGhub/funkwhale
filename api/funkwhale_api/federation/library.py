@@ -71,8 +71,7 @@ def scan_from_account_name(account_name):
     return data
 
 
-def get_library_data(library_url):
-    actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
+def get_library_data(library_url, actor):
     auth = signing.get_auth(actor.private_key, actor.private_key_id)
     try:
         response = session.get_session().get(
@@ -98,8 +97,7 @@ def get_library_data(library_url):
     return serializer.validated_data
 
 
-def get_library_page(library, page_url):
-    actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
+def get_library_page(library, page_url, actor):
     auth = signing.get_auth(actor.private_key, actor.private_key_id)
     response = session.get_session().get(
         page_url,

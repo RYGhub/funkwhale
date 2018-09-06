@@ -1,13 +1,14 @@
+import datetime
 import os
-import shutil
 import tempfile
 import uuid
 
 import markdown
 import pendulum
 from django.conf import settings
-from django.core.files import File
+from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -18,10 +19,16 @@ from taggit.managers import TaggableManager
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
-from funkwhale_api import downloader, musicbrainz
+from funkwhale_api import musicbrainz
+from funkwhale_api.common import fields
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
-
 from . import importers, metadata, utils
+
+
+def empty_dict():
+    return {}
 
 
 class APIModelMixin(models.Model):
@@ -89,6 +96,23 @@ class ArtistQuerySet(models.QuerySet):
             models.Prefetch("albums", queryset=Album.objects.with_tracks_count())
         )
 
+    def annotate_playable_by_actor(self, actor):
+        tracks = (
+            Track.objects.playable_by(actor)
+            .filter(artist=models.OuterRef("id"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(tracks)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        tracks = Track.objects.playable_by(actor, include)
+        if include:
+            return self.filter(tracks__in=tracks)
+        else:
+            return self.exclude(tracks__in=tracks)
+
 
 class Artist(APIModelMixin):
     name = models.CharField(max_length=255)
@@ -139,6 +163,23 @@ def import_tracks(instance, cleaned_data, raw_data):
 class AlbumQuerySet(models.QuerySet):
     def with_tracks_count(self):
         return self.annotate(_tracks_count=models.Count("tracks"))
+
+    def annotate_playable_by_actor(self, actor):
+        tracks = (
+            Track.objects.playable_by(actor)
+            .filter(album=models.OuterRef("id"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(tracks)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        tracks = Track.objects.playable_by(actor, include)
+        if include:
+            return self.filter(tracks__in=tracks)
+        else:
+            return self.exclude(tracks__in=tracks)
 
 
 class Album(APIModelMixin):
@@ -287,11 +328,24 @@ class Lyrics(models.Model):
 
 class TrackQuerySet(models.QuerySet):
     def for_nested_serialization(self):
-        return (
-            self.select_related()
-            .select_related("album__artist", "artist")
-            .prefetch_related("files")
+        return self.select_related().select_related("album__artist", "artist")
+
+    def annotate_playable_by_actor(self, actor):
+        files = (
+            TrackFile.objects.playable_by(actor)
+            .filter(track=models.OuterRef("id"))
+            .order_by("id")
+            .values("id")[:1]
         )
+        subquery = models.Subquery(files)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        files = TrackFile.objects.playable_by(actor, include)
+        if include:
+            return self.filter(files__in=files)
+        else:
+            return self.exclude(files__in=files)
 
 
 def get_artist(release_list):
@@ -423,12 +477,65 @@ class Track(APIModelMixin):
             },
         )
 
+    @property
+    def listen_url(self):
+        return reverse("api:v1:listen-detail", kwargs={"uuid": self.uuid})
+
+
+class TrackFileQuerySet(models.QuerySet):
+    def playable_by(self, actor, include=True):
+        if actor is None:
+            libraries = Library.objects.filter(privacy_level="everyone")
+
+        else:
+            me_query = models.Q(privacy_level="me", actor=actor)
+            instance_query = models.Q(
+                privacy_level="instance", actor__domain=actor.domain
+            )
+            libraries = Library.objects.filter(
+                me_query | instance_query | models.Q(privacy_level="everyone")
+            )
+        if include:
+            return self.filter(library__in=libraries)
+        return self.exclude(library__in=libraries)
+
+    def local(self, include=True):
+        return self.exclude(library__actor__user__isnull=include)
+
+
+TRACK_FILE_IMPORT_STATUS_CHOICES = (
+    ("pending", "Pending"),
+    ("finished", "Finished"),
+    ("errored", "Errored"),
+    ("skipped", "Skipped"),
+)
+
+
+def get_file_path(instance, filename):
+    if instance.library.actor.is_local:
+        return common_utils.ChunkedPath("tracks")(instance, filename)
+    else:
+        # we cache remote tracks in a different directory
+        return common_utils.ChunkedPath("federation_cache/tracks")(instance, filename)
+
+
+def get_import_reference():
+    return str(uuid.uuid4())
+
 
 class TrackFile(models.Model):
+    fid = models.URLField(unique=True, max_length=500, null=True, blank=True)
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
-    track = models.ForeignKey(Track, related_name="files", on_delete=models.CASCADE)
-    audio_file = models.FileField(upload_to="tracks/%Y/%m/%d", max_length=255)
-    source = models.URLField(null=True, blank=True, max_length=500)
+    track = models.ForeignKey(
+        Track, related_name="files", on_delete=models.CASCADE, null=True, blank=True
+    )
+    audio_file = models.FileField(upload_to=get_file_path, max_length=255)
+    source = models.CharField(
+        # URL validators are not flexible enough for our file:// and upload:// schemes
+        null=True,
+        blank=True,
+        max_length=500,
+    )
     creation_date = models.DateTimeField(default=timezone.now)
     modification_date = models.DateTimeField(auto_now=True)
     accessed_date = models.DateTimeField(null=True, blank=True)
@@ -437,34 +544,68 @@ class TrackFile(models.Model):
     bitrate = models.IntegerField(null=True, blank=True)
     acoustid_track_id = models.UUIDField(null=True, blank=True)
     mimetype = models.CharField(null=True, blank=True, max_length=200)
-
-    library_track = models.OneToOneField(
-        "federation.LibraryTrack",
-        related_name="local_track_file",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+    library = models.ForeignKey(
+        "library", null=True, blank=True, related_name="files", on_delete=models.CASCADE
     )
 
-    def download_file(self):
-        # import the track file, since there is not any
-        # we create a tmp dir for the download
-        tmp_dir = tempfile.mkdtemp()
-        data = downloader.download(self.source, target_directory=tmp_dir)
-        self.duration = data.get("duration", None)
-        self.audio_file.save(
-            os.path.basename(data["audio_file_path"]),
-            File(open(data["audio_file_path"], "rb")),
+    # metadata from federation
+    metadata = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+    )
+    import_date = models.DateTimeField(null=True, blank=True)
+    # optionnal metadata provided during import
+    import_metadata = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+    )
+    # status / error details for the import
+    import_status = models.CharField(
+        default="pending", choices=TRACK_FILE_IMPORT_STATUS_CHOICES, max_length=25
+    )
+    # a short reference provided by the client to group multiple files
+    # in the same import
+    import_reference = models.CharField(max_length=50, default=get_import_reference)
+
+    # optionnal metadata about import results (error messages, etc.)
+    import_details = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+    )
+
+    objects = TrackFileQuerySet.as_manager()
+
+    def download_audio_from_remote(self, user):
+        from funkwhale_api.common import session
+        from funkwhale_api.federation import signing
+
+        if user.is_authenticated and user.actor:
+            auth = signing.get_auth(user.actor.private_key, user.actor.private_key_id)
+        else:
+            auth = None
+
+        remote_response = session.get_session().get(
+            self.source,
+            auth=auth,
+            stream=True,
+            timeout=20,
+            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         )
-        shutil.rmtree(tmp_dir)
-        return self.audio_file
+        with remote_response as r:
+            remote_response.raise_for_status()
+            extension = utils.get_ext_from_type(self.mimetype)
+            title = " - ".join(
+                [self.track.title, self.track.album.title, self.track.artist.name]
+            )
+            filename = "{}.{}".format(title, extension)
+            tmp_file = tempfile.TemporaryFile()
+            for chunk in r.iter_content(chunk_size=512):
+                tmp_file.write(chunk)
+            self.audio_file.save(filename, tmp_file, save=False)
+            self.save(update_fields=["audio_file"])
 
-    def get_federation_url(self):
+    def get_federation_id(self):
+        if self.fid:
+            return self.fid
+
         return federation_utils.full_url("/federation/music/file/{}".format(self.uuid))
-
-    @property
-    def path(self):
-        return reverse("api:v1:trackfiles-serve", kwargs={"pk": self.pk})
 
     @property
     def filename(self):
@@ -483,37 +624,30 @@ class TrackFile(models.Model):
         if self.source.startswith("file://"):
             return os.path.getsize(self.source.replace("file://", "", 1))
 
-        if self.library_track and self.library_track.audio_file:
-            return self.library_track.audio_file.size
-
     def get_audio_file(self):
         if self.audio_file:
             return self.audio_file.open()
         if self.source.startswith("file://"):
             return open(self.source.replace("file://", "", 1), "rb")
-        if self.library_track and self.library_track.audio_file:
-            return self.library_track.audio_file.open()
 
-    def set_audio_data(self):
+    def get_audio_data(self):
         audio_file = self.get_audio_file()
-        if audio_file:
-            with audio_file as f:
-                audio_data = utils.get_audio_file_data(f)
-            if not audio_data:
-                return
-            self.duration = int(audio_data["length"])
-            self.bitrate = audio_data["bitrate"]
-            self.size = self.get_file_size()
-        else:
-            lt = self.library_track
-            if lt:
-                self.duration = lt.get_metadata("length")
-                self.size = lt.get_metadata("size")
-                self.bitrate = lt.get_metadata("bitrate")
+        if not audio_file:
+            return
+        audio_data = utils.get_audio_file_data(audio_file)
+        if not audio_data:
+            return
+        return {
+            "duration": int(audio_data["length"]),
+            "bitrate": audio_data["bitrate"],
+            "size": self.get_file_size(),
+        }
 
     def save(self, **kwargs):
         if not self.mimetype and self.audio_file:
             self.mimetype = utils.guess_mimetype(self.audio_file)
+        if not self.size and self.audio_file:
+            self.size = self.audio_file.size
         return super().save(**kwargs)
 
     def get_metadata(self):
@@ -521,6 +655,10 @@ class TrackFile(models.Model):
         if not audio_file:
             return
         return metadata.Metadata(audio_file)
+
+    @property
+    def listen_url(self):
+        return self.track.listen_url + "?file={}".format(self.uuid)
 
 
 IMPORT_STATUS_CHOICES = (
@@ -559,6 +697,13 @@ class ImportBatch(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    library = models.ForeignKey(
+        "Library",
+        related_name="import_batches",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         ordering = ["-creation_date"]
@@ -577,7 +722,7 @@ class ImportBatch(models.Model):
 
             tasks.import_batch_notify_followers.delay(import_batch_id=self.pk)
 
-    def get_federation_url(self):
+    def get_federation_id(self):
         return federation_utils.full_url(
             "/federation/music/import/batch/{}".format(self.uuid)
         )
@@ -609,9 +754,99 @@ class ImportJob(models.Model):
         null=True,
         blank=True,
     )
+    audio_file_size = models.IntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ("id",)
+
+    def save(self, **kwargs):
+        if self.audio_file and not self.audio_file_size:
+            self.audio_file_size = self.audio_file.size
+        return super().save(**kwargs)
+
+
+LIBRARY_PRIVACY_LEVEL_CHOICES = [
+    (k, l) for k, l in fields.PRIVACY_LEVEL_CHOICES if k != "followers"
+]
+
+
+class LibraryQuerySet(models.QuerySet):
+    def with_follows(self, actor):
+        return self.prefetch_related(
+            models.Prefetch(
+                "received_follows",
+                queryset=federation_models.LibraryFollow.objects.filter(actor=actor),
+                to_attr="_follows",
+            )
+        )
+
+
+class Library(federation_models.FederationMixin):
+    uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
+    actor = models.ForeignKey(
+        "federation.Actor", related_name="libraries", on_delete=models.CASCADE
+    )
+    followers_url = models.URLField(max_length=500)
+    creation_date = models.DateTimeField(default=timezone.now)
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=5000, null=True, blank=True)
+    privacy_level = models.CharField(
+        choices=LIBRARY_PRIVACY_LEVEL_CHOICES, default="me", max_length=25
+    )
+    files_count = models.PositiveIntegerField(default=0)
+    objects = LibraryQuerySet.as_manager()
+
+    def get_federation_id(self):
+        return federation_utils.full_url(
+            reverse("federation:music:libraries-detail", kwargs={"uuid": self.uuid})
+        )
+
+    def save(self, **kwargs):
+        if not self.pk and not self.fid and self.actor.is_local:
+            self.fid = self.get_federation_id()
+            self.followers_url = self.fid + "/followers"
+
+        return super().save(**kwargs)
+
+    def should_autoapprove_follow(self, actor):
+        if self.privacy_level == "everyone":
+            return True
+        if self.privacy_level == "instance" and actor.is_local:
+            return True
+        return False
+
+    def schedule_scan(self):
+        latest_scan = self.scans.order_by("-creation_date").first()
+        delay_between_scans = datetime.timedelta(seconds=3600 * 24)
+        now = timezone.now()
+        if latest_scan and latest_scan.creation_date + delay_between_scans > now:
+            return
+
+        scan = self.scans.create(total_files=self.files_count)
+        from . import tasks
+
+        common_utils.on_commit(tasks.start_library_scan.delay, library_scan_id=scan.pk)
+        return scan
+
+
+SCAN_STATUS = [
+    ("pending", "pending"),
+    ("scanning", "scanning"),
+    ("finished", "finished"),
+]
+
+
+class LibraryScan(models.Model):
+    actor = models.ForeignKey(
+        "federation.Actor", null=True, blank=True, on_delete=models.CASCADE
+    )
+    library = models.ForeignKey(Library, related_name="scans", on_delete=models.CASCADE)
+    total_files = models.PositiveIntegerField(default=0)
+    processed_files = models.PositiveIntegerField(default=0)
+    errored_files = models.PositiveIntegerField(default=0)
+    status = models.CharField(default="pending", max_length=25)
+    creation_date = models.DateTimeField(default=timezone.now)
+    modification_date = models.DateTimeField(null=True, blank=True)
 
 
 @receiver(post_save, sender=ImportJob)

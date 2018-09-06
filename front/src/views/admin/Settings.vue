@@ -101,7 +101,8 @@ export default {
           settings: [
             'users__registration_enabled',
             'common__api_authentication_required',
-            'users__default_permissions'
+            'users__default_permissions',
+            'users__upload_quota'
           ]
         },
         {

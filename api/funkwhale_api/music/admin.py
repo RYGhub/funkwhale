@@ -65,6 +65,7 @@ class TrackFileAdmin(admin.ModelAdmin):
         "mimetype",
         "size",
         "bitrate",
+        "import_status",
     ]
     list_select_related = ["track"]
     search_fields = [
@@ -74,4 +75,12 @@ class TrackFileAdmin(admin.ModelAdmin):
         "track__album__title",
         "track__artist__name",
     ]
-    list_filter = ["mimetype"]
+    list_filter = ["mimetype", "import_status", "library__privacy_level"]
+
+
+@admin.register(models.Library)
+class LibraryAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "actor", "uuid", "privacy_level", "creation_date"]
+    list_select_related = True
+    search_fields = ["actor__username", "name", "description"]
+    list_filter = ["privacy_level"]

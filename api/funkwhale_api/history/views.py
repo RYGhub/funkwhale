@@ -1,9 +1,12 @@
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from django.db.models import Prefetch
+
 from funkwhale_api.activity import record
 from funkwhale_api.common import fields, permissions
-
+from funkwhale_api.music.models import Track
+from funkwhale_api.music import utils as music_utils
 from . import models, serializers
 
 
@@ -15,11 +18,7 @@ class ListeningViewSet(
 ):
 
     serializer_class = serializers.ListeningSerializer
-    queryset = (
-        models.Listening.objects.all()
-        .select_related("track__artist", "track__album__artist", "user")
-        .prefetch_related("track__files")
-    )
+    queryset = models.Listening.objects.all().select_related("user")
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
@@ -39,9 +38,13 @@ class ListeningViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(
+        queryset = queryset.filter(
             fields.privacy_level_query(self.request.user, "user__privacy_level")
         )
+        tracks = Track.objects.annotate_playable_by_actor(
+            music_utils.get_actor_from_request(self.request)
+        ).select_related("artist", "album__artist")
+        return queryset.prefetch_related(Prefetch("track", queryset=tracks))
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

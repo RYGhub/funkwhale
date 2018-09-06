@@ -1,132 +1,37 @@
 import datetime
 import os
 import pathlib
+import pytest
 
-from django.core.paginator import Paginator
 from django.utils import timezone
 
-from funkwhale_api.federation import serializers, tasks
-
-
-def test_scan_library_does_nothing_if_federation_disabled(mocker, factories):
-    library = factories["federation.Library"](federation_enabled=False)
-    tasks.scan_library(library_id=library.pk)
-
-    assert library.tracks.count() == 0
-
-
-def test_scan_library_page_does_nothing_if_federation_disabled(mocker, factories):
-    library = factories["federation.Library"](federation_enabled=False)
-    tasks.scan_library_page(library_id=library.pk, page_url=None)
-
-    assert library.tracks.count() == 0
-
-
-def test_scan_library_fetches_page_and_calls_scan_page(mocker, factories, r_mock):
-    now = timezone.now()
-    library = factories["federation.Library"](federation_enabled=True)
-    collection_conf = {
-        "actor": library.actor,
-        "id": library.url,
-        "page_size": 10,
-        "items": range(10),
-    }
-    collection = serializers.PaginatedCollectionSerializer(collection_conf)
-    scan_page = mocker.patch("funkwhale_api.federation.tasks.scan_library_page.delay")
-    r_mock.get(collection_conf["id"], json=collection.data)
-    tasks.scan_library(library_id=library.pk)
-
-    scan_page.assert_called_once_with(
-        library_id=library.id, page_url=collection.data["first"], until=None
-    )
-    library.refresh_from_db()
-    assert library.fetched_date > now
-
-
-def test_scan_page_fetches_page_and_creates_tracks(mocker, factories, r_mock):
-    library = factories["federation.Library"](federation_enabled=True)
-    tfs = factories["music.TrackFile"].create_batch(size=5)
-    page_conf = {
-        "actor": library.actor,
-        "id": library.url,
-        "page": Paginator(tfs, 5).page(1),
-        "item_serializer": serializers.AudioSerializer,
-    }
-    page = serializers.CollectionPageSerializer(page_conf)
-    r_mock.get(page.data["id"], json=page.data)
-
-    tasks.scan_library_page(library_id=library.pk, page_url=page.data["id"])
-
-    lts = list(library.tracks.all().order_by("-published_date"))
-    assert len(lts) == 5
-
-
-def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock):
-    patched_scan = mocker.patch(
-        "funkwhale_api.federation.tasks.scan_library_page.delay"
-    )
-    library = factories["federation.Library"](federation_enabled=True)
-    tfs = factories["music.TrackFile"].create_batch(size=1)
-    page_conf = {
-        "actor": library.actor,
-        "id": library.url,
-        "page": Paginator(tfs, 3).page(1),
-        "item_serializer": serializers.AudioSerializer,
-    }
-    page = serializers.CollectionPageSerializer(page_conf)
-    data = page.data
-    data["next"] = data["id"]
-    r_mock.get(page.data["id"], json=data)
-
-    tasks.scan_library_page(library_id=library.pk, page_url=data["id"])
-    patched_scan.assert_not_called()
-
-
-def test_scan_page_stops_once_until_is_reached(mocker, factories, r_mock):
-    library = factories["federation.Library"](federation_enabled=True)
-    tfs = list(reversed(factories["music.TrackFile"].create_batch(size=5)))
-    page_conf = {
-        "actor": library.actor,
-        "id": library.url,
-        "page": Paginator(tfs, 3).page(1),
-        "item_serializer": serializers.AudioSerializer,
-    }
-    page = serializers.CollectionPageSerializer(page_conf)
-    r_mock.get(page.data["id"], json=page.data)
-
-    tasks.scan_library_page(
-        library_id=library.pk, page_url=page.data["id"], until=tfs[1].creation_date
-    )
-
-    lts = list(library.tracks.all().order_by("-published_date"))
-    assert len(lts) == 2
-    for i, tf in enumerate(tfs[:1]):
-        assert tf.creation_date == lts[i].published_date
+from funkwhale_api.federation import tasks
 
 
 def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     preferences["federation__music_cache_duration"] = 60
-    lt1 = factories["federation.LibraryTrack"](with_audio_file=True)
-    lt2 = factories["federation.LibraryTrack"](with_audio_file=True)
-    lt3 = factories["federation.LibraryTrack"](with_audio_file=True)
-    factories["music.TrackFile"](accessed_date=timezone.now(), library_track=lt1)
-    factories["music.TrackFile"](
-        accessed_date=timezone.now() - datetime.timedelta(minutes=61), library_track=lt2
+    remote_library = factories["music.Library"]()
+    tf1 = factories["music.TrackFile"](
+        library=remote_library, accessed_date=timezone.now()
     )
-    factories["music.TrackFile"](accessed_date=None, library_track=lt3)
-    path1 = lt1.audio_file.path
-    path2 = lt2.audio_file.path
-    path3 = lt3.audio_file.path
+    tf2 = factories["music.TrackFile"](
+        library=remote_library,
+        accessed_date=timezone.now() - datetime.timedelta(minutes=61),
+    )
+    tf3 = factories["music.TrackFile"](library=remote_library, accessed_date=None)
+    path1 = tf1.audio_file.path
+    path2 = tf2.audio_file.path
+    path3 = tf3.audio_file.path
 
     tasks.clean_music_cache()
 
-    lt1.refresh_from_db()
-    lt2.refresh_from_db()
-    lt3.refresh_from_db()
+    tf1.refresh_from_db()
+    tf2.refresh_from_db()
+    tf3.refresh_from_db()
 
-    assert bool(lt1.audio_file) is True
-    assert bool(lt2.audio_file) is False
-    assert bool(lt3.audio_file) is False
+    assert bool(tf1.audio_file) is True
+    assert bool(tf2.audio_file) is False
+    assert bool(tf3.audio_file) is False
     assert os.path.exists(path1) is True
     assert os.path.exists(path2) is False
     assert os.path.exists(path3) is False
@@ -134,22 +39,202 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
 
 def test_clean_federation_music_cache_orphaned(settings, preferences, factories):
     preferences["federation__music_cache_duration"] = 60
-    path = os.path.join(settings.MEDIA_ROOT, "federation_cache")
+    path = os.path.join(settings.MEDIA_ROOT, "federation_cache", "tracks")
     keep_path = os.path.join(os.path.join(path, "1a", "b2"), "keep.ogg")
     remove_path = os.path.join(os.path.join(path, "c3", "d4"), "remove.ogg")
     os.makedirs(os.path.dirname(keep_path), exist_ok=True)
     os.makedirs(os.path.dirname(remove_path), exist_ok=True)
     pathlib.Path(keep_path).touch()
     pathlib.Path(remove_path).touch()
-    lt = factories["federation.LibraryTrack"](
-        with_audio_file=True, audio_file__path=keep_path
+    tf = factories["music.TrackFile"](
+        accessed_date=timezone.now(), audio_file__path=keep_path
     )
-    factories["music.TrackFile"](library_track=lt, accessed_date=timezone.now())
 
     tasks.clean_music_cache()
 
-    lt.refresh_from_db()
+    tf.refresh_from_db()
 
-    assert bool(lt.audio_file) is True
-    assert os.path.exists(lt.audio_file.path) is True
+    assert bool(tf.audio_file) is True
+    assert os.path.exists(tf.audio_file.path) is True
     assert os.path.exists(remove_path) is False
+
+
+def test_handle_in(factories, mocker, now):
+    mocked_dispatch = mocker.patch("funkwhale_api.federation.routes.inbox.dispatch")
+
+    r1 = factories["users.User"](with_actor=True).actor
+    r2 = factories["users.User"](with_actor=True).actor
+    a = factories["federation.Activity"](payload={"hello": "world"})
+    ii1 = factories["federation.InboxItem"](activity=a, actor=r1)
+    ii2 = factories["federation.InboxItem"](activity=a, actor=r2)
+    tasks.dispatch_inbox(activity_id=a.pk)
+
+    mocked_dispatch.assert_called_once_with(
+        a.payload, context={"actor": a.actor, "inbox_items": [ii1, ii2]}
+    )
+
+    ii1.refresh_from_db()
+    ii2.refresh_from_db()
+
+    assert ii1.is_delivered is True
+    assert ii2.is_delivered is True
+    assert ii1.last_delivery_date == now
+    assert ii2.last_delivery_date == now
+
+
+def test_handle_in_error(factories, mocker, now):
+    mocker.patch(
+        "funkwhale_api.federation.routes.inbox.dispatch", side_effect=Exception()
+    )
+    r1 = factories["users.User"](with_actor=True).actor
+    r2 = factories["users.User"](with_actor=True).actor
+
+    a = factories["federation.Activity"](payload={"hello": "world"})
+    factories["federation.InboxItem"](activity=a, actor=r1)
+    factories["federation.InboxItem"](activity=a, actor=r2)
+
+    with pytest.raises(Exception):
+        tasks.dispatch_inbox(activity_id=a.pk)
+
+    assert a.inbox_items.filter(is_delivered=False).count() == 2
+
+
+def test_dispatch_outbox_to_inbox(factories, mocker):
+    mocked_inbox = mocker.patch("funkwhale_api.federation.tasks.dispatch_inbox.delay")
+    mocked_deliver_to_remote_inbox = mocker.patch(
+        "funkwhale_api.federation.tasks.deliver_to_remote_inbox.delay"
+    )
+    activity = factories["federation.Activity"](actor__local=True)
+    factories["federation.InboxItem"](activity=activity, actor__local=True)
+    remote_ii = factories["federation.InboxItem"](
+        activity=activity,
+        actor__shared_inbox_url=None,
+        actor__inbox_url="https://test.inbox",
+    )
+    tasks.dispatch_outbox(activity_id=activity.pk)
+    mocked_inbox.assert_called_once_with(activity_id=activity.pk)
+    mocked_deliver_to_remote_inbox.assert_called_once_with(
+        activity_id=activity.pk, inbox_url=remote_ii.actor.inbox_url
+    )
+
+
+def test_dispatch_outbox_to_shared_inbox_url(factories, mocker):
+    mocked_deliver_to_remote_inbox = mocker.patch(
+        "funkwhale_api.federation.tasks.deliver_to_remote_inbox.delay"
+    )
+    activity = factories["federation.Activity"](actor__local=True)
+    # shared inbox
+    remote_ii_shared1 = factories["federation.InboxItem"](
+        activity=activity, actor__shared_inbox_url="https://shared.inbox"
+    )
+    # another on the same shared inbox
+    factories["federation.InboxItem"](
+        activity=activity, actor__shared_inbox_url="https://shared.inbox"
+    )
+    # one on a dedicated inbox
+    remote_ii_single = factories["federation.InboxItem"](
+        activity=activity,
+        actor__shared_inbox_url=None,
+        actor__inbox_url="https://single.inbox",
+    )
+    tasks.dispatch_outbox(activity_id=activity.pk)
+
+    assert mocked_deliver_to_remote_inbox.call_count == 2
+    mocked_deliver_to_remote_inbox.assert_any_call(
+        activity_id=activity.pk,
+        shared_inbox_url=remote_ii_shared1.actor.shared_inbox_url,
+    )
+    mocked_deliver_to_remote_inbox.assert_any_call(
+        activity_id=activity.pk, inbox_url=remote_ii_single.actor.inbox_url
+    )
+
+
+def test_deliver_to_remote_inbox_inbox_url(factories, r_mock):
+    activity = factories["federation.Activity"]()
+    url = "https://test.shared/"
+    r_mock.post(url)
+
+    tasks.deliver_to_remote_inbox(activity_id=activity.pk, inbox_url=url)
+
+    request = r_mock.request_history[0]
+
+    assert r_mock.called is True
+    assert r_mock.call_count == 1
+    assert request.url == url
+    assert request.headers["content-type"] == "application/activity+json"
+    assert request.json() == activity.payload
+
+
+def test_deliver_to_remote_inbox_shared_inbox_url(factories, r_mock):
+    activity = factories["federation.Activity"]()
+    url = "https://test.shared/"
+    r_mock.post(url)
+
+    tasks.deliver_to_remote_inbox(activity_id=activity.pk, shared_inbox_url=url)
+
+    request = r_mock.request_history[0]
+
+    assert r_mock.called is True
+    assert r_mock.call_count == 1
+    assert request.url == url
+    assert request.headers["content-type"] == "application/activity+json"
+    assert request.json() == activity.payload
+
+
+def test_deliver_to_remote_inbox_success_shared_inbox_marks_inbox_items_as_delivered(
+    factories, r_mock, now
+):
+    activity = factories["federation.Activity"]()
+    url = "https://test.shared/"
+    r_mock.post(url)
+    ii = factories["federation.InboxItem"](
+        activity=activity, actor__shared_inbox_url=url
+    )
+    other_ii = factories["federation.InboxItem"](
+        activity=activity, actor__shared_inbox_url="https://other.url"
+    )
+    tasks.deliver_to_remote_inbox(activity_id=activity.pk, shared_inbox_url=url)
+
+    ii.refresh_from_db()
+    other_ii.refresh_from_db()
+
+    assert ii.is_delivered is True
+    assert ii.last_delivery_date == now
+    assert other_ii.is_delivered is False
+    assert other_ii.last_delivery_date is None
+
+
+def test_deliver_to_remote_inbox_success_single_inbox_marks_inbox_items_as_delivered(
+    factories, r_mock, now
+):
+    activity = factories["federation.Activity"]()
+    url = "https://test.single/"
+    r_mock.post(url)
+    ii = factories["federation.InboxItem"](activity=activity, actor__inbox_url=url)
+    other_ii = factories["federation.InboxItem"](
+        activity=activity, actor__inbox_url="https://other.url"
+    )
+    tasks.deliver_to_remote_inbox(activity_id=activity.pk, inbox_url=url)
+
+    ii.refresh_from_db()
+    other_ii.refresh_from_db()
+
+    assert ii.is_delivered is True
+    assert ii.last_delivery_date == now
+    assert other_ii.is_delivered is False
+    assert other_ii.last_delivery_date is None
+
+
+def test_deliver_to_remote_inbox_error(factories, r_mock, now):
+    activity = factories["federation.Activity"]()
+    url = "https://test.single/"
+    r_mock.post(url, status_code=404)
+    ii = factories["federation.InboxItem"](activity=activity, actor__inbox_url=url)
+    with pytest.raises(tasks.RequestException):
+        tasks.deliver_to_remote_inbox(activity_id=activity.pk, inbox_url=url)
+
+    ii.refresh_from_db()
+
+    assert ii.is_delivered is False
+    assert ii.last_delivery_date == now
+    assert ii.delivery_attempts == 1

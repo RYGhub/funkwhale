@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('music', '0027_auto_20180515_1808'),
-    ]
+    dependencies = [("music", "0027_auto_20180515_1808")]
 
     operations = [
         migrations.AddField(
-            model_name='importjob',
-            name='replace_if_duplicate',
+            model_name="importjob",
+            name="replace_if_duplicate",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

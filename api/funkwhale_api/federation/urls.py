@@ -11,7 +11,7 @@ router.register(
 router.register(r"federation/actors", views.ActorViewSet, "actors")
 router.register(r".well-known", views.WellKnownViewSet, "well-known")
 
-music_router.register(r"files", views.MusicFilesViewSet, "files")
+music_router.register(r"libraries", views.MusicLibraryViewSet, "libraries")
 urlpatterns = router.urls + [
     url("federation/music/", include((music_router.urls, "music"), namespace="music"))
 ]

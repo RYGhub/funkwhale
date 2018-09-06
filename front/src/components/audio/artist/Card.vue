@@ -15,13 +15,13 @@
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">
-                  <router-link class="discrete link":to="{name: 'library.albums.detail', params: {id: album.id }}">
+                  <router-link class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">
                     <strong>{{ album.title }}</strong>
                   </router-link><br />
                   {{ album.tracks_count }} tracks
                 </td>
                 <td>
-                  <play-button class="right floated basic icon" :discrete="true" :album="album.id"></play-button>
+                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album.id"></play-button>
                 </td>
               </tr>
             </tbody>
@@ -41,7 +41,7 @@
           <i class="sound icon"></i>
             <translate :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
         </span>
-        <play-button class="mini basic orange right floated" :artist="artist.id">
+        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist.id">
           <translate>Play all</translate>
         </play-button>
       </div>
@@ -70,6 +70,11 @@ export default {
         return this.artist.albums
       }
       return this.artist.albums.slice(0, this.initialAlbums)
+    },
+    isPlayable () {
+      return this.artist.albums.filter((a) => {
+        return a.is_playable
+      }).length > 0
     }
   }
 }

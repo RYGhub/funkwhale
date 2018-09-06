@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
+from django.urls import include, path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
+
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
@@ -36,4 +38,6 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]
+        urlpatterns = [
+            path("api/__debug__/", include(debug_toolbar.urls))
+        ] + urlpatterns

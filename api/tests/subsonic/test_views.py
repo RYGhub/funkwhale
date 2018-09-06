@@ -165,7 +165,7 @@ def test_stream(f, db, logged_in_api_client, factories, mocker):
     tf = factories["music.TrackFile"](track=track)
     response = logged_in_api_client.get(url, {"f": f, "id": track.pk})
 
-    mocked_serve.assert_called_once_with(track_file=tf)
+    mocked_serve.assert_called_once_with(track_file=tf, user=logged_in_api_client.user)
     assert response.status_code == 200
 
 

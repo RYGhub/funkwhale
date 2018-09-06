@@ -6,14 +6,14 @@ from . import models
 @admin.register(models.Actor)
 class ActorAdmin(admin.ModelAdmin):
     list_display = [
-        "url",
+        "fid",
         "domain",
         "preferred_username",
         "type",
         "creation_date",
         "last_fetch_date",
     ]
-    search_fields = ["url", "domain", "preferred_username"]
+    search_fields = ["fid", "domain", "preferred_username"]
     list_filter = ["type"]
 
 
@@ -21,14 +21,14 @@ class ActorAdmin(admin.ModelAdmin):
 class FollowAdmin(admin.ModelAdmin):
     list_display = ["actor", "target", "approved", "creation_date"]
     list_filter = ["approved"]
-    search_fields = ["actor__url", "target__url"]
+    search_fields = ["actor__fid", "target__fid"]
     list_select_related = True
 
 
 @admin.register(models.Library)
 class LibraryAdmin(admin.ModelAdmin):
     list_display = ["actor", "url", "creation_date", "fetched_date", "tracks_count"]
-    search_fields = ["actor__url", "url"]
+    search_fields = ["actor__fid", "url"]
     list_filter = ["federation_enabled", "download_files", "autoimport"]
     list_select_related = True
 

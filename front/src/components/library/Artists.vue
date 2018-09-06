@@ -143,7 +143,7 @@ export default {
         page_size: this.paginateBy,
         name__icontains: this.query,
         ordering: this.getOrderingAsString(),
-        listenable: 'true'
+        playable: 'true'
       }
       logger.default.debug('Fetching artists')
       axios.get(url, {params: params}).then((response) => {

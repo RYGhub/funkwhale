@@ -1,25 +1,20 @@
 from django import forms
 from django.core import paginator
-from django.db import transaction
 from django.http import HttpResponse, Http404
 from django.urls import reverse
-from rest_framework import mixins, response, viewsets
+from rest_framework import exceptions, mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
-from funkwhale_api.users.permissions import HasUserPermission
 
 from . import (
+    activity,
     actors,
     authentication,
-    filters,
-    library,
     models,
-    permissions,
     renderers,
     serializers,
-    tasks,
     utils,
     webfinger,
 )
@@ -34,7 +29,6 @@ class FederationMixin(object):
 
 class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "preferred_username"
-    lookup_value_regex = ".*"
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
@@ -43,6 +37,15 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
 
     @detail_route(methods=["get", "post"])
     def inbox(self, request, *args, **kwargs):
+        actor = self.get_object()
+        if request.method.lower() == "post" and request.actor is None:
+            raise exceptions.AuthenticationFailed(
+                "You need a valid signature to send an activity"
+            )
+        if request.method.lower() == "post":
+            activity.receive(
+                activity=request.data, on_behalf_of=request.actor, recipient=actor
+            )
         return response.Response({}, status=200)
 
     @detail_route(methods=["get", "post"])
@@ -143,161 +146,64 @@ class WellKnownViewSet(viewsets.GenericViewSet):
         return serializers.ActorWebfingerSerializer(actor).data
 
 
-class MusicFilesViewSet(FederationMixin, viewsets.GenericViewSet):
-    authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = [permissions.LibraryFollower]
-    renderer_classes = [renderers.ActivityPubRenderer]
+def has_library_access(request, library):
+    if library.privacy_level == "everyone":
+        return True
+    if request.user.is_authenticated and request.user.is_superuser:
+        return True
 
-    def list(self, request, *args, **kwargs):
+    try:
+        actor = request.actor
+    except AttributeError:
+        return False
+
+    return library.received_follows.filter(actor=actor, approved=True).exists()
+
+
+class MusicLibraryViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    serializer_class = serializers.PaginatedCollectionSerializer
+    queryset = music_models.Library.objects.all().select_related("actor")
+    lookup_field = "uuid"
+
+    def retrieve(self, request, *args, **kwargs):
+        lb = self.get_object()
+
+        conf = {
+            "id": lb.get_federation_id(),
+            "actor": lb.actor,
+            "name": lb.name,
+            "summary": lb.description,
+            "items": lb.files.order_by("-creation_date"),
+            "item_serializer": serializers.AudioSerializer,
+        }
         page = request.GET.get("page")
-        library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-        qs = (
-            music_models.TrackFile.objects.order_by("-creation_date")
-            .select_related("track__artist", "track__album__artist")
-            .filter(library_track__isnull=True)
-        )
         if page is None:
-            conf = {
-                "id": utils.full_url(reverse("federation:music:files-list")),
-                "page_size": preferences.get("federation__collection_page_size"),
-                "items": qs,
-                "item_serializer": serializers.AudioSerializer,
-                "actor": library,
-            }
-            serializer = serializers.PaginatedCollectionSerializer(conf)
+            serializer = serializers.LibrarySerializer(lb)
             data = serializer.data
         else:
+            # if actor is requesting a specific page, we ensure library is public
+            # or readable by the actor
+            if not has_library_access(request, lb):
+                raise exceptions.AuthenticationFailed(
+                    "You do not have access to this library"
+                )
             try:
                 page_number = int(page)
             except Exception:
                 return response.Response({"page": ["Invalid page number"]}, status=400)
-            p = paginator.Paginator(
-                qs, preferences.get("federation__collection_page_size")
-            )
+            conf["page_size"] = preferences.get("federation__collection_page_size")
+            p = paginator.Paginator(conf["items"], conf["page_size"])
             try:
                 page = p.page(page_number)
-                conf = {
-                    "id": utils.full_url(reverse("federation:music:files-list")),
-                    "page": page,
-                    "item_serializer": serializers.AudioSerializer,
-                    "actor": library,
-                }
+                conf["page"] = page
                 serializer = serializers.CollectionPageSerializer(conf)
                 data = serializer.data
             except paginator.EmptyPage:
                 return response.Response(status=404)
 
         return response.Response(data)
-
-
-class LibraryViewSet(
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["federation"]
-    queryset = models.Library.objects.all().select_related("actor", "follow")
-    lookup_field = "uuid"
-    filter_class = filters.LibraryFilter
-    serializer_class = serializers.APILibrarySerializer
-    ordering_fields = (
-        "id",
-        "creation_date",
-        "fetched_date",
-        "actor__domain",
-        "tracks_count",
-    )
-
-    @list_route(methods=["get"])
-    def fetch(self, request, *args, **kwargs):
-        account = request.GET.get("account")
-        if not account:
-            return response.Response({"account": "This field is mandatory"}, status=400)
-
-        data = library.scan_from_account_name(account)
-        return response.Response(data)
-
-    @detail_route(methods=["post"])
-    def scan(self, request, *args, **kwargs):
-        library = self.get_object()
-        serializer = serializers.APILibraryScanSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result = tasks.scan_library.delay(
-            library_id=library.pk, until=serializer.validated_data.get("until")
-        )
-        return response.Response({"task": result.id})
-
-    @list_route(methods=["get"])
-    def following(self, request, *args, **kwargs):
-        library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-        queryset = (
-            models.Follow.objects.filter(actor=library_actor)
-            .select_related("actor", "target")
-            .order_by("-creation_date")
-        )
-        filterset = filters.FollowFilter(request.GET, queryset=queryset)
-        final_qs = filterset.qs
-        serializer = serializers.APIFollowSerializer(final_qs, many=True)
-        data = {"results": serializer.data, "count": len(final_qs)}
-        return response.Response(data)
-
-    @list_route(methods=["get", "patch"])
-    def followers(self, request, *args, **kwargs):
-        if request.method.lower() == "patch":
-            serializer = serializers.APILibraryFollowUpdateSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            follow = serializer.save()
-            return response.Response(serializers.APIFollowSerializer(follow).data)
-
-        library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-        queryset = (
-            models.Follow.objects.filter(target=library_actor)
-            .select_related("actor", "target")
-            .order_by("-creation_date")
-        )
-        filterset = filters.FollowFilter(request.GET, queryset=queryset)
-        final_qs = filterset.qs
-        serializer = serializers.APIFollowSerializer(final_qs, many=True)
-        data = {"results": serializer.data, "count": len(final_qs)}
-        return response.Response(data)
-
-    @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        serializer = serializers.APILibraryCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return response.Response(serializer.data, status=201)
-
-
-class LibraryTrackViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["federation"]
-    queryset = (
-        models.LibraryTrack.objects.all()
-        .select_related("library__actor", "library__follow", "local_track_file")
-        .prefetch_related("import_jobs")
-    )
-    filter_class = filters.LibraryTrackFilter
-    serializer_class = serializers.APILibraryTrackSerializer
-    ordering_fields = (
-        "id",
-        "artist_name",
-        "title",
-        "album_title",
-        "creation_date",
-        "modification_date",
-        "fetched_date",
-        "published_date",
-    )
-
-    @list_route(methods=["post"])
-    def action(self, request, *args, **kwargs):
-        queryset = models.LibraryTrack.objects.filter(local_track_file__isnull=True)
-        serializer = serializers.LibraryTrackActionSerializer(
-            request.data, queryset=queryset, context={"submitted_by": request.user}
-        )
-        serializer.is_valid(raise_exception=True)
-        result = serializer.save()
-        return response.Response(result, status=200)

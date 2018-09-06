@@ -3,8 +3,8 @@ import os
 import factory
 
 from funkwhale_api.factories import ManyToManyFromList, registry
-from funkwhale_api.federation.factories import LibraryTrackFactory
-from funkwhale_api.users.factories import UserFactory
+from funkwhale_api.federation import factories as federation_factories
+
 
 SAMPLES_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -51,6 +51,7 @@ class TrackFactory(factory.django.DjangoModelFactory):
 @registry.register
 class TrackFileFactory(factory.django.DjangoModelFactory):
     track = factory.SubFactory(TrackFactory)
+    library = factory.SubFactory(federation_factories.MusicLibraryFactory)
     audio_file = factory.django.FileField(
         from_path=os.path.join(SAMPLES_PATH, "test.ogg")
     )
@@ -58,67 +59,13 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     bitrate = None
     size = None
     duration = None
+    mimetype = "audio/ogg"
 
     class Meta:
         model = "music.TrackFile"
 
     class Params:
         in_place = factory.Trait(audio_file=None)
-        federation = factory.Trait(
-            audio_file=None,
-            library_track=factory.SubFactory(LibraryTrackFactory),
-            mimetype=factory.LazyAttribute(lambda o: o.library_track.audio_mimetype),
-            source=factory.LazyAttribute(lambda o: o.library_track.audio_url),
-        )
-
-
-@registry.register
-class ImportBatchFactory(factory.django.DjangoModelFactory):
-    submitted_by = factory.SubFactory(UserFactory)
-
-    class Meta:
-        model = "music.ImportBatch"
-
-    class Params:
-        federation = factory.Trait(submitted_by=None, source="federation")
-        finished = factory.Trait(status="finished")
-
-
-@registry.register
-class ImportJobFactory(factory.django.DjangoModelFactory):
-    batch = factory.SubFactory(ImportBatchFactory)
-    source = factory.Faker("url")
-    mbid = factory.Faker("uuid4")
-    replace_if_duplicate = False
-
-    class Meta:
-        model = "music.ImportJob"
-
-    class Params:
-        federation = factory.Trait(
-            mbid=None,
-            library_track=factory.SubFactory(LibraryTrackFactory),
-            batch=factory.SubFactory(ImportBatchFactory, federation=True),
-        )
-        finished = factory.Trait(
-            status="finished", track_file=factory.SubFactory(TrackFileFactory)
-        )
-        in_place = factory.Trait(status="finished", audio_file=None)
-        with_audio_file = factory.Trait(
-            status="finished",
-            audio_file=factory.django.FileField(
-                from_path=os.path.join(SAMPLES_PATH, "test.ogg")
-            ),
-        )
-
-
-@registry.register(name="music.FileImportJob")
-class FileImportJobFactory(ImportJobFactory):
-    source = "file://"
-    mbid = None
-    audio_file = factory.django.FileField(
-        from_path=os.path.join(SAMPLES_PATH, "test.ogg")
-    )
 
 
 @registry.register

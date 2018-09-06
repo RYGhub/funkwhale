@@ -30,8 +30,10 @@ def test_fix_track_files_bitrate_length(factories, mocker):
 
 
 def test_fix_track_files_size(factories, mocker):
-    tf1 = factories["music.TrackFile"](size=1)
-    tf2 = factories["music.TrackFile"](size=None)
+    tf1 = factories["music.TrackFile"]()
+    tf2 = factories["music.TrackFile"]()
+    tf1.__class__.objects.filter(pk=tf1.pk).update(size=1)
+    tf2.__class__.objects.filter(pk=tf2.pk).update(size=None)
     c = fix_track_files.Command()
 
     mocker.patch("funkwhale_api.music.models.TrackFile.get_file_size", return_value=2)

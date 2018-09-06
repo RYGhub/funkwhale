@@ -318,4 +318,8 @@ html, body {
   margin:  0.5em;
 }
 
+a {
+  cursor: pointer;
+}
+
 </style>

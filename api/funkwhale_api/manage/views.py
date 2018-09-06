@@ -15,7 +15,7 @@ class ManageTrackFileViewSet(
 ):
     queryset = (
         music_models.TrackFile.objects.all()
-        .select_related("track__artist", "track__album__artist", "library_track")
+        .select_related("track__artist", "track__album__artist")
         .order_by("-id")
     )
     serializer_class = serializers.ManageTrackFileSerializer

@@ -59,7 +59,6 @@ class ManageTrackFileSerializer(serializers.ModelSerializer):
             "bitrate",
             "size",
             "path",
-            "library_track",
         )
 
 

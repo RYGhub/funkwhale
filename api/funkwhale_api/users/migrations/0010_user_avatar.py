@@ -7,14 +7,22 @@ import funkwhale_api.common.validators
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0009_auto_20180619_2024'),
-    ]
+    dependencies = [("users", "0009_auto_20180619_2024")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, max_length=150, null=True, upload_to=funkwhale_api.common.utils.ChunkedPath('users/avatars'), validators=[funkwhale_api.common.validators.ImageDimensionsValidator(max_height=400, max_width=400, min_height=50, min_width=50)]),
-        ),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                max_length=150,
+                null=True,
+                upload_to=funkwhale_api.common.utils.ChunkedPath("users/avatars"),
+                validators=[
+                    funkwhale_api.common.validators.ImageDimensionsValidator(
+                        max_height=400, max_width=400, min_height=50, min_width=50
+                    )
+                ],
+            ),
+        )
     ]

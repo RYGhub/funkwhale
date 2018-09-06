@@ -1,20 +1,27 @@
 import logging
 import os
 
-from django.conf import settings
-from django.core.files.base import ContentFile
-from musicbrainzngs import ResponseError
+from django.utils import timezone
+from django.db import transaction
+from django.db.models import F
+from django.dispatch import receiver
 
+from musicbrainzngs import ResponseError
+from requests.exceptions import RequestException
+
+from funkwhale_api.common import channels
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import activity, actors
-from funkwhale_api.federation import serializers as federation_serializers
+from funkwhale_api.federation import library as lb
+from funkwhale_api.federation import library as federation_serializers
 from funkwhale_api.providers.acoustid import get_acoustid_client
-from funkwhale_api.providers.audiofile import tasks as audiofile_tasks
 from funkwhale_api.taskapp import celery
 
 from . import lyrics as lyrics_utils
 from . import models
-from . import utils as music_utils
+from . import metadata
+from . import signals
+from . import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +41,7 @@ def set_acoustid_on_track_file(track_file):
         return update(result["id"])
 
 
-def import_track_from_remote(library_track):
-    metadata = library_track.metadata
+def import_track_from_remote(metadata):
     try:
         track_mbid = metadata["recording"]["musicbrainz_id"]
         assert track_mbid  # for null/empty values
@@ -52,7 +58,7 @@ def import_track_from_remote(library_track):
     else:
         album, _ = models.Album.get_or_create_from_api(mbid=album_mbid)
         return models.Track.get_or_create_from_title(
-            library_track.title, artist=album.artist, album=album
+            metadata["title"], artist=album.artist, album=album
         )[0]
 
     try:
@@ -63,128 +69,21 @@ def import_track_from_remote(library_track):
     else:
         artist, _ = models.Artist.get_or_create_from_api(mbid=artist_mbid)
         album, _ = models.Album.get_or_create_from_title(
-            library_track.album_title, artist=artist
+            metadata["album_title"], artist=artist
         )
         return models.Track.get_or_create_from_title(
-            library_track.title, artist=artist, album=album
+            metadata["title"], artist=artist, album=album
         )[0]
 
     # worst case scenario, we have absolutely no way to link to a
     # musicbrainz resource, we rely on the name/titles
-    artist, _ = models.Artist.get_or_create_from_name(library_track.artist_name)
+    artist, _ = models.Artist.get_or_create_from_name(metadata["artist_name"])
     album, _ = models.Album.get_or_create_from_title(
-        library_track.album_title, artist=artist
+        metadata["album_title"], artist=artist
     )
     return models.Track.get_or_create_from_title(
-        library_track.title, artist=artist, album=album
+        metadata["title"], artist=artist, album=album
     )[0]
-
-
-def _do_import(import_job, use_acoustid=False):
-    logger.info("[Import Job %s] starting job", import_job.pk)
-    from_file = bool(import_job.audio_file)
-    mbid = import_job.mbid
-    replace = import_job.replace_if_duplicate
-    acoustid_track_id = None
-    duration = None
-    track = None
-    # use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
-    # Acoustid is not reliable, we disable it for now.
-    use_acoustid = False
-    if not mbid and use_acoustid and from_file:
-        # we try to deduce mbid from acoustid
-        client = get_acoustid_client()
-        match = client.get_best_match(import_job.audio_file.path)
-        if match:
-            duration = match["recordings"][0]["duration"]
-            mbid = match["recordings"][0]["id"]
-            acoustid_track_id = match["id"]
-    if mbid:
-        logger.info(
-            "[Import Job %s] importing track from musicbrainz recording %s",
-            import_job.pk,
-            str(mbid),
-        )
-        track, _ = models.Track.get_or_create_from_api(mbid=mbid)
-    elif import_job.audio_file:
-        logger.info(
-            "[Import Job %s] importing track from uploaded track data at %s",
-            import_job.pk,
-            import_job.audio_file.path,
-        )
-        track = audiofile_tasks.import_track_data_from_path(import_job.audio_file.path)
-    elif import_job.library_track:
-        logger.info(
-            "[Import Job %s] importing track from federated library track %s",
-            import_job.pk,
-            import_job.library_track.pk,
-        )
-        track = import_track_from_remote(import_job.library_track)
-    elif import_job.source.startswith("file://"):
-        tf_path = import_job.source.replace("file://", "", 1)
-        logger.info(
-            "[Import Job %s] importing track from local track data at %s",
-            import_job.pk,
-            tf_path,
-        )
-        track = audiofile_tasks.import_track_data_from_path(tf_path)
-    else:
-        raise ValueError(
-            "Not enough data to process import, "
-            "add a mbid, an audio file or a library track"
-        )
-
-    track_file = None
-    if replace:
-        logger.info("[Import Job %s] deleting existing audio file", import_job.pk)
-        track.files.all().delete()
-    elif track.files.count() > 0:
-        logger.info(
-            "[Import Job %s] skipping, we already have a file for this track",
-            import_job.pk,
-        )
-        if import_job.audio_file:
-            import_job.audio_file.delete()
-        import_job.status = "skipped"
-        import_job.save()
-        return
-
-    track_file = track_file or models.TrackFile(track=track, source=import_job.source)
-    track_file.acoustid_track_id = acoustid_track_id
-    if from_file:
-        track_file.audio_file = ContentFile(import_job.audio_file.read())
-        track_file.audio_file.name = import_job.audio_file.name
-        track_file.duration = duration
-    elif import_job.library_track:
-        track_file.library_track = import_job.library_track
-        track_file.mimetype = import_job.library_track.audio_mimetype
-        if import_job.library_track.library.download_files:
-            raise NotImplementedError()
-        else:
-            # no downloading, we hotlink
-            pass
-    elif not import_job.audio_file and not import_job.source.startswith("file://"):
-        # not an inplace import, and we have a source, so let's download it
-        logger.info("[Import Job %s] downloading audio file from remote", import_job.pk)
-        track_file.download_file()
-    elif not import_job.audio_file and import_job.source.startswith("file://"):
-        # in place import, we set mimetype from extension
-        path, ext = os.path.splitext(import_job.source)
-        track_file.mimetype = music_utils.get_type_from_ext(ext)
-    track_file.set_audio_data()
-    track_file.save()
-    # if no cover is set on track album, we try to update it as well:
-    if not track.album.cover:
-        logger.info("[Import Job %s] retrieving album cover", import_job.pk)
-        update_album_cover(track.album, track_file)
-    import_job.status = "finished"
-    import_job.track_file = track_file
-    if import_job.audio_file:
-        # it's imported on the track, we don't need it anymore
-        import_job.audio_file.delete()
-    import_job.save()
-    logger.info("[Import Job %s] job finished", import_job.pk)
-    return track_file
 
 
 def update_album_cover(album, track_file, replace=False):
@@ -240,37 +139,6 @@ def get_cover_from_fs(dir_path):
                 return {"mimetype": m, "content": c.read()}
 
 
-@celery.app.task(name="ImportJob.run", bind=True)
-@celery.require_instance(
-    models.ImportJob.objects.filter(status__in=["pending", "errored"]), "import_job"
-)
-def import_job_run(self, import_job, use_acoustid=False):
-    def mark_errored(exc):
-        logger.error("[Import Job %s] Error during import: %s", import_job.pk, str(exc))
-        import_job.status = "errored"
-        import_job.save(update_fields=["status"])
-
-    try:
-        tf = _do_import(import_job, use_acoustid=use_acoustid)
-        return tf.pk if tf else None
-    except Exception as exc:
-        if not settings.DEBUG:
-            try:
-                self.retry(exc=exc, countdown=30, max_retries=3)
-            except Exception:
-                mark_errored(exc)
-                raise
-        mark_errored(exc)
-        raise
-
-
-@celery.app.task(name="ImportBatch.run")
-@celery.require_instance(models.ImportBatch, "import_batch")
-def import_batch_run(import_batch):
-    for job_id in import_batch.jobs.order_by("id").values_list("id", flat=True):
-        import_job_run.delay(import_job_id=job_id)
-
-
 @celery.app.task(name="Lyrics.fetch_content")
 @celery.require_instance(models.Lyrics, "lyrics")
 def fetch_content(lyrics):
@@ -301,7 +169,7 @@ def import_batch_notify_followers(import_batch):
     collection = federation_serializers.CollectionSerializer(
         {
             "actor": library_actor,
-            "id": import_batch.get_federation_url(),
+            "id": import_batch.get_federation_id(),
             "items": track_files,
             "item_serializer": federation_serializers.AudioSerializer,
         }
@@ -312,9 +180,266 @@ def import_batch_notify_followers(import_batch):
                 "type": "Create",
                 "id": collection["id"],
                 "object": collection,
-                "actor": library_actor.url,
+                "actor": library_actor.fid,
                 "to": [f.url],
             }
         ).data
 
         activity.deliver(create, on_behalf_of=library_actor, to=[f.url])
+
+
+@celery.app.task(
+    name="music.start_library_scan",
+    retry_backoff=60,
+    max_retries=5,
+    autoretry_for=[RequestException],
+)
+@celery.require_instance(
+    models.LibraryScan.objects.select_related().filter(status="pending"), "library_scan"
+)
+def start_library_scan(library_scan):
+    data = lb.get_library_data(library_scan.library.fid, actor=library_scan.actor)
+    library_scan.modification_date = timezone.now()
+    library_scan.status = "scanning"
+    library_scan.total_files = data["totalItems"]
+    library_scan.save(update_fields=["status", "modification_date", "total_files"])
+    scan_library_page.delay(library_scan_id=library_scan.pk, page_url=data["first"])
+
+
+@celery.app.task(
+    name="music.scan_library_page",
+    retry_backoff=60,
+    max_retries=5,
+    autoretry_for=[RequestException],
+)
+@celery.require_instance(
+    models.LibraryScan.objects.select_related().filter(status="scanning"),
+    "library_scan",
+)
+def scan_library_page(library_scan, page_url):
+    data = lb.get_library_page(library_scan.library, page_url, library_scan.actor)
+    tfs = []
+
+    for item_serializer in data["items"]:
+        tf = item_serializer.save(library=library_scan.library)
+        if tf.import_status == "pending" and not tf.track:
+            # this track is not matched to any musicbrainz or other musical
+            # metadata
+            import_track_file.delay(track_file_id=tf.pk)
+        tfs.append(tf)
+
+    library_scan.processed_files = F("processed_files") + len(tfs)
+    library_scan.modification_date = timezone.now()
+    update_fields = ["modification_date", "processed_files"]
+
+    next_page = data.get("next")
+    fetch_next = next_page and next_page != page_url
+
+    if not fetch_next:
+        update_fields.append("status")
+        library_scan.status = "finished"
+    library_scan.save(update_fields=update_fields)
+
+    if fetch_next:
+        scan_library_page.delay(library_scan_id=library_scan.pk, page_url=next_page)
+
+
+def getter(data, *keys):
+    if not data:
+        return
+    v = data
+    for k in keys:
+        v = v.get(k)
+
+    return v
+
+
+class TrackFileImportError(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+def fail_import(track_file, error_code):
+    old_status = track_file.import_status
+    track_file.import_status = "errored"
+    track_file.import_details = {"error_code": error_code}
+    track_file.import_date = timezone.now()
+    track_file.save(update_fields=["import_details", "import_status", "import_date"])
+    signals.track_file_import_status_updated.send(
+        old_status=old_status,
+        new_status=track_file.import_status,
+        track_file=track_file,
+        sender=None,
+    )
+
+
+@celery.app.task(name="music.import_track_file")
+@celery.require_instance(
+    models.TrackFile.objects.filter(import_status="pending").select_related(
+        "library__actor__user"
+    ),
+    "track_file",
+)
+def import_track_file(track_file):
+    data = track_file.import_metadata or {}
+    old_status = track_file.import_status
+    try:
+        track = get_track_from_import_metadata(track_file.import_metadata or {})
+        if not track and track_file.audio_file:
+            # easy ways did not work. Now we have to be smart and use
+            # metadata from the file itself if any
+            track = import_track_data_from_file(track_file.audio_file.file, hints=data)
+        if not track and track_file.metadata:
+            # we can try to import using federation metadata
+            track = import_track_from_remote(track_file.metadata)
+    except TrackFileImportError as e:
+        return fail_import(track_file, e.code)
+    except Exception:
+        fail_import(track_file, "unknown_error")
+        raise
+    # under some situations, we want to skip the import (
+    # for instance if the user already owns the files)
+    owned_duplicates = get_owned_duplicates(track_file, track)
+    track_file.track = track
+
+    if owned_duplicates:
+        track_file.import_status = "skipped"
+        track_file.import_details = {
+            "code": "already_imported_in_owned_libraries",
+            "duplicates": list(owned_duplicates),
+        }
+        track_file.import_date = timezone.now()
+        track_file.save(
+            update_fields=["import_details", "import_status", "import_date", "track"]
+        )
+        signals.track_file_import_status_updated.send(
+            old_status=old_status,
+            new_status=track_file.import_status,
+            track_file=track_file,
+            sender=None,
+        )
+        return
+
+    # all is good, let's finalize the import
+    audio_data = track_file.get_audio_data()
+    if audio_data:
+        track_file.duration = audio_data["duration"]
+        track_file.size = audio_data["size"]
+        track_file.bitrate = audio_data["bitrate"]
+    track_file.import_status = "finished"
+    track_file.import_date = timezone.now()
+    track_file.save(
+        update_fields=[
+            "track",
+            "import_status",
+            "import_date",
+            "size",
+            "duration",
+            "bitrate",
+        ]
+    )
+    signals.track_file_import_status_updated.send(
+        old_status=old_status,
+        new_status=track_file.import_status,
+        track_file=track_file,
+        sender=None,
+    )
+
+    if not track.album.cover:
+        update_album_cover(track.album, track_file)
+
+
+def get_track_from_import_metadata(data):
+    track_mbid = getter(data, "track", "mbid")
+    track_uuid = getter(data, "track", "uuid")
+
+    if track_mbid:
+        # easiest case: there is a MBID provided in the import_metadata
+        return models.Track.get_or_create_from_api(mbid=track_mbid)[0]
+    if track_uuid:
+        # another easy case, we have a reference to a uuid of a track that
+        # already exists in our database
+        try:
+            return models.Track.objects.get(uuid=track_uuid)
+        except models.Track.DoesNotExist:
+            raise TrackFileImportError(code="track_uuid_not_found")
+
+
+def get_owned_duplicates(track_file, track):
+    """
+    Ensure we skip duplicate tracks to avoid wasting user/instance storage
+    """
+    owned_libraries = track_file.library.actor.libraries.all()
+    return (
+        models.TrackFile.objects.filter(
+            track__isnull=False, library__in=owned_libraries, track=track
+        )
+        .exclude(pk=track_file.pk)
+        .values_list("uuid", flat=True)
+    )
+
+
+@transaction.atomic
+def import_track_data_from_file(file, hints={}):
+    data = metadata.Metadata(file)
+    album = None
+    track_mbid = data.get("musicbrainz_recordingid", None)
+    album_mbid = data.get("musicbrainz_albumid", None)
+
+    if album_mbid and track_mbid:
+        # to gain performance and avoid additional mb lookups,
+        # we import from the release data, which is already cached
+        return models.Track.get_or_create_from_release(album_mbid, track_mbid)[0]
+    elif track_mbid:
+        return models.Track.get_or_create_from_api(track_mbid)[0]
+    elif album_mbid:
+        album = models.Album.get_or_create_from_api(album_mbid)[0]
+
+    artist = album.artist if album else None
+    artist_mbid = data.get("musicbrainz_artistid", None)
+    if not artist:
+        if artist_mbid:
+            artist = models.Artist.get_or_create_from_api(artist_mbid)[0]
+        else:
+            artist = models.Artist.objects.get_or_create(
+                name__iexact=data.get("artist"), defaults={"name": data.get("artist")}
+            )[0]
+
+    release_date = data.get("date", default=None)
+    if not album:
+        album = models.Album.objects.get_or_create(
+            title__iexact=data.get("album"),
+            artist=artist,
+            defaults={"title": data.get("album"), "release_date": release_date},
+        )[0]
+    position = data.get("track_number", default=None)
+    track = models.Track.objects.get_or_create(
+        title__iexact=data.get("title"),
+        album=album,
+        defaults={"title": data.get("title"), "position": position},
+    )[0]
+    return track
+
+
+@receiver(signals.track_file_import_status_updated)
+def broadcast_import_status_update_to_owner(
+    old_status, new_status, track_file, **kwargs
+):
+    user = track_file.library.actor.get_user()
+    if not user:
+        return
+    group = "user.{}.imports".format(user.pk)
+    channels.group_send(
+        group,
+        {
+            "type": "event.send",
+            "text": "",
+            "data": {
+                "type": "import.status_updated",
+                "track_file": serializers.TrackFileForOwnerSerializer(track_file).data,
+                "old_status": old_status,
+                "new_status": new_status,
+            },
+        },
+    )

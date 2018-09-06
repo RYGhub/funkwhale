@@ -8,9 +8,6 @@ services:
       - .env
     environment:
       - "HOST=0.0.0.0"
-      - "VUE_PORT=${VUE_PORT-8080}"
-    ports:
-      - "${VUE_PORT_BINDING-8080:}${VUE_PORT-8080}"
     volumes:
       - "./front:/app"
       - "/app/node_modules"
