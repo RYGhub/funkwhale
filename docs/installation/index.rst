@@ -118,7 +118,7 @@ To avoid configuration errors at this level, we will generate an nginx configura
 using your .env file. This will ensure your reverse-proxy configuration always
 match the application configuration and make upgrade/maintenance easier.
 
-On docker deployments, run the following commands::
+On docker deployments, run the following commands:
 
 .. parsed-literal::
 
@@ -132,7 +132,7 @@ On docker deployments, run the following commands::
         < /etc/nginx/sites-available/funkwhale.template \
         > /etc/nginx/sites-available/funkwhale.conf
 
-On non-docker deployments, run the following commands::
+On non-docker deployments, run the following commands:
 
 .. parsed-literal::
 
