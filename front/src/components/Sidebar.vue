@@ -42,7 +42,12 @@
               <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
-            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
+            <template v-else>
+              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
+              <router-link class="item" :to="{path: '/signup'}">
+                <translate>Create an account</translate>
+              </router-link>
+            </template>
           </div>
         </div>
         <div class="item">
