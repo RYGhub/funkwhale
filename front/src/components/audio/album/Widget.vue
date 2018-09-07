@@ -30,7 +30,7 @@
         </div>
         <div class="extra content">
           <human-date class="left floated" :date="album.creation_date"></human-date>
-          <play-button class="right floated basic icon" :dropdown-only="true" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :album="album.id"></play-button>
+          <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="album.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :album="album.id"></play-button>
         </div>
       </div>
     </div>
