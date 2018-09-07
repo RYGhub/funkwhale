@@ -1,0 +1,2 @@
+Do not restart current song when rordering queue, deleting tracks from queue or
+adding tracks to queue (#464)

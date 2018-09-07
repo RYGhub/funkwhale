@@ -317,8 +317,8 @@ export default {
     }
   },
   watch: {
-    currentTrack (newValue) {
-      if (!this.isShuffling) {
+    currentTrack (newValue, oldValue) {
+      if (!this.isShuffling && newValue != oldValue) {
         this.audioKey = String(new Date())
       }
       if (!newValue || !newValue.album.cover) {
