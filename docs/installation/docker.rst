@@ -20,7 +20,7 @@ Create your env file:
 .. parsed-literal::
 
     export FUNKWHALE_VERSION="|version|"
-    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
+    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
 
 Ensure to edit it to match your needs (this file is heavily commented)
