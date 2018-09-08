@@ -207,7 +207,7 @@ Download the sample environment file:
 
 .. parsed-literal::
 
-    curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
+    curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
 
 .. note::
 

@@ -120,7 +120,7 @@ match the application configuration and make upgrade/maintenance easier.
 
 On docker deployments, run the following commands:
 
-.. parsed-literal::
+.. code:: shell
 
     # download the needed files
     curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
@@ -134,7 +134,7 @@ On docker deployments, run the following commands:
 
 On non-docker deployments, run the following commands:
 
-.. parsed-literal::
+.. code:: shell
 
     # download the needed files
     curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
