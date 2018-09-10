@@ -18,7 +18,7 @@
                 Album containing %{ count } track, by %{ artist }
               </translate>
             </div>
-            <div class="ui basic buttons">
+            <div class="ui buttons">
               <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
                 <translate>Artist page</translate>
               </router-link>
