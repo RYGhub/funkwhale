@@ -53,7 +53,7 @@
             <tr v-for="(plt, index) in plts" :key="plt.id">
               <td class="left aligned">{{ plt.index + 1}}</td>
               <td class="center aligned">
-                <img class="ui mini image" v-if="plt.track.album.cover" :src="plt.track.album.cover">
+                <img class="ui mini image" v-if="plt.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](plt.track.album.cover.small_square_crop)">
                 <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
