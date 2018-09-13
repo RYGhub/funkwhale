@@ -11,6 +11,12 @@
       <div v-if="scanResult && scanResult.results.length > 0" class="ui two cards">
         <library-card :library="library" v-for="library in scanResult.results" :key="library.fid" />
       </div>
+      <template v-if="existingFollows && existingFollows.count > 0">
+        <h2><translate>Known libraries</translate></h2>
+        <div class="ui two cards">
+          <library-card :library="getLibraryFromFollow(follow)" v-for="follow in existingFollows.results" :key="follow.fid" />
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -24,11 +30,12 @@ export default {
   data () {
     return {
       isLoading: false,
-      scanResult: null
+      scanResult: null,
+      existingFollows: null
     }
   },
   created () {
-    // this.fetch()
+    this.fetch()
   },
   components: {
     ScanForm,
@@ -38,13 +45,17 @@ export default {
     fetch () {
       this.isLoading = true
       let self = this
-      axios.get('libraries/').then((response) => {
+      axios.get('federation/follows/library/', {params: {'page_size': 100, 'ordering': '-creation_date'}}).then((response) => {
+        self.existingFollows = response.data
         self.isLoading = false
-        self.libraries = response.data.results
-        if (self.libraries.length === 0) {
-          self.hiddenForm = false
-        }
+      }, error => {
+        self.isLoading = false
       })
+    },
+    getLibraryFromFollow (follow) {
+      let d = follow.target
+      d.follow = follow
+      return d
     }
   }
 }

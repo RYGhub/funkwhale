@@ -33,10 +33,10 @@ def inbox_follow(payload, context):
     autoapprove = serializer.validated_data["object"].should_autoapprove_follow(
         context["actor"]
     )
-    follow = serializer.save(approved=autoapprove)
-
-    if autoapprove:
-        activity.accept_follow(follow)
+    follow = serializer.save(approved=True if autoapprove else None)
+    if follow.approved:
+        outbox.dispatch({"type": "Accept"}, context={"follow": follow})
+    return {"object": follow.target, "related_object": follow}
 
 
 @inbox.register({"type": "Accept"})
@@ -54,6 +54,8 @@ def inbox_accept(payload, context):
         return
 
     serializer.save()
+    obj = serializer.validated_data["follow"]
+    return {"object": obj, "related_object": obj.target}
 
 
 @outbox.register({"type": "Accept"})
@@ -64,7 +66,13 @@ def outbox_accept(context):
     else:
         actor = follow.target
     payload = serializers.AcceptFollowSerializer(follow, context={"actor": actor}).data
-    yield {"actor": actor, "payload": with_recipients(payload, to=[follow.actor])}
+    yield {
+        "actor": actor,
+        "type": "Accept",
+        "payload": with_recipients(payload, to=[follow.actor]),
+        "object": follow,
+        "related_object": follow.target,
+    }
 
 
 @outbox.register({"type": "Follow"})
@@ -75,4 +83,10 @@ def outbox_follow(context):
     else:
         target = follow.target
     payload = serializers.FollowSerializer(follow, context={"actor": follow.actor}).data
-    yield {"actor": follow.actor, "payload": with_recipients(payload, to=[target])}
+    yield {
+        "type": "Follow",
+        "actor": follow.actor,
+        "payload": with_recipients(payload, to=[target]),
+        "object": follow.target,
+        "related_object": follow,
+    }

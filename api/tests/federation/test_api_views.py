@@ -1,3 +1,5 @@
+import pytest
+
 from django.urls import reverse
 
 from funkwhale_api.federation import api_serializers
@@ -49,3 +51,82 @@ def test_can_follow_library(factories, logged_in_api_client, mocker):
     assert follow.actor == actor
 
     dispatch.assert_called_once_with({"type": "Follow"}, context={"follow": follow})
+
+
+@pytest.mark.parametrize("action", ["accept", "reject"])
+def test_user_cannot_edit_someone_else_library_follow(
+    factories, logged_in_api_client, action
+):
+    logged_in_api_client.user.create_actor()
+    follow = factories["federation.LibraryFollow"]()
+    url = reverse(
+        "api:v1:federation:library-follows-{}".format(action),
+        kwargs={"uuid": follow.uuid},
+    )
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("action,expected", [("accept", True), ("reject", False)])
+def test_user_can_accept_or_reject_own_follows(
+    factories, logged_in_api_client, action, expected, mocker
+):
+    mocked_dispatch = mocker.patch(
+        "funkwhale_api.federation.activity.OutboxRouter.dispatch"
+    )
+    actor = logged_in_api_client.user.create_actor()
+    follow = factories["federation.LibraryFollow"](target__actor=actor)
+    url = reverse(
+        "api:v1:federation:library-follows-{}".format(action),
+        kwargs={"uuid": follow.uuid},
+    )
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 204
+
+    follow.refresh_from_db()
+
+    assert follow.approved is expected
+
+    mocked_dispatch.assert_called_once_with(
+        {"type": "Accept"}, context={"follow": follow}
+    )
+
+
+def test_user_can_list_inbox_items(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    ii = factories["federation.InboxItem"](
+        activity__type="Follow", actor=actor, type="to"
+    )
+
+    factories["federation.InboxItem"](activity__type="Follow", actor=actor, type="cc")
+    factories["federation.InboxItem"](activity__type="Follow", type="to")
+
+    url = reverse("api:v1:federation:inbox-list")
+
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "count": 1,
+        "results": [api_serializers.InboxItemSerializer(ii).data],
+        "next": None,
+        "previous": None,
+    }
+
+
+def test_user_can_update_read_status_of_inbox_item(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    ii = factories["federation.InboxItem"](
+        activity__type="Follow", actor=actor, type="to"
+    )
+
+    url = reverse("api:v1:federation:inbox-detail", kwargs={"pk": ii.pk})
+
+    response = logged_in_api_client.patch(url, {"is_read": True})
+    assert response.status_code == 200
+
+    ii.refresh_from_db()
+
+    assert ii.is_read is True

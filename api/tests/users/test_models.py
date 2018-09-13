@@ -170,7 +170,10 @@ def test_creating_actor_from_user(factories, settings):
 def test_get_channels_groups(factories):
     user = factories["users.User"]()
 
-    assert user.get_channels_groups() == ["user.{}.imports".format(user.pk)]
+    assert user.get_channels_groups() == [
+        "user.{}.imports".format(user.pk),
+        "user.{}.inbox".format(user.pk),
+    ]
 
 
 def test_user_quota_default_to_preference(factories, preferences):

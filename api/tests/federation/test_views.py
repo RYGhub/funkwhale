@@ -105,9 +105,7 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
 
     assert response.status_code == 200
     patched_receive.assert_called_once_with(
-        activity={"hello": "world"},
-        on_behalf_of=authenticated_actor,
-        recipient=user.actor,
+        activity={"hello": "world"}, on_behalf_of=authenticated_actor
     )
 
 

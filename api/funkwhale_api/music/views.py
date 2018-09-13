@@ -18,6 +18,7 @@ from taggit.models import Tag
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.federation.authentication import SignatureAuthentication
+from funkwhale_api.federation import api_serializers as federation_api_serializers
 
 from . import filters, models, serializers, tasks, utils
 
@@ -93,6 +94,25 @@ class LibraryViewSet(
 
     def perform_create(self, serializer):
         serializer.save(actor=self.request.user.actor)
+
+    @detail_route(methods=["get"])
+    @transaction.non_atomic_requests
+    def follows(self, request, *args, **kwargs):
+        library = self.get_object()
+        queryset = (
+            library.received_follows.filter(target__actor=self.request.user.actor)
+            .select_related("actor", "target__actor")
+            .order_by("-creation_date")
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = federation_api_serializers.LibraryFollowSerializer(
+                page, many=True
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):

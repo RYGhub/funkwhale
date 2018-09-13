@@ -74,8 +74,14 @@ def dispatch_inbox(activity):
         routes.inbox.dispatch(
             activity.payload,
             context={
+                "activity": activity,
                 "actor": activity.actor,
-                "inbox_items": list(activity.inbox_items.local().select_related()),
+                "inbox_items": (
+                    activity.inbox_items.local()
+                    .select_related()
+                    .select_related("actor__user")
+                    .prefetch_related("activity__object", "activity__target")
+                ),
             },
         )
     except Exception:

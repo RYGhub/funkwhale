@@ -1,6 +1,6 @@
 <template>
   <span :title="actor.full_username">
-    <span :style="defaultAvatarStyle" class="ui circular label">{{ actor.preferred_username[0]}}</span>
+    <actor-avatar v-if="avatar" :actor="actor" />
     &nbsp;{{ actor.full_username | truncate(30) }}
   </span>
 </template>
@@ -9,22 +9,9 @@
 import {hashCode, intToRGB} from '@/utils/color'
 
 export default {
-  props: ['actor'],
-  computed: {
-    actorColor () {
-      return intToRGB(hashCode(this.actor.full_username))
-    },
-    defaultAvatarStyle () {
-      return {
-        'background-color': `#${this.actorColor}`
-      }
-    }
+  props: {
+    actor: {type: Object},
+    avatar: {type: Boolean, default: true}
   }
 }
 </script>
-<style scoped>
-.tiny.circular.avatar {
-  width: 1.7em;
-  height: 1.7em;
-}
-</style>

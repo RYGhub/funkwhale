@@ -3,6 +3,8 @@ import uuid
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -173,6 +175,7 @@ class InboxItem(models.Model):
     type = models.CharField(max_length=10, choices=[("to", "to"), ("cc", "cc")])
     last_delivery_date = models.DateTimeField(null=True, blank=True)
     delivery_attempts = models.PositiveIntegerField(default=0)
+    is_read = models.BooleanField(default=False)
 
     objects = InboxItemQuerySet.as_manager()
 
@@ -188,7 +191,36 @@ class Activity(models.Model):
     fid = models.URLField(unique=True, max_length=500, null=True, blank=True)
     url = models.URLField(max_length=500, null=True, blank=True)
     payload = JSONField(default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder)
-    creation_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now, db_index=True)
+    type = models.CharField(db_index=True, null=True, max_length=100)
+
+    # generic relations
+    object_id = models.IntegerField(null=True)
+    object_content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="objecting_activities",
+    )
+    object = GenericForeignKey("object_content_type", "object_id")
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="targeting_activities",
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+    related_object_id = models.IntegerField(null=True)
+    related_object_content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="related_objecting_activities",
+    )
+    related_object = GenericForeignKey(
+        "related_object_content_type", "related_object_id"
+    )
 
 
 class AbstractFollow(models.Model):

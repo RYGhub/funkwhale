@@ -59,7 +59,7 @@ def test_clean_federation_music_cache_orphaned(settings, preferences, factories)
     assert os.path.exists(remove_path) is False
 
 
-def test_handle_in(factories, mocker, now):
+def test_handle_in(factories, mocker, now, queryset_equal_list):
     mocked_dispatch = mocker.patch("funkwhale_api.federation.routes.inbox.dispatch")
 
     r1 = factories["users.User"](with_actor=True).actor
@@ -70,7 +70,7 @@ def test_handle_in(factories, mocker, now):
     tasks.dispatch_inbox(activity_id=a.pk)
 
     mocked_dispatch.assert_called_once_with(
-        a.payload, context={"actor": a.actor, "inbox_items": [ii1, ii2]}
+        a.payload, context={"actor": a.actor, "activity": a, "inbox_items": [ii1, ii2]}
     )
 
     ii1.refresh_from_db()

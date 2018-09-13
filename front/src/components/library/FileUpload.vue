@@ -1,24 +1,7 @@
   <template>
   <div>
-    <div class="ui hidden clearing divider"></div>
-    <!-- <div v-if="files.length > 0" class="ui indicating progress">
-      <div class="bar"></div>
-      <div class="label">
-        {{ uploadedFilesCount }}/{{ files.length }} files uploaded,
-        {{ processedFilesCount }}/{{ processableFiles }} files processed
-      </div>
-    </div> -->
-    <div class="ui form">
-      <div class="fields">
-        <div class="ui four wide field">
-          <label><translate>Import reference</translate></label>
-          <input type="text" v-model="importReference" />
-        </div>
-      </div>
-
-    </div>
-    <p><translate>This reference will be used to group imported files together.</translate></p>
     <div class="ui top attached tabular menu">
+      <a :class="['item', {active: currentTab === 'summary'}]" @click="currentTab = 'summary'"><translate>Summary</translate></a>
       <a :class="['item', {active: currentTab === 'uploads'}]" @click="currentTab = 'uploads'">
         <translate>Uploading</translate>
         <div v-if="files.length === 0" class="ui label">
@@ -43,6 +26,37 @@
           {{ processedFilesCount }}/{{ processableFiles }}
         </div>
       </a>
+    </div>
+
+    <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'summary'}]">
+      <h2 class="ui header"><translate>Upload new tracks</translate></h2>
+      <div class="ui message">
+        <p><translate>You are about to upload music to your library. Before proceeding, please ensure that:</translate></p>
+        <ul>
+          <li v-if="library.privacy_level != 'me'">
+            You are not uploading copyrighted content in a public library, otherwise you may be infringing the law
+          </li>
+          <li>
+            <translate>The music files you are uploading are tagged properly:</translate>
+            <a href="http://picard.musicbrainz.org/" target='_blank'><translate>we recommend using Picard for that purpose</translate></a>
+          </li>
+          <li>
+            <translate>The uploaded music files are in OGG, Flac or MP3 format</translate>
+          </li>
+        </ul>
+      </div>
+
+      <div class="ui form">
+        <div class="fields">
+          <div class="ui four wide field">
+            <label><translate>Import reference</translate></label>
+            <p><translate>This reference will be used to group imported files together.</translate></p>
+            <input type="text" v-model="importReference" />
+          </div>
+        </div>
+
+      </div>
+      <div class="ui green button" @click="currentTab = 'uploads'"><translate>Proceed</translate></div>
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'uploads'}]">
       <div class="ui container">
@@ -114,7 +128,6 @@ import logger from '@/logging'
 import FileUploadWidget from './FileUploadWidget'
 import LibraryFilesTable from '@/views/content/libraries/FilesTable'
 import moment from 'moment'
-import { WebSocketBridge } from 'django-channels'
 
 export default {
   props: ['library', 'defaultImportReference'],
@@ -127,7 +140,7 @@ export default {
     this.$router.replace({query: {import: importReference}})
     return {
       files: [],
-      currentTab: 'uploads',
+      currentTab: 'summary',
       uploadUrl: '/api/v1/track-files/',
       importReference,
       trackFiles: {
@@ -137,18 +150,23 @@ export default {
         errored: 0,
         objects: {},
       },
-      bridge: null,
       processTimestamp: new Date()
     }
   },
   created () {
-    this.openWebsocket()
     this.fetchStatus()
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'import.status_updated',
+      id: 'fileUpload',
+      handler: this.handleImportEvent
+    })
   },
   destroyed () {
-    this.disconnect()
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'import.status_updated',
+      id: 'fileUpload',
+    })
   },
-
   methods: {
     inputFilter (newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
@@ -199,20 +217,17 @@ export default {
         console.log('Connected to WebSocket')
       })
     },
-    handleEvent (event) {
-      console.log('Received event', event.type, event)
+    handleImportEvent (event) {
       let self = this
-      if (event.type === 'import.status_updated') {
-        if (event.track_file.import_reference != self.importReference) {
-          return
-        }
-        this.$nextTick(() => {
-          self.trackFiles[event.old_status] -= 1
-          self.trackFiles[event.new_status] += 1
-          self.trackFiles.objects[event.track_file.uuid] = event.track_file
-          self.triggerReload()
-        })
+      if (event.track_file.import_reference != self.importReference) {
+        return
       }
+      this.$nextTick(() => {
+        self.trackFiles[event.old_status] -= 1
+        self.trackFiles[event.new_status] += 1
+        self.trackFiles.objects[event.track_file.uuid] = event.track_file
+        self.triggerReload()
+      })
     },
     triggerReload: _.throttle(function () {
       this.processTimestamp = new Date()
@@ -297,8 +312,5 @@ export default {
   border-style: dashed !important;
   border: 3px solid rgba(50, 50, 50, 0.5);
   font-size: 1.5em;
-}
-.segment.hidden {
-  display: none;
 }
 </style>

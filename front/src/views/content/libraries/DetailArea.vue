@@ -1,15 +1,12 @@
 <template>
   <div>
     <div class="ui stackable grid">
-      <div class="eleven wide stretched column">
-        <slot name="header"></slot>
-      </div>
       <div class="five wide column">
         <h3 class="ui header"><translate>Current library</translate></h3>
         <library-card :library="library" />
       </div>
     </div>
-    <div class="ui divider"></div>
+    <div class="ui hidden divider"></div>
     <slot></slot>
   </div>
 </template>

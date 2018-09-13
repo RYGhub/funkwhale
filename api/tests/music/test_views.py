@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from funkwhale_api.music import serializers, tasks, views
+from funkwhale_api.federation import api_serializers as federation_api_serializers
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -384,3 +385,22 @@ def test_user_can_create_track_file(
     assert tf.import_reference == "test"
     assert tf.track is None
     m.assert_called_once_with(tasks.import_track_file.delay, track_file_id=tf.pk)
+
+
+def test_user_can_list_own_library_follows(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    library = factories["music.Library"](actor=actor)
+    another_library = factories["music.Library"](actor=actor)
+    follow = factories["federation.LibraryFollow"](target=library)
+    factories["federation.LibraryFollow"](target=another_library)
+
+    url = reverse("api:v1:libraries-follows", kwargs={"uuid": library.uuid})
+
+    response = logged_in_api_client.get(url)
+
+    assert response.data == {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [federation_api_serializers.LibraryFollowSerializer(follow).data],
+    }

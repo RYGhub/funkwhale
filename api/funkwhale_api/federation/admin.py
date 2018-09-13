@@ -1,6 +1,38 @@
 from django.contrib import admin
 
 from . import models
+from . import tasks
+
+
+def redeliver_inbox_items(modeladmin, request, queryset):
+    for id in set(
+        queryset.filter(activity__actor__user__isnull=False).values_list(
+            "activity", flat=True
+        )
+    ):
+        tasks.dispatch_outbox.delay(activity_id=id)
+
+
+redeliver_inbox_items.short_description = "Redeliver"
+
+
+def redeliver_activities(modeladmin, request, queryset):
+    for id in set(
+        queryset.filter(actor__user__isnull=False).values_list("id", flat=True)
+    ):
+        tasks.dispatch_outbox.delay(activity_id=id)
+
+
+redeliver_activities.short_description = "Redeliver"
+
+
+@admin.register(models.Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ["type", "fid", "url", "actor", "creation_date"]
+    search_fields = ["payload", "fid", "url", "actor__domain"]
+    list_filter = ["type", "actor__domain"]
+    actions = [redeliver_activities]
+    list_select_related = True
 
 
 @admin.register(models.Actor)
@@ -25,24 +57,24 @@ class FollowAdmin(admin.ModelAdmin):
     list_select_related = True
 
 
-@admin.register(models.Library)
-class LibraryAdmin(admin.ModelAdmin):
-    list_display = ["actor", "url", "creation_date", "fetched_date", "tracks_count"]
-    search_fields = ["actor__fid", "url"]
-    list_filter = ["federation_enabled", "download_files", "autoimport"]
+@admin.register(models.LibraryFollow)
+class LibraryFollowAdmin(admin.ModelAdmin):
+    list_display = ["actor", "target", "approved", "creation_date"]
+    list_filter = ["approved"]
+    search_fields = ["actor__fid", "target__fid"]
     list_select_related = True
 
 
-@admin.register(models.LibraryTrack)
-class LibraryTrackAdmin(admin.ModelAdmin):
+@admin.register(models.InboxItem)
+class InboxItemAdmin(admin.ModelAdmin):
     list_display = [
-        "title",
-        "artist_name",
-        "album_title",
-        "url",
-        "library",
-        "creation_date",
-        "published_date",
+        "actor",
+        "activity",
+        "type",
+        "last_delivery_date",
+        "delivery_attempts",
     ]
-    search_fields = ["library__url", "url", "artist_name", "title", "album_title"]
+    list_filter = ["type"]
+    search_fields = ["actor__fid", "activity__fid"]
     list_select_related = True
+    actions = [redeliver_inbox_items]
