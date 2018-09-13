@@ -1,5 +1,5 @@
 upstream funkwhale-api {
-    # depending on your setup, you may want to udpate this
+    # depending on your setup, you may want to update this
     server api:5000;
 }
 
