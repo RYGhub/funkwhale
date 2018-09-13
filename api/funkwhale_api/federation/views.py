@@ -37,15 +37,12 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
 
     @detail_route(methods=["get", "post"])
     def inbox(self, request, *args, **kwargs):
-        actor = self.get_object()
         if request.method.lower() == "post" and request.actor is None:
             raise exceptions.AuthenticationFailed(
                 "You need a valid signature to send an activity"
             )
         if request.method.lower() == "post":
-            activity.receive(
-                activity=request.data, on_behalf_of=request.actor, recipient=actor
-            )
+            activity.receive(activity=request.data, on_behalf_of=request.actor)
         return response.Response({}, status=200)
 
     @detail_route(methods=["get", "post"])

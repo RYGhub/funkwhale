@@ -15,12 +15,50 @@ from django.core.cache import cache as django_cache
 from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
+from django.db.models import QuerySet
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
+
+
+@pytest.fixture
+def queryset_equal_queries():
+    """
+    Unitting querysets is hard because we have to compare queries
+    by hand. Let's monkey patch querysets to do that for us.
+    """
+
+    def __eq__(self, other):
+        if isinstance(other, QuerySet):
+            return str(other.query) == str(self.query)
+        else:
+            return False
+
+    setattr(QuerySet, "__eq__", __eq__)
+    yield __eq__
+    delattr(QuerySet, "__eq__")
+
+
+@pytest.fixture
+def queryset_equal_list():
+    """
+    Unitting querysets is hard because we usually simply wants to ensure
+    a querysets contains the same objects as a list, let's monkey patch
+    querysets to to that for us.
+    """
+
+    def __eq__(self, other):
+        if isinstance(other, (list, tuple)):
+            return list(self) == list(other)
+        else:
+            return False
+
+    setattr(QuerySet, "__eq__", __eq__)
+    yield __eq__
+    delattr(QuerySet, "__eq__")
 
 
 @pytest.fixture(scope="session", autouse=True)

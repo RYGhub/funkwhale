@@ -206,7 +206,7 @@ class User(AbstractUser):
         }
 
     def get_channels_groups(self):
-        groups = ["imports"]
+        groups = ["imports", "inbox"]
 
         return ["user.{}.{}".format(self.pk, g) for g in groups]
 

@@ -16,6 +16,10 @@ import ActorLink from '@/components/common/ActorLink'
 
 Vue.component('actor-link', ActorLink)
 
+import ActorAvatar from '@/components/common/ActorAvatar'
+
+Vue.component('actor-avatar', ActorAvatar)
+
 import Duration from '@/components/common/Duration'
 
 Vue.component('duration', Duration)

@@ -47,6 +47,11 @@
         class="ui disabled button"><i class="check icon"></i>
         <translate>Following</translate>
       </button>
+      <button
+        v-else-if="library.follow.approved"
+        class="ui button"><i class="x icon"></i>
+        <translate>Unfollow</translate>
+      </button>
     </div>
   </div>
 </template>

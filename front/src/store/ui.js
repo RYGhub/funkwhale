@@ -9,11 +9,20 @@ export default {
     messageDisplayDuration: 10000,
     messages: [],
     notifications: {
-      federation: 0,
-      importRequests: 0
+      inbox: 0,
+    },
+    websocketEventsHandlers: {
+      'inbox.item_added': {},
+      'import.status_updated': {},
     }
   },
   mutations: {
+    addWebsocketEventHandler: (state, {eventName, id, handler}) => {
+      state.websocketEventsHandlers[eventName][id] = handler
+    },
+    removeWebsocketEventHandler: (state, {eventName, id}) => {
+      delete state.websocketEventsHandlers[eventName][id]
+    },
     currentLanguage: (state, value) => {
       state.currentLanguage = value
     },
@@ -28,23 +37,27 @@ export default {
     },
     notifications (state, {type, count}) {
       state.notifications[type] = count
+    },
+    incrementNotifications (state, {type, count}) {
+      state.notifications[type] = Math.max(0, state.notifications[type] + count)
     }
   },
   actions: {
-    fetchFederationNotificationsCount ({rootState, commit}) {
-      if (!rootState.auth.availablePermissions['federation']) {
-        return
-      }
-      axios.get('federation/libraries/followers/', {params: {pending: true}}).then(response => {
-        commit('notifications', {type: 'federation', count: response.data.count})
+    fetchUnreadNotifications ({commit}, payload) {
+      axios.get('federation/inbox/', {params: {is_read: false, page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'inbox', count: response.data.count})
       })
     },
-    fetchImportRequestsCount ({rootState, commit}) {
-      if (!rootState.auth.availablePermissions['library']) {
+    websocketEvent ({state}, event) {
+      console.log('Dispatching websocket event', event)
+      let handlers = state.websocketEventsHandlers[event.type]
+      if (!handlers) {
         return
       }
-      axios.get('requests/import-requests/', {params: {status: 'pending'}}).then(response => {
-        commit('notifications', {type: 'importRequests', count: response.data.count})
+      let names = Object.keys(handlers)
+      names.forEach((k) => {
+        let handler = handlers[k]
+        handler(event)
       })
     }
   }

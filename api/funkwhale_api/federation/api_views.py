@@ -1,5 +1,6 @@
 import requests.exceptions
 
+from django.db import transaction
 from django.db.models import Count
 
 from rest_framework import decorators
@@ -10,12 +11,20 @@ from rest_framework import viewsets
 
 from funkwhale_api.music import models as music_models
 
+from . import activity
 from . import api_serializers
 from . import filters
 from . import models
 from . import routes
 from . import serializers
 from . import utils
+
+
+@transaction.atomic
+def update_follow(follow, approved):
+    follow.approved = approved
+    follow.save(update_fields=["approved"])
+    routes.outbox.dispatch({"type": "Accept"}, context={"follow": follow})
 
 
 class LibraryFollowViewSet(
@@ -48,6 +57,29 @@ class LibraryFollowViewSet(
         context["actor"] = self.request.user.actor
         return context
 
+    @decorators.detail_route(methods=["post"])
+    def accept(self, request, *args, **kwargs):
+        try:
+            follow = self.queryset.get(
+                target__actor=self.request.user.actor, uuid=kwargs["uuid"]
+            )
+        except models.LibraryFollow.DoesNotExist:
+            return response.Response({}, status=404)
+        update_follow(follow, approved=True)
+        return response.Response(status=204)
+
+    @decorators.detail_route(methods=["post"])
+    def reject(self, request, *args, **kwargs):
+        try:
+            follow = self.queryset.get(
+                target__actor=self.request.user.actor, uuid=kwargs["uuid"]
+            )
+        except models.LibraryFollow.DoesNotExist:
+            return response.Response({}, status=404)
+
+        update_follow(follow, approved=False)
+        return response.Response(status=204)
+
 
 class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "uuid"
@@ -59,8 +91,6 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     )
     serializer_class = api_serializers.LibrarySerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_class = filters.LibraryFollowFilter
-    ordering_fields = ("creation_date",)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -90,3 +120,36 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             )
         serializer = self.serializer_class(library)
         return response.Response({"count": 1, "results": [serializer.data]})
+
+
+class InboxItemViewSet(
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+
+    queryset = (
+        models.InboxItem.objects.select_related("activity__actor")
+        .prefetch_related("activity__object", "activity__target")
+        .filter(activity__type__in=activity.BROADCAST_TO_USER_ACTIVITIES, type="to")
+        .order_by("-activity__creation_date")
+    )
+    serializer_class = api_serializers.InboxItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_class = filters.InboxItemFilter
+    ordering_fields = ("activity__creation_date",)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(actor=self.request.user.actor)
+
+    @decorators.list_route(methods=["post"])
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = api_serializers.InboxItemActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)

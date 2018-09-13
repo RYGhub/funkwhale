@@ -36,8 +36,8 @@ def test_outbox_routes(route, handler):
 
 
 def test_inbox_follow_library_autoapprove(factories, mocker):
-    mocked_accept_follow = mocker.patch(
-        "funkwhale_api.federation.activity.accept_follow"
+    mocked_outbox_dispatch = mocker.patch(
+        "funkwhale_api.federation.activity.OutboxRouter.dispatch"
     )
 
     local_actor = factories["users.User"]().create_actor()
@@ -52,23 +52,27 @@ def test_inbox_follow_library_autoapprove(factories, mocker):
         "object": library.fid,
     }
 
-    routes.inbox_follow(
+    result = routes.inbox_follow(
         payload,
         context={"actor": remote_actor, "inbox_items": [ii], "raise_exception": True},
     )
-
     follow = library.received_follows.latest("id")
+
+    assert result["object"] == library
+    assert result["related_object"] == follow
 
     assert follow.fid == payload["id"]
     assert follow.actor == remote_actor
     assert follow.approved is True
 
-    mocked_accept_follow.assert_called_once_with(follow)
+    mocked_outbox_dispatch.assert_called_once_with(
+        {"type": "Accept"}, context={"follow": follow}
+    )
 
 
 def test_inbox_follow_library_manual_approve(factories, mocker):
-    mocked_accept_follow = mocker.patch(
-        "funkwhale_api.federation.activity.accept_follow"
+    mocked_outbox_dispatch = mocker.patch(
+        "funkwhale_api.federation.activity.OutboxRouter.dispatch"
     )
 
     local_actor = factories["users.User"]().create_actor()
@@ -83,18 +87,20 @@ def test_inbox_follow_library_manual_approve(factories, mocker):
         "object": library.fid,
     }
 
-    routes.inbox_follow(
+    result = routes.inbox_follow(
         payload,
         context={"actor": remote_actor, "inbox_items": [ii], "raise_exception": True},
     )
-
     follow = library.received_follows.latest("id")
+
+    assert result["object"] == library
+    assert result["related_object"] == follow
 
     assert follow.fid == payload["id"]
     assert follow.actor == remote_actor
-    assert follow.approved is False
+    assert follow.approved is None
 
-    mocked_accept_follow.assert_not_called()
+    mocked_outbox_dispatch.assert_not_called()
 
 
 def test_outbox_accept(factories, mocker):
@@ -111,6 +117,7 @@ def test_outbox_accept(factories, mocker):
 
     assert activity["payload"] == expected
     assert activity["actor"] == follow.target.actor
+    assert activity["object"] == follow
 
 
 def test_inbox_accept(factories, mocker):
@@ -125,10 +132,12 @@ def test_inbox_accept(factories, mocker):
         follow, context={"actor": remote_actor}
     )
     ii = factories["federation.InboxItem"](actor=local_actor)
-    routes.inbox_accept(
+    result = routes.inbox_accept(
         serializer.data,
         context={"actor": remote_actor, "inbox_items": [ii], "raise_exception": True},
     )
+    assert result["object"] == follow
+    assert result["related_object"] == follow.target
 
     follow.refresh_from_db()
 
@@ -145,3 +154,4 @@ def test_outbox_follow_library(factories, mocker):
 
     assert activity["payload"] == expected
     assert activity["actor"] == follow.actor
+    assert activity["object"] == follow.target

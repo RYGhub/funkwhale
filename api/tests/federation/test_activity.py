@@ -1,23 +1,11 @@
 
 import pytest
 
-from funkwhale_api.federation import activity, serializers, tasks
-
-
-def test_accept_follow(mocker, factories):
-    deliver = mocker.patch("funkwhale_api.federation.activity.deliver")
-    follow = factories["federation.Follow"](approved=None)
-    expected_accept = serializers.AcceptFollowSerializer(follow).data
-    activity.accept_follow(follow)
-    deliver.assert_called_once_with(
-        expected_accept, to=[follow.actor.fid], on_behalf_of=follow.target
-    )
+from funkwhale_api.federation import activity, api_serializers, serializers, tasks
 
 
 def test_receive_validates_basic_attributes_and_stores_activity(factories, now, mocker):
-    mocked_dispatch = mocker.patch(
-        "funkwhale_api.federation.tasks.dispatch_inbox.delay"
-    )
+    mocked_dispatch = mocker.patch("funkwhale_api.common.utils.on_commit")
     local_actor = factories["users.User"]().create_actor()
     remote_actor = factories["federation.Actor"]()
     another_actor = factories["federation.Actor"]()
@@ -36,7 +24,10 @@ def test_receive_validates_basic_attributes_and_stores_activity(factories, now, 
     assert copy.creation_date >= now
     assert copy.actor == remote_actor
     assert copy.fid == a["id"]
-    mocked_dispatch.assert_called_once_with(activity_id=copy.pk)
+    assert copy.type == "Noop"
+    mocked_dispatch.assert_called_once_with(
+        tasks.dispatch_inbox.delay, activity_id=copy.pk
+    )
 
     inbox_item = copy.inbox_items.get(actor__fid=local_actor.fid)
     assert inbox_item.is_delivered is False
@@ -63,16 +54,62 @@ def test_receive_actor_mismatch(factories):
         activity.receive(activity=a, on_behalf_of=remote_actor)
 
 
-def test_inbox_routing(mocker):
+def test_inbox_routing(factories, mocker):
+    object = factories["music.Artist"]()
+    target = factories["music.Artist"]()
     router = activity.InboxRouter()
+    a = factories["federation.Activity"](type="Follow")
 
-    handler = mocker.stub(name="handler")
+    handler_payload = {}
+    handler_context = {}
+
+    def handler(payload, context):
+        handler_payload.update(payload)
+        handler_context.update(context)
+        return {"target": target, "object": object}
+
     router.connect({"type": "Follow"}, handler)
 
     good_message = {"type": "Follow"}
-    router.dispatch(good_message, context={})
+    router.dispatch(good_message, context={"activity": a})
 
-    handler.assert_called_once_with(good_message, context={})
+    assert handler_payload == good_message
+    assert handler_context == {"activity": a}
+
+    a.refresh_from_db()
+
+    assert a.object == object
+    assert a.target == target
+
+
+def test_inbox_routing_send_to_channel(factories, mocker):
+    group_send = mocker.patch("funkwhale_api.common.channels.group_send")
+    a = factories["federation.Activity"](type="Follow")
+    ii = factories["federation.InboxItem"](actor__local=True)
+
+    router = activity.InboxRouter()
+    handler = mocker.stub()
+    router.connect({"type": "Follow"}, handler)
+    good_message = {"type": "Follow"}
+    router.dispatch(
+        good_message, context={"activity": a, "inbox_items": ii.__class__.objects.all()}
+    )
+
+    ii.refresh_from_db()
+
+    assert ii.is_delivered is True
+
+    group_send.assert_called_once_with(
+        "user.{}.inbox".format(ii.actor.user.pk),
+        {
+            "type": "event.send",
+            "text": "",
+            "data": {
+                "type": "inbox.item_added",
+                "item": api_serializers.InboxItemSerializer(ii).data,
+            },
+        },
+    )
 
 
 @pytest.mark.parametrize(
@@ -101,10 +138,10 @@ def test_outbox_router_dispatch(mocker, factories, now):
                 "type": "Noop",
                 "actor": actor.fid,
                 "summary": context["summary"],
+                "to": [r1],
+                "cc": [r2, activity.PUBLIC_ADDRESS],
             },
             "actor": actor,
-            "to": [r1],
-            "cc": [r2, activity.PUBLIC_ADDRESS],
         }
 
     router.connect({"type": "Noop"}, handler)

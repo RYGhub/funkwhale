@@ -155,6 +155,7 @@ class BaseActivitySerializer(serializers.Serializer):
             fid=validated_data.get("id"),
             actor=validated_data["actor"],
             payload=self.initial_data,
+            type=validated_data["type"],
         )
 
     def validate(self, data):

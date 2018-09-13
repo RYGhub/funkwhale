@@ -46,6 +46,7 @@ import LibrariesUpload from '@/views/content/libraries/Upload'
 import LibrariesDetail from '@/views/content/libraries/Detail'
 import LibrariesFiles from '@/views/content/libraries/Files'
 import RemoteLibrariesHome from '@/views/content/remote/Home'
+import Notifications from '@/views/Notifications'
 
 Vue.use(Router)
 
@@ -73,6 +74,11 @@ export default new Router({
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: Notifications
     },
     {
       path: '/auth/password/reset',

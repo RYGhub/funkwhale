@@ -51,3 +51,12 @@ def test_library_serializer_validates_existing_follow(factories):
 
     assert serializer.is_valid() is False
     assert "target" in serializer.errors
+
+
+def test_manage_track_file_action_read(factories):
+    ii = factories["federation.InboxItem"]()
+    s = api_serializers.InboxItemActionSerializer(queryset=None)
+
+    s.handle_read(ii.__class__.objects.all())
+
+    assert ii.__class__.objects.filter(is_read=False).count() == 0
