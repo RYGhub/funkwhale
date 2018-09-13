@@ -4,7 +4,7 @@ Features
 Scope
 ------
 
-Funkwhale is a web based music server. It is similar in term of goals and feature set to various existing projects, such as `Sonerezh <https://www.sonerezh.bzh/>`_ or `Libresonic <https://libresonic.org/>`_.
+Funkwhale is a web based music server. It is similar in term of goals and feature set to various existing projects, such as `Sonerezh <https://www.sonerezh.bzh/>`_ or `Airsonic <https://airsonic.github.io/>`_.
 
 A social platform
 ------------------
