@@ -1,7 +1,7 @@
 # This file was generated from funkwhale.template
 
 upstream funkwhale-api {
-    # depending on your setup, you may want to udpate this
+    # depending on your setup, you may want to update this
     server ${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT};
 }
 
