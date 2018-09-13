@@ -120,9 +120,9 @@ export default {
   width: 100%;
 }
 .ui.cards {
-  justify-content: center;
+  justify-content: flex-start;
 }
-.ui.cards > .card {
+.ui.five.cards > .card {
   width: 15em;
 }
 .with-overlay {
@@ -133,5 +133,10 @@ export default {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+}
+</style>
+<style>
+.ui.cards .ui.button {
+  margin-right: 0px;
 }
 </style>
