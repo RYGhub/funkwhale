@@ -4,7 +4,7 @@ from rest_framework import routers
 from . import views
 
 library_router = routers.SimpleRouter()
-library_router.register(r"track-files", views.ManageTrackFileViewSet, "track-files")
+library_router.register(r"uploads", views.ManageUploadViewSet, "uploads")
 requests_router = routers.SimpleRouter()
 requests_router.register(
     r"import-requests", views.ManageImportRequestViewSet, "import-requests"

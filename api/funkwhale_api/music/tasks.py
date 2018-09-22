@@ -11,7 +11,7 @@ from requests.exceptions import RequestException
 
 from funkwhale_api.common import channels
 from funkwhale_api.common import preferences
-from funkwhale_api.federation import activity, actors
+from funkwhale_api.federation import activity, actors, routes
 from funkwhale_api.federation import library as lb
 from funkwhale_api.federation import library as federation_serializers
 from funkwhale_api.providers.acoustid import get_acoustid_client
@@ -26,15 +26,15 @@ from . import serializers
 logger = logging.getLogger(__name__)
 
 
-@celery.app.task(name="acoustid.set_on_track_file")
-@celery.require_instance(models.TrackFile, "track_file")
-def set_acoustid_on_track_file(track_file):
+@celery.app.task(name="acoustid.set_on_upload")
+@celery.require_instance(models.Upload, "upload")
+def set_acoustid_on_upload(upload):
     client = get_acoustid_client()
-    result = client.get_best_match(track_file.audio_file.path)
+    result = client.get_best_match(upload.audio_file.path)
 
     def update(id):
-        track_file.acoustid_track_id = id
-        track_file.save(update_fields=["acoustid_track_id"])
+        upload.acoustid_track_id = id
+        upload.save(update_fields=["acoustid_track_id"])
         return id
 
     if result:
@@ -86,14 +86,14 @@ def import_track_from_remote(metadata):
     )[0]
 
 
-def update_album_cover(album, track_file, replace=False):
+def update_album_cover(album, upload, replace=False):
     if album.cover and not replace:
         return
 
-    if track_file:
+    if upload:
         # maybe the file has a cover embedded?
         try:
-            metadata = track_file.get_metadata()
+            metadata = upload.get_metadata()
         except FileNotFoundError:
             metadata = None
         if metadata:
@@ -102,9 +102,9 @@ def update_album_cover(album, track_file, replace=False):
                 # best case scenario, cover is embedded in the track
                 logger.info("[Album %s] Using cover embedded in file", album.pk)
                 return album.get_image(data=cover)
-        if track_file.source and track_file.source.startswith("file://"):
+        if upload.source and upload.source.startswith("file://"):
             # let's look for a cover in the same directory
-            path = os.path.dirname(track_file.source.replace("file://", "", 1))
+            path = os.path.dirname(upload.source.replace("file://", "", 1))
             logger.info("[Album %s] scanning covers from %s", album.pk, path)
             cover = get_cover_from_fs(path)
             if cover:
@@ -163,14 +163,14 @@ def import_batch_notify_followers(import_batch):
     library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     followers = library_actor.get_approved_followers()
     jobs = import_batch.jobs.filter(
-        status="finished", library_track__isnull=True, track_file__isnull=False
-    ).select_related("track_file__track__artist", "track_file__track__album__artist")
-    track_files = [job.track_file for job in jobs]
+        status="finished", library_track__isnull=True, upload__isnull=False
+    ).select_related("upload__track__artist", "upload__track__album__artist")
+    uploads = [job.upload for job in jobs]
     collection = federation_serializers.CollectionSerializer(
         {
             "actor": library_actor,
             "id": import_batch.get_federation_id(),
-            "items": track_files,
+            "items": uploads,
             "item_serializer": federation_serializers.AudioSerializer,
         }
     ).data
@@ -218,17 +218,17 @@ def start_library_scan(library_scan):
 )
 def scan_library_page(library_scan, page_url):
     data = lb.get_library_page(library_scan.library, page_url, library_scan.actor)
-    tfs = []
+    uploads = []
 
     for item_serializer in data["items"]:
-        tf = item_serializer.save(library=library_scan.library)
-        if tf.import_status == "pending" and not tf.track:
+        upload = item_serializer.save(library=library_scan.library)
+        if upload.import_status == "pending" and not upload.track:
             # this track is not matched to any musicbrainz or other musical
             # metadata
-            import_track_file.delay(track_file_id=tf.pk)
-        tfs.append(tf)
+            import_upload.delay(upload_id=upload.pk)
+        uploads.append(upload)
 
-    library_scan.processed_files = F("processed_files") + len(tfs)
+    library_scan.processed_files = F("processed_files") + len(uploads)
     library_scan.modification_date = timezone.now()
     update_fields = ["modification_date", "processed_files"]
 
@@ -254,82 +254,82 @@ def getter(data, *keys):
     return v
 
 
-class TrackFileImportError(ValueError):
+class UploadImportError(ValueError):
     def __init__(self, code):
         self.code = code
         super().__init__(code)
 
 
-def fail_import(track_file, error_code):
-    old_status = track_file.import_status
-    track_file.import_status = "errored"
-    track_file.import_details = {"error_code": error_code}
-    track_file.import_date = timezone.now()
-    track_file.save(update_fields=["import_details", "import_status", "import_date"])
-    signals.track_file_import_status_updated.send(
+def fail_import(upload, error_code):
+    old_status = upload.import_status
+    upload.import_status = "errored"
+    upload.import_details = {"error_code": error_code}
+    upload.import_date = timezone.now()
+    upload.save(update_fields=["import_details", "import_status", "import_date"])
+    signals.upload_import_status_updated.send(
         old_status=old_status,
-        new_status=track_file.import_status,
-        track_file=track_file,
+        new_status=upload.import_status,
+        upload=upload,
         sender=None,
     )
 
 
-@celery.app.task(name="music.import_track_file")
+@celery.app.task(name="music.import_upload")
 @celery.require_instance(
-    models.TrackFile.objects.filter(import_status="pending").select_related(
+    models.Upload.objects.filter(import_status="pending").select_related(
         "library__actor__user"
     ),
-    "track_file",
+    "upload",
 )
-def import_track_file(track_file):
-    data = track_file.import_metadata or {}
-    old_status = track_file.import_status
+def import_upload(upload):
+    data = upload.import_metadata or {}
+    old_status = upload.import_status
     try:
-        track = get_track_from_import_metadata(track_file.import_metadata or {})
-        if not track and track_file.audio_file:
+        track = get_track_from_import_metadata(upload.import_metadata or {})
+        if not track and upload.audio_file:
             # easy ways did not work. Now we have to be smart and use
             # metadata from the file itself if any
-            track = import_track_data_from_file(track_file.audio_file.file, hints=data)
-        if not track and track_file.metadata:
+            track = import_track_data_from_file(upload.audio_file.file, hints=data)
+        if not track and upload.metadata:
             # we can try to import using federation metadata
-            track = import_track_from_remote(track_file.metadata)
-    except TrackFileImportError as e:
-        return fail_import(track_file, e.code)
+            track = import_track_from_remote(upload.metadata)
+    except UploadImportError as e:
+        return fail_import(upload, e.code)
     except Exception:
-        fail_import(track_file, "unknown_error")
+        fail_import(upload, "unknown_error")
         raise
     # under some situations, we want to skip the import (
     # for instance if the user already owns the files)
-    owned_duplicates = get_owned_duplicates(track_file, track)
-    track_file.track = track
+    owned_duplicates = get_owned_duplicates(upload, track)
+    upload.track = track
 
     if owned_duplicates:
-        track_file.import_status = "skipped"
-        track_file.import_details = {
+        upload.import_status = "skipped"
+        upload.import_details = {
             "code": "already_imported_in_owned_libraries",
             "duplicates": list(owned_duplicates),
         }
-        track_file.import_date = timezone.now()
-        track_file.save(
+        upload.import_date = timezone.now()
+        upload.save(
             update_fields=["import_details", "import_status", "import_date", "track"]
         )
-        signals.track_file_import_status_updated.send(
+        signals.upload_import_status_updated.send(
             old_status=old_status,
-            new_status=track_file.import_status,
-            track_file=track_file,
+            new_status=upload.import_status,
+            upload=upload,
             sender=None,
         )
         return
 
     # all is good, let's finalize the import
-    audio_data = track_file.get_audio_data()
+    audio_data = upload.get_audio_data()
     if audio_data:
-        track_file.duration = audio_data["duration"]
-        track_file.size = audio_data["size"]
-        track_file.bitrate = audio_data["bitrate"]
-    track_file.import_status = "finished"
-    track_file.import_date = timezone.now()
-    track_file.save(
+        upload.duration = audio_data["duration"]
+        upload.size = audio_data["size"]
+        upload.bitrate = audio_data["bitrate"]
+    upload.import_status = "finished"
+    upload.import_date = timezone.now()
+    upload.save(
         update_fields=[
             "track",
             "import_status",
@@ -339,15 +339,17 @@ def import_track_file(track_file):
             "bitrate",
         ]
     )
-    signals.track_file_import_status_updated.send(
+    signals.upload_import_status_updated.send(
         old_status=old_status,
-        new_status=track_file.import_status,
-        track_file=track_file,
+        new_status=upload.import_status,
+        upload=upload,
         sender=None,
     )
-
+    routes.outbox.dispatch(
+        {"type": "Create", "object": {"type": "Audio"}}, context={"upload": upload}
+    )
     if not track.album.cover:
-        update_album_cover(track.album, track_file)
+        update_album_cover(track.album, upload)
 
 
 def get_track_from_import_metadata(data):
@@ -363,19 +365,19 @@ def get_track_from_import_metadata(data):
         try:
             return models.Track.objects.get(uuid=track_uuid)
         except models.Track.DoesNotExist:
-            raise TrackFileImportError(code="track_uuid_not_found")
+            raise UploadImportError(code="track_uuid_not_found")
 
 
-def get_owned_duplicates(track_file, track):
+def get_owned_duplicates(upload, track):
     """
     Ensure we skip duplicate tracks to avoid wasting user/instance storage
     """
-    owned_libraries = track_file.library.actor.libraries.all()
+    owned_libraries = upload.library.actor.libraries.all()
     return (
-        models.TrackFile.objects.filter(
+        models.Upload.objects.filter(
             track__isnull=False, library__in=owned_libraries, track=track
         )
-        .exclude(pk=track_file.pk)
+        .exclude(pk=upload.pk)
         .values_list("uuid", flat=True)
     )
 
@@ -422,11 +424,9 @@ def import_track_data_from_file(file, hints={}):
     return track
 
 
-@receiver(signals.track_file_import_status_updated)
-def broadcast_import_status_update_to_owner(
-    old_status, new_status, track_file, **kwargs
-):
-    user = track_file.library.actor.get_user()
+@receiver(signals.upload_import_status_updated)
+def broadcast_import_status_update_to_owner(old_status, new_status, upload, **kwargs):
+    user = upload.library.actor.get_user()
     if not user:
         return
     group = "user.{}.imports".format(user.pk)
@@ -437,7 +437,7 @@ def broadcast_import_status_update_to_owner(
             "text": "",
             "data": {
                 "type": "import.status_updated",
-                "track_file": serializers.TrackFileForOwnerSerializer(track_file).data,
+                "upload": serializers.UploadForOwnerSerializer(upload).data,
                 "old_status": old_status,
                 "new_status": new_status,
             },

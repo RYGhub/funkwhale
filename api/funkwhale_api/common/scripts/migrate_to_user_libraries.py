@@ -5,6 +5,12 @@ visibility.
 
 Files without any import job will be bounded to a "default" library on the first
 superuser account found. This should now happen though.
+
+XXX TODO:
+
+- add followers url on actor
+- shared inbox url on actor
+- compute hash from files
 """
 
 from funkwhale_api.music import models
@@ -19,7 +25,7 @@ def main(command, **kwargs):
     command.stdout.write(
         "* {} users imported music on this instance".format(len(importers))
     )
-    files = models.TrackFile.objects.filter(
+    files = models.Upload.objects.filter(
         library__isnull=True, jobs__isnull=False
     ).distinct()
     command.stdout.write(
@@ -39,7 +45,7 @@ def main(command, **kwargs):
         )
         user_files.update(library=library)
 
-    files = models.TrackFile.objects.filter(
+    files = models.Upload.objects.filter(
         library__isnull=True, jobs__isnull=True
     ).distinct()
     command.stdout.write(

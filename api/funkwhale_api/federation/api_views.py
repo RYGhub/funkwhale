@@ -87,7 +87,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         music_models.Library.objects.all()
         .order_by("-creation_date")
         .select_related("actor")
-        .annotate(_files_count=Count("files"))
+        .annotate(_uploads_count=Count("uploads"))
     )
     serializer_class = api_serializers.LibrarySerializer
     permission_classes = [permissions.IsAuthenticated]

@@ -10,14 +10,14 @@ from funkwhale_api.users import models as users_models
 from . import filters
 
 
-class ManageTrackFileArtistSerializer(serializers.ModelSerializer):
+class ManageUploadArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = music_models.Artist
         fields = ["id", "mbid", "creation_date", "name"]
 
 
-class ManageTrackFileAlbumSerializer(serializers.ModelSerializer):
-    artist = ManageTrackFileArtistSerializer()
+class ManageUploadAlbumSerializer(serializers.ModelSerializer):
+    artist = ManageUploadArtistSerializer()
 
     class Meta:
         model = music_models.Album
@@ -32,20 +32,20 @@ class ManageTrackFileAlbumSerializer(serializers.ModelSerializer):
         )
 
 
-class ManageTrackFileTrackSerializer(serializers.ModelSerializer):
-    artist = ManageTrackFileArtistSerializer()
-    album = ManageTrackFileAlbumSerializer()
+class ManageUploadTrackSerializer(serializers.ModelSerializer):
+    artist = ManageUploadArtistSerializer()
+    album = ManageUploadAlbumSerializer()
 
     class Meta:
         model = music_models.Track
         fields = ("id", "mbid", "title", "album", "artist", "creation_date", "position")
 
 
-class ManageTrackFileSerializer(serializers.ModelSerializer):
-    track = ManageTrackFileTrackSerializer()
+class ManageUploadSerializer(serializers.ModelSerializer):
+    track = ManageUploadTrackSerializer()
 
     class Meta:
-        model = music_models.TrackFile
+        model = music_models.Upload
         fields = (
             "id",
             "path",
@@ -62,9 +62,9 @@ class ManageTrackFileSerializer(serializers.ModelSerializer):
         )
 
 
-class ManageTrackFileActionSerializer(common_serializers.ActionSerializer):
+class ManageUploadActionSerializer(common_serializers.ActionSerializer):
     actions = [common_serializers.Action("delete", allow_all=False)]
-    filterset_class = filters.ManageTrackFileFilterSet
+    filterset_class = filters.ManageUploadFilterSet
 
     @transaction.atomic
     def handle_delete(self, objects):

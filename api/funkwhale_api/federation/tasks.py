@@ -27,7 +27,7 @@ def clean_music_cache():
     limit = timezone.now() - datetime.timedelta(minutes=delay)
 
     candidates = (
-        music_models.TrackFile.objects.filter(
+        music_models.Upload.objects.filter(
             Q(audio_file__isnull=False)
             & (Q(accessed_date__lt=limit) | Q(accessed_date=None))
         )
@@ -36,13 +36,13 @@ def clean_music_cache():
         .only("audio_file", "id")
         .order_by("id")
     )
-    for tf in candidates:
-        tf.audio_file.delete()
+    for upload in candidates:
+        upload.audio_file.delete()
 
     # we also delete orphaned files, if any
     storage = models.LibraryTrack._meta.get_field("audio_file").storage
     files = get_files(storage, "federation_cache/tracks")
-    existing = music_models.TrackFile.objects.filter(audio_file__in=files)
+    existing = music_models.Upload.objects.filter(audio_file__in=files)
     missing = set(files) - set(existing.values_list("audio_file", flat=True))
     for m in missing:
         storage.delete(m)
@@ -70,61 +70,30 @@ def dispatch_inbox(activity):
     creation, etc.)
     """
 
-    try:
-        routes.inbox.dispatch(
-            activity.payload,
-            context={
-                "activity": activity,
-                "actor": activity.actor,
-                "inbox_items": (
-                    activity.inbox_items.local()
-                    .select_related()
-                    .select_related("actor__user")
-                    .prefetch_related("activity__object", "activity__target")
-                ),
-            },
-        )
-    except Exception:
-        activity.inbox_items.local().update(
-            delivery_attempts=F("delivery_attempts") + 1,
-            last_delivery_date=timezone.now(),
-        )
-        raise
-    else:
-        activity.inbox_items.local().update(
-            delivery_attempts=F("delivery_attempts") + 1,
-            last_delivery_date=timezone.now(),
-            is_delivered=True,
-        )
+    routes.inbox.dispatch(
+        activity.payload,
+        context={
+            "activity": activity,
+            "actor": activity.actor,
+            "inbox_items": activity.inbox_items.filter(is_read=False),
+        },
+    )
 
 
 @celery.app.task(name="federation.dispatch_outbox")
 @celery.require_instance(models.Activity.objects.select_related(), "activity")
 def dispatch_outbox(activity):
     """
-    Deliver a local activity to its recipients
+    Deliver a local activity to its recipients, both locally and remotely
     """
-    inbox_items = activity.inbox_items.all().select_related("actor")
-    local_recipients_items = [ii for ii in inbox_items if ii.actor.is_local]
-    if local_recipients_items:
+    inbox_items = activity.inbox_items.filter(is_read=False).select_related()
+    deliveries = activity.deliveries.filter(is_delivered=False)
+
+    if inbox_items.exists():
         dispatch_inbox.delay(activity_id=activity.pk)
-    remote_recipients_items = [ii for ii in inbox_items if not ii.actor.is_local]
 
-    shared_inbox_urls = {
-        ii.actor.shared_inbox_url
-        for ii in remote_recipients_items
-        if ii.actor.shared_inbox_url
-    }
-    inbox_urls = {
-        ii.actor.inbox_url
-        for ii in remote_recipients_items
-        if not ii.actor.shared_inbox_url
-    }
-    for url in shared_inbox_urls:
-        deliver_to_remote_inbox.delay(activity_id=activity.pk, shared_inbox_url=url)
-
-    for url in inbox_urls:
-        deliver_to_remote_inbox.delay(activity_id=activity.pk, inbox_url=url)
+    for id in deliveries.values_list("pk", flat=True):
+        deliver_to_remote.delay(delivery_id=id)
 
 
 @celery.app.task(
@@ -133,22 +102,21 @@ def dispatch_outbox(activity):
     retry_backoff=30,
     max_retries=5,
 )
-@celery.require_instance(models.Activity.objects.select_related(), "activity")
-def deliver_to_remote_inbox(activity, inbox_url=None, shared_inbox_url=None):
-    url = inbox_url or shared_inbox_url
-    actor = activity.actor
-    inbox_items = activity.inbox_items.filter(is_delivered=False)
-    if inbox_url:
-        inbox_items = inbox_items.filter(actor__inbox_url=inbox_url)
-    else:
-        inbox_items = inbox_items.filter(actor__shared_inbox_url=shared_inbox_url)
-    logger.info("Preparing activity delivery to %s", url)
+@celery.require_instance(
+    models.Delivery.objects.filter(is_delivered=False).select_related(
+        "activity__actor"
+    ),
+    "delivery",
+)
+def deliver_to_remote(delivery):
+    actor = delivery.activity.actor
+    logger.info("Preparing activity delivery to %s", delivery.inbox_url)
     auth = signing.get_auth(actor.private_key, actor.private_key_id)
     try:
         response = session.get_session().post(
             auth=auth,
-            json=activity.payload,
-            url=url,
+            json=delivery.activity.payload,
+            url=delivery.inbox_url,
             timeout=5,
             verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
@@ -156,10 +124,12 @@ def deliver_to_remote_inbox(activity, inbox_url=None, shared_inbox_url=None):
         logger.debug("Remote answered with %s", response.status_code)
         response.raise_for_status()
     except Exception:
-        inbox_items.update(
-            last_delivery_date=timezone.now(),
-            delivery_attempts=F("delivery_attempts") + 1,
-        )
+        delivery.last_attempt_date = timezone.now()
+        delivery.attempts = F("attempts") + 1
+        delivery.save(update_fields=["last_attempt_date", "attempts"])
         raise
     else:
-        inbox_items.update(last_delivery_date=timezone.now(), is_delivered=True)
+        delivery.last_attempt_date = timezone.now()
+        delivery.attempts = F("attempts") + 1
+        delivery.is_delivered = True
+        delivery.save(update_fields=["last_attempt_date", "attempts", "is_delivered"])

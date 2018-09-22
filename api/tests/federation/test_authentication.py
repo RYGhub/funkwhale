@@ -11,6 +11,7 @@ def test_authenticate(factories, mocker, api_request):
             "type": "Person",
             "outbox": "https://test.com",
             "inbox": "https://test.com",
+            "followers": "https://test.com",
             "preferredUsername": "test",
             "publicKey": {
                 "publicKeyPem": public.decode("utf-8"),

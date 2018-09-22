@@ -76,6 +76,9 @@ class ActorFactory(factory.DjangoModelFactory):
     fid = factory.LazyAttribute(
         lambda o: "https://{}/users/{}".format(o.domain, o.preferred_username)
     )
+    followers_url = factory.LazyAttribute(
+        lambda o: "https://{}/users/{}followers".format(o.domain, o.preferred_username)
+    )
     inbox_url = factory.LazyAttribute(
         lambda o: "https://{}/users/{}/inbox".format(o.domain, o.preferred_username)
     )
@@ -134,18 +137,11 @@ class MusicLibraryFactory(factory.django.DjangoModelFactory):
     privacy_level = "me"
     name = factory.Faker("sentence")
     description = factory.Faker("sentence")
-    files_count = 0
+    uploads_count = 0
+    fid = factory.Faker("federation_url")
 
     class Meta:
         model = "music.Library"
-
-    @factory.post_generation
-    def fid(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        self.fid = extracted or self.get_federation_id()
 
     @factory.post_generation
     def followers_url(self, create, extracted, **kwargs):
@@ -160,7 +156,7 @@ class MusicLibraryFactory(factory.django.DjangoModelFactory):
 class LibraryScan(factory.django.DjangoModelFactory):
     library = factory.SubFactory(MusicLibraryFactory)
     actor = factory.SubFactory(ActorFactory)
-    total_files = factory.LazyAttribute(lambda o: o.library.files_count)
+    total_files = factory.LazyAttribute(lambda o: o.library.uploads_count)
 
     class Meta:
         model = "music.LibraryScan"
@@ -169,7 +165,7 @@ class LibraryScan(factory.django.DjangoModelFactory):
 @registry.register
 class ActivityFactory(factory.django.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory)
-    url = factory.Faker("url")
+    url = factory.Faker("federation_url")
     payload = factory.LazyFunction(lambda: {"type": "Create"})
 
     class Meta:
@@ -178,12 +174,21 @@ class ActivityFactory(factory.django.DjangoModelFactory):
 
 @registry.register
 class InboxItemFactory(factory.django.DjangoModelFactory):
-    actor = factory.SubFactory(ActorFactory)
+    actor = factory.SubFactory(ActorFactory, local=True)
     activity = factory.SubFactory(ActivityFactory)
     type = "to"
 
     class Meta:
         model = "federation.InboxItem"
+
+
+@registry.register
+class DeliveryFactory(factory.django.DjangoModelFactory):
+    activity = factory.SubFactory(ActivityFactory)
+    inbox_url = factory.Faker("url")
+
+    class Meta:
+        model = "federation.Delivery"
 
 
 @registry.register
@@ -269,9 +274,9 @@ class AudioMetadataFactory(factory.Factory):
 @registry.register(name="federation.Audio")
 class AudioFactory(factory.Factory):
     type = "Audio"
-    id = factory.Faker("url")
+    id = factory.Faker("federation_url")
     published = factory.LazyFunction(lambda: timezone.now().isoformat())
-    actor = factory.Faker("url")
+    actor = factory.Faker("federation_url")
     url = factory.SubFactory(LinkFactory, audio=True)
     metadata = factory.SubFactory(LibraryTrackMetadataFactory)
 

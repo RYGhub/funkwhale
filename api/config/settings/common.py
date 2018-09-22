@@ -514,8 +514,14 @@ ACCOUNT_USERNAME_BLACKLIST = [
     "me",
     "ghost",
     "_",
+    "-",
     "hello",
     "contact",
+    "inbox",
+    "outbox",
+    "shared-inbox",
+    "shared_inbox",
+    "actor",
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)

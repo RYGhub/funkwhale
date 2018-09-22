@@ -6,6 +6,7 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.federation import routes
 
 from . import filters, models, tasks
 
@@ -60,6 +61,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     is_playable = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -73,6 +75,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "position",
             "is_playable",
             "listen_url",
+            "duration",
         )
 
     def get_is_playable(self, obj):
@@ -83,6 +86,12 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
 
     def get_listen_url(self, obj):
         return obj.listen_url
+
+    def get_duration(self, obj):
+        try:
+            return obj.duration
+        except AttributeError:
+            return None
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -142,6 +151,10 @@ class TrackSerializer(serializers.ModelSerializer):
     lyrics = serializers.SerializerMethodField()
     is_playable = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
+    duration = serializers.SerializerMethodField()
+    bitrate = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
+    mimetype = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -156,6 +169,10 @@ class TrackSerializer(serializers.ModelSerializer):
             "lyrics",
             "is_playable",
             "listen_url",
+            "duration",
+            "bitrate",
+            "size",
+            "mimetype",
         )
 
     def get_lyrics(self, obj):
@@ -170,9 +187,33 @@ class TrackSerializer(serializers.ModelSerializer):
         except AttributeError:
             return None
 
+    def get_duration(self, obj):
+        try:
+            return obj.duration
+        except AttributeError:
+            return None
+
+    def get_bitrate(self, obj):
+        try:
+            return obj.bitrate
+        except AttributeError:
+            return None
+
+    def get_size(self, obj):
+        try:
+            return obj.size
+        except AttributeError:
+            return None
+
+    def get_mimetype(self, obj):
+        try:
+            return obj.mimetype
+        except AttributeError:
+            return None
+
 
 class LibraryForOwnerSerializer(serializers.ModelSerializer):
-    files_count = serializers.SerializerMethodField()
+    uploads_count = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
 
     class Meta:
@@ -183,20 +224,20 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "privacy_level",
-            "files_count",
+            "uploads_count",
             "size",
             "creation_date",
         ]
         read_only_fields = ["fid", "uuid", "creation_date", "actor"]
 
-    def get_files_count(self, o):
-        return getattr(o, "_files_count", o.files_count)
+    def get_uploads_count(self, o):
+        return getattr(o, "_uploads_count", o.uploads_count)
 
     def get_size(self, o):
         return getattr(o, "_size", 0)
 
 
-class TrackFileSerializer(serializers.ModelSerializer):
+class UploadSerializer(serializers.ModelSerializer):
     track = TrackSerializer(required=False, allow_null=True)
     library = common_serializers.RelatedField(
         "uuid",
@@ -206,7 +247,7 @@ class TrackFileSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = models.TrackFile
+        model = models.Upload
         fields = [
             "uuid",
             "filename",
@@ -235,9 +276,9 @@ class TrackFileSerializer(serializers.ModelSerializer):
         ]
 
 
-class TrackFileForOwnerSerializer(TrackFileSerializer):
-    class Meta(TrackFileSerializer.Meta):
-        fields = TrackFileSerializer.Meta.fields + [
+class UploadForOwnerSerializer(UploadSerializer):
+    class Meta(UploadSerializer.Meta):
+        fields = UploadSerializer.Meta.fields + [
             "import_details",
             "import_metadata",
             "import_reference",
@@ -246,7 +287,7 @@ class TrackFileForOwnerSerializer(TrackFileSerializer):
             "audio_file",
         ]
         write_only_fields = ["audio_file"]
-        read_only_fields = TrackFileSerializer.Meta.read_only_fields + [
+        read_only_fields = UploadSerializer.Meta.read_only_fields + [
             "import_details",
             "import_metadata",
             "metadata",
@@ -272,16 +313,26 @@ class TrackFileForOwnerSerializer(TrackFileSerializer):
         return f
 
 
-class TrackFileActionSerializer(common_serializers.ActionSerializer):
+class UploadActionSerializer(common_serializers.ActionSerializer):
     actions = [
         common_serializers.Action("delete", allow_all=True),
         common_serializers.Action("relaunch_import", allow_all=True),
     ]
-    filterset_class = filters.TrackFileFilter
+    filterset_class = filters.UploadFilter
     pk_field = "uuid"
 
     @transaction.atomic
     def handle_delete(self, objects):
+        libraries = sorted(set(objects.values_list("library", flat=True)))
+        for id in libraries:
+            # we group deletes by library for easier federation
+            uploads = objects.filter(library__pk=id).select_related("library__actor")
+            for chunk in common_utils.chunk_queryset(uploads, 100):
+                routes.outbox.dispatch(
+                    {"type": "Delete", "object": {"type": "Audio"}},
+                    context={"uploads": chunk},
+                )
+
         return objects.delete()
 
     @transaction.atomic
@@ -290,7 +341,7 @@ class TrackFileActionSerializer(common_serializers.ActionSerializer):
         pks = list(qs.values_list("id", flat=True))
         qs.update(import_status="pending")
         for pk in pks:
-            common_utils.on_commit(tasks.import_track_file.delay, track_file_id=pk)
+            common_utils.on_commit(tasks.import_upload.delay, upload_id=pk)
 
 
 class TagSerializer(serializers.ModelSerializer):

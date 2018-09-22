@@ -10,16 +10,16 @@ from funkwhale_api.users.permissions import HasUserPermission
 from . import filters, serializers
 
 
-class ManageTrackFileViewSet(
+class ManageUploadViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     queryset = (
-        music_models.TrackFile.objects.all()
+        music_models.Upload.objects.all()
         .select_related("track__artist", "track__album__artist")
         .order_by("-id")
     )
-    serializer_class = serializers.ManageTrackFileSerializer
-    filter_class = filters.ManageTrackFileFilterSet
+    serializer_class = serializers.ManageUploadSerializer
+    filter_class = filters.ManageUploadFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["library"]
     ordering_fields = [
@@ -35,7 +35,7 @@ class ManageTrackFileViewSet(
     @list_route(methods=["post"])
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = serializers.ManageTrackFileActionSerializer(
+        serializer = serializers.ManageUploadActionSerializer(
             request.data, queryset=queryset
         )
         serializer.is_valid(raise_exception=True)

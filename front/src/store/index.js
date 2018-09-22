@@ -79,6 +79,7 @@ export default new Vuex.Store({
                 id: track.id,
                 title: track.title,
                 mbid: track.mbid,
+                listen_url: track.listen_url,
                 album: {
                   id: track.album.id,
                   title: track.album.title,
@@ -86,8 +87,7 @@ export default new Vuex.Store({
                   cover: track.album.cover,
                   artist: artist
                 },
-                artist: artist,
-                files: track.files
+                artist: artist
               }
             })
           }

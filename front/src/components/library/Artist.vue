@@ -23,7 +23,7 @@
           </h2>
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
-          <play-button class="orange" :artist="artist.id">
+          <play-button :is-playable="isPlayable" class="orange" :artist="artist.id">
             <translate>Play all albums</translate>
           </play-button>
 
@@ -134,6 +134,11 @@ export default {
       }).reduce((a, b) => {
         return a + b
       }) + this.tracks.length
+    },
+    isPlayable () {
+      return this.artist.albums.filter((a) => {
+        return a.is_playable
+      }).length > 0
     },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.artist.name

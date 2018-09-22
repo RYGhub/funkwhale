@@ -8,7 +8,7 @@ def test_get_users(mocker):
 
 
 def test_get_music_duration(factories):
-    factories["music.TrackFile"].create_batch(size=5, duration=360)
+    factories["music.Upload"].create_batch(size=5, duration=360)
 
     # duration is in hours
     assert stats.get_music_duration() == 0.5

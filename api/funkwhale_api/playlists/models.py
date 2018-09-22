@@ -12,7 +12,7 @@ class PlaylistQuerySet(models.QuerySet):
 
     def with_duration(self):
         return self.annotate(
-            duration=models.Sum("playlist_tracks__track__files__duration")
+            duration=models.Sum("playlist_tracks__track__uploads__duration")
         )
 
     def with_covers(self):
@@ -135,7 +135,7 @@ class PlaylistTrackQuerySet(models.QuerySet):
             self.select_related()
             .select_related("track__album__artist")
             .prefetch_related(
-                "track__tags", "track__files", "track__artist__albums__tracks__tags"
+                "track__tags", "track__uploads", "track__artist__albums__tracks__tags"
             )
         )
 

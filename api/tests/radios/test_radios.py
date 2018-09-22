@@ -48,7 +48,7 @@ def test_can_pick_by_weight():
 
 
 def test_can_get_choices_for_favorites_radio(factories):
-    files = factories["music.TrackFile"].create_batch(10)
+    files = factories["music.Upload"].create_batch(10)
     tracks = [f.track for f in files]
     user = factories["users.User"]()
     for i in range(5):
@@ -69,9 +69,9 @@ def test_can_get_choices_for_favorites_radio(factories):
 
 def test_can_get_choices_for_custom_radio(factories):
     artist = factories["music.Artist"]()
-    files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
+    files = factories["music.Upload"].create_batch(5, track__artist=artist)
     tracks = [f.track for f in files]
-    factories["music.TrackFile"].create_batch(5)
+    factories["music.Upload"].create_batch(5)
 
     session = factories["radios.CustomRadioSession"](
         custom_radio__config=[{"type": "artist", "ids": [artist.pk]}]
@@ -110,19 +110,19 @@ def test_can_start_custom_radio_from_api(logged_in_client, factories):
 
 
 def test_can_use_radio_session_to_filter_choices(factories):
-    factories["music.TrackFile"].create_batch(30)
+    factories["music.Upload"].create_batch(10)
     user = factories["users.User"]()
     radio = radios.RandomRadio()
     session = radio.start_session(user)
 
-    for i in range(30):
+    for i in range(10):
         radio.pick()
 
-    # ensure 30 differents tracks have been suggested
+    # ensure 10 differents tracks have been suggested
     tracks_id = [
         session_track.track.pk for session_track in session.session_tracks.all()
     ]
-    assert len(set(tracks_id)) == 30
+    assert len(set(tracks_id)) == 10
 
 
 def test_can_restore_radio_from_previous_session(factories):
@@ -143,7 +143,7 @@ def test_can_start_radio_for_logged_in_user(logged_in_client):
 
 
 def test_can_get_track_for_session_from_api(factories, logged_in_client):
-    files = factories["music.TrackFile"].create_batch(1)
+    files = factories["music.Upload"].create_batch(1)
     tracks = [f.track for f in files]
     url = reverse("api:v1:radios:sessions-list")
     response = logged_in_client.post(url, {"radio_type": "random"})
@@ -156,7 +156,7 @@ def test_can_get_track_for_session_from_api(factories, logged_in_client):
     assert data["track"]["id"] == tracks[0].id
     assert data["position"] == 1
 
-    next_track = factories["music.TrackFile"]().track
+    next_track = factories["music.Upload"]().track
     response = logged_in_client.post(url, {"session": session.pk})
     data = json.loads(response.content.decode("utf-8"))
 
@@ -180,8 +180,8 @@ def test_related_object_radio_validate_related_object(factories):
 def test_can_start_artist_radio(factories):
     user = factories["users.User"]()
     artist = factories["music.Artist"]()
-    factories["music.TrackFile"].create_batch(5)
-    good_files = factories["music.TrackFile"].create_batch(5, track__artist=artist)
+    factories["music.Upload"].create_batch(5)
+    good_files = factories["music.Upload"].create_batch(5, track__artist=artist)
     good_tracks = [f.track for f in good_files]
 
     radio = radios.ArtistRadio()
@@ -194,8 +194,8 @@ def test_can_start_artist_radio(factories):
 def test_can_start_tag_radio(factories):
     user = factories["users.User"]()
     tag = factories["taggit.Tag"]()
-    factories["music.TrackFile"].create_batch(5)
-    good_files = factories["music.TrackFile"].create_batch(5, track__tags=[tag])
+    factories["music.Upload"].create_batch(5)
+    good_files = factories["music.Upload"].create_batch(5, track__tags=[tag])
     good_tracks = [f.track for f in good_files]
 
     radio = radios.TagRadio()
@@ -223,10 +223,10 @@ def test_can_start_artist_radio_from_api(logged_in_api_client, preferences, fact
 
 def test_can_start_less_listened_radio(factories):
     user = factories["users.User"]()
-    wrong_files = factories["music.TrackFile"].create_batch(5)
+    wrong_files = factories["music.Upload"].create_batch(5)
     for f in wrong_files:
         factories["history.Listening"](track=f.track, user=user)
-    good_files = factories["music.TrackFile"].create_batch(5)
+    good_files = factories["music.Upload"].create_batch(5)
     good_tracks = [f.track for f in good_files]
     radio = radios.LessListenedRadio()
     radio.start_session(user)

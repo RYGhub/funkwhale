@@ -32,7 +32,7 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
-        :action-url="'manage/library/track-files/action/'"
+        :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Title</translate></th>
@@ -157,7 +157,7 @@ export default {
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/manage/library/track-files/', {params: params}).then((response) => {
+      axios.get('/manage/library/uploads/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {

@@ -1,13 +1,13 @@
 from funkwhale_api.manage import serializers
 
 
-def test_manage_track_file_action_delete(factories):
-    tfs = factories["music.TrackFile"](size=5)
-    s = serializers.ManageTrackFileActionSerializer(queryset=None)
+def test_manage_upload_action_delete(factories):
+    uploads = factories["music.Upload"](size=5)
+    s = serializers.ManageUploadActionSerializer(queryset=None)
 
-    s.handle_delete(tfs.__class__.objects.all())
+    s.handle_delete(uploads.__class__.objects.all())
 
-    assert tfs.__class__.objects.count() == 0
+    assert uploads.__class__.objects.count() == 0
 
 
 def test_user_update_permission(factories):

@@ -249,6 +249,7 @@ Then, in separate terminals, you can setup as many different instances as you
 need::
 
     export COMPOSE_PROJECT_NAME=node2
+    export VUE_PORT=1234  # this has to be unique for each instance
     docker-compose -f dev.yml run --rm api python manage.py migrate
     docker-compose -f dev.yml run --rm api python manage.py createsuperuser
     docker-compose -f dev.yml up nginx api front nginx api celeryworker

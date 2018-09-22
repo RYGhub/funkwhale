@@ -1,5 +1,7 @@
 import logging
 
+from funkwhale_api.music import models as music_models
+
 from . import activity
 from . import serializers
 
@@ -89,4 +91,110 @@ def outbox_follow(context):
         "payload": with_recipients(payload, to=[target]),
         "object": follow.target,
         "related_object": follow,
+    }
+
+
+@outbox.register({"type": "Create", "object.type": "Audio"})
+def outbox_create_audio(context):
+    upload = context["upload"]
+    serializer = serializers.ActivitySerializer(
+        {
+            "type": "Create",
+            "actor": upload.library.actor.fid,
+            "object": serializers.UploadSerializer(upload).data,
+        }
+    )
+    yield {
+        "type": "Create",
+        "actor": upload.library.actor,
+        "payload": with_recipients(
+            serializer.data, to=[{"type": "followers", "target": upload.library}]
+        ),
+        "object": upload,
+        "target": upload.library,
+    }
+
+
+@inbox.register({"type": "Create", "object.type": "Audio"})
+def inbox_create_audio(payload, context):
+    serializer = serializers.UploadSerializer(
+        data=payload["object"],
+        context={"activity": context.get("activity"), "actor": context["actor"]},
+    )
+
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.warn("Discarding invalid audio create")
+        return
+
+    upload = serializer.save()
+
+    return {"object": upload, "target": upload.library}
+
+
+@inbox.register({"type": "Delete", "object.type": "Library"})
+def inbox_delete_library(payload, context):
+    actor = context["actor"]
+    library_id = payload["object"].get("id")
+    if not library_id:
+        logger.debug("Discarding deletion of empty library")
+        return
+
+    try:
+        library = actor.libraries.get(fid=library_id)
+    except music_models.Library.DoesNotExist:
+        logger.debug("Discarding deletion of unkwnown library %s", library_id)
+        return
+
+    library.delete()
+
+
+@outbox.register({"type": "Delete", "object.type": "Library"})
+def outbox_delete_library(context):
+    library = context["library"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Library", "id": library.fid}}
+    )
+    yield {
+        "type": "Delete",
+        "actor": library.actor,
+        "payload": with_recipients(
+            serializer.data, to=[{"type": "followers", "target": library}]
+        ),
+    }
+
+
+@inbox.register({"type": "Delete", "object.type": "Audio"})
+def inbox_delete_audio(payload, context):
+    actor = context["actor"]
+    try:
+        upload_fids = [i for i in payload["object"]["id"]]
+    except TypeError:
+        # we did not receive a list of Ids, so we can probably use the value directly
+        upload_fids = [payload["object"]["id"]]
+
+    candidates = music_models.Upload.objects.filter(
+        library__actor=actor, fid__in=upload_fids
+    )
+
+    total = candidates.count()
+    logger.info("Deleting %s uploads with ids %s", total, upload_fids)
+    candidates.delete()
+
+
+@outbox.register({"type": "Delete", "object.type": "Audio"})
+def outbox_delete_audio(context):
+    uploads = context["uploads"]
+    library = uploads[0].library
+    serializer = serializers.ActivitySerializer(
+        {
+            "type": "Delete",
+            "object": {"type": "Audio", "id": [u.get_federation_id() for u in uploads]},
+        }
+    )
+    yield {
+        "type": "Delete",
+        "actor": library.actor,
+        "payload": with_recipients(
+            serializer.data, to=[{"type": "followers", "target": library}]
+        ),
     }

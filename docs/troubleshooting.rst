@@ -202,7 +202,7 @@ similar issues before doing that, and use the issue tracker only to report bugs,
     If you ever need to share screenshots or urls with someone else, ensure those do not include your personnal token.
     This token is binded to your account and can be used to connect and use your account.
 
-    Urls that includes your token looks like: ``https://your.instance/api/v1/trackfiles/42/serve/?jwt=yoursecrettoken``
+    Urls that includes your token looks like: ``https://your.instance/api/v1/uploads/42/serve/?jwt=yoursecrettoken``
 
 Improving this documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

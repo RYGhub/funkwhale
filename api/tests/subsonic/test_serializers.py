@@ -65,7 +65,7 @@ def test_get_album_serializer(factories):
     artist = factories["music.Artist"]()
     album = factories["music.Album"](artist=artist)
     track = factories["music.Track"](album=album)
-    tf = factories["music.TrackFile"](track=track, bitrate=42000, duration=43, size=44)
+    upload = factories["music.Upload"](track=track, bitrate=42000, duration=43, size=44)
 
     expected = {
         "id": album.pk,
@@ -86,8 +86,8 @@ def test_get_album_serializer(factories):
                 "artist": artist.name,
                 "track": track.position,
                 "year": track.album.release_date.year,
-                "contentType": tf.mimetype,
-                "suffix": tf.extension or "",
+                "contentType": upload.mimetype,
+                "suffix": upload.extension or "",
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
@@ -106,9 +106,9 @@ def test_starred_tracks2_serializer(factories):
     artist = factories["music.Artist"]()
     album = factories["music.Album"](artist=artist)
     track = factories["music.Track"](album=album)
-    tf = factories["music.TrackFile"](track=track)
+    upload = factories["music.Upload"](track=track)
     favorite = factories["favorites.TrackFavorite"](track=track)
-    expected = [serializers.get_track_data(album, track, tf)]
+    expected = [serializers.get_track_data(album, track, upload)]
     expected[0]["starred"] = favorite.creation_date
     data = serializers.get_starred_tracks_data([favorite])
     assert data == expected
@@ -147,7 +147,7 @@ def test_playlist_serializer(factories):
 
 def test_playlist_detail_serializer(factories):
     plt = factories["playlists.PlaylistTrack"]()
-    tf = factories["music.TrackFile"](track=plt.track)
+    upload = factories["music.Upload"](track=plt.track)
     playlist = plt.playlist
     qs = music_models.Album.objects.with_tracks_count().order_by("pk")
     expected = {
@@ -158,7 +158,7 @@ def test_playlist_detail_serializer(factories):
         "songCount": 1,
         "duration": 0,
         "created": playlist.creation_date,
-        "entry": [serializers.get_track_data(plt.track.album, plt.track, tf)],
+        "entry": [serializers.get_track_data(plt.track.album, plt.track, upload)],
     }
     qs = playlist.__class__.objects.with_tracks_count()
     data = serializers.get_playlist_detail_data(qs.first())
@@ -167,7 +167,7 @@ def test_playlist_detail_serializer(factories):
 
 def test_directory_serializer_artist(factories):
     track = factories["music.Track"]()
-    tf = factories["music.TrackFile"](track=track, bitrate=42000, duration=43, size=44)
+    upload = factories["music.Upload"](track=track, bitrate=42000, duration=43, size=44)
     album = track.album
     artist = track.artist
 
@@ -184,8 +184,8 @@ def test_directory_serializer_artist(factories):
                 "artist": artist.name,
                 "track": track.position,
                 "year": track.album.release_date.year,
-                "contentType": tf.mimetype,
-                "suffix": tf.extension or "",
+                "contentType": upload.mimetype,
+                "suffix": upload.extension or "",
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
@@ -202,8 +202,8 @@ def test_directory_serializer_artist(factories):
 
 
 def test_scrobble_serializer(factories):
-    tf = factories["music.TrackFile"]()
-    track = tf.track
+    upload = factories["music.Upload"]()
+    track = upload.track
     user = factories["users.User"]()
     payload = {"id": track.pk, "submission": True}
     serializer = serializers.ScrobbleSerializer(data=payload, context={"user": user})

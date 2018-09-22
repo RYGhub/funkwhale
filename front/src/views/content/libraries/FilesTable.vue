@@ -46,7 +46,7 @@
         :objects-data="result"
         :custom-objects="customObjects"
         :actions="actions"
-        :action-url="'track-files/action/'"
+        :action-url="'uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Title</translate></th>
@@ -207,7 +207,7 @@ export default {
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/track-files/', {params: params}).then((response) => {
+      axios.get('/uploads/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {

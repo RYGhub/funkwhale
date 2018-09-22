@@ -3,7 +3,7 @@ import urllib
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Prefetch, Sum
+from django.db.models import Count, Prefetch, Sum, F
 from django.db.models.functions import Length
 from django.utils import timezone
 
@@ -19,6 +19,7 @@ from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import routes
 
 from . import filters, models, serializers, tasks, utils
 
@@ -44,6 +45,9 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         albums = models.Album.objects.with_tracks_count()
+        albums = albums.annotate_playable_by_actor(
+            utils.get_actor_from_request(self.request)
+        )
         return queryset.prefetch_related(Prefetch("albums", queryset=albums)).distinct()
 
 
@@ -61,6 +65,14 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
         tracks = models.Track.objects.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         ).select_related("artist")
+        if (
+            hasattr(self, "kwargs")
+            and self.kwargs
+            and self.request.method.lower() == "get"
+        ):
+            # we are detailing a single album, so we can add the overhead
+            # to fetch additional data
+            tracks = tracks.annotate_duration()
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs.distinct()
 
@@ -77,8 +89,8 @@ class LibraryViewSet(
     queryset = (
         models.Library.objects.all()
         .order_by("-creation_date")
-        .annotate(_files_count=Count("files"))
-        .annotate(_size=Sum("files__size"))
+        .annotate(_uploads_count=Count("uploads"))
+        .annotate(_size=Sum("uploads__size"))
     )
     serializer_class = serializers.LibraryForOwnerSerializer
     permission_classes = [
@@ -94,6 +106,14 @@ class LibraryViewSet(
 
     def perform_create(self, serializer):
         serializer.save(actor=self.request.user.actor)
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Library"}},
+            context={"library": instance},
+        )
+        instance.delete()
 
     @detail_route(methods=["get"])
     @transaction.non_atomic_requests
@@ -141,7 +161,15 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
 
         queryset = queryset.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
-        )
+        ).annotate_duration()
+        if (
+            hasattr(self, "kwargs")
+            and self.kwargs
+            and self.request.method.lower() == "get"
+        ):
+            # we are detailing a single track, so we can add the overhead
+            # to fetch additional data
+            queryset = queryset.annotate_file_data()
         return queryset.distinct()
 
     @detail_route(methods=["get"])
@@ -201,8 +229,8 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def handle_serve(track_file, user):
-    f = track_file
+def handle_serve(upload, user):
+    f = upload
     # we update the accessed_date
     f.accessed_date = timezone.now()
     f.save(update_fields=["accessed_date"])
@@ -261,19 +289,20 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     def retrieve(self, request, *args, **kwargs):
         track = self.get_object()
         actor = utils.get_actor_from_request(request)
-        queryset = track.files.select_related("track__album__artist", "track__artist")
-        explicit_file = request.GET.get("file")
+        queryset = track.uploads.select_related("track__album__artist", "track__artist")
+        explicit_file = request.GET.get("upload")
         if explicit_file:
             queryset = queryset.filter(uuid=explicit_file)
         queryset = queryset.playable_by(actor)
-        tf = queryset.first()
-        if not tf:
+        queryset = queryset.order_by(F("audio_file").desc(nulls_last=True))
+        upload = queryset.first()
+        if not upload:
             return Response(status=404)
 
-        return handle_serve(tf, user=request.user)
+        return handle_serve(upload, user=request.user)
 
 
-class TrackFileViewSet(
+class UploadViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
@@ -282,18 +311,18 @@ class TrackFileViewSet(
 ):
     lookup_field = "uuid"
     queryset = (
-        models.TrackFile.objects.all()
+        models.Upload.objects.all()
         .order_by("-creation_date")
         .select_related("library", "track__artist", "track__album__artist")
     )
-    serializer_class = serializers.TrackFileForOwnerSerializer
+    serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [
         permissions.IsAuthenticated,
         common_permissions.OwnerPermission,
     ]
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
-    filter_class = filters.TrackFileFilter
+    filter_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
         "import_date",
@@ -309,9 +338,7 @@ class TrackFileViewSet(
     @list_route(methods=["post"])
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = serializers.TrackFileActionSerializer(
-            request.data, queryset=queryset
-        )
+        serializer = serializers.UploadActionSerializer(request.data, queryset=queryset)
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return Response(result, status=200)
@@ -322,8 +349,16 @@ class TrackFileViewSet(
         return context
 
     def perform_create(self, serializer):
-        tf = serializer.save()
-        common_utils.on_commit(tasks.import_track_file.delay, track_file_id=tf.pk)
+        upload = serializer.save()
+        common_utils.on_commit(tasks.import_upload.delay, upload_id=upload.pk)
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Audio"}},
+            context={"uploads": [instance]},
+        )
+        instance.delete()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
