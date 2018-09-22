@@ -48,6 +48,8 @@ u.set_password("demo")
 u.subsonic_api_token = "demo"
 u.save()
 
+library = actor.libraries.create(name='Demo library', privacy_level='everyone')
+
 from funkwhale_api.common import preferences
 
 manager = preferences.global_preferences_registry.manager()
@@ -61,7 +63,7 @@ paths = [
     "$music_path/**/*.flac",
 ]
 print(paths)
-call_command("import_files", *paths, username="demo", recursive=True, interactive=False)
+call_command("import_files", str(library.uuid), *paths, username="demo", recursive=True, interactive=False)
 
 print('Creating some dummy data...')
 
@@ -73,7 +75,7 @@ from funkwhale_api.favorites.factories import TrackFavorite as TrackFavoriteFact
 from funkwhale_api.users.factories import UserFactory
 from funkwhale_api.playlists.factories import PlaylistFactory
 
-users = UserFactory.create_batch(size=15, privacy_level="everyone")
+users = UserFactory.create_batch(size=15, privacy_level="everyone", with_actor=True)
 available_tracks = list(Track.objects.all())
 available_albums = list(Album.objects.all())
 

@@ -350,7 +350,7 @@ class UploadViewSet(
 
     def perform_create(self, serializer):
         upload = serializer.save()
-        common_utils.on_commit(tasks.import_upload.delay, upload_id=upload.pk)
+        common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
 
     @transaction.atomic
     def perform_destroy(self, instance):

@@ -255,7 +255,7 @@ def test_manage_upload_action_relaunch_import(factories, mocker):
     for obj in to_relaunch:
         obj.refresh_from_db()
         assert obj.import_status == "pending"
-        m.assert_any_call(tasks.import_upload.delay, upload_id=obj.pk)
+        m.assert_any_call(tasks.process_upload.delay, upload_id=obj.pk)
 
     finished.refresh_from_db()
     assert finished.import_status == "finished"
