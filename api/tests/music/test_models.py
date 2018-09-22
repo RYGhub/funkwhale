@@ -3,8 +3,10 @@ import os
 import pytest
 
 from django.utils import timezone
+from django.urls import reverse
 
 from funkwhale_api.music import importers, models, tasks
+from funkwhale_api.federation import utils as federation_utils
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -157,33 +159,33 @@ def test_audio_track_mime_type(extention, mimetype, factories):
 
     name = ".".join(["test", extention])
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path, mimetype=None)
+    upload = factories["music.Upload"](audio_file__from_path=path, mimetype=None)
 
-    assert tf.mimetype == mimetype
+    assert upload.mimetype == mimetype
 
 
-def test_track_file_file_name(factories):
+def test_upload_file_name(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    upload = factories["music.Upload"](audio_file__from_path=path)
 
-    assert tf.filename == tf.track.full_name + ".mp3"
+    assert upload.filename == upload.track.full_name + ".mp3"
 
 
 def test_track_get_file_size(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    upload = factories["music.Upload"](audio_file__from_path=path)
 
-    assert tf.get_file_size() == 297745
+    assert upload.get_file_size() == 297745
 
 
 def test_track_get_file_size_in_place(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](in_place=True, source="file://{}".format(path))
+    upload = factories["music.Upload"](in_place=True, source="file://{}".format(path))
 
-    assert tf.get_file_size() == 297745
+    assert upload.get_file_size() == 297745
 
 
 def test_album_get_image_content(factories):
@@ -202,7 +204,7 @@ def test_library(factories):
     )
 
     assert library.creation_date >= now
-    assert library.files.count() == 0
+    assert library.uploads.count() == 0
     assert library.uuid is not None
 
 
@@ -210,9 +212,9 @@ def test_library(factories):
     "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
 )
 def test_playable_by_correct_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    queryset = tf.library.files.playable_by(tf.library.actor)
-    match = tf in list(queryset)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    queryset = upload.library.uploads.playable_by(upload.library.actor)
+    match = upload in list(queryset)
     assert match is expected
 
 
@@ -220,10 +222,10 @@ def test_playable_by_correct_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
 )
 def test_playable_by_instance_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
-    queryset = tf.library.files.playable_by(instance_actor)
-    match = tf in list(queryset)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
+    queryset = upload.library.uploads.playable_by(instance_actor)
+    match = upload in list(queryset)
     assert match is expected
 
 
@@ -231,9 +233,22 @@ def test_playable_by_instance_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
 )
 def test_playable_by_anonymous(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    queryset = tf.library.files.playable_by(None)
-    match = tf in list(queryset)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    queryset = upload.library.uploads.playable_by(None)
+    match = upload in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize("approved", [True, False])
+def test_playable_by_follower(approved, factories):
+    upload = factories["music.Upload"](library__privacy_level="me")
+    actor = factories["federation.Actor"](local=True)
+    factories["federation.LibraryFollow"](
+        target=upload.library, actor=actor, approved=approved
+    )
+    queryset = upload.library.uploads.playable_by(actor)
+    match = upload in list(queryset)
+    expected = approved
     assert match is expected
 
 
@@ -241,11 +256,11 @@ def test_playable_by_anonymous(privacy_level, expected, factories):
     "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
 )
 def test_track_playable_by_correct_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"]()
+    upload = factories["music.Upload"]()
     queryset = models.Track.objects.playable_by(
-        tf.library.actor
-    ).annotate_playable_by_actor(tf.library.actor)
-    match = tf.track in list(queryset)
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -255,12 +270,12 @@ def test_track_playable_by_correct_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
 )
 def test_track_playable_by_instance_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
     queryset = models.Track.objects.playable_by(
         instance_actor
     ).annotate_playable_by_actor(instance_actor)
-    match = tf.track in list(queryset)
+    match = upload.track in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -270,9 +285,9 @@ def test_track_playable_by_instance_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
 )
 def test_track_playable_by_anonymous(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
     queryset = models.Track.objects.playable_by(None).annotate_playable_by_actor(None)
-    match = tf.track in list(queryset)
+    match = upload.track in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -282,12 +297,12 @@ def test_track_playable_by_anonymous(privacy_level, expected, factories):
     "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
 )
 def test_album_playable_by_correct_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"]()
+    upload = factories["music.Upload"]()
 
     queryset = models.Album.objects.playable_by(
-        tf.library.actor
-    ).annotate_playable_by_actor(tf.library.actor)
-    match = tf.track.album in list(queryset)
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track.album in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -297,12 +312,12 @@ def test_album_playable_by_correct_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
 )
 def test_album_playable_by_instance_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
     queryset = models.Album.objects.playable_by(
         instance_actor
     ).annotate_playable_by_actor(instance_actor)
-    match = tf.track.album in list(queryset)
+    match = upload.track.album in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -312,9 +327,9 @@ def test_album_playable_by_instance_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
 )
 def test_album_playable_by_anonymous(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
     queryset = models.Album.objects.playable_by(None).annotate_playable_by_actor(None)
-    match = tf.track.album in list(queryset)
+    match = upload.track.album in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -324,12 +339,12 @@ def test_album_playable_by_anonymous(privacy_level, expected, factories):
     "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
 )
 def test_artist_playable_by_correct_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"]()
+    upload = factories["music.Upload"]()
 
     queryset = models.Artist.objects.playable_by(
-        tf.library.actor
-    ).annotate_playable_by_actor(tf.library.actor)
-    match = tf.track.artist in list(queryset)
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track.artist in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -339,12 +354,12 @@ def test_artist_playable_by_correct_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
 )
 def test_artist_playable_by_instance_actor(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
-    instance_actor = factories["federation.Actor"](domain=tf.library.actor.domain)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
     queryset = models.Artist.objects.playable_by(
         instance_actor
     ).annotate_playable_by_actor(instance_actor)
-    match = tf.track.artist in list(queryset)
+    match = upload.track.artist in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
@@ -354,24 +369,24 @@ def test_artist_playable_by_instance_actor(privacy_level, expected, factories):
     "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
 )
 def test_artist_playable_by_anonymous(privacy_level, expected, factories):
-    tf = factories["music.TrackFile"](library__privacy_level=privacy_level)
+    upload = factories["music.Upload"](library__privacy_level=privacy_level)
     queryset = models.Artist.objects.playable_by(None).annotate_playable_by_actor(None)
-    match = tf.track.artist in list(queryset)
+    match = upload.track.artist in list(queryset)
     assert match is expected
     if expected:
         assert bool(queryset.first().is_playable_by_actor) is expected
 
 
-def test_track_file_listen_url(factories):
-    tf = factories["music.TrackFile"]()
-    expected = tf.track.listen_url + "?file={}".format(tf.uuid)
+def test_upload_listen_url(factories):
+    upload = factories["music.Upload"]()
+    expected = upload.track.listen_url + "?upload={}".format(upload.uuid)
 
-    assert tf.listen_url == expected
+    assert upload.listen_url == expected
 
 
 def test_library_schedule_scan(factories, now, mocker):
     on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
-    library = factories["music.Library"](files_count=5)
+    library = factories["music.Library"](uploads_count=5)
 
     scan = library.schedule_scan()
 
@@ -397,9 +412,9 @@ def test_library_schedule_scan_too_recent(factories, now):
 
 
 def test_get_audio_data(factories):
-    tf = factories["music.TrackFile"]()
+    upload = factories["music.Upload"]()
 
-    result = tf.get_audio_data()
+    result = upload.get_audio_data()
 
     assert result == {"duration": 229, "bitrate": 128000, "size": 3459481}
 
@@ -419,3 +434,43 @@ def test_library_queryset_with_follows(factories):
     l2 = list(qs)[1]
     assert l1._follows == []
     assert l2._follows == [follow]
+
+
+def test_annotate_duration(factories):
+    tf = factories["music.Upload"](duration=32)
+
+    track = models.Track.objects.annotate_duration().get(pk=tf.track.pk)
+
+    assert track.duration == 32
+
+
+def test_annotate_file_data(factories):
+    tf = factories["music.Upload"](size=42, bitrate=55, mimetype="audio/ogg")
+
+    track = models.Track.objects.annotate_file_data().get(pk=tf.track.pk)
+
+    assert track.size == 42
+    assert track.bitrate == 55
+    assert track.mimetype == "audio/ogg"
+
+
+@pytest.mark.parametrize(
+    "model,factory_args,namespace",
+    [
+        (
+            "music.Upload",
+            {"library__actor__local": True},
+            "federation:music:uploads-detail",
+        ),
+        ("music.Library", {"actor__local": True}, "federation:music:libraries-detail"),
+        ("music.Artist", {}, "federation:music:artists-detail"),
+        ("music.Album", {}, "federation:music:albums-detail"),
+        ("music.Track", {}, "federation:music:tracks-detail"),
+    ],
+)
+def test_fid_is_populated(factories, model, factory_args, namespace):
+    instance = factories[model](**factory_args, fid=None)
+
+    assert instance.fid == federation_utils.full_url(
+        reverse(namespace, kwargs={"uuid": instance.uuid})
+    )

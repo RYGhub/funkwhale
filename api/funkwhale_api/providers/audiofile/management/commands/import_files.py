@@ -198,8 +198,8 @@ class Command(BaseCommand):
     def filter_matching(self, matching):
         sources = ["file://{}".format(p) for p in matching]
         # we skip reimport for path that are already found
-        # as a TrackFile.source
-        existing = models.TrackFile.objects.filter(source__in=sources)
+        # as a Upload.source
+        existing = models.Upload.objects.filter(source__in=sources)
         existing = existing.values_list("source", flat=True)
         existing = set([p.replace("file://", "", 1) for p in existing])
         skipped = set(matching) & existing

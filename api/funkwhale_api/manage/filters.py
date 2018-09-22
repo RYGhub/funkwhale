@@ -6,7 +6,7 @@ from funkwhale_api.requests import models as requests_models
 from funkwhale_api.users import models as users_models
 
 
-class ManageTrackFileFilterSet(filters.FilterSet):
+class ManageUploadFilterSet(filters.FilterSet):
     q = fields.SearchFilter(
         search_fields=[
             "track__title",
@@ -17,7 +17,7 @@ class ManageTrackFileFilterSet(filters.FilterSet):
     )
 
     class Meta:
-        model = music_models.TrackFile
+        model = music_models.Upload
         fields = ["q", "track__album", "track__artist", "track"]
 
 

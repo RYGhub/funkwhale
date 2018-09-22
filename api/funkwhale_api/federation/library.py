@@ -108,7 +108,7 @@ def get_library_page(library, page_url, actor):
     )
     serializer = serializers.CollectionPageSerializer(
         data=response.json(),
-        context={"library": library, "item_serializer": serializers.AudioSerializer},
+        context={"library": library, "item_serializer": serializers.UploadSerializer},
     )
     serializer.is_valid(raise_exception=True)
     return serializer.validated_data

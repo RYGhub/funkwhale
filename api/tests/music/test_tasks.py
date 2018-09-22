@@ -11,7 +11,7 @@ from funkwhale_api.music import signals, tasks
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-# DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
+# DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 
 
 def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
@@ -89,64 +89,68 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     assert track.artist == artist
 
 
-def test_track_file_import_mbid(now, factories, temp_signal):
+def test_upload_import_mbid(now, factories, temp_signal, mocker):
+    outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
     track = factories["music.Track"]()
-    tf = factories["music.TrackFile"](
+    upload = factories["music.Upload"](
         track=None, import_metadata={"track": {"mbid": track.mbid}}
     )
 
-    with temp_signal(signals.track_file_import_status_updated) as handler:
-        tasks.import_track_file(track_file_id=tf.pk)
+    with temp_signal(signals.upload_import_status_updated) as handler:
+        tasks.import_upload(upload_id=upload.pk)
 
-    tf.refresh_from_db()
+    upload.refresh_from_db()
 
-    assert tf.track == track
-    assert tf.import_status == "finished"
-    assert tf.import_date == now
+    assert upload.track == track
+    assert upload.import_status == "finished"
+    assert upload.import_date == now
     handler.assert_called_once_with(
-        track_file=tf,
+        upload=upload,
         old_status="pending",
         new_status="finished",
         sender=None,
-        signal=signals.track_file_import_status_updated,
+        signal=signals.upload_import_status_updated,
+    )
+    outbox.assert_called_once_with(
+        {"type": "Create", "object": {"type": "Audio"}}, context={"upload": upload}
     )
 
 
-def test_track_file_import_get_audio_data(factories, mocker):
+def test_upload_import_get_audio_data(factories, mocker):
     mocker.patch(
-        "funkwhale_api.music.models.TrackFile.get_audio_data",
+        "funkwhale_api.music.models.Upload.get_audio_data",
         return_value={"size": 23, "duration": 42, "bitrate": 66},
     )
     track = factories["music.Track"]()
-    tf = factories["music.TrackFile"](
+    upload = factories["music.Upload"](
         track=None, import_metadata={"track": {"mbid": track.mbid}}
     )
 
-    tasks.import_track_file(track_file_id=tf.pk)
+    tasks.import_upload(upload_id=upload.pk)
 
-    tf.refresh_from_db()
-    assert tf.size == 23
-    assert tf.duration == 42
-    assert tf.bitrate == 66
+    upload.refresh_from_db()
+    assert upload.size == 23
+    assert upload.duration == 42
+    assert upload.bitrate == 66
 
 
-def test_track_file_import_skip_existing_track_in_own_library(factories, temp_signal):
+def test_upload_import_skip_existing_track_in_own_library(factories, temp_signal):
     track = factories["music.Track"]()
     library = factories["music.Library"]()
-    existing = factories["music.TrackFile"](
+    existing = factories["music.Upload"](
         track=track,
         import_status="finished",
         library=library,
         import_metadata={"track": {"mbid": track.mbid}},
     )
-    duplicate = factories["music.TrackFile"](
+    duplicate = factories["music.Upload"](
         track=track,
         import_status="pending",
         library=library,
         import_metadata={"track": {"mbid": track.mbid}},
     )
-    with temp_signal(signals.track_file_import_status_updated) as handler:
-        tasks.import_track_file(track_file_id=duplicate.pk)
+    with temp_signal(signals.upload_import_status_updated) as handler:
+        tasks.import_upload(upload_id=duplicate.pk)
 
     duplicate.refresh_from_db()
 
@@ -157,78 +161,80 @@ def test_track_file_import_skip_existing_track_in_own_library(factories, temp_si
     }
 
     handler.assert_called_once_with(
-        track_file=duplicate,
+        upload=duplicate,
         old_status="pending",
         new_status="skipped",
         sender=None,
-        signal=signals.track_file_import_status_updated,
+        signal=signals.upload_import_status_updated,
     )
 
 
-def test_track_file_import_track_uuid(now, factories):
+def test_upload_import_track_uuid(now, factories):
     track = factories["music.Track"]()
-    tf = factories["music.TrackFile"](
+    upload = factories["music.Upload"](
         track=None, import_metadata={"track": {"uuid": track.uuid}}
     )
 
-    tasks.import_track_file(track_file_id=tf.pk)
+    tasks.import_upload(upload_id=upload.pk)
 
-    tf.refresh_from_db()
+    upload.refresh_from_db()
 
-    assert tf.track == track
-    assert tf.import_status == "finished"
-    assert tf.import_date == now
+    assert upload.track == track
+    assert upload.import_status == "finished"
+    assert upload.import_date == now
 
 
-def test_track_file_import_error(factories, now, temp_signal):
-    tf = factories["music.TrackFile"](import_metadata={"track": {"uuid": uuid.uuid4()}})
-    with temp_signal(signals.track_file_import_status_updated) as handler:
-        tasks.import_track_file(track_file_id=tf.pk)
-    tf.refresh_from_db()
+def test_upload_import_error(factories, now, temp_signal):
+    upload = factories["music.Upload"](
+        import_metadata={"track": {"uuid": uuid.uuid4()}}
+    )
+    with temp_signal(signals.upload_import_status_updated) as handler:
+        tasks.import_upload(upload_id=upload.pk)
+    upload.refresh_from_db()
 
-    assert tf.import_status == "errored"
-    assert tf.import_date == now
-    assert tf.import_details == {"error_code": "track_uuid_not_found"}
+    assert upload.import_status == "errored"
+    assert upload.import_date == now
+    assert upload.import_details == {"error_code": "track_uuid_not_found"}
     handler.assert_called_once_with(
-        track_file=tf,
+        upload=upload,
         old_status="pending",
         new_status="errored",
         sender=None,
-        signal=signals.track_file_import_status_updated,
+        signal=signals.upload_import_status_updated,
     )
 
 
-def test_track_file_import_updates_cover_if_no_cover(factories, mocker, now):
+def test_upload_import_updates_cover_if_no_cover(factories, mocker, now):
     mocked_update = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
     album = factories["music.Album"](cover="")
     track = factories["music.Track"](album=album)
-    tf = factories["music.TrackFile"](
+    upload = factories["music.Upload"](
         track=None, import_metadata={"track": {"uuid": track.uuid}}
     )
-    tasks.import_track_file(track_file_id=tf.pk)
-    mocked_update.assert_called_once_with(album, tf)
+    tasks.import_upload(upload_id=upload.pk)
+    mocked_update.assert_called_once_with(album, upload)
 
 
 def test_update_album_cover_mbid(factories, mocker):
     album = factories["music.Album"](cover="")
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
-    tasks.update_album_cover(album=album, track_file=None)
+    tasks.update_album_cover(album=album, upload=None)
 
     mocked_get.assert_called_once_with()
 
 
 def test_update_album_cover_file_data(factories, mocker):
     album = factories["music.Album"](cover="", mbid=None)
-    tf = factories["music.TrackFile"](track__album=album)
+    upload = factories["music.Upload"](track__album=album)
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
     mocker.patch(
         "funkwhale_api.music.metadata.Metadata.get_picture",
         return_value={"hello": "world"},
     )
-    tasks.update_album_cover(album=album, track_file=tf)
-    tf.get_metadata()
+    tasks.update_album_cover(album=album, upload=upload)
+    upload.get_metadata()
     mocked_get.assert_called_once_with(data={"hello": "world"})
 
 
@@ -239,12 +245,14 @@ def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, m
     with open(image_path, "rb") as f:
         image_content = f.read()
     album = factories["music.Album"](cover="", mbid=None)
-    tf = factories["music.TrackFile"](track__album=album, source="file://" + image_path)
+    upload = factories["music.Upload"](
+        track__album=album, source="file://" + image_path
+    )
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
     mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture", return_value=None)
-    tasks.update_album_cover(album=album, track_file=tf)
-    tf.get_metadata()
+    tasks.update_album_cover(album=album, upload=upload)
+    upload.get_metadata()
     mocked_get.assert_called_once_with(
         data={"mimetype": mimetype, "content": image_content}
     )
@@ -275,17 +283,23 @@ def test_scan_library_fetches_page_and_calls_scan_page(now, mocker, factories, r
 
 def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_mock):
     scan_page = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
-    import_tf = mocker.patch("funkwhale_api.music.tasks.import_track_file.delay")
     scan = factories["music.LibraryScan"](status="scanning", total_files=5)
-    tfs = factories["music.TrackFile"].build_batch(size=5, library=scan.library)
-    for i, tf in enumerate(tfs):
-        tf.fid = "https://track.test/{}".format(i)
+    uploads = [
+        factories["music.Upload"].build(
+            fid="https://track.test/{}".format(i),
+            size=42,
+            bitrate=66,
+            duration=99,
+            library=scan.library,
+        )
+        for i in range(5)
+    ]
 
     page_conf = {
         "actor": scan.library.actor,
         "id": scan.library.fid,
-        "page": Paginator(tfs, 3).page(1),
-        "item_serializer": federation_serializers.AudioSerializer,
+        "page": Paginator(uploads, 3).page(1),
+        "item_serializer": federation_serializers.UploadSerializer,
     }
     page = federation_serializers.CollectionPageSerializer(page_conf)
     r_mock.get(page.data["id"], json=page.data)
@@ -293,12 +307,11 @@ def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_moc
     tasks.scan_library_page(library_scan_id=scan.pk, page_url=page.data["id"])
 
     scan.refresh_from_db()
-    lts = list(scan.library.files.all().order_by("-creation_date"))
+    lts = list(scan.library.uploads.all().order_by("-creation_date"))
 
     assert len(lts) == 3
-    for tf in tfs[:3]:
-        new_tf = scan.library.files.get(fid=tf.get_federation_id())
-        import_tf.assert_any_call(track_file_id=new_tf.pk)
+    for upload in uploads[:3]:
+        scan.library.uploads.get(fid=upload.fid)
 
     assert scan.status == "scanning"
     assert scan.processed_files == 3
@@ -312,12 +325,12 @@ def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_moc
 def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock):
     patched_scan = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
     scan = factories["music.LibraryScan"](status="scanning", total_files=5)
-    tfs = factories["music.TrackFile"].build_batch(size=5, library=scan.library)
+    uploads = factories["music.Upload"].build_batch(size=5, library=scan.library)
     page_conf = {
         "actor": scan.library.actor,
         "id": scan.library.fid,
-        "page": Paginator(tfs, 3).page(1),
-        "item_serializer": federation_serializers.AudioSerializer,
+        "page": Paginator(uploads, 3).page(1),
+        "item_serializer": federation_serializers.UploadSerializer,
     }
     page = federation_serializers.CollectionPageSerializer(page_conf)
     data = page.data

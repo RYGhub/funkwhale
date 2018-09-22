@@ -27,6 +27,22 @@ class FederationMixin(object):
         return super().dispatch(request, *args, **kwargs)
 
 
+class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
+    permission_classes = []
+    authentication_classes = [authentication.SignatureAuthentication]
+    renderer_classes = [renderers.ActivityPubRenderer]
+
+    @list_route(methods=["post"])
+    def inbox(self, request, *args, **kwargs):
+        if request.method.lower() == "post" and request.actor is None:
+            raise exceptions.AuthenticationFailed(
+                "You need a valid signature to send an activity"
+            )
+        if request.method.lower() == "post":
+            activity.receive(activity=request.data, on_behalf_of=request.actor)
+        return response.Response({}, status=200)
+
+
 class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "preferred_username"
     authentication_classes = [authentication.SignatureAuthentication]
@@ -48,6 +64,18 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     @detail_route(methods=["get", "post"])
     def outbox(self, request, *args, **kwargs):
         return response.Response({}, status=200)
+
+    @detail_route(methods=["get"])
+    def followers(self, request, *args, **kwargs):
+        self.get_object()
+        # XXX to implement
+        return response.Response({})
+
+    @detail_route(methods=["get"])
+    def following(self, request, *args, **kwargs):
+        self.get_object()
+        # XXX to implement
+        return response.Response({})
 
 
 class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
@@ -175,8 +203,8 @@ class MusicLibraryViewSet(
             "actor": lb.actor,
             "name": lb.name,
             "summary": lb.description,
-            "items": lb.files.order_by("-creation_date"),
-            "item_serializer": serializers.AudioSerializer,
+            "items": lb.uploads.order_by("-creation_date"),
+            "item_serializer": serializers.UploadSerializer,
         }
         page = request.GET.get("page")
         if page is None:
@@ -204,3 +232,49 @@ class MusicLibraryViewSet(
                 return response.Response(status=404)
 
         return response.Response(data)
+
+    @detail_route(methods=["get"])
+    def followers(self, request, *args, **kwargs):
+        self.get_object()
+        # XXX Implement this
+        return response.Response({})
+
+
+class MusicUploadViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    queryset = music_models.Upload.objects.none()
+    lookup_field = "uuid"
+
+
+class MusicArtistViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    queryset = music_models.Artist.objects.none()
+    lookup_field = "uuid"
+
+
+class MusicAlbumViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    queryset = music_models.Album.objects.none()
+    lookup_field = "uuid"
+
+
+class MusicTrackViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    queryset = music_models.Track.objects.none()
+    lookup_field = "uuid"

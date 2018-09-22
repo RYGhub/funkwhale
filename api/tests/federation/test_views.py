@@ -109,6 +109,17 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
     )
 
 
+def test_shared_inbox_post(factories, api_client, mocker, authenticated_actor):
+    patched_receive = mocker.patch("funkwhale_api.federation.activity.receive")
+    url = reverse("federation:shared-inbox")
+    response = api_client.post(url, {"hello": "world"}, format="json")
+
+    assert response.status_code == 200
+    patched_receive.assert_called_once_with(
+        activity={"hello": "world"}, on_behalf_of=authenticated_actor
+    )
+
+
 def test_wellknown_webfinger_local(factories, api_client, settings, mocker):
     user = factories["users.User"](with_actor=True)
     url = reverse("federation:well-known-webfinger")
@@ -138,14 +149,14 @@ def test_music_library_retrieve(factories, api_client, privacy_level):
 
 def test_music_library_retrieve_page_public(factories, api_client):
     library = factories["music.Library"](privacy_level="everyone")
-    tf = factories["music.TrackFile"](library=library)
+    upload = factories["music.Upload"](library=library)
     id = library.get_federation_id()
     expected = serializers.CollectionPageSerializer(
         {
             "id": id,
-            "item_serializer": serializers.AudioSerializer,
+            "item_serializer": serializers.UploadSerializer,
             "actor": library.actor,
-            "page": Paginator([tf], 1).page(1),
+            "page": Paginator([upload], 1).page(1),
             "name": library.name,
             "summary": library.description,
         }

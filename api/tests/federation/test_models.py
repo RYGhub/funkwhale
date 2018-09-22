@@ -27,25 +27,25 @@ def test_follow_federation_url(factories):
 
 def test_actor_get_quota(factories):
     library = factories["music.Library"]()
-    factories["music.TrackFile"](
+    factories["music.Upload"](
         library=library,
         import_status="pending",
         audio_file__from_path=None,
         audio_file__data=b"a",
     )
-    factories["music.TrackFile"](
+    factories["music.Upload"](
         library=library,
         import_status="skipped",
         audio_file__from_path=None,
         audio_file__data=b"aa",
     )
-    factories["music.TrackFile"](
+    factories["music.Upload"](
         library=library,
         import_status="errored",
         audio_file__from_path=None,
         audio_file__data=b"aaa",
     )
-    factories["music.TrackFile"](
+    factories["music.Upload"](
         library=library,
         import_status="finished",
         audio_file__from_path=None,

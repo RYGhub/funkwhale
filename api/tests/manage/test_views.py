@@ -7,7 +7,7 @@ from funkwhale_api.manage import serializers, views
 @pytest.mark.parametrize(
     "view,permissions,operator",
     [
-        (views.ManageTrackFileViewSet, ["library"], "and"),
+        (views.ManageUploadViewSet, ["library"], "and"),
         (views.ManageUserViewSet, ["settings"], "and"),
         (views.ManageInvitationViewSet, ["settings"], "and"),
         (views.ManageImportRequestViewSet, ["library"], "and"),
@@ -18,17 +18,17 @@ def test_permissions(assert_user_permission, view, permissions, operator):
 
 
 @pytest.mark.skip(reason="Refactoring in progress")
-def test_track_file_view(factories, superuser_api_client):
-    tfs = factories["music.TrackFile"].create_batch(size=5)
-    qs = tfs[0].__class__.objects.order_by("-creation_date")
-    url = reverse("api:v1:manage:library:track-files-list")
+def test_upload_view(factories, superuser_api_client):
+    uploads = factories["music.Upload"].create_batch(size=5)
+    qs = uploads[0].__class__.objects.order_by("-creation_date")
+    url = reverse("api:v1:manage:library:uploads-list")
 
     response = superuser_api_client.get(url, {"sort": "-creation_date"})
-    expected = serializers.ManageTrackFileSerializer(
+    expected = serializers.ManageUploadSerializer(
         qs, many=True, context={"request": response.wsgi_request}
     ).data
 
-    assert response.data["count"] == len(tfs)
+    assert response.data["count"] == len(uploads)
     assert response.data["results"] == expected
 
 

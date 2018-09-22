@@ -48,8 +48,8 @@ class ActorQuerySet(models.QuerySet):
             qs = qs.annotate(
                 **{
                     "_usage_{}".format(s): models.Sum(
-                        "libraries__files__size",
-                        filter=models.Q(libraries__files__import_status=s),
+                        "libraries__uploads__size",
+                        filter=models.Q(libraries__uploads__import_status=s),
                     )
                 }
             )
@@ -72,8 +72,8 @@ class Actor(models.Model):
     domain = models.CharField(max_length=1000)
     summary = models.CharField(max_length=500, null=True, blank=True)
     preferred_username = models.CharField(max_length=200, null=True, blank=True)
-    public_key = models.CharField(max_length=5000, null=True, blank=True)
-    private_key = models.CharField(max_length=5000, null=True, blank=True)
+    public_key = models.TextField(max_length=5000, null=True, blank=True)
+    private_key = models.TextField(max_length=5000, null=True, blank=True)
     creation_date = models.DateTimeField(default=timezone.now)
     last_fetch_date = models.DateTimeField(default=timezone.now)
     manually_approves_followers = models.NullBooleanField(default=None)
@@ -159,25 +159,34 @@ class Actor(models.Model):
         return data
 
 
-class InboxItemQuerySet(models.QuerySet):
-    def local(self, include=True):
-        return self.exclude(actor__user__isnull=include)
-
-
 class InboxItem(models.Model):
+    """
+    Store activities binding to local actors, with read/unread status.
+    """
+
     actor = models.ForeignKey(
         Actor, related_name="inbox_items", on_delete=models.CASCADE
     )
     activity = models.ForeignKey(
         "Activity", related_name="inbox_items", on_delete=models.CASCADE
     )
-    is_delivered = models.BooleanField(default=False)
     type = models.CharField(max_length=10, choices=[("to", "to"), ("cc", "cc")])
-    last_delivery_date = models.DateTimeField(null=True, blank=True)
-    delivery_attempts = models.PositiveIntegerField(default=0)
     is_read = models.BooleanField(default=False)
 
-    objects = InboxItemQuerySet.as_manager()
+
+class Delivery(models.Model):
+    """
+    Store deliveries attempt to remote inboxes
+    """
+
+    is_delivered = models.BooleanField(default=False)
+    last_attempt_date = models.DateTimeField(null=True, blank=True)
+    attempts = models.PositiveIntegerField(default=0)
+    inbox_url = models.URLField(max_length=500)
+
+    activity = models.ForeignKey(
+        "Activity", related_name="deliveries", on_delete=models.CASCADE
+    )
 
 
 class Activity(models.Model):

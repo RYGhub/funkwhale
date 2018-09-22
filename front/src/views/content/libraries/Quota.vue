@@ -132,7 +132,7 @@ export default {
           import_status: status
         }
       }
-      axios.post('track-files/action/', payload).then((response) => {
+      axios.post('uploads/action/', payload).then((response) => {
         self.fetch()
       })
     },

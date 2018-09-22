@@ -32,7 +32,7 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
-        :action-url="'manage/library/track-files/action/'"
+        :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Username</translate></th>

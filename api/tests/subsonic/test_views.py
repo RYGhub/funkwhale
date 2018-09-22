@@ -147,11 +147,13 @@ def test_get_song(f, db, logged_in_api_client, factories):
     artist = factories["music.Artist"]()
     album = factories["music.Album"](artist=artist)
     track = factories["music.Track"](album=album)
-    tf = factories["music.TrackFile"](track=track)
+    upload = factories["music.Upload"](track=track)
     response = logged_in_api_client.get(url, {"f": f, "id": track.pk})
 
     assert response.status_code == 200
-    assert response.data == {"song": serializers.get_track_data(track.album, track, tf)}
+    assert response.data == {
+        "song": serializers.get_track_data(track.album, track, upload)
+    }
 
 
 @pytest.mark.parametrize("f", ["xml", "json"])
@@ -162,10 +164,10 @@ def test_stream(f, db, logged_in_api_client, factories, mocker):
     artist = factories["music.Artist"]()
     album = factories["music.Album"](artist=artist)
     track = factories["music.Track"](album=album)
-    tf = factories["music.TrackFile"](track=track)
+    upload = factories["music.Upload"](track=track)
     response = logged_in_api_client.get(url, {"f": f, "id": track.pk})
 
-    mocked_serve.assert_called_once_with(track_file=tf, user=logged_in_api_client.user)
+    mocked_serve.assert_called_once_with(upload=upload, user=logged_in_api_client.user)
     assert response.status_code == 200
 
 
@@ -412,8 +414,8 @@ def test_get_cover_art_album(factories, logged_in_api_client):
 
 
 def test_scrobble(factories, logged_in_api_client):
-    tf = factories["music.TrackFile"]()
-    track = tf.track
+    upload = factories["music.Upload"]()
+    track = upload.track
     url = reverse("api:subsonic-scrobble")
     assert url.endswith("scrobble") is True
     response = logged_in_api_client.get(url, {"id": track.pk, "submission": True})

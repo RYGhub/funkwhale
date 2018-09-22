@@ -41,7 +41,7 @@ class TrackFilter(filters.FilterSet):
         return queryset.playable_by(actor, value)
 
 
-class TrackFileFilter(filters.FilterSet):
+class UploadFilter(filters.FilterSet):
     library = filters.CharFilter("library__uuid")
     track = filters.UUIDFilter("track__uuid")
     track_artist = filters.UUIDFilter("track__artist__uuid")
@@ -67,7 +67,7 @@ class TrackFileFilter(filters.FilterSet):
     )
 
     class Meta:
-        model = models.TrackFile
+        model = models.Upload
         fields = [
             "playable",
             "import_status",

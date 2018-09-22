@@ -43,7 +43,7 @@ def get_artists():
 
 
 def get_music_duration():
-    seconds = models.TrackFile.objects.aggregate(d=Sum("duration"))["d"]
+    seconds = models.Upload.objects.aggregate(d=Sum("duration"))["d"]
     if seconds:
         return seconds / 3600
     return 0

@@ -6,7 +6,9 @@ import PIL
 import random
 import shutil
 import tempfile
+import uuid
 
+from faker.providers import internet as internet_provider
 import factory
 import pytest
 import requests_mock
@@ -22,6 +24,25 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
+
+
+class FunkwhaleProvider(internet_provider.Provider):
+    """
+    Our own faker data generator, since built-in ones are sometimes
+    not random enough
+    """
+
+    def federation_url(self, prefix=""):
+        def path_generator():
+            return "{}/{}".format(prefix, uuid.uuid4())
+
+        domain = self.domain_name()
+        protocol = "https"
+        path = path_generator()
+        return "{}://{}/{}".format(protocol, domain, path)
+
+
+factory.Faker.add_provider(FunkwhaleProvider)
 
 
 @pytest.fixture

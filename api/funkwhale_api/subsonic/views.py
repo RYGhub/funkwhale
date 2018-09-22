@@ -177,11 +177,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     @find_object(music_models.Track.objects.all())
     def stream(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
-        queryset = track.files.select_related("track__album__artist", "track__artist")
-        track_file = queryset.first()
-        if not track_file:
+        queryset = track.uploads.select_related("track__album__artist", "track__artist")
+        upload = queryset.first()
+        if not upload:
             return response.Response(status=404)
-        return music_views.handle_serve(track_file=track_file, user=request.user)
+        return music_views.handle_serve(upload=upload, user=request.user)
 
     @list_route(methods=["get", "post"], url_name="star", url_path="star")
     @find_object(music_models.Track.objects.all())
@@ -265,9 +265,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 "subsonic": "song",
                 "search_fields": ["title"],
                 "queryset": (
-                    music_models.Track.objects.prefetch_related("files").select_related(
-                        "album__artist"
-                    )
+                    music_models.Track.objects.prefetch_related(
+                        "uploads"
+                    ).select_related("album__artist")
                 ),
                 "serializer": serializers.get_song_list_data,
             },

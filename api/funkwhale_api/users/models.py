@@ -261,13 +261,23 @@ def create_actor(user):
             reverse("federation:actors-detail", kwargs={"preferred_username": username})
         ),
         "shared_inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"preferred_username": username})
+            reverse("federation:shared-inbox")
         ),
         "inbox_url": federation_utils.full_url(
             reverse("federation:actors-inbox", kwargs={"preferred_username": username})
         ),
         "outbox_url": federation_utils.full_url(
             reverse("federation:actors-outbox", kwargs={"preferred_username": username})
+        ),
+        "followers_url": federation_utils.full_url(
+            reverse(
+                "federation:actors-followers", kwargs={"preferred_username": username}
+            )
+        ),
+        "following_url": federation_utils.full_url(
+            reverse(
+                "federation:actors-following", kwargs={"preferred_username": username}
+            )
         ),
     }
     args["private_key"] = private.decode("utf-8")

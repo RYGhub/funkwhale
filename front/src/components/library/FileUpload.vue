@@ -22,7 +22,7 @@
         <div v-else-if="processableFiles > processedFilesCount" class="ui yellow label">
           {{ processedFilesCount }}/{{ processableFiles }}
         </div>
-        <div v-else :class="['ui', {'green': trackFiles.errored === 0}, {'red': trackFiles.errored > 0}, 'label']">
+        <div v-else :class="['ui', {'green': uploads.errored === 0}, {'red': uploads.errored > 0}, 'label']">
           {{ processedFilesCount }}/{{ processableFiles }}
         </div>
       </a>
@@ -116,7 +116,7 @@
       <library-files-table
         :key="String(processTimestamp)"
         :filters="{import_reference: importReference}"
-        :custom-objects="Object.values(trackFiles.objects)"></library-files-table>
+        :custom-objects="Object.values(uploads.objects)"></library-files-table>
     </div>
   </div>
 </template>
@@ -141,9 +141,9 @@ export default {
     return {
       files: [],
       currentTab: 'summary',
-      uploadUrl: '/api/v1/track-files/',
+      uploadUrl: '/api/v1/uploads/',
       importReference,
-      trackFiles: {
+      uploads: {
         pending: 0,
         finished: 0,
         skipped: 0,
@@ -183,14 +183,14 @@ export default {
       let self = this
       let statuses = ['pending', 'errored', 'skipped', 'finished']
       statuses.forEach((status) => {
-        axios.get('track-files/', {params: {import_reference: self.importReference, import_status: status, page_size: 1}}).then((response) => {
-          self.trackFiles[status] = response.data.count
+        axios.get('uploads/', {params: {import_reference: self.importReference, import_status: status, page_size: 1}}).then((response) => {
+          self.uploads[status] = response.data.count
         })
       })
     },
     updateProgressBar () {
       $(this.$el).find('.progress').progress({
-        total: this.files.length * 2,
+        total: this.uploads.length * 2,
         value: this.uploadedFilesCount + this.finishedJobs
       })
     },
@@ -219,13 +219,13 @@ export default {
     },
     handleImportEvent (event) {
       let self = this
-      if (event.track_file.import_reference != self.importReference) {
+      if (event.upload.import_reference != self.importReference) {
         return
       }
       this.$nextTick(() => {
-        self.trackFiles[event.old_status] -= 1
-        self.trackFiles[event.new_status] += 1
-        self.trackFiles.objects[event.track_file.uuid] = event.track_file
+        self.uploads[event.old_status] -= 1
+        self.uploads[event.new_status] += 1
+        self.uploads.objects[event.track_file.uuid] = event.track_file
         self.triggerReload()
       })
     },
@@ -264,10 +264,10 @@ export default {
       }).length
     },
     processableFiles () {
-      return this.trackFiles.pending + this.trackFiles.skipped + this.trackFiles.errored + this.trackFiles.finished + this.uploadedFilesCount
+      return this.uploads.pending + this.uploads.skipped + this.uploads.errored + this.uploads.finished + this.uploadedFilesCount
     },
     processedFilesCount () {
-      return this.trackFiles.skipped + this.trackFiles.errored + this.trackFiles.finished
+      return this.uploads.skipped + this.uploads.errored + this.uploads.finished
     },
     uploadData: function () {
       return {

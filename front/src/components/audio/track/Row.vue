@@ -34,8 +34,8 @@
         {{ track.album.title }}
       </router-link>
     </td>
-    <td colspan="4" v-if="file && file.duration">
-      {{ time.parse(file.duration) }}
+    <td colspan="4" v-if="track.duration">
+      {{ time.parse(track.duration) }}
     </td>
     <td colspan="4" v-else>
       <translate>N/A</translate>
@@ -79,9 +79,6 @@ export default {
       } else {
         return this.track.album.artist
       }
-    },
-    file () {
-      return this.track.files[0]
     }
   }
 }

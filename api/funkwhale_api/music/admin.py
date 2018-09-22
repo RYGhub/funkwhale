@@ -33,8 +33,8 @@ class ImportBatchAdmin(admin.ModelAdmin):
 
 @admin.register(models.ImportJob)
 class ImportJobAdmin(admin.ModelAdmin):
-    list_display = ["source", "batch", "track_file", "status", "mbid"]
-    list_select_related = ["track_file", "batch"]
+    list_display = ["source", "batch", "upload", "status", "mbid"]
+    list_select_related = ["upload", "batch"]
     search_fields = ["source", "batch__pk", "mbid"]
     list_filter = ["status"]
 
@@ -55,8 +55,8 @@ class LyricsAdmin(admin.ModelAdmin):
     list_filter = ["work__language"]
 
 
-@admin.register(models.TrackFile)
-class TrackFileAdmin(admin.ModelAdmin):
+@admin.register(models.Upload)
+class UploadAdmin(admin.ModelAdmin):
     list_display = [
         "track",
         "audio_file",

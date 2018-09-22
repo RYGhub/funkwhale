@@ -17,6 +17,7 @@ SAMPLES_PATH = os.path.join(
 class ArtistFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
+    fid = factory.Faker("federation_url")
 
     class Meta:
         model = "music.Artist"
@@ -30,6 +31,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
+    fid = factory.Faker("federation_url")
 
     class Meta:
         model = "music.Album"
@@ -37,6 +39,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
 
 @registry.register
 class TrackFactory(factory.django.DjangoModelFactory):
+    fid = factory.Faker("federation_url")
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     album = factory.SubFactory(AlbumFactory)
@@ -49,7 +52,8 @@ class TrackFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class TrackFileFactory(factory.django.DjangoModelFactory):
+class UploadFactory(factory.django.DjangoModelFactory):
+    fid = factory.Faker("federation_url")
     track = factory.SubFactory(TrackFactory)
     library = factory.SubFactory(federation_factories.MusicLibraryFactory)
     audio_file = factory.django.FileField(
@@ -62,7 +66,7 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     mimetype = "audio/ogg"
 
     class Meta:
-        model = "music.TrackFile"
+        model = "music.Upload"
 
     class Params:
         in_place = factory.Trait(audio_file=None)

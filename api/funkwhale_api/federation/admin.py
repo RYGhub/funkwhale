@@ -4,23 +4,21 @@ from . import models
 from . import tasks
 
 
-def redeliver_inbox_items(modeladmin, request, queryset):
-    for id in set(
-        queryset.filter(activity__actor__user__isnull=False).values_list(
-            "activity", flat=True
-        )
-    ):
-        tasks.dispatch_outbox.delay(activity_id=id)
+def redeliver_deliveries(modeladmin, request, queryset):
+    queryset.update(is_delivered=False)
+    for delivery in queryset:
+        tasks.deliver_to_remote.delay(delivery_id=delivery.pk)
 
 
-redeliver_inbox_items.short_description = "Redeliver"
+redeliver_deliveries.short_description = "Redeliver"
 
 
 def redeliver_activities(modeladmin, request, queryset):
-    for id in set(
-        queryset.filter(actor__user__isnull=False).values_list("id", flat=True)
-    ):
-        tasks.dispatch_outbox.delay(activity_id=id)
+    for activity in queryset.select_related("actor__user"):
+        if activity.actor.is_local:
+            tasks.dispatch_outbox.delay(activity_id=activity.pk)
+        else:
+            tasks.dispatch_inbox.delay(activity_id=activity.pk)
 
 
 redeliver_activities.short_description = "Redeliver"
@@ -67,14 +65,22 @@ class LibraryFollowAdmin(admin.ModelAdmin):
 
 @admin.register(models.InboxItem)
 class InboxItemAdmin(admin.ModelAdmin):
-    list_display = [
-        "actor",
-        "activity",
-        "type",
-        "last_delivery_date",
-        "delivery_attempts",
-    ]
-    list_filter = ["type"]
+    list_display = ["actor", "activity", "type", "is_read"]
+    list_filter = ["type", "activity__type", "is_read"]
     search_fields = ["actor__fid", "activity__fid"]
     list_select_related = True
-    actions = [redeliver_inbox_items]
+
+
+@admin.register(models.Delivery)
+class DeliveryAdmin(admin.ModelAdmin):
+    list_display = [
+        "inbox_url",
+        "activity",
+        "last_attempt_date",
+        "attempts",
+        "is_delivered",
+    ]
+    list_filter = ["activity__type", "is_delivered"]
+    search_fields = ["inbox_url"]
+    list_select_related = True
+    actions = [redeliver_deliveries]

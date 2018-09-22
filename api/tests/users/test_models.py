@@ -148,10 +148,7 @@ def test_creating_actor_from_user(factories, settings):
         )
     )
     assert actor.shared_inbox_url == federation_utils.full_url(
-        reverse(
-            "federation:actors-inbox",
-            kwargs={"preferred_username": actor.preferred_username},
-        )
+        reverse("federation:shared-inbox")
     )
     assert actor.inbox_url == federation_utils.full_url(
         reverse(
@@ -162,6 +159,18 @@ def test_creating_actor_from_user(factories, settings):
     assert actor.outbox_url == federation_utils.full_url(
         reverse(
             "federation:actors-outbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
+    )
+    assert actor.followers_url == federation_utils.full_url(
+        reverse(
+            "federation:actors-followers",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
+    )
+    assert actor.following_url == federation_utils.full_url(
+        reverse(
+            "federation:actors-following",
             kwargs={"preferred_username": actor.preferred_username},
         )
     )

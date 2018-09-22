@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models
 
 
@@ -17,6 +18,9 @@ def test_can_create_artist_from_api(artists, mocker, db):
     assert data["id"], "62c3befb-6366-4585-b256-809472333801"
     assert artist.mbid, data["id"]
     assert artist.name, "Adhesive Wombat"
+    assert artist.fid == federation_utils.full_url(
+        "/federation/music/artists/{}".format(artist.uuid)
+    )
 
 
 def test_can_create_album_from_api(artists, albums, mocker, db):
@@ -41,6 +45,9 @@ def test_can_create_album_from_api(artists, albums, mocker, db):
     assert album.release_date, datetime.date(2005, 1, 1)
     assert album.artist.name, "System of a Down"
     assert album.artist.mbid, data["artist-credit"][0]["artist"]["id"]
+    assert album.fid == federation_utils.full_url(
+        "/federation/music/albums/{}".format(album.uuid)
+    )
 
 
 def test_can_create_track_from_api(artists, albums, tracks, mocker, db):
@@ -66,6 +73,9 @@ def test_can_create_track_from_api(artists, albums, tracks, mocker, db):
     assert track.artist.name == "Adhesive Wombat"
     assert str(track.album.mbid) == "a50d2a81-2a50-484d-9cb4-b9f6833f583e"
     assert track.album.title == "Marsupial Madness"
+    assert track.fid == federation_utils.full_url(
+        "/federation/music/tracks/{}".format(track.uuid)
+    )
 
 
 def test_can_create_track_from_api_with_corresponding_tags(

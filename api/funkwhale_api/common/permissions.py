@@ -9,7 +9,9 @@ from funkwhale_api.common import preferences
 class ConditionalAuthentication(BasePermission):
     def has_permission(self, request, view):
         if preferences.get("common__api_authentication_required"):
-            return request.user and request.user.is_authenticated
+            return (request.user and request.user.is_authenticated) or (
+                hasattr(request, "actor") and request.actor
+            )
         return True
 
 

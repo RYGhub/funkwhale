@@ -16,7 +16,7 @@ class NestedLibraryFollowSerializer(serializers.ModelSerializer):
 
 class LibrarySerializer(serializers.ModelSerializer):
     actor = federation_serializers.APIActorSerializer()
-    files_count = serializers.SerializerMethodField()
+    uploads_count = serializers.SerializerMethodField()
     follow = serializers.SerializerMethodField()
 
     class Meta:
@@ -28,13 +28,13 @@ class LibrarySerializer(serializers.ModelSerializer):
             "name",
             "description",
             "creation_date",
-            "files_count",
+            "uploads_count",
             "privacy_level",
             "follow",
         ]
 
-    def get_files_count(self, o):
-        return max(getattr(o, "_files_count", 0), o.files_count)
+    def get_uploads_count(self, o):
+        return max(getattr(o, "_uploads_count", 0), o.uploads_count)
 
     def get_follow(self, o):
         try:

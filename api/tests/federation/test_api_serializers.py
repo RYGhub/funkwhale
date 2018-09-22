@@ -3,7 +3,7 @@ from funkwhale_api.federation import serializers
 
 
 def test_library_serializer(factories):
-    library = factories["music.Library"](files_count=5678)
+    library = factories["music.Library"](uploads_count=5678)
     expected = {
         "fid": library.fid,
         "uuid": str(library.uuid),
@@ -11,7 +11,7 @@ def test_library_serializer(factories):
         "name": library.name,
         "description": library.description,
         "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
-        "files_count": library.files_count,
+        "uploads_count": library.uploads_count,
         "privacy_level": library.privacy_level,
         "follow": None,
     }
@@ -22,7 +22,7 @@ def test_library_serializer(factories):
 
 
 def test_library_serializer_with_follow(factories):
-    library = factories["music.Library"](files_count=5678)
+    library = factories["music.Library"](uploads_count=5678)
     follow = factories["federation.LibraryFollow"](target=library)
 
     setattr(library, "_follows", [follow])
@@ -33,7 +33,7 @@ def test_library_serializer_with_follow(factories):
         "name": library.name,
         "description": library.description,
         "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
-        "files_count": library.files_count,
+        "uploads_count": library.uploads_count,
         "privacy_level": library.privacy_level,
         "follow": api_serializers.NestedLibraryFollowSerializer(follow).data,
     }
@@ -53,7 +53,7 @@ def test_library_serializer_validates_existing_follow(factories):
     assert "target" in serializer.errors
 
 
-def test_manage_track_file_action_read(factories):
+def test_manage_upload_action_read(factories):
     ii = factories["federation.InboxItem"]()
     s = api_serializers.InboxItemActionSerializer(queryset=None)
 
