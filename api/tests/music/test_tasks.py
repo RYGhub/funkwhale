@@ -97,7 +97,7 @@ def test_upload_import_mbid(now, factories, temp_signal, mocker):
     )
 
     with temp_signal(signals.upload_import_status_updated) as handler:
-        tasks.import_upload(upload_id=upload.pk)
+        tasks.process_upload(upload_id=upload.pk)
 
     upload.refresh_from_db()
 
@@ -126,7 +126,7 @@ def test_upload_import_get_audio_data(factories, mocker):
         track=None, import_metadata={"track": {"mbid": track.mbid}}
     )
 
-    tasks.import_upload(upload_id=upload.pk)
+    tasks.process_upload(upload_id=upload.pk)
 
     upload.refresh_from_db()
     assert upload.size == 23
@@ -150,7 +150,7 @@ def test_upload_import_skip_existing_track_in_own_library(factories, temp_signal
         import_metadata={"track": {"mbid": track.mbid}},
     )
     with temp_signal(signals.upload_import_status_updated) as handler:
-        tasks.import_upload(upload_id=duplicate.pk)
+        tasks.process_upload(upload_id=duplicate.pk)
 
     duplicate.refresh_from_db()
 
@@ -175,7 +175,7 @@ def test_upload_import_track_uuid(now, factories):
         track=None, import_metadata={"track": {"uuid": track.uuid}}
     )
 
-    tasks.import_upload(upload_id=upload.pk)
+    tasks.process_upload(upload_id=upload.pk)
 
     upload.refresh_from_db()
 
@@ -189,7 +189,7 @@ def test_upload_import_error(factories, now, temp_signal):
         import_metadata={"track": {"uuid": uuid.uuid4()}}
     )
     with temp_signal(signals.upload_import_status_updated) as handler:
-        tasks.import_upload(upload_id=upload.pk)
+        tasks.process_upload(upload_id=upload.pk)
     upload.refresh_from_db()
 
     assert upload.import_status == "errored"
@@ -211,7 +211,7 @@ def test_upload_import_updates_cover_if_no_cover(factories, mocker, now):
     upload = factories["music.Upload"](
         track=None, import_metadata={"track": {"uuid": track.uuid}}
     )
-    tasks.import_upload(upload_id=upload.pk)
+    tasks.process_upload(upload_id=upload.pk)
     mocked_update.assert_called_once_with(album, upload)
 
 

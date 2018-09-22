@@ -225,7 +225,7 @@ def scan_library_page(library_scan, page_url):
         if upload.import_status == "pending" and not upload.track:
             # this track is not matched to any musicbrainz or other musical
             # metadata
-            import_upload.delay(upload_id=upload.pk)
+            process_upload.delay(upload_id=upload.pk)
         uploads.append(upload)
 
     library_scan.processed_files = F("processed_files") + len(uploads)
@@ -249,7 +249,10 @@ def getter(data, *keys):
         return
     v = data
     for k in keys:
-        v = v.get(k)
+        try:
+            v = v[k]
+        except KeyError:
+            return
 
     return v
 
@@ -274,14 +277,14 @@ def fail_import(upload, error_code):
     )
 
 
-@celery.app.task(name="music.import_upload")
+@celery.app.task(name="music.process_upload")
 @celery.require_instance(
     models.Upload.objects.filter(import_status="pending").select_related(
         "library__actor__user"
     ),
     "upload",
 )
-def import_upload(upload):
+def process_upload(upload):
     data = upload.import_metadata or {}
     old_status = upload.import_status
     try:

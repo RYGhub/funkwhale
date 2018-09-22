@@ -341,7 +341,7 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
         pks = list(qs.values_list("id", flat=True))
         qs.update(import_status="pending")
         for pk in pks:
-            common_utils.on_commit(tasks.import_upload.delay, upload_id=pk)
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=pk)
 
 
 class TagSerializer(serializers.ModelSerializer):

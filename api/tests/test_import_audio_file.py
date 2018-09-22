@@ -4,121 +4,124 @@ import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
-from funkwhale_api.music.models import ImportJob
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 
 
-@pytest.mark.skip("XXX : wip")
-def test_management_command_requires_a_valid_username(factories, mocker):
+def test_management_command_requires_a_valid_library_id(factories):
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    factories["users.User"](username="me")
-    mocker.patch(
-        "funkwhale_api.providers.audiofile.management.commands.import_files.Command.do_import",  # noqa
-        return_value=(mocker.MagicMock(), []),
-    )
-    with pytest.raises(CommandError):
-        call_command("import_files", path, username="not_me", interactive=False)
-    call_command("import_files", path, username="me", interactive=False)
+
+    with pytest.raises(CommandError) as e:
+        call_command("import_files", "wrong_id", path, interactive=False)
+    assert "Invalid library id" in str(e)
 
 
 def test_in_place_import_only_from_music_dir(factories, settings):
-    factories["users.User"](username="me")
+    library = factories["music.Library"](actor__local=True)
     settings.MUSIC_DIRECTORY_PATH = "/nope"
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    with pytest.raises(CommandError):
+    with pytest.raises(CommandError) as e:
         call_command(
-            "import_files", path, in_place=True, username="me", interactive=False
+            "import_files", str(library.uuid), path, in_place=True, interactive=False
         )
 
+    assert "Importing in-place only works if importing" in str(e)
 
-@pytest.mark.skip("XXX : wip")
+
 def test_import_with_multiple_argument(factories, mocker):
-    factories["users.User"](username="me")
+    library = factories["music.Library"](actor__local=True)
     path1 = os.path.join(DATA_DIR, "dummy_file.ogg")
     path2 = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
     mocked_filter = mocker.patch(
         "funkwhale_api.providers.audiofile.management.commands.import_files.Command.filter_matching",
         return_value=({"new": [], "skipped": []}),
     )
-    call_command("import_files", path1, path2, username="me", interactive=False)
-    mocked_filter.assert_called_once_with([path1, path2])
+    call_command("import_files", str(library.uuid), path1, path2, interactive=False)
+    mocked_filter.assert_called_once_with([path1, path2], library)
 
 
-@pytest.mark.skip("Refactoring in progress")
+@pytest.mark.parametrize(
+    "path",
+    [os.path.join(DATA_DIR, "dummy_file.ogg"), os.path.join(DATA_DIR, "utf8-éà◌.ogg")],
+)
+def test_import_files_stores_proper_data(factories, mocker, now, path):
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    library = factories["music.Library"](actor__local=True)
+    call_command(
+        "import_files", str(library.uuid), path, async_=False, interactive=False
+    )
+    upload = library.uploads.last()
+    assert upload.import_reference == "cli-{}".format(now.isoformat())
+    assert upload.import_status == "pending"
+    assert upload.source == "file://{}".format(path)
+
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
+
+
 def test_import_with_replace_flag(factories, mocker):
-    factories["users.User"](username="me")
+    library = factories["music.Library"](actor__local=True)
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    mocked_job_run = mocker.patch("funkwhale_api.music.tasks.import_job_run")
-    call_command("import_files", path, username="me", replace=True, interactive=False)
-    created_job = ImportJob.objects.latest("id")
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    call_command(
+        "import_files", str(library.uuid), path, replace=True, interactive=False
+    )
+    upload = library.uploads.last()
 
-    assert created_job.replace_if_duplicate is True
-    mocked_job_run.assert_called_once_with(
-        import_job_id=created_job.id, use_acoustid=False
+    assert upload.import_metadata["replace"] is True
+
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
+
+
+def test_import_with_custom_reference(factories, mocker):
+    library = factories["music.Library"](actor__local=True)
+    path = os.path.join(DATA_DIR, "dummy_file.ogg")
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    call_command(
+        "import_files",
+        str(library.uuid),
+        path,
+        reference="test",
+        replace=True,
+        interactive=False,
+    )
+    upload = library.uploads.last()
+
+    assert upload.import_reference == "test"
+
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
+
+
+def test_import_files_skip_if_path_already_imported(factories, mocker):
+    library = factories["music.Library"](actor__local=True)
+    path = os.path.join(DATA_DIR, "dummy_file.ogg")
+
+    # existing one with same source
+    factories["music.Upload"](
+        library=library, import_status="finished", source="file://{}".format(path)
     )
 
-
-@pytest.mark.skip("Refactoring in progress")
-def test_import_files_creates_a_batch_and_job(factories, mocker):
-    m = mocker.patch("funkwhale_api.music.tasks.import_job_run")
-    user = factories["users.User"](username="me")
-    path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    call_command("import_files", path, username="me", async=False, interactive=False)
-
-    batch = user.imports.latest("id")
-    assert batch.source == "shell"
-    assert batch.jobs.count() == 1
-
-    job = batch.jobs.first()
-
-    assert job.status == "pending"
-    with open(path, "rb") as f:
-        assert job.audio_file.read() == f.read()
-
-    assert job.source == "file://" + path
-    m.assert_called_once_with(import_job_id=job.pk, use_acoustid=False)
+    call_command(
+        "import_files", str(library.uuid), path, async=False, interactive=False
+    )
+    assert library.uploads.count() == 1
 
 
-@pytest.mark.skip("XXX : wip")
-def test_import_files_skip_if_path_already_imported(factories, mocker):
-    user = factories["users.User"](username="me")
-    path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    factories["music.Upload"](source="file://{}".format(path))
-
-    call_command("import_files", path, username="me", async=False, interactive=False)
-    assert user.imports.count() == 0
-
-
-@pytest.mark.skip("Refactoring in progress")
-def test_import_files_works_with_utf8_file_name(factories, mocker):
-    m = mocker.patch("funkwhale_api.music.tasks.import_job_run")
-    user = factories["users.User"](username="me")
-    path = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
-    call_command("import_files", path, username="me", async=False, interactive=False)
-    batch = user.imports.latest("id")
-    job = batch.jobs.first()
-    m.assert_called_once_with(import_job_id=job.pk, use_acoustid=False)
-
-
-@pytest.mark.skip("Refactoring in progress")
 def test_import_files_in_place(factories, mocker, settings):
     settings.MUSIC_DIRECTORY_PATH = DATA_DIR
-    m = mocker.patch("funkwhale_api.music.tasks.import_job_run")
-    user = factories["users.User"](username="me")
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    library = factories["music.Library"](actor__local=True)
     path = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
     call_command(
         "import_files",
+        str(library.uuid),
         path,
-        username="me",
-        async=False,
+        async_=False,
         in_place=True,
         interactive=False,
     )
-    batch = user.imports.latest("id")
-    job = batch.jobs.first()
-    assert bool(job.audio_file) is False
-    m.assert_called_once_with(import_job_id=job.pk, use_acoustid=False)
+    upload = library.uploads.last()
+    assert bool(upload.audio_file) is False
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
 
 
 def test_storage_rename_utf_8_files(factories):

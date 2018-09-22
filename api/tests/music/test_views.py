@@ -407,7 +407,7 @@ def test_user_can_create_upload(logged_in_api_client, factories, mocker, audio_f
     assert upload.source == "upload://test"
     assert upload.import_reference == "test"
     assert upload.track is None
-    m.assert_called_once_with(tasks.import_upload.delay, upload_id=upload.pk)
+    m.assert_called_once_with(tasks.process_upload.delay, upload_id=upload.pk)
 
 
 def test_user_can_list_own_library_follows(factories, logged_in_api_client):

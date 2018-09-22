@@ -1,18 +1,29 @@
 import glob
 import os
+import urllib.parse
 
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
 
 from funkwhale_api.music import models, tasks
-from funkwhale_api.users.models import User
 
 
 class Command(BaseCommand):
     help = "Import audio files mathinc given glob pattern"
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            "library_id",
+            type=str,
+            help=(
+                "A local library identifier where the files should be imported. "
+                "You can use the full uuid such as e29c5be9-6da3-4d92-b40b-4970edd3ee4b "
+                "or only a small portion of it, starting from the beginning, such as "
+                "e29c5be9"
+            ),
+        )
         parser.add_argument("path", nargs="+", type=str)
         parser.add_argument(
             "--recursive",
@@ -29,7 +40,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--async",
             action="store_true",
-            dest="async",
+            dest="async_",
             default=False,
             help="Will launch celery tasks for each file to import instead of doing it synchronously and block the CLI",
         )
@@ -66,6 +77,17 @@ class Command(BaseCommand):
                 "with their newest version."
             ),
         )
+
+        parser.add_argument(
+            "--reference",
+            action="store",
+            dest="reference",
+            default=None,
+            help=(
+                "A custom reference for the import. Leave this empty to have a random "
+                "reference being generated for you."
+            ),
+        )
         parser.add_argument(
             "--noinput",
             "--no-input",
@@ -77,14 +99,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         glob_kwargs = {}
         matching = []
+
+        try:
+            library = models.Library.objects.select_related("actor__user").get(
+                uuid__startswith=options["library_id"]
+            )
+        except models.Library.DoesNotExist:
+            raise CommandError("Invalid library id")
+
+        if not library.actor.is_local:
+            raise CommandError("Library {} is not a local library".format(library.uuid))
+
         if options["recursive"]:
             glob_kwargs["recursive"] = True
-        try:
-            for import_path in options["path"]:
-                matching += glob.glob(import_path, **glob_kwargs)
-            raw_matching = sorted(list(set(matching)))
-        except TypeError:
-            raise Exception("You need Python 3.5 to use the --recursive flag")
+        for import_path in options["path"]:
+            matching += glob.glob(import_path, **glob_kwargs)
+        raw_matching = sorted(list(set(matching)))
 
         matching = []
         for m in raw_matching:
@@ -128,28 +158,12 @@ class Command(BaseCommand):
         if not matching:
             raise CommandError("No file matching pattern, aborting")
 
-        user = None
-        if options["username"]:
-            try:
-                user = User.objects.get(username=options["username"])
-            except User.DoesNotExist:
-                raise CommandError("Invalid username")
-        else:
-            # we bind the import to the first registered superuser
-            try:
-                user = User.objects.filter(is_superuser=True).order_by("pk").first()
-                assert user is not None
-            except AssertionError:
-                raise CommandError(
-                    "No superuser available, please provide a --username"
-                )
-
         if options["replace"]:
             filtered = {"initial": matching, "skipped": [], "new": matching}
             message = "- {} files to be replaced"
             import_paths = matching
         else:
-            filtered = self.filter_matching(matching)
+            filtered = self.filter_matching(matching, library)
             message = "- {} files already found in database"
             import_paths = filtered["new"]
 
@@ -179,10 +193,26 @@ class Command(BaseCommand):
             )
             if input("".join(message)) != "yes":
                 raise CommandError("Import cancelled.")
+        reference = options["reference"] or "cli-{}".format(timezone.now().isoformat())
 
-        batch, errors = self.do_import(import_paths, user=user, options=options)
+        import_url = "{}://{}/content/libraries/{}/upload?{}"
+        import_url = import_url.format(
+            settings.FUNKWHALE_PROTOCOL,
+            settings.FUNKWHALE_HOSTNAME,
+            str(library.uuid),
+            urllib.parse.urlencode([("import", reference)]),
+        )
+        self.stdout.write(
+            "For details, please refer to import refrence '{}' or URL {}".format(
+                reference, import_url
+            )
+        )
+
+        errors = self.do_import(
+            import_paths, library=library, reference=reference, options=options
+        )
         message = "Successfully imported {} tracks"
-        if options["async"]:
+        if options["async_"]:
             message = "Successfully launched import for {} tracks"
 
         self.stdout.write(message.format(len(import_paths)))
@@ -191,15 +221,18 @@ class Command(BaseCommand):
 
             for path, error in errors:
                 self.stderr.write("- {}: {}".format(path, error))
+
         self.stdout.write(
-            "For details, please refer to import batch #{}".format(batch.pk)
+            "For details, please refer to import refrence '{}' or URL {}".format(
+                reference, import_url
+            )
         )
 
-    def filter_matching(self, matching):
+    def filter_matching(self, matching, library):
         sources = ["file://{}".format(p) for p in matching]
         # we skip reimport for path that are already found
         # as a Upload.source
-        existing = models.Upload.objects.filter(source__in=sources)
+        existing = library.uploads.filter(source__in=sources, import_status="finished")
         existing = existing.values_list("source", flat=True)
         existing = set([p.replace("file://", "", 1) for p in existing])
         skipped = set(matching) & existing
@@ -210,20 +243,25 @@ class Command(BaseCommand):
         }
         return result
 
-    def do_import(self, paths, user, options):
+    def do_import(self, paths, library, reference, options):
         message = "{i}/{total} Importing {path}..."
-        if options["async"]:
+        if options["async_"]:
             message = "{i}/{total} Launching import for {path}..."
 
-        # we create an import batch binded to the user
-        async_ = options["async"]
-        import_handler = tasks.import_job_run.delay if async_ else tasks.import_job_run
-        batch = user.imports.create(source="shell")
+        # we create an upload binded to the library
+        async_ = options["async_"]
         errors = []
         for i, path in list(enumerate(paths)):
             try:
                 self.stdout.write(message.format(path=path, i=i + 1, total=len(paths)))
-                self.import_file(path, batch, import_handler, options)
+                self.create_upload(
+                    path,
+                    reference,
+                    library,
+                    async_,
+                    options["replace"],
+                    options["in_place"],
+                )
             except Exception as e:
                 if options["exit_on_failure"]:
                     raise
@@ -232,16 +270,18 @@ class Command(BaseCommand):
                 )
                 self.stderr.write(m)
                 errors.append((path, "{} {}".format(e.__class__.__name__, e)))
-        return batch, errors
+        return errors
 
-    def import_file(self, path, batch, import_handler, options):
-        job = batch.jobs.create(
-            source="file://" + path, replace_if_duplicate=options["replace"]
-        )
-        if not options["in_place"]:
+    def create_upload(self, path, reference, library, async_, replace, in_place):
+        import_handler = tasks.process_upload.delay if async_ else tasks.process_upload
+        upload = models.Upload(library=library, import_reference=reference)
+        upload.source = "file://" + path
+        upload.import_metadata = {"replace": replace}
+        if not in_place:
             name = os.path.basename(path)
             with open(path, "rb") as f:
-                job.audio_file.save(name, File(f))
+                upload.audio_file.save(name, File(f), save=False)
 
-            job.save()
-        import_handler(import_job_id=job.pk, use_acoustid=False)
+        upload.save()
+
+        import_handler(upload_id=upload.pk)
