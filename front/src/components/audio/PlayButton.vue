@@ -14,7 +14,7 @@
       <div class="menu">
         <div class="item" :disabled="!playable" @click="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></div>
         <div class="item" :disabled="!playable" @click="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></div>
-        <div class="item" :disabled="!playable" @click="addNext(true)" :title="labels.playNow"><i class="arrow down icon"></i><translate>Play now</translate></div>
+        <div class="item" :disabled="!playable" @click="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></div>
       </div>
     </div>
   </span>
@@ -58,7 +58,7 @@ export default {
     },
     title () {
       if (this.playable) {
-        return this.$gettext('Play immediatly')
+        return this.$gettext('Play now')
       } else {
         if (this.track) {
           return this.$gettext('This track is not available in any library you have access to')
