@@ -138,7 +138,7 @@ On non-docker deployments, run the following commands:
 
     # download the needed files
     curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/nginx.template"
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/config/.env && set +a
