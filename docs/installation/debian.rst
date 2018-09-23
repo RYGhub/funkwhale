@@ -116,6 +116,10 @@ Then we'll download the frontend files:
         git clone https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
         cd funkwhale
 
+    By default, the repository will use the ``develop`` which may be unstable thus not recommended for production instances (unless you know what your doing). You should use the master branch instead:
+
+        git checkout master
+
     You'll also need to re-create the folders we make earlier:
 
         mkdir -p config data/static data/media data/music front
