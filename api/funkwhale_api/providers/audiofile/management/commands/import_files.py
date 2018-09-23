@@ -77,6 +77,29 @@ class Command(BaseCommand):
                 "with their newest version."
             ),
         )
+        parser.add_argument(
+            "--outbox",
+            action="store_true",
+            dest="outbox",
+            default=False,
+            help=(
+                "Use this flag to notify library followers of newly imported files. "
+                "You'll likely want to keep this disabled for CLI imports, especially if"
+                "you plan to import hundreds or thousands of files, as it will cause a lot "
+                "of overhead on your server and on servers you are federating with."
+            ),
+        )
+
+        parser.add_argument(
+            "--broadcast",
+            action="store_true",
+            dest="broadcast",
+            default=False,
+            help=(
+                "Use this flag to enable realtime updates about the import in the UI. "
+                "This causes some overhead, so it's disabled by default."
+            ),
+        )
 
         parser.add_argument(
             "--reference",
@@ -261,6 +284,8 @@ class Command(BaseCommand):
                     async_,
                     options["replace"],
                     options["in_place"],
+                    options["outbox"],
+                    options["broadcast"],
                 )
             except Exception as e:
                 if options["exit_on_failure"]:
@@ -272,11 +297,29 @@ class Command(BaseCommand):
                 errors.append((path, "{} {}".format(e.__class__.__name__, e)))
         return errors
 
-    def create_upload(self, path, reference, library, async_, replace, in_place):
+    def create_upload(
+        self,
+        path,
+        reference,
+        library,
+        async_,
+        replace,
+        in_place,
+        dispatch_outbox,
+        broadcast,
+    ):
         import_handler = tasks.process_upload.delay if async_ else tasks.process_upload
         upload = models.Upload(library=library, import_reference=reference)
         upload.source = "file://" + path
-        upload.import_metadata = {"replace": replace}
+        upload.import_metadata = {
+            "funkwhale": {
+                "config": {
+                    "replace": replace,
+                    "dispatch_outbox": dispatch_outbox,
+                    "broadcast": broadcast,
+                }
+            }
+        }
         if not in_place:
             name = os.path.basename(path)
             with open(path, "rb") as f:

@@ -282,12 +282,16 @@ export default {
     'search.tokens': {
       handler (newValue) {
         this.search.query = compileTokens(newValue)
+        this.page = 1
         this.fetchData()
       },
       deep: true
     },
     orderingDirection: function () {
       this.page = 1
+      this.fetchData()
+    },
+    page: function () {
       this.fetchData()
     },
     ordering: function () {

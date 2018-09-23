@@ -93,9 +93,9 @@ def convert_track_number(v):
 class FirstUUIDField(forms.UUIDField):
     def to_python(self, value):
         try:
-            # sometimes, Picard leaves to uuids in the field, separated
-            # by a slash
-            value = value.split("/")[0]
+            # sometimes, Picard leaves two uuids in the field, separated
+            # by a slash or a ;
+            value = value.split(";")[0].split("/")[0].strip()
         except (AttributeError, IndexError, TypeError):
             pass
 
@@ -107,10 +107,18 @@ def get_date(value):
     return datetime.date(parsed.year, parsed.month, parsed.day)
 
 
+def split_and_return_first(separator):
+    def inner(v):
+        return v.split(separator)[0].strip()
+
+    return inner
+
+
 VALIDATION = {
     "musicbrainz_artistid": FirstUUIDField(),
     "musicbrainz_albumid": FirstUUIDField(),
     "musicbrainz_recordingid": FirstUUIDField(),
+    "musicbrainz_albumartistid": FirstUUIDField(),
 }
 
 CONF = {
@@ -123,10 +131,15 @@ CONF = {
             },
             "title": {},
             "artist": {},
+            "album_artist": {
+                "field": "albumartist",
+                "to_application": split_and_return_first(";"),
+            },
             "album": {},
             "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
+            "musicbrainz_albumartistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
         },
     },
@@ -139,10 +152,15 @@ CONF = {
             },
             "title": {},
             "artist": {},
+            "album_artist": {
+                "field": "albumartist",
+                "to_application": split_and_return_first(";"),
+            },
             "album": {},
             "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
+            "musicbrainz_albumartistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
         },
     },
@@ -155,10 +173,12 @@ CONF = {
             },
             "title": {},
             "artist": {},
+            "album_artist": {"field": "albumartist"},
             "album": {},
             "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
+            "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "musicbrainz_recordingid": {"field": "MusicBrainz Track Id"},
         },
     },
@@ -169,10 +189,12 @@ CONF = {
             "track_number": {"field": "TRCK", "to_application": convert_track_number},
             "title": {"field": "TIT2"},
             "artist": {"field": "TPE1"},
+            "album_artist": {"field": "TPE2"},
             "album": {"field": "TALB"},
             "date": {"field": "TDRC", "to_application": get_date},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
+            "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "musicbrainz_recordingid": {
                 "field": "UFID",
                 "getter": get_mp3_recording_id,
@@ -190,16 +212,31 @@ CONF = {
             },
             "title": {},
             "artist": {},
+            "album_artist": {"field": "albumartist"},
             "album": {},
             "date": {"field": "date", "to_application": get_date},
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
+            "musicbrainz_albumartistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
             "test": {},
             "pictures": {},
         },
     },
 }
+
+ALL_FIELDS = [
+    "track_number",
+    "title",
+    "artist",
+    "album_artist",
+    "album",
+    "date",
+    "musicbrainz_albumid",
+    "musicbrainz_artistid",
+    "musicbrainz_albumartistid",
+    "musicbrainz_recordingid",
+]
 
 
 class Metadata(object):
@@ -237,6 +274,20 @@ class Metadata(object):
         if field:
             v = field.to_python(v)
         return v
+
+    def all(self):
+        """
+        Return a dict containing all metadata of the file
+        """
+
+        data = {}
+        for field in ALL_FIELDS:
+            try:
+                data[field] = self.get(field, None)
+            except (TagNotFound, forms.ValidationError):
+                data[field] = None
+
+        return data
 
     def get_picture(self, picture_type="cover_front"):
         ptype = getattr(mutagen.id3.PictureType, picture_type.upper())
