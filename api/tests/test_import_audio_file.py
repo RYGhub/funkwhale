@@ -54,6 +54,39 @@ def test_import_files_stores_proper_data(factories, mocker, now, path):
     assert upload.import_reference == "cli-{}".format(now.isoformat())
     assert upload.import_status == "pending"
     assert upload.source == "file://{}".format(path)
+    assert upload.import_metadata == {
+        "funkwhale": {
+            "config": {"replace": False, "dispatch_outbox": False, "broadcast": False}
+        }
+    }
+
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
+
+
+def test_import_with_outbox_flag(factories, mocker):
+    library = factories["music.Library"](actor__local=True)
+    path = os.path.join(DATA_DIR, "dummy_file.ogg")
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    call_command(
+        "import_files", str(library.uuid), path, outbox=True, interactive=False
+    )
+    upload = library.uploads.last()
+
+    assert upload.import_metadata["funkwhale"]["config"]["dispatch_outbox"] is True
+
+    mocked_process.assert_called_once_with(upload_id=upload.pk)
+
+
+def test_import_with_broadcast_flag(factories, mocker):
+    library = factories["music.Library"](actor__local=True)
+    path = os.path.join(DATA_DIR, "dummy_file.ogg")
+    mocked_process = mocker.patch("funkwhale_api.music.tasks.process_upload")
+    call_command(
+        "import_files", str(library.uuid), path, broadcast=True, interactive=False
+    )
+    upload = library.uploads.last()
+
+    assert upload.import_metadata["funkwhale"]["config"]["broadcast"] is True
 
     mocked_process.assert_called_once_with(upload_id=upload.pk)
 
@@ -67,7 +100,7 @@ def test_import_with_replace_flag(factories, mocker):
     )
     upload = library.uploads.last()
 
-    assert upload.import_metadata["replace"] is True
+    assert upload.import_metadata["funkwhale"]["config"]["replace"] is True
 
     mocked_process.assert_called_once_with(upload_id=upload.pk)
 

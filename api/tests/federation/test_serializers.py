@@ -1,3 +1,4 @@
+import io
 import pytest
 import uuid
 
@@ -588,42 +589,6 @@ def test_music_library_serializer_from_private(factories, mocker):
     )
 
 
-@pytest.mark.parametrize(
-    "model,serializer_class",
-    [
-        ("music.Artist", serializers.ArtistSerializer),
-        ("music.Album", serializers.AlbumSerializer),
-        ("music.Track", serializers.TrackSerializer),
-    ],
-)
-def test_music_entity_serializer_create_existing_mbid(
-    model, serializer_class, factories
-):
-    entity = factories[model]()
-    data = {"musicbrainzId": str(entity.mbid), "id": "https://noop"}
-    serializer = serializer_class()
-
-    assert serializer.create(data) == entity
-
-
-@pytest.mark.parametrize(
-    "model,serializer_class",
-    [
-        ("music.Artist", serializers.ArtistSerializer),
-        ("music.Album", serializers.AlbumSerializer),
-        ("music.Track", serializers.TrackSerializer),
-    ],
-)
-def test_music_entity_serializer_create_existing_fid(
-    model, serializer_class, factories
-):
-    entity = factories[model](fid="https://entity.url")
-    data = {"musicbrainzId": None, "id": "https://entity.url"}
-    serializer = serializer_class()
-
-    assert serializer.create(data) == entity
-
-
 def test_activity_pub_artist_serializer_to_ap(factories):
     artist = factories["music.Artist"]()
     expected = {
@@ -639,30 +604,6 @@ def test_activity_pub_artist_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
-def test_activity_pub_artist_serializer_from_ap(factories):
-    activity = factories["federation.Activity"]()
-
-    published = timezone.now()
-    data = {
-        "type": "Artist",
-        "id": "http://hello.artist",
-        "name": "John Smith",
-        "musicbrainzId": str(uuid.uuid4()),
-        "published": published.isoformat(),
-    }
-    serializer = serializers.ArtistSerializer(data=data, context={"activity": activity})
-
-    assert serializer.is_valid(raise_exception=True)
-
-    artist = serializer.save()
-
-    assert artist.from_activity == activity
-    assert artist.name == data["name"]
-    assert artist.fid == data["id"]
-    assert str(artist.mbid) == data["musicbrainzId"]
-    assert artist.creation_date == published
-
-
 def test_activity_pub_album_serializer_to_ap(factories):
     album = factories["music.Album"]()
 
@@ -671,7 +612,11 @@ def test_activity_pub_album_serializer_to_ap(factories):
         "type": "Album",
         "id": album.fid,
         "name": album.title,
-        "cover": {"type": "Image", "url": utils.full_url(album.cover.url)},
+        "cover": {
+            "type": "Link",
+            "mediaType": "image/jpeg",
+            "href": utils.full_url(album.cover.url),
+        },
         "musicbrainzId": album.mbid,
         "published": album.creation_date.isoformat(),
         "released": album.release_date.isoformat(),
@@ -684,49 +629,6 @@ def test_activity_pub_album_serializer_to_ap(factories):
     serializer = serializers.AlbumSerializer(album)
 
     assert serializer.data == expected
-
-
-def test_activity_pub_album_serializer_from_ap(factories):
-    activity = factories["federation.Activity"]()
-
-    published = timezone.now()
-    released = timezone.now().date()
-    data = {
-        "type": "Album",
-        "id": "http://hello.album",
-        "name": "Purple album",
-        "musicbrainzId": str(uuid.uuid4()),
-        "published": published.isoformat(),
-        "released": released.isoformat(),
-        "artists": [
-            {
-                "type": "Artist",
-                "id": "http://hello.artist",
-                "name": "John Smith",
-                "musicbrainzId": str(uuid.uuid4()),
-                "published": published.isoformat(),
-            }
-        ],
-    }
-    serializer = serializers.AlbumSerializer(data=data, context={"activity": activity})
-
-    assert serializer.is_valid(raise_exception=True)
-
-    album = serializer.save()
-    artist = album.artist
-
-    assert album.from_activity == activity
-    assert album.title == data["name"]
-    assert album.fid == data["id"]
-    assert str(album.mbid) == data["musicbrainzId"]
-    assert album.creation_date == published
-    assert album.release_date == released
-
-    assert artist.from_activity == activity
-    assert artist.name == data["artists"][0]["name"]
-    assert artist.fid == data["artists"][0]["id"]
-    assert str(artist.mbid) == data["artists"][0]["musicbrainzId"]
-    assert artist.creation_date == published
 
 
 def test_activity_pub_track_serializer_to_ap(factories):
@@ -753,7 +655,7 @@ def test_activity_pub_track_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
-def test_activity_pub_track_serializer_from_ap(factories):
+def test_activity_pub_track_serializer_from_ap(factories, r_mock):
     activity = factories["federation.Activity"]()
     published = timezone.now()
     released = timezone.now().date()
@@ -771,6 +673,11 @@ def test_activity_pub_track_serializer_from_ap(factories):
             "musicbrainzId": str(uuid.uuid4()),
             "published": published.isoformat(),
             "released": released.isoformat(),
+            "cover": {
+                "type": "Link",
+                "href": "https://cover.image/test.png",
+                "mediaType": "image/png",
+            },
             "artists": [
                 {
                     "type": "Artist",
@@ -791,12 +698,14 @@ def test_activity_pub_track_serializer_from_ap(factories):
             }
         ],
     }
+    r_mock.get(data["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
     serializer = serializers.TrackSerializer(data=data, context={"activity": activity})
     assert serializer.is_valid(raise_exception=True)
 
     track = serializer.save()
     album = track.album
     artist = track.artist
+    album_artist = track.album.artist
 
     assert track.from_activity == activity
     assert track.fid == data["id"]
@@ -806,7 +715,8 @@ def test_activity_pub_track_serializer_from_ap(factories):
     assert str(track.mbid) == data["musicbrainzId"]
 
     assert album.from_activity == activity
-
+    assert album.cover.read() == b"coucou"
+    assert album.cover.path.endswith(".png")
     assert album.title == data["album"]["name"]
     assert album.fid == data["album"]["id"]
     assert str(album.mbid) == data["album"]["musicbrainzId"]
@@ -818,6 +728,12 @@ def test_activity_pub_track_serializer_from_ap(factories):
     assert artist.fid == data["artists"][0]["id"]
     assert str(artist.mbid) == data["artists"][0]["musicbrainzId"]
     assert artist.creation_date == published
+
+    assert album_artist.from_activity == activity
+    assert album_artist.name == data["album"]["artists"][0]["name"]
+    assert album_artist.fid == data["album"]["artists"][0]["id"]
+    assert str(album_artist.mbid) == data["album"]["artists"][0]["musicbrainzId"]
+    assert album_artist.creation_date == published
 
 
 def test_activity_pub_upload_serializer_from_ap(factories, mocker):

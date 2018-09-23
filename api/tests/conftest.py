@@ -11,7 +11,7 @@ import uuid
 from faker.providers import internet as internet_provider
 import factory
 import pytest
-import requests_mock
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
 from django.core.files import uploadedfile
@@ -271,14 +271,13 @@ def media_root(settings):
     shutil.rmtree(tmp_dir)
 
 
-@pytest.fixture
-def r_mock():
+@pytest.fixture(autouse=True)
+def r_mock(requests_mock):
     """
     Returns a requests_mock.mock() object you can use to mock HTTP calls made
     using python-requests
     """
-    with requests_mock.mock() as m:
-        yield m
+    yield requests_mock
 
 
 @pytest.fixture

@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import tempfile
 import uuid
@@ -21,10 +22,13 @@ from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import musicbrainz
 from funkwhale_api.common import fields
+from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from . import importers, metadata, utils
+
+logger = logging.getLogger(__file__)
 
 
 def empty_dict():
@@ -240,14 +244,35 @@ class Album(APIModelMixin):
 
     def get_image(self, data=None):
         if data:
-            f = ContentFile(data["content"])
             extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
             extension = extensions.get(data["mimetype"], "jpg")
-            self.cover.save("{}.{}".format(self.uuid, extension), f)
-        else:
+            if data.get("content"):
+                # we have to cover itself
+                f = ContentFile(data["content"])
+            elif data.get("url"):
+                # we can fetch from a url
+                try:
+                    response = session.get_session().get(
+                        data.get("url"),
+                        timeout=3,
+                        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+                    )
+                    response.raise_for_status()
+                except Exception as e:
+                    logger.warn(
+                        "Cannot download cover at url %s: %s", data.get("url"), e
+                    )
+                    return
+                else:
+                    f = ContentFile(response.content)
+            self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
+            self.save(update_fields=["cover"])
+            return self.cover.file
+        if self.mbid:
             image_data = musicbrainz.api.images.get_front(str(self.mbid))
             f = ContentFile(image_data)
-            self.cover.save("{0}.jpg".format(self.mbid), f)
+            self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
+            self.save(update_fields=["cover"])
         return self.cover.file
 
     def __str__(self):

@@ -4,7 +4,6 @@ import urllib.parse
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db.models import F, Q
 from rest_framework import serializers
 
 from funkwhale_api.common import utils as funkwhale_utils
@@ -19,6 +18,31 @@ AP_CONTEXT = [
 ]
 
 logger = logging.getLogger(__name__)
+
+
+class LinkSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=["Link"])
+    href = serializers.URLField(max_length=500)
+    mediaType = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        self.allowed_mimetypes = kwargs.pop("allowed_mimetypes", [])
+        super().__init__(*args, **kwargs)
+
+    def validate_mediaType(self, v):
+        if not self.allowed_mimetypes:
+            # no restrictions
+            return v
+        for mt in self.allowed_mimetypes:
+            if mt.endswith("/*"):
+                if v.startswith(mt.replace("*", "")):
+                    return v
+            else:
+                if v == mt:
+                    return v
+        raise serializers.ValidationError(
+            "Invalid mimetype {}. Allowed: {}".format(v, self.allowed_mimetypes)
+        )
 
 
 class ActorSerializer(serializers.Serializer):
@@ -626,32 +650,8 @@ class MusicEntitySerializer(serializers.Serializer):
     musicbrainzId = serializers.UUIDField(allow_null=True, required=False)
     name = serializers.CharField(max_length=1000)
 
-    def create(self, validated_data):
-        mbid = validated_data.get("musicbrainzId")
-        candidates = self.model.objects.filter(
-            Q(mbid=mbid) | Q(fid=validated_data["id"])
-        ).order_by(F("fid").desc(nulls_last=True))
-
-        existing = candidates.first()
-        if existing:
-            return existing
-
-        # nothing matching in our database, let's create a new object
-        return self.model.objects.create(**self.get_create_data(validated_data))
-
-    def get_create_data(self, validated_data):
-        return {
-            "mbid": validated_data.get("musicbrainzId"),
-            "fid": validated_data["id"],
-            "name": validated_data["name"],
-            "creation_date": validated_data["published"],
-            "from_activity": self.context.get("activity"),
-        }
-
 
 class ArtistSerializer(MusicEntitySerializer):
-    model = music_models.Artist
-
     def to_representation(self, instance):
         d = {
             "type": "Artist",
@@ -667,9 +667,11 @@ class ArtistSerializer(MusicEntitySerializer):
 
 
 class AlbumSerializer(MusicEntitySerializer):
-    model = music_models.Album
     released = serializers.DateField(allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
+    cover = LinkSerializer(
+        allowed_mimetypes=["image/*"], allow_null=True, required=False
+    )
 
     def to_representation(self, instance):
         d = {
@@ -688,7 +690,12 @@ class AlbumSerializer(MusicEntitySerializer):
             ],
         }
         if instance.cover:
-            d["cover"] = {"type": "Image", "url": utils.full_url(instance.cover.url)}
+            d["cover"] = {
+                "type": "Link",
+                "href": utils.full_url(instance.cover.url),
+                "mediaType": mimetypes.guess_type(instance.cover.path)[0]
+                or "image/jpeg",
+            }
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = AP_CONTEXT
         return d
@@ -711,7 +718,6 @@ class AlbumSerializer(MusicEntitySerializer):
 
 
 class TrackSerializer(MusicEntitySerializer):
-    model = music_models.Track
     position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     album = AlbumSerializer()
@@ -738,32 +744,22 @@ class TrackSerializer(MusicEntitySerializer):
             d["@context"] = AP_CONTEXT
         return d
 
-    def get_create_data(self, validated_data):
-        artist_data = validated_data["artists"][0]
-        artist = ArtistSerializer(
-            context={"activity": self.context.get("activity")}
-        ).create(artist_data)
-        album = AlbumSerializer(
-            context={"activity": self.context.get("activity")}
-        ).create(validated_data["album"])
+    def create(self, validated_data):
+        from funkwhale_api.music import tasks as music_tasks
 
-        return {
-            "mbid": validated_data.get("musicbrainzId"),
-            "fid": validated_data["id"],
-            "title": validated_data["name"],
-            "position": validated_data.get("position"),
-            "creation_date": validated_data["published"],
-            "artist": artist,
-            "album": album,
-            "from_activity": self.context.get("activity"),
-        }
+        metadata = music_tasks.federation_audio_track_to_metadata(validated_data)
+        from_activity = self.context.get("activity")
+        if from_activity:
+            metadata["from_activity_id"] = from_activity.pk
+        track = music_tasks.get_track_from_import_metadata(metadata)
+        return track
 
 
 class UploadSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=["Audio"])
     id = serializers.URLField(max_length=500)
     library = serializers.URLField(max_length=500)
-    url = serializers.JSONField()
+    url = LinkSerializer(allowed_mimetypes=["audio/*"])
     published = serializers.DateTimeField()
     updated = serializers.DateTimeField(required=False, allow_null=True)
     bitrate = serializers.IntegerField(min_value=0)
