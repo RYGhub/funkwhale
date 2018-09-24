@@ -343,7 +343,7 @@ class AcceptFollowSerializer(serializers.Serializer):
         follow.approved = True
         follow.save()
         if follow.target._meta.label == "music.Library":
-            follow.target.schedule_scan()
+            follow.target.schedule_scan(actor=follow.actor)
         return follow
 
 
@@ -354,7 +354,8 @@ class UndoFollowSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=["Undo"])
 
     def validate_actor(self, v):
-        expected = self.context.get("follow_target")
+        expected = self.context.get("actor")
+
         if expected and expected.fid != v:
             raise serializers.ValidationError("Invalid actor")
         try:
@@ -366,11 +367,19 @@ class UndoFollowSerializer(serializers.Serializer):
         # we ensure the accept actor actually match the follow actor
         if validated_data["actor"] != validated_data["object"]["actor"]:
             raise serializers.ValidationError("Actor mismatch")
+
+        target = validated_data["object"]["object"]
+
+        if target._meta.label == "music.Library":
+            follow_class = models.LibraryFollow
+        else:
+            follow_class = models.Follow
+
         try:
-            validated_data["follow"] = models.Follow.objects.filter(
-                actor=validated_data["actor"], target=validated_data["object"]["object"]
+            validated_data["follow"] = follow_class.objects.filter(
+                actor=validated_data["actor"], target=target
             ).get()
-        except models.Follow.DoesNotExist:
+        except follow_class.DoesNotExist:
             raise serializers.ValidationError("No follow to remove")
         return validated_data
 
@@ -545,7 +554,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
             "summary": library.description,
             "page_size": 100,
             "actor": library.actor,
-            "items": library.uploads.filter(import_status="finished"),
+            "items": library.uploads.for_federation(),
             "type": "Library",
         }
         r = super().to_representation(conf)
@@ -599,9 +608,10 @@ class CollectionPageSerializer(serializers.Serializer):
         raw_items = [item_serializer(data=i, context=self.context) for i in v]
         valid_items = []
         for i in raw_items:
-            if i.is_valid():
+            try:
+                i.is_valid(raise_exception=True)
                 valid_items.append(i)
-            else:
+            except serializers.ValidationError:
                 logger.debug("Invalid item %s: %s", i.data, i.errors)
 
         return valid_items

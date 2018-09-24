@@ -11,6 +11,7 @@ from funkwhale_api.federation import routes, serializers
         ({"type": "Create", "object.type": "Audio"}, routes.inbox_create_audio),
         ({"type": "Delete", "object.type": "Library"}, routes.inbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.inbox_delete_audio),
+        ({"type": "Undo", "object.type": "Follow"}, routes.inbox_undo_follow),
     ],
 )
 def test_inbox_routes(route, handler):
@@ -30,6 +31,7 @@ def test_inbox_routes(route, handler):
         ({"type": "Create", "object.type": "Audio"}, routes.outbox_create_audio),
         ({"type": "Delete", "object.type": "Library"}, routes.outbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.outbox_delete_audio),
+        ({"type": "Undo", "object.type": "Follow"}, routes.outbox_undo_follow),
     ],
 )
 def test_outbox_routes(route, handler):
@@ -148,7 +150,7 @@ def test_inbox_accept(factories, mocker):
     follow.refresh_from_db()
 
     assert follow.approved is True
-    mocked_scan.assert_called_once_with()
+    mocked_scan.assert_called_once_with(actor=follow.actor)
 
 
 def test_outbox_follow_library(factories, mocker):
@@ -311,3 +313,43 @@ def test_outbox_delete_audio(factories):
 
     assert dict(activity["payload"]) == dict(expected)
     assert activity["actor"] == upload.library.actor
+
+
+def test_inbox_delete_follow_library(factories):
+    local_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    follow = factories["federation.LibraryFollow"](
+        actor=local_actor, target__actor=remote_actor, approved=True
+    )
+    assert follow.approved is True
+    serializer = serializers.UndoFollowSerializer(
+        follow, context={"actor": local_actor}
+    )
+    ii = factories["federation.InboxItem"](actor=local_actor)
+    routes.inbox_undo_follow(
+        serializer.data,
+        context={"actor": local_actor, "inbox_items": [ii], "raise_exception": True},
+    )
+    with pytest.raises(follow.__class__.DoesNotExist):
+        follow.refresh_from_db()
+
+
+def test_outbox_delete_follow_library(factories):
+    remote_actor = factories["federation.Actor"]()
+    local_actor = factories["federation.Actor"](local=True)
+    follow = factories["federation.LibraryFollow"](
+        actor=local_actor, target__actor=remote_actor
+    )
+
+    activity = list(routes.outbox_undo_follow({"follow": follow}))[0]
+
+    serializer = serializers.UndoFollowSerializer(
+        follow, context={"actor": follow.actor}
+    )
+    expected = serializer.data
+    expected["to"] = [follow.target.actor]
+
+    assert activity["payload"] == expected
+    assert activity["actor"] == follow.actor
+    assert activity["object"] == follow
+    assert activity["related_object"] == follow.target

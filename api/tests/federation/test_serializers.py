@@ -736,7 +736,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock):
     assert album_artist.creation_date == published
 
 
-def test_activity_pub_upload_serializer_from_ap(factories, mocker):
+def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
     activity = factories["federation.Activity"]()
     library = factories["music.Library"]()
 
@@ -769,6 +769,11 @@ def test_activity_pub_upload_serializer_from_ap(factories, mocker):
                 "musicbrainzId": str(uuid.uuid4()),
                 "published": published.isoformat(),
                 "released": released.isoformat(),
+                "cover": {
+                    "type": "Link",
+                    "href": "https://cover.image/test.png",
+                    "mediaType": "image/png",
+                },
                 "artists": [
                     {
                         "type": "Artist",
@@ -790,6 +795,7 @@ def test_activity_pub_upload_serializer_from_ap(factories, mocker):
             ],
         },
     }
+    r_mock.get(data["track"]["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
 
     serializer = serializers.UploadSerializer(data=data, context={"activity": activity})
     assert serializer.is_valid(raise_exception=True)

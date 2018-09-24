@@ -78,9 +78,37 @@ class UploadAdmin(admin.ModelAdmin):
     list_filter = ["mimetype", "import_status", "library__privacy_level"]
 
 
+def launch_scan(modeladmin, request, queryset):
+    for library in queryset:
+        library.schedule_scan(actor=request.user.actor, force=True)
+
+
+launch_scan.short_description = "Launch scan"
+
+
 @admin.register(models.Library)
 class LibraryAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "actor", "uuid", "privacy_level", "creation_date"]
     list_select_related = True
     search_fields = ["actor__username", "name", "description"]
     list_filter = ["privacy_level"]
+    actions = [launch_scan]
+
+
+@admin.register(models.LibraryScan)
+class LibraryScanAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "library",
+        "actor",
+        "status",
+        "creation_date",
+        "modification_date",
+        "status",
+        "total_files",
+        "processed_files",
+        "errored_files",
+    ]
+    list_select_related = True
+    search_fields = ["actor__username", "library__name"]
+    list_filter = ["status"]

@@ -31,13 +31,14 @@ class LibraryFollowViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     lookup_field = "uuid"
     queryset = (
         models.LibraryFollow.objects.all()
         .order_by("-creation_date")
-        .select_related("target__actor", "actor")
+        .select_related("actor", "target__actor")
     )
     serializer_class = api_serializers.LibraryFollowSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -51,6 +52,13 @@ class LibraryFollowViewSet(
     def perform_create(self, serializer):
         follow = serializer.save(actor=self.request.user.actor)
         routes.outbox.dispatch({"type": "Follow"}, context={"follow": follow})
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Undo", "object": {"type": "Follow"}}, context={"follow": instance}
+        )
+        instance.delete()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -96,8 +104,25 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         qs = super().get_queryset()
         return qs.viewable_by(actor=self.request.user.actor)
 
-    @decorators.list_route(methods=["post"])
+    @decorators.detail_route(methods=["post"])
     def scan(self, request, *args, **kwargs):
+        library = self.get_object()
+        if library.actor.is_local:
+            return response.Response({"status": "skipped"}, 200)
+
+        scan = library.schedule_scan(actor=request.user.actor)
+        if scan:
+            return response.Response(
+                {
+                    "status": "scheduled",
+                    "scan": api_serializers.LibraryScanSerializer(scan).data,
+                },
+                200,
+            )
+        return response.Response({"status": "skipped"}, 200)
+
+    @decorators.list_route(methods=["post"])
+    def fetch(self, request, *args, **kwargs):
         try:
             fid = request.data["fid"]
         except KeyError:
@@ -110,7 +135,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             )
         except requests.exceptions.RequestException as e:
             return response.Response(
-                {"detail": "Error while scanning the library: {}".format(str(e))},
+                {"detail": "Error while fetching the library: {}".format(str(e))},
                 status=400,
             )
         except serializers.serializers.ValidationError as e:

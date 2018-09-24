@@ -90,7 +90,7 @@ def get_library_data(library_url, actor):
         return {"errors": ["Permission denied while scanning library"]}
     elif scode >= 400:
         return {"errors": ["Error {} while fetching the library".format(scode)]}
-    serializer = serializers.PaginatedCollectionSerializer(data=response.json())
+    serializer = serializers.LibrarySerializer(data=response.json())
     if not serializer.is_valid():
         return {"errors": ["Invalid ActivityPub response from remote library"]}
 

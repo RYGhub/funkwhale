@@ -272,6 +272,15 @@ def media_root(settings):
 
 
 @pytest.fixture(autouse=True)
+def disabled_musicbrainz(mocker):
+    # we ensure no music brainz requests gets out
+    yield mocker.patch(
+        "musicbrainzngs.musicbrainz._safe_read",
+        side_effect=Exception("Disabled network calls"),
+    )
+
+
+@pytest.fixture(autouse=True)
 def r_mock(requests_mock):
     """
     Returns a requests_mock.mock() object you can use to mock HTTP calls made

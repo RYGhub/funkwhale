@@ -20,12 +20,12 @@ def test_user_can_list_their_library_follows(factories, logged_in_api_client):
     assert response.data["results"][0]["uuid"] == str(follow.uuid)
 
 
-def test_user_can_scan_library_using_url(mocker, factories, logged_in_api_client):
+def test_user_can_fetch_library_using_url(mocker, factories, logged_in_api_client):
     library = factories["music.Library"]()
     mocked_retrieve = mocker.patch(
         "funkwhale_api.federation.utils.retrieve", return_value=library
     )
-    url = reverse("api:v1:federation:libraries-scan")
+    url = reverse("api:v1:federation:libraries-fetch")
     response = logged_in_api_client.post(url, {"fid": library.fid})
     assert mocked_retrieve.call_count == 1
     args = mocked_retrieve.call_args
@@ -34,6 +34,22 @@ def test_user_can_scan_library_using_url(mocker, factories, logged_in_api_client
     assert args[1]["serializer_class"] == serializers.LibrarySerializer
     assert response.status_code == 200
     assert response.data["results"] == [api_serializers.LibrarySerializer(library).data]
+
+
+def test_user_can_schedule_library_scan(mocker, factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    library = factories["music.Library"](privacy_level="everyone")
+
+    schedule_scan = mocker.patch(
+        "funkwhale_api.music.models.Library.schedule_scan", return_value=True
+    )
+    url = reverse("api:v1:federation:libraries-scan", kwargs={"uuid": library.uuid})
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 200
+
+    schedule_scan.assert_called_once_with(actor=actor)
 
 
 def test_can_follow_library(factories, logged_in_api_client, mocker):
@@ -51,6 +67,24 @@ def test_can_follow_library(factories, logged_in_api_client, mocker):
     assert follow.actor == actor
 
     dispatch.assert_called_once_with({"type": "Follow"}, context={"follow": follow})
+
+
+def test_can_undo_library_follow(factories, logged_in_api_client, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    actor = logged_in_api_client.user.create_actor()
+    follow = factories["federation.LibraryFollow"](actor=actor)
+    delete = mocker.patch.object(follow.__class__, "delete")
+    url = reverse(
+        "api:v1:federation:library-follows-detail", kwargs={"uuid": follow.uuid}
+    )
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+
+    delete.assert_called_once_with()
+    dispatch.assert_called_once_with(
+        {"type": "Undo", "object": {"type": "Follow"}}, context={"follow": follow}
+    )
 
 
 @pytest.mark.parametrize("action", ["accept", "reject"])

@@ -191,7 +191,7 @@ class MusicLibraryViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
-    serializer_class = serializers.PaginatedCollectionSerializer
+    serializer_class = serializers.LibrarySerializer
     queryset = music_models.Library.objects.all().select_related("actor")
     lookup_field = "uuid"
 
@@ -203,7 +203,7 @@ class MusicLibraryViewSet(
             "actor": lb.actor,
             "name": lb.name,
             "summary": lb.description,
-            "items": lb.uploads.order_by("-creation_date"),
+            "items": lb.uploads.for_federation().order_by("-creation_date"),
             "item_serializer": serializers.UploadSerializer,
         }
         page = request.GET.get("page")

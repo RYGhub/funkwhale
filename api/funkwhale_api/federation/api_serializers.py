@@ -14,9 +14,23 @@ class NestedLibraryFollowSerializer(serializers.ModelSerializer):
         fields = ["creation_date", "uuid", "fid", "approved", "modification_date"]
 
 
+class LibraryScanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = music_models.LibraryScan
+        fields = [
+            "total_files",
+            "processed_files",
+            "errored_files",
+            "status",
+            "creation_date",
+            "modification_date",
+        ]
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     actor = federation_serializers.APIActorSerializer()
     uploads_count = serializers.SerializerMethodField()
+    latest_scan = serializers.SerializerMethodField()
     follow = serializers.SerializerMethodField()
 
     class Meta:
@@ -31,6 +45,7 @@ class LibrarySerializer(serializers.ModelSerializer):
             "uploads_count",
             "privacy_level",
             "follow",
+            "latest_scan",
         ]
 
     def get_uploads_count(self, o):
@@ -41,6 +56,11 @@ class LibrarySerializer(serializers.ModelSerializer):
             return NestedLibraryFollowSerializer(o._follows[0]).data
         except (AttributeError, IndexError):
             return None
+
+    def get_latest_scan(self, o):
+        scan = o.scans.order_by("-creation_date").first()
+        if scan:
+            return LibraryScanSerializer(scan).data
 
 
 class LibraryFollowSerializer(serializers.ModelSerializer):
@@ -54,6 +74,9 @@ class LibraryFollowSerializer(serializers.ModelSerializer):
 
     def validate_target(self, v):
         actor = self.context["actor"]
+        if v.actor == actor:
+            raise serializers.ValidationError("You cannot follow your own library")
+
         if v.received_follows.filter(actor=actor).exists():
             raise serializers.ValidationError("You are already following this library")
         return v

@@ -50,6 +50,7 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
         "musicbrainz_recordingid": "f269d497-1cc0-4ae4-a0c4-157ec7d73fcb",
         "musicbrainz_artistid": "9c6bddde-6228-4d9f-ad0d-03f6fcb19e13",
         "musicbrainz_albumartistid": "9c6bddde-6478-4d9f-ad0d-03f6fcb19e13",
+        "cover_data": {"content": b"image_content", "mimetype": "image/png"},
     }
 
     mocker.patch("funkwhale_api.music.metadata.Metadata.all", return_value=metadata)
@@ -235,6 +236,7 @@ def test_upload_import_in_place(factories, mocker):
     assert upload.size == 23
     assert upload.duration == 42
     assert upload.bitrate == 66
+    assert upload.mimetype == "audio/ogg"
 
 
 def test_upload_import_skip_existing_track_in_own_library(factories, temp_signal):
@@ -464,15 +466,18 @@ def test_scan_library_fetches_page_and_calls_scan_page(now, mocker, factories, r
         "id": scan.library.fid,
         "page_size": 10,
         "items": range(10),
+        "type": "Library",
+        "name": "hello",
     }
     collection = federation_serializers.PaginatedCollectionSerializer(collection_conf)
+    data = collection.data
+    data["followers"] = "https://followers.domain"
+
     scan_page = mocker.patch("funkwhale_api.music.tasks.scan_library_page.delay")
-    r_mock.get(collection_conf["id"], json=collection.data)
+    r_mock.get(collection_conf["id"], json=data)
     tasks.start_library_scan(library_scan_id=scan.pk)
 
-    scan_page.assert_called_once_with(
-        library_scan_id=scan.pk, page_url=collection.data["first"]
-    )
+    scan_page.assert_called_once_with(library_scan_id=scan.pk, page_url=data["first"])
     scan.refresh_from_db()
 
     assert scan.status == "scanning"

@@ -388,11 +388,12 @@ def test_library_schedule_scan(factories, now, mocker):
     on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
     library = factories["music.Library"](uploads_count=5)
 
-    scan = library.schedule_scan()
+    scan = library.schedule_scan(library.actor)
 
     assert scan.creation_date >= now
     assert scan.status == "pending"
     assert scan.library == library
+    assert scan.actor == library.actor
     assert scan.total_files == 5
     assert scan.processed_files == 0
     assert scan.errored_files == 0
@@ -405,7 +406,7 @@ def test_library_schedule_scan(factories, now, mocker):
 
 def test_library_schedule_scan_too_recent(factories, now):
     scan = factories["music.LibraryScan"]()
-    result = scan.library.schedule_scan()
+    result = scan.library.schedule_scan(scan.library.actor)
 
     assert result is None
     assert scan.library.scans.count() == 1
