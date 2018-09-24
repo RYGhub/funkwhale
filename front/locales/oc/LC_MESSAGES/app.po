@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-24 17:46+0000\n"
+"PO-Revision-Date: 2018-08-11 11:19+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -1657,7 +1657,7 @@ msgstr "Mercés de verificar que lo senhal es corrèct"
 
 #: front/src/components/auth/Login.vue:9
 msgid "Please double-check your username/password couple is correct"
-msgstr "Mercés de verificar que lo nom d’utilizaire e lo senhal son corrècts"
+msgstr "Mercés de verificar que lo nom d’utilizaire e lo senhal son corrèctes"
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
