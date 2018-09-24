@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 def update_album_cover(album, source=None, cover_data=None, replace=False):
     if album.cover and not replace:
         return
-
     if cover_data:
         return album.get_image(data=cover_data)
 
@@ -118,17 +117,17 @@ def import_batch_notify_followers(import_batch):
         activity.deliver(create, on_behalf_of=library_actor, to=[f.url])
 
 
-@celery.app.task(
-    name="music.start_library_scan",
-    retry_backoff=60,
-    max_retries=5,
-    autoretry_for=[RequestException],
-)
+@celery.app.task(name="music.start_library_scan")
 @celery.require_instance(
     models.LibraryScan.objects.select_related().filter(status="pending"), "library_scan"
 )
 def start_library_scan(library_scan):
-    data = lb.get_library_data(library_scan.library.fid, actor=library_scan.actor)
+    try:
+        data = lb.get_library_data(library_scan.library.fid, actor=library_scan.actor)
+    except Exception:
+        library_scan.status = "errored"
+        library_scan.save(update_fields=["status", "modification_date"])
+        raise
     library_scan.modification_date = timezone.now()
     library_scan.status = "scanning"
     library_scan.total_files = data["totalItems"]
@@ -152,10 +151,6 @@ def scan_library_page(library_scan, page_url):
 
     for item_serializer in data["items"]:
         upload = item_serializer.save(library=library_scan.library)
-        if upload.import_status == "pending" and not upload.track:
-            # this track is not matched to any musicbrainz or other musical
-            # metadata
-            process_upload.delay(upload_id=upload.pk)
         uploads.append(upload)
 
     library_scan.processed_files = F("processed_files") + len(uploads)

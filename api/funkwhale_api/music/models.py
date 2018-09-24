@@ -1,5 +1,6 @@
 import datetime
 import logging
+import mimetypes
 import os
 import tempfile
 import uuid
@@ -553,31 +554,17 @@ class Track(APIModelMixin):
 
 class UploadQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
-        from funkwhale_api.federation.models import LibraryFollow
+        libraries = Library.objects.viewable_by(actor)
 
-        if actor is None:
-            libraries = Library.objects.filter(privacy_level="everyone")
-
-        else:
-            me_query = models.Q(privacy_level="me", actor=actor)
-            instance_query = models.Q(
-                privacy_level="instance", actor__domain=actor.domain
-            )
-            followed_libraries = LibraryFollow.objects.filter(
-                actor=actor, approved=True
-            ).values_list("target", flat=True)
-            libraries = Library.objects.filter(
-                me_query
-                | instance_query
-                | models.Q(privacy_level="everyone")
-                | models.Q(pk__in=followed_libraries)
-            )
         if include:
             return self.filter(library__in=libraries)
         return self.exclude(library__in=libraries)
 
     def local(self, include=True):
         return self.exclude(library__actor__user__isnull=include)
+
+    def for_federation(self):
+        return self.filter(import_status="finished", mimetype__startswith="audio/")
 
 
 TRACK_FILE_IMPORT_STATUS_CHOICES = (
@@ -731,8 +718,11 @@ class Upload(models.Model):
         }
 
     def save(self, **kwargs):
-        if not self.mimetype and self.audio_file:
-            self.mimetype = utils.guess_mimetype(self.audio_file)
+        if not self.mimetype:
+            if self.audio_file:
+                self.mimetype = utils.guess_mimetype(self.audio_file)
+            elif self.source and self.source.startswith("file://"):
+                self.mimetype = mimetypes.guess_type(self.source)[0]
         if not self.size and self.audio_file:
             self.size = self.audio_file.size
         if not self.pk and not self.fid and self.library.actor.is_local:
@@ -869,6 +859,24 @@ class LibraryQuerySet(models.QuerySet):
             )
         )
 
+    def viewable_by(self, actor):
+        from funkwhale_api.federation.models import LibraryFollow
+
+        if actor is None:
+            return Library.objects.filter(privacy_level="everyone")
+
+        me_query = models.Q(privacy_level="me", actor=actor)
+        instance_query = models.Q(privacy_level="instance", actor__domain=actor.domain)
+        followed_libraries = LibraryFollow.objects.filter(
+            actor=actor, approved=True
+        ).values_list("target", flat=True)
+        return Library.objects.filter(
+            me_query
+            | instance_query
+            | models.Q(privacy_level="everyone")
+            | models.Q(pk__in=followed_libraries)
+        )
+
 
 class Library(federation_models.FederationMixin):
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
@@ -904,14 +912,20 @@ class Library(federation_models.FederationMixin):
             return True
         return False
 
-    def schedule_scan(self):
-        latest_scan = self.scans.order_by("-creation_date").first()
+    def schedule_scan(self, actor, force=False):
+        latest_scan = (
+            self.scans.exclude(status="errored").order_by("-creation_date").first()
+        )
         delay_between_scans = datetime.timedelta(seconds=3600 * 24)
         now = timezone.now()
-        if latest_scan and latest_scan.creation_date + delay_between_scans > now:
+        if (
+            not force
+            and latest_scan
+            and latest_scan.creation_date + delay_between_scans > now
+        ):
             return
 
-        scan = self.scans.create(total_files=self.uploads_count)
+        scan = self.scans.create(total_files=self.uploads_count, actor=actor)
         from . import tasks
 
         common_utils.on_commit(tasks.start_library_scan.delay, library_scan_id=scan.pk)
@@ -921,6 +935,7 @@ class Library(federation_models.FederationMixin):
 SCAN_STATUS = [
     ("pending", "pending"),
     ("scanning", "scanning"),
+    ("errored", "errored"),
     ("finished", "finished"),
 ]
 

@@ -34,7 +34,7 @@ export default {
         return
       }
       let self = this
-      axios.post('federation/libraries/scan/', {fid: this.query}).then((response) => {
+      axios.post('federation/libraries/fetch/', {fid: this.query}).then((response) => {
         self.$emit('scanned', response.data)
         self.isLoading = false
       }, error => {

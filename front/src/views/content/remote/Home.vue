@@ -13,8 +13,15 @@
       </div>
       <template v-if="existingFollows && existingFollows.count > 0">
         <h2><translate>Known libraries</translate></h2>
+        <i @click="fetch()" :class="['ui', 'circular', 'medium', 'refresh', 'icon']" /> <translate>Refresh</translate>
+        <div class="ui hidden divider"></div>
         <div class="ui two cards">
-          <library-card :library="getLibraryFromFollow(follow)" v-for="follow in existingFollows.results" :key="follow.fid" />
+          <library-card
+            @deleted="fetch()"
+            @followed="fetch()"
+            :library="getLibraryFromFollow(follow)"
+            v-for="follow in existingFollows.results"
+            :key="follow.fid" />
         </div>
       </template>
     </div>
@@ -47,6 +54,9 @@ export default {
       let self = this
       axios.get('federation/follows/library/', {params: {'page_size': 100, 'ordering': '-creation_date'}}).then((response) => {
         self.existingFollows = response.data
+        self.existingFollows.results.forEach(f => {
+          f.target.follow = f
+        })
         self.isLoading = false
       }, error => {
         self.isLoading = false
