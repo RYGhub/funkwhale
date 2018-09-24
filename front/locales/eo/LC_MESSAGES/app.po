@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-24 19:50+0000\n"
+"PO-Revision-Date: 2018-09-23 19:07+0000\n"
 "Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
 "Language-Team: none\n"
 "Language: eo\n"
@@ -1617,66 +1617,67 @@ msgstr "Ludlisto aktualigintas"
 
 #: front/src/components/playlists/Form.vue:25
 msgid "Playlist visibility"
-msgstr ""
+msgstr "Ludlistvideblo"
 
 #: front/src/components/Sidebar.vue:56 src/components/library/Home.vue:16
 #: front/src/components/library/Library.vue:13 src/views/admin/Settings.vue:83
 #: front/src/views/playlists/List.vue:103
 msgid "Playlists"
-msgstr ""
+msgstr "Ludlistoj"
 
 #: front/src/components/Home.vue:56
 msgid "Playlists? We got them"
-msgstr ""
+msgstr "Ludlistoj? Jen"
 
 #: front/src/components/auth/Settings.vue:79
 msgid "Please double-check your password is correct"
-msgstr ""
+msgstr "Bonvolu rekontroli ke via pasvorto ĝustas"
 
 #: front/src/components/auth/Login.vue:9
 msgid "Please double-check your username/password couple is correct"
-msgstr ""
+msgstr "Bonvolu rekontroli ke vian uzantnomo kaj pasvorto ĝustas"
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
 msgstr ""
+"PNG, GIF, aŭ JPG. Maksimume 2Mo. La bildo malgrandigos al 400×400 rastrumero."
 
 #: front/src/components/library/import/Main.vue:26
 msgid "Previous step"
-msgstr ""
+msgstr "Antaŭa etapo"
 
 #: front/src/components/audio/Player.vue:260
 msgid "Previous track"
-msgstr ""
+msgstr "Antaŭa kanto"
 
 #: front/src/views/auth/EmailConfirm.vue:26
 #: front/src/views/auth/PasswordResetConfirm.vue:31
 msgid "Proceed to login"
-msgstr ""
+msgstr "Ensalutu"
 
 #: front/src/components/federation/LibraryTrackTable.vue:50
 msgid "Published date"
-msgstr ""
+msgstr "Publikada dato"
 
 #: front/src/components/library/import/ArtistImport.vue:17
 msgid "Query template"
-msgstr ""
+msgstr "Modelo de demando"
 
 #: front/src/components/Sidebar.vue:20
 msgid "Queue"
-msgstr ""
+msgstr "Atendovico"
 
 #: front/src/components/audio/Player.vue:203
 msgid "Queue shuffled!"
-msgstr ""
+msgstr "Atendovico miksiĝis!"
 
 #: front/src/views/radios/Detail.vue:80
 msgid "Radio"
-msgstr ""
+msgstr "Radio"
 
 #: front/src/components/library/radios/Builder.vue:226
 msgid "Radio Builder"
-msgstr ""
+msgstr "Faranto de radio"
 
 #: front/src/components/library/radios/Builder.vue:15
 msgid "Radio created"
@@ -1684,7 +1685,7 @@ msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
-msgstr ""
+msgstr "Nomo de la radio"
 
 #: front/src/components/library/radios/Builder.vue:12
 #, fuzzy
@@ -1694,23 +1695,23 @@ msgstr "Kreodato"
 #: front/src/components/library/Library.vue:10
 #: src/components/library/Radios.vue:141
 msgid "Radios"
-msgstr ""
+msgstr "Radioj"
 
 #: front/src/views/instance/Timeline.vue:7
 msgid "Recent activity on this instance"
-msgstr ""
+msgstr "Nova agado en ĉi-tiu instanco"
 
 #: front/src/components/library/Home.vue:24
 msgid "Recently added"
-msgstr ""
+msgstr "Novaj aldonoj"
 
 #: front/src/components/library/Home.vue:11
 msgid "Recently favorited"
-msgstr ""
+msgstr "Novaj stelumoj"
 
 #: front/src/components/library/Home.vue:6
 msgid "Recently listened"
-msgstr ""
+msgstr "Lastatempaj aŭskultantoj"
 
 #: front/src/components/library/import/BatchDetail.vue:81
 msgid "Recording MusicBrainz ID"

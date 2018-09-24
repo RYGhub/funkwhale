@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-22 14:12+0200\n"
-"PO-Revision-Date: 2018-07-24 19:50+0000\n"
+"PO-Revision-Date: 2018-09-08 17:55+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
 "Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
 "funkwhale/front/ar/>\n"
@@ -42,10 +42,10 @@ msgstr[5] ""
 #: src/views/federation/LibraryDetail.vue:87
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
-msgstr[0] ""
+msgstr[0] "%{ count } مقاطع"
 msgstr[1] "%{ count } مَقطَع"
-msgstr[2] ""
-msgstr[3] "%{ count } مَقاطِع"
+msgstr[2] "%{ count } مَقاطِع"
+msgstr[3] "%{ count } مَقطَع"
 msgstr[4] "%{ count } مَقاطِع"
 msgstr[5] "%{ count } مَقاطِع"
 
@@ -54,8 +54,8 @@ msgid "%{ count } track in %{ albumsCount } albums"
 msgid_plural "%{ count } tracks in %{ albumsCount } albums"
 msgstr[0] ""
 msgstr[1] "%{ count } مَقطَع في %{ albumsCount } ألبومات"
-msgstr[2] ""
-msgstr[3] ""
+msgstr[2] "%{ count } مَقطَع في %{ albumsCount } ألبومات"
+msgstr[3] "%{ count } مَقطَع في %{ albumsCount } ألبوما"
 msgstr[4] "%{ count } مَقاطِع في %{ albumsCount } ألبومات"
 msgstr[5] "%{ count } مَقاطِع في %{ albumsCount } ألبومات"
 
@@ -74,8 +74,8 @@ msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
 msgstr[0] ""
 msgstr[1] "%{ count } مَقطَع"
-msgstr[2] ""
-msgstr[3] ""
+msgstr[2] "مقطعين"
+msgstr[3] "%{ count } مَقطَع"
 msgstr[4] "%{ count } مَقاطِع"
 msgstr[5] "%{ count } مَقاطِع"
 
@@ -202,7 +202,7 @@ msgstr "النشاط"
 
 #: front/src/components/federation/LibraryFollowTable.vue:21
 msgid "Actor"
-msgstr ""
+msgstr "الممثل"
 
 #: front/src/views/federation/LibraryList.vue:8
 msgid "Add a new library"
@@ -306,6 +306,7 @@ msgstr "حدث خطأ أثناء عملية حفظ التغييرات"
 #: front/src/components/auth/Login.vue:10
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
 msgstr ""
+"طرأ هناك خطأ ما، ذلك قد يعني أن السيرفر غير متصل أو أنّ الإتصال به غير ممكن"
 
 #: front/src/components/federation/LibraryTrackTable.vue:11
 #: front/src/components/library/import/BatchDetail.vue:68
@@ -449,7 +450,7 @@ msgstr "حسب %{ artist }"
 
 #: front/src/components/federation/LibraryFollowTable.vue:57
 msgid "By confirming, %{ username } will be denied access to your library."
-msgstr ""
+msgstr "عند التأكيد، سوف يتم رفض نفاذ المستخدم %{ username } إلى المكتبة."
 
 #: front/src/components/federation/LibraryFollowTable.vue:73
 msgid "By confirming, %{ username } will be granted access to your library."
@@ -498,6 +499,8 @@ msgstr "تمت مزامنة التعديلات مع السيرفر"
 #: front/src/components/auth/Settings.vue:70
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
 msgstr ""
+"سوف تتأثر كذلك الكلمة السرية لواجهة برمجة تطبيقات صاب سونيك إن قمت بتعديل "
+"كلمتك السرية."
 
 #: front/src/components/auth/Settings.vue:98
 msgid "Changing your password will have the following consequences"
@@ -546,7 +549,7 @@ msgstr "الرمز"
 #: front/src/components/audio/artist/Card.vue:33
 #: front/src/components/discussion/Comment.vue:20
 msgid "Collapse"
-msgstr ""
+msgstr "تصغير"
 
 #: front/src/components/manage/library/RequestsTable.vue:51
 #: front/src/components/requests/Form.vue:14
@@ -555,7 +558,7 @@ msgstr "تعليق"
 
 #: front/src/components/library/radios/Builder.vue:58
 msgid "Config"
-msgstr ""
+msgstr "الإعداد"
 
 #: front/src/components/common/DangerousButton.vue:21
 msgid "Confirm"
