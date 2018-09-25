@@ -49,7 +49,6 @@
                 v-if="$store.state.ui.notifications.inbox > 0"
                 :class="['ui', 'teal', 'label']">
                 {{ $store.state.ui.notifications.inbox }}</div>
-              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
             <template v-else>

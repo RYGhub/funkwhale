@@ -47,7 +47,7 @@ u = User.objects.create(email="demo@demo.com", username="demo", is_staff=True, i
 u.set_password("demo")
 u.subsonic_api_token = "demo"
 u.save()
-
+actor = u.create_actor()
 library = actor.libraries.create(name='Demo library', privacy_level='everyone')
 
 from funkwhale_api.common import preferences
