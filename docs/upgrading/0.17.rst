@@ -180,6 +180,7 @@ Libraries created this way will have a different visibility level depending of y
 This script will contain other database-related operations, but the impact will remain
 invisible.
 
+
 Upgrade instructions
 --------------------
 
@@ -195,3 +196,15 @@ On non docker-setups::
     python api/manage.py script migrate_to_user_libraries --no-input
 
 If the scripts ends without errors, you're instance should be updated and ready to use :)
+
+.. note::
+
+    If you use nginx, ensure your funkwhale_proxy.conf file does not contain this:
+
+        proxy_set_header X-Forwarded-Host $host:$server_port;
+
+    If you have this line present, replace it with:
+
+        proxy_set_header X-Forwarded-Host $host;
+
+    And reload your nginx server.
