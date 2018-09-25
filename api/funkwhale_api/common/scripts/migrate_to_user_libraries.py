@@ -109,7 +109,7 @@ def set_fid(queryset, path, stdout):
 
 def update_shared_inbox_url(stdout):
     stdout.write("* Update shared inbox url for local actors...")
-    candidates = federation_models.Actor.objects.local().filter(shared_inbox_url=None)
+    candidates = federation_models.Actor.objects.local()
     url = federation_models.get_shared_inbox_url()
     candidates.update(shared_inbox_url=url)
 
