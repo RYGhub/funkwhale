@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
@@ -27,6 +28,10 @@ TYPE_CHOICES = [
 
 def empty_dict():
     return {}
+
+
+def get_shared_inbox_url():
+    return federation_utils.full_url(reverse("federation:shared-inbox"))
 
 
 class FederationMixin(models.Model):

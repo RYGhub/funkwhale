@@ -41,7 +41,7 @@ def test_upload_url_is_accessible_to_authenticated_users(
 ):
     actor = logged_in_api_client.user.create_actor()
     preferences["common__api_authentication_required"] = True
-    upload = factories["music.Upload"](library__actor=actor)
+    upload = factories["music.Upload"](library__actor=actor, import_status="finished")
     assert upload.audio_file is not None
     url = upload.track.listen_url
     response = logged_in_api_client.get(url)

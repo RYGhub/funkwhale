@@ -377,3 +377,8 @@ def temp_signal(mocker):
             signal.disconnect(stub)
 
     return connect
+
+
+@pytest.fixture()
+def stdout():
+    yield io.StringIO()

@@ -1,0 +1,197 @@
+About Funkwhale 0.17
+====================
+
+Funkwhale 0.17 is a special version, which contains a lot of breaking changes.
+
+Before doing the upgrade, please read this document carefully.
+
+
+Overview of the changes
+^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. note::
+
+    The what and why are described more thoroughly in this page: https://code.eliotberriot.com/funkwhale/funkwhale/merge_requests/368
+
+To sum it up, this release big completely changes the way audio content is managed in Funkwhale.
+As you may guess, this has a huge impact on the whole project, because audio is at the
+core of Funkwhale.
+
+Here is a side by side comparison of earlier versions and this release
+to help you understand the scale of the changes:
+
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Before                                                                                 | After                                                                                           | Reason                                                                                                                                                                                                                                                  |
++========================================================================================+=================================================================================================+=========================================================================================================================================================================================================================================================+
+| There is one big audio library, managed at the instance level                          | Each user can have their own libraries (either public, private or shared at the instance level) | Managing the library at instance was cumbersome and dangerous: sharing  an instance library over federation would quickly pose copyright issues,  as well as opening public instances. It also made it impossible to only  share a subset of the music. |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Users needed a specific permissions from instance owners to upload audio content       | Users can upload music to their own libraries without any specific permissions                  | This change makes it easier for new users to start using Funkwhale, and for creators to share their content on the network.                                                                                                                             |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Users with permissions can upload as much content as they want in the instance library | Users have a storage quota and cannot exceed that storage                                       | This change gives visibiliy to instance owners about their resource usage. If you host 100 users with a 1Gb quota, you know that your Funkwhale instance will not store more than 100Gb of music files.                                                 |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| N/A                                                                                    | Users can upload private content or share content with only specific users                      | This is a new feature, and we think it will enable users to upload their own music libraries to their instance, without breaking the law or putting their admins in trouble, since their media will remain private.                                     |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Youtube Import                                                                         | This feature is removed                                                                         | This feature posed copyright issues and impacted the credibility of the project, so we removed it.                                                                                                                                                      |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Music requests                                                                         | This feature is removed                                                                         | Since all users can now upload content without specific permissions, we think this feature is less-likely to be useful in its current state.                                                                                                            |
++----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+From a shared, instance-wide library to users libraries
+------------------------------------------------------
+
+As you can see, there is a big switch: in earlier versions, each instance had one big library,
+that was available to all its users. This model don't scale well (especially if you put
+federation on top of that), because it's an all-or-nothing choice if you want to share it.
+
+Starting from version 0.17, each user will be able to create personal libraries
+and upload content in those, up to a configurable quota.
+
+Those libraries can have one of the following visibility level:
+
+- **Private**: only the owner of the library can access its content
+- **Instance**: users from the same instance can access the library content
+- **Public**: everyone (including other instances) can access the library content
+
+Regardless of this visibility level, library owners can also share them manually
+with other users, both from the same instance or from the federation.
+
+We think this change will have a really positive impact:
+
+- Admins should be more encline to open their instance to strangers, because copyrighted media
+  can be upload and shared privately
+- Creators should have a better experience when joining the network, because they can now
+  upload their own content and share it over the federation without any admin intervention
+- The federation should grow faster, because user libraries can contain copyrighted content
+  and be shared, without putting the admins at risk
+
+Accessing music
+---------------
+
+From an end-user perspective, you will be able to browse any artist or album or track
+that is known by your instance, but you'll only be able to listen to content
+that match one of those critaeria:
+
+- The content is available is one of your libraries
+- The content is available in a public library
+- The content is available in one library from your instance that has a visibility level set to "instance"
+- The content is available in one of the library you follow
+
+Following someone else's library is a four step process:
+
+1. Get the library link from its owner
+2. Use this link on your instance to follow the library
+3. Wait until your follow request is approved by the library owner
+4. If this library is unknown on your instance, it will be scanned to import its content, which may take a few minutes
+
+Libraries owner can revoke follows at any time, which will effectively prevent
+the ancient follower from accessing the library content.
+
+A brand new federation
+----------------------
+
+This is more "under the hood" work, but the whole federation/ActivityPub logic
+was rewritten for this release. This new implementation is more spec compliant
+and should scale better.
+
+The following activities are propagated over federation:
+
+- Library follow creation, accept and reject
+- Audio creation and deletion
+- Library deletion
+
+A better import UI
+------------------
+
+This version includes a completely new import UI which should make
+file uploading less annoying. Especially it's updating in real-time
+and has a better error reporting.
+
+A Better import engine
+----------------------
+
+Funkwhale is known for its quircks during music import. Missing covers,
+splitted albums, bad management of tracks with multiple artists, missing
+data for files imported over federation, bad performance, discrepencies between
+the user provided tags and what is actually stored in the database...
+
+This should be greatly improved now, as the whole import logic was rewritten
+from scratch.
+
+Import is done completely offline and do not call the MusicBrainz API anymore,
+except to retrieve covers if those are not embedded in the imported files.
+MusicBrainzare references are still stored in the database, but we rely solely
+on the tags from the audio file now.
+
+This has two positive consequences:
+
+- Improved performance for both small and big imports (possibly by a factor 10)
+- More reliable import result: if your file is tagged in a specific way, we will only
+  use tags for the import.
+
+Imports from federation, command-line and UI/API all use the same code,
+which should greatly reduce the bugs/discrepencies.
+
+Finally, the import engine now understand the difference between a track artist
+and an album artist, which should put an end to the album splitting issues
+for tracks that had a different artist than the album artist.
+
+What will break
+---------------
+
+If you've read until here, you can probably understand that all of these changes
+comes at a cost: version 0.17 contains breaking changes, feature were removed
+or changed.
+
+Those features were removed:
+
+- YouTube imports: for copyright reasons, keeping this in the core was not possible
+- Music requests: those are now less useful since anyone can upload content
+
+Also, the current federation will break, as it's absolutely not compatible
+with what we've built in version 0.17, and maintaining compatibility was simply not possible.
+
+Apart from that, other features should work the same way as they did before.
+
+Migration path
+--------------
+
+.. warning::
+
+    This migration is huge. Do a backup. Please. The database, and the music files.
+    Please.
+
+.. warning:: I'm not kidding.
+
+
+Migration will be similar to previous ones, with an additional script to run that will
+take care of updating existing rows in the database. Especially, this script
+will be responsible to create a library for each registered user, and to
+bind content imported by each one to this library.
+
+Libraries created this way will have a different visibility level depending of your instance configuration:
+
+- If your instance requires authentication to access the API / Listen to music, libraries will
+  be marked with "instance"  visibility. As a result, all users from the instance will still
+  be able to listen to all the music of the instance after the migration
+- If your instance does not requires authentication to access the API / Listen to music,
+  libraries will be completely public, allowing anyone to access the content (including federation)
+
+This script will contain other database-related operations, but the impact will remain
+invisible.
+
+Upgrade instructions
+--------------------
+
+Follow instructions from https://docs.funkwhale.audio/upgrading/index.html,
+then run the migrations script.
+
+On docker-setups::
+
+    docker-compose run --rm api python manage.py script migrate_to_user_libraries --no-input
+
+On non docker-setups::
+
+    python api/manage.py script migrate_to_user_libraries --no-input
+
+If the scripts ends without errors, you're instance should be updated and ready to use :)
