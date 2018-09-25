@@ -248,10 +248,9 @@ class Invitation(models.Model):
         return super().save(**kwargs)
 
 
-def create_actor(user):
+def get_actor_data(user):
     username = federation_utils.slugify_username(user.username)
-    private, public = keys.get_key_pair()
-    args = {
+    return {
         "preferred_username": username,
         "domain": settings.FEDERATION_HOSTNAME,
         "type": "Person",
@@ -260,9 +259,7 @@ def create_actor(user):
         "fid": federation_utils.full_url(
             reverse("federation:actors-detail", kwargs={"preferred_username": username})
         ),
-        "shared_inbox_url": federation_utils.full_url(
-            reverse("federation:shared-inbox")
-        ),
+        "shared_inbox_url": federation_models.get_shared_inbox_url(),
         "inbox_url": federation_utils.full_url(
             reverse("federation:actors-inbox", kwargs={"preferred_username": username})
         ),
@@ -280,6 +277,11 @@ def create_actor(user):
             )
         ),
     }
+
+
+def create_actor(user):
+    args = get_actor_data(user)
+    private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
 

@@ -557,8 +557,8 @@ class UploadQuerySet(models.QuerySet):
         libraries = Library.objects.viewable_by(actor)
 
         if include:
-            return self.filter(library__in=libraries)
-        return self.exclude(library__in=libraries)
+            return self.filter(library__in=libraries, import_status="finished")
+        return self.exclude(library__in=libraries, import_status="finished")
 
     def local(self, include=True):
         return self.exclude(library__actor__user__isnull=include)
@@ -899,7 +899,7 @@ class Library(federation_models.FederationMixin):
         )
 
     def save(self, **kwargs):
-        if not self.pk and not self.fid and self.actor.is_local:
+        if not self.pk and not self.fid and self.actor.get_user():
             self.fid = self.get_federation_id()
             self.followers_url = self.fid + "/followers"
 

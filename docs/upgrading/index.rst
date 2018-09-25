@@ -18,6 +18,18 @@ similarly from version to version, but some of them may require additional steps
 Those steps would be described in the version release notes.
 
 
+Insights about new versions
+---------------------------
+
+Some versions may be bigger than usual, and we'll try to detail the changes
+when possible.
+
+.. toctree::
+   :maxdepth: 1
+
+   0.17
+
+
 Docker setup
 ------------
 

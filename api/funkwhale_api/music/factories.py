@@ -4,6 +4,7 @@ import factory
 
 from funkwhale_api.factories import ManyToManyFromList, registry
 from funkwhale_api.federation import factories as federation_factories
+from funkwhale_api.users import factories as users_factories
 
 
 SAMPLES_PATH = os.path.join(
@@ -100,3 +101,24 @@ class TagFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "taggit.Tag"
+
+
+# XXX To remove
+
+
+class ImportBatchFactory(factory.django.DjangoModelFactory):
+    submitted_by = factory.SubFactory(users_factories.UserFactory)
+
+    class Meta:
+        model = "music.ImportBatch"
+
+
+@registry.register
+class ImportJobFactory(factory.django.DjangoModelFactory):
+    batch = factory.SubFactory(ImportBatchFactory)
+    source = factory.Faker("url")
+    mbid = factory.Faker("uuid4")
+    replace_if_duplicate = False
+
+    class Meta:
+        model = "music.ImportJob"

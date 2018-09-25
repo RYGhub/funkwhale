@@ -12,7 +12,9 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_artist_list_serializer(api_request, factories, logged_in_api_client):
-    track = factories["music.Upload"](library__privacy_level="everyone").track
+    track = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    ).track
     artist = track.artist
     request = api_request.get("/")
     qs = artist.__class__.objects.with_albums()
@@ -31,7 +33,9 @@ def test_artist_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_album_list_serializer(api_request, factories, logged_in_api_client):
-    track = factories["music.Upload"](library__privacy_level="everyone").track
+    track = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    ).track
     album = track.album
     request = api_request.get("/")
     qs = album.__class__.objects.all()
@@ -49,7 +53,9 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_track_list_serializer(api_request, factories, logged_in_api_client):
-    track = factories["music.Upload"](library__privacy_level="everyone").track
+    track = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    ).track
     request = api_request.get("/")
     qs = track.__class__.objects.all()
     serializer = serializers.TrackSerializer(
@@ -69,7 +75,7 @@ def test_artist_view_filter_playable(param, expected, factories, api_request):
     artists = {
         "empty": factories["music.Artist"](),
         "full": factories["music.Upload"](
-            library__privacy_level="everyone"
+            library__privacy_level="everyone", import_status="finished"
         ).track.artist,
     }
 
@@ -88,7 +94,7 @@ def test_album_view_filter_playable(param, expected, factories, api_request):
     artists = {
         "empty": factories["music.Album"](),
         "full": factories["music.Upload"](
-            library__privacy_level="everyone"
+            library__privacy_level="everyone", import_status="finished"
         ).track.album,
     }
 
@@ -106,7 +112,9 @@ def test_can_serve_upload_as_remote_library(
     factories, authenticated_actor, logged_in_api_client, settings, preferences
 ):
     preferences["common__api_authentication_required"] = True
-    upload = factories["music.Upload"](library__privacy_level="everyone")
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
     library_actor = upload.library.actor
     factories["federation.Follow"](
         approved=True, actor=authenticated_actor, target=library_actor
@@ -124,7 +132,9 @@ def test_can_serve_upload_as_remote_library_deny_not_following(
     factories, authenticated_actor, settings, api_client, preferences
 ):
     preferences["common__api_authentication_required"] = True
-    upload = factories["music.Upload"](library__privacy_level="instance")
+    upload = factories["music.Upload"](
+        import_status="finished", library__privacy_level="instance"
+    )
     response = api_client.get(upload.track.listen_url)
 
     assert response.status_code == 404
@@ -150,6 +160,7 @@ def test_serve_file_in_place(
     settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
     upload = factories["music.Upload"](
         in_place=True,
+        import_status="finished",
         source="file:///app/music/hello/world.mp3",
         library__privacy_level="everyone",
     )
@@ -202,7 +213,9 @@ def test_serve_file_media(
     settings.MUSIC_DIRECTORY_PATH = "/app/music"
     settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
 
-    upload = factories["music.Upload"](library__privacy_level="everyone")
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
     upload.__class__.objects.filter(pk=upload.pk).update(
         audio_file="tracks/hello/world.mp3"
     )
@@ -216,7 +229,10 @@ def test_can_proxy_remote_track(factories, settings, api_client, r_mock, prefere
     preferences["common__api_authentication_required"] = False
     url = "https://file.test"
     upload = factories["music.Upload"](
-        library__privacy_level="everyone", audio_file="", source=url
+        library__privacy_level="everyone",
+        audio_file="",
+        source=url,
+        import_status="finished",
     )
 
     r_mock.get(url, body=io.BytesIO(b"test"))
@@ -232,7 +248,9 @@ def test_can_proxy_remote_track(factories, settings, api_client, r_mock, prefere
 
 def test_serve_updates_access_date(factories, settings, api_client, preferences):
     preferences["common__api_authentication_required"] = False
-    upload = factories["music.Upload"](library__privacy_level="everyone")
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
     now = timezone.now()
     assert upload.accessed_date is None
 
@@ -269,7 +287,9 @@ def test_listen_no_available_file(factories, logged_in_api_client):
 def test_listen_correct_access(factories, logged_in_api_client):
     logged_in_api_client.user.create_actor()
     upload = factories["music.Upload"](
-        library__actor=logged_in_api_client.user.actor, library__privacy_level="me"
+        library__actor=logged_in_api_client.user.actor,
+        library__privacy_level="me",
+        import_status="finished",
     )
     url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
     response = logged_in_api_client.get(url)
@@ -279,9 +299,11 @@ def test_listen_correct_access(factories, logged_in_api_client):
 
 def test_listen_explicit_file(factories, logged_in_api_client, mocker):
     mocked_serve = mocker.spy(views, "handle_serve")
-    upload1 = factories["music.Upload"](library__privacy_level="everyone")
+    upload1 = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
     upload2 = factories["music.Upload"](
-        library__privacy_level="everyone", track=upload1.track
+        library__privacy_level="everyone", track=upload1.track, import_status="finished"
     )
     url = reverse("api:v1:listen-detail", kwargs={"uuid": upload2.track.uuid})
     response = logged_in_api_client.get(url, {"upload": upload2.uuid})
