@@ -66,11 +66,30 @@ We also maintain an installation guide for Debian 9 and Arch Linux.
    docker
    systemd
 
-
 Funkwhale packages are available for the following platforms:
 
 - `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
 
+
+Running Funkwhale on the develop branch
+---------------------------------------
+
+Traditionnal deployments are done using specific releases. However, you
+may want to benefits from the latest change available, or the help detect
+bugs before they are included in actual releases.
+
+To do that, you'll need to run your instance on the develop branch,
+which contains all the unreleased changes and features of the next version.
+
+Please take into account that the develop branch
+may be unstable and will contain bugs that may affect the well being of your
+instance. If you are comfortable with that, you need to backup at least your database
+before pulling latest changes from the develop branch.
+
+Otherwise, the deployment process is similar to deploying with releases.
+You simply need to use ``export FUNKWHALE_VERSION=develop``
+in the installation and upgrade process instead of a real version number,
+as we build artifacts on the development branch the same way we do for releases.
 
 .. _frontend-setup:
 
