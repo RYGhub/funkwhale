@@ -236,7 +236,8 @@ def process_upload(upload):
     except UploadImportError as e:
         return fail_import(upload, e.code)
     except Exception:
-        return fail_import(upload, "unknown_error")
+        fail_import(upload, "unknown_error")
+        raise
 
     # under some situations, we want to skip the import (
     # for instance if the user already owns the files)

@@ -130,7 +130,7 @@ class Command(BaseCommand):
         except models.Library.DoesNotExist:
             raise CommandError("Invalid library id")
 
-        if not library.actor.is_local:
+        if not library.actor.get_user():
             raise CommandError("Library {} is not a local library".format(library.uuid))
 
         if options["recursive"]:
