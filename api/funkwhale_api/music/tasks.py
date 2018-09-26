@@ -469,7 +469,7 @@ def get_track_from_import_metadata(data):
         models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
     )[0]
 
-    album_artist_name = data.get("album_artist", artist_name)
+    album_artist_name = data.get("album_artist") or artist_name
     if album_artist_name == artist_name:
         album_artist = artist
     else:
