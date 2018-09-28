@@ -87,6 +87,20 @@ def test_dispatch_outbox(factories, mocker):
     mocked_deliver_to_remote.assert_called_once_with(delivery_id=delivery.pk)
 
 
+def test_dispatch_outbox_disabled_federation(factories, mocker, preferences):
+    preferences["federation__enabled"] = False
+    mocked_inbox = mocker.patch("funkwhale_api.federation.tasks.dispatch_inbox.delay")
+    mocked_deliver_to_remote = mocker.patch(
+        "funkwhale_api.federation.tasks.deliver_to_remote.delay"
+    )
+    activity = factories["federation.Activity"](actor__local=True)
+    factories["federation.InboxItem"](activity=activity)
+    factories["federation.Delivery"](activity=activity)
+    tasks.dispatch_outbox(activity_id=activity.pk)
+    mocked_inbox.assert_called_once_with(activity_id=activity.pk)
+    mocked_deliver_to_remote.assert_not_called()
+
+
 def test_deliver_to_remote_success_mark_as_delivered(factories, r_mock, now):
     delivery = factories["federation.Delivery"]()
     r_mock.post(delivery.inbox_url)
