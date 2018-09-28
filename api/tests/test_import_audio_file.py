@@ -33,7 +33,7 @@ def test_import_with_multiple_argument(factories, mocker):
     path1 = os.path.join(DATA_DIR, "dummy_file.ogg")
     path2 = os.path.join(DATA_DIR, "utf8-éà◌.ogg")
     mocked_filter = mocker.patch(
-        "funkwhale_api.providers.audiofile.management.commands.import_files.Command.filter_matching",
+        "funkwhale_api.music.management.commands.import_files.Command.filter_matching",
         return_value=({"new": [], "skipped": []}),
     )
     call_command("import_files", str(library.uuid), path1, path2, interactive=False)

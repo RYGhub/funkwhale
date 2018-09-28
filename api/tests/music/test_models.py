@@ -452,11 +452,6 @@ def test_get_audio_data(factories):
     assert result == {"duration": 229, "bitrate": 128000, "size": 3459481}
 
 
-@pytest.mark.skip(reason="Refactoring in progress")
-def test_library_viewable_by():
-    assert False
-
-
 def test_library_queryset_with_follows(factories):
     library1 = factories["music.Library"]()
     library2 = factories["music.Library"]()
