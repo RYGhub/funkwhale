@@ -13,14 +13,6 @@
       <router-link class="ui item" to="/library/playlists" exact>
         <translate>Playlists</translate>
       </router-link>
-      <div class="ui secondary right menu">
-        <router-link v-if="showImports" class="ui item" to="/library/import/launch" exact>
-          <translate>Import</translate>
-        </router-link>
-        <router-link v-if="showImports" class="ui item" to="/library/import/batches">
-          <translate>Import batches</translate>
-        </router-link>
-      </div>
     </div>
     <router-view :key="$route.fullPath"></router-view>
   </div>
