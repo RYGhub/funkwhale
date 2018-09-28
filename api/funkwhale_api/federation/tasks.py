@@ -8,6 +8,7 @@ from django.utils import timezone
 from dynamic_preferences.registries import global_preferences_registry
 from requests.exceptions import RequestException
 
+from funkwhale_api.common import preferences
 from funkwhale_api.common import session
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
@@ -87,10 +88,15 @@ def dispatch_outbox(activity):
     Deliver a local activity to its recipients, both locally and remotely
     """
     inbox_items = activity.inbox_items.filter(is_read=False).select_related()
-    deliveries = activity.deliveries.filter(is_delivered=False)
 
     if inbox_items.exists():
         dispatch_inbox.delay(activity_id=activity.pk)
+
+    if not preferences.get("federation__enabled"):
+        # federation is disabled, we only deliver to local recipients
+        return
+
+    deliveries = activity.deliveries.filter(is_delivered=False)
 
     for id in deliveries.values_list("pk", flat=True):
         deliver_to_remote.delay(delivery_id=id)
@@ -109,6 +115,11 @@ def dispatch_outbox(activity):
     "delivery",
 )
 def deliver_to_remote(delivery):
+
+    if not preferences.get("federation__enabled"):
+        # federation is disabled, we only deliver to local recipients
+        return
+
     actor = delivery.activity.actor
     logger.info("Preparing activity delivery to %s", delivery.inbox_url)
     auth = signing.get_auth(actor.private_key, actor.private_key_id)
