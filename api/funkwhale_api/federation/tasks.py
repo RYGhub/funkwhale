@@ -29,7 +29,8 @@ def clean_music_cache():
     candidates = (
         music_models.Upload.objects.filter(
             Q(audio_file__isnull=False)
-            & (Q(accessed_date__lt=limit) | Q(accessed_date=None))
+            & (Q(accessed_date__lt=limit) | Q(accessed_date=None)),
+            # library__actor__user=None,
         )
         .local(False)
         .exclude(audio_file="")
@@ -55,8 +56,10 @@ def get_files(storage, *parts):
     """
     if not parts:
         raise ValueError("Missing path")
-
-    dirs, files = storage.listdir(os.path.join(*parts))
+    try:
+        dirs, files = storage.listdir(os.path.join(*parts))
+    except FileNotFoundError:
+        return []
     for dir in dirs:
         files += get_files(storage, *(list(parts) + [dir]))
     return [os.path.join(parts[-1], path) for path in files]
