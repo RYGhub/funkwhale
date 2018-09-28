@@ -25,6 +25,16 @@ def test_serializer_includes_tracks_count(factories, logged_in_api_client):
     assert response.data["tracks_count"] == 1
 
 
+def test_serializer_includes_is_playable(factories, logged_in_api_client):
+    playlist = factories["playlists.Playlist"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist)
+
+    url = reverse("api:v1:playlists-detail", kwargs={"pk": playlist.pk})
+    response = logged_in_api_client.get(url)
+
+    assert response.data["is_playable"] is False
+
+
 def test_playlist_inherits_user_privacy(logged_in_api_client):
     url = reverse("api:v1:playlists-list")
     user = logged_in_api_client.user

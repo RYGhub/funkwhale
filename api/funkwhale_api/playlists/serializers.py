@@ -11,10 +11,17 @@ from . import models
 
 class PlaylistTrackSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
+    is_playable = serializers.SerializerMethodField()
 
     class Meta:
         model = models.PlaylistTrack
-        fields = ("id", "track", "playlist", "index", "creation_date")
+        fields = ("id", "track", "playlist", "index", "creation_date", "is_playable")
+
+    def get_is_playable(self, obj):
+        try:
+            return bool(obj.is_playable_by_actor)
+        except AttributeError:
+            return None
 
 
 class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
@@ -68,6 +75,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField(read_only=True)
     album_covers = serializers.SerializerMethodField(read_only=True)
     user = UserBasicSerializer(read_only=True)
+    is_playable = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Playlist
@@ -81,8 +89,15 @@ class PlaylistSerializer(serializers.ModelSerializer):
             "tracks_count",
             "album_covers",
             "duration",
+            "is_playable",
         )
         read_only_fields = ["id", "modification_date", "creation_date"]
+
+    def get_is_playable(self, obj):
+        try:
+            return bool(obj.is_playable_by_actor)
+        except AttributeError:
+            return None
 
     def get_tracks_count(self, obj):
         try:

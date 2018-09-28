@@ -5,7 +5,7 @@
       <div class="ui text loader"><translate>Loading usage data...</translate></div>
     </div>
     <div :class="['ui', {'success': progress < 60}, {'yellow': progress >= 60 && progress < 96}, {'error': progress >= 95}, 'progress']">
-      <div class="bar">
+      <div class="bar" :style="{width: `${progress}%`}">
         <div class="progress">{{ progress }}%</div>
       </div>
       <div class="label" v-if="quotaStatus">
@@ -98,7 +98,6 @@
 </template>
 <script>
 import axios from 'axios'
-import $ from 'jquery'
 import {humanSize} from '@/filters'
 import {compileTokens} from '@/search'
 
@@ -145,12 +144,6 @@ export default {
     purgeErroredFiles () {
       this.purge('errored')
     },
-    updateProgressBar () {
-      $(this.$el).find('.ui.progress').progress({
-        percent: this.progress,
-        showActivity: false
-      })
-    }
   },
   computed: {
     progress () {
@@ -158,11 +151,6 @@ export default {
         return 0
       }
       return Math.min(parseInt(this.quotaStatus.current * 100 / this.quotaStatus.max), 100)
-    }
-  },
-  watch: {
-    progress () {
-      this.updateProgressBar()
     }
   }
 }

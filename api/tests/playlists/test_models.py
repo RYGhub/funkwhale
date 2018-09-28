@@ -122,3 +122,38 @@ def test_insert_many_honor_max_tracks(preferences, factories):
     track = factories["music.Track"]()
     with pytest.raises(exceptions.ValidationError):
         playlist.insert_many([track, track, track])
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_playlist_track_playable_by_anonymous(privacy_level, expected, factories):
+    plt = factories["playlists.PlaylistTrack"]()
+    track = plt.track
+    factories["music.Upload"](
+        track=track, library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = plt.__class__.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = plt in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_playlist_playable_by_anonymous(privacy_level, expected, factories):
+    plt = factories["playlists.PlaylistTrack"]()
+    playlist = plt.playlist
+    track = plt.track
+    factories["music.Upload"](
+        track=track, library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = playlist.__class__.objects.playable_by(None).annotate_playable_by_actor(
+        None
+    )
+    match = playlist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
