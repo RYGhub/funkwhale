@@ -15,7 +15,7 @@ redeliver_deliveries.short_description = "Redeliver"
 
 def redeliver_activities(modeladmin, request, queryset):
     for activity in queryset.select_related("actor__user"):
-        if activity.actor.is_local:
+        if activity.actor.get_user():
             tasks.dispatch_outbox.delay(activity_id=activity.pk)
         else:
             tasks.dispatch_inbox.delay(activity_id=activity.pk)
