@@ -20,13 +20,18 @@ def test_user_update_permission(factories):
     )
     s = serializers.ManageUserSerializer(
         user,
-        data={"is_active": False, "permissions": {"federation": False, "upload": True}},
+        data={
+            "is_active": False,
+            "permissions": {"federation": False, "upload": True},
+            "upload_quota": 12,
+        },
     )
     s.is_valid(raise_exception=True)
     s.save()
     user.refresh_from_db()
 
     assert user.is_active is False
+    assert user.upload_quota == 12
     assert user.permission_federation is False
     assert user.permission_upload is True
     assert user.permission_library is False
