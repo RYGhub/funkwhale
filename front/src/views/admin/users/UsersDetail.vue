@@ -78,6 +78,25 @@
                   </select>
                 </td>
               </tr>
+              <tr>
+                <td>
+                  <translate>Upload quota</translate>
+                  <span :data-tooltip="labels.uploadQuota"><i class="question circle icon"></i></span>
+                </td>
+                <td>
+                  <div class="ui right labeled input">
+                  <input
+                    class="ui input"
+                    @change="update('upload_quota', true)"
+                    v-model.number="object.upload_quota"
+                    step="100"
+                    type="number" />
+                  <div class="ui basic label">
+                    <translate>MB</translate>
+                  </div>
+                </div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -122,8 +141,12 @@ export default {
         self.isLoading = false
       })
     },
-    update (attr) {
+    update (attr, toNull) {
       let newValue = this.object[attr]
+      if (toNull && !newValue) {
+        newValue = null
+      }
+      console.log(newValue, typeof(newValue))
       let params = {}
       if (attr === 'permissions') {
         params['permissions'] = {}
@@ -143,7 +166,8 @@ export default {
   computed: {
     labels () {
       return {
-        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or use the service.')
+        inactive: this.$gettext('Determine if the user account is active or not. Inactive users cannot login or use the service.'),
+        uploadQuota: this.$gettext('Determine how much content the user can upload. Leave empty to use the default value of the instance.')
       }
     },
     allPermissions () {

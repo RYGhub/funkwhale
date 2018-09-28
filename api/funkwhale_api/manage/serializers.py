@@ -93,11 +93,13 @@ class ManageUserSimpleSerializer(serializers.ModelSerializer):
             "date_joined",
             "last_activity",
             "privacy_level",
+            "upload_quota",
         )
 
 
 class ManageUserSerializer(serializers.ModelSerializer):
     permissions = PermissionsSerializer(source="*")
+    upload_quota = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = users_models.User
@@ -113,6 +115,7 @@ class ManageUserSerializer(serializers.ModelSerializer):
             "last_activity",
             "permissions",
             "privacy_level",
+            "upload_quota",
         )
         read_only_fields = [
             "id",
