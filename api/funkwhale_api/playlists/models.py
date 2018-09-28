@@ -150,7 +150,9 @@ class PlaylistTrackQuerySet(models.QuerySet):
     def for_nested_serialization(self, actor=None):
         tracks = music_models.Track.objects.annotate_playable_by_actor(actor)
         tracks = tracks.select_related("artist", "album__artist")
-        return self.prefetch_related(models.Prefetch("track", queryset=tracks, to_attr='_prefetched_track'))
+        return self.prefetch_related(
+            models.Prefetch("track", queryset=tracks, to_attr="_prefetched_track")
+        )
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
