@@ -38,6 +38,23 @@ class PlaylistQuerySet(models.QuerySet):
         )
         return self.prefetch_related(plt_prefetch)
 
+    def annotate_playable_by_actor(self, actor):
+        plts = (
+            PlaylistTrack.objects.playable_by(actor)
+            .filter(playlist=models.OuterRef("id"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(plts)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        plts = PlaylistTrack.objects.playable_by(actor, include)
+        if include:
+            return self.filter(playlist_tracks__in=plts)
+        else:
+            return self.exclude(playlist_tracks__in=plts)
+
 
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
@@ -138,6 +155,23 @@ class PlaylistTrackQuerySet(models.QuerySet):
                 "track__tags", "track__uploads", "track__artist__albums__tracks__tags"
             )
         )
+
+    def annotate_playable_by_actor(self, actor):
+        tracks = (
+            music_models.Track.objects.playable_by(actor)
+            .filter(pk=models.OuterRef("track"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(tracks)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        tracks = music_models.Track.objects.playable_by(actor, include)
+        if include:
+            return self.filter(track__pk__in=tracks)
+        else:
+            return self.exclude(track__pk__in=tracks)
 
 
 class PlaylistTrack(models.Model):

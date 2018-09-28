@@ -5,8 +5,8 @@
     <div class="content">
       <div class="header">
         <div class="right floated">
-          <play-button :icon-only="true" class="ui inline" :button-classes="['ui', 'circular', 'large', {orange: playlist.tracks_count > 0}, 'icon', 'button', {disabled: playlist.tracks_count === 0}]" :playlist="playlist"></play-button>
-          <play-button class="basic inline icon" :dropdown-only="true" :dropdown-icon-classes="['ellipsis', 'vertical', 'large', {disabled: playlist.tracks_count === 0}, 'grey']" :playlist="playlist"></play-button>
+          <play-button :is-playable="playlist.is_playable" :icon-only="true" class="ui inline" :button-classes="['ui', 'circular', 'large', {orange: playlist.tracks_count > 0}, 'icon', 'button', {disabled: playlist.tracks_count === 0}]" :playlist="playlist"></play-button>
+          <play-button :is-playable="playlist.is_playable" class="basic inline icon" :dropdown-only="true" :dropdown-icon-classes="['ellipsis', 'vertical', 'large', {disabled: playlist.tracks_count === 0}, 'grey']" :playlist="playlist"></play-button>
         </div>
         <router-link :title="playlist.name" class="discrete link" :to="{name: 'library.playlists.detail', params: {id: playlist.id }}">
           {{ playlist.name | truncate(30) }}
