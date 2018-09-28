@@ -76,7 +76,7 @@ def test_can_get_choices_for_custom_radio(factories):
     session = factories["radios.CustomRadioSession"](
         custom_radio__config=[{"type": "artist", "ids": [artist.pk]}]
     )
-    choices = session.radio.get_choices()
+    choices = session.radio.get_choices(filter_playable=False)
 
     expected = [t.pk for t in tracks]
     assert list(choices.values_list("id", flat=True)) == expected
@@ -94,19 +94,19 @@ def test_cannot_start_custom_radio_if_not_owner_or_not_public(factories):
     assert message in serializer.errors["non_field_errors"]
 
 
-def test_can_start_custom_radio_from_api(logged_in_client, factories):
+def test_can_start_custom_radio_from_api(logged_in_api_client, factories):
     artist = factories["music.Artist"]()
     radio = factories["radios.Radio"](
-        config=[{"type": "artist", "ids": [artist.pk]}], user=logged_in_client.user
+        config=[{"type": "artist", "ids": [artist.pk]}], user=logged_in_api_client.user
     )
     url = reverse("api:v1:radios:sessions-list")
-    response = logged_in_client.post(
+    response = logged_in_api_client.post(
         url, {"radio_type": "custom", "custom_radio": radio.pk}
     )
     assert response.status_code == 201
     session = radio.sessions.latest("id")
     assert session.radio_type == "custom"
-    assert session.user == logged_in_client.user
+    assert session.user == logged_in_api_client.user
 
 
 def test_can_use_radio_session_to_filter_choices(factories):
@@ -116,7 +116,7 @@ def test_can_use_radio_session_to_filter_choices(factories):
     session = radio.start_session(user)
 
     for i in range(10):
-        radio.pick()
+        radio.pick(filter_playable=False)
 
     # ensure 10 differents tracks have been suggested
     tracks_id = [
@@ -134,30 +134,34 @@ def test_can_restore_radio_from_previous_session(factories):
     assert radio.session == restarted_radio.session
 
 
-def test_can_start_radio_for_logged_in_user(logged_in_client):
+def test_can_start_radio_for_logged_in_user(logged_in_api_client):
     url = reverse("api:v1:radios:sessions-list")
-    logged_in_client.post(url, {"radio_type": "random"})
+    logged_in_api_client.post(url, {"radio_type": "random"})
     session = models.RadioSession.objects.latest("id")
     assert session.radio_type == "random"
-    assert session.user == logged_in_client.user
+    assert session.user == logged_in_api_client.user
 
 
-def test_can_get_track_for_session_from_api(factories, logged_in_client):
-    files = factories["music.Upload"].create_batch(1)
-    tracks = [f.track for f in files]
+def test_can_get_track_for_session_from_api(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    track = factories["music.Upload"](
+        library__actor=actor, import_status="finished"
+    ).track
     url = reverse("api:v1:radios:sessions-list")
-    response = logged_in_client.post(url, {"radio_type": "random"})
+    response = logged_in_api_client.post(url, {"radio_type": "random"})
     session = models.RadioSession.objects.latest("id")
 
     url = reverse("api:v1:radios:tracks-list")
-    response = logged_in_client.post(url, {"session": session.pk})
+    response = logged_in_api_client.post(url, {"session": session.pk})
     data = json.loads(response.content.decode("utf-8"))
 
-    assert data["track"]["id"] == tracks[0].id
+    assert data["track"]["id"] == track.pk
     assert data["position"] == 1
 
-    next_track = factories["music.Upload"]().track
-    response = logged_in_client.post(url, {"session": session.pk})
+    next_track = factories["music.Upload"](
+        library__actor=actor, import_status="finished"
+    ).track
+    response = logged_in_api_client.post(url, {"session": session.pk})
     data = json.loads(response.content.decode("utf-8"))
 
     assert data["track"]["id"] == next_track.id
@@ -188,7 +192,7 @@ def test_can_start_artist_radio(factories):
     session = radio.start_session(user, related_object=artist)
     assert session.radio_type == "artist"
     for i in range(5):
-        assert radio.pick() in good_tracks
+        assert radio.pick(filter_playable=False) in good_tracks
 
 
 def test_can_start_tag_radio(factories):
@@ -202,7 +206,7 @@ def test_can_start_tag_radio(factories):
     session = radio.start_session(user, related_object=tag)
     assert session.radio_type == "tag"
     for i in range(5):
-        assert radio.pick() in good_tracks
+        assert radio.pick(filter_playable=False) in good_tracks
 
 
 def test_can_start_artist_radio_from_api(logged_in_api_client, preferences, factories):
@@ -232,4 +236,4 @@ def test_can_start_less_listened_radio(factories):
     radio.start_session(user)
 
     for i in range(5):
-        assert radio.pick() in good_tracks
+        assert radio.pick(filter_playable=False) in good_tracks

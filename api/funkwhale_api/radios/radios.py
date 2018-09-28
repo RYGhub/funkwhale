@@ -54,6 +54,8 @@ class SessionRadio(SimpleRadio):
         queryset = self.get_queryset(**kwargs)
         if self.session:
             queryset = self.filter_from_session(queryset)
+            if kwargs.pop("filter_playable", True):
+                queryset = queryset.playable_by(self.session.user.actor)
         return queryset
 
     def filter_from_session(self, queryset):

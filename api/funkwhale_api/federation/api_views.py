@@ -94,7 +94,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = (
         music_models.Library.objects.all()
         .order_by("-creation_date")
-        .select_related("actor")
+        .select_related("actor__user")
         .annotate(_uploads_count=Count("uploads"))
     )
     serializer_class = api_serializers.LibrarySerializer
@@ -107,7 +107,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     @decorators.detail_route(methods=["post"])
     def scan(self, request, *args, **kwargs):
         library = self.get_object()
-        if library.actor.is_local:
+        if library.actor.get_user():
             return response.Response({"status": "skipped"}, 200)
 
         scan = library.schedule_scan(actor=request.user.actor)

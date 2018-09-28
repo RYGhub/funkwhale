@@ -576,7 +576,7 @@ TRACK_FILE_IMPORT_STATUS_CHOICES = (
 
 
 def get_file_path(instance, filename):
-    if instance.library.actor.is_local:
+    if instance.library.actor.get_user():
         return common_utils.ChunkedPath("tracks")(instance, filename)
     else:
         # we cache remote tracks in a different directory
@@ -725,7 +725,7 @@ class Upload(models.Model):
                 self.mimetype = mimetypes.guess_type(self.source)[0]
         if not self.size and self.audio_file:
             self.size = self.audio_file.size
-        if not self.pk and not self.fid and self.library.actor.is_local:
+        if not self.pk and not self.fid and self.library.actor.get_user():
             self.fid = self.get_federation_id()
         return super().save(**kwargs)
 
@@ -908,7 +908,7 @@ class Library(federation_models.FederationMixin):
     def should_autoapprove_follow(self, actor):
         if self.privacy_level == "everyone":
             return True
-        if self.privacy_level == "instance" and actor.is_local:
+        if self.privacy_level == "instance" and actor.get_user():
             return True
         return False
 
