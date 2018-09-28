@@ -1,6 +1,6 @@
 from django import forms
 from django.core import paginator
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework import exceptions, mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
@@ -8,16 +8,7 @@ from rest_framework.decorators import detail_route, list_route
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
 
-from . import (
-    activity,
-    actors,
-    authentication,
-    models,
-    renderers,
-    serializers,
-    utils,
-    webfinger,
-)
+from . import activity, authentication, models, renderers, serializers, utils, webfinger
 
 
 class FederationMixin(object):
@@ -78,47 +69,6 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
         return response.Response({})
 
 
-class InstanceActorViewSet(FederationMixin, viewsets.GenericViewSet):
-    lookup_field = "actor"
-    lookup_value_regex = "[a-z]*"
-    authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
-
-    def get_object(self):
-        try:
-            return actors.SYSTEM_ACTORS[self.kwargs["actor"]]
-        except KeyError:
-            raise Http404
-
-    def retrieve(self, request, *args, **kwargs):
-        system_actor = self.get_object()
-        actor = system_actor.get_actor_instance()
-        data = actor.system_conf.serialize()
-        return response.Response(data, status=200)
-
-    @detail_route(methods=["get", "post"])
-    def inbox(self, request, *args, **kwargs):
-        system_actor = self.get_object()
-        handler = getattr(system_actor, "{}_inbox".format(request.method.lower()))
-
-        try:
-            handler(request.data, actor=request.actor)
-        except NotImplementedError:
-            return response.Response(status=405)
-        return response.Response({}, status=200)
-
-    @detail_route(methods=["get", "post"])
-    def outbox(self, request, *args, **kwargs):
-        system_actor = self.get_object()
-        handler = getattr(system_actor, "{}_outbox".format(request.method.lower()))
-        try:
-            handler(request.data, actor=request.actor)
-        except NotImplementedError:
-            return response.Response(status=405)
-        return response.Response({}, status=200)
-
-
 class WellKnownViewSet(viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []
@@ -160,13 +110,10 @@ class WellKnownViewSet(viewsets.GenericViewSet):
     def handler_acct(self, clean_result):
         username, hostname = clean_result
 
-        if username in actors.SYSTEM_ACTORS:
-            actor = actors.SYSTEM_ACTORS[username].get_actor_instance()
-        else:
-            try:
-                actor = models.Actor.objects.local().get(preferred_username=username)
-            except models.Actor.DoesNotExist:
-                raise forms.ValidationError("Invalid username")
+        try:
+            actor = models.Actor.objects.local().get(preferred_username=username)
+        except models.Actor.DoesNotExist:
+            raise forms.ValidationError("Invalid username")
 
         return serializers.ActorWebfingerSerializer(actor).data
 

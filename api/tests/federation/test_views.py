@@ -2,20 +2,7 @@ import pytest
 from django.core.paginator import Paginator
 from django.urls import reverse
 
-from funkwhale_api.federation import actors, serializers, webfinger
-
-
-@pytest.mark.parametrize("system_actor", actors.SYSTEM_ACTORS.keys())
-def test_instance_actors(system_actor, db, api_client):
-    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
-    url = reverse("federation:instance-actors-detail", kwargs={"actor": system_actor})
-    response = api_client.get(url)
-    serializer = serializers.ActorSerializer(actor)
-
-    if system_actor == "library":
-        response.data.pop("url")
-    assert response.status_code == 200
-    assert response.data == serializer.data
+from funkwhale_api.federation import serializers, webfinger
 
 
 def test_wellknown_webfinger_validates_resource(db, api_client, settings, mocker):
@@ -27,22 +14,6 @@ def test_wellknown_webfinger_validates_resource(db, api_client, settings, mocker
     assert url == "/.well-known/webfinger"
     assert response.status_code == 400
     assert response.data["errors"]["resource"] == ("Missing webfinger resource type")
-
-
-@pytest.mark.parametrize("system_actor", actors.SYSTEM_ACTORS.keys())
-def test_wellknown_webfinger_system(system_actor, db, api_client, settings, mocker):
-    actor = actors.SYSTEM_ACTORS[system_actor].get_actor_instance()
-    url = reverse("federation:well-known-webfinger")
-    response = api_client.get(
-        url,
-        data={"resource": "acct:{}".format(actor.webfinger_subject)},
-        HTTP_ACCEPT="application/jrd+json",
-    )
-    serializer = serializers.ActorWebfingerSerializer(actor)
-
-    assert response.status_code == 200
-    assert response["Content-Type"] == "application/jrd+json"
-    assert response.data == serializer.data
 
 
 def test_wellknown_nodeinfo(db, preferences, api_client, settings):
