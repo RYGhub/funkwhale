@@ -21,7 +21,7 @@
           </div>
         </h2>
         <div class="ui hidden divider"></div>
-        <play-button class="orange" :tracks="tracks"><translate>Play all</translate></play-button>
+        <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate>Play all</translate></play-button>
         <button
           class="ui icon button"
           v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id"

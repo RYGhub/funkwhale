@@ -10,18 +10,16 @@ from . import models
 
 
 class PlaylistTrackSerializer(serializers.ModelSerializer):
-    track = TrackSerializer()
-    is_playable = serializers.SerializerMethodField()
+    # track = TrackSerializer()
+    track = serializers.SerializerMethodField()
 
     class Meta:
         model = models.PlaylistTrack
-        fields = ("id", "track", "playlist", "index", "creation_date", "is_playable")
+        fields = ("id", "track", "playlist", "index", "creation_date")
 
-    def get_is_playable(self, obj):
-        try:
-            return bool(obj.is_playable_by_actor)
-        except AttributeError:
-            return None
+    def get_track(self, o):
+        track = o._prefetched_track if hasattr(o, "_prefetched_track") else o.track
+        return TrackSerializer(track).data
 
 
 class PlaylistTrackWriteSerializer(serializers.ModelSerializer):

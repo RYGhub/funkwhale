@@ -306,7 +306,7 @@ html, body {
     left: 350px;
     right: 0px;
     top: 0px;
-    z-index: 2000;
+    z-index: 99;
   }
   background-color: white;
   .item {
