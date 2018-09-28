@@ -147,14 +147,10 @@ class Playlist(models.Model):
 
 
 class PlaylistTrackQuerySet(models.QuerySet):
-    def for_nested_serialization(self):
-        return (
-            self.select_related()
-            .select_related("track__album__artist")
-            .prefetch_related(
-                "track__tags", "track__uploads", "track__artist__albums__tracks__tags"
-            )
-        )
+    def for_nested_serialization(self, actor=None):
+        tracks = music_models.Track.objects.annotate_playable_by_actor(actor)
+        tracks = tracks.select_related("artist", "album__artist")
+        return self.prefetch_related(models.Prefetch("track", queryset=tracks, to_attr='_prefetched_track'))
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
