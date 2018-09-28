@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
