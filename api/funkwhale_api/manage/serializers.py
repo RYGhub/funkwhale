@@ -1,10 +1,9 @@
 from django.db import transaction
-from django.utils import timezone
+
 from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import models as music_models
-from funkwhale_api.requests import models as requests_models
 from funkwhale_api.users import models as users_models
 
 from . import filters
@@ -169,69 +168,3 @@ class ManageInvitationActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
-
-
-class ManageImportRequestSerializer(serializers.ModelSerializer):
-    user = ManageUserSimpleSerializer(required=False)
-
-    class Meta:
-        model = requests_models.ImportRequest
-        fields = [
-            "id",
-            "status",
-            "creation_date",
-            "imported_date",
-            "user",
-            "albums",
-            "artist_name",
-            "comment",
-        ]
-        read_only_fields = [
-            "id",
-            "status",
-            "creation_date",
-            "imported_date",
-            "user",
-            "albums",
-            "artist_name",
-            "comment",
-        ]
-
-    def validate_code(self, value):
-        if not value:
-            return value
-        if users_models.Invitation.objects.filter(code__iexact=value).exists():
-            raise serializers.ValidationError(
-                "An invitation with this code already exists"
-            )
-        return value
-
-
-class ManageImportRequestActionSerializer(common_serializers.ActionSerializer):
-    actions = [
-        common_serializers.Action(
-            "mark_closed",
-            allow_all=True,
-            qs_filter=lambda qs: qs.filter(status__in=["pending", "accepted"]),
-        ),
-        common_serializers.Action(
-            "mark_imported",
-            allow_all=True,
-            qs_filter=lambda qs: qs.filter(status__in=["pending", "accepted"]),
-        ),
-        common_serializers.Action("delete", allow_all=False),
-    ]
-    filterset_class = filters.ManageImportRequestFilterSet
-
-    @transaction.atomic
-    def handle_delete(self, objects):
-        return objects.delete()
-
-    @transaction.atomic
-    def handle_mark_closed(self, objects):
-        return objects.update(status="closed")
-
-    @transaction.atomic
-    def handle_mark_imported(self, objects):
-        now = timezone.now()
-        return objects.update(status="imported", imported_date=now)
