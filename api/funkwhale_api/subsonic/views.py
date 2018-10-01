@@ -19,7 +19,9 @@ from funkwhale_api.playlists import models as playlists_models
 from . import authentication, filters, negotiation, serializers
 
 
-def find_object(queryset, model_field="pk", field="id", cast=int):
+def find_object(
+    queryset, model_field="pk", field="id", cast=int, filter_playable=False
+):
     def decorator(func):
         def inner(self, request, *args, **kwargs):
             data = request.GET or request.POST
@@ -50,6 +52,11 @@ def find_object(queryset, model_field="pk", field="id", cast=int):
             qs = queryset
             if hasattr(qs, "__call__"):
                 qs = qs(request)
+
+            if filter_playable:
+                actor = utils.get_actor_from_request(request)
+                qs = qs.playable_by(actor).distinct()
+
             try:
                 obj = qs.get(**{model_field: value})
             except qs.model.DoesNotExist:
@@ -124,7 +131,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
     @list_route(methods=["get", "post"], url_name="get_artists", url_path="getArtists")
     def get_artists(self, request, *args, **kwargs):
-        artists = music_models.Artist.objects.all()
+        artists = music_models.Artist.objects.all().playable_by(
+            utils.get_actor_from_request(request)
+        )
         data = serializers.GetArtistsSerializer(artists).data
         payload = {"artists": data}
 
@@ -132,14 +141,16 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
     @list_route(methods=["get", "post"], url_name="get_indexes", url_path="getIndexes")
     def get_indexes(self, request, *args, **kwargs):
-        artists = music_models.Artist.objects.all()
+        artists = music_models.Artist.objects.all().playable_by(
+            utils.get_actor_from_request(request)
+        )
         data = serializers.GetArtistsSerializer(artists).data
         payload = {"indexes": data}
 
         return response.Response(payload, status=200)
 
     @list_route(methods=["get", "post"], url_name="get_artist", url_path="getArtist")
-    @find_object(music_models.Artist.objects.all())
+    @find_object(music_models.Artist.objects.all(), filter_playable=True)
     def get_artist(self, request, *args, **kwargs):
         artist = kwargs.pop("obj")
         data = serializers.GetArtistSerializer(artist).data
@@ -148,7 +159,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         return response.Response(payload, status=200)
 
     @list_route(methods=["get", "post"], url_name="get_song", url_path="getSong")
-    @find_object(music_models.Track.objects.all())
+    @find_object(music_models.Track.objects.all(), filter_playable=True)
     def get_song(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
         data = serializers.GetSongSerializer(track).data
@@ -159,14 +170,16 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     @list_route(
         methods=["get", "post"], url_name="get_artist_info2", url_path="getArtistInfo2"
     )
-    @find_object(music_models.Artist.objects.all())
+    @find_object(music_models.Artist.objects.all(), filter_playable=True)
     def get_artist_info2(self, request, *args, **kwargs):
         payload = {"artist-info2": {}}
 
         return response.Response(payload, status=200)
 
     @list_route(methods=["get", "post"], url_name="get_album", url_path="getAlbum")
-    @find_object(music_models.Album.objects.select_related("artist"))
+    @find_object(
+        music_models.Album.objects.select_related("artist"), filter_playable=True
+    )
     def get_album(self, request, *args, **kwargs):
         album = kwargs.pop("obj")
         data = serializers.GetAlbumSerializer(album).data
@@ -174,7 +187,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         return response.Response(payload, status=200)
 
     @list_route(methods=["get", "post"], url_name="stream", url_path="stream")
-    @find_object(music_models.Track.objects.all())
+    @find_object(music_models.Track.objects.all(), filter_playable=True)
     def stream(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
         queryset = track.uploads.select_related("track__album__artist", "track__artist")
@@ -221,6 +234,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = request.GET or request.POST
         filterset = filters.AlbumList2FilterSet(data, queryset=queryset)
         queryset = filterset.qs
+        actor = utils.get_actor_from_request(request)
+        queryset = queryset.playable_by(actor)
+
         try:
             offset = int(data["offset"])
         except (TypeError, KeyError, ValueError):
@@ -240,6 +256,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     def search3(self, request, *args, **kwargs):
         data = request.GET or request.POST
         query = str(data.get("query", "")).replace("*", "")
+        actor = utils.get_actor_from_request(request)
         conf = [
             {
                 "subsonic": "artist",
@@ -292,6 +309,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 queryset = c["queryset"].filter(
                     utils.get_query(query, c["search_fields"])
                 )
+            queryset = queryset.playable_by(actor)
             queryset = queryset[offset : offset + size]
             payload["searchResult3"][c["subsonic"]] = c["serializer"](queryset)
         return response.Response(payload)

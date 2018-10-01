@@ -14,11 +14,28 @@ SAMPLES_PATH = os.path.join(
 )
 
 
+def playable_factory(field):
+    @factory.post_generation
+    def inner(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            UploadFactory(
+                library__privacy_level="everyone",
+                import_status="finished",
+                **{field: self}
+            )
+
+    return inner
+
+
 @registry.register
 class ArtistFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
+    playable = playable_factory("track__album__artist")
 
     class Meta:
         model = "music.Artist"
@@ -33,6 +50,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
+    playable = playable_factory("track__album")
 
     class Meta:
         model = "music.Album"
@@ -47,6 +65,7 @@ class TrackFactory(factory.django.DjangoModelFactory):
     artist = factory.SelfAttribute("album.artist")
     position = 1
     tags = ManyToManyFromList("tags")
+    playable = playable_factory("track")
 
     class Meta:
         model = "music.Track"
@@ -71,6 +90,9 @@ class UploadFactory(factory.django.DjangoModelFactory):
 
     class Params:
         in_place = factory.Trait(audio_file=None)
+        playable = factory.Trait(
+            import_status="finished", library__privacy_level="everyone"
+        )
 
 
 @registry.register
