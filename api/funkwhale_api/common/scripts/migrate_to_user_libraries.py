@@ -71,7 +71,15 @@ def update_uploads(libraries_by_user, stdout):
 
 def update_orphan_uploads(open_api, stdout):
     privacy_level = "everyone" if open_api else "instance"
-    first_superuser = User.objects.filter(is_superuser=True).order_by("pk").first()
+    first_superuser = (
+        User.objects.filter(is_superuser=True)
+        .exclude(actor=None)
+        .order_by("pk")
+        .first()
+    )
+    if not first_superuser:
+        stdout.write("* No superuser found, skipping update orphan uploads")
+        return
     library, _ = models.Library.objects.get_or_create(
         name="default",
         actor=first_superuser.actor,

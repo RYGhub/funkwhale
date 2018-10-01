@@ -285,7 +285,7 @@ def create_actor(user):
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
 
-    return federation_models.Actor.objects.create(**args)
+    return federation_models.Actor.objects.create(user=user, **args)
 
 
 @receiver(ldap_populate_user)
