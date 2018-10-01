@@ -41,7 +41,7 @@ class APIModelMixin(models.Model):
     mbid = models.UUIDField(unique=True, db_index=True, null=True, blank=True)
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
     from_activity = models.ForeignKey(
-        "federation.Activity", null=True, on_delete=models.SET_NULL
+        "federation.Activity", null=True, blank=True, on_delete=models.SET_NULL
     )
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now)
