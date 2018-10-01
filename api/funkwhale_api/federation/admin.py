@@ -1,4 +1,4 @@
-from django.contrib import admin
+from funkwhale_api.common import admin
 
 from . import models
 from . import tasks
