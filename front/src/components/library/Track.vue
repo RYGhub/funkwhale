@@ -118,6 +118,14 @@
           </a>
         </template>
       </div>
+      <div class="ui vertical stripe segment">
+        <h2>
+          <translate>User libraries</translate>
+        </h2>
+        <library-widget :url="'tracks/' + id + '/libraries/'">
+          <translate slot="subtitle">This track is present in the following libraries:</translate>
+        </library-widget>
+      </div>
     </template>
   </div>
 </template>
@@ -131,6 +139,7 @@ import logger from '@/logging'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
+import LibraryWidget from '@/components/federation/LibraryWidget'
 
 const FETCH_URL = 'tracks/'
 
@@ -139,7 +148,8 @@ export default {
   components: {
     PlayButton,
     TrackPlaylistIcon,
-    TrackFavoriteIcon
+    TrackFavoriteIcon,
+    LibraryWidget
   },
   data () {
     return {

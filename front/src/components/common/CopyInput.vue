@@ -4,7 +4,7 @@
       <translate>Text copied to clipboard!</translate>
     </p>
     <input ref="input" :value="value" type="text">
-    <button @click="copy" class="ui teal right labeled icon button">
+    <button @click="copy" :class="['ui', buttonClasses, 'right', 'labeled', 'icon', 'button']">
       <i class="copy icon"></i>
       <translate>Copy</translate>
     </button>
@@ -12,7 +12,10 @@
 </template>
 <script>
 export default {
-  props: ['value'],
+  props: {
+    value: {type: String},
+    buttonClasses: {type: String, default: 'teal'}
+  },
   data () {
     return {
       copied: false,

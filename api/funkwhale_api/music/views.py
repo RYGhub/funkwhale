@@ -3,7 +3,7 @@ import urllib
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Prefetch, Sum, F
+from django.db.models import Count, Prefetch, Sum, F, Q
 from django.db.models.functions import Length
 from django.utils import timezone
 
@@ -24,6 +24,28 @@ from funkwhale_api.federation import routes
 from . import filters, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
+
+
+def get_libraries(filter_uploads):
+    def view(self, request, *args, **kwargs):
+        obj = self.get_object()
+        actor = utils.get_actor_from_request(request)
+        uploads = models.Upload.objects.all()
+        uploads = filter_uploads(obj, uploads)
+        uploads = uploads.playable_by(actor)
+        libraries = models.Library.objects.filter(
+            pk__in=uploads.values_list("library", flat=True)
+        )
+        libraries = libraries.select_related("actor")
+        page = self.paginate_queryset(libraries)
+        if page is not None:
+            serializer = federation_api_serializers.LibrarySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = federation_api_serializers.LibrarySerializer(libraries, many=True)
+        return Response(serializer.data)
+
+    return view
 
 
 class TagViewSetMixin(object):
@@ -50,6 +72,14 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return queryset.prefetch_related(Prefetch("albums", queryset=albums)).distinct()
 
+    libraries = detail_route(methods=["get"])(
+        get_libraries(
+            filter_uploads=lambda o, uploads: uploads.filter(
+                Q(track__artist=o) | Q(track__album__artist=o)
+            )
+        )
+    )
+
 
 class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
@@ -75,6 +105,10 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
             tracks = tracks.annotate_duration()
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs.distinct()
+
+    libraries = detail_route(methods=["get"])(
+        get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
+    )
 
 
 class LibraryViewSet(
@@ -196,6 +230,10 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
             return Response({"error": "unavailable lyrics"}, status=404)
         serializer = serializers.LyricsSerializer(lyrics)
         return Response(serializer.data)
+
+    libraries = detail_route(methods=["get"])(
+        get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
+    )
 
 
 def get_file_path(audio_file):

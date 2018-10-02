@@ -26,7 +26,7 @@
         <i class="music icon"></i>
         <translate :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } tracks</translate>
       </div>
-      <div v-if="latestScan" class="meta">
+      <div v-if="displayScan && latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
           <i class="hourglass icon"></i>
           <translate>Scan pending</translate>
@@ -59,7 +59,7 @@
           <translate>Errored tracks:</translate> {{ latestScan.errored_files }}
         </div>
       </div>
-      <div v-if="canLaunchScan" class="clearfix">
+      <div v-if="displayScan && canLaunchScan" class="clearfix">
         <span class="right floated link" @click="launchScan">
           <translate>Launch scan</translate> <i class="paper plane icon" />
         </span>
@@ -68,7 +68,15 @@
     <div class="extra content">
       <actor-link :actor="library.actor" />
     </div>
-    <div class="ui bottom attached buttons">
+    <div v-if="displayCopyFid" class="extra content">
+      <div class="ui form">
+        <div class="field">
+          <label><translate>Sharing link</translate></label>
+          <copy-input :button-classes="'basic'" :value="library.fid" />
+        </div>
+      </div>
+    </div>
+    <div v-if="displayFollow" class="ui bottom attached buttons">
       <button
         v-if="!library.follow"
         @click="follow()"
@@ -104,7 +112,12 @@
 import axios from 'axios'
 
 export default {
-  props: ['library'],
+  props: {
+    library: {type: Object, required: true},
+    displayFollow: {type: Boolean, default: true},
+    displayScan: {type: Boolean, default: true},
+    displayCopyFid: {type: Boolean, default: false},
+  },
   data () {
     return {
       isLoadingFollow: false,
