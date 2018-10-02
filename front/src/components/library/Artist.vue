@@ -56,6 +56,14 @@
         </h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </div>
+      <div class="ui vertical stripe segment">
+        <h2>
+          <translate>User libraries</translate>
+        </h2>
+        <library-widget :url="'artists/' + id + '/libraries/'">
+          <translate slot="subtitle">This artist is present in the following libraries:</translate>
+        </library-widget>
+      </div>
     </template>
   </div>
 </template>
@@ -69,6 +77,7 @@ import AlbumCard from '@/components/audio/album/Card'
 import RadioButton from '@/components/radios/Button'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackTable from '@/components/audio/track/Table'
+import LibraryWidget from '@/components/federation/LibraryWidget'
 
 export default {
   props: ['id'],
@@ -76,7 +85,8 @@ export default {
     AlbumCard,
     RadioButton,
     PlayButton,
-    TrackTable
+    TrackTable,
+    LibraryWidget
   },
   data () {
     return {

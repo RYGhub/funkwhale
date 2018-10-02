@@ -449,3 +449,34 @@ def test_user_can_list_own_library_follows(factories, logged_in_api_client):
         "previous": None,
         "results": [federation_api_serializers.LibraryFollowSerializer(follow).data],
     }
+
+
+@pytest.mark.parametrize("entity", ["artist", "album", "track"])
+def test_can_get_libraries_for_music_entities(
+    factories, api_client, entity, preferences
+):
+    preferences["common__api_authentication_required"] = False
+    upload = factories["music.Upload"](playable=True)
+    # another private library that should not appear
+    factories["music.Upload"](
+        import_status="finished", library__privacy_level="me", track=upload.track
+    ).library
+    library = upload.library
+    data = {
+        "artist": upload.track.artist,
+        "album": upload.track.album,
+        "track": upload.track,
+    }
+
+    url = reverse("api:v1:{}s-libraries".format(entity), kwargs={"pk": data[entity].pk})
+
+    response = api_client.get(url)
+    expected = federation_api_serializers.LibrarySerializer(library).data
+
+    assert response.status_code == 200
+    assert response.data == {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [expected],
+    }

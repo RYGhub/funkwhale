@@ -31,12 +31,6 @@ import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
-import FederationBase from '@/views/federation/Base'
-import FederationScan from '@/views/federation/Scan'
-import FederationLibraryDetail from '@/views/federation/LibraryDetail'
-import FederationLibraryList from '@/views/federation/LibraryList'
-import FederationTrackList from '@/views/federation/LibraryTrackList'
-import FederationFollowersList from '@/views/federation/LibraryFollowersList'
 import ContentBase from '@/views/content/Base'
 import ContentHome from '@/views/content/Home'
 import LibrariesHome from '@/views/content/libraries/Home'
@@ -202,50 +196,6 @@ export default new Router({
       path: '/manage/settings',
       name: 'manage.settings',
       component: AdminSettings
-    },
-    {
-      path: '/manage/federation',
-      component: FederationBase,
-      children: [
-        {
-          path: 'scan',
-          name: 'federation.libraries.scan',
-          component: FederationScan },
-        {
-          path: 'libraries',
-          name: 'federation.libraries.list',
-          component: FederationLibraryList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        {
-          path: 'tracks',
-          name: 'federation.tracks.list',
-          component: FederationTrackList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        {
-          path: 'followers',
-          name: 'federation.followers.list',
-          component: FederationFollowersList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        { path: 'libraries/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
-      ]
     },
     {
       path: '/manage/library',
