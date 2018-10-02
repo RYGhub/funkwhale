@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-24 18:57+0200\n"
+"POT-Creation-Date: 2018-10-02 19:55+0200\n"
 "PO-Revision-Date: 2018-09-22 11:45+0000\n"
 "Last-Translator: Gregory <gs@grse.me>\n"
 "Language-Team: none\n"
@@ -37,8 +37,8 @@ msgid_plural "%{ count } on %{ total } selected"
 msgstr[0] "%{ count } von %{ total } ausgewählt"
 msgstr[1] "%{ count } von %{ total } ausgewählt"
 
-#: front/src/components/Sidebar.vue:107
-#: src/views/federation/LibraryDetail.vue:87
+#: front/src/components/Sidebar.vue:106 src/components/audio/album/Card.vue:54
+#: front/src/views/content/libraries/Card.vue:39
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
 msgstr[0] "%{ count } Track"
@@ -55,6 +55,13 @@ msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } Track entspricht dem ausgewählten Filter"
 msgstr[1] "%{ count } Tracks entspricht dem ausgewählten Filter"
+
+#: front/src/views/content/remote/Card.vue:26
+#, fuzzy
+msgid "%{ count } tracks"
+msgid_plural "%{ count } tracks"
+msgstr[0] "%{ count } Track"
+msgstr[1] "%{ count } Tracks"
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
@@ -95,26 +102,11 @@ msgid_plural "%{ count } favorites"
 msgstr[0] "1 Favorit"
 msgstr[1] "%{ count } Favoriten"
 
-#: front/src/components/audio/album/Card.vue:54
-#: front/src/components/federation/LibraryCard.vue:25
-msgid "1 track"
-msgid_plural "%{ count } tracks"
-msgstr[0] "1 Track"
-msgstr[1] "%{ count } Tracks"
-
-#: front/src/views/content/libraries/Card.vue:39
-#: src/views/content/remote/Card.vue:26
-#, fuzzy
-msgid "1 tracks"
-msgid_plural "%{ count } tracks"
-msgstr[0] "1 Track"
-msgstr[1] "%{ count } Tracks"
-
 #: front/src/components/About.vue:5
 msgid "About %{ instance }"
 msgstr "Über %{ instance }"
 
-#: front/src/App.vue:56
+#: front/src/App.vue:53
 msgid "About Funkwhale"
 msgstr "Über Funkwhale"
 
@@ -165,7 +157,6 @@ msgstr[0] "Die Aktion %{ action } wurde erfolgreich für %{ count } Element gest
 msgstr[1] "Die Aktion %{ action } wurde erfolgreich für %{ count } Elemente gestartet"
 
 #: front/src/components/common/ActionTable.vue:8
-#: front/src/components/federation/LibraryFollowTable.vue:24
 #: front/src/components/library/radios/Builder.vue:64
 #: front/src/components/manage/library/RequestsTable.vue:54
 msgid "Actions"
@@ -175,19 +166,11 @@ msgstr "Aktionen"
 msgid "Active"
 msgstr "Aktiv"
 
-#: front/src/components/Sidebar.vue:75
+#: front/src/components/Sidebar.vue:74
 msgid "Activity"
 msgstr "Aktivität"
 
-#: front/src/components/federation/LibraryFollowTable.vue:21
-msgid "Actor"
-msgstr "Aktor"
-
-#: front/src/views/federation/LibraryList.vue:8
-msgid "Add a new library"
-msgstr "Eine neue Mediathek hinzufügen"
-
-#: front/src/components/Sidebar.vue:78 src/views/content/Base.vue:19
+#: front/src/components/Sidebar.vue:77 src/views/content/Base.vue:19
 msgid "Add content"
 msgstr ""
 
@@ -221,15 +204,14 @@ msgstr "Track hinzufügen"
 msgid "Admin"
 msgstr "Admin"
 
-#: front/src/components/Sidebar.vue:82
+#: front/src/components/Sidebar.vue:81
 msgid "Administration"
 msgstr "Administration"
 
 #: front/src/components/audio/track/Table.vue:8
-#: front/src/components/federation/LibraryTrackTable.vue:49
 #: front/src/components/manage/library/FilesTable.vue:39
 #: front/src/views/content/libraries/FilesTable.vue:53
-#: front/src/components/library/Album.vue:91
+#: front/src/components/library/Album.vue:101
 #: src/components/audio/SearchBar.vue:26
 #: front/src/components/metadata/Search.vue:134
 msgid "Album"
@@ -270,33 +252,15 @@ msgstr "Beim Speichern deiner Änderungen ist ein Fehler aufgetreten"
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
 msgstr "Ein unbekannter Fehler ist aufgetreten, vielleicht ist der Server ausgeschaltet oder er kann nicht erreicht werden"
 
-#: front/src/components/federation/LibraryTrackTable.vue:11
-msgid "Any"
-msgstr "Alle"
-
-#: front/src/components/federation/LibraryFollowTable.vue:68
-#: front/src/components/federation/LibraryFollowTable.vue:78
-msgid "Approve"
-msgstr "Bestätigen"
-
-#: front/src/components/federation/LibraryFollowTable.vue:70
-msgid "Approve access?"
-msgstr "Zugriff bestätigen?"
-
-#: front/src/components/federation/LibraryFollowTable.vue:38
-msgid "Approved"
-msgstr "Bestätigt"
-
 #: front/src/components/auth/Logout.vue:5
 msgid "Are you sure you want to log out?"
 msgstr "Möchtest du dich wirklich ausloggen?"
 
 #: front/src/components/audio/track/Table.vue:7
-#: front/src/components/federation/LibraryTrackTable.vue:48
 #: front/src/components/manage/library/FilesTable.vue:38
 #: front/src/components/manage/library/RequestsTable.vue:49
 #: front/src/views/content/libraries/FilesTable.vue:52
-#: front/src/components/library/Artist.vue:119
+#: front/src/components/library/Artist.vue:129
 #: src/components/audio/SearchBar.vue:25
 #: front/src/components/metadata/Search.vue:130
 msgid "Artist"
@@ -319,25 +283,19 @@ msgid "Artists"
 msgstr "Künstler und Künstlerinnen"
 
 #: front/src/components/favorites/List.vue:33
-#: front/src/components/federation/LibraryTrackTable.vue:28
-#: front/src/components/library/Artists.vue:25
-#: src/components/library/Radios.vue:44
+#: src/components/library/Artists.vue:25
+#: front/src/components/library/Radios.vue:44
 #: front/src/components/manage/library/FilesTable.vue:19
 #: front/src/components/manage/library/RequestsTable.vue:19
 #: front/src/components/manage/users/UsersTable.vue:19
 #: front/src/views/content/libraries/FilesTable.vue:31
-#: front/src/views/federation/LibraryList.vue:28
-#: src/views/playlists/List.vue:27
+#: front/src/views/playlists/List.vue:27
 msgid "Ascending"
 msgstr "Zunehmend"
 
 #: front/src/views/auth/PasswordReset.vue:27
 msgid "Ask for a password reset"
 msgstr "Eine Kennwortzurücksetzung beantragen"
-
-#: front/src/views/federation/LibraryDetail.vue:56
-msgid "Auto importing"
-msgstr "Automatischer Import"
 
 #: front/src/components/playlists/PlaylistModal.vue:26
 msgid "Available playlists"
@@ -352,10 +310,6 @@ msgstr "Avatar"
 msgid "Back to login"
 msgstr "Zurück zur Anmeldung"
 
-#: front/src/views/federation/LibraryFollowersList.vue:5
-msgid "Be careful when accepting follow requests, as it means the follower will have access to your entire library."
-msgstr "Vorsicht beim Akzeptieren von Follow-Anfragen: Deine Follower haben Zugriff auf deine gesamte Mediathek."
-
 #: front/src/components/library/Track.vue:80
 #: front/src/components/manage/library/FilesTable.vue:42
 msgid "Bitrate"
@@ -365,25 +319,13 @@ msgstr "Bitrate"
 msgid "Browse"
 msgstr "Durchsuchen"
 
-#: front/src/components/Sidebar.vue:65
+#: front/src/components/Sidebar.vue:64
 msgid "Browse library"
 msgstr "Die Mediathek durchsuchen"
 
 #: front/src/components/library/Artists.vue:4
 msgid "Browsing artists"
 msgstr "Künstler·innen durchsuchen"
-
-#: front/src/views/federation/LibraryTrackList.vue:3
-msgid "Browsing federated tracks"
-msgstr "Föderierte Tracks durchsuchen"
-
-#: front/src/views/federation/LibraryFollowersList.vue:3
-msgid "Browsing followers"
-msgstr "Follower und Followerinnen durchsuchen"
-
-#: front/src/views/federation/LibraryList.vue:3
-msgid "Browsing libraries"
-msgstr "Mediatheke durchsuchen"
 
 #: front/src/views/playlists/List.vue:3
 msgid "Browsing playlists"
@@ -401,13 +343,9 @@ msgstr "Editor"
 msgid "By %{ artist }"
 msgstr "Von %{ artist }"
 
-#: front/src/components/federation/LibraryFollowTable.vue:57
-msgid "By confirming, %{ username } will be denied access to your library."
-msgstr "Beim Bestätigen wird der Zugriff auf deine Mediathek für %{ username } verhindert."
-
-#: front/src/components/federation/LibraryFollowTable.vue:73
-msgid "By confirming, %{ username } will be granted access to your library."
-msgstr "Beim Bestätigen wird %{ username } der Zugriff zu deiner Mediathek zugelassen."
+#: front/src/views/content/remote/Card.vue:103
+msgid "By unfollowing this library, you will loose access to its content."
+msgstr ""
 
 #: front/src/components/common/DangerousButton.vue:17
 #: front/src/components/library/radios/Filter.vue:53
@@ -423,7 +361,7 @@ msgstr "Kandidaten"
 msgid "Cannot change your password"
 msgstr "Das Kennwort kann nicht geändert werden"
 
-#: front/src/App.vue:68
+#: front/src/App.vue:65
 msgid "Change language"
 msgstr "Sprache ändern"
 
@@ -540,7 +478,7 @@ msgstr "Eine neue Playlist erstellen"
 msgid "Create a new playlist"
 msgstr "Eine neue Playlist erstellen"
 
-#: front/src/components/Sidebar.vue:57 src/components/auth/Login.vue:17
+#: front/src/components/Sidebar.vue:56 src/components/auth/Login.vue:17
 msgid "Create an account"
 msgstr "Konto erstellen"
 
@@ -566,7 +504,6 @@ msgstr "Eine Playlist erstellen"
 msgid "Create your own radio"
 msgstr "Dein eigenes Radio erstellen"
 
-#: front/src/components/federation/LibraryFollowTable.vue:22
 #: front/src/components/manage/library/RequestsTable.vue:52
 #: front/src/components/manage/users/InvitationsTable.vue:40
 msgid "Creation date"
@@ -621,25 +558,14 @@ msgstr "Radio löschen"
 msgid "Delete this library?"
 msgstr "Bring mich zur Mediathek"
 
-#: front/src/components/federation/LibraryFollowTable.vue:52
-#: front/src/components/federation/LibraryFollowTable.vue:63
-msgid "Deny"
-msgstr "Ablehnen"
-
-#: front/src/components/federation/LibraryFollowTable.vue:54
-msgid "Deny access?"
-msgstr "Zugriff ablehnen?"
-
 #: front/src/components/favorites/List.vue:34
-#: front/src/components/federation/LibraryTrackTable.vue:29
-#: front/src/components/library/Artists.vue:26
-#: src/components/library/Radios.vue:47
+#: src/components/library/Artists.vue:26
+#: front/src/components/library/Radios.vue:47
 #: front/src/components/manage/library/FilesTable.vue:20
 #: front/src/components/manage/library/RequestsTable.vue:20
 #: front/src/components/manage/users/UsersTable.vue:20
 #: front/src/views/content/libraries/FilesTable.vue:32
-#: front/src/views/federation/LibraryList.vue:29
-#: src/views/playlists/List.vue:28
+#: front/src/views/playlists/List.vue:28
 msgid "Descending"
 msgstr "Absteigend"
 
@@ -649,9 +575,13 @@ msgstr "Absteigend"
 msgid "Description"
 msgstr "Dauer"
 
-#: front/src/components/federation/LibraryCard.vue:50
 #: front/src/views/content/libraries/Card.vue:47
 msgid "Detail"
+msgstr "Detail"
+
+#: front/src/views/content/remote/Card.vue:50
+#, fuzzy
+msgid "Details"
 msgstr "Detail"
 
 #: front/src/components/auth/Settings.vue:104
@@ -697,11 +627,11 @@ msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
 msgstr[0] "Möchtest du %{ action } auf %{ count } Element ausführen?"
 msgstr[1] "Möchtest du %{ action } auf %{ count } Elemente ausführen?"
 
-#: front/src/components/Sidebar.vue:104
+#: front/src/components/Sidebar.vue:103
 msgid "Do you want to restore your previous queue?"
 msgstr "Möchtest du die Wiedergabelliste zurückerstellen?"
 
-#: front/src/App.vue:40
+#: front/src/App.vue:37
 msgid "Documentation"
 msgstr "Dokumentation"
 
@@ -759,6 +689,11 @@ msgstr "Bearbeitung abschließen"
 msgid "Error"
 msgstr "Fehler"
 
+#: front/src/views/content/remote/Card.vue:39
+#, fuzzy
+msgid "Error during scan"
+msgstr "Fehlerbericht"
+
 #: front/src/components/common/ActionTable.vue:79
 msgid "Error while applying action"
 msgstr "Fehler bei der Ausführung der Aktion"
@@ -788,10 +723,6 @@ msgstr "Fehler beim Scannen der Mediathek"
 msgid "Error while saving settings"
 msgstr "Fehler bei der Speicherung der Einstellungen"
 
-#: front/src/components/federation/LibraryForm.vue:10
-msgid "Error while scanning library"
-msgstr "Fehler beim Scannen der Mediathek"
-
 #: front/src/views/content/libraries/FilesTable.vue:16
 #: front/src/views/content/libraries/FilesTable.vue:236
 msgid "Errored"
@@ -801,6 +732,11 @@ msgstr "Ein Fehler ist aufgetreten"
 #, fuzzy
 msgid "Errored files"
 msgstr "Ein Fehler ist aufgetreten"
+
+#: front/src/views/content/remote/Card.vue:58
+#, fuzzy
+msgid "Errored tracks:"
+msgstr "Föderierte Tracks"
 
 #: front/src/components/library/radios/Builder.vue:61
 msgid "Exclude"
@@ -822,24 +758,9 @@ msgstr "Abgelaufen"
 msgid "Expired/used"
 msgstr "Abgelaufen bzw. benutzt"
 
-#: front/src/components/Sidebar.vue:66
+#: front/src/components/Sidebar.vue:65
 msgid "Favorites"
 msgstr "Favoriten"
-
-#: front/src/components/federation/LibraryForm.vue:3
-msgid "Federate with a new instance"
-msgstr "Mit einer neuen Instanz föderieren"
-
-#: front/src/views/federation/LibraryDetail.vue:40
-#: front/src/components/manage/users/UsersTable.vue:180
-#: front/src/views/admin/users/UsersDetail.vue:161
-#: src/views/admin/Settings.vue:84 front/src/views/federation/Base.vue:35
-msgid "Federation"
-msgstr "Föderation"
-
-#: front/src/views/federation/LibraryDetail.vue:3
-msgid "File mirroring"
-msgstr "Dateispiegelung"
 
 #: front/src/components/library/FileUpload.vue:83
 msgid "File name"
@@ -859,12 +780,11 @@ msgstr "Filtername"
 msgid "Finished"
 msgstr "Beendet"
 
-#: front/src/components/federation/LibraryCard.vue:44
-#: front/src/views/content/remote/Card.vue:37
+#: front/src/views/content/remote/Card.vue:83
 msgid "Follow"
 msgstr "Folgen"
 
-#: front/src/views/content/remote/Card.vue:42
+#: front/src/views/content/remote/Card.vue:88
 #, fuzzy
 msgid "Follow pending approval"
 msgstr "Ausstehende Folgen-Anfrage"
@@ -873,27 +793,11 @@ msgstr "Ausstehende Folgen-Anfrage"
 msgid "Follow remote libraries"
 msgstr ""
 
-#: front/src/components/federation/LibraryCard.vue:36
-msgid "Follow request pending approval"
-msgstr "Ausstehende Folgen-Anfrage"
-
-#: front/src/views/federation/LibraryDetail.vue:21
-msgid "Follow status"
-msgstr "Folgenstatus"
-
 #: front/src/views/content/libraries/Detail.vue:7
-#: src/views/federation/Base.vue:13
-#: front/src/views/federation/LibraryFollowersList.vue:24
 msgid "Followers"
 msgstr "Follower·innen"
 
-#: front/src/components/federation/LibraryCard.vue:18
-msgid "Followers only"
-msgstr "Nur Follower und Followerinnen"
-
-#: front/src/components/federation/LibraryCard.vue:15
-#: front/src/views/content/remote/Card.vue:47
-#: front/src/views/federation/LibraryDetail.vue:29
+#: front/src/views/content/remote/Card.vue:93
 msgid "Following"
 msgstr "Abonniert"
 
@@ -906,7 +810,7 @@ msgstr "aus %{ album } von %{ artist }"
 msgid "From album %{ album } by %{ artist }"
 msgstr "Aus dem Album %{ album } von %{ artist }"
 
-#: front/src/App.vue:58
+#: front/src/App.vue:55
 msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
 msgstr "Funkwhale ist ein kostenloses Open-Source Projekt, das von Ehrenamtlichen entwickelt wird. Hilf uns, indem du Fehler meldest, neue Funktionen vorschlägst und das Projekt mit deinen Freunden teilst!"
 
@@ -960,7 +864,7 @@ msgstr "Los!"
 msgid "Go to home page"
 msgstr "Zurück zur Startseite"
 
-#: front/src/App.vue:76
+#: front/src/App.vue:73
 msgid "Help us translate Funkwhale"
 msgstr "Hilf uns, Funkwhale zu übersetzen"
 
@@ -976,19 +880,6 @@ msgstr "Für den Zugriff auf Funkwhale von anderen Apps ist ein zusätzliches Ke
 msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
 msgstr "Wenn die angegebene E-Mail-Adresse mit einem Benutzerkonto verknüpft ist, wirst du in Kürze eine E-Mail mit einer Anleitung zur Rücksetzung deines Passworts bekommen."
 
-#: front/src/components/library/Library.vue:17
-#: front/src/components/federation/LibraryTrackTable.vue:196
-msgid "Import"
-msgstr "Import"
-
-#: front/src/components/federation/LibraryTrackTable.vue:57
-msgid "Import #%{ id } launched"
-msgstr "Import #%{ id } gestartet"
-
-#: front/src/components/library/Library.vue:20
-msgid "Import batches"
-msgstr "Importstapel"
-
 #: front/src/components/manage/library/FilesTable.vue:40
 #: front/src/components/manage/library/RequestsTable.vue:53
 msgid "Import date"
@@ -998,29 +889,16 @@ msgstr "Importsdatum"
 msgid "Import music from various platforms, such as YouTube or SoundCloud"
 msgstr "Importiere Musik aus mehreren Plattformen, wie YouTube oder SoundCloud"
 
-#: front/src/components/federation/LibraryTrackTable.vue:14
-#: front/src/components/federation/LibraryTrackTable.vue:66
-msgid "Import pending"
-msgstr "Ausstehender Import"
-
 #: front/src/components/library/FileUpload.vue:51
 #, fuzzy
 msgid "Import reference"
 msgstr "Importquelle"
 
-#: front/src/views/admin/library/Base.vue:9
-#: front/src/views/admin/library/RequestsList.vue:3
-#: front/src/views/admin/library/RequestsList.vue:21
-msgid "Import requests"
-msgstr "Importanfrage"
-
-#: front/src/components/federation/LibraryTrackTable.vue:9
 #: front/src/views/content/libraries/FilesTable.vue:11
 #: front/src/views/content/libraries/FilesTable.vue:55
 msgid "Import status"
 msgstr "Importstatus"
 
-#: front/src/components/federation/LibraryTrackTable.vue:12
 #: front/src/components/manage/library/RequestsTable.vue:29
 #: front/src/components/manage/library/RequestsTable.vue:61
 msgid "Imported"
@@ -1029,10 +907,6 @@ msgstr "Importiert"
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgid "In favorites"
 msgstr "In den Favoriten"
-
-#: front/src/components/federation/LibraryTrackTable.vue:65
-msgid "In library"
-msgstr "In der Mediathek"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgid "Inactive"
@@ -1063,7 +937,7 @@ msgstr "Einladungskode (ggf.)"
 msgid "Invitations"
 msgstr "Einladungen"
 
-#: front/src/App.vue:45
+#: front/src/App.vue:42
 msgid "Issue tracker"
 msgstr "Bugtracker"
 
@@ -1085,19 +959,20 @@ msgstr "Mediatheke durchsuchen"
 msgid "Last activity"
 msgstr "Letzte Aktivität"
 
-#: front/src/views/federation/LibraryDetail.vue:101
-msgid "Last fetched"
-msgstr "Letzter Abruf"
-
 #: front/src/components/playlists/PlaylistModal.vue:32
 msgid "Last modification"
 msgstr "Letzte Bearbeitung"
+
+#: front/src/views/content/remote/Card.vue:56
+#, fuzzy
+msgid "Last update:"
+msgstr "Playlist aktualisiert"
 
 #: front/src/components/common/ActionTable.vue:40
 msgid "Launch"
 msgstr "Starten"
 
-#: front/src/components/federation/LibraryForm.vue:31
+#: front/src/views/content/remote/Card.vue:63
 msgid "Launch scan"
 msgstr "Scan starten"
 
@@ -1109,8 +984,7 @@ msgstr "Mehr über diese Instanz erfahren"
 msgid "Leave this field empty if you're requesting the whole discography."
 msgstr "Lasse dieses Feld leer, wenn du die ganze Diskografie anfragst."
 
-#: front/src/views/content/Base.vue:5 src/views/federation/Base.vue:5
-#: front/src/views/federation/LibraryList.vue:123
+#: front/src/views/content/Base.vue:5
 msgid "Libraries"
 msgstr "Mediatheke"
 
@@ -1118,25 +992,15 @@ msgstr "Mediatheke"
 msgid "Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family."
 msgstr ""
 
-#: front/src/components/federation/LibraryTrackTable.vue:51
 #: front/src/components/instance/Stats.vue:30
 #: front/src/components/manage/users/UsersTable.vue:176
-#: front/src/views/admin/users/UsersDetail.vue:157
-#: front/src/views/federation/LibraryDetail.vue:194
+#: front/src/views/admin/users/UsersDetail.vue:181
 msgid "Library"
 msgstr "Mediathek"
 
 #: front/src/views/admin/library/FilesList.vue:3
 msgid "Library files"
 msgstr "Dateien aus der Mediathek"
-
-#: front/src/components/federation/LibraryForm.vue:20
-msgid "Library name"
-msgstr "Mediatheksname"
-
-#: front/src/views/federation/LibraryDetail.vue:84
-msgid "Library size"
-msgstr "Mediatheksgröße"
 
 #: front/src/App.vue:31
 msgid "Links"
@@ -1189,11 +1053,11 @@ msgstr "Logge dich zu deinem Funkwhale-Konto ein"
 msgid "Logged in as %{ username }"
 msgstr "Als %{ username } angemeldet"
 
-#: front/src/components/Sidebar.vue:55 src/components/auth/Login.vue:41
+#: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:41
 msgid "Login"
 msgstr "Einloggen"
 
-#: front/src/components/Sidebar.vue:53
+#: front/src/components/Sidebar.vue:52
 msgid "Logout"
 msgstr "Ausloggen"
 
@@ -1214,7 +1078,11 @@ msgstr "Verwalte deine Playlists"
 msgid "Mark all as read"
 msgstr "Als importiert markieren"
 
-#: front/src/components/Sidebar.vue:63
+#: front/src/views/admin/users/UsersDetail.vue:94
+msgid "MB"
+msgstr ""
+
+#: front/src/components/Sidebar.vue:62
 msgid "Music"
 msgstr "Musik"
 
@@ -1257,11 +1125,11 @@ msgstr "Name"
 msgid "New password"
 msgstr "Neues Kennwort"
 
-#: front/src/components/Sidebar.vue:149
+#: front/src/components/Sidebar.vue:148
 msgid "New tracks will be appended here automatically."
 msgstr "Neue Tracks werden hier automatisch hinzugefügt."
 
-#: front/src/components/Sidebar.vue:116
+#: front/src/components/Sidebar.vue:115
 msgid "No"
 msgstr "Nein"
 
@@ -1273,18 +1141,14 @@ msgstr "Keine Erweiterungen, keine Plugins: du brauchst nur eine online Mediathe
 msgid "No lyrics available for this track."
 msgstr "Kein verfügbarer Songtext für diesen Track."
 
+#: front/src/components/federation/LibraryWidget.vue:6
+#, fuzzy
+msgid "No matching library."
+msgstr "Domainname eingeben..."
+
 #: front/src/views/content/libraries/Detail.vue:57
 msgid "Nobody is following this library"
 msgstr ""
-
-#: front/src/views/federation/LibraryDetail.vue:32
-msgid "Not following"
-msgstr "Nicht abonniert"
-
-#: front/src/components/federation/LibraryTrackTable.vue:13
-#: front/src/components/federation/LibraryTrackTable.vue:67
-msgid "Not imported"
-msgstr "Nicht importiert"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgid "Not used"
@@ -1295,7 +1159,7 @@ msgstr "Nicht verwendet"
 msgid "Notifications"
 msgstr "Letzte Bearbeitung"
 
-#: front/src/App.vue:39
+#: front/src/App.vue:36
 msgid "Official website"
 msgstr "Offizielle Webseite"
 
@@ -1303,39 +1167,34 @@ msgstr "Offizielle Webseite"
 msgid "Old password"
 msgstr "Altes Kennwort"
 
-#: front/src/components/federation/LibraryCard.vue:21
 #: front/src/components/manage/users/InvitationsTable.vue:20
 msgid "Open"
 msgstr "Frei"
 
-#: front/src/App.vue:65
+#: front/src/App.vue:62
 msgid "Options"
 msgstr "Optionen"
 
 #: front/src/components/favorites/List.vue:23
-#: front/src/components/federation/LibraryTrackTable.vue:18
-#: front/src/components/library/Artists.vue:15
-#: src/components/library/Radios.vue:33
+#: src/components/library/Artists.vue:15
+#: front/src/components/library/Radios.vue:33
 #: front/src/components/manage/library/FilesTable.vue:9
 #: front/src/components/manage/library/RequestsTable.vue:9
 #: front/src/components/manage/users/InvitationsTable.vue:9
 #: front/src/components/manage/users/UsersTable.vue:9
 #: front/src/views/content/libraries/FilesTable.vue:21
-#: front/src/views/federation/LibraryList.vue:18
-#: src/views/playlists/List.vue:17
+#: front/src/views/playlists/List.vue:17
 msgid "Ordering"
 msgstr "Sortierung"
 
 #: front/src/components/favorites/List.vue:31
-#: front/src/components/federation/LibraryTrackTable.vue:26
-#: front/src/components/library/Artists.vue:23
-#: src/components/library/Radios.vue:41
+#: src/components/library/Artists.vue:23
+#: front/src/components/library/Radios.vue:41
 #: front/src/components/manage/library/FilesTable.vue:17
 #: front/src/components/manage/library/RequestsTable.vue:17
 #: front/src/components/manage/users/UsersTable.vue:17
 #: front/src/views/content/libraries/FilesTable.vue:29
-#: front/src/views/federation/LibraryList.vue:26
-#: src/views/playlists/List.vue:25
+#: front/src/views/playlists/List.vue:25
 msgid "Ordering direction"
 msgstr "Reihenfolge"
 
@@ -1355,7 +1214,6 @@ msgstr "Kennwort"
 msgid "Password updated successfully"
 msgstr "Kennwort erfolgreich aktualisiert"
 
-#: front/src/components/federation/LibraryFollowTable.vue:46
 #: front/src/components/library/FileUpload.vue:105
 #: front/src/components/manage/library/RequestsTable.vue:27
 #: front/src/components/manage/library/RequestsTable.vue:63
@@ -1364,9 +1222,7 @@ msgstr "Kennwort erfolgreich aktualisiert"
 msgid "Pending"
 msgstr "Ausstehend"
 
-#: front/src/components/federation/LibraryFollowTable.vue:11
 #: front/src/views/content/libraries/Detail.vue:37
-#: front/src/views/federation/LibraryDetail.vue:26
 msgid "Pending approval"
 msgstr "Steht auf Bestätigung aus"
 
@@ -1375,7 +1231,7 @@ msgstr "Steht auf Bestätigung aus"
 msgid "Pending files"
 msgstr "Ausstehend"
 
-#: front/src/components/requests/Form.vue:26 src/views/federation/Base.vue:36
+#: front/src/components/requests/Form.vue:26
 msgid "Pending requests"
 msgstr "Ausstehende Anfragen"
 
@@ -1433,9 +1289,9 @@ msgstr "Playlist aktualisiert"
 msgid "Playlist visibility"
 msgstr "Sichtbarkeit der Playlist"
 
-#: front/src/components/Sidebar.vue:71 src/components/library/Home.vue:16
+#: front/src/components/Sidebar.vue:70 src/components/library/Home.vue:16
 #: front/src/components/library/Library.vue:13 src/views/playlists/List.vue:103
-#: front/src/views/admin/Settings.vue:83
+#: front/src/views/admin/Settings.vue:82
 msgid "Playlists"
 msgstr "Playlists"
 
@@ -1468,10 +1324,6 @@ msgstr "Jetzt einloggen"
 #: front/src/components/library/FileUpload.vue:17
 msgid "Processing"
 msgstr ""
-
-#: front/src/components/federation/LibraryTrackTable.vue:50
-msgid "Published date"
-msgstr "Ausgabedatum"
 
 #: front/src/views/content/libraries/Quota.vue:36
 #: front/src/views/content/libraries/Quota.vue:39
@@ -1531,14 +1383,10 @@ msgstr "Neulich zu den Favoriten hinzugefügt"
 msgid "Recently listened"
 msgstr "Neulich angehört"
 
-#: front/src/views/admin/users/UsersDetail.vue:84
-#: front/src/views/federation/LibraryDetail.vue:122
+#: front/src/views/admin/users/UsersDetail.vue:103
+#: front/src/views/content/remote/Home.vue:15
 msgid "Refresh"
 msgstr "Aktualisieren"
-
-#: front/src/components/federation/LibraryFollowTable.vue:42
-msgid "Refused"
-msgstr "Abgelehnt"
 
 #: front/src/components/auth/Profile.vue:12
 msgid "Registered since %{ date }"
@@ -1590,15 +1438,6 @@ msgstr "Ein neues Subsonic-API-Kennwort beantragen?"
 msgid "Request a password"
 msgstr "Kennwort beantragen"
 
-#: front/src/App.vue:37
-msgid "Request music"
-msgstr "Musik anfragen"
-
-#: front/src/views/library/MusicRequest.vue:4
-#: src/views/library/MusicRequest.vue:21
-msgid "Request some music"
-msgstr "Musik anfragen"
-
 #: front/src/components/requests/Form.vue:20
 msgid "Request submitted!"
 msgstr "Anfrage gesendet!"
@@ -1609,9 +1448,7 @@ msgstr "Kennwort zurücksetzen"
 
 #: front/src/components/favorites/List.vue:38
 #: src/components/library/Artists.vue:30
-#: front/src/components/library/Radios.vue:52
-#: src/views/federation/LibraryList.vue:33
-#: front/src/views/playlists/List.vue:32
+#: front/src/components/library/Radios.vue:52 src/views/playlists/List.vue:32
 msgid "Results per page"
 msgstr "Ergebnisse pro Seite"
 
@@ -1620,11 +1457,25 @@ msgstr "Ergebnisse pro Seite"
 msgid "Save"
 msgstr "Speichern"
 
-#: front/src/views/federation/LibraryDetail.vue:112
-msgid "Scan triggered!"
-msgstr "Scan gestartet!"
+#: front/src/views/content/remote/Card.vue:31
+#, fuzzy
+msgid "Scan pending"
+msgstr "Zunehmend"
 
-#: front/src/components/federation/LibraryTrackTable.vue:5
+#: front/src/views/content/remote/Card.vue:43
+#, fuzzy
+msgid "Scanned successfully"
+msgstr "Einstellungen erfolgreich aktualisiert."
+
+#: front/src/views/content/remote/Card.vue:47
+#, fuzzy
+msgid "Scanned with errors"
+msgstr "Änderungen synchronisiert"
+
+#: front/src/views/content/remote/Card.vue:35
+msgid "Scanning... (%{ progress }%)"
+msgstr ""
+
 #: front/src/components/library/Artists.vue:10
 #: src/components/library/Radios.vue:29
 #: front/src/components/manage/library/FilesTable.vue:5
@@ -1632,7 +1483,6 @@ msgstr "Scan gestartet!"
 #: front/src/components/manage/users/InvitationsTable.vue:5
 #: front/src/components/manage/users/UsersTable.vue:5
 #: front/src/views/content/libraries/FilesTable.vue:5
-#: front/src/views/federation/LibraryList.vue:14
 #: src/views/playlists/List.vue:13
 msgid "Search"
 msgstr "Suchen"
@@ -1674,13 +1524,9 @@ msgstr[1] "Alle %{ total } Elemente auswählen"
 msgid "Select only current page"
 msgstr "Nur die aktuelle Seite auswählen"
 
-#: front/src/components/federation/LibraryCard.vue:43
-msgid "Send a follow request"
-msgstr "Folgen-Anfrage schicken"
-
-#: front/src/components/Sidebar.vue:43 src/components/Sidebar.vue:88
+#: front/src/components/Sidebar.vue:43 src/components/Sidebar.vue:87
 #: front/src/components/manage/users/UsersTable.vue:184
-#: front/src/views/admin/users/UsersDetail.vue:165
+#: front/src/views/admin/users/UsersDetail.vue:189
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -1701,9 +1547,17 @@ msgid "Share this link with other users so they can request an access to your li
 msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:14
+#: front/src/views/content/remote/Card.vue:73
 #, fuzzy
 msgid "Sharing link"
 msgstr "Link zum Teilen"
+
+#: front/src/components/audio/album/Card.vue:40
+#, fuzzy
+msgid "Show %{ count } more track"
+msgid_plural "Show %{ count } more tracks"
+msgstr[0] "%{ count } Track"
+msgstr[1] "%{ count } Tracks"
 
 #: front/src/components/audio/artist/Card.vue:30
 msgid "Show 1 more album"
@@ -1711,19 +1565,11 @@ msgid_plural "Show %{ count } more albums"
 msgstr[0] "1 Album mehr zeigen"
 msgstr[1] "%{ count } Alben mehr zeigen"
 
-#: front/src/components/audio/album/Card.vue:40
-msgid "Show 1 more track"
-msgid_plural "Show %{ count } more tracks"
-msgstr[0] "1 Track mehr zeigen"
-msgstr[1] "%{ count } Tracks mehr zeigen"
-
 #: front/src/views/Notifications.vue:10
 #, fuzzy
 msgid "Show read notifications"
 msgstr "Letzte Bearbeitung"
 
-#: front/src/components/federation/LibraryFollowTable.vue:97
-#: front/src/components/federation/LibraryTrackTable.vue:98
 #: front/src/components/manage/library/FilesTable.vue:97
 #: front/src/components/manage/library/RequestsTable.vue:104
 #: front/src/components/manage/users/InvitationsTable.vue:76
@@ -1766,11 +1612,11 @@ msgstr "Sorry, wir haben keine passende Alben für deine Suche gefunden"
 msgid "Sorry, we did not found any artist matching your query"
 msgstr "Entschuldigung, wir haben keine passenden Künstler oder Künstlerinnen für deine Suche gefunden"
 
-#: front/src/App.vue:43
+#: front/src/App.vue:40
 msgid "Source code"
 msgstr "Quellcode"
 
-#: front/src/App.vue:42
+#: front/src/App.vue:39
 msgid "Source code (%{version})"
 msgstr "Quelcode (%{ version })"
 
@@ -1783,8 +1629,6 @@ msgstr "Teammember"
 msgid "Start"
 msgstr "Starten"
 
-#: front/src/components/federation/LibraryFollowTable.vue:23
-#: front/src/components/federation/LibraryTrackTable.vue:46
 #: front/src/components/library/FileUpload.vue:85
 #: front/src/components/manage/library/RequestsTable.vue:24
 #: front/src/components/manage/library/RequestsTable.vue:48
@@ -1799,7 +1643,7 @@ msgstr "Status"
 msgid "Stop"
 msgstr "Abbrechen"
 
-#: front/src/components/Sidebar.vue:150
+#: front/src/components/Sidebar.vue:149
 msgid "Stop radio"
 msgstr "Radio stoppen"
 
@@ -1835,7 +1679,7 @@ msgstr ""
 msgid "That's simple: we loved Grooveshark and we want to build something even better."
 msgstr "So einfach ist es: wir liebten Grooveshark, doch wollen wir noch besser machen."
 
-#: front/src/App.vue:61
+#: front/src/App.vue:58
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
 msgstr "Das Funkwhale-Logo wurde mit Lieb von Francis Gading erbracht."
 
@@ -1859,6 +1703,14 @@ msgstr "Die Subsonic-API ist auf dieser Instanz nicht verfügbar."
 msgid "The uploaded music files are in OGG, Flac or MP3 format"
 msgstr ""
 
+#: front/src/components/library/Album.vue:52
+msgid "This album is present in the following libraries:"
+msgstr ""
+
+#: front/src/components/library/Artist.vue:63
+msgid "This artist is present in the following libraries:"
+msgstr ""
+
 #: front/src/views/content/Home.vue:9
 msgid "This instance offers up to %{quota} of storage space to every user."
 msgstr ""
@@ -1875,6 +1727,10 @@ msgstr "Durch diese Aktion können mehrere Elemente betroffen werden, prüfe bit
 msgid "This reference will be used to group imported files together."
 msgstr ""
 
+#: front/src/components/library/Track.vue:125
+msgid "This track is present in the following libraries:"
+msgstr ""
+
 #: front/src/views/playlists/Detail.vue:37
 msgid "This will completely delete this playlist and cannot be undone."
 msgstr "Die Playlist wird dauerhaft gelöscht und kann nicht zurückerstellt werden."
@@ -1887,9 +1743,9 @@ msgstr "Das Radio wird dauerhaft gelöscht und kann nicht zurückerstellt werden
 msgid "This will completely disable access to the Subsonic API using from account."
 msgstr "Der Zugriff zur Subsonic-API von diesem Konto wird deaktiviert."
 
-#: front/src/App.vue:165 src/components/About.vue:55
+#: front/src/App.vue:162 src/components/About.vue:55
 #: src/components/Home.vue:152 front/src/components/PageNotFound.vue:33
-#: src/components/Sidebar.vue:203 front/src/components/Sidebar.vue:204
+#: src/components/Sidebar.vue:202 front/src/components/Sidebar.vue:203
 #: src/components/audio/PlayButton.vue:54
 #: front/src/components/audio/PlayButton.vue:55
 #: front/src/components/audio/PlayButton.vue:56
@@ -1922,13 +1778,9 @@ msgstr "Der Zugriff zur Subsonic-API von diesem Konto wird deaktiviert."
 #: front/src/components/favorites/List.vue:109
 #: front/src/components/favorites/TrackFavoriteIcon.vue:19
 #: front/src/components/favorites/TrackFavoriteIcon.vue:21
-#: front/src/components/federation/LibraryFollowTable.vue:140
-#: front/src/components/federation/LibraryForm.vue:96
-#: front/src/components/federation/LibraryTrackTable.vue:182
-#: front/src/components/federation/LibraryTrackTable.vue:196
 #: front/src/components/forms/PasswordInput.vue:25
-#: front/src/components/library/Album.vue:91
-#: src/components/library/Artist.vue:119
+#: front/src/components/library/Album.vue:101
+#: src/components/library/Artist.vue:129
 #: front/src/components/library/Artists.vue:118
 #: front/src/components/library/Artists.vue:119
 #: front/src/components/library/FileUpload.vue:238
@@ -1938,7 +1790,7 @@ msgstr "Der Zugriff zur Subsonic-API von diesem Konto wird deaktiviert."
 #: src/components/library/Home.vue:65
 #: front/src/components/library/Radios.vue:140
 #: src/components/library/Radios.vue:141
-#: front/src/components/library/Track.vue:185
+#: front/src/components/library/Track.vue:195
 #: front/src/components/library/radios/Builder.vue:233
 #: front/src/components/library/radios/Builder.vue:235
 #: front/src/components/library/radios/Builder.vue:236
@@ -1981,17 +1833,16 @@ msgstr "Der Zugriff zur Subsonic-API von diesem Konto wird deaktiviert."
 #: front/src/views/admin/Settings.vue:81 src/views/admin/Settings.vue:82
 #: front/src/views/admin/Settings.vue:83 src/views/admin/Settings.vue:84
 #: front/src/views/admin/Settings.vue:85 src/views/admin/Settings.vue:86
-#: front/src/views/admin/Settings.vue:87 src/views/admin/library/Base.vue:25
-#: front/src/views/admin/library/Base.vue:26
+#: front/src/views/admin/library/Base.vue:16
 #: src/views/admin/library/FilesList.vue:21
-#: front/src/views/admin/library/RequestsList.vue:21
 #: front/src/views/admin/users/Base.vue:20
 #: front/src/views/admin/users/InvitationsList.vue:24
-#: front/src/views/admin/users/UsersDetail.vue:146
-#: front/src/views/admin/users/UsersDetail.vue:153
-#: front/src/views/admin/users/UsersDetail.vue:157
-#: front/src/views/admin/users/UsersDetail.vue:161
-#: front/src/views/admin/users/UsersDetail.vue:165
+#: front/src/views/admin/users/UsersDetail.vue:169
+#: front/src/views/admin/users/UsersDetail.vue:170
+#: front/src/views/admin/users/UsersDetail.vue:177
+#: front/src/views/admin/users/UsersDetail.vue:181
+#: front/src/views/admin/users/UsersDetail.vue:185
+#: front/src/views/admin/users/UsersDetail.vue:189
 #: front/src/views/admin/users/UsersList.vue:21
 #: src/views/auth/EmailConfirm.vue:51 front/src/views/auth/PasswordReset.vue:52
 #: src/views/auth/PasswordReset.vue:53
@@ -2021,22 +1872,14 @@ msgstr "Der Zugriff zur Subsonic-API von diesem Konto wird deaktiviert."
 #: front/src/views/content/libraries/Form.vue:106
 #: front/src/views/content/libraries/Form.vue:109
 #: front/src/views/content/libraries/Form.vue:129
-#: front/src/views/content/remote/Card.vue:70
-#: src/views/content/remote/Card.vue:71
+#: front/src/views/content/remote/Card.vue:131
+#: src/views/content/remote/Card.vue:132
+#: front/src/views/content/remote/Card.vue:165
+#: src/views/content/remote/Card.vue:166
 #: front/src/views/content/remote/ScanForm.vue:48
-#: src/views/federation/Base.vue:35 front/src/views/federation/Base.vue:36
-#: src/views/federation/LibraryDetail.vue:194
-#: front/src/views/federation/LibraryDetail.vue:195
-#: front/src/views/federation/LibraryDetail.vue:196
-#: front/src/views/federation/LibraryDetail.vue:197
-#: front/src/views/federation/LibraryFollowersList.vue:24
-#: front/src/views/federation/LibraryList.vue:122
-#: front/src/views/federation/LibraryList.vue:123
-#: front/src/views/federation/LibraryTrackList.vue:21
-#: front/src/views/instance/Timeline.vue:57
-#: src/views/library/MusicRequest.vue:21
-#: front/src/views/playlists/Detail.vue:90 src/views/playlists/List.vue:103
-#: front/src/views/playlists/List.vue:104 src/views/radios/Detail.vue:80
+#: src/views/instance/Timeline.vue:57 front/src/views/playlists/Detail.vue:90
+#: src/views/playlists/List.vue:103 front/src/views/playlists/List.vue:104
+#: src/views/radios/Detail.vue:80
 #, fuzzy
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgid_plural "%{ count } tracks were added to your queue"
@@ -2064,7 +1907,6 @@ msgid "This will remove tracks that were uploaded but skipped during import proc
 msgstr ""
 
 #: front/src/components/audio/track/Table.vue:6
-#: front/src/components/federation/LibraryTrackTable.vue:47
 #: front/src/components/manage/library/FilesTable.vue:37
 #: front/src/views/content/libraries/FilesTable.vue:51
 msgid "Title"
@@ -2085,14 +1927,9 @@ msgstr "Tracks"
 #: front/src/components/library/Album.vue:43
 #: front/src/components/playlists/PlaylistModal.vue:33
 #: src/views/content/Base.vue:8 front/src/views/content/libraries/Detail.vue:8
-#: src/views/federation/Base.vue:8 front/src/views/playlists/Detail.vue:50
-#: src/views/radios/Detail.vue:34
+#: src/views/playlists/Detail.vue:50 front/src/views/radios/Detail.vue:34
 msgid "Tracks"
 msgstr "Tracks"
-
-#: front/src/views/federation/LibraryDetail.vue:125
-msgid "Tracks available in this library"
-msgstr "Verfügbare Tracks in dieser Mediathek"
 
 #: front/src/components/library/Artist.vue:54
 msgid "Tracks by this artist"
@@ -2106,27 +1943,25 @@ msgstr "Tracks in den Favoriten"
 msgid "tracks listened"
 msgstr "Angehörte Tracks"
 
-#: front/src/views/federation/LibraryDetail.vue:109
-msgid "Trigger scan"
-msgstr "Scan auslösen"
-
 #: front/src/components/library/Track.vue:91
 #: front/src/components/manage/library/FilesTable.vue:41
 msgid "Type"
 msgstr "Typ"
 
-#: front/src/views/content/remote/Card.vue:52
+#: front/src/views/content/remote/Card.vue:100
+#: src/views/content/remote/Card.vue:105
 #, fuzzy
 msgid "Unfollow"
 msgstr "Folgen"
 
+#: front/src/views/content/remote/Card.vue:101
+#, fuzzy
+msgid "Unfollow this library?"
+msgstr "Bring mich zur Mediathek"
+
 #: front/src/components/About.vue:15
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
 msgstr "Leider wurde diese Seite von den Verwaltern dieser Instanz noch nicht ausgefüllt."
-
-#: front/src/views/federation/LibraryDetail.vue:95
-msgid "Unknown"
-msgstr "Unbekannt"
 
 #: front/src/components/Home.vue:37
 msgid "Unlimited music"
@@ -2156,7 +1991,7 @@ msgstr "Dein Kennwort aktualisieren"
 #: front/src/views/content/libraries/Card.vue:44
 #: front/src/components/manage/users/UsersTable.vue:172
 #: front/src/views/content/libraries/DetailArea.vue:24
-#: front/src/views/admin/users/UsersDetail.vue:153
+#: front/src/views/admin/users/UsersDetail.vue:177
 msgid "Upload"
 msgstr "Hochladen"
 
@@ -2183,6 +2018,11 @@ msgstr ""
 msgid "Upload new tracks"
 msgstr "Neues Avatar hochladen"
 
+#: front/src/views/admin/users/UsersDetail.vue:82
+#, fuzzy
+msgid "Upload quota"
+msgstr "Hochladen"
+
 #: front/src/components/library/FileUpload.vue:99
 #, fuzzy
 msgid "Uploaded"
@@ -2197,17 +2037,13 @@ msgstr "Hochladen..."
 msgid "Uploading..."
 msgstr "Hochladen..."
 
-#: front/src/App.vue:47
+#: front/src/App.vue:44
 msgid "Use another instance"
 msgstr "Eine andere Instanz benutzen"
 
 #: front/src/views/auth/PasswordReset.vue:12
 msgid "Use this form to request a password reset. We will send an email to the given address with instructions to reset your password."
 msgstr "Mit diesem Formular kannst du ein neues Kennwort beantragen. Wir schicken dir eine E-Mail an die angegebene Adresse mit den Anleitungen."
-
-#: front/src/components/federation/LibraryForm.vue:6
-msgid "Use this form to scan an instance and setup federation."
-msgstr "Scanne eine Instanz und föderiere damit."
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgid "Used"
@@ -2221,6 +2057,13 @@ msgstr "Nutzende"
 #: front/src/components/instance/Stats.vue:5
 msgid "User activity"
 msgstr "Aktivität der Nutzende"
+
+#: front/src/components/library/Album.vue:49
+#: src/components/library/Artist.vue:60
+#: front/src/components/library/Track.vue:122
+#, fuzzy
+msgid "User libraries"
+msgstr "Mediatheke"
 
 #: front/src/components/library/Radios.vue:20
 msgid "User radios"
@@ -2239,7 +2082,7 @@ msgstr "Benutzername oder E-Mail-Adresse"
 msgid "users"
 msgstr "Nutzende"
 
-#: front/src/components/Sidebar.vue:94 src/views/admin/users/Base.vue:5
+#: front/src/components/Sidebar.vue:93 src/views/admin/users/Base.vue:5
 #: front/src/views/admin/users/UsersList.vue:3
 #: src/views/admin/users/UsersList.vue:21 front/src/views/admin/Settings.vue:81
 msgid "Users"
@@ -2326,7 +2169,7 @@ msgstr "Willkommen auf Funkwhale"
 msgid "Why funkwhale?"
 msgstr "Warum Funkwhale?"
 
-#: front/src/components/Sidebar.vue:115
+#: front/src/components/Sidebar.vue:114
 msgid "Yes"
 msgstr "Ja"
 
@@ -2358,7 +2201,7 @@ msgstr "Dank dieser Schnittstelle kannst du dein eigenes Radio aufbauen, das die
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
 msgstr "Damit kannst du deine Playlists und Musik offline genießen, zum Beispiel auf deinem Smartphone bzw. Tablett."
 
-#: front/src/components/Sidebar.vue:147
+#: front/src/components/Sidebar.vue:146
 msgid "You have a radio playing"
 msgstr "Du hörst gerade ein Radio an"
 
@@ -2515,7 +2358,7 @@ msgstr ""
 msgid "Enter an artist name..."
 msgstr "Künstlername eingeben..."
 
-#: front/src/components/library/Track.vue:185
+#: front/src/components/library/Track.vue:195
 #: src/components/audio/SearchBar.vue:27
 #: front/src/components/metadata/Search.vue:138
 msgid "Track"
@@ -2540,19 +2383,6 @@ msgstr "Das Weiße Album, Thriller…"
 #: front/src/components/requests/Form.vue:75
 msgid "Use this comment box to add details to your request if needed"
 msgstr "Nutze dieses Feld um weitere Informationen über deine Anfrage beizufügen"
-
-#: front/src/components/federation/LibraryFollowTable.vue:140
-msgid "Search by username, domain..."
-msgstr "Benutzername oder Domain suchen..."
-
-#: front/src/components/federation/LibraryTrackTable.vue:182
-#: front/src/components/manage/library/FilesTable.vue:175
-msgid "Search by title, artist, domain..."
-msgstr "Titel, Künstler, Künstlerin oder Domain suchen..."
-
-#: front/src/components/federation/LibraryForm.vue:96
-msgid "library@demo.funkwhale.audio"
-msgstr "library@demo.funkwhale.audio"
 
 #: front/src/components/audio/PlayButton.vue:158
 msgid "%{ count } track was added to your queue"
@@ -2616,17 +2446,21 @@ msgstr "Wiedergabeliste mischen"
 msgid "Clear your queue"
 msgstr "Wiedergabeliste leeren"
 
-#: front/src/components/Sidebar.vue:203
+#: front/src/components/Sidebar.vue:202
 msgid "Pending import requests"
 msgstr "Ausstehende Importanfragen"
 
-#: front/src/components/Sidebar.vue:204
+#: front/src/components/Sidebar.vue:203
 msgid "Pending follow requests"
 msgstr "Ausstehende Follow-Anfrage"
 
 #: front/src/components/metadata/Search.vue:114
 msgid "Enter your search query..."
 msgstr "Suche eingeben..."
+
+#: front/src/components/manage/library/FilesTable.vue:175
+msgid "Search by title, artist, domain..."
+msgstr "Titel, Künstler, Künstlerin oder Domain suchen..."
 
 #: front/src/components/manage/library/RequestsTable.vue:180
 msgid "Search by artist, username, comment..."
@@ -2652,10 +2486,24 @@ msgstr "Benutzername, E-Mail-Adresse oder Kode suchen..."
 msgid "Search by username, email, name..."
 msgstr "Benutzername, E-Mail-Adresse oder Name suchen..."
 
+#: front/src/components/manage/users/UsersTable.vue:180
+#: front/src/views/admin/users/UsersDetail.vue:185
+#: src/views/admin/Settings.vue:83
+msgid "Federation"
+msgstr "Föderation"
+
 #: front/src/views/content/remote/ScanForm.vue:48
 #, fuzzy
 msgid "Enter a library url"
 msgstr "Domainname eingeben..."
+
+#: front/src/views/content/remote/Card.vue:165
+msgid "Scan launched"
+msgstr ""
+
+#: front/src/views/content/remote/Card.vue:166
+msgid "Scan skipped (previous scan is too recent)"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:225
 #, fuzzy
@@ -2747,9 +2595,18 @@ msgstr "Playlist"
 msgid "Enter an playlist name..."
 msgstr "Playlistname eingeben..."
 
-#: front/src/views/admin/users/UsersDetail.vue:146
+#: front/src/views/admin/library/Base.vue:16
+#, fuzzy
+msgid "Manage library"
+msgstr "In der Mediathek"
+
+#: front/src/views/admin/users/UsersDetail.vue:169
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
 msgstr "Bestimmt, ob das Konto aktiv ist oder nicht. Inaktive Konten können sich weder einloggen noch den Service nutzen."
+
+#: front/src/views/admin/users/UsersDetail.vue:170
+msgid "Determine how much content the user can upload. Leave empty to use the default value of the instance."
+msgstr ""
 
 #: front/src/views/admin/users/Base.vue:20
 msgid "Manage users"
@@ -2763,39 +2620,14 @@ msgstr "Instanzeinstellungen"
 msgid "Instance information"
 msgstr "Infos über diese Instanz"
 
-#: front/src/views/admin/Settings.vue:82
-msgid "Imports"
-msgstr "Imports"
-
-#: front/src/views/admin/Settings.vue:85
+#: front/src/views/admin/Settings.vue:84
 msgid "Subsonic"
 msgstr "Subsonic"
 
-#: front/src/views/admin/Settings.vue:86
+#: front/src/views/admin/Settings.vue:85
 msgid "Statistics"
 msgstr "Statistik"
 
-#: front/src/views/admin/Settings.vue:87
+#: front/src/views/admin/Settings.vue:86
 msgid "Error reporting"
 msgstr "Fehlerbericht"
-
-#: front/src/views/federation/LibraryTrackList.vue:21
-msgid "Federated tracks"
-msgstr "Föderierte Tracks"
-
-#: front/src/views/federation/LibraryList.vue:122
-#, fuzzy
-msgid "Enter a library domain name..."
-msgstr "Domainname eingeben..."
-
-#: front/src/views/federation/LibraryDetail.vue:195
-msgid "This indicate if the remote library granted you access"
-msgstr "Dies weist darauf hin, ob die Fernmediathek dir den Zugriff gewährt hat"
-
-#: front/src/views/federation/LibraryDetail.vue:196
-msgid "Use this flag to enable/disable federation with this library"
-msgstr "Mit dieser Einstellung kannst du die Föderation an dieser Mediathek umschalten"
-
-#: front/src/views/federation/LibraryDetail.vue:197
-msgid "When enabled, auto importing will automatically import new tracks published in this library"
-msgstr "Wenn angeschaltet, neue veröffentliche Tracks in dieser Bibliothek werden automatisch importiert"
