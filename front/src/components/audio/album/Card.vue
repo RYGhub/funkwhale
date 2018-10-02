@@ -38,7 +38,7 @@
           </table>
           <div class="center aligned segment" v-if="album.tracks.length > initialTracks">
             <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">
-              <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show 1 more track</translate>
+              <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
               <translate>Collapse</translate>
@@ -52,7 +52,7 @@
         </play-button>
         <span>
           <i class="music icon"></i>
-          <translate :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">1 track</translate>
+          <translate :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
         </span>
       </div>
     </div>

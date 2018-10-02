@@ -24,7 +24,7 @@
       </div>
       <div class="meta">
         <i class="music icon"></i>
-        <translate :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">1 tracks</translate>
+        <translate :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } tracks</translate>
       </div>
       <div v-if="latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
