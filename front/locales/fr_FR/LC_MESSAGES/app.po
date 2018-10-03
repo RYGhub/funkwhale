@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-02 19:55+0200\n"
-"PO-Revision-Date: 2018-09-23 13:53+0000\n"
-"Last-Translator: Baptiste Gelez <baptiste@gelez.xyz>\n"
+"POT-Creation-Date: 2018-10-03 18:07+0200\n"
+"PO-Revision-Date: 2018-10-03 16:06+0000\n"
+"Last-Translator: Grummfy <grummfy@gmail.com>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/front/fr/>\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
@@ -34,6 +34,7 @@ msgstr[1] "%{ count } sur %{ total } éléments sélectionnés"
 
 #: front/src/components/Sidebar.vue:106 src/components/audio/album/Card.vue:54
 #: front/src/views/content/libraries/Card.vue:39
+#: src/views/content/remote/Card.vue:26
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
 msgstr[0] "%{ count } piste"
@@ -50,13 +51,6 @@ msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } piste correspondant aux filtres sélectionnés"
 msgstr[1] "%{ count } pistes correspondant aux filtres sélectionnés"
-
-#: front/src/views/content/remote/Card.vue:26
-#, fuzzy
-msgid "%{ count } tracks"
-msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count } piste"
-msgstr[1] "%{ count } pistes"
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
@@ -167,7 +161,7 @@ msgstr "Activité"
 
 #: front/src/components/Sidebar.vue:77 src/views/content/Base.vue:19
 msgid "Add content"
-msgstr ""
+msgstr "Ajouter du contenu"
 
 #: front/src/components/library/radios/Builder.vue:50
 msgid "Add filter"
@@ -412,7 +406,7 @@ msgstr "Écoutez de la musique pendant des heures, en un clic, grâce aux radios
 
 #: front/src/components/library/FileUpload.vue:76
 msgid "Click to select files to upload or drag and drop files or directories"
-msgstr ""
+msgstr "Cliquer pour sélectionner les fichiers a téléverser ou glisser-déposser les fichiers ou répertoires"
 
 #: front/src/components/manage/library/RequestsTable.vue:30
 #: front/src/components/manage/library/RequestsTable.vue:64
@@ -454,7 +448,7 @@ msgstr "Code de confirmation"
 
 #: front/src/components/common/CopyInput.vue:8
 msgid "Copy"
-msgstr ""
+msgstr "Copier"
 
 #: front/src/components/Home.vue:88
 msgid "Covers, lyrics, our goal is to have them all ;)"
@@ -524,7 +518,7 @@ msgstr "Piste actuelle"
 
 #: front/src/views/content/libraries/Detail.vue:27
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: front/src/views/content/libraries/Form.vue:29
 #: src/views/playlists/Detail.vue:33
@@ -786,7 +780,7 @@ msgstr "Abonnement en attente de validation"
 
 #: front/src/views/content/Home.vue:16
 msgid "Follow remote libraries"
-msgstr ""
+msgstr "Suivre les bibliothèques distantes"
 
 #: front/src/views/content/libraries/Detail.vue:7
 msgid "Followers"
@@ -1078,7 +1072,7 @@ msgstr "Marquer comme importé"
 
 #: front/src/views/admin/users/UsersDetail.vue:94
 msgid "MB"
-msgstr ""
+msgstr "Mo"
 
 #: front/src/components/Sidebar.vue:62
 msgid "Music"
@@ -1146,7 +1140,7 @@ msgstr "Saisissez un nom de domaine..."
 
 #: front/src/views/content/libraries/Detail.vue:57
 msgid "Nobody is following this library"
-msgstr ""
+msgstr "Personne ne suit cette bibliothèque"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgid "Not used"
@@ -1400,11 +1394,11 @@ msgstr "utilisateur·rice standard·e"
 
 #: front/src/views/content/libraries/Detail.vue:51
 msgid "Reject"
-msgstr ""
+msgstr "Rejeter"
 
 #: front/src/views/content/libraries/Detail.vue:43
 msgid "Rejected"
-msgstr ""
+msgstr "Rejeté"
 
 #: front/src/views/content/remote/Home.vue:6
 #, fuzzy
@@ -1472,7 +1466,7 @@ msgstr "Changements synchronisés avec le serveur"
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning... (%{ progress }%)"
-msgstr ""
+msgstr "Balayage... (%{ progress }%)"
 
 #: front/src/components/library/Artists.vue:10
 #: src/components/library/Radios.vue:29
@@ -1542,7 +1536,7 @@ msgstr "Lien de partage"
 
 #: front/src/views/content/libraries/Detail.vue:15
 msgid "Share this link with other users so they can request an access to your library."
-msgstr ""
+msgstr "Partage ce lien avec les autres utilisateurs afin qu'ils aient accès a cette bibliothèque."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
@@ -1671,7 +1665,7 @@ msgstr "Synchronisation des changements avec le serveur..."
 
 #: front/src/components/common/CopyInput.vue:3
 msgid "Text copied to clipboard!"
-msgstr ""
+msgstr "Texte copier dans le presse-papier!"
 
 #: front/src/components/Home.vue:26
 msgid "That's simple: we loved Grooveshark and we want to build something even better."
@@ -1683,7 +1677,7 @@ msgstr "Le logo de Funkwhale a été généreusement dessiné et fourni par Fran
 
 #: front/src/views/content/libraries/Form.vue:34
 msgid "The library and all its tracks will be deleted. This action is irreversible."
-msgstr ""
+msgstr "Cette bibliothèque et toutes ces pistes seront supprimée. Cette action est irréversible."
 
 #: front/src/components/library/FileUpload.vue:39
 msgid "The music files you are uploading are tagged properly:"

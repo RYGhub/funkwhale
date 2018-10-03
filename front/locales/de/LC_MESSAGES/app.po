@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-02 19:55+0200\n"
+"POT-Creation-Date: 2018-10-03 18:07+0200\n"
 "PO-Revision-Date: 2018-09-22 11:45+0000\n"
 "Last-Translator: Gregory <gs@grse.me>\n"
 "Language-Team: none\n"
@@ -39,6 +39,7 @@ msgstr[1] "%{ count } von %{ total } ausgewählt"
 
 #: front/src/components/Sidebar.vue:106 src/components/audio/album/Card.vue:54
 #: front/src/views/content/libraries/Card.vue:39
+#: src/views/content/remote/Card.vue:26
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
 msgstr[0] "%{ count } Track"
@@ -55,13 +56,6 @@ msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } Track entspricht dem ausgewählten Filter"
 msgstr[1] "%{ count } Tracks entspricht dem ausgewählten Filter"
-
-#: front/src/views/content/remote/Card.vue:26
-#, fuzzy
-msgid "%{ count } tracks"
-msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count } Track"
-msgstr[1] "%{ count } Tracks"
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
