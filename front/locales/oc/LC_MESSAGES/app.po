@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-02 19:55+0200\n"
-"PO-Revision-Date: 2018-09-26 10:14+0000\n"
+"POT-Creation-Date: 2018-10-03 18:07+0200\n"
+"PO-Revision-Date: 2018-10-03 16:06+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -39,6 +39,7 @@ msgstr[1] "%{ count } sus %{ total } elements seleccionats"
 
 #: front/src/components/Sidebar.vue:106 src/components/audio/album/Card.vue:54
 #: front/src/views/content/libraries/Card.vue:39
+#: src/views/content/remote/Card.vue:26
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
 msgstr[0] "%{ count } pista"
@@ -55,13 +56,6 @@ msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
 msgstr[0] "%{ count } pista correspond als filtres seleccionats"
 msgstr[1] "%{ count } pistas correspondon als filtres seleccionats"
-
-#: front/src/views/content/remote/Card.vue:26
-#, fuzzy
-msgid "%{ count } tracks"
-msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count } pista"
-msgstr[1] "%{ count } pistas"
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
@@ -342,7 +336,7 @@ msgstr "De %{ artist }"
 
 #: front/src/views/content/remote/Card.vue:103
 msgid "By unfollowing this library, you will loose access to its content."
-msgstr ""
+msgstr "En quitar de seguir aquesta bibliotèca, perdretz l’accès a son contengut."
 
 #: front/src/components/common/DangerousButton.vue:17
 #: front/src/components/library/radios/Filter.vue:53
@@ -570,7 +564,6 @@ msgid "Detail"
 msgstr "Detalhs"
 
 #: front/src/views/content/remote/Card.vue:50
-#, fuzzy
 msgid "Details"
 msgstr "Detalhs"
 
@@ -679,9 +672,8 @@ msgid "Error"
 msgstr "Error"
 
 #: front/src/views/content/remote/Card.vue:39
-#, fuzzy
 msgid "Error during scan"
-msgstr "Rapòrt d’error"
+msgstr "Error en explorant"
 
 #: front/src/components/common/ActionTable.vue:79
 msgid "Error while applying action"
@@ -721,9 +713,8 @@ msgid "Errored files"
 msgstr "Fichièrs amb errors"
 
 #: front/src/views/content/remote/Card.vue:58
-#, fuzzy
 msgid "Errored tracks:"
-msgstr "Pistas federadas"
+msgstr "Pistas en error :"
 
 #: front/src/components/library/radios/Builder.vue:61
 msgid "Exclude"
@@ -951,9 +942,8 @@ msgid "Last modification"
 msgstr "Darrièra modificacion"
 
 #: front/src/views/content/remote/Card.vue:56
-#, fuzzy
 msgid "Last update:"
-msgstr "Lista de lectura actualizada"
+msgstr "Darrièra actualizacion :"
 
 #: front/src/components/common/ActionTable.vue:40
 msgid "Launch"
@@ -1060,7 +1050,7 @@ msgstr "Las marcar totas coma legidas"
 
 #: front/src/views/admin/users/UsersDetail.vue:94
 msgid "MB"
-msgstr ""
+msgstr "Mo"
 
 #: front/src/components/Sidebar.vue:62
 msgid "Music"
@@ -1121,9 +1111,8 @@ msgid "No lyrics available for this track."
 msgstr "Cap de paraulas pas disponiblas per aquesta pista."
 
 #: front/src/components/federation/LibraryWidget.vue:6
-#, fuzzy
 msgid "No matching library."
-msgstr "Cargament de las donadas de la bibliotèca..."
+msgstr "Cap de bibliotèca correspondenta."
 
 #: front/src/views/content/libraries/Detail.vue:57
 msgid "Nobody is following this library"
@@ -1433,23 +1422,20 @@ msgid "Save"
 msgstr "Enregistrar"
 
 #: front/src/views/content/remote/Card.vue:31
-#, fuzzy
 msgid "Scan pending"
-msgstr "Ascendent"
+msgstr "Exploracion en espèra"
 
 #: front/src/views/content/remote/Card.vue:43
-#, fuzzy
 msgid "Scanned successfully"
-msgstr "Paramètres corrèctament modificats."
+msgstr "Exploracion corrèctament realizada"
 
 #: front/src/views/content/remote/Card.vue:47
-#, fuzzy
 msgid "Scanned with errors"
-msgstr "Cambiament sincronizat amb lo servidor"
+msgstr "Explorada amb d’errors"
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning... (%{ progress }%)"
-msgstr ""
+msgstr "Exploracion... (%{ progress }%)"
 
 #: front/src/components/library/Artists.vue:10
 #: src/components/library/Radios.vue:29
@@ -1526,11 +1512,10 @@ msgid "Sharing link"
 msgstr "Ligam de partatge"
 
 #: front/src/components/audio/album/Card.vue:40
-#, fuzzy
 msgid "Show %{ count } more track"
 msgid_plural "Show %{ count } more tracks"
-msgstr[0] "%{ count } pista"
-msgstr[1] "%{ count } pistas"
+msgstr[0] "%{ count } pista mai"
+msgstr[1] "%{ count } pistas mai"
 
 #: front/src/components/audio/artist/Card.vue:30
 msgid "Show 1 more album"
@@ -1675,14 +1660,12 @@ msgid "The uploaded music files are in OGG, Flac or MP3 format"
 msgstr "Los fichièrs enviats son al format OGG, Flac o MP3"
 
 #: front/src/components/library/Album.vue:52
-#, fuzzy
 msgid "This album is present in the following libraries:"
-msgstr "La pista ja presenta dins una de vòstras bibliotècas"
+msgstr "Aqueste album es present a las bibliotècas seguentas :"
 
 #: front/src/components/library/Artist.vue:63
-#, fuzzy
 msgid "This artist is present in the following libraries:"
-msgstr "La pista ja presenta dins una de vòstras bibliotècas"
+msgstr "Aqueste artista es present a las bibliotècas seguentas :"
 
 #: front/src/views/content/Home.vue:9
 msgid "This instance offers up to %{quota} of storage space to every user."
@@ -1701,9 +1684,8 @@ msgid "This reference will be used to group imported files together."
 msgstr "Utilizarem aquesta referéncia per gropar los fichièrs importats amassa."
 
 #: front/src/components/library/Track.vue:125
-#, fuzzy
 msgid "This track is present in the following libraries:"
-msgstr "La pista ja presenta dins una de vòstras bibliotècas"
+msgstr "Aquesta pista es presenta a las bibliotècas seguentas :"
 
 #: front/src/views/playlists/Detail.vue:37
 msgid "This will completely delete this playlist and cannot be undone."
@@ -1927,9 +1909,8 @@ msgid "Unfollow"
 msgstr "Quitar de seguir"
 
 #: front/src/views/content/remote/Card.vue:101
-#, fuzzy
 msgid "Unfollow this library?"
-msgstr "Suprimir aquesta bibliotèca ?"
+msgstr "Quitar de seguir aquesta bibliotèca ?"
 
 #: front/src/components/About.vue:15
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
@@ -1987,9 +1968,8 @@ msgid "Upload new tracks"
 msgstr "Enviar nòvas pistas"
 
 #: front/src/views/admin/users/UsersDetail.vue:82
-#, fuzzy
 msgid "Upload quota"
-msgstr "Data de mandadís"
+msgstr "Quòta de mandadís"
 
 #: front/src/components/library/FileUpload.vue:99
 msgid "Uploaded"
@@ -2027,9 +2007,8 @@ msgstr "Activitat dels utilizaires"
 #: front/src/components/library/Album.vue:49
 #: src/components/library/Artist.vue:60
 #: front/src/components/library/Track.vue:122
-#, fuzzy
 msgid "User libraries"
-msgstr "Mas bibliotècas"
+msgstr "Bibliotècas de l’utilizaire"
 
 #: front/src/components/library/Radios.vue:20
 msgid "User radios"
@@ -2458,11 +2437,11 @@ msgstr "Picatz l’URL d’una bibliotèca"
 
 #: front/src/views/content/remote/Card.vue:165
 msgid "Scan launched"
-msgstr ""
+msgstr "Exploracion lançada"
 
 #: front/src/views/content/remote/Card.vue:166
 msgid "Scan skipped (previous scan is too recent)"
-msgstr ""
+msgstr "Exploracion sautada (la darrièra es tròp recenta)"
 
 #: front/src/views/content/libraries/FilesTable.vue:225
 msgid "Search by title, artist, album..."
@@ -2545,9 +2524,8 @@ msgid "Enter an playlist name..."
 msgstr "Escrivètz un nom de lista de lectura..."
 
 #: front/src/views/admin/library/Base.vue:16
-#, fuzzy
 msgid "Manage library"
-msgstr "A la bibliotèca"
+msgstr "Gerir la bibliotèca"
 
 #: front/src/views/admin/users/UsersDetail.vue:169
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
@@ -2555,7 +2533,7 @@ msgstr "Determina se l’utilizaire es actiu o non. Los compte inactius se pòdo
 
 #: front/src/views/admin/users/UsersDetail.vue:170
 msgid "Determine how much content the user can upload. Leave empty to use the default value of the instance."
-msgstr ""
+msgstr "Definissètz la quantitat de contengut que l’utilizaire pòt enviar. Daissatz void per emplegar las valors per defaut de l’instància."
 
 #: front/src/views/admin/users/Base.vue:20
 msgid "Manage users"

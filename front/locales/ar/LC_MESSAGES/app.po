@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-02 19:55+0200\n"
-"PO-Revision-Date: 2018-09-08 17:55+0000\n"
+"POT-Creation-Date: 2018-10-03 18:07+0200\n"
+"PO-Revision-Date: 2018-10-03 16:06+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
 "Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
 "Language: ar\n"
@@ -38,11 +38,12 @@ msgstr[5] ""
 
 #: front/src/components/Sidebar.vue:106 src/components/audio/album/Card.vue:54
 #: front/src/views/content/libraries/Card.vue:39
+#: src/views/content/remote/Card.vue:26
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count } مقاطع"
+msgstr[0] "%{ count } مقطع"
 msgstr[1] "%{ count } مَقطَع"
-msgstr[2] "%{ count } مَقاطِع"
+msgstr[2] "%{ count } مَقطعين"
 msgstr[3] "%{ count } مَقطَع"
 msgstr[4] "%{ count } مَقاطِع"
 msgstr[5] "%{ count } مَقاطِع"
@@ -67,21 +68,10 @@ msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
 
-#: front/src/views/content/remote/Card.vue:26
-#, fuzzy
-msgid "%{ count } tracks"
-msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count } مقاطع"
-msgstr[1] "%{ count } مَقطَع"
-msgstr[2] "%{ count } مَقاطِع"
-msgstr[3] "%{ count } مَقطَع"
-msgstr[4] "%{ count } مَقاطِع"
-msgstr[5] "%{ count } مَقاطِع"
-
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
-msgstr[0] ""
+msgstr[0] "%{ count} مَقطَع"
 msgstr[1] "%{ count } مَقطَع"
 msgstr[2] "مقطعين"
 msgstr[3] "%{ count } مَقطَع"
@@ -112,19 +102,19 @@ msgstr "قام %{ user } بالاستماع إلى مَقطَع"
 msgid "1 album"
 msgid_plural "%{ count } albums"
 msgstr[0] "ألبوم واحد"
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[1] "ألبوم"
+msgstr[2] "%{ count } ألبومين"
+msgstr[3] "%{ count } ألبوم"
 msgstr[4] "%{ count } ألبومات"
 msgstr[5] "%{ count } ألبومات"
 
 #: front/src/components/favorites/List.vue:10
 msgid "1 favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "مفضّلة واحدة"
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] "%{ count } مفضّلات"
+msgstr[0] "%{ count } مفضّلة"
+msgstr[1] "مفضلة"
+msgstr[2] "%{ count } مفضلتين"
+msgstr[3] "%{ count } مفضّلة"
 msgstr[4] "%{ count } مفضّلات"
 msgstr[5] "%{ count } مفضّلات"
 
@@ -141,7 +131,6 @@ msgid "About this instance"
 msgstr "عن مثيل الخادوم هذا"
 
 #: front/src/views/content/libraries/Detail.vue:48
-#, fuzzy
 msgid "Accept"
 msgstr "تم قبوله"
 
@@ -172,9 +161,8 @@ msgid "Account's email"
 msgstr "البريد الإلكتروني الخاص بالحساب"
 
 #: front/src/views/content/libraries/Detail.vue:29
-#, fuzzy
 msgid "Action"
-msgstr "الإجراءات"
+msgstr "الإجراء"
 
 #: front/src/components/common/ActionTable.vue:86
 msgid "Action %{ action } was launched successfully on %{ count } element"
@@ -202,7 +190,7 @@ msgstr "النشاط"
 
 #: front/src/components/Sidebar.vue:77 src/views/content/Base.vue:19
 msgid "Add content"
-msgstr ""
+msgstr "إضافة محتوى"
 
 #: front/src/components/library/radios/Builder.vue:50
 msgid "Add filter"
@@ -379,7 +367,7 @@ msgstr "حسب %{ artist }"
 
 #: front/src/views/content/remote/Card.vue:103
 msgid "By unfollowing this library, you will loose access to its content."
-msgstr ""
+msgstr "إن قمت بإلغاء متابعة هذه المكتبة فسوف لن تتمكن مِن الوصول إلى محتواها."
 
 #: front/src/components/common/DangerousButton.vue:17
 #: front/src/components/library/radios/Filter.vue:53
@@ -493,7 +481,7 @@ msgstr "رمز التأكيد"
 
 #: front/src/components/common/CopyInput.vue:8
 msgid "Copy"
-msgstr ""
+msgstr "نسخ"
 
 #: front/src/components/Home.vue:88
 msgid "Covers, lyrics, our goal is to have them all ;)"
@@ -504,9 +492,8 @@ msgid "Create a funkwhale account"
 msgstr "أنشئ حسابا على فانك وايل"
 
 #: front/src/views/content/libraries/Home.vue:14
-#, fuzzy
 msgid "Create a new library"
-msgstr "أنشئ قائمة مَقاطِع موسيقية جديدة"
+msgstr "أنشئ مكتبة جديدة"
 
 #: front/src/components/playlists/Form.vue:2
 msgid "Create a new playlist"
@@ -522,9 +509,8 @@ msgid "Create import"
 msgstr "إنشاء استيراد"
 
 #: front/src/views/content/libraries/Form.vue:26
-#, fuzzy
 msgid "Create library"
-msgstr "مكتبة موسيقية ذات جودة عالية"
+msgstr "أنشئ مكتبة"
 
 #: front/src/components/auth/Signup.vue:51
 msgid "Create my account"
@@ -548,22 +534,20 @@ msgid "Current avatar"
 msgstr "الصورة الرمزية الحالية"
 
 #: front/src/views/content/libraries/DetailArea.vue:4
-#, fuzzy
 msgid "Current library"
-msgstr "مكتبة موسيقية ذات جودة عالية"
+msgstr "المكتبة الحالية"
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgid "Current track"
 msgstr "المَقطَع الحالي"
 
 #: front/src/views/content/libraries/Quota.vue:2
-#, fuzzy
 msgid "Current usage"
-msgstr "المَقطَع الحالي"
+msgstr "الاستعمال الحالي"
 
 #: front/src/views/content/libraries/Detail.vue:27
 msgid "Date"
-msgstr ""
+msgstr "التاريخ"
 
 #: front/src/views/content/libraries/Form.vue:29
 #: src/views/playlists/Detail.vue:33
@@ -575,9 +559,8 @@ msgid "Delete"
 msgstr "حذف"
 
 #: front/src/views/content/libraries/Form.vue:39
-#, fuzzy
 msgid "Delete library"
-msgstr "مكتبة موسيقية ذات جودة عالية"
+msgstr "حذف المكتبة"
 
 #: front/src/views/playlists/Detail.vue:38
 msgid "Delete playlist"
@@ -588,9 +571,8 @@ msgid "Delete radio"
 msgstr "حذف الإذاعة"
 
 #: front/src/views/content/libraries/Form.vue:31
-#, fuzzy
 msgid "Delete this library?"
-msgstr "أنقلني إلى المكتبة"
+msgstr "أتريد حذف هذه المكتبة؟"
 
 #: front/src/components/favorites/List.vue:34
 #: src/components/library/Artists.vue:26
@@ -605,16 +587,14 @@ msgstr "تنازليًا"
 
 #: front/src/components/library/radios/Builder.vue:25
 #: front/src/views/content/libraries/Form.vue:14
-#, fuzzy
 msgid "Description"
-msgstr "المدّة"
+msgstr "الوصف"
 
 #: front/src/views/content/libraries/Card.vue:47
 msgid "Detail"
 msgstr "التفاصيل"
 
 #: front/src/views/content/remote/Card.vue:50
-#, fuzzy
 msgid "Details"
 msgstr "التفاصيل"
 
@@ -693,9 +673,8 @@ msgid "Easy to use"
 msgstr "سهل للإستخدام"
 
 #: front/src/views/content/libraries/Detail.vue:9
-#, fuzzy
 msgid "Edit"
-msgstr "تعديل …"
+msgstr "تعديل"
 
 #: front/src/components/About.vue:21
 msgid "Edit instance info"
@@ -728,9 +707,8 @@ msgid "Error"
 msgstr "خطأ"
 
 #: front/src/views/content/remote/Card.vue:39
-#, fuzzy
 msgid "Error during scan"
-msgstr "سِجِل الأخطاء"
+msgstr "خطأ أثناء الإستكشاف"
 
 #: front/src/components/common/ActionTable.vue:79
 msgid "Error while applying action"
@@ -753,9 +731,8 @@ msgid "Error while creating invitation"
 msgstr "حدث خطأ أثناء إنشاء الدعوة"
 
 #: front/src/views/content/remote/ScanForm.vue:3
-#, fuzzy
 msgid "Error while fetching remote library"
-msgstr "حدث خطأ أثناء عملية مسح المكتبة"
+msgstr "حدث خطأ أثناء عملية جلب المكتبة البُعدية"
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgid "Error while saving settings"
@@ -767,14 +744,12 @@ msgid "Errored"
 msgstr "فيه خطأ"
 
 #: front/src/views/content/libraries/Quota.vue:75
-#, fuzzy
 msgid "Errored files"
-msgstr "فيه خطأ"
+msgstr "الملفات الخاطئة"
 
 #: front/src/views/content/remote/Card.vue:58
-#, fuzzy
 msgid "Errored tracks:"
-msgstr "المَقاطع الموسيقية المتحدة"
+msgstr "المَقاطع الموسيقية الخاطئة:"
 
 #: front/src/components/library/radios/Builder.vue:61
 msgid "Exclude"
@@ -823,13 +798,12 @@ msgid "Follow"
 msgstr "إتبع"
 
 #: front/src/views/content/remote/Card.vue:88
-#, fuzzy
 msgid "Follow pending approval"
-msgstr "طلبات متابعة مُعلّقة"
+msgstr "طلبات متابعة مُعلّقة تنتظر اجراء"
 
 #: front/src/views/content/Home.vue:16
 msgid "Follow remote libraries"
-msgstr ""
+msgstr "متابعة المكتبات عن بُعد"
 
 #: front/src/views/content/libraries/Detail.vue:7
 msgid "Followers"
@@ -893,9 +867,8 @@ msgstr ""
 "              </a>"
 
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
-#, fuzzy
 msgid "Get started"
-msgstr "الخطوة التالية"
+msgstr "إبدأ هنا"
 
 #: front/src/components/common/ActionTable.vue:21
 #: front/src/components/common/ActionTable.vue:27
@@ -932,7 +905,6 @@ msgid "Import music from various platforms, such as YouTube or SoundCloud"
 msgstr "استيراد الموسيقى من منصات مختلفة، مثل يوتيوب أو ساوند كلاود"
 
 #: front/src/components/library/FileUpload.vue:51
-#, fuzzy
 msgid "Import reference"
 msgstr "مصدر الإستيراد"
 
@@ -989,16 +961,15 @@ msgstr "متعقّب المشاكل"
 
 #: front/src/views/content/libraries/Home.vue:9
 msgid "It looks like you don't have any library yet, it's time to create one!"
-msgstr ""
+msgstr "يبدو أنه ليس لديك أية مكتبة بعد، حان الأوان لإنشاء واحدة!"
 
 #: front/src/components/Home.vue:50
 msgid "Keep a track of your favorite songs"
 msgstr "حافظوا على أثر موسيقاكم و أغانيكم المفضّلة"
 
 #: front/src/views/content/remote/Home.vue:14
-#, fuzzy
 msgid "Known libraries"
-msgstr "تصفّح المكتبات"
+msgstr "المكتبات المعروفة"
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/views/admin/users/UsersDetail.vue:45
@@ -1010,9 +981,8 @@ msgid "Last modification"
 msgstr "آخر تعديل"
 
 #: front/src/views/content/remote/Card.vue:56
-#, fuzzy
 msgid "Last update:"
-msgstr "تم تحديث قائمة تشغيل الموسيقى"
+msgstr "آخِر تحديث:"
 
 #: front/src/components/common/ActionTable.vue:40
 msgid "Launch"
@@ -1053,39 +1023,33 @@ msgid "Links"
 msgstr "الروابط"
 
 #: front/src/views/content/libraries/Detail.vue:21
-#, fuzzy
 msgid "Loading followers..."
-msgstr "إستكشاف المُشاركين"
+msgstr "تحميل المتابعين…"
 
 #: front/src/views/content/libraries/Home.vue:3
-#, fuzzy
 msgid "Loading Libraries..."
-msgstr "جارٍ تحميل مفضلاتك …"
+msgstr "جارٍ تحميل المكتبات …"
 
 #: front/src/views/content/libraries/Detail.vue:3
 #: front/src/views/content/libraries/Upload.vue:3
-#, fuzzy
 msgid "Loading library data..."
-msgstr "أدخِل إسم نطاق لمكتبة ما …"
+msgstr "جارٍ تحميل بيانات المكتبات…"
 
 #: front/src/views/Notifications.vue:4
-#, fuzzy
 msgid "Loading notifications..."
-msgstr "عملية تحميل الخيط الزمني جارية …"
+msgstr "عملية تحميل الإشعارات جارية…"
 
 #: front/src/views/content/remote/Home.vue:3
-#, fuzzy
 msgid "Loading remote libraries..."
-msgstr "عملية تحميل الخيط الزمني جارية …"
+msgstr "عملية تحميل المكتبات البُعدية جارية…"
 
 #: front/src/views/instance/Timeline.vue:4
 msgid "Loading timeline..."
 msgstr "عملية تحميل الخيط الزمني جارية …"
 
 #: front/src/views/content/libraries/Quota.vue:4
-#, fuzzy
 msgid "Loading usage data..."
-msgstr "جارٍ تحميل مفضلاتك …"
+msgstr "جارٍ تحميل بيانات الإستخدام…"
 
 #: front/src/components/favorites/List.vue:5
 msgid "Loading your favorites..."
@@ -1121,11 +1085,11 @@ msgstr "إدارة القوائم الخاصة الموسيقى"
 
 #: front/src/views/Notifications.vue:17
 msgid "Mark all as read"
-msgstr ""
+msgstr "تحديد الكل كمقروء"
 
 #: front/src/views/admin/users/UsersDetail.vue:94
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: front/src/components/Sidebar.vue:62
 msgid "Music"
@@ -1136,9 +1100,8 @@ msgid "My account"
 msgstr "حسابي"
 
 #: front/src/views/content/libraries/Home.vue:6
-#, fuzzy
 msgid "My libraries"
-msgstr "المكتبات"
+msgstr "مكتباتي"
 
 #: front/src/components/audio/track/Row.vue:40
 #: src/components/library/Track.vue:64
@@ -1187,22 +1150,20 @@ msgid "No lyrics available for this track."
 msgstr "لا تتوفّر هناك كلمات لهذا المَقطَع."
 
 #: front/src/components/federation/LibraryWidget.vue:6
-#, fuzzy
 msgid "No matching library."
-msgstr "أدخِل إسم نطاق لمكتبة ما …"
+msgstr "ليس هناك أية مكتبة مطابِقة."
 
 #: front/src/views/content/libraries/Detail.vue:57
 msgid "Nobody is following this library"
-msgstr ""
+msgstr "لا أحد يتبع هذه المكتبة"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgid "Not used"
 msgstr "غير مستعمَل"
 
 #: front/src/components/Sidebar.vue:46 src/views/Notifications.vue:74
-#, fuzzy
 msgid "Notifications"
-msgstr "آخر تعديل"
+msgstr "الإشعارات"
 
 #: front/src/App.vue:36
 msgid "Official website"
@@ -1272,9 +1233,8 @@ msgid "Pending approval"
 msgstr "في انتظار التسريح"
 
 #: front/src/views/content/libraries/Quota.vue:22
-#, fuzzy
 msgid "Pending files"
-msgstr "معلّق"
+msgstr "الملفات المعلّقة"
 
 #: front/src/components/requests/Form.vue:26
 msgid "Pending requests"
@@ -1361,9 +1321,8 @@ msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
 msgstr "نسق PNG أو GIF أو JPG. الحجم الأقصى 2 ميغابيت. سيتم تغيير حجمها إلى 400×400 بكسل."
 
 #: front/src/components/library/FileUpload.vue:58
-#, fuzzy
 msgid "Proceed"
-msgstr "المواصلة إلى صفحة تسجيل الدخول"
+msgstr "واصل"
 
 #: front/src/views/auth/EmailConfirm.vue:26
 #: front/src/views/auth/PasswordResetConfirm.vue:31
@@ -1451,16 +1410,15 @@ msgstr "مستخدِم عادي"
 
 #: front/src/views/content/libraries/Detail.vue:51
 msgid "Reject"
-msgstr ""
+msgstr "رفض"
 
 #: front/src/views/content/libraries/Detail.vue:43
 msgid "Rejected"
-msgstr ""
+msgstr "تم رفضه"
 
 #: front/src/views/content/remote/Home.vue:6
-#, fuzzy
 msgid "Remote libraries"
-msgstr "أنقلني إلى المكتبة"
+msgstr "المكتبات البُعدية"
 
 #: front/src/views/content/remote/Home.vue:7
 msgid "Remote libraries are owned by other users on the network. You can access them as long as they are public or you are granted access."
@@ -1523,7 +1481,7 @@ msgstr "تمت مزامنة التعديلات مع السيرفر"
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning... (%{ progress }%)"
-msgstr ""
+msgstr "جارٍ المسح (%{ progress }%)"
 
 #: front/src/components/library/Artists.vue:10
 #: src/components/library/Radios.vue:29
@@ -1537,9 +1495,8 @@ msgid "Search"
 msgstr "البحث"
 
 #: front/src/views/content/remote/ScanForm.vue:9
-#, fuzzy
 msgid "Search a remote library"
-msgstr "أنقلني إلى المكتبة"
+msgstr "البحث عن مكتبة بُعدية"
 
 #: front/src/components/audio/Search.vue:2
 msgid "Search for some music"
@@ -1597,7 +1554,7 @@ msgstr "رابط المشاركة"
 
 #: front/src/views/content/libraries/Detail.vue:15
 msgid "Share this link with other users so they can request an access to your library."
-msgstr ""
+msgstr "قم بمشاركة هذا الرابط مع مستخدمين آخرين ليتمكنوا مِن طلب الوصول إلى مكتبتك."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
@@ -1627,9 +1584,8 @@ msgstr[4] ""
 msgstr[5] ""
 
 #: front/src/views/Notifications.vue:10
-#, fuzzy
 msgid "Show read notifications"
-msgstr "آخر تعديل"
+msgstr "عرض الإشعارات المقروءة"
 
 #: front/src/components/manage/library/FilesTable.vue:97
 #: front/src/components/manage/library/RequestsTable.vue:104
@@ -1657,9 +1613,8 @@ msgid "Skipped"
 msgstr "تمّ تجاهله"
 
 #: front/src/views/content/libraries/Quota.vue:49
-#, fuzzy
 msgid "Skipped files"
-msgstr "تمّ تجاهله"
+msgstr "الملفات التي تمّ تجاهلها"
 
 #: front/src/components/requests/Form.vue:3
 msgid "Something's missing in the library? Let us know what you would like to listen!"
@@ -1726,7 +1681,7 @@ msgstr "الخيارات المتاحة"
 
 #: front/src/components/library/FileUpload.vue:3
 msgid "Summary"
-msgstr ""
+msgstr "الملخص"
 
 #: front/src/components/playlists/Editor.vue:9
 msgid "Syncing changes to server..."
@@ -1734,7 +1689,7 @@ msgstr "مزامنة التغييرات مع الخادم …"
 
 #: front/src/components/common/CopyInput.vue:3
 msgid "Text copied to clipboard!"
-msgstr ""
+msgstr "تم نسخ النص إلى الحافظة!"
 
 #: front/src/components/Home.vue:26
 msgid "That's simple: we loved Grooveshark and we want to build something even better."
@@ -1746,7 +1701,7 @@ msgstr "تم تصميم شعار فانك وايل funkwhale بفضل و كَر�
 
 #: front/src/views/content/libraries/Form.vue:34
 msgid "The library and all its tracks will be deleted. This action is irreversible."
-msgstr ""
+msgstr "سوف يتم حذف المكتبة و كل ما تحتويه مِن مقاطِع. لا يمكن التراجع عن هذا الإجراء."
 
 #: front/src/components/library/FileUpload.vue:39
 msgid "The music files you are uploading are tagged properly:"
@@ -1758,7 +1713,7 @@ msgstr "المنصّة مجانية و مفتوحة المصدر، بإمكان�
 
 #: front/src/components/auth/SubsonicTokenForm.vue:4
 msgid "The Subsonic API is not available on this Funkwhale instance."
-msgstr ""
+msgstr "واجهة برمجة تطبيقات صاب سونيك غير متوفرة غلى مثيل خادوم فانك وايل الحالي."
 
 #: front/src/components/library/FileUpload.vue:43
 msgid "The uploaded music files are in OGG, Flac or MP3 format"
@@ -1766,15 +1721,15 @@ msgstr ""
 
 #: front/src/components/library/Album.vue:52
 msgid "This album is present in the following libraries:"
-msgstr ""
+msgstr "هذا الألبوم متوفر على المكتبات التالية:"
 
 #: front/src/components/library/Artist.vue:63
 msgid "This artist is present in the following libraries:"
-msgstr ""
+msgstr "هذا الفنان متوفر على المكتبات التالية:"
 
 #: front/src/views/content/Home.vue:9
 msgid "This instance offers up to %{quota} of storage space to every user."
-msgstr ""
+msgstr "مثيل الخادوم هذا يُتيح حجم تخرين يُقدَّر بـ %{quota} لكل مستخدِم."
 
 #: front/src/components/auth/Profile.vue:16
 msgid "This is you!"
@@ -1790,7 +1745,7 @@ msgstr ""
 
 #: front/src/components/library/Track.vue:125
 msgid "This track is present in the following libraries:"
-msgstr ""
+msgstr "هذا المقطع متوفر كذلك على المكتبات التالية:"
 
 #: front/src/views/playlists/Detail.vue:37
 msgid "This will completely delete this playlist and cannot be undone."
@@ -2015,14 +1970,12 @@ msgstr "النوع"
 
 #: front/src/views/content/remote/Card.vue:100
 #: src/views/content/remote/Card.vue:105
-#, fuzzy
 msgid "Unfollow"
-msgstr "إتبع"
+msgstr "إلغاء المتابعة"
 
 #: front/src/views/content/remote/Card.vue:101
-#, fuzzy
 msgid "Unfollow this library?"
-msgstr "أنقلني إلى المكتبة"
+msgstr "أتريد إلغاء متابعة هذه المكتبة؟"
 
 #: front/src/components/About.vue:15
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
@@ -2037,9 +1990,8 @@ msgid "Update avatar"
 msgstr "تحديث الصورة الرمزية"
 
 #: front/src/views/content/libraries/Form.vue:25
-#, fuzzy
 msgid "Update library"
-msgstr "إدارة المكتبة"
+msgstr "تحديث المكتبة"
 
 #: front/src/components/playlists/Form.vue:33
 msgid "Update playlist"
@@ -2065,23 +2017,20 @@ msgid "Upload a new avatar"
 msgstr "إرسال صورة رمزية جديدة"
 
 #: front/src/views/content/Home.vue:6
-#, fuzzy
 msgid "Upload audio content"
-msgstr "إرسال صورة رمزية جديدة"
+msgstr "إرسال محتوى صوتي"
 
 #: front/src/views/content/libraries/FilesTable.vue:54
-#, fuzzy
 msgid "Upload date"
-msgstr "أرسل"
+msgstr "تاريخ التحميل"
 
 #: front/src/views/content/Home.vue:7
 msgid "Upload music files (mp3, ogg, flac, etc.) from your personal library directly from your browser to enjoy them here."
 msgstr ""
 
 #: front/src/components/library/FileUpload.vue:31
-#, fuzzy
 msgid "Upload new tracks"
-msgstr "إرسال صورة رمزية جديدة"
+msgstr "إرسال مقاطع موسيقية جديدة"
 
 #: front/src/views/admin/users/UsersDetail.vue:82
 #, fuzzy
@@ -2089,14 +2038,12 @@ msgid "Upload quota"
 msgstr "أرسل"
 
 #: front/src/components/library/FileUpload.vue:99
-#, fuzzy
 msgid "Uploaded"
-msgstr "أرسل"
+msgstr "تم تحميلها"
 
 #: front/src/components/library/FileUpload.vue:5
-#, fuzzy
 msgid "Uploading"
-msgstr "عملية الإرسال جارية …"
+msgstr "عملية الإرسال جارية"
 
 #: front/src/components/library/FileUpload.vue:102
 msgid "Uploading..."
@@ -2156,9 +2103,8 @@ msgstr "المستخدِمون"
 #: front/src/views/content/libraries/Quota.vue:29
 #: front/src/views/content/libraries/Quota.vue:56
 #: front/src/views/content/libraries/Quota.vue:82
-#, fuzzy
 msgid "View files"
-msgstr "ملفّات المكتبة"
+msgstr "عرض الملفات"
 
 #: front/src/components/library/Album.vue:37
 #: src/components/library/Artist.vue:35
@@ -2203,16 +2149,15 @@ msgstr "لا نتعقّبك و لا نزعجك بالإعلانات"
 
 #: front/src/views/Notifications.vue:26
 msgid "We don't have any notification to display!"
-msgstr ""
+msgstr "ليس لدينا أي اشعار لعرضه هنا!"
 
 #: front/src/views/content/Home.vue:4
 msgid "We offer various way to grab new content and make it available here."
-msgstr ""
+msgstr "نوفر لكم عدة أساليب لجلب محتويات جديدة و عرضها هنا."
 
 #: front/src/components/library/FileUpload.vue:40
-#, fuzzy
 msgid "we recommend using Picard for that purpose"
-msgstr "ننصحكم باستخدام برنامج Picard لهذا الغرض."
+msgstr "ننصحكم باستخدام برنامج Picard لهذا الغرض"
 
 #: front/src/components/Home.vue:7
 msgid "We think listening to music should be simple."
@@ -2244,7 +2189,7 @@ msgstr "نعم، أؤكد الخروج !"
 
 #: front/src/components/library/FileUpload.vue:33
 msgid "You are about to upload music to your library. Before proceeding, please ensure that:"
-msgstr ""
+msgstr "إنك بصدد إرسال موسيقى إلى مكتبتك الصوتية. قبل المواصلة، ندعوك إلى التحقق من أنّ:"
 
 #: front/src/components/auth/Logout.vue:7
 msgid "You are currently logged in as %{ username }"
@@ -2260,7 +2205,7 @@ msgstr "يمكِنك دعوة أصدقائك و عائلتك للإنظمام إ
 
 #: front/src/components/library/radios/Builder.vue:7
 msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
-msgstr ""
+msgstr "يمكنك إنشاء قناتك الإذاعية الخاصة بك عبر هذه الواجهة و تشغيل مقاطعك كيفما شئت."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:8
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
@@ -2284,7 +2229,7 @@ msgstr ""
 
 #: front/src/components/auth/Settings.vue:71
 msgid "You will have to update your password on your clients that use this password."
-msgstr ""
+msgstr "يتوجب عليك تحديث كلمتك السرية على العملاء الآخرين اللذين يشتغلون بها."
 
 #: front/src/views/auth/EmailConfirm.vue:24
 msgid "Your email address was confirmed, you can now use the service without limitations."
@@ -2295,9 +2240,8 @@ msgid "Your music, your way"
 msgstr "موسيقاك، كما يحلو لك"
 
 #: front/src/views/Notifications.vue:7
-#, fuzzy
 msgid "Your notifications"
-msgstr "آخر تعديل"
+msgstr "إشعاراتك"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:29
 msgid "Your password has been updated successfully."
@@ -2398,22 +2342,20 @@ msgid "My awesome radio"
 msgstr "إذاعتي الرائعة"
 
 #: front/src/components/library/radios/Builder.vue:236
-#, fuzzy
 msgid "My awesome description"
-msgstr "إذاعتي الرائعة"
+msgstr "وصفي الرائع"
 
 #: front/src/components/library/FileUpload.vue:238
 msgid "Upload refused, ensure the file is not too big and you have not reached your quota"
-msgstr ""
+msgstr "تم رفض الإرسال، تحقق أن حجم الملف ليس ضخما و أنّ مساحة التخرين المسموح بها كافية"
 
 #: front/src/components/library/FileUpload.vue:239
 msgid "Impossible to upload this file, ensure it is not too big"
-msgstr ""
+msgstr "لا يمكن تحميل هذا الملف، تحقق أنّ حجم الملف ليس ضخما"
 
 #: front/src/components/library/FileUpload.vue:240
-#, fuzzy
 msgid "A network error occured while uploading this file"
-msgstr "حدث خطأ أثناء عملية حفظ التغييرات"
+msgstr "حدث خطأ في الشبكة أثناء تحميل هذا الملف"
 
 #: front/src/components/library/FileUpload.vue:241
 msgid "Upload timeout, please try again"
@@ -2562,26 +2504,24 @@ msgid "Federation"
 msgstr "الفديرالية"
 
 #: front/src/views/content/remote/ScanForm.vue:48
-#, fuzzy
 msgid "Enter a library url"
-msgstr "أدخِل إسم نطاق لمكتبة ما …"
+msgstr "أدخِل عنوان رابط لمكتبة ما"
 
 #: front/src/views/content/remote/Card.vue:165
 msgid "Scan launched"
-msgstr ""
+msgstr "بدأ الإستكشاف"
 
 #: front/src/views/content/remote/Card.vue:166
 msgid "Scan skipped (previous scan is too recent)"
 msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:225
-#, fuzzy
 msgid "Search by title, artist, album..."
-msgstr "البحث حسب العنوان أو إسم فنان أو نطاق …"
+msgstr "البحث حسب العنوان أو إسم فنان أو ألبوم…"
 
 #: front/src/views/content/libraries/FilesTable.vue:229
 msgid "Track was already present in one of your libraries"
-msgstr ""
+msgstr "إنّ المقطع موجود مِن قبل في إحدى مكتباتك"
 
 #: front/src/views/content/libraries/FilesTable.vue:233
 msgid "Track is uploaded but not processed by the server yet"
@@ -2616,18 +2556,16 @@ msgid "Visibility: everyone, including other instances"
 msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:61
-#, fuzzy
 msgid "Total size of the files in this library"
-msgstr "المَقاطِع المتوفّرة في هذه المكتبة"
+msgstr "الحجم الإجمالي للملفات المتوفّرة في هذه المكتبة"
 
 #: front/src/views/content/libraries/Form.vue:70
-#, fuzzy
 msgid "My awesome library"
-msgstr "إذاعتي الرائعة"
+msgstr "مكتبتي الرائعة"
 
 #: front/src/views/content/libraries/Form.vue:71
 msgid "This library contains my personnal music, I hope you will like it!"
-msgstr ""
+msgstr "تجتوي هذه المكتبة على الموسيقى الخاصة بي، أتمنى أنها ستلقى إعجابك!"
 
 #: front/src/views/content/libraries/Form.vue:74
 #, fuzzy
@@ -2635,18 +2573,16 @@ msgid "Everyone, including other instances"
 msgstr "كل مَن هم على مثيل الخادوم هذا"
 
 #: front/src/views/content/libraries/Form.vue:106
-#, fuzzy
 msgid "Library updated"
-msgstr "إسم المكتبة"
+msgstr "تم تحديث المكتبة"
 
 #: front/src/views/content/libraries/Form.vue:109
-#, fuzzy
 msgid "Library created"
-msgstr "إسم المكتبة"
+msgstr "تم انشاء المكتبة"
 
 #: front/src/views/content/Home.vue:35
 msgid "Add and manage content"
-msgstr ""
+msgstr "إضافة المحتوى و إدارته"
 
 #: front/src/views/radios/Detail.vue:80
 msgid "Radio"
@@ -2665,9 +2601,8 @@ msgid "Enter an playlist name..."
 msgstr "أدخِل إسم قائمة مَقاطِعٍ موسيقية …"
 
 #: front/src/views/admin/library/Base.vue:16
-#, fuzzy
 msgid "Manage library"
-msgstr "على المكتبة"
+msgstr "إدارة المكتبة"
 
 #: front/src/views/admin/users/UsersDetail.vue:169
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
