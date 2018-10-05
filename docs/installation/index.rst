@@ -11,6 +11,12 @@ The project relies on the following components and services to work:
 - A redis server to store cache and tasks data
 - A celery worker to run asynchronouse tasks (such as music import)
 - A celery scheduler to run recurrent tasks
+- A `ntp-synced clock <https://wiki.debian.org/NTP>`_ to ensure federation is working seamlessly
+
+.. note::
+
+    The synced clock is needed for federation purpose, to assess
+    the validity of incoming requests.
 
 
 Hardware requirements
