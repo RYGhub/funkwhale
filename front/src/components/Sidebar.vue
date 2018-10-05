@@ -54,6 +54,7 @@
             <template v-else>
               <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
               <router-link class="item" :to="{path: '/signup'}">
+                <i class="corner add icon"></i>
                 <translate>Create an account</translate>
               </router-link>
             </template>
