@@ -3,6 +3,16 @@ export default {
   computed: {
     sharedLabels () {
       return {
+        fields: {
+          privacy_level: {
+            label: this.$gettext('Activity visibility'),
+            help: this.$gettext('Determine the visibility level of your activity'),
+            choices: {
+              me: this.$gettext('Nobody except me'),
+              instance: this.$gettext('Everyone on this instance'),
+            }
+          }
+        },
         filters: {
           creation_date: this.$gettext('Creation date'),
           accessed_date: this.$gettext('Accessed date'),
