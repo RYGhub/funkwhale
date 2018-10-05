@@ -74,13 +74,10 @@
           </div>
           <div class="item">
             <i class="tag icon"></i>
-            <div class="content">
-              <template v-translate>
-                Get quality metadata about your music thanks to
-                <a href="https://musicbrainz.org" target="_blank">
-                  MusicBrainz
-                </a>
-              </template>
+            <div
+              class="content"
+              v-translate="{url: musicbrainzUrl}">
+                Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>
             </div>
           </div>
           <div class="item">
@@ -146,6 +143,11 @@
 <script>
 
 export default {
+  data () {
+    return {
+      musicbrainzUrl: 'https://musicbrainz.org/'
+    }
+  },
   computed: {
     labels () {
       return {
