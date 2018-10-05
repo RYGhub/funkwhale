@@ -22,7 +22,7 @@
           <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
-              {{ option[1] }}
+              {{ sharedLabels.filters[option[1]] }}
             </option>
           </select>
         </div>
@@ -127,9 +127,10 @@ import {normalizeQuery, parseTokens, compileTokens} from '@/search'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
+import TranslationsMixin from '@/components/mixins/Translations'
 
 export default {
-  mixins: [OrderingMixin],
+  mixins: [OrderingMixin, TranslationsMixin],
   props: {
     filters: {type: Object, required: false},
     defaultQuery: {type: String, default: ''},
@@ -153,13 +154,13 @@ export default {
       orderingDirection: '-',
       ordering: 'creation_date',
       orderingOptions: [
-        ['creation_date', 'Creation date'],
-        ['title', 'Title'],
-        ['size', 'Size'],
-        ['duration', 'Duration'],
-        ['bitrate', 'Bitrate'],
-        ['album_title', 'Album title'],
-        ['artist_name', 'Artist name']
+        ['creation_date', 'creation_date'],
+        ['title', 'title'],
+        ['size', 'size'],
+        ['duration', 'duration'],
+        ['bitrate', 'bitrate'],
+        ['album_title', 'album_title'],
+        ['artist_name', 'artist_name']
       ]
     }
   },

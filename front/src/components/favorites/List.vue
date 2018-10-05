@@ -24,7 +24,7 @@
             <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
-                {{ option[1] }}
+                {{ sharedLabels.filters[option[1]] }}
               </option>
             </select>
           </div>
@@ -69,10 +69,11 @@ import RadioButton from '@/components/radios/Button'
 import Pagination from '@/components/Pagination'
 import OrderingMixin from '@/components/mixins/Ordering'
 import PaginationMixin from '@/components/mixins/Pagination'
+import TranslationsMixin from '@/components/mixins/Translations'
 const FAVORITES_URL = 'tracks/'
 
 export default {
-  mixins: [OrderingMixin, PaginationMixin],
+  mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   components: {
     TrackTable,
     RadioButton,
@@ -90,10 +91,10 @@ export default {
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['creation_date', 'Creation date'],
-        ['title', 'Track name'],
-        ['album__title', 'Album name'],
-        ['artist__name', 'Artist name']
+        ['creation_date', 'creation_date'],
+        ['title', 'track_title'],
+        ['album__title', 'album_title'],
+        ['artist__name', 'artist_name']
       ]
     }
   },

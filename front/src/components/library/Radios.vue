@@ -34,7 +34,7 @@
             <label><translate>Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
-                {{ option[1] }}
+                {{ sharedLabels.filters[option[1]] }}
               </option>
             </select>
           </div>
@@ -99,13 +99,14 @@ import logger from '@/logging'
 
 import OrderingMixin from '@/components/mixins/Ordering'
 import PaginationMixin from '@/components/mixins/Pagination'
+import TranslationsMixin from '@/components/mixins/Translations'
 import RadioCard from '@/components/radios/Card'
 import Pagination from '@/components/Pagination'
 
 const FETCH_URL = 'radios/radios/'
 
 export default {
-  mixins: [OrderingMixin, PaginationMixin],
+  mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
     defaultQuery: {type: String, required: false, default: ''}
   },
@@ -124,8 +125,8 @@ export default {
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['creation_date', 'Creation date'],
-        ['name', 'Name']
+        ['creation_date', 'creation_date'],
+        ['name', 'name']
       ]
     }
   },
