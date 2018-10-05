@@ -18,10 +18,10 @@
             </ul>
           </div>
           <div class="field" v-for="f in orderedSettingsFields">
-            <label :for="f.id">{{ f.label }}</label>
-            <p v-if="f.help">{{ f.help }}</p>
+            <label>{{ sharedLabels.fields[f.id].label }}</label>
+            <p v-if="f.help">{{ sharedLabels.fields[f.id].help }}</p>
             <select v-if="f.type === 'dropdown'" class="ui dropdown" v-model="f.value">
-              <option :value="c.value" v-for="c in f.choices">{{ c.label }}</option>
+              <option :value="c" v-for="c in f.choices">{{ sharedLabels.fields[f.id].choices[c] }}</option>
             </select>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
@@ -118,8 +118,10 @@ import axios from 'axios'
 import logger from '@/logging'
 import PasswordInput from '@/components/forms/PasswordInput'
 import SubsonicTokenForm from '@/components/auth/SubsonicTokenForm'
+import TranslationsMixin from '@/components/mixins/Translations'
 
 export default {
+  mixins: [TranslationsMixin],
   components: {
     PasswordInput,
     SubsonicTokenForm
@@ -144,24 +146,14 @@ export default {
           'privacy_level': {
             type: 'dropdown',
             initial: this.$store.state.auth.profile.privacy_level,
-            label: 'Activity visibility',
-            help: 'Determine the visibility level of your activity',
-            choices: [
-              {
-                value: 'me',
-                label: 'Nobody except me'
-              },
-              {
-                value: 'instance',
-                label: 'Everyone on this instance'
-              }
-            ]
+            choices: ['me', 'instance']
           }
         }
       }
     }
     d.settings.order.forEach(id => {
       d.settings.fields[id].value = d.settings.fields[id].initial
+      d.settings.fields[id].id = id
     })
     return d
   },

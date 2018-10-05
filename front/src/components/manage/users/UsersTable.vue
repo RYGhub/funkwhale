@@ -10,7 +10,7 @@
           <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
-              {{ option[1] }}
+              {{ sharedLabels.filters[option[1]] }}
             </option>
           </select>
         </div>
@@ -101,9 +101,10 @@ import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
+import TranslationsMixin from '@/components/mixins/Translations'
 
 export default {
-  mixins: [OrderingMixin],
+  mixins: [OrderingMixin, TranslationsMixin],
   props: {
     filters: {type: Object, required: false}
   },
@@ -123,9 +124,9 @@ export default {
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['date_joined', 'Sign-up date'],
-        ['last_activity', 'Last activity'],
-        ['username', 'Username']
+        ['date_joined', 'date_joined'],
+        ['last_activity', 'last_activity'],
+        ['username', 'username']
       ]
 
     }
