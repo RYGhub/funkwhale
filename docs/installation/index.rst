@@ -156,6 +156,8 @@ On docker deployments, run the following commands:
     envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
         < /etc/nginx/sites-available/funkwhale.template \
         > /etc/nginx/sites-available/funkwhale.conf
+        
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 On non-docker deployments, run the following commands:
 
@@ -170,6 +172,8 @@ On non-docker deployments, run the following commands:
     envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
         < /etc/nginx/sites-available/funkwhale.template \
         > /etc/nginx/sites-available/funkwhale.conf
+    
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 .. note::
 
