@@ -4,15 +4,12 @@ import urllib.parse
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db import transaction
 from rest_framework import serializers
 
-from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import models as music_models
-from funkwhale_api.music import tasks as music_tasks
 
-from . import activity, filters, models, utils
+from . import activity, models, utils
 
 AP_CONTEXT = [
     "https://www.w3.org/ns/activitystreams",
@@ -21,6 +18,31 @@ AP_CONTEXT = [
 ]
 
 logger = logging.getLogger(__name__)
+
+
+class LinkSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=["Link"])
+    href = serializers.URLField(max_length=500)
+    mediaType = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        self.allowed_mimetypes = kwargs.pop("allowed_mimetypes", [])
+        super().__init__(*args, **kwargs)
+
+    def validate_mediaType(self, v):
+        if not self.allowed_mimetypes:
+            # no restrictions
+            return v
+        for mt in self.allowed_mimetypes:
+            if mt.endswith("/*"):
+                if v.startswith(mt.replace("*", "")):
+                    return v
+            else:
+                if v == mt:
+                    return v
+        raise serializers.ValidationError(
+            "Invalid mimetype {}. Allowed: {}".format(v, self.allowed_mimetypes)
+        )
 
 
 class ActorSerializer(serializers.Serializer):
@@ -32,13 +54,13 @@ class ActorSerializer(serializers.Serializer):
     manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
     name = serializers.CharField(required=False, max_length=200)
     summary = serializers.CharField(max_length=None, required=False)
-    followers = serializers.URLField(max_length=500, required=False, allow_null=True)
+    followers = serializers.URLField(max_length=500)
     following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = serializers.JSONField(required=False)
 
     def to_representation(self, instance):
         ret = {
-            "id": instance.url,
+            "id": instance.fid,
             "outbox": instance.outbox_url,
             "inbox": instance.inbox_url,
             "preferredUsername": instance.preferred_username,
@@ -58,9 +80,9 @@ class ActorSerializer(serializers.Serializer):
         ret["@context"] = AP_CONTEXT
         if instance.public_key:
             ret["publicKey"] = {
-                "owner": instance.url,
+                "owner": instance.fid,
                 "publicKeyPem": instance.public_key,
-                "id": "{}#main-key".format(instance.url),
+                "id": "{}#main-key".format(instance.fid),
             }
         ret["endpoints"] = {}
         if instance.shared_inbox_url:
@@ -78,7 +100,7 @@ class ActorSerializer(serializers.Serializer):
 
     def prepare_missing_fields(self):
         kwargs = {
-            "url": self.validated_data["id"],
+            "fid": self.validated_data["id"],
             "outbox_url": self.validated_data["outbox"],
             "inbox_url": self.validated_data["inbox"],
             "following_url": self.validated_data.get("following"),
@@ -91,7 +113,7 @@ class ActorSerializer(serializers.Serializer):
         maf = self.validated_data.get("manuallyApprovesFollowers")
         if maf is not None:
             kwargs["manually_approves_followers"] = maf
-        domain = urllib.parse.urlparse(kwargs["url"]).netloc
+        domain = urllib.parse.urlparse(kwargs["fid"]).netloc
         kwargs["domain"] = domain
         for endpoint, url in self.initial_data.get("endpoints", {}).items():
             if endpoint == "sharedInbox":
@@ -110,7 +132,7 @@ class ActorSerializer(serializers.Serializer):
     def save(self, **kwargs):
         d = self.prepare_missing_fields()
         d.update(kwargs)
-        return models.Actor.objects.update_or_create(url=d["url"], defaults=d)[0]
+        return models.Actor.objects.update_or_create(fid=d["fid"], defaults=d)[0]
 
     def validate_summary(self, value):
         if value:
@@ -122,6 +144,7 @@ class APIActorSerializer(serializers.ModelSerializer):
         model = models.Actor
         fields = [
             "id",
+            "fid",
             "url",
             "creation_date",
             "summary",
@@ -131,190 +154,50 @@ class APIActorSerializer(serializers.ModelSerializer):
             "domain",
             "type",
             "manually_approves_followers",
+            "full_username",
         ]
 
 
-class LibraryActorSerializer(ActorSerializer):
-    url = serializers.ListField(child=serializers.JSONField())
-
-    def validate(self, validated_data):
-        try:
-            urls = validated_data["url"]
-        except KeyError:
-            raise serializers.ValidationError("Missing URL field")
-
-        for u in urls:
-            try:
-                if u["name"] != "library":
-                    continue
-                validated_data["library_url"] = u["href"]
-                break
-            except KeyError:
-                continue
-
-        return validated_data
-
-
-class APIFollowSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Follow
-        fields = [
-            "uuid",
-            "actor",
-            "target",
-            "approved",
-            "creation_date",
-            "modification_date",
-        ]
-
-
-class APILibrarySerializer(serializers.ModelSerializer):
-    actor = APIActorSerializer()
-    follow = APIFollowSerializer()
-
-    class Meta:
-        model = models.Library
-
-        read_only_fields = [
-            "actor",
-            "uuid",
-            "url",
-            "tracks_count",
-            "follow",
-            "fetched_date",
-            "modification_date",
-            "creation_date",
-        ]
-        fields = [
-            "autoimport",
-            "federation_enabled",
-            "download_files",
-        ] + read_only_fields
-
-
-class APILibraryScanSerializer(serializers.Serializer):
-    until = serializers.DateTimeField(required=False)
-
-
-class APILibraryFollowUpdateSerializer(serializers.Serializer):
-    follow = serializers.IntegerField()
-    approved = serializers.BooleanField()
-
-    def validate_follow(self, value):
-        from . import actors
-
-        library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-        qs = models.Follow.objects.filter(pk=value, target=library_actor)
-        try:
-            return qs.get()
-        except models.Follow.DoesNotExist:
-            raise serializers.ValidationError("Invalid follow")
-
-    def save(self):
-        new_status = self.validated_data["approved"]
-        follow = self.validated_data["follow"]
-        if new_status == follow.approved:
-            return follow
-
-        follow.approved = new_status
-        follow.save(update_fields=["approved", "modification_date"])
-        if new_status:
-            activity.accept_follow(follow)
-        return follow
-
-
-class APILibraryCreateSerializer(serializers.ModelSerializer):
+class BaseActivitySerializer(serializers.Serializer):
+    id = serializers.URLField(max_length=500, required=False)
+    type = serializers.CharField(max_length=100)
     actor = serializers.URLField(max_length=500)
-    federation_enabled = serializers.BooleanField()
-    uuid = serializers.UUIDField(read_only=True)
 
-    class Meta:
-        model = models.Library
-        fields = ["uuid", "actor", "autoimport", "federation_enabled", "download_files"]
-
-    def validate(self, validated_data):
-        from . import actors
-        from . import library
-
-        actor_url = validated_data["actor"]
-        actor_data = actors.get_actor_data(actor_url)
-        acs = LibraryActorSerializer(data=actor_data)
-        acs.is_valid(raise_exception=True)
+    def validate_actor(self, v):
+        expected = self.context.get("actor")
+        if expected and expected.fid != v:
+            raise serializers.ValidationError("Invalid actor")
+        if expected:
+            # avoid a DB lookup
+            return expected
         try:
-            actor = models.Actor.objects.get(url=actor_url)
+            return models.Actor.objects.get(fid=v)
         except models.Actor.DoesNotExist:
-            actor = acs.save()
-        library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-        validated_data["follow"] = models.Follow.objects.get_or_create(
-            actor=library_actor, target=actor
-        )[0]
-        if validated_data["follow"].approved is None:
-            funkwhale_utils.on_commit(
-                activity.deliver,
-                FollowSerializer(validated_data["follow"]).data,
-                on_behalf_of=validated_data["follow"].actor,
-                to=[validated_data["follow"].target.url],
-            )
-
-        library_data = library.get_library_data(acs.validated_data["library_url"])
-        if "errors" in library_data:
-            # we pass silently because it may means we require permission
-            # before scanning
-            pass
-        validated_data["library"] = library_data
-        validated_data["library"].setdefault("id", acs.validated_data["library_url"])
-        validated_data["actor"] = actor
-        return validated_data
+            raise serializers.ValidationError("Actor not found")
 
     def create(self, validated_data):
-        library = models.Library.objects.update_or_create(
-            url=validated_data["library"]["id"],
-            defaults={
-                "actor": validated_data["actor"],
-                "follow": validated_data["follow"],
-                "tracks_count": validated_data["library"].get("totalItems"),
-                "federation_enabled": validated_data["federation_enabled"],
-                "autoimport": validated_data["autoimport"],
-                "download_files": validated_data["download_files"],
-            },
-        )[0]
-        return library
+        return models.Activity.objects.create(
+            fid=validated_data.get("id"),
+            actor=validated_data["actor"],
+            payload=self.initial_data,
+            type=validated_data["type"],
+        )
 
+    def validate(self, data):
+        data["recipients"] = self.validate_recipients(self.initial_data)
+        return super().validate(data)
 
-class APILibraryTrackSerializer(serializers.ModelSerializer):
-    library = APILibrarySerializer()
-    status = serializers.SerializerMethodField()
+    def validate_recipients(self, payload):
+        """
+        Ensure we have at least a to/cc field with valid actors
+        """
+        to = payload.get("to", [])
+        cc = payload.get("cc", [])
 
-    class Meta:
-        model = models.LibraryTrack
-        fields = [
-            "id",
-            "url",
-            "audio_url",
-            "audio_mimetype",
-            "creation_date",
-            "modification_date",
-            "fetched_date",
-            "published_date",
-            "metadata",
-            "artist_name",
-            "album_title",
-            "title",
-            "library",
-            "local_track_file",
-            "status",
-        ]
-
-    def get_status(self, o):
-        try:
-            if o.local_track_file is not None:
-                return "imported"
-        except music_models.TrackFile.DoesNotExist:
-            pass
-        for job in o.import_jobs.all():
-            if job.status == "pending":
-                return "import_pending"
-        return "not_imported"
+        if not to and not cc:
+            raise serializers.ValidationError(
+                "We cannot handle an activity with no recipient"
+            )
 
 
 class FollowSerializer(serializers.Serializer):
@@ -325,35 +208,61 @@ class FollowSerializer(serializers.Serializer):
 
     def validate_object(self, v):
         expected = self.context.get("follow_target")
-        if expected and expected.url != v:
+        if self.parent:
+            # it's probably an accept, so everything is inverted, the actor
+            # the recipient does not matter
+            recipient = None
+        else:
+            recipient = self.context.get("recipient")
+        if expected and expected.fid != v:
             raise serializers.ValidationError("Invalid target")
         try:
-            return models.Actor.objects.get(url=v)
+            obj = models.Actor.objects.get(fid=v)
+            if recipient and recipient.fid != obj.fid:
+                raise serializers.ValidationError("Invalid target")
+            return obj
         except models.Actor.DoesNotExist:
-            raise serializers.ValidationError("Target not found")
+            pass
+        try:
+            qs = music_models.Library.objects.filter(fid=v)
+            if recipient:
+                qs = qs.filter(actor=recipient)
+            return qs.get()
+        except music_models.Library.DoesNotExist:
+            pass
+
+        raise serializers.ValidationError("Target not found")
 
     def validate_actor(self, v):
         expected = self.context.get("follow_actor")
-        if expected and expected.url != v:
+        if expected and expected.fid != v:
             raise serializers.ValidationError("Invalid actor")
         try:
-            return models.Actor.objects.get(url=v)
+            return models.Actor.objects.get(fid=v)
         except models.Actor.DoesNotExist:
             raise serializers.ValidationError("Actor not found")
 
     def save(self, **kwargs):
-        return models.Follow.objects.get_or_create(
+        target = self.validated_data["object"]
+
+        if target._meta.label == "music.Library":
+            follow_class = models.LibraryFollow
+        else:
+            follow_class = models.Follow
+        defaults = kwargs
+        defaults["fid"] = self.validated_data["id"]
+        return follow_class.objects.update_or_create(
             actor=self.validated_data["actor"],
             target=self.validated_data["object"],
-            **kwargs,  # noqa
+            defaults=defaults,
         )[0]
 
     def to_representation(self, instance):
         return {
             "@context": AP_CONTEXT,
-            "actor": instance.actor.url,
-            "id": instance.get_federation_url(),
-            "object": instance.target.url,
+            "actor": instance.actor.fid,
+            "id": instance.get_federation_id(),
+            "object": instance.target.fid,
             "type": "Follow",
         }
 
@@ -376,50 +285,66 @@ class APIFollowSerializer(serializers.ModelSerializer):
 
 
 class AcceptFollowSerializer(serializers.Serializer):
-    id = serializers.URLField(max_length=500)
+    id = serializers.URLField(max_length=500, required=False)
     actor = serializers.URLField(max_length=500)
     object = FollowSerializer()
     type = serializers.ChoiceField(choices=["Accept"])
 
     def validate_actor(self, v):
-        expected = self.context.get("follow_target")
-        if expected and expected.url != v:
+        expected = self.context.get("actor")
+        if expected and expected.fid != v:
             raise serializers.ValidationError("Invalid actor")
         try:
-            return models.Actor.objects.get(url=v)
+            return models.Actor.objects.get(fid=v)
         except models.Actor.DoesNotExist:
             raise serializers.ValidationError("Actor not found")
 
     def validate(self, validated_data):
-        # we ensure the accept actor actually match the follow target
-        if validated_data["actor"] != validated_data["object"]["object"]:
+        # we ensure the accept actor actually match the follow target / library owner
+        target = validated_data["object"]["object"]
+
+        if target._meta.label == "music.Library":
+            expected = target.actor
+            follow_class = models.LibraryFollow
+        else:
+            expected = target
+            follow_class = models.Follow
+        if validated_data["actor"] != expected:
             raise serializers.ValidationError("Actor mismatch")
         try:
             validated_data["follow"] = (
-                models.Follow.objects.filter(
-                    target=validated_data["actor"],
-                    actor=validated_data["object"]["actor"],
+                follow_class.objects.filter(
+                    target=target, actor=validated_data["object"]["actor"]
                 )
                 .exclude(approved=True)
+                .select_related()
                 .get()
             )
-        except models.Follow.DoesNotExist:
+        except follow_class.DoesNotExist:
             raise serializers.ValidationError("No follow to accept")
         return validated_data
 
     def to_representation(self, instance):
+        if instance.target._meta.label == "music.Library":
+            actor = instance.target.actor
+        else:
+            actor = instance.target
+
         return {
             "@context": AP_CONTEXT,
-            "id": instance.get_federation_url() + "/accept",
+            "id": instance.get_federation_id() + "/accept",
             "type": "Accept",
-            "actor": instance.target.url,
+            "actor": actor.fid,
             "object": FollowSerializer(instance).data,
         }
 
     def save(self):
-        self.validated_data["follow"].approved = True
-        self.validated_data["follow"].save()
-        return self.validated_data["follow"]
+        follow = self.validated_data["follow"]
+        follow.approved = True
+        follow.save()
+        if follow.target._meta.label == "music.Library":
+            follow.target.schedule_scan(actor=follow.actor)
+        return follow
 
 
 class UndoFollowSerializer(serializers.Serializer):
@@ -429,11 +354,12 @@ class UndoFollowSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=["Undo"])
 
     def validate_actor(self, v):
-        expected = self.context.get("follow_target")
-        if expected and expected.url != v:
+        expected = self.context.get("actor")
+
+        if expected and expected.fid != v:
             raise serializers.ValidationError("Invalid actor")
         try:
-            return models.Actor.objects.get(url=v)
+            return models.Actor.objects.get(fid=v)
         except models.Actor.DoesNotExist:
             raise serializers.ValidationError("Actor not found")
 
@@ -441,20 +367,28 @@ class UndoFollowSerializer(serializers.Serializer):
         # we ensure the accept actor actually match the follow actor
         if validated_data["actor"] != validated_data["object"]["actor"]:
             raise serializers.ValidationError("Actor mismatch")
+
+        target = validated_data["object"]["object"]
+
+        if target._meta.label == "music.Library":
+            follow_class = models.LibraryFollow
+        else:
+            follow_class = models.Follow
+
         try:
-            validated_data["follow"] = models.Follow.objects.filter(
-                actor=validated_data["actor"], target=validated_data["object"]["object"]
+            validated_data["follow"] = follow_class.objects.filter(
+                actor=validated_data["actor"], target=target
             ).get()
-        except models.Follow.DoesNotExist:
+        except follow_class.DoesNotExist:
             raise serializers.ValidationError("No follow to remove")
         return validated_data
 
     def to_representation(self, instance):
         return {
             "@context": AP_CONTEXT,
-            "id": instance.get_federation_url() + "/undo",
+            "id": instance.get_federation_id() + "/undo",
             "type": "Undo",
-            "actor": instance.actor.url,
+            "actor": instance.actor.fid,
             "object": FollowSerializer(instance).data,
         }
 
@@ -488,9 +422,9 @@ class ActorWebfingerSerializer(serializers.Serializer):
         data = {}
         data["subject"] = "acct:{}".format(instance.webfinger_subject)
         data["links"] = [
-            {"rel": "self", "href": instance.url, "type": "application/activity+json"}
+            {"rel": "self", "href": instance.fid, "type": "application/activity+json"}
         ]
-        data["aliases"] = [instance.url]
+        data["aliases"] = [instance.fid]
         return data
 
 
@@ -498,7 +432,8 @@ class ActivitySerializer(serializers.Serializer):
     actor = serializers.URLField(max_length=500)
     id = serializers.URLField(max_length=500, required=False)
     type = serializers.ChoiceField(choices=[(c, c) for c in activity.ACTIVITY_TYPES])
-    object = serializers.JSONField()
+    object = serializers.JSONField(required=False)
+    target = serializers.JSONField(required=False)
 
     def validate_object(self, value):
         try:
@@ -519,7 +454,7 @@ class ActivitySerializer(serializers.Serializer):
 
     def validate_actor(self, value):
         request_actor = self.context.get("actor")
-        if request_actor and request_actor.url != value:
+        if request_actor and request_actor.fid != value:
             raise serializers.ValidationError(
                 "The actor making the request do not match" " the activity actor"
             )
@@ -560,6 +495,18 @@ class ObjectSerializer(serializers.Serializer):
 OBJECT_SERIALIZERS = {t: ObjectSerializer for t in activity.OBJECT_TYPES}
 
 
+def get_additional_fields(data):
+    UNSET = object()
+    additional_fields = {}
+    for field in ["name", "summary"]:
+        v = data.get(field, UNSET)
+        if v == UNSET:
+            continue
+        additional_fields[field] = v
+
+    return additional_fields
+
+
 class PaginatedCollectionSerializer(serializers.Serializer):
     type = serializers.ChoiceField(choices=["Collection"])
     totalItems = serializers.IntegerField(min_value=0)
@@ -575,16 +522,71 @@ class PaginatedCollectionSerializer(serializers.Serializer):
         last = funkwhale_utils.set_query_parameter(conf["id"], page=paginator.num_pages)
         d = {
             "id": conf["id"],
-            "actor": conf["actor"].url,
+            "actor": conf["actor"].fid,
             "totalItems": paginator.count,
-            "type": "Collection",
+            "type": conf.get("type", "Collection"),
             "current": current,
             "first": first,
             "last": last,
         }
+        d.update(get_additional_fields(conf))
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
+
+
+class LibrarySerializer(PaginatedCollectionSerializer):
+    type = serializers.ChoiceField(choices=["Library"])
+    name = serializers.CharField()
+    summary = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    followers = serializers.URLField(max_length=500)
+    audience = serializers.ChoiceField(
+        choices=["", None, "https://www.w3.org/ns/activitystreams#Public"],
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+
+    def to_representation(self, library):
+        conf = {
+            "id": library.fid,
+            "name": library.name,
+            "summary": library.description,
+            "page_size": 100,
+            "actor": library.actor,
+            "items": library.uploads.for_federation(),
+            "type": "Library",
+        }
+        r = super().to_representation(conf)
+        r["audience"] = (
+            "https://www.w3.org/ns/activitystreams#Public"
+            if library.privacy_level == "public"
+            else ""
+        )
+        r["followers"] = library.followers_url
+        return r
+
+    def create(self, validated_data):
+        actor = utils.retrieve(
+            validated_data["actor"],
+            queryset=models.Actor,
+            serializer_class=ActorSerializer,
+        )
+        library, created = music_models.Library.objects.update_or_create(
+            fid=validated_data["id"],
+            actor=actor,
+            defaults={
+                "uploads_count": validated_data["totalItems"],
+                "name": validated_data["name"],
+                "description": validated_data["summary"],
+                "followers_url": validated_data["followers"],
+                "privacy_level": "everyone"
+                if validated_data["audience"]
+                == "https://www.w3.org/ns/activitystreams#Public"
+                else "me",
+            },
+        )
+        return library
 
 
 class CollectionPageSerializer(serializers.Serializer):
@@ -606,9 +608,10 @@ class CollectionPageSerializer(serializers.Serializer):
         raw_items = [item_serializer(data=i, context=self.context) for i in v]
         valid_items = []
         for i in raw_items:
-            if i.is_valid():
+            try:
+                i.is_valid(raise_exception=True)
                 valid_items.append(i)
-            else:
+            except serializers.ValidationError:
                 logger.debug("Invalid item %s: %s", i.data, i.errors)
 
         return valid_items
@@ -623,7 +626,7 @@ class CollectionPageSerializer(serializers.Serializer):
         d = {
             "id": id,
             "partOf": conf["id"],
-            "actor": conf["actor"].url,
+            "actor": conf["actor"].fid,
             "totalItems": page.paginator.count,
             "type": "CollectionPage",
             "first": first,
@@ -645,48 +648,135 @@ class CollectionPageSerializer(serializers.Serializer):
             d["next"] = funkwhale_utils.set_query_parameter(
                 conf["id"], page=page.next_page_number()
             )
-
+        d.update(get_additional_fields(conf))
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
 
 
-class ArtistMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
-    name = serializers.CharField()
-
-
-class ReleaseMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
-    title = serializers.CharField()
-
-
-class RecordingMetadataSerializer(serializers.Serializer):
-    musicbrainz_id = serializers.UUIDField(required=False, allow_null=True)
-    title = serializers.CharField()
-
-
-class AudioMetadataSerializer(serializers.Serializer):
-    artist = ArtistMetadataSerializer()
-    release = ReleaseMetadataSerializer()
-    recording = RecordingMetadataSerializer()
-    bitrate = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    size = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    length = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-
-
-class AudioSerializer(serializers.Serializer):
-    type = serializers.CharField()
+class MusicEntitySerializer(serializers.Serializer):
     id = serializers.URLField(max_length=500)
-    url = serializers.JSONField()
     published = serializers.DateTimeField()
-    updated = serializers.DateTimeField(required=False)
-    metadata = AudioMetadataSerializer()
+    musicbrainzId = serializers.UUIDField(allow_null=True, required=False)
+    name = serializers.CharField(max_length=1000)
 
-    def validate_type(self, v):
-        if v != "Audio":
-            raise serializers.ValidationError("Invalid type for audio")
-        return v
+
+class ArtistSerializer(MusicEntitySerializer):
+    def to_representation(self, instance):
+        d = {
+            "type": "Artist",
+            "id": instance.fid,
+            "name": instance.name,
+            "published": instance.creation_date.isoformat(),
+            "musicbrainzId": str(instance.mbid) if instance.mbid else None,
+        }
+
+        if self.context.get("include_ap_context", self.parent is None):
+            d["@context"] = AP_CONTEXT
+        return d
+
+
+class AlbumSerializer(MusicEntitySerializer):
+    released = serializers.DateField(allow_null=True, required=False)
+    artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
+    cover = LinkSerializer(
+        allowed_mimetypes=["image/*"], allow_null=True, required=False
+    )
+
+    def to_representation(self, instance):
+        d = {
+            "type": "Album",
+            "id": instance.fid,
+            "name": instance.title,
+            "published": instance.creation_date.isoformat(),
+            "musicbrainzId": str(instance.mbid) if instance.mbid else None,
+            "released": instance.release_date.isoformat()
+            if instance.release_date
+            else None,
+            "artists": [
+                ArtistSerializer(
+                    instance.artist, context={"include_ap_context": False}
+                ).data
+            ],
+        }
+        if instance.cover:
+            d["cover"] = {
+                "type": "Link",
+                "href": utils.full_url(instance.cover.url),
+                "mediaType": mimetypes.guess_type(instance.cover.path)[0]
+                or "image/jpeg",
+            }
+        if self.context.get("include_ap_context", self.parent is None):
+            d["@context"] = AP_CONTEXT
+        return d
+
+    def get_create_data(self, validated_data):
+        artist_data = validated_data["artists"][0]
+        artist = ArtistSerializer(
+            context={"activity": self.context.get("activity")}
+        ).create(artist_data)
+
+        return {
+            "mbid": validated_data.get("musicbrainzId"),
+            "fid": validated_data["id"],
+            "title": validated_data["name"],
+            "creation_date": validated_data["published"],
+            "artist": artist,
+            "release_date": validated_data.get("released"),
+            "from_activity": self.context.get("activity"),
+        }
+
+
+class TrackSerializer(MusicEntitySerializer):
+    position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
+    artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
+    album = AlbumSerializer()
+
+    def to_representation(self, instance):
+        d = {
+            "type": "Track",
+            "id": instance.fid,
+            "name": instance.title,
+            "published": instance.creation_date.isoformat(),
+            "musicbrainzId": str(instance.mbid) if instance.mbid else None,
+            "position": instance.position,
+            "artists": [
+                ArtistSerializer(
+                    instance.artist, context={"include_ap_context": False}
+                ).data
+            ],
+            "album": AlbumSerializer(
+                instance.album, context={"include_ap_context": False}
+            ).data,
+        }
+
+        if self.context.get("include_ap_context", self.parent is None):
+            d["@context"] = AP_CONTEXT
+        return d
+
+    def create(self, validated_data):
+        from funkwhale_api.music import tasks as music_tasks
+
+        metadata = music_tasks.federation_audio_track_to_metadata(validated_data)
+        from_activity = self.context.get("activity")
+        if from_activity:
+            metadata["from_activity_id"] = from_activity.pk
+        track = music_tasks.get_track_from_import_metadata(metadata)
+        return track
+
+
+class UploadSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=["Audio"])
+    id = serializers.URLField(max_length=500)
+    library = serializers.URLField(max_length=500)
+    url = LinkSerializer(allowed_mimetypes=["audio/*"])
+    published = serializers.DateTimeField()
+    updated = serializers.DateTimeField(required=False, allow_null=True)
+    bitrate = serializers.IntegerField(min_value=0)
+    size = serializers.IntegerField(min_value=0)
+    duration = serializers.IntegerField(min_value=0)
+
+    track = TrackSerializer(required=True)
 
     def validate_url(self, v):
         try:
@@ -704,57 +794,70 @@ class AudioSerializer(serializers.Serializer):
 
         return v
 
+    def validate_library(self, v):
+        lb = self.context.get("library")
+        if lb:
+            if lb.fid != v:
+                raise serializers.ValidationError("Invalid library")
+            return lb
+
+        actor = self.context.get("actor")
+        kwargs = {}
+        if actor:
+            kwargs["actor"] = actor
+        try:
+            return music_models.Library.objects.get(fid=v, **kwargs)
+        except music_models.Library.DoesNotExist:
+            raise serializers.ValidationError("Invalid library")
+
     def create(self, validated_data):
-        defaults = {
-            "audio_mimetype": validated_data["url"]["mediaType"],
-            "audio_url": validated_data["url"]["href"],
-            "metadata": validated_data["metadata"],
-            "artist_name": validated_data["metadata"]["artist"]["name"],
-            "album_title": validated_data["metadata"]["release"]["title"],
-            "title": validated_data["metadata"]["recording"]["title"],
-            "published_date": validated_data["published"],
+        try:
+            return music_models.Upload.objects.get(fid=validated_data["id"])
+        except music_models.Upload.DoesNotExist:
+            pass
+
+        track = TrackSerializer(
+            context={"activity": self.context.get("activity")}
+        ).create(validated_data["track"])
+
+        data = {
+            "fid": validated_data["id"],
+            "mimetype": validated_data["url"]["mediaType"],
+            "source": validated_data["url"]["href"],
+            "creation_date": validated_data["published"],
             "modification_date": validated_data.get("updated"),
+            "track": track,
+            "duration": validated_data["duration"],
+            "size": validated_data["size"],
+            "bitrate": validated_data["bitrate"],
+            "library": validated_data["library"],
+            "from_activity": self.context.get("activity"),
+            "import_status": "finished",
         }
-        return models.LibraryTrack.objects.get_or_create(
-            library=self.context["library"], url=validated_data["id"], defaults=defaults
-        )[0]
+        return music_models.Upload.objects.create(**data)
 
     def to_representation(self, instance):
         track = instance.track
-        album = instance.track.album
-        artist = instance.track.artist
-
         d = {
             "type": "Audio",
-            "id": instance.get_federation_url(),
-            "name": instance.track.full_name,
+            "id": instance.get_federation_id(),
+            "library": instance.library.fid,
+            "name": track.full_name,
             "published": instance.creation_date.isoformat(),
-            "updated": instance.modification_date.isoformat(),
-            "metadata": {
-                "artist": {
-                    "musicbrainz_id": str(artist.mbid) if artist.mbid else None,
-                    "name": artist.name,
-                },
-                "release": {
-                    "musicbrainz_id": str(album.mbid) if album.mbid else None,
-                    "title": album.title,
-                },
-                "recording": {
-                    "musicbrainz_id": str(track.mbid) if track.mbid else None,
-                    "title": track.title,
-                },
-                "bitrate": instance.bitrate,
-                "size": instance.size,
-                "length": instance.duration,
-            },
+            "bitrate": instance.bitrate,
+            "size": instance.size,
+            "duration": instance.duration,
             "url": {
-                "href": utils.full_url(instance.path),
+                "href": utils.full_url(instance.listen_url),
                 "type": "Link",
                 "mediaType": instance.mimetype,
             },
-            "attributedTo": [self.context["actor"].url],
+            "track": TrackSerializer(track, context={"include_ap_context": False}).data,
         }
-        if self.context.get("include_ap_context", True):
+        if instance.modification_date:
+            d["updated"] = instance.modification_date.isoformat()
+
+        if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = AP_CONTEXT
         return d
 
@@ -763,7 +866,7 @@ class CollectionSerializer(serializers.Serializer):
     def to_representation(self, conf):
         d = {
             "id": conf["id"],
-            "actor": conf["actor"].url,
+            "actor": conf["actor"].fid,
             "totalItems": len(conf["items"]),
             "type": "Collection",
             "items": [
@@ -777,27 +880,3 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
-
-
-class LibraryTrackActionSerializer(common_serializers.ActionSerializer):
-    actions = [common_serializers.Action("import", allow_all=True)]
-    filterset_class = filters.LibraryTrackFilter
-
-    @transaction.atomic
-    def handle_import(self, objects):
-        batch = music_models.ImportBatch.objects.create(
-            source="federation", submitted_by=self.context["submitted_by"]
-        )
-        jobs = []
-        for lt in objects:
-            job = music_models.ImportJob(
-                batch=batch, library_track=lt, mbid=lt.mbid, source=lt.url
-            )
-            jobs.append(job)
-
-        music_models.ImportJob.objects.bulk_create(jobs)
-        funkwhale_utils.on_commit(
-            music_tasks.import_batch_run.delay, import_batch_id=batch.pk
-        )
-
-        return {"batch": {"id": batch.pk}}

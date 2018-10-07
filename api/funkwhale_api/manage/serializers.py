@@ -1,23 +1,22 @@
 from django.db import transaction
-from django.utils import timezone
+
 from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import models as music_models
-from funkwhale_api.requests import models as requests_models
 from funkwhale_api.users import models as users_models
 
 from . import filters
 
 
-class ManageTrackFileArtistSerializer(serializers.ModelSerializer):
+class ManageUploadArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = music_models.Artist
         fields = ["id", "mbid", "creation_date", "name"]
 
 
-class ManageTrackFileAlbumSerializer(serializers.ModelSerializer):
-    artist = ManageTrackFileArtistSerializer()
+class ManageUploadAlbumSerializer(serializers.ModelSerializer):
+    artist = ManageUploadArtistSerializer()
 
     class Meta:
         model = music_models.Album
@@ -32,20 +31,20 @@ class ManageTrackFileAlbumSerializer(serializers.ModelSerializer):
         )
 
 
-class ManageTrackFileTrackSerializer(serializers.ModelSerializer):
-    artist = ManageTrackFileArtistSerializer()
-    album = ManageTrackFileAlbumSerializer()
+class ManageUploadTrackSerializer(serializers.ModelSerializer):
+    artist = ManageUploadArtistSerializer()
+    album = ManageUploadAlbumSerializer()
 
     class Meta:
         model = music_models.Track
         fields = ("id", "mbid", "title", "album", "artist", "creation_date", "position")
 
 
-class ManageTrackFileSerializer(serializers.ModelSerializer):
-    track = ManageTrackFileTrackSerializer()
+class ManageUploadSerializer(serializers.ModelSerializer):
+    track = ManageUploadTrackSerializer()
 
     class Meta:
-        model = music_models.TrackFile
+        model = music_models.Upload
         fields = (
             "id",
             "path",
@@ -59,13 +58,12 @@ class ManageTrackFileSerializer(serializers.ModelSerializer):
             "bitrate",
             "size",
             "path",
-            "library_track",
         )
 
 
-class ManageTrackFileActionSerializer(common_serializers.ActionSerializer):
+class ManageUploadActionSerializer(common_serializers.ActionSerializer):
     actions = [common_serializers.Action("delete", allow_all=False)]
-    filterset_class = filters.ManageTrackFileFilterSet
+    filterset_class = filters.ManageUploadFilterSet
 
     @transaction.atomic
     def handle_delete(self, objects):
@@ -94,11 +92,13 @@ class ManageUserSimpleSerializer(serializers.ModelSerializer):
             "date_joined",
             "last_activity",
             "privacy_level",
+            "upload_quota",
         )
 
 
 class ManageUserSerializer(serializers.ModelSerializer):
     permissions = PermissionsSerializer(source="*")
+    upload_quota = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = users_models.User
@@ -114,6 +114,7 @@ class ManageUserSerializer(serializers.ModelSerializer):
             "last_activity",
             "permissions",
             "privacy_level",
+            "upload_quota",
         )
         read_only_fields = [
             "id",
@@ -167,69 +168,3 @@ class ManageInvitationActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
-
-
-class ManageImportRequestSerializer(serializers.ModelSerializer):
-    user = ManageUserSimpleSerializer(required=False)
-
-    class Meta:
-        model = requests_models.ImportRequest
-        fields = [
-            "id",
-            "status",
-            "creation_date",
-            "imported_date",
-            "user",
-            "albums",
-            "artist_name",
-            "comment",
-        ]
-        read_only_fields = [
-            "id",
-            "status",
-            "creation_date",
-            "imported_date",
-            "user",
-            "albums",
-            "artist_name",
-            "comment",
-        ]
-
-    def validate_code(self, value):
-        if not value:
-            return value
-        if users_models.Invitation.objects.filter(code__iexact=value).exists():
-            raise serializers.ValidationError(
-                "An invitation with this code already exists"
-            )
-        return value
-
-
-class ManageImportRequestActionSerializer(common_serializers.ActionSerializer):
-    actions = [
-        common_serializers.Action(
-            "mark_closed",
-            allow_all=True,
-            qs_filter=lambda qs: qs.filter(status__in=["pending", "accepted"]),
-        ),
-        common_serializers.Action(
-            "mark_imported",
-            allow_all=True,
-            qs_filter=lambda qs: qs.filter(status__in=["pending", "accepted"]),
-        ),
-        common_serializers.Action("delete", allow_all=False),
-    ]
-    filterset_class = filters.ManageImportRequestFilterSet
-
-    @transaction.atomic
-    def handle_delete(self, objects):
-        return objects.delete()
-
-    @transaction.atomic
-    def handle_mark_closed(self, objects):
-        return objects.update(status="closed")
-
-    @transaction.atomic
-    def handle_mark_imported(self, objects):
-        now = timezone.now()
-        return objects.update(status="imported", imported_date=now)

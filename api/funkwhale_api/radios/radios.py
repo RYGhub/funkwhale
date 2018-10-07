@@ -43,8 +43,8 @@ class SessionRadio(SimpleRadio):
         return self.session
 
     def get_queryset(self, **kwargs):
-        qs = Track.objects.annotate(files_count=Count("files"))
-        return qs.filter(files_count__gt=0)
+        qs = Track.objects.annotate(uploads_count=Count("uploads"))
+        return qs.filter(uploads_count__gt=0)
 
     def get_queryset_kwargs(self):
         return {}
@@ -54,6 +54,8 @@ class SessionRadio(SimpleRadio):
         queryset = self.get_queryset(**kwargs)
         if self.session:
             queryset = self.filter_from_session(queryset)
+            if kwargs.pop("filter_playable", True):
+                queryset = queryset.playable_by(self.session.user.actor)
         return queryset
 
     def filter_from_session(self, queryset):

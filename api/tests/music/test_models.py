@@ -2,7 +2,11 @@ import os
 
 import pytest
 
+from django.utils import timezone
+from django.urls import reverse
+
 from funkwhale_api.music import importers, models, tasks
+from funkwhale_api.federation import utils as federation_utils
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -148,29 +152,6 @@ def test_import_track_with_different_artist_than_release(factories, mocker):
     assert track.artist == artist
 
 
-def test_import_job_is_bound_to_track_file(factories, mocker):
-    track = factories["music.Track"]()
-    job = factories["music.ImportJob"](mbid=track.mbid)
-
-    mocker.patch("funkwhale_api.music.models.TrackFile.download_file")
-    tasks.import_job_run(import_job_id=job.pk)
-    job.refresh_from_db()
-    assert job.track_file.track == track
-
-
-@pytest.mark.parametrize("status", ["pending", "errored", "finished"])
-def test_saving_job_updates_batch_status(status, factories, mocker):
-    batch = factories["music.ImportBatch"]()
-
-    assert batch.status == "pending"
-
-    factories["music.ImportJob"](batch=batch, status=status)
-
-    batch.refresh_from_db()
-
-    assert batch.status == status
-
-
 @pytest.mark.parametrize(
     "extention,mimetype", [("ogg", "audio/ogg"), ("mp3", "audio/mpeg")]
 )
@@ -178,41 +159,33 @@ def test_audio_track_mime_type(extention, mimetype, factories):
 
     name = ".".join(["test", extention])
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    upload = factories["music.Upload"](audio_file__from_path=path, mimetype=None)
 
-    assert tf.mimetype == mimetype
+    assert upload.mimetype == mimetype
 
 
-def test_track_file_file_name(factories):
+def test_upload_file_name(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    upload = factories["music.Upload"](audio_file__from_path=path)
 
-    assert tf.filename == tf.track.full_name + ".mp3"
+    assert upload.filename == upload.track.full_name + ".mp3"
 
 
 def test_track_get_file_size(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](audio_file__from_path=path)
+    upload = factories["music.Upload"](audio_file__from_path=path)
 
-    assert tf.get_file_size() == 297745
-
-
-def test_track_get_file_size_federation(factories):
-    tf = factories["music.TrackFile"](
-        federation=True, library_track__with_audio_file=True
-    )
-
-    assert tf.get_file_size() == tf.library_track.audio_file.size
+    assert upload.get_file_size() == 297745
 
 
 def test_track_get_file_size_in_place(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    tf = factories["music.TrackFile"](in_place=True, source="file://{}".format(path))
+    upload = factories["music.Upload"](in_place=True, source="file://{}".format(path))
 
-    assert tf.get_file_size() == 297745
+    assert upload.get_file_size() == 297745
 
 
 def test_album_get_image_content(factories):
@@ -221,3 +194,311 @@ def test_album_get_image_content(factories):
     album.refresh_from_db()
 
     assert album.cover.read() == b"test"
+
+
+def test_library(factories):
+    now = timezone.now()
+    actor = factories["federation.Actor"]()
+    library = factories["music.Library"](
+        name="Hello world", description="hello", actor=actor, privacy_level="instance"
+    )
+
+    assert library.creation_date >= now
+    assert library.uploads.count() == 0
+    assert library.uuid is not None
+
+
+@pytest.mark.parametrize(
+    "status,expected", [("pending", False), ("errored", False), ("finished", True)]
+)
+def test_playable_by_correct_status(status, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status=status
+    )
+    queryset = upload.library.uploads.playable_by(None)
+    match = upload in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_playable_by_correct_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = upload.library.uploads.playable_by(upload.library.actor)
+    match = upload in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_playable_by_instance_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
+    queryset = upload.library.uploads.playable_by(instance_actor)
+    match = upload in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_playable_by_anonymous(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = upload.library.uploads.playable_by(None)
+    match = upload in list(queryset)
+    assert match is expected
+
+
+@pytest.mark.parametrize("approved", [True, False])
+def test_playable_by_follower(approved, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level="me", import_status="finished"
+    )
+    actor = factories["federation.Actor"](local=True)
+    factories["federation.LibraryFollow"](
+        target=upload.library, actor=actor, approved=approved
+    )
+    queryset = upload.library.uploads.playable_by(actor)
+    match = upload in list(queryset)
+    expected = approved
+    assert match is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_track_playable_by_correct_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](import_status="finished")
+    queryset = models.Track.objects.playable_by(
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_track_playable_by_instance_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
+    queryset = models.Track.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = upload.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_track_playable_by_anonymous(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = models.Track.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = upload.track in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_album_playable_by_correct_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](import_status="finished")
+
+    queryset = models.Album.objects.playable_by(
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_album_playable_by_instance_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
+    queryset = models.Album.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = upload.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_album_playable_by_anonymous(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = models.Album.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = upload.track.album in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", True), ("instance", True), ("everyone", True)]
+)
+def test_artist_playable_by_correct_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](import_status="finished")
+
+    queryset = models.Artist.objects.playable_by(
+        upload.library.actor
+    ).annotate_playable_by_actor(upload.library.actor)
+    match = upload.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", True), ("everyone", True)]
+)
+def test_artist_playable_by_instance_actor(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    instance_actor = factories["federation.Actor"](domain=upload.library.actor.domain)
+    queryset = models.Artist.objects.playable_by(
+        instance_actor
+    ).annotate_playable_by_actor(instance_actor)
+    match = upload.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+@pytest.mark.parametrize(
+    "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
+)
+def test_artist_playable_by_anonymous(privacy_level, expected, factories):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level, import_status="finished"
+    )
+    queryset = models.Artist.objects.playable_by(None).annotate_playable_by_actor(None)
+    match = upload.track.artist in list(queryset)
+    assert match is expected
+    if expected:
+        assert bool(queryset.first().is_playable_by_actor) is expected
+
+
+def test_upload_listen_url(factories):
+    upload = factories["music.Upload"]()
+    expected = upload.track.listen_url + "?upload={}".format(upload.uuid)
+
+    assert upload.listen_url == expected
+
+
+def test_library_schedule_scan(factories, now, mocker):
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+    library = factories["music.Library"](uploads_count=5)
+
+    scan = library.schedule_scan(library.actor)
+
+    assert scan.creation_date >= now
+    assert scan.status == "pending"
+    assert scan.library == library
+    assert scan.actor == library.actor
+    assert scan.total_files == 5
+    assert scan.processed_files == 0
+    assert scan.errored_files == 0
+    assert scan.modification_date is None
+
+    on_commit.assert_called_once_with(
+        tasks.start_library_scan.delay, library_scan_id=scan.pk
+    )
+
+
+def test_library_schedule_scan_too_recent(factories, now):
+    scan = factories["music.LibraryScan"]()
+    result = scan.library.schedule_scan(scan.library.actor)
+
+    assert result is None
+    assert scan.library.scans.count() == 1
+
+
+def test_get_audio_data(factories):
+    upload = factories["music.Upload"]()
+
+    result = upload.get_audio_data()
+
+    assert result == {"duration": 229, "bitrate": 128000, "size": 3459481}
+
+
+def test_library_queryset_with_follows(factories):
+    library1 = factories["music.Library"]()
+    library2 = factories["music.Library"]()
+    follow = factories["federation.LibraryFollow"](target=library2)
+    qs = library1.__class__.objects.with_follows(follow.actor).order_by("pk")
+
+    l1 = list(qs)[0]
+    l2 = list(qs)[1]
+    assert l1._follows == []
+    assert l2._follows == [follow]
+
+
+def test_annotate_duration(factories):
+    tf = factories["music.Upload"](duration=32)
+
+    track = models.Track.objects.annotate_duration().get(pk=tf.track.pk)
+
+    assert track.duration == 32
+
+
+def test_annotate_file_data(factories):
+    tf = factories["music.Upload"](size=42, bitrate=55, mimetype="audio/ogg")
+
+    track = models.Track.objects.annotate_file_data().get(pk=tf.track.pk)
+
+    assert track.size == 42
+    assert track.bitrate == 55
+    assert track.mimetype == "audio/ogg"
+
+
+@pytest.mark.parametrize(
+    "model,factory_args,namespace",
+    [
+        (
+            "music.Upload",
+            {"library__actor__local": True},
+            "federation:music:uploads-detail",
+        ),
+        ("music.Library", {"actor__local": True}, "federation:music:libraries-detail"),
+        ("music.Artist", {}, "federation:music:artists-detail"),
+        ("music.Album", {}, "federation:music:albums-detail"),
+        ("music.Track", {}, "federation:music:tracks-detail"),
+    ],
+)
+def test_fid_is_populated(factories, model, factory_args, namespace):
+    instance = factories[model](**factory_args, fid=None)
+
+    assert instance.fid == federation_utils.full_url(
+        reverse(namespace, kwargs={"uuid": instance.uuid})
+    )

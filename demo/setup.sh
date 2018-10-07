@@ -12,6 +12,9 @@ mkdir -p $demo_path
 echo 'Downloading demo files...'
 curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker-compose.yml"
 curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/env.prod.sample"
+mkdir nginx
+curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker.nginx.template"
+curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/funkwhale_proxy.conf"
 
 mkdir data/
 curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$version/download?job=build_front"
@@ -23,6 +26,7 @@ echo "MUSIC_DIRECTORY_SERVE_PATH=$music_path" >> .env
 echo "MUSIC_DIRECTORY_PATH=$music_path" >> .env
 echo "MEDIA_ROOT=$demo_path/data/media/" >> .env
 echo "STATIC_ROOT=$demo_path/data/static/" >> .env
+echo "FUNKWHALE_FRONTEND_PATH=$demo_path/front/dist/" >> .env
 
 # /usr/local/bin/docker-compose pull
 /usr/local/bin/docker-compose up -d postgres redis
@@ -43,6 +47,8 @@ u = User.objects.create(email="demo@demo.com", username="demo", is_staff=True, i
 u.set_password("demo")
 u.subsonic_api_token = "demo"
 u.save()
+actor = u.create_actor()
+library = actor.libraries.create(name='Demo library', privacy_level='everyone')
 
 from funkwhale_api.common import preferences
 
@@ -57,7 +63,7 @@ paths = [
     "$music_path/**/*.flac",
 ]
 print(paths)
-call_command("import_files", *paths, username="demo", recursive=True, interactive=False)
+call_command("import_files", str(library.uuid), *paths, username="demo", recursive=True, interactive=False)
 
 print('Creating some dummy data...')
 
@@ -69,7 +75,7 @@ from funkwhale_api.favorites.factories import TrackFavorite as TrackFavoriteFact
 from funkwhale_api.users.factories import UserFactory
 from funkwhale_api.playlists.factories import PlaylistFactory
 
-users = UserFactory.create_batch(size=15, privacy_level="everyone")
+users = UserFactory.create_batch(size=15, privacy_level="everyone", with_actor=True)
 available_tracks = list(Track.objects.all())
 available_albums = list(Album.objects.all())
 

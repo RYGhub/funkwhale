@@ -1,9 +1,10 @@
 from rest_framework import routers
 
-from . import views
+from . import api_views
 
 router = routers.SimpleRouter()
-router.register(r"libraries", views.LibraryViewSet, "libraries")
-router.register(r"library-tracks", views.LibraryTrackViewSet, "library-tracks")
+router.register(r"follows/library", api_views.LibraryFollowViewSet, "library-follows")
+router.register(r"inbox", api_views.InboxItemViewSet, "inbox")
+router.register(r"libraries", api_views.LibraryViewSet, "libraries")
 
 urlpatterns = router.urls

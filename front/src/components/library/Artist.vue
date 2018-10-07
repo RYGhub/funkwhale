@@ -23,7 +23,7 @@
           </h2>
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
-          <play-button class="orange" :artist="artist.id">
+          <play-button :is-playable="isPlayable" class="orange" :artist="artist.id">
             <translate>Play all albums</translate>
           </play-button>
 
@@ -56,6 +56,14 @@
         </h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </div>
+      <div class="ui vertical stripe segment">
+        <h2>
+          <translate>User libraries</translate>
+        </h2>
+        <library-widget :url="'artists/' + id + '/libraries/'">
+          <translate slot="subtitle">This artist is present in the following libraries:</translate>
+        </library-widget>
+      </div>
     </template>
   </div>
 </template>
@@ -69,6 +77,7 @@ import AlbumCard from '@/components/audio/album/Card'
 import RadioButton from '@/components/radios/Button'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackTable from '@/components/audio/track/Table'
+import LibraryWidget from '@/components/federation/LibraryWidget'
 
 export default {
   props: ['id'],
@@ -76,7 +85,8 @@ export default {
     AlbumCard,
     RadioButton,
     PlayButton,
-    TrackTable
+    TrackTable,
+    LibraryWidget
   },
   data () {
     return {
@@ -134,6 +144,11 @@ export default {
       }).reduce((a, b) => {
         return a + b
       }) + this.tracks.length
+    },
+    isPlayable () {
+      return this.artist.albums.filter((a) => {
+        return a.is_playable
+      }).length > 0
     },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + this.artist.name

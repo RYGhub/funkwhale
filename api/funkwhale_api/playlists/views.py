@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from funkwhale_api.common import fields, permissions
-
+from funkwhale_api.music import utils as music_utils
 from . import filters, models, serializers
 
 
@@ -39,7 +39,9 @@ class PlaylistViewSet(
     @detail_route(methods=["get"])
     def tracks(self, request, *args, **kwargs):
         playlist = self.get_object()
-        plts = playlist.playlist_tracks.all().for_nested_serialization()
+        plts = playlist.playlist_tracks.all().for_nested_serialization(
+            music_utils.get_actor_from_request(request)
+        )
         serializer = serializers.PlaylistTrackSerializer(plts, many=True)
         data = {"count": len(plts), "results": serializer.data}
         return Response(data, status=200)
@@ -59,7 +61,7 @@ class PlaylistViewSet(
         plts = (
             models.PlaylistTrack.objects.filter(pk__in=ids)
             .order_by("index")
-            .for_nested_serialization()
+            .for_nested_serialization(music_utils.get_actor_from_request(request))
         )
         serializer = serializers.PlaylistTrackSerializer(plts, many=True)
         data = {"count": len(plts), "results": serializer.data}
@@ -74,7 +76,9 @@ class PlaylistViewSet(
         return Response(status=204)
 
     def get_queryset(self):
-        return self.queryset.filter(fields.privacy_level_query(self.request.user))
+        return self.queryset.filter(
+            fields.privacy_level_query(self.request.user)
+        ).annotate_playable_by_actor(music_utils.get_actor_from_request(self.request))
 
     def perform_create(self, serializer):
         return serializer.save(
@@ -95,7 +99,7 @@ class PlaylistTrackViewSet(
 ):
 
     serializer_class = serializers.PlaylistTrackSerializer
-    queryset = models.PlaylistTrack.objects.all().for_nested_serialization()
+    queryset = models.PlaylistTrack.objects.all()
     permission_classes = [
         permissions.ConditionalAuthentication,
         permissions.OwnerPermission,
@@ -116,7 +120,7 @@ class PlaylistTrackViewSet(
                 lookup_field="playlist__privacy_level",
                 user_field="playlist__user",
             )
-        )
+        ).for_nested_serialization(music_utils.get_actor_from_request(self.request))
 
     def perform_destroy(self, instance):
         instance.delete(update_indexes=True)

@@ -1,34 +1,51 @@
-import json
 import logging
 import urllib
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Prefetch, Sum, F, Q
 from django.db.models.functions import Length
 from django.utils import timezone
-from musicbrainzngs import ResponseError
+
 from rest_framework import mixins
+from rest_framework import permissions
 from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from taggit.models import Tag
 
-from funkwhale_api.common import utils as funkwhale_utils
-from funkwhale_api.common.permissions import ConditionalAuthentication
+from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.federation.authentication import SignatureAuthentication
-from funkwhale_api.federation.models import LibraryTrack
-from funkwhale_api.musicbrainz import api
-from funkwhale_api.requests.models import ImportRequest
-from funkwhale_api.users.permissions import HasUserPermission
+from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import routes
 
-from . import filters, importers, models
-from . import permissions as music_permissions
-from . import serializers, tasks, utils
+from . import filters, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
+
+
+def get_libraries(filter_uploads):
+    def view(self, request, *args, **kwargs):
+        obj = self.get_object()
+        actor = utils.get_actor_from_request(request)
+        uploads = models.Upload.objects.all()
+        uploads = filter_uploads(obj, uploads)
+        uploads = uploads.playable_by(actor)
+        libraries = models.Library.objects.filter(
+            pk__in=uploads.values_list("library", flat=True)
+        )
+        libraries = libraries.select_related("actor")
+        page = self.paginate_queryset(libraries)
+        if page is not None:
+            serializer = federation_api_serializers.LibrarySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = federation_api_serializers.LibrarySerializer(libraries, many=True)
+        return Response(serializer.data)
+
+    return view
 
 
 class TagViewSetMixin(object):
@@ -41,107 +58,115 @@ class TagViewSetMixin(object):
 
 
 class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Artist.objects.with_albums()
+    queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [common_permissions.ConditionalAuthentication]
     filter_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        albums = models.Album.objects.with_tracks_count()
+        albums = albums.annotate_playable_by_actor(
+            utils.get_actor_from_request(self.request)
+        )
+        return queryset.prefetch_related(Prefetch("albums", queryset=albums)).distinct()
+
+    libraries = detail_route(methods=["get"])(
+        get_libraries(
+            filter_uploads=lambda o, uploads: uploads.filter(
+                Q(track__artist=o) | Q(track__album__artist=o)
+            )
+        )
+    )
 
 
 class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
-        models.Album.objects.all()
-        .order_by("artist", "release_date")
-        .select_related()
-        .prefetch_related("tracks__artist", "tracks__files")
+        models.Album.objects.all().order_by("artist", "release_date").select_related()
     )
     serializer_class = serializers.AlbumSerializer
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [common_permissions.ConditionalAuthentication]
     ordering_fields = ("creation_date", "release_date", "title")
     filter_class = filters.AlbumFilter
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tracks = models.Track.objects.annotate_playable_by_actor(
+            utils.get_actor_from_request(self.request)
+        ).select_related("artist")
+        if (
+            hasattr(self, "kwargs")
+            and self.kwargs
+            and self.request.method.lower() == "get"
+        ):
+            # we are detailing a single album, so we can add the overhead
+            # to fetch additional data
+            tracks = tracks.annotate_duration()
+        qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
+        return qs.distinct()
 
-class ImportBatchViewSet(
+    libraries = detail_route(methods=["get"])(
+        get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
+    )
+
+
+class LibraryViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
+    lookup_field = "uuid"
     queryset = (
-        models.ImportBatch.objects.select_related()
+        models.Library.objects.all()
         .order_by("-creation_date")
-        .annotate(job_count=Count("jobs"))
+        .annotate(_uploads_count=Count("uploads"))
+        .annotate(_size=Sum("uploads__size"))
     )
-    serializer_class = serializers.ImportBatchSerializer
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["library", "upload"]
-    permission_operator = "or"
-    filter_class = filters.ImportBatchFilter
-
-    def perform_create(self, serializer):
-        serializer.save(submitted_by=self.request.user)
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        # if user do not have library permission, we limit to their
-        # own jobs
-        if not self.request.user.has_permissions("library"):
-            qs = qs.filter(submitted_by=self.request.user)
-        return qs
-
-
-class ImportJobViewSet(
-    mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
-):
-    queryset = models.ImportJob.objects.all().select_related()
-    serializer_class = serializers.ImportJobSerializer
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["library", "upload"]
-    permission_operator = "or"
-    filter_class = filters.ImportJobFilter
+    serializer_class = serializers.LibraryForOwnerSerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+        common_permissions.OwnerPermission,
+    ]
+    owner_field = "actor.user"
+    owner_checks = ["read", "write"]
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # if user do not have library permission, we limit to their
-        # own jobs
-        if not self.request.user.has_permissions("library"):
-            qs = qs.filter(batch__submitted_by=self.request.user)
-        return qs
-
-    @list_route(methods=["get"])
-    def stats(self, request, *args, **kwargs):
-        if not request.user.has_permissions("library"):
-            return Response(status=403)
-        qs = models.ImportJob.objects.all()
-        filterset = filters.ImportJobFilter(request.GET, queryset=qs)
-        qs = filterset.qs
-        qs = qs.values("status").order_by("status")
-        qs = qs.annotate(status_count=Count("status"))
-
-        data = {}
-        for row in qs:
-            data[row["status"]] = row["status_count"]
-
-        for s, _ in models.IMPORT_STATUS_CHOICES:
-            data.setdefault(s, 0)
-
-        data["count"] = sum([v for v in data.values()])
-        return Response(data)
-
-    @list_route(methods=["post"])
-    def run(self, request, *args, **kwargs):
-        serializer = serializers.ImportJobRunSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        payload = serializer.save()
-
-        return Response(payload)
+        return qs.filter(actor=self.request.user.actor)
 
     def perform_create(self, serializer):
-        source = "file://" + serializer.validated_data["audio_file"].name
-        serializer.save(source=source)
-        funkwhale_utils.on_commit(
-            tasks.import_job_run.delay, import_job_id=serializer.instance.pk
+        serializer.save(actor=self.request.user.actor)
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Library"}},
+            context={"library": instance},
         )
+        instance.delete()
+
+    @detail_route(methods=["get"])
+    @transaction.non_atomic_requests
+    def follows(self, request, *args, **kwargs):
+        library = self.get_object()
+        queryset = (
+            library.received_follows.filter(target__actor=self.request.user.actor)
+            .select_related("actor", "target__actor")
+            .order_by("-creation_date")
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = federation_api_serializers.LibraryFollowSerializer(
+                page, many=True
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
@@ -151,14 +176,13 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [common_permissions.ConditionalAuthentication]
     filter_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
         "title",
-        "album__title",
         "album__release_date",
-        "position",
+        "size",
         "artist__name",
     )
 
@@ -169,7 +193,18 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         if user.is_authenticated and filter_favorites == "true":
             queryset = queryset.filter(track_favorites__user=user)
 
-        return queryset
+        queryset = queryset.annotate_playable_by_actor(
+            utils.get_actor_from_request(self.request)
+        ).annotate_duration()
+        if (
+            hasattr(self, "kwargs")
+            and self.kwargs
+            and self.request.method.lower() == "get"
+        ):
+            # we are detailing a single track, so we can add the overhead
+            # to fetch additional data
+            queryset = queryset.annotate_file_data()
+        return queryset.distinct()
 
     @detail_route(methods=["get"])
     @transaction.non_atomic_requests
@@ -195,6 +230,10 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
             return Response({"error": "unavailable lyrics"}, status=404)
         serializer = serializers.LyricsSerializer(lyrics)
         return Response(serializer.data)
+
+    libraries = detail_route(methods=["get"])(
+        get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
+    )
 
 
 def get_file_path(audio_file):
@@ -228,40 +267,37 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def handle_serve(track_file):
-    f = track_file
+def handle_serve(upload, user):
+    f = upload
     # we update the accessed_date
     f.accessed_date = timezone.now()
     f.save(update_fields=["accessed_date"])
 
-    mt = f.mimetype
-    audio_file = f.audio_file
-    try:
-        library_track = f.library_track
-    except ObjectDoesNotExist:
-        library_track = None
-    if library_track and not audio_file:
-        if not library_track.audio_file:
-            # we need to populate from cache
-            with transaction.atomic():
-                # why the transaction/select_for_update?
-                # this is because browsers may send multiple requests
-                # in a short time range, for partial content,
-                # thus resulting in multiple downloads from the remote
-                qs = LibraryTrack.objects.select_for_update()
-                library_track = qs.get(pk=library_track.pk)
-                library_track.download_audio()
-            track_file.library_track = library_track
-            track_file.set_audio_data()
-            track_file.save(update_fields=["bitrate", "duration", "size"])
+    if f.audio_file:
+        file_path = get_file_path(f.audio_file)
 
-        audio_file = library_track.audio_file
-        file_path = get_file_path(audio_file)
-        mt = library_track.audio_mimetype
-    elif audio_file:
-        file_path = get_file_path(audio_file)
+    elif f.source and (
+        f.source.startswith("http://") or f.source.startswith("https://")
+    ):
+        # we need to populate from cache
+        with transaction.atomic():
+            # why the transaction/select_for_update?
+            # this is because browsers may send multiple requests
+            # in a short time range, for partial content,
+            # thus resulting in multiple downloads from the remote
+            qs = f.__class__.objects.select_for_update()
+            f = qs.get(pk=f.pk)
+            f.download_audio_from_remote(user=user)
+        data = f.get_audio_data()
+        if data:
+            f.duration = data["duration"]
+            f.size = data["size"]
+            f.bitrate = data["bitrate"]
+            f.save(update_fields=["bitrate", "duration", "size"])
+        file_path = get_file_path(f.audio_file)
     elif f.source and f.source.startswith("file://"):
         file_path = get_file_path(f.source.replace("file://", "", 1))
+    mt = f.mimetype
     if mt:
         response = Response(content_type=mt)
     else:
@@ -278,39 +314,100 @@ def handle_serve(track_file):
     return response
 
 
-class TrackFileViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        models.TrackFile.objects.all()
-        .select_related("track__artist", "track__album")
-        .order_by("-id")
-    )
-    serializer_class = serializers.TrackFileSerializer
+class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = models.Track.objects.all()
+    serializer_class = serializers.TrackSerializer
     authentication_classes = (
         rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES
         + [SignatureAuthentication]
     )
-    permission_classes = [music_permissions.Listen]
+    permission_classes = [common_permissions.ConditionalAuthentication]
+    lookup_field = "uuid"
 
-    @detail_route(methods=["get"])
-    def serve(self, request, *args, **kwargs):
-        queryset = models.TrackFile.objects.select_related(
-            "library_track", "track__album__artist", "track__artist"
-        )
-        try:
-            return handle_serve(queryset.get(pk=kwargs["pk"]))
-        except models.TrackFile.DoesNotExist:
+    def retrieve(self, request, *args, **kwargs):
+        track = self.get_object()
+        actor = utils.get_actor_from_request(request)
+        queryset = track.uploads.select_related("track__album__artist", "track__artist")
+        explicit_file = request.GET.get("upload")
+        if explicit_file:
+            queryset = queryset.filter(uuid=explicit_file)
+        queryset = queryset.playable_by(actor)
+        queryset = queryset.order_by(F("audio_file").desc(nulls_last=True))
+        upload = queryset.first()
+        if not upload:
             return Response(status=404)
+
+        return handle_serve(upload, user=request.user)
+
+
+class UploadViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        models.Upload.objects.all()
+        .order_by("-creation_date")
+        .select_related("library", "track__artist", "track__album__artist")
+    )
+    serializer_class = serializers.UploadForOwnerSerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+        common_permissions.OwnerPermission,
+    ]
+    owner_field = "library.actor.user"
+    owner_checks = ["read", "write"]
+    filter_class = filters.UploadFilter
+    ordering_fields = (
+        "creation_date",
+        "import_date",
+        "bitrate",
+        "size",
+        "artist__name",
+    )
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(library__actor=self.request.user.actor)
+
+    @list_route(methods=["post"])
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.UploadActionSerializer(request.data, queryset=queryset)
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return Response(result, status=200)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
+
+    def perform_create(self, serializer):
+        upload = serializer.save()
+        common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": "Audio"}},
+            context={"uploads": [instance]},
+        )
+        instance.delete()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all().order_by("name")
     serializer_class = serializers.TagSerializer
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [common_permissions.ConditionalAuthentication]
 
 
 class Search(views.APIView):
     max_results = 3
-    permission_classes = [ConditionalAuthentication]
+    permission_classes = [common_permissions.ConditionalAuthentication]
 
     def get(self, request, *args, **kwargs):
         query = request.GET["query"]
@@ -340,7 +437,6 @@ class Search(views.APIView):
             models.Track.objects.all()
             .filter(query_obj)
             .select_related("artist", "album__artist")
-            .prefetch_related("files")
         )[: self.max_results]
 
     def get_albums(self, query):
@@ -350,7 +446,7 @@ class Search(views.APIView):
             models.Album.objects.all()
             .filter(query_obj)
             .select_related()
-            .prefetch_related("tracks__files")
+            .prefetch_related("tracks")
         )[: self.max_results]
 
     def get_artists(self, query):
@@ -372,99 +468,3 @@ class Search(views.APIView):
         )
 
         return qs.filter(query_obj)[: self.max_results]
-
-
-class SubmitViewSet(viewsets.ViewSet):
-    queryset = models.ImportBatch.objects.none()
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["library"]
-
-    @list_route(methods=["post"])
-    @transaction.non_atomic_requests
-    def single(self, request, *args, **kwargs):
-        try:
-            models.Track.objects.get(mbid=request.POST["mbid"])
-            return Response({})
-        except models.Track.DoesNotExist:
-            pass
-        batch = models.ImportBatch.objects.create(submitted_by=request.user)
-        job = models.ImportJob.objects.create(
-            mbid=request.POST["mbid"], batch=batch, source=request.POST["import_url"]
-        )
-        tasks.import_job_run.delay(import_job_id=job.pk)
-        serializer = serializers.ImportBatchSerializer(batch)
-        return Response(serializer.data, status=201)
-
-    def get_import_request(self, data):
-        try:
-            raw = data["importRequest"]
-        except KeyError:
-            return
-
-        pk = int(raw)
-        try:
-            return ImportRequest.objects.get(pk=pk)
-        except ImportRequest.DoesNotExist:
-            pass
-
-    @list_route(methods=["post"])
-    @transaction.non_atomic_requests
-    def album(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode("utf-8"))
-        import_request = self.get_import_request(data)
-        import_data, batch = self._import_album(
-            data, request, batch=None, import_request=import_request
-        )
-        return Response(import_data)
-
-    @transaction.atomic
-    def _import_album(self, data, request, batch=None, import_request=None):
-        # we import the whole album here to prevent race conditions that occurs
-        # when using get_or_create_from_api in tasks
-        album_data = api.releases.get(
-            id=data["releaseId"], includes=models.Album.api_includes
-        )["release"]
-        cleaned_data = models.Album.clean_musicbrainz_data(album_data)
-        album = importers.load(
-            models.Album, cleaned_data, album_data, import_hooks=[models.import_tracks]
-        )
-        try:
-            album.get_image()
-        except ResponseError:
-            pass
-        if not batch:
-            batch = models.ImportBatch.objects.create(
-                submitted_by=request.user, import_request=import_request
-            )
-        for row in data["tracks"]:
-            try:
-                models.TrackFile.objects.get(track__mbid=row["mbid"])
-            except models.TrackFile.DoesNotExist:
-                job = models.ImportJob.objects.create(
-                    mbid=row["mbid"], batch=batch, source=row["source"]
-                )
-                funkwhale_utils.on_commit(
-                    tasks.import_job_run.delay, import_job_id=job.pk
-                )
-
-        serializer = serializers.ImportBatchSerializer(batch)
-        return serializer.data, batch
-
-    @list_route(methods=["post"])
-    @transaction.non_atomic_requests
-    def artist(self, request, *args, **kwargs):
-        data = json.loads(request.body.decode("utf-8"))
-        import_request = self.get_import_request(data)
-        artist_data = api.artists.get(id=data["artistId"])["artist"]
-        cleaned_data = models.Artist.clean_musicbrainz_data(artist_data)
-        importers.load(models.Artist, cleaned_data, artist_data, import_hooks=[])
-
-        import_data = []
-        batch = None
-        for row in data["albums"]:
-            row_data, batch = self._import_album(
-                row, request, batch=batch, import_request=import_request
-            )
-            import_data.append(row_data)
-
-        return Response(import_data[0])

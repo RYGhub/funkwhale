@@ -1,4 +1,4 @@
-from django.contrib import admin
+from funkwhale_api.common import admin
 
 from . import models
 
@@ -33,8 +33,8 @@ class ImportBatchAdmin(admin.ModelAdmin):
 
 @admin.register(models.ImportJob)
 class ImportJobAdmin(admin.ModelAdmin):
-    list_display = ["source", "batch", "track_file", "status", "mbid"]
-    list_select_related = ["track_file", "batch"]
+    list_display = ["source", "batch", "upload", "status", "mbid"]
+    list_select_related = ["upload", "batch"]
     search_fields = ["source", "batch__pk", "mbid"]
     list_filter = ["status"]
 
@@ -55,8 +55,8 @@ class LyricsAdmin(admin.ModelAdmin):
     list_filter = ["work__language"]
 
 
-@admin.register(models.TrackFile)
-class TrackFileAdmin(admin.ModelAdmin):
+@admin.register(models.Upload)
+class UploadAdmin(admin.ModelAdmin):
     list_display = [
         "track",
         "audio_file",
@@ -65,6 +65,7 @@ class TrackFileAdmin(admin.ModelAdmin):
         "mimetype",
         "size",
         "bitrate",
+        "import_status",
     ]
     list_select_related = ["track"]
     search_fields = [
@@ -74,4 +75,40 @@ class TrackFileAdmin(admin.ModelAdmin):
         "track__album__title",
         "track__artist__name",
     ]
-    list_filter = ["mimetype"]
+    list_filter = ["mimetype", "import_status", "library__privacy_level"]
+
+
+def launch_scan(modeladmin, request, queryset):
+    for library in queryset:
+        library.schedule_scan(actor=request.user.actor, force=True)
+
+
+launch_scan.short_description = "Launch scan"
+
+
+@admin.register(models.Library)
+class LibraryAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "actor", "uuid", "privacy_level", "creation_date"]
+    list_select_related = True
+    search_fields = ["actor__username", "name", "description"]
+    list_filter = ["privacy_level"]
+    actions = [launch_scan]
+
+
+@admin.register(models.LibraryScan)
+class LibraryScanAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "library",
+        "actor",
+        "status",
+        "creation_date",
+        "modification_date",
+        "status",
+        "total_files",
+        "processed_files",
+        "errored_files",
+    ]
+    list_select_related = True
+    search_fields = ["actor__username", "library__name"]
+    list_filter = ["status"]

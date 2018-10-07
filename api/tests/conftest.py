@@ -1,23 +1,85 @@
+import contextlib
 import datetime
 import io
+import os
 import PIL
 import random
 import shutil
 import tempfile
+import uuid
 
+from faker.providers import internet as internet_provider
 import factory
 import pytest
-import requests_mock
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache
+from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
+from django.db.models import QuerySet
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
+
+
+class FunkwhaleProvider(internet_provider.Provider):
+    """
+    Our own faker data generator, since built-in ones are sometimes
+    not random enough
+    """
+
+    def federation_url(self, prefix=""):
+        def path_generator():
+            return "{}/{}".format(prefix, uuid.uuid4())
+
+        domain = self.domain_name()
+        protocol = "https"
+        path = path_generator()
+        return "{}://{}/{}".format(protocol, domain, path)
+
+
+factory.Faker.add_provider(FunkwhaleProvider)
+
+
+@pytest.fixture
+def queryset_equal_queries():
+    """
+    Unitting querysets is hard because we have to compare queries
+    by hand. Let's monkey patch querysets to do that for us.
+    """
+
+    def __eq__(self, other):
+        if isinstance(other, QuerySet):
+            return str(other.query) == str(self.query)
+        else:
+            return False
+
+    setattr(QuerySet, "__eq__", __eq__)
+    yield __eq__
+    delattr(QuerySet, "__eq__")
+
+
+@pytest.fixture
+def queryset_equal_list():
+    """
+    Unitting querysets is hard because we usually simply wants to ensure
+    a querysets contains the same objects as a list, let's monkey patch
+    querysets to to that for us.
+    """
+
+    def __eq__(self, other):
+        if isinstance(other, (list, tuple)):
+            return list(self) == list(other)
+        else:
+            return False
+
+    setattr(QuerySet, "__eq__", __eq__)
+    yield __eq__
+    delattr(QuerySet, "__eq__")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -209,14 +271,22 @@ def media_root(settings):
     shutil.rmtree(tmp_dir)
 
 
-@pytest.fixture
-def r_mock():
+@pytest.fixture(autouse=True)
+def disabled_musicbrainz(mocker):
+    # we ensure no music brainz requests gets out
+    yield mocker.patch(
+        "musicbrainzngs.musicbrainz._safe_read",
+        side_effect=Exception("Disabled network calls"),
+    )
+
+
+@pytest.fixture(autouse=True)
+def r_mock(requests_mock):
     """
     Returns a requests_mock.mock() object you can use to mock HTTP calls made
     using python-requests
     """
-    with requests_mock.mock() as m:
-        yield m
+    yield requests_mock
 
 
 @pytest.fixture
@@ -272,3 +342,43 @@ def avatar():
     f.seek(0)
     yield f
     f.close()
+
+
+@pytest.fixture()
+def audio_file():
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "music")
+    path = os.path.join(data_dir, "test.ogg")
+    assert os.path.exists(path)
+    with open(path, "rb") as f:
+        yield f
+
+
+@pytest.fixture()
+def uploaded_audio_file(audio_file):
+    yield uploadedfile.SimpleUploadedFile(
+        name=audio_file.name, content=audio_file.read()
+    )
+
+
+@pytest.fixture()
+def temp_signal(mocker):
+    """
+    Connect a temporary handler to a given signal. This is helpful to validate
+    a signal is dispatched properly, without mocking.
+    """
+
+    @contextlib.contextmanager
+    def connect(signal):
+        stub = mocker.stub()
+        signal.connect(stub)
+        try:
+            yield stub
+        finally:
+            signal.disconnect(stub)
+
+    return connect
+
+
+@pytest.fixture()
+def stdout():
+    yield io.StringIO()

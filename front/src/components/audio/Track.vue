@@ -29,6 +29,7 @@ export default {
     let self = this
     this.sound = new Howl({
       src: this.srcs.map((s) => { return s.url }),
+      format: this.srcs.map((s) => { return s.type }),
       autoplay: false,
       loop: false,
       html5: true,
@@ -66,13 +67,13 @@ export default {
       looping: state => state.player.looping
     }),
     srcs: function () {
-      let file = this.track.files[0]
-      if (!file) {
-        this.$store.dispatch('player/trackErrored')
-        return []
-      }
+      // let file = this.track.files[0]
+      // if (!file) {
+      //   this.$store.dispatch('player/trackErrored')
+      //   return []
+      // }
       let sources = [
-        {type: file.mimetype, url: this.$store.getters['instance/absoluteUrl'](file.path)}
+        {type: 'mp3', url: this.$store.getters['instance/absoluteUrl'](this.track.listen_url)}
       ]
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url

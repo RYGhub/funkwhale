@@ -31,7 +31,7 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     @list_route(methods=["get"])
     def me(self, request, *args, **kwargs):
         """Return information about the current user"""
-        serializer = serializers.UserReadSerializer(request.user)
+        serializer = serializers.MeSerializer(request.user)
         return Response(serializer.data)
 
     @detail_route(methods=["get", "post", "delete"], url_path="subsonic-token")

@@ -1,8 +1,11 @@
-import pendulum
+import io
 import pytest
-from django.core.paginator import Paginator
+import uuid
 
-from funkwhale_api.federation import actors, models, serializers, utils
+from django.core.paginator import Paginator
+from django.utils import timezone
+
+from funkwhale_api.federation import models, serializers, utils
 
 
 def test_actor_serializer_from_ap(db):
@@ -31,7 +34,7 @@ def test_actor_serializer_from_ap(db):
 
     actor = serializer.build()
 
-    assert actor.url == payload["id"]
+    assert actor.fid == payload["id"]
     assert actor.inbox_url == payload["inbox"]
     assert actor.outbox_url == payload["outbox"]
     assert actor.shared_inbox_url == payload["endpoints"]["sharedInbox"]
@@ -62,7 +65,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
 
     actor = serializer.build()
 
-    assert actor.url == payload["id"]
+    assert actor.fid == payload["id"]
     assert actor.inbox_url == payload["inbox"]
     assert actor.outbox_url == payload["outbox"]
     assert actor.followers_url == payload["followers"]
@@ -98,7 +101,7 @@ def test_actor_serializer_to_ap():
         "endpoints": {"sharedInbox": "https://test.federation/inbox"},
     }
     ac = models.Actor(
-        url=expected["id"],
+        fid=expected["id"],
         inbox_url=expected["inbox"],
         outbox_url=expected["outbox"],
         shared_inbox_url=expected["endpoints"]["sharedInbox"],
@@ -130,7 +133,7 @@ def test_webfinger_serializer():
         "aliases": ["https://test.federation/federation/instance/actor"],
     }
     actor = models.Actor(
-        url=expected["links"][0]["href"],
+        fid=expected["links"][0]["href"],
         preferred_username="service",
         domain="test.federation",
     )
@@ -149,10 +152,10 @@ def test_follow_serializer_to_ap(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url(),
+        "id": follow.get_federation_id(),
         "type": "Follow",
-        "actor": follow.actor.url,
-        "object": follow.target.url,
+        "actor": follow.actor.fid,
+        "object": follow.target.fid,
     }
 
     assert serializer.data == expected
@@ -165,8 +168,8 @@ def test_follow_serializer_save(factories):
     data = {
         "id": "https://test.follow",
         "type": "Follow",
-        "actor": actor.url,
-        "object": target.url,
+        "actor": actor.fid,
+        "object": target.fid,
     }
     serializer = serializers.FollowSerializer(data=data)
 
@@ -188,8 +191,8 @@ def test_follow_serializer_save_validates_on_context(factories):
     data = {
         "id": "https://test.follow",
         "type": "Follow",
-        "actor": actor.url,
-        "object": target.url,
+        "actor": actor.fid,
+        "object": target.fid,
     }
     serializer = serializers.FollowSerializer(
         data=data, context={"follow_actor": impostor, "follow_target": impostor}
@@ -210,9 +213,9 @@ def test_accept_follow_serializer_representation(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/accept",
+        "id": follow.get_federation_id() + "/accept",
         "type": "Accept",
-        "actor": follow.target.url,
+        "actor": follow.target.fid,
         "object": serializers.FollowSerializer(follow).data,
     }
 
@@ -230,9 +233,9 @@ def test_accept_follow_serializer_save(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/accept",
+        "id": follow.get_federation_id() + "/accept",
         "type": "Accept",
-        "actor": follow.target.url,
+        "actor": follow.target.fid,
         "object": serializers.FollowSerializer(follow).data,
     }
 
@@ -254,7 +257,7 @@ def test_accept_follow_serializer_validates_on_context(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/accept",
+        "id": follow.get_federation_id() + "/accept",
         "type": "Accept",
         "actor": impostor.url,
         "object": serializers.FollowSerializer(follow).data,
@@ -278,9 +281,9 @@ def test_undo_follow_serializer_representation(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/undo",
+        "id": follow.get_federation_id() + "/undo",
         "type": "Undo",
-        "actor": follow.actor.url,
+        "actor": follow.actor.fid,
         "object": serializers.FollowSerializer(follow).data,
     }
 
@@ -298,9 +301,9 @@ def test_undo_follow_serializer_save(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/undo",
+        "id": follow.get_federation_id() + "/undo",
         "type": "Undo",
-        "actor": follow.actor.url,
+        "actor": follow.actor.fid,
         "object": serializers.FollowSerializer(follow).data,
     }
 
@@ -321,7 +324,7 @@ def test_undo_follow_serializer_validates_on_context(factories):
             "https://w3id.org/security/v1",
             {},
         ],
-        "id": follow.get_federation_url() + "/undo",
+        "id": follow.get_federation_id() + "/undo",
         "type": "Undo",
         "actor": impostor.url,
         "object": serializers.FollowSerializer(follow).data,
@@ -337,13 +340,13 @@ def test_undo_follow_serializer_validates_on_context(factories):
 
 
 def test_paginated_collection_serializer(factories):
-    tfs = factories["music.TrackFile"].create_batch(size=5)
+    uploads = factories["music.Upload"].create_batch(size=5)
     actor = factories["federation.Actor"](local=True)
 
     conf = {
         "id": "https://test.federation/test",
-        "items": tfs,
-        "item_serializer": serializers.AudioSerializer,
+        "items": uploads,
+        "item_serializer": serializers.UploadSerializer,
         "actor": actor,
         "page_size": 2,
     }
@@ -355,8 +358,8 @@ def test_paginated_collection_serializer(factories):
         ],
         "type": "Collection",
         "id": conf["id"],
-        "actor": actor.url,
-        "totalItems": len(tfs),
+        "actor": actor.fid,
+        "totalItems": len(uploads),
         "current": conf["id"] + "?page=1",
         "last": conf["id"] + "?page=3",
         "first": conf["id"] + "?page=1",
@@ -426,7 +429,7 @@ def test_collection_page_serializer_can_validate_child():
     }
 
     serializer = serializers.CollectionPageSerializer(
-        data=data, context={"item_serializer": serializers.AudioSerializer}
+        data=data, context={"item_serializer": serializers.UploadSerializer}
     )
 
     # child are validated but not included in data if not valid
@@ -435,14 +438,14 @@ def test_collection_page_serializer_can_validate_child():
 
 
 def test_collection_page_serializer(factories):
-    tfs = factories["music.TrackFile"].create_batch(size=5)
+    uploads = factories["music.Upload"].create_batch(size=5)
     actor = factories["federation.Actor"](local=True)
 
     conf = {
         "id": "https://test.federation/test",
-        "item_serializer": serializers.AudioSerializer,
+        "item_serializer": serializers.UploadSerializer,
         "actor": actor,
-        "page": Paginator(tfs, 2).page(2),
+        "page": Paginator(uploads, 2).page(2),
     }
     expected = {
         "@context": [
@@ -452,8 +455,8 @@ def test_collection_page_serializer(factories):
         ],
         "type": "CollectionPage",
         "id": conf["id"] + "?page=2",
-        "actor": actor.url,
-        "totalItems": len(tfs),
+        "actor": actor.fid,
+        "totalItems": len(uploads),
         "partOf": conf["id"],
         "prev": conf["id"] + "?page=1",
         "next": conf["id"] + "?page=3",
@@ -472,215 +475,386 @@ def test_collection_page_serializer(factories):
     assert serializer.data == expected
 
 
-def test_activity_pub_audio_serializer_to_library_track(factories):
-    remote_library = factories["federation.Library"]()
-    audio = factories["federation.Audio"]()
-    serializer = serializers.AudioSerializer(
-        data=audio, context={"library": remote_library}
+def test_music_library_serializer_to_ap(factories):
+    library = factories["music.Library"]()
+    # pending, errored and skippednot included
+    factories["music.Upload"](import_status="pending")
+    factories["music.Upload"](import_status="errored")
+    factories["music.Upload"](import_status="finished")
+    serializer = serializers.LibrarySerializer(library)
+    expected = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+        "type": "Library",
+        "id": library.fid,
+        "name": library.name,
+        "summary": library.description,
+        "audience": "",
+        "actor": library.actor.fid,
+        "totalItems": 0,
+        "current": library.fid + "?page=1",
+        "last": library.fid + "?page=1",
+        "first": library.fid + "?page=1",
+        "followers": library.followers_url,
+    }
+
+    assert serializer.data == expected
+
+
+def test_music_library_serializer_from_public(factories, mocker):
+    actor = factories["federation.Actor"]()
+    retrieve = mocker.patch(
+        "funkwhale_api.federation.utils.retrieve", return_value=actor
     )
+    data = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+        "audience": "https://www.w3.org/ns/activitystreams#Public",
+        "name": "Hello",
+        "summary": "World",
+        "type": "Library",
+        "id": "https://library.id",
+        "followers": "https://library.id/followers",
+        "actor": actor.fid,
+        "totalItems": 12,
+        "first": "https://library.id?page=1",
+        "last": "https://library.id?page=2",
+    }
+    serializer = serializers.LibrarySerializer(data=data)
 
     assert serializer.is_valid(raise_exception=True)
 
-    lt = serializer.save()
+    library = serializer.save()
 
-    assert lt.pk is not None
-    assert lt.url == audio["id"]
-    assert lt.library == remote_library
-    assert lt.audio_url == audio["url"]["href"]
-    assert lt.audio_mimetype == audio["url"]["mediaType"]
-    assert lt.metadata == audio["metadata"]
-    assert lt.title == audio["metadata"]["recording"]["title"]
-    assert lt.artist_name == audio["metadata"]["artist"]["name"]
-    assert lt.album_title == audio["metadata"]["release"]["title"]
-    assert lt.published_date == pendulum.parse(audio["published"])
+    assert library.actor == actor
+    assert library.fid == data["id"]
+    assert library.uploads_count == data["totalItems"]
+    assert library.privacy_level == "everyone"
+    assert library.name == "Hello"
+    assert library.description == "World"
+    assert library.followers_url == data["followers"]
 
-
-def test_activity_pub_audio_serializer_to_library_track_no_duplicate(factories):
-    remote_library = factories["federation.Library"]()
-    audio = factories["federation.Audio"]()
-    serializer1 = serializers.AudioSerializer(
-        data=audio, context={"library": remote_library}
-    )
-    serializer2 = serializers.AudioSerializer(
-        data=audio, context={"library": remote_library}
+    retrieve.assert_called_once_with(
+        actor.fid,
+        queryset=actor.__class__,
+        serializer_class=serializers.ActorSerializer,
     )
 
-    assert serializer1.is_valid() is True
-    assert serializer2.is_valid() is True
 
-    lt1 = serializer1.save()
-    lt2 = serializer2.save()
+def test_music_library_serializer_from_private(factories, mocker):
+    actor = factories["federation.Actor"]()
+    retrieve = mocker.patch(
+        "funkwhale_api.federation.utils.retrieve", return_value=actor
+    )
+    data = {
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+        "audience": "",
+        "name": "Hello",
+        "summary": "World",
+        "type": "Library",
+        "id": "https://library.id",
+        "followers": "https://library.id/followers",
+        "actor": actor.fid,
+        "totalItems": 12,
+        "first": "https://library.id?page=1",
+        "last": "https://library.id?page=2",
+    }
+    serializer = serializers.LibrarySerializer(data=data)
 
-    assert lt1 == lt2
-    assert models.LibraryTrack.objects.count() == 1
+    assert serializer.is_valid(raise_exception=True)
+
+    library = serializer.save()
+
+    assert library.actor == actor
+    assert library.fid == data["id"]
+    assert library.uploads_count == data["totalItems"]
+    assert library.privacy_level == "me"
+    assert library.name == "Hello"
+    assert library.description == "World"
+    assert library.followers_url == data["followers"]
+    retrieve.assert_called_once_with(
+        actor.fid,
+        queryset=actor.__class__,
+        serializer_class=serializers.ActorSerializer,
+    )
+
+
+def test_activity_pub_artist_serializer_to_ap(factories):
+    artist = factories["music.Artist"]()
+    expected = {
+        "@context": serializers.AP_CONTEXT,
+        "type": "Artist",
+        "id": artist.fid,
+        "name": artist.name,
+        "musicbrainzId": artist.mbid,
+        "published": artist.creation_date.isoformat(),
+    }
+    serializer = serializers.ArtistSerializer(artist)
+
+    assert serializer.data == expected
+
+
+def test_activity_pub_album_serializer_to_ap(factories):
+    album = factories["music.Album"]()
+
+    expected = {
+        "@context": serializers.AP_CONTEXT,
+        "type": "Album",
+        "id": album.fid,
+        "name": album.title,
+        "cover": {
+            "type": "Link",
+            "mediaType": "image/jpeg",
+            "href": utils.full_url(album.cover.url),
+        },
+        "musicbrainzId": album.mbid,
+        "published": album.creation_date.isoformat(),
+        "released": album.release_date.isoformat(),
+        "artists": [
+            serializers.ArtistSerializer(
+                album.artist, context={"include_ap_context": False}
+            ).data
+        ],
+    }
+    serializer = serializers.AlbumSerializer(album)
+
+    assert serializer.data == expected
+
+
+def test_activity_pub_track_serializer_to_ap(factories):
+    track = factories["music.Track"]()
+    expected = {
+        "@context": serializers.AP_CONTEXT,
+        "published": track.creation_date.isoformat(),
+        "type": "Track",
+        "musicbrainzId": track.mbid,
+        "id": track.fid,
+        "name": track.title,
+        "position": track.position,
+        "artists": [
+            serializers.ArtistSerializer(
+                track.artist, context={"include_ap_context": False}
+            ).data
+        ],
+        "album": serializers.AlbumSerializer(
+            track.album, context={"include_ap_context": False}
+        ).data,
+    }
+    serializer = serializers.TrackSerializer(track)
+
+    assert serializer.data == expected
+
+
+def test_activity_pub_track_serializer_from_ap(factories, r_mock):
+    activity = factories["federation.Activity"]()
+    published = timezone.now()
+    released = timezone.now().date()
+    data = {
+        "type": "Track",
+        "id": "http://hello.track",
+        "published": published.isoformat(),
+        "musicbrainzId": str(uuid.uuid4()),
+        "name": "Black in back",
+        "position": 5,
+        "album": {
+            "type": "Album",
+            "id": "http://hello.album",
+            "name": "Purple album",
+            "musicbrainzId": str(uuid.uuid4()),
+            "published": published.isoformat(),
+            "released": released.isoformat(),
+            "cover": {
+                "type": "Link",
+                "href": "https://cover.image/test.png",
+                "mediaType": "image/png",
+            },
+            "artists": [
+                {
+                    "type": "Artist",
+                    "id": "http://hello.artist",
+                    "name": "John Smith",
+                    "musicbrainzId": str(uuid.uuid4()),
+                    "published": published.isoformat(),
+                }
+            ],
+        },
+        "artists": [
+            {
+                "type": "Artist",
+                "id": "http://hello.trackartist",
+                "name": "Bob Smith",
+                "musicbrainzId": str(uuid.uuid4()),
+                "published": published.isoformat(),
+            }
+        ],
+    }
+    r_mock.get(data["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
+    serializer = serializers.TrackSerializer(data=data, context={"activity": activity})
+    assert serializer.is_valid(raise_exception=True)
+
+    track = serializer.save()
+    album = track.album
+    artist = track.artist
+    album_artist = track.album.artist
+
+    assert track.from_activity == activity
+    assert track.fid == data["id"]
+    assert track.title == data["name"]
+    assert track.position == data["position"]
+    assert track.creation_date == published
+    assert str(track.mbid) == data["musicbrainzId"]
+
+    assert album.from_activity == activity
+    assert album.cover.read() == b"coucou"
+    assert album.cover.path.endswith(".png")
+    assert album.title == data["album"]["name"]
+    assert album.fid == data["album"]["id"]
+    assert str(album.mbid) == data["album"]["musicbrainzId"]
+    assert album.creation_date == published
+    assert album.release_date == released
+
+    assert artist.from_activity == activity
+    assert artist.name == data["artists"][0]["name"]
+    assert artist.fid == data["artists"][0]["id"]
+    assert str(artist.mbid) == data["artists"][0]["musicbrainzId"]
+    assert artist.creation_date == published
+
+    assert album_artist.from_activity == activity
+    assert album_artist.name == data["album"]["artists"][0]["name"]
+    assert album_artist.fid == data["album"]["artists"][0]["id"]
+    assert str(album_artist.mbid) == data["album"]["artists"][0]["musicbrainzId"]
+    assert album_artist.creation_date == published
+
+
+def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
+    activity = factories["federation.Activity"]()
+    library = factories["music.Library"]()
+
+    published = timezone.now()
+    updated = timezone.now()
+    released = timezone.now().date()
+    data = {
+        "@context": serializers.AP_CONTEXT,
+        "type": "Audio",
+        "id": "https://track.file",
+        "name": "Ignored",
+        "published": published.isoformat(),
+        "updated": updated.isoformat(),
+        "duration": 43,
+        "bitrate": 42,
+        "size": 66,
+        "url": {"href": "https://audio.file", "type": "Link", "mediaType": "audio/mp3"},
+        "library": library.fid,
+        "track": {
+            "type": "Track",
+            "id": "http://hello.track",
+            "published": published.isoformat(),
+            "musicbrainzId": str(uuid.uuid4()),
+            "name": "Black in back",
+            "position": 5,
+            "album": {
+                "type": "Album",
+                "id": "http://hello.album",
+                "name": "Purple album",
+                "musicbrainzId": str(uuid.uuid4()),
+                "published": published.isoformat(),
+                "released": released.isoformat(),
+                "cover": {
+                    "type": "Link",
+                    "href": "https://cover.image/test.png",
+                    "mediaType": "image/png",
+                },
+                "artists": [
+                    {
+                        "type": "Artist",
+                        "id": "http://hello.artist",
+                        "name": "John Smith",
+                        "musicbrainzId": str(uuid.uuid4()),
+                        "published": published.isoformat(),
+                    }
+                ],
+            },
+            "artists": [
+                {
+                    "type": "Artist",
+                    "id": "http://hello.trackartist",
+                    "name": "Bob Smith",
+                    "musicbrainzId": str(uuid.uuid4()),
+                    "published": published.isoformat(),
+                }
+            ],
+        },
+    }
+    r_mock.get(data["track"]["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
+
+    serializer = serializers.UploadSerializer(data=data, context={"activity": activity})
+    assert serializer.is_valid(raise_exception=True)
+    track_create = mocker.spy(serializers.TrackSerializer, "create")
+    upload = serializer.save()
+
+    assert upload.track.from_activity == activity
+    assert upload.from_activity == activity
+    assert track_create.call_count == 1
+    assert upload.fid == data["id"]
+    assert upload.track.fid == data["track"]["id"]
+    assert upload.duration == data["duration"]
+    assert upload.size == data["size"]
+    assert upload.bitrate == data["bitrate"]
+    assert upload.source == data["url"]["href"]
+    assert upload.mimetype == data["url"]["mediaType"]
+    assert upload.creation_date == published
+    assert upload.import_status == "finished"
+    assert upload.modification_date == updated
+
+
+def test_activity_pub_upload_serializer_validtes_library_actor(factories, mocker):
+    library = factories["music.Library"]()
+    usurpator = factories["federation.Actor"]()
+
+    serializer = serializers.UploadSerializer(data={}, context={"actor": usurpator})
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        serializer.validate_library(library.fid)
 
 
 def test_activity_pub_audio_serializer_to_ap(factories):
-    tf = factories["music.TrackFile"](
+    upload = factories["music.Upload"](
         mimetype="audio/mp3", bitrate=42, duration=43, size=44
     )
-    library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
     expected = {
         "@context": serializers.AP_CONTEXT,
         "type": "Audio",
-        "id": tf.get_federation_url(),
-        "name": tf.track.full_name,
-        "published": tf.creation_date.isoformat(),
-        "updated": tf.modification_date.isoformat(),
-        "metadata": {
-            "artist": {
-                "musicbrainz_id": tf.track.artist.mbid,
-                "name": tf.track.artist.name,
-            },
-            "release": {
-                "musicbrainz_id": tf.track.album.mbid,
-                "title": tf.track.album.title,
-            },
-            "recording": {"musicbrainz_id": tf.track.mbid, "title": tf.track.title},
-            "size": tf.size,
-            "length": tf.duration,
-            "bitrate": tf.bitrate,
-        },
+        "id": upload.fid,
+        "name": upload.track.full_name,
+        "published": upload.creation_date.isoformat(),
+        "updated": upload.modification_date.isoformat(),
+        "duration": upload.duration,
+        "bitrate": upload.bitrate,
+        "size": upload.size,
         "url": {
-            "href": utils.full_url(tf.path),
+            "href": utils.full_url(upload.listen_url),
             "type": "Link",
             "mediaType": "audio/mp3",
         },
-        "attributedTo": [library.url],
+        "library": upload.library.fid,
+        "track": serializers.TrackSerializer(
+            upload.track, context={"include_ap_context": False}
+        ).data,
     }
 
-    serializer = serializers.AudioSerializer(tf, context={"actor": library})
+    serializer = serializers.UploadSerializer(upload)
 
     assert serializer.data == expected
-
-
-def test_activity_pub_audio_serializer_to_ap_no_mbid(factories):
-    tf = factories["music.TrackFile"](
-        mimetype="audio/mp3",
-        track__mbid=None,
-        track__album__mbid=None,
-        track__album__artist__mbid=None,
-    )
-    library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    expected = {
-        "@context": serializers.AP_CONTEXT,
-        "type": "Audio",
-        "id": tf.get_federation_url(),
-        "name": tf.track.full_name,
-        "published": tf.creation_date.isoformat(),
-        "updated": tf.modification_date.isoformat(),
-        "metadata": {
-            "artist": {"name": tf.track.artist.name, "musicbrainz_id": None},
-            "release": {"title": tf.track.album.title, "musicbrainz_id": None},
-            "recording": {"title": tf.track.title, "musicbrainz_id": None},
-            "size": None,
-            "length": None,
-            "bitrate": None,
-        },
-        "url": {
-            "href": utils.full_url(tf.path),
-            "type": "Link",
-            "mediaType": "audio/mp3",
-        },
-        "attributedTo": [library.url],
-    }
-
-    serializer = serializers.AudioSerializer(tf, context={"actor": library})
-
-    assert serializer.data == expected
-
-
-def test_collection_serializer_to_ap(factories):
-    tf1 = factories["music.TrackFile"](mimetype="audio/mp3")
-    tf2 = factories["music.TrackFile"](mimetype="audio/ogg")
-    library = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    expected = {
-        "@context": serializers.AP_CONTEXT,
-        "id": "https://test.id",
-        "actor": library.url,
-        "totalItems": 2,
-        "type": "Collection",
-        "items": [
-            serializers.AudioSerializer(
-                tf1, context={"actor": library, "include_ap_context": False}
-            ).data,
-            serializers.AudioSerializer(
-                tf2, context={"actor": library, "include_ap_context": False}
-            ).data,
-        ],
-    }
-
-    collection = {
-        "id": expected["id"],
-        "actor": library,
-        "items": [tf1, tf2],
-        "item_serializer": serializers.AudioSerializer,
-    }
-    serializer = serializers.CollectionSerializer(
-        collection, context={"actor": library, "id": "https://test.id"}
-    )
-
-    assert serializer.data == expected
-
-
-def test_api_library_create_serializer_save(factories, r_mock):
-    library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    actor = factories["federation.Actor"]()
-    follow = factories["federation.Follow"](target=actor, actor=library_actor)
-    actor_data = serializers.ActorSerializer(actor).data
-    actor_data["url"] = [
-        {"href": "https://test.library", "name": "library", "type": "Link"}
-    ]
-    library_conf = {
-        "id": "https://test.library",
-        "items": range(10),
-        "actor": actor,
-        "page_size": 5,
-    }
-    library_data = serializers.PaginatedCollectionSerializer(library_conf).data
-    r_mock.get(actor.url, json=actor_data)
-    r_mock.get("https://test.library", json=library_data)
-    data = {
-        "actor": actor.url,
-        "autoimport": False,
-        "federation_enabled": True,
-        "download_files": False,
-    }
-
-    serializer = serializers.APILibraryCreateSerializer(data=data)
-    assert serializer.is_valid(raise_exception=True) is True
-    library = serializer.save()
-    follow = models.Follow.objects.get(target=actor, actor=library_actor, approved=None)
-
-    assert library.autoimport is data["autoimport"]
-    assert library.federation_enabled is data["federation_enabled"]
-    assert library.download_files is data["download_files"]
-    assert library.tracks_count == 10
-    assert library.actor == actor
-    assert library.follow == follow
-
-
-def test_tapi_library_track_serializer_not_imported(factories):
-    lt = factories["federation.LibraryTrack"]()
-    serializer = serializers.APILibraryTrackSerializer(lt)
-
-    assert serializer.get_status(lt) == "not_imported"
-
-
-def test_tapi_library_track_serializer_imported(factories):
-    tf = factories["music.TrackFile"](federation=True)
-    lt = tf.library_track
-    serializer = serializers.APILibraryTrackSerializer(lt)
-
-    assert serializer.get_status(lt) == "imported"
-
-
-def test_tapi_library_track_serializer_import_pending(factories):
-    job = factories["music.ImportJob"](federation=True, status="pending")
-    lt = job.library_track
-    serializer = serializers.APILibraryTrackSerializer(lt)
-
-    assert serializer.get_status(lt) == "import_pending"
 
 
 def test_local_actor_serializer_to_ap(factories):
@@ -708,7 +882,7 @@ def test_local_actor_serializer_to_ap(factories):
         "endpoints": {"sharedInbox": "https://test.federation/inbox"},
     }
     ac = models.Actor.objects.create(
-        url=expected["id"],
+        fid=expected["id"],
         inbox_url=expected["inbox"],
         outbox_url=expected["outbox"],
         shared_inbox_url=expected["endpoints"]["sharedInbox"],
@@ -734,3 +908,16 @@ def test_local_actor_serializer_to_ap(factories):
     serializer = serializers.ActorSerializer(ac)
 
     assert serializer.data == expected
+
+
+def test_activity_serializer_validate_recipients_empty(db):
+    s = serializers.BaseActivitySerializer()
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        s.validate_recipients({})
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        s.validate_recipients({"to": []})
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        s.validate_recipients({"cc": []})

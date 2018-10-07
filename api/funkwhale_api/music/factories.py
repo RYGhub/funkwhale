@@ -3,8 +3,9 @@ import os
 import factory
 
 from funkwhale_api.factories import ManyToManyFromList, registry
-from funkwhale_api.federation.factories import LibraryTrackFactory
-from funkwhale_api.users.factories import UserFactory
+from funkwhale_api.federation import factories as federation_factories
+from funkwhale_api.users import factories as users_factories
+
 
 SAMPLES_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -13,10 +14,28 @@ SAMPLES_PATH = os.path.join(
 )
 
 
+def playable_factory(field):
+    @factory.post_generation
+    def inner(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            UploadFactory(
+                library__privacy_level="everyone",
+                import_status="finished",
+                **{field: self}
+            )
+
+    return inner
+
+
 @registry.register
 class ArtistFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
+    fid = factory.Faker("federation_url")
+    playable = playable_factory("track__album__artist")
 
     class Meta:
         model = "music.Artist"
@@ -30,6 +49,8 @@ class AlbumFactory(factory.django.DjangoModelFactory):
     cover = factory.django.ImageField()
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
+    fid = factory.Faker("federation_url")
+    playable = playable_factory("track__album")
 
     class Meta:
         model = "music.Album"
@@ -37,20 +58,24 @@ class AlbumFactory(factory.django.DjangoModelFactory):
 
 @registry.register
 class TrackFactory(factory.django.DjangoModelFactory):
+    fid = factory.Faker("federation_url")
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     album = factory.SubFactory(AlbumFactory)
     artist = factory.SelfAttribute("album.artist")
     position = 1
     tags = ManyToManyFromList("tags")
+    playable = playable_factory("track")
 
     class Meta:
         model = "music.Track"
 
 
 @registry.register
-class TrackFileFactory(factory.django.DjangoModelFactory):
+class UploadFactory(factory.django.DjangoModelFactory):
+    fid = factory.Faker("federation_url")
     track = factory.SubFactory(TrackFactory)
+    library = factory.SubFactory(federation_factories.MusicLibraryFactory)
     audio_file = factory.django.FileField(
         from_path=os.path.join(SAMPLES_PATH, "test.ogg")
     )
@@ -58,67 +83,16 @@ class TrackFileFactory(factory.django.DjangoModelFactory):
     bitrate = None
     size = None
     duration = None
+    mimetype = "audio/ogg"
 
     class Meta:
-        model = "music.TrackFile"
+        model = "music.Upload"
 
     class Params:
         in_place = factory.Trait(audio_file=None)
-        federation = factory.Trait(
-            audio_file=None,
-            library_track=factory.SubFactory(LibraryTrackFactory),
-            mimetype=factory.LazyAttribute(lambda o: o.library_track.audio_mimetype),
-            source=factory.LazyAttribute(lambda o: o.library_track.audio_url),
+        playable = factory.Trait(
+            import_status="finished", library__privacy_level="everyone"
         )
-
-
-@registry.register
-class ImportBatchFactory(factory.django.DjangoModelFactory):
-    submitted_by = factory.SubFactory(UserFactory)
-
-    class Meta:
-        model = "music.ImportBatch"
-
-    class Params:
-        federation = factory.Trait(submitted_by=None, source="federation")
-        finished = factory.Trait(status="finished")
-
-
-@registry.register
-class ImportJobFactory(factory.django.DjangoModelFactory):
-    batch = factory.SubFactory(ImportBatchFactory)
-    source = factory.Faker("url")
-    mbid = factory.Faker("uuid4")
-    replace_if_duplicate = False
-
-    class Meta:
-        model = "music.ImportJob"
-
-    class Params:
-        federation = factory.Trait(
-            mbid=None,
-            library_track=factory.SubFactory(LibraryTrackFactory),
-            batch=factory.SubFactory(ImportBatchFactory, federation=True),
-        )
-        finished = factory.Trait(
-            status="finished", track_file=factory.SubFactory(TrackFileFactory)
-        )
-        in_place = factory.Trait(status="finished", audio_file=None)
-        with_audio_file = factory.Trait(
-            status="finished",
-            audio_file=factory.django.FileField(
-                from_path=os.path.join(SAMPLES_PATH, "test.ogg")
-            ),
-        )
-
-
-@registry.register(name="music.FileImportJob")
-class FileImportJobFactory(ImportJobFactory):
-    source = "file://"
-    mbid = None
-    audio_file = factory.django.FileField(
-        from_path=os.path.join(SAMPLES_PATH, "test.ogg")
-    )
 
 
 @registry.register
@@ -149,3 +123,24 @@ class TagFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "taggit.Tag"
+
+
+# XXX To remove
+
+
+class ImportBatchFactory(factory.django.DjangoModelFactory):
+    submitted_by = factory.SubFactory(users_factories.UserFactory)
+
+    class Meta:
+        model = "music.ImportBatch"
+
+
+@registry.register
+class ImportJobFactory(factory.django.DjangoModelFactory):
+    batch = factory.SubFactory(ImportBatchFactory)
+    source = factory.Faker("url")
+    mbid = factory.Faker("uuid4")
+    replace_if_duplicate = False
+
+    class Meta:
+        model = "music.ImportJob"

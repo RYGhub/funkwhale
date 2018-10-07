@@ -7,7 +7,7 @@ touch $locales_dir/app.pot
 
 # Create a main .pot template, then generate .po files for each available language.
 # Extract gettext strings from templates files and create a POT dictionary template.
-$(yarn bin gettext-extract)/gettext-extract --attribute v-translate --quiet --output $locales_dir/app.pot $sources
+$(yarn bin)/gettext-extract --attribute v-translate --quiet --output $locales_dir/app.pot $sources
 xgettext --language=JavaScript --keyword=npgettext:1c,2,3 \
     --from-code=utf-8 --join-existing --no-wrap \
     --package-name=$(node -e "console.log(require('./package.json').name);") \

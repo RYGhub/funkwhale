@@ -10,7 +10,7 @@
           <label><translate>Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
-              {{ option[1] }}
+              {{ sharedLabels.filters[option[1]] }}
             </option>
           </select>
         </div>
@@ -32,7 +32,7 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
-        :action-url="'manage/library/track-files/action/'"
+        :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Title</translate></th>
@@ -111,9 +111,10 @@ import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
+import TranslationsMixin from '@/components/mixins/Translations'
 
 export default {
-  mixins: [OrderingMixin],
+  mixins: [OrderingMixin, TranslationsMixin],
   props: {
     filters: {type: Object, required: false}
   },
@@ -133,12 +134,12 @@ export default {
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['creation_date', 'Creation date'],
-        ['accessed_date', 'Accessed date'],
-        ['modification_date', 'Modification date'],
-        ['size', 'Size'],
-        ['bitrate', 'Bitrate'],
-        ['duration', 'Duration']
+        ['creation_date', 'creation_date'],
+        ['accessed_date', 'accessed_date'],
+        ['modification_date', 'modification_date'],
+        ['size', 'size'],
+        ['bitrate', 'bitrate'],
+        ['duration', 'duration']
       ]
 
     }
@@ -157,7 +158,7 @@ export default {
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/manage/library/track-files/', {params: params}).then((response) => {
+      axios.get('/manage/library/uploads/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {

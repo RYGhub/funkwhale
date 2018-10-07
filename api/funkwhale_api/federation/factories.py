@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.http import http_date
 
 from funkwhale_api.factories import registry
+from funkwhale_api.users import factories as user_factories
 
 from . import keys, models
 
@@ -61,6 +62,10 @@ class LinkFactory(factory.Factory):
         audio = factory.Trait(mediaType=factory.Iterator(["audio/mp3", "audio/ogg"]))
 
 
+def create_user(actor):
+    return user_factories.UserFactory(actor=actor)
+
+
 @registry.register
 class ActorFactory(factory.DjangoModelFactory):
     public_key = None
@@ -68,8 +73,11 @@ class ActorFactory(factory.DjangoModelFactory):
     preferred_username = factory.Faker("user_name")
     summary = factory.Faker("paragraph")
     domain = factory.Faker("domain_name")
-    url = factory.LazyAttribute(
+    fid = factory.LazyAttribute(
         lambda o: "https://{}/users/{}".format(o.domain, o.preferred_username)
+    )
+    followers_url = factory.LazyAttribute(
+        lambda o: "https://{}/users/{}followers".format(o.domain, o.preferred_username)
     )
     inbox_url = factory.LazyAttribute(
         lambda o: "https://{}/users/{}/inbox".format(o.domain, o.preferred_username)
@@ -81,20 +89,34 @@ class ActorFactory(factory.DjangoModelFactory):
     class Meta:
         model = models.Actor
 
-    class Params:
-        local = factory.Trait(
-            domain=factory.LazyAttribute(lambda o: settings.FEDERATION_HOSTNAME)
-        )
+    @factory.post_generation
+    def local(self, create, extracted, **kwargs):
+        if not extracted and not kwargs:
+            return
+        from funkwhale_api.users.factories import UserFactory
 
-    @classmethod
-    def _generate(cls, create, attrs):
-        has_public = attrs.get("public_key") is not None
-        has_private = attrs.get("private_key") is not None
-        if not has_public and not has_private:
+        self.domain = settings.FEDERATION_HOSTNAME
+        self.save(update_fields=["domain"])
+        if not create:
+            if extracted and hasattr(extracted, "pk"):
+                extracted.actor = self
+            else:
+                UserFactory.build(actor=self, **kwargs)
+        if extracted and hasattr(extracted, "pk"):
+            extracted.actor = self
+            extracted.save(update_fields=["user"])
+        else:
+            self.user = UserFactory(actor=self, **kwargs)
+
+    @factory.post_generation
+    def keys(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        if not extracted:
             private, public = keys.get_key_pair()
-            attrs["private_key"] = private.decode("utf-8")
-            attrs["public_key"] = public.decode("utf-8")
-        return super()._generate(create, attrs)
+            self.private_key = private.decode("utf-8")
+            self.public_key = public.decode("utf-8")
 
 
 @registry.register
@@ -110,15 +132,72 @@ class FollowFactory(factory.DjangoModelFactory):
 
 
 @registry.register
-class LibraryFactory(factory.DjangoModelFactory):
+class MusicLibraryFactory(factory.django.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory)
-    url = factory.Faker("url")
-    federation_enabled = True
-    download_files = False
-    autoimport = False
+    privacy_level = "me"
+    name = factory.Faker("sentence")
+    description = factory.Faker("sentence")
+    uploads_count = 0
+    fid = factory.Faker("federation_url")
 
     class Meta:
-        model = models.Library
+        model = "music.Library"
+
+    @factory.post_generation
+    def followers_url(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        self.followers_url = extracted or self.fid + "/followers"
+
+
+@registry.register
+class LibraryScan(factory.django.DjangoModelFactory):
+    library = factory.SubFactory(MusicLibraryFactory)
+    actor = factory.SubFactory(ActorFactory)
+    total_files = factory.LazyAttribute(lambda o: o.library.uploads_count)
+
+    class Meta:
+        model = "music.LibraryScan"
+
+
+@registry.register
+class ActivityFactory(factory.django.DjangoModelFactory):
+    actor = factory.SubFactory(ActorFactory)
+    url = factory.Faker("federation_url")
+    payload = factory.LazyFunction(lambda: {"type": "Create"})
+
+    class Meta:
+        model = "federation.Activity"
+
+
+@registry.register
+class InboxItemFactory(factory.django.DjangoModelFactory):
+    actor = factory.SubFactory(ActorFactory, local=True)
+    activity = factory.SubFactory(ActivityFactory)
+    type = "to"
+
+    class Meta:
+        model = "federation.InboxItem"
+
+
+@registry.register
+class DeliveryFactory(factory.django.DjangoModelFactory):
+    activity = factory.SubFactory(ActivityFactory)
+    inbox_url = factory.Faker("url")
+
+    class Meta:
+        model = "federation.Delivery"
+
+
+@registry.register
+class LibraryFollowFactory(factory.DjangoModelFactory):
+    target = factory.SubFactory(MusicLibraryFactory)
+    actor = factory.SubFactory(ActorFactory)
+
+    class Meta:
+        model = "federation.LibraryFollow"
 
 
 class ArtistMetadataFactory(factory.Factory):
@@ -161,25 +240,6 @@ class LibraryTrackMetadataFactory(factory.Factory):
         model = dict
 
 
-@registry.register
-class LibraryTrackFactory(factory.DjangoModelFactory):
-    library = factory.SubFactory(LibraryFactory)
-    url = factory.Faker("url")
-    title = factory.Faker("sentence")
-    artist_name = factory.Faker("sentence")
-    album_title = factory.Faker("sentence")
-    audio_url = factory.Faker("url")
-    audio_mimetype = "audio/ogg"
-    metadata = factory.SubFactory(LibraryTrackMetadataFactory)
-    published_date = factory.LazyFunction(timezone.now)
-
-    class Meta:
-        model = models.LibraryTrack
-
-    class Params:
-        with_audio_file = factory.Trait(audio_file=factory.django.FileField())
-
-
 @registry.register(name="federation.Note")
 class NoteFactory(factory.Factory):
     type = "Note"
@@ -187,22 +247,6 @@ class NoteFactory(factory.Factory):
     published = factory.LazyFunction(lambda: timezone.now().isoformat())
     inReplyTo = None
     content = factory.Faker("sentence")
-
-    class Meta:
-        model = dict
-
-
-@registry.register(name="federation.Activity")
-class ActivityFactory(factory.Factory):
-    type = "Create"
-    id = factory.Faker("url")
-    published = factory.LazyFunction(lambda: timezone.now().isoformat())
-    actor = factory.Faker("url")
-    object = factory.SubFactory(
-        NoteFactory,
-        actor=factory.SelfAttribute("..actor"),
-        published=factory.SelfAttribute("..published"),
-    )
 
     class Meta:
         model = dict
@@ -230,9 +274,9 @@ class AudioMetadataFactory(factory.Factory):
 @registry.register(name="federation.Audio")
 class AudioFactory(factory.Factory):
     type = "Audio"
-    id = factory.Faker("url")
+    id = factory.Faker("federation_url")
     published = factory.LazyFunction(lambda: timezone.now().isoformat())
-    actor = factory.Faker("url")
+    actor = factory.Faker("federation_url")
     url = factory.SubFactory(LinkFactory, audio=True)
     metadata = factory.SubFactory(LibraryTrackMetadataFactory)
 

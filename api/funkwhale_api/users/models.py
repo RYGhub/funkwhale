@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from django_auth_ldap.backend import populate_user as ldap_populate_user
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
@@ -121,6 +122,8 @@ class User(AbstractUser):
         blank=True,
     )
 
+    upload_quota = models.PositiveIntegerField(null=True, blank=True)
+
     def __str__(self):
         return self.username
 
@@ -181,6 +184,32 @@ class User(AbstractUser):
             self.last_activity = now
             self.save(update_fields=["last_activity"])
 
+    def create_actor(self):
+        self.actor = create_actor(self)
+        self.save(update_fields=["actor"])
+        return self.actor
+
+    def get_upload_quota(self):
+        return self.upload_quota or preferences.get("users__upload_quota")
+
+    def get_quota_status(self):
+        data = self.actor.get_current_usage()
+        max_ = self.get_upload_quota()
+        return {
+            "max": max_,
+            "remaining": max(max_ - (data["total"] / 1000 / 1000), 0),
+            "current": data["total"] / 1000 / 1000,
+            "skipped": data["skipped"] / 1000 / 1000,
+            "pending": data["pending"] / 1000 / 1000,
+            "finished": data["finished"] / 1000 / 1000,
+            "errored": data["errored"] / 1000 / 1000,
+        }
+
+    def get_channels_groups(self):
+        groups = ["imports", "inbox"]
+
+        return ["user.{}.{}".format(self.pk, g) for g in groups]
+
 
 def generate_code(length=10):
     return "".join(
@@ -219,32 +248,50 @@ class Invitation(models.Model):
         return super().save(**kwargs)
 
 
-def create_actor(user):
-    username = user.username
-    private, public = keys.get_key_pair()
-    args = {
+def get_actor_data(user):
+    username = federation_utils.slugify_username(user.username)
+    return {
         "preferred_username": username,
         "domain": settings.FEDERATION_HOSTNAME,
         "type": "Person",
-        "name": username,
+        "name": user.username,
         "manually_approves_followers": False,
-        "url": federation_utils.full_url(
-            reverse("federation:actors-detail", kwargs={"user__username": username})
+        "fid": federation_utils.full_url(
+            reverse("federation:actors-detail", kwargs={"preferred_username": username})
         ),
-        "shared_inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"user__username": username})
-        ),
+        "shared_inbox_url": federation_models.get_shared_inbox_url(),
         "inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"user__username": username})
+            reverse("federation:actors-inbox", kwargs={"preferred_username": username})
         ),
         "outbox_url": federation_utils.full_url(
-            reverse("federation:actors-outbox", kwargs={"user__username": username})
+            reverse("federation:actors-outbox", kwargs={"preferred_username": username})
+        ),
+        "followers_url": federation_utils.full_url(
+            reverse(
+                "federation:actors-followers", kwargs={"preferred_username": username}
+            )
+        ),
+        "following_url": federation_utils.full_url(
+            reverse(
+                "federation:actors-following", kwargs={"preferred_username": username}
+            )
         ),
     }
+
+
+def create_actor(user):
+    args = get_actor_data(user)
+    private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")
 
-    return federation_models.Actor.objects.create(**args)
+    return federation_models.Actor.objects.create(user=user, **args)
+
+
+@receiver(ldap_populate_user)
+def init_ldap_user(sender, user, ldap_user, **kwargs):
+    if not user.actor:
+        user.actor = create_actor(user)
 
 
 @receiver(models.signals.post_save, sender=User)

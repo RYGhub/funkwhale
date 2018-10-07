@@ -14,7 +14,7 @@ def create_data(count=25):
             artist=artist, size=random.randint(1, 5)
         )
         for album in albums:
-            factories.TrackFileFactory.create_batch(
+            factories.UploadFactory.create_batch(
                 track__album=album, size=random.randint(3, 18)
             )
 

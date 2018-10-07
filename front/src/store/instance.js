@@ -31,6 +31,9 @@ export default {
       users: {
         registration_enabled: {
           value: true
+        },
+        upload_quota: {
+          value: 0
         }
       },
       subsonic: {

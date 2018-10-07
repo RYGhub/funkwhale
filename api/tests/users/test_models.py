@@ -133,23 +133,90 @@ def test_can_filter_closed_invitations(factories):
 
 
 def test_creating_actor_from_user(factories, settings):
-    user = factories["users.User"]()
+    user = factories["users.User"](username="Hello M. world")
     actor = models.create_actor(user)
 
-    assert actor.preferred_username == user.username
+    assert actor.preferred_username == "Hello_M_world"  # slugified
     assert actor.domain == settings.FEDERATION_HOSTNAME
     assert actor.type == "Person"
     assert actor.name == user.username
     assert actor.manually_approves_followers is False
-    assert actor.url == federation_utils.full_url(
-        reverse("federation:actors-detail", kwargs={"user__username": user.username})
+    assert actor.fid == federation_utils.full_url(
+        reverse(
+            "federation:actors-detail",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
     assert actor.shared_inbox_url == federation_utils.full_url(
-        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+        reverse("federation:shared-inbox")
     )
     assert actor.inbox_url == federation_utils.full_url(
-        reverse("federation:actors-inbox", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-inbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
     assert actor.outbox_url == federation_utils.full_url(
-        reverse("federation:actors-outbox", kwargs={"user__username": user.username})
+        reverse(
+            "federation:actors-outbox",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
     )
+    assert actor.followers_url == federation_utils.full_url(
+        reverse(
+            "federation:actors-followers",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
+    )
+    assert actor.following_url == federation_utils.full_url(
+        reverse(
+            "federation:actors-following",
+            kwargs={"preferred_username": actor.preferred_username},
+        )
+    )
+
+
+def test_get_channels_groups(factories):
+    user = factories["users.User"]()
+
+    assert user.get_channels_groups() == [
+        "user.{}.imports".format(user.pk),
+        "user.{}.inbox".format(user.pk),
+    ]
+
+
+def test_user_quota_default_to_preference(factories, preferences):
+    preferences["users__upload_quota"] = 42
+
+    user = factories["users.User"]()
+    assert user.get_upload_quota() == 42
+
+
+def test_user_quota_set_on_user(factories, preferences):
+    preferences["users__upload_quota"] = 42
+
+    user = factories["users.User"](upload_quota=66)
+    assert user.get_upload_quota() == 66
+
+
+def test_user_get_quota_status(factories, preferences, mocker):
+    user = factories["users.User"](upload_quota=66, with_actor=True)
+    mocker.patch(
+        "funkwhale_api.federation.models.Actor.get_current_usage",
+        return_value={
+            "total": 10 * 1000 * 1000,
+            "pending": 1 * 1000 * 1000,
+            "skipped": 2 * 1000 * 1000,
+            "errored": 3 * 1000 * 1000,
+            "finished": 4 * 1000 * 1000,
+        },
+    )
+    assert user.get_quota_status() == {
+        "max": 66,
+        "remaining": 56,
+        "current": 10,
+        "pending": 1,
+        "skipped": 2,
+        "errored": 3,
+        "finished": 4,
+    }

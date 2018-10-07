@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# PROVIDE: funkwhale_worker
+# REQUIRE: LOGIN postgresql nginx redis
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf to enable funkwhale_worker:
+# funkwhale_worker (bool):        Set it to "YES" to enable Funkwhale task worker.
+#                                 Default is "NO".
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+
+. /etc/rc.subr
+
+desc="Funkwhale worker"
+name=funkwhale_worker
+rcvar=funkwhale_worker_enable
+
+load_rc_config $name
+
+: ${funkwhale_worker_enable:=NO}
+
+funkwhale_worker_chdir="/usr/local/www/funkwhale/api"
+funkwhale_worker_user=funkwhale
+funkwhale_worker_env=$(cat /usr/local/www/funkwhale/config/.env | grep -v ^# | xargs)
+pidfile="/var/run/funkwhale/${name##funkwhale_}.pid"
+command_interpreter="/usr/local/www/funkwhale/virtualenv/bin/python3"
+
+command="/usr/local/www/funkwhale/virtualenv/bin/celery"
+command_args="-A funkwhale_api.taskapp worker -l INFO \
+--pidfile=${pidfile} \
+>> /var/log/funkwhale/${name##funkwhale_}.log 2>&1 &"
+
+run_rc_command "$1"

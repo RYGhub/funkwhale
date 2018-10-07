@@ -16,3 +16,5 @@ class JsonAuthConsumer(JsonWebsocketConsumer):
         super().accept()
         for group in self.groups:
             channels.group_add(group, self.channel_name)
+        for group in self.scope["user"].get_channels_groups():
+            channels.group_add(group, self.channel_name)

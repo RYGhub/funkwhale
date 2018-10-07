@@ -1,228 +1,54 @@
+import collections
 import logging
 import os
 
-from django.conf import settings
-from django.core.files.base import ContentFile
-from musicbrainzngs import ResponseError
+from django.utils import timezone
+from django.db import transaction
+from django.db.models import F, Q
+from django.dispatch import receiver
 
-from funkwhale_api.common import preferences
-from funkwhale_api.federation import activity, actors
-from funkwhale_api.federation import serializers as federation_serializers
-from funkwhale_api.providers.acoustid import get_acoustid_client
-from funkwhale_api.providers.audiofile import tasks as audiofile_tasks
+from musicbrainzngs import ResponseError
+from requests.exceptions import RequestException
+
+from funkwhale_api.common import channels
+from funkwhale_api.federation import routes
+from funkwhale_api.federation import library as lb
 from funkwhale_api.taskapp import celery
 
 from . import lyrics as lyrics_utils
 from . import models
-from . import utils as music_utils
+from . import metadata
+from . import signals
+from . import serializers
 
 logger = logging.getLogger(__name__)
 
 
-@celery.app.task(name="acoustid.set_on_track_file")
-@celery.require_instance(models.TrackFile, "track_file")
-def set_acoustid_on_track_file(track_file):
-    client = get_acoustid_client()
-    result = client.get_best_match(track_file.audio_file.path)
-
-    def update(id):
-        track_file.acoustid_track_id = id
-        track_file.save(update_fields=["acoustid_track_id"])
-        return id
-
-    if result:
-        return update(result["id"])
-
-
-def import_track_from_remote(library_track):
-    metadata = library_track.metadata
-    try:
-        track_mbid = metadata["recording"]["musicbrainz_id"]
-        assert track_mbid  # for null/empty values
-    except (KeyError, AssertionError):
-        pass
-    else:
-        return models.Track.get_or_create_from_api(mbid=track_mbid)[0]
-
-    try:
-        album_mbid = metadata["release"]["musicbrainz_id"]
-        assert album_mbid  # for null/empty values
-    except (KeyError, AssertionError):
-        pass
-    else:
-        album, _ = models.Album.get_or_create_from_api(mbid=album_mbid)
-        return models.Track.get_or_create_from_title(
-            library_track.title, artist=album.artist, album=album
-        )[0]
-
-    try:
-        artist_mbid = metadata["artist"]["musicbrainz_id"]
-        assert artist_mbid  # for null/empty values
-    except (KeyError, AssertionError):
-        pass
-    else:
-        artist, _ = models.Artist.get_or_create_from_api(mbid=artist_mbid)
-        album, _ = models.Album.get_or_create_from_title(
-            library_track.album_title, artist=artist
-        )
-        return models.Track.get_or_create_from_title(
-            library_track.title, artist=artist, album=album
-        )[0]
-
-    # worst case scenario, we have absolutely no way to link to a
-    # musicbrainz resource, we rely on the name/titles
-    artist, _ = models.Artist.get_or_create_from_name(library_track.artist_name)
-    album, _ = models.Album.get_or_create_from_title(
-        library_track.album_title, artist=artist
-    )
-    return models.Track.get_or_create_from_title(
-        library_track.title, artist=artist, album=album
-    )[0]
-
-
-def _do_import(import_job, use_acoustid=False):
-    logger.info("[Import Job %s] starting job", import_job.pk)
-    from_file = bool(import_job.audio_file)
-    mbid = import_job.mbid
-    replace = import_job.replace_if_duplicate
-    acoustid_track_id = None
-    duration = None
-    track = None
-    # use_acoustid = use_acoustid and preferences.get('providers_acoustid__api_key')
-    # Acoustid is not reliable, we disable it for now.
-    use_acoustid = False
-    if not mbid and use_acoustid and from_file:
-        # we try to deduce mbid from acoustid
-        client = get_acoustid_client()
-        match = client.get_best_match(import_job.audio_file.path)
-        if match:
-            duration = match["recordings"][0]["duration"]
-            mbid = match["recordings"][0]["id"]
-            acoustid_track_id = match["id"]
-    if mbid:
-        logger.info(
-            "[Import Job %s] importing track from musicbrainz recording %s",
-            import_job.pk,
-            str(mbid),
-        )
-        track, _ = models.Track.get_or_create_from_api(mbid=mbid)
-    elif import_job.audio_file:
-        logger.info(
-            "[Import Job %s] importing track from uploaded track data at %s",
-            import_job.pk,
-            import_job.audio_file.path,
-        )
-        track = audiofile_tasks.import_track_data_from_path(import_job.audio_file.path)
-    elif import_job.library_track:
-        logger.info(
-            "[Import Job %s] importing track from federated library track %s",
-            import_job.pk,
-            import_job.library_track.pk,
-        )
-        track = import_track_from_remote(import_job.library_track)
-    elif import_job.source.startswith("file://"):
-        tf_path = import_job.source.replace("file://", "", 1)
-        logger.info(
-            "[Import Job %s] importing track from local track data at %s",
-            import_job.pk,
-            tf_path,
-        )
-        track = audiofile_tasks.import_track_data_from_path(tf_path)
-    else:
-        raise ValueError(
-            "Not enough data to process import, "
-            "add a mbid, an audio file or a library track"
-        )
-
-    track_file = None
-    if replace:
-        logger.info("[Import Job %s] deleting existing audio file", import_job.pk)
-        track.files.all().delete()
-    elif track.files.count() > 0:
-        logger.info(
-            "[Import Job %s] skipping, we already have a file for this track",
-            import_job.pk,
-        )
-        if import_job.audio_file:
-            import_job.audio_file.delete()
-        import_job.status = "skipped"
-        import_job.save()
-        return
-
-    track_file = track_file or models.TrackFile(track=track, source=import_job.source)
-    track_file.acoustid_track_id = acoustid_track_id
-    if from_file:
-        track_file.audio_file = ContentFile(import_job.audio_file.read())
-        track_file.audio_file.name = import_job.audio_file.name
-        track_file.duration = duration
-    elif import_job.library_track:
-        track_file.library_track = import_job.library_track
-        track_file.mimetype = import_job.library_track.audio_mimetype
-        if import_job.library_track.library.download_files:
-            raise NotImplementedError()
-        else:
-            # no downloading, we hotlink
-            pass
-    elif not import_job.audio_file and not import_job.source.startswith("file://"):
-        # not an inplace import, and we have a source, so let's download it
-        logger.info("[Import Job %s] downloading audio file from remote", import_job.pk)
-        track_file.download_file()
-    elif not import_job.audio_file and import_job.source.startswith("file://"):
-        # in place import, we set mimetype from extension
-        path, ext = os.path.splitext(import_job.source)
-        track_file.mimetype = music_utils.get_type_from_ext(ext)
-    track_file.set_audio_data()
-    track_file.save()
-    # if no cover is set on track album, we try to update it as well:
-    if not track.album.cover:
-        logger.info("[Import Job %s] retrieving album cover", import_job.pk)
-        update_album_cover(track.album, track_file)
-    import_job.status = "finished"
-    import_job.track_file = track_file
-    if import_job.audio_file:
-        # it's imported on the track, we don't need it anymore
-        import_job.audio_file.delete()
-    import_job.save()
-    logger.info("[Import Job %s] job finished", import_job.pk)
-    return track_file
-
-
-def update_album_cover(album, track_file, replace=False):
+def update_album_cover(album, source=None, cover_data=None, replace=False):
     if album.cover and not replace:
         return
+    if cover_data:
+        return album.get_image(data=cover_data)
 
-    if track_file:
-        # maybe the file has a cover embedded?
+    if source and source.startswith("file://"):
+        # let's look for a cover in the same directory
+        path = os.path.dirname(source.replace("file://", "", 1))
+        logger.info("[Album %s] scanning covers from %s", album.pk, path)
+        cover = get_cover_from_fs(path)
+        if cover:
+            return album.get_image(data=cover)
+    if album.mbid:
         try:
-            metadata = track_file.get_metadata()
-        except FileNotFoundError:
-            metadata = None
-        if metadata:
-            cover = metadata.get_picture("cover_front")
-            if cover:
-                # best case scenario, cover is embedded in the track
-                logger.info("[Album %s] Using cover embedded in file", album.pk)
-                return album.get_image(data=cover)
-        if track_file.source and track_file.source.startswith("file://"):
-            # let's look for a cover in the same directory
-            path = os.path.dirname(track_file.source.replace("file://", "", 1))
-            logger.info("[Album %s] scanning covers from %s", album.pk, path)
-            cover = get_cover_from_fs(path)
-            if cover:
-                return album.get_image(data=cover)
-    if not album.mbid:
-        return
-    try:
-        logger.info(
-            "[Album %s] Fetching cover from musicbrainz release %s",
-            album.pk,
-            str(album.mbid),
-        )
-        return album.get_image()
-    except ResponseError as exc:
-        logger.warning(
-            "[Album %s] cannot fetch cover from musicbrainz: %s", album.pk, str(exc)
-        )
+            logger.info(
+                "[Album %s] Fetching cover from musicbrainz release %s",
+                album.pk,
+                str(album.mbid),
+            )
+            return album.get_image()
+        except ResponseError as exc:
+            logger.warning(
+                "[Album %s] cannot fetch cover from musicbrainz: %s", album.pk, str(exc)
+            )
 
 
 IMAGE_TYPES = [("jpg", "image/jpeg"), ("png", "image/png")]
@@ -240,37 +66,6 @@ def get_cover_from_fs(dir_path):
                 return {"mimetype": m, "content": c.read()}
 
 
-@celery.app.task(name="ImportJob.run", bind=True)
-@celery.require_instance(
-    models.ImportJob.objects.filter(status__in=["pending", "errored"]), "import_job"
-)
-def import_job_run(self, import_job, use_acoustid=False):
-    def mark_errored(exc):
-        logger.error("[Import Job %s] Error during import: %s", import_job.pk, str(exc))
-        import_job.status = "errored"
-        import_job.save(update_fields=["status"])
-
-    try:
-        tf = _do_import(import_job, use_acoustid=use_acoustid)
-        return tf.pk if tf else None
-    except Exception as exc:
-        if not settings.DEBUG:
-            try:
-                self.retry(exc=exc, countdown=30, max_retries=3)
-            except Exception:
-                mark_errored(exc)
-                raise
-        mark_errored(exc)
-        raise
-
-
-@celery.app.task(name="ImportBatch.run")
-@celery.require_instance(models.ImportBatch, "import_batch")
-def import_batch_run(import_batch):
-    for job_id in import_batch.jobs.order_by("id").values_list("id", flat=True):
-        import_job_run.delay(import_job_id=job_id)
-
-
 @celery.app.task(name="Lyrics.fetch_content")
 @celery.require_instance(models.Lyrics, "lyrics")
 def fetch_content(lyrics):
@@ -281,40 +76,453 @@ def fetch_content(lyrics):
     lyrics.save(update_fields=["content"])
 
 
-@celery.app.task(name="music.import_batch_notify_followers")
+@celery.app.task(name="music.start_library_scan")
 @celery.require_instance(
-    models.ImportBatch.objects.filter(status="finished"), "import_batch"
+    models.LibraryScan.objects.select_related().filter(status="pending"), "library_scan"
 )
-def import_batch_notify_followers(import_batch):
-    if not preferences.get("federation__enabled"):
-        return
+def start_library_scan(library_scan):
+    try:
+        data = lb.get_library_data(library_scan.library.fid, actor=library_scan.actor)
+    except Exception:
+        library_scan.status = "errored"
+        library_scan.save(update_fields=["status", "modification_date"])
+        raise
+    library_scan.modification_date = timezone.now()
+    library_scan.status = "scanning"
+    library_scan.total_files = data["totalItems"]
+    library_scan.save(update_fields=["status", "modification_date", "total_files"])
+    scan_library_page.delay(library_scan_id=library_scan.pk, page_url=data["first"])
 
-    if import_batch.source == "federation":
-        return
 
-    library_actor = actors.SYSTEM_ACTORS["library"].get_actor_instance()
-    followers = library_actor.get_approved_followers()
-    jobs = import_batch.jobs.filter(
-        status="finished", library_track__isnull=True, track_file__isnull=False
-    ).select_related("track_file__track__artist", "track_file__track__album__artist")
-    track_files = [job.track_file for job in jobs]
-    collection = federation_serializers.CollectionSerializer(
-        {
-            "actor": library_actor,
-            "id": import_batch.get_federation_url(),
-            "items": track_files,
-            "item_serializer": federation_serializers.AudioSerializer,
+@celery.app.task(
+    name="music.scan_library_page",
+    retry_backoff=60,
+    max_retries=5,
+    autoretry_for=[RequestException],
+)
+@celery.require_instance(
+    models.LibraryScan.objects.select_related().filter(status="scanning"),
+    "library_scan",
+)
+def scan_library_page(library_scan, page_url):
+    data = lb.get_library_page(library_scan.library, page_url, library_scan.actor)
+    uploads = []
+
+    for item_serializer in data["items"]:
+        upload = item_serializer.save(library=library_scan.library)
+        uploads.append(upload)
+
+    library_scan.processed_files = F("processed_files") + len(uploads)
+    library_scan.modification_date = timezone.now()
+    update_fields = ["modification_date", "processed_files"]
+
+    next_page = data.get("next")
+    fetch_next = next_page and next_page != page_url
+
+    if not fetch_next:
+        update_fields.append("status")
+        library_scan.status = "finished"
+    library_scan.save(update_fields=update_fields)
+
+    if fetch_next:
+        scan_library_page.delay(library_scan_id=library_scan.pk, page_url=next_page)
+
+
+def getter(data, *keys, default=None):
+    if not data:
+        return default
+    v = data
+    for k in keys:
+        try:
+            v = v[k]
+        except KeyError:
+            return default
+
+    return v
+
+
+class UploadImportError(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+def fail_import(upload, error_code):
+    old_status = upload.import_status
+    upload.import_status = "errored"
+    upload.import_details = {"error_code": error_code}
+    upload.import_date = timezone.now()
+    upload.save(update_fields=["import_details", "import_status", "import_date"])
+
+    broadcast = getter(
+        upload.import_metadata, "funkwhale", "config", "broadcast", default=True
+    )
+    if broadcast:
+        signals.upload_import_status_updated.send(
+            old_status=old_status,
+            new_status=upload.import_status,
+            upload=upload,
+            sender=None,
+        )
+
+
+@celery.app.task(name="music.process_upload")
+@celery.require_instance(
+    models.Upload.objects.filter(import_status="pending").select_related(
+        "library__actor__user"
+    ),
+    "upload",
+)
+def process_upload(upload):
+    import_metadata = upload.import_metadata or {}
+    old_status = upload.import_status
+    audio_file = upload.get_audio_file()
+    try:
+        additional_data = {}
+        if not audio_file:
+            # we can only rely on user proveded data
+            final_metadata = import_metadata
+        else:
+            # we use user provided data and data from the file itself
+            m = metadata.Metadata(audio_file)
+            file_metadata = m.all()
+            final_metadata = collections.ChainMap(
+                additional_data, import_metadata, file_metadata
+            )
+            additional_data["cover_data"] = m.get_picture("cover_front")
+        additional_data["upload_source"] = upload.source
+        track = get_track_from_import_metadata(final_metadata)
+    except UploadImportError as e:
+        return fail_import(upload, e.code)
+    except Exception:
+        fail_import(upload, "unknown_error")
+        raise
+
+    # under some situations, we want to skip the import (
+    # for instance if the user already owns the files)
+    owned_duplicates = get_owned_duplicates(upload, track)
+    upload.track = track
+
+    if owned_duplicates:
+        upload.import_status = "skipped"
+        upload.import_details = {
+            "code": "already_imported_in_owned_libraries",
+            "duplicates": list(owned_duplicates),
         }
-    ).data
-    for f in followers:
-        create = federation_serializers.ActivitySerializer(
-            {
-                "type": "Create",
-                "id": collection["id"],
-                "object": collection,
-                "actor": library_actor.url,
-                "to": [f.url],
-            }
-        ).data
+        upload.import_date = timezone.now()
+        upload.save(
+            update_fields=["import_details", "import_status", "import_date", "track"]
+        )
+        signals.upload_import_status_updated.send(
+            old_status=old_status,
+            new_status=upload.import_status,
+            upload=upload,
+            sender=None,
+        )
+        return
 
-        activity.deliver(create, on_behalf_of=library_actor, to=[f.url])
+    # all is good, let's finalize the import
+    audio_data = upload.get_audio_data()
+    if audio_data:
+        upload.duration = audio_data["duration"]
+        upload.size = audio_data["size"]
+        upload.bitrate = audio_data["bitrate"]
+    upload.import_status = "finished"
+    upload.import_date = timezone.now()
+    upload.save(
+        update_fields=[
+            "track",
+            "import_status",
+            "import_date",
+            "size",
+            "duration",
+            "bitrate",
+        ]
+    )
+    broadcast = getter(
+        import_metadata, "funkwhale", "config", "broadcast", default=True
+    )
+    if broadcast:
+        signals.upload_import_status_updated.send(
+            old_status=old_status,
+            new_status=upload.import_status,
+            upload=upload,
+            sender=None,
+        )
+    dispatch_outbox = getter(
+        import_metadata, "funkwhale", "config", "dispatch_outbox", default=True
+    )
+    if dispatch_outbox:
+        routes.outbox.dispatch(
+            {"type": "Create", "object": {"type": "Audio"}}, context={"upload": upload}
+        )
+
+
+def federation_audio_track_to_metadata(payload):
+    """
+    Given a valid payload as returned by federation.serializers.TrackSerializer.validated_data,
+    returns a correct metadata payload for use with get_track_from_import_metadata.
+    """
+    musicbrainz_recordingid = payload.get("musicbrainzId")
+    musicbrainz_artistid = payload["artists"][0].get("musicbrainzId")
+    musicbrainz_albumartistid = payload["album"]["artists"][0].get("musicbrainzId")
+    musicbrainz_albumid = payload["album"].get("musicbrainzId")
+
+    new_data = {
+        "title": payload["name"],
+        "album": payload["album"]["name"],
+        "track_number": payload["position"],
+        "artist": payload["artists"][0]["name"],
+        "album_artist": payload["album"]["artists"][0]["name"],
+        "date": payload["album"].get("released"),
+        # musicbrainz
+        "musicbrainz_recordingid": str(musicbrainz_recordingid)
+        if musicbrainz_recordingid
+        else None,
+        "musicbrainz_artistid": str(musicbrainz_artistid)
+        if musicbrainz_artistid
+        else None,
+        "musicbrainz_albumartistid": str(musicbrainz_albumartistid)
+        if musicbrainz_albumartistid
+        else None,
+        "musicbrainz_albumid": str(musicbrainz_albumid)
+        if musicbrainz_albumid
+        else None,
+        # federation
+        "fid": payload["id"],
+        "artist_fid": payload["artists"][0]["id"],
+        "album_artist_fid": payload["album"]["artists"][0]["id"],
+        "album_fid": payload["album"]["id"],
+        "fdate": payload["published"],
+        "album_fdate": payload["album"]["published"],
+        "album_artist_fdate": payload["album"]["artists"][0]["published"],
+        "artist_fdate": payload["artists"][0]["published"],
+    }
+    cover = payload["album"].get("cover")
+    if cover:
+        new_data["cover_data"] = {"mimetype": cover["mediaType"], "url": cover["href"]}
+    return new_data
+
+
+def get_owned_duplicates(upload, track):
+    """
+    Ensure we skip duplicate tracks to avoid wasting user/instance storage
+    """
+    owned_libraries = upload.library.actor.libraries.all()
+    return (
+        models.Upload.objects.filter(
+            track__isnull=False, library__in=owned_libraries, track=track
+        )
+        .exclude(pk=upload.pk)
+        .values_list("uuid", flat=True)
+    )
+
+
+def get_best_candidate_or_create(model, query, defaults, sort_fields):
+    """
+    Like queryset.get_or_create() but does not crash if multiple objects
+    are returned on the get() call
+    """
+    candidates = model.objects.filter(query)
+    if candidates:
+
+        return sort_candidates(candidates, sort_fields)[0], False
+
+    return model.objects.create(**defaults), True
+
+
+def sort_candidates(candidates, important_fields):
+    """
+    Given a list of objects and a list of fields,
+    will return a sorted list of those objects by score.
+
+    Score is higher for objects that have a non-empty attribute
+    that is also present in important fields::
+
+        artist1 = Artist(mbid=None, fid=None)
+        artist2 = Artist(mbid="something", fid=None)
+
+        # artist2 has a mbid, so is sorted first
+        assert sort_candidates([artist1, artist2], ['mbid'])[0] == artist2
+
+    Only supports string fields.
+    """
+
+    # map each fields to its score, giving a higher score to first fields
+    fields_scores = {f: i + 1 for i, f in enumerate(sorted(important_fields))}
+    candidates_with_scores = []
+    for candidate in candidates:
+        current_score = 0
+        for field, score in fields_scores.items():
+            v = getattr(candidate, field, "")
+            if v:
+                current_score += score
+
+        candidates_with_scores.append((candidate, current_score))
+
+    return [c for c, s in reversed(sorted(candidates_with_scores, key=lambda v: v[1]))]
+
+
+@transaction.atomic
+def get_track_from_import_metadata(data):
+    track_uuid = getter(data, "funkwhale", "track", "uuid")
+
+    if track_uuid:
+        # easy case, we have a reference to a uuid of a track that
+        # already exists in our database
+        try:
+            track = models.Track.objects.get(uuid=track_uuid)
+        except models.Track.DoesNotExist:
+            raise UploadImportError(code="track_uuid_not_found")
+
+        if not track.album.cover:
+            update_album_cover(
+                track.album,
+                source=data.get("upload_source"),
+                cover_data=data.get("cover_data"),
+            )
+        return track
+
+    from_activity_id = data.get("from_activity_id", None)
+    track_mbid = data.get("musicbrainz_recordingid", None)
+    album_mbid = data.get("musicbrainz_albumid", None)
+    track_fid = getter(data, "fid")
+
+    query = None
+
+    if album_mbid and track_mbid:
+        query = Q(mbid=track_mbid, album__mbid=album_mbid)
+
+    if track_fid:
+        query = query | Q(fid=track_fid) if query else Q(fid=track_fid)
+
+    if query:
+        # second easy case: we have a (track_mbid, album_mbid) pair or
+        # a federation uuid we can check on
+        try:
+            return sort_candidates(models.Track.objects.filter(query), ["mbid", "fid"])[
+                0
+            ]
+        except IndexError:
+            pass
+
+    # get / create artist and album artist
+    artist_mbid = data.get("musicbrainz_artistid", None)
+    artist_fid = data.get("artist_fid", None)
+    artist_name = data["artist"]
+    query = Q(name__iexact=artist_name)
+    if artist_mbid:
+        query |= Q(mbid=artist_mbid)
+    if artist_fid:
+        query |= Q(fid=artist_fid)
+    defaults = {
+        "name": artist_name,
+        "mbid": artist_mbid,
+        "fid": artist_fid,
+        "from_activity_id": from_activity_id,
+    }
+    if data.get("artist_fdate"):
+        defaults["creation_date"] = data.get("artist_fdate")
+
+    artist = get_best_candidate_or_create(
+        models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
+    )[0]
+
+    album_artist_name = data.get("album_artist") or artist_name
+    if album_artist_name == artist_name:
+        album_artist = artist
+    else:
+        query = Q(name__iexact=album_artist_name)
+        album_artist_mbid = data.get("musicbrainz_albumartistid", None)
+        album_artist_fid = data.get("album_artist_fid", None)
+        if album_artist_mbid:
+            query |= Q(mbid=album_artist_mbid)
+        if album_artist_fid:
+            query |= Q(fid=album_artist_fid)
+        defaults = {
+            "name": album_artist_name,
+            "mbid": album_artist_mbid,
+            "fid": album_artist_fid,
+            "from_activity_id": from_activity_id,
+        }
+        if data.get("album_artist_fdate"):
+            defaults["creation_date"] = data.get("album_artist_fdate")
+
+        album_artist = get_best_candidate_or_create(
+            models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
+        )[0]
+
+    # get / create album
+    album_title = data["album"]
+    album_fid = data.get("album_fid", None)
+    query = Q(title__iexact=album_title, artist=album_artist)
+    if album_mbid:
+        query |= Q(mbid=album_mbid)
+    if album_fid:
+        query |= Q(fid=album_fid)
+    defaults = {
+        "title": album_title,
+        "artist": album_artist,
+        "mbid": album_mbid,
+        "release_date": data.get("date"),
+        "fid": album_fid,
+        "from_activity_id": from_activity_id,
+    }
+    if data.get("album_fdate"):
+        defaults["creation_date"] = data.get("album_fdate")
+
+    album = get_best_candidate_or_create(
+        models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
+    )[0]
+    if not album.cover:
+        update_album_cover(
+            album, source=data.get("upload_source"), cover_data=data.get("cover_data")
+        )
+
+    # get / create track
+    track_title = data["title"]
+    track_number = data.get("track_number", 1)
+    query = Q(title__iexact=track_title, artist=artist, album=album)
+    if track_mbid:
+        query |= Q(mbid=track_mbid)
+    if track_fid:
+        query |= Q(fid=track_fid)
+    defaults = {
+        "title": track_title,
+        "album": album,
+        "mbid": track_mbid,
+        "artist": artist,
+        "position": track_number,
+        "fid": track_fid,
+        "from_activity_id": from_activity_id,
+    }
+    if data.get("fdate"):
+        defaults["creation_date"] = data.get("fdate")
+
+    track = get_best_candidate_or_create(
+        models.Track, query, defaults=defaults, sort_fields=["mbid", "fid"]
+    )[0]
+
+    return track
+
+
+@receiver(signals.upload_import_status_updated)
+def broadcast_import_status_update_to_owner(old_status, new_status, upload, **kwargs):
+    user = upload.library.actor.get_user()
+    if not user:
+        return
+
+    group = "user.{}.imports".format(user.pk)
+    channels.group_send(
+        group,
+        {
+            "type": "event.send",
+            "text": "",
+            "data": {
+                "type": "import.status_updated",
+                "upload": serializers.UploadForOwnerSerializer(upload).data,
+                "old_status": old_status,
+                "new_status": new_status,
+            },
+        },
+    )

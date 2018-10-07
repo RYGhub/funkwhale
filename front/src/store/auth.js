@@ -117,6 +117,7 @@ export default {
         commit('authenticated', true)
         commit('profile', data)
         commit('username', data.username)
+        dispatch('ui/fetchUnreadNotifications', null, { root: true })
         dispatch('favorites/fetch', null, { root: true })
         dispatch('playlists/fetchOwn', null, { root: true })
         Object.keys(data.permissions).forEach(function (key) {

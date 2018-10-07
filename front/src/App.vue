@@ -34,9 +34,6 @@
                 <router-link class="item" to="/about">
                   <translate>About this instance</translate>
                 </router-link>
-                <router-link class="item" :to="{name: 'library.request'}">
-                  <translate>Request music</translate>
-                </router-link>
                 <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
                 <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
                 <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
@@ -94,6 +91,8 @@
 import axios from 'axios'
 import _ from 'lodash'
 import {mapState} from 'vuex'
+import { WebSocketBridge } from 'django-channels'
+
 
 import translations from '@/translations'
 
@@ -113,11 +112,13 @@ export default {
   },
   data () {
     return {
+      bridge: null,
       nodeinfo: null,
       instanceUrl: null
     }
   },
   created () {
+    this.openWebsocket()
     let self = this
     this.autodetectLanguage()
     setInterval(() => {
@@ -134,8 +135,23 @@ export default {
     this.$store.dispatch('auth/check')
     this.$store.dispatch('instance/fetchSettings')
     this.fetchNodeInfo()
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'inbox.item_added',
+      id: 'sidebarCount',
+      handler: this.incrementNotificationCountInSidebar
+    })
+  },
+  destroyed () {
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'inbox.item_added',
+      id: 'sidebarCount',
+    })
+    this.disconnect()
   },
   methods: {
+    incrementNotificationCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'inbox', count: 1})
+    },
     fetchNodeInfo () {
       let self = this
       axios.get('instance/nodeinfo/2.0/').then(response => {
@@ -162,6 +178,36 @@ export default {
       } else if (almostMatching.length > 0) {
         this.$language.current = almostMatching[0]
       }
+    },
+    disconnect () {
+      if (!this.bridge) {
+        return
+      }
+      this.bridge.socket.close(1000, 'goodbye', {keepClosed: true})
+    },
+    openWebsocket () {
+      if (!this.$store.state.auth.authenticated) {
+        return
+      }
+      this.disconnect()
+      let self = this
+      let token = this.$store.state.auth.token
+      // let token = 'test'
+      const bridge = new WebSocketBridge()
+      this.bridge = bridge
+      let url = this.$store.getters['instance/absoluteUrl'](`api/v1/activity?token=${token}`)
+      url = url.replace('http://', 'ws://')
+      url = url.replace('https://', 'wss://')
+      bridge.connect(
+        url,
+        null,
+        {reconnectInterval: 5000})
+      bridge.listen(function (event) {
+        self.$store.dispatch('ui/websocketEvent', event)
+      })
+      bridge.socket.addEventListener('open', function () {
+        console.log('Connected to WebSocket')
+      })
     }
   },
   computed: {
@@ -188,6 +234,13 @@ export default {
     '$store.state.instance.instanceUrl' () {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
+    },
+    '$store.state.auth.authenticated' (newValue) {
+      if (!newValue) {
+        this.disconnect()
+      } else {
+        this.openWebsocket()
+      }
     },
     '$language.current' (newValue) {
       this.$store.commit('ui/currentLanguage', newValue)
@@ -250,7 +303,7 @@ html, body {
     left: 350px;
     right: 0px;
     top: 0px;
-    z-index: 2000;
+    z-index: 99;
   }
   background-color: white;
   .item {
@@ -299,9 +352,11 @@ html, body {
   }
 }
 
-.discrete.link {
-    color: rgba(0, 0, 0, 0.87);
-    cursor: pointer;
+.discrete {
+  color: rgba(0, 0, 0, 0.87);
+}
+.link {
+  cursor: pointer;
 }
 
 .floated.buttons .button ~ .dropdown {
@@ -316,6 +371,13 @@ html, body {
 
 .segment-content .button{
   margin:  0.5em;
+}
+
+a {
+  cursor: pointer;
+}
+.segment.hidden {
+  display: none;
 }
 
 </style>

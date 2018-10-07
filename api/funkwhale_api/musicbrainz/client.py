@@ -6,6 +6,7 @@ from funkwhale_api import __version__
 
 _api = musicbrainzngs
 _api.set_useragent("funkwhale", str(__version__), settings.FUNKWHALE_URL)
+_api.set_hostname(settings.MUSICBRAINZ_HOSTNAME)
 
 
 store = memoize.djangocache.Cache("default")

@@ -12,7 +12,7 @@ class PlaylistQuerySet(models.QuerySet):
 
     def with_duration(self):
         return self.annotate(
-            duration=models.Sum("playlist_tracks__track__files__duration")
+            duration=models.Sum("playlist_tracks__track__uploads__duration")
         )
 
     def with_covers(self):
@@ -37,6 +37,23 @@ class PlaylistQuerySet(models.QuerySet):
             to_attr="plts_for_cover",
         )
         return self.prefetch_related(plt_prefetch)
+
+    def annotate_playable_by_actor(self, actor):
+        plts = (
+            PlaylistTrack.objects.playable_by(actor)
+            .filter(playlist=models.OuterRef("id"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(plts)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        plts = PlaylistTrack.objects.playable_by(actor, include)
+        if include:
+            return self.filter(playlist_tracks__in=plts)
+        else:
+            return self.exclude(playlist_tracks__in=plts)
 
 
 class Playlist(models.Model):
@@ -130,14 +147,29 @@ class Playlist(models.Model):
 
 
 class PlaylistTrackQuerySet(models.QuerySet):
-    def for_nested_serialization(self):
-        return (
-            self.select_related()
-            .select_related("track__album__artist")
-            .prefetch_related(
-                "track__tags", "track__files", "track__artist__albums__tracks__tags"
-            )
+    def for_nested_serialization(self, actor=None):
+        tracks = music_models.Track.objects.annotate_playable_by_actor(actor)
+        tracks = tracks.select_related("artist", "album__artist")
+        return self.prefetch_related(
+            models.Prefetch("track", queryset=tracks, to_attr="_prefetched_track")
         )
+
+    def annotate_playable_by_actor(self, actor):
+        tracks = (
+            music_models.Track.objects.playable_by(actor)
+            .filter(pk=models.OuterRef("track"))
+            .order_by("id")
+            .values("id")[:1]
+        )
+        subquery = models.Subquery(tracks)
+        return self.annotate(is_playable_by_actor=subquery)
+
+    def playable_by(self, actor, include=True):
+        tracks = music_models.Track.objects.playable_by(actor, include)
+        if include:
+            return self.filter(track__pk__in=tracks)
+        else:
+            return self.exclude(track__pk__in=tracks)
 
 
 class PlaylistTrack(models.Model):

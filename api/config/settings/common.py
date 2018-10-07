@@ -125,8 +125,6 @@ LOCAL_APPS = (
     "funkwhale_api.radios",
     "funkwhale_api.history",
     "funkwhale_api.playlists",
-    "funkwhale_api.providers.audiofile",
-    "funkwhale_api.providers.youtube",
     "funkwhale_api.providers.acoustid",
     "funkwhale_api.subsonic",
 )
@@ -280,7 +278,7 @@ MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR("media")))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = env("MEDIA_URL", default="/media/")
-
+FILE_UPLOAD_PERMISSIONS = 0o644
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
@@ -309,6 +307,71 @@ ACCOUNT_USERNAME_VALIDATORS = "funkwhale_api.users.serializers.username_validato
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
+
+# LDAP AUTHENTICATION CONFIGURATION
+# ------------------------------------------------------------------------------
+AUTH_LDAP_ENABLED = env.bool("LDAP_ENABLED", default=False)
+if AUTH_LDAP_ENABLED:
+
+    # Import the LDAP modules here; this way, we don't need the dependency unless someone
+    # actually enables the LDAP support
+    import ldap
+    from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion, GroupOfNamesType
+
+    # Add LDAP to the authentication backends
+    AUTHENTICATION_BACKENDS += ("django_auth_ldap.backend.LDAPBackend",)
+
+    # Basic configuration
+    AUTH_LDAP_SERVER_URI = env("LDAP_SERVER_URI")
+    AUTH_LDAP_BIND_DN = env("LDAP_BIND_DN", default="")
+    AUTH_LDAP_BIND_PASSWORD = env("LDAP_BIND_PASSWORD", default="")
+    AUTH_LDAP_SEARCH_FILTER = env("LDAP_SEARCH_FILTER", default="(uid={0})").format(
+        "%(user)s"
+    )
+    AUTH_LDAP_START_TLS = env.bool("LDAP_START_TLS", default=False)
+
+    DEFAULT_USER_ATTR_MAP = [
+        "first_name:givenName",
+        "last_name:sn",
+        "username:cn",
+        "email:mail",
+    ]
+    LDAP_USER_ATTR_MAP = env.list("LDAP_USER_ATTR_MAP", default=DEFAULT_USER_ATTR_MAP)
+    AUTH_LDAP_USER_ATTR_MAP = {}
+    for m in LDAP_USER_ATTR_MAP:
+        funkwhale_field, ldap_field = m.split(":")
+        AUTH_LDAP_USER_ATTR_MAP[funkwhale_field.strip()] = ldap_field.strip()
+
+    # Determine root DN supporting multiple root DNs
+    AUTH_LDAP_ROOT_DN = env("LDAP_ROOT_DN")
+    AUTH_LDAP_ROOT_DN_LIST = []
+    for ROOT_DN in AUTH_LDAP_ROOT_DN.split():
+        AUTH_LDAP_ROOT_DN_LIST.append(
+            LDAPSearch(ROOT_DN, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
+        )
+    # Search for the user in all the root DNs
+    AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*AUTH_LDAP_ROOT_DN_LIST)
+
+    # Search for group types
+    LDAP_GROUP_DN = env("LDAP_GROUP_DN", default="")
+    if LDAP_GROUP_DN:
+        AUTH_LDAP_GROUP_DN = LDAP_GROUP_DN
+        # Get filter
+        AUTH_LDAP_GROUP_FILTER = env("LDAP_GROUP_FILER", default="")
+        # Search for the group in the specified DN
+        AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+            AUTH_LDAP_GROUP_DN, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_FILTER
+        )
+        AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+
+        # Configure basic group support
+        LDAP_REQUIRE_GROUP = env("LDAP_REQUIRE_GROUP", default="")
+        if LDAP_REQUIRE_GROUP:
+            AUTH_LDAP_REQUIRE_GROUP = LDAP_REQUIRE_GROUP
+        LDAP_DENY_GROUP = env("LDAP_DENY_GROUP", default="")
+        if LDAP_DENY_GROUP:
+            AUTH_LDAP_DENY_GROUP = LDAP_DENY_GROUP
+
 
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
@@ -381,7 +444,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS",
         "funkwhale_api.common.authentication.BearerTokenHeaderAuth",
-        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
+        "funkwhale_api.common.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
@@ -422,6 +485,11 @@ PROTECT_FILES_PATH = env("PROTECT_FILES_PATH", default="/_protected")
 # musicbrainz results. (value is in seconds)
 MUSICBRAINZ_CACHE_DURATION = env.int("MUSICBRAINZ_CACHE_DURATION", default=300)
 
+# Use this setting to change the musicbrainz hostname, for instance to
+# use a mirror. The hostname can also contain a port number (so, e.g.,
+# "localhost:5000" is a valid name to set).
+MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
+
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
 CSRF_USE_SESSIONS = True
@@ -445,8 +513,14 @@ ACCOUNT_USERNAME_BLACKLIST = [
     "me",
     "ghost",
     "_",
+    "-",
     "hello",
     "contact",
+    "inbox",
+    "outbox",
+    "shared-inbox",
+    "shared_inbox",
+    "actor",
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)

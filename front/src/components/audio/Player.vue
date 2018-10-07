@@ -86,13 +86,13 @@
           v-bind:class="{ active : showVolume }">
           <i
             :title="labels.unmute"
-            @click="$store.commit('player/volume', 1)" v-if="volume === 0" class="volume off secondary icon"></i>
+            @click="unmute" v-if="volume === 0" class="volume off secondary icon"></i>
           <i
             :title="labels.mute"
-            @click="$store.commit('player/volume', 0)" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
+            @click="mute" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
           <i
             :title="labels.mute"
-            @click="$store.commit('player/volume', 0)" v-else class="volume up secondary icon"></i>
+            @click="mute" v-else class="volume up secondary icon"></i>
           <input
             type="range"
             step="0.05"
@@ -202,6 +202,8 @@ export default {
   methods: {
     ...mapActions({
       togglePlay: 'player/togglePlay',
+      mute: 'player/mute',
+      unmute: 'player/unmute',
       clean: 'queue/clean',
       updateProgress: 'player/updateProgress'
     }),
@@ -315,8 +317,8 @@ export default {
     }
   },
   watch: {
-    currentTrack (newValue) {
-      if (!this.isShuffling) {
+    currentTrack (newValue, oldValue) {
+      if (!this.isShuffling && newValue != oldValue) {
         this.audioKey = String(new Date())
       }
       if (!newValue || !newValue.album.cover) {

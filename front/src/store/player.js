@@ -9,6 +9,7 @@ export default {
     errorCount: 0,
     playing: false,
     volume: 0.5,
+    tempVolume: 0.5,
     duration: 0,
     currentTime: 0,
     errored: false,
@@ -24,6 +25,12 @@ export default {
       value = Math.min(value, 1)
       value = Math.max(value, 0)
       state.volume = value
+    },
+    tempVolume (state, value) {
+      value = parseFloat(value)
+      value = Math.min(value, 1)
+      value = Math.max(value, 0)
+      state.tempVolume = value
     },
     incrementVolume (state, value) {
       value = parseFloat(state.volume + value)
@@ -110,6 +117,13 @@ export default {
     },
     updateProgress ({commit}, t) {
       commit('currentTime', t)
+    },
+    mute({commit, state}) {
+      commit('tempVolume', state.volume)
+      commit('volume', 0)
+    },
+    unmute({commit, state}) {
+      commit('volume', state.tempVolume)
     }
   }
 }

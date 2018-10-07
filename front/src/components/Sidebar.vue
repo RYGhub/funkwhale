@@ -41,8 +41,23 @@
               </translate>
               <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate>Settings</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'notifications'}">
+              <i class="feed icon"></i>
+              <translate>Notifications</translate>
+              <div
+                v-if="$store.state.ui.notifications.inbox > 0"
+                :class="['ui', 'teal', 'label']">
+                {{ $store.state.ui.notifications.inbox }}</div>
+            </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
-            <router-link class="item" v-else :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
+            <template v-else>
+              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
+              <router-link class="item" :to="{path: '/signup'}">
+                <i class="corner add icon"></i>
+                <translate>Create an account</translate>
+              </router-link>
+            </template>
           </div>
         </div>
         <div class="item">
@@ -59,38 +74,14 @@
             <router-link
               v-if="$store.state.auth.authenticated"
               class="item" :to="{path: '/activity'}"><i class="bell icon"></i><translate>Activity</translate></router-link>
+            <router-link
+              v-if="$store.state.auth.authenticated"
+              class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate>Add content</translate></router-link>
           </div>
         </div>
         <div class="item" v-if="showAdmin">
           <div class="header"><translate>Administration</translate></div>
           <div class="menu">
-            <router-link
-              class="item"
-              v-if="$store.state.auth.availablePermissions['library']"
-              :to="{name: 'manage.library.files'}">
-              <i class="book icon"></i><translate>Library</translate>
-              <div
-                :class="['ui', {'teal': $store.state.ui.notifications.importRequests > 0}, 'label']"
-                :title="labels.pendingRequests">
-                {{ $store.state.ui.notifications.importRequests }}</div>
-
-            </router-link>
-            <router-link
-              class="item"
-              v-else-if="$store.state.auth.availablePermissions['upload']"
-              to="/library/import/launch">
-              <i class="download icon"></i><translate>Import music</translate>
-            </router-link>
-            <router-link
-              class="item"
-              v-if="$store.state.auth.availablePermissions['federation']"
-              :to="{path: '/manage/federation/libraries'}">
-              <i class="sitemap icon"></i><translate>Federation</translate>
-              <div
-                :class="['ui', {'teal': $store.state.ui.notifications.federation > 0}, 'label']"
-                :title="labels.pendingFollows">
-                {{ $store.state.ui.notifications.federation }}</div>
-            </router-link>
             <router-link
               class="item"
               v-if="$store.state.auth.availablePermissions['settings']"
@@ -198,11 +189,6 @@ export default {
   mounted () {
     $(this.$el).find('.menu .item').tab()
   },
-  created () {
-    this.fetchNotificationsCount()
-    this.fetchInterval = setInterval(
-        this.fetchNotificationsCount, 1000 * 60 * 15)
-  },
   destroy () {
     if (this.fetchInterval) {
       clearInterval(this.fetchInterval)
@@ -251,11 +237,6 @@ export default {
         return e
       }).length > 0
     },
-
-    fetchNotificationsCount () {
-      this.$store.dispatch('ui/fetchFederationNotificationsCount')
-      this.$store.dispatch('ui/fetchImportRequestsCount')
-    },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {
         tracks: this.tracksChangeBuffer, oldIndex: event.oldIndex, newIndex: event.newIndex})
@@ -292,7 +273,6 @@ export default {
     '$store.state.auth.availablePermissions': {
       handler () {
         this.showAdmin = this.getShowAdmin()
-        this.fetchNotificationsCount()
       },
       deep: true
     }

@@ -176,5 +176,24 @@ describe('store/player', () => {
         ]
       })
     })
+    it('mute', () => {
+      testAction({
+        action: store.actions.mute,
+        params: {state: { volume: 0.7, tempVolume: 0}},
+        expectedMutations: [
+          { type: 'tempVolume', payload: 0.7 },
+          { type: 'volume', payload: 0 },
+        ]
+      })
+    })
+    it('unmute', () => {
+      testAction({
+        action: store.actions.unmute,
+        params: {state: { volume: 0, tempVolume: 0.8}},
+        expectedMutations: [
+          { type: 'volume', payload: 0.8 },
+        ]
+      })
+    })
   })
 })

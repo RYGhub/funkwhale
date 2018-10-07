@@ -9,16 +9,18 @@ Download the sample docker-compose file:
 
 .. parsed-literal::
 
-    mkdir -p /srv/funkwhale
     cd /srv/funkwhale
-    curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
+    mkdir nginx
+    curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker-compose.yml"
 
 Create your env file:
 
 .. parsed-literal::
 
     export FUNKWHALE_VERSION="|version|"
-    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
+    curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
 
 Ensure to edit it to match your needs (this file is heavily commented)

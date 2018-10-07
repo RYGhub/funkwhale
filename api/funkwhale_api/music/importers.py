@@ -15,7 +15,7 @@ class Importer(object):
         # let's validate data, just in case
         instance = self.model(**cleaned_data)
         exclude = EXCLUDE_VALIDATION.get(self.model.__name__, [])
-        instance.full_clean(exclude=["mbid", "uuid"] + exclude)
+        instance.full_clean(exclude=["mbid", "uuid", "fid", "from_activity"] + exclude)
         m = self.model.objects.update_or_create(mbid=mbid, defaults=cleaned_data)[0]
         for hook in import_hooks:
             hook(m, cleaned_data, raw_data)

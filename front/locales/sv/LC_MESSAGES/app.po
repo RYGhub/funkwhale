@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-07-23 16:49+0000\n"
+"PO-Revision-Date: 2018-10-03 16:06+0000\n"
 "Last-Translator: Tim Stahel <gitlab@swedneck.xyz>\n"
 "Language-Team: none\n"
 "Language: sv\n"
@@ -272,7 +272,7 @@ msgstr ""
 #: front/src/components/library/import/BatchList.vue:13
 #: front/src/components/library/import/BatchList.vue:22
 msgid "Any"
-msgstr ""
+msgstr "Vilken som helst"
 
 #: front/src/components/library/import/BatchList.vue:24
 msgid "API"
@@ -377,27 +377,27 @@ msgstr "Bläddra artister"
 
 #: front/src/views/federation/LibraryTrackList.vue:3
 msgid "Browsing federated tracks"
-msgstr ""
+msgstr "Bläddrar genom federerade spår"
 
 #: front/src/views/federation/LibraryFollowersList.vue:3
 msgid "Browsing followers"
-msgstr ""
+msgstr "Bläddrar genom följare"
 
 #: front/src/views/federation/LibraryList.vue:3
 msgid "Browsing libraries"
-msgstr ""
+msgstr "Bläddrar genom bibliotek"
 
 #: front/src/views/playlists/List.vue:3
 msgid "Browsing playlists"
-msgstr ""
+msgstr "Bläddrar genom spellistor"
 
 #: front/src/components/library/Radios.vue:4
 msgid "Browsing radios"
-msgstr ""
+msgstr "Bläddrar genom radiostationer"
 
 #: front/src/components/library/radios/Builder.vue:5
 msgid "Builder"
-msgstr ""
+msgstr "Byggare"
 
 #: front/src/components/audio/album/Card.vue:13
 msgid "By %{ artist }"
@@ -456,6 +456,8 @@ msgstr "Ändringar synkade med servern"
 #: front/src/components/auth/Settings.vue:70
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
 msgstr ""
+"Ändring av lösenord kommer också att ändra ditt lösenord för Subsonic API:n "
+"om du har efterfrågat ett."
 
 #: front/src/components/auth/Settings.vue:98
 msgid "Changing your password will have the following consequences"
@@ -467,141 +469,141 @@ msgstr "Välj din instans"
 
 #: front/src/components/Home.vue:64
 msgid "Clean library"
-msgstr ""
+msgstr "Rensa bibliotek"
 
 #: front/src/components/manage/users/InvitationForm.vue:37
 msgid "Clear"
-msgstr ""
+msgstr "Rensa"
 
 #: front/src/components/playlists/Editor.vue:40
 #: front/src/components/playlists/Editor.vue:45
 msgid "Clear playlist"
-msgstr ""
+msgstr "Rensa spellista"
 
 #: front/src/components/audio/Player.vue:270
 msgid "Clear your queue"
-msgstr ""
+msgstr "Rensa din kö"
 
 #: front/src/components/library/import/BatchList.vue:23
 msgid "CLI"
-msgstr ""
+msgstr "Kommandolinje"
 
 #: front/src/components/Home.vue:44
 msgid "Click once, listen for hours using built-in radios"
-msgstr ""
+msgstr "Klicka en gång, lyssna i flera timmarmed inbyggda radiostationer"
 
 #: front/src/components/manage/library/RequestsTable.vue:30
 #: front/src/components/manage/library/RequestsTable.vue:64
 msgid "Closed"
-msgstr ""
+msgstr "Stängd"
 
 #: front/src/components/manage/users/InvitationForm.vue:26
 #: front/src/components/manage/users/InvitationsTable.vue:42
 msgid "Code"
-msgstr ""
+msgstr "Kod"
 
 #: front/src/components/audio/album/Card.vue:43
 #: front/src/components/audio/artist/Card.vue:33
 #: front/src/components/discussion/Comment.vue:20
 msgid "Collapse"
-msgstr ""
+msgstr "Kollapsa"
 
 #: front/src/components/manage/library/RequestsTable.vue:51
 #: front/src/components/requests/Form.vue:14
 msgid "Comment"
-msgstr ""
+msgstr "Kommentera"
 
 #: front/src/components/library/radios/Builder.vue:48
 msgid "Config"
-msgstr ""
+msgstr "Konfiguration"
 
 #: front/src/components/common/DangerousButton.vue:21
 msgid "Confirm"
-msgstr ""
+msgstr "Bekräfta"
 
 #: front/src/views/auth/EmailConfirm.vue:4 src/views/auth/EmailConfirm.vue:20
 #: front/src/views/auth/EmailConfirm.vue:51
 msgid "Confirm your email"
-msgstr ""
+msgstr "Bekräfta din e-post"
 
 #: front/src/views/auth/EmailConfirm.vue:13
 msgid "Confirmation code"
-msgstr ""
+msgstr "Bekräftningskod"
 
 #: front/src/components/playlists/Editor.vue:163
 msgid "Copy tracks from current queue to playlist"
-msgstr ""
+msgstr "Kopiera spår från nuvarande kö till spellista"
 
 #: front/src/components/Home.vue:88
 msgid "Covers, lyrics, our goal is to have them all ;)"
-msgstr ""
+msgstr "Omslag, text, vårat mål är att ha dem alla ;)"
 
 #: front/src/components/auth/Signup.vue:4
 msgid "Create a funkwhale account"
-msgstr ""
+msgstr "Skapa ett funkwhale-konto"
 
 #: front/src/components/playlists/Form.vue:2
 msgid "Create a new playlist"
-msgstr ""
+msgstr "Skapa en ny spellista"
 
 #: front/src/components/auth/Login.vue:17
 msgid "Create an account"
-msgstr ""
+msgstr "Skapa ett konto"
 
 #: front/src/components/manage/library/RequestsTable.vue:88
 #: front/src/components/requests/Card.vue:25
 msgid "Create import"
-msgstr ""
+msgstr "Skapa import"
 
 #: front/src/components/auth/Signup.vue:51
 msgid "Create my account"
-msgstr ""
+msgstr "Skapa mitt konto"
 
 #: front/src/components/playlists/Form.vue:34
 msgid "Create playlist"
-msgstr ""
+msgstr "Skapa spellista"
 
 #: front/src/components/library/Radios.vue:23
 msgid "Create your own radio"
-msgstr ""
+msgstr "Skapa din egen radiostation"
 
 #: front/src/components/federation/LibraryFollowTable.vue:22
 #: front/src/components/manage/library/RequestsTable.vue:52
 #: front/src/components/manage/users/InvitationsTable.vue:40
 msgid "Creation date"
-msgstr ""
+msgstr "Skapningsdatum"
 
 #: front/src/components/auth/Settings.vue:54
 msgid "Current avatar"
-msgstr ""
+msgstr "Nuvarande avatar"
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgid "Current track"
-msgstr ""
+msgstr "Nuvarande spår"
 
 #: front/src/components/manage/library/FilesTable.vue:189
 #: front/src/components/manage/library/RequestsTable.vue:195
 #: front/src/components/manage/users/InvitationsTable.vue:166
 #: front/src/views/playlists/Detail.vue:33
 msgid "Delete"
-msgstr ""
+msgstr "Radera"
 
 #: front/src/views/playlists/Detail.vue:38
 msgid "Delete playlist"
-msgstr ""
+msgstr "Radera spellista"
 
 #: front/src/views/radios/Detail.vue:28
 msgid "Delete radio"
-msgstr ""
+msgstr "Radera radiostation"
 
 #: front/src/components/federation/LibraryFollowTable.vue:52
 #: front/src/components/federation/LibraryFollowTable.vue:63
 msgid "Deny"
-msgstr ""
+msgstr "Neka"
 
 #: front/src/components/federation/LibraryFollowTable.vue:54
 msgid "Deny access?"
-msgstr ""
+msgstr "Neka åtkomst?"
 
 #: front/src/components/favorites/List.vue:34
 #: front/src/components/federation/LibraryTrackTable.vue:29
@@ -611,108 +613,110 @@ msgstr ""
 #: front/src/components/manage/users/UsersTable.vue:20
 #: front/src/views/federation/LibraryList.vue:29 src/views/playlists/List.vue:28
 msgid "Descending"
-msgstr ""
+msgstr "Sjunkande"
 
 #: front/src/components/federation/LibraryCard.vue:50
 msgid "Detail"
-msgstr ""
+msgstr "Detalj"
 
 #: front/src/views/admin/users/UsersDetail.vue:146
 msgid "Determine if the user account is active or not. Inactive users cannot login or use the service."
 msgstr ""
+"Avgör om användarkontot är aktivt eller inte. Inaktiva användare kan inte "
+"logga in eller använda tjänsten."
 
 #: front/src/components/auth/Settings.vue:104
 #: front/src/components/auth/SubsonicTokenForm.vue:52
 msgid "Disable access"
-msgstr ""
+msgstr "Inaktivera åtkomst"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:49
 msgid "Disable Subsonic access"
-msgstr ""
+msgstr "Inaktivera Subsonic-åtkomst"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:50
 msgid "Disable Subsonic API access?"
-msgstr ""
+msgstr "Inaktivera åtkomst till Subsonic-API:n?"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:14
 msgid "Discover how to use Funkwhale from other apps"
-msgstr ""
+msgstr "Upptäck hur du kan använda Funkwhale från andra appar"
 
 #: front/src/components/library/radios/Builder.vue:16
 msgid "Display publicly"
-msgstr ""
+msgstr "Visa publikt"
 
 #: front/src/components/playlists/Editor.vue:42
 msgid "Do you want to clear the playlist \"%{ playlist }\"?"
-msgstr ""
+msgstr "Vill du rensa spellistan \"%{ playlist }\"?"
 
 #: front/src/components/common/DangerousButton.vue:7
 msgid "Do you want to confirm this action?"
-msgstr ""
+msgstr "Vill du bekräfta denna handling?"
 
 #: front/src/views/playlists/Detail.vue:35
 msgid "Do you want to delete the playlist \"%{ playlist }\"?"
-msgstr ""
+msgstr "Vill du radera spellistan \"%{ playlist }\"?"
 
 #: front/src/views/radios/Detail.vue:26
 msgid "Do you want to delete the radio \"{{ radio }}\"?"
-msgstr ""
+msgstr "Vill du radera radiokanalen \"{{ radio }}\"?"
 
 #: front/src/components/common/ActionTable.vue:29
 msgid "Do you want to launch %{ action } on %{ count } element?"
 msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Vill du starta %{ action } på %{ count } element?"
+msgstr[1] "Vill du starta %{ action } på %{ count } element?"
 
 #: front/src/components/Sidebar.vue:113
 msgid "Do you want to restore your previous queue?"
-msgstr ""
+msgstr "Vill du återställa din föregående kö?"
 
 #: front/src/App.vue:38
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentation"
 
 #: front/src/components/audio/track/Table.vue:24 src/components/library/Track.vue:48
 msgid "Download"
-msgstr ""
+msgstr "Ladda ner"
 
 #: front/src/components/audio/track/Table.vue:27
 msgid "Download tracks"
-msgstr ""
+msgstr "Ladda ner spår"
 
 #: front/src/components/playlists/Editor.vue:49
 msgid "Drag and drop rows to reorder tracks in the playlist"
-msgstr ""
+msgstr "Dra och släpp rader för att omordna spår i spellistan"
 
 #: front/src/components/library/Track.vue:58
 #: front/src/components/manage/library/FilesTable.vue:43
 msgid "Duration"
-msgstr ""
+msgstr "Tid"
 
 #: front/src/components/Home.vue:96
 msgid "Easy to use"
-msgstr ""
+msgstr "Enkelt att använda"
 
 #: front/src/components/About.vue:21
 msgid "Edit instance info"
-msgstr ""
+msgstr "Redigera info om instans"
 
 #: front/src/components/radios/Card.vue:20 src/views/playlists/Detail.vue:30
 msgid "Edit..."
-msgstr ""
+msgstr "Redigera..."
 
 #: front/src/components/auth/Signup.vue:29
 #: front/src/components/manage/users/UsersTable.vue:38
 msgid "Email"
-msgstr ""
+msgstr "E-post"
 
 #: front/src/views/admin/users/UsersDetail.vue:29
 msgid "Email address"
-msgstr ""
+msgstr "E-postadress"
 
 #: front/src/views/auth/EmailConfirm.vue:23
 msgid "Email confirmed"
-msgstr ""
+msgstr "E-post bekräftad"
 
 #: front/src/views/playlists/Detail.vue:29
 msgid "End edition"
@@ -724,11 +728,11 @@ msgstr ""
 
 #: front/src/components/library/Radios.vue:140
 msgid "Enter a radio name..."
-msgstr ""
+msgstr "Ange namn på radiostation..."
 
 #: front/src/components/library/Artists.vue:118
 msgid "Enter an artist name..."
-msgstr ""
+msgstr "Ange ett artistnamn..."
 
 #: front/src/views/federation/LibraryList.vue:122
 msgid "Enter an library domain name..."
@@ -736,39 +740,39 @@ msgstr ""
 
 #: front/src/views/playlists/List.vue:104
 msgid "Enter an playlist name..."
-msgstr ""
+msgstr "Ange ett spellistenamn..."
 
 #: front/src/components/auth/Signup.vue:98
 msgid "Enter your email"
-msgstr ""
+msgstr "Ange din e-post"
 
 #: front/src/components/auth/Signup.vue:96
 msgid "Enter your invitation code (case insensitive)"
-msgstr ""
+msgstr "Ange din inbjudningskod (skiftlägesokänsligt)"
 
 #: front/src/components/metadata/Search.vue:114
 msgid "Enter your search query..."
-msgstr ""
+msgstr "Ange dina söktermer..."
 
 #: front/src/components/auth/Signup.vue:97
 msgid "Enter your username"
-msgstr ""
+msgstr "Ange ditt användarnamn"
 
 #: front/src/components/auth/Login.vue:77
 msgid "Enter your username or email"
-msgstr ""
+msgstr "Ange ditt användarnamn eller e-post"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:20
 msgid "Error"
-msgstr ""
+msgstr "Fel"
 
 #: front/src/views/admin/Settings.vue:87
 msgid "Error reporting"
-msgstr ""
+msgstr "Felrapportering"
 
 #: front/src/components/common/ActionTable.vue:75
 msgid "Error while applying action"
-msgstr ""
+msgstr "Fel vid handling"
 
 #: front/src/views/auth/PasswordReset.vue:7
 msgid "Error while asking for a password reset"

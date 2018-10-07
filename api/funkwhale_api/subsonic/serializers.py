@@ -24,7 +24,8 @@ class GetArtistsSerializer(serializers.Serializer):
 
         first_letter_mapping = collections.defaultdict(list)
         for artist in values:
-            first_letter_mapping[artist["name"][0].upper()].append(artist)
+            if artist["name"]:
+                first_letter_mapping[artist["name"][0].upper()].append(artist)
 
         for letter, artists in sorted(first_letter_mapping.items()):
             letter_data = {
@@ -37,7 +38,7 @@ class GetArtistsSerializer(serializers.Serializer):
 
 class GetArtistSerializer(serializers.Serializer):
     def to_representation(self, artist):
-        albums = artist.albums.prefetch_related("tracks__files")
+        albums = artist.albums.prefetch_related("tracks__uploads")
         payload = {
             "id": artist.pk,
             "name": artist.name,
@@ -61,7 +62,7 @@ class GetArtistSerializer(serializers.Serializer):
         return payload
 
 
-def get_track_data(album, track, tf):
+def get_track_data(album, track, upload):
     data = {
         "id": track.pk,
         "isDir": "false",
@@ -69,9 +70,9 @@ def get_track_data(album, track, tf):
         "album": album.title,
         "artist": album.artist.name,
         "track": track.position or 1,
-        "contentType": tf.mimetype,
-        "suffix": tf.extension or "",
-        "duration": tf.duration or 0,
+        "contentType": upload.mimetype,
+        "suffix": upload.extension or "",
+        "duration": upload.duration or 0,
         "created": track.creation_date,
         "albumId": album.pk,
         "artistId": album.artist.pk,
@@ -79,10 +80,10 @@ def get_track_data(album, track, tf):
     }
     if track.album.cover:
         data["coverArt"] = "al-{}".format(track.album.id)
-    if tf.bitrate:
-        data["bitrate"] = int(tf.bitrate / 1000)
-    if tf.size:
-        data["size"] = tf.size
+    if upload.bitrate:
+        data["bitrate"] = int(upload.bitrate / 1000)
+    if upload.size:
+        data["size"] = upload.size
     if album.release_date:
         data["year"] = album.release_date.year
     return data
@@ -102,7 +103,7 @@ def get_album2_data(album):
     try:
         payload["songCount"] = album._tracks_count
     except AttributeError:
-        payload["songCount"] = len(album.tracks.prefetch_related("files"))
+        payload["songCount"] = len(album.tracks.prefetch_related("uploads"))
     return payload
 
 
@@ -110,17 +111,17 @@ def get_song_list_data(tracks):
     songs = []
     for track in tracks:
         try:
-            tf = [tf for tf in track.files.all()][0]
+            uploads = [upload for upload in track.uploads.all()][0]
         except IndexError:
             continue
-        track_data = get_track_data(track.album, track, tf)
+        track_data = get_track_data(track.album, track, uploads)
         songs.append(track_data)
     return songs
 
 
 class GetAlbumSerializer(serializers.Serializer):
     def to_representation(self, album):
-        tracks = album.tracks.prefetch_related("files").select_related("album")
+        tracks = album.tracks.prefetch_related("uploads").select_related("album")
         payload = get_album2_data(album)
         if album.release_date:
             payload["year"] = album.release_date.year
@@ -129,21 +130,29 @@ class GetAlbumSerializer(serializers.Serializer):
         return payload
 
 
+class GetSongSerializer(serializers.Serializer):
+    def to_representation(self, track):
+        uploads = track.uploads.all()
+        if not len(uploads):
+            return {}
+        return get_track_data(track.album, track, uploads[0])
+
+
 def get_starred_tracks_data(favorites):
     by_track_id = {f.track_id: f for f in favorites}
     tracks = (
         music_models.Track.objects.filter(pk__in=by_track_id.keys())
         .select_related("album__artist")
-        .prefetch_related("files")
+        .prefetch_related("uploads")
     )
     tracks = tracks.order_by("-creation_date")
     data = []
     for t in tracks:
         try:
-            tf = [tf for tf in t.files.all()][0]
+            uploads = [upload for upload in t.uploads.all()][0]
         except IndexError:
             continue
-        td = get_track_data(t.album, t, tf)
+        td = get_track_data(t.album, t, uploads)
         td["starred"] = by_track_id[t.pk].creation_date
         data.append(td)
     return data
@@ -169,26 +178,26 @@ def get_playlist_detail_data(playlist):
     data = get_playlist_data(playlist)
     qs = (
         playlist.playlist_tracks.select_related("track__album__artist")
-        .prefetch_related("track__files")
+        .prefetch_related("track__uploads")
         .order_by("index")
     )
     data["entry"] = []
     for plt in qs:
         try:
-            tf = [tf for tf in plt.track.files.all()][0]
+            uploads = [upload for upload in plt.track.uploads.all()][0]
         except IndexError:
             continue
-        td = get_track_data(plt.track.album, plt.track, tf)
+        td = get_track_data(plt.track.album, plt.track, uploads)
         data["entry"].append(td)
     return data
 
 
 def get_music_directory_data(artist):
-    tracks = artist.tracks.select_related("album").prefetch_related("files")
+    tracks = artist.tracks.select_related("album").prefetch_related("uploads")
     data = {"id": artist.pk, "parent": 1, "name": artist.name, "child": []}
     for track in tracks:
         try:
-            tf = [tf for tf in track.files.all()][0]
+            upload = [upload for upload in track.uploads.all()][0]
         except IndexError:
             continue
         album = track.album
@@ -200,19 +209,19 @@ def get_music_directory_data(artist):
             "artist": artist.name,
             "track": track.position or 1,
             "year": track.album.release_date.year if track.album.release_date else 0,
-            "contentType": tf.mimetype,
-            "suffix": tf.extension or "",
-            "duration": tf.duration or 0,
+            "contentType": upload.mimetype,
+            "suffix": upload.extension or "",
+            "duration": upload.duration or 0,
             "created": track.creation_date,
             "albumId": album.pk,
             "artistId": artist.pk,
             "parent": artist.id,
             "type": "music",
         }
-        if tf.bitrate:
-            td["bitrate"] = int(tf.bitrate / 1000)
-        if tf.size:
-            td["size"] = tf.size
+        if upload.bitrate:
+            td["bitrate"] = int(upload.bitrate / 1000)
+        if upload.size:
+            td["size"] = upload.size
         data["child"].append(td)
     return data
 
@@ -220,9 +229,9 @@ def get_music_directory_data(artist):
 class ScrobbleSerializer(serializers.Serializer):
     submission = serializers.BooleanField(default=True, required=False)
     id = serializers.PrimaryKeyRelatedField(
-        queryset=music_models.Track.objects.annotate(files_count=Count("files")).filter(
-            files_count__gt=0
-        )
+        queryset=music_models.Track.objects.annotate(
+            uploads_count=Count("uploads")
+        ).filter(uploads_count__gt=0)
     )
 
     def create(self, data):

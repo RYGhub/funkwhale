@@ -18,30 +18,27 @@ import LibraryArtist from '@/components/library/Artist'
 import LibraryArtists from '@/components/library/Artists'
 import LibraryAlbum from '@/components/library/Album'
 import LibraryTrack from '@/components/library/Track'
-import LibraryImport from '@/components/library/import/Main'
 import LibraryRadios from '@/components/library/Radios'
 import RadioBuilder from '@/components/library/radios/Builder'
 import RadioDetail from '@/views/radios/Detail'
-import BatchList from '@/components/library/import/BatchList'
-import BatchDetail from '@/components/library/import/BatchDetail'
 import PlaylistDetail from '@/views/playlists/Detail'
 import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
-import AdminLibraryRequestsList from '@/views/admin/library/RequestsList'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
-import MusicRequest from '@/views/library/MusicRequest'
-import FederationBase from '@/views/federation/Base'
-import FederationScan from '@/views/federation/Scan'
-import FederationLibraryDetail from '@/views/federation/LibraryDetail'
-import FederationLibraryList from '@/views/federation/LibraryList'
-import FederationTrackList from '@/views/federation/LibraryTrackList'
-import FederationFollowersList from '@/views/federation/LibraryFollowersList'
+import ContentBase from '@/views/content/Base'
+import ContentHome from '@/views/content/Home'
+import LibrariesHome from '@/views/content/libraries/Home'
+import LibrariesUpload from '@/views/content/libraries/Upload'
+import LibrariesDetail from '@/views/content/libraries/Detail'
+import LibrariesFiles from '@/views/content/libraries/Files'
+import RemoteLibrariesHome from '@/views/content/remote/Home'
+import Notifications from '@/views/Notifications'
 
 Vue.use(Router)
 
@@ -69,6 +66,11 @@ export default new Router({
       name: 'login',
       component: Login,
       props: (route) => ({ next: route.query.next || '/library' })
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: Notifications
     },
     {
       path: '/auth/password/reset',
@@ -129,53 +131,71 @@ export default new Router({
       })
     },
     {
+      path: '/content',
+      component: ContentBase,
+      children: [
+        {
+          path: '',
+          name: 'content.index',
+          component: ContentHome
+        }
+      ]
+    },
+    {
+      path: '/content/libraries/tracks',
+      component: ContentBase,
+      children: [
+        {
+          path: '',
+          name: 'content.libraries.files',
+          component: LibrariesFiles,
+          props: (route) => ({
+            query: route.query.q
+          })
+        }
+      ]
+    },
+    {
+      path: '/content/libraries',
+      component: ContentBase,
+      children: [
+        {
+          path: '',
+          name: 'content.libraries.index',
+          component: LibrariesHome
+        },
+        {
+          path: ':id/upload',
+          name: 'content.libraries.detail.upload',
+          component: LibrariesUpload,
+          props: (route) => ({
+            id: route.params.id,
+            defaultImportReference: route.query.import
+          })
+        },
+        {
+          path: ':id',
+          name: 'content.libraries.detail',
+          component: LibrariesDetail,
+          props: true
+        }
+      ]
+    },
+    {
+      path: '/content/remote',
+      component: ContentBase,
+      children: [
+        {
+          path: '',
+          name: 'content.remote.index',
+          component: RemoteLibrariesHome
+        }
+      ]
+    },
+    {
       path: '/manage/settings',
       name: 'manage.settings',
       component: AdminSettings
-    },
-    {
-      path: '/manage/federation',
-      component: FederationBase,
-      children: [
-        {
-          path: 'scan',
-          name: 'federation.libraries.scan',
-          component: FederationScan },
-        {
-          path: 'libraries',
-          name: 'federation.libraries.list',
-          component: FederationLibraryList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        {
-          path: 'tracks',
-          name: 'federation.tracks.list',
-          component: FederationTrackList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        {
-          path: 'followers',
-          name: 'federation.followers.list',
-          component: FederationFollowersList,
-          props: (route) => ({
-            defaultOrdering: route.query.ordering,
-            defaultQuery: route.query.query,
-            defaultPaginateBy: route.query.paginateBy,
-            defaultPage: route.query.page
-          })
-        },
-        { path: 'libraries/:id', name: 'federation.libraries.detail', component: FederationLibraryDetail, props: true }
-      ]
     },
     {
       path: '/manage/library',
@@ -185,11 +205,6 @@ export default new Router({
           path: 'files',
           name: 'manage.library.files',
           component: AdminLibraryFilesList
-        },
-        {
-          path: 'requests',
-          name: 'manage.library.requests',
-          component: AdminLibraryRequestsList
         }
       ]
     },
@@ -220,11 +235,6 @@ export default new Router({
       component: Library,
       children: [
         { path: '', component: LibraryHome, name: 'library.index' },
-        {
-          path: 'requests/',
-          name: 'library.request',
-          component: MusicRequest
-        },
         {
           path: 'artists/',
           name: 'library.artists.browse',
@@ -272,24 +282,6 @@ export default new Router({
         { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
         { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
         { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },
-        {
-          path: 'import/launch',
-          name: 'library.import.launch',
-          component: LibraryImport,
-          props: (route) => ({
-            source: route.query.source,
-            request: route.query.request,
-            mbType: route.query.type,
-            mbId: route.query.id })
-        },
-        {
-          path: 'import/batches',
-          name: 'library.import.batches',
-          component: BatchList,
-          children: [
-          ]
-        },
-        { path: 'import/batches/:id', name: 'library.import.batches.detail', component: BatchDetail, props: true }
       ]
     },
     { path: '*', component: PageNotFound }

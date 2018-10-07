@@ -44,13 +44,13 @@
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
-          <a v-if="downloadUrl" :href="downloadUrl" target="_blank" class="ui button">
+          <a v-if="track.is_playable" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
             <translate>Download</translate>
           </a>
         </div>
       </div>
-      <div v-if="file" class="ui vertical stripe center aligned segment">
+      <div class="ui vertical stripe center aligned segment">
         <h2 class="ui header"><translate>Track information</translate></h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
@@ -58,8 +58,8 @@
               <td>
                 <translate>Duration</translate>
               </td>
-              <td v-if="file.duration">
-                {{ time.parse(file.duration) }}
+              <td v-if="track.duration">
+                {{ time.parse(track.duration) }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -69,8 +69,8 @@
               <td>
                 <translate>Size</translate>
               </td>
-              <td v-if="file.size">
-                {{ file.size | humanSize }}
+              <td v-if="track.size">
+                {{ track.size | humanSize }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -80,8 +80,8 @@
               <td>
                 <translate>Bitrate</translate>
               </td>
-              <td v-if="file.bitrate">
-                {{ file.bitrate | humanSize }}/s
+              <td v-if="track.bitrate">
+                {{ track.bitrate | humanSize }}/s
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -91,8 +91,8 @@
               <td>
                 <translate>Type</translate>
               </td>
-              <td v-if="file.mimetype">
-                {{ file.mimetype }}
+              <td v-if="track.mimetype">
+                {{ track.mimetype }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -118,6 +118,14 @@
           </a>
         </template>
       </div>
+      <div class="ui vertical stripe segment">
+        <h2>
+          <translate>User libraries</translate>
+        </h2>
+        <library-widget :url="'tracks/' + id + '/libraries/'">
+          <translate slot="subtitle">This track is present in the following libraries:</translate>
+        </library-widget>
+      </div>
     </template>
   </div>
 </template>
@@ -131,6 +139,7 @@ import logger from '@/logging'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
+import LibraryWidget from '@/components/federation/LibraryWidget'
 
 const FETCH_URL = 'tracks/'
 
@@ -139,7 +148,8 @@ export default {
   components: {
     PlayButton,
     TrackPlaylistIcon,
-    TrackFavoriteIcon
+    TrackFavoriteIcon,
+    LibraryWidget
   },
   data () {
     return {
@@ -192,16 +202,11 @@ export default {
       return 'https://musicbrainz.org/recording/' + this.track.mbid
     },
     downloadUrl () {
-      if (this.track.files.length > 0) {
-        let u = this.$store.getters['instance/absoluteUrl'](this.track.files[0].path)
-        if (this.$store.state.auth.authenticated) {
-          u = url.updateQueryString(u, 'jwt', this.$store.state.auth.token)
-        }
-        return u
+      let u = this.$store.getters['instance/absoluteUrl'](this.track.listen_url)
+      if (this.$store.state.auth.authenticated) {
+        u = url.updateQueryString(u, 'jwt', encodeURI(this.$store.state.auth.token))
       }
-    },
-    file () {
-      return this.track.files[0]
+      return u
     },
     lyricsSearchUrl () {
       let base = 'http://lyrics.wikia.com/wiki/Special:Search?query='

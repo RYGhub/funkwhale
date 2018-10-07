@@ -56,3 +56,20 @@ class BearerTokenHeaderAuth(authentication.BaseJSONWebTokenAuthentication):
 
     def authenticate_header(self, request):
         return '{0} realm="{1}"'.format("Bearer", self.www_authenticate_realm)
+
+    def authenticate(self, request):
+        auth = super().authenticate(request)
+        if auth:
+            if not auth[0].actor:
+                auth[0].create_actor()
+        return auth
+
+
+class JSONWebTokenAuthentication(authentication.JSONWebTokenAuthentication):
+    def authenticate(self, request):
+        auth = super().authenticate(request)
+
+        if auth:
+            if not auth[0].actor:
+                auth[0].create_actor()
+        return auth

@@ -18,7 +18,7 @@
                 Album containing %{ count } track, by %{ artist }
               </translate>
             </div>
-            <div class="ui basic buttons">
+            <div class="ui buttons">
               <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
                 <translate>Artist page</translate>
               </router-link>
@@ -45,6 +45,14 @@
         </h2>
         <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
       </div>
+      <div class="ui vertical stripe segment">
+        <h2>
+          <translate>User libraries</translate>
+        </h2>
+        <library-widget :url="'albums/' + id + '/libraries/'">
+          <translate slot="subtitle">This album is present in the following libraries:</translate>
+        </library-widget>
+      </div>
     </template>
   </div>
 </template>
@@ -55,6 +63,7 @@ import logger from '@/logging'
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TrackTable from '@/components/audio/track/Table'
+import LibraryWidget from '@/components/federation/LibraryWidget'
 
 const FETCH_URL = 'albums/'
 
@@ -62,7 +71,8 @@ export default {
   props: ['id'],
   components: {
     PlayButton,
-    TrackTable
+    TrackTable,
+    LibraryWidget
   },
   data () {
     return {

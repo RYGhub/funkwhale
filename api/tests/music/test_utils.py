@@ -9,7 +9,7 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def test_guess_mimetype_try_using_extension(factories, mocker):
     mocker.patch("magic.from_buffer", return_value="audio/mpeg")
-    f = factories["music.TrackFile"].build(audio_file__filename="test.ogg")
+    f = factories["music.Upload"].build(audio_file__filename="test.ogg")
 
     assert utils.guess_mimetype(f.audio_file) == "audio/mpeg"
 
@@ -17,7 +17,7 @@ def test_guess_mimetype_try_using_extension(factories, mocker):
 @pytest.mark.parametrize("wrong", ["application/octet-stream", "application/x-empty"])
 def test_guess_mimetype_try_using_extension_if_fail(wrong, factories, mocker):
     mocker.patch("magic.from_buffer", return_value=wrong)
-    f = factories["music.TrackFile"].build(audio_file__filename="test.mp3")
+    f = factories["music.Upload"].build(audio_file__filename="test.mp3")
 
     assert utils.guess_mimetype(f.audio_file) == "audio/mpeg"
 

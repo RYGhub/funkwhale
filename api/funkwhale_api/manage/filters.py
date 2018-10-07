@@ -2,11 +2,10 @@ from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.music import models as music_models
-from funkwhale_api.requests import models as requests_models
 from funkwhale_api.users import models as users_models
 
 
-class ManageTrackFileFilterSet(filters.FilterSet):
+class ManageUploadFilterSet(filters.FilterSet):
     q = fields.SearchFilter(
         search_fields=[
             "track__title",
@@ -17,8 +16,8 @@ class ManageTrackFileFilterSet(filters.FilterSet):
     )
 
     class Meta:
-        model = music_models.TrackFile
-        fields = ["q", "track__album", "track__artist", "track", "library_track"]
+        model = music_models.Upload
+        fields = ["q", "track__album", "track__artist", "track"]
 
 
 class ManageUserFilterSet(filters.FilterSet):
@@ -51,13 +50,3 @@ class ManageInvitationFilterSet(filters.FilterSet):
         if value is None:
             return queryset
         return queryset.open(value)
-
-
-class ManageImportRequestFilterSet(filters.FilterSet):
-    q = fields.SearchFilter(
-        search_fields=["user__username", "albums", "artist_name", "comment"]
-    )
-
-    class Meta:
-        model = requests_models.ImportRequest
-        fields = ["q", "status"]

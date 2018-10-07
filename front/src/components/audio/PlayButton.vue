@@ -2,7 +2,7 @@
   <span :title="title" :class="['ui', {'tiny': discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
     <button
       v-if="!dropdownOnly"
-      :title="labels.addToQueue"
+      :title="labels.playNow"
       @click="addNext(true)"
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
@@ -12,9 +12,9 @@
     <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])"></i>
       <div class="menu">
-        <div class="item" :disabled="!playable" @click="add"><i class="plus icon"></i><translate>Add to queue</translate></div>
-        <div class="item" :disabled="!playable" @click="addNext()"><i class="step forward icon"></i><translate>Play next</translate></div>
-        <div class="item" :disabled="!playable" @click="addNext(true)"><i class="arrow down icon"></i><translate>Play now</translate></div>
+        <div class="item" :disabled="!playable" @click="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></div>
+        <div class="item" :disabled="!playable" @click="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></div>
+        <div class="item" :disabled="!playable" @click="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></div>
       </div>
     </div>
   </span>
@@ -37,7 +37,8 @@ export default {
     dropdownOnly: {type: Boolean, default: false},
     iconOnly: {type: Boolean, default: false},
     artist: {type: Number, required: false},
-    album: {type: Number, required: false}
+    album: {type: Number, required: false},
+    isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
     return {
@@ -50,29 +51,30 @@ export default {
   computed: {
     labels () {
       return {
-        addToQueue: this.$gettext('Add to current queue')
+        playNow: this.$gettext('Play now'),
+        addToQueue: this.$gettext('Add to current queue'),
+        playNext: this.$gettext('Play next')
       }
     },
     title () {
       if (this.playable) {
-        return this.$gettext('Play immediatly')
+        return this.$gettext('Play now')
       } else {
         if (this.track) {
-          return this.$gettext('This track is not imported and cannot be played')
+          return this.$gettext('This track is not available in any library you have access to')
         }
       }
     },
     playable () {
+      if (this.isPlayable) {
+        return true
+      }
       if (this.track) {
-        return this.track.files.length > 0
+        return this.track.is_playable
       } else if (this.tracks) {
-        return this.tracks.length > 0
-      } else if (this.playlist) {
-        return true
-      } else if (this.artist) {
-        return true
-      } else if (this.album) {
-        return true
+        return this.tracks.filter((t) => {
+          return t.is_playable
+        }).length > 0
       }
       return false
     }
@@ -128,7 +130,7 @@ export default {
           self.isLoading = false
         }, 250)
         return tracks.filter(e => {
-          return e.files.length > 0
+          return e.is_playable === true
         })
       })
     },

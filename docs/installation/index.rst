@@ -11,6 +11,12 @@ The project relies on the following components and services to work:
 - A redis server to store cache and tasks data
 - A celery worker to run asynchronouse tasks (such as music import)
 - A celery scheduler to run recurrent tasks
+- A `ntp-synced clock <https://wiki.debian.org/NTP>`_ to ensure federation is working seamlessly
+
+.. note::
+
+    The synced clock is needed for federation purpose, to assess
+    the validity of incoming requests.
 
 
 Hardware requirements
@@ -66,11 +72,30 @@ We also maintain an installation guide for Debian 9 and Arch Linux.
    docker
    systemd
 
-
 Funkwhale packages are available for the following platforms:
 
 - `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
 
+
+Running Funkwhale on the develop branch
+---------------------------------------
+
+Traditionnal deployments are done using specific releases. However, you
+may want to benefits from the latest change available, or the help detect
+bugs before they are included in actual releases.
+
+To do that, you'll need to run your instance on the develop branch,
+which contains all the unreleased changes and features of the next version.
+
+Please take into account that the develop branch
+may be unstable and will contain bugs that may affect the well being of your
+instance. If you are comfortable with that, you need to backup at least your database
+before pulling latest changes from the develop branch.
+
+Otherwise, the deployment process is similar to deploying with releases.
+You simply need to use ``export FUNKWHALE_VERSION=develop``
+in the installation and upgrade process instead of a real version number,
+as we build artifacts on the development branch the same way we do for releases.
 
 .. _frontend-setup:
 
@@ -114,16 +139,61 @@ On Arch Linux and its derivatives:
 
     sudo pacman -S nginx
 
-Then, download our sample virtualhost file and proxy conf:
+To avoid configuration errors at this level, we will generate an nginx configuration
+using your .env file. This will ensure your reverse-proxy configuration always
+match the application configuration and make upgrade/maintenance easier.
 
-.. parsed-literal::
+On docker deployments, run the following commands:
 
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/nginx.conf"
+.. code:: shell
+
+    # download the needed files
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
+
+    # create a final nginx configuration using the template based on your environment
+    set -a && source /srv/funkwhale/.env && set +a
+    envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
+        < /etc/nginx/sites-available/funkwhale.template \
+        > /etc/nginx/sites-available/funkwhale.conf
+        
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
-Ensure static assets and proxy pass match your configuration, and check the configuration is valid with ``nginx -t``.
-If everything is fine, you can restart your nginx server with ``service nginx restart``.
+On non-docker deployments, run the following commands:
+
+.. code:: shell
+
+    # download the needed files
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/nginx.template"
+
+    # create a final nginx configuration using the template based on your environment
+    set -a && source /srv/funkwhale/config/.env && set +a
+    envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
+        < /etc/nginx/sites-available/funkwhale.template \
+        > /etc/nginx/sites-available/funkwhale.conf
+    
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
+
+.. note::
+
+    The resulting file should not contain any variable such as ``${FUNKWHALE_HOSTNAME}``.
+    You can check that using this command::
+
+        grep '${' /etc/nginx/sites-available/funkwhale.conf
+
+.. note::
+
+    You can freely adapt the resulting file to your own needs, as we cannot
+    cover every use case with a single template, especially when it's related
+    to SSL configuration.
+
+Finally, enable the resulting configuration:
+
+.. code-block:: bash
+    ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
+
+Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``systemctl restart nginx``.
 
 .. warning::
 

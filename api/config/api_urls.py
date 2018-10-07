@@ -14,12 +14,11 @@ router.register(r"settings", GlobalPreferencesViewSet, base_name="settings")
 router.register(r"activity", activity_views.ActivityViewSet, "activity")
 router.register(r"tags", views.TagViewSet, "tags")
 router.register(r"tracks", views.TrackViewSet, "tracks")
-router.register(r"trackfiles", views.TrackFileViewSet, "trackfiles")
+router.register(r"uploads", views.UploadViewSet, "uploads")
+router.register(r"libraries", views.LibraryViewSet, "libraries")
+router.register(r"listen", views.ListenViewSet, "listen")
 router.register(r"artists", views.ArtistViewSet, "artists")
 router.register(r"albums", views.AlbumViewSet, "albums")
-router.register(r"import-batches", views.ImportBatchViewSet, "import-batches")
-router.register(r"import-jobs", views.ImportJobViewSet, "import-jobs")
-router.register(r"submit", views.SubmitViewSet, "submit")
 router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
 router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
@@ -65,10 +64,6 @@ v1_patterns += [
     url(
         r"^users/",
         include(("funkwhale_api.users.api_urls", "users"), namespace="users"),
-    ),
-    url(
-        r"^requests/",
-        include(("funkwhale_api.requests.api_urls", "requests"), namespace="requests"),
     ),
     url(r"^token/$", jwt_views.obtain_jwt_token, name="token"),
     url(r"^token/refresh/$", jwt_views.refresh_jwt_token, name="token_refresh"),

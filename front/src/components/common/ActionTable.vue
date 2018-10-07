@@ -21,13 +21,14 @@
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
                   <translate>Go</translate></div>
                 <dangerous-button
-                  v-else-if="!currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
+                  v-else :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
                   <translate>Go</translate>
                   <p slot="modal-header">
                     <translate
+                      key="1"
                       :translate-n="objectsData.count"
                       :translate-params="{count: objectsData.count, action: currentActionName}"
                       translate-plural="Do you want to launch %{ action } on %{ count } elements?">
@@ -44,6 +45,7 @@
                 <translate
                   tag="span"
                   v-if="selectAll"
+                  key="1"
                   :translate-n="objectsData.count"
                   :translate-params="{count: objectsData.count, total: objectsData.count}"
                   translate-plural="%{ count } on %{ total } selected">
@@ -52,14 +54,16 @@
                 <translate
                   tag="span"
                   v-else
+                  key="2"
                   :translate-n="checked.length"
                   :translate-params="{count: checked.length, total: objectsData.count}"
                   translate-plural="%{ count } on %{ total } selected">
                   %{ count } on %{ total } selected
                 </translate>
-                <template v-if="!currentAction.isDangerous && checkable.length > 0 && checkable.length === checked.length">
+                <template v-if="currentAction.allowAll && checkable.length > 0 && checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
                     <translate
+                      key="3"
                       :translate-n="objectsData.count"
                       :translate-params="{total: objectsData.count}"
                       translate-plural="Select all %{ total } elements">
@@ -67,7 +71,7 @@
                     </translate>
                   </a>
                   <a @click="selectAll = false" v-else>
-                    <translate>Select only current page</translate>
+                    <translate key="4">Select only current page</translate>
                   </a>
                 </template>
               </div>
@@ -108,13 +112,13 @@
       </tr>
     </thead>
     <tbody v-if="objectsData.count > 0">
-      <tr v-for="(obj, index) in objectsData.results">
+      <tr v-for="(obj, index) in objects">
         <td v-if="actions.length > 0" class="collapsing">
           <input
             type="checkbox"
-            :disabled="checkable.indexOf(obj.id) === -1"
-            @click="toggleCheck($event, obj.id, index)"
-            :checked="checked.indexOf(obj.id) > -1"><label>&nbsp;</label>
+            :disabled="checkable.indexOf(getId(obj)) === -1"
+            @click="toggleCheck($event, getId(obj), index)"
+            :checked="checked.indexOf(getId(obj)) > -1"><label>&nbsp;</label>
         </td>
         <slot name="row-cells" :obj="obj"></slot>
       </tr>
@@ -127,9 +131,11 @@ import axios from 'axios'
 export default {
   props: {
     actionUrl: {type: String, required: true},
+    idField: {type: String, required: true, default: 'id'},
     objectsData: {type: Object, required: true},
     actions: {type: Array, required: true, default: () => { return [] }},
-    filters: {type: Object, required: false, default: () => { return {} }}
+    filters: {type: Object, required: false, default: () => { return {} }},
+    customObjects: {type: Array, required: false, default: () => { return [] }},
   },
   components: {},
   data () {
@@ -208,6 +214,9 @@ export default {
         self.actionLoading = false
         self.actionErrors = error.backendErrors
       })
+    },
+    getId (obj) {
+      return obj[this.idField]
     }
   },
   computed: {
@@ -218,6 +227,7 @@ export default {
       })[0]
     },
     checkable () {
+      let self = this
       if (!this.currentAction) {
         return []
       }
@@ -228,7 +238,19 @@ export default {
           return filter(o)
         })
       }
-      return objs.map((o) => { return o.id })
+      return objs.map((o) => { return self.getId(o) })
+    },
+    objects () {
+      let self = this
+      return this.objectsData.results.map((o) => {
+        let custom = self.customObjects.filter((co) => {
+          return self.getId(co) == self.getId(o)
+        })[0]
+        if (custom) {
+          return custom
+        }
+        return o
+      })
     }
   },
   watch: {
@@ -238,6 +260,14 @@ export default {
         this.selectAll = false
       },
       deep: true
+    },
+    currentActionName () {
+      // we update checked status as some actions have specific filters
+      // on what is checkable or not
+      let self = this
+      this.checked = this.checked.filter(r => {
+        return self.checkable.indexOf(r) > -1
+      })
     }
   }
 }

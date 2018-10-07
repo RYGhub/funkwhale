@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/bash -ex
 
-OS_REQUIREMENTS_FILENAME="requirements.apt"
+script_path=$(dirname "$(realpath $0)")
+
+OS_REQUIREMENTS_FILENAME="$script_path/requirements.apt"
 
 # Handle call with wrong command
 function wrong_command()
