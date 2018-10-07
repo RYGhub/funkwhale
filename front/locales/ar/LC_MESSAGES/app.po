@@ -3,14 +3,16 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-05 20:10+0200\n"
-"PO-Revision-Date: 2018-10-03 16:06+0000\n"
+"PO-Revision-Date: 2018-10-06 19:26+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
+"funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: Weblate 2.20\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -843,13 +845,10 @@ msgid "Get me to the library"
 msgstr "أنقلني إلى المكتبة"
 
 #: front/src/components/Home.vue:76
-#, fuzzy
 msgid "Get quality metadata about your music thanks to <a href=\"%{ url }\" target=\"_blank\">MusicBrainz</a>"
 msgstr ""
-"أحصلوا على بيانات وصفية ذات جودة بفضل\n"
-"              <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
-"                MusicBrainz\n"
-"              </a>"
+"احصلوا على بيانات وصفية ذات جودة عن موسيقاكم بفضل <a href=\"%{ url }\" "
+"target=\"_blank\">MusicBrainz</a>"
 
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
 msgid "Get started"
@@ -1322,11 +1321,11 @@ msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:37
 msgid "Purge pending files?"
-msgstr ""
+msgstr "هل تريد إزالة الملفات المعلّقة؟"
 
 #: front/src/views/content/libraries/Quota.vue:63
 msgid "Purge skipped files?"
-msgstr ""
+msgstr "هل تريد إزالة الملفات المتخطاة؟"
 
 #: front/src/components/Sidebar.vue:20
 msgid "Queue"
@@ -1439,19 +1438,16 @@ msgid "Save"
 msgstr "احفظ"
 
 #: front/src/views/content/remote/Card.vue:31
-#, fuzzy
 msgid "Scan pending"
-msgstr "تصاعدي"
+msgstr "المسح المعلق"
 
 #: front/src/views/content/remote/Card.vue:43
-#, fuzzy
 msgid "Scanned successfully"
-msgstr "تم تحديث الإعدادات بنجاح."
+msgstr "تمت عملية المسح بنجاح"
 
 #: front/src/views/content/remote/Card.vue:47
-#, fuzzy
 msgid "Scanned with errors"
-msgstr "تمت مزامنة التعديلات مع السيرفر"
+msgstr "تمت عملية المسح بأخطاء"
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning... (%{ progress }%)"
@@ -1531,7 +1527,6 @@ msgstr "قم بمشاركة هذا الرابط مع مستخدمين آخرين
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
-#, fuzzy
 msgid "Sharing link"
 msgstr "رابط المشاركة"
 
@@ -1676,7 +1671,7 @@ msgstr "سوف يتم حذف المكتبة و كل ما تحتويه مِن م�
 
 #: front/src/components/library/FileUpload.vue:39
 msgid "The music files you are uploading are tagged properly:"
-msgstr ""
+msgstr "الملفات الموسيقية التي هي في صدد الإرسال موسومة بطريقة صحيحة:"
 
 #: front/src/components/Home.vue:121
 msgid "The plaform is free and open-source, you can install it and modify it without worries"
@@ -2021,9 +2016,8 @@ msgid "Upload new tracks"
 msgstr "إرسال مقاطع موسيقية جديدة"
 
 #: front/src/views/admin/users/UsersDetail.vue:82
-#, fuzzy
 msgid "Upload quota"
-msgstr "أرسل"
+msgstr "حصة التحميل"
 
 #: front/src/components/library/FileUpload.vue:99
 msgid "Uploaded"
@@ -2060,9 +2054,8 @@ msgstr "نشاط المستخدِم"
 #: front/src/components/library/Album.vue:49
 #: src/components/library/Artist.vue:60
 #: front/src/components/library/Track.vue:122
-#, fuzzy
 msgid "User libraries"
-msgstr "المكتبات"
+msgstr "مكتبات المستخدِم"
 
 #: front/src/components/library/Radios.vue:20
 msgid "User radios"
@@ -2103,9 +2096,8 @@ msgid "View on MusicBrainz"
 msgstr "إطّلع عليه على ميوزيك براينز"
 
 #: front/src/views/content/libraries/Form.vue:18
-#, fuzzy
 msgid "Visibility"
-msgstr "مدى رؤية القائمة"
+msgstr "المشاهدة"
 
 #: front/src/components/playlists/PlaylistModal.vue:20
 msgid "We cannot add the track to a playlist"
@@ -2240,9 +2232,8 @@ msgid "Your Subsonic password will be changed to a new, random one, logging you 
 msgstr ""
 
 #: front/src/components/mixins/Translations.vue:8
-#, fuzzy
 msgid "Activity visibility"
-msgstr "مدى رؤية القائمة"
+msgstr "عرض النشاط"
 
 #: front/src/components/mixins/Translations.vue:9
 msgid "Determine the visibility level of your activity"
@@ -2261,34 +2252,28 @@ msgid "Everyone on this instance"
 msgstr "كل مَن هم على مثيل الخادوم هذا"
 
 #: front/src/components/mixins/Translations.vue:18
-#, fuzzy
 msgid "Accessed date"
-msgstr "عُطّل النفاذ"
+msgstr "تاريخ النفاذ"
 
 #: front/src/components/mixins/Translations.vue:19
-#, fuzzy
 msgid "Modification date"
-msgstr "تاريخ نهاية الصلاحية"
+msgstr "تاريخ التعديل"
 
 #: front/src/components/mixins/Translations.vue:20
-#, fuzzy
 msgid "Imported date"
 msgstr "تاريخ الإستيراد"
 
 #: front/src/components/mixins/Translations.vue:22
-#, fuzzy
 msgid "Track name"
-msgstr "المَقطَع"
+msgstr "اسم المَقطَع"
 
 #: front/src/components/mixins/Translations.vue:23
-#, fuzzy
 msgid "Album name"
-msgstr "صفحة الألبوم"
+msgstr "عنوان الألبوم"
 
 #: front/src/components/mixins/Translations.vue:30
-#, fuzzy
 msgid "Sign-up date"
-msgstr "التسجيل"
+msgstr "تاريخ التسجيل"
 
 #: front/src/components/playlists/Editor.vue:163
 msgid "Copy tracks from current queue to playlist"
@@ -2553,24 +2538,20 @@ msgid "An error occured while processing this track, ensure the track is correct
 msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:242
-#, fuzzy
 msgid "Import went on successfully"
-msgstr "تم تحديث كلمة السر بنجاح"
+msgstr "تمت عملية الإستيراد بنجاح"
 
 #: front/src/views/content/libraries/FilesTable.vue:259
-#, fuzzy
 msgid "Relaunch import"
-msgstr "إنهاء الإستيراد"
+msgstr "إعادة محاولة الإستيراد"
 
 #: front/src/views/content/libraries/Card.vue:58
-#, fuzzy
 msgid "Visibility: nobody except me"
-msgstr "لا أحد غيري"
+msgstr "المشاهدة: لا أحد غيري"
 
 #: front/src/views/content/libraries/Card.vue:59
-#, fuzzy
 msgid "Visibility: everyone on this instance"
-msgstr "كل مَن هم على مثيل الخادوم هذا"
+msgstr "المشاهدة: كل مَن هم على مثيل الخادوم هذا"
 
 #: front/src/views/content/libraries/Card.vue:60
 msgid "Visibility: everyone, including other instances"
@@ -2589,9 +2570,8 @@ msgid "This library contains my personnal music, I hope you will like it!"
 msgstr "تجتوي هذه المكتبة على الموسيقى الخاصة بي، أتمنى أنها ستلقى إعجابك!"
 
 #: front/src/views/content/libraries/Form.vue:74
-#, fuzzy
 msgid "Everyone, including other instances"
-msgstr "كل مَن هم على مثيل الخادوم هذا"
+msgstr "جميع المستخدمين بما في ذلك المتواجدون على مثيلات الخوادم الأخرى"
 
 #: front/src/views/content/libraries/Form.vue:106
 msgid "Library updated"

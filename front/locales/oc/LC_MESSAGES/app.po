@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-05 20:10+0200\n"
-"PO-Revision-Date: 2018-10-03 16:06+0000\n"
+"PO-Revision-Date: 2018-10-05 21:32+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -808,13 +808,10 @@ msgid "Get me to the library"
 msgstr "Menatz-me a la bibliotèca"
 
 #: front/src/components/Home.vue:76
-#, fuzzy
 msgid "Get quality metadata about your music thanks to <a href=\"%{ url }\" target=\"_blank\">MusicBrainz</a>"
 msgstr ""
-"Obtenètz de metadonadas de qualitat per vòstra musica gràcia a\n"
-"              <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
-"                MusicBrainz\n"
-"              </a>"
+"Obtenètz de metadonadas de qualitat per vòstra musica gràcia a <a href=\"%{ "
+"url }\" target=\"_blank\">MusicBrainz</a>"
 
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
 msgid "Get started"
@@ -2172,13 +2169,12 @@ msgid "Your Subsonic password will be changed to a new, random one, logging you 
 msgstr "Vòstre senhal Subsonic serà remplaçat per un nòu aleatòri, aquò vos desconnectarà de totes los periferics qu’utilizan l’ancian senhal"
 
 #: front/src/components/mixins/Translations.vue:8
-#, fuzzy
 msgid "Activity visibility"
-msgstr "Visibilitat de la lista de lectura"
+msgstr "Visibilitat de l’activitat"
 
 #: front/src/components/mixins/Translations.vue:9
 msgid "Determine the visibility level of your activity"
-msgstr ""
+msgstr "Determinatz lo nivèl de visibilitat de vòstra activitat"
 
 #: front/src/components/mixins/Translations.vue:11
 #: front/src/components/playlists/Form.vue:81
@@ -2193,34 +2189,28 @@ msgid "Everyone on this instance"
 msgstr "Lo monde d’aquesta instància"
 
 #: front/src/components/mixins/Translations.vue:18
-#, fuzzy
 msgid "Accessed date"
-msgstr "Accès desactivat"
+msgstr "Data d’accès"
 
 #: front/src/components/mixins/Translations.vue:19
-#, fuzzy
 msgid "Modification date"
-msgstr "Data d’expiracion"
+msgstr "Data de modificacion"
 
 #: front/src/components/mixins/Translations.vue:20
-#, fuzzy
 msgid "Imported date"
 msgstr "Data d’import"
 
 #: front/src/components/mixins/Translations.vue:22
-#, fuzzy
 msgid "Track name"
-msgstr "Pista"
+msgstr "Nom de la pista"
 
 #: front/src/components/mixins/Translations.vue:23
-#, fuzzy
 msgid "Album name"
-msgstr "Pagina de l’album"
+msgstr "Nom de l’album"
 
 #: front/src/components/mixins/Translations.vue:30
-#, fuzzy
 msgid "Sign-up date"
-msgstr "Inscripcion"
+msgstr "Data d’inscripcion"
 
 #: front/src/components/playlists/Editor.vue:163
 msgid "Copy tracks from current queue to playlist"
@@ -2450,7 +2440,7 @@ msgstr "Federacion"
 
 #: front/src/components/Home.vue:154
 msgid "Welcome"
-msgstr ""
+msgstr "La benvenguda"
 
 #: front/src/views/content/remote/ScanForm.vue:48
 msgid "Enter a library url"
