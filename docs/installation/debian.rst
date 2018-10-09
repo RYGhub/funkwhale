@@ -112,13 +112,14 @@ Then we'll download the frontend files:
     case, run
 
         cd /srv
+        
         rm -r funkwhale
-        git clone https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        
+        git clone -b master https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        
         cd funkwhale
 
-    By default, the repository will use the ``develop`` which may be unstable thus not recommended for production instances (unless you know what your doing). You should use the master branch instead:
-
-        git checkout master
+    The above clone command uses the master branch instead of the default develop branch, as master is stable and more suited for production setups.
 
     You'll also need to re-create the folders we make earlier:
 
