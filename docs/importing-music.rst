@@ -78,7 +78,7 @@ configuration options to ensure the webserver can serve them properly:
 
 We recommend you symlink all your music directories into ``/srv/funkwhale/data/music``
 and run the `import_files` command from that directory. This will make it possible
-to use multiple music music directories, without any additional configuration
+to use multiple music directories, without any additional configuration
 on the webserver side.
 
 For instance, if you have a NFS share with your music mounted at ``/media/mynfsshare``,
