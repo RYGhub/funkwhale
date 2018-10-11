@@ -17,7 +17,7 @@ Funkwhale's federation is built on top of the following technologies:
 
 Support for the following is planned but not implemented-yet:
 
-- `JSON-LD signatures`_ as an alternate mean to authentify messages
+- `JSON-LD signatures`_ as an alternate mean to authenticate messages
 
 .. _ActivityPub: https://www.w3.org/TR/activitypub/
 .. _HTTP Signatures: https://tools.ietf.org/id/draft-cavage-http-signatures-01.html
@@ -85,13 +85,13 @@ to posting an activity to an outbox, we create an object, with the proper payloa
    and create a ``Delivery`` object in our database, linked to the initial activity and the inbox or shared inbox url.
    This ``Delivery`` object is then used by our worker to post the activity content to the url.
 
-Receiving an activity from a remote actor in a local inbox is basically the same, but we skip 2#.
+Receiving an activity from a remote actor in a local inbox is basically the same, but we skip step 2.
 
 Funkwhale does not support all activities, and we have a basic routing logic to handle
 specific activities, and discard unsupported ones. Unsupported activities are still
 received and stored though.
 
-If a delivered activity match one of our routes, a dedicated handler is called,
+If a delivered activity matches one of our routes, a dedicated handler is called,
 which can trigger additionnal logic. For instance, if we receive a :ref:`activity-create` activity
 for an :ref:`object-audio` object, our handler will persist the proper data in our local ``Upload``
 table, retrieve the audio cover, etc.
@@ -143,10 +143,10 @@ When a follow is received on a :ref:`object-Library`, Funkwhale will behave diff
 depending on the visibility of the library:
 
 - Automatic accept, when the library is public: a notification is sent to the library owner, and an :ref:`activity-accept` is sent automatically to the follow actor.
-- Manuel accept, in all other cases: a notification is sent to the library owner. After manual approval from the owner, an :ref:`activity-accept` is sent to the follow actor.
+- Manual accept, in all other cases: a notification is sent to the library owner. After manual approval from the owner, an :ref:`activity-accept` is sent to the follow actor.
 
-Funkwhale uses library follows status to grant access to the follow actor. If a library
-is not public and an actor does not have an approved follow, library content must be
+Funkwhale uses library follow status to grant access to the follow actor. If a library
+is not public and an actor does not have an approved follow, library content will be
 inaccessible to the actor.
 
 Checks
@@ -368,19 +368,19 @@ In this example, Bob notifies the followers of their library that 3 objects were
 
 .. note::
 
-  For performance reason, when deleting :ref:`object-audio` objects, Funkwhale support
+  For performance reason, when deleting :ref:`object-audio` objects, Funkwhale supports
   either a list of ids or a single id.
 
 Internal logic
 **************
 
-When a :ref:`activity-delete` is received, the corresponding objects are deleted immediatly
+When a :ref:`activity-delete` is received, the corresponding objects are immediately deleted
 from the database.
 
 Checks
 ******
 
-Before handling deletion, Funkwhale ensure the actor initiating the activity
+Before handling deletion, Funkwhale ensures the actor initiating the activity
 is the owner of the deleted :ref:`object-audio` or :ref:`object-Library`.
 
 Supported objects
@@ -494,7 +494,7 @@ Structure
 - **published** (required): the publication date of the entity (on the federation)
 - **musicbrainzId** (optional): the musicbrainz recording id
 - **album** (required): the :ref:`object-album` that contains the track
-- **artists** (required): a list of :ref:`object-artist` objects involved in the track (they can differ fro mthe album artists)
+- **artists** (required): a list of :ref:`object-artist` objects involved in the track (they can differ from the album artists)
 
 .. _object-library:
 
@@ -591,7 +591,7 @@ Structure
 
 .. note::
 
-  Accessing the Audio file via its url requires authentication and an approved follow on the upload library,
+  Accessing the Audio file via its url requires authentication and an approved follow on the containing library,
   unless the library is public.
 
 
@@ -600,7 +600,7 @@ Structure
 Audio fetching on restricted libraries
 --------------------------------------
 
-:ref:`object-library` and :ref:`object-audio` url objects may require additional authentications
+:ref:`object-library` and :ref:`object-audio` url objects may require additional authentication
 to be accessed.
 
 For :ref:`object-library` objects:
