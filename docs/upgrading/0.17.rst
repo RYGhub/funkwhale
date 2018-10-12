@@ -196,8 +196,8 @@ On docker-setups::
 On non docker-setups::
 
     # if you missed this one from a previous upgrade
-    python api/manage.py script create_actors --no-input
-    python api/manage.py script migrate_to_user_libraries --no-input
+    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py script create_actors --no-input
+    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py script migrate_to_user_libraries --no-input
 
 If the scripts ends without errors, you're instance should be updated and ready to use :)
 
