@@ -102,7 +102,7 @@ export default {
       }
     },
     wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + this.album.title + ' ' + this.album.artist.name
+      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.album.title + ' ' + this.album.artist.name)
     },
     musicbrainzUrl () {
       return 'https://musicbrainz.org/release/' + this.album.mbid

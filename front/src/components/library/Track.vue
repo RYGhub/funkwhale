@@ -196,7 +196,7 @@ export default {
       }
     },
     wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + this.track.title + ' ' + this.track.artist.name
+      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.track.title + ' ' + this.track.artist.name)
     },
     musicbrainzUrl () {
       return 'https://musicbrainz.org/recording/' + this.track.mbid
@@ -211,7 +211,7 @@ export default {
     lyricsSearchUrl () {
       let base = 'http://lyrics.wikia.com/wiki/Special:Search?query='
       let query = this.track.artist.name + ' ' + this.track.title
-      return base + query
+      return base + encodeURI(query)
     },
     cover () {
       return null
