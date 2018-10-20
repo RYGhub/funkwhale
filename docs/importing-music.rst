@@ -14,14 +14,25 @@ You can import those tracks as follows, assuming they are located in
 
 .. code-block:: bash
 
-    python api/manage.py import_files "/srv/funkwhale/data/music/**/*.ogg" --recursive --noinput
+    export LIBRARY_ID="<your_libary_id>"
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/**/*.ogg" --recursive --noinput
 
 When you use docker, the ``/srv/funkwhale/data/music`` is mounted from the host
 to the ``/music`` directory on the container:
 
 .. code-block:: bash
 
-    docker-compose run --rm api python manage.py import_files "/music/**/*.ogg" --recursive --noinput
+    export LIBRARY_ID="<your_libary_id>"
+    docker-compose run --rm api python manage.py import_files $LIBRARY_ID "/music/**/*.ogg" --recursive --noinput
+
+.. note::
+
+    Library IDs are available in library urls or sharing link. In this example:
+    https://funkwhale.instance/content/libraries/769a2ae3-eb3d-4aff-9f94-2c4d80d5c2d1,
+    the library ID is 769a2bc3-eb1d-4aff-9f84-2c4d80d5c2d1
+
+    You can use only the first characters of the ID when calling the command, like that:
+    ``export LIBRARY_ID="769a2bc3"``
 
 The import command supports several options, and you can check the help to
 get details::
