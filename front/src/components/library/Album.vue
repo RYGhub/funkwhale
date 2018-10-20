@@ -33,7 +33,7 @@
             <i class="wikipedia icon"></i>
             <translate>Search on Wikipedia</translate>
           </a>
-          <a :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
@@ -105,7 +105,9 @@ export default {
       return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.album.title + ' ' + this.album.artist.name)
     },
     musicbrainzUrl () {
-      return 'https://musicbrainz.org/release/' + this.album.mbid
+      if (this.album.mbid) {
+        return 'https://musicbrainz.org/release/' + this.album.mbid
+      }
     },
     headerStyle () {
       if (!this.album.cover.original) {
