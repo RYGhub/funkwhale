@@ -134,7 +134,7 @@ test_api:
     - postgres:9.4
     - redis:3
   stage: test
-  image: funkwhale/funkwhale:latest
+  image: funkwhale/funkwhale:develop
   cache:
     key: "$CI_PROJECT_ID__pip_cache"
     paths:
