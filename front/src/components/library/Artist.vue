@@ -151,7 +151,7 @@ export default {
       }).length > 0
     },
     wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + this.artist.name
+      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.artist.name)
     },
     musicbrainzUrl () {
       return 'https://musicbrainz.org/artist/' + this.artist.mbid
