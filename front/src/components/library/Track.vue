@@ -40,7 +40,7 @@
             <i class="wikipedia icon"></i>
             <translate>Search on Wikipedia</translate>
           </a>
-          <a :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
@@ -199,7 +199,9 @@ export default {
       return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.track.title + ' ' + this.track.artist.name)
     },
     musicbrainzUrl () {
-      return 'https://musicbrainz.org/recording/' + this.track.mbid
+      if (this.track.mbid) {
+        return 'https://musicbrainz.org/recording/' + this.track.mbid
+      }
     },
     downloadUrl () {
       let u = this.$store.getters['instance/absoluteUrl'](this.track.listen_url)
