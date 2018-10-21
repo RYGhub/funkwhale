@@ -135,6 +135,9 @@ export default {
         }
       }
     },
+    last ({state, dispatch}) {
+      dispatch('currentIndex', state.tracks.length - 1)
+    },
     currentIndex ({commit, state, rootState, dispatch}, index) {
       commit('ended', false)
       commit('player/currentTime', 0, {root: true})
