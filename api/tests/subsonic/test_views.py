@@ -5,6 +5,8 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
+import funkwhale_api
+
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
 from funkwhale_api.subsonic import renderers, serializers
@@ -18,7 +20,12 @@ def test_render_content_json(db, api_client):
     url = reverse("api:subsonic-ping")
     response = api_client.get(url, {"f": "json"})
 
-    expected = {"status": "ok", "version": "1.16.0"}
+    expected = {
+        "status": "ok",
+        "version": "1.16.0",
+        "type": "funkwhale",
+        "funkwhale-version": funkwhale_api.__version__,
+    }
     assert response.status_code == 200
     assert json.loads(response.content) == render_json(expected)
 
