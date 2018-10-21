@@ -124,7 +124,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             "status": "ok",
             "version": "1.16.0",
             "type": "funkwhale",
-            "funkwhale-version": funkwhale_api.__version__,
+            "funkwhaleVersion": funkwhale_api.__version__,
             "license": {
                 "valid": "true",
                 "email": "valid@valid.license",

@@ -15,7 +15,7 @@ class SubsonicJSONRenderer(renderers.JSONRenderer):
                 "status": "ok",
                 "version": "1.16.0",
                 "type": "funkwhale",
-                "funkwhale-version": funkwhale_api.__version__,
+                "funkwhaleVersion": funkwhale_api.__version__,
             }
         }
         final["subsonic-response"].update(data)

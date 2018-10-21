@@ -24,7 +24,7 @@ def test_render_content_json(db, api_client):
         "status": "ok",
         "version": "1.16.0",
         "type": "funkwhale",
-        "funkwhale-version": funkwhale_api.__version__,
+        "funkwhaleVersion": funkwhale_api.__version__,
     }
     assert response.status_code == 200
     assert json.loads(response.content) == render_json(expected)
@@ -60,6 +60,8 @@ def test_get_license(f, db, logged_in_api_client, mocker):
     expected = {
         "status": "ok",
         "version": "1.16.0",
+        "type": "funkwhale",
+        "funkwhaleVersion": funkwhale_api.__version__,
         "license": {
             "valid": "true",
             "email": "valid@valid.license",
