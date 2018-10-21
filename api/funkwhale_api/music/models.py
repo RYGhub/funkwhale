@@ -135,9 +135,9 @@ class ArtistQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
         if include:
-            return self.filter(tracks__in=tracks)
+            return self.filter(tracks__in=tracks).distinct()
         else:
-            return self.exclude(tracks__in=tracks)
+            return self.exclude(tracks__in=tracks).distinct()
 
 
 class Artist(APIModelMixin):
@@ -203,9 +203,9 @@ class AlbumQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
         if include:
-            return self.filter(tracks__in=tracks)
+            return self.filter(tracks__in=tracks).distinct()
         else:
-            return self.exclude(tracks__in=tracks)
+            return self.exclude(tracks__in=tracks).distinct()
 
 
 class Album(APIModelMixin):
@@ -399,9 +399,9 @@ class TrackQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         files = Upload.objects.playable_by(actor, include)
         if include:
-            return self.filter(uploads__in=files)
+            return self.filter(uploads__in=files).distinct()
         else:
-            return self.exclude(uploads__in=files)
+            return self.exclude(uploads__in=files).distinct()
 
     def annotate_duration(self):
         first_upload = Upload.objects.filter(track=models.OuterRef("pk")).order_by("pk")
@@ -557,8 +557,8 @@ class UploadQuerySet(models.QuerySet):
         libraries = Library.objects.viewable_by(actor)
 
         if include:
-            return self.filter(library__in=libraries, import_status="finished")
-        return self.exclude(library__in=libraries, import_status="finished")
+            return self.filter(library__in=libraries, import_status="finished").distinct()
+        return self.exclude(library__in=libraries, import_status="finished").distinct()
 
     def local(self, include=True):
         return self.exclude(library__actor__user__isnull=include)
