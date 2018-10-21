@@ -35,7 +35,7 @@ def get_libraries(filter_uploads):
         uploads = uploads.playable_by(actor)
         libraries = models.Library.objects.filter(
             pk__in=uploads.values_list("library", flat=True)
-        )
+        ).annotate(_uploads_count=Count("uploads"))
         libraries = libraries.select_related("actor")
         page = self.paginate_queryset(libraries)
         if page is not None:

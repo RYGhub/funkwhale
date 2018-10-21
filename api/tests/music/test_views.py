@@ -462,6 +462,7 @@ def test_can_get_libraries_for_music_entities(
         import_status="finished", library__privacy_level="me", track=upload.track
     ).library
     library = upload.library
+    setattr(library, "_uploads_count", 1)
     data = {
         "artist": upload.track.artist,
         "album": upload.track.album,
