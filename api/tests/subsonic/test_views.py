@@ -457,6 +457,19 @@ def test_get_cover_art_album(factories, logged_in_api_client):
     ).decode("utf-8")
 
 
+def test_get_avatar(factories, logged_in_api_client):
+    user = factories["users.User"]()
+    url = reverse("api:subsonic-get-avatar")
+    assert url.endswith("getAvatar") is True
+    response = logged_in_api_client.get(url, {"username": user.username})
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == ""
+    assert response["X-Accel-Redirect"] == music_views.get_file_path(
+        user.avatar
+    ).decode("utf-8")
+
+
 def test_scrobble(factories, logged_in_api_client):
     upload = factories["music.Upload"]()
     track = upload.track

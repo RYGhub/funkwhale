@@ -15,6 +15,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
 from funkwhale_api.playlists import models as playlists_models
+from funkwhale_api.users import models as users_models
 
 from . import authentication, filters, negotiation, serializers
 
@@ -425,6 +426,23 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         playlist = request.user.playlists.with_tracks_count().get(pk=playlist.pk)
         data = {"playlist": serializers.get_playlist_detail_data(playlist)}
         return response.Response(data)
+
+    @list_route(methods=["get", "post"], url_name="get_avatar", url_path="getAvatar")
+    @find_object(
+        queryset=users_models.User.objects.exclude(avatar=None).exclude(avatar=""),
+        model_field="username__iexact",
+        field="username",
+        cast=str,
+    )
+    def get_avatar(self, request, *args, **kwargs):
+        user = kwargs.pop("obj")
+        mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
+        path = music_views.get_file_path(user.avatar)
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        # let the proxy set the content-type
+        r = response.Response({}, content_type="")
+        r[file_header] = path
+        return r
 
     @list_route(
         methods=["get", "post"],
