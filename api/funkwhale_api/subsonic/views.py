@@ -8,6 +8,7 @@ from rest_framework import renderers, response, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
+import funkwhale_api
 from funkwhale_api.activity import record
 from funkwhale_api.common import preferences
 from funkwhale_api.favorites.models import TrackFavorite
@@ -122,6 +123,8 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {
             "status": "ok",
             "version": "1.16.0",
+            "type": "funkwhale",
+            "funkwhale-version": funkwhale_api.__version__,
             "license": {
                 "valid": "true",
                 "email": "valid@valid.license",
