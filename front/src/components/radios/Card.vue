@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="extra content">
-        <user-link :user="radio.user" class="left floated" />
+        <user-link v-if="radio.user" :user="radio.user" class="left floated" />
         <radio-button class="right floated button" :type="type" :custom-radio-id="customRadioId"></radio-button>
         <router-link
           class="ui basic yellow button right floated"
