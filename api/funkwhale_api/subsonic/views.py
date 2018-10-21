@@ -444,6 +444,17 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         r[file_header] = path
         return r
 
+    @list_route(methods=["get", "post"], url_name="get_user", url_path="getUser")
+    @find_object(
+        queryset=lambda request: users_models.User.objects.filter(pk=request.user.pk),
+        model_field="username__iexact",
+        field="username",
+        cast=str,
+    )
+    def get_user(self, request, *args, **kwargs):
+        data = {"user": serializers.get_user_detail_data(request.user)}
+        return response.Response(data)
+
     @list_route(
         methods=["get", "post"],
         url_name="get_music_folders",

@@ -481,3 +481,34 @@ def test_scrobble(factories, logged_in_api_client):
 
     listening = logged_in_api_client.user.listenings.latest("id")
     assert listening.track == track
+
+
+@pytest.mark.parametrize("f", ["json"])
+def test_get_user(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get-user")
+    assert url.endswith("getUser") is True
+    response = logged_in_api_client.get(
+        url, {"f": f, "username": logged_in_api_client.user.username}
+    )
+    assert response.status_code == 200
+    assert response.data == {
+        "user": {
+            "username": logged_in_api_client.user.username,
+            "email": logged_in_api_client.user.email,
+            "scrobblingEnabled": "true",
+            "adminRole": "false",
+            "downloadRole": "true",
+            "uploadRole": "true",
+            "settingsRole": "false",
+            "playlistRole": "true",
+            "commentRole": "false",
+            "podcastRole": "false",
+            "streamRole": "true",
+            "jukeboxRole": "true",
+            "coverArtRole": "false",
+            "shareRole": "false",
+            "folder": [
+                f["id"] for f in serializers.get_folders(logged_in_api_client.user)
+            ],
+        }
+    }
