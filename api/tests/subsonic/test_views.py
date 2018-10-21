@@ -245,6 +245,27 @@ def test_get_starred2(f, db, logged_in_api_client, factories):
     }
 
 
+@pytest.mark.parametrize("f", ["json"])
+def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
+    url = reverse("api:subsonic-get-random-songs")
+    assert url.endswith("getRandomSongs") is True
+    track1 = factories["music.Track"]()
+    track2 = factories["music.Track"]()
+    factories["music.Track"]()
+
+    order_by = mocker.patch.object(
+        music_models.TrackQuerySet, 'order_by', return_value=[track1, track2]
+    )
+    response = logged_in_api_client.get(url, {"f": f, "size": 2})
+
+    assert response.status_code == 200
+    assert response.data == {
+        "randomSongs": {"song": serializers.GetSongSerializer([track1, track2], many=True).data}
+    }
+
+    order_by.assert_called_once_with("?")
+
+
 @pytest.mark.parametrize("f", ["xml", "json"])
 def test_get_starred(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-starred")

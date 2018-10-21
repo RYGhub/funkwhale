@@ -219,6 +219,27 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"starred2": {"song": serializers.get_starred_tracks_data(favorites)}}
         return response.Response(data)
 
+    @list_route(
+        methods=["get", "post"], url_name="get_random_songs", url_path="getRandomSongs"
+    )
+    def get_random_songs(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        actor = utils.get_actor_from_request(request)
+        queryset = music_models.Track.objects.all()
+        queryset = queryset.playable_by(actor)
+        try:
+            size = int(data["size"])
+        except (TypeError, KeyError, ValueError):
+            size = 50
+
+        queryset = queryset.playable_by(actor).prefetch_related('uploads').order_by("?")[:size]
+        data = {
+            "randomSongs": {
+                "song": serializers.GetSongSerializer(queryset, many=True).data
+            }
+        }
+        return response.Response(data)
+
     @list_route(methods=["get", "post"], url_name="get_starred", url_path="getStarred")
     def get_starred(self, request, *args, **kwargs):
         favorites = request.user.track_favorites.all()
