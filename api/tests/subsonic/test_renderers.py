@@ -1,13 +1,21 @@
 import json
 import xml.etree.ElementTree as ET
 
+import funkwhale_api
+
 from funkwhale_api.subsonic import renderers
 
 
 def test_json_renderer():
     data = {"hello": "world"}
     expected = {
-        "subsonic-response": {"status": "ok", "version": "1.16.0", "hello": "world"}
+        "subsonic-response": {
+            "status": "ok",
+            "version": "1.16.0",
+            "type": "funkwhale",
+            "funkwhale-version": funkwhale_api.__version__,
+            "hello": "world",
+        }
     }
     renderer = renderers.SubsonicJSONRenderer()
     assert json.loads(renderer.render(data)) == expected

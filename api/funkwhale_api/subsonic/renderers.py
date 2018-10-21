@@ -2,13 +2,22 @@ import xml.etree.ElementTree as ET
 
 from rest_framework import renderers
 
+import funkwhale_api
+
 
 class SubsonicJSONRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if not data:
             # when stream view is called, we don't have any data
             return super().render(data, accepted_media_type, renderer_context)
-        final = {"subsonic-response": {"status": "ok", "version": "1.16.0"}}
+        final = {
+            "subsonic-response": {
+                "status": "ok",
+                "version": "1.16.0",
+                "type": "funkwhale",
+                "funkwhale-version": funkwhale_api.__version__,
+            }
+        }
         final["subsonic-response"].update(data)
         if "error" in final:
             # an error was returned
