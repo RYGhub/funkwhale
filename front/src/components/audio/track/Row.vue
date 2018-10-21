@@ -40,7 +40,7 @@
     <td colspan="4" v-else>
       <translate>N/A</translate>
     </td>
-    <td>
+    <td colspan="2">
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
       <track-playlist-icon
         v-if="$store.state.auth.authenticated"
@@ -89,7 +89,7 @@ export default {
 
 tr:not(:hover) {
   .favorite-icon:not(.favorited), .playlist-icon {
-    display: none;
+    visibility: hidden;
   }
 }
 </style>

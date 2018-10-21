@@ -16,8 +16,8 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" @click="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
-      <a class="item" @click="selectedTab = 'queue'" data-tab="queue">
+      <a class="active item" href @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
+      <a class="item" href @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
         <translate>Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
            <translate>(empty)</translate>
@@ -128,8 +128,10 @@
                   <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
-                  <strong>{{ track.title }}</strong><br />
-                  {{ track.artist.name }}
+                  <button class="title reset ellipsis">
+                    <strong>{{ track.title }}</strong><br />
+                    {{ track.artist.name }}
+                  </button>
               </td>
               <td>
                 <template v-if="$store.getters['favorites/isFavorite'](track.id)">
@@ -137,7 +139,9 @@
                 </template>
               </td>
               <td>
-                  <i @click.stop="cleanTrack(index)" class="circular trash icon"></i>
+                  <button @click.stop="cleanTrack(index)" :class="['ui', {'inverted': index != queue.currentIndex}, 'really', 'tiny', 'basic', 'circular', 'icon', 'button']">
+                    <i class="trash icon"></i>
+                  </button>
               </td>
             </tr>
           </draggable>
@@ -427,5 +431,9 @@ $sidebar-color: #3d3e3f;
   position: relative;
   top: -0.5em;
   width: 3em;
+}
+
+:not(.active) button.title {
+  outline-color: white;
 }
 </style>

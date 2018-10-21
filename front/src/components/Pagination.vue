@@ -1,25 +1,25 @@
 <template>
   <div class="ui pagination menu">
-    <div
+    <a href
       :disabled="current - 1 < 1"
-      @click="selectPage(current - 1)"
-      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></div>
+      @click.prevent.stop="selectPage(current - 1)"
+      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></a>
     <template v-if="!compact">
-      <div
+      <a href
         v-if="page !== 'skip'"
         v-for="page in pages"
-        @click="selectPage(page)"
+        @click.prevent.stop="selectPage(page)"
         :class="[{'active': page === current}, 'item']">
         {{ page }}
-      </div>
+      </a href>
       <div v-else class="disabled item">
         ...
       </div>
     </template>
-    <div
+    <a href
       :disabled="current + 1 > maxPage"
-      @click="selectPage(current + 1)"
-      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></div>
+      @click.prevent.stop="selectPage(current + 1)"
+      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></a>
   </div>
 </template>
 
@@ -90,4 +90,3 @@ export default {
     cursor: pointer;
 }
 </style>
-

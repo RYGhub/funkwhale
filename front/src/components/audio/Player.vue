@@ -31,9 +31,11 @@
             <div class="description">
               <track-favorite-icon
                 v-if="$store.state.auth.authenticated"
+                :class="{'inverted': !$store.getters['favorites/isFavorite'](currentTrack.id)}"
                 :track="currentTrack"></track-favorite-icon>
               <track-playlist-icon
                 v-if="$store.state.auth.authenticated"
+                :class="['inverted']"
                 :track="currentTrack"></track-playlist-icon>
             </div>
           </div>
@@ -55,44 +57,71 @@
       </div>
 
       <div class="two wide column controls ui grid">
-        <div
+        <a
+          href
           :title="labels.previousTrack"
+          :aria-label="labels.previousTrack"
           class="two wide column control"
+          @click.prevent.stop="previous"
           :disabled="emptyQueue">
-            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
-        </div>
-        <div
+            <i :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
+        </a>
+        <a
+          href
           v-if="!playing"
           :title="labels.play"
+          :aria-label="labels.play"
+          @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </div>
-        <div
+            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+        </a>
+        <a
+          href
           v-else
           :title="labels.pause"
+          :aria-label="labels.pause"
+          @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </div>
-        <div
+            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+        </a>
+        <a
+          href
           :title="labels.next"
+          :aria-label="labels.next"
           class="two wide column control"
+          @click.prevent.stop="next"
           :disabled="!hasNext">
-            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
-        </div>
+            <i :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
+        </a>
         <div
           class="wide column control volume-control"
           v-on:mouseover="showVolume = true"
           v-on:mouseleave="showVolume = false"
           v-bind:class="{ active : showVolume }">
-          <i
+          <a
+            href
+            v-if="volume === 0"
             :title="labels.unmute"
-            @click="unmute" v-if="volume === 0" class="volume off secondary icon"></i>
-          <i
+            :aria-label="labels.unmute"
+            @click.prevent.stop="unmute">
+            <i class="volume off secondary icon"></i>
+          </a>
+          <a
+            href
+            v-else-if="volume < 0.5"
             :title="labels.mute"
-            @click="mute" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
-          <i
+            :aria-label="labels.mute"
+            @click.prevent.stop="mute">
+            <i class="volume down secondary icon"></i>
+          </a>
+          <a
+            href
+            v-else
             :title="labels.mute"
-            @click="mute" v-else class="volume up secondary icon"></i>
+            :aria-label="labels.mute"
+            @click.prevent.stop="mute">
+            <i class="volume up secondary icon"></i>
+          </a>
           <input
             type="range"
             step="0.05"
@@ -102,44 +131,61 @@
             v-if="showVolume" />
         </div>
         <div class="two wide column control looping" v-if="!showVolume">
-          <i
-            :title="labels.loopingDisabled"
+          <a
+            href
             v-if="looping === 0"
-            @click="$store.commit('player/looping', 1)"
-            :disabled="!currentTrack"
-            :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
-          <i
+            :title="labels.loopingDisabled"
+            :aria-label="labels.loopingDisabled"
+            @click.prevent.stop="$store.commit('player/looping', 1)"
+            :disabled="!currentTrack">
+            <i :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
+          </a>
+          <a
+            href
+            @click.prevent.stop="$store.commit('player/looping', 2)"
             :title="labels.loopingSingle"
+            :aria-label="labels.loopingSingle"
             v-if="looping === 1"
-            @click="$store.commit('player/looping', 2)"
-            :disabled="!currentTrack"
-            class="repeat secondary icon">
-            <span class="ui circular tiny orange label">1</span>
-          </i>
-          <i
+            :disabled="!currentTrack">
+            <i
+              class="repeat secondary icon">
+              <span class="ui circular tiny orange label">1</span>
+            </i>
+          </a>
+          <a
+            href
             :title="labels.loopingWhole"
+            :aria-label="labels.loopingWhole"
             v-if="looping === 2"
-            @click="$store.commit('player/looping', 0)"
             :disabled="!currentTrack"
-            class="repeat orange secondary icon">
-          </i>
+            @click.prevent.stop="$store.commit('player/looping', 0)">
+            <i
+              class="repeat orange secondary icon">
+            </i>
+          </a>
         </div>
-        <div
+        <a
+          href
           :disabled="queue.tracks.length === 0"
           :title="labels.shuffle"
+          :aria-label="labels.shuffle"
           v-if="!showVolume"
+          @click.prevent.stop="shuffle()"
           class="two wide column control">
           <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
-          <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </div>
+          <i v-else :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </a>
         <div class="one wide column" v-if="!showVolume"></div>
-        <div
+        <a
+          href
           :disabled="queue.tracks.length === 0"
           :title="labels.clear"
+          :aria-label="labels.clear"
           v-if="!showVolume"
+          @click.prevent.stop="clean()"
           class="two wide column control">
-          <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </div>
+          <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </a>
       </div>
       <GlobalEvents
         @keydown.space.prevent.exact="togglePlay"
@@ -147,7 +193,6 @@
         @keydown.ctrl.right.prevent.exact="next"
         @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
         @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
-        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
         @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
         @keydown.s.prevent.exact="shuffle"
         />
@@ -369,6 +414,9 @@ export default {
   .header, .meta, .artist, .album {
     color: white !important;
   }
+}
+.controls a {
+  color: white;
 }
 
 .controls .icon.big {

@@ -12,9 +12,9 @@
     <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])"></i>
       <div class="menu">
-        <div class="item" :disabled="!playable" @click="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></div>
-        <div class="item" :disabled="!playable" @click="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></div>
-        <div class="item" :disabled="!playable" @click="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></div>
+        <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></button>
+        <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></button>
+        <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></button>
       </div>
     </div>
   </span>
@@ -46,7 +46,16 @@ export default {
     }
   },
   mounted () {
-    jQuery(this.$el).find('.ui.dropdown').dropdown()
+    let self = this
+    jQuery(this.$el).find('.ui.dropdown').dropdown({
+      selectOnKeydown: false,
+      action: function (text, value, $el) {
+        // used ton ensure focusing the dropdown and clicking via keyboard
+        // works as expected
+        self.$refs[$el.data('ref')].click()
+        jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+      }
+    })
   },
   computed: {
     labels () {
@@ -139,6 +148,7 @@ export default {
       this.getPlayableTracks().then((tracks) => {
         self.$store.dispatch('queue/appendMany', {tracks: tracks}).then(() => self.addMessage(tracks))
       })
+      jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
     },
     addNext (next) {
       let self = this
@@ -150,6 +160,7 @@ export default {
           self.$store.dispatch('queue/next')
         }
       })
+      jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
     },
     addMessage (tracks) {
       if (tracks.length < 1) {
@@ -169,5 +180,9 @@ export default {
 <style scoped>
 i {
   cursor: pointer;
+}
+button.item {
+  background-color: white;
+  width: 100%;
 }
 </style>
