@@ -24,7 +24,7 @@ def test_render_content_json(db, api_client):
         "status": "ok",
         "version": "1.16.0",
         "type": "funkwhale",
-        "funkwhale-version": funkwhale_api.__version__,
+        "funkwhaleVersion": funkwhale_api.__version__,
     }
     assert response.status_code == 200
     assert json.loads(response.content) == render_json(expected)
@@ -60,6 +60,8 @@ def test_get_license(f, db, logged_in_api_client, mocker):
     expected = {
         "status": "ok",
         "version": "1.16.0",
+        "type": "funkwhale",
+        "funkwhaleVersion": funkwhale_api.__version__,
         "license": {
             "valid": "true",
             "email": "valid@valid.license",
@@ -243,6 +245,29 @@ def test_get_starred2(f, db, logged_in_api_client, factories):
     assert response.data == {
         "starred2": {"song": serializers.get_starred_tracks_data([favorite])}
     }
+
+
+@pytest.mark.parametrize("f", ["json"])
+def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
+    url = reverse("api:subsonic-get-random-songs")
+    assert url.endswith("getRandomSongs") is True
+    track1 = factories["music.Track"]()
+    track2 = factories["music.Track"]()
+    factories["music.Track"]()
+
+    order_by = mocker.patch.object(
+        music_models.TrackQuerySet, "order_by", return_value=[track1, track2]
+    )
+    response = logged_in_api_client.get(url, {"f": f, "size": 2})
+
+    assert response.status_code == 200
+    assert response.data == {
+        "randomSongs": {
+            "song": serializers.GetSongSerializer([track1, track2], many=True).data
+        }
+    }
+
+    order_by.assert_called_once_with("?")
 
 
 @pytest.mark.parametrize("f", ["xml", "json"])
@@ -457,6 +482,19 @@ def test_get_cover_art_album(factories, logged_in_api_client):
     ).decode("utf-8")
 
 
+def test_get_avatar(factories, logged_in_api_client):
+    user = factories["users.User"]()
+    url = reverse("api:subsonic-get-avatar")
+    assert url.endswith("getAvatar") is True
+    response = logged_in_api_client.get(url, {"username": user.username})
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == ""
+    assert response["X-Accel-Redirect"] == music_views.get_file_path(
+        user.avatar
+    ).decode("utf-8")
+
+
 def test_scrobble(factories, logged_in_api_client):
     upload = factories["music.Upload"]()
     track = upload.track
@@ -468,3 +506,34 @@ def test_scrobble(factories, logged_in_api_client):
 
     listening = logged_in_api_client.user.listenings.latest("id")
     assert listening.track == track
+
+
+@pytest.mark.parametrize("f", ["json"])
+def test_get_user(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get-user")
+    assert url.endswith("getUser") is True
+    response = logged_in_api_client.get(
+        url, {"f": f, "username": logged_in_api_client.user.username}
+    )
+    assert response.status_code == 200
+    assert response.data == {
+        "user": {
+            "username": logged_in_api_client.user.username,
+            "email": logged_in_api_client.user.email,
+            "scrobblingEnabled": "true",
+            "adminRole": "false",
+            "downloadRole": "true",
+            "uploadRole": "true",
+            "settingsRole": "false",
+            "playlistRole": "true",
+            "commentRole": "false",
+            "podcastRole": "false",
+            "streamRole": "true",
+            "jukeboxRole": "true",
+            "coverArtRole": "false",
+            "shareRole": "false",
+            "folder": [
+                f["id"] for f in serializers.get_folders(logged_in_api_client.user)
+            ],
+        }
+    }

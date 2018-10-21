@@ -51,9 +51,9 @@ class PlaylistQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         plts = PlaylistTrack.objects.playable_by(actor, include)
         if include:
-            return self.filter(playlist_tracks__in=plts)
+            return self.filter(playlist_tracks__in=plts).distinct()
         else:
-            return self.exclude(playlist_tracks__in=plts)
+            return self.exclude(playlist_tracks__in=plts).distinct()
 
 
 class Playlist(models.Model):
@@ -167,9 +167,9 @@ class PlaylistTrackQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         tracks = music_models.Track.objects.playable_by(actor, include)
         if include:
-            return self.filter(track__pk__in=tracks)
+            return self.filter(track__pk__in=tracks).distinct()
         else:
-            return self.exclude(track__pk__in=tracks)
+            return self.exclude(track__pk__in=tracks).distinct()
 
 
 class PlaylistTrack(models.Model):

@@ -8,6 +8,7 @@ from rest_framework import renderers, response, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.serializers import ValidationError
 
+import funkwhale_api
 from funkwhale_api.activity import record
 from funkwhale_api.common import preferences
 from funkwhale_api.favorites.models import TrackFavorite
@@ -15,6 +16,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
 from funkwhale_api.playlists import models as playlists_models
+from funkwhale_api.users import models as users_models
 
 from . import authentication, filters, negotiation, serializers
 
@@ -121,6 +123,8 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {
             "status": "ok",
             "version": "1.16.0",
+            "type": "funkwhale",
+            "funkwhaleVersion": funkwhale_api.__version__,
             "license": {
                 "valid": "true",
                 "email": "valid@valid.license",
@@ -216,6 +220,29 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     def get_starred2(self, request, *args, **kwargs):
         favorites = request.user.track_favorites.all()
         data = {"starred2": {"song": serializers.get_starred_tracks_data(favorites)}}
+        return response.Response(data)
+
+    @list_route(
+        methods=["get", "post"], url_name="get_random_songs", url_path="getRandomSongs"
+    )
+    def get_random_songs(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        actor = utils.get_actor_from_request(request)
+        queryset = music_models.Track.objects.all()
+        queryset = queryset.playable_by(actor)
+        try:
+            size = int(data["size"])
+        except (TypeError, KeyError, ValueError):
+            size = 50
+
+        queryset = (
+            queryset.playable_by(actor).prefetch_related("uploads").order_by("?")[:size]
+        )
+        data = {
+            "randomSongs": {
+                "song": serializers.GetSongSerializer(queryset, many=True).data
+            }
+        }
         return response.Response(data)
 
     @list_route(methods=["get", "post"], url_name="get_starred", url_path="getStarred")
@@ -424,6 +451,34 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 playlist.insert_many(sorted_tracks)
         playlist = request.user.playlists.with_tracks_count().get(pk=playlist.pk)
         data = {"playlist": serializers.get_playlist_detail_data(playlist)}
+        return response.Response(data)
+
+    @list_route(methods=["get", "post"], url_name="get_avatar", url_path="getAvatar")
+    @find_object(
+        queryset=users_models.User.objects.exclude(avatar=None).exclude(avatar=""),
+        model_field="username__iexact",
+        field="username",
+        cast=str,
+    )
+    def get_avatar(self, request, *args, **kwargs):
+        user = kwargs.pop("obj")
+        mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
+        path = music_views.get_file_path(user.avatar)
+        file_header = mapping[settings.REVERSE_PROXY_TYPE]
+        # let the proxy set the content-type
+        r = response.Response({}, content_type="")
+        r[file_header] = path
+        return r
+
+    @list_route(methods=["get", "post"], url_name="get_user", url_path="getUser")
+    @find_object(
+        queryset=lambda request: users_models.User.objects.filter(pk=request.user.pk),
+        model_field="username__iexact",
+        field="username",
+        cast=str,
+    )
+    def get_user(self, request, *args, **kwargs):
+        data = {"user": serializers.get_user_detail_data(request.user)}
         return response.Response(data)
 
     @list_route(
