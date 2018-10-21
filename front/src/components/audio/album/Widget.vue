@@ -3,10 +3,8 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle left', 'icon']">
-    </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle right', 'icon']">
-    </i>
+    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
+    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
     <div class="ui five cards">
       <div v-if="isLoading" class="ui inverted active dimmer">

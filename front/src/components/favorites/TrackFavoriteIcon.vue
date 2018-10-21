@@ -4,7 +4,14 @@
     <translate v-if="isFavorite">In favorites</translate>
     <translate v-else>Add to favorites</translate>
   </button>
-  <i v-else @click="$store.dispatch('favorites/toggle', track.id)" :class="['favorite-icon', 'heart', {'pink': isFavorite}, {'favorited': isFavorite}, 'link', 'icon']" :title="title"></i>
+  <button
+    v-else
+    @click="$store.dispatch('favorites/toggle', track.id)"
+    :class="['ui', 'favorite-icon', {'pink': isFavorite}, {'favorited': isFavorite}, 'basic', 'circular', 'icon', 'really', 'button']"
+    :aria-label="title"
+    :title="title">
+    <i :class="['heart', {'pink': isFavorite}, 'basic', 'icon']"></i>
+  </button>
 </template>
 
 <script>
