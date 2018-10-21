@@ -254,13 +254,15 @@ def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
     factories["music.Track"]()
 
     order_by = mocker.patch.object(
-        music_models.TrackQuerySet, 'order_by', return_value=[track1, track2]
+        music_models.TrackQuerySet, "order_by", return_value=[track1, track2]
     )
     response = logged_in_api_client.get(url, {"f": f, "size": 2})
 
     assert response.status_code == 200
     assert response.data == {
-        "randomSongs": {"song": serializers.GetSongSerializer([track1, track2], many=True).data}
+        "randomSongs": {
+            "song": serializers.GetSongSerializer([track1, track2], many=True).data
+        }
     }
 
     order_by.assert_called_once_with("?")

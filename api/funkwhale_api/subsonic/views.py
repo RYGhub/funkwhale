@@ -235,7 +235,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         except (TypeError, KeyError, ValueError):
             size = 50
 
-        queryset = queryset.playable_by(actor).prefetch_related('uploads').order_by("?")[:size]
+        queryset = (
+            queryset.playable_by(actor).prefetch_related("uploads").order_by("?")[:size]
+        )
         data = {
             "randomSongs": {
                 "song": serializers.GetSongSerializer(queryset, many=True).data

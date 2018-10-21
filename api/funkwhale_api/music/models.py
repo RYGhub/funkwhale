@@ -557,7 +557,9 @@ class UploadQuerySet(models.QuerySet):
         libraries = Library.objects.viewable_by(actor)
 
         if include:
-            return self.filter(library__in=libraries, import_status="finished").distinct()
+            return self.filter(
+                library__in=libraries, import_status="finished"
+            ).distinct()
         return self.exclude(library__in=libraries, import_status="finished").distinct()
 
     def local(self, include=True):
