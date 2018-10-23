@@ -51,7 +51,11 @@
             <p class="timer total">{{durationFormatted}}</p>
           </div>
         </div>
-        <div ref="progress" class="ui small orange inverted progress" @click="touchProgress">
+        <div
+          ref="progress"
+          :class="['ui', 'small', 'orange', 'inverted', {'indicating': isLoadingAudio}, 'progress']"
+          @click="touchProgress">
+          <div class="buffer bar" :data-percent="bufferProgress" :style="{ 'width': bufferProgress + '%' }"></div>
           <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
@@ -301,9 +305,11 @@ export default {
     ...mapState({
       currentIndex: state => state.queue.currentIndex,
       playing: state => state.player.playing,
+      isLoadingAudio: state => state.player.isLoadingAudio,
       volume: state => state.player.volume,
       looping: state => state.player.looping,
       duration: state => state.player.duration,
+      bufferProgress: state => state.player.bufferProgress,
       queue: state => state.queue
     }),
     ...mapGetters({
@@ -522,4 +528,43 @@ export default {
   margin: 0;
 }
 
+
+@keyframes MOVE-BG {
+	from {
+		transform: translateX(0px);
+	}
+	to {
+		transform: translateX(46px);
+	}
+}
+
+.indicating.progress {
+  overflow: hidden;
+}
+
+.ui.progress .bar {
+  transition: none;
+}
+
+.ui.inverted.progress .buffer.bar {
+  position: absolute;
+  background-color:rgba(255, 255, 255, 0.15);
+}
+.indicating.progress .bar {
+  left: -46px;
+  width: 200% !important;
+  color: grey;
+  background: repeating-linear-gradient(
+    -55deg,
+    grey 1px,
+    grey 10px,
+    transparent 10px,
+    transparent 20px,
+	) !important;
+
+  animation-name: MOVE-BG;
+	animation-duration: 2s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
 </style>
