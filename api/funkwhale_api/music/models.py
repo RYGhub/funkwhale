@@ -578,6 +578,9 @@ TRACK_FILE_IMPORT_STATUS_CHOICES = (
 
 
 def get_file_path(instance, filename):
+    if isinstance(instance, UploadVersion):
+        return common_utils.ChunkedPath("transcoded")(instance, filename)
+
     if instance.library.actor.get_user():
         return common_utils.ChunkedPath("tracks")(instance, filename)
     else:
@@ -740,6 +743,28 @@ class Upload(models.Model):
     @property
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
+
+
+MIMETYPE_CHOICES = [
+    (mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE
+]
+
+
+class UploadVersion(models.Model):
+    upload = models.ForeignKey(Upload, related_name='versions', on_delete=models.CASCADE)
+    mimetype = models.CharField(max_length=50, choices=MIMETYPE_CHOICES)
+    creation_date = models.DateTimeField(default=timezone.now)
+    accessed_date = models.DateTimeField(null=True, blank=True)
+    audio_file = models.FileField(upload_to=get_file_path, max_length=255)
+    bitrate = models.PositiveIntegerField()
+    size = models.IntegerField()
+
+    class Meta:
+        unique_together = ('upload', 'mimetype', 'bitrate')
+
+    @property
+    def filename(self):
+        return self.upload.filename
 
 
 IMPORT_STATUS_CHOICES = (

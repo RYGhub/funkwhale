@@ -78,6 +78,28 @@ class UploadAdmin(admin.ModelAdmin):
     list_filter = ["mimetype", "import_status", "library__privacy_level"]
 
 
+@admin.register(models.UploadVersion)
+class UploadVersionAdmin(admin.ModelAdmin):
+    list_display = [
+        "upload",
+        "audio_file",
+        "mimetype",
+        "size",
+        "bitrate",
+        "creation_date",
+        "accessed_date",
+    ]
+    list_select_related = ["upload"]
+    search_fields = [
+        "upload__source",
+        "upload__acoustid_track_id",
+        "upload__track__title",
+        "upload__track__album__title",
+        "upload__track__artist__name",
+    ]
+    list_filter = ["mimetype"]
+
+
 def launch_scan(modeladmin, request, queryset):
     for library in queryset:
         library.schedule_scan(actor=request.user.actor, force=True)
