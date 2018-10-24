@@ -17,3 +17,18 @@ class MaxTracks(types.BooleanPreference):
         "load on the server."
     )
     default = True
+
+
+@global_preferences_registry.register
+class MusicCacheDuration(types.IntPreference):
+    show_in_api = True
+    section = music
+    name = "transcoding_cache_duration"
+    default = 60 * 24 * 7
+    verbose_name = "Transcoding cache duration"
+    help_text = (
+        "How much minutes do you want to keep a copy of transcoded tracks"
+        "locally? Transcoded files that were not listened in this interval "
+        "will be erased and retranscoded from the remote on the next listening."
+    )
+    field_kwargs = {"required": False}

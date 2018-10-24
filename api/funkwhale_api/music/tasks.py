@@ -1,4 +1,5 @@
 import collections
+import datetime
 import logging
 import os
 
@@ -10,7 +11,7 @@ from django.dispatch import receiver
 from musicbrainzngs import ResponseError
 from requests.exceptions import RequestException
 
-from funkwhale_api.common import channels
+from funkwhale_api.common import channels, preferences
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
 from funkwhale_api.taskapp import celery
@@ -526,3 +527,19 @@ def broadcast_import_status_update_to_owner(old_status, new_status, upload, **kw
             },
         },
     )
+
+
+@celery.app.task(name="music.clean_transcoding_cache")
+def clean_transcoding_cache():
+    delay = preferences.get("music__transcoding_cache_duration")
+    if delay < 1:
+        return  # cache clearing disabled
+    limit = timezone.now() - datetime.timedelta(minutes=delay)
+    candidates = (
+        models.UploadVersion.objects.filter(
+            (Q(accessed_date__lt=limit) | Q(accessed_date=None))
+        )
+        .only("audio_file", "id")
+        .order_by("id")
+    )
+    return candidates.delete()

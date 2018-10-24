@@ -96,6 +96,18 @@ class UploadFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
+class UploadVersionFactory(factory.django.DjangoModelFactory):
+    upload = factory.SubFactory(UploadFactory, bitrate=200000)
+    bitrate = factory.SelfAttribute("upload.bitrate")
+    mimetype = "audio/mpeg"
+    audio_file = factory.django.FileField()
+    size = 2000000
+
+    class Meta:
+        model = "music.UploadVersion"
+
+
+@registry.register
 class WorkFactory(factory.django.DjangoModelFactory):
     mbid = factory.Faker("uuid4")
     language = "eng"

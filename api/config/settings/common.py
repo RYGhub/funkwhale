@@ -412,7 +412,12 @@ CELERY_BEAT_SCHEDULE = {
         "task": "federation.clean_music_cache",
         "schedule": crontab(hour="*/2"),
         "options": {"expires": 60 * 2},
-    }
+    },
+    "music.clean_transcoding_cache": {
+        "task": "music.clean_transcoding_cache",
+        "schedule": crontab(hour="*"),
+        "options": {"expires": 60 * 2},
+    },
 }
 
 JWT_AUTH = {
