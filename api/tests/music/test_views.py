@@ -1,11 +1,12 @@
 import io
+import magic
 import os
 
 import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import serializers, tasks, views
+from funkwhale_api.music import models, serializers, tasks, views
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -309,7 +310,69 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
     response = logged_in_api_client.get(url, {"upload": upload2.uuid})
 
     assert response.status_code == 200
-    mocked_serve.assert_called_once_with(upload2, user=logged_in_api_client.user)
+    mocked_serve.assert_called_once_with(
+        upload2, user=logged_in_api_client.user, format=None
+    )
+
+
+@pytest.mark.parametrize(
+    "mimetype,format,expected",
+    [
+        # already in proper format
+        ("audio/mpeg", "mp3", False),
+        # empty mimetype / format
+        (None, "mp3", False),
+        ("audio/mpeg", None, False),
+        # unsupported format
+        ("audio/mpeg", "noop", False),
+        # should transcode
+        ("audio/mpeg", "ogg", True),
+    ],
+)
+def test_should_transcode(mimetype, format, expected, factories):
+    upload = models.Upload(mimetype=mimetype)
+    assert views.should_transcode(upload, format) is expected
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_should_transcode_according_to_preference(value, preferences, factories):
+    upload = models.Upload(mimetype="audio/ogg")
+    expected = value
+    preferences["music__transcoding_enabled"] = value
+
+    assert views.should_transcode(upload, "mp3") is expected
+
+
+def test_handle_serve_create_mp3_version(factories, now):
+    user = factories["users.User"]()
+    upload = factories["music.Upload"](bitrate=42)
+    response = views.handle_serve(upload, user, format="mp3")
+
+    version = upload.versions.latest("id")
+
+    assert version.mimetype == "audio/mpeg"
+    assert version.accessed_date == now
+    assert version.bitrate == upload.bitrate
+    assert version.audio_file.path.endswith(".mp3")
+    assert version.size == version.audio_file.size
+    assert magic.from_buffer(version.audio_file.read(), mime=True) == "audio/mpeg"
+
+    assert response.status_code == 200
+
+
+def test_listen_transcode(factories, now, logged_in_api_client, mocker):
+    upload = factories["music.Upload"](
+        import_status="finished", library__actor__user=logged_in_api_client.user
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    handle_serve = mocker.spy(views, "handle_serve")
+    response = logged_in_api_client.get(url, {"to": "mp3"})
+
+    assert response.status_code == 200
+
+    handle_serve.assert_called_once_with(
+        upload, user=logged_in_api_client.user, format="mp3"
+    )
 
 
 def test_user_can_create_library(factories, logged_in_api_client):

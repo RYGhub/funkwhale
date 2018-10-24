@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -743,6 +743,37 @@ class Upload(models.Model):
     @property
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
+
+    def get_transcoded_version(self, format):
+        mimetype = utils.EXTENSION_TO_MIMETYPE[format]
+        existing_versions = list(self.versions.filter(mimetype=mimetype))
+        if existing_versions:
+            # we found an existing version, no need to transcode again
+            return existing_versions[0]
+
+        return self.create_transcoded_version(mimetype, format)
+
+    @transaction.atomic
+    def create_transcoded_version(self, mimetype, format):
+        # we create the version with an empty file, then
+        # we'll write to it
+        f = ContentFile(b"")
+        version = self.versions.create(mimetype=mimetype, bitrate=self.bitrate or 128000, size=0)
+        # we keep the same name, but we update the extension
+        new_name = os.path.splitext(
+            os.path.basename(self.audio_file.name)
+        )[0] + '.{}'.format(format)
+        version.audio_file.save(new_name, f)
+        utils.transcode_file(
+            input=self.audio_file,
+            output=version.audio_file,
+            input_format=utils.MIMETYPE_TO_EXTENSION[self.mimetype],
+            output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
+        )
+        version.size = version.audio_file.size
+        version.save(update_fields=['size'])
+
+        return version
 
 
 MIMETYPE_CHOICES = [
