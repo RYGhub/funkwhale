@@ -93,7 +93,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
 
     def get_is_playable(self, obj):
         try:
-            return bool(obj.is_playable_by_actor)
+            return bool(obj.playable_plts)
         except AttributeError:
             return None
 

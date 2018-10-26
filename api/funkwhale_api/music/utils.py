@@ -5,7 +5,6 @@ import mutagen
 import pydub
 
 from funkwhale_api.common.search import normalize_query, get_query  # noqa
-from funkwhale_api.common import utils
 
 
 def guess_mimetype(f):

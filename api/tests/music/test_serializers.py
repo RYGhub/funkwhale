@@ -48,6 +48,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
 def test_album_track_serializer(factories, to_api_date):
     upload = factories["music.Upload"]()
     track = upload.track
+    setattr(track, "playable_uploads", [upload])
 
     expected = {
         "id": track.id,
@@ -56,7 +57,7 @@ def test_album_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
-        "is_playable": None,
+        "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
         "duration": None,
@@ -127,7 +128,7 @@ def test_album_serializer(factories, to_api_date):
         "title": album.title,
         "artist": serializers.ArtistSimpleSerializer(album.artist).data,
         "creation_date": to_api_date(album.creation_date),
-        "is_playable": None,
+        "is_playable": False,
         "cover": {
             "original": album.cover.url,
             "square_crop": album.cover.crop["400x400"].url,
@@ -145,7 +146,7 @@ def test_album_serializer(factories, to_api_date):
 def test_track_serializer(factories, to_api_date):
     upload = factories["music.Upload"]()
     track = upload.track
-
+    setattr(track, "playable_uploads", [upload])
     expected = {
         "id": track.id,
         "artist": serializers.ArtistSimpleSerializer(track.artist).data,
@@ -153,14 +154,10 @@ def test_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
-        "is_playable": None,
+        "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "lyrics": track.get_lyrics_url(),
         "listen_url": track.listen_url,
-        "duration": None,
-        "size": None,
-        "bitrate": None,
-        "mimetype": None,
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected
@@ -260,3 +257,20 @@ def test_manage_upload_action_relaunch_import(factories, mocker):
     finished.refresh_from_db()
     assert finished.import_status == "finished"
     assert m.call_count == 3
+
+
+def test_track_upload_serializer(factories):
+    upload = factories["music.Upload"]()
+
+    expected = {
+        "listen_url": upload.listen_url,
+        "uuid": str(upload.uuid),
+        "size": upload.size,
+        "bitrate": upload.bitrate,
+        "mimetype": upload.mimetype,
+        "extension": upload.extension,
+        "duration": upload.duration,
+    }
+
+    serializer = serializers.TrackUploadSerializer(upload)
+    assert serializer.data == expected

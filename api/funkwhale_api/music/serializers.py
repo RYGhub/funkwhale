@@ -59,7 +59,7 @@ class ArtistSimpleSerializer(serializers.ModelSerializer):
 
 class AlbumTrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
-    is_playable = serializers.SerializerMethodField()
+    uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
 
@@ -73,16 +73,14 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "artist",
             "creation_date",
             "position",
-            "is_playable",
+            "uploads",
             "listen_url",
             "duration",
         )
 
-    def get_is_playable(self, obj):
-        try:
-            return bool(obj.is_playable_by_actor)
-        except AttributeError:
-            return None
+    def get_uploads(self, obj):
+        uploads = getattr(obj, "playable_uploads", [])
+        return TrackUploadSerializer(uploads, many=True).data
 
     def get_listen_url(self, obj):
         return obj.listen_url
@@ -123,7 +121,9 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     def get_is_playable(self, obj):
         try:
-            return any([bool(t.is_playable_by_actor) for t in obj.tracks.all()])
+            return any(
+                [bool(getattr(t, "playable_uploads", [])) for t in obj.tracks.all()]
+            )
         except AttributeError:
             return None
 
@@ -145,16 +145,26 @@ class TrackAlbumSerializer(serializers.ModelSerializer):
         )
 
 
+class TrackUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Upload
+        fields = (
+            "uuid",
+            "listen_url",
+            "size",
+            "duration",
+            "bitrate",
+            "mimetype",
+            "extension",
+        )
+
+
 class TrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     album = TrackAlbumSerializer(read_only=True)
     lyrics = serializers.SerializerMethodField()
-    is_playable = serializers.SerializerMethodField()
+    uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
-    duration = serializers.SerializerMethodField()
-    bitrate = serializers.SerializerMethodField()
-    size = serializers.SerializerMethodField()
-    mimetype = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -167,12 +177,8 @@ class TrackSerializer(serializers.ModelSerializer):
             "creation_date",
             "position",
             "lyrics",
-            "is_playable",
+            "uploads",
             "listen_url",
-            "duration",
-            "bitrate",
-            "size",
-            "mimetype",
         )
 
     def get_lyrics(self, obj):
@@ -181,35 +187,9 @@ class TrackSerializer(serializers.ModelSerializer):
     def get_listen_url(self, obj):
         return obj.listen_url
 
-    def get_is_playable(self, obj):
-        try:
-            return bool(obj.is_playable_by_actor)
-        except AttributeError:
-            return None
-
-    def get_duration(self, obj):
-        try:
-            return obj.duration
-        except AttributeError:
-            return None
-
-    def get_bitrate(self, obj):
-        try:
-            return obj.bitrate
-        except AttributeError:
-            return None
-
-    def get_size(self, obj):
-        try:
-            return obj.size
-        except AttributeError:
-            return None
-
-    def get_mimetype(self, obj):
-        try:
-            return obj.mimetype
-        except AttributeError:
-            return None
+    def get_uploads(self, obj):
+        uploads = getattr(obj, "playable_uploads", [])
+        return TrackUploadSerializer(uploads, many=True).data
 
 
 class LibraryForOwnerSerializer(serializers.ModelSerializer):

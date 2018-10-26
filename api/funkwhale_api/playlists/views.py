@@ -78,7 +78,7 @@ class PlaylistViewSet(
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(self.request.user)
-        ).annotate_playable_by_actor(music_utils.get_actor_from_request(self.request))
+        ).with_playable_plts(music_utils.get_actor_from_request(self.request))
 
     def perform_create(self, serializer):
         return serializer.save(

@@ -124,8 +124,8 @@ class ArtistQuerySet(models.QuerySet):
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
-            Track.objects.playable_by(actor)
-            .filter(artist=models.OuterRef("id"))
+            Upload.objects.playable_by(actor)
+            .filter(track__artist=models.OuterRef("id"))
             .order_by("id")
             .values("id")[:1]
         )
@@ -192,8 +192,8 @@ class AlbumQuerySet(models.QuerySet):
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
-            Track.objects.playable_by(actor)
-            .filter(album=models.OuterRef("id"))
+            Upload.objects.playable_by(actor)
+            .filter(track__album=models.OuterRef("id"))
             .order_by("id")
             .values("id")[:1]
         )
@@ -206,6 +206,15 @@ class AlbumQuerySet(models.QuerySet):
             return self.filter(tracks__in=tracks).distinct()
         else:
             return self.exclude(tracks__in=tracks).distinct()
+
+    def with_prefetched_tracks_and_playable_uploads(self, actor):
+        tracks = Track.objects.with_playable_uploads(actor)
+        return self.prefetch_related(
+            models.Prefetch(
+                'tracks',
+                queryset=tracks,
+            )
+        )
 
 
 class Album(APIModelMixin):
@@ -403,18 +412,14 @@ class TrackQuerySet(models.QuerySet):
         else:
             return self.exclude(uploads__in=files).distinct()
 
-    def annotate_duration(self):
-        first_upload = Upload.objects.filter(track=models.OuterRef("pk")).order_by("pk")
-        return self.annotate(
-            duration=models.Subquery(first_upload.values("duration")[:1])
-        )
-
-    def annotate_file_data(self):
-        first_upload = Upload.objects.filter(track=models.OuterRef("pk")).order_by("pk")
-        return self.annotate(
-            bitrate=models.Subquery(first_upload.values("bitrate")[:1]),
-            size=models.Subquery(first_upload.values("size")[:1]),
-            mimetype=models.Subquery(first_upload.values("mimetype")[:1]),
+    def with_playable_uploads(self, actor):
+        uploads = Upload.objects.playable_by(actor).select_related('track')
+        return self.prefetch_related(
+            models.Prefetch(
+                'uploads',
+                queryset=uploads,
+                to_attr='playable_uploads'
+            )
         )
 
 

@@ -93,17 +93,9 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        tracks = models.Track.objects.annotate_playable_by_actor(
+        tracks = models.Track.objects.select_related("artist").with_playable_uploads(
             utils.get_actor_from_request(self.request)
-        ).select_related("artist")
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single album, so we can add the overhead
-            # to fetch additional data
-            tracks = tracks.annotate_duration()
+        )
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs.distinct()
 
@@ -194,18 +186,10 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         if user.is_authenticated and filter_favorites == "true":
             queryset = queryset.filter(track_favorites__user=user)
 
-        queryset = queryset.annotate_playable_by_actor(
+        queryset = queryset.with_playable_uploads(
             utils.get_actor_from_request(self.request)
-        ).annotate_duration()
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single track, so we can add the overhead
-            # to fetch additional data
-            queryset = queryset.annotate_file_data()
-        return queryset.distinct()
+        )
+        return queryset
 
     @detail_route(methods=["get"])
     @transaction.non_atomic_requests

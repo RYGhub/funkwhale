@@ -51,7 +51,7 @@ class TrackFavoriteViewSet(
         queryset = queryset.filter(
             fields.privacy_level_query(self.request.user, "user__privacy_level")
         )
-        tracks = Track.objects.annotate_playable_by_actor(
+        tracks = Track.objects.with_playable_uploads(
             music_utils.get_actor_from_request(self.request)
         ).select_related("artist", "album__artist")
         queryset = queryset.prefetch_related(Prefetch("track", queryset=tracks))

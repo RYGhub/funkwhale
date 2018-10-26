@@ -39,13 +39,11 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
     ).track
     album = track.album
     request = api_request.get("/")
-    qs = album.__class__.objects.all()
+    qs = album.__class__.objects.with_prefetched_tracks_and_playable_uploads(None)
     serializer = serializers.AlbumSerializer(
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
-    expected["results"][0]["is_playable"] = True
-    expected["results"][0]["tracks"][0]["is_playable"] = True
     url = reverse("api:v1:albums-list")
     response = logged_in_api_client.get(url)
 
@@ -58,12 +56,11 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
         library__privacy_level="everyone", import_status="finished"
     ).track
     request = api_request.get("/")
-    qs = track.__class__.objects.all()
+    qs = track.__class__.objects.with_playable_uploads(None)
     serializer = serializers.TrackSerializer(
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
-    expected["results"][0]["is_playable"] = True
     url = reverse("api:v1:tracks-list")
     response = logged_in_api_client.get(url)
 

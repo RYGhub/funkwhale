@@ -549,11 +549,11 @@ def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock
 
 
 def test_clean_transcoding_cache(preferences, now, factories):
-    preferences['music__transcoding_cache_duration'] = 60
-    u1 = factories['music.UploadVersion'](
+    preferences["music__transcoding_cache_duration"] = 60
+    u1 = factories["music.UploadVersion"](
         accessed_date=now - datetime.timedelta(minutes=61)
     )
-    u2 = factories['music.UploadVersion'](
+    u2 = factories["music.UploadVersion"](
         accessed_date=now - datetime.timedelta(minutes=59)
     )
 
