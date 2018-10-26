@@ -209,12 +209,7 @@ class AlbumQuerySet(models.QuerySet):
 
     def with_prefetched_tracks_and_playable_uploads(self, actor):
         tracks = Track.objects.with_playable_uploads(actor)
-        return self.prefetch_related(
-            models.Prefetch(
-                'tracks',
-                queryset=tracks,
-            )
-        )
+        return self.prefetch_related(models.Prefetch("tracks", queryset=tracks))
 
 
 class Album(APIModelMixin):
@@ -413,13 +408,9 @@ class TrackQuerySet(models.QuerySet):
             return self.exclude(uploads__in=files).distinct()
 
     def with_playable_uploads(self, actor):
-        uploads = Upload.objects.playable_by(actor).select_related('track')
+        uploads = Upload.objects.playable_by(actor).select_related("track")
         return self.prefetch_related(
-            models.Prefetch(
-                'uploads',
-                queryset=uploads,
-                to_attr='playable_uploads'
-            )
+            models.Prefetch("uploads", queryset=uploads, to_attr="playable_uploads")
         )
 
 
@@ -763,11 +754,13 @@ class Upload(models.Model):
         # we create the version with an empty file, then
         # we'll write to it
         f = ContentFile(b"")
-        version = self.versions.create(mimetype=mimetype, bitrate=self.bitrate or 128000, size=0)
+        version = self.versions.create(
+            mimetype=mimetype, bitrate=self.bitrate or 128000, size=0
+        )
         # we keep the same name, but we update the extension
-        new_name = os.path.splitext(
-            os.path.basename(self.audio_file.name)
-        )[0] + '.{}'.format(format)
+        new_name = os.path.splitext(os.path.basename(self.audio_file.name))[
+            0
+        ] + ".{}".format(format)
         version.audio_file.save(new_name, f)
         utils.transcode_file(
             input=self.audio_file,
@@ -776,18 +769,18 @@ class Upload(models.Model):
             output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
         )
         version.size = version.audio_file.size
-        version.save(update_fields=['size'])
+        version.save(update_fields=["size"])
 
         return version
 
 
-MIMETYPE_CHOICES = [
-    (mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE
-]
+MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]
 
 
 class UploadVersion(models.Model):
-    upload = models.ForeignKey(Upload, related_name='versions', on_delete=models.CASCADE)
+    upload = models.ForeignKey(
+        Upload, related_name="versions", on_delete=models.CASCADE
+    )
     mimetype = models.CharField(max_length=50, choices=MIMETYPE_CHOICES)
     creation_date = models.DateTimeField(default=timezone.now)
     accessed_date = models.DateTimeField(null=True, blank=True)
@@ -796,7 +789,7 @@ class UploadVersion(models.Model):
     size = models.IntegerField()
 
     class Meta:
-        unique_together = ('upload', 'mimetype', 'bitrate')
+        unique_together = ("upload", "mimetype", "bitrate")
 
     @property
     def filename(self):

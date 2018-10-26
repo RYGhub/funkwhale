@@ -200,8 +200,8 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         if not upload:
             return response.Response(status=404)
 
-        format = data.get('format', 'raw')
-        if format == 'raw':
+        format = data.get("format", "raw")
+        if format == "raw":
             format = None
         return music_views.handle_serve(upload=upload, user=request.user, format=format)
 

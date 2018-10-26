@@ -206,14 +206,18 @@ def test_stream(f, db, logged_in_api_client, factories, mocker, queryset_equal_q
     playable_by.assert_called_once_with(music_models.Track.objects.all(), None)
 
 
-@pytest.mark.parametrize("format,expected", [("mp3", 'mp3'), ("raw", None)])
+@pytest.mark.parametrize("format,expected", [("mp3", "mp3"), ("raw", None)])
 def test_stream_format(format, expected, logged_in_api_client, factories, mocker):
     url = reverse("api:subsonic-stream")
-    mocked_serve = mocker.patch.object(music_views, "handle_serve", return_value=Response())
+    mocked_serve = mocker.patch.object(
+        music_views, "handle_serve", return_value=Response()
+    )
     upload = factories["music.Upload"](playable=True)
     response = logged_in_api_client.get(url, {"id": upload.track.pk, "format": format})
 
-    mocked_serve.assert_called_once_with(upload=upload, user=logged_in_api_client.user, format=expected)
+    mocked_serve.assert_called_once_with(
+        upload=upload, user=logged_in_api_client.user, format=expected
+    )
     assert response.status_code == 200
 
 
