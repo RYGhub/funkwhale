@@ -134,7 +134,7 @@ def test_import_files_skip_if_path_already_imported(factories, mocker):
     )
 
     call_command(
-        "import_files", str(library.uuid), path, async=False, interactive=False
+        "import_files", str(library.uuid), path, async_=False, interactive=False
     )
     assert library.uploads.count() == 1
 

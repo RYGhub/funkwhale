@@ -193,12 +193,17 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     @list_route(methods=["get", "post"], url_name="stream", url_path="stream")
     @find_object(music_models.Track.objects.all(), filter_playable=True)
     def stream(self, request, *args, **kwargs):
+        data = request.GET or request.POST
         track = kwargs.pop("obj")
         queryset = track.uploads.select_related("track__album__artist", "track__artist")
         upload = queryset.first()
         if not upload:
             return response.Response(status=404)
-        return music_views.handle_serve(upload=upload, user=request.user)
+
+        format = data.get("format", "raw")
+        if format == "raw":
+            format = None
+        return music_views.handle_serve(upload=upload, user=request.user, format=format)
 
     @list_route(methods=["get", "post"], url_name="star", url_path="star")
     @find_object(music_models.Track.objects.all())

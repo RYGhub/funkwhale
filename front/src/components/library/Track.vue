@@ -44,13 +44,13 @@
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
-          <a v-if="track.is_playable" :href="downloadUrl" target="_blank" class="ui button">
+          <a v-if="upload" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
             <translate>Download</translate>
           </a>
         </div>
       </div>
-      <div class="ui vertical stripe center aligned segment">
+      <div class="ui vertical stripe center aligned segment" v-if="upload">
         <h2 class="ui header"><translate>Track information</translate></h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
@@ -58,8 +58,8 @@
               <td>
                 <translate>Duration</translate>
               </td>
-              <td v-if="track.duration">
-                {{ time.parse(track.duration) }}
+              <td v-if="upload.duration">
+                {{ time.parse(upload.duration) }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -69,8 +69,8 @@
               <td>
                 <translate>Size</translate>
               </td>
-              <td v-if="track.size">
-                {{ track.size | humanSize }}
+              <td v-if="upload.size">
+                {{ upload.size | humanSize }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -80,8 +80,8 @@
               <td>
                 <translate>Bitrate</translate>
               </td>
-              <td v-if="track.bitrate">
-                {{ track.bitrate | humanSize }}/s
+              <td v-if="upload.bitrate">
+                {{ upload.bitrate | humanSize }}/s
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -91,8 +91,8 @@
               <td>
                 <translate>Type</translate>
               </td>
-              <td v-if="track.mimetype">
-                {{ track.mimetype }}
+              <td v-if="upload.extension">
+                {{ upload.extension }}
               </td>
               <td v-else>
                 <translate>N/A</translate>
@@ -195,6 +195,11 @@ export default {
         title: this.$gettext('Track')
       }
     },
+    upload () {
+      if (this.track.uploads) {
+        return this.track.uploads[0]
+      }
+    },
     wikipediaUrl () {
       return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.track.title + ' ' + this.track.artist.name)
     },
@@ -204,7 +209,7 @@ export default {
       }
     },
     downloadUrl () {
-      let u = this.$store.getters['instance/absoluteUrl'](this.track.listen_url)
+      let u = this.$store.getters['instance/absoluteUrl'](this.upload.listen_url)
       if (this.$store.state.auth.authenticated) {
         u = url.updateQueryString(u, 'jwt', encodeURI(this.$store.state.auth.token))
       }

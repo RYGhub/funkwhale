@@ -267,7 +267,6 @@ describe('store/queue', () => {
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
           { type: 'player/playing', payload: true, options: {root: true} },
-          { type: 'player/errored', payload: false, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
       })
@@ -281,7 +280,6 @@ describe('store/queue', () => {
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
           { type: 'player/playing', payload: true, options: {root: true} },
-          { type: 'player/errored', payload: false, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ]
       })
@@ -295,7 +293,6 @@ describe('store/queue', () => {
           { type: 'ended', payload: false },
           { type: 'player/currentTime', payload: 0, options: {root: true} },
           { type: 'player/playing', payload: true, options: {root: true} },
-          { type: 'player/errored', payload: false, options: {root: true} },
           { type: 'currentIndex', payload: 1 }
         ],
         expectedActions: [

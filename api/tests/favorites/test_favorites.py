@@ -35,7 +35,6 @@ def test_user_can_get_his_favorites(api_request, factories, logged_in_client, cl
             "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
         }
     ]
-    expected[0]["track"]["is_playable"] = False
     assert response.status_code == 200
     assert response.data["results"] == expected
 

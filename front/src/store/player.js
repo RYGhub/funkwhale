@@ -8,11 +8,13 @@ export default {
     maxConsecutiveErrors: 5,
     errorCount: 0,
     playing: false,
+    isLoadingAudio: false,
     volume: 0.5,
     tempVolume: 0.5,
     duration: 0,
     currentTime: 0,
     errored: false,
+    bufferProgress: 0,
     looping: 0 // 0 -> no, 1 -> on  track, 2 -> on queue
   },
   mutations: {
@@ -59,12 +61,18 @@ export default {
     playing (state, value) {
       state.playing = value
     },
+    bufferProgress (state, value) {
+      state.bufferProgress = value
+    },
     toggleLooping (state) {
       if (state.looping > 1) {
         state.looping = 0
       } else {
         state.looping += 1
       }
+    },
+    isLoadingAudio (state, value) {
+      state.isLoadingAudio = value
     }
   },
   getters: {
@@ -87,10 +95,19 @@ export default {
     incrementVolume ({commit, state}, value) {
       commit('volume', state.volume + value)
     },
-    stop (context) {
+    stop ({commit}) {
+      commit('errored', false)
+      commit('resetErrorCount')
     },
-    togglePlay ({commit, state}) {
+    togglePlay ({commit, state, dispatch}) {
       commit('playing', !state.playing)
+      if (state.errored && state.errorCount < state.maxConsecutiveErrors) {
+        setTimeout(() => {
+          if (state.playing) {
+            dispatch('queue/next', null, {root: true})
+          }
+        }, 3000)
+      }
     },
     trackListened ({commit, rootState}, track) {
       if (!rootState.auth.authenticated) {
@@ -113,7 +130,13 @@ export default {
     trackErrored ({commit, dispatch, state}) {
       commit('errored', true)
       commit('incrementErrorCount')
-      dispatch('queue/next', null, {root: true})
+      if (state.errorCount < state.maxConsecutiveErrors) {
+        setTimeout(() => {
+          if (state.playing) {
+            dispatch('queue/next', null, {root: true})
+          }
+        }, 3000)
+      }
     },
     updateProgress ({commit}, t) {
       commit('currentTime', t)

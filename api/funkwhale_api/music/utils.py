@@ -2,6 +2,7 @@ import mimetypes
 
 import magic
 import mutagen
+import pydub
 
 from funkwhale_api.common.search import normalize_query, get_query  # noqa
 
@@ -68,3 +69,10 @@ def get_actor_from_request(request):
         actor = request.user.actor
 
     return actor
+
+
+def transcode_file(input, output, input_format, output_format, **kwargs):
+    with input.open("rb"):
+        audio = pydub.AudioSegment.from_file(input, format=input_format)
+    with output.open("wb"):
+        return audio.export(output, format=output_format, **kwargs)

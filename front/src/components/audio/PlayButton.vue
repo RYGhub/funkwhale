@@ -79,10 +79,14 @@ export default {
         return true
       }
       if (this.track) {
-        return this.track.is_playable
+        return this.track.uploads && this.track.uploads.length > 0
+      } else if (this.artist) {
+        return this.albums.filter((a) => {
+          return a.is_playable === true
+        }).length > 0
       } else if (this.tracks) {
         return this.tracks.filter((t) => {
-          return t.is_playable
+          return t.uploads && t.uploads.length > 0
         }).length > 0
       }
       return false
@@ -139,7 +143,7 @@ export default {
           self.isLoading = false
         }, 250)
         return tracks.filter(e => {
-          return e.is_playable === true
+          return e.uploads && e.uploads.length > 0
         })
       })
     },

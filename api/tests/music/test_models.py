@@ -464,24 +464,6 @@ def test_library_queryset_with_follows(factories):
     assert l2._follows == [follow]
 
 
-def test_annotate_duration(factories):
-    tf = factories["music.Upload"](duration=32)
-
-    track = models.Track.objects.annotate_duration().get(pk=tf.track.pk)
-
-    assert track.duration == 32
-
-
-def test_annotate_file_data(factories):
-    tf = factories["music.Upload"](size=42, bitrate=55, mimetype="audio/ogg")
-
-    track = models.Track.objects.annotate_file_data().get(pk=tf.track.pk)
-
-    assert track.size == 42
-    assert track.bitrate == 55
-    assert track.mimetype == "audio/ogg"
-
-
 @pytest.mark.parametrize(
     "model,factory_args,namespace",
     [

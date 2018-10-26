@@ -546,3 +546,20 @@ def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock
     scan.refresh_from_db()
 
     assert scan.status == "finished"
+
+
+def test_clean_transcoding_cache(preferences, now, factories):
+    preferences["music__transcoding_cache_duration"] = 60
+    u1 = factories["music.UploadVersion"](
+        accessed_date=now - datetime.timedelta(minutes=61)
+    )
+    u2 = factories["music.UploadVersion"](
+        accessed_date=now - datetime.timedelta(minutes=59)
+    )
+
+    tasks.clean_transcoding_cache()
+
+    u2.refresh_from_db()
+
+    with pytest.raises(u1.__class__.DoesNotExist):
+        u1.refresh_from_db()

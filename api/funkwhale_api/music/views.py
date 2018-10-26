@@ -15,8 +15,9 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from taggit.models import Tag
 
-from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import permissions as common_permissions
+from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
@@ -92,17 +93,9 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        tracks = models.Track.objects.annotate_playable_by_actor(
+        tracks = models.Track.objects.select_related("artist").with_playable_uploads(
             utils.get_actor_from_request(self.request)
-        ).select_related("artist")
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single album, so we can add the overhead
-            # to fetch additional data
-            tracks = tracks.annotate_duration()
+        )
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs.distinct()
 
@@ -193,18 +186,10 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         if user.is_authenticated and filter_favorites == "true":
             queryset = queryset.filter(track_favorites__user=user)
 
-        queryset = queryset.annotate_playable_by_actor(
+        queryset = queryset.with_playable_uploads(
             utils.get_actor_from_request(self.request)
-        ).annotate_duration()
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single track, so we can add the overhead
-            # to fetch additional data
-            queryset = queryset.annotate_file_data()
-        return queryset.distinct()
+        )
+        return queryset
 
     @detail_route(methods=["get"])
     @transaction.non_atomic_requests
@@ -267,12 +252,31 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def handle_serve(upload, user):
+def should_transcode(upload, format):
+    if not preferences.get("music__transcoding_enabled"):
+        return False
+    if format is None:
+        return False
+    if format not in utils.EXTENSION_TO_MIMETYPE:
+        # format should match supported formats
+        return False
+    if upload.mimetype is None:
+        # upload should have a mimetype, otherwise we cannot transcode
+        return False
+    if upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
+        # requested format sould be different than upload mimetype, otherwise
+        # there is no need to transcode
+        return False
+    return True
+
+
+def handle_serve(upload, user, format=None):
     f = upload
     # we update the accessed_date
-    f.accessed_date = timezone.now()
-    f.save(update_fields=["accessed_date"])
-
+    now = timezone.now()
+    upload.accessed_date = now
+    upload.save(update_fields=["accessed_date"])
+    f = upload
     if f.audio_file:
         file_path = get_file_path(f.audio_file)
 
@@ -298,6 +302,14 @@ def handle_serve(upload, user):
     elif f.source and f.source.startswith("file://"):
         file_path = get_file_path(f.source.replace("file://", "", 1))
     mt = f.mimetype
+
+    if should_transcode(f, format):
+        transcoded_version = upload.get_transcoded_version(format)
+        transcoded_version.accessed_date = now
+        transcoded_version.save(update_fields=["accessed_date"])
+        f = transcoded_version
+        file_path = get_file_path(f.audio_file)
+        mt = f.mimetype
     if mt:
         response = Response(content_type=mt)
     else:
@@ -337,7 +349,8 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         if not upload:
             return Response(status=404)
 
-        return handle_serve(upload, user=request.user)
+        format = request.GET.get("to")
+        return handle_serve(upload, user=request.user, format=format)
 
 
 class UploadViewSet(

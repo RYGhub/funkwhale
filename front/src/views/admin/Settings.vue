@@ -79,6 +79,7 @@ export default {
       // somehow, extraction fails if in the return block directly
       let instanceLabel = this.$gettext('Instance information')
       let usersLabel = this.$gettext('Users')
+      let musicLabel = this.$gettext('Music')
       let playlistsLabel = this.$gettext('Playlists')
       let federationLabel = this.$gettext('Federation')
       let subsonicLabel = this.$gettext('Subsonic')
@@ -102,6 +103,14 @@ export default {
             'common__api_authentication_required',
             'users__default_permissions',
             'users__upload_quota'
+          ]
+        },
+        {
+          label: musicLabel,
+          id: 'music',
+          settings: [
+            'music__transcoding_enabled',
+            'music__transcoding_cache_duration',
           ]
         },
         {
