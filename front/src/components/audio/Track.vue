@@ -46,12 +46,17 @@ export default {
       onload: function () {
         self.$store.commit('player/isLoadingAudio', false)
         self.$store.commit('player/resetErrorCount')
+        self.$store.commit('player/errored', false)
         self.$store.commit('player/duration', self.sound.duration())
         let node = self.sound._sounds[0]._node;
         node.addEventListener('progress', () => {
           self.updateBuffer(node)
         })
-      }
+      },
+      onloaderror: function (sound, error) {
+        console.log('Error while playing:', sound, error)
+        self.$emit('errored', {sound, error})
+      },
     })
     if (this.autoplay) {
       self.$store.commit('player/isLoadingAudio', true)
@@ -73,14 +78,23 @@ export default {
       looping: state => state.player.looping
     }),
     srcs: function () {
-      // let file = this.track.files[0]
-      // if (!file) {
-      //   this.$store.dispatch('player/trackErrored')
-      //   return []
-      // }
-      let sources = [
-        {type: 'mp3', url: this.$store.getters['instance/absoluteUrl'](this.track.listen_url)}
-      ]
+      let sources = this.track.uploads.map(u => {
+        return {
+          type: u.extension,
+          url: this.$store.getters['instance/absoluteUrl'](u.listen_url),
+        }
+      })
+      // We always add a transcoded MP3 src at the end
+      // because transcoding is expensive, but we want browsers that do
+      // not support other codecs to be able to play it :)
+      sources.push({
+        type: 'mp3',
+        url: url.updateQueryString(
+          this.$store.getters['instance/absoluteUrl'](this.track.listen_url),
+          'to',
+          'mp3'
+        )
+      })
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url
         // so authentication can be checked by the backend

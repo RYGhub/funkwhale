@@ -34,8 +34,8 @@
         {{ track.album.title }}
       </router-link>
     </td>
-    <td colspan="4" v-if="track.duration">
-      {{ time.parse(track.duration) }}
+    <td colspan="4" v-if="track.uploads && track.uploads.length > 0">
+      {{ time.parse(track.uploads[0].duration) }}
     </td>
     <td colspan="4" v-else>
       <translate>N/A</translate>

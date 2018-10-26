@@ -95,10 +95,19 @@ export default {
     incrementVolume ({commit, state}, value) {
       commit('volume', state.volume + value)
     },
-    stop (context) {
+    stop ({commit}) {
+      commit('errored', false)
+      commit('resetErrorCount')
     },
-    togglePlay ({commit, state}) {
+    togglePlay ({commit, state, dispatch}) {
       commit('playing', !state.playing)
+      if (state.errored && state.errorCount < state.maxConsecutiveErrors) {
+        setTimeout(() => {
+          if (state.playing) {
+            dispatch('queue/next', null, {root: true})
+          }
+        }, 3000)
+      }
     },
     trackListened ({commit, rootState}, track) {
       if (!rootState.auth.authenticated) {
@@ -121,7 +130,13 @@ export default {
     trackErrored ({commit, dispatch, state}) {
       commit('errored', true)
       commit('incrementErrorCount')
-      dispatch('queue/next', null, {root: true})
+      if (state.errorCount < state.maxConsecutiveErrors) {
+        setTimeout(() => {
+          if (state.playing) {
+            dispatch('queue/next', null, {root: true})
+          }
+        }, 3000)
+      }
     },
     updateProgress ({commit}, t) {
       commit('currentTime', t)

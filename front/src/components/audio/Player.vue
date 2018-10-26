@@ -4,6 +4,7 @@
       <audio-track
         ref="currentAudio"
         v-if="currentTrack"
+        @errored="handleError"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
         :autoplay="$store.state.player.playing"
@@ -41,13 +42,13 @@
           </div>
         </div>
       </div>
-      <div class="progress-area" v-if="currentTrack">
+      <div class="progress-area" v-if="currentTrack && !errored">
         <div class="ui grid">
           <div class="left floated four wide column">
             <p class="timer start" @click="updateProgress(0)">{{currentTimeFormatted}}</p>
           </div>
 
-          <div class="right floated four wide column">
+          <div v-if="!isLoadingAudio" class="right floated four wide column">
             <p class="timer total">{{durationFormatted}}</p>
           </div>
         </div>
@@ -59,7 +60,18 @@
           <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
-
+      <div class="ui small warning message" v-if="currentTrack && errored">
+        <div class="header">
+          <translate>We cannot load this track</translate>
+        </div>
+        <p v-if="hasNext && playing && $store.state.player.errorCount < $store.state.player.maxConsecutiveErrors">
+          <translate>The next track will play automatically in a few seconds...</translate>
+          <i class="loading spinner icon"></i>
+        </p>
+        <p>
+          <translate>You may have a connectivity issue.</translate>
+        </p>
+      </div>
       <div class="two wide column controls ui grid">
         <a
           href
@@ -299,6 +311,10 @@ export default {
       }
       let image = this.$refs.cover
       this.ambiantColors = ColorThief.prototype.getPalette(image, 4).slice(0, 4)
+    },
+    handleError ({sound, error}) {
+      this.$store.commit('player/isLoadingAudio', false)
+      this.$store.dispatch('player/trackErrored')
     }
   },
   computed: {
@@ -310,6 +326,7 @@ export default {
       looping: state => state.player.looping,
       duration: state => state.player.duration,
       bufferProgress: state => state.player.bufferProgress,
+      errored: state => state.player.errored,
       queue: state => state.queue
     }),
     ...mapGetters({
