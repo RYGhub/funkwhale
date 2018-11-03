@@ -66,18 +66,19 @@
           :multiple="true"
           :data="uploadData"
           :drop="true"
-          accept="audio/*"
+          :extensions="supportedExtensions"
           v-model="files"
           name="audio_file"
           :thread="1"
-          @input-filter="inputFilter"
           @input-file="inputFile"
           ref="upload">
-          <i class="upload icon"></i>
+          <i class="upload icon"></i>&nbsp;
           <translate>Click to select files to upload or drag and drop files or directories</translate>
+          <br />
+          <br />
+          <i><translate :translate-params="{extensions: supportedExtensions.join(', ')}">  Supported extensions: %{ extensions }</translate></i>
         </file-upload-widget>
       </div>
-
       <table v-if="files.length > 0" class="ui single line table">
         <thead>
           <tr>
@@ -122,184 +123,213 @@
 </template>
 
 <script>
-import $ from 'jquery'
-import axios from 'axios'
-import logger from '@/logging'
-import FileUploadWidget from './FileUploadWidget'
-import LibraryFilesTable from '@/views/content/libraries/FilesTable'
-import moment from 'moment'
+import $ from "jquery";
+import axios from "axios";
+import logger from "@/logging";
+import FileUploadWidget from "./FileUploadWidget";
+import LibraryFilesTable from "@/views/content/libraries/FilesTable";
+import moment from "moment";
 
 export default {
-  props: ['library', 'defaultImportReference'],
+  props: ["library", "defaultImportReference"],
   components: {
     FileUploadWidget,
     LibraryFilesTable
   },
-  data () {
-    let importReference = this.defaultImportReference || moment().format()
-    this.$router.replace({query: {import: importReference}})
+  data() {
+    let importReference = this.defaultImportReference || moment().format();
+    this.$router.replace({ query: { import: importReference } });
     return {
       files: [],
-      currentTab: 'summary',
-      uploadUrl: '/api/v1/uploads/',
+      currentTab: "summary",
+      uploadUrl: "/api/v1/uploads/",
       importReference,
+      supportedExtensions: ["flac", "ogg", "mp3", "opus"],
       uploads: {
         pending: 0,
         finished: 0,
         skipped: 0,
         errored: 0,
-        objects: {},
+        objects: {}
       },
       processTimestamp: new Date()
-    }
+    };
   },
-  created () {
-    this.fetchStatus()
-    this.$store.commit('ui/addWebsocketEventHandler', {
-      eventName: 'import.status_updated',
-      id: 'fileUpload',
+  created() {
+    this.fetchStatus();
+    this.$store.commit("ui/addWebsocketEventHandler", {
+      eventName: "import.status_updated",
+      id: "fileUpload",
       handler: this.handleImportEvent
-    })
+    });
   },
-  destroyed () {
-    this.$store.commit('ui/removeWebsocketEventHandler', {
-      eventName: 'import.status_updated',
-      id: 'fileUpload',
-    })
+  destroyed() {
+    this.$store.commit("ui/removeWebsocketEventHandler", {
+      eventName: "import.status_updated",
+      id: "fileUpload"
+    });
   },
   methods: {
-    inputFilter (newFile, oldFile, prevent) {
-      if (newFile && !oldFile) {
-        let extension = newFile.name.split('.').pop()
-        if (['ogg', 'mp3', 'flac'].indexOf(extension) < 0) {
-          prevent()
-        }
-      }
+    inputFile(newFile, oldFile) {
+      this.$refs.upload.active = true;
     },
-    inputFile (newFile, oldFile) {
-      this.$refs.upload.active = true
+    fetchStatus() {
+      let self = this;
+      let statuses = ["pending", "errored", "skipped", "finished"];
+      statuses.forEach(status => {
+        axios
+          .get("uploads/", {
+            params: {
+              import_reference: self.importReference,
+              import_status: status,
+              page_size: 1
+            }
+          })
+          .then(response => {
+            self.uploads[status] = response.data.count;
+          });
+      });
     },
-    fetchStatus () {
-      let self = this
-      let statuses = ['pending', 'errored', 'skipped', 'finished']
-      statuses.forEach((status) => {
-        axios.get('uploads/', {params: {import_reference: self.importReference, import_status: status, page_size: 1}}).then((response) => {
-          self.uploads[status] = response.data.count
-        })
-      })
+    updateProgressBar() {
+      $(this.$el)
+        .find(".progress")
+        .progress({
+          total: this.uploads.length * 2,
+          value: this.uploadedFilesCount + this.finishedJobs
+        });
     },
-    updateProgressBar () {
-      $(this.$el).find('.progress').progress({
-        total: this.uploads.length * 2,
-        value: this.uploadedFilesCount + this.finishedJobs
-      })
-    },
-    disconnect () {
+    disconnect() {
       if (!this.bridge) {
-        return
+        return;
       }
-      this.bridge.socket.close(1000, 'goodbye', {keepClosed: true})
+      this.bridge.socket.close(1000, "goodbye", { keepClosed: true });
     },
-    openWebsocket () {
-      this.disconnect()
-      let self = this
-      let token = this.$store.state.auth.token
-      const bridge = new WebSocketBridge()
-      this.bridge = bridge
-      let url = this.$store.getters['instance/absoluteUrl'](`api/v1/activity?token=${token}`)
-      url = url.replace('http://', 'ws://')
-      url = url.replace('https://', 'wss://')
-      bridge.connect(url)
-      bridge.listen(function (event) {
-        self.handleEvent(event)
-      })
-      bridge.socket.addEventListener('open', function () {
-        console.log('Connected to WebSocket')
-      })
+    openWebsocket() {
+      this.disconnect();
+      let self = this;
+      let token = this.$store.state.auth.token;
+      const bridge = new WebSocketBridge();
+      this.bridge = bridge;
+      let url = this.$store.getters["instance/absoluteUrl"](
+        `api/v1/activity?token=${token}`
+      );
+      url = url.replace("http://", "ws://");
+      url = url.replace("https://", "wss://");
+      bridge.connect(url);
+      bridge.listen(function(event) {
+        self.handleEvent(event);
+      });
+      bridge.socket.addEventListener("open", function() {
+        console.log("Connected to WebSocket");
+      });
     },
-    handleImportEvent (event) {
-      let self = this
+    handleImportEvent(event) {
+      let self = this;
       if (event.upload.import_reference != self.importReference) {
-        return
+        return;
       }
       this.$nextTick(() => {
-        self.uploads[event.old_status] -= 1
-        self.uploads[event.new_status] += 1
-        self.uploads.objects[event.track_file.uuid] = event.track_file
-        self.triggerReload()
-      })
+        self.uploads[event.old_status] -= 1;
+        self.uploads[event.new_status] += 1;
+        self.uploads.objects[event.upload.uuid] = event.track_file;
+        self.triggerReload();
+      });
     },
-    triggerReload: _.throttle(function () {
-      this.processTimestamp = new Date()
-    }, 10000, {'leading': true})
+    triggerReload: _.throttle(
+      function() {
+        this.processTimestamp = new Date();
+      },
+      10000,
+      { leading: true }
+    )
   },
   computed: {
-    labels () {
-      let denied = this.$gettext('Upload refused, ensure the file is not too big and you have not reached your quota')
-      let server = this.$gettext('Impossible to upload this file, ensure it is not too big')
-      let network = this.$gettext('A network error occured while uploading this file')
-      let timeout = this.$gettext('Upload timeout, please try again')
+    labels() {
+      let denied = this.$gettext(
+        "Upload refused, ensure the file is not too big and you have not reached your quota"
+      );
+      let server = this.$gettext(
+        "Impossible to upload this file, ensure it is not too big"
+      );
+      let network = this.$gettext(
+        "A network error occured while uploading this file"
+      );
+      let timeout = this.$gettext("Upload timeout, please try again");
+      let extension = this.$gettext(
+        "Invalid file type, ensure you are uploading an audio file. Supported file extensions are %{ extensions }"
+      );
       return {
         tooltips: {
           denied,
           server,
           network,
-          timeout
+          timeout,
+          extension: this.$gettextInterpolate(extension, {
+            extensions: this.supportedExtensions.join(", ")
+          })
         }
-      }
+      };
     },
-    uploadedFilesCount () {
-      return this.files.filter((f) => {
-        return f.success
-      }).length
+    uploadedFilesCount() {
+      return this.files.filter(f => {
+        return f.success;
+      }).length;
     },
-    uploadingFilesCount () {
-      return this.files.filter((f) => {
-        return !f.success && !f.error
-      }).length
+    uploadingFilesCount() {
+      return this.files.filter(f => {
+        return !f.success && !f.error;
+      }).length;
     },
-    erroredFilesCount () {
-      return this.files.filter((f) => {
-        return f.error
-      }).length
+    erroredFilesCount() {
+      return this.files.filter(f => {
+        return f.error;
+      }).length;
     },
-    processableFiles () {
-      return this.uploads.pending + this.uploads.skipped + this.uploads.errored + this.uploads.finished + this.uploadedFilesCount
+    processableFiles() {
+      return (
+        this.uploads.pending +
+        this.uploads.skipped +
+        this.uploads.errored +
+        this.uploads.finished +
+        this.uploadedFilesCount
+      );
     },
-    processedFilesCount () {
-      return this.uploads.skipped + this.uploads.errored + this.uploads.finished
+    processedFilesCount() {
+      return (
+        this.uploads.skipped + this.uploads.errored + this.uploads.finished
+      );
     },
-    uploadData: function () {
+    uploadData: function() {
       return {
-        'library': this.library.uuid,
-        'import_reference': this.importReference,
-      }
+        library: this.library.uuid,
+        import_reference: this.importReference
+      };
     },
-    sortedFiles () {
+    sortedFiles() {
       // return errored files on top
-      return this.files.sort((f) => {
+      return this.files.sort(f => {
         if (f.errored) {
-          return -5
+          return -5;
         }
         if (f.success) {
-          return 5
+          return 5;
         }
-        return 0
-      })
+        return 0;
+      });
     }
   },
   watch: {
-    uploadedFilesCount () {
-      this.updateProgressBar()
+    uploadedFilesCount() {
+      this.updateProgressBar();
     },
-    finishedJobs () {
-      this.updateProgressBar()
+    finishedJobs() {
+      this.updateProgressBar();
     },
-    importReference: _.debounce(function () {
-      this.$router.replace({query: {import: this.importReference}})
+    importReference: _.debounce(function() {
+      this.$router.replace({ query: { import: this.importReference } });
     }, 500)
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
