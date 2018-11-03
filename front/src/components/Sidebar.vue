@@ -76,18 +76,16 @@
               class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate>Add content</translate></router-link>
           </div>
         </div>
-        <div class="item" v-if="showAdmin">
+        <div class="item" v-if="$store.state.auth.availablePermissions['settings']">
           <div class="header"><translate>Administration</translate></div>
           <div class="menu">
             <router-link
               class="item"
-              v-if="$store.state.auth.availablePermissions['settings']"
               :to="{path: '/manage/settings'}">
               <i class="settings icon"></i><translate>Settings</translate>
             </router-link>
             <router-link
               class="item"
-              v-if="$store.state.auth.availablePermissions['settings']"
               :to="{name: 'manage.users.users.list'}">
               <i class="users icon"></i><translate>Users</translate>
             </router-link>
@@ -184,7 +182,6 @@ export default {
       tracksChangeBuffer: null,
       isCollapsed: true,
       fetchInterval: null,
-      showAdmin: this.getShowAdmin()
     }
   },
   mounted () {
@@ -228,16 +225,6 @@ export default {
     ...mapActions({
       cleanTrack: 'queue/cleanTrack'
     }),
-    getShowAdmin () {
-      let adminPermissions = [
-        this.$store.state.auth.availablePermissions['federation'],
-        this.$store.state.auth.availablePermissions['library'],
-        this.$store.state.auth.availablePermissions['upload']
-      ]
-      return adminPermissions.filter(e => {
-        return e
-      }).length > 0
-    },
     reorder: function (event) {
       this.$store.commit('queue/reorder', {
         tracks: this.tracksChangeBuffer, oldIndex: event.oldIndex, newIndex: event.newIndex})
@@ -271,12 +258,6 @@ export default {
         this.scrollToCurrent()
       }
     },
-    '$store.state.auth.availablePermissions': {
-      handler () {
-        this.showAdmin = this.getShowAdmin()
-      },
-      deep: true
-    }
   }
 }
 </script>

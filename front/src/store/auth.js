@@ -8,7 +8,12 @@ export default {
   state: {
     authenticated: false,
     username: '',
-    availablePermissions: {},
+    availablePermissions: {
+      federation: false,
+      settings: false,
+      library: false,
+      upload: false
+    },
     profile: null,
     token: '',
     tokenData: {}
@@ -27,6 +32,7 @@ export default {
       state.tokenData = {}
       state.availablePermissions = {
         federation: false,
+        settings: false,
         library: false,
         upload: false
       }
