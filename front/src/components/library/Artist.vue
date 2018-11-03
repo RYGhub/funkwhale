@@ -94,6 +94,8 @@ export default {
       isLoadingAlbums: true,
       artist: null,
       albums: null,
+      totalTracks: 0,
+      totalAlbums: 0,
       tracks: []
     }
   },
@@ -107,12 +109,14 @@ export default {
       logger.default.debug('Fetching artist "' + this.id + '"')
       axios.get('tracks/', {params: {artist: this.id}}).then((response) => {
         self.tracks = response.data.results
+        self.totalTracks = response.data.count
       })
       axios.get('artists/' + this.id + '/').then((response) => {
         self.artist = response.data
         self.isLoading = false
         self.isLoadingAlbums = true
         axios.get('albums/', {params: {artist: self.id, ordering: '-release_date'}}).then((response) => {
+          self.totalAlbums = response.data.count
           let parsed = JSON.parse(JSON.stringify(response.data.results))
           self.albums = parsed.map((album) => {
             return backend.Album.clean(album)
@@ -128,22 +132,6 @@ export default {
       return {
         title: this.$gettext('Artist')
       }
-    },
-    totalAlbums () {
-      let trackAlbums = _.uniqBy(this.tracks, (t) => {
-        return t.album.id
-      })
-      return this.albums.length + trackAlbums.length
-    },
-    totalTracks () {
-      if (this.albums.length === 0) {
-        return 0 + this.tracks.length
-      }
-      return this.albums.map((album) => {
-        return album.tracks.length
-      }).reduce((a, b) => {
-        return a + b
-      }) + this.tracks.length
     },
     isPlayable () {
       return this.artist.albums.filter((a) => {
