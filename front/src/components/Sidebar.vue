@@ -73,9 +73,6 @@
             </a>
             <router-link
               v-if="$store.state.auth.authenticated"
-              class="item" :to="{path: '/activity'}"><i class="bell icon"></i><translate>Activity</translate></router-link>
-            <router-link
-              v-if="$store.state.auth.authenticated"
               class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate>Add content</translate></router-link>
           </div>
         </div>
