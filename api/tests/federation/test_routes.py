@@ -9,6 +9,7 @@ from funkwhale_api.federation import routes, serializers
         ({"type": "Follow"}, routes.inbox_follow),
         ({"type": "Accept"}, routes.inbox_accept),
         ({"type": "Create", "object.type": "Audio"}, routes.inbox_create_audio),
+        ({"type": "Update", "object.type": "Library"}, routes.inbox_update_library),
         ({"type": "Delete", "object.type": "Library"}, routes.inbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.inbox_delete_audio),
         ({"type": "Undo", "object.type": "Follow"}, routes.inbox_undo_follow),
@@ -29,6 +30,7 @@ def test_inbox_routes(route, handler):
         ({"type": "Accept"}, routes.outbox_accept),
         ({"type": "Follow"}, routes.outbox_follow),
         ({"type": "Create", "object.type": "Audio"}, routes.outbox_create_audio),
+        ({"type": "Update", "object.type": "Library"}, routes.outbox_update_library),
         ({"type": "Delete", "object.type": "Library"}, routes.outbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.outbox_delete_audio),
         ({"type": "Undo", "object.type": "Follow"}, routes.outbox_undo_follow),
@@ -260,6 +262,55 @@ def test_outbox_delete_library(factories):
 
     assert dict(activity["payload"]) == dict(expected)
     assert activity["actor"] == library.actor
+
+
+def test_outbox_update_library(factories):
+    library = factories["music.Library"]()
+    activity = list(routes.outbox_update_library({"library": library}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.LibrarySerializer(library).data}
+    ).data
+
+    expected["to"] = [{"type": "followers", "target": library}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == library.actor
+
+
+def test_inbox_update_library(factories):
+    activity = factories["federation.Activity"]()
+
+    library = factories["music.Library"]()
+    data = serializers.LibrarySerializer(library).data
+    data["name"] = "New name"
+    payload = {"type": "Update", "actor": library.actor.fid, "object": data}
+
+    routes.inbox_update_library(
+        payload,
+        context={"actor": library.actor, "raise_exception": True, "activity": activity},
+    )
+
+    library.refresh_from_db()
+    assert library.name == "New name"
+
+
+# def test_inbox_update_library_impostor(factories):
+#     activity = factories["federation.Activity"]()
+#     impostor = factories["federation.Actor"]()
+#     library = factories["music.Library"]()
+#     payload = {
+#         "type": "Delete",
+#         "actor": library.actor.fid,
+#         "object": {"type": "Library", "id": library.fid},
+#     }
+
+#     routes.inbox_update_library(
+#         payload,
+#         context={"actor": impostor, "raise_exception": True, "activity": activity},
+#     )
+
+#     # not deleted, should still be here
+#     library.refresh_from_db()
 
 
 def test_inbox_delete_audio(factories):

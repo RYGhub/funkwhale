@@ -1,3 +1,5 @@
+import pytest
+
 from funkwhale_api.music import models
 from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
@@ -274,3 +276,28 @@ def test_track_upload_serializer(factories):
 
     serializer = serializers.TrackUploadSerializer(upload)
     assert serializer.data == expected
+
+
+@pytest.mark.parametrize(
+    "field,before,after",
+    [
+        ("privacy_level", "me", "everyone"),
+        ("name", "Before", "After"),
+        ("description", "Before", "After"),
+    ],
+)
+def test_update_library_privacy_level_broadcasts_to_followers(
+    factories, field, before, after, mocker
+):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    library = factories["music.Library"](**{field: before})
+
+    serializer = serializers.LibraryForOwnerSerializer(
+        library, data={field: after}, partial=True
+    )
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    dispatch.assert_called_once_with(
+        {"type": "Update", "object": {"type": "Library"}}, context={"library": library}
+    )

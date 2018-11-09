@@ -476,7 +476,7 @@ def test_collection_page_serializer(factories):
 
 
 def test_music_library_serializer_to_ap(factories):
-    library = factories["music.Library"]()
+    library = factories["music.Library"](privacy_level="everyone")
     # pending, errored and skippednot included
     factories["music.Upload"](import_status="pending")
     factories["music.Upload"](import_status="errored")
@@ -488,11 +488,11 @@ def test_music_library_serializer_to_ap(factories):
             "https://w3id.org/security/v1",
             {},
         ],
+        "audience": "https://www.w3.org/ns/activitystreams#Public",
         "type": "Library",
         "id": library.fid,
         "name": library.name,
         "summary": library.description,
-        "audience": "",
         "actor": library.actor.fid,
         "totalItems": 0,
         "current": library.fid + "?page=1",

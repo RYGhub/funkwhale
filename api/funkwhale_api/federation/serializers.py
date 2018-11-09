@@ -560,7 +560,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
         r = super().to_representation(conf)
         r["audience"] = (
             "https://www.w3.org/ns/activitystreams#Public"
-            if library.privacy_level == "public"
+            if library.privacy_level == "everyone"
             else ""
         )
         r["followers"] = library.followers_url
