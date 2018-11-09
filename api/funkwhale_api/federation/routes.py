@@ -82,7 +82,7 @@ def inbox_undo_follow(payload, context):
     serializer = serializers.UndoFollowSerializer(data=payload, context=context)
     if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
         logger.debug(
-            "Discarding invalid follow undo from {}: %s",
+            "Discarding invalid follow undo from %s: %s",
             context["actor"].fid,
             serializer.errors,
         )
