@@ -119,20 +119,25 @@ export default {
 
       return axios.get('users/users/me/').then((response) => {
         logger.default.info('Successfully fetched user profile')
-        let data = response.data
-        commit('authenticated', true)
-        commit('profile', data)
-        commit('username', data.username)
+        dispatch('updateProfile', response.data)
         dispatch('ui/fetchUnreadNotifications', null, { root: true })
         dispatch('favorites/fetch', null, { root: true })
         dispatch('playlists/fetchOwn', null, { root: true })
-        Object.keys(data.permissions).forEach(function (key) {
-          // this makes it easier to check for permissions in templates
-          commit('permission', {key, status: data.permissions[String(key)]})
-        })
         return response.data
       }, (response) => {
         logger.default.info('Error while fetching user profile')
+      })
+    },
+    updateProfile({ commit }, data) {
+      commit("authenticated", true)
+      commit("profile", data)
+      commit("username", data.username)
+      Object.keys(data.permissions).forEach(function(key) {
+        // this makes it easier to check for permissions in templates
+        commit("permission", {
+          key,
+          status: data.permissions[String(key)]
+        })
       })
     },
     refreshToken ({commit, dispatch, state}) {

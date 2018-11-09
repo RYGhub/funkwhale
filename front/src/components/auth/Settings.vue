@@ -170,6 +170,9 @@ export default {
       return axios.patch(url, payload).then(response => {
         logger.default.info('Updated settings successfully')
         self.settings.success = true
+        return axios.get('users/users/me/').then((response) => {
+          self.$store.dispatch('auth/updateProfile', response.data)
+        })
       }, error => {
         logger.default.error('Error while updating settings')
         self.isLoading = false
