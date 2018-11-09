@@ -159,3 +159,34 @@ class ActionSerializer(serializers.Serializer):
             "result": result,
         }
         return payload
+
+
+def track_fields_for_update(*fields):
+    """
+    Apply this decorator to serializer to call function when specific values
+    are updated on an object:
+
+    .. code-block:: python
+
+        @track_fields_for_update('privacy_level')
+        class LibrarySerializer(serializers.ModelSerializer):
+            def on_updated_privacy_level(self, obj, old_value, new_value):
+                print('Do someting')
+    """
+
+    def decorator(serializer_class):
+        original_update = serializer_class.update
+
+        def new_update(self, obj, validated_data):
+            tracked_fields_before = {f: getattr(obj, f) for f in fields}
+            obj = original_update(self, obj, validated_data)
+            tracked_fields_after = {f: getattr(obj, f) for f in fields}
+
+            if tracked_fields_before != tracked_fields_after:
+                self.on_updated_fields(obj, tracked_fields_before, tracked_fields_after)
+            return obj
+
+        serializer_class.update = new_update
+        return serializer_class
+
+    return decorator

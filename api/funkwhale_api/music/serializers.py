@@ -192,6 +192,7 @@ class TrackSerializer(serializers.ModelSerializer):
         return TrackUploadSerializer(uploads, many=True).data
 
 
+@common_serializers.track_fields_for_update("name", "description", "privacy_level")
 class LibraryForOwnerSerializer(serializers.ModelSerializer):
     uploads_count = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
@@ -215,6 +216,11 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
 
     def get_size(self, o):
         return getattr(o, "_size", 0)
+
+    def on_updated_fields(self, obj, before, after):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Library"}}, context={"library": obj}
+        )
 
 
 class UploadSerializer(serializers.ModelSerializer):

@@ -134,3 +134,32 @@ def test_action_serializers_can_require_filter(factories):
 
     assert serializer.is_valid(raise_exception=True) is True
     assert list(serializer.validated_data["objects"]) == [user1]
+
+
+def test_track_fields_for_update(mocker):
+    @serializers.track_fields_for_update("field1", "field2")
+    class S(serializers.serializers.Serializer):
+        field1 = serializers.serializers.CharField()
+        field2 = serializers.serializers.CharField()
+
+        def update(self, obj, validated_data):
+            for key, value in validated_data.items():
+                setattr(obj, key, value)
+            return obj
+
+        on_updated_fields = mocker.stub()
+
+    class Obj(object):
+        field1 = "value1"
+        field2 = "value2"
+
+    obj = Obj()
+    serializer = S(obj, data={"field1": "newvalue1", "field2": "newvalue2"})
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    serializer.on_updated_fields.assert_called_once_with(
+        obj,
+        {"field1": "value1", "field2": "value2"},
+        {"field1": "newvalue1", "field2": "newvalue2"},
+    )
