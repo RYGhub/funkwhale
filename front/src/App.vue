@@ -25,64 +25,17 @@
       <service-messages v-if="messages.length > 0" />
       <router-view :key="$route.fullPath"></router-view>
       <div class="ui fitted divider"></div>
-      <div id="footer" class="ui vertical footer segment">
-        <div class="ui container">
-          <div class="ui stackable equal height stackable grid">
-            <div class="three wide column">
-              <h4 v-translate class="ui header">Links</h4>
-              <div class="ui link list">
-                <router-link class="item" to="/about">
-                  <translate>About this instance</translate>
-                </router-link>
-                <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
-                <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
-                <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank">
-                  <translate :translate-params="{version: version}" v-if="version">Source code (%{version})</translate>
-                  <translate v-else>Source code</translate>
-                </a>
-                <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
-                <a @click="switchInstance" class="item" >
-                  <translate>Use another instance</translate>
-                  <template v-if="$store.state.instance.instanceUrl !== '/'">
-                    <br>
-                    ({{ $store.state.instance.instanceUrl }})
-                  </template>
-                </a>
-              </div>
-            </div>
-            <div class="ten wide column">
-              <h4 v-translate class="ui header">About Funkwhale</h4>
-              <p>
-                <translate>Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!</translate>
-              </p>
-              <p>
-                <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
-              </p>
-            </div>
-            <div class="three wide column">
-              <h4 v-translate class="ui header">Options</h4>
-              <div class="ui form">
-                <div class="ui field">
-                  <label><translate>Change language</translate></label>
-                  <select class="ui dropdown" v-model="$language.current">
-                    <option v-for="(language, key) in $language.available" :value="key">{{ language }}</option>
-                  </select>
-                </div>
-              </div>
-              <br>
-              <a target="_blank" href="https://translate.funkwhale.audio/engage/funkwhale/">
-                <translate>Help us translate Funkwhale</translate>
-              </a>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      <app-footer :version="version" @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"></app-footer>
       <raven
         v-if="$store.state.instance.settings.raven.front_enabled.value"
         :dsn="$store.state.instance.settings.raven.front_dsn.value">
       </raven>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+      <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
+       <GlobalEvents
+        @keydown.h.exact="showShortcutsModal = !showShortcutsModal"
+        />
+
     </template>
   </div>
 </template>
@@ -92,29 +45,35 @@ import axios from 'axios'
 import _ from 'lodash'
 import {mapState} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
-
+import GlobalEvents from '@/components/utils/global-events'
 
 import translations from '@/translations'
 
 import Sidebar from '@/components/Sidebar'
+import AppFooter from '@/components/Footer'
 import Raven from '@/components/Raven'
 import ServiceMessages from '@/components/ServiceMessages'
 
 import PlaylistModal from '@/components/playlists/PlaylistModal'
+import ShortcutsModal from '@/components/ShortcutsModal'
 
 export default {
   name: 'app',
   components: {
     Sidebar,
+    AppFooter,
     Raven,
     PlaylistModal,
+    ShortcutsModal,
+    GlobalEvents,
     ServiceMessages
   },
   data () {
     return {
       bridge: null,
       nodeinfo: null,
-      instanceUrl: null
+      instanceUrl: null,
+      showShortcutsModal: false,
     }
   },
   created () {
@@ -409,5 +368,11 @@ button.reset {
     /* Corrects inability to style clickable `input` types in iOS */
   -webkit-appearance: none;
   text-align: inherit;
+}
+
+.ui.table > caption {
+  font-weight: bold;
+  padding: 0.5em;
+  text-align: left;
 }
 </style>
