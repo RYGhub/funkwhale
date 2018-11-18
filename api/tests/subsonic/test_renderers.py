@@ -1,9 +1,54 @@
 import json
+import pytest
 import xml.etree.ElementTree as ET
 
 import funkwhale_api
 
 from funkwhale_api.subsonic import renderers
+
+
+@pytest.mark.parametrize(
+    "data,expected",
+    [
+        (
+            {"hello": "world"},
+            {
+                "status": "ok",
+                "version": "1.16.0",
+                "type": "funkwhale",
+                "funkwhaleVersion": funkwhale_api.__version__,
+                "hello": "world",
+            },
+        ),
+        (
+            {
+                "hello": "world",
+                "error": {"code": 10, "message": "something went wrong"},
+            },
+            {
+                "status": "failed",
+                "version": "1.16.0",
+                "type": "funkwhale",
+                "funkwhaleVersion": funkwhale_api.__version__,
+                "hello": "world",
+                "error": {"code": 10, "message": "something went wrong"},
+            },
+        ),
+        (
+            {"hello": "world", "detail": "something went wrong"},
+            {
+                "status": "failed",
+                "version": "1.16.0",
+                "type": "funkwhale",
+                "funkwhaleVersion": funkwhale_api.__version__,
+                "hello": "world",
+                "error": {"code": 0, "message": "something went wrong"},
+            },
+        ),
+    ],
+)
+def test_structure_payload(data, expected):
+    assert renderers.structure_payload(data) == expected
 
 
 def test_json_renderer():
@@ -32,7 +77,8 @@ def test_xml_renderer_dict_to_xml():
 
 def test_xml_renderer():
     payload = {"hello": "world"}
-    expected = b'<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response hello="world" status="ok" version="1.16.0" xmlns="http://subsonic.org/restapi" />'  # noqa
+    expected = '<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response funkwhaleVersion="{}" hello="world" status="ok" type="funkwhale" version="1.16.0" xmlns="http://subsonic.org/restapi" />'  # noqa
+    expected = expected.format(funkwhale_api.__version__).encode()
 
     renderer = renderers.SubsonicXMLRenderer()
     rendered = renderer.render(payload)

@@ -43,6 +43,20 @@ def test_exception_wrong_credentials(f, db, api_client):
     assert response.data == expected
 
 
+@pytest.mark.parametrize("f", ["json"])
+def test_exception_missing_credentials(f, db, api_client):
+    url = reverse("api:subsonic-get-artists")
+    response = api_client.get(url)
+
+    expected = {
+        "status": "failed",
+        "error": {"code": 10, "message": "Required parameter is missing."},
+    }
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
 def test_disabled_subsonic(preferences, api_client):
     preferences["subsonic__enabled"] = False
     url = reverse("api:subsonic-ping")
