@@ -5,23 +5,27 @@ from rest_framework import renderers
 import funkwhale_api
 
 
+def structure_payload(data):
+    payload = {
+        "status": "ok",
+        "version": "1.16.0",
+        "type": "funkwhale",
+        "funkwhaleVersion": funkwhale_api.__version__,
+    }
+    payload.update(data)
+    if "detail" in payload:
+        payload["error"] = {"code": 0, "message": payload.pop("detail")}
+    if "error" in payload:
+        payload["status"] = "failed"
+    return payload
+
+
 class SubsonicJSONRenderer(renderers.JSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if not data:
             # when stream view is called, we don't have any data
             return super().render(data, accepted_media_type, renderer_context)
-        final = {
-            "subsonic-response": {
-                "status": "ok",
-                "version": "1.16.0",
-                "type": "funkwhale",
-                "funkwhaleVersion": funkwhale_api.__version__,
-            }
-        }
-        final["subsonic-response"].update(data)
-        if "error" in final:
-            # an error was returned
-            final["subsonic-response"]["status"] = "failed"
+        final = {"subsonic-response": structure_payload(data)}
         return super().render(final, accepted_media_type, renderer_context)
 
 
@@ -32,15 +36,8 @@ class SubsonicXMLRenderer(renderers.JSONRenderer):
         if not data:
             # when stream view is called, we don't have any data
             return super().render(data, accepted_media_type, renderer_context)
-        final = {
-            "xmlns": "http://subsonic.org/restapi",
-            "status": "ok",
-            "version": "1.16.0",
-        }
-        final.update(data)
-        if "error" in final:
-            # an error was returned
-            final["status"] = "failed"
+        final = structure_payload(data)
+        final["xmlns"] = "http://subsonic.org/restapi"
         tree = dict_to_xml_tree("subsonic-response", final)
         return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(
             tree, encoding="utf-8"

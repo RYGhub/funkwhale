@@ -97,7 +97,10 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     def handle_exception(self, exc):
         # subsonic API sends 200 status code with custom error
         # codes in the payload
-        mapping = {exceptions.AuthenticationFailed: (40, "Wrong username or password.")}
+        mapping = {
+            exceptions.AuthenticationFailed: (40, "Wrong username or password."),
+            exceptions.NotAuthenticated: (10, "Required parameter is missing."),
+        }
         payload = {"status": "failed"}
         if exc.__class__ in mapping:
             code, message = mapping[exc.__class__]
