@@ -167,8 +167,7 @@ def test_audio_track_mime_type(extention, mimetype, factories):
 def test_upload_file_name(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    upload = factories["music.Upload"](audio_file__from_path=path)
-
+    upload = factories["music.Upload"](audio_file__from_path=path, mimetype=None)
     assert upload.filename == upload.track.full_name + ".mp3"
 
 
@@ -484,3 +483,18 @@ def test_fid_is_populated(factories, model, factory_args, namespace):
     assert instance.fid == federation_utils.full_url(
         reverse(namespace, kwargs={"uuid": instance.uuid})
     )
+
+
+@pytest.mark.parametrize(
+    "factory_args,expected",
+    [
+        ({"audio_file__filename": "test.mp3", "mimetype": None}, "mp3"),
+        ({"mimetype": "audio/mpeg"}, "mp3"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/mpeg"}, "mp3"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/flac"}, "flac"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/x-flac"}, "flac"),
+    ],
+)
+def test_upload_extension(factory_args, factories, expected):
+    upload = factories["music.Upload"].build(**factory_args)
+    assert upload.extension == expected

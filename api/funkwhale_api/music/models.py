@@ -688,6 +688,10 @@ class Upload(models.Model):
 
     @property
     def extension(self):
+        try:
+            return utils.MIMETYPE_TO_EXTENSION[self.mimetype]
+        except KeyError:
+            pass
         if not self.audio_file:
             return
         return os.path.splitext(self.audio_file.name)[-1].replace(".", "", 1)
