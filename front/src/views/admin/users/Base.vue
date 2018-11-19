@@ -1,13 +1,13 @@
 <template>
   <div class="main pusher"  v-title="labels.manageUsers">
-    <div class="ui secondary pointing menu">
+    <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
         :to="{name: 'manage.users.users.list'}"><translate>Users</translate></router-link>
       <router-link
         class="ui item"
         :to="{name: 'manage.users.invitations.list'}"><translate>Invitations</translate></router-link>
-    </div>
+    </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
@@ -15,9 +15,10 @@
 <script>
 export default {
   computed: {
-    labels () {
+    labels() {
       return {
-        manageUsers: this.$gettext('Manage users')
+        manageUsers: this.$gettext("Manage users"),
+        secondaryMenu: this.$gettext("Secondary menu")
       }
     }
   }

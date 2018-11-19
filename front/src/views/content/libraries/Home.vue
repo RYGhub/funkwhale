@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical aligned stripe segment">
+  <section class="ui vertical aligned stripe segment">
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
       <div class="ui text loader"><translate>Loading Libraries...</translate></div>
     </div>
@@ -24,24 +24,24 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-import axios from 'axios'
-import LibraryForm from './Form'
-import LibraryCard from './Card'
-import Quota from './Quota'
+import axios from "axios"
+import LibraryForm from "./Form"
+import LibraryCard from "./Card"
+import Quota from "./Quota"
 
 export default {
-  data () {
+  data() {
     return {
       isLoading: false,
       hiddenForm: true,
       libraries: []
     }
   },
-  created () {
+  created() {
     this.fetch()
   },
   components: {
@@ -50,10 +50,10 @@ export default {
     Quota
   },
   methods: {
-    fetch () {
+    fetch() {
       this.isLoading = true
       let self = this
-      axios.get('libraries/').then((response) => {
+      axios.get("libraries/").then(response => {
         self.isLoading = false
         self.libraries = response.data.results
         if (self.libraries.length === 0) {
@@ -61,7 +61,7 @@ export default {
         }
       })
     },
-    libraryCreated (library) {
+    libraryCreated(library) {
       this.hiddenForm = true
       this.libraries.unshift(library)
     }

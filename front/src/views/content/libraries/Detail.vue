@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical aligned stripe segment">
+  <section class="ui vertical aligned stripe segment">
     <div v-if="isLoadingLibrary" :class="['ui', {'active': isLoadingLibrary}, 'inverted', 'dimmer']">
       <div class="ui text loader"><translate>Loading library data...</translate></div>
     </div>
@@ -64,15 +64,15 @@
         <library-form :library="library" @updated="libraryUpdated" @deleted="libraryDeleted" />
       </div>
     </detail-area>
-  </div>
+  </section>
 </template>
 
 <script>
-import axios from 'axios'
-import DetailMixin from './DetailMixin'
-import DetailArea from './DetailArea'
-import LibraryForm from './Form'
-import LibraryFilesTable from './FilesTable'
+import axios from "axios"
+import DetailMixin from "./DetailMixin"
+import DetailArea from "./DetailArea"
+import LibraryForm from "./Form"
+import LibraryFilesTable from "./FilesTable"
 
 export default {
   mixins: [DetailMixin],
@@ -81,46 +81,48 @@ export default {
     LibraryForm,
     LibraryFilesTable
   },
-  data () {
+  data() {
     return {
-      currentTab: 'follows',
+      currentTab: "follows",
       isLoadingFollows: false,
       follows: null
     }
   },
-  created () {
+  created() {
     this.fetchFollows()
   },
   methods: {
-    libraryUpdated () {
+    libraryUpdated() {
       this.hiddenForm = true
       this.fetch()
     },
-    libraryDeleted () {
+    libraryDeleted() {
       this.$router.push({
-        name: 'content.libraries.index'
+        name: "content.libraries.index"
       })
     },
-    fetchFollows () {
+    fetchFollows() {
       let self = this
       self.isLoadingLibrary = true
-      axios.get(`libraries/${this.id}/follows/`).then((response) => {
+      axios.get(`libraries/${this.id}/follows/`).then(response => {
         self.follows = response.data
         self.isLoadingFollows = false
       })
     },
-    updateApproved (follow, value) {
+    updateApproved(follow, value) {
       let self = this
       let action
       if (value) {
-        action = 'accept'
+        action = "accept"
       } else {
-        action = 'reject'
+        action = "reject"
       }
-      axios.post(`federation/follows/library/${follow.uuid}/${action}/`).then((response) => {
-        follow.isLoading = false
-        follow.approved = value
-      })
+      axios
+        .post(`federation/follows/library/${follow.uuid}/${action}/`)
+        .then(response => {
+          follow.isLoading = false
+          follow.approved = value
+        })
     }
   }
 }

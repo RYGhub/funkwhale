@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
-    <div class="ui vertical center aligned stripe segment">
+  <main class="main pusher" v-title="labels.title">
+    <section class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
           <translate>Welcome on Funkwhale</translate>
@@ -15,8 +15,8 @@
           <i class="right arrow icon"></i>
         </router-link>
       </div>
-    </div>
-    <div class="ui vertical stripe segment">
+    </section>
+    <section class="ui vertical stripe segment">
       <div class="ui middle aligned stackable text container">
         <div class="ui grid">
           <div class="row">
@@ -136,22 +136,21 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-
 export default {
-  data () {
+  data() {
     return {
-      musicbrainzUrl: 'https://musicbrainz.org/'
+      musicbrainzUrl: "https://musicbrainz.org/"
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Welcome')
+        title: this.$gettext("Welcome")
       }
     }
   }

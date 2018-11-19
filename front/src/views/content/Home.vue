@@ -1,5 +1,5 @@
 <template>
-  <div class="ui vertical aligned stripe segment" v-title="labels.title">
+  <section class="ui vertical aligned stripe segment" v-title="labels.title">
     <div class="ui text container">
       <h1>{{ labels.title }}</h1>
       <p><translate>We offer various way to grab new content and make it available here.</translate></p>
@@ -22,21 +22,24 @@
       </div>
 
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-import {humanSize} from '@/filters'
+import { humanSize } from "@/filters"
 
 export default {
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Add and manage content')
+        title: this.$gettext("Add and manage content")
       }
     },
-    defaultQuota () {
-      let quota = this.$store.state.instance.settings.users.upload_quota.value * 1000 * 1000
+    defaultQuota() {
+      let quota =
+        this.$store.state.instance.settings.users.upload_quota.value *
+        1000 *
+        1000
       return humanSize(quota)
     }
   }

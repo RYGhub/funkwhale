@@ -1,6 +1,6 @@
 <template>
-  <div v-title="labels.title">
-    <div class="ui vertical stripe segment">
+  <main v-title="labels.title">
+    <section class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
           <track-widget :url="'history/listenings/'" :filters="{scope: 'user', ordering: '-creation_date'}">
@@ -26,23 +26,23 @@
           </album-widget>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import Search from '@/components/audio/Search'
-import logger from '@/logging'
-import ArtistCard from '@/components/audio/artist/Card'
-import TrackWidget from '@/components/audio/track/Widget'
-import AlbumWidget from '@/components/audio/album/Widget'
-import PlaylistWidget from '@/components/playlists/Widget'
+import axios from "axios"
+import Search from "@/components/audio/Search"
+import logger from "@/logging"
+import ArtistCard from "@/components/audio/artist/Card"
+import TrackWidget from "@/components/audio/track/Widget"
+import AlbumWidget from "@/components/audio/album/Widget"
+import PlaylistWidget from "@/components/playlists/Widget"
 
-const ARTISTS_URL = 'artists/'
+const ARTISTS_URL = "artists/"
 
 export default {
-  name: 'library',
+  name: "library",
   components: {
     Search,
     ArtistCard,
@@ -50,35 +50,35 @@ export default {
     AlbumWidget,
     PlaylistWidget
   },
-  data () {
+  data() {
     return {
       artists: [],
       isLoadingArtists: false
     }
   },
-  created () {
+  created() {
     this.fetchArtists()
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Home')
+        title: this.$gettext("Home")
       }
     }
   },
   methods: {
-    fetchArtists () {
+    fetchArtists() {
       var self = this
       this.isLoadingArtists = true
       let params = {
-        ordering: '-creation_date',
+        ordering: "-creation_date",
         playable: true
       }
       let url = ARTISTS_URL
-      logger.default.time('Loading latest artists')
-      axios.get(url, {params: params}).then((response) => {
+      logger.default.time("Loading latest artists")
+      axios.get(url, { params: params }).then(response => {
         self.artists = response.data.results
-        logger.default.timeEnd('Loading latest artists')
+        logger.default.timeEnd("Loading latest artists")
         self.isLoadingArtists = false
       })
     }

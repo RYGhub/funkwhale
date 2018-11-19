@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
-    <div class="ui vertical aligned stripe segment">
+  <main class="main pusher" v-title="labels.title">
+    <section class="ui vertical aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader"><translate>Loading notifications...</translate></div>
       </div>
@@ -27,19 +27,19 @@
           <translate>We don't have any notification to display!</translate>
         </p>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import {mapState} from 'vuex'
-import axios from 'axios'
-import logger from '@/logging'
+import { mapState } from "vuex"
+import axios from "axios"
+import logger from "@/logging"
 
-import NotificationRow from '@/components/notifications/NotificationRow'
+import NotificationRow from "@/components/notifications/NotificationRow"
 
 export default {
-  data () {
+  data() {
     return {
       isLoading: false,
       notifications: null,
@@ -51,64 +51,63 @@ export default {
   components: {
     NotificationRow
   },
-  created () {
+  created() {
     this.fetch(this.filters)
-    this.$store.commit('ui/addWebsocketEventHandler', {
-      eventName: 'inbox.item_added',
-      id: 'notificationPage',
+    this.$store.commit("ui/addWebsocketEventHandler", {
+      eventName: "inbox.item_added",
+      id: "notificationPage",
       handler: this.handleNewNotification
     })
   },
-  destroyed () {
-    this.$store.commit('ui/removeWebsocketEventHandler', {
-      eventName: 'inbox.item_added',
-      id: 'notificationPage',
+  destroyed() {
+    this.$store.commit("ui/removeWebsocketEventHandler", {
+      eventName: "inbox.item_added",
+      id: "notificationPage"
     })
   },
   computed: {
     ...mapState({
       events: state => state.instance.events
     }),
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Notifications'),
+        title: this.$gettext("Notifications")
       }
     }
   },
   methods: {
-    handleNewNotification (event) {
+    handleNewNotification(event) {
       this.notifications.results.unshift(event.item)
     },
-    fetch (params) {
+    fetch(params) {
       this.isLoading = true
       let self = this
-      axios.get('federation/inbox/', {params: params}).then((response) => {
+      axios.get("federation/inbox/", { params: params }).then(response => {
         self.isLoading = false
         self.notifications = response.data
       })
     },
-    markAllAsRead () {
+    markAllAsRead() {
       let self = this
       let before = this.notifications.results[0].id
       let payload = {
-        action: 'read',
-        objects: 'all',
+        action: "read",
+        objects: "all",
         filters: {
           is_read: false,
           before
         }
       }
-      axios.post('federation/inbox/action/', payload).then((response) => {
-        self.$store.commit('ui/notifications', {type: 'inbox', count: 0})
+      axios.post("federation/inbox/action/", payload).then(response => {
+        self.$store.commit("ui/notifications", { type: "inbox", count: 0 })
         self.notifications.results.forEach(n => {
           n.is_read = true
         })
-
       })
-    },
+    }
   },
   watch: {
-    'filters.is_read' () {
+    "filters.is_read"() {
       this.fetch(this.filters)
     }
   }

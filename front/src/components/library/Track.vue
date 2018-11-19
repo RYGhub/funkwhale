@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <main>
     <div v-if="isLoadingTrack" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
-      <div :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="track.title">
+      <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="track.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted music orange icon"></i>
@@ -49,8 +49,8 @@
             <translate>Download</translate>
           </a>
         </div>
-      </div>
-      <div class="ui vertical stripe center aligned segment" v-if="upload">
+      </section>
+      <section class="ui vertical stripe center aligned segment" v-if="upload">
         <h2 class="ui header"><translate>Track information</translate></h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
@@ -100,8 +100,8 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="ui vertical stripe center aligned segment">
+      </section>
+      <section class="ui vertical stripe center aligned segment">
         <h2>
           <translate>Lyrics</translate>
         </h2>
@@ -117,41 +117,40 @@
             <translate>Search on lyrics.wikia.com</translate>
           </a>
         </template>
-      </div>
-      <div class="ui vertical stripe segment">
+      </section>
+      <section class="ui vertical stripe segment">
         <h2>
           <translate>User libraries</translate>
         </h2>
         <library-widget :url="'tracks/' + id + '/libraries/'">
           <translate slot="subtitle">This track is present in the following libraries:</translate>
         </library-widget>
-      </div>
+      </section>
     </template>
-  </div>
+  </main>
 </template>
 
 <script>
+import time from "@/utils/time"
+import axios from "axios"
+import url from "@/utils/url"
+import logger from "@/logging"
+import PlayButton from "@/components/audio/PlayButton"
+import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
+import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
+import LibraryWidget from "@/components/federation/LibraryWidget"
 
-import time from '@/utils/time'
-import axios from 'axios'
-import url from '@/utils/url'
-import logger from '@/logging'
-import PlayButton from '@/components/audio/PlayButton'
-import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
-import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
-import LibraryWidget from '@/components/federation/LibraryWidget'
-
-const FETCH_URL = 'tracks/'
+const FETCH_URL = "tracks/"
 
 export default {
-  props: ['id'],
+  props: ["id"],
   components: {
     PlayButton,
     TrackPlaylistIcon,
     TrackFavoriteIcon,
     LibraryWidget
   },
-  data () {
+  data() {
     return {
       time,
       isLoadingTrack: true,
@@ -160,78 +159,94 @@ export default {
       lyrics: null
     }
   },
-  created () {
+  created() {
     this.fetchData()
     this.fetchLyrics()
   },
   methods: {
-    fetchData () {
+    fetchData() {
       var self = this
       this.isLoadingTrack = true
-      let url = FETCH_URL + this.id + '/'
+      let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching track "' + this.id + '"')
-      axios.get(url).then((response) => {
+      axios.get(url).then(response => {
         self.track = response.data
         self.isLoadingTrack = false
       })
     },
-    fetchLyrics () {
+    fetchLyrics() {
       var self = this
       this.isLoadingLyrics = true
-      let url = FETCH_URL + this.id + '/lyrics/'
+      let url = FETCH_URL + this.id + "/lyrics/"
       logger.default.debug('Fetching lyrics for track "' + this.id + '"')
-      axios.get(url).then((response) => {
-        self.lyrics = response.data
-        self.isLoadingLyrics = false
-      }, (response) => {
-        console.error('No lyrics available')
-        self.isLoadingLyrics = false
-      })
+      axios.get(url).then(
+        response => {
+          self.lyrics = response.data
+          self.isLoadingLyrics = false
+        },
+        response => {
+          console.error("No lyrics available")
+          self.isLoadingLyrics = false
+        }
+      )
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Track')
+        title: this.$gettext("Track")
       }
     },
-    upload () {
+    upload() {
       if (this.track.uploads) {
         return this.track.uploads[0]
       }
     },
-    wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURI(this.track.title + ' ' + this.track.artist.name)
+    wikipediaUrl() {
+      return (
+        "https://en.wikipedia.org/w/index.php?search=" +
+        encodeURI(this.track.title + " " + this.track.artist.name)
+      )
     },
-    musicbrainzUrl () {
+    musicbrainzUrl() {
       if (this.track.mbid) {
-        return 'https://musicbrainz.org/recording/' + this.track.mbid
+        return "https://musicbrainz.org/recording/" + this.track.mbid
       }
     },
-    downloadUrl () {
-      let u = this.$store.getters['instance/absoluteUrl'](this.upload.listen_url)
+    downloadUrl() {
+      let u = this.$store.getters["instance/absoluteUrl"](
+        this.upload.listen_url
+      )
       if (this.$store.state.auth.authenticated) {
-        u = url.updateQueryString(u, 'jwt', encodeURI(this.$store.state.auth.token))
+        u = url.updateQueryString(
+          u,
+          "jwt",
+          encodeURI(this.$store.state.auth.token)
+        )
       }
       return u
     },
-    lyricsSearchUrl () {
-      let base = 'http://lyrics.wikia.com/wiki/Special:Search?query='
-      let query = this.track.artist.name + ' ' + this.track.title
+    lyricsSearchUrl() {
+      let base = "http://lyrics.wikia.com/wiki/Special:Search?query="
+      let query = this.track.artist.name + " " + this.track.title
       return base + encodeURI(query)
     },
-    cover () {
+    cover() {
       return null
     },
-    headerStyle () {
+    headerStyle() {
       if (!this.cover) {
-        return ''
+        return ""
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover) + ')'
+      return (
+        "background-image: url(" +
+        this.$store.getters["instance/absoluteUrl"](this.cover) +
+        ")"
+      )
     }
   },
   watch: {
-    id () {
+    id() {
       this.fetchData()
     }
   }
