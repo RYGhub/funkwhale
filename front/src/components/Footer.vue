@@ -1,8 +1,8 @@
 <template>
-  <footer id="footer" class="ui vertical footer segment">
+  <footer id="footer" role="contentinfo" class="ui vertical footer segment">
     <div class="ui container">
       <div class="ui stackable equal height stackable grid">
-        <div class="four wide column">
+        <section class="four wide column">
           <h4 v-translate class="ui header">
             <translate :translate-params="{instanceName: instanceHostname}" >About %{instanceName}</translate>
           </h4>
@@ -25,24 +25,24 @@
               </select>
             </div>
           </div>
-        </div>
-        <div class="four wide column">
+        </section>
+        <section class="four wide column">
           <h4 v-translate class="ui header">Using Funkwhale</h4>
           <div class="ui link list">
             <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
             <a href="https://docs.funkwhale.audio/users/apps.html" class="item" target="_blank"><translate>Mobile and desktop apps</translate></a>
             <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate>Keyboard shortcuts</translate></div>
           </div>
-        </div>
-        <div class="four wide column">
+        </section>
+        <section class="four wide column">
           <h4 v-translate class="ui header">Getting help</h4>
           <div class="ui link list">
             <a href="https://socialhub.network/c/projects/funkwhale" class="item" target="_blank"><translate>Support forum</translate></a>
             <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate>Chat room</translate></a>
             <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
           </div>
-        </div>
-        <div class="four wide column">
+        </section>
+        <section class="four wide column">
           <h4 v-translate class="ui header">About Funkwhale</h4>
           <div class="ui link list">
             <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
@@ -53,45 +53,51 @@
           <p>
             <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
           </p>
-        </div>
+        </section>
       </div>
     </div>
   </footer>
 </template>
 
 <script>
-import {mapState} from 'vuex'
-
+import { mapState } from "vuex"
 
 export default {
-  props: ['version'],
+  props: ["version"],
   methods: {
-    switchInstance () {
-      let confirm = window.confirm(this.$gettext('This will erase your local data and disconnect you, do you want to continue?'))
+    switchInstance() {
+      let confirm = window.confirm(
+        this.$gettext(
+          "This will erase your local data and disconnect you, do you want to continue?"
+        )
+      )
       if (confirm) {
-        this.$store.commit('instance/instanceUrl', null)
+        this.$store.commit("instance/instanceUrl", null)
       }
-    },
+    }
   },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
     }),
-    instanceHostname () {
+    instanceHostname() {
       let url = this.$store.state.instance.instanceUrl
-      let parser = document.createElement('a');
+      let parser = document.createElement("a")
       parser.href = url
       return parser.hostname
     },
-    suggestedInstances () {
-      let instances = [this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio']
+    suggestedInstances() {
+      let instances = [
+        this.$store.getters["instance/defaultUrl"](),
+        "https://demo.funkwhale.audio"
+      ]
       return instances
-    },
+    }
   }
 }
 </script>
 <style scoped>
-  footer p {
-    color: grey;
-  }
+footer p {
+  color: grey;
+}
 </style>

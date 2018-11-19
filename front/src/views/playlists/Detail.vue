@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <main>
     <div v-if="isLoading" class="ui vertical segment" v-title="labels.playlist">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <div v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment" v-title="playlist.name">
+    <section v-if="!isLoading && playlist" class="ui head vertical center aligned stripe segment" v-title="playlist.name">
       <div class="segment-content">
         <h2 class="ui center aligned icon header">
           <i class="circular inverted list yellow icon"></i>
@@ -39,8 +39,8 @@
           <p slot="modal-confirm"><translate>Delete playlist</translate></p>
         </dangerous-button>
       </div>
-    </div>
-    <div class="ui vertical stripe segment">
+    </section>
+    <section class="ui vertical stripe segment">
       <template v-if="edit">
         <playlist-editor
           @playlist-updated="playlist = $event"
@@ -51,20 +51,20 @@
         <h2><translate>Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 <script>
-import axios from 'axios'
-import TrackTable from '@/components/audio/track/Table'
-import RadioButton from '@/components/radios/Button'
-import PlayButton from '@/components/audio/PlayButton'
-import PlaylistEditor from '@/components/playlists/Editor'
+import axios from "axios"
+import TrackTable from "@/components/audio/track/Table"
+import RadioButton from "@/components/radios/Button"
+import PlayButton from "@/components/audio/PlayButton"
+import PlaylistEditor from "@/components/playlists/Editor"
 
 export default {
   props: {
-    id: {required: true},
-    defaultEdit: {type: Boolean, default: false}
+    id: { required: true },
+    defaultEdit: { type: Boolean, default: false }
   },
   components: {
     PlaylistEditor,
@@ -72,7 +72,7 @@ export default {
     PlayButton,
     RadioButton
   },
-  data: function () {
+  data: function() {
     return {
       edit: this.defaultEdit,
       isLoading: false,
@@ -81,18 +81,18 @@ export default {
       playlistTracks: []
     }
   },
-  created: function () {
+  created: function() {
     this.fetch()
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        playlist: this.$gettext('Playlist')
+        playlist: this.$gettext("Playlist")
       }
     }
   },
   methods: {
-    updatePlts (v) {
+    updatePlts(v) {
       this.playlistTracks = v
       this.tracks = v.map((e, i) => {
         let track = e.track
@@ -100,26 +100,29 @@ export default {
         return track
       })
     },
-    fetch: function () {
+    fetch: function() {
       let self = this
       self.isLoading = true
-      let url = 'playlists/' + this.id + '/'
-      axios.get(url).then((response) => {
+      let url = "playlists/" + this.id + "/"
+      axios.get(url).then(response => {
         self.playlist = response.data
-        axios.get(url + 'tracks/').then((response) => {
-          self.updatePlts(response.data.results)
-        }).then(() => {
-          self.isLoading = false
-        })
+        axios
+          .get(url + "tracks/")
+          .then(response => {
+            self.updatePlts(response.data.results)
+          })
+          .then(() => {
+            self.isLoading = false
+          })
       })
     },
-    deletePlaylist () {
+    deletePlaylist() {
       let self = this
-      let url = 'playlists/' + this.id + '/'
-      axios.delete(url).then((response) => {
-        self.$store.dispatch('playlists/fetchOwn')
+      let url = "playlists/" + this.id + "/"
+      axios.delete(url).then(response => {
+        self.$store.dispatch("playlists/fetchOwn")
         self.$router.push({
-          path: '/library'
+          path: "/library"
         })
       })
     }

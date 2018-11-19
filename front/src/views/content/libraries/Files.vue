@@ -1,14 +1,14 @@
 <template>
-  <div class="ui vertical aligned stripe segment">
+  <section class="ui vertical aligned stripe segment">
     <library-files-table :default-query="query"></library-files-table>
-  </div>
+  </section>
 </template>
 
 <script>
-import LibraryFilesTable from './FilesTable'
+import LibraryFilesTable from "./FilesTable"
 
 export default {
-  props: ['query'],
+  props: ["query"],
   components: {
     LibraryFilesTable
   }

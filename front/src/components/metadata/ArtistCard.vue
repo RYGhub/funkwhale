@@ -5,9 +5,9 @@
         <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       </div>
       <template v-if="data.id">
-        <div class="header">
+        <header class="header">
           <a :href="getMusicbrainzUrl('artist', data.id)" target="_blank" :title="labels.musicbrainz">{{ data.name }}</a>
-        </div>
+        </header>
         <div class="description">
           <table class="ui very basic fixed single line compact table">
             <tbody>
@@ -32,29 +32,29 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import CardMixin from './CardMixin'
-import time from '@/utils/time'
+import Vue from "vue"
+import CardMixin from "./CardMixin"
+import time from "@/utils/time"
 
 export default Vue.extend({
   mixins: [CardMixin],
-  data () {
+  data() {
     return {
       time
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        musicbrainz: this.$gettext('View on MusicBrainz')
+        musicbrainz: this.$gettext("View on MusicBrainz")
       }
     },
-    type () {
-      return 'artist'
+    type() {
+      return "artist"
     },
-    releasesGroups () {
-      return this.data['release-group-list'].filter(r => {
-        return r.type === 'Album'
+    releasesGroups() {
+      return this.data["release-group-list"].filter(r => {
+        return r.type === "Album"
       })
     }
   }
@@ -64,6 +64,6 @@ export default Vue.extend({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .ui.card {
-    width: 100% !important;
+  width: 100% !important;
 }
 </style>

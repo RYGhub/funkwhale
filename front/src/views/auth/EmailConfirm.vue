@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.confirm">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" v-title="labels.confirm">
+    <section class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Confirm your email</translate></h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
@@ -28,16 +28,16 @@
           </router-link>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios"
 
 export default {
-  props: ['defaultKey'],
-  data () {
+  props: ["defaultKey"],
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -46,30 +46,32 @@ export default {
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        confirm: this.$gettext('Confirm your email')
+        confirm: this.$gettext("Confirm your email")
       }
     }
   },
   methods: {
-    submit () {
+    submit() {
       let self = this
       self.isLoading = true
       self.errors = []
       let payload = {
         key: this.key
       }
-      return axios.post('auth/registration/verify-email/', payload).then(response => {
-        self.isLoading = false
-        self.success = true
-      }, error => {
-        self.errors = error.backendErrors
-        self.isLoading = false
-      })
+      return axios.post("auth/registration/verify-email/", payload).then(
+        response => {
+          self.isLoading = false
+          self.success = true
+        },
+        error => {
+          self.errors = error.backendErrors
+          self.isLoading = false
+        }
+      )
     }
   }
-
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
-    <div class="ui vertical center aligned stripe segment">
+  <main class="main pusher" v-title="labels.title">
+    <section class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">
           <translate>Loading your favorites...</translate>
@@ -16,8 +16,8 @@
         </translate>
       </h2>
       <radio-button type="favorites"></radio-button>
-    </div>
-    <div class="ui vertical stripe segment">
+    </section>
+    <section class="ui vertical stripe segment">
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
@@ -56,21 +56,21 @@
           :total="results.count"
           ></pagination>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import $ from 'jquery'
-import logger from '@/logging'
-import TrackTable from '@/components/audio/track/Table'
-import RadioButton from '@/components/radios/Button'
-import Pagination from '@/components/Pagination'
-import OrderingMixin from '@/components/mixins/Ordering'
-import PaginationMixin from '@/components/mixins/Pagination'
-import TranslationsMixin from '@/components/mixins/Translations'
-const FAVORITES_URL = 'tracks/'
+import axios from "axios"
+import $ from "jquery"
+import logger from "@/logging"
+import TrackTable from "@/components/audio/track/Table"
+import RadioButton from "@/components/radios/Button"
+import Pagination from "@/components/Pagination"
+import OrderingMixin from "@/components/mixins/Ordering"
+import PaginationMixin from "@/components/mixins/Pagination"
+import TranslationsMixin from "@/components/mixins/Translations"
+const FAVORITES_URL = "tracks/"
 
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
@@ -79,8 +79,10 @@ export default {
     RadioButton,
     Pagination
   },
-  data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
+  data() {
+    let defaultOrdering = this.getOrderingFromString(
+      this.defaultOrdering || "-creation_date"
+    )
     return {
       results: null,
       isLoading: false,
@@ -88,31 +90,31 @@ export default {
       previousLink: null,
       page: parseInt(this.defaultPage),
       paginateBy: parseInt(this.defaultPaginateBy || 25),
-      orderingDirection: defaultOrdering.direction || '+',
+      orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['creation_date', 'creation_date'],
-        ['title', 'track_title'],
-        ['album__title', 'album_title'],
-        ['artist__name', 'artist_name']
+        ["creation_date", "creation_date"],
+        ["title", "track_title"],
+        ["album__title", "album_title"],
+        ["artist__name", "artist_name"]
       ]
     }
   },
-  created () {
+  created() {
     this.fetchFavorites(FAVORITES_URL)
   },
-  mounted () {
-    $('.ui.dropdown').dropdown()
+  mounted() {
+    $(".ui.dropdown").dropdown()
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Your Favorites')
+        title: this.$gettext("Your Favorites")
       }
     }
   },
   methods: {
-    updateQueryString: function () {
+    updateQueryString: function() {
       this.$router.replace({
         query: {
           page: this.page,
@@ -121,42 +123,42 @@ export default {
         }
       })
     },
-    fetchFavorites (url) {
+    fetchFavorites(url) {
       var self = this
       this.isLoading = true
       let params = {
-        favorites: 'true',
+        favorites: "true",
         page: this.page,
         page_size: this.paginateBy,
         ordering: this.getOrderingAsString()
       }
-      logger.default.time('Loading user favorites')
-      axios.get(url, {params: params}).then((response) => {
+      logger.default.time("Loading user favorites")
+      axios.get(url, { params: params }).then(response => {
         self.results = response.data
         self.nextLink = response.data.next
         self.previousLink = response.data.previous
-        self.results.results.forEach((track) => {
-          self.$store.commit('favorites/track', {id: track.id, value: true})
+        self.results.results.forEach(track => {
+          self.$store.commit("favorites/track", { id: track.id, value: true })
         })
-        logger.default.timeEnd('Loading user favorites')
+        logger.default.timeEnd("Loading user favorites")
         self.isLoading = false
       })
     },
-    selectPage: function (page) {
+    selectPage: function(page) {
       this.page = page
     }
   },
   watch: {
-    page: function () {
+    page: function() {
       this.updateQueryString()
     },
-    paginateBy: function () {
+    paginateBy: function() {
       this.updateQueryString()
     },
-    orderingDirection: function () {
+    orderingDirection: function() {
       this.updateQueryString()
     },
-    ordering: function () {
+    ordering: function() {
       this.updateQueryString()
     }
   }
