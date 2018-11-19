@@ -107,7 +107,7 @@
           class="two wide column control"
           @click.prevent.stop="next"
           :disabled="!hasNext">
-            <i :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
+            <i :class="['ui', {'disabled': !hasNext}, 'forward', 'secondary', 'icon']" ></i>
         </a>
         <div
           class="wide column control volume-control"
