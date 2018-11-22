@@ -35,6 +35,12 @@ Describe the expected behaviour.
 ## Context
 
 <!--
+The version of your instance can be found on the footer : Source code (x.y)
+-->
+
+**Funkwhale version(s) affected**: x.y
+
+<!--
 If relevant, share additional context here like:
 
 - Browser type and version (for front-end bugs)
