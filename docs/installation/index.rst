@@ -75,7 +75,7 @@ We also maintain an installation guide for Debian 9 and Arch Linux.
 Funkwhale packages are available for the following platforms:
 
 - `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
-
+- ArchLinux (as an AUR package): if you'd rather use a package, check out this alternative installation method on ArchLinux: https://wiki.archlinux.org/index.php/Funkwhale (package and wiki kindly maintained by getzee)
 
 Running Funkwhale on the develop branch
 ---------------------------------------
