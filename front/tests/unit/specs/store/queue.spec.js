@@ -88,7 +88,7 @@ describe('store/queue', () => {
     it('append at end', () => {
       testAction({
         action: store.actions.append,
-        payload: {track: 4, skipPlay: true},
+        payload: {track: 4},
         params: {state: {tracks: [1, 2, 3]}},
         expectedMutations: [
           { type: 'insert', payload: {track: 4, index: 3} }
@@ -98,23 +98,10 @@ describe('store/queue', () => {
     it('append at index', () => {
       testAction({
         action: store.actions.append,
-        payload: {track: 2, index: 1, skipPlay: true},
+        payload: {track: 2, index: 1},
         params: {state: {tracks: [1, 3]}},
         expectedMutations: [
           { type: 'insert', payload: {track: 2, index: 1} }
-        ]
-      })
-    })
-    it('append and play', () => {
-      testAction({
-        action: store.actions.append,
-        payload: {track: 3},
-        params: {state: {tracks: [1, 2]}},
-        expectedMutations: [
-          { type: 'insert', payload: {track: 3, index: 2} }
-        ],
-        expectedActions: [
-          { type: 'resume' }
         ]
       })
     })
@@ -125,9 +112,8 @@ describe('store/queue', () => {
         payload: {tracks: tracks},
         params: {state: {tracks: []}},
         expectedActions: [
-          { type: 'append', payload: {track: tracks[0], index: 0, skipPlay: true} },
-          { type: 'append', payload: {track: tracks[1], index: 1, skipPlay: true} },
-          { type: 'resume' }
+          { type: 'append', payload: {track: tracks[0], index: 0} },
+          { type: 'append', payload: {track: tracks[1], index: 1} },
         ]
       })
     })
@@ -138,9 +124,8 @@ describe('store/queue', () => {
         payload: {tracks: tracks, index: 1},
         params: {state: {tracks: [1, 2]}},
         expectedActions: [
-          { type: 'append', payload: {track: tracks[0], index: 1, skipPlay: true} },
-          { type: 'append', payload: {track: tracks[1], index: 2, skipPlay: true} },
-          { type: 'resume' }
+          { type: 'append', payload: {track: tracks[0], index: 1} },
+          { type: 'append', payload: {track: tracks[1], index: 2} },
         ]
       })
     })
@@ -177,31 +162,6 @@ describe('store/queue', () => {
         expectedActions: [
           { type: 'player/stop', payload: null, options: {root: true} }
         ]
-      })
-    })
-    it('resume when ended', () => {
-      testAction({
-        action: store.actions.resume,
-        params: {state: {ended: true}, rootState: {player: {errored: false}}},
-        expectedActions: [
-          { type: 'next' }
-        ]
-      })
-    })
-    it('resume when errored', () => {
-      testAction({
-        action: store.actions.resume,
-        params: {state: {ended: false}, rootState: {player: {errored: true}}},
-        expectedActions: [
-          { type: 'next' }
-        ]
-      })
-    })
-    it('skip resume when not ended or not error', () => {
-      testAction({
-        action: store.actions.resume,
-        params: {state: {ended: false}, rootState: {player: {errored: false}}},
-        expectedActions: []
       })
     })
     it('previous when at beginning', () => {
