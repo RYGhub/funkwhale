@@ -59,7 +59,7 @@ export default {
     isEmpty: state => state.tracks.length === 0
   },
   actions: {
-    append ({commit, state, dispatch}, {track, index, skipPlay}) {
+    append ({commit, state, dispatch}, {track, index}) {
       index = index || state.tracks.length
       if (index > state.tracks.length - 1) {
         // we simply push to the end
@@ -67,9 +67,6 @@ export default {
       } else {
         // we insert the track at given position
         commit('insert', {track, index})
-      }
-      if (!skipPlay) {
-        dispatch('resume')
       }
     },
 
@@ -82,13 +79,12 @@ export default {
       }
       let total = tracks.length
       tracks.forEach((t, i) => {
-        let p = dispatch('append', {track: t, index: index, skipPlay: true})
+        let p = dispatch('append', {track: t, index: index})
         index += 1
         if (callback && i + 1 === total) {
           p.then(callback)
         }
       })
-      dispatch('resume')
     },
 
     cleanTrack ({state, dispatch, commit}, index) {
@@ -110,11 +106,6 @@ export default {
       }
     },
 
-    resume ({state, dispatch, rootState}) {
-      if (state.ended | rootState.player.errored) {
-        dispatch('next')
-      }
-    },
     previous ({state, dispatch, rootState}) {
       if (state.currentIndex > 0 && rootState.player.currentTime < 3) {
         dispatch('currentIndex', state.currentIndex - 1)

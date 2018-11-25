@@ -1,0 +1,1 @@
+Fixed skipped track when appending multiple tracks to the queue under certain conditions (#209)
