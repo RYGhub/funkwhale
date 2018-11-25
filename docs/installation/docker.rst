@@ -3,17 +3,29 @@ Docker installation
 
 Docker is the easiest way to get a Funkwhale instance up and running.
 
-First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://github.com/docker/compose/releases>`_ installed.
+First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ installed.
 
 Download the sample docker-compose file:
 
 .. parsed-literal::
 
+    mkdir /srv/funkwhale
     cd /srv/funkwhale
     mkdir nginx
     curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
     curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
     curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker-compose.yml"
+
+At this point, the archticture of ``/srv/funkwhale``  should look like that:
+
+::
+
+    .
+    ├── docker-compose.yml
+    ├── .env
+    └── nginx
+        ├── funkwhale_proxy.conf
+        └── funkwhale.template
 
 Create your env file:
 
@@ -22,8 +34,10 @@ Create your env file:
     export FUNKWHALE_VERSION="|version|"
     curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
+    sudo nano .env
 
-Ensure to edit it to match your needs (this file is heavily commented)
+Ensure to edit it to match your needs (this file is heavily commented), in particular ``DJANGO_SECRET_KEY`` and ``FUNKWHALE_HOSTNAME``.
+You should take a look at the `configuration reference <https://docs.funkwhale.audio/configuration.html#configuration-reference>`_ for more detailed information regarding each setting.
 
 Then, you should be able to pull the required images:
 
