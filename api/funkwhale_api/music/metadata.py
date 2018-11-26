@@ -1,8 +1,11 @@
 import datetime
+import logging
 import mutagen
 import pendulum
+
 from django import forms
 
+logger = logging.getLogger(__name__)
 NODEFAULT = object()
 
 
@@ -11,6 +14,10 @@ class TagNotFound(KeyError):
 
 
 class UnsupportedTag(KeyError):
+    pass
+
+
+class ParseError(ValueError):
     pass
 
 
@@ -103,8 +110,22 @@ class FirstUUIDField(forms.UUIDField):
 
 
 def get_date(value):
-    parsed = pendulum.parse(str(value))
-    return datetime.date(parsed.year, parsed.month, parsed.day)
+    ADDITIONAL_FORMATS = ["%Y-%d-%m %H:%M"]  # deezer date format
+    try:
+        parsed = pendulum.parse(str(value))
+        return datetime.date(parsed.year, parsed.month, parsed.day)
+    except pendulum.exceptions.ParserError:
+        pass
+
+    for date_format in ADDITIONAL_FORMATS:
+        try:
+            parsed = datetime.datetime.strptime(value, date_format)
+        except ValueError:
+            continue
+        else:
+            return datetime.date(parsed.year, parsed.month, parsed.day)
+
+    raise ParseError("{} cannot be parsed as a date".format(value))
 
 
 def split_and_return_first(separator):
@@ -275,7 +296,7 @@ class Metadata(object):
             v = field.to_python(v)
         return v
 
-    def all(self):
+    def all(self, ignore_parse_errors=True):
         """
         Return a dict containing all metadata of the file
         """
@@ -285,6 +306,11 @@ class Metadata(object):
             try:
                 data[field] = self.get(field, None)
             except (TagNotFound, forms.ValidationError):
+                data[field] = None
+            except ParseError as e:
+                if not ignore_parse_errors:
+                    raise
+                logger.warning("Unparsable field {}: {}".format(field, str(e)))
                 data[field] = None
 
         return data
