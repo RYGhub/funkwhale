@@ -60,7 +60,7 @@ FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
 )
 # XXX: deprecated, see #186
 FEDERATION_ACTOR_FETCH_DELAY = env.int("FEDERATION_ACTOR_FETCH_DELAY", default=60 * 12)
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[]) + [FUNKWHALE_HOSTNAME]
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
