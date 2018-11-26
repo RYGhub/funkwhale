@@ -196,7 +196,31 @@ def test_mbid_clean_keeps_only_first(field_name):
 
 @pytest.mark.parametrize(
     "raw,expected",
-    [("2017", datetime.date(2017, 1, 1)), ("2017-12-31", datetime.date(2017, 12, 31))],
+    [
+        ("2017", datetime.date(2017, 1, 1)),
+        ("2017-12-31", datetime.date(2017, 12, 31)),
+        ("2017-14-01 01:32", datetime.date(2017, 1, 14)),  # deezer format
+    ],
 )
 def test_date_parsing(raw, expected):
     assert metadata.get_date(raw) == expected
+
+
+def test_date_parsing_failure():
+    with pytest.raises(metadata.ParseError):
+        metadata.get_date("noop")
+
+
+def test_metadata_all_ignore_parse_errors_true(mocker):
+    path = os.path.join(DATA_DIR, "sample.flac")
+    data = metadata.Metadata(path)
+    mocker.patch.object(data, "get", side_effect=metadata.ParseError("Failure"))
+    assert data.all()["date"] is None
+
+
+def test_metadata_all_ignore_parse_errors_false(mocker):
+    path = os.path.join(DATA_DIR, "sample.flac")
+    data = metadata.Metadata(path)
+    mocker.patch.object(data, "get", side_effect=metadata.ParseError("Failure"))
+    with pytest.raises(metadata.ParseError):
+        data.all(ignore_parse_errors=False)
