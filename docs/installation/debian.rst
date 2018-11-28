@@ -112,11 +112,11 @@ Then we'll download the frontend files:
     case, run
 
         cd /srv
-        
+
         rm -r funkwhale
-        
+
         git clone -b master https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
-        
+
         cd funkwhale
 
     The above clone command uses the master branch instead of the default develop branch, as master is stable and more suited for production setups.
@@ -228,18 +228,9 @@ Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
 how you configured your PostgreSQL and Redis servers in
 :doc:`external dependencies <./external_dependencies>`.
 
-
-When you want to run command on the API server, such as to create the
-database or compile static files, you have to ensure you source
-the environment variables in that file.
-
-This can be done like this::
-
-    export $(cat config/.env | grep -v ^# | xargs)
-
 .. note::
 
-    Remember to reload these variables whenever you edit your .env file.
+    The environment file at config/.env is loaded automatically by Funkwhale processes.
 
 Database setup
 ---------------

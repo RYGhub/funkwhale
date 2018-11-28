@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import datetime
+import logging
+
 from urllib.parse import urlparse, urlsplit
 
 import environ
@@ -18,14 +20,35 @@ from celery.schedules import crontab
 
 from funkwhale_api import __version__
 
+logger = logging.getLogger(__name__)
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("funkwhale_api")
 
 env = environ.Env()
-try:
-    env.read_env(ROOT_DIR.file(".env"))
-except FileNotFoundError:
-    pass
+env_file = env("ENV_FILE", default=None)
+if env_file:
+    # we have an explicitely specified env file
+    # so we try to load and it fail loudly if it does not exist
+    print("ENV_FILE", env_file)
+    env.read_env(env_file)
+else:
+    # we try to load from .env and config/.env
+    # but do not crash if those files don't exist
+    paths = [
+        # /srv/funwhale/api/.env
+        ROOT_DIR,
+        # /srv/funwhale/config/.env
+        ((ROOT_DIR - 1) + "config"),
+    ]
+    for path in paths:
+        try:
+            env_path = path.file(".env")
+        except FileNotFoundError:
+            logger.debug("No env file found at %s/.env", path)
+            continue
+        env.read_env(env_path)
+        logger.info("Loaded env file at %s/.env", path)
+        break
 
 FUNKWHALE_HOSTNAME = None
 FUNKWHALE_HOSTNAME_SUFFIX = env("FUNKWHALE_HOSTNAME_SUFFIX", default=None)
