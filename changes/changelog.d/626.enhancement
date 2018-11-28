@@ -1,0 +1,10 @@
+Load env file in config/.env automatically to avoid sourcing it by hand (#626)
+
+Automatically load .env file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+On non-docker deployments, earlier versions required you to source
+the config/.env file before launching any Funkwhale command, with ``export $(cat config/.env | grep -v ^# | xargs)``
+This led to more complex and error prode deployment / setup.
+
+This is not the case anymore, and Funkwhale will automatically load this file if it's available.
