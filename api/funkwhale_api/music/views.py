@@ -22,7 +22,7 @@ from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
 
-from . import filters, models, serializers, tasks, utils
+from . import filters, licenses, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
 
@@ -481,3 +481,28 @@ class Search(views.APIView):
         )
 
         return qs.filter(query_obj)[: self.max_results]
+
+
+class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [common_permissions.ConditionalAuthentication]
+    serializer_class = serializers.LicenseSerializer
+    queryset = models.License.objects.all().order_by("code")
+    lookup_value_regex = ".*"
+
+    def get_queryset(self):
+        # ensure our licenses are up to date in DB
+        licenses.load(licenses.LICENSES)
+        return super().get_queryset()
+
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 0:
+            return super().get_serializer(*args, **kwargs)
+
+        # our serializer works with license dict, not License instances
+        # so we pass those instead
+        instance_or_qs = args[0]
+        try:
+            first_arg = instance_or_qs.conf
+        except AttributeError:
+            first_arg = [i.conf for i in instance_or_qs if i.conf]
+        return super().get_serializer(*((first_arg,) + args[1:]), **kwargs)

@@ -16,6 +16,7 @@ from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
 from funkwhale_api.taskapp import celery
 
+from . import licenses
 from . import lyrics as lyrics_utils
 from . import models
 from . import metadata
@@ -276,6 +277,8 @@ def federation_audio_track_to_metadata(payload):
         "artist": payload["artists"][0]["name"],
         "album_artist": payload["album"]["artists"][0]["name"],
         "date": payload["album"].get("released"),
+        "license": payload.get("license"),
+        "copyright": payload.get("copyright"),
         # musicbrainz
         "musicbrainz_recordingid": str(musicbrainz_recordingid)
         if musicbrainz_recordingid
@@ -496,6 +499,8 @@ def get_track_from_import_metadata(data):
         "position": track_number,
         "fid": track_fid,
         "from_activity_id": from_activity_id,
+        "license": licenses.match(data.get("license"), data.get("copyright")),
+        "copyright": data.get("copyright"),
     }
     if data.get("fdate"):
         defaults["creation_date"] = data.get("fdate")

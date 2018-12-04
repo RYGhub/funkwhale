@@ -1,17 +1,31 @@
 <template>
   <div id="app">
     <!-- here, we display custom stylesheets, if any -->
-    <link v-for="url in customStylesheets" rel="stylesheet" property="stylesheet" :href="url" :key="url">
+    <link
+      v-for="url in customStylesheets"
+      rel="stylesheet"
+      property="stylesheet"
+      :href="url"
+      :key="url"
+    >
     <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
       <div class="ui padded segment">
-        <h1 class="ui header"><translate>Choose your instance</translate></h1>
+        <h1 class="ui header">
+          <translate>Choose your instance</translate>
+        </h1>
         <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
-          <p><translate>You need to select an instance in order to continue</translate></p>
+          <p>
+            <translate>You need to select an instance in order to continue</translate>
+          </p>
           <div class="ui action input">
             <input type="text" v-model="instanceUrl">
-            <button type="submit" class="ui button"><translate>Submit</translate></button>
+            <button type="submit" class="ui button">
+              <translate>Submit</translate>
+            </button>
           </div>
-          <p><translate>Suggested choices</translate></p>
+          <p>
+            <translate>Suggested choices</translate>
+          </p>
           <div class="ui bulleted list">
             <div class="ui item" v-for="url in suggestedInstances">
               <a @click="instanceUrl = url">{{ url }}</a>
@@ -22,20 +36,20 @@
     </div>
     <template v-else>
       <sidebar></sidebar>
-      <service-messages v-if="messages.length > 0" />
+      <service-messages v-if="messages.length > 0"/>
       <router-view :key="$route.fullPath"></router-view>
       <div class="ui fitted divider"></div>
-      <app-footer :version="version" @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"></app-footer>
+      <app-footer
+        :version="version"
+        @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"
+      ></app-footer>
       <raven
         v-if="$store.state.instance.settings.raven.front_enabled.value"
-        :dsn="$store.state.instance.settings.raven.front_dsn.value">
-      </raven>
+        :dsn="$store.state.instance.settings.raven.front_dsn.value"
+      ></raven>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
-       <GlobalEvents
-        @keydown.h.exact="showShortcutsModal = !showShortcutsModal"
-        />
-
+      <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
     </template>
   </div>
 </template>
@@ -213,17 +227,17 @@ export default {
 // as resolve order is not deterministric in webpack
 // and we end up with CSS rules not applied,
 // see https://github.com/webpack/webpack/issues/215
-@import 'semantic/semantic.css';
-@import 'style/vendor/media';
+@import "semantic/semantic.css";
+@import "style/vendor/media";
 
-
-html, body {
+html,
+body {
   @include media("<desktop") {
     font-size: 90%;
   }
 }
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -232,14 +246,14 @@ html, body {
   margin-top: 2em;
 }
 
-.main.pusher, .footer {
+.main.pusher,
+.footer {
   @include media(">desktop") {
     margin-left: 350px !important;
     margin-top: 50px;
   }
   transform: none !important;
 }
-
 
 .main.pusher > .ui.secondary.menu {
   margin-left: 0;
@@ -282,7 +296,8 @@ html, body {
 .main-pusher {
   padding: 1.5rem 0;
 }
-.ui.stripe.segment, #footer {
+.ui.stripe.segment,
+#footer {
   padding: 2em;
   @include media(">tablet") {
     padding: 4em;
@@ -300,7 +315,7 @@ html, body {
 }
 
 .button.icon.tiny {
-    padding: 0.5em !important;
+  padding: 0.5em !important;
 }
 
 .sidebar {
@@ -332,11 +347,10 @@ html, body {
 .ui.icon.header .circular.icon {
   display: flex;
   justify-content: center;
-
 }
 
-.segment-content .button{
-  margin:  0.5em;
+.segment-content .button {
+  margin: 0.5em;
 }
 
 a {
@@ -365,7 +379,7 @@ button.reset {
   /* Corrects font smoothing for webkit */
   -webkit-font-smoothing: inherit;
   -moz-osx-font-smoothing: inherit;
-    /* Corrects inability to style clickable `input` types in iOS */
+  /* Corrects inability to style clickable `input` types in iOS */
   -webkit-appearance: none;
   text-align: inherit;
 }
@@ -374,5 +388,8 @@ button.reset {
   font-weight: bold;
   padding: 0.5em;
   text-align: left;
+}
+[role="button"] {
+  cursor: pointer;
 }
 </style>

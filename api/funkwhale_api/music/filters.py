@@ -34,6 +34,7 @@ class TrackFilter(filters.FilterSet):
             "playable": ["exact"],
             "artist": ["exact"],
             "album": ["exact"],
+            "license": ["exact"],
         }
 
     def filter_playable(self, queryset, name, value):

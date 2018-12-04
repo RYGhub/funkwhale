@@ -731,6 +731,8 @@ class TrackSerializer(MusicEntitySerializer):
     position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     album = AlbumSerializer()
+    license = serializers.URLField(allow_null=True, required=False)
+    copyright = serializers.CharField(allow_null=True, required=False)
 
     def to_representation(self, instance):
         d = {
@@ -740,6 +742,10 @@ class TrackSerializer(MusicEntitySerializer):
             "published": instance.creation_date.isoformat(),
             "musicbrainzId": str(instance.mbid) if instance.mbid else None,
             "position": instance.position,
+            "license": instance.local_license["identifiers"][0]
+            if instance.local_license
+            else None,
+            "copyright": instance.copyright if instance.copyright else None,
             "artists": [
                 ArtistSerializer(
                     instance.artist, context={"include_ap_context": False}

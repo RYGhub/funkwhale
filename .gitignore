@@ -94,3 +94,4 @@ docs/swagger
 _build
 front/src/translations.json
 front/locales/en_US/LC_MESSAGES/app.po
+*.prof

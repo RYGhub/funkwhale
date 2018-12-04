@@ -1,0 +1,4539 @@
+[
+    {
+        "name": "Creative commons - Attribution 1.0",
+        "code": "cc-by-1.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.0",
+        "code": "cc-by-2.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5",
+        "code": "cc-by-2.5",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Argentina",
+        "code": "cc-by-2.5-ar",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Bulgaria",
+        "code": "cc-by-2.5-bg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Canada",
+        "code": "cc-by-2.5-ca",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Colombia",
+        "code": "cc-by-2.5-co",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Denmark",
+        "code": "cc-by-2.5-dk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Hungary",
+        "code": "cc-by-2.5-hu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Israel",
+        "code": "cc-by-2.5-il",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 India",
+        "code": "cc-by-2.5-in",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Macedonia",
+        "code": "cc-by-2.5-mk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Malta",
+        "code": "cc-by-2.5-mt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Mexico",
+        "code": "cc-by-2.5-mx",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Malaysia",
+        "code": "cc-by-2.5-my",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 Peru",
+        "code": "cc-by-2.5-pe",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 2.5 UK: Scotland",
+        "code": "cc-by-2.5-scotland",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0",
+        "code": "cc-by-3.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Austria",
+        "code": "cc-by-3.0-at",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Australia",
+        "code": "cc-by-3.0-au",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Brazil",
+        "code": "cc-by-3.0-br",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Switzerland",
+        "code": "cc-by-3.0-ch",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Chile",
+        "code": "cc-by-3.0-cl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 China Mainland",
+        "code": "cc-by-3.0-cn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Costa Rica",
+        "code": "cc-by-3.0-cr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Czech Republic",
+        "code": "cc-by-3.0-cz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Germany",
+        "code": "cc-by-3.0-de",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Ecuador",
+        "code": "cc-by-3.0-ec",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Estonia",
+        "code": "cc-by-3.0-ee",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Egypt",
+        "code": "cc-by-3.0-eg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Spain",
+        "code": "cc-by-3.0-es",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 France",
+        "code": "cc-by-3.0-fr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Greece",
+        "code": "cc-by-3.0-gr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Guatemala",
+        "code": "cc-by-3.0-gt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Hong Kong",
+        "code": "cc-by-3.0-hk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Croatia",
+        "code": "cc-by-3.0-hr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Ireland",
+        "code": "cc-by-3.0-ie",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 IGO",
+        "code": "cc-by-3.0-igo",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Italy",
+        "code": "cc-by-3.0-it",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Luxembourg",
+        "code": "cc-by-3.0-lu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Netherlands",
+        "code": "cc-by-3.0-nl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Norway",
+        "code": "cc-by-3.0-no",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 New Zealand",
+        "code": "cc-by-3.0-nz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Philippines",
+        "code": "cc-by-3.0-ph",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Poland",
+        "code": "cc-by-3.0-pl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Puerto Rico",
+        "code": "cc-by-3.0-pr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Portugal",
+        "code": "cc-by-3.0-pt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Romania",
+        "code": "cc-by-3.0-ro",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Serbia",
+        "code": "cc-by-3.0-rs",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Singapore",
+        "code": "cc-by-3.0-sg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Thailand",
+        "code": "cc-by-3.0-th",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Taiwan",
+        "code": "cc-by-3.0-tw",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Uganda",
+        "code": "cc-by-3.0-ug",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 United States",
+        "code": "cc-by-3.0-us",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Venezuela",
+        "code": "cc-by-3.0-ve",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 Vietnam",
+        "code": "cc-by-3.0-vn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 3.0 South Africa",
+        "code": "cc-by-3.0-za",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution 4.0",
+        "code": "cc-by-4.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by/4.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 1.0",
+        "code": "cc-by-nc-1.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.0",
+        "code": "cc-by-nc-2.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5",
+        "code": "cc-by-nc-2.5",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Argentina",
+        "code": "cc-by-nc-2.5-ar",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Bulgaria",
+        "code": "cc-by-nc-2.5-bg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Canada",
+        "code": "cc-by-nc-2.5-ca",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Colombia",
+        "code": "cc-by-nc-2.5-co",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Denmark",
+        "code": "cc-by-nc-2.5-dk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Hungary",
+        "code": "cc-by-nc-2.5-hu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Israel",
+        "code": "cc-by-nc-2.5-il",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 India",
+        "code": "cc-by-nc-2.5-in",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Macedonia",
+        "code": "cc-by-nc-2.5-mk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Malta",
+        "code": "cc-by-nc-2.5-mt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Mexico",
+        "code": "cc-by-nc-2.5-mx",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Malaysia",
+        "code": "cc-by-nc-2.5-my",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 Peru",
+        "code": "cc-by-nc-2.5-pe",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 2.5 UK: Scotland",
+        "code": "cc-by-nc-2.5-scotland",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0",
+        "code": "cc-by-nc-3.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Austria",
+        "code": "cc-by-nc-3.0-at",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Australia",
+        "code": "cc-by-nc-3.0-au",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Brazil",
+        "code": "cc-by-nc-3.0-br",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Switzerland",
+        "code": "cc-by-nc-3.0-ch",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Chile",
+        "code": "cc-by-nc-3.0-cl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 China Mainland",
+        "code": "cc-by-nc-3.0-cn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Costa Rica",
+        "code": "cc-by-nc-3.0-cr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Czech Republic",
+        "code": "cc-by-nc-3.0-cz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Germany",
+        "code": "cc-by-nc-3.0-de",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Ecuador",
+        "code": "cc-by-nc-3.0-ec",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Estonia",
+        "code": "cc-by-nc-3.0-ee",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Egypt",
+        "code": "cc-by-nc-3.0-eg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Spain",
+        "code": "cc-by-nc-3.0-es",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 France",
+        "code": "cc-by-nc-3.0-fr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Greece",
+        "code": "cc-by-nc-3.0-gr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Guatemala",
+        "code": "cc-by-nc-3.0-gt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Hong Kong",
+        "code": "cc-by-nc-3.0-hk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Croatia",
+        "code": "cc-by-nc-3.0-hr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Ireland",
+        "code": "cc-by-nc-3.0-ie",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 IGO",
+        "code": "cc-by-nc-3.0-igo",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Italy",
+        "code": "cc-by-nc-3.0-it",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Luxembourg",
+        "code": "cc-by-nc-3.0-lu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Netherlands",
+        "code": "cc-by-nc-3.0-nl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Norway",
+        "code": "cc-by-nc-3.0-no",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 New Zealand",
+        "code": "cc-by-nc-3.0-nz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Philippines",
+        "code": "cc-by-nc-3.0-ph",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Poland",
+        "code": "cc-by-nc-3.0-pl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Puerto Rico",
+        "code": "cc-by-nc-3.0-pr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Portugal",
+        "code": "cc-by-nc-3.0-pt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Romania",
+        "code": "cc-by-nc-3.0-ro",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Serbia",
+        "code": "cc-by-nc-3.0-rs",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Singapore",
+        "code": "cc-by-nc-3.0-sg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Thailand",
+        "code": "cc-by-nc-3.0-th",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Taiwan",
+        "code": "cc-by-nc-3.0-tw",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Uganda",
+        "code": "cc-by-nc-3.0-ug",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 United States",
+        "code": "cc-by-nc-3.0-us",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Venezuela",
+        "code": "cc-by-nc-3.0-ve",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 Vietnam",
+        "code": "cc-by-nc-3.0-vn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 3.0 South Africa",
+        "code": "cc-by-nc-3.0-za",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial 4.0",
+        "code": "cc-by-nc-4.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc/4.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 1.0",
+        "code": "cc-by-nc-nd-1.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.0",
+        "code": "cc-by-nc-nd-2.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5",
+        "code": "cc-by-nc-nd-2.5",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Argentina",
+        "code": "cc-by-nc-nd-2.5-ar",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Bulgaria",
+        "code": "cc-by-nc-nd-2.5-bg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Canada",
+        "code": "cc-by-nc-nd-2.5-ca",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Colombia",
+        "code": "cc-by-nc-nd-2.5-co",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Denmark",
+        "code": "cc-by-nc-nd-2.5-dk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Hungary",
+        "code": "cc-by-nc-nd-2.5-hu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Israel",
+        "code": "cc-by-nc-nd-2.5-il",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 India",
+        "code": "cc-by-nc-nd-2.5-in",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Macedonia",
+        "code": "cc-by-nc-nd-2.5-mk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Malta",
+        "code": "cc-by-nc-nd-2.5-mt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Mexico",
+        "code": "cc-by-nc-nd-2.5-mx",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Malaysia",
+        "code": "cc-by-nc-nd-2.5-my",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 Peru",
+        "code": "cc-by-nc-nd-2.5-pe",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 2.5 UK: Scotland",
+        "code": "cc-by-nc-nd-2.5-scotland",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0",
+        "code": "cc-by-nc-nd-3.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Austria",
+        "code": "cc-by-nc-nd-3.0-at",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Australia",
+        "code": "cc-by-nc-nd-3.0-au",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Brazil",
+        "code": "cc-by-nc-nd-3.0-br",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Switzerland",
+        "code": "cc-by-nc-nd-3.0-ch",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Chile",
+        "code": "cc-by-nc-nd-3.0-cl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 China Mainland",
+        "code": "cc-by-nc-nd-3.0-cn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Costa Rica",
+        "code": "cc-by-nc-nd-3.0-cr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Czech Republic",
+        "code": "cc-by-nc-nd-3.0-cz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Germany",
+        "code": "cc-by-nc-nd-3.0-de",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Ecuador",
+        "code": "cc-by-nc-nd-3.0-ec",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Estonia",
+        "code": "cc-by-nc-nd-3.0-ee",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Egypt",
+        "code": "cc-by-nc-nd-3.0-eg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Spain",
+        "code": "cc-by-nc-nd-3.0-es",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 France",
+        "code": "cc-by-nc-nd-3.0-fr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Greece",
+        "code": "cc-by-nc-nd-3.0-gr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Guatemala",
+        "code": "cc-by-nc-nd-3.0-gt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Hong Kong",
+        "code": "cc-by-nc-nd-3.0-hk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Croatia",
+        "code": "cc-by-nc-nd-3.0-hr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Ireland",
+        "code": "cc-by-nc-nd-3.0-ie",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 IGO",
+        "code": "cc-by-nc-nd-3.0-igo",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Italy",
+        "code": "cc-by-nc-nd-3.0-it",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Luxembourg",
+        "code": "cc-by-nc-nd-3.0-lu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Netherlands",
+        "code": "cc-by-nc-nd-3.0-nl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Norway",
+        "code": "cc-by-nc-nd-3.0-no",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 New Zealand",
+        "code": "cc-by-nc-nd-3.0-nz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Philippines",
+        "code": "cc-by-nc-nd-3.0-ph",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Poland",
+        "code": "cc-by-nc-nd-3.0-pl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Puerto Rico",
+        "code": "cc-by-nc-nd-3.0-pr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Portugal",
+        "code": "cc-by-nc-nd-3.0-pt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Romania",
+        "code": "cc-by-nc-nd-3.0-ro",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Serbia",
+        "code": "cc-by-nc-nd-3.0-rs",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Singapore",
+        "code": "cc-by-nc-nd-3.0-sg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Thailand",
+        "code": "cc-by-nc-nd-3.0-th",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Taiwan",
+        "code": "cc-by-nc-nd-3.0-tw",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Uganda",
+        "code": "cc-by-nc-nd-3.0-ug",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 United States",
+        "code": "cc-by-nc-nd-3.0-us",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Venezuela",
+        "code": "cc-by-nc-nd-3.0-ve",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 Vietnam",
+        "code": "cc-by-nc-nd-3.0-vn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 3.0 South Africa",
+        "code": "cc-by-nc-nd-3.0-za",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-NoDerivatives 4.0",
+        "code": "cc-by-nc-nd-4.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-nd/4.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 1.0",
+        "code": "cc-by-nc-sa-1.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.0",
+        "code": "cc-by-nc-sa-2.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5",
+        "code": "cc-by-nc-sa-2.5",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Argentina",
+        "code": "cc-by-nc-sa-2.5-ar",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Bulgaria",
+        "code": "cc-by-nc-sa-2.5-bg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Canada",
+        "code": "cc-by-nc-sa-2.5-ca",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Colombia",
+        "code": "cc-by-nc-sa-2.5-co",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Denmark",
+        "code": "cc-by-nc-sa-2.5-dk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Hungary",
+        "code": "cc-by-nc-sa-2.5-hu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Israel",
+        "code": "cc-by-nc-sa-2.5-il",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 India",
+        "code": "cc-by-nc-sa-2.5-in",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Macedonia",
+        "code": "cc-by-nc-sa-2.5-mk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Malta",
+        "code": "cc-by-nc-sa-2.5-mt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Mexico",
+        "code": "cc-by-nc-sa-2.5-mx",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Malaysia",
+        "code": "cc-by-nc-sa-2.5-my",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 Peru",
+        "code": "cc-by-nc-sa-2.5-pe",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 2.5 UK: Scotland",
+        "code": "cc-by-nc-sa-2.5-scotland",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0",
+        "code": "cc-by-nc-sa-3.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Austria",
+        "code": "cc-by-nc-sa-3.0-at",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Australia",
+        "code": "cc-by-nc-sa-3.0-au",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Brazil",
+        "code": "cc-by-nc-sa-3.0-br",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Switzerland",
+        "code": "cc-by-nc-sa-3.0-ch",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Chile",
+        "code": "cc-by-nc-sa-3.0-cl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 China Mainland",
+        "code": "cc-by-nc-sa-3.0-cn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Costa Rica",
+        "code": "cc-by-nc-sa-3.0-cr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Czech Republic",
+        "code": "cc-by-nc-sa-3.0-cz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Germany",
+        "code": "cc-by-nc-sa-3.0-de",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Ecuador",
+        "code": "cc-by-nc-sa-3.0-ec",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Estonia",
+        "code": "cc-by-nc-sa-3.0-ee",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Egypt",
+        "code": "cc-by-nc-sa-3.0-eg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Spain",
+        "code": "cc-by-nc-sa-3.0-es",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 France",
+        "code": "cc-by-nc-sa-3.0-fr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Greece",
+        "code": "cc-by-nc-sa-3.0-gr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Guatemala",
+        "code": "cc-by-nc-sa-3.0-gt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Hong Kong",
+        "code": "cc-by-nc-sa-3.0-hk",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Croatia",
+        "code": "cc-by-nc-sa-3.0-hr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Ireland",
+        "code": "cc-by-nc-sa-3.0-ie",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 IGO",
+        "code": "cc-by-nc-sa-3.0-igo",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Italy",
+        "code": "cc-by-nc-sa-3.0-it",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Luxembourg",
+        "code": "cc-by-nc-sa-3.0-lu",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Netherlands",
+        "code": "cc-by-nc-sa-3.0-nl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Norway",
+        "code": "cc-by-nc-sa-3.0-no",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 New Zealand",
+        "code": "cc-by-nc-sa-3.0-nz",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Philippines",
+        "code": "cc-by-nc-sa-3.0-ph",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Poland",
+        "code": "cc-by-nc-sa-3.0-pl",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Puerto Rico",
+        "code": "cc-by-nc-sa-3.0-pr",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Portugal",
+        "code": "cc-by-nc-sa-3.0-pt",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Romania",
+        "code": "cc-by-nc-sa-3.0-ro",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Serbia",
+        "code": "cc-by-nc-sa-3.0-rs",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Singapore",
+        "code": "cc-by-nc-sa-3.0-sg",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Thailand",
+        "code": "cc-by-nc-sa-3.0-th",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Taiwan",
+        "code": "cc-by-nc-sa-3.0-tw",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Uganda",
+        "code": "cc-by-nc-sa-3.0-ug",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 United States",
+        "code": "cc-by-nc-sa-3.0-us",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Venezuela",
+        "code": "cc-by-nc-sa-3.0-ve",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 Vietnam",
+        "code": "cc-by-nc-sa-3.0-vn",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 3.0 South Africa",
+        "code": "cc-by-nc-sa-3.0-za",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NonCommercial-ShareAlike 4.0",
+        "code": "cc-by-nc-sa-4.0",
+        "redistribute": true,
+        "commercial": false,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nc-sa/4.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 1.0",
+        "code": "cc-by-nd-1.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.0",
+        "code": "cc-by-nd-2.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5",
+        "code": "cc-by-nd-2.5",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Argentina",
+        "code": "cc-by-nd-2.5-ar",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Bulgaria",
+        "code": "cc-by-nd-2.5-bg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Canada",
+        "code": "cc-by-nd-2.5-ca",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Colombia",
+        "code": "cc-by-nd-2.5-co",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Denmark",
+        "code": "cc-by-nd-2.5-dk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Hungary",
+        "code": "cc-by-nd-2.5-hu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Israel",
+        "code": "cc-by-nd-2.5-il",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 India",
+        "code": "cc-by-nd-2.5-in",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Macedonia",
+        "code": "cc-by-nd-2.5-mk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Malta",
+        "code": "cc-by-nd-2.5-mt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Mexico",
+        "code": "cc-by-nd-2.5-mx",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Malaysia",
+        "code": "cc-by-nd-2.5-my",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 Peru",
+        "code": "cc-by-nd-2.5-pe",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 2.5 UK: Scotland",
+        "code": "cc-by-nd-2.5-scotland",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0",
+        "code": "cc-by-nd-3.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Austria",
+        "code": "cc-by-nd-3.0-at",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Australia",
+        "code": "cc-by-nd-3.0-au",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Brazil",
+        "code": "cc-by-nd-3.0-br",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Switzerland",
+        "code": "cc-by-nd-3.0-ch",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Chile",
+        "code": "cc-by-nd-3.0-cl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 China Mainland",
+        "code": "cc-by-nd-3.0-cn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Costa Rica",
+        "code": "cc-by-nd-3.0-cr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Czech Republic",
+        "code": "cc-by-nd-3.0-cz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Germany",
+        "code": "cc-by-nd-3.0-de",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Ecuador",
+        "code": "cc-by-nd-3.0-ec",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Estonia",
+        "code": "cc-by-nd-3.0-ee",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Egypt",
+        "code": "cc-by-nd-3.0-eg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Spain",
+        "code": "cc-by-nd-3.0-es",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 France",
+        "code": "cc-by-nd-3.0-fr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Greece",
+        "code": "cc-by-nd-3.0-gr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Guatemala",
+        "code": "cc-by-nd-3.0-gt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Hong Kong",
+        "code": "cc-by-nd-3.0-hk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Croatia",
+        "code": "cc-by-nd-3.0-hr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Ireland",
+        "code": "cc-by-nd-3.0-ie",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 IGO",
+        "code": "cc-by-nd-3.0-igo",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Italy",
+        "code": "cc-by-nd-3.0-it",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Luxembourg",
+        "code": "cc-by-nd-3.0-lu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Netherlands",
+        "code": "cc-by-nd-3.0-nl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Norway",
+        "code": "cc-by-nd-3.0-no",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 New Zealand",
+        "code": "cc-by-nd-3.0-nz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Philippines",
+        "code": "cc-by-nd-3.0-ph",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Poland",
+        "code": "cc-by-nd-3.0-pl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Puerto Rico",
+        "code": "cc-by-nd-3.0-pr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Portugal",
+        "code": "cc-by-nd-3.0-pt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Romania",
+        "code": "cc-by-nd-3.0-ro",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Serbia",
+        "code": "cc-by-nd-3.0-rs",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Singapore",
+        "code": "cc-by-nd-3.0-sg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Thailand",
+        "code": "cc-by-nd-3.0-th",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Taiwan",
+        "code": "cc-by-nd-3.0-tw",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Uganda",
+        "code": "cc-by-nd-3.0-ug",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 United States",
+        "code": "cc-by-nd-3.0-us",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Venezuela",
+        "code": "cc-by-nd-3.0-ve",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 Vietnam",
+        "code": "cc-by-nd-3.0-vn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 3.0 South Africa",
+        "code": "cc-by-nd-3.0-za",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-NoDerivatives 4.0",
+        "code": "cc-by-nd-4.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": false,
+        "copyleft": false,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-nd/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-nd/4.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 1.0",
+        "code": "cc-by-sa-1.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/1.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.0",
+        "code": "cc-by-sa-2.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5",
+        "code": "cc-by-sa-2.5",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Argentina",
+        "code": "cc-by-sa-2.5-ar",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/ar/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/ar/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Bulgaria",
+        "code": "cc-by-sa-2.5-bg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/bg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/bg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Canada",
+        "code": "cc-by-sa-2.5-ca",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/ca/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/ca/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Colombia",
+        "code": "cc-by-sa-2.5-co",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/co/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/co/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Denmark",
+        "code": "cc-by-sa-2.5-dk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/dk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/dk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Hungary",
+        "code": "cc-by-sa-2.5-hu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/hu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/hu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Israel",
+        "code": "cc-by-sa-2.5-il",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/il/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/il/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 India",
+        "code": "cc-by-sa-2.5-in",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/in/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/in/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Macedonia",
+        "code": "cc-by-sa-2.5-mk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/mk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/mk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Malta",
+        "code": "cc-by-sa-2.5-mt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/mt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/mt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Mexico",
+        "code": "cc-by-sa-2.5-mx",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/mx/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/mx/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Malaysia",
+        "code": "cc-by-sa-2.5-my",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/my/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/my/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 Peru",
+        "code": "cc-by-sa-2.5-pe",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/pe/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/pe/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 2.5 UK: Scotland",
+        "code": "cc-by-sa-2.5-scotland",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/2.5/scotland/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/2.5/scotland/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0",
+        "code": "cc-by-sa-3.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Austria",
+        "code": "cc-by-sa-3.0-at",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/at/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/at/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Australia",
+        "code": "cc-by-sa-3.0-au",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/au/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/au/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Brazil",
+        "code": "cc-by-sa-3.0-br",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/br/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/br/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Switzerland",
+        "code": "cc-by-sa-3.0-ch",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ch/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ch/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Chile",
+        "code": "cc-by-sa-3.0-cl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/cl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/cl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 China Mainland",
+        "code": "cc-by-sa-3.0-cn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/cn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/cn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Costa Rica",
+        "code": "cc-by-sa-3.0-cr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/cr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/cr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Czech Republic",
+        "code": "cc-by-sa-3.0-cz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/cz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/cz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Germany",
+        "code": "cc-by-sa-3.0-de",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/de/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/de/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Ecuador",
+        "code": "cc-by-sa-3.0-ec",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ec/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ec/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Estonia",
+        "code": "cc-by-sa-3.0-ee",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ee/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ee/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Egypt",
+        "code": "cc-by-sa-3.0-eg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/eg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/eg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Spain",
+        "code": "cc-by-sa-3.0-es",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/es/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/es/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 France",
+        "code": "cc-by-sa-3.0-fr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/fr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/fr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Greece",
+        "code": "cc-by-sa-3.0-gr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/gr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/gr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Guatemala",
+        "code": "cc-by-sa-3.0-gt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/gt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/gt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Hong Kong",
+        "code": "cc-by-sa-3.0-hk",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/hk/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/hk/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Croatia",
+        "code": "cc-by-sa-3.0-hr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/hr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/hr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Ireland",
+        "code": "cc-by-sa-3.0-ie",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ie/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ie/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 IGO",
+        "code": "cc-by-sa-3.0-igo",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/igo/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/igo/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Italy",
+        "code": "cc-by-sa-3.0-it",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/it/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/it/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Luxembourg",
+        "code": "cc-by-sa-3.0-lu",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/lu/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/lu/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Netherlands",
+        "code": "cc-by-sa-3.0-nl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/nl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/nl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Norway",
+        "code": "cc-by-sa-3.0-no",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/no/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/no/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 New Zealand",
+        "code": "cc-by-sa-3.0-nz",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/nz/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/nz/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Philippines",
+        "code": "cc-by-sa-3.0-ph",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ph/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ph/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Poland",
+        "code": "cc-by-sa-3.0-pl",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/pl/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/pl/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Puerto Rico",
+        "code": "cc-by-sa-3.0-pr",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/pr/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/pr/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Portugal",
+        "code": "cc-by-sa-3.0-pt",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/pt/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/pt/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Romania",
+        "code": "cc-by-sa-3.0-ro",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ro/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ro/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Serbia",
+        "code": "cc-by-sa-3.0-rs",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/rs/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/rs/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Singapore",
+        "code": "cc-by-sa-3.0-sg",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/sg/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/sg/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Thailand",
+        "code": "cc-by-sa-3.0-th",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/th/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/th/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Taiwan",
+        "code": "cc-by-sa-3.0-tw",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/tw/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/tw/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Uganda",
+        "code": "cc-by-sa-3.0-ug",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ug/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ug/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 United States",
+        "code": "cc-by-sa-3.0-us",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/us/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/us/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Venezuela",
+        "code": "cc-by-sa-3.0-ve",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/ve/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/ve/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 Vietnam",
+        "code": "cc-by-sa-3.0-vn",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/vn/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/vn/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 3.0 South Africa",
+        "code": "cc-by-sa-3.0-za",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/3.0/za/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/3.0/za/"
+        ]
+    },
+    {
+        "name": "Creative commons - Attribution-ShareAlike 4.0",
+        "code": "cc-by-sa-4.0",
+        "redistribute": true,
+        "commercial": true,
+        "derivative": true,
+        "copyleft": true,
+        "attribution": true,
+        "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "identifiers": [
+            "http://creativecommons.org/licenses/by-sa/4.0/"
+        ]
+    },
+    {
+        "code": "cc0-1.0",
+        "name": "CC0 - Public domain",
+        "redistribute": true,
+        "derivative": true,
+        "commercial": true,
+        "attribution": false,
+        "copyleft": false,
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "identifiers": [
+            "http://creativecommons.org/publicdomain/zero/1.0/"
+        ]
+    }
+]

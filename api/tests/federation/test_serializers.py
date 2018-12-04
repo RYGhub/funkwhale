@@ -632,7 +632,7 @@ def test_activity_pub_album_serializer_to_ap(factories):
 
 
 def test_activity_pub_track_serializer_to_ap(factories):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](license="cc-by-4.0", copyright="test")
     expected = {
         "@context": serializers.AP_CONTEXT,
         "published": track.creation_date.isoformat(),
@@ -641,6 +641,8 @@ def test_activity_pub_track_serializer_to_ap(factories):
         "id": track.fid,
         "name": track.title,
         "position": track.position,
+        "license": track.license.conf["identifiers"][0],
+        "copyright": "test",
         "artists": [
             serializers.ArtistSerializer(
                 track.artist, context={"include_ap_context": False}

@@ -1,8 +1,31 @@
 import pytest
 
+from funkwhale_api.music import licenses
 from funkwhale_api.music import models
 from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
+
+
+def test_license_serializer():
+    """
+    We serializer all licenses to ensure we have valid hardcoded data
+    """
+    for data in licenses.LICENSES:
+        expected = {
+            "id": data["identifiers"][0],
+            "code": data["code"],
+            "name": data["name"],
+            "url": data["url"],
+            "redistribute": data["redistribute"],
+            "derivative": data["derivative"],
+            "commercial": data["commercial"],
+            "attribution": data["attribution"],
+            "copyleft": data["copyleft"],
+        }
+
+        serializer = serializers.LicenseSerializer(data)
+
+        assert serializer.data == expected
 
 
 def test_artist_album_serializer(factories, to_api_date):
@@ -48,7 +71,9 @@ def test_artist_with_albums_serializer(factories, to_api_date):
 
 
 def test_album_track_serializer(factories, to_api_date):
-    upload = factories["music.Upload"]()
+    upload = factories["music.Upload"](
+        track__license="cc-by-4.0", track__copyright="test"
+    )
     track = upload.track
     setattr(track, "playable_uploads", [upload])
 
@@ -63,6 +88,8 @@ def test_album_track_serializer(factories, to_api_date):
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
         "duration": None,
+        "license": track.license.code,
+        "copyright": track.copyright,
     }
     serializer = serializers.AlbumTrackSerializer(track)
     assert serializer.data == expected
@@ -146,7 +173,9 @@ def test_album_serializer(factories, to_api_date):
 
 
 def test_track_serializer(factories, to_api_date):
-    upload = factories["music.Upload"]()
+    upload = factories["music.Upload"](
+        track__license="cc-by-4.0", track__copyright="test"
+    )
     track = upload.track
     setattr(track, "playable_uploads", [upload])
     expected = {
@@ -160,6 +189,8 @@ def test_track_serializer(factories, to_api_date):
         "creation_date": to_api_date(track.creation_date),
         "lyrics": track.get_lyrics_url(),
         "listen_url": track.listen_url,
+        "license": upload.track.license.code,
+        "copyright": upload.track.copyright,
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected
