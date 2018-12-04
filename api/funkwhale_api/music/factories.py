@@ -121,7 +121,7 @@ class UploadFactory(factory.django.DjangoModelFactory):
         model = "music.Upload"
 
     class Params:
-        in_place = factory.Trait(audio_file=None)
+        in_place = factory.Trait(audio_file=None, mimetype=None)
         playable = factory.Trait(
             import_status="finished", library__privacy_level="everyone"
         )
