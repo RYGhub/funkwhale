@@ -24,6 +24,8 @@ def test_get_all_metadata_at_once():
         "musicbrainz_recordingid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
         "musicbrainz_artistid": uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
         "musicbrainz_albumartistid": uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
+        "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "Someone",
     }
 
     assert data.all() == expected
@@ -45,6 +47,8 @@ def test_get_all_metadata_at_once():
             "musicbrainz_albumartistid",
             uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
         ),
+        ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
+        ("copyright", "Someone"),
     ],
 )
 def test_can_get_metadata_from_ogg_file(field, value):
@@ -70,6 +74,8 @@ def test_can_get_metadata_from_ogg_file(field, value):
             "musicbrainz_albumartistid",
             uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
         ),
+        ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
+        ("copyright", "Someone"),
     ],
 )
 def test_can_get_metadata_from_opus_file(field, value):
@@ -95,6 +101,9 @@ def test_can_get_metadata_from_opus_file(field, value):
             "musicbrainz_albumartistid",
             uuid.UUID("c3bc80a6-1f4a-4e17-8cf0-6b1efe8302f1"),
         ),
+        # somehow, I cannot successfully create an ogg theora file
+        # with the proper license field
+        # ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
     ],
 )
 def test_can_get_metadata_from_ogg_theora_file(field, value):
@@ -120,6 +129,8 @@ def test_can_get_metadata_from_ogg_theora_file(field, value):
             "musicbrainz_albumartistid",
             uuid.UUID("9c6bddde-6228-4d9f-ad0d-03f6fcb19e13"),
         ),
+        ("license", "https://creativecommons.org/licenses/by-nc-nd/2.5/"),
+        ("copyright", "Someone"),
     ],
 )
 def test_can_get_metadata_from_id3_mp3_file(field, value):
@@ -159,6 +170,8 @@ def test_can_get_pictures(name):
             "musicbrainz_albumartistid",
             uuid.UUID("b7ffd2af-418f-4be2-bdd1-22f8b48613da"),
         ),
+        ("license", "http://creativecommons.org/licenses/by-nc-sa/3.0/us/"),
+        ("copyright", "2008 nin"),
     ],
 )
 def test_can_get_metadata_from_flac_file(field, value):

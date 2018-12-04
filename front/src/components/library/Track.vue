@@ -4,23 +4,33 @@
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="track">
-      <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="track.title">
+      <section
+        :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']"
+        :style="headerStyle"
+        v-title="track.title"
+      >
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted music orange icon"></i>
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                <translate :translate-params="{album: track.album.title, artist: track.artist.name}">
-                  From album %{ album } by %{ artist }
-                </translate>
+                <translate
+                  :translate-params="{album: track.album.title, artist: track.artist.name}"
+                >From album %{ album } by %{ artist }</translate>
               </div>
               <br>
               <div class="ui basic buttons">
-                <router-link class="ui button" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
+                <router-link
+                  class="ui button"
+                  :to="{name: 'library.albums.detail', params: {id: track.album.id }}"
+                >
                   <translate>Album page</translate>
                 </router-link>
-                <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+                <router-link
+                  class="ui button"
+                  :to="{name: 'library.artists.detail', params: {id: track.artist.id }}"
+                >
                   <translate>Artist page</translate>
                 </router-link>
               </div>
@@ -31,10 +41,7 @@
             <translate>Play</translate>
           </play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
-          <track-playlist-icon
-            :button="true"
-            v-if="$store.state.auth.authenticated"
-            :track="track"></track-playlist-icon>
+          <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia icon"></i>
@@ -50,17 +57,37 @@
           </a>
         </div>
       </section>
-      <section class="ui vertical stripe center aligned segment" v-if="upload">
-        <h2 class="ui header"><translate>Track information</translate></h2>
+      <section class="ui vertical stripe center aligned segment">
+        <h2 class="ui header">
+          <translate>Track information</translate>
+        </h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
             <tr>
               <td>
+                <translate>Copyright</translate>
+              </td>
+              <td v-if="track.copyright" :title="track.copyright">{{ track.copyright|truncate(50) }}</td>
+              <td v-else>
+                <translate>We don't have any copyright information for this track</translate>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <translate>License</translate>
+              </td>
+              <td v-if="license">
+                <a :href="license.url" target="_blank" rel="noopener noreferrer">{{ license.name }}</a>
+              </td>
+              <td v-else>
+                <translate>We don't have any licensing information for this track</translate>
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <translate>Duration</translate>
               </td>
-              <td v-if="upload.duration">
-                {{ time.parse(upload.duration) }}
-              </td>
+              <td v-if="upload && upload.duration">{{ time.parse(upload.duration) }}</td>
               <td v-else>
                 <translate>N/A</translate>
               </td>
@@ -69,9 +96,7 @@
               <td>
                 <translate>Size</translate>
               </td>
-              <td v-if="upload.size">
-                {{ upload.size | humanSize }}
-              </td>
+              <td v-if="upload && upload.size">{{ upload.size | humanSize }}</td>
               <td v-else>
                 <translate>N/A</translate>
               </td>
@@ -80,9 +105,7 @@
               <td>
                 <translate>Bitrate</translate>
               </td>
-              <td v-if="upload.bitrate">
-                {{ upload.bitrate | humanSize }}/s
-              </td>
+              <td v-if="upload && upload.bitrate">{{ upload.bitrate | humanSize }}/s</td>
               <td v-else>
                 <translate>N/A</translate>
               </td>
@@ -91,9 +114,7 @@
               <td>
                 <translate>Type</translate>
               </td>
-              <td v-if="upload.extension">
-                {{ upload.extension }}
-              </td>
+              <td v-if="upload && upload.extension">{{ upload.extension }}</td>
               <td v-else>
                 <translate>N/A</translate>
               </td>
@@ -108,10 +129,11 @@
         <div v-if="isLoadingLyrics" class="ui vertical segment">
           <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
         </div>
-        <div v-if="lyrics" v-html="lyrics.content_rendered">
-        </div>
+        <div v-if="lyrics" v-html="lyrics.content_rendered"></div>
         <template v-if="!isLoadingLyrics & !lyrics">
-          <p><translate>No lyrics available for this track.</translate></p>
+          <p>
+            <translate>No lyrics available for this track.</translate>
+          </p>
           <a class="ui button" target="_blank" :href="lyricsSearchUrl">
             <i class="search icon"></i>
             <translate>Search on lyrics.wikia.com</translate>
@@ -139,6 +161,7 @@ import PlayButton from "@/components/audio/PlayButton"
 import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import LibraryWidget from "@/components/federation/LibraryWidget"
+import Modal from '@/components/semantic/Modal'
 
 const FETCH_URL = "tracks/"
 
@@ -148,7 +171,8 @@ export default {
     PlayButton,
     TrackPlaylistIcon,
     TrackFavoriteIcon,
-    LibraryWidget
+    LibraryWidget,
+    Modal
   },
   data() {
     return {
@@ -156,7 +180,8 @@ export default {
       isLoadingTrack: true,
       isLoadingLyrics: true,
       track: null,
-      lyrics: null
+      lyrics: null,
+      licenseData: null
     }
   },
   created() {
@@ -172,6 +197,13 @@ export default {
       axios.get(url).then(response => {
         self.track = response.data
         self.isLoadingTrack = false
+      })
+    },
+    fetchLicenseData(licenseId) {
+      var self = this
+      let url = `licenses/${licenseId}/`
+      axios.get(url).then(response => {
+        self.licenseData = response.data
       })
     },
     fetchLyrics() {
@@ -243,11 +275,22 @@ export default {
         this.$store.getters["instance/absoluteUrl"](this.cover) +
         ")"
       )
+    },
+    license() {
+      if (!this.track || !this.track.license) {
+        return null
+      }
+      return this.licenseData
     }
   },
   watch: {
     id() {
       this.fetchData()
+    },
+    track (v) {
+      if (v && v.license) {
+        this.fetchLicenseData(v.license)
+      }
     }
   }
 }

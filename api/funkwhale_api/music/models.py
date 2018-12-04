@@ -113,6 +113,33 @@ class APIModelMixin(models.Model):
         return super().save(**kwargs)
 
 
+class License(models.Model):
+    code = models.CharField(primary_key=True, max_length=100)
+    url = models.URLField(max_length=500)
+
+    # if true, license is a copyleft license, meaning that derivative
+    # work must be shared under the same license
+    copyleft = models.BooleanField()
+    # if true, commercial use of the work is allowed
+    commercial = models.BooleanField()
+    # if true, attribution to the original author is required when reusing
+    # the work
+    attribution = models.BooleanField()
+    # if true, derivative work are allowed
+    derivative = models.BooleanField()
+    # if true, redistribution of the wor is allowed
+    redistribute = models.BooleanField()
+
+    @property
+    def conf(self):
+        from . import licenses
+
+        for row in licenses.LICENSES:
+            if self.code == row["code"]:
+                return row
+        logger.warning("%s do not match any registered license", self.code)
+
+
 class ArtistQuerySet(models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count("albums"))
@@ -430,6 +457,14 @@ class Track(APIModelMixin):
     work = models.ForeignKey(
         Work, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
     )
+    license = models.ForeignKey(
+        License,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        related_name="tracks",
+    )
+    copyright = models.CharField(max_length=500, null=True, blank=True)
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
@@ -546,6 +581,17 @@ class Track(APIModelMixin):
     @property
     def listen_url(self):
         return reverse("api:v1:listen-detail", kwargs={"uuid": self.uuid})
+
+    @property
+    def local_license(self):
+        """
+        Since license primary keys are strings, and we can get the data
+        from our hardcoded licenses.LICENSES list, there is no need
+        for extra SQL joins / queries.
+        """
+        from . import licenses
+
+        return licenses.LICENSES_BY_ID.get(self.license_id)
 
 
 class UploadQuerySet(models.QuerySet):

@@ -12,3 +12,4 @@ pytest-xdist
 pytest-cov
 pytest-env
 requests-mock
+pytest-profiling

@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import models, serializers, tasks, views
+from funkwhale_api.music import licenses, models, serializers, tasks, views
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -541,3 +541,32 @@ def test_can_get_libraries_for_music_entities(
         "previous": None,
         "results": [expected],
     }
+
+
+def test_list_licenses(api_client, preferences, mocker):
+    licenses.load(licenses.LICENSES)
+    load = mocker.spy(licenses, "load")
+    preferences["common__api_authentication_required"] = False
+
+    expected = [
+        serializers.LicenseSerializer(l.conf).data
+        for l in models.License.objects.order_by("code")[:25]
+    ]
+    url = reverse("api:v1:licenses-list")
+
+    response = api_client.get(url)
+
+    assert response.data["results"] == expected
+    load.assert_called_once_with(licenses.LICENSES)
+
+
+def test_detail_license(api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    id = "cc-by-sa-4.0"
+    expected = serializers.LicenseSerializer(licenses.LICENSES_BY_ID[id]).data
+
+    url = reverse("api:v1:licenses-detail", kwargs={"pk": id})
+
+    response = api_client.get(url)
+
+    assert response.data == expected

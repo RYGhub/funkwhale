@@ -19,6 +19,7 @@ router.register(r"libraries", views.LibraryViewSet, "libraries")
 router.register(r"listen", views.ListenViewSet, "listen")
 router.register(r"artists", views.ArtistViewSet, "artists")
 router.register(r"albums", views.AlbumViewSet, "albums")
+router.register(r"licenses", views.LicenseViewSet, "licenses")
 router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
 router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"

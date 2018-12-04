@@ -498,3 +498,15 @@ def test_fid_is_populated(factories, model, factory_args, namespace):
 def test_upload_extension(factory_args, factories, expected):
     upload = factories["music.Upload"].build(**factory_args)
     assert upload.extension == expected
+
+
+def test_can_create_license(db):
+    models.License.objects.create(
+        code="cc-by-sa",
+        copyleft=True,
+        commercial=True,
+        attribution=True,
+        derivative=True,
+        redistribute=True,
+        url="http://cc",
+    )

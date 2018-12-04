@@ -14,6 +14,21 @@ from . import filters, models, tasks
 cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
 
 
+class LicenseSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField()
+    url = serializers.URLField()
+    code = serializers.CharField()
+    name = serializers.CharField()
+    redistribute = serializers.BooleanField()
+    derivative = serializers.BooleanField()
+    commercial = serializers.BooleanField()
+    attribution = serializers.BooleanField()
+    copyleft = serializers.BooleanField()
+
+    def get_id(self, obj):
+        return obj["identifiers"][0]
+
+
 class ArtistAlbumSerializer(serializers.ModelSerializer):
     tracks_count = serializers.SerializerMethodField()
     cover = cover_field
@@ -76,6 +91,8 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "uploads",
             "listen_url",
             "duration",
+            "copyright",
+            "license",
         )
 
     def get_uploads(self, obj):
@@ -179,6 +196,8 @@ class TrackSerializer(serializers.ModelSerializer):
             "lyrics",
             "uploads",
             "listen_url",
+            "copyright",
+            "license",
         )
 
     def get_lyrics(self, obj):

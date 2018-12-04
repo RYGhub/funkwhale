@@ -4,8 +4,8 @@ import factory
 
 from funkwhale_api.factories import ManyToManyFromList, registry
 from funkwhale_api.federation import factories as federation_factories
+from funkwhale_api.music import licenses
 from funkwhale_api.users import factories as users_factories
-
 
 SAMPLES_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
@@ -28,6 +28,29 @@ def playable_factory(field):
             )
 
     return inner
+
+
+def deduce_from_conf(field):
+    @factory.lazy_attribute
+    def inner(self):
+        return licenses.LICENSES_BY_ID[self.code][field]
+
+    return inner
+
+
+@registry.register
+class LicenseFactory(factory.django.DjangoModelFactory):
+    code = "cc-by-4.0"
+    url = deduce_from_conf("url")
+    commercial = deduce_from_conf("commercial")
+    redistribute = deduce_from_conf("redistribute")
+    copyleft = deduce_from_conf("copyleft")
+    attribution = deduce_from_conf("attribution")
+    derivative = deduce_from_conf("derivative")
+
+    class Meta:
+        model = "music.License"
+        django_get_or_create = ("code",)
 
 
 @registry.register
@@ -69,6 +92,15 @@ class TrackFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "music.Track"
+
+    @factory.post_generation
+    def license(self, created, extracted, **kwargs):
+        if not created:
+            return
+
+        if extracted:
+            self.license = LicenseFactory(code=extracted)
+            self.save()
 
 
 @registry.register

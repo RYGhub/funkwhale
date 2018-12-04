@@ -25,10 +25,18 @@ def get_id3_tag(f, k):
     if k == "pictures":
         return f.tags.getall("APIC")
     # First we try to grab the standard key
-    try:
-        return f.tags[k].text[0]
-    except KeyError:
-        pass
+    possible_attributes = [("text", True), ("url", False)]
+    for attr, select_first in possible_attributes:
+        try:
+            v = getattr(f.tags[k], attr)
+            if select_first:
+                v = v[0]
+            return v
+        except KeyError:
+            break
+        except AttributeError:
+            continue
+
     # then we fallback on parsing non standard tags
     all_tags = f.tags.getall("TXXX")
     try:
@@ -162,6 +170,8 @@ CONF = {
             "musicbrainz_artistid": {},
             "musicbrainz_albumartistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
+            "license": {},
+            "copyright": {},
         },
     },
     "OggVorbis": {
@@ -183,6 +193,8 @@ CONF = {
             "musicbrainz_artistid": {},
             "musicbrainz_albumartistid": {},
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
+            "license": {},
+            "copyright": {},
         },
     },
     "OggTheora": {
@@ -201,6 +213,9 @@ CONF = {
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
             "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "musicbrainz_recordingid": {"field": "MusicBrainz Track Id"},
+            # somehow, I cannot successfully create an ogg theora file
+            # with the proper license field
+            # "license": {"field": "license"},
         },
     },
     "MP3": {
@@ -221,6 +236,8 @@ CONF = {
                 "getter": get_mp3_recording_id,
             },
             "pictures": {},
+            "license": {"field": "WCOP"},
+            "copyright": {"field": "TCOP"},
         },
     },
     "FLAC": {
@@ -242,6 +259,8 @@ CONF = {
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
             "test": {},
             "pictures": {},
+            "license": {},
+            "copyright": {},
         },
     },
 }
@@ -257,6 +276,8 @@ ALL_FIELDS = [
     "musicbrainz_artistid",
     "musicbrainz_albumartistid",
     "musicbrainz_recordingid",
+    "license",
+    "copyright",
 ]
 
 
