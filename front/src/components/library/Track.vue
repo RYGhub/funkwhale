@@ -228,7 +228,7 @@ export default {
     },
     lyricsSearchUrl() {
       let base = "http://lyrics.wikia.com/wiki/Special:Search?query="
-      let query = this.track.artist.name + " " + this.track.title
+      let query = this.track.artist.name + ":" + this.track.title
       return base + encodeURI(query)
     },
     cover() {
