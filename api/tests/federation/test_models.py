@@ -54,3 +54,16 @@ def test_actor_get_quota(factories):
     expected = {"total": 10, "pending": 1, "skipped": 2, "errored": 3, "finished": 4}
 
     assert library.actor.get_current_usage() == expected
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("Domain.com", "domain.com"),
+        ("hello-WORLD.com", "hello-world.com"),
+        ("posés.com", "posés.com"),
+    ],
+)
+def test_domain_name_saved_properly(value, expected, factories):
+    domain = factories["federation.Domain"](name=value)
+    assert domain.name == expected

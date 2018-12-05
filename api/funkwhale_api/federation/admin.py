@@ -24,6 +24,12 @@ def redeliver_activities(modeladmin, request, queryset):
 redeliver_activities.short_description = "Redeliver"
 
 
+@admin.register(models.Domain)
+class DomainAdmin(admin.ModelAdmin):
+    list_display = ["name", "creation_date"]
+    search_fields = ["name"]
+
+
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ["type", "fid", "url", "actor", "creation_date"]

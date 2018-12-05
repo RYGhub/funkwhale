@@ -62,6 +62,23 @@ class ActorQuerySet(models.QuerySet):
         return qs
 
 
+class Domain(models.Model):
+    name = models.CharField(primary_key=True, max_length=255)
+    creation_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, **kwargs):
+        lowercase_fields = ["name"]
+        for field in lowercase_fields:
+            v = getattr(self, field, None)
+            if v:
+                setattr(self, field, v.lower())
+
+        super().save(**kwargs)
+
+
 class Actor(models.Model):
     ap_type = "Actor"
 
@@ -74,7 +91,7 @@ class Actor(models.Model):
     shared_inbox_url = models.URLField(max_length=500, null=True, blank=True)
     type = models.CharField(choices=TYPE_CHOICES, default="Person", max_length=25)
     name = models.CharField(max_length=200, null=True, blank=True)
-    domain = models.CharField(max_length=1000)
+    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name="actors")
     summary = models.CharField(max_length=500, null=True, blank=True)
     preferred_username = models.CharField(max_length=200, null=True, blank=True)
     public_key = models.TextField(max_length=5000, null=True, blank=True)
@@ -110,36 +127,9 @@ class Actor(models.Model):
     def __str__(self):
         return "{}@{}".format(self.preferred_username, self.domain)
 
-    def save(self, **kwargs):
-        lowercase_fields = ["domain"]
-        for field in lowercase_fields:
-            v = getattr(self, field, None)
-            if v:
-                setattr(self, field, v.lower())
-
-        super().save(**kwargs)
-
     @property
     def is_local(self):
-        return self.domain == settings.FEDERATION_HOSTNAME
-
-    @property
-    def is_system(self):
-        from . import actors
-
-        return all(
-            [
-                settings.FEDERATION_HOSTNAME == self.domain,
-                self.preferred_username in actors.SYSTEM_ACTORS,
-            ]
-        )
-
-    @property
-    def system_conf(self):
-        from . import actors
-
-        if self.is_system:
-            return actors.SYSTEM_ACTORS[self.preferred_username]
+        return self.domain_id == settings.FEDERATION_HOSTNAME
 
     def get_approved_followers(self):
         follows = self.received_follows.filter(approved=True)

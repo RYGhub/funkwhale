@@ -43,7 +43,7 @@ def test_actor_serializer_from_ap(db):
     assert actor.public_key == payload["publicKey"]["publicKeyPem"]
     assert actor.preferred_username == payload["preferredUsername"]
     assert actor.name == payload["name"]
-    assert actor.domain == "test.federation"
+    assert actor.domain.pk == "test.federation"
     assert actor.summary == payload["summary"]
     assert actor.type == "Person"
     assert actor.manually_approves_followers == payload["manuallyApprovesFollowers"]
@@ -71,7 +71,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     assert actor.followers_url == payload["followers"]
     assert actor.following_url == payload["following"]
     assert actor.preferred_username == payload["preferredUsername"]
-    assert actor.domain == "test.federation"
+    assert actor.domain.pk == "test.federation"
     assert actor.type == "Person"
     assert actor.manually_approves_followers is None
 
@@ -110,7 +110,7 @@ def test_actor_serializer_to_ap():
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain="test.federation",
+        domain=models.Domain(pk="test.federation"),
         summary=expected["summary"],
         type="Person",
         manually_approves_followers=False,
@@ -135,7 +135,7 @@ def test_webfinger_serializer():
     actor = models.Actor(
         fid=expected["links"][0]["href"],
         preferred_username="service",
-        domain="test.federation",
+        domain=models.Domain(pk="test.federation"),
     )
     serializer = serializers.ActorWebfingerSerializer(actor)
 
@@ -898,7 +898,7 @@ def test_local_actor_serializer_to_ap(factories):
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain="test.federation",
+        domain=models.Domain.objects.create(pk="test.federation"),
         summary=expected["summary"],
         type="Person",
         manually_approves_followers=False,

@@ -137,7 +137,7 @@ def test_creating_actor_from_user(factories, settings):
     actor = models.create_actor(user)
 
     assert actor.preferred_username == "Hello_M_world"  # slugified
-    assert actor.domain == settings.FEDERATION_HOSTNAME
+    assert actor.domain.pk == settings.FEDERATION_HOSTNAME
     assert actor.type == "Person"
     assert actor.name == user.username
     assert actor.manually_approves_followers is False

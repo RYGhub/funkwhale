@@ -114,7 +114,8 @@ class ActorSerializer(serializers.Serializer):
         if maf is not None:
             kwargs["manually_approves_followers"] = maf
         domain = urllib.parse.urlparse(kwargs["fid"]).netloc
-        kwargs["domain"] = domain
+        kwargs["domain"] = models.Domain.objects.get_or_create(
+            pk=domain)[0]
         for endpoint, url in self.initial_data.get("endpoints", {}).items():
             if endpoint == "sharedInbox":
                 kwargs["shared_inbox_url"] = url

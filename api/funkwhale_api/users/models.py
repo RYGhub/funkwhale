@@ -252,7 +252,9 @@ def get_actor_data(user):
     username = federation_utils.slugify_username(user.username)
     return {
         "preferred_username": username,
-        "domain": settings.FEDERATION_HOSTNAME,
+        "domain": federation_models.Domain.objects.get_or_create(
+            name=settings.FEDERATION_HOSTNAME
+        )[0],
         "type": "Person",
         "name": user.username,
         "manually_approves_followers": False,
