@@ -42,23 +42,39 @@ ACTIVITY_TYPES = [
     "View",
 ]
 
-
-OBJECT_TYPES = [
-    "Article",
-    "Audio",
-    "Collection",
-    "Document",
-    "Event",
-    "Image",
-    "Note",
-    "OrderedCollection",
-    "Page",
-    "Place",
-    "Profile",
-    "Relationship",
-    "Tombstone",
-    "Video",
-] + ACTIVITY_TYPES
+FUNKWHALE_OBJECT_TYPES = [
+    ("Domain", "Domain"),
+    ("Artist", "Artist"),
+    ("Album", "Album"),
+    ("Track", "Track"),
+    ("Library", "Library"),
+]
+OBJECT_TYPES = (
+    [
+        "Application",
+        "Article",
+        "Audio",
+        "Collection",
+        "Document",
+        "Event",
+        "Group",
+        "Image",
+        "Note",
+        "Object",
+        "OrderedCollection",
+        "Organization",
+        "Page",
+        "Person",
+        "Place",
+        "Profile",
+        "Relationship",
+        "Service",
+        "Tombstone",
+        "Video",
+    ]
+    + ACTIVITY_TYPES
+    + FUNKWHALE_OBJECT_TYPES
+)
 
 
 BROADCAST_TO_USER_ACTIVITIES = ["Follow", "Accept"]
