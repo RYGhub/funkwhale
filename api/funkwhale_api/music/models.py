@@ -29,7 +29,7 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from . import importers, metadata, utils
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 def empty_dict():
