@@ -738,9 +738,10 @@ class Upload(models.Model):
             return utils.MIMETYPE_TO_EXTENSION[self.mimetype]
         except KeyError:
             pass
-        if not self.audio_file:
-            return
-        return os.path.splitext(self.audio_file.name)[-1].replace(".", "", 1)
+        if self.audio_file:
+            return os.path.splitext(self.audio_file.name)[-1].replace(".", "", 1)
+        if self.in_place_path:
+            return os.path.splitext(self.in_place_path)[-1].replace(".", "", 1)
 
     def get_file_size(self):
         if self.audio_file:
@@ -822,6 +823,12 @@ class Upload(models.Model):
         version.save(update_fields=["size"])
 
         return version
+
+    @property
+    def in_place_path(self):
+        if not self.source or not self.source.startswith("file://"):
+            return
+        return self.source.lstrip("file://")
 
 
 MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]

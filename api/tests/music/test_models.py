@@ -490,6 +490,7 @@ def test_fid_is_populated(factories, model, factory_args, namespace):
     [
         ({"audio_file__filename": "test.mp3", "mimetype": None}, "mp3"),
         ({"mimetype": "audio/mpeg"}, "mp3"),
+        ({"in_place": True, "source": "file:///test.mp3"}, "mp3"),
         ({"audio_file__filename": "test.None", "mimetype": "audio/mpeg"}, "mp3"),
         ({"audio_file__filename": "test.None", "mimetype": "audio/flac"}, "flac"),
         ({"audio_file__filename": "test.None", "mimetype": "audio/x-flac"}, "flac"),
@@ -497,6 +498,7 @@ def test_fid_is_populated(factories, model, factory_args, namespace):
 )
 def test_upload_extension(factory_args, factories, expected):
     upload = factories["music.Upload"].build(**factory_args)
+
     assert upload.extension == expected
 
 
