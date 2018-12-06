@@ -10,7 +10,6 @@ from funkwhale_api.users import models
 mapping = {
     "dynamic_preferences.change_globalpreferencemodel": "settings",
     "music.add_importbatch": "library",
-    "federation.change_library": "federation",
 }
 
 

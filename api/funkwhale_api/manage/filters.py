@@ -31,10 +31,9 @@ class ManageUserFilterSet(filters.FilterSet):
             "privacy_level",
             "is_staff",
             "is_superuser",
-            "permission_upload",
             "permission_library",
             "permission_settings",
-            "permission_federation",
+            "permission_moderation",
         ]
 
 
