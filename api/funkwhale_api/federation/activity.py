@@ -386,15 +386,3 @@ def get_actors_from_audience(urls):
     if not final_query:
         return models.Actor.objects.none()
     return models.Actor.objects.filter(final_query)
-
-
-def get_inbox_urls(actor_queryset):
-    """
-    Given an actor queryset, returns a deduplicated set containing
-    all inbox or shared inbox urls where we should deliver our payloads for
-    those actors
-    """
-    values = actor_queryset.values("inbox_url", "shared_inbox_url")
-
-    urls = set([actor["shared_inbox_url"] or actor["inbox_url"] for actor in values])
-    return sorted(urls)
