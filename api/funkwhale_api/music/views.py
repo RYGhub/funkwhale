@@ -93,8 +93,10 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        tracks = models.Track.objects.select_related("artist").with_playable_uploads(
-            utils.get_actor_from_request(self.request)
+        tracks = (
+            models.Track.objects.select_related("artist")
+            .with_playable_uploads(utils.get_actor_from_request(self.request))
+            .order_for_album()
         )
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs.distinct()

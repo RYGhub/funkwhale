@@ -729,6 +729,7 @@ class AlbumSerializer(MusicEntitySerializer):
 
 class TrackSerializer(MusicEntitySerializer):
     position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
+    disc = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     album = AlbumSerializer()
     license = serializers.URLField(allow_null=True, required=False)
@@ -742,6 +743,7 @@ class TrackSerializer(MusicEntitySerializer):
             "published": instance.creation_date.isoformat(),
             "musicbrainzId": str(instance.mbid) if instance.mbid else None,
             "position": instance.position,
+            "disc": instance.disc_number,
             "license": instance.local_license["identifiers"][0]
             if instance.local_license
             else None,

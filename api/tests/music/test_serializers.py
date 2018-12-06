@@ -72,7 +72,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
 
 def test_album_track_serializer(factories, to_api_date):
     upload = factories["music.Upload"](
-        track__license="cc-by-4.0", track__copyright="test"
+        track__license="cc-by-4.0", track__copyright="test", track__disc_number=2
     )
     track = upload.track
     setattr(track, "playable_uploads", [upload])
@@ -84,6 +84,7 @@ def test_album_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
+        "disc_number": track.disc_number,
         "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
@@ -174,7 +175,7 @@ def test_album_serializer(factories, to_api_date):
 
 def test_track_serializer(factories, to_api_date):
     upload = factories["music.Upload"](
-        track__license="cc-by-4.0", track__copyright="test"
+        track__license="cc-by-4.0", track__copyright="test", track__disc_number=2
     )
     track = upload.track
     setattr(track, "playable_uploads", [upload])
@@ -185,6 +186,7 @@ def test_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
+        "disc_number": track.disc_number,
         "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "lyrics": track.get_lyrics_url(),
