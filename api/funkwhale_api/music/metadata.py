@@ -92,7 +92,7 @@ def get_mp3_recording_id(f, k):
         raise TagNotFound(k)
 
 
-def convert_track_number(v):
+def convert_position(v):
     try:
         return int(v)
     except ValueError:
@@ -156,8 +156,9 @@ CONF = {
         "fields": {
             "track_number": {
                 "field": "TRACKNUMBER",
-                "to_application": convert_track_number,
+                "to_application": convert_position,
             },
+            "disc_number": {"field": "DISCNUMBER", "to_application": convert_position},
             "title": {},
             "artist": {},
             "album_artist": {
@@ -179,8 +180,9 @@ CONF = {
         "fields": {
             "track_number": {
                 "field": "TRACKNUMBER",
-                "to_application": convert_track_number,
+                "to_application": convert_position,
             },
+            "disc_number": {"field": "DISCNUMBER", "to_application": convert_position},
             "title": {},
             "artist": {},
             "album_artist": {
@@ -202,8 +204,9 @@ CONF = {
         "fields": {
             "track_number": {
                 "field": "TRACKNUMBER",
-                "to_application": convert_track_number,
+                "to_application": convert_position,
             },
+            "disc_number": {"field": "DISCNUMBER", "to_application": convert_position},
             "title": {},
             "artist": {},
             "album_artist": {"field": "albumartist"},
@@ -222,7 +225,8 @@ CONF = {
         "getter": get_id3_tag,
         "clean_pictures": clean_id3_pictures,
         "fields": {
-            "track_number": {"field": "TRCK", "to_application": convert_track_number},
+            "track_number": {"field": "TRCK", "to_application": convert_position},
+            "disc_number": {"field": "TPOS", "to_application": convert_position},
             "title": {"field": "TIT2"},
             "artist": {"field": "TPE1"},
             "album_artist": {"field": "TPE2"},
@@ -246,8 +250,9 @@ CONF = {
         "fields": {
             "track_number": {
                 "field": "tracknumber",
-                "to_application": convert_track_number,
+                "to_application": convert_position,
             },
+            "disc_number": {"field": "discnumber", "to_application": convert_position},
             "title": {},
             "artist": {},
             "album_artist": {"field": "albumartist"},
@@ -267,6 +272,7 @@ CONF = {
 
 ALL_FIELDS = [
     "track_number",
+    "disc_number",
     "title",
     "artist",
     "album_artist",

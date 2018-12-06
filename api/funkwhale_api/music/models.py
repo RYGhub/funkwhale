@@ -440,6 +440,12 @@ class TrackQuerySet(models.QuerySet):
             models.Prefetch("uploads", queryset=uploads, to_attr="playable_uploads")
         )
 
+    def order_for_album(self):
+        """
+        Order by disc number then position
+        """
+        return self.order_by("disc_number", "position", "title")
+
 
 def get_artist(release_list):
     return Artist.get_or_create_from_api(
@@ -450,6 +456,7 @@ def get_artist(release_list):
 class Track(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
+    disc_number = models.PositiveIntegerField(null=True, blank=True)
     position = models.PositiveIntegerField(null=True, blank=True)
     album = models.ForeignKey(
         Album, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
@@ -485,7 +492,7 @@ class Track(APIModelMixin):
     tags = TaggableManager(blank=True)
 
     class Meta:
-        ordering = ["album", "position"]
+        ordering = ["album", "disc_number", "position"]
 
     def __str__(self):
         return self.title

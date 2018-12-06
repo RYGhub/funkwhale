@@ -512,3 +512,13 @@ def test_can_create_license(db):
         redistribute=True,
         url="http://cc",
     )
+
+
+def test_track_order_for_album(factories):
+    album = factories["music.Album"]()
+    t1 = factories["music.Track"](album=album, position=1, disc_number=1)
+    t2 = factories["music.Track"](album=album, position=1, disc_number=2)
+    t3 = factories["music.Track"](album=album, position=2, disc_number=1)
+    t4 = factories["music.Track"](album=album, position=2, disc_number=2)
+
+    assert list(models.Track.objects.order_for_album()) == [t1, t3, t2, t4]

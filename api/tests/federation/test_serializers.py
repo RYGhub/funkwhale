@@ -632,7 +632,9 @@ def test_activity_pub_album_serializer_to_ap(factories):
 
 
 def test_activity_pub_track_serializer_to_ap(factories):
-    track = factories["music.Track"](license="cc-by-4.0", copyright="test")
+    track = factories["music.Track"](
+        license="cc-by-4.0", copyright="test", disc_number=3
+    )
     expected = {
         "@context": serializers.AP_CONTEXT,
         "published": track.creation_date.isoformat(),
@@ -641,6 +643,7 @@ def test_activity_pub_track_serializer_to_ap(factories):
         "id": track.fid,
         "name": track.title,
         "position": track.position,
+        "disc": track.disc_number,
         "license": track.license.conf["identifiers"][0],
         "copyright": "test",
         "artists": [
@@ -668,6 +671,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock):
         "musicbrainzId": str(uuid.uuid4()),
         "name": "Black in back",
         "position": 5,
+        "disc": 1,
         "album": {
             "type": "Album",
             "id": "http://hello.album",
@@ -713,6 +717,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock):
     assert track.fid == data["id"]
     assert track.title == data["name"]
     assert track.position == data["position"]
+    assert track.disc_number == data["disc"]
     assert track.creation_date == published
     assert str(track.mbid) == data["musicbrainzId"]
 

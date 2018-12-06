@@ -88,6 +88,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "artist",
             "creation_date",
             "position",
+            "disc_number",
             "uploads",
             "listen_url",
             "duration",
@@ -130,10 +131,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         )
 
     def get_tracks(self, o):
-        ordered_tracks = sorted(
-            o.tracks.all(),
-            key=lambda v: (v.position, v.title) if v.position else (99999, v.title),
-        )
+        ordered_tracks = o.tracks.all()
         return AlbumTrackSerializer(ordered_tracks, many=True).data
 
     def get_is_playable(self, obj):
@@ -193,6 +191,7 @@ class TrackSerializer(serializers.ModelSerializer):
             "artist",
             "creation_date",
             "position",
+            "disc_number",
             "lyrics",
             "uploads",
             "listen_url",

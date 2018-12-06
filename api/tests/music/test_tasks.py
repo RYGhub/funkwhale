@@ -23,6 +23,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
         "album": "Test album",
         "date": datetime.date(2012, 8, 15),
         "track_number": 4,
+        "disc_number": 2,
         "license": "Hello world: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
     }
@@ -34,6 +35,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     assert track.title == metadata["title"]
     assert track.mbid is None
     assert track.position == 4
+    assert track.disc_number == 2
     assert track.license.code == "cc-by-sa-4.0"
     assert track.copyright == metadata["copyright"]
     assert track.album.title == metadata["album"]
@@ -66,6 +68,7 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     assert track.title == metadata["title"]
     assert track.mbid == metadata["musicbrainz_recordingid"]
     assert track.position == 4
+    assert track.disc_number is None
     assert track.album.title == metadata["album"]
     assert track.album.mbid == metadata["musicbrainz_albumid"]
     assert track.album.artist.mbid == metadata["musicbrainz_albumartistid"]
@@ -402,6 +405,7 @@ def test_federation_audio_track_to_metadata(now):
         "musicbrainzId": str(uuid.uuid4()),
         "name": "Black in back",
         "position": 5,
+        "disc": 2,
         "published": published.isoformat(),
         "license": "http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
@@ -441,6 +445,7 @@ def test_federation_audio_track_to_metadata(now):
         "title": payload["name"],
         "date": released,
         "track_number": payload["position"],
+        "disc_number": payload["disc"],
         "license": "http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
         # musicbrainz
