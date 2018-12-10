@@ -22,7 +22,7 @@ default on system. On Debian-like systems, you can install them using:
 .. code-block:: shell
 
     sudo apt-get update
-    sudo apt-get install curl python3-pip python3-venv git unzip
+    sudo apt-get install curl python3-pip python3-venv git unzip libldap2-dev libsasl2-dev
 
 On Arch Linux and its derivatives:
 
