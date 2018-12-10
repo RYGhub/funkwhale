@@ -68,7 +68,7 @@ local and remote users.
 
 Links:
 
-- `Federation models <https://code.eliotberriot.com/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/models.py>`_
+- `Federation models <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/models.py>`_
 
 
 Activity creation and delivery
@@ -98,8 +98,8 @@ table, retrieve the audio cover, etc.
 
 Links:
 
-- `Routing logic for activities <https://code.eliotberriot.com/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/routes.py>`_
-- `Delivery logic for activities <https://code.eliotberriot.com/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/tasks.py>`_
+- `Routing logic for activities <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/routes.py>`_
+- `Delivery logic for activities <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/tasks.py>`_
 
 
 Supported activities

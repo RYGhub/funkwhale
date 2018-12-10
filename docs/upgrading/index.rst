@@ -45,8 +45,8 @@ easy:
     # Load your environment variables
     source .env
     # Download newest nginx configuration file
-    curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
     # Pull the new version containers
     docker-compose pull
     # Apply the database migrations
@@ -81,7 +81,7 @@ The following example assume your setup match :ref:`frontend-setup`.
     # this assumes you want to upgrade to version "|version|"
     export FUNKWHALE_VERSION="|version|"
     cd /srv/funkwhale
-    sudo -u funkwhale curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
+    sudo -u funkwhale curl -L -o front.zip "https://dev.funkwhale.audio/funkwhale/funkwhale/builds/artifacts/$FUNKWHALE_VERSION/download?job=build_front"
     sudo -u funkwhale unzip -o front.zip
     sudo -u funkwhale rm front.zip
 
@@ -98,7 +98,7 @@ match what is described in :doc:`/installation/debian`:
     cd /srv/funkwhale
 
     # download more recent API files
-    sudo -u funkwhale curl -L -o "api-$FUNKWHALE_VERSION.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWHALE_VERSION/download?job=build_api"
+    sudo -u funkwhale curl -L -o "api-$FUNKWHALE_VERSION.zip" "https://dev.funkwhale.audio/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWHALE_VERSION/download?job=build_api"
     sudo -u funkwhale unzip "api-$FUNKWHALE_VERSION.zip" -d extracted
     sudo -u funkwhale rm -rf api/ && mv extracted/api .
     sudo -u funkwhale rm -rf extracted

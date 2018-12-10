@@ -143,7 +143,7 @@ class Command(BaseCommand):
         for m in raw_matching:
             # In some situations, the path is encoded incorrectly on the filesystem
             # so we filter out faulty paths and display a warning to the user.
-            # see https://code.eliotberriot.com/funkwhale/funkwhale/issues/138
+            # see https://dev.funkwhale.audio/funkwhale/funkwhale/issues/138
             try:
                 m.encode("utf-8")
                 matching.append(m)

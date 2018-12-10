@@ -91,7 +91,7 @@ First, we'll download the latest api release.
 
 .. parsed-literal::
 
-    curl -L -o "api-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
+    curl -L -o "api-|version|.zip" "https://dev.funkwhale.audio/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_api"
     unzip "api-|version|.zip" -d extracted
     mv extracted/api/* api/
     rm -rf extracted
@@ -101,7 +101,7 @@ Then we'll download the frontend files:
 
 .. parsed-literal::
 
-    curl -L -o "front-|version|.zip" "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_front"
+    curl -L -o "front-|version|.zip" "https://dev.funkwhale.audio/funkwhale/funkwhale/-/jobs/artifacts/|version|/download?job=build_front"
     unzip "front-|version|.zip" -d extracted
     mv extracted/front .
     rm -rf extracted
@@ -113,7 +113,7 @@ Then we'll download the frontend files:
 
         cd /srv
         rm -r funkwhale
-        git clone -b master https://code.eliotberriot.com/funkwhale/funkwhale funkwhale
+        git clone -b master https://dev.funkwhale.audio/funkwhale/funkwhale funkwhale
         cd funkwhale
 
     By default, the repository will use the ``develop`` which may be unstable thus not recommended for production instances (unless you know what your doing). You should use the master branch instead:
@@ -211,7 +211,7 @@ Download the sample environment file:
 
 .. parsed-literal::
 
-    curl -L -o config/.env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
+    curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
 
 .. note::
 
