@@ -10,10 +10,10 @@ First, download the sample unitfiles:
 
 .. parsed-literal::
 
-    curl -L -o "/etc/systemd/system/funkwhale.target" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale.target"
-    curl -L -o "/etc/systemd/system/funkwhale-server.service" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-server.service"
-    curl -L -o "/etc/systemd/system/funkwhale-worker.service" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-worker.service"
-    curl -L -o "/etc/systemd/system/funkwhale-beat.service" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-beat.service"
+    curl -L -o "/etc/systemd/system/funkwhale.target" "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale.target"
+    curl -L -o "/etc/systemd/system/funkwhale-server.service" "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-server.service"
+    curl -L -o "/etc/systemd/system/funkwhale-worker.service" "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-worker.service"
+    curl -L -o "/etc/systemd/system/funkwhale-beat.service" "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale-beat.service"
 
 This will download three unitfiles:
 

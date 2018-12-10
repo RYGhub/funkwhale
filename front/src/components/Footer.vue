@@ -39,7 +39,7 @@
           <div class="ui link list">
             <a href="https://socialhub.network/c/projects/funkwhale" class="item" target="_blank"><translate>Support forum</translate></a>
             <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate>Chat room</translate></a>
-            <a href="https://code.eliotberriot.com/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
+            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
           </div>
         </section>
         <section class="four wide column">
@@ -47,7 +47,7 @@
           <div class="ui link list">
             <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
             <a href="https://contribute.funkwhale.audio" class="item" target="_blank"><translate>Contribute</translate></a>
-            <a href="https://code.eliotberriot.com/funkwhale/funkwhale" class="item" target="_blank"><translate>Source code</translate></a>
+            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale" class="item" target="_blank"><translate>Source code</translate></a>
           </div>
           <div class="ui hidden divider"></div>
           <p>

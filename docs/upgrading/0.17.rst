@@ -12,7 +12,7 @@ Overview of the changes
 
 .. note::
 
-    The what and why are described more thoroughly in this page: https://code.eliotberriot.com/funkwhale/funkwhale/merge_requests/368
+    The what and why are described more thoroughly in this page: https://dev.funkwhale.audio/funkwhale/funkwhale/merge_requests/368
 
 To sum it up, this release big completely changes the way audio content is managed in Funkwhale.
 As you may guess, this has a huge impact on the whole project, because audio is at the

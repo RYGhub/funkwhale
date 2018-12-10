@@ -13,7 +13,7 @@ do not include folder-based endpoints, as it does not match our internal model a
 and will require substantial effort to emulate.
 
 We'll try to keep this list up-to-date, but you can also browse `the relevant code
-<https://code.eliotberriot.com/funkwhale/funkwhale/blob/develop/api/funkwhale_api/subsonic/views.py>`_
+<https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/subsonic/views.py>`_
 if needed.
 
 As of today, the following endpoints are implemented:

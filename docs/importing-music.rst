@@ -138,8 +138,8 @@ under creative commons (courtesy of Jamendo):
 
 .. parsed-literal::
 
-    curl -L -o download-tracks.sh "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/demo/download-tracks.sh"
-    curl -L -o music.txt "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/demo/music.txt"
+    curl -L -o download-tracks.sh "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/demo/download-tracks.sh"
+    curl -L -o music.txt "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/demo/music.txt"
     chmod +x download-tracks.sh
     ./download-tracks.sh music.txt
 

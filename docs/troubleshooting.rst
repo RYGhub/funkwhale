@@ -194,7 +194,7 @@ Here are a few recommendations on how to structure and what to include in your h
 - Give us as much context as possible about your installation (OS, version, Docker/non-docker, reverse-proxy type, relevant logs and errors, etc.)
 - Including screenshots or small gifs or videos can help us considerably when debugging front-end issues
 
-You can also open issues on our `issue tracker <https://code.eliotberriot.com/funkwhale/funkwhale/issues>`_. Please have a quick look for
+You can also open issues on our `issue tracker <https://dev.funkwhale.audio/funkwhale/funkwhale/issues>`_. Please have a quick look for
 similar issues before doing that, and use the issue tracker only to report bugs, suggest enhancements (both in the software and the documentation) or new features.
 
 .. warning::
@@ -208,5 +208,5 @@ Improving this documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you feel like something should be improved in this document (and in the documentation in general), feel free to `edit
-it <https://code.eliotberriot.com/funkwhale/funkwhale/tree/develop/docs>`_ and open a Merge Request. If you lack time or skills
+it <https://dev.funkwhale.audio/funkwhale/funkwhale/tree/develop/docs>`_ and open a Merge Request. If you lack time or skills
 to do that, you can open an issue to discuss that, and someone else will do it.

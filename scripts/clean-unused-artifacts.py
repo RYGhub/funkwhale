@@ -2,7 +2,7 @@ import gitlab
 
 TOKEN = "CHANGEME"
 CLEAN_BEFORE = "2018-07"
-gl = gitlab.Gitlab("https://code.eliotberriot.com", private_token=TOKEN, per_page=100)
+gl = gitlab.Gitlab("https://dev.funkwhale.audio", private_token=TOKEN, per_page=100)
 project = gl.projects.get("funkwhale/funkwhale")
 
 jobs = project.jobs.list(as_list=False)

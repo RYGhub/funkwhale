@@ -11,7 +11,7 @@ This setup requires Docker and docker-compose.
 
 You can use your own music (put it in `/usr/share/music`, this is the directory the demo will look into by default).
 
-If you don't have any music, you can use the repository https://code.eliotberriot.com/funkwhale/catalog, which
+If you don't have any music, you can use the repository https://dev.funkwhale.audio/funkwhale/catalog, which
 requires Git LFS.
 
 ## Create an env file

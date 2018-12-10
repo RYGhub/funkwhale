@@ -10,14 +10,14 @@ cd $demo_path
 sudo rm -rf $demo_path/*
 mkdir -p $demo_path
 echo 'Downloading demo files...'
-curl -L -o docker-compose.yml "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker-compose.yml"
-curl -L -o .env "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/env.prod.sample"
+curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$version/deploy/docker-compose.yml"
+curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$version/deploy/env.prod.sample"
 mkdir nginx
-curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/docker.nginx.template"
-curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/$version/deploy/funkwhale_proxy.conf"
+curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$version/deploy/docker.nginx.template"
+curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$version/deploy/funkwhale_proxy.conf"
 
 mkdir data/
-curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/-/jobs/artifacts/$version/download?job=build_front"
+curl -L -o front.zip "https://dev.funkwhale.audio/funkwhale/funkwhale/-/jobs/artifacts/$version/download?job=build_front"
 unzip front.zip
 
 cat $env_file >> .env
