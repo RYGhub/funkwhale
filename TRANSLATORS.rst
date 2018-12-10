@@ -6,7 +6,7 @@ you found the proper place :)
 
 Translation is done via our own Weblate instance at https://translate.funkwhale.audio/projects/funkwhale/front/.
 
-You can signup/login using your Gitlab account (from https://code.eliotberriot.com).
+You can signup/login using your Gitlab account (from https://dev.funkwhale.audio).
 
 Translation workflow
 --------------------
@@ -25,4 +25,4 @@ Requesting a new language
 -------------------------
 
 If you'd like to see a new language in Funkwhale, please open an issue here:
-https://code.eliotberriot.com/funkwhale/funkwhale/issues
+https://dev.funkwhale.audio/funkwhale/funkwhale/issues

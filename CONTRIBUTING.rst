@@ -31,7 +31,7 @@ Setup front-end only development environment
 
 1. Clone the repository::
 
-    git clone ssh://git@code.eliotberriot.com:2222/funkwhale/funkwhale.git
+    git clone ssh://git@dev.funkwhale.audio:2222/funkwhale/funkwhale.git
     cd funkwhale
     cd front
 
@@ -75,9 +75,9 @@ This is already cover in the relevant documentations:
 Cloning the project
 ^^^^^^^^^^^^^^^^^^^
 
-Visit https://code.eliotberriot.com/funkwhale/funkwhale and clone the repository using SSH or HTTPS. Exemple using SSH::
+Visit https://dev.funkwhale.audio/funkwhale/funkwhale and clone the repository using SSH or HTTPS. Exemple using SSH::
 
-    git clone ssh://git@code.eliotberriot.com:2222/funkwhale/funkwhale.git
+    git clone ssh://git@dev.funkwhale.audio:2222/funkwhale/funkwhale.git
     cd funkwhale
 
 

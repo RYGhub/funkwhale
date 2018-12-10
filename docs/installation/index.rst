@@ -113,7 +113,7 @@ Files for the web frontend are purely static and can simply be downloaded, unzip
 .. parsed-literal::
 
     cd /srv/funkwhale
-    curl -L -o front.zip "https://code.eliotberriot.com/funkwhale/funkwhale/builds/artifacts/|version|/download?job=build_front"
+    curl -L -o front.zip "https://dev.funkwhale.audio/funkwhale/funkwhale/builds/artifacts/|version|/download?job=build_front"
     unzip front.zip
 
 .. _reverse-proxy-setup:
@@ -148,15 +148,15 @@ On docker deployments, run the following commands:
 .. code:: shell
 
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.proxy.template"
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/.env && set +a
     envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
         < /etc/nginx/sites-available/funkwhale.template \
         > /etc/nginx/sites-available/funkwhale.conf
-        
+
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 On non-docker deployments, run the following commands:
@@ -164,15 +164,15 @@ On non-docker deployments, run the following commands:
 .. code:: shell
 
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/nginx.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/nginx.template"
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/config/.env && set +a
     envsubst "`env | awk -F = '{printf \" $%s\", $$1}'`" \
         < /etc/nginx/sites-available/funkwhale.template \
         > /etc/nginx/sites-available/funkwhale.conf
-    
+
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 .. note::
@@ -219,7 +219,7 @@ Then, download our sample virtualhost file:
 
 .. parsed-literal::
 
-    curl -L -o /etc/apache2/sites-available/funkwhale.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/apache.conf"
+    curl -L -o /etc/apache2/sites-available/funkwhale.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/apache.conf"
     ln -s /etc/apache2/sites-available/funkwhale.conf /etc/apache2/sites-enabled/
 
 You can tweak the configuration file according to your setup, especially the

@@ -4,7 +4,7 @@ Changelog
 You can subscribe to release announcements by:
 
 - Following `funkwhale@mastodon.eliotberriot.com <https://mastodon.eliotberriot.com/@funkwhale>`_ on Mastodon
-- Subscribing to the following Atom feed: https://code.eliotberriot.com/funkwhale/funkwhale/commits/develop?format=atom&search=Merge+tag
+- Subscribing to the following Atom feed: https://dev.funkwhale.audio/funkwhale/funkwhale/commits/develop?format=atom&search=Merge+tag
 
 This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.html.
 
@@ -149,8 +149,8 @@ Download the required configuration files for the nginx container:
 
     cd /srv/funkwhale
     mkdir nginx
-    curl -L -o nginx/funkwhale.template "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://code.eliotberriot.com/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
 
 Update the funkwhale.conf configuration of your server's reverse-proxy::
 
@@ -788,7 +788,7 @@ it to work Apache2, for instance. It was also not compatible with Subsonic clien
 
 Based on that, we're currently removing support for transcoding
 **in its current state**. The work on a better designed transcoding feature
-can be tracked in https://code.eliotberriot.com/funkwhale/funkwhale/issues/272.
+can be tracked in https://dev.funkwhale.audio/funkwhale/funkwhale/issues/272.
 
 You don't have to do anything on your side, but you may want to remove
 the now obsolete configuration from your reverse proxy file (nginx only)::
@@ -1562,7 +1562,7 @@ information periodically.
 
 Celery beat can be enabled easily::
 
-    curl -L -o "/etc/systemd/system/funkwhale-beat.service" "https://code.eliotberriot.com/funkwhale/funkwhale/raw/develop/deploy/funkwhale-beat.service"
+    curl -L -o "/etc/systemd/system/funkwhale-beat.service" "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale-beat.service"
     # Also edit /etc/systemd/system/funkwhale.target
     # and ensure the Wants= line contains the following:
     # Wants=funkwhale-server.service funkwhale-worker.service funkwhale-beat.service
