@@ -39,12 +39,27 @@
           </a>
         </div>
       </section>
-      <section class="ui vertical stripe segment">
-        <h2>
-          <translate>Tracks</translate>
-        </h2>
-        <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
-      </section>
+      <template v-if="discs && discs.length > 1">
+        <section v-for="(tracks, disc_number) in discs" class="ui vertical stripe segment">
+          <translate
+            tag="h2"
+            class="left floated"
+            :translate-params="{number: disc_number + 1}"
+          >Volume %{ number }</translate>
+          <play-button class="right floated orange" :tracks="tracks">
+            <translate>Play all</translate>
+          </play-button>
+          <track-table :artist="album.artist" :display-position="true" :tracks="tracks"></track-table>
+        </section>
+      </template>
+      <template v-else>
+        <section class="ui vertical stripe segment">
+          <h2>
+            <translate>Tracks</translate>
+          </h2>
+          <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
+        </section>
+      </template>
       <section class="ui vertical stripe segment">
         <h2>
           <translate>User libraries</translate>
@@ -67,6 +82,17 @@ import LibraryWidget from "@/components/federation/LibraryWidget"
 
 const FETCH_URL = "albums/"
 
+function groupByDisc(acc, track) {
+  var dn = track.disc_number - 1
+  if (dn < 0) dn = 0
+  if (acc[dn] == undefined) {
+    acc.push([track])
+  } else {
+    acc[dn].push(track)
+  }
+  return acc
+}
+
 export default {
   props: ["id"],
   components: {
@@ -77,7 +103,8 @@ export default {
   data() {
     return {
       isLoading: true,
-      album: null
+      album: null,
+      discs: []
     }
   },
   created() {
@@ -91,6 +118,7 @@ export default {
       logger.default.debug('Fetching album "' + this.id + '"')
       axios.get(url).then(response => {
         self.album = backend.Album.clean(response.data)
+        self.discs = self.album.tracks.reduce(groupByDisc, [])
         self.isLoading = false
       })
     }
