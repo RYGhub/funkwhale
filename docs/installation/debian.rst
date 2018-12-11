@@ -169,12 +169,11 @@ To avoid collisions with other software on your system, Python dependencies
 will be installed in a dedicated
 `virtualenv <https://docs.python.org/3/library/venv.html>`_.
 
-First, create the virtualenv and install wheel:
+First, create the virtualenv:
 
 .. code-block:: shell
 
     python3 -m venv /srv/funkwhale/virtualenv
-    pip3 install wheel
 
 This will result in a ``virtualenv`` directory being created in
 ``/srv/funkwhale/virtualenv``.
@@ -192,6 +191,7 @@ Finally, install the python dependencies:
 
 .. code-block:: shell
 
+    pip install wheel
     pip install -r api/requirements.txt
 
 .. important::
