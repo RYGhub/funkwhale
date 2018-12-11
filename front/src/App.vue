@@ -392,4 +392,12 @@ button.reset {
 [role="button"] {
   cursor: pointer;
 }
+
+.left.floated {
+  float: left;
+}
+
+.right.floated {
+  float: right;
+}
 </style>
