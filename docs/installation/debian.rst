@@ -212,6 +212,9 @@ Download the sample environment file:
 .. parsed-literal::
 
     curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
+    # symlink it so it's sourced automatically by the API process
+    # (This won't be needed anymore once release 0.18 is out)
+    ln -s /srv/funkwhale/config/.env /srv/funkwhale/api/.env
 
 .. note::
 
@@ -226,10 +229,6 @@ configuration options are mentioned at the top of the file.
 Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
 how you configured your PostgreSQL and Redis servers in
 :doc:`external dependencies <./external_dependencies>`.
-
-.. note::
-
-    The environment file at config/.env is loaded automatically by Funkwhale processes.
 
 Database setup
 ---------------
