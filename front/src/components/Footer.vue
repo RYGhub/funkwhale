@@ -37,7 +37,7 @@
         <section class="four wide column">
           <h4 v-translate class="ui header">Getting help</h4>
           <div class="ui link list">
-            <a href="https://socialhub.network/c/projects/funkwhale" class="item" target="_blank"><translate>Support forum</translate></a>
+            <a href="https://socialhub.network/c/funkwhale" class="item" target="_blank"><translate>Support forum</translate></a>
             <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate>Chat room</translate></a>
             <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
           </div>
