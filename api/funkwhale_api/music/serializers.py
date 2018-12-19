@@ -9,7 +9,6 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
-from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
@@ -430,8 +429,8 @@ class OembedSerializer(serializers.Serializer):
                 data["thumbnail_url"] = federation_utils.full_url(
                     track.album.cover.crop["400x400"].url
                 )
-                data['thumbnail_width'] = 400
-                data['thumbnail_height'] = 400
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
             data["description"] = track.full_name
             data["author_name"] = track.artist.name
             data["height"] = 150
@@ -456,8 +455,8 @@ class OembedSerializer(serializers.Serializer):
                 data["thumbnail_url"] = federation_utils.full_url(
                     album.cover.crop["400x400"].url
                 )
-                data['thumbnail_width'] = 400
-                data['thumbnail_height'] = 400
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
             data["title"] = "{} by {}".format(album.title, album.artist.name)
             data["description"] = "{} by {}".format(album.title, album.artist.name)
             data["author_name"] = album.artist.name
