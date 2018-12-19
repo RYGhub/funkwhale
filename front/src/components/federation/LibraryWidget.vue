@@ -62,6 +62,7 @@ export default {
         self.nextPage = response.data.next
         self.isLoading = false
         self.libraries = response.data.results
+        self.$emit('loaded', self.libraries)
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

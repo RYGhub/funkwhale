@@ -1,0 +1,80 @@
+<template>
+  <div>
+    <div class="ui form">
+      <div class="two fields">
+        <div class="field">
+          <div class="field">
+            <label for="embed-width"><translate>Widget width</translate></label>
+            <p><translate>Leave empty for a responsive widget</translate></p>
+            <input id="embed-width" type="number" v-model.number="width" min="0" step="10" />
+          </div>
+          <template v-if="type != 'track'">
+            <br>
+            <div class="field">
+              <label for="embed-height"><translate>Widget height</translate></label>
+              <input id="embed-height" type="number" v-model="height" :min="minHeight" max="1000" step="10" />
+            </div>
+          </template>
+        </div>
+        <div class="field">
+          <button @click="copy" class="ui right floated button"><translate>Copy</translate></button>
+          <label for="embed-width"><translate>Embed code</translate></label>
+          <p><translate>Copy/paste this code in your website HTML</translate></p>
+          <div class="ui hidden divider"></div>
+          <textarea ref="textarea":value="embedCode" rows="3" readonly>
+          </textarea>
+        </div>
+      </div>
+    </div>
+    <div class="preview">
+      <h3><translate>Preview</translate></h3>
+      <iframe :width="frameWidth" :height="height" scrolling="no" frameborder="no" :src="iframeSrc"></iframe>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  props: ['type', 'id'],
+  data () {
+    let d = {
+      width: null,
+      height: 150,
+      minHeight: 100
+    }
+    if (this.type === 'album') {
+      d.height = 330
+      d.minHeight = 250
+    }
+    return d
+  },
+  computed: {
+    iframeSrc () {
+      return this.$store.getters['instance/absoluteUrl'](
+        `/front/embed.html?&type=${this.type}&id=${this.id}`
+      )
+    },
+    frameWidth () {
+      if (this.width) {
+        return this.width
+      }
+      return '100%'
+    },
+    embedCode () {
+      let src = this.iframeSrc.replace(/&/g, '&amp;')
+      return `<iframe width="${this.frameWidth}" height="${this.height}" scrolling="no" frameborder="no" src="${src}"></iframe>`
+    }
+  },
+  methods: {
+    copy () {
+      this.$refs.textarea.select()
+      document.execCommand("Copy")
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>

@@ -37,6 +37,30 @@
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
+          <template v-if="publicLibraries.length > 0">
+            <button
+              @click="showEmbedModal = !showEmbedModal"
+              class="ui button">
+              <i class="code icon"></i>
+              <translate>Embed</translate>
+            </button>
+            <modal :show.sync="showEmbedModal">
+              <div class="header">
+                <translate>Embed this album on your website</translate>
+              </div>
+              <div class="content">
+                <div class="description">
+                  <embed-wizard type="album" :id="album.id" />
+
+                </div>
+              </div>
+              <div class="actions">
+                <div class="ui deny button">
+                  <translate>Cancel</translate>
+                </div>
+              </div>
+            </modal>
+          </template>
         </div>
       </section>
       <template v-if="discs && discs.length > 1">
@@ -64,7 +88,7 @@
         <h2>
           <translate>User libraries</translate>
         </h2>
-        <library-widget :url="'albums/' + id + '/libraries/'">
+        <library-widget @loaded="libraries = $event" :url="'albums/' + id + '/libraries/'">
           <translate slot="subtitle">This album is present in the following libraries:</translate>
         </library-widget>
       </section>
@@ -79,6 +103,8 @@ import backend from "@/audio/backend"
 import PlayButton from "@/components/audio/PlayButton"
 import TrackTable from "@/components/audio/track/Table"
 import LibraryWidget from "@/components/federation/LibraryWidget"
+import EmbedWizard from "@/components/audio/EmbedWizard"
+import Modal from '@/components/semantic/Modal'
 
 const FETCH_URL = "albums/"
 
@@ -98,13 +124,17 @@ export default {
   components: {
     PlayButton,
     TrackTable,
-    LibraryWidget
+    LibraryWidget,
+    EmbedWizard,
+    Modal
   },
   data() {
     return {
       isLoading: true,
       album: null,
-      discs: []
+      discs: [],
+      libraries: [],
+      showEmbedModal: false
     }
   },
   created() {
@@ -128,6 +158,11 @@ export default {
       return {
         title: this.$gettext("Album")
       }
+    },
+    publicLibraries () {
+      return this.libraries.filter(l => {
+        return l.privacy_level === 'everyone'
+      })
     },
     wikipediaUrl() {
       return (

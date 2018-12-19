@@ -55,6 +55,30 @@
             <i class="download icon"></i>
             <translate>Download</translate>
           </a>
+          <template v-if="publicLibraries.length > 0">
+            <button
+              @click="showEmbedModal = !showEmbedModal"
+              class="ui button">
+              <i class="code icon"></i>
+              <translate>Embed</translate>
+            </button>
+            <modal :show.sync="showEmbedModal">
+              <div class="header">
+                <translate>Embed this track on your website</translate>
+              </div>
+              <div class="content">
+                <div class="description">
+                  <embed-wizard type="track" :id="track.id" />
+
+                </div>
+              </div>
+              <div class="actions">
+                <div class="ui deny button">
+                  <translate>Cancel</translate>
+                </div>
+              </div>
+            </modal>
+          </template>
         </div>
       </section>
       <section class="ui vertical stripe center aligned segment">
@@ -144,7 +168,7 @@
         <h2>
           <translate>User libraries</translate>
         </h2>
-        <library-widget :url="'tracks/' + id + '/libraries/'">
+        <library-widget @loaded="libraries = $event" :url="'tracks/' + id + '/libraries/'">
           <translate slot="subtitle">This track is present in the following libraries:</translate>
         </library-widget>
       </section>
@@ -162,6 +186,7 @@ import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import LibraryWidget from "@/components/federation/LibraryWidget"
 import Modal from '@/components/semantic/Modal'
+import EmbedWizard from "@/components/audio/EmbedWizard"
 
 const FETCH_URL = "tracks/"
 
@@ -172,7 +197,8 @@ export default {
     TrackPlaylistIcon,
     TrackFavoriteIcon,
     LibraryWidget,
-    Modal
+    Modal,
+    EmbedWizard
   },
   data() {
     return {
@@ -181,7 +207,9 @@ export default {
       isLoadingLyrics: true,
       track: null,
       lyrics: null,
-      licenseData: null
+      licenseData: null,
+      libraries: [],
+      showEmbedModal: false
     }
   },
   created() {
@@ -224,6 +252,11 @@ export default {
     }
   },
   computed: {
+    publicLibraries () {
+      return this.libraries.filter(l => {
+        return l.privacy_level === 'everyone'
+      })
+    },
     labels() {
       return {
         title: this.$gettext("Track")
