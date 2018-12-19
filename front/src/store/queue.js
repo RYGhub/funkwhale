@@ -70,10 +70,12 @@ export default {
       }
     },
 
-    appendMany ({state, dispatch}, {tracks, index, callback}) {
+    appendMany ({state, commit, dispatch}, {tracks, index, callback}) {
       logger.default.info('Appending many tracks to the queue', tracks.map(e => { return e.title }))
+      let shouldPlay = false
       if (state.tracks.length === 0) {
         index = 0
+        shouldPlay = true
       } else {
         index = index || state.tracks.length
       }
@@ -83,6 +85,11 @@ export default {
         index += 1
         if (callback && i + 1 === total) {
           p.then(callback)
+        }
+        if (shouldPlay && p) {
+          p.then(() => {
+            dispatch('next')
+          })
         }
       })
     },
