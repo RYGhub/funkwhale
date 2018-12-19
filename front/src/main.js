@@ -22,12 +22,9 @@ import globals from '@/components/globals' // eslint-disable-line
 sync(store, router)
 
 window.$ = window.jQuery = require('jquery')
-
-// this is absolutely dirty but at the moment, semantic UI does not
-// play really nice with webpack and I want to get rid of Google Fonts
-// require('./semantic/semantic.css')
-require('semantic-ui-css/semantic.js')
+require('./semantic.js')
 require('masonry-layout')
+
 let availableLanguages = (function () {
   let l = {}
   locales.locales.forEach(c => {
