@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.conf import settings
 from django.urls import reverse
 
@@ -58,6 +60,7 @@ def library_track(request, pk):
                 "content": utils.join_url(settings.FUNKWHALE_URL, obj.listen_url),
             }
         )
+
         metas.append(
             {
                 "tag": "link",
@@ -65,7 +68,7 @@ def library_track(request, pk):
                 "type": "application/json+oembed",
                 "href": (
                     utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                    + "?url={}&amp;format=json".format(track_url)
+                    + "?format=json&url={}".format(urllib.parse.quote_plus(track_url))
                 ),
             }
         )
@@ -124,7 +127,7 @@ def library_album(request, pk):
                 "type": "application/json+oembed",
                 "href": (
                     utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                    + "?url={}&amp;format=json".format(album_url)
+                    + "?format=json&url={}".format(urllib.parse.quote_plus(album_url))
                 ),
             }
         )

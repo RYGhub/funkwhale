@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.urls import reverse
 
 from funkwhale_api.common import utils
@@ -61,8 +63,8 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
             "type": "application/json+oembed",
             "href": (
                 utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                + "?url={}&amp;format=json".format(
-                    utils.join_url(settings.FUNKWHALE_URL, url)
+                + "?format=json&url={}".format(
+                    urllib.parse.quote_plus(utils.join_url(settings.FUNKWHALE_URL, url))
                 )
             ),
         },
@@ -115,8 +117,8 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
             "type": "application/json+oembed",
             "href": (
                 utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                + "?url={}&amp;format=json".format(
-                    utils.join_url(settings.FUNKWHALE_URL, url)
+                + "?format=json&url={}".format(
+                    urllib.parse.quote_plus(utils.join_url(settings.FUNKWHALE_URL, url))
                 )
             ),
         },
