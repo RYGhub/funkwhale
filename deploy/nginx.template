@@ -44,17 +44,14 @@ server {
     root ${FUNKWHALE_FRONTEND_PATH};
 
     location / {
-        try_files $uri $uri/ @rewrites;
-    }
-
-    location @rewrites {
-        rewrite ^(.+)$ /index.html last;
-    }
-    location /api/ {
         include /etc/nginx/funkwhale_proxy.conf;
         # this is needed if you have file import via upload enabled
         client_max_body_size ${NGINX_MAX_BODY_SIZE};
-        proxy_pass   http://funkwhale-api/api/;
+        proxy_pass   http://funkwhale-api/;
+    }
+
+    location /front/ {
+        alias ${FUNKWHALE_FRONTEND_PATH};
     }
 
     location /federation/ {

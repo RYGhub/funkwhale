@@ -1,12 +1,18 @@
+import urllib.parse
+
 from django.db import transaction
+from django import urls
+from django.conf import settings
 from rest_framework import serializers
 from taggit.models import Tag
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import utils as federation_utils
 
 from . import filters, models, tasks
 
@@ -380,3 +386,98 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return "Audio"
+
+
+class OembedSerializer(serializers.Serializer):
+    format = serializers.ChoiceField(choices=["json"])
+    url = serializers.URLField()
+    maxheight = serializers.IntegerField(required=False)
+    maxwidth = serializers.IntegerField(required=False)
+
+    def validate(self, validated_data):
+        try:
+            match = common_utils.spa_resolve(
+                urllib.parse.urlparse(validated_data["url"]).path
+            )
+        except urls.exceptions.Resolver404:
+            raise serializers.ValidationError(
+                "Invalid URL {}".format(validated_data["url"])
+            )
+        data = {
+            "version": 1.0,
+            "type": "rich",
+            "provider_name": "{} - {}".format(
+                preferences.get("instance__name"), settings.APP_NAME
+            ),
+            "provider_url": settings.FUNKWHALE_URL,
+            "height": validated_data.get("maxheight") or 400,
+            "width": validated_data.get("maxwidth") or 600,
+        }
+        embed_id = None
+        embed_type = None
+        if match.url_name == "library_track":
+            qs = models.Track.objects.select_related("artist", "album__artist").filter(
+                pk=int(match.kwargs["pk"])
+            )
+            try:
+                track = qs.get()
+            except models.Track.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No track matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "track"
+            embed_id = track.pk
+            data["title"] = "{} by {}".format(track.title, track.artist.name)
+            if track.album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    track.album.cover.crop["400x400"].url
+                )
+            data["description"] = track.full_name
+            data["author_name"] = track.artist.name
+            data["height"] = 150
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "library_artist", kwargs={"pk": track.artist.pk}
+                )
+            )
+        elif match.url_name == "library_album":
+            qs = models.Album.objects.select_related("artist").filter(
+                pk=int(match.kwargs["pk"])
+            )
+            try:
+                album = qs.get()
+            except models.Album.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No album matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "album"
+            embed_id = album.pk
+            if album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    album.cover.crop["400x400"].url
+                )
+            data["title"] = "{} by {}".format(album.title, album.artist.name)
+            data["description"] = "{} by {}".format(album.title, album.artist.name)
+            data["author_name"] = album.artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "library_artist", kwargs={"pk": album.artist.pk}
+                )
+            )
+        else:
+            raise serializers.ValidationError(
+                "Unsupported url: {}".format(validated_data["url"])
+            )
+        data[
+            "html"
+        ] = '<iframe width="{}" height="{}" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            data["width"],
+            data["height"],
+            settings.FUNKWHALE_EMBED_URL
+            + "?type={}&id={}".format(embed_type, embed_id),
+        )
+        return data
+
+    def create(self, data):
+        return data

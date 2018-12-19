@@ -31,6 +31,7 @@ subsonic_router.register(r"subsonic/rest", SubsonicViewSet, base_name="subsonic"
 
 
 v1_patterns += [
+    url(r"^oembed/$", views.OembedView.as_view(), name="oembed"),
     url(
         r"^instance/",
         include(("funkwhale_api.instance.urls", "instance"), namespace="instance"),

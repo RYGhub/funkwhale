@@ -70,7 +70,16 @@ else:
         FUNKWHALE_PROTOCOL = _parsed.scheme
 
 FUNKWHALE_URL = "{}://{}".format(FUNKWHALE_PROTOCOL, FUNKWHALE_HOSTNAME)
-
+FUNKWHALE_SPA_HTML_ROOT = env(
+    "FUNKWHALE_SPA_HTML_ROOT", default=FUNKWHALE_URL + "/front/"
+)
+FUNKWHALE_SPA_HTML_CACHE_DURATION = env.int(
+    "FUNKWHALE_SPA_HTML_CACHE_DURATION", default=60 * 15
+)
+FUNKWHALE_EMBED_URL = env(
+    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_SPA_HTML_ROOT + "embed.html"
+)
+APP_NAME = "Funkwhale"
 
 # XXX: deprecated, see #186
 FEDERATION_ENABLED = env.bool("FEDERATION_ENABLED", default=True)
@@ -159,7 +168,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
-    # Make sure djangosecure.middleware.SecurityMiddleware is listed first
+    "funkwhale_api.common.middleware.SPAFallbackMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -305,6 +314,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
+SPA_URLCONF = "config.spa_urls"
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.routing.application"
@@ -400,7 +410,13 @@ if AUTH_LDAP_ENABLED:
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
 
 CACHE_DEFAULT = "redis://127.0.0.1:6379/0"
-CACHES = {"default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT)}
+CACHES = {
+    "default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT),
+    "local": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "local-cache",
+    },
+}
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
 

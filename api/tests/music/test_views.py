@@ -6,8 +6,10 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import licenses, models, serializers, tasks, views
+from funkwhale_api.common import utils
 from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.music import licenses, models, serializers, tasks, views
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -568,5 +570,76 @@ def test_detail_license(api_client, preferences):
     url = reverse("api:v1:licenses-detail", kwargs={"pk": id})
 
     response = api_client.get(url)
+
+    assert response.data == expected
+
+
+def test_oembed_track(factories, no_api_auth, api_client, settings, preferences):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    preferences["instance__name"] = "Hello"
+    track = factories["music.Track"]()
+    url = reverse("api:v1:oembed")
+    track_url = "https://test.com/library/tracks/{}".format(track.pk)
+    iframe_src = "http://embed?type=track&id={}".format(track.pk)
+    expected = {
+        "version": 1.0,
+        "type": "rich",
+        "provider_name": "{} - {}".format(
+            preferences["instance__name"], settings.APP_NAME
+        ),
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 150,
+        "width": 600,
+        "title": "{} by {}".format(track.title, track.artist.name),
+        "description": track.full_name,
+        "thumbnail_url": federation_utils.full_url(
+            track.album.cover.crop["400x400"].url
+        ),
+        "html": '<iframe width="600" height="150" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": track.artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": track.artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": track_url, "format": "json"})
+
+    assert response.data == expected
+
+
+def test_oembed_album(factories, no_api_auth, api_client, settings, preferences):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    preferences["instance__name"] = "Hello"
+    track = factories["music.Track"]()
+    album = track.album
+    url = reverse("api:v1:oembed")
+    album_url = "https://test.com/library/albums/{}".format(album.pk)
+    iframe_src = "http://embed?type=album&id={}".format(album.pk)
+    expected = {
+        "version": 1.0,
+        "type": "rich",
+        "provider_name": "{} - {}".format(
+            preferences["instance__name"], settings.APP_NAME
+        ),
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": "{} by {}".format(album.title, album.artist.name),
+        "description": "{} by {}".format(album.title, album.artist.name),
+        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": album.artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": album.artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": album_url, "format": "json"})
 
     assert response.data == expected
