@@ -211,7 +211,7 @@ Download the sample environment file:
 
 .. parsed-literal::
 
-    curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
+    curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
     # symlink it so it's sourced automatically by the API process
     # (This won't be needed anymore once release 0.18 is out)
     ln -s /srv/funkwhale/config/.env /srv/funkwhale/api/.env

@@ -230,7 +230,7 @@ pages:
     paths:
       - public
   only:
-    - develop@funkwhale/funkwhale
+    - master@funkwhale/funkwhale
   tags:
     - docker
 
