@@ -3,7 +3,7 @@ import re
 from django.db.models import Q
 
 
-QUERY_REGEX = re.compile('(((?P<key>\w+):)?(?P<value>"[^"]+"|[\S]+))')
+QUERY_REGEX = re.compile(r'(((?P<key>\w+):)?(?P<value>"[^"]+"|[\S]+))')
 
 
 def parse_query(query):
