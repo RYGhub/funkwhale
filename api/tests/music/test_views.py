@@ -574,20 +574,17 @@ def test_detail_license(api_client, preferences):
     assert response.data == expected
 
 
-def test_oembed_track(factories, no_api_auth, api_client, settings, preferences):
+def test_oembed_track(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
-    preferences["instance__name"] = "Hello"
     track = factories["music.Track"]()
     url = reverse("api:v1:oembed")
     track_url = "https://test.com/library/tracks/{}".format(track.pk)
     iframe_src = "http://embed?type=track&id={}".format(track.pk)
     expected = {
-        "version": 1.0,
+        "version": "1.0",
         "type": "rich",
-        "provider_name": "{} - {}".format(
-            preferences["instance__name"], settings.APP_NAME
-        ),
+        "provider_name": settings.APP_NAME,
         "provider_url": settings.FUNKWHALE_URL,
         "height": 150,
         "width": 600,
@@ -596,6 +593,8 @@ def test_oembed_track(factories, no_api_auth, api_client, settings, preferences)
         "thumbnail_url": federation_utils.full_url(
             track.album.cover.crop["400x400"].url
         ),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
         "html": '<iframe width="600" height="150" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),
@@ -610,27 +609,26 @@ def test_oembed_track(factories, no_api_auth, api_client, settings, preferences)
     assert response.data == expected
 
 
-def test_oembed_album(factories, no_api_auth, api_client, settings, preferences):
+def test_oembed_album(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
-    preferences["instance__name"] = "Hello"
     track = factories["music.Track"]()
     album = track.album
     url = reverse("api:v1:oembed")
     album_url = "https://test.com/library/albums/{}".format(album.pk)
     iframe_src = "http://embed?type=album&id={}".format(album.pk)
     expected = {
-        "version": 1.0,
+        "version": "1.0",
         "type": "rich",
-        "provider_name": "{} - {}".format(
-            preferences["instance__name"], settings.APP_NAME
-        ),
+        "provider_name": settings.APP_NAME,
         "provider_url": settings.FUNKWHALE_URL,
         "height": 400,
         "width": 600,
         "title": "{} by {}".format(album.title, album.artist.name),
         "description": "{} by {}".format(album.title, album.artist.name),
         "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
         "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),

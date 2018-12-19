@@ -404,11 +404,9 @@ class OembedSerializer(serializers.Serializer):
                 "Invalid URL {}".format(validated_data["url"])
             )
         data = {
-            "version": 1.0,
+            "version": "1.0",
             "type": "rich",
-            "provider_name": "{} - {}".format(
-                preferences.get("instance__name"), settings.APP_NAME
-            ),
+            "provider_name": settings.APP_NAME,
             "provider_url": settings.FUNKWHALE_URL,
             "height": validated_data.get("maxheight") or 400,
             "width": validated_data.get("maxwidth") or 600,
@@ -432,6 +430,8 @@ class OembedSerializer(serializers.Serializer):
                 data["thumbnail_url"] = federation_utils.full_url(
                     track.album.cover.crop["400x400"].url
                 )
+                data['thumbnail_width'] = 400
+                data['thumbnail_height'] = 400
             data["description"] = track.full_name
             data["author_name"] = track.artist.name
             data["height"] = 150
@@ -456,6 +456,8 @@ class OembedSerializer(serializers.Serializer):
                 data["thumbnail_url"] = federation_utils.full_url(
                     album.cover.crop["400x400"].url
                 )
+                data['thumbnail_width'] = 400
+                data['thumbnail_height'] = 400
             data["title"] = "{} by {}".format(album.title, album.artist.name)
             data["description"] = "{} by {}".format(album.title, album.artist.name)
             data["author_name"] = album.artist.name
