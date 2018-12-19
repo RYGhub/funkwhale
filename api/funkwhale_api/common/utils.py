@@ -3,9 +3,12 @@ from django.utils.deconstruct import deconstructible
 import os
 import shutil
 import uuid
+import xml.etree.ElementTree as ET
 
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
+from django.conf import settings
+from django import urls
 from django.db import transaction
 
 
@@ -107,3 +110,32 @@ def chunk_queryset(source_qs, chunk_size):
 
         if nb_items < chunk_size:
             return
+
+
+def join_url(start, end):
+    if start.endswith("/") and end.startswith("/"):
+        return start + end[1:]
+
+    if not start.endswith("/") and not end.startswith("/"):
+        return start + "/" + end
+
+    return start + end
+
+
+def spa_reverse(name, args=[], kwargs={}):
+    return urls.reverse(name, urlconf=settings.SPA_URLCONF, args=args, kwargs=kwargs)
+
+
+def spa_resolve(path):
+    return urls.resolve(path, urlconf=settings.SPA_URLCONF)
+
+
+def parse_meta(html):
+    # dirty but this is only for testing so we don't really care,
+    # we convert the html string to xml so it can be parsed as xml
+    html = '<?xml version="1.0"?>' + html
+    tree = ET.fromstring(html)
+
+    meta = [elem for elem in tree.iter() if elem.tag in ["meta", "link"]]
+
+    return [dict([("tag", elem.tag)] + list(elem.items())) for elem in meta]

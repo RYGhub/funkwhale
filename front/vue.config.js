@@ -1,5 +1,21 @@
 
 module.exports = {
+  baseUrl: '/front/',
+  pages: {
+    embed: {
+      entry: 'src/embed.js',
+      template: 'public/embed.html',
+      filename: 'embed.html',
+    },
+    index: {
+      entry: 'src/main.js',
+      template: 'public/index.html',
+      filename: 'index.html'
+    }
+  },
+  chainWebpack: config => {
+    config.optimization.delete('splitChunks')
+  },
   configureWebpack: {
     resolve: {
       alias: {
@@ -9,33 +25,7 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true,
-    proxy: {
-      '^/rest': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/staticfiles': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/.well-known': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/media': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/federation': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-        ws: true,
-      },
-      '^/api': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-        ws: true,
-      },
-    }
+    // use https://node1.funkwhale.test/front-server/ if you use docker with federation
+    public: process.env.FRONT_DEVSERVER_URL || ('http://localhost:' + (process.env.VUE_PORT || '8080'))
   }
 }

@@ -13,7 +13,7 @@ import factory
 import pytest
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache as django_cache
+from django.core.cache import cache as django_cache, caches
 from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
@@ -98,6 +98,12 @@ def cache():
     """
     yield django_cache
     django_cache.clear()
+
+
+@pytest.fixture(autouse=True)
+def local_cache():
+    yield caches["local"]
+    caches["local"].clear()
 
 
 @pytest.fixture
@@ -382,3 +388,15 @@ def temp_signal(mocker):
 @pytest.fixture()
 def stdout():
     yield io.StringIO()
+
+
+@pytest.fixture
+def spa_html(r_mock, settings):
+    yield r_mock.get(
+        settings.FUNKWHALE_SPA_HTML_ROOT + "index.html", text="<head></head>"
+    )
+
+
+@pytest.fixture
+def no_api_auth(preferences):
+    preferences["common__api_authentication_required"] = False

@@ -508,3 +508,13 @@ class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
         except AttributeError:
             first_arg = [i.conf for i in instance_or_qs if i.conf]
         return super().get_serializer(*((first_arg,) + args[1:]), **kwargs)
+
+
+class OembedView(views.APIView):
+    permission_classes = [common_permissions.ConditionalAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        serializer = serializers.OembedSerializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        embed_data = serializer.save()
+        return Response(embed_data)
