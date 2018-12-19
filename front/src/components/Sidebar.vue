@@ -206,10 +206,8 @@ export default {
     labels() {
       let mainMenu = this.$gettext("Main menu")
       let selectTrack = this.$gettext("Play this track")
-      let pendingRequests = this.$gettext("Pending import requests")
       let pendingFollows = this.$gettext("Pending follow requests")
       return {
-        pendingRequests,
         pendingFollows,
         mainMenu,
         selectTrack

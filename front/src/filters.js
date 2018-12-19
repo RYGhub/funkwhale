@@ -1,7 +1,6 @@
 import Vue from 'vue'
 
 import moment from 'moment'
-import showdown from 'showdown'
 
 export function truncate (str, max, ellipsis) {
   max = max || 100
@@ -13,13 +12,6 @@ export function truncate (str, max, ellipsis) {
 }
 
 Vue.filter('truncate', truncate)
-
-export function markdown (str) {
-  const converter = new showdown.Converter()
-  return converter.makeHtml(str)
-}
-
-Vue.filter('markdown', markdown)
 
 export function ago (date) {
   const m = moment(date)
