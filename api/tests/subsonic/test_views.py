@@ -96,7 +96,7 @@ def test_ping(f, db, api_client):
     assert response.data == expected
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_artists(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -116,7 +116,7 @@ def test_get_artists(
     playable_by.assert_called_once_with(music_models.Artist.objects.all(), None)
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_artist(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -134,7 +134,7 @@ def test_get_artist(
     playable_by.assert_called_once_with(music_models.Artist.objects.all(), None)
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_invalid_artist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-artist")
     assert url.endswith("getArtist") is True
@@ -145,7 +145,7 @@ def test_get_invalid_artist(f, db, logged_in_api_client, factories):
     assert response.data == expected
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_artist_info2(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -163,7 +163,7 @@ def test_get_artist_info2(
     playable_by.assert_called_once_with(music_models.Artist.objects.all(), None)
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_album(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -184,7 +184,7 @@ def test_get_album(
     )
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_song(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -204,7 +204,7 @@ def test_get_song(
     playable_by.assert_called_once_with(music_models.Track.objects.all(), None)
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_stream(f, db, logged_in_api_client, factories, mocker, queryset_equal_queries):
     url = reverse("api:subsonic-stream")
     mocked_serve = mocker.spy(music_views, "handle_serve")
@@ -235,7 +235,7 @@ def test_stream_format(format, expected, logged_in_api_client, factories, mocker
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_star(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-star")
     assert url.endswith("star") is True
@@ -249,7 +249,7 @@ def test_star(f, db, logged_in_api_client, factories):
     assert favorite.track == track
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_unstar(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-unstar")
     assert url.endswith("unstar") is True
@@ -262,7 +262,7 @@ def test_unstar(f, db, logged_in_api_client, factories):
     assert logged_in_api_client.user.track_favorites.count() == 0
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_starred2(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-starred2")
     assert url.endswith("getStarred2") is True
@@ -301,7 +301,7 @@ def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
     order_by.assert_called_once_with("?")
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_starred(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-starred")
     assert url.endswith("getStarred") is True
@@ -317,7 +317,7 @@ def test_get_starred(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_album_list2(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
@@ -336,7 +336,7 @@ def test_get_album_list2(
     playable_by.assert_called_once()
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_album_list2_pagination(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-album-list2")
     assert url.endswith("getAlbumList2") is True
@@ -352,7 +352,7 @@ def test_get_album_list2_pagination(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_search3(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-search3")
     assert url.endswith("search3") is True
@@ -383,7 +383,7 @@ def test_search3(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_playlists(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-playlists")
     assert url.endswith("getPlaylists") is True
@@ -397,7 +397,7 @@ def test_get_playlists(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_playlist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-playlist")
     assert url.endswith("getPlaylist") is True
@@ -411,7 +411,7 @@ def test_get_playlist(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_update_playlist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-update-playlist")
     assert url.endswith("updatePlaylist") is True
@@ -435,7 +435,7 @@ def test_update_playlist(f, db, logged_in_api_client, factories):
     assert playlist.playlist_tracks.first().track_id == new_track.pk
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_delete_playlist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-delete-playlist")
     assert url.endswith("deletePlaylist") is True
@@ -446,7 +446,7 @@ def test_delete_playlist(f, db, logged_in_api_client, factories):
         playlist.refresh_from_db()
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_create_playlist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-create-playlist")
     assert url.endswith("createPlaylist") is True
@@ -468,7 +468,7 @@ def test_create_playlist(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_music_folders(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get-music-folders")
     assert url.endswith("getMusicFolders") is True
@@ -479,7 +479,7 @@ def test_get_music_folders(f, db, logged_in_api_client, factories):
     }
 
 
-@pytest.mark.parametrize("f", ["xml", "json"])
+@pytest.mark.parametrize("f", ["json"])
 def test_get_indexes(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
