@@ -27,6 +27,7 @@
     "vue-gettext": "^2.1.0",
     "vue-lazyload": "^1.2.6",
     "vue-masonry": "^0.11.5",
+    "vue-plyr": "^5.0.4",
     "vue-router": "^3.0.1",
     "vue-upload-component": "^2.8.11",
     "vuedraggable": "^2.16.0",
