@@ -23,7 +23,7 @@ the ``location /api/`` and `location /` blocks by the following snippets::
     }
 
     location /front/ {
-        alias /frontend;
+        alias /frontend/;
     }
 
 The change of configuration will be picked when restarting your nginx container.
@@ -40,7 +40,7 @@ and replace the ``location /api/`` and `location /` blocks by the following snip
     }
 
     location /front/ {
-        alias ${FUNKWHALE_FRONTEND_PATH};
+        alias ${FUNKWHALE_FRONTEND_PATH}/;
     }
 
 Replace ``${FUNKWHALE_FRONTEND_PATH}`` by the corresponding variable from your .env file,

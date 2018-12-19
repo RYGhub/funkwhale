@@ -51,7 +51,7 @@ server {
     }
 
     location /front/ {
-        alias ${FUNKWHALE_FRONTEND_PATH};
+        alias ${FUNKWHALE_FRONTEND_PATH}/;
     }
 
     location /federation/ {

@@ -31,7 +31,7 @@ server {
     }
 
     location /front/ {
-        alias /frontend;
+        alias /frontend/;
     }
 
     location /federation/ {
