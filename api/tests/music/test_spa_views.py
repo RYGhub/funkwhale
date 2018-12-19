@@ -46,7 +46,9 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(settings.FUNKWHALE_URL, track.album.cover.url),
+            "content": utils.join_url(
+                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
+            ),
         },
         {
             "tag": "meta",
@@ -103,7 +105,9 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(settings.FUNKWHALE_URL, album.cover.url),
+            "content": utils.join_url(
+                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
+            ),
         },
         {
             "tag": "link",
@@ -142,7 +146,9 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(settings.FUNKWHALE_URL, album.cover.url),
+            "content": utils.join_url(
+                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
+            ),
         },
     ]
 

@@ -44,7 +44,9 @@ def library_track(request, pk):
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(settings.FUNKWHALE_URL, obj.album.cover.url),
+                "content": utils.join_url(
+                    settings.FUNKWHALE_URL, obj.album.cover.crop["400x400"].url
+                ),
             }
         )
 
@@ -108,7 +110,9 @@ def library_album(request, pk):
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(settings.FUNKWHALE_URL, obj.cover.url),
+                "content": utils.join_url(
+                    settings.FUNKWHALE_URL, obj.cover.crop["400x400"].url
+                ),
             }
         )
 
@@ -153,7 +157,7 @@ def library_artist(request, pk):
                 "tag": "meta",
                 "property": "og:image",
                 "content": utils.join_url(
-                    settings.FUNKWHALE_URL, latest_album.cover.url
+                    settings.FUNKWHALE_URL, latest_album.cover.crop["400x400"].url
                 ),
             }
         )
