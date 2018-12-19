@@ -114,9 +114,7 @@ Then we'll download the frontend files:
         cd /srv
 
         rm -r funkwhale
-
         git clone -b master https://dev.funkwhale.audio/funkwhale/funkwhale funkwhale
-
         cd funkwhale
 
     The above clone command uses the master branch instead of the default develop branch, as master is stable and more suited for production setups.
@@ -212,7 +210,7 @@ Download the sample environment file:
 
 .. parsed-literal::
 
-    curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
+    curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
     # symlink it so it's sourced automatically by the API process
     # (This won't be needed anymore once release 0.18 is out)
     ln -s /srv/funkwhale/config/.env /srv/funkwhale/api/.env

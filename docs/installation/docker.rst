@@ -12,9 +12,9 @@ Download the sample docker-compose file:
     mkdir /srv/funkwhale
     cd /srv/funkwhale
     mkdir nginx
-    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
-    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker-compose.yml"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
+    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker-compose.yml"
 
 At this point, the archticture of ``/srv/funkwhale``  should look like that:
 
@@ -32,7 +32,7 @@ Create your env file:
 .. parsed-literal::
 
     export FUNKWHALE_VERSION="|version|"
-    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/env.prod.sample"
+    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
     sudo nano .env
 
