@@ -80,7 +80,7 @@
           class="two wide column control"
           @click.prevent.stop="previous"
           :disabled="emptyQueue">
-            <i :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
+            <i :class="['ui', 'backward step', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
         </a>
         <a
           href
@@ -107,7 +107,7 @@
           class="two wide column control"
           @click.prevent.stop="next"
           :disabled="!hasNext">
-            <i :class="['ui', {'disabled': !hasNext}, 'forward', 'secondary', 'icon']" ></i>
+            <i :class="['ui', {'disabled': !hasNext}, 'forward step', 'secondary', 'icon']" ></i>
         </a>
         <div
           class="wide column control volume-control"
