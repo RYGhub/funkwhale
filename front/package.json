@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "scripts/i18n-compile.sh && vue-cli-service serve --port ${VUE_PORT:-8000} --host ${VUE_HOST:-0.0.0.0}",
+    "serve": "vue-cli-service serve --port ${VUE_PORT:-8000} --host ${VUE_HOST:-0.0.0.0}",
     "build": "scripts/i18n-compile.sh && vue-cli-service build",
     "lint": "vue-cli-service lint",
     "i18n-extract": "scripts/i18n-extract.sh",
@@ -49,7 +49,8 @@
     "node-sass": "^4.9.3",
     "sass-loader": "^7.1.0",
     "sinon": "^6.1.5",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.5.17",
+    "webpack-bundle-size-analyzer": "^3.0.0"
   },
   "eslintConfig": {
     "root": true,

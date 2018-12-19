@@ -14,7 +14,6 @@ import VueLazyload from 'vue-lazyload'
 import store from './store'
 import GetTextPlugin from 'vue-gettext'
 import { sync } from 'vuex-router-sync'
-import translations from './translations.json'
 import locales from '@/locales'
 
 import filters from '@/filters' // eslint-disable-line
@@ -54,7 +53,7 @@ Vue.use(GetTextPlugin, {
       }
     }
   },
-  translations: translations,
+  translations: {},
   silent: true
 })
 

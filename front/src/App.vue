@@ -61,13 +61,12 @@ import {mapState} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
 
-import translations from '@/translations'
-
 import Sidebar from '@/components/Sidebar'
 import AppFooter from '@/components/Footer'
 import Raven from '@/components/Raven'
 import ServiceMessages from '@/components/ServiceMessages'
 
+import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
 
@@ -139,7 +138,7 @@ export default {
     },
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
-      let available = _.keys(translations)
+      let available = locales.locales.map(e => { return e.code })
       let matching = available.filter((a) => {
         return userLanguage.replace('-', '_') === a
       })

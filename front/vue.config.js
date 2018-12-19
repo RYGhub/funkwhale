@@ -1,4 +1,9 @@
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+let plugins = []
+if (process.env.BUNDLE_ANALYZE === '1') {
+  plugins.push(new BundleAnalyzerPlugin())
+}
 module.exports = {
   baseUrl: '/front/',
   pages: {
@@ -17,6 +22,7 @@ module.exports = {
     config.optimization.delete('splitChunks')
   },
   configureWebpack: {
+    plugins: plugins,
     resolve: {
       alias: {
         'vue$': 'vue/dist/vue.esm.js'
