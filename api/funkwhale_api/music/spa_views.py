@@ -63,7 +63,7 @@ def library_track(request, pk):
                 "type": "application/json+oembed",
                 "href": (
                     utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                    + "?url={}".format(track_url)
+                    + "?url={}&amp;format=json".format(track_url)
                 ),
             }
         )
@@ -120,7 +120,7 @@ def library_album(request, pk):
                 "type": "application/json+oembed",
                 "href": (
                     utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
-                    + "?url={}".format(album_url)
+                    + "?url={}&amp;format=json".format(album_url)
                 ),
             }
         )
