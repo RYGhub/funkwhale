@@ -43,10 +43,6 @@
         :version="version"
         @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"
       ></app-footer>
-      <raven
-        v-if="$store.state.instance.settings.raven.front_enabled.value"
-        :dsn="$store.state.instance.settings.raven.front_dsn.value"
-      ></raven>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
       <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
@@ -63,7 +59,6 @@ import GlobalEvents from '@/components/utils/global-events'
 
 import Sidebar from '@/components/Sidebar'
 import AppFooter from '@/components/Footer'
-import Raven from '@/components/Raven'
 import ServiceMessages from '@/components/ServiceMessages'
 
 import locales from './locales'
@@ -75,7 +70,6 @@ export default {
   components: {
     Sidebar,
     AppFooter,
-    Raven,
     PlaylistModal,
     ShortcutsModal,
     GlobalEvents,

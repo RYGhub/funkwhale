@@ -40,14 +40,6 @@ export default {
         enabled: {
           value: true
         }
-      },
-      raven: {
-        front_enabled: {
-          value: false
-        },
-        front_dsn: {
-          value: null
-        }
       }
     }
   },

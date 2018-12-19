@@ -18,11 +18,11 @@ describe('store/instance', () => {
 
   describe('mutations', () => {
     it('settings', () => {
-      const state = {settings: {raven: {front_dsn: {value: 'test'}}}}
-      let settings = {raven: {front_enabled: {value: true}}}
+      const state = {settings: {users: {upload_quota: {value: 1}}}}
+      let settings = {users: {registration_enabled: {value: true}}}
       store.mutations.settings(state, settings)
       expect(state.settings).to.deep.equal({
-        raven: {front_dsn: {value: 'test'}, front_enabled: {value: true}}
+        users: {upload_quota: {value: 1}, registration_enabled: {value: true}}
       })
     })
   })
@@ -32,13 +32,13 @@ describe('store/instance', () => {
         status: 200,
         response: [
           {
-            section: 'raven',
-            name: 'front_dsn',
-            value: 'test'
+            section: 'users',
+            name: 'upload_quota',
+            value: 1
           },
           {
-            section: 'raven',
-            name: 'front_enabled',
+            section: 'users',
+            name: 'registration_enabled',
             value: false
           }
         ]
@@ -50,15 +50,15 @@ describe('store/instance', () => {
           {
             type: 'settings',
             payload: {
-              raven: {
-                front_dsn: {
-                  section: 'raven',
-                  name: 'front_dsn',
-                  value: 'test'
+              users: {
+                upload_quota: {
+                  section: 'users',
+                  name: 'upload_quota',
+                  value: 1
                 },
-                front_enabled: {
-                  section: 'raven',
-                  name: 'front_enabled',
+                registration_enabled: {
+                  section: 'users',
+                  name: 'registration_enabled',
                   value: false
                 }
               }
