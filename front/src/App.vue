@@ -167,7 +167,7 @@ export default {
       bridge.connect(
         url,
         null,
-        {reconnectInterval: 5000})
+        {reconnectInterval: 1000 * 60})
       bridge.listen(function (event) {
         self.$store.dispatch('ui/websocketEvent', event)
       })
