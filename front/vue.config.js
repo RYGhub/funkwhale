@@ -37,6 +37,9 @@ module.exports = {
   },
   chainWebpack: config => {
     config.optimization.delete('splitChunks')
+    console.log(config.plugins)
+    config.plugins.delete('prefetch-embed')
+    config.plugins.delete('prefetch-index')
   },
   configureWebpack: {
     plugins: plugins,
