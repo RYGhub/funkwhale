@@ -87,6 +87,9 @@ server {
 
     location /front/ {
         alias ${FUNKWHALE_FRONTEND_PATH}/;
+        expires 30d;
+        add_header Pragma public;
+        add_header Cache-Control "public, must-revalidate, proxy-revalidate";
     }
 
     location /federation/ {
