@@ -11,7 +11,7 @@
         <div class="ui loader"></div>
       </div>
       <div class="card" v-for="album in albums" :key="album.id">
-        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" :style="getImageStyle(album)">
+        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" v-lazy:background-image="getImageUrl(album)">
           <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
         </div>
         <div class="content">
@@ -87,17 +87,15 @@ export default {
         this.offset = Math.max(this.offset - this.limit, 0)
       }
     },
-    getImageStyle (album) {
+    getImageUrl (album) {
       let url = '../../../assets/audio/default-cover.png'
 
       if (album.cover.original) {
         url = this.$store.getters['instance/absoluteUrl'](album.cover.medium_square_crop)
       } else {
-        return {}
+        return null
       }
-      return {
-        'background-image': `url("${url}")`
-      }
+      return url
     }
   },
   watch: {
@@ -108,10 +106,10 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import '../../../style/vendor/media';
+@import "../../../style/vendor/media";
 
 .default-cover {
-  background-image: url('../../../assets/audio/default-cover.png') !important;
+  background-image: url("../../../assets/audio/default-cover.png") !important;
 }
 
 .wrapper {

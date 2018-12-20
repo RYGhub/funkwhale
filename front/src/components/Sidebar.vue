@@ -39,7 +39,7 @@
               <translate :translate-params="{username: $store.state.auth.username}">
                 Logged in as %{ username }
               </translate>
-              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
+              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate>Settings</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'notifications'}">

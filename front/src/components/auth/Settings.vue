@@ -53,7 +53,7 @@
             </div>
             <div class="ui six wide column">
               <h3 class="ui header"><translate>Current avatar</translate></h3>
-              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" :src="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
+              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
               <div class="ui hidden divider"></div>
               <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
                 <translate>Remove avatar</translate>
