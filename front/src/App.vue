@@ -43,10 +43,6 @@
         :version="version"
         @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"
       ></app-footer>
-      <raven
-        v-if="$store.state.instance.settings.raven.front_enabled.value"
-        :dsn="$store.state.instance.settings.raven.front_dsn.value"
-      ></raven>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
       <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
@@ -56,18 +52,16 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import {mapState} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
 
-import translations from '@/translations'
-
 import Sidebar from '@/components/Sidebar'
 import AppFooter from '@/components/Footer'
-import Raven from '@/components/Raven'
 import ServiceMessages from '@/components/ServiceMessages'
 
+import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
 
@@ -76,7 +70,6 @@ export default {
   components: {
     Sidebar,
     AppFooter,
-    Raven,
     PlaylistModal,
     ShortcutsModal,
     GlobalEvents,
@@ -139,7 +132,7 @@ export default {
     },
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
-      let available = _.keys(translations)
+      let available = locales.locales.map(e => { return e.code })
       let matching = available.filter((a) => {
         return userLanguage.replace('-', '_') === a
       })
@@ -223,181 +216,5 @@ export default {
 </script>
 
 <style lang="scss">
-// we do the import here instead in main.js
-// as resolve order is not deterministric in webpack
-// and we end up with CSS rules not applied,
-// see https://github.com/webpack/webpack/issues/215
-@import "semantic/semantic.css";
-@import "style/vendor/media";
-
-html,
-body {
-  @include media("<desktop") {
-    font-size: 90%;
-  }
-}
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.instance-chooser {
-  margin-top: 2em;
-}
-
-.main.pusher,
-.footer {
-  @include media(">desktop") {
-    margin-left: 350px !important;
-    margin-top: 50px;
-  }
-  transform: none !important;
-}
-
-.main.pusher > .ui.secondary.menu {
-  margin-left: 0;
-  margin-right: 0;
-  border: none;
-  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
-  .ui.item {
-    border: none;
-    border-bottom-style: none;
-    margin-bottom: 0px;
-    &.active {
-      box-shadow: inset 0px -2px 0px 0px #000;
-    }
-  }
-  @include media(">tablet") {
-    padding: 0 2.5rem;
-  }
-  @include media(">desktop") {
-    position: fixed;
-    left: 350px;
-    right: 0px;
-    top: 0px;
-    z-index: 99;
-  }
-  background-color: white;
-  .item {
-    padding-top: 1.5em;
-    padding-bottom: 1.5em;
-  }
-}
-
-.service-messages {
-  position: fixed;
-  bottom: 1em;
-  left: 1em;
-  @include media(">desktop") {
-    left: 350px;
-  }
-}
-.main-pusher {
-  padding: 1.5rem 0;
-}
-.ui.stripe.segment,
-#footer {
-  padding: 2em;
-  @include media(">tablet") {
-    padding: 4em;
-  }
-}
-
-.ellipsis {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.ui.small.text.container {
-  max-width: 500px !important;
-}
-
-.button.icon.tiny {
-  padding: 0.5em !important;
-}
-
-.sidebar {
-  .logo {
-    path {
-      fill: white;
-    }
-  }
-}
-
-.discrete {
-  color: rgba(0, 0, 0, 0.87);
-}
-.link {
-  cursor: pointer;
-}
-
-.ui.really.basic.button {
-  &:not(:focus) {
-    box-shadow: none !important;
-    background-color: none !important;
-  }
-}
-
-.floated.buttons .button ~ .dropdown {
-  border-left: none;
-}
-
-.ui.icon.header .circular.icon {
-  display: flex;
-  justify-content: center;
-}
-
-.segment-content .button {
-  margin: 0.5em;
-}
-
-a {
-  cursor: pointer;
-}
-.segment.hidden {
-  display: none;
-}
-
-button.reset {
-  border: none;
-  margin: 0;
-  padding: 0;
-  width: auto;
-  overflow: visible;
-
-  background: transparent;
-
-  /* inherit font & color from ancestor */
-  color: inherit;
-  font: inherit;
-
-  /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
-  line-height: normal;
-
-  /* Corrects font smoothing for webkit */
-  -webkit-font-smoothing: inherit;
-  -moz-osx-font-smoothing: inherit;
-  /* Corrects inability to style clickable `input` types in iOS */
-  -webkit-appearance: none;
-  text-align: inherit;
-}
-
-.ui.table > caption {
-  font-weight: bold;
-  padding: 0.5em;
-  text-align: left;
-}
-[role="button"] {
-  cursor: pointer;
-}
-
-.left.floated {
-  float: left;
-}
-
-.right.floated {
-  float: right;
-}
+@import "style/_main";
 </style>

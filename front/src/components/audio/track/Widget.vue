@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
 
@@ -109,7 +109,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../../style/vendor/media';
+@import "../../../style/vendor/media";
 
 .play-overlay {
   position: absolute;

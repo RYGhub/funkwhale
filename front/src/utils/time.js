@@ -16,7 +16,7 @@ export default {
   durationFormatted (v) {
     let duration = parseInt(v)
     if (duration % 1 !== 0) {
-      return time.parse(0)
+      return this.parse(0)
     }
     duration = Math.round(duration)
     return this.parse(duration)

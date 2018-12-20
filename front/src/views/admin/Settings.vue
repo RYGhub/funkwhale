@@ -142,11 +142,6 @@ export default {
             "instance__nodeinfo_stats_enabled",
             "instance__nodeinfo_private"
           ]
-        },
-        {
-          label: errorLabel,
-          id: "reporting",
-          settings: ["raven__front_enabled", "raven__front_dsn"]
         }
       ]
     }

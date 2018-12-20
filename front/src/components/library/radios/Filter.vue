@@ -64,7 +64,7 @@
 <script>
 import axios from 'axios'
 import $ from 'jquery'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 import Modal from '@/components/semantic/Modal'
 import TrackTable from '@/components/audio/track/Table'

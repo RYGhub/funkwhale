@@ -70,7 +70,7 @@
 
 <script>
 import axios from "axios"
-import _ from "lodash"
+import _ from "@/lodash"
 import $ from "jquery"
 
 import logger from "@/logging"

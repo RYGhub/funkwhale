@@ -14,7 +14,6 @@ import VueLazyload from 'vue-lazyload'
 import store from './store'
 import GetTextPlugin from 'vue-gettext'
 import { sync } from 'vuex-router-sync'
-import translations from './translations.json'
 import locales from '@/locales'
 
 import filters from '@/filters' // eslint-disable-line
@@ -23,12 +22,9 @@ import globals from '@/components/globals' // eslint-disable-line
 sync(store, router)
 
 window.$ = window.jQuery = require('jquery')
-
-// this is absolutely dirty but at the moment, semantic UI does not
-// play really nice with webpack and I want to get rid of Google Fonts
-// require('./semantic/semantic.css')
-require('semantic-ui-css/semantic.js')
+require('./semantic.js')
 require('masonry-layout')
+
 let availableLanguages = (function () {
   let l = {}
   locales.locales.forEach(c => {
@@ -54,7 +50,7 @@ Vue.use(GetTextPlugin, {
       }
     }
   },
-  translations: translations,
+  translations: {},
   silent: true
 })
 

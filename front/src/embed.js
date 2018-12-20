@@ -1,7 +1,6 @@
 
 import Vue from 'vue'
 import Embed from './Embed'
-import axios from 'axios'
 import VuePlyr from 'vue-plyr'
 
 Vue.use(VuePlyr)

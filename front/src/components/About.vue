@@ -27,9 +27,9 @@
         <p>{{ instance.short_description.value }}</p>
       </div>
       <div
-        v-if="instance.long_description.value"
+        v-if="markdown && instance.long_description.value"
         class="ui middle aligned stackable text container"
-        v-html="$options.filters.markdown(instance.long_description.value)">
+        v-html="markdown.makeHtml(instance.long_description.value)">
       </div>
     </section>
   </main>
@@ -43,8 +43,17 @@ export default {
   components: {
     Stats
   },
-  created() {
+  data () {
+    return {
+      markdown: null
+    }
+  },
+  created () {
     this.$store.dispatch("instance/fetchSettings")
+    let self = this
+    import('showdown').then(module => {
+      self.markdown = new module.default.Converter()
+    })
   },
   computed: {
     ...mapState({

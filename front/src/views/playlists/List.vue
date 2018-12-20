@@ -56,7 +56,7 @@
 
 <script>
 import axios from "axios"
-import _ from "lodash"
+import _ from "@/lodash"
 import $ from "jquery"
 
 import OrderingMixin from "@/components/mixins/Ordering"

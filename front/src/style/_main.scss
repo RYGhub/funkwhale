@@ -1,0 +1,250 @@
+/*
+
+███████╗███████╗███╗   ███╗ █████╗ ███╗   ██╗████████╗██╗ ██████╗    ██╗   ██╗██╗
+██╔════╝██╔════╝████╗ ████║██╔══██╗████╗  ██║╚══██╔══╝██║██╔════╝    ██║   ██║██║
+███████╗█████╗  ██╔████╔██║███████║██╔██╗ ██║   ██║   ██║██║         ██║   ██║██║
+╚════██║██╔══╝  ██║╚██╔╝██║██╔══██║██║╚██╗██║   ██║   ██║██║         ██║   ██║██║
+███████║███████╗██║ ╚═╝ ██║██║  ██║██║ ╚████║   ██║   ██║╚██████╗    ╚██████╔╝██║
+╚══════╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝ ╚═════╝     ╚═════╝ ╚═╝
+
+  Import this file into your LESS project to use Semantic UI without build tools
+*/
+
+/* Global */
+@import "~semantic-ui-css/components/reset.css";
+// we use our custom site css here to avoid loading google font
+@import "./site";
+
+/* Elements */
+@import "~semantic-ui-css/components/button.css";
+@import "~semantic-ui-css/components/container.css";
+@import "~semantic-ui-css/components/divider.css";
+// @import "~semantic-ui-css/components/flag.css";
+@import "~semantic-ui-css/components/header.css";
+@import "~semantic-ui-css/components/icon.css";
+@import "~semantic-ui-css/components/image.css";
+@import "~semantic-ui-css/components/input.css";
+@import "~semantic-ui-css/components/label.css";
+@import "~semantic-ui-css/components/list.css";
+@import "~semantic-ui-css/components/loader.css";
+// @import "~semantic-ui-css/components/placeholder.css";
+// @import "~semantic-ui-css/components/rail.css";
+// @import "~semantic-ui-css/components/reveal.css";
+@import "~semantic-ui-css/components/segment.css";
+@import "~semantic-ui-css/components/step.css";
+
+/* Collections */
+// @import "~semantic-ui-css/components/breadcrumb.css";
+@import "~semantic-ui-css/components/form.css";
+@import "~semantic-ui-css/components/grid.css";
+@import "~semantic-ui-css/components/menu.css";
+@import "~semantic-ui-css/components/message.css";
+@import "~semantic-ui-css/components/table.css";
+
+/* Views */
+// @import "~semantic-ui-css/components/ad.css";
+@import "~semantic-ui-css/components/card.css";
+// @import "~semantic-ui-css/components/comment.css";
+// @import "~semantic-ui-css/components/feed.css";
+@import "~semantic-ui-css/components/item.css";
+@import "~semantic-ui-css/components/statistic.css";
+
+/* Modules */
+// @import "~semantic-ui-css/components/accordion.css";
+@import "~semantic-ui-css/components/checkbox.css";
+@import "~semantic-ui-css/components/dimmer.css";
+@import "~semantic-ui-css/components/dropdown.css";
+// @import "~semantic-ui-css/components/embed.css";
+@import "~semantic-ui-css/components/modal.css";
+// @import "~semantic-ui-css/components/nag.css";
+@import "~semantic-ui-css/components/popup.css";
+@import "~semantic-ui-css/components/progress.css";
+// @import "~semantic-ui-css/components/rating.css";
+@import "~semantic-ui-css/components/search.css";
+// @import "~semantic-ui-css/components/shape.css";
+@import "~semantic-ui-css/components/sidebar.css";
+@import "~semantic-ui-css/components/sticky.css";
+@import "~semantic-ui-css/components/tab.css";
+@import "~semantic-ui-css/components/transition.css";
+
+
+
+// we do the import here instead in main.js
+// as resolve order is not deterministric in webpack
+// and we end up with CSS rules not applied,
+// see https://github.com/webpack/webpack/issues/215
+@import "./vendor/media";
+
+html,
+body {
+  @include media("<desktop") {
+    font-size: 90%;
+  }
+}
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.instance-chooser {
+  margin-top: 2em;
+}
+
+.main.pusher,
+.footer {
+  @include media(">desktop") {
+    margin-left: 350px !important;
+    margin-top: 50px;
+  }
+  transform: none !important;
+}
+
+.main.pusher > .ui.secondary.menu {
+  margin-left: 0;
+  margin-right: 0;
+  border: none;
+  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
+  .ui.item {
+    border: none;
+    border-bottom-style: none;
+    margin-bottom: 0px;
+    &.active {
+      box-shadow: inset 0px -2px 0px 0px #000;
+    }
+  }
+  @include media(">tablet") {
+    padding: 0 2.5rem;
+  }
+  @include media(">desktop") {
+    position: fixed;
+    left: 350px;
+    right: 0px;
+    top: 0px;
+    z-index: 99;
+  }
+  background-color: white;
+  .item {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
+}
+
+.service-messages {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+  @include media(">desktop") {
+    left: 350px;
+  }
+}
+.main-pusher {
+  padding: 1.5rem 0;
+}
+.ui.stripe.segment,
+#footer {
+  padding: 2em;
+  @include media(">tablet") {
+    padding: 4em;
+  }
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ui.small.text.container {
+  max-width: 500px !important;
+}
+
+.button.icon.tiny {
+  padding: 0.5em !important;
+}
+
+.sidebar {
+  .logo {
+    &.bordered.icon {
+      padding: .5em .41em !important;
+    }
+    path {
+      fill: white;
+    }
+  }
+}
+
+.discrete {
+  color: rgba(0, 0, 0, 0.87);
+}
+.link {
+  cursor: pointer;
+}
+
+.ui.really.basic.button {
+  &:not(:focus) {
+    box-shadow: none !important;
+    background-color: none !important;
+  }
+}
+
+.floated.buttons .button ~ .dropdown {
+  border-left: none;
+}
+
+.ui.icon.header .circular.icon {
+  display: flex;
+  justify-content: center;
+}
+
+.segment-content .button {
+  margin: 0.5em;
+}
+
+a {
+  cursor: pointer;
+}
+.segment.hidden {
+  display: none;
+}
+
+button.reset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  overflow: visible;
+
+  background: transparent;
+
+  /* inherit font & color from ancestor */
+  color: inherit;
+  font: inherit;
+
+  /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+  line-height: normal;
+
+  /* Corrects font smoothing for webkit */
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  /* Corrects inability to style clickable `input` types in iOS */
+  -webkit-appearance: none;
+  text-align: inherit;
+}
+
+.ui.table > caption {
+  font-weight: bold;
+  padding: 0.5em;
+  text-align: left;
+}
+[role="button"] {
+  cursor: pointer;
+}
+
+.left.floated {
+  float: left;
+}
+
+.right.floated {
+  float: right;
+}

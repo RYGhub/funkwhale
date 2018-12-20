@@ -59,15 +59,6 @@ class RavenDSN(types.StringPreference):
 
 
 @global_preferences_registry.register
-class RavenEnabled(types.BooleanPreference):
-    show_in_api = True
-    section = raven
-    name = "front_enabled"
-    default = False
-    verbose_name = "Report front-end errors with Raven"
-
-
-@global_preferences_registry.register
 class InstanceNodeinfoEnabled(types.BooleanPreference):
     show_in_api = False
     section = instance

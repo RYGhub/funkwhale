@@ -1,3 +1,5 @@
 {
-  "additionalStylesheets": ["/custom.css"]
+  "additionalStylesheets": [
+    "/front/custom.css"
+  ]
 }

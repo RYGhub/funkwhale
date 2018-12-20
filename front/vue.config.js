@@ -1,4 +1,14 @@
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require('webpack');
+
+let plugins = [
+  // do not include moment.js locales since it's quite heavy
+  new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+]
+if (process.env.BUNDLE_ANALYZE === '1') {
+  plugins.push(new BundleAnalyzerPlugin())
+}
 module.exports = {
   baseUrl: '/front/',
   pages: {
@@ -17,6 +27,7 @@ module.exports = {
     config.optimization.delete('splitChunks')
   },
   configureWebpack: {
+    plugins: plugins,
     resolve: {
       alias: {
         'vue$': 'vue/dist/vue.esm.js'

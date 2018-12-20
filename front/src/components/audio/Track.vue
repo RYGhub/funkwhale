@@ -4,7 +4,7 @@
 
 <script>
 import {mapState} from 'vuex'
-import _ from 'lodash'
+import _ from '@/lodash'
 import url from '@/utils/url'
 import {Howl} from 'howler'
 

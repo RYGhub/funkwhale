@@ -16,8 +16,8 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
-      <a class="item" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
+      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
+      <a :class="[{active: selectedTab === 'queue'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
         <translate>Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
            <translate>(empty)</translate>
@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="tabs">
-    <section class="ui bottom attached active tab" data-tab="library" :aria-label="labels.mainMenu">
+    <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'library'}, 'tab']" :aria-label="labels.mainMenu">
       <nav class="ui inverted vertical large fluid menu" role="navigation" :aria-label="labels.mainMenu">
         <div class="item">
           <header class="header"><translate>My account</translate></header>
@@ -39,7 +39,7 @@
               <translate :translate-params="{username: $store.state.auth.username}">
                 Logged in as %{ username }
               </translate>
-              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" :src="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
+              <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate>Settings</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'notifications'}">
@@ -113,7 +113,7 @@
         </div>
       </div>
     </div>
-    <section class="ui bottom attached tab" data-tab="queue">
+    <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'queue'}, 'tab']">
       <table class="ui compact inverted very basic fixed single line unstackable table">
         <draggable v-model="tracks" element="tbody" @update="reorder">
           <tr
@@ -188,11 +188,6 @@ export default {
       fetchInterval: null
     }
   },
-  mounted() {
-    $(this.$el)
-      .find(".menu .item")
-      .tab()
-  },
   destroy() {
     if (this.fetchInterval) {
       clearInterval(this.fetchInterval)
@@ -206,10 +201,8 @@ export default {
     labels() {
       let mainMenu = this.$gettext("Main menu")
       let selectTrack = this.$gettext("Play this track")
-      let pendingRequests = this.$gettext("Pending import requests")
       let pendingFollows = this.$gettext("Pending follow requests")
       return {
-        pendingRequests,
         pendingFollows,
         mainMenu,
         selectTrack

@@ -1,5 +1,5 @@
 import logger from '@/logging'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 export default {
   namespaced: true,
@@ -86,7 +86,7 @@ export default {
         if (callback && i + 1 === total) {
           p.then(callback)
         }
-        if (shouldPlay && p) {
+        if (shouldPlay && p && i + 1 === total) {
           p.then(() => {
             dispatch('next')
           })

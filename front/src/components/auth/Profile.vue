@@ -7,7 +7,7 @@
       <div :class="['ui', 'head', 'vertical', 'center', 'aligned', 'stripe', 'segment']">
         <h2 class="ui center aligned icon header">
           <i v-if="!profile.avatar.square_crop" class="circular inverted user green icon"></i>
-          <img class="ui big circular image" v-else :src="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
+          <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
           <div class="content">
             {{ profile.username }}
             <div class="sub header" v-translate="{date: signupDate}">Registered since %{ date }</div>

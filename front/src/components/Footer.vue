@@ -20,7 +20,7 @@
           <div class="ui form">
             <div class="ui field">
               <label><translate>Change language</translate></label>
-              <select class="ui dropdown" v-model="$language.current">
+              <select class="ui dropdown" :value="$language.current" @change="updateLanguage($event.target.value)">
                 <option v-for="(language, key) in $language.available" :key="key" :value="key">{{ language }}</option>
               </select>
             </div>
@@ -60,7 +60,9 @@
 </template>
 
 <script>
+import Vue from "vue"
 import { mapState } from "vuex"
+import axios from 'axios'
 
 export default {
   props: ["version"],
@@ -74,6 +76,13 @@ export default {
       if (confirm) {
         this.$store.commit("instance/instanceUrl", null)
       }
+    },
+    updateLanguage(value) {
+      let self = this
+      import(`../translations/${value}.json`).then((response) =>{
+        Vue.$translations[value] = response.default[value]
+        self.$language.current = value
+      })
     }
   },
   computed: {
