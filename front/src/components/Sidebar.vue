@@ -16,8 +16,8 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a class="active item" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
-      <a class="item" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
+      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
+      <a :class="[{active: selectedTab === 'queue'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
         <translate>Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
            <translate>(empty)</translate>
@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="tabs">
-    <section class="ui bottom attached active tab" data-tab="library" :aria-label="labels.mainMenu">
+    <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'library'}, 'tab']" :aria-label="labels.mainMenu">
       <nav class="ui inverted vertical large fluid menu" role="navigation" :aria-label="labels.mainMenu">
         <div class="item">
           <header class="header"><translate>My account</translate></header>
@@ -113,7 +113,7 @@
         </div>
       </div>
     </div>
-    <section class="ui bottom attached tab" data-tab="queue">
+    <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'queue'}, 'tab']">
       <table class="ui compact inverted very basic fixed single line unstackable table">
         <draggable v-model="tracks" element="tbody" @update="reorder">
           <tr
@@ -187,11 +187,6 @@ export default {
       isCollapsed: true,
       fetchInterval: null
     }
-  },
-  mounted() {
-    $(this.$el)
-      .find(".menu .item")
-      .tab()
   },
   destroy() {
     if (this.fetchInterval) {
