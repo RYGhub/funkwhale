@@ -13,7 +13,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import logging
 
-from urllib.parse import urlparse, urlsplit
+from urllib.parse import urlsplit
 
 import environ
 from celery.schedules import crontab
@@ -420,11 +420,10 @@ CACHES = {
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
 
-cache_url = urlparse(CACHES["default"]["LOCATION"])
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(cache_url.hostname, cache_url.port)]},
+        "CONFIG": {"hosts": [CACHES["default"]["LOCATION"]]},
     }
 }
 
