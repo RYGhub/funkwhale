@@ -1,6 +1,6 @@
 import axios from 'axios'
 import logger from '@/logging'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 function getDefaultUrl () {
   return (

@@ -1,5 +1,5 @@
 import logger from '@/logging'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 export default {
   namespaced: true,

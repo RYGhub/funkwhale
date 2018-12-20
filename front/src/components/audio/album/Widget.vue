@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
 

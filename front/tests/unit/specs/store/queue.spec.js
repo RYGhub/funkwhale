@@ -1,7 +1,7 @@
 var sinon = require('sinon')
 import {expect} from 'chai'
 
-import _ from 'lodash'
+import _ from '@/lodash'
 
 import store from '@/store/queue'
 import { testAction } from '../../utils'

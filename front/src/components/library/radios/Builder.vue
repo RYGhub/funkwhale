@@ -94,7 +94,7 @@
 <script>
 import axios from "axios"
 import $ from "jquery"
-import _ from "lodash"
+import _ from "@/lodash"
 import BuilderFilter from "./Filter"
 import TrackTable from "@/components/audio/track/Table"
 import RadioButton from "@/components/radios/Button"

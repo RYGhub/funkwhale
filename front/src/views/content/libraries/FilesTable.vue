@@ -120,7 +120,7 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import time from '@/utils/time'
 import {normalizeQuery, parseTokens, compileTokens} from '@/search'
 

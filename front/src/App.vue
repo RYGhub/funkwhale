@@ -52,7 +52,7 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import {mapState} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
