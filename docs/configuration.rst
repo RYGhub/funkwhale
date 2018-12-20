@@ -182,7 +182,7 @@ work. We will store the necessary files in the ``/srv/funkwhale/custom`` directo
     mkdir custom
     cat <<EOF > custom/settings.json
     {
-      "additionalStylesheets": ["/custom/custom.css"]
+      "additionalStylesheets": ["/front/custom/custom.css"]
     }
     EOF
     cat <<EOF > custom/custom.css
@@ -194,7 +194,7 @@ work. We will store the necessary files in the ``/srv/funkwhale/custom`` directo
 By executing the previous commands, you will end up with two files in your ``/srv/funkwhale/custom``
 directory:
 
-- ``settings.json`` will tell the front-end what stylesheets you want to load (``/custom/custom.css`` in this example)
+- ``settings.json`` will tell the front-end what stylesheets you want to load (``/front/custom/custom.css`` in this example)
 - ``custom.css`` will hold your custom CSS
 
 The last step to make this work is to ensure both files are served by the reverse proxy.

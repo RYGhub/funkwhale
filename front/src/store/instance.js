@@ -123,7 +123,7 @@ export default {
       })
     },
     fetchFrontSettings ({commit}) {
-      return axios.get('/settings.json').then(response => {
+      return axios.get('/front/settings.json').then(response => {
         commit('frontSettings', response.data)
       }, response => {
         logger.default.error('Error when fetching front-end configuration (or no customization available)')
