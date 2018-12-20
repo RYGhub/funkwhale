@@ -81,6 +81,7 @@ export default {
       let self = this
       import(`../translations/${value}.json`).then((response) =>{
         Vue.$translations[value] = response.default[value]
+      }).finally(() => {
         self.$language.current = value
       })
     }
