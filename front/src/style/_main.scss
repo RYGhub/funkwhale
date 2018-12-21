@@ -172,6 +172,9 @@ body {
       fill: white;
     }
   }
+  .tab {
+    flex-direction: column;
+  }
 }
 
 .discrete {
