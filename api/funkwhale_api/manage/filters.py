@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 
@@ -18,6 +19,14 @@ class ManageUploadFilterSet(filters.FilterSet):
     class Meta:
         model = music_models.Upload
         fields = ["q", "track__album", "track__artist", "track"]
+
+
+class ManageDomainFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(search_fields=["name"])
+
+    class Meta:
+        model = federation_models.Domain
+        fields = ["name"]
 
 
 class ManageUserFilterSet(filters.FilterSet):

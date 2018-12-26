@@ -15,6 +15,7 @@ export default {
         },
         filters: {
           creation_date: this.$gettext('Creation date'),
+          first_seen: this.$gettext('First seen date'),
           accessed_date: this.$gettext('Accessed date'),
           modification_date: this.$gettext('Modification date'),
           imported_date: this.$gettext('Imported date'),
@@ -30,6 +31,8 @@ export default {
           date_joined: this.$gettext('Sign-up date'),
           last_activity: this.$gettext('Last activity'),
           username: this.$gettext('Username'),
+          users: this.$gettext('Users'),
+          received_messages: this.$gettext('Received messages'),
         }
       }
     }

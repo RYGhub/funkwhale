@@ -10,6 +10,7 @@ from funkwhale_api.manage import serializers, views
         (views.ManageUploadViewSet, ["library"], "and"),
         (views.ManageUserViewSet, ["settings"], "and"),
         (views.ManageInvitationViewSet, ["settings"], "and"),
+        (views.ManageDomainViewSet, ["moderation"], "and"),
     ],
 )
 def test_permissions(assert_user_permission, view, permissions, operator):
@@ -64,3 +65,15 @@ def test_invitation_view_create(factories, superuser_api_client, mocker):
 
     assert response.status_code == 201
     assert superuser_api_client.user.invitations.latest("id") is not None
+
+
+def test_domain_list(factories, superuser_api_client, settings):
+    factories["federation.Domain"](pk=settings.FEDERATION_HOSTNAME)
+    d = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == d.pk

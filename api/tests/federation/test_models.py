@@ -1,6 +1,8 @@
 import pytest
 from django import db
 
+from funkwhale_api.federation import models
+
 
 def test_cannot_duplicate_actor(factories):
     actor = factories["federation.Actor"]()
@@ -67,3 +69,11 @@ def test_actor_get_quota(factories):
 def test_domain_name_saved_properly(value, expected, factories):
     domain = factories["federation.Domain"](name=value)
     assert domain.name == expected
+
+
+def test_external_domains(factories, settings):
+    d1 = factories["federation.Domain"]()
+    d2 = factories["federation.Domain"]()
+    settings.FEDERATION_HOSTNAME = d1.pk
+
+    assert list(models.Domain.objects.external()) == [d2]

@@ -76,18 +76,26 @@
               class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate>Add content</translate></router-link>
           </div>
         </div>
-        <div class="item" v-if="$store.state.auth.availablePermissions['settings']">
+        <div class="item" v-if="$store.state.auth.availablePermissions['settings'] || $store.state.auth.availablePermissions['moderation']">
           <header class="header"><translate>Administration</translate></header>
           <div class="menu">
             <router-link
+              v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{path: '/manage/settings'}">
               <i class="settings icon"></i><translate>Settings</translate>
             </router-link>
             <router-link
+              v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{name: 'manage.users.users.list'}">
               <i class="users icon"></i><translate>Users</translate>
+            </router-link>
+            <router-link
+              v-if="$store.state.auth.availablePermissions['moderation']"
+              class="item"
+              :to="{name: 'manage.moderation.domains.list'}">
+              <i class="shield icon"></i><translate>Moderation</translate>
             </router-link>
           </div>
         </div>

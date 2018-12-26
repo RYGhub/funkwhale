@@ -2,6 +2,7 @@ from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import list_route
 
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.users.permissions import HasUserPermission
@@ -92,3 +93,26 @@ class ManageInvitationViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+
+class ManageDomainViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    queryset = (
+        federation_models.Domain.objects.external()
+        .with_last_activity_date()
+        .with_actors_count()
+        .with_outbox_activities_count()
+        .order_by("name")
+    )
+    serializer_class = serializers.ManageDomainSerializer
+    filter_class = filters.ManageDomainFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["moderation"]
+    ordering_fields = [
+        "name",
+        "creation_date",
+        "last_activity_date",
+        "actors_count",
+        "outbox_activities_count",
+    ]

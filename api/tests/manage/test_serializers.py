@@ -21,7 +21,7 @@ def test_user_update_permission(factories):
         user,
         data={
             "is_active": False,
-            "permissions": {"federation": False, "upload": True},
+            "permissions": {"moderation": True, "settings": False},
             "upload_quota": 12,
         },
     )
@@ -33,4 +33,21 @@ def test_user_update_permission(factories):
     assert user.upload_quota == 12
     assert user.permission_moderation is True
     assert user.permission_library is False
-    assert user.permission_settings is True
+    assert user.permission_settings is False
+
+
+def test_manage_domain_serializer(factories, now):
+    domain = factories["federation.Domain"]()
+    setattr(domain, "actors_count", 42)
+    setattr(domain, "outbox_activities_count", 23)
+    setattr(domain, "last_activity_date", now)
+    expected = {
+        "name": domain.name,
+        "creation_date": domain.creation_date.isoformat().split("+")[0] + "Z",
+        "last_activity_date": now,
+        "actors_count": 42,
+        "outbox_activities_count": 23,
+    }
+    s = serializers.ManageDomainSerializer(domain)
+
+    assert s.data == expected

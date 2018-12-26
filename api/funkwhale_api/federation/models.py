@@ -62,9 +62,32 @@ class ActorQuerySet(models.QuerySet):
         return qs
 
 
+class DomainQuerySet(models.QuerySet):
+    def external(self):
+        return self.exclude(pk=settings.FEDERATION_HOSTNAME)
+
+    def with_last_activity_date(self):
+        activities = Activity.objects.filter(
+            actor__domain=models.OuterRef("pk")
+        ).order_by("-creation_date")
+
+        return self.annotate(
+            last_activity_date=models.Subquery(activities.values("creation_date")[:1])
+        )
+
+    def with_actors_count(self):
+        return self.annotate(actors_count=models.Count("actors", distinct=True))
+
+    def with_outbox_activities_count(self):
+        return self.annotate(
+            outbox_activities_count=models.Count("actors__outbox_activities")
+        )
+
+
 class Domain(models.Model):
     name = models.CharField(primary_key=True, max_length=255)
     creation_date = models.DateTimeField(default=timezone.now)
+    objects = DomainQuerySet.as_manager()
 
     def __str__(self):
         return self.name

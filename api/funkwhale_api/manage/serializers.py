@@ -3,6 +3,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 
@@ -168,3 +169,28 @@ class ManageInvitationActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
+
+
+class ManageDomainSerializer(serializers.ModelSerializer):
+    actors_count = serializers.SerializerMethodField()
+    last_activity_date = serializers.SerializerMethodField()
+    outbox_activities_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = federation_models.Domain
+        fields = [
+            "name",
+            "creation_date",
+            "actors_count",
+            "last_activity_date",
+            "outbox_activities_count",
+        ]
+
+    def get_actors_count(self, o):
+        return getattr(o, "actors_count", 0)
+
+    def get_last_activity_date(self, o):
+        return getattr(o, "last_activity_date", None)
+
+    def get_outbox_activities_count(self, o):
+        return getattr(o, "outbox_activities_count", 0)

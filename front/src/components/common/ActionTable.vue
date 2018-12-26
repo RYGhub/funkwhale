@@ -1,7 +1,7 @@
 <template>
   <table class="ui compact very basic single line unstackable table">
     <thead>
-      <tr v-if="actions.length > 0">
+      <tr v-if="actionUrl && actions.length > 0">
         <th colspan="1000">
           <div class="ui small form">
             <div class="ui inline fields">
@@ -130,8 +130,8 @@ import axios from 'axios'
 
 export default {
   props: {
-    actionUrl: {type: String, required: true},
-    idField: {type: String, required: true, default: 'id'},
+    actionUrl: {type: String, required: false, default: null},
+    idField: {type: String, required: false, default: 'id'},
     objectsData: {type: Object, required: true},
     actions: {type: Array, required: true, default: () => { return [] }},
     filters: {type: Object, required: false, default: () => { return {} }},
