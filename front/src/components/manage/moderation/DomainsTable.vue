@@ -35,27 +35,27 @@
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Name</translate></th>
-          <th><translate>First seen</translate></th>
           <th><translate>Users</translate></th>
-          <th><translate>Last activity</translate></th>
           <th><translate>Received messages</translate></th>
+          <th><translate>First seen</translate></th>
+          <th><translate>Last activity</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.moderation.domain.detail', params: {id: scope.obj.name }}">{{ scope.obj.name }}</router-link>
-          </td>
-          <td>
-            <human-date :date="scope.obj.creation_date"></human-date>
+            <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.name }}">{{ scope.obj.name }}</router-link>
           </td>
           <td>
             {{ scope.obj.actors_count }}
           </td>
           <td>
-            <human-date v-if="scope.obj.last_activity_date" :date="scope.obj.last_activity_date"></human-date>
-            <translate v-else>N/A</translate>
+            {{ scope.obj.outbox_activities_count }}
           </td>
           <td>
-            {{ scope.obj.outbox_activities_count }}
+            <human-date :date="scope.obj.creation_date"></human-date>
+          </td>
+          <td>
+            <human-date v-if="scope.obj.last_activity_date" :date="scope.obj.last_activity_date"></human-date>
+            <translate v-else>N/A</translate>
           </td>
         </template>
       </action-table>

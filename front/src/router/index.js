@@ -32,6 +32,7 @@ import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
 import AdminModerationBase from '@/views/admin/moderation/Base'
 import AdminDomainsList from '@/views/admin/moderation/DomainsList'
+import AdminDomainsDetail from '@/views/admin/moderation/DomainsDetail'
 import ContentBase from '@/views/content/Base'
 import ContentHome from '@/views/content/Home'
 import LibrariesHome from '@/views/content/libraries/Home'
@@ -234,6 +235,12 @@ export default new Router({
           path: 'domains',
           name: 'manage.moderation.domains.list',
           component: AdminDomainsList
+        },
+        {
+          path: 'domains/:id',
+          name: 'manage.moderation.domains.detail',
+          component: AdminDomainsDetail,
+          props: true
         }
       ]
     },
