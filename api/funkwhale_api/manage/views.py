@@ -125,3 +125,8 @@ class ManageDomainViewSet(
         federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
         domain.refresh_from_db()
         return response.Response(domain.nodeinfo, status=200)
+
+    @detail_route(methods=["get"])
+    def stats(self, request, *args, **kwargs):
+        domain = self.get_object()
+        return response.Response(domain.get_stats(), status=200)

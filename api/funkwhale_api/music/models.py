@@ -617,6 +617,8 @@ class UploadQuerySet(models.QuerySet):
     def for_federation(self):
         return self.filter(import_status="finished", mimetype__startswith="audio/")
 
+    def with_file(self):
+        return self.exclude(audio_file=None).exclude(audio_file='')
 
 TRACK_FILE_IMPORT_STATUS_CHOICES = (
     ("pending", "Pending"),

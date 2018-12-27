@@ -88,7 +88,7 @@ class Domain(models.Model):
     name = models.CharField(primary_key=True, max_length=255)
     creation_date = models.DateTimeField(default=timezone.now)
     nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
-    nodeinfo = JSONField(default=empty_dict, max_length=50000)
+    nodeinfo = JSONField(default=empty_dict, max_length=50000, blank=True)
 
     objects = DomainQuerySet.as_manager()
 
@@ -103,6 +103,38 @@ class Domain(models.Model):
                 setattr(self, field, v.lower())
 
         super().save(**kwargs)
+
+    def get_stats(self):
+        from funkwhale_api.music import models as music_models
+
+        data = Domain.objects.filter(pk=self.pk).aggregate(
+            actors=models.Count("actors", distinct=True),
+            outbox_activities=models.Count("actors__outbox_activities", distinct=True),
+            libraries=models.Count("actors__libraries", distinct=True),
+            uploads=models.Count("actors__libraries__uploads", distinct=True),
+            received_library_follows=models.Count(
+                "actors__libraries__received_follows", distinct=True
+            ),
+            emitted_library_follows=models.Count(
+                "actors__library_follows", distinct=True
+            ),
+        )
+        data["artists"] = music_models.Artist.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+        data["albums"] = music_models.Album.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+        data["tracks"] = music_models.Track.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+
+        uploads = music_models.Upload.objects.filter(library__actor__domain_id=self.pk)
+        data["media_total_size"] = uploads.aggregate(v=models.Sum("size"))["v"] or 0
+        data["media_downloaded_size"] = (
+            uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
+        )
+        return data
 
 
 class Actor(models.Model):
