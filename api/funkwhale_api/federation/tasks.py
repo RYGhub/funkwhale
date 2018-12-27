@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import requests
 
 from django.conf import settings
 from django.db.models import Q, F
@@ -14,6 +15,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
 from . import models, signing
+from . import serializers
 from . import routes
 
 logger = logging.getLogger(__name__)
@@ -147,3 +149,40 @@ def deliver_to_remote(delivery):
         delivery.attempts = F("attempts") + 1
         delivery.is_delivered = True
         delivery.save(update_fields=["last_attempt_date", "attempts", "is_delivered"])
+
+
+def fetch_nodeinfo(domain_name):
+    s = session.get_session()
+    wellknown_url = "https://{}/.well-known/nodeinfo".format(domain_name)
+    response = s.get(
+        url=wellknown_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
+    )
+    response.raise_for_status()
+    serializer = serializers.NodeInfoSerializer(data=response.json())
+    serializer.is_valid(raise_exception=True)
+    nodeinfo_url = None
+    for link in serializer.validated_data["links"]:
+        if link["rel"] == "http://nodeinfo.diaspora.software/ns/schema/2.0":
+            nodeinfo_url = link["href"]
+            break
+
+    response = s.get(
+        url=nodeinfo_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+@celery.app.task(name="federation.update_domain_nodeinfo")
+@celery.require_instance(
+    models.Domain.objects.external(), "domain", id_kwarg_name="domain_name"
+)
+def update_domain_nodeinfo(domain):
+    now = timezone.now()
+    try:
+        nodeinfo = {"status": "ok", "payload": fetch_nodeinfo(domain.name)}
+    except (requests.RequestException, serializers.serializers.ValidationError) as e:
+        nodeinfo = {"status": "error", "error": str(e)}
+    domain.nodeinfo_fetch_date = now
+    domain.nodeinfo = nodeinfo
+    domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date"])

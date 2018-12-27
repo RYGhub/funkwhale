@@ -87,6 +87,9 @@ class DomainQuerySet(models.QuerySet):
 class Domain(models.Model):
     name = models.CharField(primary_key=True, max_length=255)
     creation_date = models.DateTimeField(default=timezone.now)
+    nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
+    nodeinfo = JSONField(default=empty_dict, max_length=50000)
+
     objects = DomainQuerySet.as_manager()
 
     def __str__(self):

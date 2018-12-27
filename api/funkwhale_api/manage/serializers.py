@@ -184,6 +184,8 @@ class ManageDomainSerializer(serializers.ModelSerializer):
             "actors_count",
             "last_activity_date",
             "outbox_activities_count",
+            "nodeinfo",
+            "nodeinfo_fetch_date",
         ]
 
     def get_actors_count(self, o):

@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers, views
 
 
@@ -77,3 +78,28 @@ def test_domain_list(factories, superuser_api_client, settings):
 
     assert response.data["count"] == 1
     assert response.data["results"][0]["name"] == d.pk
+
+
+def test_domain_detail(factories, superuser_api_client):
+    d = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": d.name})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["name"] == d.pk
+
+
+def test_domain_nodeinfo(factories, superuser_api_client, mocker):
+    domain = factories["federation.Domain"]()
+    url = reverse(
+        "api:v1:manage:federation:domains-nodeinfo", kwargs={"pk": domain.name}
+    )
+    mocker.patch.object(
+        federation_tasks, "fetch_nodeinfo", return_value={"hello": "world"}
+    )
+    update_domain_nodeinfo = mocker.spy(federation_tasks, "update_domain_nodeinfo")
+    response = superuser_api_client.get(url)
+    assert response.status_code == 200
+    assert response.data == {"status": "ok", "payload": {"hello": "world"}}
+
+    update_domain_nodeinfo.assert_called_once_with(domain_name=domain.name)

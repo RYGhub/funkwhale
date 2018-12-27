@@ -47,6 +47,8 @@ def test_manage_domain_serializer(factories, now):
         "last_activity_date": now,
         "actors_count": 42,
         "outbox_activities_count": 23,
+        "nodeinfo": {},
+        "nodeinfo_fetch_date": None,
     }
     s = serializers.ManageDomainSerializer(domain)
 

@@ -889,3 +889,15 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
+
+
+class NodeInfoLinkSerializer(serializers.Serializer):
+    href = serializers.URLField()
+    rel = serializers.URLField()
+
+
+class NodeInfoSerializer(serializers.Serializer):
+    links = serializers.ListField(
+        child=NodeInfoLinkSerializer(),
+        min_length=1
+    )
