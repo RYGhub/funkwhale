@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 import _ from '@/lodash'
 import {mapState} from 'vuex'
@@ -133,6 +134,8 @@ export default {
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
       let available = locales.locales.map(e => { return e.code })
+      let self = this
+      let candidate
       let matching = available.filter((a) => {
         return userLanguage.replace('-', '_') === a
       })
@@ -140,10 +143,20 @@ export default {
         return userLanguage.replace('-', '_').split('_')[0] === a.split('_')[0]
       })
       if (matching.length > 0) {
-        this.$language.current = matching[0]
+        candidate = matching[0]
       } else if (almostMatching.length > 0) {
-        this.$language.current = almostMatching[0]
+        candidate = almostMatching[0]
+      } else {
+        return
       }
+      import(`./translations/${candidate}.json`).then((response) =>{
+        Vue.$translations[candidate] = response.default[candidate]
+      }).finally(() => {
+        // set current language twice, otherwise we seem to have a cache somewhere
+        // and rendering does not happen
+        self.$language.current = 'noop'
+        self.$language.current = candidate
+      })
     },
     disconnect () {
       if (!this.bridge) {
