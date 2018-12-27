@@ -9,10 +9,9 @@ export default {
     authenticated: false,
     username: '',
     availablePermissions: {
-      federation: false,
       settings: false,
       library: false,
-      upload: false
+      moderation: false
     },
     profile: null,
     token: '',

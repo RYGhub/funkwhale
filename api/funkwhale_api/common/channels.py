@@ -5,7 +5,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.core.serializers.json import DjangoJSONEncoder
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 channel_layer = get_channel_layer()
 group_add = async_to_sync(channel_layer.group_add)
 

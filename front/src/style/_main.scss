@@ -27,7 +27,7 @@
 @import "~semantic-ui-css/components/label.css";
 @import "~semantic-ui-css/components/list.css";
 @import "~semantic-ui-css/components/loader.css";
-// @import "~semantic-ui-css/components/placeholder.css";
+@import "~semantic-ui-css/components/placeholder.css";
 // @import "~semantic-ui-css/components/rail.css";
 // @import "~semantic-ui-css/components/reveal.css";
 @import "~semantic-ui-css/components/segment.css";
@@ -250,4 +250,12 @@ button.reset {
 
 .right.floated {
   float: right;
+}
+
+
+[data-tooltip]::after {
+  white-space: normal;
+  width: 300px;
+  max-width: 300px;
+  z-index: 999;
 }

@@ -30,6 +30,9 @@ import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
+import AdminModerationBase from '@/views/admin/moderation/Base'
+import AdminDomainsList from '@/views/admin/moderation/DomainsList'
+import AdminDomainsDetail from '@/views/admin/moderation/DomainsDetail'
 import ContentBase from '@/views/content/Base'
 import ContentHome from '@/views/content/Home'
 import LibrariesHome from '@/views/content/libraries/Home'
@@ -221,6 +224,23 @@ export default new Router({
           path: 'invitations',
           name: 'manage.users.invitations.list',
           component: AdminInvitationsList
+        }
+      ]
+    },
+    {
+      path: '/manage/moderation',
+      component: AdminModerationBase,
+      children: [
+        {
+          path: 'domains',
+          name: 'manage.moderation.domains.list',
+          component: AdminDomainsList
+        },
+        {
+          path: 'domains/:id',
+          name: 'manage.moderation.domains.detail',
+          component: AdminDomainsDetail,
+          props: true
         }
       ]
     },

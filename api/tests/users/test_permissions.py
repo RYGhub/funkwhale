@@ -21,21 +21,21 @@ def test_has_user_permission_anonymous(anonymous_user, api_request):
 
 @pytest.mark.parametrize("value", [True, False])
 def test_has_user_permission_logged_in_single(value, factories, api_request):
-    user = factories["users.User"](permission_federation=value)
+    user = factories["users.User"](permission_moderation=value)
 
     class View(APIView):
-        required_permissions = ["federation"]
+        required_permissions = ["moderation"]
 
     view = View()
     permission = permissions.HasUserPermission()
     request = api_request.get("/")
     setattr(request, "user", user)
     result = permission.has_permission(request, view)
-    assert result == user.has_permissions("federation") == value
+    assert result == user.has_permissions("moderation") == value
 
 
 @pytest.mark.parametrize(
-    "federation,library,expected",
+    "moderation,library,expected",
     [
         (True, False, False),
         (False, True, False),
@@ -44,14 +44,14 @@ def test_has_user_permission_logged_in_single(value, factories, api_request):
     ],
 )
 def test_has_user_permission_logged_in_multiple_and(
-    federation, library, expected, factories, api_request
+    moderation, library, expected, factories, api_request
 ):
     user = factories["users.User"](
-        permission_federation=federation, permission_library=library
+        permission_moderation=moderation, permission_library=library
     )
 
     class View(APIView):
-        required_permissions = ["federation", "library"]
+        required_permissions = ["moderation", "library"]
         permission_operator = "and"
 
     view = View()
@@ -59,11 +59,11 @@ def test_has_user_permission_logged_in_multiple_and(
     request = api_request.get("/")
     setattr(request, "user", user)
     result = permission.has_permission(request, view)
-    assert result == user.has_permissions("federation", "library") == expected
+    assert result == user.has_permissions("moderation", "library") == expected
 
 
 @pytest.mark.parametrize(
-    "federation,library,expected",
+    "moderation,library,expected",
     [
         (True, False, True),
         (False, True, True),
@@ -72,14 +72,14 @@ def test_has_user_permission_logged_in_multiple_and(
     ],
 )
 def test_has_user_permission_logged_in_multiple_or(
-    federation, library, expected, factories, api_request
+    moderation, library, expected, factories, api_request
 ):
     user = factories["users.User"](
-        permission_federation=federation, permission_library=library
+        permission_moderation=moderation, permission_library=library
     )
 
     class View(APIView):
-        required_permissions = ["federation", "library"]
+        required_permissions = ["moderation", "library"]
         permission_operator = "or"
 
     view = View()
@@ -87,6 +87,6 @@ def test_has_user_permission_logged_in_multiple_or(
     request = api_request.get("/")
     setattr(request, "user", user)
     result = permission.has_permission(request, view)
-    has_permission_result = user.has_permissions("federation", "library", operator="or")
+    has_permission_result = user.has_permissions("moderation", "library", operator="or")
 
     assert result == has_permission_result == expected

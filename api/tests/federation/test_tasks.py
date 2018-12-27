@@ -138,3 +138,55 @@ def test_deliver_to_remote_error(factories, r_mock, now):
     assert delivery.is_delivered is False
     assert delivery.attempts == 1
     assert delivery.last_attempt_date == now
+
+
+def test_fetch_nodeinfo(factories, r_mock, now):
+    wellknown_url = "https://test.test/.well-known/nodeinfo"
+    nodeinfo_url = "https://test.test/nodeinfo"
+
+    r_mock.get(
+        wellknown_url,
+        json={
+            "links": [
+                {
+                    "rel": "http://nodeinfo.diaspora.software/ns/schema/2.0",
+                    "href": "https://test.test/nodeinfo",
+                }
+            ]
+        },
+    )
+    r_mock.get(nodeinfo_url, json={"hello": "world"})
+
+    assert tasks.fetch_nodeinfo("test.test") == {"hello": "world"}
+
+
+def test_update_domain_nodeinfo(factories, mocker, now):
+    domain = factories["federation.Domain"]()
+    mocker.patch.object(tasks, "fetch_nodeinfo", return_value={"hello": "world"})
+
+    assert domain.nodeinfo == {}
+    assert domain.nodeinfo_fetch_date is None
+
+    tasks.update_domain_nodeinfo(domain_name=domain.name)
+
+    domain.refresh_from_db()
+
+    assert domain.nodeinfo_fetch_date == now
+    assert domain.nodeinfo == {"status": "ok", "payload": {"hello": "world"}}
+
+
+def test_update_domain_nodeinfo_error(factories, r_mock, now):
+    domain = factories["federation.Domain"]()
+    wellknown_url = "https://{}/.well-known/nodeinfo".format(domain.name)
+
+    r_mock.get(wellknown_url, status_code=500)
+
+    tasks.update_domain_nodeinfo(domain_name=domain.name)
+
+    domain.refresh_from_db()
+
+    assert domain.nodeinfo_fetch_date == now
+    assert domain.nodeinfo == {
+        "status": "error",
+        "error": "500 Server Error: None for url: {}".format(wellknown_url),
+    }

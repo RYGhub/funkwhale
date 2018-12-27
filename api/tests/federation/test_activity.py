@@ -78,22 +78,6 @@ def test_get_actors_from_audience_urls(settings, db):
     assert str(activity.get_actors_from_audience(urls).query) == str(expected.query)
 
 
-def test_get_inbox_urls(factories):
-    a1 = factories["federation.Actor"](
-        shared_inbox_url=None, inbox_url="https://a1.inbox"
-    )
-    a2 = factories["federation.Actor"](
-        shared_inbox_url="https://shared.inbox", inbox_url="https://a2.inbox"
-    )
-    factories["federation.Actor"](
-        shared_inbox_url="https://shared.inbox", inbox_url="https://a3.inbox"
-    )
-
-    expected = sorted(set([a1.inbox_url, a2.shared_inbox_url]))
-
-    assert activity.get_inbox_urls(a1.__class__.objects.all()) == expected
-
-
 def test_receive_invalid_data(factories):
     remote_actor = factories["federation.Actor"]()
     a = {"@context": [], "actor": remote_actor.fid, "id": "https://test.activity"}
@@ -212,9 +196,6 @@ def test_outbox_router_dispatch(mocker, factories, now):
             "actor": actor,
         }
 
-    expected_deliveries_url = activity.get_inbox_urls(
-        models.Actor.objects.filter(pk__in=[r1.pk, r2.pk])
-    )
     router.connect({"type": "Noop"}, handler)
     activities = router.dispatch({"type": "Noop"}, {"summary": "hello"})
     a = activities[0]
@@ -235,8 +216,8 @@ def test_outbox_router_dispatch(mocker, factories, now):
     assert a.uuid is not None
 
     assert a.deliveries.count() == 2
-    for url in expected_deliveries_url:
-        delivery = a.deliveries.get(inbox_url=url)
+    for actor in [r1, r2]:
+        delivery = a.deliveries.get(inbox_url=actor.inbox_url)
         assert delivery.is_delivered is False
 
 

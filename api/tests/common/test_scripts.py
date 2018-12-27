@@ -22,30 +22,6 @@ def test_script_command_list(command, script_name, mocker):
     mocked.assert_called_once_with(command, script_name=script_name, interactive=False)
 
 
-def test_django_permissions_to_user_permissions(factories, command):
-    group = factories["auth.Group"](perms=["federation.change_library"])
-    user1 = factories["users.User"](
-        perms=[
-            "dynamic_preferences.change_globalpreferencemodel",
-            "music.add_importbatch",
-        ]
-    )
-    user2 = factories["users.User"](perms=["music.add_importbatch"], groups=[group])
-
-    scripts.django_permissions_to_user_permissions.main(command)
-
-    user1.refresh_from_db()
-    user2.refresh_from_db()
-
-    assert user1.permission_settings is True
-    assert user1.permission_library is True
-    assert user1.permission_federation is False
-
-    assert user2.permission_settings is False
-    assert user2.permission_library is True
-    assert user2.permission_federation is True
-
-
 @pytest.mark.parametrize(
     "open_api,expected_visibility", [(True, "everyone"), (False, "instance")]
 )

@@ -51,7 +51,7 @@ django-taggit>=0.22,<0.23
 # Until this is merged
 pymemoize==1.0.3
 
-django-dynamic-preferences>=1.5,<1.6
+django-dynamic-preferences>=1.7,<1.8
 pyacoustid>=1.1.5,<1.2
 raven>=6.5,<7
 python-magic==0.4.15

@@ -12,12 +12,16 @@ from faker.providers import internet as internet_provider
 import factory
 import pytest
 
+from django.core.management import call_command
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache as django_cache, caches
 from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
 from django.db.models import QuerySet
+
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
@@ -400,3 +404,9 @@ def spa_html(r_mock, settings):
 @pytest.fixture
 def no_api_auth(preferences):
     preferences["common__api_authentication_required"] = False
+
+
+@pytest.fixture()
+def migrator(transactional_db):
+    yield MigrationExecutor(connection)
+    call_command("migrate", interactive=False)

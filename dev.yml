@@ -85,6 +85,8 @@ services:
       - redis
     networks:
       - internal
+    cap_add:
+      - SYS_PTRACE
   nginx:
     command: /entrypoint.sh
     env_file:

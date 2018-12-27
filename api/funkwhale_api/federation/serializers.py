@@ -114,7 +114,7 @@ class ActorSerializer(serializers.Serializer):
         if maf is not None:
             kwargs["manually_approves_followers"] = maf
         domain = urllib.parse.urlparse(kwargs["fid"]).netloc
-        kwargs["domain"] = domain
+        kwargs["domain"] = models.Domain.objects.get_or_create(pk=domain)[0]
         for endpoint, url in self.initial_data.get("endpoints", {}).items():
             if endpoint == "sharedInbox":
                 kwargs["shared_inbox_url"] = url
@@ -888,3 +888,12 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
+
+
+class NodeInfoLinkSerializer(serializers.Serializer):
+    href = serializers.URLField()
+    rel = serializers.URLField()
+
+
+class NodeInfoSerializer(serializers.Serializer):
+    links = serializers.ListField(child=NodeInfoLinkSerializer(), min_length=1)

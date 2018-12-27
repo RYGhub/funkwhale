@@ -1,6 +1,8 @@
 import pytest
 from django import db
 
+from funkwhale_api.federation import models
+
 
 def test_cannot_duplicate_actor(factories):
     actor = factories["federation.Actor"]()
@@ -54,3 +56,44 @@ def test_actor_get_quota(factories):
     expected = {"total": 10, "pending": 1, "skipped": 2, "errored": 3, "finished": 4}
 
     assert library.actor.get_current_usage() == expected
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("Domain.com", "domain.com"),
+        ("hello-WORLD.com", "hello-world.com"),
+        ("posés.com", "posés.com"),
+    ],
+)
+def test_domain_name_saved_properly(value, expected, factories):
+    domain = factories["federation.Domain"](name=value)
+    assert domain.name == expected
+
+
+def test_external_domains(factories, settings):
+    d1 = factories["federation.Domain"]()
+    d2 = factories["federation.Domain"]()
+    settings.FEDERATION_HOSTNAME = d1.pk
+
+    assert list(models.Domain.objects.external()) == [d2]
+
+
+def test_domain_stats(factories):
+    expected = {
+        "actors": 0,
+        "libraries": 0,
+        "tracks": 0,
+        "albums": 0,
+        "uploads": 0,
+        "artists": 0,
+        "outbox_activities": 0,
+        "received_library_follows": 0,
+        "emitted_library_follows": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+
+    domain = factories["federation.Domain"]()
+
+    assert domain.get_stats() == expected

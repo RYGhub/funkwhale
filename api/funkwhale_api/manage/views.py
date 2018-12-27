@@ -1,7 +1,9 @@
 from rest_framework import mixins, response, viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import detail_route, list_route
 
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.users.permissions import HasUserPermission
@@ -92,3 +94,39 @@ class ManageInvitationViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+
+class ManageDomainViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
+    queryset = (
+        federation_models.Domain.objects.external()
+        .with_last_activity_date()
+        .with_actors_count()
+        .with_outbox_activities_count()
+        .order_by("name")
+    )
+    serializer_class = serializers.ManageDomainSerializer
+    filter_class = filters.ManageDomainFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["moderation"]
+    ordering_fields = [
+        "name",
+        "creation_date",
+        "last_activity_date",
+        "actors_count",
+        "outbox_activities_count",
+    ]
+
+    @detail_route(methods=["get"])
+    def nodeinfo(self, request, *args, **kwargs):
+        domain = self.get_object()
+        federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
+        domain.refresh_from_db()
+        return response.Response(domain.nodeinfo, status=200)
+
+    @detail_route(methods=["get"])
+    def stats(self, request, *args, **kwargs):
+        domain = self.get_object()
+        return response.Response(domain.get_stats(), status=200)

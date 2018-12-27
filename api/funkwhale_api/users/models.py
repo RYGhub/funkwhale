@@ -34,16 +34,15 @@ def get_token():
 
 
 PERMISSIONS_CONFIGURATION = {
-    "federation": {
-        "label": "Manage library federation",
-        "help_text": "Follow other instances, accept/deny library follow requests...",
+    "moderation": {
+        "label": "Moderation",
+        "help_text": "Block/mute/remove domains, users and content",
     },
     "library": {
         "label": "Manage library",
         "help_text": "Manage library, delete files, tracks, artists, albums...",
     },
     "settings": {"label": "Manage instance-level settings", "help_text": ""},
-    "upload": {"label": "Upload new content to the library", "help_text": ""},
 }
 
 PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
@@ -71,9 +70,9 @@ class User(AbstractUser):
     subsonic_api_token = models.CharField(blank=True, null=True, max_length=255)
 
     # permissions
-    permission_federation = models.BooleanField(
-        PERMISSIONS_CONFIGURATION["federation"]["label"],
-        help_text=PERMISSIONS_CONFIGURATION["federation"]["help_text"],
+    permission_moderation = models.BooleanField(
+        PERMISSIONS_CONFIGURATION["moderation"]["label"],
+        help_text=PERMISSIONS_CONFIGURATION["moderation"]["help_text"],
         default=False,
     )
     permission_library = models.BooleanField(
@@ -84,11 +83,6 @@ class User(AbstractUser):
     permission_settings = models.BooleanField(
         PERMISSIONS_CONFIGURATION["settings"]["label"],
         help_text=PERMISSIONS_CONFIGURATION["settings"]["help_text"],
-        default=False,
-    )
-    permission_upload = models.BooleanField(
-        PERMISSIONS_CONFIGURATION["upload"]["label"],
-        help_text=PERMISSIONS_CONFIGURATION["upload"]["help_text"],
         default=False,
     )
 
@@ -252,7 +246,9 @@ def get_actor_data(user):
     username = federation_utils.slugify_username(user.username)
     return {
         "preferred_username": username,
-        "domain": settings.FEDERATION_HOSTNAME,
+        "domain": federation_models.Domain.objects.get_or_create(
+            name=settings.FEDERATION_HOSTNAME
+        )[0],
         "type": "Person",
         "name": user.username,
         "manually_approves_followers": False,

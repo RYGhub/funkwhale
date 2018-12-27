@@ -67,23 +67,38 @@ def create_user(actor):
 
 
 @registry.register
+class Domain(factory.django.DjangoModelFactory):
+    name = factory.Faker("domain_name")
+
+    class Meta:
+        model = "federation.Domain"
+        django_get_or_create = ("name",)
+
+
+@registry.register
 class ActorFactory(factory.DjangoModelFactory):
     public_key = None
     private_key = None
     preferred_username = factory.Faker("user_name")
     summary = factory.Faker("paragraph")
-    domain = factory.Faker("domain_name")
+    domain = factory.SubFactory(Domain)
     fid = factory.LazyAttribute(
-        lambda o: "https://{}/users/{}".format(o.domain, o.preferred_username)
+        lambda o: "https://{}/users/{}".format(o.domain.name, o.preferred_username)
     )
     followers_url = factory.LazyAttribute(
-        lambda o: "https://{}/users/{}followers".format(o.domain, o.preferred_username)
+        lambda o: "https://{}/users/{}followers".format(
+            o.domain.name, o.preferred_username
+        )
     )
     inbox_url = factory.LazyAttribute(
-        lambda o: "https://{}/users/{}/inbox".format(o.domain, o.preferred_username)
+        lambda o: "https://{}/users/{}/inbox".format(
+            o.domain.name, o.preferred_username
+        )
     )
     outbox_url = factory.LazyAttribute(
-        lambda o: "https://{}/users/{}/outbox".format(o.domain, o.preferred_username)
+        lambda o: "https://{}/users/{}/outbox".format(
+            o.domain.name, o.preferred_username
+        )
     )
 
     class Meta:
@@ -95,7 +110,9 @@ class ActorFactory(factory.DjangoModelFactory):
             return
         from funkwhale_api.users.factories import UserFactory
 
-        self.domain = settings.FEDERATION_HOSTNAME
+        self.domain = models.Domain.objects.get_or_create(
+            name=settings.FEDERATION_HOSTNAME
+        )[0]
         self.save(update_fields=["domain"])
         if not create:
             if extracted and hasattr(extracted, "pk"):
