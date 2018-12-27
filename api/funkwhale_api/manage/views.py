@@ -102,7 +102,6 @@ class ManageDomainViewSet(
     lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
     queryset = (
         federation_models.Domain.objects.external()
-        .with_last_activity_date()
         .with_actors_count()
         .with_outbox_activities_count()
         .order_by("name")
@@ -114,7 +113,7 @@ class ManageDomainViewSet(
     ordering_fields = [
         "name",
         "creation_date",
-        "last_activity_date",
+        "nodeinfo_fetch_date",
         "actors_count",
         "outbox_activities_count",
     ]

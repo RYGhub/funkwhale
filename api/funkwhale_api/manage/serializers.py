@@ -173,7 +173,6 @@ class ManageInvitationActionSerializer(common_serializers.ActionSerializer):
 
 class ManageDomainSerializer(serializers.ModelSerializer):
     actors_count = serializers.SerializerMethodField()
-    last_activity_date = serializers.SerializerMethodField()
     outbox_activities_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -182,7 +181,6 @@ class ManageDomainSerializer(serializers.ModelSerializer):
             "name",
             "creation_date",
             "actors_count",
-            "last_activity_date",
             "outbox_activities_count",
             "nodeinfo",
             "nodeinfo_fetch_date",
@@ -190,9 +188,6 @@ class ManageDomainSerializer(serializers.ModelSerializer):
 
     def get_actors_count(self, o):
         return getattr(o, "actors_count", 0)
-
-    def get_last_activity_date(self, o):
-        return getattr(o, "last_activity_date", None)
 
     def get_outbox_activities_count(self, o):
         return getattr(o, "outbox_activities_count", 0)

@@ -38,7 +38,6 @@
           <th><translate>Users</translate></th>
           <th><translate>Received messages</translate></th>
           <th><translate>First seen</translate></th>
-          <th><translate>Last activity</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -52,10 +51,6 @@
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
-          </td>
-          <td>
-            <human-date v-if="scope.obj.last_activity_date" :date="scope.obj.last_activity_date"></human-date>
-            <translate v-else>N/A</translate>
           </td>
         </template>
       </action-table>
@@ -112,7 +107,6 @@ export default {
       orderingOptions: [
         ['name', 'name'],
         ['creation_date', 'first_seen'],
-        ['last_activity_date', 'last_activity'],
         ['actors_count', 'users'],
         ['outbox_activities_count', 'received_messages']
       ]

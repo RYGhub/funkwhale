@@ -66,15 +66,6 @@ class DomainQuerySet(models.QuerySet):
     def external(self):
         return self.exclude(pk=settings.FEDERATION_HOSTNAME)
 
-    def with_last_activity_date(self):
-        activities = Activity.objects.filter(
-            actor__domain=models.OuterRef("pk")
-        ).order_by("-creation_date")
-
-        return self.annotate(
-            last_activity_date=models.Subquery(activities.values("creation_date")[:1])
-        )
-
     def with_actors_count(self):
         return self.annotate(actors_count=models.Count("actors", distinct=True))
 
@@ -111,7 +102,6 @@ class Domain(models.Model):
             actors=models.Count("actors", distinct=True),
             outbox_activities=models.Count("actors__outbox_activities", distinct=True),
             libraries=models.Count("actors__libraries", distinct=True),
-            uploads=models.Count("actors__libraries__uploads", distinct=True),
             received_library_follows=models.Count(
                 "actors__libraries__received_follows", distinct=True
             ),
@@ -130,6 +120,7 @@ class Domain(models.Model):
         ).count()
 
         uploads = music_models.Upload.objects.filter(library__actor__domain_id=self.pk)
+        data["uploads"] = uploads.count()
         data["media_total_size"] = uploads.aggregate(v=models.Sum("size"))["v"] or 0
         data["media_downloaded_size"] = (
             uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
