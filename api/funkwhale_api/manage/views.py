@@ -99,7 +99,7 @@ class ManageInvitationViewSet(
 class ManageDomainViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
-    lookup_value_regex = "[a-zA-Z0-9\-\.]+"
+    lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
     queryset = (
         federation_models.Domain.objects.external()
         .with_last_activity_date()

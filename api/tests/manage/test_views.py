@@ -107,9 +107,7 @@ def test_domain_nodeinfo(factories, superuser_api_client, mocker):
 
 def test_domain_stats(factories, superuser_api_client, mocker):
     domain = factories["federation.Domain"]()
-    get_stats = mocker.patch.object(
-        domain.__class__, "get_stats", return_value={"hello": "world"}
-    )
+    mocker.patch.object(domain.__class__, "get_stats", return_value={"hello": "world"})
     url = reverse("api:v1:manage:federation:domains-stats", kwargs={"pk": domain.name})
     response = superuser_api_client.get(url)
     assert response.status_code == 200
