@@ -17,7 +17,7 @@ A quick path to contribute on the front-end
 
 The next sections of this document include a full installation guide to help
 you setup a local, development version of Funkwhale. If you only want to fix small things
-on the front-end, and don't want to manage a full development environment, there is anoter way.
+on the front-end, and don't want to manage a full development environment, there is another way.
 
 As the front-end can work with any Funkwhale server, you can work with the front-end only,
 and make it talk with an existing instance (like the demo one, or you own instance, if you have one).
@@ -73,9 +73,9 @@ This is already cover in the relevant documentations:
 Cloning the project
 ^^^^^^^^^^^^^^^^^^^
 
-Visit https://dev.funkwhale.audio/funkwhale/funkwhale and clone the repository using SSH or HTTPS. Exemple using SSH::
+Visit https://dev.funkwhale.audio/funkwhale/funkwhale and clone the repository using SSH or HTTPS. Example using SSH::
 
-    git clone ssh://git@dev.funkwhale.audio:2222/funkwhale/funkwhale.git
+    git clone ssh://git@dev.funkwhale.audio/funkwhale/funkwhale.git
     cd funkwhale
 
 
@@ -88,11 +88,11 @@ Next release development occurs on the "develop" branch, and releases are made o
 Working with docker
 ^^^^^^^^^^^^^^^^^^^
 
-In developpement, we use the docker-compose file named ``dev.yml``, and this is why all our docker-compose commands will look like this::
+In development, we use the docker-compose file named ``dev.yml``, and this is why all our docker-compose commands will look like this::
 
     docker-compose -f dev.yml logs
 
-If you do not want to add the ``-f dev.yml`` snippet everytime, you can run this command before starting your work::
+If you do not want to add the ``-f dev.yml`` snippet every time, you can run this command before starting your work::
 
     export COMPOSE_FILE=dev.yml
 
@@ -135,7 +135,7 @@ To setup funkwhale's database schema, run this::
 
     docker-compose -f dev.yml run --rm api python manage.py migrate
 
-This will create all the tables needed for the API to run proprely.
+This will create all the tables needed for the API to run properly.
 You will also need to run this whenever changes are made on the database
 schema.
 
@@ -153,7 +153,7 @@ Create an admin user with the following command::
 
     docker-compose -f dev.yml run --rm api python manage.py createsuperuser
 
-Injecting fake data is done by running the fllowing script::
+Injecting fake data is done by running the following script::
 
     artists=25
     command="from funkwhale_api.music import fake_data; fake_data.create_data($artists)"
@@ -296,7 +296,7 @@ sure about what to do, do not panic, open your merge request normally and we'll
 figure everything during the review ;)
 
 Changelog fragments are text files that can contain one or multiple lines
-that describe the changes occuring in a bunch of commits. Those files reside
+that describe the changes occurring in a bunch of commits. Those files reside
 in ``changes/changelog.d``.
 
 Content

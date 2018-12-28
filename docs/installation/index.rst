@@ -9,7 +9,7 @@ The project relies on the following components and services to work:
 - A web application server (Python/Django/Gunicorn)
 - A PostgreSQL database to store application data
 - A redis server to store cache and tasks data
-- A celery worker to run asynchronouse tasks (such as music import)
+- A celery worker to run asynchronous tasks (such as music import)
 - A celery scheduler to run recurrent tasks
 - A `ntp-synced clock <https://wiki.debian.org/NTP>`_ to ensure federation is working seamlessly
 
@@ -36,10 +36,10 @@ Some users have reported running Funkwhale on Raspberry Pis with a memory
 consumption of less than 350MiB.
 
 Thus, Funkwhale should run fine on commodity hardware, small hosting boxes and
-Raspberry Pi. We lack real-world exemples of such deployments, so don't hesitate
+Raspberry Pi. We lack real-world examples of such deployments, so don't hesitate
 do give us your feedback (either positive or negative).
 
-Check out :doc:`optimization` for advices on how to tune your instance on small
+Check out :doc:`optimization` for advice on how to tune your instance on small
 configurations.
 
 Software requirements
@@ -54,7 +54,7 @@ dependencies should be available in your distribution's repositories.
 
 .. note::
 
-   Funkwhale works only with Pyhon >= 3.5, as we need support for async/await.
+   Funkwhale works only with Python >= 3.5, as we need support for async/await.
    Older versions of Python are not supported.
 
 
@@ -80,7 +80,7 @@ Funkwhale packages are available for the following platforms:
 Running Funkwhale on the develop branch
 ---------------------------------------
 
-Traditionnal deployments are done using specific releases. However, you
+Traditional deployments are done using specific releases. However, you
 may want to benefits from the latest change available, or the help detect
 bugs before they are included in actual releases.
 

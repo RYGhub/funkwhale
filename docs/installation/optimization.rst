@@ -11,7 +11,7 @@ Asynchronous tasks are handled by a celery worker, which will by default
 spawn a worker process per CPU available. This can lead to a higher
 memory usage.
 
-You can control this behaviour using the ``--concurrency`` flag.
+You can control this behavior using the ``--concurrency`` flag.
 For instance, setting ``--concurrency=1`` will spawn only one worker.
 
 This flag should be appended after the ``celery -A funkwhale_api.taskapp
@@ -30,7 +30,7 @@ Switch from prefork to solo pool
 Using a different pool implementation for Celery tasks may also help.
 
 Using the ``solo`` pool type should reduce your memory consumption.
-You can control this behaviour using the ``--pool=solo`` flag.
+You can control this behavior using the ``--pool=solo`` flag.
 
 This flag should be appended after the ``celery -A funkwhale_api.taskapp worker``
 command in your :file:`docker-compose.yml` file if you're using Docker, or in

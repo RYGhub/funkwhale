@@ -14,7 +14,7 @@ and technical aspects of your instance, such as database credentials.
 
 .. note::
 
-    You should restart all funwhale processes when you change the values
+    You should restart all funkwhale processes when you change the values
     on environment variables.
 
 
@@ -87,7 +87,7 @@ Default: ``Funkwhale <noreply@yourdomain>``
 
 Default: ``None``
 
-The path on your server where Funwkhale can import files using :ref:`in-place import
+The path on your server where Funkwhale can import files using :ref:`in-place import
 <in-place-import>`. It must be readable by the webserver and Funkwhale
 api and worker processes.
 
@@ -144,7 +144,7 @@ Funkwhale's permission model works as follows:
   the whole instance
 - Superusers can do anything
 
-To make things more granular and allow some delegation of responsability,
+To make things more granular and allow some delegation of responsibility,
 superusers can grant specific permissions to specific users. Available
 permissions are:
 
@@ -153,7 +153,7 @@ permissions are:
 - **Manage library**: users with this permission can import new music in the
   instance
 - **Manage library federation**: users with this permission can ask to federate with
-  other instances, and accept/deny federation requests from other intances
+  other instances, and accept/deny federation requests from other instances
 
 There is no dedicated interface to manage users permissions, but superusers
 can login on the Django's admin at ``/api/admin/`` and grant permissions
@@ -162,9 +162,9 @@ to users at ``/api/admin/users/user/``.
 Theming
 -------
 
-Funkwhale supports custom themes, which are great if you want to personnalize the
+Funkwhale supports custom themes, which are great if you want to personalize the
 look and feel of your instance. Theming is achieved by declaring
-additionnal stylesheets you want to load in the front-end.
+additional stylesheets you want to load in the front-end.
 
 Customize the settings
 ^^^^^^^^^^^^^^^^^^^^^^

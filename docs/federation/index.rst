@@ -12,7 +12,7 @@ Funkwhale's federation is built on top of the following technologies:
 
 - `ActivityPub`_ as the high-level federation protocol
 - `HTTP Signatures`_ as the primary mean to authenticate messages
-- `Webfinger`_ to easily retrive resources using human-friendly names
+- `Webfinger`_ to easily retrieve resources using human-friendly names
 - `ActivityStreams`_ and `ActivityStreams vocabulary`_ as the mean to structure messages
 
 Support for the following is planned but not implemented-yet:
@@ -91,8 +91,8 @@ Funkwhale does not support all activities, and we have a basic routing logic to 
 specific activities, and discard unsupported ones. Unsupported activities are still
 received and stored though.
 
-If a delivered activity match one of our routes, a dedicated handler is called,
-which can trigger additionnal logic. For instance, if we receive a :ref:`activity-create` activity
+If a delivered activity matches one of our routes, a dedicated handler is called,
+which can trigger additional logic. For instance, if we receive a :ref:`activity-create` activity
 for an :ref:`object-audio` object, our handler will persist the proper data in our local ``Upload``
 table, retrieve the audio cover, etc.
 
@@ -197,7 +197,7 @@ When an :ref:`activity-accept` is received with a :ref:`activity-follow` object,
 is marked as accepted in the database.
 
 For library follows, this means that the actor will receive future
-activities occuring within this library, such as :ref:`activity-create` :ref:`object-audio`,
+activities occurring within this library, such as :ref:`activity-create` :ref:`object-audio`,
 :ref:`activity-delete` :ref:`object-audio` or :ref:`activity-delete` :ref:`object-library`
 
 The follow actor will also be able to browse the library pages and download the library's
