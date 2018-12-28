@@ -7,7 +7,7 @@ with various apps in the Subsonic ecosystem (See :doc:`../users/apps`).
 Supported endpoints
 -------------------
 
-We seek the best compatibility with existing apps and wil eventually implement
+We seek the best compatibility with existing apps and Will eventually implement
 all endpoints that match Funkwhale's feature set. However, the current implementation
 do not include folder-based endpoints, as it does not match our internal model at all
 and will require substantial effort to emulate.

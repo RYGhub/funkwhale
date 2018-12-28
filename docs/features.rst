@@ -36,10 +36,10 @@ Structure
 
 The project itself is split in two parts:
 
-1. The backend, a REST API developped using Python3 and Django
+1. The backend, a REST API developed using Python3 and Django
 2. The frontend, that consumes the API, built as a single page application with VueJS and Semantic UI
 
-While the main interface to the server and API is the bundled front-end, the project itself is agnostic in the way you connect to it. Therefore, desktop clients or apps could be developped and could implement the same (or even more) features as the bundled frontend.
+While the main interface to the server and API is the bundled front-end, the project itself is agnostic in the way you connect to it. Therefore, desktop clients or apps could be developed and could implement the same (or even more) features as the bundled frontend.
 
 This modularity also makes it possible to deploy only a single component from the system.
 

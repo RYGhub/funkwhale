@@ -49,7 +49,7 @@ Create the project database and user:
 
     It's important that you use utf-8 encoding for your database,
     otherwise you'll end up with errors and crashes later on when dealing
-    with music metedata that contains non-ascii chars.
+    with music metadata that contains non-ascii chars.
 
 
 Assuming you already have :ref:`created your funkwhale user <create-funkwhale-user>`,

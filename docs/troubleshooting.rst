@@ -177,7 +177,7 @@ It's a bit hard to give targeted advice about problems that do not fit in the pr
 - Try to identify the scope of the issue and reproduce it reliably
 - Ensure your instance is configured as detailed in the installation documentation, and if you did not use the default
   values, to check what you changed
-- To read the .env file carefuly, as most of the options are described in the comments
+- To read the .env file carefully, as most of the options are described in the comments
 
 
 Report an issue or get help
@@ -199,7 +199,7 @@ similar issues before doing that, and use the issue tracker only to report bugs,
 
 .. warning::
 
-    If you ever need to share screenshots or urls with someone else, ensure those do not include your personnal token.
+    If you ever need to share screenshots or urls with someone else, ensure those do not include your personal token.
     This token is binded to your account and can be used to connect and use your account.
 
     Urls that includes your token looks like: ``https://your.instance/api/v1/uploads/42/serve/?jwt=yoursecrettoken``

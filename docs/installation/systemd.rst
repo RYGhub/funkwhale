@@ -4,7 +4,7 @@ Systemd configuration
 Systemd offers a convenient way to manage your Funkwhale instance if you're
 not using docker.
 
-We'll see how to setup systemd to proprely start a Funkwhale instance.
+We'll see how to setup systemd to properly start a Funkwhale instance.
 
 First, download the sample unitfiles:
 
