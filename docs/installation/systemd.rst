@@ -37,6 +37,14 @@ And start the services:
 
     systemctl start funkwhale.target
 
+To ensure all Funkwhale processes are started automatically after a reboot, run:
+
+.. code-block:: shell
+    
+    systemctl enable funkwhale-server
+    systemctl enable funkwhale-worker
+    systemctl enable funkwhale-beat
+
 You can check the statuses of all processes like this:
 
 .. code-block:: shell
