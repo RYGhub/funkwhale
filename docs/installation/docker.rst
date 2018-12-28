@@ -16,7 +16,7 @@ Download the sample docker-compose file:
     curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
     curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker-compose.yml"
 
-At this point, the archticture of ``/srv/funkwhale``  should look like that:
+At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
 ::
 

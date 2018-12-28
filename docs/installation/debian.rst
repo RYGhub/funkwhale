@@ -64,7 +64,7 @@ Now let's setup our directory layout. Here is how it will look like::
     ├── front       # frontend files for the web user interface
     └── virtualenv  # python dependencies for Funkwhale
 
-Create the aforementionned directories:
+Create the aforementioned directories:
 
 .. code-block:: shell
 

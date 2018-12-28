@@ -41,7 +41,7 @@ get details::
 
 .. note::
 
-    For the best results, we recommand tagging your music collection through
+    For the best results, we recommend tagging your music collection through
     `Picard <http://picard.musicbrainz.org/>`_ in order to have the best quality metadata.
 
 .. note::
@@ -60,7 +60,7 @@ In-place import
 ^^^^^^^^^^^^^^^
 
 By default, the CLI-importer will copy imported files to Funkwhale's internal
-storage. This means importing a 1Gb library will result in the same amount
+storage. This means importing a 1GB library will result in the same amount
 of space being used by Funkwhale.
 
 While this behaviour has some benefits (easier backups and configuration),
@@ -127,7 +127,7 @@ Whenever possible, Funkwhale will import album cover, with the following precede
 
 1. It will use the cover embedded in the audio files themeselves, if any (Flac/MP3 only)
 2. It will use a cover.jpg or a cover.png file from the imported track directory, if any
-3. It will fectch cover art from musicbrainz, assuming the file is tagged correctly
+3. It will fetch cover art from musicbrainz, assuming the file is tagged correctly
 
 Getting demo tracks
 ^^^^^^^^^^^^^^^^^^^
