@@ -13,6 +13,7 @@
     </thead>
     <tbody>
       <track-row
+        :playable="playable"
         :display-position="displayPosition"
         :track="track"
         :artist="artist"
@@ -31,6 +32,7 @@ import Modal from '@/components/semantic/Modal'
 export default {
   props: {
     tracks: {type: Array, required: true},
+    playable: {type: Boolean, required: false, default: false},
     artist: {type: Object, required: false},
     displayPosition: {type: Boolean, default: false}
   },
@@ -48,7 +50,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 tr:not(:hover) .favorite-icon:not(.favorited) {
   display: none;
 }

@@ -77,7 +77,7 @@
             </builder-filter>
           </tbody>
         </table>
-        <template v-if="checkResult">
+        <template v-if="checkResult && checkResult.candidates && checkResult.candidates.count">
           <h3
             class="ui header"
             v-translate="{count: checkResult.candidates.count}"
@@ -85,7 +85,7 @@
             translate-plural="%{ count } tracks matching combined filters">
             %{ count } track matching combined filters
           </h3>
-          <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample"></track-table>
+          <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample" :playable="true"></track-table>
         </template>
       </section>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <play-button class="basic icon" :discrete="true" :track="track"></play-button>
+      <play-button class="basic icon" :discrete="true" :is-playable="playable" :track="track"></play-button>
     </td>
     <td>
       <img class="ui mini image" v-if="track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
@@ -60,7 +60,8 @@ export default {
   props: {
     track: {type: Object, required: true},
     artist: {type: Object, required: false},
-    displayPosition: {type: Boolean, default: false}
+    displayPosition: {type: Boolean, default: false},
+    playable: {type: Boolean, required: false, default: false},
   },
   components: {
     TrackFavoriteIcon,
@@ -86,9 +87,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-
 tr:not(:hover) {
-  .favorite-icon:not(.favorited), .playlist-icon {
+  .favorite-icon:not(.favorited),
+  .playlist-icon {
     visibility: hidden;
   }
 }

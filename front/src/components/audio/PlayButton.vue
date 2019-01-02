@@ -120,7 +120,14 @@ export default {
       this.isLoading = true
       let getTracks = new Promise((resolve, reject) => {
         if (self.track) {
-          resolve([self.track])
+          if (!self.track.uploads || self.track.uploads.length === 0) {
+            // fetch uploads from api
+            axios.get(`tracks/${self.track.id}/`).then((response) => {
+              resolve([response.data])
+            })
+          } else {
+            resolve([self.track])
+          }
         } else if (self.tracks) {
           resolve(self.tracks)
         } else if (self.playlist) {
