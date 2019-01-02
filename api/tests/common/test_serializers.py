@@ -1,3 +1,8 @@
+import os
+import PIL
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 import django_filters
 
 from funkwhale_api.common import serializers
@@ -163,3 +168,17 @@ def test_track_fields_for_update(mocker):
         {"field1": "value1", "field2": "value2"},
         {"field1": "newvalue1", "field2": "newvalue2"},
     )
+
+
+def test_strip_exif_field():
+    source_path = os.path.join(os.path.dirname(__file__), "exif.jpg")
+    source = PIL.Image.open(source_path)
+
+    assert bool(source._getexif())
+
+    with open(source_path, "rb") as f:
+        uploaded = SimpleUploadedFile("source.jpg", f.read(), content_type="image/jpeg")
+    field = serializers.StripExifImageField()
+
+    cleaned = PIL.Image.open(field.to_internal_value(uploaded))
+    assert cleaned._getexif() is None
