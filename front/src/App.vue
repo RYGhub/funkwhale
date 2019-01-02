@@ -179,7 +179,7 @@ export default {
       url = url.replace('https://', 'wss://')
       bridge.connect(
         url,
-        null,
+        [],
         {reconnectInterval: 1000 * 60})
       bridge.listen(function (event) {
         self.$store.dispatch('ui/websocketEvent', event)
