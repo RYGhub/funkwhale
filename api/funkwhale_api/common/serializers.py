@@ -1,8 +1,12 @@
 import collections
+import io
+import PIL
+import os
 
 from rest_framework import serializers
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -190,3 +194,25 @@ def track_fields_for_update(*fields):
         return serializer_class
 
     return decorator
+
+
+class StripExifImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        file_obj = super().to_internal_value(data)
+
+        image = PIL.Image.open(file_obj)
+        data = list(image.getdata())
+        image_without_exif = PIL.Image.new(image.mode, image.size)
+        image_without_exif.putdata(data)
+
+        with io.BytesIO() as output:
+            image_without_exif.save(
+                output,
+                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1]],
+                quality=100,
+            )
+            content = output.getvalue()
+
+        return SimpleUploadedFile(
+            file_obj.name, content, content_type=file_obj.content_type
+        )

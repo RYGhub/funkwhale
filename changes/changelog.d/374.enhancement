@@ -1,0 +1,1 @@
+Strip EXIF metadata from uploaded avatars to avoid leaking private data (#374)
