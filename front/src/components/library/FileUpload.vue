@@ -115,7 +115,8 @@
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'processing'}]">
       <library-files-table
-        :key="String(processTimestamp)"
+        :needs-refresh="needsRefresh"
+        @fetch-start="needsRefresh = false"
         :filters="{import_reference: importReference}"
         :custom-objects="Object.values(uploads.objects)"></library-files-table>
     </div>
@@ -142,6 +143,7 @@ export default {
     this.$router.replace({ query: { import: importReference } });
     return {
       files: [],
+      needsRefresh: false,
       currentTab: "summary",
       uploadUrl: "/api/v1/uploads/",
       importReference,
@@ -199,31 +201,6 @@ export default {
           value: this.uploadedFilesCount + this.finishedJobs
         });
     },
-    disconnect() {
-      if (!this.bridge) {
-        return;
-      }
-      this.bridge.socket.close(1000, "goodbye", { keepClosed: true });
-    },
-    openWebsocket() {
-      this.disconnect();
-      let self = this;
-      let token = this.$store.state.auth.token;
-      const bridge = new WebSocketBridge();
-      this.bridge = bridge;
-      let url = this.$store.getters["instance/absoluteUrl"](
-        `api/v1/activity?token=${token}`
-      );
-      url = url.replace("http://", "ws://");
-      url = url.replace("https://", "wss://");
-      bridge.connect(url);
-      bridge.listen(function(event) {
-        self.handleEvent(event);
-      });
-      bridge.socket.addEventListener("open", function() {
-        console.log("Connected to WebSocket");
-      });
-    },
     handleImportEvent(event) {
       let self = this;
       if (event.upload.import_reference != self.importReference) {
@@ -232,17 +209,10 @@ export default {
       this.$nextTick(() => {
         self.uploads[event.old_status] -= 1;
         self.uploads[event.new_status] += 1;
-        self.uploads.objects[event.upload.uuid] = event.track_file;
-        self.triggerReload();
+        self.uploads.objects[event.upload.uuid] = event.upload;
+        self.needsRefresh = true
       });
-    },
-    triggerReload: _.throttle(
-      function() {
-        this.processTimestamp = new Date();
-      },
-      10000,
-      { leading: true }
-    )
+    }
   },
   computed: {
     labels() {

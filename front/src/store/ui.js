@@ -49,8 +49,8 @@ export default {
       })
     },
     websocketEvent ({state}, event) {
-      console.log('Dispatching websocket event', event)
       let handlers = state.websocketEventsHandlers[event.type]
+      console.log('Dispatching websocket event', event, handlers)
       if (!handlers) {
         return
       }

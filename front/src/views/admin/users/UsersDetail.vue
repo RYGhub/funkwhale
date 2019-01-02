@@ -145,7 +145,6 @@ export default {
       if (toNull && !newValue) {
         newValue = null
       }
-      console.log(newValue, typeof newValue)
       let params = {}
       if (attr === "permissions") {
         params["permissions"] = {}

@@ -1,9 +1,22 @@
 <template>
   <table class="ui compact very basic single line unstackable table">
     <thead>
-      <tr v-if="actionUrl && actions.length > 0">
+      <tr>
         <th colspan="1000">
-          <div class="ui small form">
+          <div v-if="refreshable" class="right floated">
+            <span v-if="needsRefresh">
+              <translate>Content have been updated, click refresh to see up-to-date content</translate>
+            </span>
+            <button
+              @click="$emit('refresh')"
+              class="ui basic icon button"
+              :title="labels.refresh"
+              :aria-label="labels.refresh">
+              <i class="refresh icon"></i>
+            </button>
+          </div>
+
+          <div class="ui small left floated form" v-if="actionUrl && actions.length > 0">
             <div class="ui inline fields">
               <div class="field">
                 <label><translate>Actions</translate></label>
@@ -132,6 +145,8 @@ export default {
   props: {
     actionUrl: {type: String, required: false, default: null},
     idField: {type: String, required: false, default: 'id'},
+    refreshable: {type: Boolean, required: false, default: false},
+    needsRefresh: {type: Boolean, required: false, default: false},
     objectsData: {type: Object, required: true},
     actions: {type: Array, required: true, default: () => { return [] }},
     filters: {type: Object, required: false, default: () => { return {} }},
@@ -244,13 +259,18 @@ export default {
       let self = this
       return this.objectsData.results.map((o) => {
         let custom = self.customObjects.filter((co) => {
-          return self.getId(co) == self.getId(o)
+          return self.getId(co) === self.getId(o)
         })[0]
         if (custom) {
           return custom
         }
         return o
       })
+    },
+    labels () {
+      return {
+        refresh: this.$gettext('Refresh table content')
+      }
     }
   },
   watch: {

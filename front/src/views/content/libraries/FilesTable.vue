@@ -46,7 +46,10 @@
         :objects-data="result"
         :custom-objects="customObjects"
         :actions="actions"
+        :refreshable="true"
+        :needs-refresh="needsRefresh"
         :action-url="'uploads/action/'"
+        @refresh="fetchData"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Title</translate></th>
@@ -133,6 +136,7 @@ export default {
   mixins: [OrderingMixin, TranslationsMixin],
   props: {
     filters: {type: Object, required: false},
+    needsRefresh: {type: Boolean, required: false, default: false},
     defaultQuery: {type: String, default: ''},
     customObjects: {type: Array, required: false, default: () => { return [] }}
   },
@@ -199,12 +203,13 @@ export default {
       }
     },
     fetchData () {
+      this.$emit('fetch-start')
       let params = _.merge({
         'page': this.page,
         'page_size': this.paginateBy,
         'ordering': this.getOrderingAsString(),
         'q': this.search.query
-      }, {})
+      }, this.filters || {})
       let self = this
       self.isLoading = true
       self.checked = []
@@ -302,7 +307,7 @@ export default {
     search (newValue) {
       this.page = 1
       this.fetchData()
-    },
+    }
   }
 }
 </script>
