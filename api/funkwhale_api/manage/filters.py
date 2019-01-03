@@ -1,6 +1,8 @@
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import search
+
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
@@ -27,6 +29,28 @@ class ManageDomainFilterSet(filters.FilterSet):
     class Meta:
         model = federation_models.Domain
         fields = ["name"]
+
+
+class ManageActorFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "name": {"to": "name"},
+                "username": {"to": "preferred_username"},
+                "bio": {"to": "summary"},
+                "type": {"to": "type"},
+            },
+            filter_fields={"domain": {"to": "domain_id__iexact"}},
+        )
+    )
+    local = filters.BooleanFilter(name="_", method="filter_local")
+
+    class Meta:
+        model = federation_models.Actor
+        fields = ["q", "domain", "type", "manually_approves_followers", "local"]
+
+    def filter_local(self, queryset, name, value):
+        return queryset.local(value)
 
 
 class ManageUserFilterSet(filters.FilterSet):

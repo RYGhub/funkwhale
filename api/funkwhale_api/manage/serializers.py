@@ -191,3 +191,40 @@ class ManageDomainSerializer(serializers.ModelSerializer):
 
     def get_outbox_activities_count(self, o):
         return getattr(o, "outbox_activities_count", 0)
+
+
+class ManageActorSerializer(serializers.ModelSerializer):
+    outbox_activities_count = serializers.SerializerMethodField()
+    uploads_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = federation_models.Actor
+        fields = [
+            "id",
+            "url",
+            "fid",
+            "preferred_username",
+            "domain",
+            "name",
+            "summary",
+            "type",
+            "creation_date",
+            "last_fetch_date",
+            "inbox_url",
+            "outbox_url",
+            "shared_inbox_url",
+            "manually_approves_followers",
+            "outbox_activities_count",
+            "uploads_count",
+            "followers_count",
+        ]
+
+    def get_uploads_count(self, o):
+        return getattr(o, "uploads_count", 0)
+
+    def get_followers_count(self, o):
+        return getattr(o, "followers_count", 0)
+
+    def get_outbox_activities_count(self, o):
+        return getattr(o, "outbox_activities_count", 0)

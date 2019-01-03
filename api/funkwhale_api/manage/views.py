@@ -1,5 +1,6 @@
 from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
+from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import models as federation_models
@@ -124,6 +125,48 @@ class ManageDomainViewSet(
         federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
         domain.refresh_from_db()
         return response.Response(domain.nodeinfo, status=200)
+
+    @detail_route(methods=["get"])
+    def stats(self, request, *args, **kwargs):
+        domain = self.get_object()
+        return response.Response(domain.get_stats(), status=200)
+
+
+class ManageActorViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    lookup_value_regex = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+    queryset = (
+        federation_models.Actor.objects.all()
+        .with_outbox_activities_count()
+        .with_followers_count()
+        .with_uploads_count()
+        .order_by("-creation_date")
+    )
+    serializer_class = serializers.ManageActorSerializer
+    filter_class = filters.ManageActorFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["moderation"]
+    ordering_fields = [
+        "name",
+        "preferred_username",
+        "domain",
+        "fid",
+        "creation_date",
+        "last_fetch_date",
+        "uploads_count",
+        "followers_count",
+        "outbox_activities_count",
+    ]
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        username, domain = self.kwargs["pk"].split("@")
+        filter_kwargs = {"domain_id": domain, "preferred_username": username}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
     @detail_route(methods=["get"])
     def stats(self, request, *args, **kwargs):

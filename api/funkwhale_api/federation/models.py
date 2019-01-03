@@ -61,6 +61,21 @@ class ActorQuerySet(models.QuerySet):
 
         return qs
 
+    def with_outbox_activities_count(self):
+        return self.annotate(
+            outbox_activities_count=models.Count("outbox_activities", distinct=True)
+        )
+
+    def with_followers_count(self):
+        return self.annotate(
+            followers_count=models.Count("received_follows", distinct=True)
+        )
+
+    def with_uploads_count(self):
+        return self.annotate(
+            uploads_count=models.Count("libraries__uploads", distinct=True)
+        )
+
 
 class DomainQuerySet(models.QuerySet):
     def external(self):
@@ -71,7 +86,7 @@ class DomainQuerySet(models.QuerySet):
 
     def with_outbox_activities_count(self):
         return self.annotate(
-            outbox_activities_count=models.Count("actors__outbox_activities")
+            outbox_activities_count=models.Count("actors__outbox_activities", distinct=True)
         )
 
 

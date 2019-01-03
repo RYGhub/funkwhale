@@ -12,6 +12,7 @@ from funkwhale_api.manage import serializers, views
         (views.ManageUserViewSet, ["settings"], "and"),
         (views.ManageInvitationViewSet, ["settings"], "and"),
         (views.ManageDomainViewSet, ["moderation"], "and"),
+        (views.ManageActorViewSet, ["moderation"], "and"),
     ],
 )
 def test_permissions(assert_user_permission, view, permissions, operator):
@@ -112,3 +113,23 @@ def test_domain_stats(factories, superuser_api_client, mocker):
     response = superuser_api_client.get(url)
     assert response.status_code == 200
     assert response.data == {"hello": "world"}
+
+
+def test_actor_list(factories, superuser_api_client, settings):
+    actor = factories["federation.Actor"]()
+    url = reverse("api:v1:manage:accounts-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == actor.id
+
+
+def test_actor_detail(factories, superuser_api_client):
+    actor = factories["federation.Actor"]()
+    url = reverse("api:v1:manage:accounts-detail", kwargs={"pk": actor.full_username})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == actor.id

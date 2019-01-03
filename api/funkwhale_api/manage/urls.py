@@ -11,6 +11,9 @@ users_router = routers.SimpleRouter()
 users_router.register(r"users", views.ManageUserViewSet, "users")
 users_router.register(r"invitations", views.ManageInvitationViewSet, "invitations")
 
+other_router = routers.SimpleRouter()
+other_router.register(r"accounts", views.ManageActorViewSet, "accounts")
+
 urlpatterns = [
     url(
         r"^federation/",
@@ -18,4 +21,4 @@ urlpatterns = [
     ),
     url(r"^library/", include((library_router.urls, "instance"), namespace="library")),
     url(r"^users/", include((users_router.urls, "instance"), namespace="users")),
-]
+] + other_router.urls
