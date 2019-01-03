@@ -115,7 +115,11 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate>Known users</translate>
+                      <router-link
+                        :to="{name: 'manage.moderation.accounts.list', query: {q: 'domain:' + object.name }}">
+                        <translate>Known accounts</translate>
+                        </router-link>
+
                     </td>
                     <td>
                       {{ stats.actors }}
@@ -169,26 +173,18 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate>Artists</translate>
+                      <translate>Cached size</translate>
                     </td>
                     <td>
-                      {{ stats.artists }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <translate>Albums</translate>
-                    </td>
-                    <td>
-                      {{ stats.albums}}
+                      {{ stats.media_downloaded_size | humanSize }}
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <translate>Tracks</translate>
+                      <translate>Total size</translate>
                     </td>
                     <td>
-                      {{ stats.tracks }}
+                      {{ stats.media_total_size | humanSize }}
                     </td>
                   </tr>
                   <tr>
@@ -209,18 +205,26 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Cached size</translate>
+                      <translate>Artists</translate>
                     </td>
                     <td>
-                      {{ stats.media_downloaded_size | humanSize }}
+                      {{ stats.artists }}
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <translate>Total size</translate>
+                      <translate>Albums</translate>
                     </td>
                     <td>
-                      {{ stats.media_total_size | humanSize }}
+                      {{ stats.albums}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <translate>Tracks</translate>
+                    </td>
+                    <td>
+                      {{ stats.tracks }}
                     </td>
                   </tr>
                 </tbody>

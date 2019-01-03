@@ -27,12 +27,13 @@ import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
 import AdminUsersBase from '@/views/admin/users/Base'
-import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
 import AdminModerationBase from '@/views/admin/moderation/Base'
 import AdminDomainsList from '@/views/admin/moderation/DomainsList'
 import AdminDomainsDetail from '@/views/admin/moderation/DomainsDetail'
+import AdminAccountsList from '@/views/admin/moderation/AccountsList'
+import AdminAccountsDetail from '@/views/admin/moderation/AccountsDetail'
 import ContentBase from '@/views/content/Base'
 import ContentHome from '@/views/content/Home'
 import LibrariesHome from '@/views/content/libraries/Home'
@@ -215,12 +216,6 @@ export default new Router({
           component: AdminUsersList
         },
         {
-          path: 'users/:id',
-          name: 'manage.users.users.detail',
-          component: AdminUsersDetail,
-          props: true
-        },
-        {
           path: 'invitations',
           name: 'manage.users.invitations.list',
           component: AdminInvitationsList
@@ -240,6 +235,23 @@ export default new Router({
           path: 'domains/:id',
           name: 'manage.moderation.domains.detail',
           component: AdminDomainsDetail,
+          props: true
+        },
+        {
+          path: 'accounts',
+          name: 'manage.moderation.accounts.list',
+          component: AdminAccountsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+
+            }
+          }
+        },
+        {
+          path: 'accounts/:id',
+          name: 'manage.moderation.accounts.detail',
+          component: AdminAccountsDetail,
           props: true
         }
       ]

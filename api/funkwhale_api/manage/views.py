@@ -138,10 +138,9 @@ class ManageActorViewSet(
     lookup_value_regex = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
     queryset = (
         federation_models.Actor.objects.all()
-        .with_outbox_activities_count()
-        .with_followers_count()
         .with_uploads_count()
         .order_by("-creation_date")
+        .select_related("user")
     )
     serializer_class = serializers.ManageActorSerializer
     filter_class = filters.ManageActorFilterSet
@@ -155,7 +154,6 @@ class ManageActorViewSet(
         "creation_date",
         "last_fetch_date",
         "uploads_count",
-        "followers_count",
         "outbox_activities_count",
     ]
 

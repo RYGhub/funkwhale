@@ -37,10 +37,15 @@ class ManageActorFilterSet(filters.FilterSet):
             search_fields={
                 "name": {"to": "name"},
                 "username": {"to": "preferred_username"},
+                "email": {"to": "user__email"},
                 "bio": {"to": "summary"},
                 "type": {"to": "type"},
             },
-            filter_fields={"domain": {"to": "domain_id__iexact"}},
+            filter_fields={
+                "domain": {"to": "domain__name__iexact"},
+                "username": {"to": "preferred_username__iexact"},
+                "email": {"to": "user__email__iexact"},
+            },
         )
     )
     local = filters.BooleanFilter(name="_", method="filter_local")

@@ -4,7 +4,8 @@ import {normalizeQuery, parseTokens, compileTokens} from '@/search'
 
 export default {
   props: {
-    defaultQuery: {type: String, default: '', required: false},
+    defaultQuery: {type: String, required: false},
+    updateUrl: {type: Boolean, required: false, default: false},
   },
   methods: {
     getTokenValue (key, fallback) {
@@ -47,6 +48,15 @@ export default {
         this.search.query = compileTokens(newValue)
         this.page = 1
         this.fetchData()
+        if (this.updateUrl) {
+          let params = {}
+          if (this.search.query) {
+            params.q = this.search.query
+          }
+          this.$router.replace({
+            query: params
+          })
+        }
       },
       deep: true
     },

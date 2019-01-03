@@ -55,16 +55,12 @@ def test_manage_domain_serializer(factories, now):
 
 def test_manage_actor_serializer(factories, now):
     actor = factories["federation.Actor"]()
-    setattr(actor, "outbox_activities_count", 23)
-    setattr(actor, "followers_count", 42)
     setattr(actor, "uploads_count", 66)
     expected = {
         "id": actor.id,
         "name": actor.name,
         "creation_date": actor.creation_date.isoformat().split("+")[0] + "Z",
         "last_fetch_date": actor.last_fetch_date.isoformat().split("+")[0] + "Z",
-        "outbox_activities_count": 23,
-        "followers_count": 42,
         "uploads_count": 66,
         "fid": actor.fid,
         "url": actor.url,
@@ -76,6 +72,8 @@ def test_manage_actor_serializer(factories, now):
         "summary": actor.summary,
         "preferred_username": actor.preferred_username,
         "manually_approves_followers": actor.manually_approves_followers,
+        "full_username": actor.full_username,
+        "user": None,
     }
     s = serializers.ManageActorSerializer(actor)
 
