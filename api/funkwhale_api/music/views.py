@@ -448,28 +448,29 @@ class Search(views.APIView):
             "artist__name__unaccent",
         ]
         query_obj = utils.get_query(query, search_fields)
-        return (
+        qs = (
             models.Track.objects.all()
             .filter(query_obj)
             .select_related("artist", "album__artist")
-        )[: self.max_results]
+        )
+        return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_albums(self, query):
         search_fields = ["mbid", "title__unaccent", "artist__name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-        return (
+        qs = (
             models.Album.objects.all()
             .filter(query_obj)
             .select_related()
-            .prefetch_related("tracks")
-        )[: self.max_results]
+            .prefetch_related("tracks__artist")
+        )
+        return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_artists(self, query):
         search_fields = ["mbid", "name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-        return (models.Artist.objects.all().filter(query_obj).with_albums())[
-            : self.max_results
-        ]
+        qs = models.Artist.objects.all().filter(query_obj).with_albums()
+        return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):
         search_fields = ["slug", "name__unaccent"]
