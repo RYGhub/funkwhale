@@ -204,6 +204,9 @@ class User(AbstractUser):
 
         return ["user.{}.{}".format(self.pk, g) for g in groups]
 
+    def full_username(self):
+        return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
+
 
 def generate_code(length=10):
     return "".join(

@@ -61,6 +61,11 @@ class ActorQuerySet(models.QuerySet):
 
         return qs
 
+    def with_uploads_count(self):
+        return self.annotate(
+            uploads_count=models.Count("libraries__uploads", distinct=True)
+        )
+
 
 class DomainQuerySet(models.QuerySet):
     def external(self):
@@ -71,7 +76,9 @@ class DomainQuerySet(models.QuerySet):
 
     def with_outbox_activities_count(self):
         return self.annotate(
-            outbox_activities_count=models.Count("actors__outbox_activities")
+            outbox_activities_count=models.Count(
+                "actors__outbox_activities", distinct=True
+            )
         )
 
 
@@ -171,10 +178,10 @@ class Actor(models.Model):
 
     @property
     def full_username(self):
-        return "{}@{}".format(self.preferred_username, self.domain)
+        return "{}@{}".format(self.preferred_username, self.domain_id)
 
     def __str__(self):
-        return "{}@{}".format(self.preferred_username, self.domain)
+        return "{}@{}".format(self.preferred_username, self.domain_id)
 
     @property
     def is_local(self):
@@ -200,6 +207,35 @@ class Actor(models.Model):
             data[s] = getattr(actor, "_usage_{}".format(s)) or 0
 
         data["total"] = sum(data.values())
+        return data
+
+    def get_stats(self):
+        from funkwhale_api.music import models as music_models
+
+        data = Actor.objects.filter(pk=self.pk).aggregate(
+            outbox_activities=models.Count("outbox_activities", distinct=True),
+            libraries=models.Count("libraries", distinct=True),
+            received_library_follows=models.Count(
+                "libraries__received_follows", distinct=True
+            ),
+            emitted_library_follows=models.Count("library_follows", distinct=True),
+        )
+        data["artists"] = music_models.Artist.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+        data["albums"] = music_models.Album.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+        data["tracks"] = music_models.Track.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+
+        uploads = music_models.Upload.objects.filter(library__actor=self.pk)
+        data["uploads"] = uploads.count()
+        data["media_total_size"] = uploads.aggregate(v=models.Sum("size"))["v"] or 0
+        data["media_downloaded_size"] = (
+            uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
+        )
         return data
 
 

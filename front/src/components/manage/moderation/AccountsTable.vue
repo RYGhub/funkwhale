@@ -2,9 +2,11 @@
   <div>
     <div class="ui inline form">
       <div class="fields">
-        <div class="ui field">
+        <div class="ui six wide field">
           <label><translate>Search</translate></label>
-          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
+          <form @submit.prevent="search.query = $refs.search.value">
+            <input ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
+          </form>
         </div>
         <div class="field">
           <label><translate>Ordering</translate></label>
@@ -32,44 +34,38 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
-        :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Username</translate></th>
-          <th><translate>Email</translate></th>
-          <th><translate>Account status</translate></th>
-          <th><translate>Sign-up</translate></th>
-          <th><translate>Last activity</translate></th>
-          <th><translate>Permissions</translate></th>
-          <th><translate>Status</translate></th>
+          <th><translate>Name</translate></th>
+          <th><translate>Domain</translate></th>
+          <th><translate>Uploads</translate></th>
+          <th><translate>First seen</translate></th>
+          <th><translate>Last seen</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.full_username }}">{{ scope.obj.username }}</router-link>
+            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.full_username }}">{{ scope.obj.preferred_username }}</router-link>
           </td>
           <td>
-            <span>{{ scope.obj.email }}</span>
-          </td>
-          <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label"><translate>Active</translate></span>
-            <span v-else class="ui basic grey label"><translate>Inactive</translate></span>
-          </td>
-          <td>
-            <human-date :date="scope.obj.date_joined"></human-date>
-          </td>
-          <td>
-            <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else><translate>N/A</translate></template>
-          </td>
-          <td>
-            <template v-for="p in permissions">
-              <span class="ui basic tiny label" v-if="scope.obj.permissions[p.code]">{{ p.label }}</span>
+            <template v-if="!scope.obj.user">
+              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.domain }}">
+                <i class="wrench icon"></i>
+              </router-link>
+              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.domain)" :title="scope.obj.domain">{{ scope.obj.domain }}</span>
             </template>
+            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.domain)">
+              <i class="home icon"></i>
+              <translate>Local account</translate>
+            </span>
           </td>
           <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label"><translate>Admin</translate></span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate>Staff member</translate></span>
-            <span v-else class="ui basic label"><translate>regular user</translate></span>
+            {{ scope.obj.uploads_count }}
+          </td>
+          <td>
+            <human-date :date="scope.obj.creation_date"></human-date>
+          </td>
+          <td>
+            <human-date v-if="scope.obj.last_fetch_date" :date="scope.obj.last_fetch_date"></human-date>
           </td>
         </template>
       </action-table>
@@ -98,37 +94,44 @@
 import axios from 'axios'
 import _ from '@/lodash'
 import time from '@/utils/time'
+import {normalizeQuery, parseTokens} from '@/search'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
+import SmartSearchMixin from '@/components/mixins/SmartSearch'
+
 
 export default {
-  mixins: [OrderingMixin, TranslationsMixin],
+  mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   props: {
-    filters: {type: Object, required: false}
+    filters: {type: Object, required: false},
   },
   components: {
     Pagination,
     ActionTable
   },
   data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-date_joined')
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
       time,
       isLoading: false,
       result: null,
       page: 1,
       paginateBy: 50,
-      search: '',
+      search: {
+        query: this.defaultQuery,
+        tokens: parseTokens(normalizeQuery(this.defaultQuery))
+      },
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
-        ['date_joined', 'date_joined'],
-        ['last_activity', 'last_activity'],
-        ['username', 'username']
+        ['creation_date', 'first_seen'],
+        ["last_fetch_date", "last_seen"],
+        ["preferred_username", "username"],
+        ["domain", "domain"],
+        ["uploads_count", "uploads"],
       ]
-
     }
   },
   created () {
@@ -139,13 +142,13 @@ export default {
       let params = _.merge({
         'page': this.page,
         'page_size': this.paginateBy,
-        'q': this.search,
+        'q': this.search.query,
         'ordering': this.getOrderingAsString()
       }, this.filters)
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/manage/users/users/', {params: params}).then((response) => {
+      axios.get('/manage/accounts/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {
@@ -160,31 +163,12 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by username, email, name...')
+        searchPlaceholder: this.$gettext('Search by domain, username, bio...')
       }
-    },
-    privacyLevels () {
-      return {}
-    },
-    permissions () {
-      return [
-        {
-          'code': 'library',
-          'label': this.$gettext('Library')
-        },
-        {
-          'code': 'moderation',
-          'label': this.$gettext('Moderation')
-        },
-        {
-          'code': 'settings',
-          'label': this.$gettext('Settings')
-        }
-      ]
     },
     actionFilters () {
       var currentFilters = {
-        q: this.search
+        q: this.search.query
       }
       if (this.filters) {
         return _.merge(currentFilters, this.filters)

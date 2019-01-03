@@ -97,3 +97,22 @@ def test_domain_stats(factories):
     domain = factories["federation.Domain"]()
 
     assert domain.get_stats() == expected
+
+
+def test_actor_stats(factories):
+    expected = {
+        "libraries": 0,
+        "tracks": 0,
+        "albums": 0,
+        "uploads": 0,
+        "artists": 0,
+        "outbox_activities": 0,
+        "received_library_follows": 0,
+        "emitted_library_follows": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+
+    actor = factories["federation.Actor"]()
+
+    assert actor.get_stats() == expected

@@ -247,7 +247,6 @@ export default {
         self.isLoading = false;
       }).catch(error => {
         if (error.response) {
-          console.log(error.response)
           if (error.response.status === 404) {
             self.error = 'server_not_found'
           }
@@ -274,7 +273,6 @@ export default {
         self.isLoading = false;
       }).catch(error => {
         if (error.response) {
-          console.log(error.response)
           if (error.response.status === 404) {
             self.error = 'server_not_found'
           }

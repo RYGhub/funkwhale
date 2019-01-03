@@ -125,19 +125,19 @@
 import axios from 'axios'
 import _ from '@/lodash'
 import time from '@/utils/time'
-import {normalizeQuery, parseTokens, compileTokens} from '@/search'
+import {normalizeQuery, parseTokens} from '@/search'
 
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
+import SmartSearchMixin from '@/components/mixins/SmartSearch'
 
 export default {
-  mixins: [OrderingMixin, TranslationsMixin],
+  mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   props: {
     filters: {type: Object, required: false},
     needsRefresh: {type: Boolean, required: false, default: false},
-    defaultQuery: {type: String, default: ''},
     customObjects: {type: Array, required: false, default: () => { return [] }}
   },
   components: {
@@ -172,36 +172,6 @@ export default {
     this.fetchData()
   },
   methods: {
-    getTokenValue (key, fallback) {
-      let matching = this.search.tokens.filter(t => {
-        return t.field === key
-      })
-      if (matching.length > 0) {
-        return matching[0].value
-      }
-      return fallback
-    },
-    addSearchToken (key, value) {
-      if (!value) {
-        // we remove existing matching tokens, if any
-        this.search.tokens = this.search.tokens.filter(t => {
-          return t.field != key
-        })
-      } else {
-        let existing = this.search.tokens.filter(t => {
-          return t.field === key
-        })
-        if (existing.length > 0) {
-          // we replace the value in existing tokens, if any
-          existing.forEach(t => {
-            t.value = value
-          })
-        } else {
-          // we add a new token
-          this.search.tokens.push({field: key, value})
-        }
-      }
-    },
     fetchData () {
       this.$emit('fetch-start')
       let params = _.merge({
@@ -282,17 +252,6 @@ export default {
     }
   },
   watch: {
-    'search.query' (newValue) {
-      this.search.tokens = parseTokens(normalizeQuery(newValue))
-    },
-    'search.tokens': {
-      handler (newValue) {
-        this.search.query = compileTokens(newValue)
-        this.page = 1
-        this.fetchData()
-      },
-      deep: true
-    },
     orderingDirection: function () {
       this.page = 1
       this.fetchData()

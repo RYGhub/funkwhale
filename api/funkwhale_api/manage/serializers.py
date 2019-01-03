@@ -116,6 +116,7 @@ class ManageUserSerializer(serializers.ModelSerializer):
             "permissions",
             "privacy_level",
             "upload_quota",
+            "full_username",
         )
         read_only_fields = [
             "id",
@@ -191,3 +192,33 @@ class ManageDomainSerializer(serializers.ModelSerializer):
 
     def get_outbox_activities_count(self, o):
         return getattr(o, "outbox_activities_count", 0)
+
+
+class ManageActorSerializer(serializers.ModelSerializer):
+    uploads_count = serializers.SerializerMethodField()
+    user = ManageUserSerializer()
+
+    class Meta:
+        model = federation_models.Actor
+        fields = [
+            "id",
+            "url",
+            "fid",
+            "preferred_username",
+            "full_username",
+            "domain",
+            "name",
+            "summary",
+            "type",
+            "creation_date",
+            "last_fetch_date",
+            "inbox_url",
+            "outbox_url",
+            "shared_inbox_url",
+            "manually_approves_followers",
+            "uploads_count",
+            "user",
+        ]
+
+    def get_uploads_count(self, o):
+        return getattr(o, "uploads_count", 0)
