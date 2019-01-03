@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from django.conf import settings
 from django import urls
-from django.db import transaction
+from django.db import models, transaction
 
 
 def rename_file(instance, field_name, new_name, allow_missing_file=False):
@@ -139,3 +139,11 @@ def parse_meta(html):
     meta = [elem for elem in tree.iter() if elem.tag in ["meta", "link"]]
 
     return [dict([("tag", elem.tag)] + list(elem.items())) for elem in meta]
+
+
+def order_for_search(qs, field):
+    """
+    When searching, it's often more useful to have short results first,
+    this function will order the given qs based on the length of the given field
+    """
+    return qs.annotate(__size=models.functions.Length(field)).order_by("__size")
