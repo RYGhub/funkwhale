@@ -44,7 +44,7 @@ class APIModelMixin(models.Model):
         "federation.Activity", null=True, blank=True, on_delete=models.SET_NULL
     )
     api_includes = []
-    creation_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     import_hooks = []
 
     class Meta:
@@ -161,10 +161,11 @@ class ArtistQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
+        matches = self.filter(tracks__in=tracks).values_list("pk")
         if include:
-            return self.filter(tracks__in=tracks).distinct()
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(tracks__in=tracks).distinct()
+            return self.exclude(pk__in=matches)
 
 
 class Artist(APIModelMixin):
@@ -229,10 +230,11 @@ class AlbumQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
+        matches = self.filter(tracks__in=tracks).values_list("pk")
         if include:
-            return self.filter(tracks__in=tracks).distinct()
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(tracks__in=tracks).distinct()
+            return self.exclude(pk__in=matches)
 
     def with_prefetched_tracks_and_playable_uploads(self, actor):
         tracks = Track.objects.with_playable_uploads(actor)
@@ -429,10 +431,11 @@ class TrackQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         files = Upload.objects.playable_by(actor, include)
+        matches = self.filter(uploads__in=files).values_list("pk")
         if include:
-            return self.filter(uploads__in=files).distinct()
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(uploads__in=files).distinct()
+            return self.exclude(pk__in=matches)
 
     def with_playable_uploads(self, actor):
         uploads = Upload.objects.playable_by(actor).select_related("track")
@@ -606,10 +609,8 @@ class UploadQuerySet(models.QuerySet):
         libraries = Library.objects.viewable_by(actor)
 
         if include:
-            return self.filter(
-                library__in=libraries, import_status="finished"
-            ).distinct()
-        return self.exclude(library__in=libraries, import_status="finished").distinct()
+            return self.filter(library__in=libraries, import_status="finished")
+        return self.exclude(library__in=libraries, import_status="finished")
 
     def local(self, include=True):
         return self.exclude(library__actor__user__isnull=include)
@@ -657,7 +658,7 @@ class Upload(models.Model):
         blank=True,
         max_length=500,
     )
-    creation_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     modification_date = models.DateTimeField(default=timezone.now, null=True)
     accessed_date = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)

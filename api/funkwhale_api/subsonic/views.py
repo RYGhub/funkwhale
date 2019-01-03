@@ -57,7 +57,7 @@ def find_object(
 
             if filter_playable:
                 actor = utils.get_actor_from_request(request)
-                qs = qs.playable_by(actor).distinct()
+                qs = qs.playable_by(actor)
 
             try:
                 obj = qs.get(**{model_field: value})
