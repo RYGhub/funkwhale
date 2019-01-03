@@ -71,7 +71,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
-        return queryset.prefetch_related(Prefetch("albums", queryset=albums)).distinct()
+        return queryset.prefetch_related(Prefetch("albums", queryset=albums))
 
     libraries = detail_route(methods=["get"])(
         get_libraries(
@@ -99,7 +99,7 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
             .order_for_album()
         )
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
-        return qs.distinct()
+        return qs
 
     libraries = detail_route(methods=["get"])(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
