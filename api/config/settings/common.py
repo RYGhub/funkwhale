@@ -538,6 +538,7 @@ MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
 CSRF_USE_SESSIONS = True
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # Playlist settings
 # XXX: deprecated, see #186
