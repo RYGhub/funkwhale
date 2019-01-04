@@ -27,7 +27,7 @@ def test_guess_mimetype_try_using_extension_if_fail(wrong, factories, mocker):
     [
         ("sample.flac", {"bitrate": 1608000, "length": 0.001}),
         ("test.mp3", {"bitrate": 8000, "length": 267.70285714285717}),
-        ("test.ogg", {"bitrate": 128000, "length": 229.18304166666667}),
+        ("test.ogg", {"bitrate": 112000, "length": 1}),
     ],
 )
 def test_get_audio_file_data(name, expected):
