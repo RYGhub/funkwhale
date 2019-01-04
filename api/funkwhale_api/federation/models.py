@@ -238,6 +238,15 @@ class Actor(models.Model):
         )
         return data
 
+    @property
+    def keys(self):
+        return self.private_key, self.public_key
+
+    @keys.setter
+    def keys(self, v):
+        self.private_key = v[0].decode("utf-8")
+        self.public_key = v[1].decode("utf-8")
+
 
 class InboxItem(models.Model):
     """

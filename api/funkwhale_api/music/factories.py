@@ -2,7 +2,8 @@ import os
 
 import factory
 
-from funkwhale_api.factories import ManyToManyFromList, registry
+from funkwhale_api.factories import ManyToManyFromList, registry, NoUpdateOnCreate
+
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
 from funkwhale_api.users import factories as users_factories
@@ -39,7 +40,7 @@ def deduce_from_conf(field):
 
 
 @registry.register
-class LicenseFactory(factory.django.DjangoModelFactory):
+class LicenseFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     code = "cc-by-4.0"
     url = deduce_from_conf("url")
     commercial = deduce_from_conf("commercial")
@@ -54,7 +55,7 @@ class LicenseFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ArtistFactory(factory.django.DjangoModelFactory):
+class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
@@ -65,7 +66,7 @@ class ArtistFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class AlbumFactory(factory.django.DjangoModelFactory):
+class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
@@ -80,7 +81,7 @@ class AlbumFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class TrackFactory(factory.django.DjangoModelFactory):
+class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     fid = factory.Faker("federation_url")
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
@@ -104,7 +105,7 @@ class TrackFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class UploadFactory(factory.django.DjangoModelFactory):
+class UploadFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     fid = factory.Faker("federation_url")
     track = factory.SubFactory(TrackFactory)
     library = factory.SubFactory(federation_factories.MusicLibraryFactory)
@@ -128,7 +129,7 @@ class UploadFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class UploadVersionFactory(factory.django.DjangoModelFactory):
+class UploadVersionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     upload = factory.SubFactory(UploadFactory, bitrate=200000)
     bitrate = factory.SelfAttribute("upload.bitrate")
     mimetype = "audio/mpeg"
@@ -140,7 +141,7 @@ class UploadVersionFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class WorkFactory(factory.django.DjangoModelFactory):
+class WorkFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     mbid = factory.Faker("uuid4")
     language = "eng"
     nature = "song"
@@ -151,7 +152,7 @@ class WorkFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class LyricsFactory(factory.django.DjangoModelFactory):
+class LyricsFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     work = factory.SubFactory(WorkFactory)
     url = factory.Faker("url")
     content = factory.Faker("paragraphs", nb=4)
@@ -161,7 +162,7 @@ class LyricsFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class TagFactory(factory.django.DjangoModelFactory):
+class TagFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.SelfAttribute("slug")
     slug = factory.Faker("slug")
 
@@ -172,7 +173,7 @@ class TagFactory(factory.django.DjangoModelFactory):
 # XXX To remove
 
 
-class ImportBatchFactory(factory.django.DjangoModelFactory):
+class ImportBatchFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     submitted_by = factory.SubFactory(users_factories.UserFactory)
 
     class Meta:
@@ -180,7 +181,7 @@ class ImportBatchFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ImportJobFactory(factory.django.DjangoModelFactory):
+class ImportJobFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     batch = factory.SubFactory(ImportBatchFactory)
     source = factory.Faker("url")
     mbid = factory.Faker("uuid4")
