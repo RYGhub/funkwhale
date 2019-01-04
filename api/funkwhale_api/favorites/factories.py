@@ -1,12 +1,12 @@
 import factory
 
-from funkwhale_api.factories import registry
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 from funkwhale_api.music.factories import TrackFactory
 from funkwhale_api.users.factories import UserFactory
 
 
 @registry.register
-class TrackFavorite(factory.django.DjangoModelFactory):
+class TrackFavorite(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     track = factory.SubFactory(TrackFactory)
     user = factory.SubFactory(UserFactory)
 

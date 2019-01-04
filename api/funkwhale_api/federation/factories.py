@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.http import http_date
 
-from funkwhale_api.factories import registry
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 from funkwhale_api.users import factories as user_factories
 
 from . import keys, models
@@ -67,7 +67,7 @@ def create_user(actor):
 
 
 @registry.register
-class Domain(factory.django.DjangoModelFactory):
+class Domain(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("domain_name")
 
     class Meta:
@@ -76,7 +76,7 @@ class Domain(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ActorFactory(factory.DjangoModelFactory):
+class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     public_key = None
     private_key = None
     preferred_username = factory.Faker("user_name")
@@ -100,6 +100,7 @@ class ActorFactory(factory.DjangoModelFactory):
             o.domain.name, o.preferred_username
         )
     )
+    keys = factory.LazyFunction(keys.get_key_pair)
 
     class Meta:
         model = models.Actor
@@ -125,19 +126,9 @@ class ActorFactory(factory.DjangoModelFactory):
         else:
             self.user = UserFactory(actor=self, **kwargs)
 
-    @factory.post_generation
-    def keys(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        if not extracted:
-            private, public = keys.get_key_pair()
-            self.private_key = private.decode("utf-8")
-            self.public_key = public.decode("utf-8")
-
 
 @registry.register
-class FollowFactory(factory.DjangoModelFactory):
+class FollowFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     target = factory.SubFactory(ActorFactory)
     actor = factory.SubFactory(ActorFactory)
 
@@ -149,28 +140,23 @@ class FollowFactory(factory.DjangoModelFactory):
 
 
 @registry.register
-class MusicLibraryFactory(factory.django.DjangoModelFactory):
+class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory)
     privacy_level = "me"
     name = factory.Faker("sentence")
     description = factory.Faker("sentence")
     uploads_count = 0
     fid = factory.Faker("federation_url")
+    followers_url = factory.LazyAttribute(
+        lambda o: o.fid + "/followers" if o.fid else None
+    )
 
     class Meta:
         model = "music.Library"
 
-    @factory.post_generation
-    def followers_url(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        self.followers_url = extracted or self.fid + "/followers"
-
 
 @registry.register
-class LibraryScan(factory.django.DjangoModelFactory):
+class LibraryScan(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     library = factory.SubFactory(MusicLibraryFactory)
     actor = factory.SubFactory(ActorFactory)
     total_files = factory.LazyAttribute(lambda o: o.library.uploads_count)
@@ -180,7 +166,7 @@ class LibraryScan(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ActivityFactory(factory.django.DjangoModelFactory):
+class ActivityFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory)
     url = factory.Faker("federation_url")
     payload = factory.LazyFunction(lambda: {"type": "Create"})
@@ -190,7 +176,7 @@ class ActivityFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class InboxItemFactory(factory.django.DjangoModelFactory):
+class InboxItemFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     actor = factory.SubFactory(ActorFactory, local=True)
     activity = factory.SubFactory(ActivityFactory)
     type = "to"
@@ -200,7 +186,7 @@ class InboxItemFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class DeliveryFactory(factory.django.DjangoModelFactory):
+class DeliveryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     activity = factory.SubFactory(ActivityFactory)
     inbox_url = factory.Faker("url")
 
@@ -209,7 +195,7 @@ class DeliveryFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class LibraryFollowFactory(factory.DjangoModelFactory):
+class LibraryFollowFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     target = factory.SubFactory(MusicLibraryFactory)
     actor = factory.SubFactory(ActorFactory)
 

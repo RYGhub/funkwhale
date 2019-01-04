@@ -327,7 +327,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
+    "funkwhale_api.users.auth_backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 SESSION_COOKIE_HTTPONLY = False
@@ -538,6 +538,7 @@ MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
 CSRF_USE_SESSIONS = True
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # Playlist settings
 # XXX: deprecated, see #186

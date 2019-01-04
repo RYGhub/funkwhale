@@ -1,11 +1,11 @@
 import factory
 
-from funkwhale_api.factories import registry
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 from funkwhale_api.users.factories import UserFactory
 
 
 @registry.register
-class RadioFactory(factory.django.DjangoModelFactory):
+class RadioFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     description = factory.Faker("paragraphs")
     user = factory.SubFactory(UserFactory)
@@ -16,7 +16,7 @@ class RadioFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class RadioSessionFactory(factory.django.DjangoModelFactory):
+class RadioSessionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
 
     class Meta:
@@ -24,7 +24,7 @@ class RadioSessionFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register(name="radios.CustomRadioSession")
-class CustomRadioSessionFactory(factory.django.DjangoModelFactory):
+class CustomRadioSessionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     radio_type = "custom"
     custom_radio = factory.SubFactory(
