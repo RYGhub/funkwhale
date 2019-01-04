@@ -327,7 +327,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
+    "funkwhale_api.users.auth_backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 SESSION_COOKIE_HTTPONLY = False
