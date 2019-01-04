@@ -1107,7 +1107,7 @@ def update_request_status(sender, instance, created, **kwargs):
 
 @receiver(models.signals.post_save, sender=Album)
 def warm_album_covers(sender, instance, **kwargs):
-    if not instance.cover:
+    if not instance.cover or not settings.CREATE_IMAGE_THUMBNAILS:
         return
     album_covers_warmer = VersatileImageFieldWarmer(
         instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"

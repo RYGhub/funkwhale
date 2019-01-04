@@ -31,7 +31,6 @@ EMAIL_PORT = 1025
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
-MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 
 # INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 
@@ -45,14 +44,18 @@ DEBUG_TOOLBAR_CONFIG = {
 # django-extensions
 # ------------------------------------------------------------------------------
 # INSTALLED_APPS += ('django_extensions', )
-INSTALLED_APPS += ("debug_toolbar",)
+
+# Debug toolbar is slow, we disable it for tests
+DEBUG_TOOLBAR_ENABLED = env.bool("DEBUG_TOOLBAR_ENABLED", default=DEBUG)
+if DEBUG_TOOLBAR_ENABLED:
+    MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+    INSTALLED_APPS += ("debug_toolbar",)
 
 # TESTING
 # ------------------------------------------------------------------------------
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # CELERY
-# In development, all tasks will be executed locally by blocking until the task returns
 CELERY_TASK_ALWAYS_EAGER = False
 # END CELERY
 
@@ -72,3 +75,8 @@ LOGGING = {
     },
 }
 CSRF_TRUSTED_ORIGINS = [o for o in ALLOWED_HOSTS]
+
+
+if env.bool("WEAK_PASSWORDS", default=False):
+    # Faster during tests
+    PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)

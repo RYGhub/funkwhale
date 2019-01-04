@@ -592,3 +592,7 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
     ]
 }
 VERSATILEIMAGEFIELD_SETTINGS = {"create_images_on_demand": False}
+RSA_KEY_SIZE = 2048
+# for performance gain in tests, since we don't need to actually create the
+# thumbnails
+CREATE_IMAGE_THUMBNAILS = env.bool("CREATE_IMAGE_THUMBNAILS", default=True)

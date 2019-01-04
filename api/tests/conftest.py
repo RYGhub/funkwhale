@@ -410,3 +410,9 @@ def no_api_auth(preferences):
 def migrator(transactional_db):
     yield MigrationExecutor(connection)
     call_command("migrate", interactive=False)
+
+
+@pytest.fixture(autouse=True)
+def rsa_small_key(settings):
+    # smaller size for faster generation, since it's CPU hungry
+    settings.RSA_KEY_SIZE = 512
