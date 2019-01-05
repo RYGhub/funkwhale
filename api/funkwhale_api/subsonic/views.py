@@ -10,7 +10,7 @@ from rest_framework.serializers import ValidationError
 
 import funkwhale_api
 from funkwhale_api.activity import record
-from funkwhale_api.common import preferences
+from funkwhale_api.common import preferences, utils as common_utils
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
@@ -345,6 +345,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                     utils.get_query(query, c["search_fields"])
                 )
             queryset = queryset.playable_by(actor)
+            queryset = common_utils.order_for_search(queryset, c["search_fields"][0])
             queryset = queryset[offset : offset + size]
             payload["searchResult3"][c["subsonic"]] = c["serializer"](queryset)
         return response.Response(payload)
