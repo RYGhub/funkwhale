@@ -12,8 +12,8 @@
             <div class="sub header">
               <translate
                 translate-plural="Playlist containing %{ count } tracks, by %{ username }"
-                :translate-n="playlistTracks.length"
-                :translate-params="{count: playlistTracks.length, username: playlist.user.username}">
+                :translate-n="playlist.tracks_count"
+                :translate-params="{count: playlist.tracks_count, username: playlist.user.username}">
                 Playlist containing %{ count } track, by %{ username }
               </translate><br>
               <duration :seconds="playlist.duration" />
