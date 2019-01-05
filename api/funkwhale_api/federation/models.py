@@ -13,6 +13,7 @@ from django.urls import reverse
 
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import validators as common_validators
 from funkwhale_api.music import utils as music_utils
 
 from . import utils as federation_utils
@@ -83,7 +84,11 @@ class DomainQuerySet(models.QuerySet):
 
 
 class Domain(models.Model):
-    name = models.CharField(primary_key=True, max_length=255)
+    name = models.CharField(
+        primary_key=True,
+        max_length=255,
+        validators=[common_validators.DomainValidator()],
+    )
     creation_date = models.DateTimeField(default=timezone.now)
     nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
     nodeinfo = JSONField(default=empty_dict, max_length=50000, blank=True)

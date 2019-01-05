@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers, views
 
@@ -88,6 +89,14 @@ def test_domain_detail(factories, superuser_api_client):
 
     assert response.status_code == 200
     assert response.data["name"] == d.pk
+
+
+def test_domain_create(superuser_api_client):
+    url = reverse("api:v1:manage:federation:domains-list")
+    response = superuser_api_client.post(url, {"name": "test.federation"})
+
+    assert response.status_code == 201
+    assert federation_models.Domain.objects.filter(pk="test.federation").exists()
 
 
 def test_domain_nodeinfo(factories, superuser_api_client, mocker):

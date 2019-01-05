@@ -1,3 +1,5 @@
+import pytest
+
 from funkwhale_api.manage import serializers
 
 
@@ -51,6 +53,13 @@ def test_manage_domain_serializer(factories, now):
     s = serializers.ManageDomainSerializer(domain)
 
     assert s.data == expected
+
+
+def test_manage_domain_serializer_validates_hostname(db):
+    s = serializers.ManageDomainSerializer(data={"name": "hello world"})
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        s.is_valid(raise_exception=True)
 
 
 def test_manage_actor_serializer(factories, now):

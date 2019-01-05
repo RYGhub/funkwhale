@@ -98,7 +98,10 @@ class ManageInvitationViewSet(
 
 
 class ManageDomainViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
     queryset = (
