@@ -44,7 +44,7 @@
           <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
-            <i class="wikipedia icon"></i>
+            <i class="wikipedia w icon"></i>
             <translate>Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">

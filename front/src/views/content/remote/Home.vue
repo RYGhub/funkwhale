@@ -13,7 +13,7 @@
       </div>
       <template v-if="existingFollows && existingFollows.count > 0">
         <h2><translate>Known libraries</translate></h2>
-        <i @click="fetch()" :class="['ui', 'circular', 'medium', 'refresh', 'icon']" /> <translate>Refresh</translate>
+        <i @click="fetch()" :class="['ui', 'circular', 'refresh', 'icon']" /> <translate>Refresh</translate>
         <div class="ui hidden divider"></div>
         <div class="ui two cards">
           <library-card
