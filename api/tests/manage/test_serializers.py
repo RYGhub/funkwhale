@@ -49,6 +49,7 @@ def test_manage_domain_serializer(factories, now):
         "outbox_activities_count": 23,
         "nodeinfo": {},
         "nodeinfo_fetch_date": None,
+        "instance_policy": None,
     }
     s = serializers.ManageDomainSerializer(domain)
 
@@ -83,7 +84,57 @@ def test_manage_actor_serializer(factories, now):
         "manually_approves_followers": actor.manually_approves_followers,
         "full_username": actor.full_username,
         "user": None,
+        "instance_policy": None,
     }
     s = serializers.ManageActorSerializer(actor)
 
     assert s.data == expected
+
+
+@pytest.mark.parametrize(
+    "factory_kwargs,expected",
+    [
+        (
+            {"for_domain": True, "target_domain__name": "test.federation"},
+            {"target": {"type": "domain", "id": "test.federation"}},
+        ),
+        (
+            {
+                "for_actor": True,
+                "target_actor__domain__name": "test.federation",
+                "target_actor__preferred_username": "hello",
+            },
+            {"target": {"type": "actor", "id": "hello@test.federation"}},
+        ),
+    ],
+)
+def test_instance_policy_serializer_repr(factories, factory_kwargs, expected):
+    policy = factories["moderation.InstancePolicy"](block_all=True, **factory_kwargs)
+
+    e = {
+        "id": policy.id,
+        "uuid": str(policy.uuid),
+        "creation_date": policy.creation_date.isoformat().split("+")[0] + "Z",
+        "actor": policy.actor.full_username,
+        "block_all": True,
+        "silence_activity": False,
+        "silence_notifications": False,
+        "reject_media": False,
+        "is_active": policy.is_active,
+        "summary": policy.summary,
+    }
+    e.update(expected)
+
+    assert serializers.ManageInstancePolicySerializer(policy).data == e
+
+
+def test_instance_policy_serializer_save_domain(factories):
+    domain = factories["federation.Domain"]()
+
+    data = {"target": {"id": domain.name, "type": "domain"}, "block_all": True}
+
+    serializer = serializers.ManageInstancePolicySerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    policy = serializer.save()
+
+    assert policy.target_domain == domain

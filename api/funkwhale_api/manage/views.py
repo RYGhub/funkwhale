@@ -6,6 +6,7 @@ from funkwhale_api.common import preferences
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import models as music_models
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.users.permissions import HasUserPermission
 
@@ -173,3 +174,26 @@ class ManageActorViewSet(
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
+
+
+class ManageInstancePolicyViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        moderation_models.InstancePolicy.objects.all()
+        .order_by("-creation_date")
+        .select_related()
+    )
+    serializer_class = serializers.ManageInstancePolicySerializer
+    filter_class = filters.ManageInstancePolicyFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["moderation"]
+    ordering_fields = ["id", "creation_date"]
+
+    def perform_create(self, serializer):
+        serializer.save(actor=self.request.user.actor)

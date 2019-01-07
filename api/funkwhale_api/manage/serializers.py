@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import fields as federation_fields
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 
@@ -185,6 +187,13 @@ class ManageDomainSerializer(serializers.ModelSerializer):
             "outbox_activities_count",
             "nodeinfo",
             "nodeinfo_fetch_date",
+            "instance_policy",
+        ]
+        read_only_fields = [
+            "creation_date",
+            "instance_policy",
+            "nodeinfo",
+            "nodeinfo_fetch_date",
         ]
 
     def get_actors_count(self, o):
@@ -218,7 +227,62 @@ class ManageActorSerializer(serializers.ModelSerializer):
             "manually_approves_followers",
             "uploads_count",
             "user",
+            "instance_policy",
         ]
+        read_only_fields = ["creation_date", "instance_policy"]
 
     def get_uploads_count(self, o):
         return getattr(o, "uploads_count", 0)
+
+
+class TargetSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=["domain", "actor"])
+    id = serializers.CharField()
+
+    def to_representation(self, value):
+        if value["type"] == "domain":
+            return {"type": "domain", "id": value["obj"].name}
+        if value["type"] == "actor":
+            return {"type": "actor", "id": value["obj"].full_username}
+
+    def to_internal_value(self, value):
+        if value["type"] == "domain":
+            field = serializers.PrimaryKeyRelatedField(
+                queryset=federation_models.Domain.objects.external()
+            )
+        if value["type"] == "actor":
+            field = federation_fields.ActorRelatedField()
+        value["obj"] = field.to_internal_value(value["id"])
+        return value
+
+
+class ManageInstancePolicySerializer(serializers.ModelSerializer):
+    target = TargetSerializer()
+    actor = federation_fields.ActorRelatedField(read_only=True)
+
+    class Meta:
+        model = moderation_models.InstancePolicy
+        fields = [
+            "id",
+            "uuid",
+            "target",
+            "creation_date",
+            "actor",
+            "summary",
+            "is_active",
+            "block_all",
+            "silence_activity",
+            "silence_notifications",
+            "reject_media",
+        ]
+
+        read_only_fields = ["uuid", "id", "creation_date", "actor", "target"]
+
+    def validate(self, data):
+        target = data.pop("target")
+        if target["type"] == "domain":
+            data["target_domain"] = target["obj"]
+        if target["type"] == "actor":
+            data["target_actor"] = target["obj"]
+
+        return data
