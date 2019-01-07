@@ -255,7 +255,11 @@ button.reset {
 
 [data-tooltip]::after {
   white-space: normal;
-  width: 300px;
-  max-width: 300px;
+  width: 500px;
+  max-width: 500px;
   z-index: 999;
+}
+
+label .tooltip {
+  margin-left: 1em;
 }
