@@ -5,26 +5,68 @@
     </div>
     <template v-if="object">
       <section :class="['ui', 'head', 'vertical', 'stripe', 'segment']" v-title="object.full_username">
-        <div class="segment-content">
-          <h2 class="ui header">
-            <i class="circular inverted user icon"></i>
-            <div class="content">
-              {{ object.full_username }}
-              <div class="sub header">
-                <template v-if="object.user">
-                  <span class="ui tiny teal icon label">
-                    <i class="home icon"></i>
-                    <translate>Local account</translate>
-                  </span>
-                  &nbsp;
-                </template>
-                <a :href="object.url || object.fid" target="_blank" rel="noopener noreferrer">
-                  <translate>Open profile</translate>&nbsp;
-                  <i class="external icon"></i>
-                </a>
-              </div>
+        <div class="ui stackable two column grid">
+          <div class="ui column">
+            <div class="segment-content">
+              <h2 class="ui header">
+                <i class="circular inverted user icon"></i>
+                <div class="content">
+                  {{ object.full_username }}
+                  <div class="sub header">
+                    <template v-if="object.user">
+                      <span class="ui tiny teal icon label">
+                        <i class="home icon"></i>
+                        <translate>Local account</translate>
+                      </span>
+                      &nbsp;
+                    </template>
+                    <a :href="object.url || object.fid" target="_blank" rel="noopener noreferrer">
+                      <translate>Open profile</translate>&nbsp;
+                      <i class="external icon"></i>
+                    </a>
+                  </div>
+                </div>
+              </h2>
             </div>
-          </h2>
+          </div>
+          <div class="ui column">
+            <div v-if="!object.user" class="ui compact clearing placeholder segment">
+              <template v-if="isLoadingPolicy">
+                <div class="paragraph">
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                </div>
+              </template>
+              <template v-else-if="!policy && !showPolicyForm">
+                <header class="ui header">
+                  <h3>
+                    <i class="shield icon"></i>
+                    <translate>You don't have any rule in place for this account.</translate>
+                  </h3>
+                </header>
+                <p><translate>Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
+                <button @click="showPolicyForm = true" class="ui primary button">Add a moderation policy</button>
+              </template>
+              <instance-policy-card v-else-if="policy && !showPolicyForm" :object="policy" @update="showPolicyForm = true">
+                <header class="ui header">
+                  <h3>
+                    <translate>This domain is subject to specific moderation rules</translate>
+                  </h3>
+                </header>
+              </instance-policy-card>
+              <instance-policy-form
+                v-else-if="showPolicyForm"
+                @cancel="showPolicyForm = false"
+                @save="updatePolicy"
+                @delete="policy = null; showPolicyForm = false"
+                :object="policy"
+                type="actor"
+                :target="object.full_username" />
+            </div>
+          </div>
         </div>
       </section>
       <div class="ui vertical stripe segment">
@@ -309,15 +351,24 @@ import logger from "@/logging"
 import lodash from '@/lodash'
 import $ from "jquery"
 
+import InstancePolicyForm from "@/components/manage/moderation/InstancePolicyForm"
+import InstancePolicyCard from "@/components/manage/moderation/InstancePolicyCard"
+
 export default {
   props: ["id"],
+  components: {
+    InstancePolicyForm,
+    InstancePolicyCard,
+  },
   data() {
     return {
       lodash,
       isLoading: true,
       isLoadingStats: false,
+      isLoadingPolicy: false,
       object: null,
       stats: null,
+      showPolicyForm: false,
       permissions: [],
     }
   },
@@ -333,6 +384,9 @@ export default {
       axios.get(url).then(response => {
         self.object = response.data
         self.isLoading = false
+        if (self.object.instance_policy) {
+          self.fetchPolicy(self.object.instance_policy)
+        }
         if (response.data.user) {
           self.allPermissions.forEach(p => {
             if (self.object.user.permissions[p.code]) {
@@ -340,6 +394,15 @@ export default {
             }
           })
         }
+      })
+    },
+    fetchPolicy(id) {
+      var self = this
+      this.isLoadingPolicy = true
+      let url = `manage/moderation/instance-policies/${id}/`
+      axios.get(url).then(response => {
+        self.policy = response.data
+        self.isLoadingPolicy = false
       })
     },
     fetchStats() {
@@ -423,4 +486,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.placeholder.segment {
+  width: 100%;
+}
 </style>
