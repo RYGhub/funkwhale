@@ -10,6 +10,17 @@
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
+
+    <div class="field" v-if="object">
+      <div class="ui toggle checkbox">
+        <input id="policy-is-active" v-model="current.isActive" type="checkbox">
+        <label for="policy-is-active">
+          <translate v-if="current.isActive" key="1">Enabled</translate>
+          <translate v-else key="2">Disabled</translate>
+          <tooltip :content="labels.isActiveHelp" />
+        </label>
+      </div>
+    </div>
     <div class="field">
       <label for="policy-summary">
         <translate>Reason</translate>
@@ -36,16 +47,6 @@
           <i :class="[config.icon, 'icon']"></i>
           {{ labels[config.id].label }}
           <tooltip :content="labels[config.id].help" />
-        </label>
-      </div>
-    </div>
-    <div class="field" v-if="object">
-      <div class="ui toggle checkbox">
-        <input id="policy-is-active" v-model="current.isActive" type="checkbox">
-        <label for="policy-is-active">
-          <translate v-if="current.isActive" key="1">Enabled</translate>
-          <translate v-else key="2">Disabled</translate>
-          <tooltip :content="labels.isActiveHelp" />
         </label>
       </div>
     </div>
@@ -96,8 +97,9 @@ export default {
         rejectMedia: _.get(current, 'reject_media', false),
       },
       fieldConfig: [
-        {id: "silenceActivity", icon: "feed"},
-        {id: "silenceNotifications", icon: "bell"},
+        // we hide those until we actually have the related features implemented :)
+        // {id: "silenceActivity", icon: "feed"},
+        // {id: "silenceNotifications", icon: "bell"},
         {id: "rejectMedia", icon: "file"},
       ]
     }
