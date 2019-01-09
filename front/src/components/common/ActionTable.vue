@@ -27,14 +27,8 @@
                 </select>
               </div>
               <div class="field">
-                <div
-                  v-if="!selectAll"
-                  @click="launchAction"
-                  :disabled="checked.length === 0"
-                  :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
-                  <translate>Go</translate></div>
                 <dangerous-button
-                  v-else :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
+                  v-if="selectAll || currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
@@ -42,17 +36,23 @@
                   <p slot="modal-header">
                     <translate
                       key="1"
-                      :translate-n="objectsData.count"
-                      :translate-params="{count: objectsData.count, action: currentActionName}"
+                      :translate-n="checked.length"
+                      :translate-params="{count: checked.length, action: currentActionName}"
                       translate-plural="Do you want to launch %{ action } on %{ count } elements?">
                       Do you want to launch %{ action } on %{ count } element?
                     </translate>
                   </p>
                   <p slot="modal-content">
-                    <translate>This may affect a lot of elements, please double check this is really what you want.</translate>
+                    <translate>This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
                   </p>
                   <p slot="modal-confirm"><translate>Launch</translate></p>
                 </dangerous-button>
+                <div
+                  v-else
+                  @click="launchAction"
+                  :disabled="checked.length === 0"
+                  :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
+                  <translate>Go</translate></div>
               </div>
               <div class="count field">
                 <translate
