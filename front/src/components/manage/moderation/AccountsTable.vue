@@ -34,6 +34,7 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
+        action-url="manage/accounts/action/"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Name</translate></th>
@@ -41,6 +42,7 @@
           <th><translate>Uploads</translate></th>
           <th><translate>First seen</translate></th>
           <th><translate>Last seen</translate></th>
+          <th><translate>Under moderation rule</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -67,6 +69,9 @@
           <td>
             <human-date v-if="scope.obj.last_fetch_date" :date="scope.obj.last_fetch_date"></human-date>
           </td>
+          <td>
+            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate>Yes</translate></span>
+          </td>
         </template>
       </action-table>
     </div>
@@ -78,7 +83,6 @@
         :current="page"
         :paginate-by="paginateBy"
         :total="result.count"
-        action-url="manage/accounts/action/"
         ></pagination>
 
       <span v-if="result && result.results.length > 0">

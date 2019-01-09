@@ -109,6 +109,7 @@ class ManageDomainViewSet(
         federation_models.Domain.objects.external()
         .with_actors_count()
         .with_outbox_activities_count()
+        .prefetch_related("instance_policy")
         .order_by("name")
     )
     serializer_class = serializers.ManageDomainSerializer
@@ -121,6 +122,7 @@ class ManageDomainViewSet(
         "nodeinfo_fetch_date",
         "actors_count",
         "outbox_activities_count",
+        "instance_policy",
     ]
 
     @detail_route(methods=["get"])
@@ -147,6 +149,7 @@ class ManageActorViewSet(
         .with_uploads_count()
         .order_by("-creation_date")
         .select_related("user")
+        .prefetch_related("instance_policy")
     )
     serializer_class = serializers.ManageActorSerializer
     filter_class = filters.ManageActorFilterSet
@@ -161,6 +164,7 @@ class ManageActorViewSet(
         "last_fetch_date",
         "uploads_count",
         "outbox_activities_count",
+        "instance_policy",
     ]
 
     def get_object(self):

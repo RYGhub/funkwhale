@@ -40,6 +40,7 @@
           <th><translate>Users</translate></th>
           <th><translate>Received messages</translate></th>
           <th><translate>First seen</translate></th>
+          <th><translate>Under moderation rule</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -53,6 +54,9 @@
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
+          </td>
+          <td>
+            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate>Yes</translate></span>
           </td>
         </template>
       </action-table>
