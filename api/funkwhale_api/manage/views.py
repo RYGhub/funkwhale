@@ -2,7 +2,7 @@ from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
 from django.shortcuts import get_object_or_404
 
-from funkwhale_api.common import preferences
+from funkwhale_api.common import preferences, decorators
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import models as music_models
@@ -135,6 +135,8 @@ class ManageDomainViewSet(
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
 
+    action = decorators.action_route(serializers.ManageDomainActionSerializer)
+
 
 class ManageActorViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
@@ -174,6 +176,8 @@ class ManageActorViewSet(
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
+
+    action = decorators.action_route(serializers.ManageActorActionSerializer)
 
 
 class ManageInstancePolicyViewSet(

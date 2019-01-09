@@ -107,7 +107,7 @@ export default {
       return {
         summaryHelp: this.$gettext("Explain why you're applying this policy. Depending on your instance configuration, this will help you remember why you acted on this account or domain, and may be displayed publicly to help users understand what moderation rules are in place."),
         isActiveHelp: this.$gettext("Use this setting to temporarily enable/disable the policy without completely removing it."),
-        blockAllHelp: this.$gettext("Block everything from this account or domain. This will prevent any interaction with the entity."),
+        blockAllHelp: this.$gettext("Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"),
         silenceActivity: {
           help: this.$gettext("Hide account or domain content, except from followers."),
           label: this.$gettext("Silence activity"),

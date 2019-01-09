@@ -1,6 +1,7 @@
 import pytest
 
 from funkwhale_api.manage import serializers
+from funkwhale_api.federation import tasks as federation_tasks
 
 
 def test_manage_upload_action_delete(factories):
@@ -138,3 +139,89 @@ def test_instance_policy_serializer_save_domain(factories):
     policy = serializer.save()
 
     assert policy.target_domain == domain
+
+
+def test_manage_actor_action_purge(factories, mocker):
+    actors = factories["federation.Actor"].create_batch(size=3)
+    s = serializers.ManageActorActionSerializer(queryset=None)
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    s.handle_purge(actors[0].__class__.objects.all())
+    on_commit.assert_called_once_with(
+        federation_tasks.purge_actors.delay, ids=[a.pk for a in actors]
+    )
+
+
+def test_manage_domain_action_purge(factories, mocker):
+    domains = factories["federation.Domain"].create_batch(size=3)
+    s = serializers.ManageDomainActionSerializer(queryset=None)
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    s.handle_purge(domains[0].__class__.objects.all())
+    on_commit.assert_called_once_with(
+        federation_tasks.purge_actors.delay, domains=[d.pk for d in domains]
+    )
+
+
+def test_instance_policy_serializer_purges_target_domain(factories, mocker):
+    policy = factories["moderation.InstancePolicy"](for_domain=True, block_all=False)
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    serializer = serializers.ManageInstancePolicySerializer(
+        policy, data={"block_all": True}, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    policy.refresh_from_db()
+
+    assert policy.block_all is True
+    on_commit.assert_called_once_with(
+        federation_tasks.purge_actors.delay, domains=[policy.target_domain_id]
+    )
+
+    on_commit.reset_mock()
+
+    # setting to false should have no effect
+    serializer = serializers.ManageInstancePolicySerializer(
+        policy, data={"block_all": False}, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    policy.refresh_from_db()
+
+    assert policy.block_all is False
+    assert on_commit.call_count == 0
+
+
+def test_instance_policy_serializer_purges_target_actor(factories, mocker):
+    policy = factories["moderation.InstancePolicy"](for_actor=True, block_all=False)
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    serializer = serializers.ManageInstancePolicySerializer(
+        policy, data={"block_all": True}, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    policy.refresh_from_db()
+
+    assert policy.block_all is True
+    on_commit.assert_called_once_with(
+        federation_tasks.purge_actors.delay, ids=[policy.target_actor_id]
+    )
+
+    on_commit.reset_mock()
+
+    # setting to false should have no effect
+    serializer = serializers.ManageInstancePolicySerializer(
+        policy, data={"block_all": False}, partial=True
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    policy.refresh_from_db()
+
+    assert policy.block_all is False
+    assert on_commit.call_count == 0

@@ -78,6 +78,7 @@
         :current="page"
         :paginate-by="paginateBy"
         :total="result.count"
+        action-url="manage/accounts/action/"
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
@@ -178,11 +179,11 @@ export default {
     },
     actions () {
       return [
-        // {
-        //   name: 'delete',
-        //   label: this.$gettext('Delete'),
-        //   isDangerous: true
-        // }
+        {
+          name: 'purge',
+          label: this.$gettext('Purge'),
+          isDangerous: true
+        }
       ]
     }
   },

@@ -3,8 +3,10 @@ from django.db import transaction
 from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import fields as federation_fields
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
@@ -203,6 +205,17 @@ class ManageDomainSerializer(serializers.ModelSerializer):
         return getattr(o, "outbox_activities_count", 0)
 
 
+class ManageDomainActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("purge", allow_all=False)]
+    filterset_class = filters.ManageDomainFilterSet
+    pk_field = "name"
+
+    @transaction.atomic
+    def handle_purge(self, objects):
+        ids = objects.values_list("pk", flat=True)
+        common_utils.on_commit(federation_tasks.purge_actors.delay, domains=list(ids))
+
+
 class ManageActorSerializer(serializers.ModelSerializer):
     uploads_count = serializers.SerializerMethodField()
     user = ManageUserSerializer()
@@ -233,6 +246,16 @@ class ManageActorSerializer(serializers.ModelSerializer):
 
     def get_uploads_count(self, o):
         return getattr(o, "uploads_count", 0)
+
+
+class ManageActorActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("purge", allow_all=False)]
+    filterset_class = filters.ManageActorFilterSet
+
+    @transaction.atomic
+    def handle_purge(self, objects):
+        ids = objects.values_list("id", flat=True)
+        common_utils.on_commit(federation_tasks.purge_actors.delay, ids=list(ids))
 
 
 class TargetSerializer(serializers.Serializer):
@@ -279,10 +302,39 @@ class ManageInstancePolicySerializer(serializers.ModelSerializer):
         read_only_fields = ["uuid", "id", "creation_date", "actor", "target"]
 
     def validate(self, data):
-        target = data.pop("target")
+        try:
+            target = data.pop("target")
+        except KeyError:
+            # partial update
+            return data
         if target["type"] == "domain":
             data["target_domain"] = target["obj"]
         if target["type"] == "actor":
             data["target_actor"] = target["obj"]
 
         return data
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        block_all = self.validated_data.get("block_all", False)
+        need_purge = (
+            # we purge when we create with block all
+            (not self.instance and block_all)
+            or
+            # or when block all value switch from False to True
+            (self.instance and block_all and not self.instance.block_all)
+        )
+        instance = super().save(*args, **kwargs)
+
+        if need_purge:
+            target = instance.target
+            if target["type"] == "domain":
+                common_utils.on_commit(
+                    federation_tasks.purge_actors.delay, domains=[target["obj"].pk]
+                )
+            if target["type"] == "actor":
+                common_utils.on_commit(
+                    federation_tasks.purge_actors.delay, ids=[target["obj"].pk]
+                )
+
+        return instance

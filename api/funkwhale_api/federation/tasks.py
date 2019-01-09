@@ -186,3 +186,39 @@ def update_domain_nodeinfo(domain):
     domain.nodeinfo_fetch_date = now
     domain.nodeinfo = nodeinfo
     domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date"])
+
+
+def delete_qs(qs):
+    label = qs.model._meta.label
+    result = qs.delete()
+    related = sum(result[1].values())
+
+    logger.info(
+        "Purged %s %s objects (and %s related entities)", result[0], label, related
+    )
+
+
+def handle_purge_actors(ids):
+    # purge follows (received emitted)
+    delete_qs(models.LibraryFollow.objects.filter(target__actor_id__in=ids))
+    delete_qs(models.LibraryFollow.objects.filter(actor_id__in=ids))
+    delete_qs(models.Follow.objects.filter(target_id__in=ids))
+    delete_qs(models.Follow.objects.filter(actor_id__in=ids))
+
+    # purge audio content
+    delete_qs(music_models.Upload.objects.filter(library__actor_id__in=ids))
+    delete_qs(music_models.Library.objects.filter(actor_id__in=ids))
+
+    # purge remaining activities / deliveries
+    delete_qs(models.InboxItem.objects.filter(actor_id__in=ids))
+    delete_qs(models.Activity.objects.filter(actor_id__in=ids))
+
+
+@celery.app.task(name="federation.purge_actors")
+def purge_actors(ids=[], domains=[]):
+    actors = models.Actor.objects.filter(
+        Q(id__in=ids) | Q(domain_id__in=domains)
+    ).order_by("id")
+    found_ids = list(actors.values_list("id", flat=True))
+    logger.info("Starting purging %s accounts", len(found_ids))
+    handle_purge_actors(ids=found_ids)

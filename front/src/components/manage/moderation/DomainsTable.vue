@@ -32,6 +32,8 @@
         @action-launched="fetchData"
         :objects-data="result"
         :actions="actions"
+        action-url="manage/federation/domains/action/"
+        idField="name"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Name</translate></th>
@@ -157,11 +159,11 @@ export default {
     },
     actions () {
       return [
-        // {
-        //   name: 'delete',
-        //   label: this.$gettext('Delete'),
-        //   isDangerous: true
-        // }
+        {
+          name: 'purge',
+          label: this.$gettext('Purge'),
+          isDangerous: true
+        }
       ]
     }
   },
