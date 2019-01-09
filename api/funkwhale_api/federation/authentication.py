@@ -1,8 +1,14 @@
 import cryptography
+import logging
+
 from django.contrib.auth.models import AnonymousUser
 from rest_framework import authentication, exceptions
 
-from . import actors, keys, signing, utils
+from funkwhale_api.moderation import models as moderation_models
+from . import actors, exceptions, keys, signing, utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):
@@ -17,8 +23,24 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(str(e))
 
         try:
-            actor = actors.get_actor(key_id.split("#")[0])
+            actor_url = key_id.split("#")[0]
+        except (TypeError, IndexError, AttributeError):
+            raise exceptions.AuthenticationFailed("Invalid key id")
+
+        policies = (
+            moderation_models.InstancePolicy.objects.active()
+            .filter(block_all=True)
+            .matching_url(actor_url)
+        )
+        if policies.exists():
+            raise exceptions.BlockedActorOrDomain()
+
+        try:
+            actor = actors.get_actor(actor_url)
         except Exception as e:
+            logger.info(
+                "Discarding HTTP request from blocked actor/domain %s", actor_url
+            )
             raise exceptions.AuthenticationFailed(str(e))
 
         if not actor.public_key:

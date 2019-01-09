@@ -9,10 +9,22 @@ class InstancePolicyQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
 
-    def matching_url(self, url):
+    def matching_url(self, *urls):
+        if not urls:
+            return self.none()
+        query = None
+        for url in urls:
+            new_query = self.matching_url_query(url)
+            if query:
+                query = query | new_query
+            else:
+                query = new_query
+        return self.filter(query)
+
+    def matching_url_query(self, url):
         parsed = urllib.parse.urlparse(url)
-        return self.filter(
-            models.Q(target_domain_id=parsed.hostname) | models.Q(target_actor__fid=url)
+        return models.Q(target_domain_id=parsed.hostname) | models.Q(
+            target_actor__fid=url
         )
 
 

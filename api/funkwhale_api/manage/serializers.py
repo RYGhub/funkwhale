@@ -316,15 +316,8 @@ class ManageInstancePolicySerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def save(self, *args, **kwargs):
-        block_all = self.validated_data.get("block_all", False)
-        need_purge = (
-            # we purge when we create with block all
-            (not self.instance and block_all)
-            or
-            # or when block all value switch from False to True
-            (self.instance and block_all and not self.instance.block_all)
-        )
         instance = super().save(*args, **kwargs)
+        need_purge = self.instance.is_active and self.instance.block_all
 
         if need_purge:
             target = instance.target

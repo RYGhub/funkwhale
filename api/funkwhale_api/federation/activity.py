@@ -80,6 +80,30 @@ OBJECT_TYPES = (
 BROADCAST_TO_USER_ACTIVITIES = ["Follow", "Accept"]
 
 
+def should_reject(id, actor_id=None, payload={}):
+    from funkwhale_api.moderation import models as moderation_models
+
+    policies = moderation_models.InstancePolicy.objects.active()
+
+    media_types = ["Audio", "Artist", "Album", "Track", "Library", "Image"]
+    relevant_values = [
+        recursive_gettattr(payload, "type", permissive=True),
+        recursive_gettattr(payload, "object.type", permissive=True),
+        recursive_gettattr(payload, "target.type", permissive=True),
+    ]
+    # if one of the payload types match our internal media types, then
+    # we apply policies that reject media
+    if set(media_types) & set(relevant_values):
+        policy_type = Q(block_all=True) | Q(reject_media=True)
+    else:
+        policy_type = Q(block_all=True)
+
+    query = policies.matching_url_query(id) & policy_type
+    if actor_id:
+        query |= policies.matching_url_query(actor_id) & policy_type
+    return policies.filter(query).exists()
+
+
 @transaction.atomic
 def receive(activity, on_behalf_of):
     from . import models
@@ -92,6 +116,16 @@ def receive(activity, on_behalf_of):
         data=activity, context={"actor": on_behalf_of, "local_recipients": True}
     )
     serializer.is_valid(raise_exception=True)
+    if should_reject(
+        id=serializer.validated_data["id"],
+        actor_id=serializer.validated_data["actor"].fid,
+        payload=activity,
+    ):
+        logger.info(
+            "[federation] Discarding activity due to instance policies %s",
+            serializer.validated_data.get("id"),
+        )
+        return
     try:
         copy = serializer.save()
     except IntegrityError:
@@ -283,7 +317,7 @@ class OutboxRouter(Router):
             return activities
 
 
-def recursive_gettattr(obj, key):
+def recursive_gettattr(obj, key, permissive=False):
     """
     Given a dictionary such as {'user': {'name': 'Bob'}} and
     a dotted string such as user.name, returns 'Bob'.
@@ -292,7 +326,12 @@ def recursive_gettattr(obj, key):
     """
     v = obj
     for k in key.split("."):
-        v = v.get(k)
+        try:
+            v = v.get(k)
+        except (TypeError, AttributeError):
+            if not permissive:
+                raise
+            return
         if v is None:
             return
 

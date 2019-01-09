@@ -141,6 +141,18 @@ def test_instance_policy_serializer_save_domain(factories):
     assert policy.target_domain == domain
 
 
+def test_instance_policy_serializer_save_actor(factories):
+    actor = factories["federation.Actor"]()
+
+    data = {"target": {"id": actor.full_username, "type": "actor"}, "block_all": True}
+
+    serializer = serializers.ManageInstancePolicySerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    policy = serializer.save()
+
+    assert policy.target_actor == actor
+
+
 def test_manage_actor_action_purge(factories, mocker):
     actors = factories["federation.Actor"].create_batch(size=3)
     s = serializers.ManageActorActionSerializer(queryset=None)

@@ -567,7 +567,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
         return r
 
     def create(self, validated_data):
-        actor = utils.retrieve(
+        actor = utils.retrieve_ap_object(
             validated_data["actor"],
             queryset=models.Actor,
             serializer_class=ActorSerializer,

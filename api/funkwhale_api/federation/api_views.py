@@ -13,6 +13,7 @@ from funkwhale_api.music import models as music_models
 
 from . import activity
 from . import api_serializers
+from . import exceptions
 from . import filters
 from . import models
 from . import routes
@@ -128,10 +129,15 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         except KeyError:
             return response.Response({"fid": ["This field is required"]})
         try:
-            library = utils.retrieve(
+            library = utils.retrieve_ap_object(
                 fid,
                 queryset=self.queryset,
                 serializer_class=serializers.LibrarySerializer,
+            )
+        except exceptions.BlockedActorOrDomain:
+            return response.Response(
+                {"detail": "This domain/account is blocked on your instance."},
+                status=400,
             )
         except requests.exceptions.RequestException as e:
             return response.Response(

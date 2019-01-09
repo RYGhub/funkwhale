@@ -7,8 +7,8 @@ class ActorRelatedField(serializers.EmailField):
     def to_representation(self, value):
         return value.full_username
 
-    def to_interal_value(self, value):
-        value = super().to_interal_value(value)
+    def to_internal_value(self, value):
+        value = super().to_internal_value(value)
         username, domain = value.split("@")
         try:
             return models.Actor.objects.get(
