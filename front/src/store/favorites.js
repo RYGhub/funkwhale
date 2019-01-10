@@ -60,20 +60,12 @@ export default {
         page_size: 50,
         ordering: '-creation_date'
       }
-      let promise
-      if (url) {
-        promise = axios.get(url)
-      } else {
-        promise = axios.get('favorites/tracks/', {params: params})
-      }
+      let promise = axios.get('favorites/tracks/all/', {params: params})
       return promise.then((response) => {
         logger.default.info('Fetched a batch of ' + response.data.results.length + ' favorites')
         response.data.results.forEach(result => {
-          commit('track', {id: result.track.id, value: true})
+          commit('track', {id: result.track, value: true})
         })
-        if (response.data.next) {
-          dispatch('fetch', response.data.next)
-        }
       })
     }
   }

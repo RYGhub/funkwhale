@@ -71,3 +71,19 @@ class TrackFavoriteViewSet(
             return Response({}, status=400)
         favorite.delete()
         return Response([], status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(methods=["get"])
+    def all(self, request, *args, **kwargs):
+        """
+        Return all the favorites of the current user, with only limited data
+        to have a performant endpoint and avoid lots of queries just to display
+        favorites status in the UI
+        """
+        if not request.user.is_authenticated:
+            return Response({"results": [], "count": 0}, status=200)
+
+        favorites = list(
+            request.user.track_favorites.values("id", "track").order_by("id")
+        )
+        payload = {"results": favorites, "count": len(favorites)}
+        return Response(payload, status=200)

@@ -14,6 +14,7 @@ from .common import *  # noqa
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", default=True)
+FORCE_HTTPS_URLS = env.bool("FORCE_HTTPS_URLS", default=False)
 TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG
 
 # SECRET CONFIGURATION
@@ -80,3 +81,5 @@ CSRF_TRUSTED_ORIGINS = [o for o in ALLOWED_HOSTS]
 if env.bool("WEAK_PASSWORDS", default=False):
     # Faster during tests
     PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+
+MIDDLEWARE = ("funkwhale_api.common.middleware.DevHttpsMiddleware",) + MIDDLEWARE
