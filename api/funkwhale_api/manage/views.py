@@ -2,10 +2,11 @@ from rest_framework import mixins, response, viewsets
 from rest_framework.decorators import detail_route, list_route
 from django.shortcuts import get_object_or_404
 
-from funkwhale_api.common import preferences
+from funkwhale_api.common import preferences, decorators
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import models as music_models
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.users.permissions import HasUserPermission
 
@@ -98,13 +99,17 @@ class ManageInvitationViewSet(
 
 
 class ManageDomainViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
 ):
     lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
     queryset = (
         federation_models.Domain.objects.external()
         .with_actors_count()
         .with_outbox_activities_count()
+        .prefetch_related("instance_policy")
         .order_by("name")
     )
     serializer_class = serializers.ManageDomainSerializer
@@ -117,6 +122,7 @@ class ManageDomainViewSet(
         "nodeinfo_fetch_date",
         "actors_count",
         "outbox_activities_count",
+        "instance_policy",
     ]
 
     @detail_route(methods=["get"])
@@ -131,6 +137,8 @@ class ManageDomainViewSet(
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
 
+    action = decorators.action_route(serializers.ManageDomainActionSerializer)
+
 
 class ManageActorViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
@@ -141,6 +149,7 @@ class ManageActorViewSet(
         .with_uploads_count()
         .order_by("-creation_date")
         .select_related("user")
+        .prefetch_related("instance_policy")
     )
     serializer_class = serializers.ManageActorSerializer
     filter_class = filters.ManageActorFilterSet
@@ -155,6 +164,7 @@ class ManageActorViewSet(
         "last_fetch_date",
         "uploads_count",
         "outbox_activities_count",
+        "instance_policy",
     ]
 
     def get_object(self):
@@ -170,3 +180,28 @@ class ManageActorViewSet(
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
+
+    action = decorators.action_route(serializers.ManageActorActionSerializer)
+
+
+class ManageInstancePolicyViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        moderation_models.InstancePolicy.objects.all()
+        .order_by("-creation_date")
+        .select_related()
+    )
+    serializer_class = serializers.ManageInstancePolicySerializer
+    filter_class = filters.ManageInstancePolicyFilterSet
+    permission_classes = (HasUserPermission,)
+    required_permissions = ["moderation"]
+    ordering_fields = ["id", "creation_date"]
+
+    def perform_create(self, serializer):
+        serializer.save(actor=self.request.user.actor)

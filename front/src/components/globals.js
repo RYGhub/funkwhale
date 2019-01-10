@@ -40,5 +40,9 @@ import AjaxButton from '@/components/common/AjaxButton'
 
 Vue.component('ajax-button', AjaxButton)
 
+import Tooltip from '@/components/common/Tooltip'
+
+Vue.component('tooltip', Tooltip)
+
 
 export default {}

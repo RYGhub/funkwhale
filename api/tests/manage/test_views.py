@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers, views
 
@@ -13,6 +14,7 @@ from funkwhale_api.manage import serializers, views
         (views.ManageInvitationViewSet, ["settings"], "and"),
         (views.ManageDomainViewSet, ["moderation"], "and"),
         (views.ManageActorViewSet, ["moderation"], "and"),
+        (views.ManageInstancePolicyViewSet, ["moderation"], "and"),
     ],
 )
 def test_permissions(assert_user_permission, view, permissions, operator):
@@ -90,6 +92,14 @@ def test_domain_detail(factories, superuser_api_client):
     assert response.data["name"] == d.pk
 
 
+def test_domain_create(superuser_api_client):
+    url = reverse("api:v1:manage:federation:domains-list")
+    response = superuser_api_client.post(url, {"name": "test.federation"})
+
+    assert response.status_code == 201
+    assert federation_models.Domain.objects.filter(pk="test.federation").exists()
+
+
 def test_domain_nodeinfo(factories, superuser_api_client, mocker):
     domain = factories["federation.Domain"]()
     url = reverse(
@@ -133,3 +143,19 @@ def test_actor_detail(factories, superuser_api_client):
 
     assert response.status_code == 200
     assert response.data["id"] == actor.id
+
+
+def test_instance_policy_create(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    actor = superuser_api_client.user.create_actor()
+    url = reverse("api:v1:manage:moderation:instance-policies-list")
+    response = superuser_api_client.post(
+        url,
+        {"target": {"type": "domain", "id": domain.name}, "block_all": True},
+        format="json",
+    )
+
+    assert response.status_code == 201
+
+    policy = domain.instance_policy
+    assert policy.actor == actor

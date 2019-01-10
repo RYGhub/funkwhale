@@ -507,7 +507,7 @@ def test_music_library_serializer_to_ap(factories):
 def test_music_library_serializer_from_public(factories, mocker):
     actor = factories["federation.Actor"]()
     retrieve = mocker.patch(
-        "funkwhale_api.federation.utils.retrieve", return_value=actor
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
     )
     data = {
         "@context": [
@@ -550,7 +550,7 @@ def test_music_library_serializer_from_public(factories, mocker):
 def test_music_library_serializer_from_private(factories, mocker):
     actor = factories["federation.Actor"]()
     retrieve = mocker.patch(
-        "funkwhale_api.federation.utils.retrieve", return_value=actor
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
     )
     data = {
         "@context": [

@@ -4,6 +4,7 @@ from funkwhale_api.common import fields
 from funkwhale_api.common import search
 
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 
@@ -87,3 +88,24 @@ class ManageInvitationFilterSet(filters.FilterSet):
         if value is None:
             return queryset
         return queryset.open(value)
+
+
+class ManageInstancePolicyFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(
+        search_fields=[
+            "summary",
+            "target_domain__name",
+            "target_actor__username",
+            "target_actor__domain__name",
+        ]
+    )
+
+    class Meta:
+        model = moderation_models.InstancePolicy
+        fields = [
+            "q",
+            "block_all",
+            "silence_activity",
+            "silence_notifications",
+            "reject_media",
+        ]

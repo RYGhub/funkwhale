@@ -34,6 +34,8 @@ export default {
         return
       }
       let self = this
+      self.errors = []
+      self.isLoading = true
       axios.post('federation/libraries/fetch/', {fid: this.query}).then((response) => {
         self.$emit('scanned', response.data)
         self.isLoading = false

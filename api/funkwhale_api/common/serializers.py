@@ -123,7 +123,7 @@ class ActionSerializer(serializers.Serializer):
         if type(value) in [list, tuple]:
             return self.queryset.filter(
                 **{"{}__in".format(self.pk_field): value}
-            ).order_by("id")
+            ).order_by(self.pk_field)
 
         raise serializers.ValidationError(
             "{} is not a valid value for objects. You must provide either a "

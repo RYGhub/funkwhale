@@ -67,7 +67,7 @@ def create_user(actor):
 
 
 @registry.register
-class Domain(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class DomainFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("domain_name")
 
     class Meta:
@@ -81,7 +81,7 @@ class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     private_key = None
     preferred_username = factory.Faker("user_name")
     summary = factory.Faker("paragraph")
-    domain = factory.SubFactory(Domain)
+    domain = factory.SubFactory(DomainFactory)
     fid = factory.LazyAttribute(
         lambda o: "https://{}/users/{}".format(o.domain.name, o.preferred_username)
     )

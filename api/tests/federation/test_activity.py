@@ -46,6 +46,69 @@ def test_receive_validates_basic_attributes_and_stores_activity(factories, now, 
         assert ii.is_read is False
 
 
+def test_receive_calls_should_reject(factories, now, mocker):
+    should_reject = mocker.patch.object(activity, "should_reject", return_value=True)
+    local_to_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    a = {
+        "@context": [],
+        "actor": remote_actor.fid,
+        "type": "Noop",
+        "id": "https://test.activity",
+        "to": [local_to_actor.fid, remote_actor.fid],
+    }
+
+    copy = activity.receive(activity=a, on_behalf_of=remote_actor)
+    should_reject.assert_called_once_with(
+        id=a["id"], actor_id=remote_actor.fid, payload=a
+    )
+    assert copy is None
+
+
+@pytest.mark.parametrize(
+    "params, policy_kwargs, expected",
+    [
+        ({"id": "https://ok.test"}, {"target_domain__name": "notok.test"}, False),
+        (
+            {"id": "https://ok.test"},
+            {"target_domain__name": "ok.test", "is_active": False},
+            False,
+        ),
+        (
+            {"id": "https://ok.test"},
+            {"target_domain__name": "ok.test", "block_all": False},
+            False,
+        ),
+        # id match blocked domain
+        ({"id": "http://notok.test"}, {"target_domain__name": "notok.test"}, True),
+        # actor id match blocked domain
+        (
+            {"id": "http://ok.test", "actor_id": "https://notok.test"},
+            {"target_domain__name": "notok.test"},
+            True,
+        ),
+        # reject media
+        (
+            {
+                "payload": {"type": "Library"},
+                "id": "http://ok.test",
+                "actor_id": "http://notok.test",
+            },
+            {
+                "target_domain__name": "notok.test",
+                "block_all": False,
+                "reject_media": True,
+            },
+            True,
+        ),
+    ],
+)
+def test_should_reject(factories, params, policy_kwargs, expected):
+    factories["moderation.InstancePolicy"](for_domain=True, **policy_kwargs)
+
+    assert activity.should_reject(**params) is expected
+
+
 def test_get_actors_from_audience_urls(settings, db):
     settings.FEDERATION_HOSTNAME = "federation.hostname"
     library_uuid1 = uuid.uuid4()
