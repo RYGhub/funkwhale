@@ -1,7 +1,6 @@
 import unicodedata
 import re
 from django.conf import settings
-from django.db.models import Q
 
 from funkwhale_api.common import session
 from funkwhale_api.moderation import models as moderation_models
@@ -64,7 +63,7 @@ def slugify_username(username):
 def retrieve_ap_object(
     fid, actor=None, serializer_class=None, queryset=None, apply_instance_policies=True
 ):
-    from . import activity, serializers
+    from . import activity
 
     policies = moderation_models.InstancePolicy.objects.active().filter(block_all=True)
     if apply_instance_policies and policies.matching_url(fid):

@@ -79,7 +79,7 @@ def test_retrieve_ap_object_honor_instance_policy_different_url_and_id(
         block_all=True, for_domain=True
     ).target_domain
     fid = "https://ok/test"
-    m = r_mock.get(fid, json={"id": "http://{}/test".format(domain.name)})
+    r_mock.get(fid, json={"id": "http://{}/test".format(domain.name)})
 
     with pytest.raises(exceptions.BlockedActorOrDomain):
         utils.retrieve_ap_object(fid)
