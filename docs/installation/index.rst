@@ -80,7 +80,7 @@ Funkwhale packages are available for the following platforms:
 Running Funkwhale on the develop branch
 ---------------------------------------
 
-Traditional deployments are done using specific releases. However, you
+Traditional deployments are done using tagged releases. However, you
 may want to benefits from the latest change available, or the help detect
 bugs before they are included in actual releases.
 
@@ -96,6 +96,9 @@ Otherwise, the deployment process is similar to deploying with releases.
 You simply need to use ``export FUNKWHALE_VERSION=develop``
 in the installation and upgrade process instead of a real version number,
 as we build artifacts on the development branch the same way we do for releases.
+
+It's also recommended to check out the `develop release notes <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/changes/notes.rst>_` before upgrading,
+since you may have to apply manual actions for your instance to continue to work. Such actions are labelled with ``[manual action required]`` in the releases notes.
 
 .. _frontend-setup:
 
