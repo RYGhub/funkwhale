@@ -223,11 +223,46 @@ def test_handle_purge_actors(factories, mocker):
             d.refresh_from_db()
 
 
+def test_handle_purge_actors_restrict_media(factories, mocker):
+    to_purge = factories["federation.Actor"]()
+    keeped = [
+        factories["music.Upload"](),
+        factories["federation.Activity"](),
+        factories["federation.InboxItem"](),
+        factories["federation.Follow"](),
+        factories["federation.LibraryFollow"](),
+        factories["federation.Activity"](actor=to_purge),
+        factories["federation.InboxItem"](actor=to_purge),
+        factories["federation.Follow"](actor=to_purge),
+    ]
+
+    library = factories["music.Library"](actor=to_purge)
+    deleted = [
+        library,
+        factories["music.Upload"](library=library),
+        factories["federation.LibraryFollow"](actor=to_purge),
+    ]
+
+    tasks.handle_purge_actors([to_purge.pk], only=["media"])
+
+    for k in keeped:
+        # this should not be deleted
+        k.refresh_from_db()
+
+    for d in deleted:
+        with pytest.raises(d.__class__.DoesNotExist):
+            d.refresh_from_db()
+
+
 def test_purge_actors(factories, mocker):
     handle_purge_actors = mocker.spy(tasks, "handle_purge_actors")
     factories["federation.Actor"]()
     to_delete = factories["federation.Actor"]()
     to_delete_domain = factories["federation.Actor"]()
-    tasks.purge_actors(ids=[to_delete.pk], domains=[to_delete_domain.domain.name])
+    tasks.purge_actors(
+        ids=[to_delete.pk], domains=[to_delete_domain.domain.name], only=["hello"]
+    )
 
-    handle_purge_actors.assert_called_once_with(ids=[to_delete.pk, to_delete_domain.pk])
+    handle_purge_actors.assert_called_once_with(
+        ids=[to_delete.pk, to_delete_domain.pk], only=["hello"]
+    )

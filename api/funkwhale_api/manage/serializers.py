@@ -317,17 +317,25 @@ class ManageInstancePolicySerializer(serializers.ModelSerializer):
     @transaction.atomic
     def save(self, *args, **kwargs):
         instance = super().save(*args, **kwargs)
-        need_purge = self.instance.is_active and self.instance.block_all
-
+        need_purge = self.instance.is_active and (
+            self.instance.block_all or self.instance.reject_media
+        )
         if need_purge:
+            only = []
+            if self.instance.reject_media:
+                only.append("media")
             target = instance.target
             if target["type"] == "domain":
                 common_utils.on_commit(
-                    federation_tasks.purge_actors.delay, domains=[target["obj"].pk]
+                    federation_tasks.purge_actors.delay,
+                    domains=[target["obj"].pk],
+                    only=only,
                 )
             if target["type"] == "actor":
                 common_utils.on_commit(
-                    federation_tasks.purge_actors.delay, ids=[target["obj"].pk]
+                    federation_tasks.purge_actors.delay,
+                    ids=[target["obj"].pk],
+                    only=only,
                 )
 
         return instance

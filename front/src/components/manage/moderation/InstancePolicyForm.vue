@@ -119,7 +119,7 @@ export default {
           label: this.$gettext("Silence notifications"),
         },
         rejectMedia: {
-          help: this.$gettext("Do not download any media file (audio, album cover, account avatar…) from this account or domain."),
+          help: this.$gettext("Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."),
           label: this.$gettext("Reject media"),
         }
       }
