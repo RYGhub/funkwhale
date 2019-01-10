@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 # given a commit hash, will append this to the version number stored
 # in api/funkwhale_api/__init__.py
 
