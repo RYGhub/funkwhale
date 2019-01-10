@@ -1,0 +1,1 @@
+Performance improvement when fetching favorites, down to a single, small http request
