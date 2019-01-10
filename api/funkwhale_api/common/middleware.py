@@ -135,3 +135,25 @@ class SPAFallbackMiddleware:
             return serve_spa(request)
 
         return response
+
+
+class DevHttpsMiddleware:
+    """
+    In development, it's sometimes difficult to have django use HTTPS
+    when we have django behind nginx behind traefix.
+
+    We thus use a simple setting (in dev ONLY) to control that.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if settings.FORCE_HTTPS_URLS:
+            setattr(request.__class__, "scheme", "https")
+            setattr(
+                request,
+                "get_host",
+                lambda: request.__class__.get_host(request).replace(":80", ":443"),
+            )
+        return self.get_response(request)
