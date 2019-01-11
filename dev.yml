@@ -22,7 +22,7 @@ services:
     env_file:
       - .env.dev
       - .env
-    image: postgres:9.6
+    image: postgres:${POSTGRES_VERSION-11}
     command: postgres -c log_min_duration_statement=0
     volumes:
       - "./data/${COMPOSE_PROJECT_NAME-node1}/postgres:/var/lib/postgresql/data"

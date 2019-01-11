@@ -131,7 +131,7 @@ flake8:
 
 test_api:
   services:
-    - postgres:9.4
+    - postgres:11
     - redis:3
   stage: test
   image: funkwhale/funkwhale:develop
