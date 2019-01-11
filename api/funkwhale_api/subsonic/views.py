@@ -1,11 +1,12 @@
 import datetime
+import functools
 
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
 from rest_framework import renderers, response, viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.serializers import ValidationError
 
 import funkwhale_api
@@ -25,6 +26,7 @@ def find_object(
     queryset, model_field="pk", field="id", cast=int, filter_playable=False
 ):
     def decorator(func):
+        @functools.wraps(func)
         def inner(self, request, *args, **kwargs):
             data = request.GET or request.POST
             try:
@@ -110,12 +112,13 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], permission_classes=[])
+    @action(detail=False, methods=["get", "post"], permission_classes=[])
     def ping(self, request, *args, **kwargs):
         data = {"status": "ok", "version": "1.16.0"}
         return response.Response(data, status=200)
 
-    @list_route(
+    @action(
+        detail=False,
         methods=["get", "post"],
         url_name="get_license",
         permissions_classes=[],
@@ -136,7 +139,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data, status=200)
 
-    @list_route(methods=["get", "post"], url_name="get_artists", url_path="getArtists")
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_artists",
+        url_path="getArtists",
+    )
     def get_artists(self, request, *args, **kwargs):
         artists = music_models.Artist.objects.all().playable_by(
             utils.get_actor_from_request(request)
@@ -146,7 +154,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], url_name="get_indexes", url_path="getIndexes")
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_indexes",
+        url_path="getIndexes",
+    )
     def get_indexes(self, request, *args, **kwargs):
         artists = music_models.Artist.objects.all().playable_by(
             utils.get_actor_from_request(request)
@@ -156,7 +169,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], url_name="get_artist", url_path="getArtist")
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_artist",
+        url_path="getArtist",
+    )
     @find_object(music_models.Artist.objects.all(), filter_playable=True)
     def get_artist(self, request, *args, **kwargs):
         artist = kwargs.pop("obj")
@@ -165,7 +183,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], url_name="get_song", url_path="getSong")
+    @action(
+        detail=False, methods=["get", "post"], url_name="get_song", url_path="getSong"
+    )
     @find_object(music_models.Track.objects.all(), filter_playable=True)
     def get_song(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
@@ -174,8 +194,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_artist_info2", url_path="getArtistInfo2"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_artist_info2",
+        url_path="getArtistInfo2",
     )
     @find_object(music_models.Artist.objects.all(), filter_playable=True)
     def get_artist_info2(self, request, *args, **kwargs):
@@ -183,7 +206,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], url_name="get_album", url_path="getAlbum")
+    @action(
+        detail=False, methods=["get", "post"], url_name="get_album", url_path="getAlbum"
+    )
     @find_object(
         music_models.Album.objects.select_related("artist"), filter_playable=True
     )
@@ -193,7 +218,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         payload = {"album": data}
         return response.Response(payload, status=200)
 
-    @list_route(methods=["get", "post"], url_name="stream", url_path="stream")
+    @action(detail=False, methods=["get", "post"], url_name="stream", url_path="stream")
     @find_object(music_models.Track.objects.all(), filter_playable=True)
     def stream(self, request, *args, **kwargs):
         data = request.GET or request.POST
@@ -208,30 +233,36 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             format = None
         return music_views.handle_serve(upload=upload, user=request.user, format=format)
 
-    @list_route(methods=["get", "post"], url_name="star", url_path="star")
+    @action(detail=False, methods=["get", "post"], url_name="star", url_path="star")
     @find_object(music_models.Track.objects.all())
     def star(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
         TrackFavorite.add(user=request.user, track=track)
         return response.Response({"status": "ok"})
 
-    @list_route(methods=["get", "post"], url_name="unstar", url_path="unstar")
+    @action(detail=False, methods=["get", "post"], url_name="unstar", url_path="unstar")
     @find_object(music_models.Track.objects.all())
     def unstar(self, request, *args, **kwargs):
         track = kwargs.pop("obj")
         request.user.track_favorites.filter(track=track).delete()
         return response.Response({"status": "ok"})
 
-    @list_route(
-        methods=["get", "post"], url_name="get_starred2", url_path="getStarred2"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_starred2",
+        url_path="getStarred2",
     )
     def get_starred2(self, request, *args, **kwargs):
         favorites = request.user.track_favorites.all()
         data = {"starred2": {"song": serializers.get_starred_tracks_data(favorites)}}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_random_songs", url_path="getRandomSongs"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_random_songs",
+        url_path="getRandomSongs",
     )
     def get_random_songs(self, request, *args, **kwargs):
         data = request.GET or request.POST
@@ -253,14 +284,22 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data)
 
-    @list_route(methods=["get", "post"], url_name="get_starred", url_path="getStarred")
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_starred",
+        url_path="getStarred",
+    )
     def get_starred(self, request, *args, **kwargs):
         favorites = request.user.track_favorites.all()
         data = {"starred": {"song": serializers.get_starred_tracks_data(favorites)}}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_album_list2", url_path="getAlbumList2"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_album_list2",
+        url_path="getAlbumList2",
     )
     def get_album_list2(self, request, *args, **kwargs):
         queryset = music_models.Album.objects.with_tracks_count().order_by(
@@ -287,7 +326,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"albumList2": {"album": serializers.get_album_list2_data(queryset)}}
         return response.Response(data)
 
-    @list_route(methods=["get", "post"], url_name="search3", url_path="search3")
+    @action(
+        detail=False, methods=["get", "post"], url_name="search3", url_path="search3"
+    )
     def search3(self, request, *args, **kwargs):
         data = request.GET or request.POST
         query = str(data.get("query", "")).replace("*", "")
@@ -350,8 +391,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             payload["searchResult3"][c["subsonic"]] = c["serializer"](queryset)
         return response.Response(payload)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_playlists", url_path="getPlaylists"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_playlists",
+        url_path="getPlaylists",
     )
     def get_playlists(self, request, *args, **kwargs):
         playlists = request.user.playlists.with_tracks_count().select_related("user")
@@ -362,8 +406,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_playlist", url_path="getPlaylist"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_playlist",
+        url_path="getPlaylist",
     )
     @find_object(playlists_models.Playlist.objects.with_tracks_count())
     def get_playlist(self, request, *args, **kwargs):
@@ -371,8 +418,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"playlist": serializers.get_playlist_detail_data(playlist)}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="update_playlist", url_path="updatePlaylist"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="update_playlist",
+        url_path="updatePlaylist",
     )
     @find_object(lambda request: request.user.playlists.all(), field="playlistId")
     def update_playlist(self, request, *args, **kwargs):
@@ -413,8 +463,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"status": "ok"}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="delete_playlist", url_path="deletePlaylist"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="delete_playlist",
+        url_path="deletePlaylist",
     )
     @find_object(lambda request: request.user.playlists.all())
     def delete_playlist(self, request, *args, **kwargs):
@@ -423,8 +476,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"status": "ok"}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="create_playlist", url_path="createPlaylist"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="create_playlist",
+        url_path="createPlaylist",
     )
     def create_playlist(self, request, *args, **kwargs):
         data = request.GET or request.POST
@@ -462,7 +518,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"playlist": serializers.get_playlist_detail_data(playlist)}
         return response.Response(data)
 
-    @list_route(methods=["get", "post"], url_name="get_avatar", url_path="getAvatar")
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_avatar",
+        url_path="getAvatar",
+    )
     @find_object(
         queryset=users_models.User.objects.exclude(avatar=None).exclude(avatar=""),
         model_field="username__iexact",
@@ -479,7 +540,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         r[file_header] = path
         return r
 
-    @list_route(methods=["get", "post"], url_name="get_user", url_path="getUser")
+    @action(
+        detail=False, methods=["get", "post"], url_name="get_user", url_path="getUser"
+    )
     @find_object(
         queryset=lambda request: users_models.User.objects.filter(pk=request.user.pk),
         model_field="username__iexact",
@@ -490,7 +553,8 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"user": serializers.get_user_detail_data(request.user)}
         return response.Response(data)
 
-    @list_route(
+    @action(
+        detail=False,
         methods=["get", "post"],
         url_name="get_music_folders",
         url_path="getMusicFolders",
@@ -499,8 +563,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = {"musicFolders": {"musicFolder": [{"id": 1, "name": "Music"}]}}
         return response.Response(data)
 
-    @list_route(
-        methods=["get", "post"], url_name="get_cover_art", url_path="getCoverArt"
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_cover_art",
+        url_path="getCoverArt",
     )
     def get_cover_art(self, request, *args, **kwargs):
         data = request.GET or request.POST
@@ -536,7 +603,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         r[file_header] = path
         return r
 
-    @list_route(methods=["get", "post"], url_name="scrobble", url_path="scrobble")
+    @action(
+        detail=False, methods=["get", "post"], url_name="scrobble", url_path="scrobble"
+    )
     def scrobble(self, request, *args, **kwargs):
         data = request.GET or request.POST
         serializer = serializers.ScrobbleSerializer(

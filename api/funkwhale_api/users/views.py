@@ -1,7 +1,7 @@
 from allauth.account.adapter import get_adapter
 from rest_auth.registration.views import RegisterView as BaseRegisterView
 from rest_framework import mixins, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from funkwhale_api.common import preferences
@@ -28,13 +28,13 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.UserWriteSerializer
     lookup_field = "username"
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def me(self, request, *args, **kwargs):
         """Return information about the current user"""
         serializer = serializers.MeSerializer(request.user)
         return Response(serializer.data)
 
-    @detail_route(methods=["get", "post", "delete"], url_path="subsonic-token")
+    @action(methods=["get", "post", "delete"], url_path="subsonic-token", detail=True)
     def subsonic_token(self, request, *args, **kwargs):
         if not self.request.user.username == kwargs.get("username"):
             return Response(status=403)

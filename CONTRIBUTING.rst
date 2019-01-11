@@ -391,7 +391,7 @@ This is regular pytest, so you can use any arguments/options that pytest usually
     # Stop on first failure
     docker-compose -f dev.yml run --rm api pytest -x
     # Run a specific test file
-    docker-compose -f dev.yml run --rm api pytest tests/test_acoustid.py
+    docker-compose -f dev.yml run --rm api pytest tests/music/test_models.py
 
 Writing tests
 ^^^^^^^^^^^^^

@@ -49,7 +49,7 @@ class ManageActorFilterSet(filters.FilterSet):
             },
         )
     )
-    local = filters.BooleanFilter(name="_", method="filter_local")
+    local = filters.BooleanFilter(field_name="_", method="filter_local")
 
     class Meta:
         model = federation_models.Actor

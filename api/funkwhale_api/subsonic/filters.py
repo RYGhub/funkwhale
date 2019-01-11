@@ -4,7 +4,7 @@ from funkwhale_api.music import models as music_models
 
 
 class AlbumList2FilterSet(filters.FilterSet):
-    type = filters.CharFilter(name="_", method="filter_type")
+    type = filters.CharFilter(field_name="_", method="filter_type")
 
     class Meta:
         model = music_models.Album

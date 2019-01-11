@@ -43,7 +43,7 @@ class LibraryFollowViewSet(
     )
     serializer_class = api_serializers.LibraryFollowSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_class = filters.LibraryFollowFilter
+    filterset_class = filters.LibraryFollowFilter
     ordering_fields = ("creation_date",)
 
     def get_queryset(self):
@@ -66,7 +66,7 @@ class LibraryFollowViewSet(
         context["actor"] = self.request.user.actor
         return context
 
-    @decorators.detail_route(methods=["post"])
+    @decorators.action(methods=["post"], detail=True)
     def accept(self, request, *args, **kwargs):
         try:
             follow = self.queryset.get(
@@ -77,7 +77,7 @@ class LibraryFollowViewSet(
         update_follow(follow, approved=True)
         return response.Response(status=204)
 
-    @decorators.detail_route(methods=["post"])
+    @decorators.action(methods=["post"], detail=True)
     def reject(self, request, *args, **kwargs):
         try:
             follow = self.queryset.get(
@@ -105,7 +105,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         qs = super().get_queryset()
         return qs.viewable_by(actor=self.request.user.actor)
 
-    @decorators.detail_route(methods=["post"])
+    @decorators.action(methods=["post"], detail=True)
     def scan(self, request, *args, **kwargs):
         library = self.get_object()
         if library.actor.get_user():
@@ -122,7 +122,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             )
         return response.Response({"status": "skipped"}, 200)
 
-    @decorators.list_route(methods=["post"])
+    @decorators.action(methods=["post"], detail=False)
     def fetch(self, request, *args, **kwargs):
         try:
             fid = request.data["fid"]
@@ -168,14 +168,14 @@ class InboxItemViewSet(
     )
     serializer_class = api_serializers.InboxItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_class = filters.InboxItemFilter
+    filterset_class = filters.InboxItemFilter
     ordering_fields = ("activity__creation_date",)
 
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(actor=self.request.user.actor)
 
-    @decorators.list_route(methods=["post"])
+    @decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = api_serializers.InboxItemActionSerializer(

@@ -1,5 +1,5 @@
 from rest_framework import mixins, response, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework import decorators as rest_decorators
 from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import preferences, decorators
@@ -22,7 +22,7 @@ class ManageUploadViewSet(
         .order_by("-id")
     )
     serializer_class = serializers.ManageUploadSerializer
-    filter_class = filters.ManageUploadFilterSet
+    filterset_class = filters.ManageUploadFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["library"]
     ordering_fields = [
@@ -35,7 +35,7 @@ class ManageUploadViewSet(
         "duration",
     ]
 
-    @list_route(methods=["post"])
+    @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageUploadActionSerializer(
@@ -54,7 +54,7 @@ class ManageUserViewSet(
 ):
     queryset = users_models.User.objects.all().order_by("-id")
     serializer_class = serializers.ManageUserSerializer
-    filter_class = filters.ManageUserFilterSet
+    filterset_class = filters.ManageUserFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["settings"]
     ordering_fields = ["date_joined", "last_activity", "username"]
@@ -79,7 +79,7 @@ class ManageInvitationViewSet(
         .select_related("owner")
     )
     serializer_class = serializers.ManageInvitationSerializer
-    filter_class = filters.ManageInvitationFilterSet
+    filterset_class = filters.ManageInvitationFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["settings"]
     ordering_fields = ["creation_date", "expiration_date"]
@@ -87,7 +87,7 @@ class ManageInvitationViewSet(
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    @list_route(methods=["post"])
+    @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageInvitationActionSerializer(
@@ -113,7 +113,7 @@ class ManageDomainViewSet(
         .order_by("name")
     )
     serializer_class = serializers.ManageDomainSerializer
-    filter_class = filters.ManageDomainFilterSet
+    filterset_class = filters.ManageDomainFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = [
@@ -125,14 +125,14 @@ class ManageDomainViewSet(
         "instance_policy",
     ]
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def nodeinfo(self, request, *args, **kwargs):
         domain = self.get_object()
         federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
         domain.refresh_from_db()
         return response.Response(domain.nodeinfo, status=200)
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
@@ -152,7 +152,7 @@ class ManageActorViewSet(
         .prefetch_related("instance_policy")
     )
     serializer_class = serializers.ManageActorSerializer
-    filter_class = filters.ManageActorFilterSet
+    filterset_class = filters.ManageActorFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = [
@@ -176,7 +176,7 @@ class ManageActorViewSet(
 
         return obj
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
@@ -198,7 +198,7 @@ class ManageInstancePolicyViewSet(
         .select_related()
     )
     serializer_class = serializers.ManageInstancePolicySerializer
-    filter_class = filters.ManageInstancePolicyFilterSet
+    filterset_class = filters.ManageInstancePolicyFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = ["id", "creation_date"]

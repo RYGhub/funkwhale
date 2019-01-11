@@ -160,7 +160,6 @@ LOCAL_APPS = (
     "funkwhale_api.radios",
     "funkwhale_api.history",
     "funkwhale_api.playlists",
-    "funkwhale_api.providers.acoustid",
     "funkwhale_api.subsonic",
 )
 
@@ -318,8 +317,6 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
 SPA_URLCONF = "config.spa_urls"
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.routing.application"
 
 # This ensures that Django will be able to detect a secure connection

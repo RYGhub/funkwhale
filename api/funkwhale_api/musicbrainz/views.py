@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -47,19 +47,19 @@ class ReleaseBrowse(APIView):
 class SearchViewSet(viewsets.ViewSet):
     permission_classes = [ConditionalAuthentication]
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def recordings(self, request, *args, **kwargs):
         query = request.GET["query"]
         results = api.recordings.search(query)
         return Response(results)
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def releases(self, request, *args, **kwargs):
         query = request.GET["query"]
         results = api.releases.search(query)
         return Response(results)
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def artists(self, request, *args, **kwargs):
         query = request.GET["query"]
         results = api.artists.search(query)

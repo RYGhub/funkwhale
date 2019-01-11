@@ -11,7 +11,7 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from taggit.models import Tag
 
@@ -28,25 +28,25 @@ logger = logging.getLogger(__name__)
 
 
 def get_libraries(filter_uploads):
-    def view(self, request, *args, **kwargs):
+    def libraries(self, request, *args, **kwargs):
         obj = self.get_object()
         actor = utils.get_actor_from_request(request)
         uploads = models.Upload.objects.all()
         uploads = filter_uploads(obj, uploads)
         uploads = uploads.playable_by(actor)
-        libraries = models.Library.objects.filter(
+        qs = models.Library.objects.filter(
             pk__in=uploads.values_list("library", flat=True)
         ).annotate(_uploads_count=Count("uploads"))
-        libraries = libraries.select_related("actor")
-        page = self.paginate_queryset(libraries)
+        qs = qs.select_related("actor")
+        page = self.paginate_queryset(qs)
         if page is not None:
             serializer = federation_api_serializers.LibrarySerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = federation_api_serializers.LibrarySerializer(libraries, many=True)
+        serializer = federation_api_serializers.LibrarySerializer(qs, many=True)
         return Response(serializer.data)
 
-    return view
+    return libraries
 
 
 class TagViewSetMixin(object):
@@ -62,7 +62,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.ArtistFilter
+    filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
     def get_queryset(self):
@@ -73,7 +73,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return queryset.prefetch_related(Prefetch("albums", queryset=albums))
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(
             filter_uploads=lambda o, uploads: uploads.filter(
                 Q(track__artist=o) | Q(track__album__artist=o)
@@ -89,7 +89,7 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.AlbumSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
     ordering_fields = ("creation_date", "release_date", "title")
-    filter_class = filters.AlbumFilter
+    filterset_class = filters.AlbumFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -101,7 +101,7 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
         return qs
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
     )
 
@@ -144,7 +144,9 @@ class LibraryViewSet(
         )
         instance.delete()
 
-    @detail_route(methods=["get"])
+    follows = action
+
+    @action(methods=["get"], detail=True)
     @transaction.non_atomic_requests
     def follows(self, request, *args, **kwargs):
         library = self.get_object()
@@ -172,7 +174,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.TrackFilter
+    filterset_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
         "title",
@@ -193,7 +195,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         )
         return queryset
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     @transaction.non_atomic_requests
     def lyrics(self, request, *args, **kwargs):
         try:
@@ -218,7 +220,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         serializer = serializers.LyricsSerializer(lyrics)
         return Response(serializer.data)
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
     )
 
@@ -375,7 +377,7 @@ class UploadViewSet(
     ]
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
-    filter_class = filters.UploadFilter
+    filterset_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
         "import_date",
@@ -388,7 +390,7 @@ class UploadViewSet(
         qs = super().get_queryset()
         return qs.filter(library__actor=self.request.user.actor)
 
-    @list_route(methods=["post"])
+    @action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.UploadActionSerializer(request.data, queryset=queryset)

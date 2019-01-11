@@ -10,7 +10,7 @@ from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
 
 router = routers.SimpleRouter()
-router.register(r"settings", GlobalPreferencesViewSet, base_name="settings")
+router.register(r"settings", GlobalPreferencesViewSet, basename="settings")
 router.register(r"activity", activity_views.ActivityViewSet, "activity")
 router.register(r"tags", views.TagViewSet, "tags")
 router.register(r"tracks", views.TrackViewSet, "tracks")
@@ -27,7 +27,7 @@ router.register(
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)
-subsonic_router.register(r"subsonic/rest", SubsonicViewSet, base_name="subsonic")
+subsonic_router.register(r"subsonic/rest", SubsonicViewSet, basename="subsonic")
 
 
 v1_patterns += [
