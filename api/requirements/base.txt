@@ -30,11 +30,9 @@ celery>=4.1,<4.2
 # Your custom requirements go here
 django-cors-headers>=2.1,<2.2
 musicbrainzngs==0.6
-youtube_dl>=2017.12.14
 djangorestframework>=3.7,<3.8
 djangorestframework-jwt>=1.11,<1.12
 oauth2client<4
-google-api-python-client>=1.6,<1.7
 pendulum>=2,<3
 persisting-theory>=0.2,<0.3
 django-versatileimagefield>=1.9,<1.10
