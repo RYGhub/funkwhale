@@ -10,7 +10,7 @@ RUN apt-get update; \
     grep -Fv "python3-dev" | \
     xargs apt-get install -y --no-install-recommends; \
     rm -rf /usr/share/doc/* /usr/share/locale/*
-RUN curl -L https://github.com/acoustid/chromaprint/releases/download/v1.4.2/chromaprint-fpcalc-1.4.2-linux-x86_64.tar.gz | tar -xz -C /usr/local/bin --strip 1
+
 COPY ./requirements/base.txt /requirements/base.txt
 RUN pip install -r /requirements/base.txt
 COPY ./requirements/production.txt /requirements/production.txt

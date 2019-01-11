@@ -160,7 +160,6 @@ LOCAL_APPS = (
     "funkwhale_api.radios",
     "funkwhale_api.history",
     "funkwhale_api.playlists",
-    "funkwhale_api.providers.acoustid",
     "funkwhale_api.subsonic",
 )
 
