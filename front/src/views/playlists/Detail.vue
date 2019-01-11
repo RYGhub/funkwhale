@@ -28,7 +28,7 @@
           @click="edit = !edit">
           <i class="pencil icon"></i>
           <template v-if="edit"><translate>End edition</translate></template>
-          <template v-else><translate>Edit...</translate></template>
+          <template v-else><translate>Edit…</translate></template>
         </button>
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
           <i class="trash icon"></i> <translate>Delete</translate>

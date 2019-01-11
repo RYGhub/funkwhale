@@ -115,7 +115,7 @@ export default {
   },
   computed: {
     labels() {
-      let searchPlaceholder = this.$gettext("Enter an artist name...")
+      let searchPlaceholder = this.$gettext("Enter artist name…")
       let title = this.$gettext("Artists")
       return {
         searchPlaceholder,

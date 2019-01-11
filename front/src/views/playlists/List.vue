@@ -23,7 +23,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate>Ordering direction</translate></label>
+            <label><translate>Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+"><translate>Ascending</translate></option>
               <option value="-"><translate>Descending</translate></option>
@@ -104,7 +104,7 @@ export default {
   computed: {
     labels() {
       let playlists = this.$gettext("Playlists")
-      let searchPlaceholder = this.$gettext("Enter an playlist name...")
+      let searchPlaceholder = this.$gettext("Enter playlist name…")
       return {
         playlists,
         searchPlaceholder

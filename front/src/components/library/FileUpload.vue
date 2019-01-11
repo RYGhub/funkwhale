@@ -38,7 +38,7 @@
           </li>
           <li>
             <translate>The music files you are uploading are tagged properly:</translate>
-            <a href="http://picard.musicbrainz.org/" target='_blank'><translate>we recommend using Picard for that purpose</translate></a>
+            <a href="http://picard.musicbrainz.org/" target='_blank'><translate>We recommend using Picard for that purpose.</translate></a>
           </li>
           <li>
             <translate>The uploaded music files are in OGG, Flac or MP3 format</translate>
@@ -82,7 +82,7 @@
       <table v-if="files.length > 0" class="ui single line table">
         <thead>
           <tr>
-            <th><translate>File name</translate></th>
+            <th><translate>Filename</translate></th>
             <th><translate>Size</translate></th>
             <th><translate>Status</translate></th>
           </tr>
@@ -101,7 +101,7 @@
                 <translate key="1">Uploaded</translate>
               </span>
               <span v-else-if="file.active" class="ui yellow label">
-                <translate key="2">Uploading...</translate>
+                <translate key="2">Uploading…</translate>
               </span>
               <template v-else>
                 <span class="ui label"><translate key="3">Pending</translate></span>
@@ -217,10 +217,10 @@ export default {
   computed: {
     labels() {
       let denied = this.$gettext(
-        "Upload refused, ensure the file is not too big and you have not reached your quota"
+        "Upload denied, ensure the file is not too big and that you have not reached your quota"
       );
       let server = this.$gettext(
-        "Impossible to upload this file, ensure it is not too big"
+        "Cannot upload this file, ensure it is not too big"
       );
       let network = this.$gettext(
         "A network error occured while uploading this file"

@@ -1,7 +1,7 @@
 <template>
   <section class="ui vertical aligned stripe segment">
     <div v-if="isLoadingLibrary" :class="['ui', {'active': isLoadingLibrary}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading library data...</translate></div>
+      <div class="ui text loader"><translate>Loading library data…</translate></div>
     </div>
     <detail-area v-else :library="library">
       <div class="ui top attached tabular menu">
@@ -13,13 +13,13 @@
         <div class="ui form">
           <div class="field">
             <label><translate>Sharing link</translate></label>
-            <p><translate>Share this link with other users so they can request an access to your library.</translate></p>
+            <p><translate>Share this link with other users so they can request access to your library.</translate></p>
             <copy-input :value="library.fid" />
           </div>
         </div>
         <div class="ui hidden divider"></div>
         <div v-if="isLoadingFollows" :class="['ui', {'active': isLoadingFollows}, 'inverted', 'dimmer']">
-          <div class="ui text loader"><translate>Loading followers...</translate></div>
+          <div class="ui text loader"><translate>Loading followers…</translate></div>
         </div>
         <table v-else-if="follows && follows.count > 0" class="ui table">
           <thead>

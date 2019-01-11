@@ -39,7 +39,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate>Ordering direction</translate></label>
+            <label><translate>Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">
                 <translate>Ascending</translate>
@@ -137,7 +137,7 @@ export default {
   },
   computed: {
     labels() {
-      let searchPlaceholder = this.$gettext("Enter a radio name...")
+      let searchPlaceholder = this.$gettext("Enter a radio name…")
       let title = this.$gettext("Radios")
       return {
         searchPlaceholder,

@@ -2,10 +2,10 @@
   <main class="main pusher" v-title="labels.confirm">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate>Confirm your email</translate></h2>
+        <h2><translate>Confirm your e-mail address</translate></h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><translate>Error while confirming your email</translate></div>
+            <div class="header"><translate>Could not confirm your e-mail address</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
@@ -15,14 +15,14 @@
             <input type="text" required v-model="key" />
           </div>
           <router-link :to="{path: '/login'}">
-            <translate>Back to login</translate>
+            <translate>Return to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            <translate>Confirm your email</translate></button>
+            <translate>Confirm your e-mail address</translate></button>
         </form>
         <div v-else class="ui positive message">
-          <div class="header"><translate>Email confirmed</translate></div>
-          <p><translate>Your email address was confirmed, you can now use the service without limitations.</translate></p>
+          <div class="header"><translate>E-mail address confirmed</translate></div>
+          <p><translate>You can now use the service without limitations.</translate></p>
           <router-link :to="{name: 'login'}">
             <translate>Proceed to login</translate>
           </router-link>
@@ -48,7 +48,7 @@ export default {
   computed: {
     labels() {
       return {
-        confirm: this.$gettext("Confirm your email")
+        confirm: this.$gettext("Confirm your e-mail address")
       }
     }
   },

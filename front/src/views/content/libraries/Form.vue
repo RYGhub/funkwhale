@@ -17,7 +17,7 @@
     </div>
     <div class="field">
       <label><translate>Visibility</translate></label>
-      <p><translate>You will be able to share your library with other people, regardless of it's visibility.</translate></p>
+      <p><translate>You are able to share your library with other people, regardless of its visibility.</translate></p>
       <select class="ui dropdown" v-model="currentVisibilityLevel">
         <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ labels.visibility[c] }}</option>
       </select>
@@ -33,7 +33,7 @@
       </p>
       <p slot="modal-content">
         <translate>
-          The library and all its tracks will be deleted. This action is irreversible.
+          The library and all its tracks will be deleted. This can not be undone.
         </translate>
       </p>
       <p slot="modal-confirm">
@@ -68,10 +68,10 @@ export default {
   computed: {
     labels () {
       let namePlaceholder = this.$gettext('My awesome library')
-      let descriptionPlaceholder = this.$gettext('This library contains my personnal music, I hope you will like it!')
+      let descriptionPlaceholder = this.$gettext('This library contains my personal music, I hope you like it.')
       let me = this.$gettext('Nobody except me')
       let instance = this.$gettext('Everyone on this instance')
-      let everyone = this.$gettext('Everyone, including other instances')
+      let everyone = this.$gettext('Everyone, across all instances')
       return {
         namePlaceholder,
         descriptionPlaceholder,
