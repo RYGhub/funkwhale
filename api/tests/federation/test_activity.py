@@ -387,3 +387,47 @@ def test_prepare_deliveries_and_inbox_items(factories):
     ):
         assert inbox_item.actor == expected_inbox_item.actor
         assert inbox_item.type == "to"
+
+
+def test_should_rotate_actor_key(settings, cache, now):
+    actor_id = 42
+    settings.ACTOR_KEY_ROTATION_DELAY = 10
+
+    cache.set(activity.ACTOR_KEY_ROTATION_LOCK_CACHE_KEY.format(actor_id), True)
+
+    assert activity.should_rotate_actor_key(actor_id) is False
+
+    cache.delete(activity.ACTOR_KEY_ROTATION_LOCK_CACHE_KEY.format(actor_id))
+
+    assert activity.should_rotate_actor_key(actor_id) is True
+
+
+def test_schedule_key_rotation(cache, mocker):
+    actor_id = 42
+    rotate_actor_key = mocker.patch.object(tasks.rotate_actor_key, "apply_async")
+
+    activity.schedule_key_rotation(actor_id, 3600)
+    rotate_actor_key.assert_called_once_with(
+        kwargs={"actor_id": actor_id}, countdown=3600
+    )
+    assert cache.get(activity.ACTOR_KEY_ROTATION_LOCK_CACHE_KEY.format(actor_id), True)
+
+
+def test_outbox_dispatch_rotate_key_on_delete(mocker, factories, cache, settings):
+    router = activity.OutboxRouter()
+    actor = factories["federation.Actor"]()
+    r1 = factories["federation.Actor"]()
+    schedule_key_rotation = mocker.spy(activity, "schedule_key_rotation")
+
+    def handler(context):
+        yield {
+            "payload": {"type": "Delete", "actor": actor.fid, "to": [r1]},
+            "actor": actor,
+        }
+
+    router.connect({"type": "Delete"}, handler)
+    router.dispatch({"type": "Delete"}, {})
+
+    schedule_key_rotation.assert_called_once_with(
+        actor.id, settings.ACTOR_KEY_ROTATION_DELAY
+    )

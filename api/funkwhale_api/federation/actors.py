@@ -25,17 +25,18 @@ def get_actor_data(actor_url):
         raise ValueError("Invalid actor payload: {}".format(response.text))
 
 
-def get_actor(fid):
-    try:
-        actor = models.Actor.objects.get(fid=fid)
-    except models.Actor.DoesNotExist:
-        actor = None
-    fetch_delta = datetime.timedelta(
-        minutes=preferences.get("federation__actor_fetch_delay")
-    )
-    if actor and actor.last_fetch_date > timezone.now() - fetch_delta:
-        # cache is hot, we can return as is
-        return actor
+def get_actor(fid, skip_cache=False):
+    if not skip_cache:
+        try:
+            actor = models.Actor.objects.get(fid=fid)
+        except models.Actor.DoesNotExist:
+            actor = None
+        fetch_delta = datetime.timedelta(
+            minutes=preferences.get("federation__actor_fetch_delay")
+        )
+        if actor and actor.last_fetch_date > timezone.now() - fetch_delta:
+            # cache is hot, we can return as is
+            return actor
     data = get_actor_data(fid)
     serializer = serializers.ActorSerializer(data=data)
     serializer.is_valid(raise_exception=True)

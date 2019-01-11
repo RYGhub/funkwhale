@@ -266,3 +266,20 @@ def test_purge_actors(factories, mocker):
     handle_purge_actors.assert_called_once_with(
         ids=[to_delete.pk, to_delete_domain.pk], only=["hello"]
     )
+
+
+def test_rotate_actor_key(factories, settings, mocker):
+    actor = factories["federation.Actor"](local=True)
+    get_key_pair = mocker.patch(
+        "funkwhale_api.federation.keys.get_key_pair",
+        return_value=(b"private", b"public"),
+    )
+
+    tasks.rotate_actor_key(actor_id=actor.pk)
+
+    actor.refresh_from_db()
+
+    get_key_pair.assert_called_once_with()
+
+    assert actor.public_key == "public"
+    assert actor.private_key == "private"
