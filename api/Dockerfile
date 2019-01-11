@@ -13,8 +13,6 @@ RUN apt-get update; \
 
 COPY ./requirements/base.txt /requirements/base.txt
 RUN pip install -r /requirements/base.txt
-COPY ./requirements/production.txt /requirements/production.txt
-RUN pip install -r /requirements/production.txt
 
 COPY . /app
 
