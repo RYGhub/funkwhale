@@ -62,7 +62,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.ArtistFilter
+    filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
     def get_queryset(self):
@@ -89,7 +89,7 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.AlbumSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
     ordering_fields = ("creation_date", "release_date", "title")
-    filter_class = filters.AlbumFilter
+    filterset_class = filters.AlbumFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -172,7 +172,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.TrackFilter
+    filterset_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
         "title",
@@ -375,7 +375,7 @@ class UploadViewSet(
     ]
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
-    filter_class = filters.UploadFilter
+    filterset_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
         "import_date",

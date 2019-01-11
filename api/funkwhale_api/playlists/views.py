@@ -33,7 +33,7 @@ class PlaylistViewSet(
         IsAuthenticatedOrReadOnly,
     ]
     owner_checks = ["write"]
-    filter_class = filters.PlaylistFilter
+    filterset_class = filters.PlaylistFilter
     ordering_fields = ("id", "name", "creation_date", "modification_date")
 
     @detail_route(methods=["get"])

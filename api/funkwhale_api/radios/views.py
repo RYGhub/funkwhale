@@ -23,7 +23,7 @@ class RadioViewSet(
         permissions.IsAuthenticated,
         common_permissions.OwnerPermission,
     ]
-    filter_class = filtersets.RadioFilter
+    filterset_class = filtersets.RadioFilter
     owner_field = "user"
     owner_checks = ["write"]
 

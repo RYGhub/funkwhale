@@ -20,7 +20,7 @@ class TrackFavoriteViewSet(
     viewsets.GenericViewSet,
 ):
 
-    filter_class = filters.TrackFavoriteFilter
+    filterset_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
     queryset = models.TrackFavorite.objects.all().select_related("user")
     permission_classes = [

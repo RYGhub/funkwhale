@@ -22,7 +22,7 @@ class ManageUploadViewSet(
         .order_by("-id")
     )
     serializer_class = serializers.ManageUploadSerializer
-    filter_class = filters.ManageUploadFilterSet
+    filterset_class = filters.ManageUploadFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["library"]
     ordering_fields = [
@@ -54,7 +54,7 @@ class ManageUserViewSet(
 ):
     queryset = users_models.User.objects.all().order_by("-id")
     serializer_class = serializers.ManageUserSerializer
-    filter_class = filters.ManageUserFilterSet
+    filterset_class = filters.ManageUserFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["settings"]
     ordering_fields = ["date_joined", "last_activity", "username"]
@@ -79,7 +79,7 @@ class ManageInvitationViewSet(
         .select_related("owner")
     )
     serializer_class = serializers.ManageInvitationSerializer
-    filter_class = filters.ManageInvitationFilterSet
+    filterset_class = filters.ManageInvitationFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["settings"]
     ordering_fields = ["creation_date", "expiration_date"]
@@ -113,7 +113,7 @@ class ManageDomainViewSet(
         .order_by("name")
     )
     serializer_class = serializers.ManageDomainSerializer
-    filter_class = filters.ManageDomainFilterSet
+    filterset_class = filters.ManageDomainFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = [
@@ -152,7 +152,7 @@ class ManageActorViewSet(
         .prefetch_related("instance_policy")
     )
     serializer_class = serializers.ManageActorSerializer
-    filter_class = filters.ManageActorFilterSet
+    filterset_class = filters.ManageActorFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = [
@@ -198,7 +198,7 @@ class ManageInstancePolicyViewSet(
         .select_related()
     )
     serializer_class = serializers.ManageInstancePolicySerializer
-    filter_class = filters.ManageInstancePolicyFilterSet
+    filterset_class = filters.ManageInstancePolicyFilterSet
     permission_classes = (HasUserPermission,)
     required_permissions = ["moderation"]
     ordering_fields = ["id", "creation_date"]

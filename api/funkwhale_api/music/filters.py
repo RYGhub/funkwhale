@@ -9,7 +9,7 @@ from . import utils
 
 class ArtistFilter(filters.FilterSet):
     q = fields.SearchFilter(search_fields=["name"])
-    playable = filters.BooleanFilter(name="_", method="filter_playable")
+    playable = filters.BooleanFilter(field_name="_", method="filter_playable")
 
     class Meta:
         model = models.Artist
@@ -25,7 +25,7 @@ class ArtistFilter(filters.FilterSet):
 
 class TrackFilter(filters.FilterSet):
     q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
-    playable = filters.BooleanFilter(name="_", method="filter_playable")
+    playable = filters.BooleanFilter(field_name="_", method="filter_playable")
 
     class Meta:
         model = models.Track
@@ -48,7 +48,7 @@ class UploadFilter(filters.FilterSet):
     track_artist = filters.UUIDFilter("track__artist__uuid")
     album_artist = filters.UUIDFilter("track__album__artist__uuid")
     library = filters.UUIDFilter("library__uuid")
-    playable = filters.BooleanFilter(name="_", method="filter_playable")
+    playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SmartSearchFilter(
         config=search.SearchConfig(
             search_fields={
@@ -86,7 +86,7 @@ class UploadFilter(filters.FilterSet):
 
 
 class AlbumFilter(filters.FilterSet):
-    playable = filters.BooleanFilter(name="_", method="filter_playable")
+    playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SearchFilter(search_fields=["title", "artist__name" "source"])
 
     class Meta:

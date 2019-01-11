@@ -43,7 +43,7 @@ class LibraryFollowViewSet(
     )
     serializer_class = api_serializers.LibraryFollowSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_class = filters.LibraryFollowFilter
+    filterset_class = filters.LibraryFollowFilter
     ordering_fields = ("creation_date",)
 
     def get_queryset(self):
@@ -168,7 +168,7 @@ class InboxItemViewSet(
     )
     serializer_class = api_serializers.InboxItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_class = filters.InboxItemFilter
+    filterset_class = filters.InboxItemFilter
     ordering_fields = ("activity__creation_date",)
 
     def get_queryset(self):
