@@ -3,7 +3,7 @@ from django.core import paginator
 from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework import exceptions, mixins, response, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
@@ -23,7 +23,7 @@ class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = [renderers.ActivityPubRenderer]
 
-    @list_route(methods=["post"])
+    @action(methods=["post"], detail=False)
     def inbox(self, request, *args, **kwargs):
         if request.method.lower() == "post" and request.actor is None:
             raise exceptions.AuthenticationFailed(
@@ -42,7 +42,7 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
 
-    @detail_route(methods=["get", "post"])
+    @action(methods=["get", "post"], detail=True)
     def inbox(self, request, *args, **kwargs):
         if request.method.lower() == "post" and request.actor is None:
             raise exceptions.AuthenticationFailed(
@@ -52,17 +52,17 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
             activity.receive(activity=request.data, on_behalf_of=request.actor)
         return response.Response({}, status=200)
 
-    @detail_route(methods=["get", "post"])
+    @action(methods=["get", "post"], detail=True)
     def outbox(self, request, *args, **kwargs):
         return response.Response({}, status=200)
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     def followers(self, request, *args, **kwargs):
         self.get_object()
         # XXX to implement
         return response.Response({})
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     def following(self, request, *args, **kwargs):
         self.get_object()
         # XXX to implement
@@ -74,7 +74,7 @@ class WellKnownViewSet(viewsets.GenericViewSet):
     permission_classes = []
     renderer_classes = [renderers.JSONRenderer, renderers.WebfingerRenderer]
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def nodeinfo(self, request, *args, **kwargs):
         if not preferences.get("instance__nodeinfo_enabled"):
             return HttpResponse(status=404)
@@ -88,7 +88,7 @@ class WellKnownViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data)
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def webfinger(self, request, *args, **kwargs):
         if not preferences.get("federation__enabled"):
             return HttpResponse(status=405)
@@ -180,7 +180,7 @@ class MusicLibraryViewSet(
 
         return response.Response(data)
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     def followers(self, request, *args, **kwargs):
         self.get_object()
         # XXX Implement this

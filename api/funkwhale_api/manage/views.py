@@ -1,5 +1,5 @@
 from rest_framework import mixins, response, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework import decorators as rest_decorators
 from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import preferences, decorators
@@ -35,7 +35,7 @@ class ManageUploadViewSet(
         "duration",
     ]
 
-    @list_route(methods=["post"])
+    @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageUploadActionSerializer(
@@ -87,7 +87,7 @@ class ManageInvitationViewSet(
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    @list_route(methods=["post"])
+    @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageInvitationActionSerializer(
@@ -125,14 +125,14 @@ class ManageDomainViewSet(
         "instance_policy",
     ]
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def nodeinfo(self, request, *args, **kwargs):
         domain = self.get_object()
         federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
         domain.refresh_from_db()
         return response.Response(domain.nodeinfo, status=200)
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)
@@ -176,7 +176,7 @@ class ManageActorViewSet(
 
         return obj
 
-    @detail_route(methods=["get"])
+    @rest_decorators.action(methods=["get"], detail=True)
     def stats(self, request, *args, **kwargs):
         domain = self.get_object()
         return response.Response(domain.get_stats(), status=200)

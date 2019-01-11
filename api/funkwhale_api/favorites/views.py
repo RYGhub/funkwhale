@@ -1,5 +1,5 @@
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -62,7 +62,7 @@ class TrackFavoriteViewSet(
         favorite = models.TrackFavorite.add(track=track, user=self.request.user)
         return favorite
 
-    @list_route(methods=["delete", "post"])
+    @action(methods=["delete", "post"], detail=False)
     def remove(self, request, *args, **kwargs):
         try:
             pk = int(request.data["track"])
@@ -72,7 +72,7 @@ class TrackFavoriteViewSet(
         favorite.delete()
         return Response([], status=status.HTTP_204_NO_CONTENT)
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def all(self, request, *args, **kwargs):
         """
         Return all the favorites of the current user, with only limited data
