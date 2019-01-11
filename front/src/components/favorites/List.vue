@@ -3,7 +3,7 @@
     <section class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">
-          <translate>Loading your favorites...</translate>
+          <translate>Loading your favorites…</translate>
         </div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
@@ -29,7 +29,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate>Ordering direction</translate></label>
+            <label><translate>Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+"><translate>Ascending</translate></option>
               <option value="-"><translate>Descending</translate></option>

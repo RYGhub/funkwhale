@@ -2,7 +2,7 @@
   <main class="main pusher" v-title="labels.title">
     <section class="ui vertical aligned stripe segment">
       <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader"><translate>Loading notifications...</translate></div>
+        <div class="ui text loader"><translate>Loading notifications…</translate></div>
       </div>
       <div v-else class="ui container">
         <h1 class="ui header"><translate>Your notifications</translate></h1>
@@ -24,7 +24,7 @@
           </tbody>
         </table>
         <p v-else>
-          <translate>We don't have any notification to display!</translate>
+          <translate>No notifications yet.</translate>
         </p>
       </div>
     </section>

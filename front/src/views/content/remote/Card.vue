@@ -29,19 +29,19 @@
       <div v-if="displayScan && latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
           <i class="hourglass icon"></i>
-          <translate>Scan pending</translate>
+          <translate>Scan waiting</translate>
         </template>
         <template v-if="latestScan.status === 'scanning'">
           <i class="loading spinner icon"></i>
-          <translate :translate-params="{progress: scanProgress}">Scanning... (%{ progress }%)</translate>
+          <translate :translate-params="{progress: scanProgress}">Scanning… (%{ progress }%)</translate>
         </template>
         <template v-else-if="latestScan.status === 'errored'">
           <i class="red download icon"></i>
-          <translate>Error during scan</translate>
+          <translate>Problem during scanning</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files === 0">
           <i class="green download icon"></i>
-          <translate>Scanned successfully</translate>
+          <translate>Scanned</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files > 0">
           <i class="yellow download icon"></i>
@@ -56,12 +56,12 @@
           <template v-if="latestScan.modification_date">
             <translate>Last update:</translate><human-date :date="latestScan.modification_date" /><br />
           </template>
-          <translate>Errored tracks:</translate> {{ latestScan.errored_files }}
+          <translate>Failed tracks:</translate> {{ latestScan.errored_files }}
         </div>
       </div>
       <div v-if="displayScan && canLaunchScan" class="clearfix">
         <span class="right floated link" @click="launchScan">
-          <translate>Launch scan</translate> <i class="paper plane icon" />
+          <translate>Scan now</translate> <i class="paper plane icon" />
         </span>
       </div>
     </div>
@@ -86,7 +86,7 @@
       <button
         v-else-if="!library.follow.approved"
         class="ui disabled button"><i class="hourglass icon"></i>
-        <translate>Follow pending approval</translate>
+        <translate>Follow request pending approval</translate>
       </button>
       <button
         v-else-if="!library.follow.approved"
@@ -101,7 +101,7 @@
         <translate>Unfollow</translate>
         <p slot="modal-header"><translate>Unfollow this library?</translate></p>
         <div slot="modal-content">
-          <p><translate>By unfollowing this library, you will loose access to its content.</translate></p>
+          <p><translate>By unfollowing this library, you loose access to its content.</translate></p>
         </div>
         <p slot="modal-confirm"><translate>Unfollow</translate></p>
       </dangerous-button>
@@ -128,8 +128,8 @@ export default {
   },
   computed: {
     labels () {
-      let me = this.$gettext('This library is private and you will need approval from its owner to access its content')
-      let everyone = this.$gettext('This library is public and you can access its content without any authorization')
+      let me = this.$gettext('This library is private and your approval from its owner is needed to access its content')
+      let everyone = this.$gettext('This library is public and you can access its content freely')
 
       return {
         tooltips: {

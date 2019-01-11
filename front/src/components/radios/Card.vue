@@ -20,7 +20,7 @@
           class="ui basic yellow button right floated"
           v-if="$store.state.auth.authenticated && type === 'custom' && radio.user.id === $store.state.auth.profile.id"
           :to="{name: 'library.radios.edit', params: {id: customRadioId }}">
-          <translate>Edit...</translate>
+          <translate>Edit…</translate>
         </router-link>
       </div>
     </div>

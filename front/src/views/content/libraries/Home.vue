@@ -1,13 +1,13 @@
 <template>
   <section class="ui vertical aligned stripe segment">
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading Libraries...</translate></div>
+      <div class="ui text loader"><translate>Loading Libraries…</translate></div>
     </div>
     <div v-else class="ui text container">
       <h1 class="ui header"><translate>My libraries</translate></h1>
 
       <p v-if="libraries.length == 0">
-        <translate>It looks like you don't have any library yet, it's time to create one!</translate>
+        <translate>Looks like you don't have a library, it's time to create one.</translate>
       </p>
       <a @click="hiddenForm = !hiddenForm">
         <i class="plus icon" v-if="hiddenForm" />

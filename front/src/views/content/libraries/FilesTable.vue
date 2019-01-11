@@ -14,7 +14,7 @@
             <option value=""><translate>All</translate></option>
             <option value="pending"><translate>Pending</translate></option>
             <option value="skipped"><translate>Skipped</translate></option>
-            <option value="errored"><translate>Errored</translate></option>
+            <option value="errored"><translate>Failed</translate></option>
             <option value="finished"><translate>Finished</translate></option>
           </select>
         </div>
@@ -198,23 +198,23 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by title, artist, album...'),
+        searchPlaceholder: this.$gettext('Search by title, artist, album…'),
         importStatuses: {
           skipped: {
             label: this.$gettext('Skipped'),
-            help: this.$gettext('Track was already present in one of your libraries'),
+            help: this.$gettext('Track already present in one of your libraries'),
           },
           pending: {
             label: this.$gettext('Pending'),
-            help: this.$gettext('Track is uploaded but not processed by the server yet'),
+            help: this.$gettext('Track uploaded, but not processed by the server yet'),
           },
           errored: {
             label: this.$gettext('Errored'),
-            help: this.$gettext('An error occured while processing this track, ensure the track is correctly tagged'),
+            help: this.$gettext('Could not process this track, ensure it is tagged correctly'),
           },
           finished: {
             label: this.$gettext('Finished'),
-            help: this.$gettext('Import went on successfully'),
+            help: this.$gettext('Imported'),
           },
         }
       }

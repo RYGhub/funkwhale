@@ -14,7 +14,7 @@
           <artist-card class="fluid" :artist="artist" ></artist-card>
         </div>
       </div>
-      <p v-else><translate>Sorry, we did not found any artist matching your query</translate></p>
+      <p v-else><translate>No artist matched your query</translate></p>
     </template>
     <template v-if="query.length > 0">
       <h3 class="ui title"><translate>Albums</translate></h3>
@@ -23,7 +23,7 @@
           <album-card class="fluid" :album="album" ></album-card>
         </div>
       </div>
-      <p v-else><translate>Sorry, we did not found any album matching your query</translate></p>
+      <p v-else><translate>No album matched your query</translate></p>
     </template>
   </div>
 </template>
@@ -62,7 +62,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Artist, album, track...')
+        searchPlaceholder: this.$gettext('Artist, album, track…')
       }
     }
   },
