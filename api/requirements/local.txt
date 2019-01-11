@@ -1,13 +1,13 @@
 # Local development dependencies go here
 
-coverage>=4.4,<4.5
-django_coverage_plugin>=1.5,<1.6
-factory_boy>=2.8.1
+coverage>=4.5,<4.6
+django_coverage_plugin>=1.6,<1.7
+factory_boy>=2.11.1
 
 # django-debug-toolbar that works with Django 1.5+
-django-debug-toolbar>=1.9,<1.10
+django-debug-toolbar>=1.11,<1.12
 
 # improved REPL
-ipdb==0.8.1
+ipdb==0.11
 black
 profiling
