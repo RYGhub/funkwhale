@@ -94,7 +94,7 @@ services:
       - .env
     image: nginx
     environment:
-      - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-30M}"
+      - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-100M}"
       - "FUNKWHALE_API_IP=${FUNKHALE_API_IP-api}"
       - "FUNKWHALE_API_PORT=${FUNKWHALE_API_PORT-5000}"
       - "FUNKWHALE_FRONT_IP=${FUNKHALE_FRONT_IP-front}"
