@@ -120,7 +120,7 @@ Then, add the following block at the end of your docker-compose.yml file::
         - .env
       environment:
         # Override those variables in your .env file if needed
-        - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-30M}"
+        - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-100M}"
       volumes:
         - "./nginx/funkwhale.template:/etc/nginx/conf.d/funkwhale.template:ro"
         - "./nginx/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro"
