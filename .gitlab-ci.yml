@@ -235,12 +235,13 @@ pages:
 
 docker_release:
   stage: deploy
+  image: bash
   before_script:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - cp -r front/dist api/frontend
+    - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $(echo $CI_COMMIT_SHA | cut -c 1-8); fi);
     - cd api
   script:
-    - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $CI_COMMIT_SHORT_SHA; fi);
     - docker build -t $IMAGE .
     - docker push $IMAGE
   only:
@@ -252,13 +253,13 @@ docker_release:
 build_api:
   # Simply publish a zip containing api/ directory
   stage: deploy
-  image: busybox
+  image: bash
   artifacts:
     name: "api_${CI_COMMIT_REF_NAME}"
     paths:
       - api
   script:
-    - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $CI_COMMIT_SHORT_SHA; fi);
+    - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $(echo $CI_COMMIT_SHA | cut -c 1-8); fi);
     - chmod -R 750 api
     - echo Done!
   only:
