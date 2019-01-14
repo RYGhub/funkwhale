@@ -52,6 +52,25 @@ Funkwhale will successfully extract licensing data for the following licenses:
 Support for other licenses such as Art Libre or WTFPL will be added in future releases.
 
 
+
+Delete pre 0.17 federated tracks [manual action suggested]
+----------------------------------------------------------
+
+If you were using Funkwhale before the 0.17 release and federated with other instances,
+it's possible that you still have some unplayable federated files in the database.
+
+To purge the database of those entries, you can run the following command:
+
+On docker setups::
+
+    docker-compose run --rm api python manage.py script delete_pre_017_federated_uploads --no-input
+
+On non-docker setups::
+
+    python manage.py script delete_pre_017_federated_uploads --no-input
+
+
+
 Enable gzip compression [manual action suggested]
 -------------------------------------------------
 
