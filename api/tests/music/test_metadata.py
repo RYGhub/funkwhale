@@ -1,8 +1,10 @@
 import datetime
 import os
 import uuid
-
 import pytest
+
+import mutagen.oggtheora
+import mutagen.oggvorbis
 
 from funkwhale_api.music import metadata
 
@@ -145,7 +147,7 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
     assert data.get(field) == value
 
 
-@pytest.mark.parametrize("name", ["test.mp3", "sample.flac"])
+@pytest.mark.parametrize("name", ["test.mp3", "sample.flac", "with_cover.ogg"])
 def test_can_get_pictures(name):
     path = os.path.join(DATA_DIR, name)
     data = metadata.Metadata(path)
@@ -243,3 +245,20 @@ def test_metadata_all_ignore_parse_errors_false(mocker):
     mocker.patch.object(data, "get", side_effect=metadata.ParseError("Failure"))
     with pytest.raises(metadata.ParseError):
         data.all(ignore_parse_errors=False)
+
+
+def test_metadata_fallback_ogg_theora(mocker):
+    path = os.path.join(DATA_DIR, "with_cover.ogg")
+    data = metadata.Metadata(path)
+
+    assert isinstance(data._file, mutagen.oggtheora.OggTheora)
+    assert isinstance(data.fallback, metadata.Metadata)
+    assert isinstance(data.fallback._file, mutagen.oggvorbis.OggVorbis)
+
+    expected_result = data.fallback.get("pictures")
+    fallback_get = mocker.spy(data.fallback, "get")
+
+    assert expected_result is not None
+    assert data.get("pictures", "default") == expected_result
+
+    fallback_get.assert_called_once_with("pictures", "default")
