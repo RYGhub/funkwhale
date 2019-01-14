@@ -1,7 +1,12 @@
+import base64
 import datetime
 import logging
-import mutagen
 import pendulum
+
+import mutagen._util
+import mutagen.oggtheora
+import mutagen.oggvorbis
+import mutagen.flac
 
 from django import forms
 
@@ -78,6 +83,31 @@ def clean_flac_pictures(apic):
                 "content": p.data,
                 "description": p.desc,
                 "type": p.type.real,
+            }
+        )
+    return pictures
+
+
+def clean_ogg_pictures(metadata_block_picture):
+    pictures = []
+    for b64_data in [metadata_block_picture]:
+
+        try:
+            data = base64.b64decode(b64_data)
+        except (TypeError, ValueError):
+            continue
+
+        try:
+            picture = mutagen.flac.Picture(data)
+        except mutagen.flac.FLACError:
+            continue
+
+        pictures.append(
+            {
+                "mimetype": picture.mime,
+                "content": picture.data,
+                "description": "",
+                "type": picture.type.real,
             }
         )
     return pictures
@@ -197,6 +227,10 @@ CONF = {
             "musicbrainz_recordingid": {"field": "musicbrainz_trackid"},
             "license": {},
             "copyright": {},
+            "pictures": {
+                "field": "metadata_block_picture",
+                "to_application": clean_ogg_pictures,
+            },
         },
     },
     "OggTheora": {
@@ -216,9 +250,8 @@ CONF = {
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
             "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "musicbrainz_recordingid": {"field": "MusicBrainz Track Id"},
-            # somehow, I cannot successfully create an ogg theora file
-            # with the proper license field
-            # "license": {"field": "license"},
+            "license": {},
+            "copyright": {},
         },
     },
     "MP3": {
@@ -288,10 +321,11 @@ ALL_FIELDS = [
 
 
 class Metadata(object):
-    def __init__(self, path):
-        self._file = mutagen.File(path)
+    def __init__(self, filething, kind=mutagen.File):
+        self._file = kind(filething)
         if self._file is None:
-            raise ValueError("Cannot parse metadata from {}".format(path))
+            raise ValueError("Cannot parse metadata from {}".format(filething))
+        self.fallback = self.load_fallback(filething, self._file)
         ft = self.get_file_type(self._file)
         try:
             self._conf = CONF[ft]
@@ -301,7 +335,40 @@ class Metadata(object):
     def get_file_type(self, f):
         return f.__class__.__name__
 
+    def load_fallback(self, filething, parent):
+        """
+        In some situations, such as Ogg Theora files tagged with MusicBrainz Picard,
+        part of the tags are only available in the ogg vorbis comments
+        """
+        try:
+            filething.seek(0)
+        except AttributeError:
+            pass
+        if isinstance(parent, mutagen.oggtheora.OggTheora):
+            try:
+                return Metadata(filething, kind=mutagen.oggvorbis.OggVorbis)
+            except (ValueError, mutagen._util.MutagenError):
+                raise
+                pass
+
     def get(self, key, default=NODEFAULT):
+        try:
+            return self._get_from_self(key)
+        except TagNotFound:
+            if not self.fallback:
+                if default != NODEFAULT:
+                    return default
+                else:
+                    raise
+            else:
+                return self.fallback.get(key, default=default)
+        except UnsupportedTag:
+            if not self.fallback:
+                raise
+            else:
+                return self.fallback.get(key, default=default)
+
+    def _get_from_self(self, key, default=NODEFAULT):
         try:
             field_conf = self._conf["fields"][key]
         except KeyError:
