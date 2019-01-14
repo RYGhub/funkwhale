@@ -73,71 +73,71 @@
         </p>
       </div>
       <div class="two wide column controls ui grid">
-        <a
-          href
+        <span
+          role="button"
           :title="labels.previousTrack"
           :aria-label="labels.previousTrack"
           class="two wide column control"
           @click.prevent.stop="previous"
           :disabled="emptyQueue">
             <i :class="['ui', 'backward step', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
-        </a>
-        <a
-          href
+        </span>
+        <span
+          role="button"
           v-if="!playing"
           :title="labels.play"
           :aria-label="labels.play"
           @click.prevent.stop="togglePlay"
           class="two wide column control">
             <i :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </a>
-        <a
-          href
+        </span>
+        <span
+          role="button"
           v-else
           :title="labels.pause"
           :aria-label="labels.pause"
           @click.prevent.stop="togglePlay"
           class="two wide column control">
             <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </a>
-        <a
-          href
+        </span>
+        <span
+          role="button"
           :title="labels.next"
           :aria-label="labels.next"
           class="two wide column control"
           @click.prevent.stop="next"
           :disabled="!hasNext">
             <i :class="['ui', {'disabled': !hasNext}, 'forward step', 'secondary', 'icon']" ></i>
-        </a>
+        </span>
         <div
           class="wide column control volume-control"
           v-on:mouseover="showVolume = true"
           v-on:mouseleave="showVolume = false"
           v-bind:class="{ active : showVolume }">
-          <a
-            href
+          <span
+            role="button"
             v-if="volume === 0"
             :title="labels.unmute"
             :aria-label="labels.unmute"
             @click.prevent.stop="unmute">
             <i class="volume off secondary icon"></i>
-          </a>
-          <a
-            href
+          </span>
+          <span
+            role="button"
             v-else-if="volume < 0.5"
             :title="labels.mute"
             :aria-label="labels.mute"
             @click.prevent.stop="mute">
             <i class="volume down secondary icon"></i>
-          </a>
-          <a
-            href
+          </span>
+          <span
+            role="button"
             v-else
             :title="labels.mute"
             :aria-label="labels.mute"
             @click.prevent.stop="mute">
             <i class="volume up secondary icon"></i>
-          </a>
+          </span>
           <input
             type="range"
             step="0.05"
@@ -147,17 +147,17 @@
             v-if="showVolume" />
         </div>
         <div class="two wide column control looping" v-if="!showVolume">
-          <a
-            href
+          <span
+            role="button"
             v-if="looping === 0"
             :title="labels.loopingDisabled"
             :aria-label="labels.loopingDisabled"
             @click.prevent.stop="$store.commit('player/looping', 1)"
             :disabled="!currentTrack">
             <i :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
-          </a>
-          <a
-            href
+          </span>
+          <span
+            role="button"
             @click.prevent.stop="$store.commit('player/looping', 2)"
             :title="labels.loopingSingle"
             :aria-label="labels.loopingSingle"
@@ -167,9 +167,9 @@
               class="repeat secondary icon">
               <span class="ui circular tiny orange label">1</span>
             </i>
-          </a>
-          <a
-            href
+          </span>
+          <span
+            role="button"
             :title="labels.loopingWhole"
             :aria-label="labels.loopingWhole"
             v-if="looping === 2"
@@ -178,10 +178,10 @@
             <i
               class="repeat orange secondary icon">
             </i>
-          </a>
+          </span>
         </div>
-        <a
-          href
+        <span
+          role="button"
           :disabled="queue.tracks.length === 0"
           :title="labels.shuffle"
           :aria-label="labels.shuffle"
@@ -190,10 +190,10 @@
           class="two wide column control">
           <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
           <i v-else :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </a>
+        </span>
         <div class="one wide column" v-if="!showVolume"></div>
-        <a
-          href
+        <span
+          role="button"
           :disabled="queue.tracks.length === 0"
           :title="labels.clear"
           :aria-label="labels.clear"
@@ -201,7 +201,7 @@
           @click.prevent.stop="clean()"
           class="two wide column control">
           <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </a>
+        </span>
       </div>
       <GlobalEvents
         @keydown.space.prevent.exact="togglePlay"
