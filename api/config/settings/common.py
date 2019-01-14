@@ -595,3 +595,5 @@ RSA_KEY_SIZE = 2048
 # for performance gain in tests, since we don't need to actually create the
 # thumbnails
 CREATE_IMAGE_THUMBNAILS = env.bool("CREATE_IMAGE_THUMBNAILS", default=True)
+# we rotate actor keys at most every two days by default
+ACTOR_KEY_ROTATION_DELAY = env.int("ACTOR_KEY_ROTATION_DELAY", default=3600 * 48)

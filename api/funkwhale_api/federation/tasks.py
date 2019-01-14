@@ -14,6 +14,7 @@ from funkwhale_api.common import session
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
+from . import keys
 from . import models, signing
 from . import serializers
 from . import routes
@@ -229,3 +230,12 @@ def purge_actors(ids=[], domains=[], only=[]):
     found_ids = list(actors.values_list("id", flat=True))
     logger.info("Starting purging %s accounts", len(found_ids))
     handle_purge_actors(ids=found_ids, only=only)
+
+
+@celery.app.task(name="federation.rotate_actor_key")
+@celery.require_instance(models.Actor.objects.local(), "actor")
+def rotate_actor_key(actor):
+    pair = keys.get_key_pair()
+    actor.private_key = pair[0].decode()
+    actor.public_key = pair[1].decode()
+    actor.save(update_fields=["private_key", "public_key"])

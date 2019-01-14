@@ -1,6 +1,8 @@
 import uuid
 import logging
 
+from django.core.cache import cache
+from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 
@@ -236,6 +238,21 @@ class InboxRouter(Router):
                 return
 
 
+ACTOR_KEY_ROTATION_LOCK_CACHE_KEY = "federation:actor-key-rotation-lock:{}"
+
+
+def should_rotate_actor_key(actor_id):
+    lock = cache.get(ACTOR_KEY_ROTATION_LOCK_CACHE_KEY.format(actor_id))
+    return lock is None
+
+
+def schedule_key_rotation(actor_id, delay):
+    from . import tasks
+
+    cache.set(ACTOR_KEY_ROTATION_LOCK_CACHE_KEY.format(actor_id), True, timeout=delay)
+    tasks.rotate_actor_key.apply_async(kwargs={"actor_id": actor_id}, countdown=delay)
+
+
 class OutboxRouter(Router):
     @transaction.atomic
     def dispatch(self, routing, context):
@@ -256,6 +273,15 @@ class OutboxRouter(Router):
                 # a route can yield zero, one or more activity payloads
                 if e:
                     activities_data.append(e)
+            deletions = [
+                a["actor"].id
+                for a in activities_data
+                if a["payload"]["type"] == "Delete"
+            ]
+            for actor_id in deletions:
+                # we way need to triggers a blind key rotation
+                if should_rotate_actor_key(actor_id):
+                    schedule_key_rotation(actor_id, settings.ACTOR_KEY_ROTATION_DELAY)
             inbox_items_by_activity_uuid = {}
             deliveries_by_activity_uuid = {}
             prepared_activities = []

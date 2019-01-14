@@ -49,7 +49,13 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         try:
             signing.verify_django(request, actor.public_key.encode("utf-8"))
         except cryptography.exceptions.InvalidSignature:
-            raise rest_exceptions.AuthenticationFailed("Invalid signature")
+            # in case of invalid signature, we refetch the actor object
+            # to load a potentially new public key. This process is called
+            # Blind key rotation, and is described at
+            # https://blog.dereferenced.org/the-case-for-blind-key-rotation
+            # if signature verification fails after that, then we return a 403 error
+            actor = actors.get_actor(actor_url, skip_cache=True)
+            signing.verify_django(request, actor.public_key.encode("utf-8"))
 
         return actor
 
