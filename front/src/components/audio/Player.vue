@@ -221,6 +221,7 @@ import { mapState, mapGetters, mapActions } from "vuex"
 import GlobalEvents from "@/components/utils/global-events"
 import ColorThief from "@/vendor/color-thief"
 import { Howl } from "howler"
+import $ from 'jquery'
 
 import AudioTrack from "@/components/audio/Track"
 import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
@@ -310,6 +311,8 @@ export default {
       this.$refs.currentAudio.setCurrentTime(time)
     },
     updateBackground() {
+      // delete existing canvas, if any
+      $('canvas.color-thief').remove()
       if (!this.currentTrack.album.cover) {
         this.ambiantColors = this.defaultAmbiantColors
         return

@@ -27,6 +27,7 @@
 */
 var CanvasImage = function (image) {
     this.canvas  = document.createElement('canvas');
+    this.canvas.className = "color-thief hidden";
     this.context = this.canvas.getContext('2d');
 
     document.body.appendChild(this.canvas);
