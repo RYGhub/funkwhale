@@ -93,7 +93,11 @@ export default {
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
     if (!this.$store.state.instance.instanceUrl) {
-      let defaultInstanceUrl = process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
+      // we have several way to guess the API server url. By order of precedence:
+      // 1. use the url provided in settings.json, if any
+      // 2. use the url specified when building via VUE_APP_INSTANCE_URL
+      // 3. use the current url
+      let defaultInstanceUrl = this.$store.state.instance.frontSettings.defaultServerUrl || process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
       this.$store.commit('instance/instanceUrl', defaultInstanceUrl)
     } else {
       // needed to trigger initialization of axios
@@ -194,7 +198,11 @@ export default {
       messages: state => state.ui.messages
     }),
     suggestedInstances () {
-      let instances = [this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio']
+      let instances = []
+      if (this.$store.state.instance.frontSettings.defaultServerUrl) {
+        instances.push(this.$store.state.instance.frontSettings.defaultServerUrl)
+      }
+      instances.push(this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio')
       return instances
     },
     version () {
