@@ -4226,9 +4226,9 @@ hosted-git-info@^2.1.4:
   integrity sha512-7T/BxH19zbcCTa8XkMlbK5lTo1WtgkFi3GvdWEyNuc4Vex7/9Dqbnpsf4JMydcfj9HCg4zUWFTL3Za6lapg5/w==
 
 howler@^2.0.14:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/howler/-/howler-2.1.0.tgz#1834f663915a0ef245698d9baaeb9363ff505048"
-  integrity sha512-/HK8g6bLRNtzNG+HKUEWR/9DguRkgE2IpbIoyyAPTP/jhTJJR/2x4ovAp8pFyJSnpkeXZ6366Gi7LYaXnn2hJw==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/howler/-/howler-2.1.1.tgz#b8ae44b83f4b8a5b5ef354030ed0927314d8a996"
+  integrity sha512-9nwyDCGxhAGMmNXDfMLv0M/uS/WUg2//jG6t96D8DqbbsVZgXQzsP/ZMItbWO/Fqg7Gg69kOv3xVSDzJdd7aqA==
 
 hpack.js@^2.1.6:
   version "2.1.6"
