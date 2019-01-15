@@ -126,15 +126,15 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
-store.dispatch('instance/fetchFrontSettings')
+store.dispatch('instance/fetchFrontSettings').finally(() => {
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    store,
+    template: '<App/>',
+    components: { App }
+  })
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  store,
-  template: '<App/>',
-  components: { App }
+  logger.default.info('Everything loaded!')
 })
-
-logger.default.info('Everything loaded!')
