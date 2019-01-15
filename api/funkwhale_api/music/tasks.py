@@ -191,7 +191,7 @@ def process_upload(upload):
             final_metadata = collections.ChainMap(
                 additional_data, import_metadata, file_metadata
             )
-            additional_data["cover_data"] = m.get_picture("cover_front")
+            additional_data["cover_data"] = m.get_picture("cover_front", "other")
         additional_data["upload_source"] = upload.source
         track = get_track_from_import_metadata(final_metadata)
     except UploadImportError as e:

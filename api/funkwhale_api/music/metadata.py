@@ -409,8 +409,14 @@ class Metadata(object):
 
         return data
 
-    def get_picture(self, picture_type="cover_front"):
-        ptype = getattr(mutagen.id3.PictureType, picture_type.upper())
+    def get_picture(self, *picture_types):
+        if not picture_types:
+            raise ValueError("You need to request at least one picture type")
+        ptypes = [
+            getattr(mutagen.id3.PictureType, picture_type.upper())
+            for picture_type in picture_types
+        ]
+
         try:
             pictures = self.get("pictures")
         except (UnsupportedTag, TagNotFound):
@@ -418,6 +424,9 @@ class Metadata(object):
 
         cleaner = self._conf.get("clean_pictures", lambda v: v)
         pictures = cleaner(pictures)
-        for p in pictures:
-            if p["type"] == ptype:
-                return p
+        if not pictures:
+            return
+        for ptype in ptypes:
+            for p in pictures:
+                if p["type"] == ptype:
+                    return p
