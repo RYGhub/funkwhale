@@ -165,7 +165,7 @@ test_front:
   only:
     - branches
   script:
-    - yarn install
+    - yarn install --check-files
     - yarn test:unit
   cache:
     key: "funkwhale__front_dependencies"
@@ -193,11 +193,6 @@ build_front:
     # cf https://dev.funkwhale.audio/funkwhale/funkwhale/issues/169
     - yarn build | tee /dev/stderr | (! grep -i 'ERROR in')
     - chmod -R 755 dist
-  cache:
-    key: "funkwhale__front_dependencies"
-    paths:
-      - front/node_modules
-      - front/yarn.lock
   artifacts:
     name: "front_${CI_COMMIT_REF_NAME}"
     paths:
