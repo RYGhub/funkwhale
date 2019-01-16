@@ -1,7 +1,82 @@
 Docker installation
-====================
+===================
 
 Docker is the easiest way to get a Funkwhale instance up and running.
+
+We support two types of Docker deployments:
+
+- :ref:`Mono-container <docker-mono-container>`: all processes live in the same container (database, nginx, redis, etc.). It's easier to deploy and to integrate with container management systems like Portainer. However, it's not possible to scale this type of deployment on multiple servers.
+- :ref:`Multi-container <docker-multi-container>`: each process lives in a dedicated container. This setup is more involved but also more flexible and scalable.
+
+.. _docker-mono-container:
+
+Mono-container installation
+---------------------------
+
+.. note::
+
+    This installation method was contributed by @thetarkus, at https://github.com/thetarkus/docker-funkwhale
+
+First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ installed.
+
+Then set up a directory for your data::
+
+    mkdir /srv/funkwhale
+    cd /srv/funkwhale
+
+Export the version you want to deploy:
+
+.. parsed-literal::
+
+    export FUNKWHALE_VERSION="|version|"
+
+Create an env file to store a few important configuration options:
+
+.. code-block:: shell
+
+    touch .env
+    echo "FUNKWHALE_HOSTNAME=yourdomain.funkwhale" >> .env
+	echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
+	echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
+
+Then start the container:
+
+.. code-block:: shell
+
+    docker run \
+        --name=funkwhale \
+        --restart=unless-stopped \
+        --env-file=/srv/funkwhale/.env \
+        -v /srv/funkwhale/data:/data \
+        -v /path/to/your/music/dir:/music:ro \
+        -e PUID=$UID \
+        -e PGID=$GID \
+        -p 5000:80 \
+        -d \
+        funkwhale/all-in-one:$FUNKWHALE_VERSION
+
+.. note::
+
+    - ``-e PUID`` and ``-e PGID`` are optional but useful to prevent permission issues with docker volumes
+    - ``-v /path/to/your/music/dir`` should point to a path on your host were is located music you want to import in your Funkwhale instance. You can safely remove the volume if you don't want to import music that way.
+
+Your container should start in the background, and your instance be available at ``yourip:5000`` shortly.
+
+You will need an admin account to login and manage your account, create one using the following command: ``docker exec -it funkwhale manage createsuperuser``
+
+Useful commands:
+
+- You can examine the logs by running ``docker logs -f --tail=50 funkwhale``
+- You can start and stop your instance using ``docker start funkwhale`` and ``docker stop funkwhale``, respectively
+- To have a better idea of the resource usage of your instance (CPU, memory), run ``docker stats funkwhale``
+
+
+
+
+.. _docker-multi-container:
+
+Multi-container installation
+----------------------------
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ installed.
 
