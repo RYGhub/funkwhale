@@ -130,7 +130,8 @@ export default {
         page: this.page,
         page_size: this.paginateBy,
         q: this.query,
-        ordering: this.getOrderingAsString()
+        ordering: this.getOrderingAsString(),
+        playable: true
       }
       axios.get(url, { params: params }).then(response => {
         self.result = response.data
