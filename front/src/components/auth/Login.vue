@@ -52,7 +52,7 @@ import PasswordInput from "@/components/forms/PasswordInput"
 
 export default {
   props: {
-    next: { type: String, default: "/" }
+    next: { type: String, default: "/library" }
   },
   components: {
     PasswordInput
@@ -67,6 +67,11 @@ export default {
       },
       error: "",
       isLoading: false
+    }
+  },
+  created () {
+    if (this.$store.state.auth.authenticated) {
+      this.$router.push(this.next)
     }
   },
   mounted() {
@@ -91,10 +96,11 @@ export default {
         username: this.credentials.username,
         password: this.credentials.password
       }
+      console.log('NEXT', this.next)
       this.$store
         .dispatch("auth/login", {
           credentials,
-          next: "/library",
+          next: this.next,
           onError: error => {
             if (error.response.status === 400) {
               self.error = "invalid_credentials"

@@ -101,6 +101,9 @@ export default {
     }
   },
   created() {
+    if (!this.$store.state.auth.authenticated) {
+      this.$router.push({name: 'login', query: {next: this.$router.currentRoute.fullPath}})
+    }
     this.fetchFavorites(FAVORITES_URL)
   },
   mounted() {

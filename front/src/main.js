@@ -97,7 +97,7 @@ axios.interceptors.response.use(function (response) {
   error.backendErrors = []
   if (error.response.status === 401) {
     store.commit('auth/authenticated', false)
-    logger.default.warn('Received 401 response from API, redirecting to login form')
+    logger.default.warn('Received 401 response from API, redirecting to login form', router.currentRoute.fullPath)
     router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
   }
   if (error.response.status === 404) {
