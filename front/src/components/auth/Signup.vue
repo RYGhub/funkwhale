@@ -39,11 +39,10 @@
             <label><translate>Password</translate></label>
             <password-input v-model="password" />
           </div>
-          <div class="field">
-            <label v-if="!$store.state.instance.settings.users.registration_enabled.value"><translate>Invitation code</translate></label>
-            <label v-else><translate>Invitation code (optional)</translate></label>
+          <div class="field" v-if="!$store.state.instance.settings.users.registration_enabled.value">
+            <label><translate>Invitation code</translate></label>
             <input
-            :required="!$store.state.instance.settings.users.registration_enabled.value"
+            required
             type="text"
             :placeholder="labels.placeholder"
             v-model="invitation">
