@@ -1,7 +1,8 @@
 variables:
   IMAGE_NAME: funkwhale/funkwhale
   IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
-  IMAGE_LATEST: $IMAGE_NAME:latest
+  ALL_IN_ONE_IMAGE_NAME: funkwhale/all-in-one
+  ALL_IN_ONE_IMAGE: $ALL_IN_ONE_IMAGE_NAME:$CI_COMMIT_REF_NAME
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
   PYTHONDONTWRITEBYTECODE: "true"
   REVIEW_DOMAIN: preview.funkwhale.audio
@@ -201,6 +202,7 @@ build_front:
     - tags@funkwhale/funkwhale
     - master@funkwhale/funkwhale
     - develop@funkwhale/funkwhale
+
   tags:
     - docker
 
@@ -239,6 +241,32 @@ docker_release:
   script:
     - docker build -t $IMAGE .
     - docker push $IMAGE
+  only:
+    - develop@funkwhale/funkwhale
+    - tags@funkwhale/funkwhale
+  tags:
+    - docker-build
+
+docker_all_in_one_release:
+  stage: deploy
+  image: bash
+  variables:
+    ALL_IN_ONE_REF: master
+    ALL_IN_ONE_ARTIFACT_URL: https://github.com/thetarkus/docker-funkwhale/archive/$ALL_IN_ONE_REF.zip
+    BUILD_PATH: all_in_one
+  before_script:
+    - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+    - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $(echo $CI_COMMIT_SHA | cut -c 1-8); fi);
+  script:
+    - wget $ALL_IN_ONE_ARTIFACT_URL -O all_in_one.zip
+    - unzip -o all_in_one.zip -d tmpdir
+    - mv tmpdir/docker-funkwhale-$ALL_IN_ONE_REF $BUILD_PATH && rmdir tmpdir
+    - cp -r api $BUILD_PATH/src/api
+    - cp -r front $BUILD_PATH/src/front
+    - cd $BUILD_PATH
+    - ./scripts/download-nginx-template.sh src/ $CI_COMMIT_REF_NAME
+    - docker build -t $ALL_IN_ONE_IMAGE .
+    - docker push $ALL_IN_ONE_IMAGE
   only:
     - develop@funkwhale/funkwhale
     - tags@funkwhale/funkwhale

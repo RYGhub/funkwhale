@@ -184,3 +184,16 @@ and replace the ``location /api/`` and `location /` blocks by the following snip
 Replace ``${FUNKWHALE_FRONTEND_PATH}`` by the corresponding variable from your .env file,
 which should be ``/srv/funkwhale/front/dist`` by default, then reload your nginx process with
 ``sudo systemctl reload nginx``.
+
+
+Alternative docker deployment method
+------------------------------------
+
+Thanks to the awesome done by @thetarkus at https://github.com/thetarkus/docker-funkwhale,
+we're now able to provide an alternative and easier Docker deployment method!
+
+In contrast with our current, multi-container offer, this method integrates
+all Funkwhale processes and services (database, redis, etc.) into a single, easier to deploy container.
+
+Both method will coexist in parallel, as each one has pros and cons. You can learn more
+about this exciting new deployment option by visiting https://docs.funkwhale.audio/installation/docker.html!
