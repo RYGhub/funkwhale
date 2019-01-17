@@ -28,7 +28,7 @@
           </p>
           <div class="ui bulleted list">
             <div class="ui item" v-for="url in suggestedInstances">
-              <a @click="instanceUrl = url">{{ url }}</a>
+              <a @click="instanceUrl = url; $store.dispatch('instance/setUrl', url)">{{ url }}</a>
             </div>
           </div>
         </form>
@@ -198,12 +198,18 @@ export default {
       messages: state => state.ui.messages
     }),
     suggestedInstances () {
-      let instances = []
+      let instances = this.$store.state.instance.knownInstances.slice(0)
+      console.log('instance', instances)
       if (this.$store.state.instance.frontSettings.defaultServerUrl) {
-        instances.push(this.$store.state.instance.frontSettings.defaultServerUrl)
+        let serverUrl = this.$store.state.instance.frontSettings.defaultServerUrl
+        if (!serverUrl.endsWith('/')) {
+          serverUrl = serverUrl + '/'
+        }
+        instances.push(serverUrl)
       }
-      instances.push(this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio')
-      return instances
+      instances.push(this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio/')
+      console.log('HELLO', instances)
+      return _.uniq(instances.filter((e) => {return e}))
     },
     version () {
       if (!this.nodeinfo) {

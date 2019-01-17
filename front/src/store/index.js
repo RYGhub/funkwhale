@@ -34,7 +34,7 @@ export default new Vuex.Store({
     }),
     createPersistedState({
       key: 'instance',
-      paths: ['instance.events', 'instance.instanceUrl']
+      paths: ['instance.events', 'instance.instanceUrl', 'instance.knownInstances']
     }),
     createPersistedState({
       key: 'ui',

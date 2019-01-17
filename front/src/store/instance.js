@@ -5,7 +5,7 @@ import _ from '@/lodash'
 function getDefaultUrl () {
   return (
     window.location.protocol + '//' + window.location.hostname +
-    (window.location.port ? ':' + window.location.port : '')
+    (window.location.port ? ':' + window.location.port : '') + '/'
   )
 }
 
@@ -16,6 +16,7 @@ export default {
     frontSettings: {},
     instanceUrl: process.env.VUE_APP_INSTANCE_URL,
     events: [],
+    knownInstances: [],
     settings: {
       instance: {
         name: {
@@ -64,6 +65,15 @@ export default {
         value = value + '/'
       }
       state.instanceUrl = value
+
+      // append the URL to the list (and remove existing one if needed)
+      if (value) {
+        let index = state.knownInstances.indexOf(value);
+        if (index > -1) {
+          state.knownInstances.splice(index, 1);
+        }
+        state.knownInstances.splice(0, 0, value)
+      }
       if (!value) {
         axios.defaults.baseURL = null
         return

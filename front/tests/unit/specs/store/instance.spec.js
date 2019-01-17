@@ -25,6 +25,14 @@ describe('store/instance', () => {
         users: {upload_quota: {value: 1}, registration_enabled: {value: true}}
       })
     })
+    it('instanceUrl', () => {
+      const state = {instanceUrl: null, knownInstances: ['http://test2/', 'http://test/']}
+      store.mutations.instanceUrl(state, 'http://test')
+      expect(state).to.deep.equal({
+        instanceUrl: 'http://test/',  // trailing slash added
+        knownInstances: ['http://test/', 'http://test2/']
+      })
+    })
   })
   describe('actions', () => {
     it('fetchSettings', () => {
