@@ -12,15 +12,18 @@
       </div>
     </section>
     <section class="ui vertical stripe segment">
-      <p v-if="!instance.short_description.value && !instance.long_description.value">
-        <translate>Unfortunately, owners of this instance did not yet take the time to complete this page.</translate>
-      </p>
-      <router-link
-        class="ui button"
-        v-if="$store.state.auth.availablePermissions['settings']"
-        :to="{path: '/manage/settings', hash: 'instance'}">
-        <i class="pencil icon"></i><translate>Edit instance info</translate>
-      </router-link>
+      <div
+        class="ui middle aligned stackable text container">
+        <p
+        v-if="!instance.short_description.value && !instance.long_description.value"><translate>Unfortunately, owners of this instance did not yet take the time to complete this page.</translate></p>
+        <router-link
+          class="ui button"
+          v-if="$store.state.auth.availablePermissions['settings']"
+          :to="{path: '/manage/settings', hash: 'instance'}">
+          <i class="pencil icon"></i><translate>Edit instance info</translate>
+        </router-link>
+        <div class="ui hidden divider"></div>
+      </div>
       <div
         v-if="instance.short_description.value"
         class="ui middle aligned stackable text container">
