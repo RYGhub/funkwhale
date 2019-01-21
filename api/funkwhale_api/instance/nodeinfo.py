@@ -17,7 +17,7 @@ def get():
         "protocols": ["activitypub"],
         "services": {"inbound": [], "outbound": []},
         "openRegistrations": preferences.get("users__registration_enabled"),
-        "usage": {"users": {"total": 0}},
+        "usage": {"users": {"total": 0, "activeHalfyear": 0, "activeMonth": 0}},
         "metadata": {
             "private": preferences.get("instance__nodeinfo_private"),
             "shortDescription": preferences.get("instance__short_description"),
@@ -37,7 +37,11 @@ def get():
     if share_stats:
         getter = memo(lambda: stats.get(), max_age=600)
         statistics = getter()
-        data["usage"]["users"]["total"] = statistics["users"]
+        data["usage"]["users"]["total"] = statistics["users"]["total"]
+        data["usage"]["users"]["activeHalfyear"] = statistics["users"][
+            "active_halfyear"
+        ]
+        data["usage"]["users"]["activeMonth"] = statistics["users"]["active_month"]
         data["metadata"]["library"]["tracks"] = {"total": statistics["tracks"]}
         data["metadata"]["library"]["artists"] = {"total": statistics["artists"]}
         data["metadata"]["library"]["albums"] = {"total": statistics["albums"]}

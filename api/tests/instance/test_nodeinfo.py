@@ -5,7 +5,7 @@ from funkwhale_api.instance import nodeinfo
 def test_nodeinfo_dump(preferences, mocker):
     preferences["instance__nodeinfo_stats_enabled"] = True
     stats = {
-        "users": 1,
+        "users": {"total": 1, "active_halfyear": 12, "active_month": 13},
         "tracks": 2,
         "albums": 3,
         "artists": 4,
@@ -21,7 +21,7 @@ def test_nodeinfo_dump(preferences, mocker):
         "protocols": ["activitypub"],
         "services": {"inbound": [], "outbound": []},
         "openRegistrations": preferences["users__registration_enabled"],
-        "usage": {"users": {"total": stats["users"]}},
+        "usage": {"users": {"total": 1, "activeHalfyear": 12, "activeMonth": 13}},
         "metadata": {
             "private": preferences["instance__nodeinfo_private"],
             "shortDescription": preferences["instance__short_description"],
@@ -58,7 +58,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
         "protocols": ["activitypub"],
         "services": {"inbound": [], "outbound": []},
         "openRegistrations": preferences["users__registration_enabled"],
-        "usage": {"users": {"total": 0}},
+        "usage": {"users": {"total": 0, "activeHalfyear": 0, "activeMonth": 0}},
         "metadata": {
             "private": preferences["instance__nodeinfo_private"],
             "shortDescription": preferences["instance__short_description"],
