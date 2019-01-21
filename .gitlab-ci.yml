@@ -148,11 +148,10 @@ test_api:
     - branches
   before_script:
     - cd api
-    - apt-get update
-    - grep "^[^#;]" requirements.apt | grep -Fv "python3-dev" | xargs apt-get install -y --no-install-recommends
-    - pip install -r requirements/base.txt
-    - pip install -r requirements/local.txt
-    - pip install -r requirements/test.txt
+    - sed -i '/Pillow/d' requirements/base.txt
+    - pip3 install -r requirements/base.txt
+    - pip3 install -r requirements/local.txt
+    - pip3 install -r requirements/test.txt
   script:
     - pytest --cov=funkwhale_api tests/
   tags:
