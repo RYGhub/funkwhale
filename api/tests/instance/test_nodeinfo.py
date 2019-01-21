@@ -32,7 +32,7 @@ def test_nodeinfo_dump(preferences, mocker):
                 "federationNeedsApproval": preferences[
                     "federation__music_needs_approval"
                 ],
-                "anonymousCanListen": preferences[
+                "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
                 "tracks": {"total": stats["tracks"]},
@@ -69,7 +69,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 "federationNeedsApproval": preferences[
                     "federation__music_needs_approval"
                 ],
-                "anonymousCanListen": preferences[
+                "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
             },

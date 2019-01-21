@@ -28,7 +28,7 @@ def get():
                 "federationNeedsApproval": preferences.get(
                     "federation__music_needs_approval"
                 ),
-                "anonymousCanListen": preferences.get(
+                "anonymousCanListen": not preferences.get(
                     "common__api_authentication_required"
                 ),
             },
