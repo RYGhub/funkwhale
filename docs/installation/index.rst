@@ -71,6 +71,7 @@ We also maintain an installation guide for Debian 9 and Arch Linux.
    debian
    docker
    systemd
+   non_amd64_architectures
 
 Funkwhale packages are available for the following platforms:
 

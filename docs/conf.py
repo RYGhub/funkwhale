@@ -58,6 +58,8 @@ author = "Eliot Berriot"
 #
 # The short X.Y version.
 version = funkwhale_api.__version__
+if "-dev" in version:
+    version = "develop"
 # The full version, including alpha/beta/rc tags.
 release = version
 

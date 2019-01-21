@@ -8,6 +8,12 @@ We support two types of Docker deployments:
 - :ref:`Mono-container <docker-mono-container>`: all processes live in the same container (database, nginx, redis, etc.). It's easier to deploy and to integrate with container management systems like Portainer. However, it's not possible to scale this type of deployment on multiple servers.
 - :ref:`Multi-container <docker-multi-container>`: each process lives in a dedicated container. This setup is more involved but also more flexible and scalable.
 
+.. note::
+
+    We do not distribute Docker images for non-amd64 architectures yet. However, :doc:`you can easily build
+    those images yourself following our instructions <non_amd64_architectures>`, and come back to this installation guide once
+    the build is over.
+
 .. _docker-mono-container:
 
 Mono-container installation
