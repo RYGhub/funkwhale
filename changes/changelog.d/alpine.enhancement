@@ -1,0 +1,1 @@
+Based Docker image on alpine to have a smaller (and faster to build) image
