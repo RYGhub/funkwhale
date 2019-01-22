@@ -67,7 +67,7 @@ Instance-level moderation tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This release includes a first set of moderation tools that will give more control
-to admins about the way their instance federate with other instance and accounts on the network.
+to admins about the way their instance federates with other instance and accounts on the network.
 Using these tools, it's now possible to:
 
 - Browse known accounts and domains, and associated data (storage size, software version, etc.)
