@@ -174,7 +174,7 @@ Enable gzip compression [manual action suggested]
 Gzip compression will be enabled on new instances by default
 and will reduce the amount of bandwidth consumed by your instance.
 
-If you with to benefit from gzip compression on your instance,
+If you want to benefit from gzip compression on your instance,
 edit your reverse proxy virtualhost file (located at ``/etc/nginx/sites-available/funkwhale.conf``) and add the following snippet
 in the server block, then reload your nginx server::
 
