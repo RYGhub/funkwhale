@@ -1,6 +1,10 @@
 Systemd configuration
 ----------------------
 
+.. note::
+
+    All the command lines below should be executed as root.
+
 Systemd offers a convenient way to manage your Funkwhale instance if you're
 not using docker.
 

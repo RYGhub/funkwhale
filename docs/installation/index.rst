@@ -197,6 +197,14 @@ Finally, enable the resulting configuration:
 .. code-block:: bash
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
+.. note::
+
+    At this point you will need a certificate to enable HTTPS on your server.
+    There are many ways to obtain this certificate. The most popular and free
+    way is to obtain it from Let's Encryt. To do this, you can use an utility
+    called certbot. You can find a complete documentation on how to use certbot
+    at the `certbot documentation <https://certbot.eff.org/docs/>`.
+
 Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``systemctl restart nginx``.
 
 .. warning::
@@ -229,6 +237,11 @@ Then, download our sample virtualhost file:
 You can tweak the configuration file according to your setup, especially the
 TLS configuration. Otherwise, defaults, should work if you followed the
 installation guide.
+
+.. note::
+
+    To obtain a certificate to enable HTTPS on your server, please refer to the note in
+    the nginx chapter above.
 
 Check the configuration is valid with ``apache2ctl configtest``, and once you're
 done, load the new configuration with ``service apache2 restart``.
