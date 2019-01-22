@@ -65,6 +65,7 @@ server {
 
     location / {
         include /etc/nginx/funkwhale_proxy.conf;
+        client_max_body_size ${NGINX_MAX_BODY_SIZE};
         proxy_pass   http://fw/;
     }
 }
