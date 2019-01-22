@@ -95,9 +95,25 @@ DSub is a full-featured Subsonic client that works great, and has a lot of featu
 It's one of the recommended Android client to use with Funkwhale, as we are doing
 our Android tests on this one.
 
+play:Sub (iOS)
+^^^^^^^^^^^^^^
+
+- Price: $4,99
+- App Store: https://itunes.apple.com/us/app/play-sub-subsonic-music-streamer/id955329386
+- Website: http://michaelsapps.dk/playsubapp/
+
+Although paying, this app is known to work great with Funkwhale as the maintainer, Michael Bech Hansen implements Funkwhale
+specific logic and checks.
+
+Substreamer (iOS)
+^^^^^^^^^^^^^^^^^
+
+- Price: free
+- App Store: https://itunes.apple.com/us/app/substreamer/id1012991665
+
+
 Clementine (Desktop)
 ^^^^^^^^^^^^^^^^^^^^
-
 - Price: free
 - Website: https://www.clementine-player.org/fr/
 
