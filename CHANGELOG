@@ -84,7 +84,7 @@ inspired from what's being done in Mastodon. Thank you so much!
 Iframe widget to embed public tracks and albums [manual action required]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Funkwhale now support embedding a lightweight audio player on external websites
+Funkwhale now supports embedding a lightweight audio player on external websites
 for album and tracks that are available in public libraries. Important pages,
 such as artist, album and track pages also include OpenGraph tags that will
 enable previews on compatible apps (like sharing a Funkwhale track link on Mastodon
@@ -132,7 +132,7 @@ which should be ``/srv/funkwhale/front/dist`` by default, then reload your nginx
 Alternative docker deployment method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Thanks to the awesome done by @thetarkus at https://github.com/thetarkus/docker-funkwhale,
+Thanks to the awesome work done by @thetarkus at https://github.com/thetarkus/docker-funkwhale,
 we're now able to provide an alternative and easier Docker deployment method!
 
 In contrast with our current, multi-container offer, this method integrates
