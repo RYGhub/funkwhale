@@ -133,12 +133,6 @@ which version you've installed next time you want to upgrade your installation.
 System dependencies
 -------------------
 
-First, switch to the api directory:
-
-.. code-block:: shell
-
-    cd api
-
 A few OS packages are required in order to run Funkwhale. On Debian-like
 systems, they can be installed with
 
@@ -221,12 +215,21 @@ Download the sample environment file:
 
         cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
 
+Generate a secret key for Django:
 
-You can then edit it: the file is heavily commented, and the most relevant
+.. code-block:: shell
+    openssl rand -base64 45
+
+You can then edit the file: the file is heavily commented, and the most relevant
 configuration options are mentioned at the top of the file.
 
-Especially, populate the ``DATABASE_URL`` and ``CACHE_URL`` values based on
-how you configured your PostgreSQL and Redis servers in
+.. code-block:: shell
+    nano /srv/funkwhale/api/.env
+
+Paste the secret key you generated earlier at the entry
+``DJANGO_SECRET_KEY`` and populate the ``DATABASE_URL``
+and ``CACHE_URL`` values based on how you configured
+your PostgreSQL and Redis servers in
 :doc:`external dependencies <./external_dependencies>`.
 
 Database setup

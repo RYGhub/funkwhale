@@ -14,7 +14,7 @@ Funkwhale supports LDAP through the Django LDAP authentication module and by set
 Dependencies
 ------------
 
-LDAP support requires some additional dependencies to enable. On the OS level both ``libldap2-dev`` and ``libsasl2-dev`` are required, and the Python modules ``python-ldap`` and ``django-auth-ldap`` must be installed. These dependencies are all included in the ``requirements.*`` files so deploying with those will install these dependencies by default. However, they are not required unless LDAP support is explicitly enabled.
+LDAP support requires some additional dependencies to enable. On the OS level both ``libldap2-dev`` and ``libsasl2-dev`` are required, and the Python modules ``python-ldap`` and ``python-django-auth-ldap`` must be installed. These dependencies are all included in the ``requirements.*`` files so deploying with those will install these dependencies by default. However, they are not required unless LDAP support is explicitly enabled.
 
 Environment variables
 ---------------------
