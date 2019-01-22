@@ -105,16 +105,16 @@ match what is described in :doc:`/installation/debian`:
 
     # update os dependencies
     sudo api/install_os_dependencies.sh install
-    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/pip install -r api/requirements.txt
+    sudo -u funkwhale -H -E /srv/funkwhale/virtualenv/bin/pip install -r api/requirements.txt
 
     # collect static files
-    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py collectstatic --no-input
+    sudo -u funkwhale -H -E /srv/funkwhale/virtualenv/bin/python api/manage.py collectstatic --no-input
 
     # stop the services
     sudo systemctl stop funkwhale.target
 
     # apply database migrations
-    sudo -u funkwhale -E /srv/funkwhale/virtualenv/bin/python api/manage.py migrate
+    sudo -u funkwhale -H -E /srv/funkwhale/virtualenv/bin/python api/manage.py migrate
 
     # restart the services
     sudo systemctl start funkwhale.target
