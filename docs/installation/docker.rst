@@ -25,10 +25,19 @@ Mono-container installation
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ installed.
 
-Then set up a directory for your data::
+Create the user and the directory:
 
-    mkdir /srv/funkwhale
+.. code-block:: shell
+
+    sudo useradd -r -s /usr/bin/nologin -d /srv/funkwhale -m funkwhale
+    sudo adduser funkwhale docker
     cd /srv/funkwhale
+
+Log in as the newly created user from now on:
+
+.. code-block:: shell
+
+    sudo -u funkwhale -H bash
 
 Export the version you want to deploy:
 
@@ -42,8 +51,8 @@ Create an env file to store a few important configuration options:
 
     touch .env
     echo "FUNKWHALE_HOSTNAME=yourdomain.funkwhale" >> .env
-	echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
-	echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
+    echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
+    echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
 
 Then start the container:
 
@@ -76,8 +85,32 @@ Useful commands:
 - You can start and stop your instance using ``docker start funkwhale`` and ``docker stop funkwhale``, respectively
 - To have a better idea of the resource usage of your instance (CPU, memory), run ``docker stats funkwhale``
 
+.. note::
 
+    The container will not pick up changes made in .env file automatically.
+    In order to load new configuration, run:
 
+    .. parsed-literal::
+
+        export FUNKWHALE_VERSION="|version|"
+
+    .. code-block:: shell
+
+        # stop and remove the existing container
+        docker stop funkwhale
+        docker rm funkwhale
+        # relaunch a new container
+        docker run \
+            --name=funkwhale \
+            --restart=unless-stopped \
+            --env-file=/srv/funkwhale/.env \
+            -v /srv/funkwhale/data:/data \
+            -v /path/to/your/music/dir:/music:ro \
+            -e PUID=$UID \
+            -e PGID=$GID \
+            -p 5000:80 \
+            -d \
+            funkwhale/all-in-one:$FUNKWHALE_VERSION
 
 .. _docker-multi-container:
 
@@ -86,6 +119,12 @@ Multi-container installation
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ installed.
 
+Export the version you want to deploy:
+
+.. parsed-literal::
+
+    export FUNKWHALE_VERSION="|version|"
+
 Download the sample docker-compose file:
 
 .. parsed-literal::
@@ -93,9 +132,9 @@ Download the sample docker-compose file:
     mkdir /srv/funkwhale
     cd /srv/funkwhale
     mkdir nginx
-    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker-compose.yml"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
 
 At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
@@ -103,7 +142,6 @@ At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
     .
     ├── docker-compose.yml
-    ├── .env
     └── nginx
         ├── funkwhale_proxy.conf
         └── funkwhale.template
@@ -112,8 +150,7 @@ Create your env file:
 
 .. parsed-literal::
 
-    export FUNKWHALE_VERSION="|version|"
-    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
+    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
     sudo nano .env
 

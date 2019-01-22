@@ -149,11 +149,14 @@ match the application configuration and make upgrade/maintenance easier.
 
 On docker deployments, run the following commands:
 
-.. code:: shell
+.. parsed-literal::
 
+    export FUNKWHALE_VERSION="|version|"
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker.proxy.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.proxy.template"
+
+.. code-block:: shell
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/.env && set +a
@@ -165,11 +168,16 @@ On docker deployments, run the following commands:
 
 On non-docker deployments, run the following commands:
 
-.. code:: shell
+
+.. parsed-literal::
+
+    export FUNKWHALE_VERSION="|version|"
 
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/nginx.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/nginx.template"
+
+.. code-block:: shell
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/config/.env && set +a
