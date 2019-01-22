@@ -1,1 +1,0 @@
-Load env file in config/.env automatically to avoid sourcing it by hand (#626)

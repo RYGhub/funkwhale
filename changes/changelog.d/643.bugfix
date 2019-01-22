@@ -1,1 +1,0 @@
-Upgraded core dependencies to fix websocket/messaging issues and possible memory leaks (#643)
