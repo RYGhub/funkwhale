@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-11 15:55+0100\n"
-"PO-Revision-Date: 2019-01-10 13:17+0000\n"
-"Last-Translator: jovuit <jo.vuitton@gmail.com>\n"
+"PO-Revision-Date: 2019-01-17 05:50+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: none\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -2453,7 +2453,9 @@ msgstr "Así de simple: nos encantó Grooveshark y quisimos hacer algo incluso m
 
 #: front/src/components/Footer.vue:53
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
-msgstr "El logotipo de funkwhale fue generosamente diseñado y suplido por Francis Gading."
+msgstr ""
+"El logotipo de Funkwhale fue generosamente diseñado y suplido por Francis "
+"Gading."
 
 #: front/src/views/content/libraries/Form.vue:34
 #, fuzzy

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-05 20:10+0200\n"
-"PO-Revision-Date: 2019-01-08 19:50+0000\n"
+"PO-Revision-Date: 2019-01-22 08:45+0000\n"
 "Last-Translator: Urtzi Odriozola <uodriozola@codesyntax.com>\n"
 "Language-Team: none\n"
 "Language: eu\n"
@@ -1008,7 +1008,7 @@ msgstr "Sartu zure Funkwhale kontura"
 
 #: front/src/components/Sidebar.vue:38
 msgid "Logged in as %{ username }"
-msgstr ""
+msgstr "%{ username } moduan sartuta"
 
 #: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:41
 msgid "Login"
@@ -1062,7 +1062,7 @@ msgstr "Nire liburutegiak"
 #: front/src/views/content/libraries/FilesTable.vue:89
 #: front/src/views/content/libraries/FilesTable.vue:95
 msgid "N/A"
-msgstr ""
+msgstr "Daturik gabe"
 
 #: front/src/components/playlists/PlaylistModal.vue:31
 #: front/src/views/admin/users/UsersDetail.vue:21
@@ -1242,28 +1242,28 @@ msgstr "Zerrendak? Guk badauzkagu"
 
 #: front/src/components/auth/Settings.vue:79
 msgid "Please double-check your password is correct"
-msgstr ""
+msgstr "Mesedez egiaztatu bi aldiz pasahitza zuzena dela"
 
 #: front/src/components/auth/Login.vue:9
 msgid "Please double-check your username/password couple is correct"
-msgstr ""
+msgstr "Mesedez egiaztatu erabiltzaile izena eta pasahitza zuzenak direla"
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr ""
+msgstr "PNG, GIF edo JPG. Gehienez 2MB. 400x400px tamainara murriztuko da."
 
 #: front/src/components/library/FileUpload.vue:58
 msgid "Proceed"
-msgstr ""
+msgstr "Jarraitu"
 
 #: front/src/views/auth/EmailConfirm.vue:26
 #: front/src/views/auth/PasswordResetConfirm.vue:31
 msgid "Proceed to login"
-msgstr ""
+msgstr "Jarraitu sarbidera"
 
 #: front/src/components/library/FileUpload.vue:17
 msgid "Processing"
-msgstr ""
+msgstr "Prozesatzen"
 
 #: front/src/views/content/libraries/Quota.vue:36
 #: front/src/views/content/libraries/Quota.vue:39
@@ -1272,143 +1272,148 @@ msgstr ""
 #: front/src/views/content/libraries/Quota.vue:88
 #: front/src/views/content/libraries/Quota.vue:91
 msgid "Purge"
-msgstr ""
+msgstr "Hustu"
 
 #: front/src/views/content/libraries/Quota.vue:89
 msgid "Purge errored files?"
-msgstr ""
+msgstr "Hustu errore fitxategiak?"
 
 #: front/src/views/content/libraries/Quota.vue:37
 msgid "Purge pending files?"
-msgstr ""
+msgstr "Hustu zain dauden fitxategiak?"
 
 #: front/src/views/content/libraries/Quota.vue:63
 msgid "Purge skipped files?"
-msgstr ""
+msgstr "Hustu saltatutako fitxategiak?"
 
 #: front/src/components/Sidebar.vue:20
 msgid "Queue"
-msgstr ""
+msgstr "Ilara"
 
 #: front/src/components/library/radios/Builder.vue:15
 msgid "Radio created"
-msgstr ""
+msgstr "Irratia sortuta"
 
 #: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
-msgstr ""
+msgstr "Irratiaren izena"
 
 #: front/src/components/library/radios/Builder.vue:12
 msgid "Radio updated"
-msgstr ""
+msgstr "Irratia eguneratuta"
 
 #: front/src/components/library/Library.vue:10 src/components/library/Radios.vue:142
 msgid "Radios"
-msgstr ""
+msgstr "Irratiak"
 
 #: front/src/views/instance/Timeline.vue:7
 msgid "Recent activity on this instance"
-msgstr ""
+msgstr "Instantzia honetako azken jarduerak"
 
 #: front/src/components/library/Home.vue:24
 msgid "Recently added"
-msgstr ""
+msgstr "Azken aldian gehituta"
 
 #: front/src/components/library/Home.vue:11
 msgid "Recently favorited"
-msgstr ""
+msgstr "Azken aldian gogokoa"
 
 #: front/src/components/library/Home.vue:6
 msgid "Recently listened"
-msgstr ""
+msgstr "Azken aldian entzuna"
 
 #: front/src/views/admin/users/UsersDetail.vue:103
 #: front/src/views/content/remote/Home.vue:15
 msgid "Refresh"
-msgstr ""
+msgstr "Berriztu"
 
 #: front/src/components/auth/Profile.vue:12
 msgid "Registered since %{ date }"
-msgstr ""
+msgstr "%{ date }-(e)tik erregistratuta"
 
 #: front/src/components/auth/Signup.vue:9
 msgid "Registration are closed on this instance, you will need an invitation code to signup."
 msgstr ""
+"Erregistratzea itxita dago instantzia honetan. Gonbidapen kode bat beharko "
+"duzu izena emateko."
 
 #: front/src/components/manage/users/UsersTable.vue:71
 msgid "regular user"
-msgstr ""
+msgstr "erabiltzaile normala"
 
 #: front/src/views/content/libraries/Detail.vue:51
 msgid "Reject"
-msgstr ""
+msgstr "Baztertu"
 
 #: front/src/views/content/libraries/Detail.vue:43
 msgid "Rejected"
-msgstr ""
+msgstr "Baztertuta"
 
 #: front/src/views/content/remote/Home.vue:6
 msgid "Remote libraries"
-msgstr ""
+msgstr "Urruneko liburutegiak"
 
 #: front/src/views/content/remote/Home.vue:7
 msgid "Remote libraries are owned by other users on the network. You can access them as long as they are public or you are granted access."
 msgstr ""
+"Urruneko liburutegiak interneteko beste erabiltzaile batzuenak dira. "
+"Hauetara sarbidea lor dezakezu hauetara baimena lortzen baduzu edo publikoak "
+"diren bitartean."
 
 #: front/src/components/library/radios/Filter.vue:59
 msgid "Remove"
-msgstr ""
+msgstr "Ezabatu"
 
 #: front/src/components/auth/Settings.vue:58
 msgid "Remove avatar"
-msgstr ""
+msgstr "Ezabatu irudia"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:34
 #: front/src/components/auth/SubsonicTokenForm.vue:37
 msgid "Request a new password"
-msgstr ""
+msgstr "Eskatu pasahitz berria"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:35
 msgid "Request a new Subsonic API password?"
-msgstr ""
+msgstr "Subsonic API pasahitz berria eskatu?"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:43
 msgid "Request a password"
-msgstr ""
+msgstr "Eskatu pasahitza"
 
 #: front/src/components/requests/Form.vue:20
 msgid "Request submitted!"
-msgstr ""
+msgstr "Eskaera eginda!"
 
 #: front/src/components/auth/Login.vue:34 src/views/auth/PasswordReset.vue:4
 msgid "Reset your password"
-msgstr ""
+msgstr "Berrezarri pasahitza"
 
 #: front/src/components/favorites/List.vue:38 src/components/library/Artists.vue:30
 #: front/src/components/library/Radios.vue:52 src/views/playlists/List.vue:32
 msgid "Results per page"
-msgstr ""
+msgstr "Emaitzak orrialdeko"
 
 #: front/src/components/admin/SettingsGroup.vue:63
 #: front/src/components/library/radios/Builder.vue:33
 msgid "Save"
-msgstr ""
+msgstr "Gorde"
 
 #: front/src/views/content/remote/Card.vue:31
 msgid "Scan pending"
-msgstr ""
+msgstr "Eskaneatzeko zain"
 
 #: front/src/views/content/remote/Card.vue:43
 msgid "Scanned successfully"
-msgstr ""
+msgstr "Arrakastaz eskaneatuta"
 
 #: front/src/views/content/remote/Card.vue:47
 msgid "Scanned with errors"
-msgstr ""
+msgstr "Erroreak eskaneatzean"
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning... (%{ progress }%)"
-msgstr ""
+msgstr "Eskaneatzen... (%{ progress }%)"
 
 #: front/src/components/library/Artists.vue:10 src/components/library/Radios.vue:29
 #: front/src/components/manage/library/FilesTable.vue:5
@@ -1416,85 +1421,87 @@ msgstr ""
 #: front/src/components/manage/users/UsersTable.vue:5
 #: front/src/views/content/libraries/FilesTable.vue:5 src/views/playlists/List.vue:13
 msgid "Search"
-msgstr ""
+msgstr "Bilatu"
 
 #: front/src/views/content/remote/ScanForm.vue:9
 msgid "Search a remote library"
-msgstr ""
+msgstr "Bilatu urruneko liburutegia"
 
 #: front/src/components/audio/Search.vue:2
 msgid "Search for some music"
-msgstr ""
+msgstr "Bilatu musika pixka bat"
 
 #: front/src/components/library/Track.vue:116
 msgid "Search on lyrics.wikia.com"
-msgstr ""
+msgstr "Bilatu lyrics.wikia.com-en"
 
 #: front/src/components/library/Album.vue:33 src/components/library/Artist.vue:31
 #: front/src/components/library/Track.vue:40
 msgid "Search on Wikipedia"
-msgstr ""
+msgstr "Bilatu Wikipedian"
 
 #: front/src/views/admin/Settings.vue:15
 msgid "Sections"
-msgstr ""
+msgstr "Atalak"
 
 #: front/src/components/library/radios/Builder.vue:45
 msgid "Select a filter"
-msgstr ""
+msgstr "Aukeratu filtroa"
 
 #: front/src/components/common/ActionTable.vue:64
 msgid "Select all %{ total } elements"
 msgid_plural "Select all %{ total } elements"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Aukeratu elementu %{ total }"
+msgstr[1] "Aukeratu %{ total } elementu"
 
 #: front/src/components/common/ActionTable.vue:73
 msgid "Select only current page"
-msgstr ""
+msgstr "Aukeratu orrialde hau bakarrik"
 
 #: front/src/components/Sidebar.vue:43 src/components/Sidebar.vue:88
 #: front/src/components/manage/users/UsersTable.vue:185
 #: front/src/views/admin/users/UsersDetail.vue:189
 msgid "Settings"
-msgstr ""
+msgstr "Ezarpenak"
 
 #: front/src/components/auth/Settings.vue:10
 msgid "Settings updated"
-msgstr ""
+msgstr "Ezarpenak eguneratuta"
 
 #: front/src/components/admin/SettingsGroup.vue:11
 msgid "Settings updated successfully."
-msgstr ""
+msgstr "Ezarpenak arrakastaz eguneratuta."
 
 #: front/src/components/manage/users/InvitationForm.vue:27
 msgid "Share link"
-msgstr ""
+msgstr "Partekatu esteka"
 
 #: front/src/views/content/libraries/Detail.vue:15
 msgid "Share this link with other users so they can request an access to your library."
 msgstr ""
+"Partekatu esteka hau beste erabiltzaile batzuekin zure liburutegira sarbidea "
+"eska dezaten."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
 msgid "Sharing link"
-msgstr ""
+msgstr "Esteka partekatzen"
 
 #: front/src/components/audio/album/Card.vue:40
 msgid "Show %{ count } more track"
 msgid_plural "Show %{ count } more tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Erakutsi abesti %{ count } gehiago"
+msgstr[1] "Erakutsi %{ count } abesti gehiago"
 
 #: front/src/components/audio/artist/Card.vue:30
 msgid "Show 1 more album"
 msgid_plural "Show %{ count } more albums"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Erakutsi album 1 gehiago"
+msgstr[1] "Erakutsi %{ count } album gehiago"
 
 #: front/src/views/Notifications.vue:10
 msgid "Show read notifications"
-msgstr ""
+msgstr "Erakutsi irakurritako jakinarazpenak"
 
 #: front/src/components/manage/library/FilesTable.vue:97
 #: front/src/components/manage/users/InvitationsTable.vue:76
@@ -1506,43 +1513,43 @@ msgstr ""
 #: front/src/components/manage/users/UsersTable.vue:40
 #: front/src/views/admin/users/UsersDetail.vue:37
 msgid "Sign-up"
-msgstr ""
+msgstr "Erregistratu"
 
 #: front/src/components/library/FileUpload.vue:84 src/components/library/Track.vue:69
 #: front/src/components/manage/library/FilesTable.vue:44
 #: front/src/views/content/libraries/FilesTable.vue:57
 #: front/src/components/mixins/Translations.vue:27
 msgid "Size"
-msgstr ""
+msgstr "Tamaina"
 
 #: front/src/views/content/libraries/FilesTable.vue:15
 #: front/src/views/content/libraries/FilesTable.vue:229
 msgid "Skipped"
-msgstr ""
+msgstr "Saltatuta"
 
 #: front/src/views/content/libraries/Quota.vue:49
 msgid "Skipped files"
-msgstr ""
+msgstr "Saltatutako fitxategiak"
 
 #: front/src/components/requests/Form.vue:3
 msgid "Something's missing in the library? Let us know what you would like to listen!"
-msgstr ""
+msgstr "Zerbait falta da liburutegian? Esaiguzu zer entzun nahiko zenukeen!"
 
 #: front/src/components/audio/Search.vue:25
 msgid "Sorry, we did not found any album matching your query"
-msgstr ""
+msgstr "Barkatu, ez dugu zure bilaketarekin zer ikusirik duen albumik aurkitu"
 
 #: front/src/components/audio/Search.vue:16
 msgid "Sorry, we did not found any artist matching your query"
-msgstr ""
+msgstr "Barkatu, ez dugu zure eskararekin zerikusia duen artistarik aurkitu"
 
 #: front/src/App.vue:40
 msgid "Source code"
-msgstr ""
+msgstr "Iturburu kodea"
 
 #: front/src/App.vue:39
 msgid "Source code (%{version})"
-msgstr ""
+msgstr "Iturburu kodea (%{version})"
 
 #: front/src/components/auth/Profile.vue:23
 #: front/src/components/manage/users/UsersTable.vue:70
