@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
 import About from '@/components/About'
 import Home from '@/components/Home'
-import InstanceTimeline from '@/views/instance/Timeline'
 import Login from '@/components/auth/Login'
 import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
@@ -28,9 +27,13 @@ import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryFilesList from '@/views/admin/library/FilesList'
 import AdminUsersBase from '@/views/admin/users/Base'
-import AdminUsersDetail from '@/views/admin/users/UsersDetail'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
+import AdminModerationBase from '@/views/admin/moderation/Base'
+import AdminDomainsList from '@/views/admin/moderation/DomainsList'
+import AdminDomainsDetail from '@/views/admin/moderation/DomainsDetail'
+import AdminAccountsList from '@/views/admin/moderation/AccountsList'
+import AdminAccountsDetail from '@/views/admin/moderation/AccountsDetail'
 import ContentBase from '@/views/content/Base'
 import ContentHome from '@/views/content/Home'
 import LibrariesHome from '@/views/content/libraries/Home'
@@ -52,14 +55,14 @@ export default new Router({
       component: Home
     },
     {
+      path: '/front',
+      name: 'front',
+      redirect: '/'
+    },
+    {
       path: '/about',
       name: 'about',
       component: About
-    },
-    {
-      path: '/activity',
-      name: 'activity',
-      component: InstanceTimeline
     },
     {
       path: '/login',
@@ -218,15 +221,43 @@ export default new Router({
           component: AdminUsersList
         },
         {
-          path: 'users/:id',
-          name: 'manage.users.users.detail',
-          component: AdminUsersDetail,
-          props: true
-        },
-        {
           path: 'invitations',
           name: 'manage.users.invitations.list',
           component: AdminInvitationsList
+        }
+      ]
+    },
+    {
+      path: '/manage/moderation',
+      component: AdminModerationBase,
+      children: [
+        {
+          path: 'domains',
+          name: 'manage.moderation.domains.list',
+          component: AdminDomainsList
+        },
+        {
+          path: 'domains/:id',
+          name: 'manage.moderation.domains.detail',
+          component: AdminDomainsDetail,
+          props: true
+        },
+        {
+          path: 'accounts',
+          name: 'manage.moderation.accounts.list',
+          component: AdminAccountsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+
+            }
+          }
+        },
+        {
+          path: 'accounts/:id',
+          name: 'manage.moderation.accounts.detail',
+          component: AdminAccountsDetail,
+          props: true
         }
       ]
     },

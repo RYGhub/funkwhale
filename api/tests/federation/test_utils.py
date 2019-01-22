@@ -1,7 +1,7 @@
 from rest_framework import serializers
 import pytest
 
-from funkwhale_api.federation import utils
+from funkwhale_api.federation import exceptions, utils
 
 
 @pytest.mark.parametrize(
@@ -53,20 +53,43 @@ def test_extract_headers_from_meta():
     assert cleaned_headers == expected
 
 
-def test_retrieve(r_mock):
+def test_retrieve_ap_object(db, r_mock):
     fid = "https://some.url"
     m = r_mock.get(fid, json={"hello": "world"})
-    result = utils.retrieve(fid)
+    result = utils.retrieve_ap_object(fid)
 
     assert result == {"hello": "world"}
     assert m.request_history[-1].headers["Accept"] == "application/activity+json"
+
+
+def test_retrieve_ap_object_honor_instance_policy_domain(factories):
+    domain = factories["moderation.InstancePolicy"](
+        block_all=True, for_domain=True
+    ).target_domain
+    fid = "https://{}/test".format(domain.name)
+
+    with pytest.raises(exceptions.BlockedActorOrDomain):
+        utils.retrieve_ap_object(fid)
+
+
+def test_retrieve_ap_object_honor_instance_policy_different_url_and_id(
+    r_mock, factories
+):
+    domain = factories["moderation.InstancePolicy"](
+        block_all=True, for_domain=True
+    ).target_domain
+    fid = "https://ok/test"
+    r_mock.get(fid, json={"id": "http://{}/test".format(domain.name)})
+
+    with pytest.raises(exceptions.BlockedActorOrDomain):
+        utils.retrieve_ap_object(fid)
 
 
 def test_retrieve_with_actor(r_mock, factories):
     actor = factories["federation.Actor"]()
     fid = "https://some.url"
     m = r_mock.get(fid, json={"hello": "world"})
-    result = utils.retrieve(fid, actor=actor)
+    result = utils.retrieve_ap_object(fid, actor=actor)
 
     assert result == {"hello": "world"}
     assert m.request_history[-1].headers["Accept"] == "application/activity+json"
@@ -76,16 +99,16 @@ def test_retrieve_with_actor(r_mock, factories):
 def test_retrieve_with_queryset(factories):
     actor = factories["federation.Actor"]()
 
-    assert utils.retrieve(actor.fid, queryset=actor.__class__)
+    assert utils.retrieve_ap_object(actor.fid, queryset=actor.__class__)
 
 
-def test_retrieve_with_serializer(r_mock):
+def test_retrieve_with_serializer(db, r_mock):
     class S(serializers.Serializer):
         def create(self, validated_data):
             return {"persisted": "object"}
 
     fid = "https://some.url"
     r_mock.get(fid, json={"hello": "world"})
-    result = utils.retrieve(fid, serializer_class=S)
+    result = utils.retrieve_ap_object(fid, serializer_class=S)
 
     assert result == {"persisted": "object"}

@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.db.models import Count
 from rest_framework import exceptions, mixins, viewsets
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -33,10 +33,10 @@ class PlaylistViewSet(
         IsAuthenticatedOrReadOnly,
     ]
     owner_checks = ["write"]
-    filter_class = filters.PlaylistFilter
+    filterset_class = filters.PlaylistFilter
     ordering_fields = ("id", "name", "creation_date", "modification_date")
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     def tracks(self, request, *args, **kwargs):
         playlist = self.get_object()
         plts = playlist.playlist_tracks.all().for_nested_serialization(
@@ -46,7 +46,7 @@ class PlaylistViewSet(
         data = {"count": len(plts), "results": serializer.data}
         return Response(data, status=200)
 
-    @detail_route(methods=["post"])
+    @action(methods=["post"], detail=True)
     @transaction.atomic
     def add(self, request, *args, **kwargs):
         playlist = self.get_object()
@@ -67,7 +67,7 @@ class PlaylistViewSet(
         data = {"count": len(plts), "results": serializer.data}
         return Response(data, status=201)
 
-    @detail_route(methods=["delete"])
+    @action(methods=["delete"], detail=True)
     @transaction.atomic
     def clear(self, request, *args, **kwargs):
         playlist = self.get_object()
@@ -78,7 +78,7 @@ class PlaylistViewSet(
     def get_queryset(self):
         return self.queryset.filter(
             fields.privacy_level_query(self.request.user)
-        ).annotate_playable_by_actor(music_utils.get_actor_from_request(self.request))
+        ).with_playable_plts(music_utils.get_actor_from_request(self.request))
 
     def perform_create(self, serializer):
         return serializer.save(

@@ -159,58 +159,113 @@ There is no dedicated interface to manage users permissions, but superusers
 can login on the Django's admin at ``/api/admin/`` and grant permissions
 to users at ``/api/admin/users/user/``.
 
-Theming
--------
+Front-end settings
+------------------
 
-Funkwhale supports custom themes, which are great if you want to personalize the
-look and feel of your instance. Theming is achieved by declaring
-additional stylesheets you want to load in the front-end.
+We offer a basic mechanism to customize the behaviour and look and feel of Funkwhale's Web UI.
+To use any of the options below, you will need to create a custom JSON configuration file and serve it
+on ``https://yourinstanceurl/settings.json``.
 
-Customize the settings
-^^^^^^^^^^^^^^^^^^^^^^
+On typical deployments, this url returns a 404 error, which is simply ignored.
 
-In order to know what stylesheets to load, the front-end requests the following
-url: ``https://your.instance/settings.json``. On typical deployments, this url
-returns a 404 error, which is simply ignored.
+Set-up
+------
 
-However, if you return the appropriate payload on this url, you can make the magic
-work. We will store the necessary files in the ``/srv/funkwhale/custom`` directory:
+First, create the settings file:
 
 .. code-block:: shell
 
     cd /srv/funkwhale/
+
+    # create a directory for your configuration file
+    # you can use a different name / path of course
     mkdir custom
+
+    # populate the configuration file with default values
     cat <<EOF > custom/settings.json
     {
-      "additionalStylesheets": ["/custom/custom.css"]
+      "additionalStylesheets": [],
+      "defaultServerUrl": null
     }
     EOF
-    cat <<EOF > custom/custom.css
+
+Once the ``settings.json`` file is created, you will need to serve it from your reverse proxy.
+
+If you are using nginx, add the following snippet to your vhost configuration::
+
+    location /settings.json {
+        alias /srv/funkwhale/custom/settings.json;
+    }
+
+On apache, add the following to your vhost configuration::
+
+    Alias /settings.json /srv/funkwhale/custom/settings.json
+
+Then reload your reverse proxy.
+
+At this point, visiting ``https://yourinstanceurl/settings.json`` should serve the content
+of the settings.json file.
+
+.. warning::
+
+    The settings.json file must be a valid JSON file. If you have any issue, try linting
+    the file with a tool such as `<https://github.com/zaach/jsonlint>`_ to detect potential
+    syntax issues.
+
+Available configuration options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Your :file:`settings.json` can contain the following options:
+
++----------------------------------+--------------------+---------------------------------------+---------------------------------------------------------------+
+| Name                             | Type               | Example value                         | Description                                                   |
++----------------------------------+--------------------+---------------------------------------+---------------------------------------------------------------+
+| ``additionalStylesheets``        | Array of URLs      | ``["https://test/theme.css"]``        | A list of stylesheets URL (absolute or relative)              |
+|                                  |                    | (default: ``[]``)                     | that the web UI should load. see the "Theming" section        |
+|                                  |                    |                                       | below for a detailed explanation                              |
+|                                  |                    |                                       |                                                               |
++----------------------------------+--------------------+---------------------------------------+---------------------------------------------------------------+
+| ``defaultServerUrl``             | URL                | ``"https://api.yourdomain.com"``      | The URL of the API server this front-end should               |
+|                                  |                    | (default: ``null``)                   | connect with. If null, the UI will use                        |
+|                                  |                    |                                       | the value of VUE_APP_INSTANCE_URL                             |
+|                                  |                    |                                       | (specified during build) or fallback to the current domain    |
++----------------------------------+--------------------+---------------------------------------+---------------------------------------------------------------+
+
+Missing options or options with a ``null`` value in the ``settings.json`` file are ignored.
+
+Theming
+^^^^^^^
+
+To theme your Funkwhale instance, you need:
+
+1. A CSS file for your theme, that can be loaded by the front-end
+2. To update the value of ``additionalStylesheets`` in your settings.json file to point to your CSS file URL
+
+.. code-block:: shell
+
+    cd /srv/funkwhale/custom
+    nano settings.json
+    # append
+    # "additionalStylesheets": ["/front/custom/custom.css"]
+    # to the configuration or replace the existing value, if any
+
+    # create a basic theming file changing the background to red
+    cat <<EOF > custom.css
     body {
       background-color: red;
     }
     EOF
 
-By executing the previous commands, you will end up with two files in your ``/srv/funkwhale/custom``
-directory:
-
-- ``settings.json`` will tell the front-end what stylesheets you want to load (``/custom/custom.css`` in this example)
-- ``custom.css`` will hold your custom CSS
-
-The last step to make this work is to ensure both files are served by the reverse proxy.
+The last step to make this work is to ensure your CSS file is served by the reverse proxy.
 
 On nginx, add the following snippet to your vhost config::
 
-    location /settings.json {
-        alias /srv/funkwhale/custom/settings.json;
-    }
     location /custom {
         alias /srv/funkwhale/custom;
     }
 
 On apache, use the following one::
 
-    Alias /settings.json /srv/funkwhale/custom/settings.json
     Alias /custom /srv/funkwhale/custom
 
     <Directory "/srv/funkwhale/custom">
@@ -224,7 +279,7 @@ a red background.
 
 .. note::
 
-    You can reference external urls as well in ``settings.json``, simply use
+    You can reference external urls as well in ``additionalStylesheets``, simply use
     the full urls. Be especially careful with external urls as they may affect your users
     privacy.
 

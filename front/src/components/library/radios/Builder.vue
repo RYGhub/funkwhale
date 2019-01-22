@@ -1,7 +1,7 @@
 <template>
   <div class="ui vertical stripe segment" v-title="labels.title">
     <div>
-      <div>
+      <section>
         <h2 class="ui header">
           <translate>Builder</translate>
         </h2>
@@ -77,7 +77,7 @@
             </builder-filter>
           </tbody>
         </table>
-        <template v-if="checkResult">
+        <template v-if="checkResult && checkResult.candidates && checkResult.candidates.count">
           <h3
             class="ui header"
             v-translate="{count: checkResult.candidates.count}"
@@ -85,30 +85,30 @@
             translate-plural="%{ count } tracks matching combined filters">
             %{ count } track matching combined filters
           </h3>
-          <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample"></track-table>
+          <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample" :playable="true"></track-table>
         </template>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 <script>
-import axios from 'axios'
-import $ from 'jquery'
-import _ from 'lodash'
-import BuilderFilter from './Filter'
-import TrackTable from '@/components/audio/track/Table'
-import RadioButton from '@/components/radios/Button'
+import axios from "axios"
+import $ from "jquery"
+import _ from "@/lodash"
+import BuilderFilter from "./Filter"
+import TrackTable from "@/components/audio/track/Table"
+import RadioButton from "@/components/radios/Button"
 
 export default {
   props: {
-    id: {required: false}
+    id: { required: false }
   },
   components: {
     BuilderFilter,
     TrackTable,
     RadioButton
   },
-  data: function () {
+  data: function() {
     return {
       isLoading: false,
       success: false,
@@ -116,12 +116,12 @@ export default {
       currentFilterType: null,
       filters: [],
       checkResult: null,
-      radioName: '',
-      radioDesc: '',
+      radioName: "",
+      radioDesc: "",
       isPublic: true
     }
   },
-  created: function () {
+  created: function() {
     let self = this
     this.fetchFilters().then(() => {
       if (self.id) {
@@ -129,18 +129,18 @@ export default {
       }
     })
   },
-  mounted () {
-    $('.ui.dropdown').dropdown()
+  mounted() {
+    $(".ui.dropdown").dropdown()
   },
   methods: {
-    fetchFilters: function () {
+    fetchFilters: function() {
       let self = this
-      let url = 'radios/radios/filters/'
-      return axios.get(url).then((response) => {
+      let url = "radios/radios/filters/"
+      return axios.get(url).then(response => {
         self.availableFilters = response.data
       })
     },
-    add () {
+    add() {
       this.filters.push({
         config: {},
         filter: this.currentFilter,
@@ -148,23 +148,25 @@ export default {
       })
       this.fetchCandidates()
     },
-    updateConfig (index, field, value) {
+    updateConfig(index, field, value) {
       this.filters[index].config[field] = value
       this.fetchCandidates()
     },
-    deleteFilter (index) {
+    deleteFilter(index) {
       this.filters.splice(index, 1)
       this.fetchCandidates()
     },
-    fetch: function () {
+    fetch: function() {
       let self = this
       self.isLoading = true
-      let url = 'radios/radios/' + this.id + '/'
-      axios.get(url).then((response) => {
+      let url = "radios/radios/" + this.id + "/"
+      axios.get(url).then(response => {
         self.filters = response.data.config.map(f => {
           return {
             config: f,
-            filter: this.availableFilters.filter(e => { return e.type === f.type })[0],
+            filter: this.availableFilters.filter(e => {
+              return e.type === f.type
+            })[0],
             hash: +new Date()
           }
         })
@@ -174,24 +176,22 @@ export default {
         self.isLoading = false
       })
     },
-    fetchCandidates: function () {
+    fetchCandidates: function() {
       let self = this
-      let url = 'radios/radios/validate/'
+      let url = "radios/radios/validate/"
       let final = this.filters.map(f => {
         let c = _.clone(f.config)
         c.type = f.filter.type
         return c
       })
       final = {
-        'filters': [
-          {'type': 'group', filters: final}
-        ]
+        filters: [{ type: "group", filters: final }]
       }
-      axios.post(url, final).then((response) => {
+      axios.post(url, final).then(response => {
         self.checkResult = response.data.filters[0]
       })
     },
-    save: function () {
+    save: function() {
       let self = this
       self.success = false
       self.isLoading = true
@@ -202,24 +202,24 @@ export default {
         return c
       })
       final = {
-        'name': this.radioName,
-        'description': this.radioDesc,
-        'is_public': this.isPublic,
-        'config': final
+        name: this.radioName,
+        description: this.radioDesc,
+        is_public: this.isPublic,
+        config: final
       }
       if (this.id) {
-        let url = 'radios/radios/' + this.id + '/'
-        axios.put(url, final).then((response) => {
+        let url = "radios/radios/" + this.id + "/"
+        axios.put(url, final).then(response => {
           self.isLoading = false
           self.success = true
         })
       } else {
-        let url = 'radios/radios/'
-        axios.post(url, final).then((response) => {
+        let url = "radios/radios/"
+        axios.post(url, final).then(response => {
           self.success = true
           self.isLoading = false
           self.$router.push({
-            name: 'library.radios.detail',
+            name: "library.radios.detail",
             params: {
               id: response.data.id
             }
@@ -229,30 +229,28 @@ export default {
     }
   },
   computed: {
-    labels () {
-      let title = this.$gettext('Radio Builder')
+    labels() {
+      let title = this.$gettext("Radio Builder")
       let placeholder = {
-        'name': this.$gettext('My awesome radio'),
-        'description': this.$gettext('My awesome description')
+        name: this.$gettext("My awesome radio"),
+        description: this.$gettext("My awesome description")
       }
       return {
         title,
         placeholder
       }
     },
-    canSave: function () {
-      return (
-        this.radioName.length > 0 && this.checkErrors.length === 0
-      )
+    canSave: function() {
+      return this.radioName.length > 0 && this.checkErrors.length === 0
     },
-    checkErrors: function () {
+    checkErrors: function() {
       if (!this.checkResult) {
         return []
       }
       let errors = this.checkResult.errors
       return errors
     },
-    currentFilter: function () {
+    currentFilter: function() {
       let self = this
       return this.availableFilters.filter(e => {
         return e.type === self.currentFilterType
@@ -261,7 +259,7 @@ export default {
   },
   watch: {
     filters: {
-      handler: function () {
+      handler: function() {
         this.fetchCandidates()
       },
       deep: true

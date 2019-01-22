@@ -14,7 +14,7 @@
             <option value=""><translate>All</translate></option>
             <option value="pending"><translate>Pending</translate></option>
             <option value="skipped"><translate>Skipped</translate></option>
-            <option value="errored"><translate>Errored</translate></option>
+            <option value="errored"><translate>Failed</translate></option>
             <option value="finished"><translate>Finished</translate></option>
           </select>
         </div>
@@ -46,7 +46,10 @@
         :objects-data="result"
         :custom-objects="customObjects"
         :actions="actions"
+        :refreshable="true"
+        :needs-refresh="needsRefresh"
         :action-url="'uploads/action/'"
+        @refresh="fetchData"
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate>Title</translate></th>
@@ -120,20 +123,21 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import time from '@/utils/time'
-import {normalizeQuery, parseTokens, compileTokens} from '@/search'
+import {normalizeQuery, parseTokens} from '@/search'
 
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
+import SmartSearchMixin from '@/components/mixins/SmartSearch'
 
 export default {
-  mixins: [OrderingMixin, TranslationsMixin],
+  mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   props: {
     filters: {type: Object, required: false},
-    defaultQuery: {type: String, default: ''},
+    needsRefresh: {type: Boolean, required: false, default: false},
     customObjects: {type: Array, required: false, default: () => { return [] }}
   },
   components: {
@@ -168,43 +172,14 @@ export default {
     this.fetchData()
   },
   methods: {
-    getTokenValue (key, fallback) {
-      let matching = this.search.tokens.filter(t => {
-        return t.field === key
-      })
-      if (matching.length > 0) {
-        return matching[0].value
-      }
-      return fallback
-    },
-    addSearchToken (key, value) {
-      if (!value) {
-        // we remove existing matching tokens, if any
-        this.search.tokens = this.search.tokens.filter(t => {
-          return t.field != key
-        })
-      } else {
-        let existing = this.search.tokens.filter(t => {
-          return t.field === key
-        })
-        if (existing.length > 0) {
-          // we replace the value in existing tokens, if any
-          existing.forEach(t => {
-            t.value = value
-          })
-        } else {
-          // we add a new token
-          this.search.tokens.push({field: key, value})
-        }
-      }
-    },
     fetchData () {
+      this.$emit('fetch-start')
       let params = _.merge({
         'page': this.page,
         'page_size': this.paginateBy,
         'ordering': this.getOrderingAsString(),
         'q': this.search.query
-      }, {})
+      }, this.filters || {})
       let self = this
       self.isLoading = true
       self.checked = []
@@ -223,23 +198,23 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by title, artist, album...'),
+        searchPlaceholder: this.$gettext('Search by title, artist, album…'),
         importStatuses: {
           skipped: {
             label: this.$gettext('Skipped'),
-            help: this.$gettext('Track was already present in one of your libraries'),
+            help: this.$gettext('Track already present in one of your libraries'),
           },
           pending: {
             label: this.$gettext('Pending'),
-            help: this.$gettext('Track is uploaded but not processed by the server yet'),
+            help: this.$gettext('Track uploaded, but not processed by the server yet'),
           },
           errored: {
             label: this.$gettext('Errored'),
-            help: this.$gettext('An error occured while processing this track, ensure the track is correctly tagged'),
+            help: this.$gettext('Could not process this track, ensure it is tagged correctly'),
           },
           finished: {
             label: this.$gettext('Finished'),
-            help: this.$gettext('Import went on successfully'),
+            help: this.$gettext('Imported'),
           },
         }
       }
@@ -277,17 +252,6 @@ export default {
     }
   },
   watch: {
-    'search.query' (newValue) {
-      this.search.tokens = parseTokens(normalizeQuery(newValue))
-    },
-    'search.tokens': {
-      handler (newValue) {
-        this.search.query = compileTokens(newValue)
-        this.page = 1
-        this.fetchData()
-      },
-      deep: true
-    },
     orderingDirection: function () {
       this.page = 1
       this.fetchData()
@@ -302,7 +266,7 @@ export default {
     search (newValue) {
       this.page = 1
       this.fetchData()
-    },
+    }
   }
 }
 </script>

@@ -1,12 +1,15 @@
 import io
+import magic
 import os
 
 import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from funkwhale_api.music import serializers, tasks, views
+from funkwhale_api.common import utils
 from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.music import licenses, models, serializers, tasks, views
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,13 +41,11 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
     ).track
     album = track.album
     request = api_request.get("/")
-    qs = album.__class__.objects.all()
+    qs = album.__class__.objects.with_prefetched_tracks_and_playable_uploads(None)
     serializer = serializers.AlbumSerializer(
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
-    expected["results"][0]["is_playable"] = True
-    expected["results"][0]["tracks"][0]["is_playable"] = True
     url = reverse("api:v1:albums-list")
     response = logged_in_api_client.get(url)
 
@@ -57,12 +58,11 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
         library__privacy_level="everyone", import_status="finished"
     ).track
     request = api_request.get("/")
-    qs = track.__class__.objects.all()
+    qs = track.__class__.objects.with_playable_uploads(None)
     serializer = serializers.TrackSerializer(
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
-    expected["results"][0]["is_playable"] = True
     url = reverse("api:v1:tracks-list")
     response = logged_in_api_client.get(url)
 
@@ -309,7 +309,69 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
     response = logged_in_api_client.get(url, {"upload": upload2.uuid})
 
     assert response.status_code == 200
-    mocked_serve.assert_called_once_with(upload2, user=logged_in_api_client.user)
+    mocked_serve.assert_called_once_with(
+        upload2, user=logged_in_api_client.user, format=None
+    )
+
+
+@pytest.mark.parametrize(
+    "mimetype,format,expected",
+    [
+        # already in proper format
+        ("audio/mpeg", "mp3", False),
+        # empty mimetype / format
+        (None, "mp3", False),
+        ("audio/mpeg", None, False),
+        # unsupported format
+        ("audio/mpeg", "noop", False),
+        # should transcode
+        ("audio/mpeg", "ogg", True),
+    ],
+)
+def test_should_transcode(mimetype, format, expected, factories):
+    upload = models.Upload(mimetype=mimetype)
+    assert views.should_transcode(upload, format) is expected
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_should_transcode_according_to_preference(value, preferences, factories):
+    upload = models.Upload(mimetype="audio/ogg")
+    expected = value
+    preferences["music__transcoding_enabled"] = value
+
+    assert views.should_transcode(upload, "mp3") is expected
+
+
+def test_handle_serve_create_mp3_version(factories, now):
+    user = factories["users.User"]()
+    upload = factories["music.Upload"](bitrate=42)
+    response = views.handle_serve(upload, user, format="mp3")
+
+    version = upload.versions.latest("id")
+
+    assert version.mimetype == "audio/mpeg"
+    assert version.accessed_date == now
+    assert version.bitrate == upload.bitrate
+    assert version.audio_file.path.endswith(".mp3")
+    assert version.size == version.audio_file.size
+    assert magic.from_buffer(version.audio_file.read(), mime=True) == "audio/mpeg"
+
+    assert response.status_code == 200
+
+
+def test_listen_transcode(factories, now, logged_in_api_client, mocker):
+    upload = factories["music.Upload"](
+        import_status="finished", library__actor__user=logged_in_api_client.user
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    handle_serve = mocker.spy(views, "handle_serve")
+    response = logged_in_api_client.get(url, {"to": "mp3"})
+
+    assert response.status_code == 200
+
+    handle_serve.assert_called_once_with(
+        upload, user=logged_in_api_client.user, format="mp3"
+    )
 
 
 def test_user_can_create_library(factories, logged_in_api_client):
@@ -462,6 +524,7 @@ def test_can_get_libraries_for_music_entities(
         import_status="finished", library__privacy_level="me", track=upload.track
     ).library
     library = upload.library
+    setattr(library, "_uploads_count", 1)
     data = {
         "artist": upload.track.artist,
         "album": upload.track.album,
@@ -480,3 +543,101 @@ def test_can_get_libraries_for_music_entities(
         "previous": None,
         "results": [expected],
     }
+
+
+def test_list_licenses(api_client, preferences, mocker):
+    licenses.load(licenses.LICENSES)
+    load = mocker.spy(licenses, "load")
+    preferences["common__api_authentication_required"] = False
+
+    expected = [
+        serializers.LicenseSerializer(l.conf).data
+        for l in models.License.objects.order_by("code")[:25]
+    ]
+    url = reverse("api:v1:licenses-list")
+
+    response = api_client.get(url)
+
+    assert response.data["results"] == expected
+    load.assert_called_once_with(licenses.LICENSES)
+
+
+def test_detail_license(api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    id = "cc-by-sa-4.0"
+    expected = serializers.LicenseSerializer(licenses.LICENSES_BY_ID[id]).data
+
+    url = reverse("api:v1:licenses-detail", kwargs={"pk": id})
+
+    response = api_client.get(url)
+
+    assert response.data == expected
+
+
+def test_oembed_track(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    track = factories["music.Track"]()
+    url = reverse("api:v1:oembed")
+    track_url = "https://test.com/library/tracks/{}".format(track.pk)
+    iframe_src = "http://embed?type=track&id={}".format(track.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 150,
+        "width": 600,
+        "title": "{} by {}".format(track.title, track.artist.name),
+        "description": track.full_name,
+        "thumbnail_url": federation_utils.full_url(
+            track.album.cover.crop["400x400"].url
+        ),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="150" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": track.artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": track.artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": track_url, "format": "json"})
+
+    assert response.data == expected
+
+
+def test_oembed_album(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    track = factories["music.Track"]()
+    album = track.album
+    url = reverse("api:v1:oembed")
+    album_url = "https://test.com/library/albums/{}".format(album.pk)
+    iframe_src = "http://embed?type=album&id={}".format(album.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": "{} by {}".format(album.title, album.artist.name),
+        "description": "{} by {}".format(album.title, album.artist.name),
+        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": album.artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": album.artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": album_url, "format": "json"})
+
+    assert response.data == expected

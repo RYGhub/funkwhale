@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -29,7 +29,7 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from . import importers, metadata, utils
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 def empty_dict():
@@ -44,7 +44,7 @@ class APIModelMixin(models.Model):
         "federation.Activity", null=True, blank=True, on_delete=models.SET_NULL
     )
     api_includes = []
-    creation_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     import_hooks = []
 
     class Meta:
@@ -113,6 +113,33 @@ class APIModelMixin(models.Model):
         return super().save(**kwargs)
 
 
+class License(models.Model):
+    code = models.CharField(primary_key=True, max_length=100)
+    url = models.URLField(max_length=500)
+
+    # if true, license is a copyleft license, meaning that derivative
+    # work must be shared under the same license
+    copyleft = models.BooleanField()
+    # if true, commercial use of the work is allowed
+    commercial = models.BooleanField()
+    # if true, attribution to the original author is required when reusing
+    # the work
+    attribution = models.BooleanField()
+    # if true, derivative work are allowed
+    derivative = models.BooleanField()
+    # if true, redistribution of the wor is allowed
+    redistribute = models.BooleanField()
+
+    @property
+    def conf(self):
+        from . import licenses
+
+        for row in licenses.LICENSES:
+            if self.code == row["code"]:
+                return row
+        logger.warning("%s do not match any registered license", self.code)
+
+
 class ArtistQuerySet(models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count("albums"))
@@ -124,8 +151,8 @@ class ArtistQuerySet(models.QuerySet):
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
-            Track.objects.playable_by(actor)
-            .filter(artist=models.OuterRef("id"))
+            Upload.objects.playable_by(actor)
+            .filter(track__artist=models.OuterRef("id"))
             .order_by("id")
             .values("id")[:1]
         )
@@ -134,10 +161,11 @@ class ArtistQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
+        matches = self.filter(tracks__in=tracks).values_list("pk")
         if include:
-            return self.filter(tracks__in=tracks)
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(tracks__in=tracks)
+            return self.exclude(pk__in=matches)
 
 
 class Artist(APIModelMixin):
@@ -192,8 +220,8 @@ class AlbumQuerySet(models.QuerySet):
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
-            Track.objects.playable_by(actor)
-            .filter(album=models.OuterRef("id"))
+            Upload.objects.playable_by(actor)
+            .filter(track__album=models.OuterRef("id"))
             .order_by("id")
             .values("id")[:1]
         )
@@ -202,10 +230,15 @@ class AlbumQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         tracks = Track.objects.playable_by(actor, include)
+        matches = self.filter(tracks__in=tracks).values_list("pk")
         if include:
-            return self.filter(tracks__in=tracks)
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(tracks__in=tracks)
+            return self.exclude(pk__in=matches)
+
+    def with_prefetched_tracks_and_playable_uploads(self, actor):
+        tracks = Track.objects.with_playable_uploads(actor)
+        return self.prefetch_related(models.Prefetch("tracks", queryset=tracks))
 
 
 class Album(APIModelMixin):
@@ -398,24 +431,23 @@ class TrackQuerySet(models.QuerySet):
 
     def playable_by(self, actor, include=True):
         files = Upload.objects.playable_by(actor, include)
+        matches = self.filter(uploads__in=files).values_list("pk")
         if include:
-            return self.filter(uploads__in=files)
+            return self.filter(pk__in=matches)
         else:
-            return self.exclude(uploads__in=files)
+            return self.exclude(pk__in=matches)
 
-    def annotate_duration(self):
-        first_upload = Upload.objects.filter(track=models.OuterRef("pk")).order_by("pk")
-        return self.annotate(
-            duration=models.Subquery(first_upload.values("duration")[:1])
+    def with_playable_uploads(self, actor):
+        uploads = Upload.objects.playable_by(actor).select_related("track")
+        return self.prefetch_related(
+            models.Prefetch("uploads", queryset=uploads, to_attr="playable_uploads")
         )
 
-    def annotate_file_data(self):
-        first_upload = Upload.objects.filter(track=models.OuterRef("pk")).order_by("pk")
-        return self.annotate(
-            bitrate=models.Subquery(first_upload.values("bitrate")[:1]),
-            size=models.Subquery(first_upload.values("size")[:1]),
-            mimetype=models.Subquery(first_upload.values("mimetype")[:1]),
-        )
+    def order_for_album(self):
+        """
+        Order by disc number then position
+        """
+        return self.order_by("disc_number", "position", "title")
 
 
 def get_artist(release_list):
@@ -427,6 +459,7 @@ def get_artist(release_list):
 class Track(APIModelMixin):
     title = models.CharField(max_length=255)
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
+    disc_number = models.PositiveIntegerField(null=True, blank=True)
     position = models.PositiveIntegerField(null=True, blank=True)
     album = models.ForeignKey(
         Album, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
@@ -434,6 +467,14 @@ class Track(APIModelMixin):
     work = models.ForeignKey(
         Work, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
     )
+    license = models.ForeignKey(
+        License,
+        null=True,
+        blank=True,
+        on_delete=models.DO_NOTHING,
+        related_name="tracks",
+    )
+    copyright = models.CharField(max_length=500, null=True, blank=True)
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
@@ -454,7 +495,7 @@ class Track(APIModelMixin):
     tags = TaggableManager(blank=True)
 
     class Meta:
-        ordering = ["album", "position"]
+        ordering = ["album", "disc_number", "position"]
 
     def __str__(self):
         return self.title
@@ -551,6 +592,17 @@ class Track(APIModelMixin):
     def listen_url(self):
         return reverse("api:v1:listen-detail", kwargs={"uuid": self.uuid})
 
+    @property
+    def local_license(self):
+        """
+        Since license primary keys are strings, and we can get the data
+        from our hardcoded licenses.LICENSES list, there is no need
+        for extra SQL joins / queries.
+        """
+        from . import licenses
+
+        return licenses.LICENSES_BY_ID.get(self.license_id)
+
 
 class UploadQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
@@ -566,6 +618,9 @@ class UploadQuerySet(models.QuerySet):
     def for_federation(self):
         return self.filter(import_status="finished", mimetype__startswith="audio/")
 
+    def with_file(self):
+        return self.exclude(audio_file=None).exclude(audio_file="")
+
 
 TRACK_FILE_IMPORT_STATUS_CHOICES = (
     ("pending", "Pending"),
@@ -576,6 +631,9 @@ TRACK_FILE_IMPORT_STATUS_CHOICES = (
 
 
 def get_file_path(instance, filename):
+    if isinstance(instance, UploadVersion):
+        return common_utils.ChunkedPath("transcoded")(instance, filename)
+
     if instance.library.actor.get_user():
         return common_utils.ChunkedPath("tracks")(instance, filename)
     else:
@@ -600,7 +658,7 @@ class Upload(models.Model):
         blank=True,
         max_length=500,
     )
-    creation_date = models.DateTimeField(default=timezone.now)
+    creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     modification_date = models.DateTimeField(default=timezone.now, null=True)
     accessed_date = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
@@ -687,9 +745,14 @@ class Upload(models.Model):
 
     @property
     def extension(self):
-        if not self.audio_file:
-            return
-        return os.path.splitext(self.audio_file.name)[-1].replace(".", "", 1)
+        try:
+            return utils.MIMETYPE_TO_EXTENSION[self.mimetype]
+        except KeyError:
+            pass
+        if self.audio_file:
+            return os.path.splitext(self.audio_file.name)[-1].replace(".", "", 1)
+        if self.in_place_path:
+            return os.path.splitext(self.in_place_path)[-1].replace(".", "", 1)
 
     def get_file_size(self):
         if self.audio_file:
@@ -738,6 +801,67 @@ class Upload(models.Model):
     @property
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
+
+    def get_transcoded_version(self, format):
+        mimetype = utils.EXTENSION_TO_MIMETYPE[format]
+        existing_versions = list(self.versions.filter(mimetype=mimetype))
+        if existing_versions:
+            # we found an existing version, no need to transcode again
+            return existing_versions[0]
+
+        return self.create_transcoded_version(mimetype, format)
+
+    @transaction.atomic
+    def create_transcoded_version(self, mimetype, format):
+        # we create the version with an empty file, then
+        # we'll write to it
+        f = ContentFile(b"")
+        version = self.versions.create(
+            mimetype=mimetype, bitrate=self.bitrate or 128000, size=0
+        )
+        # we keep the same name, but we update the extension
+        new_name = os.path.splitext(os.path.basename(self.audio_file.name))[
+            0
+        ] + ".{}".format(format)
+        version.audio_file.save(new_name, f)
+        utils.transcode_file(
+            input=self.audio_file,
+            output=version.audio_file,
+            input_format=utils.MIMETYPE_TO_EXTENSION[self.mimetype],
+            output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
+        )
+        version.size = version.audio_file.size
+        version.save(update_fields=["size"])
+
+        return version
+
+    @property
+    def in_place_path(self):
+        if not self.source or not self.source.startswith("file://"):
+            return
+        return self.source.lstrip("file://")
+
+
+MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]
+
+
+class UploadVersion(models.Model):
+    upload = models.ForeignKey(
+        Upload, related_name="versions", on_delete=models.CASCADE
+    )
+    mimetype = models.CharField(max_length=50, choices=MIMETYPE_CHOICES)
+    creation_date = models.DateTimeField(default=timezone.now)
+    accessed_date = models.DateTimeField(null=True, blank=True)
+    audio_file = models.FileField(upload_to=get_file_path, max_length=255)
+    bitrate = models.PositiveIntegerField()
+    size = models.IntegerField()
+
+    class Meta:
+        unique_together = ("upload", "mimetype", "bitrate")
+
+    @property
+    def filename(self):
+        return self.upload.filename
 
 
 IMPORT_STATUS_CHOICES = (
@@ -983,7 +1107,7 @@ def update_request_status(sender, instance, created, **kwargs):
 
 @receiver(models.signals.post_save, sender=Album)
 def warm_album_covers(sender, instance, **kwargs):
-    if not instance.cover:
+    if not instance.cover or not settings.CREATE_IMAGE_THUMBNAILS:
         return
     album_covers_warmer = VersatileImageFieldWarmer(
         instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"

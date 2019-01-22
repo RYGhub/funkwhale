@@ -138,3 +138,148 @@ def test_deliver_to_remote_error(factories, r_mock, now):
     assert delivery.is_delivered is False
     assert delivery.attempts == 1
     assert delivery.last_attempt_date == now
+
+
+def test_fetch_nodeinfo(factories, r_mock, now):
+    wellknown_url = "https://test.test/.well-known/nodeinfo"
+    nodeinfo_url = "https://test.test/nodeinfo"
+
+    r_mock.get(
+        wellknown_url,
+        json={
+            "links": [
+                {
+                    "rel": "http://nodeinfo.diaspora.software/ns/schema/2.0",
+                    "href": "https://test.test/nodeinfo",
+                }
+            ]
+        },
+    )
+    r_mock.get(nodeinfo_url, json={"hello": "world"})
+
+    assert tasks.fetch_nodeinfo("test.test") == {"hello": "world"}
+
+
+def test_update_domain_nodeinfo(factories, mocker, now):
+    domain = factories["federation.Domain"]()
+    mocker.patch.object(tasks, "fetch_nodeinfo", return_value={"hello": "world"})
+
+    assert domain.nodeinfo == {}
+    assert domain.nodeinfo_fetch_date is None
+
+    tasks.update_domain_nodeinfo(domain_name=domain.name)
+
+    domain.refresh_from_db()
+
+    assert domain.nodeinfo_fetch_date == now
+    assert domain.nodeinfo == {"status": "ok", "payload": {"hello": "world"}}
+
+
+def test_update_domain_nodeinfo_error(factories, r_mock, now):
+    domain = factories["federation.Domain"]()
+    wellknown_url = "https://{}/.well-known/nodeinfo".format(domain.name)
+
+    r_mock.get(wellknown_url, status_code=500)
+
+    tasks.update_domain_nodeinfo(domain_name=domain.name)
+
+    domain.refresh_from_db()
+
+    assert domain.nodeinfo_fetch_date == now
+    assert domain.nodeinfo == {
+        "status": "error",
+        "error": "500 Server Error: None for url: {}".format(wellknown_url),
+    }
+
+
+def test_handle_purge_actors(factories, mocker):
+    to_purge = factories["federation.Actor"]()
+    keeped = [
+        factories["music.Upload"](),
+        factories["federation.Activity"](),
+        factories["federation.InboxItem"](),
+        factories["federation.Follow"](),
+        factories["federation.LibraryFollow"](),
+    ]
+
+    library = factories["music.Library"](actor=to_purge)
+    deleted = [
+        library,
+        factories["music.Upload"](library=library),
+        factories["federation.Activity"](actor=to_purge),
+        factories["federation.InboxItem"](actor=to_purge),
+        factories["federation.Follow"](actor=to_purge),
+        factories["federation.LibraryFollow"](actor=to_purge),
+    ]
+
+    tasks.handle_purge_actors([to_purge.pk])
+
+    for k in keeped:
+        # this should not be deleted
+        k.refresh_from_db()
+
+    for d in deleted:
+        with pytest.raises(d.__class__.DoesNotExist):
+            d.refresh_from_db()
+
+
+def test_handle_purge_actors_restrict_media(factories, mocker):
+    to_purge = factories["federation.Actor"]()
+    keeped = [
+        factories["music.Upload"](),
+        factories["federation.Activity"](),
+        factories["federation.InboxItem"](),
+        factories["federation.Follow"](),
+        factories["federation.LibraryFollow"](),
+        factories["federation.Activity"](actor=to_purge),
+        factories["federation.InboxItem"](actor=to_purge),
+        factories["federation.Follow"](actor=to_purge),
+    ]
+
+    library = factories["music.Library"](actor=to_purge)
+    deleted = [
+        library,
+        factories["music.Upload"](library=library),
+        factories["federation.LibraryFollow"](actor=to_purge),
+    ]
+
+    tasks.handle_purge_actors([to_purge.pk], only=["media"])
+
+    for k in keeped:
+        # this should not be deleted
+        k.refresh_from_db()
+
+    for d in deleted:
+        with pytest.raises(d.__class__.DoesNotExist):
+            d.refresh_from_db()
+
+
+def test_purge_actors(factories, mocker):
+    handle_purge_actors = mocker.spy(tasks, "handle_purge_actors")
+    factories["federation.Actor"]()
+    to_delete = factories["federation.Actor"]()
+    to_delete_domain = factories["federation.Actor"]()
+    tasks.purge_actors(
+        ids=[to_delete.pk], domains=[to_delete_domain.domain.name], only=["hello"]
+    )
+
+    handle_purge_actors.assert_called_once_with(
+        ids=[to_delete.pk, to_delete_domain.pk], only=["hello"]
+    )
+
+
+def test_rotate_actor_key(factories, settings, mocker):
+    actor = factories["federation.Actor"](local=True)
+    get_key_pair = mocker.patch(
+        "funkwhale_api.federation.keys.get_key_pair",
+        return_value=(b"private", b"public"),
+    )
+
+    tasks.rotate_actor_key(actor_id=actor.pk)
+
+    actor.refresh_from_db()
+
+    get_key_pair.assert_called_once_with()
+
+    assert actor.public_key == "public"
+    assert actor.private_key == "private"

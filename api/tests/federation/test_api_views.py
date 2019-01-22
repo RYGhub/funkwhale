@@ -23,7 +23,7 @@ def test_user_can_list_their_library_follows(factories, logged_in_api_client):
 def test_user_can_fetch_library_using_url(mocker, factories, logged_in_api_client):
     library = factories["music.Library"]()
     mocked_retrieve = mocker.patch(
-        "funkwhale_api.federation.utils.retrieve", return_value=library
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=library
     )
     url = reverse("api:v1:federation:libraries-fetch")
     response = logged_in_api_client.post(url, {"fid": library.fid})

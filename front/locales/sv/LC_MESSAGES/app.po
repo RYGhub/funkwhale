@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-10-03 16:06+0000\n"
+"PO-Revision-Date: 2018-10-09 18:22+0000\n"
 "Last-Translator: Tim Stahel <gitlab@swedneck.xyz>\n"
 "Language-Team: none\n"
 "Language: sv\n"
@@ -724,7 +724,7 @@ msgstr ""
 
 #: front/src/components/library/import/FileUpload.vue:4
 msgid "Ensure your music files are properly tagged before uploading them."
-msgstr ""
+msgstr "Se till att dina musikfiler är korrekt taggade innan du laddar upp dem."
 
 #: front/src/components/library/Radios.vue:140
 msgid "Enter a radio name..."
@@ -780,29 +780,29 @@ msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgid "Error while changing your password"
-msgstr ""
+msgstr "Fel vid ändring av lösenord"
 
 #: front/src/views/auth/EmailConfirm.vue:7
 msgid "Error while confirming your email"
-msgstr ""
+msgstr "Fel vid bekräftelse av e-post"
 
 #: front/src/components/manage/users/InvitationForm.vue:4
 msgid "Error while creating invitation"
-msgstr ""
+msgstr "Fel vid skapande av inbjudan"
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgid "Error while saving settings"
-msgstr ""
+msgstr "Fel vid sparning av inställningar"
 
 #: front/src/components/federation/LibraryForm.vue:10
 msgid "Error while scanning library"
-msgstr ""
+msgstr "Fel vid skanning av bibliotek"
 
 #: front/src/components/library/import/BatchDetail.vue:41
 #: front/src/components/library/import/BatchDetail.vue:70
 #: front/src/components/library/import/BatchList.vue:15
 msgid "Errored"
-msgstr ""
+msgstr "Ett fel uppstod"
 
 #: front/src/components/playlists/Form.vue:89
 msgid "Everyone"

@@ -64,7 +64,7 @@
 <script>
 import axios from 'axios'
 import $ from 'jquery'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 import Modal from '@/components/semantic/Modal'
 import TrackTable from '@/components/audio/track/Table'
@@ -113,7 +113,7 @@ export default {
         settings.fields = f.autocomplete_fields
         settings.minCharacters = 1
         settings.apiSettings = {
-          url: f.autocomplete + '?' + f.autocomplete_qs,
+          url: self.$store.getters['instance/absoluteUrl'](f.autocomplete + '?' + f.autocomplete_qs),
           beforeXHR: function (xhrObject) {
             xhrObject.setRequestHeader('Authorization', self.$store.getters['auth/header'])
             return xhrObject

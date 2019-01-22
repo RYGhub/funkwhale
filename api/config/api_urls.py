@@ -10,7 +10,7 @@ from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
 
 router = routers.SimpleRouter()
-router.register(r"settings", GlobalPreferencesViewSet, base_name="settings")
+router.register(r"settings", GlobalPreferencesViewSet, basename="settings")
 router.register(r"activity", activity_views.ActivityViewSet, "activity")
 router.register(r"tags", views.TagViewSet, "tags")
 router.register(r"tracks", views.TrackViewSet, "tracks")
@@ -19,6 +19,7 @@ router.register(r"libraries", views.LibraryViewSet, "libraries")
 router.register(r"listen", views.ListenViewSet, "listen")
 router.register(r"artists", views.ArtistViewSet, "artists")
 router.register(r"albums", views.AlbumViewSet, "albums")
+router.register(r"licenses", views.LicenseViewSet, "licenses")
 router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
 router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
@@ -26,10 +27,11 @@ router.register(
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)
-subsonic_router.register(r"subsonic/rest", SubsonicViewSet, base_name="subsonic")
+subsonic_router.register(r"subsonic/rest", SubsonicViewSet, basename="subsonic")
 
 
 v1_patterns += [
+    url(r"^oembed/$", views.OembedView.as_view(), name="oembed"),
     url(
         r"^instance/",
         include(("funkwhale_api.instance.urls", "instance"), namespace="instance"),

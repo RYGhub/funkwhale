@@ -8,7 +8,11 @@ export default {
   state: {
     authenticated: false,
     username: '',
-    availablePermissions: {},
+    availablePermissions: {
+      settings: false,
+      library: false,
+      moderation: false
+    },
     profile: null,
     token: '',
     tokenData: {}
@@ -27,6 +31,7 @@ export default {
       state.tokenData = {}
       state.availablePermissions = {
         federation: false,
+        settings: false,
         library: false,
         upload: false
       }
@@ -70,9 +75,10 @@ export default {
       return axios.post('token/', credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
         commit('token', response.data.token)
-        dispatch('fetchProfile')
-        // Redirect to a specified route
-        router.push(next)
+        dispatch('fetchProfile').then(() => {
+          // Redirect to a specified route
+          router.push(next)
+        })
       }, response => {
         logger.default.error('Error while logging in', response.data)
         onError(response)
@@ -111,22 +117,34 @@ export default {
         document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       }
 
-      return axios.get('users/users/me/').then((response) => {
-        logger.default.info('Successfully fetched user profile')
-        let data = response.data
-        commit('authenticated', true)
-        commit('profile', data)
-        commit('username', data.username)
-        dispatch('ui/fetchUnreadNotifications', null, { root: true })
-        dispatch('favorites/fetch', null, { root: true })
-        dispatch('playlists/fetchOwn', null, { root: true })
-        Object.keys(data.permissions).forEach(function (key) {
-          // this makes it easier to check for permissions in templates
-          commit('permission', {key, status: data.permissions[String(key)]})
+      return new Promise((resolve, reject) => {
+        axios.get('users/users/me/').then((response) => {
+          logger.default.info('Successfully fetched user profile')
+          dispatch('updateProfile', response.data).then(() => {
+            resolve(response.data)
+          })
+          dispatch('ui/fetchUnreadNotifications', null, { root: true })
+          dispatch('favorites/fetch', null, { root: true })
+          dispatch('playlists/fetchOwn', null, { root: true })
+        }, (response) => {
+          logger.default.info('Error while fetching user profile')
+          reject()
         })
-        return response.data
-      }, (response) => {
-        logger.default.info('Error while fetching user profile')
+      })
+    },
+    updateProfile({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        commit("authenticated", true)
+        commit("profile", data)
+        commit("username", data.username)
+        Object.keys(data.permissions).forEach(function(key) {
+          // this makes it easier to check for permissions in templates
+          commit("permission", {
+            key,
+            status: data.permissions[String(key)]
+          })
+        })
+        resolve()
       })
     },
     refreshToken ({commit, dispatch, state}) {

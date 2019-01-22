@@ -46,23 +46,22 @@ def test_get_permissions_regular(factories):
 
 
 def test_get_permissions_default(factories, preferences):
-    preferences["users__default_permissions"] = ["upload", "federation"]
+    preferences["users__default_permissions"] = ["library", "moderation"]
     user = factories["users.User"]()
 
     perms = user.get_permissions()
-    assert perms["upload"] is True
-    assert perms["federation"] is True
-    assert perms["library"] is False
+    assert perms["moderation"] is True
+    assert perms["library"] is True
     assert perms["settings"] is False
 
 
 @pytest.mark.parametrize(
     "args,perms,expected",
     [
-        ({"is_superuser": True}, ["federation", "library"], True),
-        ({"is_superuser": False}, ["federation"], False),
+        ({"is_superuser": True}, ["moderation", "library"], True),
+        ({"is_superuser": False}, ["moderation"], False),
         ({"permission_library": True}, ["library"], True),
-        ({"permission_library": True}, ["library", "federation"], False),
+        ({"permission_library": True}, ["library", "moderation"], False),
     ],
 )
 def test_has_permissions_and(args, perms, expected, factories):
@@ -73,10 +72,10 @@ def test_has_permissions_and(args, perms, expected, factories):
 @pytest.mark.parametrize(
     "args,perms,expected",
     [
-        ({"is_superuser": True}, ["federation", "library"], True),
-        ({"is_superuser": False}, ["federation"], False),
-        ({"permission_library": True}, ["library", "federation"], True),
-        ({"permission_library": True}, ["federation"], False),
+        ({"is_superuser": True}, ["moderation", "library"], True),
+        ({"is_superuser": False}, ["moderation"], False),
+        ({"permission_library": True}, ["library", "moderation"], True),
+        ({"permission_library": True}, ["moderation"], False),
     ],
 )
 def test_has_permissions_or(args, perms, expected, factories):
@@ -137,7 +136,7 @@ def test_creating_actor_from_user(factories, settings):
     actor = models.create_actor(user)
 
     assert actor.preferred_username == "Hello_M_world"  # slugified
-    assert actor.domain == settings.FEDERATION_HOSTNAME
+    assert actor.domain.pk == settings.FEDERATION_HOSTNAME
     assert actor.type == "Person"
     assert actor.name == user.username
     assert actor.manually_approves_followers is False

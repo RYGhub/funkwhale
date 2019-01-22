@@ -82,7 +82,7 @@ def inbox_undo_follow(payload, context):
     serializer = serializers.UndoFollowSerializer(data=payload, context=context)
     if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
         logger.debug(
-            "Discarding invalid follow undo from {}: %s",
+            "Discarding invalid follow undo from %s: %s",
             context["actor"].fid,
             serializer.errors,
         )
@@ -193,6 +193,45 @@ def outbox_delete_library(context):
             serializer.data, to=[{"type": "followers", "target": library}]
         ),
     }
+
+
+@outbox.register({"type": "Update", "object.type": "Library"})
+def outbox_update_library(context):
+    library = context["library"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.LibrarySerializer(library).data}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": library.actor,
+        "payload": with_recipients(
+            serializer.data, to=[{"type": "followers", "target": library}]
+        ),
+    }
+
+
+@inbox.register({"type": "Update", "object.type": "Library"})
+def inbox_update_library(payload, context):
+    actor = context["actor"]
+    library_id = payload["object"].get("id")
+    if not library_id:
+        logger.debug("Discarding deletion of empty library")
+        return
+
+    if not actor.libraries.filter(fid=library_id).exists():
+        logger.debug("Discarding deletion of unkwnown library %s", library_id)
+        return
+
+    serializer = serializers.LibrarySerializer(data=payload["object"])
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        logger.debug(
+            "Discarding update of library %s because of payload errors: %s",
+            library_id,
+            serializer.errors,
+        )
 
 
 @inbox.register({"type": "Delete", "object.type": "Audio"})

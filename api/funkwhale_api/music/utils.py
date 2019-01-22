@@ -2,6 +2,7 @@ import mimetypes
 
 import magic
 import mutagen
+import pydub
 
 from funkwhale_api.common.search import normalize_query, get_query  # noqa
 
@@ -32,6 +33,7 @@ AUDIO_EXTENSIONS_AND_MIMETYPE = [
     ("ogg", "audio/ogg"),
     ("mp3", "audio/mpeg"),
     ("flac", "audio/x-flac"),
+    ("flac", "audio/flac"),
 ]
 
 EXTENSION_TO_MIMETYPE = {ext: mt for ext, mt in AUDIO_EXTENSIONS_AND_MIMETYPE}
@@ -68,3 +70,10 @@ def get_actor_from_request(request):
         actor = request.user.actor
 
     return actor
+
+
+def transcode_file(input, output, input_format, output_format, **kwargs):
+    with input.open("rb"):
+        audio = pydub.AudioSegment.from_file(input, format=input_format)
+    with output.open("wb"):
+        return audio.export(output, format=output_format, **kwargs)

@@ -14,7 +14,6 @@ import VueLazyload from 'vue-lazyload'
 import store from './store'
 import GetTextPlugin from 'vue-gettext'
 import { sync } from 'vuex-router-sync'
-import translations from './translations.json'
 import locales from '@/locales'
 
 import filters from '@/filters' // eslint-disable-line
@@ -23,12 +22,9 @@ import globals from '@/components/globals' // eslint-disable-line
 sync(store, router)
 
 window.$ = window.jQuery = require('jquery')
-
-// this is absolutely dirty but at the moment, semantic UI does not
-// play really nice with webpack and I want to get rid of Google Fonts
-// require('./semantic/semantic.css')
-require('semantic-ui-css/semantic.js')
+require('./semantic.js')
 require('masonry-layout')
+
 let availableLanguages = (function () {
   let l = {}
   locales.locales.forEach(c => {
@@ -54,7 +50,7 @@ Vue.use(GetTextPlugin, {
       }
     }
   },
-  translations: translations,
+  translations: {},
   silent: true
 })
 
@@ -101,7 +97,7 @@ axios.interceptors.response.use(function (response) {
   error.backendErrors = []
   if (error.response.status === 401) {
     store.commit('auth/authenticated', false)
-    logger.default.warn('Received 401 response from API, redirecting to login form')
+    logger.default.warn('Received 401 response from API, redirecting to login form', router.currentRoute.fullPath)
     router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
   }
   if (error.response.status === 404) {
@@ -130,15 +126,15 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error)
 })
 
-store.dispatch('instance/fetchFrontSettings')
+store.dispatch('instance/fetchFrontSettings').finally(() => {
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#app',
+    router,
+    store,
+    template: '<App/>',
+    components: { App }
+  })
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  store,
-  template: '<App/>',
-  components: { App }
+  logger.default.info('Everything loaded!')
 })
-
-logger.default.info('Everything loaded!')

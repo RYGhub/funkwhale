@@ -1,6 +1,6 @@
 from django.db.models import Q
 from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from funkwhale_api.common import permissions as common_permissions
@@ -23,7 +23,7 @@ class RadioViewSet(
         permissions.IsAuthenticated,
         common_permissions.OwnerPermission,
     ]
-    filter_class = filtersets.RadioFilter
+    filterset_class = filtersets.RadioFilter
     owner_field = "user"
     owner_checks = ["write"]
 
@@ -40,7 +40,7 @@ class RadioViewSet(
     def perform_update(self, serializer):
         return serializer.save(user=self.request.user)
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     def tracks(self, request, *args, **kwargs):
         radio = self.get_object()
         tracks = radio.get_candidates().for_nested_serialization()
@@ -50,14 +50,14 @@ class RadioViewSet(
             serializer = TrackSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-    @list_route(methods=["get"])
+    @action(methods=["get"], detail=False)
     def filters(self, request, *args, **kwargs):
         serializer = serializers.FilterSerializer(
             filters.registry.exposed_filters, many=True
         )
         return Response(serializer.data)
 
-    @list_route(methods=["post"])
+    @action(methods=["post"], detail=False)
     def validate(self, request, *args, **kwargs):
         try:
             f_list = request.data["filters"]

@@ -1,7 +1,7 @@
 <template>
-  <div class="ui vertical aligned stripe segment">
+  <section class="ui vertical aligned stripe segment">
     <div v-if="isLoadingLibrary" :class="['ui', {'active': isLoadingLibrary}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading library data...</translate></div>
+      <div class="ui text loader"><translate>Loading library data…</translate></div>
     </div>
     <detail-area v-else :library="library">
       <div class="ui top attached tabular menu">
@@ -13,13 +13,13 @@
         <div class="ui form">
           <div class="field">
             <label><translate>Sharing link</translate></label>
-            <p><translate>Share this link with other users so they can request an access to your library.</translate></p>
+            <p><translate>Share this link with other users so they can request access to your library.</translate></p>
             <copy-input :value="library.fid" />
           </div>
         </div>
         <div class="ui hidden divider"></div>
         <div v-if="isLoadingFollows" :class="['ui', {'active': isLoadingFollows}, 'inverted', 'dimmer']">
-          <div class="ui text loader"><translate>Loading followers...</translate></div>
+          <div class="ui text loader"><translate>Loading followers…</translate></div>
         </div>
         <table v-else-if="follows && follows.count > 0" class="ui table">
           <thead>
@@ -64,15 +64,15 @@
         <library-form :library="library" @updated="libraryUpdated" @deleted="libraryDeleted" />
       </div>
     </detail-area>
-  </div>
+  </section>
 </template>
 
 <script>
-import axios from 'axios'
-import DetailMixin from './DetailMixin'
-import DetailArea from './DetailArea'
-import LibraryForm from './Form'
-import LibraryFilesTable from './FilesTable'
+import axios from "axios"
+import DetailMixin from "./DetailMixin"
+import DetailArea from "./DetailArea"
+import LibraryForm from "./Form"
+import LibraryFilesTable from "./FilesTable"
 
 export default {
   mixins: [DetailMixin],
@@ -81,46 +81,48 @@ export default {
     LibraryForm,
     LibraryFilesTable
   },
-  data () {
+  data() {
     return {
-      currentTab: 'follows',
+      currentTab: "follows",
       isLoadingFollows: false,
       follows: null
     }
   },
-  created () {
+  created() {
     this.fetchFollows()
   },
   methods: {
-    libraryUpdated () {
+    libraryUpdated() {
       this.hiddenForm = true
       this.fetch()
     },
-    libraryDeleted () {
+    libraryDeleted() {
       this.$router.push({
-        name: 'content.libraries.index'
+        name: "content.libraries.index"
       })
     },
-    fetchFollows () {
+    fetchFollows() {
       let self = this
       self.isLoadingLibrary = true
-      axios.get(`libraries/${this.id}/follows/`).then((response) => {
+      axios.get(`libraries/${this.id}/follows/`).then(response => {
         self.follows = response.data
         self.isLoadingFollows = false
       })
     },
-    updateApproved (follow, value) {
+    updateApproved(follow, value) {
       let self = this
       let action
       if (value) {
-        action = 'accept'
+        action = "accept"
       } else {
-        action = 'reject'
+        action = "reject"
       }
-      axios.post(`federation/follows/library/${follow.uuid}/${action}/`).then((response) => {
-        follow.isLoading = false
-        follow.approved = value
-      })
+      axios
+        .post(`federation/follows/library/${follow.uuid}/${action}/`)
+        .then(response => {
+          follow.isLoading = false
+          follow.approved = value
+        })
     }
   }
 }

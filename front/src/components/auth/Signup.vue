@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" v-title="labels.title">
+    <section class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Create a funkwhale account</translate></h2>
         <form
@@ -39,11 +39,10 @@
             <label><translate>Password</translate></label>
             <password-input v-model="password" />
           </div>
-          <div class="field">
-            <label v-if="!$store.state.instance.settings.users.registration_enabled.value"><translate>Invitation code</translate></label>
-            <label v-else><translate>Invitation code (optional)</translate></label>
+          <div class="field" v-if="!$store.state.instance.settings.users.registration_enabled.value">
+            <label><translate>Invitation code</translate></label>
             <input
-            :required="!$store.state.instance.settings.users.registration_enabled.value"
+            required
             type="text"
             :placeholder="labels.placeholder"
             v-model="invitation">
@@ -53,49 +52,51 @@
           </button>
         </form>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import logger from '@/logging'
+import axios from "axios"
+import logger from "@/logging"
 
-import PasswordInput from '@/components/forms/PasswordInput'
+import PasswordInput from "@/components/forms/PasswordInput"
 
 export default {
   props: {
-    defaultInvitation: {type: String, required: false, default: null},
-    next: {type: String, default: '/'}
+    defaultInvitation: { type: String, required: false, default: null },
+    next: { type: String, default: "/" }
   },
   components: {
     PasswordInput
   },
-  data () {
+  data() {
     return {
-      username: '',
-      email: '',
-      password: '',
+      username: "",
+      email: "",
+      password: "",
       isLoadingInstanceSetting: true,
       errors: [],
       isLoading: false,
       invitation: this.defaultInvitation
     }
   },
-  created () {
+  created() {
     let self = this
-    this.$store.dispatch('instance/fetchSettings', {
-      callback: function () {
+    this.$store.dispatch("instance/fetchSettings", {
+      callback: function() {
         self.isLoadingInstanceSetting = false
       }
     })
   },
   computed: {
-    labels () {
-      let title = this.$gettext('Sign Up')
-      let placeholder = this.$gettext('Enter your invitation code (case insensitive)')
-      let usernamePlaceholder = this.$gettext('Enter your username')
-      let emailPlaceholder = this.$gettext('Enter your email')
+    labels() {
+      let title = this.$gettext("Sign Up")
+      let placeholder = this.$gettext(
+        "Enter your invitation code (case insensitive)"
+      )
+      let usernamePlaceholder = this.$gettext("Enter your username")
+      let emailPlaceholder = this.$gettext("Enter your email")
       return {
         title,
         usernamePlaceholder,
@@ -105,7 +106,7 @@ export default {
     }
   },
   methods: {
-    submit () {
+    submit() {
       var self = this
       self.isLoading = true
       this.errors = []
@@ -116,17 +117,21 @@ export default {
         email: this.email,
         invitation: this.invitation
       }
-      return axios.post('auth/registration/', payload).then(response => {
-        logger.default.info('Successfully created account')
-        self.$router.push({
-          name: 'profile',
-          params: {
-            username: this.username
-          }})
-      }, error => {
-        self.errors = error.backendErrors
-        self.isLoading = false
-      })
+      return axios.post("auth/registration/", payload).then(
+        response => {
+          logger.default.info("Successfully created account")
+          self.$router.push({
+            name: "profile",
+            params: {
+              username: this.username
+            }
+          })
+        },
+        error => {
+          self.errors = error.backendErrors
+          self.isLoading = false
+        }
+      )
     }
   }
 }

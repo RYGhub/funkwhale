@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <play-button class="basic icon" :discrete="true" :track="track"></play-button>
+      <play-button class="basic icon" :discrete="true" :is-playable="playable" :track="track"></play-button>
     </td>
     <td>
       <img class="ui mini image" v-if="track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
@@ -34,13 +34,13 @@
         {{ track.album.title }}
       </router-link>
     </td>
-    <td colspan="4" v-if="track.duration">
-      {{ time.parse(track.duration) }}
+    <td colspan="4" v-if="track.uploads && track.uploads.length > 0">
+      {{ time.parse(track.uploads[0].duration) }}
     </td>
     <td colspan="4" v-else>
       <translate>N/A</translate>
     </td>
-    <td>
+    <td colspan="2">
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
       <track-playlist-icon
         v-if="$store.state.auth.authenticated"
@@ -60,7 +60,8 @@ export default {
   props: {
     track: {type: Object, required: true},
     artist: {type: Object, required: false},
-    displayPosition: {type: Boolean, default: false}
+    displayPosition: {type: Boolean, default: false},
+    playable: {type: Boolean, required: false, default: false},
   },
   components: {
     TrackFavoriteIcon,
@@ -86,10 +87,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-
 tr:not(:hover) {
-  .favorite-icon:not(.favorited), .playlist-icon {
-    display: none;
+  .favorite-icon:not(.favorited),
+  .playlist-icon {
+    visibility: hidden;
   }
 }
 </style>

@@ -4,14 +4,16 @@
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
-    <translate>Add to playlist...</translate>
+    <translate>Add to playlist…</translate>
   </button>
-  <i
+  <button
     v-else
     @click="$store.commit('playlists/chooseTrack', track)"
-    :class="['playlist-icon', 'list', 'link', 'icon']"
+    :class="['ui', 'basic', 'circular', 'icon', 'really', 'button']"
+    :aria-label="labels.addToPlaylist"
     :title="labels.addToPlaylist">
-  </i>
+    <i :class="['list', 'basic', 'icon']"></i>
+  </button>
 </template>
 
 <script>
@@ -29,7 +31,7 @@ export default {
   computed: {
     labels () {
       return {
-        addToPlaylist: this.$gettext('Add to playlist...')
+        addToPlaylist: this.$gettext('Add to playlist…')
       }
     }
   }

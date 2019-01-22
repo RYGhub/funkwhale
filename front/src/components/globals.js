@@ -36,4 +36,13 @@ import CopyInput from '@/components/common/CopyInput'
 
 Vue.component('copy-input', CopyInput)
 
+import AjaxButton from '@/components/common/AjaxButton'
+
+Vue.component('ajax-button', AjaxButton)
+
+import Tooltip from '@/components/common/Tooltip'
+
+Vue.component('tooltip', Tooltip)
+
+
 export default {}

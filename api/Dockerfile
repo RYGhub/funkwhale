@@ -1,27 +1,47 @@
-FROM python:3.6
+FROM alpine:3.8
 
-ENV PYTHONUNBUFFERED 1
+RUN \
+    echo 'installing dependencies' && \
+    apk add                \
+    bash             \
+    git             \
+    gettext            \
+    musl-dev           \
+    gcc \
+    postgresql-dev \
+    python3-dev        \
+    py3-psycopg2       \
+    py3-pillow         \
+    libldap            \
+    ffmpeg             \
+    libpq              \
+    libmagic           \
+    libffi-dev         \
+    zlib-dev           \
+    openldap-dev && \
+    \
+    \
+    ln -s /usr/bin/python3 /usr/bin/python
 
-# Requirements have to be pulled and installed here, otherwise caching won't work
-RUN echo 'deb http://httpredir.debian.org/debian/ jessie-backports main' > /etc/apt/sources.list.d/ffmpeg.list
-COPY ./requirements.apt /requirements.apt
-RUN apt-get update; \
-    grep "^[^#;]" requirements.apt | \
-    grep -Fv "python3-dev" | \
-    xargs apt-get install -y --no-install-recommends; \
-    rm -rf /usr/share/doc/* /usr/share/locale/*
-RUN curl -L https://github.com/acoustid/chromaprint/releases/download/v1.4.2/chromaprint-fpcalc-1.4.2-linux-x86_64.tar.gz | tar -xz -C /usr/local/bin --strip 1
+RUN mkdir /requirements
 COPY ./requirements/base.txt /requirements/base.txt
-RUN pip install -r /requirements/base.txt
-COPY ./requirements/production.txt /requirements/production.txt
-RUN pip install -r /requirements/production.txt
+RUN \
+    echo 'fixing requirements file for alpine' && \
+    sed -i '/Pillow/d' /requirements/base.txt && \
+    \
+    \
+    echo 'installing pip requirements' && \
+    pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir setuptools wheel && \
+    pip3 install --no-cache-dir -r /requirements/base.txt
 
-COPY . /app
-
-# Since youtube-dl code is updated fairly often, we split it here
-RUN pip install --upgrade youtube-dl
-
-WORKDIR /app
+ARG install_dev_deps=0
+COPY ./requirements/*.txt /requirements/
+RUN \
+    if [ "$install_dev_deps" = "1" ] ; then echo "Installing dev dependencies" && pip3 install --no-cache-dir -r /requirements/local.txt -r /requirements/test.txt ; else echo "Skipping dev deps installation" ; fi
 
 ENTRYPOINT ["./compose/django/entrypoint.sh"]
 CMD ["./compose/django/daphne.sh"]
+
+COPY . /app
+WORKDIR /app

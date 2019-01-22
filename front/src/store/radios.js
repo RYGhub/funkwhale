@@ -48,7 +48,7 @@ export default {
         logger.default.info('Successfully started radio ', type)
         commit('current', {type, objectId, session: response.data.id, customRadioId})
         commit('running', true)
-        dispatch('populateQueue')
+        dispatch('populateQueue', true)
       }, (response) => {
         logger.default.error('Error while starting radio', type)
       })
@@ -57,7 +57,7 @@ export default {
       commit('current', null)
       commit('running', false)
     },
-    populateQueue ({rootState, state, dispatch}) {
+    populateQueue ({rootState, state, dispatch}, playNow) {
       if (!state.running) {
         return
       }
@@ -69,7 +69,12 @@ export default {
       }
       return axios.post('radios/tracks/', params).then((response) => {
         logger.default.info('Adding track to queue from radio')
-        dispatch('queue/append', {track: response.data.track}, {root: true})
+        let append = dispatch('queue/append', {track: response.data.track}, {root: true})
+        if (playNow) {
+          append.then(() => {
+            dispatch('queue/last', null, {root: true})
+          })
+        }
       }, (response) => {
         logger.default.error('Error while adding track to queue from radio')
       })

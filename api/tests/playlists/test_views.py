@@ -145,7 +145,7 @@ def test_can_list_tracks_from_playlist(level, factories, logged_in_api_client):
     url = reverse("api:v1:playlists-tracks", kwargs={"pk": plt.playlist.pk})
     response = logged_in_api_client.get(url)
     serialized_plt = serializers.PlaylistTrackSerializer(plt).data
-    serialized_plt["track"]["is_playable"] = False
+
     assert response.data["count"] == 1
     assert response.data["results"][0] == serialized_plt
 

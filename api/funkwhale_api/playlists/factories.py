@@ -1,12 +1,12 @@
 import factory
 
-from funkwhale_api.factories import registry
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 from funkwhale_api.music.factories import TrackFactory
 from funkwhale_api.users.factories import UserFactory
 
 
 @registry.register
-class PlaylistFactory(factory.django.DjangoModelFactory):
+class PlaylistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     user = factory.SubFactory(UserFactory)
 
@@ -15,7 +15,7 @@ class PlaylistFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class PlaylistTrackFactory(factory.django.DjangoModelFactory):
+class PlaylistTrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     playlist = factory.SubFactory(PlaylistFactory)
     track = factory.SubFactory(TrackFactory)
 

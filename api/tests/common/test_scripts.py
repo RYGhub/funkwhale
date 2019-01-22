@@ -12,7 +12,12 @@ def command():
 
 
 @pytest.mark.parametrize(
-    "script_name", ["django_permissions_to_user_permissions", "test"]
+    "script_name",
+    [
+        "django_permissions_to_user_permissions",
+        "test",
+        "delete_pre_017_federated_uploads",
+    ],
 )
 def test_script_command_list(command, script_name, mocker):
     mocked = mocker.patch("funkwhale_api.common.scripts.{}.main".format(script_name))
@@ -20,30 +25,6 @@ def test_script_command_list(command, script_name, mocker):
     command.handle(script_name=script_name, interactive=False)
 
     mocked.assert_called_once_with(command, script_name=script_name, interactive=False)
-
-
-def test_django_permissions_to_user_permissions(factories, command):
-    group = factories["auth.Group"](perms=["federation.change_library"])
-    user1 = factories["users.User"](
-        perms=[
-            "dynamic_preferences.change_globalpreferencemodel",
-            "music.add_importbatch",
-        ]
-    )
-    user2 = factories["users.User"](perms=["music.add_importbatch"], groups=[group])
-
-    scripts.django_permissions_to_user_permissions.main(command)
-
-    user1.refresh_from_db()
-    user2.refresh_from_db()
-
-    assert user1.permission_settings is True
-    assert user1.permission_library is True
-    assert user1.permission_federation is False
-
-    assert user2.permission_settings is False
-    assert user2.permission_library is True
-    assert user2.permission_federation is True
 
 
 @pytest.mark.parametrize(
@@ -259,3 +240,17 @@ def test_migrate_to_users_libraries_command(
 
     for part in ["followers", "following"]:
         generate_actor_urls.assert_any_call(part, command.stdout)
+
+
+def test_delete_pre_017_federated_uploads(factories, command):
+    to_delete = factories["music.Upload"](
+        source="https://test.com/federation/music/file/1"
+    )
+    to_keep = factories["music.Upload"](source="https://hello.world")
+
+    scripts.delete_pre_017_federated_uploads.main(command)
+
+    to_keep.refresh_from_db()
+
+    with pytest.raises(to_delete.__class__.DoesNotExist):
+        to_delete.refresh_from_db()

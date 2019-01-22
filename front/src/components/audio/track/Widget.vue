@@ -3,12 +3,9 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle up', 'icon']">
-    </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle down', 'icon']">
-    </i>
-    <i @click="fetchData(url)" :class="['ui', 'circular', 'medium', 'refresh', 'icon']">
-    </i>
+    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
+    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
+    <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui divided unstackable items">
       <div class="item" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
@@ -50,7 +47,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
 
@@ -112,7 +109,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../../style/vendor/media';
+@import "../../../style/vendor/media";
 
 .play-overlay {
   position: absolute;

@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import requests
 
 from django.conf import settings
 from django.db.models import Q, F
@@ -13,7 +14,9 @@ from funkwhale_api.common import session
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
+from . import keys
 from . import models, signing
+from . import serializers
 from . import routes
 
 logger = logging.getLogger(__name__)
@@ -147,3 +150,92 @@ def deliver_to_remote(delivery):
         delivery.attempts = F("attempts") + 1
         delivery.is_delivered = True
         delivery.save(update_fields=["last_attempt_date", "attempts", "is_delivered"])
+
+
+def fetch_nodeinfo(domain_name):
+    s = session.get_session()
+    wellknown_url = "https://{}/.well-known/nodeinfo".format(domain_name)
+    response = s.get(
+        url=wellknown_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
+    )
+    response.raise_for_status()
+    serializer = serializers.NodeInfoSerializer(data=response.json())
+    serializer.is_valid(raise_exception=True)
+    nodeinfo_url = None
+    for link in serializer.validated_data["links"]:
+        if link["rel"] == "http://nodeinfo.diaspora.software/ns/schema/2.0":
+            nodeinfo_url = link["href"]
+            break
+
+    response = s.get(
+        url=nodeinfo_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+@celery.app.task(name="federation.update_domain_nodeinfo")
+@celery.require_instance(
+    models.Domain.objects.external(), "domain", id_kwarg_name="domain_name"
+)
+def update_domain_nodeinfo(domain):
+    now = timezone.now()
+    try:
+        nodeinfo = {"status": "ok", "payload": fetch_nodeinfo(domain.name)}
+    except (requests.RequestException, serializers.serializers.ValidationError) as e:
+        nodeinfo = {"status": "error", "error": str(e)}
+    domain.nodeinfo_fetch_date = now
+    domain.nodeinfo = nodeinfo
+    domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date"])
+
+
+def delete_qs(qs):
+    label = qs.model._meta.label
+    result = qs.delete()
+    related = sum(result[1].values())
+
+    logger.info(
+        "Purged %s %s objects (and %s related entities)", result[0], label, related
+    )
+
+
+def handle_purge_actors(ids, only=[]):
+    """
+    Empty only means we purge everything
+    Otherwise, we purge only the requested bits: media
+    """
+    # purge follows (received emitted)
+    if not only:
+        delete_qs(models.LibraryFollow.objects.filter(target__actor_id__in=ids))
+        delete_qs(models.Follow.objects.filter(actor_id__in=ids))
+
+    # purge audio content
+    if not only or "media" in only:
+        delete_qs(models.LibraryFollow.objects.filter(actor_id__in=ids))
+        delete_qs(models.Follow.objects.filter(target_id__in=ids))
+        delete_qs(music_models.Upload.objects.filter(library__actor_id__in=ids))
+        delete_qs(music_models.Library.objects.filter(actor_id__in=ids))
+
+    # purge remaining activities / deliveries
+    if not only:
+        delete_qs(models.InboxItem.objects.filter(actor_id__in=ids))
+        delete_qs(models.Activity.objects.filter(actor_id__in=ids))
+
+
+@celery.app.task(name="federation.purge_actors")
+def purge_actors(ids=[], domains=[], only=[]):
+    actors = models.Actor.objects.filter(
+        Q(id__in=ids) | Q(domain_id__in=domains)
+    ).order_by("id")
+    found_ids = list(actors.values_list("id", flat=True))
+    logger.info("Starting purging %s accounts", len(found_ids))
+    handle_purge_actors(ids=found_ids, only=only)
+
+
+@celery.app.task(name="federation.rotate_actor_key")
+@celery.require_instance(models.Actor.objects.local(), "actor")
+def rotate_actor_key(actor):
+    pair = keys.get_key_pair()
+    actor.private_key = pair[0].decode()
+    actor.public_key = pair[1].decode()
+    actor.save(update_fields=["private_key", "public_key"])

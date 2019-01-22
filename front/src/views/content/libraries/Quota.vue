@@ -2,7 +2,7 @@
   <div class="ui segment">
     <h3 class="ui header"><translate>Current usage</translate></h3>
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading usage data...</translate></div>
+      <div class="ui text loader"><translate>Loading usage data…</translate></div>
     </div>
     <div :class="['ui', {'success': progress < 60}, {'yellow': progress >= 60 && progress < 96}, {'error': progress >= 95}, 'progress']">
       <div class="bar" :style="{width: `${progress}%`}">
@@ -36,7 +36,7 @@
             :action="purgePendingFiles">
             <translate>Purge</translate>
             <p slot="modal-header"><translate>Purge pending files?</translate></p>
-            <p slot="modal-content"><translate>This will remove tracks that were uploaded but not processed yet. This will remove those files completely and you will regain the corresponding quota.</translate></p>
+            <p slot="modal-content"><translate>Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota.</translate></p>
             <p slot="modal-confirm"><translate>Purge</translate></p>
           </dangerous-button>
         </div>
@@ -62,7 +62,7 @@
             :action="purgeSkippedFiles">
             <translate>Purge</translate>
             <p slot="modal-header"><translate>Purge skipped files?</translate></p>
-            <p slot="modal-content"><translate>This will remove tracks that were uploaded but skipped during import processes for various reasons. This will remove those files completely and you will regain the corresponding quota.</translate></p>
+            <p slot="modal-content"><translate>Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota.</translate></p>
             <p slot="modal-confirm"><translate>Purge</translate></p>
           </dangerous-button>
         </div>
@@ -88,7 +88,7 @@
             :action="purgeErroredFiles">
             <translate>Purge</translate>
             <p slot="modal-header"><translate>Purge errored files?</translate></p>
-            <p slot="modal-content"><translate>This will remove tracks that were uploaded but failed to be process by the server. This will remove those files completely and you will regain the corresponding quota.</translate></p>
+            <p slot="modal-content"><translate>Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota.</translate></p>
             <p slot="modal-confirm"><translate>Purge</translate></p>
           </dangerous-button>
         </div>

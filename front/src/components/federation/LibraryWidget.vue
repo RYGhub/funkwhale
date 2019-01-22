@@ -5,9 +5,9 @@
     </h3>
     <p v-if="!isLoading && libraries.length > 0" class="ui subtitle"><slot name="subtitle"></slot></p>
     <p v-if="!isLoading && libraries.length === 0" class="ui subtitle"><translate>No matching library.</translate></p>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle left', 'icon']">
+    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'angle left', 'icon']">
     </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle right', 'icon']">
+    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'angle right', 'icon']">
     </i>
     <div class="ui hidden divider"></div>
     <div class="ui three cards">
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from '@/lodash'
 import axios from 'axios'
 import LibraryCard from '@/views/content/remote/Card'
 
@@ -62,6 +62,7 @@ export default {
         self.nextPage = response.data.next
         self.isLoading = false
         self.libraries = response.data.results
+        self.$emit('loaded', self.libraries)
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

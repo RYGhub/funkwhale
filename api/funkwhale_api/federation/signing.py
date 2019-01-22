@@ -85,7 +85,7 @@ def verify_django(django_request, public_key):
 def get_auth(private_key, private_key_id):
     return requests_http_signature.HTTPSignatureAuth(
         use_auth_header=False,
-        headers=["(request-target)", "user-agent", "host", "date", "content-type"],
+        headers=["(request-target)", "user-agent", "host", "date"],
         algorithm="rsa-sha256",
         key=private_key.encode("utf-8"),
         key_id=private_key_id,

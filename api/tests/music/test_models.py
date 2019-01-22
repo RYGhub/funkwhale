@@ -167,8 +167,7 @@ def test_audio_track_mime_type(extention, mimetype, factories):
 def test_upload_file_name(factories):
     name = "test.mp3"
     path = os.path.join(DATA_DIR, name)
-    upload = factories["music.Upload"](audio_file__from_path=path)
-
+    upload = factories["music.Upload"](audio_file__from_path=path, mimetype=None)
     assert upload.filename == upload.track.full_name + ".mp3"
 
 
@@ -449,7 +448,7 @@ def test_get_audio_data(factories):
 
     result = upload.get_audio_data()
 
-    assert result == {"duration": 229, "bitrate": 128000, "size": 3459481}
+    assert result == {"duration": 1, "bitrate": 112000, "size": 14858}
 
 
 def test_library_queryset_with_follows(factories):
@@ -462,24 +461,6 @@ def test_library_queryset_with_follows(factories):
     l2 = list(qs)[1]
     assert l1._follows == []
     assert l2._follows == [follow]
-
-
-def test_annotate_duration(factories):
-    tf = factories["music.Upload"](duration=32)
-
-    track = models.Track.objects.annotate_duration().get(pk=tf.track.pk)
-
-    assert track.duration == 32
-
-
-def test_annotate_file_data(factories):
-    tf = factories["music.Upload"](size=42, bitrate=55, mimetype="audio/ogg")
-
-    track = models.Track.objects.annotate_file_data().get(pk=tf.track.pk)
-
-    assert track.size == 42
-    assert track.bitrate == 55
-    assert track.mimetype == "audio/ogg"
 
 
 @pytest.mark.parametrize(
@@ -502,3 +483,42 @@ def test_fid_is_populated(factories, model, factory_args, namespace):
     assert instance.fid == federation_utils.full_url(
         reverse(namespace, kwargs={"uuid": instance.uuid})
     )
+
+
+@pytest.mark.parametrize(
+    "factory_args,expected",
+    [
+        ({"audio_file__filename": "test.mp3", "mimetype": None}, "mp3"),
+        ({"mimetype": "audio/mpeg"}, "mp3"),
+        ({"in_place": True, "source": "file:///test.mp3"}, "mp3"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/mpeg"}, "mp3"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/flac"}, "flac"),
+        ({"audio_file__filename": "test.None", "mimetype": "audio/x-flac"}, "flac"),
+    ],
+)
+def test_upload_extension(factory_args, factories, expected):
+    upload = factories["music.Upload"].build(**factory_args)
+
+    assert upload.extension == expected
+
+
+def test_can_create_license(db):
+    models.License.objects.create(
+        code="cc-by-sa",
+        copyleft=True,
+        commercial=True,
+        attribution=True,
+        derivative=True,
+        redistribute=True,
+        url="http://cc",
+    )
+
+
+def test_track_order_for_album(factories):
+    album = factories["music.Album"]()
+    t1 = factories["music.Track"](album=album, position=1, disc_number=1)
+    t2 = factories["music.Track"](album=album, position=1, disc_number=2)
+    t3 = factories["music.Track"](album=album, position=2, disc_number=1)
+    t4 = factories["music.Track"](album=album, position=2, disc_number=2)
+
+    assert list(models.Track.objects.order_for_album()) == [t1, t3, t2, t4]

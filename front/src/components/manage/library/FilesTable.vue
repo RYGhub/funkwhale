@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering direction</translate></label>
+          <label><translate>Order</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+"><translate>Ascending</translate></option>
             <option value="-"><translate>Descending</translate></option>
@@ -106,7 +106,7 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
@@ -173,7 +173,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by title, artist, domain...')
+        searchPlaceholder: this.$gettext('Search by title, artist, domain…')
       }
     },
     actionFilters () {

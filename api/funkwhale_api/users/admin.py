@@ -51,7 +51,7 @@ class UserAdmin(AuthUserAdmin):
         "privacy_level",
         "permission_settings",
         "permission_library",
-        "permission_federation",
+        "permission_moderation",
     ]
 
     fieldsets = (
@@ -67,10 +67,9 @@ class UserAdmin(AuthUserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "permission_upload",
                     "permission_library",
                     "permission_settings",
-                    "permission_federation",
+                    "permission_moderation",
                 )
             },
         ),

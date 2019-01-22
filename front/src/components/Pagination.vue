@@ -1,53 +1,65 @@
 <template>
-  <div class="ui pagination menu">
-    <div
+  <div class="ui pagination menu" role="navigation" :aria-label="labels.pagination">
+    <a href
       :disabled="current - 1 < 1"
-      @click="selectPage(current - 1)"
-      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></div>
+      @click.prevent.stop="selectPage(current - 1)"
+      :class="[{'disabled': current - 1 < 1}, 'item']"><i class="angle left icon"></i></a>
     <template v-if="!compact">
-      <div
+      <a href
         v-if="page !== 'skip'"
         v-for="page in pages"
-        @click="selectPage(page)"
+        @click.prevent.stop="selectPage(page)"
         :class="[{'active': page === current}, 'item']">
         {{ page }}
-      </div>
+      </a href>
       <div v-else class="disabled item">
         ...
       </div>
     </template>
-    <div
+    <a href
       :disabled="current + 1 > maxPage"
-      @click="selectPage(current + 1)"
-      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></div>
+      @click.prevent.stop="selectPage(current + 1)"
+      :class="[{'disabled': current + 1 > maxPage}, 'item']"><i class="angle right icon"></i></a>
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from "@/lodash"
 
 export default {
   props: {
-    current: {type: Number, default: 1},
-    paginateBy: {type: Number, default: 25},
-    total: {type: Number},
-    compact: {type: Boolean, default: false}
+    current: { type: Number, default: 1 },
+    paginateBy: { type: Number, default: 25 },
+    total: { type: Number },
+    compact: { type: Boolean, default: false }
   },
   computed: {
-    pages: function () {
+    labels() {
+      return {
+        pagination: this.$gettext("Pagination")
+      }
+    },
+    pages: function() {
       let range = 2
       let current = this.current
       let beginning = _.range(1, Math.min(this.maxPage, 1 + range))
-      let middle = _.range(Math.max(1, current - range + 1), Math.min(this.maxPage, current + range))
+      let middle = _.range(
+        Math.max(1, current - range + 1),
+        Math.min(this.maxPage, current + range)
+      )
       let end = _.range(this.maxPage, Math.max(1, this.maxPage - range))
       let allowed = beginning.concat(middle, end)
       allowed = _.uniq(allowed)
-      allowed = _.sortBy(allowed, [(e) => { return e }])
+      allowed = _.sortBy(allowed, [
+        e => {
+          return e
+        }
+      ])
       let final = []
       allowed.forEach(p => {
         let last = final.slice(-1)[0]
         let consecutive = true
-        if (last === 'skip') {
+        if (last === "skip") {
           consecutive = false
         } else {
           if (!last) {
@@ -59,25 +71,25 @@ export default {
         if (consecutive) {
           final.push(p)
         } else {
-          if (p !== 'skip') {
-            final.push('skip')
+          if (p !== "skip") {
+            final.push("skip")
             final.push(p)
           }
         }
       })
       return final
     },
-    maxPage: function () {
+    maxPage: function() {
       return Math.ceil(this.total / this.paginateBy)
     }
   },
   methods: {
-    selectPage: function (page) {
+    selectPage: function(page) {
       if (page > this.maxPage || page < 1) {
         return
       }
       if (this.current !== page) {
-        this.$emit('page-changed', page)
+        this.$emit("page-changed", page)
       }
     }
   }
@@ -87,7 +99,6 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .ui.pagination.menu .item {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>
-

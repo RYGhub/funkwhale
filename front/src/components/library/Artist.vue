@@ -1,10 +1,10 @@
 <template>
-  <div v-title="labels.title">
+  <main v-title="labels.title">
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="artist">
-      <div :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="artist.name">
+      <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="artist.name">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted users violet icon"></i>
@@ -28,19 +28,19 @@
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
-            <i class="wikipedia icon"></i>
+            <i class="wikipedia w icon"></i>
             <translate>Search on Wikipedia</translate>
           </a>
-          <a :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
         </div>
-      </div>
-      <div v-if="isLoadingAlbums" class="ui vertical stripe segment">
+      </section>
+      <section v-if="isLoadingAlbums" class="ui vertical stripe segment">
         <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
-      </div>
-      <div v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
+      </section>
+      <section v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
         <h2>
           <translate>Albums by this artist</translate>
         </h2>
@@ -49,38 +49,38 @@
             <album-card :mode="'rich'" class="fluid" :album="album"></album-card>
           </div>
         </div>
-      </div>
-      <div v-if="tracks.length > 0" class="ui vertical stripe segment">
+      </section>
+      <section v-if="tracks.length > 0" class="ui vertical stripe segment">
         <h2>
           <translate>Tracks by this artist</translate>
         </h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
-      </div>
-      <div class="ui vertical stripe segment">
+      </section>
+      <section class="ui vertical stripe segment">
         <h2>
           <translate>User libraries</translate>
         </h2>
         <library-widget :url="'artists/' + id + '/libraries/'">
           <translate slot="subtitle">This artist is present in the following libraries:</translate>
         </library-widget>
-      </div>
+      </section>
     </template>
-  </div>
+  </main>
 </template>
 
 <script>
-import _ from 'lodash'
-import axios from 'axios'
-import logger from '@/logging'
-import backend from '@/audio/backend'
-import AlbumCard from '@/components/audio/album/Card'
-import RadioButton from '@/components/radios/Button'
-import PlayButton from '@/components/audio/PlayButton'
-import TrackTable from '@/components/audio/track/Table'
-import LibraryWidget from '@/components/federation/LibraryWidget'
+import _ from "@/lodash"
+import axios from "axios"
+import logger from "@/logging"
+import backend from "@/audio/backend"
+import AlbumCard from "@/components/audio/album/Card"
+import RadioButton from "@/components/radios/Button"
+import PlayButton from "@/components/audio/PlayButton"
+import TrackTable from "@/components/audio/track/Table"
+import LibraryWidget from "@/components/federation/LibraryWidget"
 
 export default {
-  props: ['id'],
+  props: ["id"],
   components: {
     AlbumCard,
     RadioButton,
@@ -88,75 +88,74 @@ export default {
     TrackTable,
     LibraryWidget
   },
-  data () {
+  data() {
     return {
       isLoading: true,
       isLoadingAlbums: true,
       artist: null,
       albums: null,
+      totalTracks: 0,
+      totalAlbums: 0,
       tracks: []
     }
   },
-  created () {
+  created() {
     this.fetchData()
   },
   methods: {
-    fetchData () {
+    fetchData() {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching artist "' + this.id + '"')
-      axios.get('tracks/', {params: {artist: this.id}}).then((response) => {
+      axios.get("tracks/", { params: { artist: this.id } }).then(response => {
         self.tracks = response.data.results
+        self.totalTracks = response.data.count
       })
-      axios.get('artists/' + this.id + '/').then((response) => {
+      axios.get("artists/" + this.id + "/").then(response => {
         self.artist = response.data
         self.isLoading = false
         self.isLoadingAlbums = true
-        axios.get('albums/', {params: {artist: self.id, ordering: '-release_date'}}).then((response) => {
-          let parsed = JSON.parse(JSON.stringify(response.data.results))
-          self.albums = parsed.map((album) => {
-            return backend.Album.clean(album)
+        axios
+          .get("albums/", {
+            params: { artist: self.id, ordering: "-release_date" }
           })
+          .then(response => {
+            self.totalAlbums = response.data.count
+            let parsed = JSON.parse(JSON.stringify(response.data.results))
+            self.albums = parsed.map(album => {
+              return backend.Album.clean(album)
+            })
 
-          self.isLoadingAlbums = false
-        })
+            self.isLoadingAlbums = false
+          })
       })
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Artist')
+        title: this.$gettext("Artist")
       }
     },
-    totalAlbums () {
-      let trackAlbums = _.uniqBy(this.tracks, (t) => {
-        return t.album.id
-      })
-      return this.albums.length + trackAlbums.length
+    isPlayable() {
+      return (
+        this.artist.albums.filter(a => {
+          return a.is_playable
+        }).length > 0
+      )
     },
-    totalTracks () {
-      if (this.albums.length === 0) {
-        return 0 + this.tracks.length
+    wikipediaUrl() {
+      return (
+        "https://en.wikipedia.org/w/index.php?search=" +
+        encodeURI(this.artist.name)
+      )
+    },
+    musicbrainzUrl() {
+      if (this.artist.mbid) {
+        return "https://musicbrainz.org/artist/" + this.artist.mbid
       }
-      return this.albums.map((album) => {
-        return album.tracks.length
-      }).reduce((a, b) => {
-        return a + b
-      }) + this.tracks.length
     },
-    isPlayable () {
-      return this.artist.albums.filter((a) => {
-        return a.is_playable
-      }).length > 0
-    },
-    wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + this.artist.name
-    },
-    musicbrainzUrl () {
-      return 'https://musicbrainz.org/artist/' + this.artist.mbid
-    },
-    allTracks () {
+    allTracks() {
       let tracks = []
       this.albums.forEach(album => {
         album.tracks.forEach(track => {
@@ -165,22 +164,28 @@ export default {
       })
       return tracks
     },
-    cover () {
-      return this.artist.albums.filter(album => {
-        return album.cover
-      }).map(album => {
-        return album.cover
-      })[0]
+    cover() {
+      return this.artist.albums
+        .filter(album => {
+          return album.cover
+        })
+        .map(album => {
+          return album.cover
+        })[0]
     },
-    headerStyle () {
+    headerStyle() {
       if (!this.cover || !this.cover.original) {
-        return ''
+        return ""
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.cover.original) + ')'
+      return (
+        "background-image: url(" +
+        this.$store.getters["instance/absoluteUrl"](this.cover.original) +
+        ")"
+      )
     }
   },
   watch: {
-    id () {
+    id() {
       this.fetchData()
     }
   }

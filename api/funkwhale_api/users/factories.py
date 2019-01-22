@@ -2,13 +2,13 @@ import factory
 from django.contrib.auth.models import Permission
 from django.utils import timezone
 
-from funkwhale_api.factories import ManyToManyFromList, registry
+from funkwhale_api.factories import ManyToManyFromList, registry, NoUpdateOnCreate
 
 from . import models
 
 
 @registry.register
-class GroupFactory(factory.django.DjangoModelFactory):
+class GroupFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: "group-{0}".format(n))
 
     class Meta:
@@ -32,7 +32,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
 
 @registry.register
-class InvitationFactory(factory.django.DjangoModelFactory):
+class InvitationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     owner = factory.LazyFunction(lambda: UserFactory())
 
     class Meta:

@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <main>
     <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <div v-if="!isLoading && radio" class="ui head vertical center aligned stripe segment" v-title="radio.name">
+    <section v-if="!isLoading && radio" class="ui head vertical center aligned stripe segment" v-title="radio.name">
       <div class="segment-content">
         <h2 class="ui center aligned icon header">
           <i class="circular inverted feed blue icon"></i>
@@ -30,8 +30,8 @@
           </dangerous-button>
         </template>
       </div>
-    </div>
-    <div class="ui vertical stripe segment">
+    </section>
+    <section class="ui vertical stripe segment">
       <h2><translate>Tracks</translate></h2>
       <track-table :tracks="tracks"></track-table>
       <div class="ui center aligned basic segment">
@@ -43,26 +43,26 @@
           :total="totalTracks"
           ></pagination>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import TrackTable from '@/components/audio/track/Table'
-import RadioButton from '@/components/radios/Button'
-import Pagination from '@/components/Pagination'
+import axios from "axios"
+import TrackTable from "@/components/audio/track/Table"
+import RadioButton from "@/components/radios/Button"
+import Pagination from "@/components/Pagination"
 
 export default {
   props: {
-    id: {required: true}
+    id: { required: true }
   },
   components: {
     TrackTable,
     RadioButton,
     Pagination
   },
-  data: function () {
+  data: function() {
     return {
       isLoading: false,
       radio: null,
@@ -71,46 +71,49 @@ export default {
       page: 1
     }
   },
-  created: function () {
+  created: function() {
     this.fetch()
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Radio')
+        title: this.$gettext("Radio")
       }
     }
   },
   methods: {
-    selectPage: function (page) {
+    selectPage: function(page) {
       this.page = page
     },
-    fetch: function () {
+    fetch: function() {
       let self = this
       self.isLoading = true
-      let url = 'radios/radios/' + this.id + '/'
-      axios.get(url).then((response) => {
+      let url = "radios/radios/" + this.id + "/"
+      axios.get(url).then(response => {
         self.radio = response.data
-        axios.get(url + 'tracks/', {params: {page: this.page}}).then((response) => {
-          this.totalTracks = response.data.count
-          this.tracks = response.data.results
-        }).then(() => {
-          self.isLoading = false
-        })
+        axios
+          .get(url + "tracks/", { params: { page: this.page } })
+          .then(response => {
+            this.totalTracks = response.data.count
+            this.tracks = response.data.results
+          })
+          .then(() => {
+            self.isLoading = false
+          })
       })
     },
-    deleteRadio () {
+    deleteRadio() {
       let self = this
-      let url = 'radios/radios/' + this.id + '/'
-      axios.delete(url).then((response) => {
+      let url = "radios/radios/" + this.id + "/"
+      axios.delete(url).then(response => {
         self.$router.push({
-          path: '/library'
+          path: "/library"
         })
       })
     }
   },
   watch: {
-    page: function () {
+    page: function() {
       this.fetch()
     }
   }

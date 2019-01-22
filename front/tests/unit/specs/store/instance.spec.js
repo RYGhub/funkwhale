@@ -1,5 +1,6 @@
 import {expect} from 'chai'
 var sinon = require('sinon')
+import axios from 'axios'
 import moxios from 'moxios'
 import store from '@/store/instance'
 import { testAction } from '../../utils'
@@ -14,15 +15,24 @@ describe('store/instance', () => {
   afterEach(function () {
     sandbox.restore()
     moxios.uninstall()
+    axios.defaults.baseURL = null
   })
 
   describe('mutations', () => {
     it('settings', () => {
-      const state = {settings: {raven: {front_dsn: {value: 'test'}}}}
-      let settings = {raven: {front_enabled: {value: true}}}
+      const state = {settings: {users: {upload_quota: {value: 1}}}}
+      let settings = {users: {registration_enabled: {value: true}}}
       store.mutations.settings(state, settings)
       expect(state.settings).to.deep.equal({
-        raven: {front_dsn: {value: 'test'}, front_enabled: {value: true}}
+        users: {upload_quota: {value: 1}, registration_enabled: {value: true}}
+      })
+    })
+    it('instanceUrl', () => {
+      const state = {instanceUrl: null, knownInstances: ['http://test2/', 'http://test/']}
+      store.mutations.instanceUrl(state, 'http://test')
+      expect(state).to.deep.equal({
+        instanceUrl: 'http://test/',  // trailing slash added
+        knownInstances: ['http://test/', 'http://test2/']
       })
     })
   })
@@ -32,13 +42,13 @@ describe('store/instance', () => {
         status: 200,
         response: [
           {
-            section: 'raven',
-            name: 'front_dsn',
-            value: 'test'
+            section: 'users',
+            name: 'upload_quota',
+            value: 1
           },
           {
-            section: 'raven',
-            name: 'front_enabled',
+            section: 'users',
+            name: 'registration_enabled',
             value: false
           }
         ]
@@ -50,15 +60,15 @@ describe('store/instance', () => {
           {
             type: 'settings',
             payload: {
-              raven: {
-                front_dsn: {
-                  section: 'raven',
-                  name: 'front_dsn',
-                  value: 'test'
+              users: {
+                upload_quota: {
+                  section: 'users',
+                  name: 'upload_quota',
+                  value: 1
                 },
-                front_enabled: {
-                  section: 'raven',
-                  name: 'front_enabled',
+                registration_enabled: {
+                  section: 'users',
+                  name: 'registration_enabled',
                   value: false
                 }
               }

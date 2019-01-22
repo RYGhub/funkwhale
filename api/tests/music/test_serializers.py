@@ -1,6 +1,31 @@
+import pytest
+
+from funkwhale_api.music import licenses
 from funkwhale_api.music import models
 from funkwhale_api.music import serializers
 from funkwhale_api.music import tasks
+
+
+def test_license_serializer():
+    """
+    We serializer all licenses to ensure we have valid hardcoded data
+    """
+    for data in licenses.LICENSES:
+        expected = {
+            "id": data["identifiers"][0],
+            "code": data["code"],
+            "name": data["name"],
+            "url": data["url"],
+            "redistribute": data["redistribute"],
+            "derivative": data["derivative"],
+            "commercial": data["commercial"],
+            "attribution": data["attribution"],
+            "copyleft": data["copyleft"],
+        }
+
+        serializer = serializers.LicenseSerializer(data)
+
+        assert serializer.data == expected
 
 
 def test_artist_album_serializer(factories, to_api_date):
@@ -46,8 +71,11 @@ def test_artist_with_albums_serializer(factories, to_api_date):
 
 
 def test_album_track_serializer(factories, to_api_date):
-    upload = factories["music.Upload"]()
+    upload = factories["music.Upload"](
+        track__license="cc-by-4.0", track__copyright="test", track__disc_number=2
+    )
     track = upload.track
+    setattr(track, "playable_uploads", [upload])
 
     expected = {
         "id": track.id,
@@ -56,10 +84,13 @@ def test_album_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
-        "is_playable": None,
+        "disc_number": track.disc_number,
+        "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
         "duration": None,
+        "license": track.license.code,
+        "copyright": track.copyright,
     }
     serializer = serializers.AlbumTrackSerializer(track)
     assert serializer.data == expected
@@ -127,7 +158,7 @@ def test_album_serializer(factories, to_api_date):
         "title": album.title,
         "artist": serializers.ArtistSimpleSerializer(album.artist).data,
         "creation_date": to_api_date(album.creation_date),
-        "is_playable": None,
+        "is_playable": False,
         "cover": {
             "original": album.cover.url,
             "square_crop": album.cover.crop["400x400"].url,
@@ -143,9 +174,11 @@ def test_album_serializer(factories, to_api_date):
 
 
 def test_track_serializer(factories, to_api_date):
-    upload = factories["music.Upload"]()
+    upload = factories["music.Upload"](
+        track__license="cc-by-4.0", track__copyright="test", track__disc_number=2
+    )
     track = upload.track
-
+    setattr(track, "playable_uploads", [upload])
     expected = {
         "id": track.id,
         "artist": serializers.ArtistSimpleSerializer(track.artist).data,
@@ -153,14 +186,13 @@ def test_track_serializer(factories, to_api_date):
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
-        "is_playable": None,
+        "disc_number": track.disc_number,
+        "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
         "lyrics": track.get_lyrics_url(),
         "listen_url": track.listen_url,
-        "duration": None,
-        "size": None,
-        "bitrate": None,
-        "mimetype": None,
+        "license": upload.track.license.code,
+        "copyright": upload.track.copyright,
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected
@@ -260,3 +292,45 @@ def test_manage_upload_action_relaunch_import(factories, mocker):
     finished.refresh_from_db()
     assert finished.import_status == "finished"
     assert m.call_count == 3
+
+
+def test_track_upload_serializer(factories):
+    upload = factories["music.Upload"]()
+
+    expected = {
+        "listen_url": upload.listen_url,
+        "uuid": str(upload.uuid),
+        "size": upload.size,
+        "bitrate": upload.bitrate,
+        "mimetype": upload.mimetype,
+        "extension": upload.extension,
+        "duration": upload.duration,
+    }
+
+    serializer = serializers.TrackUploadSerializer(upload)
+    assert serializer.data == expected
+
+
+@pytest.mark.parametrize(
+    "field,before,after",
+    [
+        ("privacy_level", "me", "everyone"),
+        ("name", "Before", "After"),
+        ("description", "Before", "After"),
+    ],
+)
+def test_update_library_privacy_level_broadcasts_to_followers(
+    factories, field, before, after, mocker
+):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    library = factories["music.Library"](**{field: before})
+
+    serializer = serializers.LibraryForOwnerSerializer(
+        library, data={field: after}, partial=True
+    )
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    dispatch.assert_called_once_with(
+        {"type": "Update", "object": {"type": "Library"}}, context={"library": library}
+    )

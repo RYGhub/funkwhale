@@ -35,7 +35,18 @@ def test_user_can_get_his_favorites(api_request, factories, logged_in_client, cl
             "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
         }
     ]
-    expected[0]["track"]["is_playable"] = False
+    assert response.status_code == 200
+    assert response.data["results"] == expected
+
+
+def test_user_can_retrieve_all_favorites_at_once(
+    api_request, factories, logged_in_client, client
+):
+    favorite = factories["favorites.TrackFavorite"](user=logged_in_client.user)
+    factories["favorites.TrackFavorite"]()
+    url = reverse("api:v1:favorites:tracks-all")
+    response = logged_in_client.get(url, {"user": logged_in_client.user.pk})
+    expected = [{"track": favorite.track.id, "id": favorite.id}]
     assert response.status_code == 200
     assert response.data["results"] == expected
 

@@ -12,12 +12,16 @@ from faker.providers import internet as internet_provider
 import factory
 import pytest
 
+from django.core.management import call_command
 from django.contrib.auth.models import AnonymousUser
-from django.core.cache import cache as django_cache
+from django.core.cache import cache as django_cache, caches
 from django.core.files import uploadedfile
 from django.utils import timezone
 from django.test import client
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
 from django.db.models import QuerySet
+
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
@@ -98,6 +102,12 @@ def cache():
     """
     yield django_cache
     django_cache.clear()
+
+
+@pytest.fixture(autouse=True)
+def local_cache():
+    yield caches["local"]
+    caches["local"].clear()
 
 
 @pytest.fixture
@@ -382,3 +392,27 @@ def temp_signal(mocker):
 @pytest.fixture()
 def stdout():
     yield io.StringIO()
+
+
+@pytest.fixture
+def spa_html(r_mock, settings):
+    yield r_mock.get(
+        settings.FUNKWHALE_SPA_HTML_ROOT + "index.html", text="<head></head>"
+    )
+
+
+@pytest.fixture
+def no_api_auth(preferences):
+    preferences["common__api_authentication_required"] = False
+
+
+@pytest.fixture()
+def migrator(transactional_db):
+    yield MigrationExecutor(connection)
+    call_command("migrate", interactive=False)
+
+
+@pytest.fixture(autouse=True)
+def rsa_small_key(settings):
+    # smaller size for faster generation, since it's CPU hungry
+    settings.RSA_KEY_SIZE = 512

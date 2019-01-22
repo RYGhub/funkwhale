@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" v-title="labels.title">
+    <section class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Log in to your Funkwhale account</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
@@ -43,39 +43,44 @@
           </button>
         </form>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import PasswordInput from '@/components/forms/PasswordInput'
+import PasswordInput from "@/components/forms/PasswordInput"
 
 export default {
   props: {
-    next: {type: String, default: '/'}
+    next: { type: String, default: "/library" }
   },
   components: {
     PasswordInput
   },
-  data () {
+  data() {
     return {
       // We need to initialize the component with any
       // properties that will be used in it
       credentials: {
-        username: '',
-        password: ''
+        username: "",
+        password: ""
       },
-      error: '',
+      error: "",
       isLoading: false
     }
   },
-  mounted () {
+  created () {
+    if (this.$store.state.auth.authenticated) {
+      this.$router.push(this.next)
+    }
+  },
+  mounted() {
     this.$refs.username.focus()
   },
   computed: {
-    labels () {
-      let usernamePlaceholder = this.$gettext('Enter your username or email')
-      let title = this.$gettext('Log In')
+    labels() {
+      let usernamePlaceholder = this.$gettext("Enter your username or email")
+      let title = this.$gettext("Log In")
       return {
         usernamePlaceholder,
         title
@@ -83,30 +88,32 @@ export default {
     }
   },
   methods: {
-    submit () {
+    submit() {
       var self = this
       self.isLoading = true
-      this.error = ''
+      this.error = ""
       var credentials = {
         username: this.credentials.username,
         password: this.credentials.password
       }
-      this.$store.dispatch('auth/login', {
-        credentials,
-        next: '/library',
-        onError: error => {
-          if (error.response.status === 400) {
-            self.error = 'invalid_credentials'
-          } else {
-            self.error = 'unknown_error'
+      console.log('NEXT', this.next)
+      this.$store
+        .dispatch("auth/login", {
+          credentials,
+          next: this.next,
+          onError: error => {
+            if (error.response.status === 400) {
+              self.error = "invalid_credentials"
+            } else {
+              self.error = "unknown_error"
+            }
           }
-        }
-      }).then(e => {
-        self.isLoading = false
-      })
+        })
+        .then(e => {
+          self.isLoading = false
+        })
     }
   }
-
 }
 </script>
 

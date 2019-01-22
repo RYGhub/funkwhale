@@ -1,7 +1,7 @@
 <template>
   <form class="ui form" @submit.prevent="scan">
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header"><translate>Error while fetching remote library</translate></div>
+      <div class="header"><translate>Could not fetch remote library</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
@@ -34,6 +34,8 @@ export default {
         return
       }
       let self = this
+      self.errors = []
+      self.isLoading = true
       axios.post('federation/libraries/fetch/', {fid: this.query}).then((response) => {
         self.$emit('scanned', response.data)
         self.isLoading = false
@@ -45,7 +47,7 @@ export default {
   },
   computed: {
     labels () {
-      let placeholder = this.$gettext('Enter a library url')
+      let placeholder = this.$gettext('Enter a library URL')
       return {
         placeholder
       }

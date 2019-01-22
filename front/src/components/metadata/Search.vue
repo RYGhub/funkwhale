@@ -111,7 +111,7 @@ export default {
   computed: {
     labels () {
       return {
-        placeholder: this.$gettext('Enter your search query...')
+        placeholder: this.$gettext('Enter your search query…')
       }
     },
     currentTypeObject: function () {

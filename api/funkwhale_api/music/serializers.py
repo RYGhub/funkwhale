@@ -1,4 +1,8 @@
+import urllib.parse
+
 from django.db import transaction
+from django import urls
+from django.conf import settings
 from rest_framework import serializers
 from taggit.models import Tag
 from versatileimagefield.serializers import VersatileImageFieldSerializer
@@ -7,11 +11,27 @@ from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import utils as federation_utils
 
 from . import filters, models, tasks
 
 
 cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+
+
+class LicenseSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField()
+    url = serializers.URLField()
+    code = serializers.CharField()
+    name = serializers.CharField()
+    redistribute = serializers.BooleanField()
+    derivative = serializers.BooleanField()
+    commercial = serializers.BooleanField()
+    attribution = serializers.BooleanField()
+    copyleft = serializers.BooleanField()
+
+    def get_id(self, obj):
+        return obj["identifiers"][0]
 
 
 class ArtistAlbumSerializer(serializers.ModelSerializer):
@@ -59,7 +79,7 @@ class ArtistSimpleSerializer(serializers.ModelSerializer):
 
 class AlbumTrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
-    is_playable = serializers.SerializerMethodField()
+    uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
 
@@ -73,16 +93,17 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "artist",
             "creation_date",
             "position",
-            "is_playable",
+            "disc_number",
+            "uploads",
             "listen_url",
             "duration",
+            "copyright",
+            "license",
         )
 
-    def get_is_playable(self, obj):
-        try:
-            return bool(obj.is_playable_by_actor)
-        except AttributeError:
-            return None
+    def get_uploads(self, obj):
+        uploads = getattr(obj, "playable_uploads", [])
+        return TrackUploadSerializer(uploads, many=True).data
 
     def get_listen_url(self, obj):
         return obj.listen_url
@@ -115,15 +136,14 @@ class AlbumSerializer(serializers.ModelSerializer):
         )
 
     def get_tracks(self, o):
-        ordered_tracks = sorted(
-            o.tracks.all(),
-            key=lambda v: (v.position, v.title) if v.position else (99999, v.title),
-        )
+        ordered_tracks = o.tracks.all()
         return AlbumTrackSerializer(ordered_tracks, many=True).data
 
     def get_is_playable(self, obj):
         try:
-            return any([bool(t.is_playable_by_actor) for t in obj.tracks.all()])
+            return any(
+                [bool(getattr(t, "playable_uploads", [])) for t in obj.tracks.all()]
+            )
         except AttributeError:
             return None
 
@@ -145,16 +165,26 @@ class TrackAlbumSerializer(serializers.ModelSerializer):
         )
 
 
+class TrackUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Upload
+        fields = (
+            "uuid",
+            "listen_url",
+            "size",
+            "duration",
+            "bitrate",
+            "mimetype",
+            "extension",
+        )
+
+
 class TrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     album = TrackAlbumSerializer(read_only=True)
     lyrics = serializers.SerializerMethodField()
-    is_playable = serializers.SerializerMethodField()
+    uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
-    duration = serializers.SerializerMethodField()
-    bitrate = serializers.SerializerMethodField()
-    size = serializers.SerializerMethodField()
-    mimetype = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -166,13 +196,12 @@ class TrackSerializer(serializers.ModelSerializer):
             "artist",
             "creation_date",
             "position",
+            "disc_number",
             "lyrics",
-            "is_playable",
+            "uploads",
             "listen_url",
-            "duration",
-            "bitrate",
-            "size",
-            "mimetype",
+            "copyright",
+            "license",
         )
 
     def get_lyrics(self, obj):
@@ -181,37 +210,12 @@ class TrackSerializer(serializers.ModelSerializer):
     def get_listen_url(self, obj):
         return obj.listen_url
 
-    def get_is_playable(self, obj):
-        try:
-            return bool(obj.is_playable_by_actor)
-        except AttributeError:
-            return None
-
-    def get_duration(self, obj):
-        try:
-            return obj.duration
-        except AttributeError:
-            return None
-
-    def get_bitrate(self, obj):
-        try:
-            return obj.bitrate
-        except AttributeError:
-            return None
-
-    def get_size(self, obj):
-        try:
-            return obj.size
-        except AttributeError:
-            return None
-
-    def get_mimetype(self, obj):
-        try:
-            return obj.mimetype
-        except AttributeError:
-            return None
+    def get_uploads(self, obj):
+        uploads = getattr(obj, "playable_uploads", [])
+        return TrackUploadSerializer(uploads, many=True).data
 
 
+@common_serializers.track_fields_for_update("name", "description", "privacy_level")
 class LibraryForOwnerSerializer(serializers.ModelSerializer):
     uploads_count = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
@@ -235,6 +239,11 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
 
     def get_size(self, o):
         return getattr(o, "_size", 0)
+
+    def on_updated_fields(self, obj, before, after):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Library"}}, context={"library": obj}
+        )
 
 
 class UploadSerializer(serializers.ModelSerializer):
@@ -376,3 +385,100 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return "Audio"
+
+
+class OembedSerializer(serializers.Serializer):
+    format = serializers.ChoiceField(choices=["json"])
+    url = serializers.URLField()
+    maxheight = serializers.IntegerField(required=False)
+    maxwidth = serializers.IntegerField(required=False)
+
+    def validate(self, validated_data):
+        try:
+            match = common_utils.spa_resolve(
+                urllib.parse.urlparse(validated_data["url"]).path
+            )
+        except urls.exceptions.Resolver404:
+            raise serializers.ValidationError(
+                "Invalid URL {}".format(validated_data["url"])
+            )
+        data = {
+            "version": "1.0",
+            "type": "rich",
+            "provider_name": settings.APP_NAME,
+            "provider_url": settings.FUNKWHALE_URL,
+            "height": validated_data.get("maxheight") or 400,
+            "width": validated_data.get("maxwidth") or 600,
+        }
+        embed_id = None
+        embed_type = None
+        if match.url_name == "library_track":
+            qs = models.Track.objects.select_related("artist", "album__artist").filter(
+                pk=int(match.kwargs["pk"])
+            )
+            try:
+                track = qs.get()
+            except models.Track.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No track matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "track"
+            embed_id = track.pk
+            data["title"] = "{} by {}".format(track.title, track.artist.name)
+            if track.album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    track.album.cover.crop["400x400"].url
+                )
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
+            data["description"] = track.full_name
+            data["author_name"] = track.artist.name
+            data["height"] = 150
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "library_artist", kwargs={"pk": track.artist.pk}
+                )
+            )
+        elif match.url_name == "library_album":
+            qs = models.Album.objects.select_related("artist").filter(
+                pk=int(match.kwargs["pk"])
+            )
+            try:
+                album = qs.get()
+            except models.Album.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No album matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "album"
+            embed_id = album.pk
+            if album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    album.cover.crop["400x400"].url
+                )
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
+            data["title"] = "{} by {}".format(album.title, album.artist.name)
+            data["description"] = "{} by {}".format(album.title, album.artist.name)
+            data["author_name"] = album.artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "library_artist", kwargs={"pk": album.artist.pk}
+                )
+            )
+        else:
+            raise serializers.ValidationError(
+                "Unsupported url: {}".format(validated_data["url"])
+            )
+        data[
+            "html"
+        ] = '<iframe width="{}" height="{}" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            data["width"],
+            data["height"],
+            settings.FUNKWHALE_EMBED_URL
+            + "?type={}&id={}".format(embed_type, embed_id),
+        )
+        return data
+
+    def create(self, data):
+        return data

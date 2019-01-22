@@ -14,13 +14,13 @@
         </div>
       </div>
       <div class="extra content">
-        <user-link :user="radio.user" class="left floated" />
+        <user-link v-if="radio.user" :user="radio.user" class="left floated" />
         <radio-button class="right floated button" :type="type" :custom-radio-id="customRadioId"></radio-button>
         <router-link
           class="ui basic yellow button right floated"
           v-if="$store.state.auth.authenticated && type === 'custom' && radio.user.id === $store.state.auth.profile.id"
           :to="{name: 'library.radios.edit', params: {id: customRadioId }}">
-          <translate>Edit...</translate>
+          <translate>Edit…</translate>
         </router-link>
       </div>
     </div>

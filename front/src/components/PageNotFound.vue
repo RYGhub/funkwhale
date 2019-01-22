@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" :v-title="labels.title">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" :v-title="labels.title">
+    <section class="ui vertical stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
           <i class="warning icon"></i>
@@ -16,21 +16,21 @@
           <i class="right arrow icon"></i>
         </router-link>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
 export default {
-  data: function () {
+  data: function() {
     return {
       path: window.location.href
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Page Not Found')
+        title: this.$gettext("Page Not Found")
       }
     }
   }

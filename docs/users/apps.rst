@@ -6,8 +6,8 @@ the one you use in your browser.
 
 While the web client works okay, it's still not ready for some use cases, especially:
 
-- Usage on narrow/touche screens (smartphones, tablets)
-- Usage on the go, with an intermittent connexion
+- Usage on narrow/touch screens (smartphones, tablets)
+- Usage on the go, with an intermittent connection
 
 This pages lists alternative clients you can use to connect to your Funkwhale
 instance and enjoy your music.

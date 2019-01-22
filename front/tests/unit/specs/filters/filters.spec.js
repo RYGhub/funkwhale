@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import {truncate, markdown, ago, capitalize, year} from '@/filters'
+import {truncate, ago, capitalize, year} from '@/filters'
 
 describe('filters', () => {
   describe('truncate', () => {
@@ -18,13 +18,6 @@ describe('filters', () => {
       const input = 'Hello world'
       let output = truncate(input, 5, ' pouet')
       expect(output).to.equal('Hello pouet')
-    })
-  })
-  describe('markdown', () => {
-    it('renders markdown', () => {
-      const input = 'Hello world'
-      let output = markdown(input)
-      expect(output).to.equal('<p>Hello world</p>')
     })
   })
   describe('ago', () => {

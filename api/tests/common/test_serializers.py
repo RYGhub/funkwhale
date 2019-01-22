@@ -1,3 +1,8 @@
+import os
+import PIL
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 import django_filters
 
 from funkwhale_api.common import serializers
@@ -134,3 +139,46 @@ def test_action_serializers_can_require_filter(factories):
 
     assert serializer.is_valid(raise_exception=True) is True
     assert list(serializer.validated_data["objects"]) == [user1]
+
+
+def test_track_fields_for_update(mocker):
+    @serializers.track_fields_for_update("field1", "field2")
+    class S(serializers.serializers.Serializer):
+        field1 = serializers.serializers.CharField()
+        field2 = serializers.serializers.CharField()
+
+        def update(self, obj, validated_data):
+            for key, value in validated_data.items():
+                setattr(obj, key, value)
+            return obj
+
+        on_updated_fields = mocker.stub()
+
+    class Obj(object):
+        field1 = "value1"
+        field2 = "value2"
+
+    obj = Obj()
+    serializer = S(obj, data={"field1": "newvalue1", "field2": "newvalue2"})
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    serializer.on_updated_fields.assert_called_once_with(
+        obj,
+        {"field1": "value1", "field2": "value2"},
+        {"field1": "newvalue1", "field2": "newvalue2"},
+    )
+
+
+def test_strip_exif_field():
+    source_path = os.path.join(os.path.dirname(__file__), "exif.jpg")
+    source = PIL.Image.open(source_path)
+
+    assert bool(source._getexif())
+
+    with open(source_path, "rb") as f:
+        uploaded = SimpleUploadedFile("source.jpg", f.read(), content_type="image/jpeg")
+    field = serializers.StripExifImageField()
+
+    cleaned = PIL.Image.open(field.to_internal_value(uploaded))
+    assert cleaned._getexif() is None

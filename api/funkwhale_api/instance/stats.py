@@ -1,4 +1,7 @@
+import datetime
+
 from django.db.models import Sum
+from django.utils import timezone
 
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.history.models import Listening
@@ -19,6 +22,15 @@ def get():
 
 
 def get_users():
+    qs = User.objects.filter(is_active=True)
+    now = timezone.now()
+    active_month = now - datetime.timedelta(days=30)
+    active_halfyear = now - datetime.timedelta(days=30 * 6)
+    return {
+        "total": qs.count(),
+        "active_month": qs.filter(last_activity__gte=active_month).count(),
+        "active_halfyear": qs.filter(last_activity__gte=active_halfyear).count(),
+    }
     return User.objects.count()
 
 

@@ -1,6 +1,6 @@
 <template>
-  <div v-title="labels.title">
-    <div class="ui vertical stripe segment">
+  <main v-title="labels.title">
+    <section class="ui vertical stripe segment">
       <h2 class="ui header">
         <translate>Browsing artists</translate>
       </h2>
@@ -64,60 +64,59 @@
           :total="result.count"
           ></pagination>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import _ from 'lodash'
-import $ from 'jquery'
+import axios from "axios"
+import _ from "@/lodash"
+import $ from "jquery"
 
-import logger from '@/logging'
+import logger from "@/logging"
 
-import OrderingMixin from '@/components/mixins/Ordering'
-import PaginationMixin from '@/components/mixins/Pagination'
-import TranslationsMixin from '@/components/mixins/Translations'
-import ArtistCard from '@/components/audio/artist/Card'
-import Pagination from '@/components/Pagination'
+import OrderingMixin from "@/components/mixins/Ordering"
+import PaginationMixin from "@/components/mixins/Pagination"
+import TranslationsMixin from "@/components/mixins/Translations"
+import ArtistCard from "@/components/audio/artist/Card"
+import Pagination from "@/components/Pagination"
 
-const FETCH_URL = 'artists/'
+const FETCH_URL = "artists/"
 
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
-    defaultQuery: {type: String, required: false, default: ''}
+    defaultQuery: { type: String, required: false, default: "" }
   },
   components: {
     ArtistCard,
     Pagination
   },
-  data () {
-    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
+  data() {
+    let defaultOrdering = this.getOrderingFromString(
+      this.defaultOrdering || "-creation_date"
+    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction || '+',
+      orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
-      orderingOptions: [
-        ['creation_date', 'creation_date'],
-        ['name', 'name']
-      ]
+      orderingOptions: [["creation_date", "creation_date"], ["name", "name"]]
     }
   },
-  created () {
+  created() {
     this.fetchData()
   },
-  mounted () {
-    $('.ui.dropdown').dropdown()
+  mounted() {
+    $(".ui.dropdown").dropdown()
   },
   computed: {
-    labels () {
-      let searchPlaceholder = this.$gettext('Enter an artist name...')
-      let title = this.$gettext('Artists')
+    labels() {
+      let searchPlaceholder = this.$gettext("Enter artist name…")
+      let title = this.$gettext("Artists")
       return {
         searchPlaceholder,
         title
@@ -125,7 +124,7 @@ export default {
     }
   },
   methods: {
-    updateQueryString: _.debounce(function () {
+    updateQueryString: _.debounce(function() {
       this.$router.replace({
         query: {
           query: this.query,
@@ -135,7 +134,7 @@ export default {
         }
       })
     }, 500),
-    fetchData: _.debounce(function () {
+    fetchData: _.debounce(function() {
       var self = this
       this.isLoading = true
       let url = FETCH_URL
@@ -144,36 +143,36 @@ export default {
         page_size: this.paginateBy,
         name__icontains: this.query,
         ordering: this.getOrderingAsString(),
-        playable: 'true'
+        playable: "true"
       }
-      logger.default.debug('Fetching artists')
-      axios.get(url, {params: params}).then((response) => {
+      logger.default.debug("Fetching artists")
+      axios.get(url, { params: params }).then(response => {
         self.result = response.data
         self.isLoading = false
       })
     }, 500),
-    selectPage: function (page) {
+    selectPage: function(page) {
       this.page = page
     }
   },
   watch: {
-    page () {
+    page() {
       this.updateQueryString()
       this.fetchData()
     },
-    paginateBy () {
+    paginateBy() {
       this.updateQueryString()
       this.fetchData()
     },
-    ordering () {
+    ordering() {
       this.updateQueryString()
       this.fetchData()
     },
-    orderingDirection () {
+    orderingDirection() {
       this.updateQueryString()
       this.fetchData()
     },
-    query () {
+    query() {
       this.updateQueryString()
       this.fetchData()
     }

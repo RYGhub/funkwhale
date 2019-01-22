@@ -1,6 +1,35 @@
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require('webpack');
+
+let plugins = [
+  // do not include moment.js locales since it's quite heavy
+  new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+]
+if (process.env.BUNDLE_ANALYZE === '1') {
+  plugins.push(new BundleAnalyzerPlugin())
+}
 module.exports = {
+  baseUrl: '/front/',
+  pages: {
+    embed: {
+      entry: 'src/embed.js',
+      template: 'public/embed.html',
+      filename: 'embed.html',
+    },
+    index: {
+      entry: 'src/main.js',
+      template: 'public/index.html',
+      filename: 'index.html'
+    }
+  },
+  chainWebpack: config => {
+    config.optimization.delete('splitChunks')
+    config.plugins.delete('prefetch-embed')
+    config.plugins.delete('prefetch-index')
+  },
   configureWebpack: {
+    plugins: plugins,
     resolve: {
       alias: {
         'vue$': 'vue/dist/vue.esm.js'
@@ -9,33 +38,7 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true,
-    proxy: {
-      '^/rest': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/staticfiles': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/.well-known': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/media': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-      },
-      '^/federation': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-        ws: true,
-      },
-      '^/api': {
-        target: 'http://nginx:6001',
-        changeOrigin: true,
-        ws: true,
-      },
-    }
+    // use https://node1.funkwhale.test/front-server/ if you use docker with federation
+    public: process.env.FRONT_DEVSERVER_URL || ('http://localhost:' + (process.env.VUE_PORT || '8080'))
   }
 }

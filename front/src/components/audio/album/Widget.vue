@@ -3,17 +3,15 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'medium', 'angle left', 'icon']">
-    </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'medium', 'angle right', 'icon']">
-    </i>
+    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
+    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
     <div class="ui five cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>
       </div>
       <div class="card" v-for="album in albums" :key="album.id">
-        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" :style="getImageStyle(album)">
+        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" v-lazy:background-image="getImageUrl(album)">
           <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
         </div>
         <div class="content">
@@ -38,7 +36,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
 
@@ -89,17 +87,15 @@ export default {
         this.offset = Math.max(this.offset - this.limit, 0)
       }
     },
-    getImageStyle (album) {
+    getImageUrl (album) {
       let url = '../../../assets/audio/default-cover.png'
 
       if (album.cover.original) {
         url = this.$store.getters['instance/absoluteUrl'](album.cover.medium_square_crop)
       } else {
-        return {}
+        return null
       }
-      return {
-        'background-image': `url("${url}")`
-      }
+      return url
     }
   },
   watch: {
@@ -110,10 +106,10 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import '../../../style/vendor/media';
+@import "../../../style/vendor/media";
 
 .default-cover {
-  background-image: url('../../../assets/audio/default-cover.png') !important;
+  background-image: url("../../../assets/audio/default-cover.png") !important;
 }
 
 .wrapper {

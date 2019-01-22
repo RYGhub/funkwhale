@@ -1,9 +1,10 @@
 <template>
-  <div class="ui inverted segment player-wrapper" :style="style">
+  <section class="ui inverted segment player-wrapper" :aria-label="labels.audioPlayer" :style="style">
     <div class="player">
       <audio-track
         ref="currentAudio"
         v-if="currentTrack"
+        @errored="handleError"
         :is-current="true"
         :start-time="$store.state.player.currentTime"
         :autoplay="$store.state.player.playing"
@@ -31,68 +32,112 @@
             <div class="description">
               <track-favorite-icon
                 v-if="$store.state.auth.authenticated"
+                :class="{'inverted': !$store.getters['favorites/isFavorite'](currentTrack.id)}"
                 :track="currentTrack"></track-favorite-icon>
               <track-playlist-icon
                 v-if="$store.state.auth.authenticated"
+                :class="['inverted']"
                 :track="currentTrack"></track-playlist-icon>
             </div>
           </div>
         </div>
       </div>
-      <div class="progress-area" v-if="currentTrack">
+      <div class="progress-area" v-if="currentTrack && !errored">
         <div class="ui grid">
           <div class="left floated four wide column">
             <p class="timer start" @click="updateProgress(0)">{{currentTimeFormatted}}</p>
           </div>
 
-          <div class="right floated four wide column">
+          <div v-if="!isLoadingAudio" class="right floated four wide column">
             <p class="timer total">{{durationFormatted}}</p>
           </div>
         </div>
-        <div ref="progress" class="ui small orange inverted progress" @click="touchProgress">
+        <div
+          ref="progress"
+          :class="['ui', 'small', 'orange', 'inverted', {'indicating': isLoadingAudio}, 'progress']"
+          @click="touchProgress">
+          <div class="buffer bar" :data-percent="bufferProgress" :style="{ 'width': bufferProgress + '%' }"></div>
           <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
-
-      <div class="two wide column controls ui grid">
-        <div
-          :title="labels.previousTrack"
-          class="two wide column control"
-          :disabled="emptyQueue">
-            <i @click="previous" :class="['ui', 'backward', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
+      <div class="ui small warning message" v-if="currentTrack && errored">
+        <div class="header">
+          <translate>We cannot load this track</translate>
         </div>
-        <div
+        <p v-if="hasNext && playing && $store.state.player.errorCount < $store.state.player.maxConsecutiveErrors">
+          <translate>The next track will play automatically in a few seconds...</translate>
+          <i class="loading spinner icon"></i>
+        </p>
+        <p>
+          <translate>You may have a connectivity issue.</translate>
+        </p>
+      </div>
+      <div class="two wide column controls ui grid">
+        <span
+          role="button"
+          :title="labels.previousTrack"
+          :aria-label="labels.previousTrack"
+          class="two wide column control"
+          @click.prevent.stop="previous"
+          :disabled="emptyQueue">
+            <i :class="['ui', 'backward step', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
+        </span>
+        <span
+          role="button"
           v-if="!playing"
           :title="labels.play"
+          :aria-label="labels.play"
+          @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </div>
-        <div
+            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+        </span>
+        <span
+          role="button"
           v-else
           :title="labels.pause"
+          :aria-label="labels.pause"
+          @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i @click="togglePlay" :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
-        </div>
-        <div
+            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+        </span>
+        <span
+          role="button"
           :title="labels.next"
+          :aria-label="labels.next"
           class="two wide column control"
+          @click.prevent.stop="next"
           :disabled="!hasNext">
-            <i @click="next" :class="['ui', {'disabled': !hasNext}, 'step', 'forward', 'secondary', 'icon']" ></i>
-        </div>
+            <i :class="['ui', {'disabled': !hasNext}, 'forward step', 'secondary', 'icon']" ></i>
+        </span>
         <div
           class="wide column control volume-control"
           v-on:mouseover="showVolume = true"
           v-on:mouseleave="showVolume = false"
           v-bind:class="{ active : showVolume }">
-          <i
+          <span
+            role="button"
+            v-if="volume === 0"
             :title="labels.unmute"
-            @click="unmute" v-if="volume === 0" class="volume off secondary icon"></i>
-          <i
+            :aria-label="labels.unmute"
+            @click.prevent.stop="unmute">
+            <i class="volume off secondary icon"></i>
+          </span>
+          <span
+            role="button"
+            v-else-if="volume < 0.5"
             :title="labels.mute"
-            @click="mute" v-else-if="volume < 0.5" class="volume down secondary icon"></i>
-          <i
+            :aria-label="labels.mute"
+            @click.prevent.stop="mute">
+            <i class="volume down secondary icon"></i>
+          </span>
+          <span
+            role="button"
+            v-else
             :title="labels.mute"
-            @click="mute" v-else class="volume up secondary icon"></i>
+            :aria-label="labels.mute"
+            @click.prevent.stop="mute">
+            <i class="volume up secondary icon"></i>
+          </span>
           <input
             type="range"
             step="0.05"
@@ -102,44 +147,61 @@
             v-if="showVolume" />
         </div>
         <div class="two wide column control looping" v-if="!showVolume">
-          <i
-            :title="labels.loopingDisabled"
+          <span
+            role="button"
             v-if="looping === 0"
-            @click="$store.commit('player/looping', 1)"
-            :disabled="!currentTrack"
-            :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
-          <i
+            :title="labels.loopingDisabled"
+            :aria-label="labels.loopingDisabled"
+            @click.prevent.stop="$store.commit('player/looping', 1)"
+            :disabled="!currentTrack">
+            <i :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
+          </span>
+          <span
+            role="button"
+            @click.prevent.stop="$store.commit('player/looping', 2)"
             :title="labels.loopingSingle"
+            :aria-label="labels.loopingSingle"
             v-if="looping === 1"
-            @click="$store.commit('player/looping', 2)"
-            :disabled="!currentTrack"
-            class="repeat secondary icon">
-            <span class="ui circular tiny orange label">1</span>
-          </i>
-          <i
+            :disabled="!currentTrack">
+            <i
+              class="repeat secondary icon">
+              <span class="ui circular tiny orange label">1</span>
+            </i>
+          </span>
+          <span
+            role="button"
             :title="labels.loopingWhole"
+            :aria-label="labels.loopingWhole"
             v-if="looping === 2"
-            @click="$store.commit('player/looping', 0)"
             :disabled="!currentTrack"
-            class="repeat orange secondary icon">
-          </i>
+            @click.prevent.stop="$store.commit('player/looping', 0)">
+            <i
+              class="repeat orange secondary icon">
+            </i>
+          </span>
         </div>
-        <div
+        <span
+          role="button"
           :disabled="queue.tracks.length === 0"
           :title="labels.shuffle"
+          :aria-label="labels.shuffle"
           v-if="!showVolume"
+          @click.prevent.stop="shuffle()"
           class="two wide column control">
           <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
-          <i v-else @click="shuffle()" :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </div>
+          <i v-else :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </span>
         <div class="one wide column" v-if="!showVolume"></div>
-        <div
+        <span
+          role="button"
           :disabled="queue.tracks.length === 0"
           :title="labels.clear"
+          :aria-label="labels.clear"
           v-if="!showVolume"
+          @click.prevent.stop="clean()"
           class="two wide column control">
-          <i @click="clean()" :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-        </div>
+          <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+        </span>
       </div>
       <GlobalEvents
         @keydown.space.prevent.exact="togglePlay"
@@ -147,23 +209,23 @@
         @keydown.ctrl.right.prevent.exact="next"
         @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
         @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
-        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
         @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
         @keydown.s.prevent.exact="shuffle"
         />
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-import {mapState, mapGetters, mapActions} from 'vuex'
-import GlobalEvents from '@/components/utils/global-events'
-import ColorThief from '@/vendor/color-thief'
-import {Howl} from 'howler'
+import { mapState, mapGetters, mapActions } from "vuex"
+import GlobalEvents from "@/components/utils/global-events"
+import ColorThief from "@/vendor/color-thief"
+import { Howl } from "howler"
+import $ from 'jquery'
 
-import AudioTrack from '@/components/audio/Track'
-import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
-import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
+import AudioTrack from "@/components/audio/Track"
+import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
+import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 
 export default {
   components: {
@@ -172,8 +234,13 @@ export default {
     GlobalEvents,
     AudioTrack
   },
-  data () {
-    let defaultAmbiantColors = [[46, 46, 46], [46, 46, 46], [46, 46, 46], [46, 46, 46]]
+  data() {
+    let defaultAmbiantColors = [
+      [46, 46, 46],
+      [46, 46, 46],
+      [46, 46, 46],
+      [46, 46, 46]
+    ]
     return {
       isShuffling: false,
       sliderVolume: this.volume,
@@ -184,7 +251,7 @@ export default {
       dummyAudio: null
     }
   },
-  mounted () {
+  mounted() {
     // we trigger the watcher explicitely it does not work otherwise
     this.sliderVolume = this.volume
     // this is needed to unlock audio playing under some browsers,
@@ -193,95 +260,112 @@ export default {
     this.dummyAudio = new Howl({
       preload: false,
       autoplay: false,
-      src: ['noop.webm', 'noop.mp3']
+      src: ["noop.webm", "noop.mp3"]
     })
   },
-  destroyed () {
+  destroyed() {
     this.dummyAudio.unload()
   },
   methods: {
     ...mapActions({
-      togglePlay: 'player/togglePlay',
-      mute: 'player/mute',
-      unmute: 'player/unmute',
-      clean: 'queue/clean',
-      updateProgress: 'player/updateProgress'
+      togglePlay: "player/togglePlay",
+      mute: "player/mute",
+      unmute: "player/unmute",
+      clean: "queue/clean",
+      updateProgress: "player/updateProgress"
     }),
-    shuffle () {
+    shuffle() {
       let disabled = this.queue.tracks.length === 0
       if (this.isShuffling || disabled) {
         return
       }
       let self = this
-      let msg = this.$gettext('Queue shuffled!')
+      let msg = this.$gettext("Queue shuffled!")
       this.isShuffling = true
       setTimeout(() => {
-        self.$store.dispatch('queue/shuffle', () => {
+        self.$store.dispatch("queue/shuffle", () => {
           self.isShuffling = false
-          self.$store.commit('ui/addMessage', {
+          self.$store.commit("ui/addMessage", {
             content: msg,
             date: new Date()
           })
         })
       }, 100)
     },
-    next () {
+    next() {
       let self = this
-      this.$store.dispatch('queue/next').then(() => {
-        self.$emit('next')
+      this.$store.dispatch("queue/next").then(() => {
+        self.$emit("next")
       })
     },
-    previous () {
+    previous() {
       let self = this
-      this.$store.dispatch('queue/previous').then(() => {
-        self.$emit('previous')
+      this.$store.dispatch("queue/previous").then(() => {
+        self.$emit("previous")
       })
     },
-    touchProgress (e) {
+    touchProgress(e) {
       let time
       let target = this.$refs.progress
-      time = e.layerX / target.offsetWidth * this.duration
+      time = (e.layerX / target.offsetWidth) * this.duration
       this.$refs.currentAudio.setCurrentTime(time)
     },
-    updateBackground () {
+    updateBackground() {
+      // delete existing canvas, if any
+      $('canvas.color-thief').remove()
       if (!this.currentTrack.album.cover) {
         this.ambiantColors = this.defaultAmbiantColors
         return
       }
       let image = this.$refs.cover
       this.ambiantColors = ColorThief.prototype.getPalette(image, 4).slice(0, 4)
+    },
+    handleError({ sound, error }) {
+      this.$store.commit("player/isLoadingAudio", false)
+      this.$store.dispatch("player/trackErrored")
     }
   },
   computed: {
     ...mapState({
       currentIndex: state => state.queue.currentIndex,
       playing: state => state.player.playing,
+      isLoadingAudio: state => state.player.isLoadingAudio,
       volume: state => state.player.volume,
       looping: state => state.player.looping,
       duration: state => state.player.duration,
+      bufferProgress: state => state.player.bufferProgress,
+      errored: state => state.player.errored,
       queue: state => state.queue
     }),
     ...mapGetters({
-      currentTrack: 'queue/currentTrack',
-      hasNext: 'queue/hasNext',
-      emptyQueue: 'queue/isEmpty',
-      durationFormatted: 'player/durationFormatted',
-      currentTimeFormatted: 'player/currentTimeFormatted',
-      progress: 'player/progress'
+      currentTrack: "queue/currentTrack",
+      hasNext: "queue/hasNext",
+      emptyQueue: "queue/isEmpty",
+      durationFormatted: "player/durationFormatted",
+      currentTimeFormatted: "player/currentTimeFormatted",
+      progress: "player/progress"
     }),
-    labels () {
-      let previousTrack = this.$gettext('Previous track')
-      let play = this.$gettext('Play track')
-      let pause = this.$gettext('Pause track')
-      let next = this.$gettext('Next track')
-      let unmute = this.$gettext('Unmute')
-      let mute = this.$gettext('Mute')
-      let loopingDisabled = this.$gettext('Looping disabled. Click to switch to single-track looping.')
-      let loopingSingle = this.$gettext('Looping on a single track. Click to switch to whole queue looping.')
-      let loopingWhole = this.$gettext('Looping on whole queue. Click to disable looping.')
-      let shuffle = this.$gettext('Shuffle your queue')
-      let clear = this.$gettext('Clear your queue')
+    labels() {
+      let audioPlayer = this.$gettext("Media player")
+      let previousTrack = this.$gettext("Previous track")
+      let play = this.$gettext("Play track")
+      let pause = this.$gettext("Pause track")
+      let next = this.$gettext("Next track")
+      let unmute = this.$gettext("Unmute")
+      let mute = this.$gettext("Mute")
+      let loopingDisabled = this.$gettext(
+        "Looping disabled. Click to switch to single-track looping."
+      )
+      let loopingSingle = this.$gettext(
+        "Looping on a single track. Click to switch to whole queue looping."
+      )
+      let loopingWhole = this.$gettext(
+        "Looping on whole queue. Click to disable looping."
+      )
+      let shuffle = this.$gettext("Shuffle your queue")
+      let clear = this.$gettext("Clear your queue")
       return {
+        audioPlayer,
         previousTrack,
         play,
         pause,
@@ -295,29 +379,35 @@ export default {
         clear
       }
     },
-    style: function () {
+    style: function() {
       let style = {
-        'background': this.ambiantGradiant
+        background: this.ambiantGradiant
       }
       return style
     },
-    ambiantGradiant: function () {
+    ambiantGradiant: function() {
       let indexConf = [
-        {orientation: 330, percent: 100, opacity: 0.7},
-        {orientation: 240, percent: 90, opacity: 0.7},
-        {orientation: 150, percent: 80, opacity: 0.7},
-        {orientation: 60, percent: 70, opacity: 0.7}
+        { orientation: 330, percent: 100, opacity: 0.7 },
+        { orientation: 240, percent: 90, opacity: 0.7 },
+        { orientation: 150, percent: 80, opacity: 0.7 },
+        { orientation: 60, percent: 70, opacity: 0.7 }
       ]
-      let gradients = this.ambiantColors.map((e, i) => {
-        let [r, g, b] = e
-        let conf = indexConf[i]
-        return `linear-gradient(${conf.orientation}deg, rgba(${r}, ${g}, ${b}, ${conf.opacity}) 10%, rgba(255, 255, 255, 0) ${conf.percent}%)`
-      }).join(', ')
+      let gradients = this.ambiantColors
+        .map((e, i) => {
+          let [r, g, b] = e
+          let conf = indexConf[i]
+          return `linear-gradient(${
+            conf.orientation
+          }deg, rgba(${r}, ${g}, ${b}, ${
+            conf.opacity
+          }) 10%, rgba(255, 255, 255, 0) ${conf.percent}%)`
+        })
+        .join(", ")
       return gradients
     }
   },
   watch: {
-    currentTrack (newValue, oldValue) {
+    currentTrack(newValue, oldValue) {
       if (!this.isShuffling && newValue != oldValue) {
         this.audioKey = String(new Date())
       }
@@ -325,11 +415,11 @@ export default {
         this.ambiantColors = this.defaultAmbiantColors
       }
     },
-    volume (newValue) {
+    volume(newValue) {
       this.sliderVolume = newValue
     },
-    sliderVolume (newValue) {
-      this.$store.commit('player/volume', newValue)
+    sliderVolume(newValue) {
+      this.$store.commit("player/volume", newValue)
     }
   }
 }
@@ -337,7 +427,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 .ui.progress {
   margin: 0.5rem 0 1rem;
 }
@@ -355,20 +444,26 @@ export default {
 .ui.item {
   .meta {
     font-size: 90%;
-    line-height: 1.2
+    line-height: 1.2;
   }
 }
 .timer.total {
-    text-align: right;
+  text-align: right;
 }
 .timer.start {
-    cursor: pointer
+  cursor: pointer;
 }
 .track-area {
   margin-top: 0;
-  .header, .meta, .artist, .album {
+  .header,
+  .meta,
+  .artist,
+  .album {
     color: white !important;
   }
+}
+.controls a {
+  color: white;
 }
 
 .controls .icon.big {
@@ -397,57 +492,57 @@ export default {
     left: 25%;
     cursor: pointer;
   }
-  input[type=range]:focus {
+  input[type="range"]:focus {
     outline: none;
   }
-  input[type=range]::-webkit-slider-runnable-track {
+  input[type="range"]::-webkit-slider-runnable-track {
     cursor: pointer;
   }
-  input[type=range]::-webkit-slider-thumb {
+  input[type="range"]::-webkit-slider-thumb {
     background: white;
     cursor: pointer;
     -webkit-appearance: none;
     border-radius: 3px;
     width: 10px;
   }
-  input[type=range]::-moz-range-track {
+  input[type="range"]::-moz-range-track {
     cursor: pointer;
     background: white;
     opacity: 0.3;
   }
-  input[type=range]::-moz-focus-outer {
+  input[type="range"]::-moz-focus-outer {
     border: 0;
   }
-  input[type=range]::-moz-range-thumb {
+  input[type="range"]::-moz-range-thumb {
     background: white;
     cursor: pointer;
     border-radius: 3px;
     width: 10px;
   }
-  input[type=range]::-ms-track {
+  input[type="range"]::-ms-track {
     cursor: pointer;
     background: transparent;
     border-color: transparent;
     color: transparent;
   }
-  input[type=range]::-ms-fill-lower {
+  input[type="range"]::-ms-fill-lower {
     background: white;
     opacity: 0.3;
   }
-  input[type=range]::-ms-fill-upper {
+  input[type="range"]::-ms-fill-upper {
     background: white;
     opacity: 0.3;
   }
-  input[type=range]::-ms-thumb {
+  input[type="range"]::-ms-thumb {
     background: white;
     cursor: pointer;
     border-radius: 3px;
     width: 10px;
   }
-  input[type=range]:focus::-ms-fill-lower {
+  input[type="range"]:focus::-ms-fill-lower {
     background: white;
   }
-  input[type=range]:focus::-ms-fill-upper {
+  input[type="range"]:focus::-ms-fill-upper {
     background: white;
   }
 }
@@ -474,4 +569,42 @@ export default {
   margin: 0;
 }
 
+@keyframes MOVE-BG {
+  from {
+    transform: translateX(0px);
+  }
+  to {
+    transform: translateX(46px);
+  }
+}
+
+.indicating.progress {
+  overflow: hidden;
+}
+
+.ui.progress .bar {
+  transition: none;
+}
+
+.ui.inverted.progress .buffer.bar {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.indicating.progress .bar {
+  left: -46px;
+  width: 200% !important;
+  color: grey;
+  background: repeating-linear-gradient(
+    -55deg,
+    grey 1px,
+    grey 10px,
+    transparent 10px,
+    transparent 20px
+  ) !important;
+
+  animation-name: MOVE-BG;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
 </style>

@@ -1,8 +1,12 @@
 import collections
+import io
+import PIL
+import os
 
 from rest_framework import serializers
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -119,7 +123,7 @@ class ActionSerializer(serializers.Serializer):
         if type(value) in [list, tuple]:
             return self.queryset.filter(
                 **{"{}__in".format(self.pk_field): value}
-            ).order_by("id")
+            ).order_by(self.pk_field)
 
         raise serializers.ValidationError(
             "{} is not a valid value for objects. You must provide either a "
@@ -159,3 +163,56 @@ class ActionSerializer(serializers.Serializer):
             "result": result,
         }
         return payload
+
+
+def track_fields_for_update(*fields):
+    """
+    Apply this decorator to serializer to call function when specific values
+    are updated on an object:
+
+    .. code-block:: python
+
+        @track_fields_for_update('privacy_level')
+        class LibrarySerializer(serializers.ModelSerializer):
+            def on_updated_privacy_level(self, obj, old_value, new_value):
+                print('Do someting')
+    """
+
+    def decorator(serializer_class):
+        original_update = serializer_class.update
+
+        def new_update(self, obj, validated_data):
+            tracked_fields_before = {f: getattr(obj, f) for f in fields}
+            obj = original_update(self, obj, validated_data)
+            tracked_fields_after = {f: getattr(obj, f) for f in fields}
+
+            if tracked_fields_before != tracked_fields_after:
+                self.on_updated_fields(obj, tracked_fields_before, tracked_fields_after)
+            return obj
+
+        serializer_class.update = new_update
+        return serializer_class
+
+    return decorator
+
+
+class StripExifImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        file_obj = super().to_internal_value(data)
+
+        image = PIL.Image.open(file_obj)
+        data = list(image.getdata())
+        image_without_exif = PIL.Image.new(image.mode, image.size)
+        image_without_exif.putdata(data)
+
+        with io.BytesIO() as output:
+            image_without_exif.save(
+                output,
+                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1]],
+                quality=100,
+            )
+            content = output.getvalue()
+
+        return SimpleUploadedFile(
+            file_obj.name, content, content_type=file_obj.content_type
+        )

@@ -86,7 +86,7 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
-import _ from 'lodash'
+import _ from '@/lodash'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
@@ -150,7 +150,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by username, email, code...')
+        searchPlaceholder: this.$gettext('Search by username, e-mail address, code…')
       }
     },
     actionFilters () {

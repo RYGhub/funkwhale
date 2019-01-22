@@ -13,7 +13,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import logging
 
-from urllib.parse import urlparse, urlsplit
+from urllib.parse import urlsplit
 
 import environ
 from celery.schedules import crontab
@@ -69,12 +69,23 @@ else:
         FUNKWHALE_HOSTNAME = _parsed.netloc
         FUNKWHALE_PROTOCOL = _parsed.scheme
 
+FUNKWHALE_PROTOCOL = FUNKWHALE_PROTOCOL.lower()
+FUNKWHALE_HOSTNAME = FUNKWHALE_HOSTNAME.lower()
 FUNKWHALE_URL = "{}://{}".format(FUNKWHALE_PROTOCOL, FUNKWHALE_HOSTNAME)
-
+FUNKWHALE_SPA_HTML_ROOT = env(
+    "FUNKWHALE_SPA_HTML_ROOT", default=FUNKWHALE_URL + "/front/"
+)
+FUNKWHALE_SPA_HTML_CACHE_DURATION = env.int(
+    "FUNKWHALE_SPA_HTML_CACHE_DURATION", default=60 * 15
+)
+FUNKWHALE_EMBED_URL = env(
+    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_SPA_HTML_ROOT + "embed.html"
+)
+APP_NAME = "Funkwhale"
 
 # XXX: deprecated, see #186
 FEDERATION_ENABLED = env.bool("FEDERATION_ENABLED", default=True)
-FEDERATION_HOSTNAME = env("FEDERATION_HOSTNAME", default=FUNKWHALE_HOSTNAME)
+FEDERATION_HOSTNAME = env("FEDERATION_HOSTNAME", default=FUNKWHALE_HOSTNAME).lower()
 # XXX: deprecated, see #186
 FEDERATION_COLLECTION_PAGE_SIZE = env.int("FEDERATION_COLLECTION_PAGE_SIZE", default=50)
 # XXX: deprecated, see #186
@@ -83,7 +94,7 @@ FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
 )
 # XXX: deprecated, see #186
 FEDERATION_ACTOR_FETCH_DELAY = env.int("FEDERATION_ACTOR_FETCH_DELAY", default=60 * 12)
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[]) + [FUNKWHALE_HOSTNAME]
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -145,10 +156,10 @@ LOCAL_APPS = (
     "funkwhale_api.requests",
     "funkwhale_api.favorites",
     "funkwhale_api.federation",
+    "funkwhale_api.moderation",
     "funkwhale_api.radios",
     "funkwhale_api.history",
     "funkwhale_api.playlists",
-    "funkwhale_api.providers.acoustid",
     "funkwhale_api.subsonic",
 )
 
@@ -159,7 +170,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
-    # Make sure djangosecure.middleware.SecurityMiddleware is listed first
+    "funkwhale_api.common.middleware.SPAFallbackMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -305,8 +316,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = "config.wsgi.application"
+SPA_URLCONF = "config.spa_urls"
 ASGI_APPLICATION = "config.routing.application"
 
 # This ensures that Django will be able to detect a secure connection
@@ -315,7 +325,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
+    "funkwhale_api.users.auth_backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 SESSION_COOKIE_HTTPONLY = False
@@ -400,15 +410,20 @@ if AUTH_LDAP_ENABLED:
 AUTOSLUG_SLUGIFY_FUNCTION = "slugify.slugify"
 
 CACHE_DEFAULT = "redis://127.0.0.1:6379/0"
-CACHES = {"default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT)}
+CACHES = {
+    "default": env.cache_url("CACHE_URL", default=CACHE_DEFAULT),
+    "local": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "local-cache",
+    },
+}
 
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
 
-cache_url = urlparse(CACHES["default"]["LOCATION"])
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(cache_url.hostname, cache_url.port)]},
+        "CONFIG": {"hosts": [CACHES["default"]["LOCATION"]]},
     }
 }
 
@@ -435,7 +450,12 @@ CELERY_BEAT_SCHEDULE = {
         "task": "federation.clean_music_cache",
         "schedule": crontab(hour="*/2"),
         "options": {"expires": 60 * 2},
-    }
+    },
+    "music.clean_transcoding_cache": {
+        "task": "music.clean_transcoding_cache",
+        "schedule": crontab(hour="*"),
+        "options": {"expires": 60 * 2},
+    },
 }
 
 JWT_AUTH = {
@@ -516,6 +536,7 @@ MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
 CSRF_USE_SESSIONS = True
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # Playlist settings
 # XXX: deprecated, see #186
@@ -570,3 +591,9 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
     ]
 }
 VERSATILEIMAGEFIELD_SETTINGS = {"create_images_on_demand": False}
+RSA_KEY_SIZE = 2048
+# for performance gain in tests, since we don't need to actually create the
+# thumbnails
+CREATE_IMAGE_THUMBNAILS = env.bool("CREATE_IMAGE_THUMBNAILS", default=True)
+# we rotate actor keys at most every two days by default
+ACTOR_KEY_ROTATION_DELAY = env.int("ACTOR_KEY_ROTATION_DELAY", default=3600 * 48)

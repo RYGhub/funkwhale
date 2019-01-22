@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering direction</translate></label>
+          <label><translate>Order</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+"><translate>Ascending</translate></option>
             <option value="-"><translate>Descending</translate></option>
@@ -45,7 +45,7 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.username }}</router-link>
+            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.full_username }}">{{ scope.obj.username }}</router-link>
           </td>
           <td>
             <span>{{ scope.obj.email }}</span>
@@ -96,7 +96,7 @@
 
 <script>
 import axios from 'axios'
-import _ from 'lodash'
+import _ from '@/lodash'
 import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
@@ -160,7 +160,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by username, email, name...')
+        searchPlaceholder: this.$gettext('Search by username, e-mail address, name…')
       }
     },
     privacyLevels () {
@@ -169,16 +169,12 @@ export default {
     permissions () {
       return [
         {
-          'code': 'upload',
-          'label': this.$gettext('Upload')
-        },
-        {
           'code': 'library',
           'label': this.$gettext('Library')
         },
         {
-          'code': 'federation',
-          'label': this.$gettext('Federation')
+          'code': 'moderation',
+          'label': this.$gettext('Moderation')
         },
         {
           'code': 'settings',

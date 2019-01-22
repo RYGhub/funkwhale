@@ -226,6 +226,30 @@ def get_music_directory_data(artist):
     return data
 
 
+def get_folders(user):
+    return []
+
+
+def get_user_detail_data(user):
+    return {
+        "username": user.username,
+        "email": user.email,
+        "scrobblingEnabled": "true",
+        "adminRole": "false",
+        "settingsRole": "false",
+        "commentRole": "false",
+        "podcastRole": "false",
+        "coverArtRole": "false",
+        "shareRole": "false",
+        "uploadRole": "true",
+        "downloadRole": "true",
+        "playlistRole": "true",
+        "streamRole": "true",
+        "jukeboxRole": "true",
+        "folder": [f["id"] for f in get_folders(user)],
+    }
+
+
 class ScrobbleSerializer(serializers.Serializer):
     submission = serializers.BooleanField(default=True, required=False)
     id = serializers.PrimaryKeyRelatedField(

@@ -4,9 +4,10 @@
 
 <script>
 import {mapState} from 'vuex'
-import _ from 'lodash'
+import _ from '@/lodash'
 import url from '@/utils/url'
 import {Howl} from 'howler'
+import axios from 'axios'
 
 // import logger from '@/logging'
 
@@ -19,6 +20,7 @@ export default {
   },
   data () {
     return {
+      trackData: this.track,
       sourceErrors: 0,
       sound: null,
       isUpdatingTime: false,
@@ -27,31 +29,16 @@ export default {
   },
   mounted () {
     let self = this
-    this.sound = new Howl({
-      src: this.srcs.map((s) => { return s.url }),
-      format: this.srcs.map((s) => { return s.type }),
-      autoplay: false,
-      loop: false,
-      html5: true,
-      preload: true,
-      volume: this.volume,
-      onend: function () {
-        self.ended()
-      },
-      onunlock: function () {
-        if (this.$store.state.player.playing) {
-          self.sound.play()
-        }
-      },
-      onload: function () {
-        self.$store.commit('player/resetErrorCount')
-        self.$store.commit('player/duration', self.sound.duration())
-      }
-    })
-    if (this.autoplay) {
-      this.sound.play()
-      this.$store.commit('player/playing', true)
-      this.observeProgress(true)
+    if (!this.trackData.uploads.length || this.trackData.uploads.length === 0) {
+      // we don't have upload informations for this track, we need to fetch it
+      axios.get(`tracks/${this.trackData.id}/`).then((response) => {
+        self.trackData = response.data
+        self.setupSound()
+      }, error => {
+        self.$emit('errored', {})
+      })
+    } else {
+      this.setupSound()
     }
   },
   destroyed () {
@@ -67,14 +54,23 @@ export default {
       looping: state => state.player.looping
     }),
     srcs: function () {
-      // let file = this.track.files[0]
-      // if (!file) {
-      //   this.$store.dispatch('player/trackErrored')
-      //   return []
-      // }
-      let sources = [
-        {type: 'mp3', url: this.$store.getters['instance/absoluteUrl'](this.track.listen_url)}
-      ]
+      let sources = this.trackData.uploads.map(u => {
+        return {
+          type: u.extension,
+          url: this.$store.getters['instance/absoluteUrl'](u.listen_url),
+        }
+      })
+      // We always add a transcoded MP3 src at the end
+      // because transcoding is expensive, but we want browsers that do
+      // not support other codecs to be able to play it :)
+      sources.push({
+        type: 'mp3',
+        url: url.updateQueryString(
+          this.$store.getters['instance/absoluteUrl'](this.trackData.listen_url),
+          'to',
+          'mp3'
+        )
+      })
       if (this.$store.state.auth.authenticated) {
         // we need to send the token directly in url
         // so authentication can be checked by the backend
@@ -91,10 +87,80 @@ export default {
     }
   },
   methods: {
+    setupSound () {
+      let self = this
+      this.sound = new Howl({
+        src: this.srcs.map((s) => { return s.url }),
+        format: this.srcs.map((s) => { return s.type }),
+        autoplay: false,
+        loop: false,
+        html5: true,
+        preload: true,
+        volume: this.volume,
+        onend: function () {
+          self.ended()
+        },
+        onunlock: function () {
+          if (this.$store.state.player.playing) {
+            self.sound.play()
+          }
+        },
+        onload: function () {
+          self.$store.commit('player/isLoadingAudio', false)
+          self.$store.commit('player/resetErrorCount')
+          self.$store.commit('player/errored', false)
+          self.$store.commit('player/duration', self.sound.duration())
+          let node = self.sound._sounds[0]._node;
+          node.addEventListener('progress', () => {
+            self.updateBuffer(node)
+          })
+        },
+        onloaderror: function (sound, error) {
+          console.log('Error while playing:', sound, error)
+          self.$emit('errored', {sound, error})
+        },
+      })
+      if (this.autoplay) {
+        self.$store.commit('player/isLoadingAudio', true)
+        this.sound.play()
+        this.$store.commit('player/playing', true)
+        this.observeProgress(true)
+      }
+    },
+    updateBuffer (node) {
+      // from https://github.com/goldfire/howler.js/issues/752#issuecomment-372083163
+      let range = 0;
+      let bf = node.buffered;
+      let time = node.currentTime;
+      try {
+        while(!(bf.start(range) <= time && time <= bf.end(range))) {
+          range += 1;
+        }
+      } catch (IndexSizeError) {
+        return
+      }
+      let loadPercentage
+      let start =  bf.start(range)
+      let end =  bf.end(range)
+      if (range === 0) {
+        // easy case, no user-seek
+        let loadStartPercentage = start / node.duration;
+        let loadEndPercentage = end / node.duration;
+        loadPercentage = loadEndPercentage - loadStartPercentage;
+      } else {
+        let loaded = end - start
+        let remainingToLoad = node.duration - start
+        // user seeked a specific position in the audio, our progress must be
+        // computed based on the remaining portion of the track
+        loadPercentage = loaded / remainingToLoad;
+      }
+      this.$store.commit('player/bufferProgress', loadPercentage * 100)
+    },
     updateProgress: function () {
       this.isUpdatingTime = true
       if (this.sound && this.sound.state() === 'loaded') {
         this.$store.dispatch('player/updateProgress', this.sound.seek())
+        this.updateBuffer(this.sound._sounds[0]._node)
       }
     },
     observeProgress: function (enable) {
@@ -128,7 +194,7 @@ export default {
         this.sound.seek(0)
         this.sound.play()
       } else {
-        this.$store.dispatch('player/trackEnded', this.track)
+        this.$store.dispatch('player/trackEnded', this.trackData)
       }
     }
   },

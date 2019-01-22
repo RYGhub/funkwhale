@@ -1,8 +1,14 @@
 import cryptography
-from django.contrib.auth.models import AnonymousUser
-from rest_framework import authentication, exceptions
+import logging
 
-from . import actors, keys, signing, utils
+from django.contrib.auth.models import AnonymousUser
+from rest_framework import authentication, exceptions as rest_exceptions
+
+from funkwhale_api.moderation import models as moderation_models
+from . import actors, exceptions, keys, signing, utils
+
+
+logger = logging.getLogger(__name__)
 
 
 class SignatureAuthentication(authentication.BaseAuthentication):
@@ -14,20 +20,42 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         except KeyError:
             return
         except ValueError as e:
-            raise exceptions.AuthenticationFailed(str(e))
+            raise rest_exceptions.AuthenticationFailed(str(e))
 
         try:
-            actor = actors.get_actor(key_id.split("#")[0])
+            actor_url = key_id.split("#")[0]
+        except (TypeError, IndexError, AttributeError):
+            raise rest_exceptions.AuthenticationFailed("Invalid key id")
+
+        policies = (
+            moderation_models.InstancePolicy.objects.active()
+            .filter(block_all=True)
+            .matching_url(actor_url)
+        )
+        if policies.exists():
+            raise exceptions.BlockedActorOrDomain()
+
+        try:
+            actor = actors.get_actor(actor_url)
         except Exception as e:
-            raise exceptions.AuthenticationFailed(str(e))
+            logger.info(
+                "Discarding HTTP request from blocked actor/domain %s", actor_url
+            )
+            raise rest_exceptions.AuthenticationFailed(str(e))
 
         if not actor.public_key:
-            raise exceptions.AuthenticationFailed("No public key found")
+            raise rest_exceptions.AuthenticationFailed("No public key found")
 
         try:
             signing.verify_django(request, actor.public_key.encode("utf-8"))
         except cryptography.exceptions.InvalidSignature:
-            raise exceptions.AuthenticationFailed("Invalid signature")
+            # in case of invalid signature, we refetch the actor object
+            # to load a potentially new public key. This process is called
+            # Blind key rotation, and is described at
+            # https://blog.dereferenced.org/the-case-for-blind-key-rotation
+            # if signature verification fails after that, then we return a 403 error
+            actor = actors.get_actor(actor_url, skip_cache=True)
+            signing.verify_django(request, actor.public_key.encode("utf-8"))
 
         return actor
 

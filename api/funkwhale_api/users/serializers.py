@@ -11,7 +11,7 @@ from rest_framework import serializers
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
-
+from funkwhale_api.common import serializers as common_serializers
 from . import models
 
 
@@ -66,7 +66,13 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
-avatar_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+class AvatarField(
+    common_serializers.StripExifImageField, VersatileImageFieldSerializer
+):
+    pass
+
+
+avatar_field = AvatarField(allow_null=True, sizes="square")
 
 
 class UserBasicSerializer(serializers.ModelSerializer):

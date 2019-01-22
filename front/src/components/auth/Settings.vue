@@ -1,7 +1,7 @@
 <template>
-  <div class="main pusher" v-title="labels.title">
+  <main class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
-      <div class="ui small text container">
+      <section class="ui small text container">
         <h2 class="ui header">
           <translate>Account settings</translate>
         </h2>
@@ -28,9 +28,9 @@
             <translate>Update settings</translate>
           </button>
         </form>
-      </div>
+      </section>
       <div class="ui hidden divider"></div>
-      <div class="ui small text container">
+      <section class="ui small text container">
         <h2 class="ui header">
           <translate>Avatar</translate>
         </h2>
@@ -53,7 +53,7 @@
             </div>
             <div class="ui six wide column">
               <h3 class="ui header"><translate>Current avatar</translate></h3>
-              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" :src="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
+              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
               <div class="ui hidden divider"></div>
               <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
                 <translate>Remove avatar</translate>
@@ -61,9 +61,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
       <div class="ui hidden divider"></div>
-      <div class="ui small text container">
+      <section class="ui small text container">
         <h2 class="ui header">
           <translate>Change my password</translate>
         </h2>
@@ -107,18 +107,18 @@
         </form>
         <div class="ui hidden divider" />
         <subsonic-token-form />
-      </div>
+      </section>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>
-import $ from 'jquery'
-import axios from 'axios'
-import logger from '@/logging'
-import PasswordInput from '@/components/forms/PasswordInput'
-import SubsonicTokenForm from '@/components/auth/SubsonicTokenForm'
-import TranslationsMixin from '@/components/mixins/Translations'
+import $ from "jquery"
+import axios from "axios"
+import logger from "@/logging"
+import PasswordInput from "@/components/forms/PasswordInput"
+import SubsonicTokenForm from "@/components/auth/SubsonicTokenForm"
+import TranslationsMixin from "@/components/mixins/Translations"
 
 export default {
   mixins: [TranslationsMixin],
@@ -126,14 +126,14 @@ export default {
     PasswordInput,
     SubsonicTokenForm
   },
-  data () {
+  data() {
     let d = {
       // We need to initialize the component with any
       // properties that will be used in it
-      old_password: '',
-      new_password: '',
+      old_password: "",
+      new_password: "",
       currentAvatar: this.$store.state.auth.profile.avatar,
-      passwordError: '',
+      passwordError: "",
       isLoading: false,
       isLoadingAvatar: false,
       avatarErrors: [],
@@ -141,12 +141,12 @@ export default {
       settings: {
         success: false,
         errors: [],
-        order: ['privacy_level'],
+        order: ["privacy_level"],
         fields: {
-          'privacy_level': {
-            type: 'dropdown',
+          privacy_level: {
+            type: "dropdown",
             initial: this.$store.state.auth.profile.privacy_level,
-            choices: ['me', 'instance']
+            choices: ["me", "instance"]
           }
         }
       }
@@ -157,105 +157,120 @@ export default {
     })
     return d
   },
-  mounted () {
-    $('select.dropdown').dropdown()
+  mounted() {
+    $("select.dropdown").dropdown()
   },
   methods: {
-    submitSettings () {
+    submitSettings() {
       this.settings.success = false
       this.settings.errors = []
       let self = this
       let payload = this.settingsValues
       let url = `users/users/${this.$store.state.auth.username}/`
-      return axios.patch(url, payload).then(response => {
-        logger.default.info('Updated settings successfully')
-        self.settings.success = true
-      }, error => {
-        logger.default.error('Error while updating settings')
-        self.isLoading = false
-        self.settings.errors = error.backendErrors
-      })
+      return axios.patch(url, payload).then(
+        response => {
+          logger.default.info("Updated settings successfully")
+          self.settings.success = true
+          return axios.get("users/users/me/").then(response => {
+            self.$store.dispatch("auth/updateProfile", response.data)
+          })
+        },
+        error => {
+          logger.default.error("Error while updating settings")
+          self.isLoading = false
+          self.settings.errors = error.backendErrors
+        }
+      )
     },
-    submitAvatar () {
+    submitAvatar() {
       this.isLoadingAvatar = true
       this.avatarErrors = []
       let self = this
       this.avatar = this.$refs.avatar.files[0]
       let formData = new FormData()
-      formData.append('avatar', this.avatar)
-      axios.patch(
-        `users/users/${this.$store.state.auth.username}/`,
-        formData,
-        {
+      formData.append("avatar", this.avatar)
+      axios
+        .patch(`users/users/${this.$store.state.auth.username}/`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data"
           }
-        }
-      ).then(response => {
-        this.isLoadingAvatar = false
-        self.currentAvatar = response.data.avatar
-        self.$store.commit('auth/avatar', self.currentAvatar)
-      }, error => {
-        self.isLoadingAvatar = false
-        self.avatarErrors = error.backendErrors
-      })
+        })
+        .then(
+          response => {
+            this.isLoadingAvatar = false
+            self.currentAvatar = response.data.avatar
+            self.$store.commit("auth/avatar", self.currentAvatar)
+          },
+          error => {
+            self.isLoadingAvatar = false
+            self.avatarErrors = error.backendErrors
+          }
+        )
     },
-    removeAvatar () {
+    removeAvatar() {
       this.isLoadingAvatar = true
       let self = this
       this.avatar = null
-      axios.patch(
-        `users/users/${this.$store.state.auth.username}/`,
-        {avatar: null}
-      ).then(response => {
-        this.isLoadingAvatar = false
-        self.currentAvatar = {}
-        self.$store.commit('auth/avatar', self.currentAvatar)
-      }, error => {
-        self.isLoadingAvatar = false
-        self.avatarErrors = error.backendErrors
-      })
+      axios
+        .patch(`users/users/${this.$store.state.auth.username}/`, {
+          avatar: null
+        })
+        .then(
+          response => {
+            this.isLoadingAvatar = false
+            self.currentAvatar = {}
+            self.$store.commit("auth/avatar", self.currentAvatar)
+          },
+          error => {
+            self.isLoadingAvatar = false
+            self.avatarErrors = error.backendErrors
+          }
+        )
     },
-    submitPassword () {
+    submitPassword() {
       var self = this
       self.isLoading = true
-      this.error = ''
+      this.error = ""
       var credentials = {
         old_password: this.old_password,
         new_password1: this.new_password,
         new_password2: this.new_password
       }
-      let url = 'auth/registration/change-password/'
-      return axios.post(url, credentials).then(response => {
-        logger.default.info('Password successfully changed')
-        self.$router.push({
-          name: 'profile',
-          params: {
-            username: self.$store.state.auth.username
-          }})
-      }, error => {
-        if (error.response.status === 400) {
-          self.passwordError = 'invalid_credentials'
-        } else {
-          self.passwordError = 'unknown_error'
+      let url = "auth/registration/change-password/"
+      return axios.post(url, credentials).then(
+        response => {
+          logger.default.info("Password successfully changed")
+          self.$router.push({
+            name: "profile",
+            params: {
+              username: self.$store.state.auth.username
+            }
+          })
+        },
+        error => {
+          if (error.response.status === 400) {
+            self.passwordError = "invalid_credentials"
+          } else {
+            self.passwordError = "unknown_error"
+          }
+          self.isLoading = false
         }
-        self.isLoading = false
-      })
+      )
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Account Settings')
+        title: this.$gettext("Account Settings")
       }
     },
-    orderedSettingsFields () {
+    orderedSettingsFields() {
       let self = this
       return this.settings.order.map(id => {
         return self.settings.fields[id]
       })
     },
-    settingsValues () {
+    settingsValues() {
       let self = this
       let s = {}
       this.settings.order.forEach(setting => {
@@ -265,7 +280,6 @@ export default {
       return s
     }
   }
-
 }
 </script>
 

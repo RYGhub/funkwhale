@@ -1,11 +1,11 @@
 import axios from 'axios'
 import logger from '@/logging'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 function getDefaultUrl () {
   return (
     window.location.protocol + '//' + window.location.hostname +
-    (window.location.port ? ':' + window.location.port : '')
+    (window.location.port ? ':' + window.location.port : '') + '/'
   )
 }
 
@@ -16,6 +16,7 @@ export default {
     frontSettings: {},
     instanceUrl: process.env.VUE_APP_INSTANCE_URL,
     events: [],
+    knownInstances: [],
     settings: {
       instance: {
         name: {
@@ -39,14 +40,6 @@ export default {
       subsonic: {
         enabled: {
           value: true
-        }
-      },
-      raven: {
-        front_enabled: {
-          value: false
-        },
-        front_dsn: {
-          value: null
         }
       }
     }
@@ -72,6 +65,15 @@ export default {
         value = value + '/'
       }
       state.instanceUrl = value
+
+      // append the URL to the list (and remove existing one if needed)
+      if (value) {
+        let index = state.knownInstances.indexOf(value);
+        if (index > -1) {
+          state.knownInstances.splice(index, 1);
+        }
+        state.knownInstances.splice(0, 0, value)
+      }
       if (!value) {
         axios.defaults.baseURL = null
         return
@@ -131,7 +133,7 @@ export default {
       })
     },
     fetchFrontSettings ({commit}) {
-      return axios.get('/settings.json').then(response => {
+      return axios.get('/front/settings.json').then(response => {
         commit('frontSettings', response.data)
       }, response => {
         logger.default.error('Error when fetching front-end configuration (or no customization available)')

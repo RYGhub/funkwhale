@@ -71,6 +71,7 @@ We also maintain an installation guide for Debian 9 and Arch Linux.
    debian
    docker
    systemd
+   non_amd64_architectures
 
 Funkwhale packages are available for the following platforms:
 
@@ -81,7 +82,7 @@ Funkwhale packages are available for the following platforms:
 Running Funkwhale on the develop branch
 ---------------------------------------
 
-Traditional deployments are done using specific releases. However, you
+Traditional deployments are done using tagged releases. However, you
 may want to benefits from the latest change available, or the help detect
 bugs before they are included in actual releases.
 
@@ -97,6 +98,9 @@ Otherwise, the deployment process is similar to deploying with releases.
 You simply need to use ``export FUNKWHALE_VERSION=develop``
 in the installation and upgrade process instead of a real version number,
 as we build artifacts on the development branch the same way we do for releases.
+
+It's also recommended to check out the `develop release notes <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/changes/notes.rst>_` before upgrading,
+since you may have to apply manual actions for your instance to continue to work. Such actions are labelled with ``[manual action required]`` in the releases notes.
 
 .. _frontend-setup:
 
@@ -146,11 +150,14 @@ match the application configuration and make upgrade/maintenance easier.
 
 On docker deployments, run the following commands:
 
-.. code:: shell
+.. parsed-literal::
 
+    export FUNKWHALE_VERSION="|version|"
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker.proxy.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.proxy.template"
+
+.. code-block:: shell
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/.env && set +a
@@ -162,11 +169,16 @@ On docker deployments, run the following commands:
 
 On non-docker deployments, run the following commands:
 
-.. code:: shell
+
+.. parsed-literal::
+
+    export FUNKWHALE_VERSION="|version|"
 
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/nginx.template"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/nginx.template"
+
+.. code-block:: shell
 
     # create a final nginx configuration using the template based on your environment
     set -a && source /srv/funkwhale/config/.env && set +a
@@ -193,6 +205,14 @@ Finally, enable the resulting configuration:
 
 .. code-block:: bash
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
+
+.. note::
+
+    At this point you will need a certificate to enable HTTPS on your server.
+    There are many ways to obtain this certificate. The most popular and free
+    way is to obtain it from Let's Encryt. To do this, you can use an utility
+    called certbot. You can find a complete documentation on how to use certbot
+    at the `certbot documentation <https://certbot.eff.org/docs/>`.
 
 Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``systemctl restart nginx``.
 
@@ -226,6 +246,11 @@ Then, download our sample virtualhost file:
 You can tweak the configuration file according to your setup, especially the
 TLS configuration. Otherwise, defaults, should work if you followed the
 installation guide.
+
+.. note::
+
+    To obtain a certificate to enable HTTPS on your server, please refer to the note in
+    the nginx chapter above.
 
 Check the configuration is valid with ``apache2ctl configtest``, and once you're
 done, load the new configuration with ``service apache2 restart``.

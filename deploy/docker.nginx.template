@@ -24,17 +24,17 @@ server {
     root /frontend;
 
     location / {
-        try_files $uri $uri/ @rewrites;
-    }
-
-    location @rewrites {
-        rewrite ^(.+)$ /index.html last;
-    }
-    location /api/ {
         include /etc/nginx/funkwhale_proxy.conf;
         # this is needed if you have file import via upload enabled
         client_max_body_size ${NGINX_MAX_BODY_SIZE};
-        proxy_pass   http://funkwhale-api/api/;
+        proxy_pass   http://funkwhale-api/;
+    }
+
+    location /front/ {
+        alias /frontend/;
+        expires 30d;
+        add_header Pragma public;
+        add_header Cache-Control "public, must-revalidate, proxy-revalidate";
     }
 
     location /federation/ {

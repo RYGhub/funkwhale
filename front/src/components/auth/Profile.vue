@@ -1,5 +1,5 @@
 <template>
-  <div class="main pusher" v-title="labels.usernameProfile">
+  <main class="main pusher" v-title="labels.usernameProfile">
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
@@ -7,7 +7,7 @@
       <div :class="['ui', 'head', 'vertical', 'center', 'aligned', 'stripe', 'segment']">
         <h2 class="ui center aligned icon header">
           <i v-if="!profile.avatar.square_crop" class="circular inverted user green icon"></i>
-          <img class="ui big circular image" v-else :src="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
+          <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
           <div class="content">
             {{ profile.username }}
             <div class="sub header" v-translate="{date: signupDate}">Registered since %{ date }</div>
@@ -25,36 +25,37 @@
         </a>
       </div>
     </template>
-  </div>
+  </main>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from "vuex"
 
-const dateFormat = require('dateformat')
+const dateFormat = require("dateformat")
 
 export default {
-  props: ['username'],
-  created () {
-    this.$store.dispatch('auth/fetchProfile')
+  props: ["username"],
+  created() {
+    this.$store.dispatch("auth/fetchProfile")
   },
   computed: {
-
     ...mapState({
       profile: state => state.auth.profile
     }),
-    labels () {
-      let msg = this.$gettext('%{ username }\'s profile')
-      let usernameProfile = this.$gettextInterpolate(msg, {username: this.username})
+    labels() {
+      let msg = this.$gettext("%{ username }'s profile")
+      let usernameProfile = this.$gettextInterpolate(msg, {
+        username: this.username
+      })
       return {
         usernameProfile
       }
     },
-    signupDate () {
+    signupDate() {
       let d = new Date(this.profile.date_joined)
-      return dateFormat(d, 'longDate')
+      return dateFormat(d, "longDate")
     },
-    isLoading () {
+    isLoading() {
       return !this.profile
     }
   }

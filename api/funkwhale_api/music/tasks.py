@@ -1,4 +1,5 @@
 import collections
+import datetime
 import logging
 import os
 
@@ -10,11 +11,12 @@ from django.dispatch import receiver
 from musicbrainzngs import ResponseError
 from requests.exceptions import RequestException
 
-from funkwhale_api.common import channels
+from funkwhale_api.common import channels, preferences
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
 from funkwhale_api.taskapp import celery
 
+from . import licenses
 from . import lyrics as lyrics_utils
 from . import models
 from . import metadata
@@ -189,7 +191,7 @@ def process_upload(upload):
             final_metadata = collections.ChainMap(
                 additional_data, import_metadata, file_metadata
             )
-            additional_data["cover_data"] = m.get_picture("cover_front")
+            additional_data["cover_data"] = m.get_picture("cover_front", "other")
         additional_data["upload_source"] = upload.source
         track = get_track_from_import_metadata(final_metadata)
     except UploadImportError as e:
@@ -272,9 +274,12 @@ def federation_audio_track_to_metadata(payload):
         "title": payload["name"],
         "album": payload["album"]["name"],
         "track_number": payload["position"],
+        "disc_number": payload.get("disc"),
         "artist": payload["artists"][0]["name"],
         "album_artist": payload["album"]["artists"][0]["name"],
         "date": payload["album"].get("released"),
+        "license": payload.get("license"),
+        "copyright": payload.get("copyright"),
         # musicbrainz
         "musicbrainz_recordingid": str(musicbrainz_recordingid)
         if musicbrainz_recordingid
@@ -493,8 +498,11 @@ def get_track_from_import_metadata(data):
         "mbid": track_mbid,
         "artist": artist,
         "position": track_number,
+        "disc_number": data.get("disc_number"),
         "fid": track_fid,
         "from_activity_id": from_activity_id,
+        "license": licenses.match(data.get("license"), data.get("copyright")),
+        "copyright": data.get("copyright"),
     }
     if data.get("fdate"):
         defaults["creation_date"] = data.get("fdate")
@@ -526,3 +534,19 @@ def broadcast_import_status_update_to_owner(old_status, new_status, upload, **kw
             },
         },
     )
+
+
+@celery.app.task(name="music.clean_transcoding_cache")
+def clean_transcoding_cache():
+    delay = preferences.get("music__transcoding_cache_duration")
+    if delay < 1:
+        return  # cache clearing disabled
+    limit = timezone.now() - datetime.timedelta(minutes=delay)
+    candidates = (
+        models.UploadVersion.objects.filter(
+            (Q(accessed_date__lt=limit) | Q(accessed_date=None))
+        )
+        .only("audio_file", "id")
+        .order_by("id")
+    )
+    return candidates.delete()

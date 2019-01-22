@@ -114,7 +114,7 @@ class ActorSerializer(serializers.Serializer):
         if maf is not None:
             kwargs["manually_approves_followers"] = maf
         domain = urllib.parse.urlparse(kwargs["fid"]).netloc
-        kwargs["domain"] = domain
+        kwargs["domain"] = models.Domain.objects.get_or_create(pk=domain)[0]
         for endpoint, url in self.initial_data.get("endpoints", {}).items():
             if endpoint == "sharedInbox":
                 kwargs["shared_inbox_url"] = url
@@ -560,14 +560,14 @@ class LibrarySerializer(PaginatedCollectionSerializer):
         r = super().to_representation(conf)
         r["audience"] = (
             "https://www.w3.org/ns/activitystreams#Public"
-            if library.privacy_level == "public"
+            if library.privacy_level == "everyone"
             else ""
         )
         r["followers"] = library.followers_url
         return r
 
     def create(self, validated_data):
-        actor = utils.retrieve(
+        actor = utils.retrieve_ap_object(
             validated_data["actor"],
             queryset=models.Actor,
             serializer_class=ActorSerializer,
@@ -729,8 +729,11 @@ class AlbumSerializer(MusicEntitySerializer):
 
 class TrackSerializer(MusicEntitySerializer):
     position = serializers.IntegerField(min_value=0, allow_null=True, required=False)
+    disc = serializers.IntegerField(min_value=1, allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     album = AlbumSerializer()
+    license = serializers.URLField(allow_null=True, required=False)
+    copyright = serializers.CharField(allow_null=True, required=False)
 
     def to_representation(self, instance):
         d = {
@@ -740,6 +743,11 @@ class TrackSerializer(MusicEntitySerializer):
             "published": instance.creation_date.isoformat(),
             "musicbrainzId": str(instance.mbid) if instance.mbid else None,
             "position": instance.position,
+            "disc": instance.disc_number,
+            "license": instance.local_license["identifiers"][0]
+            if instance.local_license
+            else None,
+            "copyright": instance.copyright if instance.copyright else None,
             "artists": [
                 ArtistSerializer(
                     instance.artist, context={"include_ap_context": False}
@@ -880,3 +888,12 @@ class CollectionSerializer(serializers.Serializer):
         if self.context.get("include_ap_context", True):
             d["@context"] = AP_CONTEXT
         return d
+
+
+class NodeInfoLinkSerializer(serializers.Serializer):
+    href = serializers.URLField()
+    rel = serializers.URLField()
+
+
+class NodeInfoSerializer(serializers.Serializer):
+    links = serializers.ListField(child=NodeInfoLinkSerializer(), min_length=1)

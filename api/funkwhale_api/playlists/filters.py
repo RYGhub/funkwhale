@@ -7,8 +7,8 @@ from . import models
 
 
 class PlaylistFilter(filters.FilterSet):
-    q = filters.CharFilter(name="_", method="filter_q")
-    playable = filters.BooleanFilter(name="_", method="filter_playable")
+    q = filters.CharFilter(field_name="_", method="filter_q")
+    playable = filters.BooleanFilter(field_name="_", method="filter_playable")
 
     class Meta:
         model = models.Playlist

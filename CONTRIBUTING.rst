@@ -35,18 +35,20 @@ Setup front-end only development environment
     cd funkwhale
     cd front
 
-2. Install [nodejs](https://nodejs.org/en/download/package-manager/) and [yarn](https://yarnpkg.com/lang/en/docs/install/#debian-stable)
+2. Install `nodejs <https://nodejs.org/en/download/package-manager/>`_ and `yarn <https://yarnpkg.com/lang/en/docs/install/#debian-stable>`_
+
 3. Install the dependencies::
 
     yarn install
 
 4. Launch the development server::
 
-    # this will serve the front-end on http://localhost:8000
+    # this will serve the front-end on http://localhost:8000/front/
     VUE_PORT=8000 yarn serve
 
 5. Make the front-end talk with an existing server (like https://demo.funkwhale.audio),
    by clicking on the corresponding link in the footer
+
 6. Start hacking!
 
 Setup your development environment
@@ -307,7 +309,7 @@ A typical fragment looks like that:
     Fixed broken audio player on Chrome 42 for ogg files (#567)
 
 If the work fixes one or more issues, the issue number should be included at the
-end of the fragment (``(#567)`` is the issue number in the previous example.
+end of the fragment (``(#567)`` is the issue number in the previous example).
 
 If your work is not related to a specific issue, use the merge request
 identifier instead, like this:
@@ -389,7 +391,7 @@ This is regular pytest, so you can use any arguments/options that pytest usually
     # Stop on first failure
     docker-compose -f dev.yml run --rm api pytest -x
     # Run a specific test file
-    docker-compose -f dev.yml run --rm api pytest tests/test_acoustid.py
+    docker-compose -f dev.yml run --rm api pytest tests/music/test_models.py
 
 Writing tests
 ^^^^^^^^^^^^^
@@ -507,7 +509,7 @@ useful when testing components that depend on each other:
         # here, we ensure no email was sent
         mocked_notify.assert_not_called()
 
-Views: you can find some readable views tests in :file:`tests/users/test_views.py`
+Views: you can find some readable views tests in file: ``api/tests/users/test_views.py``
 
 .. note::
 

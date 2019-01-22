@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.reset">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" v-title="labels.reset">
+    <section class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Reset your password</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
@@ -28,29 +28,31 @@
             <translate>Ask for a password reset</translate></button>
         </form>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios"
 
 export default {
-  props: ['defaultEmail'],
-  data () {
+  props: ["defaultEmail"],
+  data() {
     return {
       email: this.defaultEmail,
       isLoading: false,
       errors: []
     }
   },
-  mounted () {
+  mounted() {
     this.$refs.email.focus()
   },
   computed: {
-    labels () {
-      let reset = this.$gettext('Reset your password')
-      let placeholder = this.$gettext('Input the email address binded to your account')
+    labels() {
+      let reset = this.$gettext("Reset your password")
+      let placeholder = this.$gettext(
+        "Input the email address binded to your account"
+      )
       return {
         reset,
         placeholder
@@ -58,25 +60,27 @@ export default {
     }
   },
   methods: {
-    submit () {
+    submit() {
       let self = this
       self.isLoading = true
       self.errors = []
       let payload = {
         email: this.email
       }
-      return axios.post('auth/password/reset/', payload).then(response => {
-        self.isLoading = false
-        self.$router.push({
-          name: 'auth.password-reset-confirm'
-        })
-      }, error => {
-        self.errors = error.backendErrors
-        self.isLoading = false
-      })
+      return axios.post("auth/password/reset/", payload).then(
+        response => {
+          self.isLoading = false
+          self.$router.push({
+            name: "auth.password-reset-confirm"
+          })
+        },
+        error => {
+          self.errors = error.backendErrors
+          self.isLoading = false
+        }
+      )
     }
   }
-
 }
 </script>
 

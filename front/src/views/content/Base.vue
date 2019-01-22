@@ -1,24 +1,25 @@
 <template>
-  <div class="main pusher"  v-title="labels.title">
-    <div class="ui secondary pointing menu">
+  <main class="main pusher"  v-title="labels.title">
+    <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
         :to="{name: 'content.libraries.index'}"><translate>Libraries</translate></router-link>
       <router-link
         class="ui item"
         :to="{name: 'content.libraries.files'}"><translate>Tracks</translate></router-link>
-    </div>
+    </nav>
     <router-view :key="$route.fullPath"></router-view>
-  </div>
+  </main>
 </template>
 <script>
-
 export default {
   computed: {
-    labels () {
-      let title = this.$gettext('Add content')
+    labels() {
+      let title = this.$gettext("Add content")
+      let secondaryMenu = this.$gettext("Secondary menu")
       return {
-        title
+        title,
+        secondaryMenu
       }
     }
   }

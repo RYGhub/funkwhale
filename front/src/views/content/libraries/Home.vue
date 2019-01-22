@@ -1,13 +1,13 @@
 <template>
-  <div class="ui vertical aligned stripe segment">
+  <section class="ui vertical aligned stripe segment">
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading Libraries...</translate></div>
+      <div class="ui text loader"><translate>Loading Libraries…</translate></div>
     </div>
     <div v-else class="ui text container">
       <h1 class="ui header"><translate>My libraries</translate></h1>
 
       <p v-if="libraries.length == 0">
-        <translate>It looks like you don't have any library yet, it's time to create one!</translate>
+        <translate>Looks like you don't have a library, it's time to create one.</translate>
       </p>
       <a @click="hiddenForm = !hiddenForm">
         <i class="plus icon" v-if="hiddenForm" />
@@ -24,24 +24,24 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
-import axios from 'axios'
-import LibraryForm from './Form'
-import LibraryCard from './Card'
-import Quota from './Quota'
+import axios from "axios"
+import LibraryForm from "./Form"
+import LibraryCard from "./Card"
+import Quota from "./Quota"
 
 export default {
-  data () {
+  data() {
     return {
       isLoading: false,
       hiddenForm: true,
       libraries: []
     }
   },
-  created () {
+  created() {
     this.fetch()
   },
   components: {
@@ -50,10 +50,10 @@ export default {
     Quota
   },
   methods: {
-    fetch () {
+    fetch() {
       this.isLoading = true
       let self = this
-      axios.get('libraries/').then((response) => {
+      axios.get("libraries/").then(response => {
         self.isLoading = false
         self.libraries = response.data.results
         if (self.libraries.length === 0) {
@@ -61,7 +61,7 @@ export default {
         }
       })
     },
-    libraryCreated (library) {
+    libraryCreated(library) {
       this.hiddenForm = true
       this.libraries.unshift(library)
     }

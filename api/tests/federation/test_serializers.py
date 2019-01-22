@@ -43,7 +43,7 @@ def test_actor_serializer_from_ap(db):
     assert actor.public_key == payload["publicKey"]["publicKeyPem"]
     assert actor.preferred_username == payload["preferredUsername"]
     assert actor.name == payload["name"]
-    assert actor.domain == "test.federation"
+    assert actor.domain.pk == "test.federation"
     assert actor.summary == payload["summary"]
     assert actor.type == "Person"
     assert actor.manually_approves_followers == payload["manuallyApprovesFollowers"]
@@ -71,7 +71,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     assert actor.followers_url == payload["followers"]
     assert actor.following_url == payload["following"]
     assert actor.preferred_username == payload["preferredUsername"]
-    assert actor.domain == "test.federation"
+    assert actor.domain.pk == "test.federation"
     assert actor.type == "Person"
     assert actor.manually_approves_followers is None
 
@@ -110,7 +110,7 @@ def test_actor_serializer_to_ap():
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain="test.federation",
+        domain=models.Domain(pk="test.federation"),
         summary=expected["summary"],
         type="Person",
         manually_approves_followers=False,
@@ -135,7 +135,7 @@ def test_webfinger_serializer():
     actor = models.Actor(
         fid=expected["links"][0]["href"],
         preferred_username="service",
-        domain="test.federation",
+        domain=models.Domain(pk="test.federation"),
     )
     serializer = serializers.ActorWebfingerSerializer(actor)
 
@@ -476,7 +476,7 @@ def test_collection_page_serializer(factories):
 
 
 def test_music_library_serializer_to_ap(factories):
-    library = factories["music.Library"]()
+    library = factories["music.Library"](privacy_level="everyone")
     # pending, errored and skippednot included
     factories["music.Upload"](import_status="pending")
     factories["music.Upload"](import_status="errored")
@@ -488,11 +488,11 @@ def test_music_library_serializer_to_ap(factories):
             "https://w3id.org/security/v1",
             {},
         ],
+        "audience": "https://www.w3.org/ns/activitystreams#Public",
         "type": "Library",
         "id": library.fid,
         "name": library.name,
         "summary": library.description,
-        "audience": "",
         "actor": library.actor.fid,
         "totalItems": 0,
         "current": library.fid + "?page=1",
@@ -507,7 +507,7 @@ def test_music_library_serializer_to_ap(factories):
 def test_music_library_serializer_from_public(factories, mocker):
     actor = factories["federation.Actor"]()
     retrieve = mocker.patch(
-        "funkwhale_api.federation.utils.retrieve", return_value=actor
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
     )
     data = {
         "@context": [
@@ -550,7 +550,7 @@ def test_music_library_serializer_from_public(factories, mocker):
 def test_music_library_serializer_from_private(factories, mocker):
     actor = factories["federation.Actor"]()
     retrieve = mocker.patch(
-        "funkwhale_api.federation.utils.retrieve", return_value=actor
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
     )
     data = {
         "@context": [
@@ -632,7 +632,9 @@ def test_activity_pub_album_serializer_to_ap(factories):
 
 
 def test_activity_pub_track_serializer_to_ap(factories):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](
+        license="cc-by-4.0", copyright="test", disc_number=3
+    )
     expected = {
         "@context": serializers.AP_CONTEXT,
         "published": track.creation_date.isoformat(),
@@ -641,6 +643,9 @@ def test_activity_pub_track_serializer_to_ap(factories):
         "id": track.fid,
         "name": track.title,
         "position": track.position,
+        "disc": track.disc_number,
+        "license": track.license.conf["identifiers"][0],
+        "copyright": "test",
         "artists": [
             serializers.ArtistSerializer(
                 track.artist, context={"include_ap_context": False}
@@ -666,6 +671,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock):
         "musicbrainzId": str(uuid.uuid4()),
         "name": "Black in back",
         "position": 5,
+        "disc": 1,
         "album": {
             "type": "Album",
             "id": "http://hello.album",
@@ -711,6 +717,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock):
     assert track.fid == data["id"]
     assert track.title == data["name"]
     assert track.position == data["position"]
+    assert track.disc_number == data["disc"]
     assert track.creation_date == published
     assert str(track.mbid) == data["musicbrainzId"]
 
@@ -891,7 +898,7 @@ def test_local_actor_serializer_to_ap(factories):
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain="test.federation",
+        domain=models.Domain.objects.create(pk="test.federation"),
         summary=expected["summary"],
         type="Person",
         manually_approves_followers=False,

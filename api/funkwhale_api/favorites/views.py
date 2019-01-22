@@ -1,5 +1,5 @@
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
@@ -20,7 +20,7 @@ class TrackFavoriteViewSet(
     viewsets.GenericViewSet,
 ):
 
-    filter_class = filters.TrackFavoriteFilter
+    filterset_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
     queryset = models.TrackFavorite.objects.all().select_related("user")
     permission_classes = [
@@ -51,7 +51,7 @@ class TrackFavoriteViewSet(
         queryset = queryset.filter(
             fields.privacy_level_query(self.request.user, "user__privacy_level")
         )
-        tracks = Track.objects.annotate_playable_by_actor(
+        tracks = Track.objects.with_playable_uploads(
             music_utils.get_actor_from_request(self.request)
         ).select_related("artist", "album__artist")
         queryset = queryset.prefetch_related(Prefetch("track", queryset=tracks))
@@ -62,7 +62,7 @@ class TrackFavoriteViewSet(
         favorite = models.TrackFavorite.add(track=track, user=self.request.user)
         return favorite
 
-    @list_route(methods=["delete", "post"])
+    @action(methods=["delete", "post"], detail=False)
     def remove(self, request, *args, **kwargs):
         try:
             pk = int(request.data["track"])
@@ -71,3 +71,19 @@ class TrackFavoriteViewSet(
             return Response({}, status=400)
         favorite.delete()
         return Response([], status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=["get"], detail=False)
+    def all(self, request, *args, **kwargs):
+        """
+        Return all the favorites of the current user, with only limited data
+        to have a performant endpoint and avoid lots of queries just to display
+        favorites status in the UI
+        """
+        if not request.user.is_authenticated:
+            return Response({"results": [], "count": 0}, status=200)
+
+        favorites = list(
+            request.user.track_favorites.values("id", "track").order_by("id")
+        )
+        payload = {"results": favorites, "count": len(favorites)}
+        return Response(payload, status=200)

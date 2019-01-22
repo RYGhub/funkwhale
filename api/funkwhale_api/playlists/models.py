@@ -38,22 +38,21 @@ class PlaylistQuerySet(models.QuerySet):
         )
         return self.prefetch_related(plt_prefetch)
 
-    def annotate_playable_by_actor(self, actor):
-        plts = (
-            PlaylistTrack.objects.playable_by(actor)
-            .filter(playlist=models.OuterRef("id"))
-            .order_by("id")
-            .values("id")[:1]
+    def with_playable_plts(self, actor):
+        return self.prefetch_related(
+            models.Prefetch(
+                "playlist_tracks",
+                queryset=PlaylistTrack.objects.playable_by(actor),
+                to_attr="playable_plts",
+            )
         )
-        subquery = models.Subquery(plts)
-        return self.annotate(is_playable_by_actor=subquery)
 
     def playable_by(self, actor, include=True):
         plts = PlaylistTrack.objects.playable_by(actor, include)
         if include:
-            return self.filter(playlist_tracks__in=plts)
+            return self.filter(playlist_tracks__in=plts).distinct()
         else:
-            return self.exclude(playlist_tracks__in=plts)
+            return self.exclude(playlist_tracks__in=plts).distinct()
 
 
 class Playlist(models.Model):
@@ -148,7 +147,7 @@ class Playlist(models.Model):
 
 class PlaylistTrackQuerySet(models.QuerySet):
     def for_nested_serialization(self, actor=None):
-        tracks = music_models.Track.objects.annotate_playable_by_actor(actor)
+        tracks = music_models.Track.objects.with_playable_uploads(actor)
         tracks = tracks.select_related("artist", "album__artist")
         return self.prefetch_related(
             models.Prefetch("track", queryset=tracks, to_attr="_prefetched_track")
@@ -156,8 +155,8 @@ class PlaylistTrackQuerySet(models.QuerySet):
 
     def annotate_playable_by_actor(self, actor):
         tracks = (
-            music_models.Track.objects.playable_by(actor)
-            .filter(pk=models.OuterRef("track"))
+            music_models.Upload.objects.playable_by(actor)
+            .filter(track__pk=models.OuterRef("track"))
             .order_by("id")
             .values("id")[:1]
         )
@@ -167,9 +166,9 @@ class PlaylistTrackQuerySet(models.QuerySet):
     def playable_by(self, actor, include=True):
         tracks = music_models.Track.objects.playable_by(actor, include)
         if include:
-            return self.filter(track__pk__in=tracks)
+            return self.filter(track__pk__in=tracks).distinct()
         else:
-            return self.exclude(track__pk__in=tracks)
+            return self.exclude(track__pk__in=tracks).distinct()
 
 
 class PlaylistTrack(models.Model):

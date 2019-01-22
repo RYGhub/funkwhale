@@ -4,7 +4,7 @@ services:
   postgres:
     restart: unless-stopped
     env_file: .env
-    image: postgres:9.4
+    image: postgres:11
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
@@ -62,12 +62,13 @@ services:
       - redis
 
   nginx:
+    restart: unless-stopped
     image: nginx
     env_file:
       - .env
     environment:
       # Override those variables in your .env file if needed
-      - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-30M}"
+      - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-100M}"
     volumes:
       - "./nginx/funkwhale.template:/etc/nginx/conf.d/funkwhale.template:ro"
       - "./nginx/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro"

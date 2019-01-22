@@ -11,41 +11,42 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from taggit.models import Tag
 
-from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import permissions as common_permissions
+from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
 
-from . import filters, models, serializers, tasks, utils
+from . import filters, licenses, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
 
 
 def get_libraries(filter_uploads):
-    def view(self, request, *args, **kwargs):
+    def libraries(self, request, *args, **kwargs):
         obj = self.get_object()
         actor = utils.get_actor_from_request(request)
         uploads = models.Upload.objects.all()
         uploads = filter_uploads(obj, uploads)
         uploads = uploads.playable_by(actor)
-        libraries = models.Library.objects.filter(
+        qs = models.Library.objects.filter(
             pk__in=uploads.values_list("library", flat=True)
-        )
-        libraries = libraries.select_related("actor")
-        page = self.paginate_queryset(libraries)
+        ).annotate(_uploads_count=Count("uploads"))
+        qs = qs.select_related("actor")
+        page = self.paginate_queryset(qs)
         if page is not None:
             serializer = federation_api_serializers.LibrarySerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = federation_api_serializers.LibrarySerializer(libraries, many=True)
+        serializer = federation_api_serializers.LibrarySerializer(qs, many=True)
         return Response(serializer.data)
 
-    return view
+    return libraries
 
 
 class TagViewSetMixin(object):
@@ -61,7 +62,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.ArtistFilter
+    filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
     def get_queryset(self):
@@ -70,9 +71,9 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
-        return queryset.prefetch_related(Prefetch("albums", queryset=albums)).distinct()
+        return queryset.prefetch_related(Prefetch("albums", queryset=albums))
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(
             filter_uploads=lambda o, uploads: uploads.filter(
                 Q(track__artist=o) | Q(track__album__artist=o)
@@ -88,25 +89,19 @@ class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.AlbumSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
     ordering_fields = ("creation_date", "release_date", "title")
-    filter_class = filters.AlbumFilter
+    filterset_class = filters.AlbumFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        tracks = models.Track.objects.annotate_playable_by_actor(
-            utils.get_actor_from_request(self.request)
-        ).select_related("artist")
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single album, so we can add the overhead
-            # to fetch additional data
-            tracks = tracks.annotate_duration()
+        tracks = (
+            models.Track.objects.select_related("artist")
+            .with_playable_uploads(utils.get_actor_from_request(self.request))
+            .order_for_album()
+        )
         qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
-        return qs.distinct()
+        return qs
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
     )
 
@@ -149,7 +144,9 @@ class LibraryViewSet(
         )
         instance.delete()
 
-    @detail_route(methods=["get"])
+    follows = action
+
+    @action(methods=["get"], detail=True)
     @transaction.non_atomic_requests
     def follows(self, request, *args, **kwargs):
         library = self.get_object()
@@ -177,7 +174,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
-    filter_class = filters.TrackFilter
+    filterset_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
         "title",
@@ -193,20 +190,12 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         if user.is_authenticated and filter_favorites == "true":
             queryset = queryset.filter(track_favorites__user=user)
 
-        queryset = queryset.annotate_playable_by_actor(
+        queryset = queryset.with_playable_uploads(
             utils.get_actor_from_request(self.request)
-        ).annotate_duration()
-        if (
-            hasattr(self, "kwargs")
-            and self.kwargs
-            and self.request.method.lower() == "get"
-        ):
-            # we are detailing a single track, so we can add the overhead
-            # to fetch additional data
-            queryset = queryset.annotate_file_data()
-        return queryset.distinct()
+        )
+        return queryset
 
-    @detail_route(methods=["get"])
+    @action(methods=["get"], detail=True)
     @transaction.non_atomic_requests
     def lyrics(self, request, *args, **kwargs):
         try:
@@ -231,7 +220,7 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
         serializer = serializers.LyricsSerializer(lyrics)
         return Response(serializer.data)
 
-    libraries = detail_route(methods=["get"])(
+    libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
     )
 
@@ -267,12 +256,31 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def handle_serve(upload, user):
+def should_transcode(upload, format):
+    if not preferences.get("music__transcoding_enabled"):
+        return False
+    if format is None:
+        return False
+    if format not in utils.EXTENSION_TO_MIMETYPE:
+        # format should match supported formats
+        return False
+    if upload.mimetype is None:
+        # upload should have a mimetype, otherwise we cannot transcode
+        return False
+    if upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
+        # requested format sould be different than upload mimetype, otherwise
+        # there is no need to transcode
+        return False
+    return True
+
+
+def handle_serve(upload, user, format=None):
     f = upload
     # we update the accessed_date
-    f.accessed_date = timezone.now()
-    f.save(update_fields=["accessed_date"])
-
+    now = timezone.now()
+    upload.accessed_date = now
+    upload.save(update_fields=["accessed_date"])
+    f = upload
     if f.audio_file:
         file_path = get_file_path(f.audio_file)
 
@@ -298,6 +306,14 @@ def handle_serve(upload, user):
     elif f.source and f.source.startswith("file://"):
         file_path = get_file_path(f.source.replace("file://", "", 1))
     mt = f.mimetype
+
+    if should_transcode(f, format):
+        transcoded_version = upload.get_transcoded_version(format)
+        transcoded_version.accessed_date = now
+        transcoded_version.save(update_fields=["accessed_date"])
+        f = transcoded_version
+        file_path = get_file_path(f.audio_file)
+        mt = f.mimetype
     if mt:
         response = Response(content_type=mt)
     else:
@@ -337,7 +353,8 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         if not upload:
             return Response(status=404)
 
-        return handle_serve(upload, user=request.user)
+        format = request.GET.get("to")
+        return handle_serve(upload, user=request.user, format=format)
 
 
 class UploadViewSet(
@@ -360,7 +377,7 @@ class UploadViewSet(
     ]
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
-    filter_class = filters.UploadFilter
+    filterset_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
         "import_date",
@@ -373,7 +390,7 @@ class UploadViewSet(
         qs = super().get_queryset()
         return qs.filter(library__actor=self.request.user.actor)
 
-    @list_route(methods=["post"])
+    @action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.UploadActionSerializer(request.data, queryset=queryset)
@@ -433,28 +450,29 @@ class Search(views.APIView):
             "artist__name__unaccent",
         ]
         query_obj = utils.get_query(query, search_fields)
-        return (
+        qs = (
             models.Track.objects.all()
             .filter(query_obj)
             .select_related("artist", "album__artist")
-        )[: self.max_results]
+        )
+        return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_albums(self, query):
         search_fields = ["mbid", "title__unaccent", "artist__name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-        return (
+        qs = (
             models.Album.objects.all()
             .filter(query_obj)
             .select_related()
-            .prefetch_related("tracks")
-        )[: self.max_results]
+            .prefetch_related("tracks__artist")
+        )
+        return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_artists(self, query):
         search_fields = ["mbid", "name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-        return (models.Artist.objects.all().filter(query_obj).with_albums())[
-            : self.max_results
-        ]
+        qs = models.Artist.objects.all().filter(query_obj).with_albums()
+        return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):
         search_fields = ["slug", "name__unaccent"]
@@ -468,3 +486,38 @@ class Search(views.APIView):
         )
 
         return qs.filter(query_obj)[: self.max_results]
+
+
+class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [common_permissions.ConditionalAuthentication]
+    serializer_class = serializers.LicenseSerializer
+    queryset = models.License.objects.all().order_by("code")
+    lookup_value_regex = ".*"
+
+    def get_queryset(self):
+        # ensure our licenses are up to date in DB
+        licenses.load(licenses.LICENSES)
+        return super().get_queryset()
+
+    def get_serializer(self, *args, **kwargs):
+        if len(args) == 0:
+            return super().get_serializer(*args, **kwargs)
+
+        # our serializer works with license dict, not License instances
+        # so we pass those instead
+        instance_or_qs = args[0]
+        try:
+            first_arg = instance_or_qs.conf
+        except AttributeError:
+            first_arg = [i.conf for i in instance_or_qs if i.conf]
+        return super().get_serializer(*((first_arg,) + args[1:]), **kwargs)
+
+
+class OembedView(views.APIView):
+    permission_classes = [common_permissions.ConditionalAuthentication]
+
+    def get(self, request, *args, **kwargs):
+        serializer = serializers.OembedSerializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        embed_data = serializer.save()
+        return Response(embed_data)

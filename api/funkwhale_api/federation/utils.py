@@ -3,7 +3,9 @@ import re
 from django.conf import settings
 
 from funkwhale_api.common import session
+from funkwhale_api.moderation import models as moderation_models
 
+from . import exceptions
 from . import signing
 
 
@@ -58,7 +60,14 @@ def slugify_username(username):
     return re.sub(r"[-\s]+", "_", value)
 
 
-def retrieve(fid, actor=None, serializer_class=None, queryset=None):
+def retrieve_ap_object(
+    fid, actor=None, serializer_class=None, queryset=None, apply_instance_policies=True
+):
+    from . import activity
+
+    policies = moderation_models.InstancePolicy.objects.active().filter(block_all=True)
+    if apply_instance_policies and policies.matching_url(fid):
+        raise exceptions.BlockedActorOrDomain()
     if queryset:
         try:
             # queryset can also be a Model class
@@ -83,6 +92,16 @@ def retrieve(fid, actor=None, serializer_class=None, queryset=None):
     )
     response.raise_for_status()
     data = response.json()
+
+    # we match against moderation policies here again, because the FID of the returned
+    # object may not be the same as the URL used to access it
+    try:
+        id = data["id"]
+    except KeyError:
+        pass
+    else:
+        if apply_instance_policies and activity.should_reject(id=id, payload=data):
+            raise exceptions.BlockedActorOrDomain()
     if not serializer_class:
         return data
     serializer = serializer_class(data=data)

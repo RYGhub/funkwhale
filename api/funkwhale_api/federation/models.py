@@ -13,6 +13,7 @@ from django.urls import reverse
 
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import validators as common_validators
 from funkwhale_api.music import utils as music_utils
 
 from . import utils as federation_utils
@@ -61,6 +62,83 @@ class ActorQuerySet(models.QuerySet):
 
         return qs
 
+    def with_uploads_count(self):
+        return self.annotate(
+            uploads_count=models.Count("libraries__uploads", distinct=True)
+        )
+
+
+class DomainQuerySet(models.QuerySet):
+    def external(self):
+        return self.exclude(pk=settings.FEDERATION_HOSTNAME)
+
+    def with_actors_count(self):
+        return self.annotate(actors_count=models.Count("actors", distinct=True))
+
+    def with_outbox_activities_count(self):
+        return self.annotate(
+            outbox_activities_count=models.Count(
+                "actors__outbox_activities", distinct=True
+            )
+        )
+
+
+class Domain(models.Model):
+    name = models.CharField(
+        primary_key=True,
+        max_length=255,
+        validators=[common_validators.DomainValidator()],
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
+    nodeinfo = JSONField(default=empty_dict, max_length=50000, blank=True)
+
+    objects = DomainQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
+
+    def save(self, **kwargs):
+        lowercase_fields = ["name"]
+        for field in lowercase_fields:
+            v = getattr(self, field, None)
+            if v:
+                setattr(self, field, v.lower())
+
+        super().save(**kwargs)
+
+    def get_stats(self):
+        from funkwhale_api.music import models as music_models
+
+        data = Domain.objects.filter(pk=self.pk).aggregate(
+            actors=models.Count("actors", distinct=True),
+            outbox_activities=models.Count("actors__outbox_activities", distinct=True),
+            libraries=models.Count("actors__libraries", distinct=True),
+            received_library_follows=models.Count(
+                "actors__libraries__received_follows", distinct=True
+            ),
+            emitted_library_follows=models.Count(
+                "actors__library_follows", distinct=True
+            ),
+        )
+        data["artists"] = music_models.Artist.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+        data["albums"] = music_models.Album.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+        data["tracks"] = music_models.Track.objects.filter(
+            from_activity__actor__domain_id=self.pk
+        ).count()
+
+        uploads = music_models.Upload.objects.filter(library__actor__domain_id=self.pk)
+        data["uploads"] = uploads.count()
+        data["media_total_size"] = uploads.aggregate(v=models.Sum("size"))["v"] or 0
+        data["media_downloaded_size"] = (
+            uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
+        )
+        return data
+
 
 class Actor(models.Model):
     ap_type = "Actor"
@@ -74,7 +152,7 @@ class Actor(models.Model):
     shared_inbox_url = models.URLField(max_length=500, null=True, blank=True)
     type = models.CharField(choices=TYPE_CHOICES, default="Person", max_length=25)
     name = models.CharField(max_length=200, null=True, blank=True)
-    domain = models.CharField(max_length=1000)
+    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name="actors")
     summary = models.CharField(max_length=500, null=True, blank=True)
     preferred_username = models.CharField(max_length=200, null=True, blank=True)
     public_key = models.TextField(max_length=5000, null=True, blank=True)
@@ -105,41 +183,14 @@ class Actor(models.Model):
 
     @property
     def full_username(self):
-        return "{}@{}".format(self.preferred_username, self.domain)
+        return "{}@{}".format(self.preferred_username, self.domain_id)
 
     def __str__(self):
-        return "{}@{}".format(self.preferred_username, self.domain)
-
-    def save(self, **kwargs):
-        lowercase_fields = ["domain"]
-        for field in lowercase_fields:
-            v = getattr(self, field, None)
-            if v:
-                setattr(self, field, v.lower())
-
-        super().save(**kwargs)
+        return "{}@{}".format(self.preferred_username, self.domain_id)
 
     @property
     def is_local(self):
-        return self.domain == settings.FEDERATION_HOSTNAME
-
-    @property
-    def is_system(self):
-        from . import actors
-
-        return all(
-            [
-                settings.FEDERATION_HOSTNAME == self.domain,
-                self.preferred_username in actors.SYSTEM_ACTORS,
-            ]
-        )
-
-    @property
-    def system_conf(self):
-        from . import actors
-
-        if self.is_system:
-            return actors.SYSTEM_ACTORS[self.preferred_username]
+        return self.domain_id == settings.FEDERATION_HOSTNAME
 
     def get_approved_followers(self):
         follows = self.received_follows.filter(approved=True)
@@ -162,6 +213,44 @@ class Actor(models.Model):
 
         data["total"] = sum(data.values())
         return data
+
+    def get_stats(self):
+        from funkwhale_api.music import models as music_models
+
+        data = Actor.objects.filter(pk=self.pk).aggregate(
+            outbox_activities=models.Count("outbox_activities", distinct=True),
+            libraries=models.Count("libraries", distinct=True),
+            received_library_follows=models.Count(
+                "libraries__received_follows", distinct=True
+            ),
+            emitted_library_follows=models.Count("library_follows", distinct=True),
+        )
+        data["artists"] = music_models.Artist.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+        data["albums"] = music_models.Album.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+        data["tracks"] = music_models.Track.objects.filter(
+            from_activity__actor=self.pk
+        ).count()
+
+        uploads = music_models.Upload.objects.filter(library__actor=self.pk)
+        data["uploads"] = uploads.count()
+        data["media_total_size"] = uploads.aggregate(v=models.Sum("size"))["v"] or 0
+        data["media_downloaded_size"] = (
+            uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
+        )
+        return data
+
+    @property
+    def keys(self):
+        return self.private_key, self.public_key
+
+    @keys.setter
+    def keys(self, v):
+        self.private_key = v[0].decode("utf-8")
+        self.public_key = v[1].decode("utf-8")
 
 
 class InboxItem(models.Model):

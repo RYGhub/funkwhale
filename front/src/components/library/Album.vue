@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <main>
     <div v-if="isLoading" class="ui vertical segment" v-title="">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
     <template v-if="album">
-      <div :class="['ui', 'head', {'with-background': album.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
+      <section :class="['ui', 'head', {'with-background': album.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted sound yellow icon"></i>
@@ -30,92 +30,164 @@
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
-            <i class="wikipedia icon"></i>
+            <i class="wikipedia w icon"></i>
             <translate>Search on Wikipedia</translate>
           </a>
-          <a :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
             <translate>View on MusicBrainz</translate>
           </a>
+          <template v-if="publicLibraries.length > 0">
+            <button
+              @click="showEmbedModal = !showEmbedModal"
+              class="ui button">
+              <i class="code icon"></i>
+              <translate>Embed</translate>
+            </button>
+            <modal :show.sync="showEmbedModal">
+              <div class="header">
+                <translate>Embed this album on your website</translate>
+              </div>
+              <div class="content">
+                <div class="description">
+                  <embed-wizard type="album" :id="album.id" />
+
+                </div>
+              </div>
+              <div class="actions">
+                <div class="ui deny button">
+                  <translate>Cancel</translate>
+                </div>
+              </div>
+            </modal>
+          </template>
         </div>
-      </div>
-      <div class="ui vertical stripe segment">
-        <h2>
-          <translate>Tracks</translate>
-        </h2>
-        <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
-      </div>
-      <div class="ui vertical stripe segment">
+      </section>
+      <template v-if="discs && discs.length > 1">
+        <section v-for="(tracks, disc_number) in discs" class="ui vertical stripe segment">
+          <translate
+            tag="h2"
+            class="left floated"
+            :translate-params="{number: disc_number + 1}"
+          >Volume %{ number }</translate>
+          <play-button class="right floated orange" :tracks="tracks">
+            <translate>Play all</translate>
+          </play-button>
+          <track-table :artist="album.artist" :display-position="true" :tracks="tracks"></track-table>
+        </section>
+      </template>
+      <template v-else>
+        <section class="ui vertical stripe segment">
+          <h2>
+            <translate>Tracks</translate>
+          </h2>
+          <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
+        </section>
+      </template>
+      <section class="ui vertical stripe segment">
         <h2>
           <translate>User libraries</translate>
         </h2>
-        <library-widget :url="'albums/' + id + '/libraries/'">
+        <library-widget @loaded="libraries = $event" :url="'albums/' + id + '/libraries/'">
           <translate slot="subtitle">This album is present in the following libraries:</translate>
         </library-widget>
-      </div>
+      </section>
     </template>
-  </div>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import logger from '@/logging'
-import backend from '@/audio/backend'
-import PlayButton from '@/components/audio/PlayButton'
-import TrackTable from '@/components/audio/track/Table'
-import LibraryWidget from '@/components/federation/LibraryWidget'
+import axios from "axios"
+import logger from "@/logging"
+import backend from "@/audio/backend"
+import PlayButton from "@/components/audio/PlayButton"
+import TrackTable from "@/components/audio/track/Table"
+import LibraryWidget from "@/components/federation/LibraryWidget"
+import EmbedWizard from "@/components/audio/EmbedWizard"
+import Modal from '@/components/semantic/Modal'
 
-const FETCH_URL = 'albums/'
+const FETCH_URL = "albums/"
+
+function groupByDisc(acc, track) {
+  var dn = track.disc_number - 1
+  if (dn < 0) dn = 0
+  if (acc[dn] == undefined) {
+    acc.push([track])
+  } else {
+    acc[dn].push(track)
+  }
+  return acc
+}
 
 export default {
-  props: ['id'],
+  props: ["id"],
   components: {
     PlayButton,
     TrackTable,
-    LibraryWidget
+    LibraryWidget,
+    EmbedWizard,
+    Modal
   },
-  data () {
+  data() {
     return {
       isLoading: true,
-      album: null
+      album: null,
+      discs: [],
+      libraries: [],
+      showEmbedModal: false
     }
   },
-  created () {
+  created() {
     this.fetchData()
   },
   methods: {
-    fetchData () {
+    fetchData() {
       var self = this
       this.isLoading = true
-      let url = FETCH_URL + this.id + '/'
+      let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching album "' + this.id + '"')
-      axios.get(url).then((response) => {
+      axios.get(url).then(response => {
         self.album = backend.Album.clean(response.data)
+        self.discs = self.album.tracks.reduce(groupByDisc, [])
         self.isLoading = false
       })
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        title: this.$gettext('Album')
+        title: this.$gettext("Album")
       }
     },
-    wikipediaUrl () {
-      return 'https://en.wikipedia.org/w/index.php?search=' + this.album.title + ' ' + this.album.artist.name
+    publicLibraries () {
+      return this.libraries.filter(l => {
+        return l.privacy_level === 'everyone'
+      })
     },
-    musicbrainzUrl () {
-      return 'https://musicbrainz.org/release/' + this.album.mbid
+    wikipediaUrl() {
+      return (
+        "https://en.wikipedia.org/w/index.php?search=" +
+        encodeURI(this.album.title + " " + this.album.artist.name)
+      )
     },
-    headerStyle () {
+    musicbrainzUrl() {
+      if (this.album.mbid) {
+        return "https://musicbrainz.org/release/" + this.album.mbid
+      }
+    },
+    headerStyle() {
       if (!this.album.cover.original) {
-        return ''
+        return ""
       }
-      return 'background-image: url(' + this.$store.getters['instance/absoluteUrl'](this.album.cover.original) + ')'
+      return (
+        "background-image: url(" +
+        this.$store.getters["instance/absoluteUrl"](this.album.cover.original) +
+        ")"
+      )
     }
   },
   watch: {
-    id () {
+    id() {
       this.fetchData()
     }
   }
@@ -124,5 +196,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 </style>

@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers, views
 
 
@@ -10,6 +12,9 @@ from funkwhale_api.manage import serializers, views
         (views.ManageUploadViewSet, ["library"], "and"),
         (views.ManageUserViewSet, ["settings"], "and"),
         (views.ManageInvitationViewSet, ["settings"], "and"),
+        (views.ManageDomainViewSet, ["moderation"], "and"),
+        (views.ManageActorViewSet, ["moderation"], "and"),
+        (views.ManageInstancePolicyViewSet, ["moderation"], "and"),
     ],
 )
 def test_permissions(assert_user_permission, view, permissions, operator):
@@ -64,3 +69,93 @@ def test_invitation_view_create(factories, superuser_api_client, mocker):
 
     assert response.status_code == 201
     assert superuser_api_client.user.invitations.latest("id") is not None
+
+
+def test_domain_list(factories, superuser_api_client, settings):
+    factories["federation.Domain"](pk=settings.FEDERATION_HOSTNAME)
+    d = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == d.pk
+
+
+def test_domain_detail(factories, superuser_api_client):
+    d = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": d.name})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["name"] == d.pk
+
+
+def test_domain_create(superuser_api_client):
+    url = reverse("api:v1:manage:federation:domains-list")
+    response = superuser_api_client.post(url, {"name": "test.federation"})
+
+    assert response.status_code == 201
+    assert federation_models.Domain.objects.filter(pk="test.federation").exists()
+
+
+def test_domain_nodeinfo(factories, superuser_api_client, mocker):
+    domain = factories["federation.Domain"]()
+    url = reverse(
+        "api:v1:manage:federation:domains-nodeinfo", kwargs={"pk": domain.name}
+    )
+    mocker.patch.object(
+        federation_tasks, "fetch_nodeinfo", return_value={"hello": "world"}
+    )
+    update_domain_nodeinfo = mocker.spy(federation_tasks, "update_domain_nodeinfo")
+    response = superuser_api_client.get(url)
+    assert response.status_code == 200
+    assert response.data == {"status": "ok", "payload": {"hello": "world"}}
+
+    update_domain_nodeinfo.assert_called_once_with(domain_name=domain.name)
+
+
+def test_domain_stats(factories, superuser_api_client, mocker):
+    domain = factories["federation.Domain"]()
+    mocker.patch.object(domain.__class__, "get_stats", return_value={"hello": "world"})
+    url = reverse("api:v1:manage:federation:domains-stats", kwargs={"pk": domain.name})
+    response = superuser_api_client.get(url)
+    assert response.status_code == 200
+    assert response.data == {"hello": "world"}
+
+
+def test_actor_list(factories, superuser_api_client, settings):
+    actor = factories["federation.Actor"]()
+    url = reverse("api:v1:manage:accounts-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == actor.id
+
+
+def test_actor_detail(factories, superuser_api_client):
+    actor = factories["federation.Actor"]()
+    url = reverse("api:v1:manage:accounts-detail", kwargs={"pk": actor.full_username})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == actor.id
+
+
+def test_instance_policy_create(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    actor = superuser_api_client.user.create_actor()
+    url = reverse("api:v1:manage:moderation:instance-policies-list")
+    response = superuser_api_client.post(
+        url,
+        {"target": {"type": "domain", "id": domain.name}, "block_all": True},
+        format="json",
+    )
+
+    assert response.status_code == 201
+
+    policy = domain.instance_policy
+    assert policy.actor == actor

@@ -11,7 +11,7 @@
             <tbody>
               <tr v-for="album in albums">
                 <td>
-                  <img class="ui mini image" v-if="album.cover.original" :src="$store.getters['instance/absoluteUrl'](album.cover.small_square_crop)">
+                  <img class="ui mini image" v-if="album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](album.cover.small_square_crop)">
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">
@@ -82,5 +82,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

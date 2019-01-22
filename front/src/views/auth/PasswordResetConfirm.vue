@@ -1,6 +1,6 @@
 <template>
-  <div class="main pusher" v-title="labels.changePassword">
-    <div class="ui vertical stripe segment">
+  <main class="main pusher" v-title="labels.changePassword">
+    <section class="ui vertical stripe segment">
       <div class="ui small text container">
         <h2><translate>Change your password</translate></h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
@@ -33,22 +33,22 @@
           </router-link>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 </template>
 
 <script>
-import axios from 'axios'
-import PasswordInput from '@/components/forms/PasswordInput'
+import axios from "axios"
+import PasswordInput from "@/components/forms/PasswordInput"
 
 export default {
-  props: ['defaultToken', 'defaultUid'],
+  props: ["defaultToken", "defaultUid"],
   components: {
     PasswordInput
   },
-  data () {
+  data() {
     return {
-      newPassword: '',
+      newPassword: "",
       isLoading: false,
       errors: [],
       token: this.defaultToken,
@@ -57,14 +57,14 @@ export default {
     }
   },
   computed: {
-    labels () {
+    labels() {
       return {
-        changePassword: this.$gettext('Change your password')
+        changePassword: this.$gettext("Change your password")
       }
     }
   },
   methods: {
-    submit () {
+    submit() {
       let self = this
       self.isLoading = true
       self.errors = []
@@ -74,16 +74,18 @@ export default {
         new_password1: this.newPassword,
         new_password2: this.newPassword
       }
-      return axios.post('auth/password/reset/confirm/', payload).then(response => {
-        self.isLoading = false
-        self.success = true
-      }, error => {
-        self.errors = error.backendErrors
-        self.isLoading = false
-      })
+      return axios.post("auth/password/reset/confirm/", payload).then(
+        response => {
+          self.isLoading = false
+          self.success = true
+        },
+        error => {
+          self.errors = error.backendErrors
+          self.isLoading = false
+        }
+      )
     }
   }
-
 }
 </script>
 

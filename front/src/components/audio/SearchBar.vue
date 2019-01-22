@@ -17,7 +17,7 @@ export default {
   computed: {
     labels () {
       return {
-        placeholder: this.$gettext('Search for artists, albums, tracks...')
+        placeholder: this.$gettext('Search for artists, albums, tracks…')
       }
     }
   },

@@ -7,7 +7,7 @@
     <div class="ui attached segment">
       <template v-if="status === 'loading'">
         <div class="ui active tiny inline loader"></div>
-        <translate>Syncing changes to server...</translate>
+        <translate>Syncing changes to server…</translate>
       </template>
       <template v-else-if="status === 'errored'">
         <i class="red close icon"></i>

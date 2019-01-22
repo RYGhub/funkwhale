@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 from funkwhale_api.federation import serializers as federation_serializers
-from funkwhale_api.music import metadata, signals, tasks
+from funkwhale_api.music import licenses, metadata, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,19 +23,27 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
         "album": "Test album",
         "date": datetime.date(2012, 8, 15),
         "track_number": 4,
+        "disc_number": 2,
+        "license": "Hello world: http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "2018 Someone",
     }
     mocker.patch("funkwhale_api.music.metadata.Metadata.all", return_value=metadata)
+    match_license = mocker.spy(licenses, "match")
 
     track = tasks.get_track_from_import_metadata(metadata)
 
     assert track.title == metadata["title"]
     assert track.mbid is None
     assert track.position == 4
+    assert track.disc_number == 2
+    assert track.license.code == "cc-by-sa-4.0"
+    assert track.copyright == metadata["copyright"]
     assert track.album.title == metadata["album"]
     assert track.album.mbid is None
     assert track.album.release_date == datetime.date(2012, 8, 15)
     assert track.artist.name == metadata["artist"]
     assert track.artist.mbid is None
+    match_license.assert_called_once_with(metadata["license"], metadata["copyright"])
 
 
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
@@ -60,6 +68,7 @@ def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     assert track.title == metadata["title"]
     assert track.mbid == metadata["musicbrainz_recordingid"]
     assert track.position == 4
+    assert track.disc_number is None
     assert track.album.title == metadata["album"]
     assert track.album.mbid == metadata["musicbrainz_albumid"]
     assert track.album.artist.mbid == metadata["musicbrainz_albumartistid"]
@@ -396,7 +405,10 @@ def test_federation_audio_track_to_metadata(now):
         "musicbrainzId": str(uuid.uuid4()),
         "name": "Black in back",
         "position": 5,
+        "disc": 2,
         "published": published.isoformat(),
+        "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "2018 Someone",
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -433,6 +445,9 @@ def test_federation_audio_track_to_metadata(now):
         "title": payload["name"],
         "date": released,
         "track_number": payload["position"],
+        "disc_number": payload["disc"],
+        "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "2018 Someone",
         # musicbrainz
         "musicbrainz_albumid": payload["album"]["musicbrainzId"],
         "musicbrainz_recordingid": payload["musicbrainzId"],
@@ -546,3 +561,20 @@ def test_scan_page_trigger_next_page_scan_skip_if_same(mocker, factories, r_mock
     scan.refresh_from_db()
 
     assert scan.status == "finished"
+
+
+def test_clean_transcoding_cache(preferences, now, factories):
+    preferences["music__transcoding_cache_duration"] = 60
+    u1 = factories["music.UploadVersion"](
+        accessed_date=now - datetime.timedelta(minutes=61)
+    )
+    u2 = factories["music.UploadVersion"](
+        accessed_date=now - datetime.timedelta(minutes=59)
+    )
+
+    tasks.clean_transcoding_cache()
+
+    u2.refresh_from_db()
+
+    with pytest.raises(u1.__class__.DoesNotExist):
+        u1.refresh_from_db()

@@ -1,5 +1,5 @@
 import logger from '@/logging'
-import _ from 'lodash'
+import _ from '@/lodash'
 
 export default {
   namespaced: true,
@@ -59,7 +59,7 @@ export default {
     isEmpty: state => state.tracks.length === 0
   },
   actions: {
-    append ({commit, state, dispatch}, {track, index, skipPlay}) {
+    append ({commit, state, dispatch}, {track, index}) {
       index = index || state.tracks.length
       if (index > state.tracks.length - 1) {
         // we simply push to the end
@@ -68,27 +68,30 @@ export default {
         // we insert the track at given position
         commit('insert', {track, index})
       }
-      if (!skipPlay) {
-        dispatch('resume')
-      }
     },
 
-    appendMany ({state, dispatch}, {tracks, index, callback}) {
+    appendMany ({state, commit, dispatch}, {tracks, index, callback}) {
       logger.default.info('Appending many tracks to the queue', tracks.map(e => { return e.title }))
+      let shouldPlay = false
       if (state.tracks.length === 0) {
         index = 0
+        shouldPlay = true
       } else {
         index = index || state.tracks.length
       }
       let total = tracks.length
       tracks.forEach((t, i) => {
-        let p = dispatch('append', {track: t, index: index, skipPlay: true})
+        let p = dispatch('append', {track: t, index: index})
         index += 1
         if (callback && i + 1 === total) {
           p.then(callback)
         }
+        if (shouldPlay && p && i + 1 === total) {
+          p.then(() => {
+            dispatch('next')
+          })
+        }
       })
-      dispatch('resume')
     },
 
     cleanTrack ({state, dispatch, commit}, index) {
@@ -110,11 +113,6 @@ export default {
       }
     },
 
-    resume ({state, dispatch, rootState}) {
-      if (state.ended | rootState.player.errored) {
-        dispatch('next')
-      }
-    },
     previous ({state, dispatch, rootState}) {
       if (state.currentIndex > 0 && rootState.player.currentTime < 3) {
         dispatch('currentIndex', state.currentIndex - 1)
@@ -135,11 +133,13 @@ export default {
         }
       }
     },
+    last ({state, dispatch}) {
+      dispatch('currentIndex', state.tracks.length - 1)
+    },
     currentIndex ({commit, state, rootState, dispatch}, index) {
       commit('ended', false)
       commit('player/currentTime', 0, {root: true})
       commit('player/playing', true, {root: true})
-      commit('player/errored', false, {root: true})
       commit('currentIndex', index)
       if (state.tracks.length - index <= 2 && rootState.radios.running) {
         dispatch('radios/populateQueue', null, {root: true})

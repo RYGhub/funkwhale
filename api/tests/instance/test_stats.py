@@ -1,10 +1,15 @@
+import datetime
+
 from funkwhale_api.instance import stats
 
 
-def test_get_users(mocker):
-    mocker.patch("funkwhale_api.users.models.User.objects.count", return_value=42)
-
-    assert stats.get_users() == 42
+def test_get_users(factories, now):
+    factories["users.User"](last_activity=now)
+    factories["users.User"](last_activity=now - datetime.timedelta(days=29))
+    factories["users.User"](last_activity=now - datetime.timedelta(days=31))
+    factories["users.User"](last_activity=now - datetime.timedelta(days=190))
+    factories["users.User"](is_active=False)
+    assert stats.get_users() == {"total": 4, "active_month": 2, "active_halfyear": 3}
 
 
 def test_get_music_duration(factories):

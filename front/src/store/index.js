@@ -34,7 +34,7 @@ export default new Vuex.Store({
     }),
     createPersistedState({
       key: 'instance',
-      paths: ['instance.events', 'instance.instanceUrl']
+      paths: ['instance.events', 'instance.instanceUrl', 'instance.knownInstances']
     }),
     createPersistedState({
       key: 'ui',
@@ -79,6 +79,7 @@ export default new Vuex.Store({
                 id: track.id,
                 title: track.title,
                 mbid: track.mbid,
+                uploads: track.uploads,
                 listen_url: track.listen_url,
                 album: {
                   id: track.album.id,

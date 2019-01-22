@@ -26,6 +26,8 @@ to the ``/music`` directory on the container:
     docker-compose run --rm api python manage.py import_files $LIBRARY_ID "/music/**/*.ogg" --recursive --noinput
 
 .. note::
+    You'll have to create a library in the Web UI before to get your library ID. Simply visit
+    https://yourdomain/content/libraries/ to create one.
 
     Library IDs are available in library urls or sharing link. In this example:
     https://funkwhale.instance/content/libraries/769a2ae3-eb3d-4aff-9f94-2c4d80d5c2d1,
@@ -89,7 +91,7 @@ configuration options to ensure the webserver can serve them properly:
 
 We recommend you symlink all your music directories into ``/srv/funkwhale/data/music``
 and run the `import_files` command from that directory. This will make it possible
-to use multiple music music directories, without any additional configuration
+to use multiple music directories, without any additional configuration
 on the webserver side.
 
 For instance, if you have a NFS share with your music mounted at ``/media/mynfsshare``,

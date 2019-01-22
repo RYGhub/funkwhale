@@ -3,10 +3,13 @@ from django.utils.deconstruct import deconstructible
 import os
 import shutil
 import uuid
+import xml.etree.ElementTree as ET
 
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-from django.db import transaction
+from django.conf import settings
+from django import urls
+from django.db import models, transaction
 
 
 def rename_file(instance, field_name, new_name, allow_missing_file=False):
@@ -107,3 +110,40 @@ def chunk_queryset(source_qs, chunk_size):
 
         if nb_items < chunk_size:
             return
+
+
+def join_url(start, end):
+    if start.endswith("/") and end.startswith("/"):
+        return start + end[1:]
+
+    if not start.endswith("/") and not end.startswith("/"):
+        return start + "/" + end
+
+    return start + end
+
+
+def spa_reverse(name, args=[], kwargs={}):
+    return urls.reverse(name, urlconf=settings.SPA_URLCONF, args=args, kwargs=kwargs)
+
+
+def spa_resolve(path):
+    return urls.resolve(path, urlconf=settings.SPA_URLCONF)
+
+
+def parse_meta(html):
+    # dirty but this is only for testing so we don't really care,
+    # we convert the html string to xml so it can be parsed as xml
+    html = '<?xml version="1.0"?>' + html
+    tree = ET.fromstring(html)
+
+    meta = [elem for elem in tree.iter() if elem.tag in ["meta", "link"]]
+
+    return [dict([("tag", elem.tag)] + list(elem.items())) for elem in meta]
+
+
+def order_for_search(qs, field):
+    """
+    When searching, it's often more useful to have short results first,
+    this function will order the given qs based on the length of the given field
+    """
+    return qs.annotate(__size=models.functions.Length(field)).order_by("__size")

@@ -1,6 +1,7 @@
 import mimetypes
 from os.path import splitext
 
+from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from django.template.defaultfilters import filesizeformat
@@ -150,3 +151,17 @@ class FileValidator(object):
             }
 
             raise ValidationError(message)
+
+
+class DomainValidator(validators.URLValidator):
+    message = "Enter a valid domain name."
+
+    def __call__(self, value):
+        """
+        This is a bit hackish but since we don't have any built-in domain validator,
+        we use the url one, and prepend http:// in front of it.
+
+        If it fails, we know the domain is not valid.
+        """
+        super().__call__("http://{}".format(value))
+        return value
