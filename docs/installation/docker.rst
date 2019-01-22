@@ -119,6 +119,12 @@ Multi-container installation
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ installed.
 
+Export the version you want to deploy:
+
+.. parsed-literal::
+
+    export FUNKWHALE_VERSION="|version|"
+
 Download the sample docker-compose file:
 
 .. parsed-literal::
@@ -126,9 +132,9 @@ Download the sample docker-compose file:
     mkdir /srv/funkwhale
     cd /srv/funkwhale
     mkdir nginx
-    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/funkwhale_proxy.conf"
-    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/docker-compose.yml"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
 
 At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
@@ -136,7 +142,6 @@ At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
     .
     ├── docker-compose.yml
-    ├── .env
     └── nginx
         ├── funkwhale_proxy.conf
         └── funkwhale.template
@@ -145,8 +150,7 @@ Create your env file:
 
 .. parsed-literal::
 
-    export FUNKWHALE_VERSION="|version|"
-    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
+    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
     sudo nano .env
 
