@@ -1,2 +1,0 @@
-Improved front-end performance by stripping unused dependencies, reducing bundle size
-and enabling gzip compression

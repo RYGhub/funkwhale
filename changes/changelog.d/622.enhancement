@@ -1,2 +1,0 @@
-More resilient date parsing during audio import, will not crash anymore on
-invalid dates (#622)
