@@ -13,22 +13,27 @@ dependencies. However, Funkwhale requires a
 :doc:`few external dependencies <./external_dependencies>` for which
 documentation is outside of this document scope.
 
-Install utilities
------------------
+Install system dependencies
+---------------------------
 
-You'll need a few utilities during this guide that are not always present by
-default on system. On Debian-like systems, you can install them using:
+On Debian-like systems, you can install them using:
 
 .. code-block:: shell
 
     sudo apt-get update
+    # Install dependencies
     sudo apt-get install curl python3-pip python3-venv git unzip libldap2-dev libsasl2-dev
+    # Funkwhale dependencies
+    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
 
 On Arch Linux and its derivatives:
 
 .. code-block:: shell
 
+    # Install dependencies
     sudo pacman -S curl python-pip python-virtualenv git unzip
+    # Funkwhale dependencies
+    sudo pacman -S curl file ffmpeg libjpeg-turbo libpqxx python libldap libsasl
 
 Layout
 -------
@@ -130,24 +135,6 @@ Then we'll download the frontend files:
 You can leave the ZIP archives in the directory, this will help you know
 which version you've installed next time you want to upgrade your installation.
 
-System dependencies
--------------------
-
-A few OS packages are required in order to run Funkwhale. On Debian-like
-systems, they can be installed with
-
-.. code-block:: shell
-
-    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
-
-On Arch, run
-
-.. code-block:: shell
-
-    pacman -S $(cat api/requirements.pac)
-
-From now on, you should use the funkwhale user for all commands.
-
 Python dependencies
 --------------------
 
@@ -205,9 +192,6 @@ Download the sample environment file:
 .. parsed-literal::
 
     curl -L -o config/.env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/master/deploy/env.prod.sample"
-    # symlink it so it's sourced automatically by the API process
-    # (This won't be needed anymore once release 0.18 is out)
-    ln -s /srv/funkwhale/config/.env /srv/funkwhale/api/.env
 
 .. note::
 
@@ -215,9 +199,8 @@ Download the sample environment file:
 
         cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
 
-Generate a secret key for Django:
+Generate a secret key for Django::
 
-.. code-block:: shell
     openssl rand -base64 45
 
 You can then edit the file: the file is heavily commented, and the most relevant
