@@ -67,7 +67,7 @@ Instance-level moderation tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This release includes a first set of moderation tools that will give more control
-to admins about the way their instance federate with other instance and accounts on the network.
+to admins about the way their instance federates with other instance and accounts on the network.
 Using these tools, it's now possible to:
 
 - Browse known accounts and domains, and associated data (storage size, software version, etc.)
@@ -75,7 +75,7 @@ Using these tools, it's now possible to:
 - Block or partially restrict interactions with any account or domain
 
 All those features are usable using a brand new "moderation" permission, meaning
-you can appoints one or nultiple moderators to help with this task.
+you can appoint one or multiple moderators to help with this task.
 
 I'd like to thank all Mastodon contributors, because some of the these tools are heavily
 inspired from what's being done in Mastodon. Thank you so much!
@@ -84,7 +84,7 @@ inspired from what's being done in Mastodon. Thank you so much!
 Iframe widget to embed public tracks and albums [manual action required]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Funkwhale now support embedding a lightweight audio player on external websites
+Funkwhale now supports embedding a lightweight audio player on external websites
 for album and tracks that are available in public libraries. Important pages,
 such as artist, album and track pages also include OpenGraph tags that will
 enable previews on compatible apps (like sharing a Funkwhale track link on Mastodon
@@ -132,13 +132,13 @@ which should be ``/srv/funkwhale/front/dist`` by default, then reload your nginx
 Alternative docker deployment method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Thanks to the awesome done by @thetarkus at https://github.com/thetarkus/docker-funkwhale,
+Thanks to the awesome work done by @thetarkus at https://github.com/thetarkus/docker-funkwhale,
 we're now able to provide an alternative and easier Docker deployment method!
 
 In contrast with our current, multi-container offer, this method integrates
 all Funkwhale processes and services (database, redis, etc.) into a single, easier to deploy container.
 
-Both method will coexist in parallel, as each one has pros and cons. You can learn more
+Both methods will coexist in parallel, as each one has pros and cons. You can learn more
 about this exciting new deployment option by visiting https://docs.funkwhale.audio/installation/docker.html!
 
 Automatically load .env file
@@ -146,7 +146,7 @@ Automatically load .env file
 
 On non-docker deployments, earlier versions required you to source
 the config/.env file before launching any Funkwhale command, with ``export $(cat config/.env | grep -v ^# | xargs)``
-This led to more complex and error prode deployment / setup.
+This led to more complex and error prone deployment / setup.
 
 This is not the case anymore, and Funkwhale will automatically load this file if it's available.
 
@@ -174,7 +174,7 @@ Enable gzip compression [manual action suggested]
 Gzip compression will be enabled on new instances by default
 and will reduce the amount of bandwidth consumed by your instance.
 
-If you with to benefit from gzip compression on your instance,
+If you want to benefit from gzip compression on your instance,
 edit your reverse proxy virtualhost file (located at ``/etc/nginx/sites-available/funkwhale.conf``) and add the following snippet
 in the server block, then reload your nginx server::
 
