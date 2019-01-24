@@ -20,7 +20,7 @@ class AlbumAdmin(admin.ModelAdmin):
 class TrackAdmin(admin.ModelAdmin):
     list_display = ["title", "artist", "album", "mbid"]
     search_fields = ["title", "artist__name", "album__title", "mbid"]
-    list_select_related = True
+    list_select_related = ["album__artist", "artist"]
 
 
 @admin.register(models.ImportBatch)

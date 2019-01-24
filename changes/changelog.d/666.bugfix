@@ -1,0 +1,1 @@
+Fixed crashing Django admin when loading track detail page (#666)
