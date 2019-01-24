@@ -25,15 +25,18 @@ RUN \
 
 RUN mkdir /requirements
 COPY ./requirements/base.txt /requirements/base.txt
+# hack around https://github.com/pypa/pip/issues/6158#issuecomment-456619072
+ENV PIP_DOWNLOAD_CACHE=/noop/
 RUN \
     echo 'fixing requirements file for alpine' && \
     sed -i '/Pillow/d' /requirements/base.txt && \
     \
     \
     echo 'installing pip requirements' && \
-    pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir setuptools wheel && \
-    pip3 install --no-cache-dir -r /requirements/base.txt
+    pip3 install --upgrade pip && \
+    pip3 install setuptools wheel && \
+    pip3 install -r /requirements/base.txt && \
+    rm -rf $PIP_DOWNLOAD_CACHE
 
 ARG install_dev_deps=0
 COPY ./requirements/*.txt /requirements/
