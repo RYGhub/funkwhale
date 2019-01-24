@@ -22,11 +22,11 @@
       <div v-else class="ui list">
         <div class="ui item" v-if="object.silence_activity">
           <i class="feed icon"></i>
-          <div class="content"><translate>Silence activity</translate></div>
+          <div class="content"><translate>Mute activity</translate></div>
         </div>
         <div class="ui item" v-if="object.silence_notifications">
           <i class="bell icon"></i>
-          <div class="content"><translate>Silence notifications</translate></div>
+          <div class="content"><translate>Mute notifications</translate></div>
         </div>
         <div class="ui item" v-if="object.reject_media">
           <i class="file icon"></i>
