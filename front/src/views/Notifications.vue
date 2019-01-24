@@ -24,7 +24,7 @@
           </tbody>
         </table>
         <p v-else>
-          <translate>No notifications yet.</translate>
+          <translate>No notification to show.</translate>
         </p>
       </div>
     </section>
