@@ -65,7 +65,7 @@
           <translate>We cannot load this track</translate>
         </div>
         <p v-if="hasNext && playing && $store.state.player.errorCount < $store.state.player.maxConsecutiveErrors">
-          <translate>The next track will play automatically in a few seconds...</translate>
+          <translate>The next track will play automatically in a few seconds…</translate>
           <i class="loading spinner icon"></i>
         </p>
         <p>

@@ -1,7 +1,7 @@
 <template>
   <div class="ui vertical aligned stripe segment">
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading remote libraries...</translate></div>
+      <div class="ui text loader"><translate>Loading remote libraries…</translate></div>
     </div>
     <div v-else class="ui text container">
       <h1 class="ui header"><translate>Remote libraries</translate></h1>
