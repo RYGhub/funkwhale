@@ -112,7 +112,7 @@ export default {
         blockAllHelp: this.$gettext("Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"),
         silenceActivity: {
           help: this.$gettext("Hide account or domain content, except from followers."),
-          label: this.$gettext("Silence activity"),
+          label: this.$gettext("Mute activity"),
         },
         silenceNotifications: {
           help: this.$gettext("Prevent account or domain from triggering notifications, except from followers."),
