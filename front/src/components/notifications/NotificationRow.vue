@@ -38,9 +38,11 @@ export default {
     labels () {
       let libraryFollowMessage = this.$gettext('%{ username } followed your library "%{ library }"')
       let libraryAcceptFollowMessage = this.$gettext('%{ username } accepted your follow on library "%{ library }"')
+      let libraryPendingFollowMessage = this.$gettext('%{ username } wants to follow your library "%{ library }"')
       return {
         libraryFollowMessage,
         libraryAcceptFollowMessage,
+				libraryPendingFollowMessage,
         markRead: this.$gettext('Mark as read'),
         markUnread: this.$gettext('Mark as unread'),
 
@@ -55,19 +57,23 @@ export default {
       if (a.type === 'Follow') {
         if (a.object && a.object.type === 'music.Library') {
           let action = null
+					let textmessage = null
           if (!a.related_object.approved) {
+						textmessage = this.labels.libraryPendingFollowMessage
             action = {
               buttonClass: 'green',
               icon: 'check',
               label: this.$gettext('Approve'),
               handler: () => { self.approveLibraryFollow(a.related_object) }
             }
-          }
+					} else {
+						textmessage = this.labels.libraryFollowMessage
+					}
           return {
             action,
             detailUrl: {name: 'content.libraries.detail', params: {id: a.object.uuid}},
             message: this.$gettextInterpolate(
-              this.labels.libraryFollowMessage,
+              textmessage,
               {username: this.username, library: a.object.name}
             )
           }
