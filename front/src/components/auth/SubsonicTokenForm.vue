@@ -5,8 +5,7 @@
       <translate>The Subsonic API is not available on this Funkwhale instance.</translate>
     </p>
     <p>
-      <translate>Funkwhale is compatible with other music players that support the Subsonic API.</translate>
-      <translate>You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance.</translate>
+      <translate>Funkwhale is compatible with other music players that support the Subsonic API.</translate>&nbsp;<translate>You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance.</translate>
     </p>
     <p>
       <translate>However, accessing Funkwhale from those clients require a separate password you can set below.</translate>
