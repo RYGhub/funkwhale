@@ -67,7 +67,7 @@ export default {
     },
     title () {
       if (this.playable) {
-        return this.$gettext('Play now')
+        return this.$gettext('Play...')
       } else {
         if (this.track) {
           return this.$gettext('This track is not available in any library you have access to')
