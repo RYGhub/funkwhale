@@ -21,7 +21,7 @@ pytz==2018.9
 # Redis support
 django-redis>=4.10,<4.11
 redis>=3.0,<3.1
-
+kombu>=4.2.2,<4.3
 
 celery>=4.2,<4.3
 
