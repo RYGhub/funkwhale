@@ -1,0 +1,1 @@
+Upgraded kombu to fix an incompatibility with redis>=3

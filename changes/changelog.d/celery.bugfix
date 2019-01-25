@@ -1,0 +1,1 @@
+Fixed celery worker defaulting to development settings instead of production
