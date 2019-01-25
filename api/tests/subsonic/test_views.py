@@ -387,21 +387,40 @@ def test_search3(f, db, logged_in_api_client, factories):
 def test_get_playlists(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get_playlists")
     assert url.endswith("getPlaylists") is True
-    playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
+    playlist1 = factories["playlists.PlaylistTrack"](
+        playlist__user=logged_in_api_client.user
+    ).playlist
+    playlist2 = factories["playlists.PlaylistTrack"](
+        playlist__privacy_level="everyone"
+    ).playlist
+    playlist3 = factories["playlists.PlaylistTrack"](
+        playlist__privacy_level="instance"
+    ).playlist
+    # private
+    factories["playlists.PlaylistTrack"](playlist__privacy_level="me")
+    # no track
+    factories["playlists.Playlist"](privacy_level="everyone")
     response = logged_in_api_client.get(url, {"f": f})
 
-    qs = playlist.__class__.objects.with_tracks_count()
-    assert response.status_code == 200
-    assert response.data == {
-        "playlists": {"playlist": [serializers.get_playlist_data(qs.first())]}
+    qs = (
+        playlist1.__class__.objects.with_tracks_count()
+        .filter(pk__in=[playlist1.pk, playlist2.pk, playlist3.pk])
+        .order_by("-creation_date")
+    )
+    expected = {
+        "playlists": {"playlist": [serializers.get_playlist_data(p) for p in qs]}
     }
+    assert response.status_code == 200
+    assert response.data == expected
 
 
 @pytest.mark.parametrize("f", ["json"])
 def test_get_playlist(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get_playlist")
     assert url.endswith("getPlaylist") is True
-    playlist = factories["playlists.Playlist"](user=logged_in_api_client.user)
+    playlist = factories["playlists.PlaylistTrack"](
+        playlist__user=logged_in_api_client.user
+    ).playlist
     response = logged_in_api_client.get(url, {"f": f, "id": playlist.pk})
 
     qs = playlist.__class__.objects.with_tracks_count()

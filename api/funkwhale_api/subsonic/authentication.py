@@ -18,7 +18,7 @@ def authenticate(username, password):
         if password.startswith("enc:"):
             password = password.replace("enc:", "", 1)
             password = binascii.unhexlify(password).decode("utf-8")
-        user = User.objects.get(
+        user = User.objects.select_related("actor").get(
             username__iexact=username, is_active=True, subsonic_api_token=password
         )
     except (User.DoesNotExist, binascii.Error):
@@ -29,7 +29,7 @@ def authenticate(username, password):
 
 def authenticate_salt(username, salt, token):
     try:
-        user = User.objects.get(
+        user = User.objects.select_related("actor").get(
             username=username, is_active=True, subsonic_api_token__isnull=False
         )
     except User.DoesNotExist:
