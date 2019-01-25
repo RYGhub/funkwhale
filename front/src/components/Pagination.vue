@@ -13,7 +13,7 @@
         {{ page }}
       </a href>
       <div v-else class="disabled item">
-        ...
+        …
       </div>
     </template>
     <a href
