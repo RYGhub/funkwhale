@@ -11,7 +11,7 @@ from rest_framework.serializers import ValidationError
 
 import funkwhale_api
 from funkwhale_api.activity import record
-from funkwhale_api.common import preferences, utils as common_utils
+from funkwhale_api.common import fields, preferences, utils as common_utils
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
@@ -68,9 +68,7 @@ def find_object(
                     {
                         "error": {
                             "code": 70,
-                            "message": "{} not found".format(
-                                qs.model.__class__.__name__
-                            ),
+                            "message": "{} not found".format(qs.model.__name__),
                         }
                     }
                 )
@@ -80,6 +78,14 @@ def find_object(
         return inner
 
     return decorator
+
+
+def get_playlist_qs(request):
+    qs = playlists_models.Playlist.objects.filter(
+        fields.privacy_level_query(request.user)
+    )
+    qs = qs.with_tracks_count().exclude(_tracks_count=0).select_related("user")
+    return qs.order_by("-creation_date")
 
 
 class SubsonicViewSet(viewsets.GenericViewSet):
@@ -398,11 +404,9 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         url_path="getPlaylists",
     )
     def get_playlists(self, request, *args, **kwargs):
-        playlists = request.user.playlists.with_tracks_count().select_related("user")
+        qs = get_playlist_qs(request)
         data = {
-            "playlists": {
-                "playlist": [serializers.get_playlist_data(p) for p in playlists]
-            }
+            "playlists": {"playlist": [serializers.get_playlist_data(p) for p in qs]}
         }
         return response.Response(data)
 
@@ -412,7 +416,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         url_name="get_playlist",
         url_path="getPlaylist",
     )
-    @find_object(playlists_models.Playlist.objects.with_tracks_count())
+    @find_object(lambda request: get_playlist_qs(request))
     def get_playlist(self, request, *args, **kwargs):
         playlist = kwargs.pop("obj")
         data = {"playlist": serializers.get_playlist_detail_data(playlist)}
