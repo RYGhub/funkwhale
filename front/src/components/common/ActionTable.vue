@@ -36,8 +36,8 @@
                   <p slot="modal-header">
                     <translate
                       key="1"
-                      :translate-n="checked.length"
-                      :translate-params="{count: checked.length, action: currentActionName}"
+                      :translate-n="affectedObjectsCount"
+                      :translate-params="{count: affectedObjectsCount, action: currentActionName}"
                       translate-plural="Do you want to launch %{ action } on %{ count } elements?">
                       Do you want to launch %{ action } on %{ count } element?
                     </translate>
@@ -271,6 +271,12 @@ export default {
       return {
         refresh: this.$gettext('Refresh table content')
       }
+    },
+    affectedObjectsCount () {
+      if (this.selectAll) {
+        return this.objectsData.count
+      }
+      return this.checked.length
     }
   },
   watch: {
