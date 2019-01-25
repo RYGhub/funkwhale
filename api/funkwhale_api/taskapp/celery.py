@@ -14,7 +14,7 @@ logger = logging.getLogger("celery")
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
     os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "config.settings.local"
+        "DJANGO_SETTINGS_MODULE", "config.settings.production"
     )  # pragma: no cover
 
 app = celery.Celery("funkwhale_api")
