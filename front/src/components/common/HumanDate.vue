@@ -1,5 +1,5 @@
 <template>
-  <time :datetime="date" :title="date | moment">{{ realDate | ago }}</time>
+  <time :datetime="date" :title="date | moment">{{ realDate | ago($store.state.ui.momentLocale) }}</time>
 </template>
 <script>
 import {mapState} from 'vuex'

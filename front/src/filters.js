@@ -13,8 +13,10 @@ export function truncate (str, max, ellipsis) {
 
 Vue.filter('truncate', truncate)
 
-export function ago (date) {
+export function ago (date, locale) {
+  locale = locale || 'en'
   const m = moment(date)
+  m.locale(locale)
   return m.fromNow()
 }
 

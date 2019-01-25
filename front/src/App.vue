@@ -57,11 +57,10 @@ import _ from '@/lodash'
 import {mapState} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
-
 import Sidebar from '@/components/Sidebar'
 import AppFooter from '@/components/Footer'
 import ServiceMessages from '@/components/ServiceMessages'
-
+import moment from  'moment'
 import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
@@ -153,14 +152,7 @@ export default {
       } else {
         return
       }
-      import(`./translations/${candidate}.json`).then((response) =>{
-        Vue.$translations[candidate] = response.default[candidate]
-      }).finally(() => {
-        // set current language twice, otherwise we seem to have a cache somewhere
-        // and rendering does not happen
-        self.$language.current = 'noop'
-        self.$language.current = candidate
-      })
+      this.$store.commit('ui/currentLanguage', candidate)
     },
     disconnect () {
       if (!this.bridge) {
@@ -191,7 +183,7 @@ export default {
       bridge.socket.addEventListener('open', function () {
         console.log('Connected to WebSocket')
       })
-    }
+    },
   },
   computed: {
     ...mapState({
@@ -235,8 +227,35 @@ export default {
         this.openWebsocket()
       }
     },
-    '$language.current' (newValue) {
-      this.$store.commit('ui/currentLanguage', newValue)
+    '$store.state.ui.currentLanguage': {
+      immediate: true,
+      handler(newValue) {
+        let self = this
+        import(`./translations/${newValue}.json`).then((response) =>{
+          Vue.$translations[newValue] = response.default[newValue]
+        }).finally(() => {
+          // set current language twice, otherwise we seem to have a cache somewhere
+          // and rendering does not happen
+          self.$language.current = 'noop'
+          self.$language.current = newValue
+        })
+        if (newValue === 'en_US') {
+          return self.$store.commit('ui/momentLocale', 'en')
+        }
+        let momentLocale = newValue.replace('_', '-').toLowerCase()
+        import(`moment/locale/${momentLocale}.js`).then(() => {
+          self.$store.commit('ui/momentLocale', momentLocale)
+        }).catch(() => {
+          console.log('No momentjs locale available for', momentLocale)
+          let shortLocale = momentLocale.split('-')[0]
+          import(`moment/locale/${shortLocale}.js`).then(() => {
+            self.$store.commit('ui/momentLocale', shortLocale)
+          }).catch(() => {
+            console.log('No momentjs locale available for', shortLocale)
+          })
+        })
+        console.log(moment.locales())
+      }
     }
   }
 }

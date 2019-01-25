@@ -1,9 +1,11 @@
 import axios from 'axios'
+import moment from 'moment'
 
 export default {
   namespaced: true,
   state: {
     currentLanguage: 'en_US',
+    momentLocale: 'en',
     lastDate: new Date(),
     maxMessages: 100,
     messageDisplayDuration: 10000,
@@ -25,6 +27,10 @@ export default {
     },
     currentLanguage: (state, value) => {
       state.currentLanguage = value
+    },
+    momentLocale: (state, value) => {
+      state.momentLocale = value
+      moment.locale(value)
     },
     computeLastDate: (state) => {
       state.lastDate = new Date()
