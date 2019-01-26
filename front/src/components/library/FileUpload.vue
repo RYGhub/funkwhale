@@ -102,6 +102,7 @@
               </span>
               <span v-else-if="file.active" class="ui yellow label">
                 <translate key="2">Uploading…</translate>
+                ({{ parseInt(file.progress) }}%)
               </span>
               <template v-else>
                 <span class="ui label"><translate key="3">Pending</translate></span>
@@ -145,7 +146,7 @@ export default {
       files: [],
       needsRefresh: false,
       currentTab: "summary",
-      uploadUrl: "/api/v1/uploads/",
+      uploadUrl: this.$store.getters['instance/absoluteUrl']("/api/v1/uploads/"),
       importReference,
       supportedExtensions: ["flac", "ogg", "mp3", "opus"],
       uploads: {
