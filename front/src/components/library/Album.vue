@@ -10,13 +10,7 @@
             <i class="circular inverted sound yellow icon"></i>
             <div class="content">
               {{ album.title }}
-              <translate
-                tag="div"
-                translate-plural="Album containing %{ count } tracks, by %{ artist }"
-                :translate-n="album.tracks.length"
-                :translate-params="{count: album.tracks.length, artist: album.artist.name}">
-                Album containing %{ count } track, by %{ artist }
-              </translate>
+              <div v-html="subtitle"></div>
             </div>
             <div class="ui buttons">
               <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
@@ -184,6 +178,10 @@ export default {
         this.$store.getters["instance/absoluteUrl"](this.album.cover.original) +
         ")"
       )
+    },
+    subtitle () {
+      let msg = this.$ngettext('Album containing %{ count } track, by %{ artist }', 'Album containing %{ count } tracks, by %{ artist }', this.album.tracks.length)
+      return this.$gettextInterpolate(msg, {count: this.album.tracks.length, artist: this.album.artist.name})
     }
   },
   watch: {
