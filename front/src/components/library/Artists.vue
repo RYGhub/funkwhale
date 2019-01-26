@@ -10,7 +10,7 @@
             <label>
               <translate>Search</translate>
             </label>
-            <input type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
+            <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
             <label><translate>Ordering</translate></label>

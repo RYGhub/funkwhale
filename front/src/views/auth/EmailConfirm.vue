@@ -12,7 +12,7 @@
           </div>
           <div class="field">
             <label><translate>Confirmation code</translate></label>
-            <input type="text" required v-model="key" />
+            <input name="confirmation-code" type="text" required v-model="key" />
           </div>
           <router-link :to="{path: '/login'}">
             <translate>Return to login</translate>

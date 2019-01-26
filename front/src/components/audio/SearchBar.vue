@@ -1,7 +1,7 @@
 <template>
   <div class="ui fluid category search">
     <slot></slot><div class="ui icon input">
-      <input class="prompt" :placeholder="labels.placeholder" type="text">
+      <input class="prompt" name="search" :placeholder="labels.placeholder" type="text">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
@@ -110,5 +110,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

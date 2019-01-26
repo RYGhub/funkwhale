@@ -9,7 +9,7 @@
     </div>
     <div class="required field">
       <label><translate>Name</translate></label>
-      <input v-model="currentName" :placeholder="labels.namePlaceholder" required maxlength="100">
+      <input name="name" v-model="currentName" :placeholder="labels.namePlaceholder" required maxlength="100">
     </div>
     <div class="field">
       <label><translate>Description</translate></label>

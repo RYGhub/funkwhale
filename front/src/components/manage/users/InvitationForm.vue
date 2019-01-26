@@ -10,7 +10,7 @@
       <div class="inline fields">
         <div class="ui field">
           <label><translate>Invitation code</translate></label>
-          <input type="text" v-model="code" :placeholder="labels.placeholder" />
+          <input name="code" type="text" v-model="code" :placeholder="labels.placeholder" />
         </div>
         <div class="ui field">
           <button :class="['ui', {loading: isLoading}, 'button']" :disabled="isLoading" type="submit">

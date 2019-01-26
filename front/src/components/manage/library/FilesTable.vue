@@ -4,7 +4,7 @@
       <div class="fields">
         <div class="ui field">
           <label><translate>Search</translate></label>
-          <input type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
+          <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
           <label><translate>Ordering</translate></label>

@@ -12,7 +12,7 @@
         <div class="inline fields">
           <div class="field">
             <label for="domain"><translate>Add a domain</translate></label>
-            <input type="text" id="domain" v-model="domainName">
+            <input type="text" name="domain" id="domain" v-model="domainName">
           </div>
           <div class="field">
             <button :class="['ui', {'loading': isCreating}, 'green', 'button']" type="submit" :disabled="isCreating">

@@ -51,7 +51,7 @@
           <div class="ui four wide field">
             <label><translate>Import reference</translate></label>
             <p><translate>This reference will be used to group imported files together.</translate></p>
-            <input type="text" v-model="importReference" />
+            <input name="import-ref" type="text" v-model="importReference" />
           </div>
         </div>
 

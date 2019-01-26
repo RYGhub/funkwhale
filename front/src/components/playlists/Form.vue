@@ -20,7 +20,7 @@
     <div class="three fields">
       <div class="field">
         <label><translate>Playlist name</translate></label>
-        <input v-model="name" required type="text" :placeholder="labels.placeholder" />
+        <input name="name" v-model="name" required type="text" :placeholder="labels.placeholder" />
       </div>
       <div class="field">
         <label><translate>Playlist visibility</translate></label>

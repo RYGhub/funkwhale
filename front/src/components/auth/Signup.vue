@@ -20,6 +20,7 @@
             <label><translate>Username</translate></label>
             <input
             ref="username"
+            name="username"
             required
             type="text"
             autofocus
@@ -30,6 +31,7 @@
             <label><translate>Email</translate></label>
             <input
             ref="email"
+            name="email"
             required
             type="email"
             :placeholder="labels.emailPlaceholder"
@@ -44,6 +46,7 @@
             <input
             required
             type="text"
+            name="invitation"
             :placeholder="labels.placeholder"
             v-model="invitation">
           </div>

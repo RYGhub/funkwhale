@@ -19,24 +19,28 @@
       </template>
       <input
         :id="setting.identifier"
+        :name="setting.identifier"
         v-if="setting.field.widget.class === 'PasswordInput'"
         type="password"
         class="ui input"
         v-model="values[setting.identifier]" />
       <input
         :id="setting.identifier"
+        :name="setting.identifier"
         v-if="setting.field.widget.class === 'TextInput'"
         type="text"
         class="ui input"
         v-model="values[setting.identifier]" />
       <input
         :id="setting.identifier"
+        :name="setting.identifier"
         v-if="setting.field.class === 'IntegerField'"
         type="number"
         class="ui input"
         v-model.number="values[setting.identifier]" />
       <textarea
         :id="setting.identifier"
+        :name="setting.identifier"
         v-else-if="setting.field.widget.class === 'Textarea'"
         type="text"
         class="ui input"
@@ -120,7 +124,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .ui.checkbox p {
   margin-top: 1rem;
 }
