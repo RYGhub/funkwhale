@@ -2,6 +2,7 @@
   <div class="ui action input">
     <input
     required
+    name="password"
     :tabindex="index"
     :type="passwordInputType"
     @input="$emit('input', $event.target.value)"

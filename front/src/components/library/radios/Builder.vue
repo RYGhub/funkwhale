@@ -20,7 +20,7 @@
           <div class="">
             <div class="field">
               <label for="name"><translate>Radio name</translate></label>
-              <input id="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
+              <input id="name" name="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
             </div>
             <div class="field">
               <label for="description"><translate>Description</translate></label>

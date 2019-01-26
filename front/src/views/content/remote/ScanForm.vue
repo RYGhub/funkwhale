@@ -9,7 +9,7 @@
     <div class="ui field">
       <label><translate>Search a remote library</translate></label>
       <div :class="['ui', 'action', {loading: isLoading}, 'input']">
-        <input v-model="query" :placeholder="labels.placeholder" type="url">
+        <input name="url" v-model="query" :placeholder="labels.placeholder" type="url">
         <button type="submit" class="ui icon button">
           <i class="search icon"></i>
         </button>

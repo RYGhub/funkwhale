@@ -17,6 +17,7 @@
               required
               ref="email"
               type="email"
+              name="email"
               autofocus
               :placeholder="labels.placeholder"
               v-model="email">

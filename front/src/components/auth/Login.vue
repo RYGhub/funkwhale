@@ -22,6 +22,7 @@
             ref="username"
             tabindex="1"
             required
+            name="username"
             type="text"
             autofocus
             :placeholder="labels.usernamePlaceholder"

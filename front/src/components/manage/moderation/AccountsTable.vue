@@ -5,7 +5,7 @@
         <div class="ui six wide field">
           <label><translate>Search</translate></label>
           <form @submit.prevent="search.query = $refs.search.value">
-            <input ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
+            <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
           </form>
         </div>
         <div class="field">
