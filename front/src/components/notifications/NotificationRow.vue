@@ -4,10 +4,10 @@
       <actor-link class="user" :actor="item.activity.actor" />
     </td>
     <td>
-      <router-link tag="span" class="link" v-if="notificationData.detailUrl" :to="notificationData.detailUrl">
-        {{ notificationData.message }}
+      <router-link tag="span" class="link" v-if="notificationData.detailUrl" :to="notificationData.detailUrl" v-html="notificationData.message">
+
       </router-link>
-      <template v-else>{{ notificationData.message }}</template>
+      <template v-else v-html="notificationData.message"></template>
       <template v-if="notificationData.action">&nbsp;
         <div @click="handleAction(notificationData.action.handler)" :class="['ui', 'basic', 'tiny', notificationData.action.buttonClass || '', 'button']">
           <i v-if="notificationData.action.icon" :class="[notificationData.action.icon, 'icon']" />
