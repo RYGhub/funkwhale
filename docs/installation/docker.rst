@@ -133,7 +133,7 @@ Download the sample docker-compose file:
     cd /srv/funkwhale
     mkdir nginx
     curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.funkwhale_proxy.conf"
     curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
 
 At this point, the architecture of ``/srv/funkwhale``  should look like that:
