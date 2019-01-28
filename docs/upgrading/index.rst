@@ -62,6 +62,37 @@ easy:
 
     This is a warning, not an error, and it can be safely ignored.
     Never run the ``makemigrations`` command yourself.
+    
+Upgrading the Postgres container
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With some Funkwhale releases, it is recommended to upgrade the version of the
+Postgres database server container. For example, Funkwhale 0.17 recommended
+Postgres 9.4, but Funkwhale 0.18 recommends Postgres 11. When upgrading
+Postgres, it is not sufficient to change the container referenced in
+``docker-compose.yml``. New major versions of Postgres cannot read the databases
+created by older major versions. The data has to be exported from a running
+instance of the old version and imported by the new version.
+
+Thankfully, there is a Docker container available to automate this process. You
+can use the following snippet to upgrade your database in ``./postgres``,
+keeping a backup of the old version in ``./postgres-old``:
+
+.. parsed-literal::
+
+    # Replace "9.4" and "11" with the versions you are migrating between.
+    export OLD_POSTGRES=9.4
+    export NEW_POSTGRES=11
+    docker-compose stop postgres
+    docker run --rm \
+      -v `pwd`/data/postgres:/var/lib/postgresql/${OLD_POSTGRES}/data \
+      -v `pwd`/data/postgres-new:/var/lib/postgresql/${NEW_POSTGRES}/data \
+      tianon/postgres-upgrade:${OLD_POSTGRES}-to-${NEW_POSTGRES}
+    # Add back the access control rule that doesn't survive the upgrade
+    echo "host all all all trust" | sudo tee -a ./postgres-new/pg_hba.conf
+    # Swap over to the new database
+    mv ./data/postgres ./data/postgres-old
+    mv ./data/postgres-new ./data/postgres
 
 
 Non-docker setup
