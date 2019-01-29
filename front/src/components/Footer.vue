@@ -3,7 +3,7 @@
     <div class="ui container">
       <div class="ui stackable equal height stackable grid">
         <section class="four wide column">
-          <h4 v-translate class="ui header">
+          <h4 class="ui header">
             <translate :translate-params="{instanceName: instanceHostname}" >About %{instanceName}</translate>
           </h4>
           <div class="ui link list">
