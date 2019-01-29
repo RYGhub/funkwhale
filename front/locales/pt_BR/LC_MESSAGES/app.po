@@ -5,364 +5,358 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: front 1.0.0\n"
+"Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 10:47+0100\n"
-"PO-Revision-Date: 2019-01-20 10:50+0000\n"
-"Last-Translator: Elza Gelez <elza@gelez.xyz>\n"
+"POT-Creation-Date: 2019-01-11 16:04+0100\n"
+"PO-Revision-Date: 2019-01-29 08:32+0000\n"
+"Last-Translator: Rodrigo Leite <kazecadastros@gmail.com>\n"
 "Language-Team: none\n"
-"Language: eo\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Weblate 3.2.2\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgid "\"%{ title }\", by %{ artist }"
-msgstr "\"%{title}\" je %{artist}"
+msgstr "\"%{ title }\", por %{ artist }"
 
 #: front/src/components/Sidebar.vue:24
 msgid "(%{ index } of %{ length })"
-msgstr "(%{index} da %{length})"
+msgstr "(%{ index } de %{ length })"
 
 #: front/src/components/Sidebar.vue:22
 msgid "(empty)"
-msgstr "(malplena)"
+msgstr "(vazio)"
 
 #: front/src/components/common/ActionTable.vue:57
 #: front/src/components/common/ActionTable.vue:66
 msgid "%{ count } on %{ total } selected"
 msgid_plural "%{ count } on %{ total } selected"
-msgstr[0] "Unu el %{total} estas selekta"
-msgstr[1] "%{count} el %{total} estas selektaj"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/Sidebar.vue:110 src/components/audio/album/Card.vue:54
-#: front/src/views/content/libraries/Card.vue:39
-#: src/views/content/remote/Card.vue:26
+#: front/src/views/content/libraries/Card.vue:39 src/views/content/remote/Card.vue:26
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "%{count} kanto"
-msgstr[1] "%{count} kantoj"
+msgstr[0] "%{ count } faixa"
+msgstr[1] "%{ count } faixas"
 
 #: front/src/components/library/Artist.vue:13
 msgid "%{ count } track in %{ albumsCount } albums"
 msgid_plural "%{ count } tracks in %{ albumsCount } albums"
-msgstr[0] "%{count} kanto en %{albumsCount} albumo"
-msgstr[1] "%{count} kantoj en %{albumsCount} albumoj"
+msgstr[0] "%{ count } faixa em %{ albumsCount } álbuns"
+msgstr[1] "%{ count } faixas em %{ albumsCount } álbuns"
 
 #: front/src/components/library/radios/Builder.vue:80
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
-msgstr[0] "%{count} kanto kongruas kun la tutaj filtriloj"
-msgstr[1] "%{count} kantoj kongruas kun la tutaj filtriloj"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/audio/PlayButton.vue:180
 msgid "%{ count } track was added to your queue"
 msgid_plural "%{ count } tracks were added to your queue"
-msgstr[0] "Aldonis unu kanto al atendovico"
-msgstr[1] "Aldonis %{ count }kantoj al atendovico"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/playlists/Card.vue:18
 msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "%{count} kanto"
-msgstr[1] "%{count} kantoj"
+msgstr[0] "%{ count } faixa"
+msgstr[1] "%{ count } faixas"
 
 #: front/src/views/content/libraries/Quota.vue:11
 msgid "%{ current } used on %{ max } allowed"
-msgstr "%{current} uzantas el %{max} rajtantas"
+msgstr "%{ current } usados de %{ max } permitidos"
 
 #: front/src/components/common/Duration.vue:2
 msgid "%{ hours } h %{ minutes } min"
-msgstr "%{hours} h %{minutes} min"
+msgstr "%{ hours } h %{ minutes } min"
 
 #: front/src/components/common/Duration.vue:5
 msgid "%{ minutes } min"
-msgstr "%{minutes} min"
+msgstr "%{ minutes } min"
 
 #: front/src/components/notifications/NotificationRow.vue:40
 msgid "%{ username } accepted your follow on library \"%{ library }\""
-msgstr "%{ username } akceptis vian sekvadon de muzikejo \"%{ library }\""
+msgstr ""
+"%{ username } aceitou seu pedido para seguir a biblioteca \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:39
 msgid "%{ username } followed your library \"%{ library }\""
-msgstr "%{ username } sekvis vian muzikejon \"%{ library }\""
-
-#: front/src/components/notifications/NotificationRow.vue:41
-#, fuzzy
-msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } sekvis vian muzikejon \"%{ library }\""
+msgstr "%{ username } seguiu sua biblioteca \"%{ library }\""
 
 #: front/src/components/auth/Profile.vue:46
 msgid "%{ username }'s profile"
-msgstr "Profilo de %{username}"
+msgstr "Perfil de %{ username }"
+
+#: front/src/components/Footer.vue:5
+msgid "<translate :translate-params=\"{instanceName: instanceHostname}\">About %{instanceName}</translate>"
+msgstr ""
+"<translate :translate-params=\"{instanceName: instanceHostname}\">Sobre "
+"%{instanceName}</translate>"
 
 #: front/src/components/audio/artist/Card.vue:41
 msgid "1 album"
 msgid_plural "%{ count } albums"
-msgstr[0] "Unu albumo"
-msgstr[1] "%{count} albumoj"
+msgstr[0] "1 álbum"
+msgstr[1] "%{ count } álbuns"
 
 #: front/src/components/favorites/List.vue:10
 msgid "1 favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "Unu stelumo"
-msgstr[1] "%{count} stelumoj"
+msgstr[0] "1 favorito"
+msgstr[1] "%{ count } favoritos"
 
+#: front/src/components/library/FileUpload.vue:225
 #: front/src/components/library/FileUpload.vue:226
-#: front/src/components/library/FileUpload.vue:227
 msgid "A network error occured while uploading this file"
-msgstr "Eraro okazis dum alŝuto de tiu dosiero"
+msgstr "Um erro de rede ocorreu ao enviar este arquivo"
 
 #: front/src/components/About.vue:5
 msgid "About %{ instance }"
-msgstr "Pri %{instance}"
+msgstr "Sobre %{ instance }"
 
 #: front/src/components/Footer.vue:6
 msgid "About %{instanceName}"
-msgstr "Pri %{instanceName}"
+msgstr "Sobre %{instanceName}"
 
 #: front/src/components/Footer.vue:45
 msgid "About Funkwhale"
-msgstr "Pri Funkwhale"
+msgstr "Sobre o Funkwhale"
 
 #: front/src/components/Footer.vue:10
 msgid "About page"
-msgstr "Pripaĝo"
+msgstr "Sobre"
 
-#: front/src/components/About.vue:8 src/components/About.vue:67
+#: front/src/components/About.vue:8 src/components/About.vue:64
 msgid "About this instance"
-msgstr "Pri tiu instanco"
+msgstr "Sobre esta instância"
 
 #: front/src/views/content/libraries/Detail.vue:48
 msgid "Accept"
-msgstr "Akcepti"
+msgstr "Aceitar"
 
 #: front/src/views/content/libraries/Detail.vue:40
 msgid "Accepted"
-msgstr "akceptanta"
+msgstr "Aceito"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:110
+#: front/src/components/auth/SubsonicTokenForm.vue:111
 msgid "Access disabled"
-msgstr "Atingo malaktivigas"
+msgstr "Acesso desabilitado"
 
 #: front/src/components/Home.vue:106
 msgid "Access your music from a clean interface that focus on what really matters"
-msgstr "Atingas vian muzikon kun pura interfaco ke koncentras ĝin sur gravaĵo"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:19
 #: front/src/components/mixins/Translations.vue:20
 msgid "Accessed date"
-msgstr "Atingdato"
+msgstr "Data de acesso"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:78
 msgid "Account data"
-msgstr "Kontdatumo"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:5
 msgid "Account settings"
-msgstr "Preferoj de via konto"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:263
+#: front/src/components/auth/Settings.vue:264
 msgid "Account Settings"
-msgstr "Preferoj de via konto"
+msgstr "Configurações de Conta"
 
 #: front/src/components/manage/users/UsersTable.vue:39
 msgid "Account status"
-msgstr "Pozicio de via konto"
+msgstr ""
 
 #: front/src/views/auth/PasswordReset.vue:14
 msgid "Account's email"
-msgstr "Retadreso de via konto"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsList.vue:3
 #: front/src/views/admin/moderation/AccountsList.vue:24
 #: front/src/views/admin/moderation/Base.vue:8
 msgid "Accounts"
-msgstr "Kontoj"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:29
 msgid "Action"
-msgstr "Ago"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:99
 msgid "Action %{ action } was launched successfully on %{ count } element"
 msgid_plural "Action %{ action } was launched successfully on %{ count } elements"
-msgstr[0] "Ago %{action} sukcese komenciĝis por %{count} ero"
-msgstr[1] "Ago %{action} sukcese komenciĝis por %{count} eroj"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/common/ActionTable.vue:21
 #: front/src/components/library/radios/Builder.vue:64
 msgid "Actions"
-msgstr "Agoj"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:53
 msgid "Active"
-msgstr "Aktiva"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:199
 #: front/src/views/admin/moderation/DomainsDetail.vue:144
 msgid "Activity"
-msgstr "Aktivo"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:7
 #: front/src/components/mixins/Translations.vue:8
 msgid "Activity visibility"
-msgstr "Videblo de Akto"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsList.vue:18
 msgid "Add"
-msgstr "Aldoni"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsList.vue:13
 msgid "Add a domain"
-msgstr "Aldoni domajnon"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:4
 msgid "Add a new moderation rule"
-msgstr "Aldoni novan moderecan regulon"
+msgstr ""
 
 #: front/src/views/content/Home.vue:35
 msgid "Add and manage content"
-msgstr "Aldoni kaj administri datumoj"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:75 src/views/content/Base.vue:18
 msgid "Add content"
-msgstr "Aldoni muzikon"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:50
 msgid "Add filter"
-msgstr "Aldoni filtrilo"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:40
 msgid "Add filters to customize your radio"
-msgstr "Aldonu filtriloj por agordi vian radion"
+msgstr ""
 
 #: front/src/components/audio/PlayButton.vue:64
 msgid "Add to current queue"
-msgstr "Aldoni al aktuala atendovico"
+msgstr ""
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:4
 #: front/src/components/favorites/TrackFavoriteIcon.vue:28
 msgid "Add to favorites"
-msgstr "Aldoni al stelumoj"
+msgstr ""
 
 #: front/src/components/playlists/TrackPlaylistIcon.vue:6
 #: front/src/components/playlists/TrackPlaylistIcon.vue:34
 msgid "Add to playlist…"
-msgstr "Aldoni al ludlisto…"
+msgstr ""
 
 #: front/src/components/audio/PlayButton.vue:14
 msgid "Add to queue"
-msgstr "Aldoni al atendovico"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:116
 msgid "Add to this playlist"
-msgstr "Aldoni al tiu ludlisto"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:54
 msgid "Add track"
-msgstr "Aldoni kanton"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:69
 msgid "Admin"
-msgstr "Administranto"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:79
 msgid "Administration"
-msgstr "Administrejo"
+msgstr ""
 
-#: front/src/components/audio/SearchBar.vue:26
-#: src/components/audio/track/Table.vue:8
-#: front/src/components/library/Album.vue:153
+#: front/src/components/audio/SearchBar.vue:26 src/components/audio/track/Table.vue:8
+#: front/src/components/library/Album.vue:159
 #: front/src/components/manage/library/FilesTable.vue:39
 #: front/src/components/metadata/Search.vue:134
 #: front/src/views/content/libraries/FilesTable.vue:56
 msgid "Album"
-msgstr "Albumo"
+msgstr ""
 
-#: front/src/components/library/Album.vue:183
+#: front/src/components/library/Album.vue:12
 msgid "Album containing %{ count } track, by %{ artist }"
 msgid_plural "Album containing %{ count } tracks, by %{ artist }"
-msgstr[0] "Albumo kun %{count} kanto, je %{artist}"
-msgstr[1] "Albumo kun %{count} kantoj, je %{artist}"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/mixins/Translations.vue:24
 #: front/src/components/mixins/Translations.vue:25
 msgid "Album name"
-msgstr "Albumnomo"
+msgstr ""
 
 #: front/src/components/library/Track.vue:27
 msgid "Album page"
-msgstr "Albumpagô"
+msgstr ""
 
-#: front/src/components/audio/Search.vue:19
-#: src/components/instance/Stats.vue:48
+#: front/src/components/audio/Search.vue:19 src/components/instance/Stats.vue:48
 #: front/src/views/admin/moderation/AccountsDetail.vue:321
 #: front/src/views/admin/moderation/DomainsDetail.vue:257
 msgid "Albums"
-msgstr "Albumoj"
+msgstr ""
 
 #: front/src/components/library/Artist.vue:44
 msgid "Albums by this artist"
-msgstr "Albumoj je ĉi-tiu artisto"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:19
 #: front/src/views/content/libraries/FilesTable.vue:13
 msgid "All"
-msgstr "Ĉia"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:13
 msgid "An error occured while saving your changes"
-msgstr "Eraro okazis kiam konservi viajn ŝanĝojn"
+msgstr ""
 
 #: front/src/components/auth/Login.vue:10
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
-msgstr "Nekonata eraro okazis, povus signifi ke la servilo paneas aŭ ne estas atingebla"
+msgstr ""
 
-#: front/src/components/notifications/NotificationRow.vue:66
+#: front/src/components/notifications/NotificationRow.vue:62
 msgid "Approve"
-msgstr "Akcepti"
+msgstr ""
 
 #: front/src/components/auth/Logout.vue:5
 msgid "Are you sure you want to log out?"
-msgstr "Ĉu vi vere volas elsaluti?"
+msgstr ""
 
-#: front/src/components/audio/SearchBar.vue:25
-#: src/components/audio/track/Table.vue:7
+#: front/src/components/audio/SearchBar.vue:25 src/components/audio/track/Table.vue:7
 #: front/src/components/library/Artist.vue:137
 #: front/src/components/manage/library/FilesTable.vue:38
 #: front/src/components/metadata/Search.vue:130
 #: front/src/views/content/libraries/FilesTable.vue:55
 msgid "Artist"
-msgstr "Artisto"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:25
 #: front/src/components/mixins/Translations.vue:26
 msgid "Artist name"
-msgstr "Nomo de artisto"
+msgstr ""
 
-#: front/src/components/library/Album.vue:16
-#: src/components/library/Track.vue:33
+#: front/src/components/library/Album.vue:22 src/components/library/Track.vue:33
 msgid "Artist page"
-msgstr "Artistpaĝo"
+msgstr ""
 
 #: front/src/components/audio/Search.vue:65
 msgid "Artist, album, track…"
-msgstr "Artisto, albumo, kanto…"
+msgstr ""
 
-#: front/src/components/audio/Search.vue:10
-#: src/components/instance/Stats.vue:42
-#: front/src/components/library/Artists.vue:119
-#: src/components/library/Library.vue:7
+#: front/src/components/audio/Search.vue:10 src/components/instance/Stats.vue:42
+#: front/src/components/library/Artists.vue:119 src/components/library/Library.vue:7
 #: front/src/views/admin/moderation/AccountsDetail.vue:313
 #: front/src/views/admin/moderation/DomainsDetail.vue:249
 msgid "Artists"
-msgstr "Artistoj"
+msgstr ""
 
-#: front/src/components/favorites/List.vue:33
-#: src/components/library/Artists.vue:25
+#: front/src/components/favorites/List.vue:33 src/components/library/Artists.vue:25
 #: front/src/components/library/Radios.vue:44
 #: front/src/components/manage/library/FilesTable.vue:19
 #: front/src/components/manage/moderation/AccountsTable.vue:21
@@ -371,349 +365,345 @@ msgstr "Artistoj"
 #: front/src/views/content/libraries/FilesTable.vue:31
 #: front/src/views/playlists/List.vue:27
 msgid "Ascending"
-msgstr "Foste"
+msgstr ""
 
-#: front/src/views/auth/PasswordReset.vue:28
+#: front/src/views/auth/PasswordReset.vue:27
 msgid "Ask for a password reset"
-msgstr "Demandi pasvortrenuligadon"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:245
 #: front/src/views/admin/moderation/DomainsDetail.vue:202
 msgid "Audio content"
-msgstr "Muzika datumo"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:55
 msgid "Audio player shortcuts"
-msgstr "Fulmoklavoj de muzika ludilo"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:26
 msgid "Available playlists"
-msgstr "Disponeblaj ludlistoj"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:34
 msgid "Avatar"
-msgstr "Avataro"
+msgstr ""
 
-#: front/src/views/auth/PasswordReset.vue:25
+#: front/src/views/auth/PasswordReset.vue:24
 #: front/src/views/auth/PasswordResetConfirm.vue:18
 msgid "Back to login"
-msgstr "Reiri al ensalutpaĝo"
+msgstr ""
 
 #: front/src/components/library/Track.vue:129
 #: front/src/components/manage/library/FilesTable.vue:42
 #: front/src/components/mixins/Translations.vue:29
 #: front/src/components/mixins/Translations.vue:30
 msgid "Bitrate"
-msgstr "Bitrapido"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:19
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:34
 msgid "Block everything"
-msgstr "Bloki ĉiu"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:112
 msgid "Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"
-msgstr "Bloki ĉiu el tiu konto aŭ domajno. Preventos interagojn kaj malaperigis ĝian datumon (dosieroj, muzikejoj, sekvadoj…)"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:18 src/components/library/Library.vue:4
 msgid "Browse"
-msgstr "Folii"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:65
 msgid "Browse library"
-msgstr "Folii muzikejon"
+msgstr ""
 
 #: front/src/components/library/Artists.vue:4
 msgid "Browsing artists"
-msgstr "Folii artistojn"
+msgstr ""
 
 #: front/src/views/playlists/List.vue:3
 msgid "Browsing playlists"
-msgstr "Folii ludlistojn"
+msgstr ""
 
 #: front/src/components/library/Radios.vue:4
 msgid "Browsing radios"
-msgstr "Folii radiojn"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:5
 msgid "Builder"
-msgstr "Konstruilo"
+msgstr ""
 
 #: front/src/components/audio/album/Card.vue:13
 msgid "By %{ artist }"
-msgstr "Je %{artist}"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:103
 msgid "By unfollowing this library, you loose access to its content."
-msgstr "Se vi malsekvantus tiun muzikejon, vi perdus ĝian muzikon."
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:261
 #: front/src/views/admin/moderation/DomainsDetail.vue:217
 msgid "Cached size"
-msgstr "Kaŝmemora grando"
+msgstr ""
 
 #: front/src/components/common/DangerousButton.vue:17
-#: front/src/components/library/Album.vue:52
-#: src/components/library/Track.vue:76
+#: front/src/components/library/Album.vue:58 src/components/library/Track.vue:76
 #: front/src/components/library/radios/Filter.vue:53
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:54
 #: front/src/components/playlists/PlaylistModal.vue:63
 msgid "Cancel"
-msgstr "Nuligi"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:63
 msgid "Candidates"
-msgstr "Kandidatoj"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:75
+#: front/src/components/auth/Settings.vue:76
 msgid "Cannot change your password"
-msgstr "Ne eblas ŝanĝi vian pasvorton"
+msgstr ""
 
+#: front/src/components/library/FileUpload.vue:222
 #: front/src/components/library/FileUpload.vue:223
-#: front/src/components/library/FileUpload.vue:224
 msgid "Cannot upload this file, ensure it is not too big"
-msgstr "Ne povis alŝuti tiun dosieron, certigi ne tro grandas"
+msgstr ""
 
 #: front/src/components/Footer.vue:21
 msgid "Change language"
-msgstr "Ŝanĝi lingvon"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:67
 msgid "Change my password"
-msgstr "Ŝanĝi mian pasvorton"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:94
+#: front/src/components/auth/Settings.vue:95
 msgid "Change password"
-msgstr "Ŝanĝi pasvorton"
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:4
 #: front/src/views/auth/PasswordResetConfirm.vue:62
 msgid "Change your password"
-msgstr "Ŝanĝi vian pasvorton"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:95
+#: front/src/components/auth/Settings.vue:96
 msgid "Change your password?"
-msgstr "Ĉu vi volas ŝanĝi vian pasvorton?"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:21
 msgid "Changes synced with server"
-msgstr "Konservis ŝanĝoj"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:70
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
-msgstr "Ŝanĝi vian pasvorton ankaŭ ŝanĝos vian Subsonic API pasvorto se vi petis tiun."
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:97
+#: front/src/components/auth/Settings.vue:98
 msgid "Changing your password will have the following consequences"
-msgstr "Ŝanĝi vian pasvorton tiel rezultigos"
+msgstr ""
 
 #: front/src/components/Footer.vue:40
 msgid "Chat room"
-msgstr "Babilejo"
+msgstr ""
 
 #: front/src/App.vue:13
 msgid "Choose your instance"
-msgstr "Elekti vian instanco"
+msgstr ""
 
 #: front/src/components/Home.vue:64
 msgid "Clean library"
-msgstr "Purigi muzikejon"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:37
 msgid "Clear"
-msgstr "Purigi"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:40
 #: front/src/components/playlists/Editor.vue:45
 msgid "Clear playlist"
-msgstr "Purigi ludliston"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:366
+#: front/src/components/audio/Player.vue:363
 msgid "Clear your queue"
-msgstr "Purigi vian atendovico"
+msgstr ""
 
 #: front/src/components/Home.vue:44
 msgid "Click once, listen for hours using built-in radios"
-msgstr "Alklaki unu foje, aŭskulti enkonstruitajn radiojn dum horoj"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:75
 msgid "Click to select files to upload or drag and drop files or directories"
-msgstr "Alklaki por selekti elŝutontaj dosieroj, aŭ ŝovi kaj demeti dosierojn aŭ dosierujojn"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:20
 msgid "Close"
-msgstr "Fermi"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:26
 #: front/src/components/manage/users/InvitationsTable.vue:42
 msgid "Code"
-msgstr "Kodo"
+msgstr ""
 
 #: front/src/components/audio/album/Card.vue:43
 #: front/src/components/audio/artist/Card.vue:33
 msgid "Collapse"
-msgstr "Malgrandigi"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:62
 msgid "Config"
-msgstr "Preferoj"
+msgstr ""
 
 #: front/src/components/common/DangerousButton.vue:21
 msgid "Confirm"
-msgstr "Konfirmi"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:4 src/views/auth/EmailConfirm.vue:20
 #: front/src/views/auth/EmailConfirm.vue:51
 msgid "Confirm your e-mail address"
-msgstr "Konfirmi vian retadreson"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:13
 msgid "Confirmation code"
-msgstr "Konfirmada kodo"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:7
 msgid "Content have been updated, click refresh to see up-to-date content"
-msgstr "Ĝisdatigis datumon, alklaku aktualigi por vidi novan datumon"
+msgstr ""
 
 #: front/src/components/Footer.vue:48
 msgid "Contribute"
-msgstr "Kontribui"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:19
 #: front/src/components/common/CopyInput.vue:8
 msgid "Copy"
-msgstr "Kopii"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:163
-#, fuzzy
-msgid "Copy queued tracks to playlist"
-msgstr "Kopii kantojn el la aktuala atendovico en tiu ludlisto"
+msgid "Copy tracks from current queue to playlist"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:21
 msgid "Copy/paste this code in your website HTML"
-msgstr "Kopi kaj alglui tiun kodon en via retejo"
+msgstr ""
 
 #: front/src/components/library/Track.vue:91
 msgid "Copyright"
-msgstr "Kopirajto"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:7
 msgid "Could not confirm your e-mail address"
-msgstr "Ne povis konfirmi vian retadreson"
+msgstr ""
 
 #: front/src/views/content/remote/ScanForm.vue:3
 msgid "Could not fetch remote library"
-msgstr "Eraro dum skano de malloka muzikejo"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:213
 msgid "Could not process this track, ensure it is tagged correctly"
-msgstr "Ne povis traktadi tiun kanton, certiĝi ĝi estas bone etikedata"
+msgstr ""
 
 #: front/src/components/Home.vue:85
 msgid "Covers, lyrics, our goal is to have them all ;)"
-msgstr "Reludversioj, kantparoloj, nian celon estas havi ĉiujn ;)"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:58
 msgid "Create"
-msgstr "Krei"
+msgstr ""
 
 #: front/src/components/auth/Signup.vue:4
 msgid "Create a funkwhale account"
-msgstr "Krei Funkwhale konton"
+msgstr ""
 
 #: front/src/views/content/libraries/Home.vue:14
 msgid "Create a new library"
-msgstr "Krei novan muzikejon"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:2
 msgid "Create a new playlist"
-msgstr "Krei novan ludliston"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:57 src/components/auth/Login.vue:17
 msgid "Create an account"
-msgstr "Krei konton"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:26
 msgid "Create library"
-msgstr "Krei muzikejon"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:53
+#: front/src/components/auth/Signup.vue:51
 msgid "Create my account"
-msgstr "Kreu mian konton"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:34
 msgid "Create playlist"
-msgstr "Krei ludliston"
+msgstr ""
 
 #: front/src/components/library/Radios.vue:23
 msgid "Create your own radio"
-msgstr "Krei vian propran radion"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:40
 #: front/src/components/mixins/Translations.vue:16
 #: front/src/components/mixins/Translations.vue:17
 msgid "Creation date"
-msgstr "Kreodato"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:54
 msgid "Current avatar"
-msgstr "Aktuala avataro"
+msgstr ""
 
 #: front/src/views/content/libraries/DetailArea.vue:4
 msgid "Current library"
-msgstr "Aktuala muzikejo"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgid "Current track"
-msgstr "Aktuala kanto"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:2
 msgid "Current usage"
-msgstr "Aktuala uzo"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:27
 msgid "Date"
-msgstr "Dato"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:75
 msgid "Decrease volume"
-msgstr "Malgrandigi volumo"
+msgstr ""
 
 #: front/src/components/manage/library/FilesTable.vue:190
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:61
 #: front/src/components/manage/users/InvitationsTable.vue:167
 #: front/src/views/content/libraries/FilesTable.vue:233
-#: front/src/views/content/libraries/Form.vue:29
-#: src/views/playlists/Detail.vue:33
+#: front/src/views/content/libraries/Form.vue:29 src/views/playlists/Detail.vue:33
 msgid "Delete"
-msgstr "Forigi"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:39
 msgid "Delete library"
-msgstr "Forigi muzikejon"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:69
 msgid "Delete moderation rule"
-msgstr "Forigi moderecan regulon"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:38
 msgid "Delete playlist"
-msgstr "Forigi ludliston"
+msgstr ""
 
 #: front/src/views/radios/Detail.vue:28
 msgid "Delete radio"
-msgstr "Forigi radion"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:31
 msgid "Delete this library?"
-msgstr "Forigi tiun muzikejon?"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:63
 msgid "Delete this moderation rule?"
-msgstr "Forigi tiun moderecan regulon?"
+msgstr ""
 
-#: front/src/components/favorites/List.vue:34
-#: src/components/library/Artists.vue:26
+#: front/src/components/favorites/List.vue:34 src/components/library/Artists.vue:26
 #: front/src/components/library/Radios.vue:47
 #: front/src/components/manage/library/FilesTable.vue:20
 #: front/src/components/manage/moderation/AccountsTable.vue:22
@@ -722,839 +712,815 @@ msgstr "Forigi tiun moderecan regulon?"
 #: front/src/views/content/libraries/FilesTable.vue:32
 #: front/src/views/playlists/List.vue:28
 msgid "Descending"
-msgstr "Malfoste"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:25
 #: front/src/views/content/libraries/Form.vue:14
 msgid "Description"
-msgstr "Resumo"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:47
 msgid "Detail"
-msgstr "Detalo"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:50
 msgid "Details"
-msgstr "Detaloj"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:455
 msgid "Determine how much content the user can upload. Leave empty to use the default value of the instance."
-msgstr "Kiom da datumo la uzanto povas elŝuti. Lasi malplene por uzi la defaŭlta valoro de la instanco."
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:8
 #: front/src/components/mixins/Translations.vue:9
 msgid "Determine the visibility level of your activity"
-msgstr "Kiu estas la videblo de viaj aktoj"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:103
-#: front/src/components/auth/SubsonicTokenForm.vue:51
+#: front/src/components/auth/Settings.vue:104
+#: front/src/components/auth/SubsonicTokenForm.vue:52
 msgid "Disable access"
-msgstr "Malatingeblu"
-
-#: front/src/components/auth/SubsonicTokenForm.vue:48
-msgid "Disable Subsonic access"
-msgstr "Malatingeblu Subsonic"
+msgstr ""
 
 #: front/src/components/auth/SubsonicTokenForm.vue:49
+msgid "Disable Subsonic access"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:50
 msgid "Disable Subsonic API access?"
-msgstr "Ĉu vi volas malatingeblu la Subsonic API?"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:18
 #: front/src/views/admin/moderation/AccountsDetail.vue:128
 #: front/src/views/admin/moderation/AccountsDetail.vue:132
 msgid "Disabled"
-msgstr "Malaktiva"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:13
+#: front/src/components/auth/SubsonicTokenForm.vue:14
 msgid "Discover how to use Funkwhale from other apps"
-msgstr "Malkovri kiel vi povas uzi Funkwhale el aliaj aplikaĵoj"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:103
 msgid "Display name"
-msgstr "Afiŝata nomo"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:30
 msgid "Display publicly"
-msgstr "Publike montri"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
-msgstr "Neniam alŝuti aŭdovidaĵojn (muzikoj, albumbildoj, avataroj…) el tiu konto aŭ domajno. Ankaŭ forigos aktualajn datumojn."
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:42
 msgid "Do you want to clear the playlist \"%{ playlist }\"?"
-msgstr "Ĉu vi volas purigi la \"%{playlist}\" ludliston?"
+msgstr ""
 
 #: front/src/components/common/DangerousButton.vue:7
 msgid "Do you want to confirm this action?"
-msgstr "Ĉu vi volas konfirmi tiun akton?"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:35
 msgid "Do you want to delete the playlist \"%{ playlist }\"?"
-msgstr "Ĉu vi volas forigi la \"%{playlist}\" ludliston?"
+msgstr ""
 
 #: front/src/views/radios/Detail.vue:26
 msgid "Do you want to delete the radio \"%{ radio }\"?"
-msgstr "Ĉu vi volas forigi la \"%{radio}\" radion?"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:36
 msgid "Do you want to launch %{ action } on %{ count } element?"
 msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
-msgstr[0] "Ĉu vi volas komenci %{action} por %{count} ero?"
-msgstr[1] "Ĉu vi volas komenci %{action} por %{count} eroj?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/Sidebar.vue:107
 msgid "Do you want to restore your previous queue?"
-msgstr "Ĉu vi volas reŝargi vian antaŭan atendovicon?"
+msgstr ""
 
 #: front/src/components/Footer.vue:31
 msgid "Documentation"
-msgstr "Dokumentaro"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:40
 #: front/src/components/mixins/Translations.vue:34
 #: front/src/views/admin/moderation/AccountsDetail.vue:93
 #: front/src/components/mixins/Translations.vue:35
 msgid "Domain"
-msgstr "Domajno"
+msgstr ""
 
 #: front/src/views/admin/moderation/Base.vue:5
 #: front/src/views/admin/moderation/DomainsList.vue:3
 #: front/src/views/admin/moderation/DomainsList.vue:48
 msgid "Domains"
-msgstr "Domajnoj"
+msgstr ""
 
 #: front/src/components/library/Track.vue:55
 msgid "Download"
-msgstr "Elŝuti"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:49
 msgid "Drag and drop rows to reorder tracks in the playlist"
-msgstr "Treni kaj guti horizontaloj por reordigi kantojn en la ludlisto"
+msgstr ""
 
-#: front/src/components/audio/track/Table.vue:9
-#: src/components/library/Track.vue:111
+#: front/src/components/audio/track/Table.vue:9 src/components/library/Track.vue:111
 #: front/src/components/manage/library/FilesTable.vue:43
 #: front/src/components/mixins/Translations.vue:30
 #: front/src/views/content/libraries/FilesTable.vue:59
 #: front/src/components/mixins/Translations.vue:31
 msgid "Duration"
-msgstr "Daŭro"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:23
 msgid "E-mail address confirmed"
-msgstr "Konfirmintas retadreson"
+msgstr ""
 
 #: front/src/components/Home.vue:93
 msgid "Easy to use"
-msgstr "Facila uzo"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:9
 msgid "Edit"
-msgstr "Redakti"
+msgstr ""
 
-#: front/src/components/About.vue:22
+#: front/src/components/About.vue:21
 msgid "Edit instance info"
-msgstr "Redakti informoj de instanco"
+msgstr ""
 
 #: front/src/components/radios/Card.vue:22 src/views/playlists/Detail.vue:30
 msgid "Edit…"
-msgstr "Redakti…"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:30
+#: front/src/components/auth/Signup.vue:29
 #: front/src/components/manage/users/UsersTable.vue:38
 msgid "Email"
-msgstr "Retmesaĝo"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:111
 msgid "Email address"
-msgstr "Retadreso"
+msgstr ""
 
-#: front/src/components/library/Album.vue:38
-#: src/components/library/Track.vue:62
+#: front/src/components/library/Album.vue:44 src/components/library/Track.vue:62
 msgid "Embed"
-msgstr "Enkorpigi"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:20
 msgid "Embed code"
-msgstr "Enkorpiga kodo"
+msgstr ""
 
-#: front/src/components/library/Album.vue:42
+#: front/src/components/library/Album.vue:48
 msgid "Embed this album on your website"
-msgstr "Enkorpigi tiun albumon en via retejo"
+msgstr ""
 
 #: front/src/components/library/Track.vue:66
 msgid "Embed this track on your website"
-msgstr "Enkorpigi tiun kanton en via retejo"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:230
 #: front/src/views/admin/moderation/DomainsDetail.vue:187
 msgid "Emitted library follows"
-msgstr "Sendintaj sekvadoj de muzikejo"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:214
 #: front/src/views/admin/moderation/DomainsDetail.vue:171
 msgid "Emitted messages"
-msgstr "Sendintaj mesaĝoj"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:8
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:17
 #: front/src/views/admin/moderation/AccountsDetail.vue:127
 #: front/src/views/admin/moderation/AccountsDetail.vue:131
 msgid "Enabled"
-msgstr "Aktiva"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:29
 msgid "End edition"
-msgstr "Fini redakto"
+msgstr ""
 
 #: front/src/views/content/remote/ScanForm.vue:50
 msgid "Enter a library URL"
-msgstr "Tajpu retadreson de muzikejo"
+msgstr ""
 
 #: front/src/components/library/Radios.vue:140
 msgid "Enter a radio name…"
-msgstr "Tajpu nomon de radio…"
+msgstr ""
 
 #: front/src/components/library/Artists.vue:118
 msgid "Enter artist name…"
-msgstr "Tajpu nomon de artisto…"
+msgstr ""
 
 #: front/src/views/playlists/List.vue:107
 msgid "Enter playlist name…"
-msgstr "Tajpu nomon de ludlisto…"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:102
+#: front/src/components/auth/Signup.vue:100
 msgid "Enter your email"
-msgstr "Tajpu vian retadreson"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:98 src/components/auth/Signup.vue:99
+#: front/src/components/auth/Signup.vue:96 src/components/auth/Signup.vue:97
 msgid "Enter your invitation code (case insensitive)"
-msgstr "Tajpu vian invitkodon (usklecoblindan)"
+msgstr ""
 
 #: front/src/components/metadata/Search.vue:114
 msgid "Enter your search query…"
-msgstr "Tajpu vian serĉon…"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:101
+#: front/src/components/auth/Signup.vue:99
 msgid "Enter your username"
-msgstr "Tajpu vian uzantnomon"
+msgstr ""
 
-#: front/src/components/auth/Login.vue:83
+#: front/src/components/auth/Login.vue:77
 msgid "Enter your username or email"
-msgstr "Tajpu vian uzantnomon aŭ retadreson"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:19
+#: front/src/components/auth/SubsonicTokenForm.vue:20
 #: front/src/views/content/libraries/Form.vue:4
 msgid "Error"
-msgstr "Eraro"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:87
 msgid "Error reporting"
-msgstr "Eraroraportado"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:92
 msgid "Error while applying action"
-msgstr "Eraro kiam ruli akton"
+msgstr ""
 
 #: front/src/views/auth/PasswordReset.vue:7
 msgid "Error while asking for a password reset"
-msgstr "Eraro kiam demandi renuligadon de pasvorto"
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgid "Error while changing your password"
-msgstr "Eraro kiam ŝanĝi vian pasvorton"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsList.vue:6
 msgid "Error while creating domain"
-msgstr "Eraro kiam krei domajnon"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:4
 msgid "Error while creating invitation"
-msgstr "Eraro kiam krei inviton"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:7
 msgid "Error while creating rule"
-msgstr "Eraro kiam krei regulon"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:126
 msgid "Error while fetching node info"
-msgstr "Eraro dum skano de malloka instanco"
+msgstr ""
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgid "Error while saving settings"
-msgstr "Eraro kiam konservi preferojn"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:212
 msgid "Errored"
-msgstr "Eraris"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:75
 msgid "Errored files"
-msgstr "Erarintaj dosieroj"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:89
 msgid "Everyone"
-msgstr "Ĉiu"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:11
-#: front/src/components/playlists/Form.vue:85
-#: src/views/content/libraries/Form.vue:73
+#: front/src/components/playlists/Form.vue:85 src/views/content/libraries/Form.vue:73
 #: front/src/components/mixins/Translations.vue:12
 msgid "Everyone on this instance"
-msgstr "Ĉiu en ĉi-tiu instanco"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:74
 msgid "Everyone, across all instances"
-msgstr "Ĉiu en ĉiuj instancoj"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:61
 msgid "Exclude"
-msgstr "Ekskluzivi"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:41
 #: front/src/components/mixins/Translations.vue:22
 #: front/src/components/mixins/Translations.vue:23
 msgid "Expiration date"
-msgstr "Fortempiĝa dato"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:50
 msgid "Expired"
-msgstr "Fortempiĝis"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:21
 msgid "Expired/used"
-msgstr "Fortempiĝis aŭ uzantiĝis"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:110
 msgid "Explain why you're applying this policy. Depending on your instance configuration, this will help you remember why you acted on this account or domain, and may be displayed publicly to help users understand what moderation rules are in place."
-msgstr "Ekspliku kial vi aplikas tiun regularon. Depende de la preferado de via instanco, ĝi helpos vin memori kial vi agis sur tiu konto aŭ domajno, kaj povus esti afiŝa por helpi uzantoj kompreni kiuj moderecaj reguloj ekzistas."
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:16
 msgid "Failed"
-msgstr "Eraris"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:58
 msgid "Failed tracks:"
-msgstr "Erarintaj kantoj:"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:66
 msgid "Favorites"
-msgstr "Stelumoj"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:84
 msgid "Federation"
-msgstr "Federo"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:84
 msgid "Filename"
-msgstr "Dosiernomo"
+msgstr ""
 
-#: front/src/views/admin/library/Base.vue:5
-#: src/views/admin/library/FilesList.vue:21
+#: front/src/views/admin/library/Base.vue:5 src/views/admin/library/FilesList.vue:21
 msgid "Files"
-msgstr "Dosieroj"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:60
 msgid "Filter name"
-msgstr "Filtri nomon"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:17
 #: front/src/views/content/libraries/FilesTable.vue:216
 msgid "Finished"
-msgstr "Finanto"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:42
 #: front/src/components/manage/moderation/DomainsTable.vue:41
 #: front/src/views/admin/moderation/AccountsDetail.vue:159
 #: front/src/views/admin/moderation/DomainsDetail.vue:78
 msgid "First seen"
-msgstr "Unua vido"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:17
 #: front/src/components/mixins/Translations.vue:18
 msgid "First seen date"
-msgstr "Dato de unua vido"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:83
 msgid "Follow"
-msgstr "Sekvi"
+msgstr ""
 
 #: front/src/views/content/Home.vue:16
 msgid "Follow remote libraries"
-msgstr "Sekvi mallokajn muzikejojn"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:88
 msgid "Follow request pending approval"
-msgstr "Peto da sekvado atendanta konsenton"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:38
 #: front/src/views/content/libraries/Detail.vue:7
 #: front/src/components/mixins/Translations.vue:39
 msgid "Followers"
-msgstr "Sekvantoj"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:93
 msgid "Following"
-msgstr "Sekvata"
+msgstr ""
 
 #: front/src/components/library/Track.vue:17
 msgid "From album %{ album } by %{ artist }"
-msgstr "El %{album} albumo je %{artist}"
+msgstr ""
 
 #: front/src/components/auth/SubsonicTokenForm.vue:7
 msgid "Funkwhale is compatible with other music players that support the Subsonic API."
-msgstr "Funkwhale funkcias kun aliaj muzikludiloj ke apogas la Subsonic API."
+msgstr ""
 
 #: front/src/components/Home.vue:95
 msgid "Funkwhale is dead simple to use."
-msgstr "Uzi Funkwhale facilegas."
+msgstr ""
 
 #: front/src/components/Home.vue:39
 msgid "Funkwhale is designed to make it easy to listen to music you like, or to discover new artists."
-msgstr "Funkwhale estas dizajna tiel ke estas facile aŭskulti muzikon vi ŝatas, aŭ malkovri novajn artistojn."
+msgstr ""
 
 #: front/src/components/Home.vue:116
 msgid "Funkwhale is free and gives you control on your music."
-msgstr "Funkwhale estas senpaga kaj lasis vin estri vian muzikon."
+msgstr ""
 
 #: front/src/components/Home.vue:66
 msgid "Funkwhale takes care of handling your music"
-msgstr "Funkwhale atentas manipuli vian muzikon"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:38
 msgid "General shortcuts"
-msgstr "Generalaj fulmoklavoj"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:16
 msgid "Get a new invitation"
-msgstr "Akiri novan inviton"
+msgstr ""
 
 #: front/src/components/Home.vue:13
 msgid "Get me to the library"
-msgstr "Iru al la muzikejo"
+msgstr ""
 
 #: front/src/components/Home.vue:76
 msgid "Get quality metadata about your music thanks to <a href=\"%{ url }\" target=\"_blank\">MusicBrainz</a>"
-msgstr "Akiri kvalitaj metadatumoj pri vian muzikon kun <a href=\"%{url}\" target=\"_blank\">MusicBrainz</a>"
+msgstr ""
 
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
 msgid "Get started"
-msgstr "Komencu"
+msgstr ""
 
 #: front/src/components/Footer.vue:37
 msgid "Getting help"
-msgstr "Ricevi helpon"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:34
 #: front/src/components/common/ActionTable.vue:54
 msgid "Go"
-msgstr "Komenci"
+msgstr ""
 
 #: front/src/components/PageNotFound.vue:14
 msgid "Go to home page"
-msgstr "Iru hejme"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:114
 msgid "Hide account or domain content, except from followers."
-msgstr "Kaŝi konton aŭ domajnon, krom sekvantoj."
+msgstr ""
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
-msgstr "Hejmo"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:36
 msgid "Hours of music"
-msgstr "Muzikhoroj"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:10
+#: front/src/components/auth/SubsonicTokenForm.vue:11
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
-msgstr "Tamen, atingi Funkwhale el tiuj aplikaĵo bezonas alian pasvorton ke vi povas difini malsupre."
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:24
 msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
-msgstr "Se la retadreso provizanta dum la antaŭa etapo korektas kaj bindas al uzantkonto, vi baldaŭ ricevus retmesaĝon kun renuligadaj instrukcioj."
+msgstr ""
 
 #: front/src/components/manage/library/FilesTable.vue:40
 msgid "Import date"
-msgstr "Importdato"
+msgstr ""
 
 #: front/src/components/Home.vue:71
 msgid "Import music from various platforms, such as YouTube or SoundCloud"
-msgstr "Importi muzikon el multe da servicoj, kiel YouTube aŭ SoundCloud"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:51
 msgid "Import reference"
-msgstr "Importfonto"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:11
 #: front/src/views/content/libraries/FilesTable.vue:58
 msgid "Import status"
-msgstr "Importstato"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:217
 msgid "Imported"
-msgstr "Importinta"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:21
 #: front/src/components/mixins/Translations.vue:22
 msgid "Imported date"
-msgstr "Importdato"
+msgstr ""
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgid "In favorites"
-msgstr "En stelumoj"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgid "Inactive"
-msgstr "Malaktiva"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:71
 msgid "Increase volume"
-msgstr "Pliigi volumon"
+msgstr ""
 
-#: front/src/views/auth/PasswordReset.vue:54
+#: front/src/views/auth/PasswordReset.vue:53
 msgid "Input the email address binded to your account"
-msgstr "Tajpu la retadreson bindanta al via konto"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:31
 msgid "Insert from queue (%{ count } track)"
 msgid_plural "Insert from queue (%{ count } tracks)"
-msgstr[0] "Internigi el atendovico (unu kanto)"
-msgstr[1] "Internigi el atendovico (%{count} kantoj)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:71
 msgid "Instance data"
-msgstr "Instanca datumo"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:80
 msgid "Instance information"
-msgstr "Instanca informo"
+msgstr ""
 
 #: front/src/components/library/Radios.vue:9
 msgid "Instance radios"
-msgstr "Instancaj radioj"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:75
 msgid "Instance settings"
-msgstr "Instancaj preferoj"
+msgstr ""
 
+#: front/src/components/library/FileUpload.vue:229
 #: front/src/components/library/FileUpload.vue:230
-#: front/src/components/library/FileUpload.vue:231
 msgid "Invalid file type, ensure you are uploading an audio file. Supported file extensions are %{ extensions }"
-msgstr "Malbona dosiertipo, aserti ĝi estas aŭda dosiero. %{ extensions } funkcias"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:44
+#: front/src/components/auth/Signup.vue:42
 #: front/src/components/manage/users/InvitationForm.vue:11
 msgid "Invitation code"
-msgstr "Invita kodo"
+msgstr ""
 
-#: front/src/views/admin/users/Base.vue:8
-#: src/views/admin/users/InvitationsList.vue:3
+#: front/src/components/auth/Signup.vue:43
+msgid "Invitation code (optional)"
+msgstr ""
+
+#: front/src/views/admin/users/Base.vue:8 src/views/admin/users/InvitationsList.vue:3
 #: front/src/views/admin/users/InvitationsList.vue:24
 msgid "Invitations"
-msgstr "Invitoj"
+msgstr ""
 
 #: front/src/components/Footer.vue:41
 msgid "Issue tracker"
-msgstr "Cimspuradilo"
+msgstr ""
 
 #: front/src/components/Home.vue:50
 msgid "Keep a track of your favorite songs"
-msgstr "Konservi postsignojn de viaj preferitaj kantoj"
+msgstr ""
 
 #: front/src/components/Footer.vue:33 src/components/ShortcutsModal.vue:3
 msgid "Keyboard shortcuts"
-msgstr "Fulmoklavo"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:161
 msgid "Known accounts"
-msgstr "Konataj kontoj"
+msgstr ""
 
 #: front/src/views/content/remote/Home.vue:14
 msgid "Known libraries"
-msgstr "Konataj muzikejoj"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/components/mixins/Translations.vue:32
 #: front/src/views/admin/moderation/AccountsDetail.vue:184
 #: front/src/components/mixins/Translations.vue:33
 msgid "Last activity"
-msgstr "Lasta akto"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:167
 #: front/src/views/admin/moderation/DomainsDetail.vue:86
 msgid "Last checked"
-msgstr "Lasta kontrolado"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:32
 msgid "Last modification"
-msgstr "Lasta redakto"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:43
 msgid "Last seen"
-msgstr "Lasta vidanto"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:18
 #: front/src/components/mixins/Translations.vue:19
 msgid "Last seen date"
-msgstr "Dato de lasta vido"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:56
 msgid "Last update:"
-msgstr "Lasta ĝisdatigo:"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:47
 msgid "Launch"
-msgstr "Lanĉi"
+msgstr ""
 
 #: front/src/components/Home.vue:10
 msgid "Learn more about this instance"
-msgstr "Lerni pli pri tiu instanco"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:58
 msgid "Leave empty for a random code"
-msgstr "Lasu malplena por hazarda kodo"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:7
 msgid "Leave empty for a responsive widget"
-msgstr "Lasu malplena por adaptiĝema fenestraĵo"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:297
 #: front/src/views/admin/moderation/DomainsDetail.vue:233
 #: front/src/views/content/Base.vue:5
 msgid "Libraries"
-msgstr "Muzikejoj"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:2
 msgid "Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family."
-msgstr "Muzikejoj helpas vin organizi kaj diskonigi viajn muzikarojn. Vi povas elŝuti vian propran muzikaron je Funkwhale kaj diskonigi ĝin kun viajn amikojn kaj familio."
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:30
 #: front/src/components/manage/users/UsersTable.vue:173
 #: front/src/views/admin/moderation/AccountsDetail.vue:464
 msgid "Library"
-msgstr "Muzikejo"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:109
 msgid "Library created"
-msgstr "Kreis muzikejon"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:129
 msgid "Library deleted"
-msgstr "Forigis muzikejon"
+msgstr ""
 
 #: front/src/views/admin/library/FilesList.vue:3
 msgid "Library files"
-msgstr "Muzikejaj dosieroj"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:106
 msgid "Library updated"
-msgstr "Ĝisdatigas muzikejon"
+msgstr ""
 
 #: front/src/components/library/Track.vue:100
 msgid "License"
-msgstr "Permesilo"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:21
 msgid "Loading followers…"
-msgstr "Ŝargas sekvantojn…"
+msgstr ""
 
 #: front/src/views/content/libraries/Home.vue:3
 msgid "Loading Libraries…"
-msgstr "Ŝarĝas muzikejojn…"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:3
 #: front/src/views/content/libraries/Upload.vue:3
 msgid "Loading library data…"
-msgstr "Ŝargas datumon de muzikejo…"
+msgstr ""
 
 #: front/src/views/Notifications.vue:4
 msgid "Loading notifications…"
-msgstr "Ŝarĝas sciigojn…"
+msgstr ""
 
 #: front/src/views/content/remote/Home.vue:3
-#, fuzzy
-msgid "Loading remote libraries…"
-msgstr "Ŝargas mallokajn muzikejojn…"
+msgid "Loading remote libraries..."
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:4
 msgid "Loading usage data…"
-msgstr "Ŝarĝas uzdatumon…"
+msgstr ""
 
 #: front/src/components/favorites/List.vue:5
 msgid "Loading your favorites…"
-msgstr "Ŝarĝas viajn stelumojn…"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:59
 #: front/src/views/admin/moderation/AccountsDetail.vue:18
 msgid "Local account"
-msgstr "Loka konto"
+msgstr ""
 
-#: front/src/components/auth/Login.vue:84
+#: front/src/components/auth/Login.vue:78
 msgid "Log In"
-msgstr "Ensaluti"
+msgstr ""
 
 #: front/src/components/auth/Login.vue:4
 msgid "Log in to your Funkwhale account"
-msgstr "Ensaluti en via Funkwhale konto"
+msgstr ""
 
 #: front/src/components/auth/Logout.vue:20
 msgid "Log Out"
-msgstr "Elsaluti"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:38
 msgid "Logged in as %{ username }"
-msgstr "Elsuta je %{username}"
+msgstr ""
 
-#: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:42
+#: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:41
 msgid "Login"
-msgstr "Ensaluti"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:119
 msgid "Login status"
-msgstr "Stato de konektado"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:52
 msgid "Logout"
-msgstr "Elsaluti"
+msgstr ""
 
 #: front/src/views/content/libraries/Home.vue:9
 msgid "Looks like you don't have a library, it's time to create one."
-msgstr "Ŝajni ke vi ne jam havas muzikejon, kreu unu."
+msgstr ""
 
-#: front/src/components/audio/Player.vue:356
-#: src/components/audio/Player.vue:357
+#: front/src/components/audio/Player.vue:353 src/components/audio/Player.vue:354
 msgid "Looping disabled. Click to switch to single-track looping."
-msgstr "Ripeto malaktivas. Alklaki por aktivi ripetado de la aktuala kanto."
+msgstr ""
 
-#: front/src/components/audio/Player.vue:359
-#: src/components/audio/Player.vue:360
+#: front/src/components/audio/Player.vue:356 src/components/audio/Player.vue:357
 msgid "Looping on a single track. Click to switch to whole queue looping."
-msgstr "Ripetas unu kanton. Alklaki por aktivi ripetado de la tutan atendovico."
+msgstr ""
 
-#: front/src/components/audio/Player.vue:362
-#: src/components/audio/Player.vue:363
+#: front/src/components/audio/Player.vue:359 src/components/audio/Player.vue:360
 msgid "Looping on whole queue. Click to disable looping."
-msgstr "Ripetas la tutan atendovicon. Alklaki por malaktivi ripeto."
+msgstr ""
 
 #: front/src/components/library/Track.vue:150
 msgid "Lyrics"
-msgstr "Teksto"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:210
 msgid "Main menu"
-msgstr "Precipa menuo"
+msgstr ""
 
 #: front/src/views/admin/library/Base.vue:16
 msgid "Manage library"
-msgstr "Administri muzikejon"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:3
 msgid "Manage playlists"
-msgstr "Manipuli ludlistojn"
+msgstr ""
 
 #: front/src/views/admin/users/Base.vue:20
 msgid "Manage users"
-msgstr "Manipuli uzantojn"
+msgstr ""
 
 #: front/src/views/playlists/List.vue:8
 msgid "Manage your playlists"
-msgstr "Manipuli viajn ludlistojn"
+msgstr ""
 
 #: front/src/views/Notifications.vue:17
 msgid "Mark all as read"
-msgstr "Marki ĉiujn legata"
+msgstr ""
 
-#: front/src/components/notifications/NotificationRow.vue:46
+#: front/src/components/notifications/NotificationRow.vue:44
 msgid "Mark as read"
-msgstr "Marki legata"
+msgstr ""
 
-#: front/src/components/notifications/NotificationRow.vue:47
+#: front/src/components/notifications/NotificationRow.vue:45
 msgid "Mark as unread"
-msgstr "Marki mallegata"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:281
 msgid "MB"
-msgstr "Mb"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:349
+#: front/src/components/audio/Player.vue:346
 msgid "Media player"
-msgstr "Aŭdilo"
-
-#: front/src/components/auth/Profile.vue:12
-#, fuzzy
-msgid "Member since %{ date }"
-msgstr "Aligis je %{date}"
+msgstr ""
 
 #: front/src/components/Footer.vue:32
 msgid "Mobile and desktop apps"
-msgstr "Poŝkomputilaj kaj komputilaj aplikaĵoj"
+msgstr ""
 
-#: front/src/components/Sidebar.vue:97
-#: src/components/manage/users/UsersTable.vue:177
+#: front/src/components/Sidebar.vue:97 src/components/manage/users/UsersTable.vue:177
 #: front/src/views/admin/moderation/AccountsDetail.vue:468
 #: front/src/views/admin/moderation/Base.vue:21
 msgid "Moderation"
-msgstr "Modereco"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:49
 #: front/src/views/admin/moderation/DomainsDetail.vue:42
 msgid "Moderation policies help you control how your instance interact with a given domain or account."
-msgstr "Moderecaj regularoj helpas vin kontroli kial via instanco interagis kun domajnon aŭ konton."
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:20
 #: front/src/components/mixins/Translations.vue:21
 msgid "Modification date"
-msgstr "Modifdato"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:63 src/views/admin/Settings.vue:82
 msgid "Music"
-msgstr "Muziko"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:355
+#: front/src/components/audio/Player.vue:352
 msgid "Mute"
-msgstr "Silentigi"
-
-#: front/src/components/manage/moderation/InstancePolicyCard.vue:24
-#: front/src/components/manage/moderation/InstancePolicyForm.vue:115
-#, fuzzy
-msgid "Mute activity"
-msgstr "Lasta akto"
-
-#: front/src/components/manage/moderation/InstancePolicyCard.vue:28
-#, fuzzy
-msgid "Mute notifications"
-msgstr "Viaj sciigoj"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:34
 msgid "My account"
-msgstr "Mia konto"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:236
 msgid "My awesome description"
-msgstr "Mia mojosa priskribo"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:70
 msgid "My awesome library"
-msgstr "Mia mojosa muzikejo"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:74
 msgid "My awesome playlist"
-msgstr "Mia mojosa ludlisto"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:235
 msgid "My awesome radio"
-msgstr "Mia mojosa radio"
+msgstr ""
 
 #: front/src/views/content/libraries/Home.vue:6
 msgid "My libraries"
-msgstr "Miaj muzikejoj"
+msgstr ""
 
-#: front/src/components/audio/track/Row.vue:40
-#: src/components/library/Track.vue:115
-#: front/src/components/library/Track.vue:124
-#: src/components/library/Track.vue:133
+#: front/src/components/audio/track/Row.vue:40 src/components/library/Track.vue:115
+#: front/src/components/library/Track.vue:124 src/components/library/Track.vue:133
 #: front/src/components/library/Track.vue:142
 #: front/src/components/manage/library/FilesTable.vue:63
 #: front/src/components/manage/library/FilesTable.vue:69
@@ -1568,7 +1534,7 @@ msgstr "Miaj muzikejoj"
 #: front/src/views/admin/moderation/DomainsDetail.vue:109
 #: front/src/views/admin/moderation/DomainsDetail.vue:117
 msgid "N/A"
-msgstr "ND"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:39
 #: front/src/components/manage/moderation/DomainsTable.vue:38
@@ -1578,103 +1544,99 @@ msgstr "ND"
 #: front/src/views/content/libraries/Form.vue:10
 #: front/src/components/mixins/Translations.vue:27
 msgid "Name"
-msgstr "Nomo"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:87
+#: front/src/components/auth/Settings.vue:88
 #: front/src/views/auth/PasswordResetConfirm.vue:14
 msgid "New password"
-msgstr "Nova pasvorto"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:160
 msgid "New tracks will be appended here automatically."
-msgstr "Novaj kantoj estos aldonataj ĉi-tie aŭtomate."
+msgstr ""
 
-#: front/src/components/audio/Player.vue:353
+#: front/src/components/audio/Player.vue:350
 msgid "Next track"
-msgstr "Baldaŭa kanto"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:119
 msgid "No"
-msgstr "Ne"
+msgstr ""
 
 #: front/src/components/Home.vue:100
 msgid "No add-ons, no plugins : you only need a web library"
-msgstr "Nek aldonaĵoj, nek kromprogramoj: vi nur bezonas retmuzikejo"
+msgstr ""
 
 #: front/src/components/audio/Search.vue:25
 msgid "No album matched your query"
-msgstr "Neniom albumo kongruas kun via serĉo"
+msgstr ""
 
 #: front/src/components/audio/Search.vue:16
 msgid "No artist matched your query"
-msgstr "Neniom artisto kongruas kun via serĉo"
+msgstr ""
 
 #: front/src/components/library/Track.vue:158
 msgid "No lyrics available for this track."
-msgstr "Nenio teksto disponeblas por tiu kanto."
+msgstr ""
 
 #: front/src/components/federation/LibraryWidget.vue:6
 msgid "No matching library."
-msgstr "Neniu muzikejo korespondas."
+msgstr ""
 
 #: front/src/views/Notifications.vue:26
-#, fuzzy
-msgid "No notification to show."
-msgstr "Nenio sciigoj jam."
+msgid "No notifications yet."
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:10
-#: front/src/components/playlists/Form.vue:81
-#: src/views/content/libraries/Form.vue:72
+#: front/src/components/playlists/Form.vue:81 src/views/content/libraries/Form.vue:72
 #: front/src/components/mixins/Translations.vue:11
 msgid "Nobody except me"
-msgstr "Neniu krom mi"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:57
 msgid "Nobody is following this library"
-msgstr "Neniu sekvas tiun muzikejon"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgid "Not used"
-msgstr "Ne uzantata"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:46 src/views/Notifications.vue:74
 msgid "Notifications"
-msgstr "Sciigoj"
+msgstr ""
 
 #: front/src/components/Footer.vue:47
 msgid "Official website"
-msgstr "Oficiala retejo"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:82
+#: front/src/components/auth/Settings.vue:83
 msgid "Old password"
-msgstr "Malnova pasvorto"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:20
 msgid "Open"
-msgstr "Malferma"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:23
 msgid "Open profile"
-msgstr "Malfermi profilon"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:16
 msgid "Open website"
-msgstr "Malfermi retejon"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:40
 msgid "Or customize your rule"
-msgstr "Aŭ agordi vian regulon"
+msgstr ""
 
-#: front/src/components/favorites/List.vue:31
-#: src/components/library/Radios.vue:41
+#: front/src/components/favorites/List.vue:31 src/components/library/Radios.vue:41
 #: front/src/components/manage/library/FilesTable.vue:17
 #: front/src/components/manage/users/UsersTable.vue:17
 #: front/src/views/playlists/List.vue:25
 msgid "Order"
-msgstr "Ordo"
+msgstr ""
 
-#: front/src/components/favorites/List.vue:23
-#: src/components/library/Artists.vue:15
+#: front/src/components/favorites/List.vue:23 src/components/library/Artists.vue:15
 #: front/src/components/library/Radios.vue:33
 #: front/src/components/manage/library/FilesTable.vue:9
 #: front/src/components/manage/moderation/AccountsTable.vue:11
@@ -1684,205 +1646,199 @@ msgstr "Ordo"
 #: front/src/views/content/libraries/FilesTable.vue:21
 #: front/src/views/playlists/List.vue:17
 msgid "Ordering"
-msgstr "Ordo"
+msgstr ""
 
 #: front/src/components/library/Artists.vue:23
 #: front/src/components/manage/moderation/AccountsTable.vue:19
 #: front/src/components/manage/moderation/DomainsTable.vue:17
 #: front/src/views/content/libraries/FilesTable.vue:29
 msgid "Ordering direction"
-msgstr "Orda direkto"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:38
 msgid "Owner"
-msgstr "Proprietulo"
+msgstr ""
 
 #: front/src/components/PageNotFound.vue:33
 msgid "Page Not Found"
-msgstr "Maltrovita paĝo"
+msgstr ""
 
 #: front/src/components/PageNotFound.vue:7
 msgid "Page not found!"
-msgstr "Maltrovitas paĝon!"
+msgstr ""
 
 #: front/src/components/Pagination.vue:39
 msgid "Pagination"
-msgstr "Paĝeco"
+msgstr ""
 
-#: front/src/components/auth/Login.vue:33 src/components/auth/Signup.vue:40
+#: front/src/components/auth/Login.vue:32 src/components/auth/Signup.vue:38
 msgid "Password"
-msgstr "Pasvorto"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:94
+#: front/src/components/auth/SubsonicTokenForm.vue:95
 msgid "Password updated"
-msgstr "Pasvorto aktuliginta"
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:28
 msgid "Password updated successfully"
-msgstr "Pasvorto sukcese aktualiginta"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:352
+#: front/src/components/audio/Player.vue:349
 msgid "Pause track"
-msgstr "Paŭzi kanton"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:59
 msgid "Pause/play the current track"
-msgstr "Paŭzi/ludi la aktualan kanton"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:12
 msgid "Paused"
-msgstr "Paŭza"
+msgstr ""
 
-#: front/src/components/library/FileUpload.vue:107
+#: front/src/components/library/FileUpload.vue:106
 #: front/src/views/content/libraries/FilesTable.vue:14
 #: front/src/views/content/libraries/FilesTable.vue:208
 msgid "Pending"
-msgstr "Atendas"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:37
 msgid "Pending approval"
-msgstr "Atendas aprobon"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:22
 msgid "Pending files"
-msgstr "Atendantaj dosieroj"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:212
 msgid "Pending follow requests"
-msgstr "Atendantaj petoj da sekvado"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:42
 #: front/src/views/admin/moderation/AccountsDetail.vue:137
 msgid "Permissions"
-msgstr "Rajtoj"
+msgstr ""
 
-#: front/src/components/audio/PlayButton.vue:9
-#: src/components/library/Track.vue:40
+#: front/src/components/audio/PlayButton.vue:9 src/components/library/Track.vue:40
 msgid "Play"
-msgstr "Ludi"
+msgstr ""
 
 #: front/src/components/audio/album/Card.vue:50
-#: front/src/components/audio/artist/Card.vue:44
-#: src/components/library/Album.vue:22
-#: front/src/components/library/Album.vue:67 src/views/playlists/Detail.vue:23
+#: front/src/components/audio/artist/Card.vue:44 src/components/library/Album.vue:28
+#: front/src/components/library/Album.vue:73 src/views/playlists/Detail.vue:23
 msgid "Play all"
-msgstr "Ludi ĉiu"
+msgstr ""
 
 #: front/src/components/library/Artist.vue:26
 msgid "Play all albums"
-msgstr "Ludi ĉiuj albumoj"
+msgstr ""
 
 #: front/src/components/audio/PlayButton.vue:15
 #: front/src/components/audio/PlayButton.vue:65
 msgid "Play next"
-msgstr "Ludi baldaŭe"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:67
 msgid "Play next track"
-msgstr "Ludi sekvan kanton"
+msgstr ""
 
 #: front/src/components/audio/PlayButton.vue:16
 #: front/src/components/audio/PlayButton.vue:63
+#: front/src/components/audio/PlayButton.vue:70
 msgid "Play now"
-msgstr "Ludi tuj"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:63
 msgid "Play previous track"
-msgstr "Ludi antaŭa kanto"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:211
 msgid "Play this track"
-msgstr "Ludi tiun kanton"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:351
+#: front/src/components/audio/Player.vue:348
 msgid "Play track"
-msgstr "Ludi kanton"
-
-#: front/src/components/audio/PlayButton.vue:70
-#, fuzzy
-msgid "Play..."
-msgstr "Ludi"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:90
 msgid "Playlist"
-msgstr "Ludlisto"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:12
 msgid "Playlist containing %{ count } track, by %{ username }"
 msgid_plural "Playlist containing %{ count } tracks, by %{ username }"
-msgstr[0] "Ludisto enhavanta unu kanto, je %{username}"
-msgstr[1] "Ludisto enhavanta %{count} kantoj, je %{username}"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/playlists/Form.vue:9
 msgid "Playlist created"
-msgstr "Ludlisto kreiintas"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:4
 msgid "Playlist editor"
-msgstr "Ludlista redaktilo"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:21
 msgid "Playlist name"
-msgstr "Nomo de la ludlisto"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:6
 msgid "Playlist updated"
-msgstr "Ludlisto aktualigintas"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:25
 msgid "Playlist visibility"
-msgstr "Ludlistvideblo"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:71 src/components/library/Home.vue:16
 #: front/src/components/library/Library.vue:13 src/views/admin/Settings.vue:83
 #: front/src/views/playlists/List.vue:106
 msgid "Playlists"
-msgstr "Ludlistoj"
+msgstr ""
 
 #: front/src/components/Home.vue:56
 msgid "Playlists? We got them"
-msgstr "Ludlistoj? Jen"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:78
+#: front/src/components/auth/Settings.vue:79
 msgid "Please double-check your password is correct"
-msgstr "Bonvolu rekontroli ke via pasvorto ĝustas"
+msgstr ""
 
 #: front/src/components/auth/Login.vue:9
 msgid "Please double-check your username/password couple is correct"
-msgstr "Bonvolu rekontroli ke vian uzantnomo kaj pasvorto ĝustas"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:46
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr "PNG, GIF, aŭ JPG. Maksimume 2Mo. La bildo malgrandigos al 400×400 rastrumero."
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:118
 msgid "Prevent account or domain from triggering notifications, except from followers."
-msgstr "Preventi konton aŭ domajno de sendi sciigoj, krom el sekvantoj."
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:29
 msgid "Preview"
-msgstr "Antaŭvido"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:350
+#: front/src/components/audio/Player.vue:347
 msgid "Previous track"
-msgstr "Antaŭa kanto"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:39
 msgid "Problem during scanning"
-msgstr "Eraro dum skano"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:58
 msgid "Proceed"
-msgstr "Konfirmi"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:26
 #: front/src/views/auth/PasswordResetConfirm.vue:31
 msgid "Proceed to login"
-msgstr "Ensalutu"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:17
 msgid "Processing"
-msgstr "Procedas"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
 #: front/src/components/manage/moderation/DomainsTable.vue:168
@@ -1893,350 +1849,346 @@ msgstr "Procedas"
 #: front/src/views/content/libraries/Quota.vue:88
 #: front/src/views/content/libraries/Quota.vue:91
 msgid "Purge"
-msgstr "Purigi"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:89
 msgid "Purge errored files?"
-msgstr "Purigi erarajn dosierojn?"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:37
 msgid "Purge pending files?"
-msgstr "Purigi atendantajn dosierojn?"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:63
 msgid "Purge skipped files?"
-msgstr "Purigi ignoratajn dosierojn?"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:20
 msgid "Queue"
-msgstr "Atendovico"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:283
+#: front/src/components/audio/Player.vue:282
 msgid "Queue shuffled!"
-msgstr "Atendovico miksiĝis!"
+msgstr ""
 
 #: front/src/views/radios/Detail.vue:80
 msgid "Radio"
-msgstr "Radio"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:233
 msgid "Radio Builder"
-msgstr "Faranto de radio"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:15
 msgid "Radio created"
-msgstr "Kreis radion"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:21
 msgid "Radio name"
-msgstr "Nomo de la radio"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:12
 msgid "Radio updated"
-msgstr "Ĝisdatigas radion"
+msgstr ""
 
-#: front/src/components/library/Library.vue:10
-#: src/components/library/Radios.vue:141
+#: front/src/components/library/Library.vue:10 src/components/library/Radios.vue:141
 msgid "Radios"
-msgstr "Radioj"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:39
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:25
 msgid "Reason"
-msgstr "Kialo"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:222
 #: front/src/views/admin/moderation/DomainsDetail.vue:179
 msgid "Received library follows"
-msgstr "Ricevintaj sekvadoj de muzikejo"
+msgstr ""
 
 #: front/src/components/manage/moderation/DomainsTable.vue:40
 #: front/src/components/mixins/Translations.vue:36
 #: front/src/components/mixins/Translations.vue:37
 msgid "Received messages"
-msgstr "Ricevintaj mesaĝoj"
+msgstr ""
 
 #: front/src/components/library/Home.vue:24
 msgid "Recently added"
-msgstr "Novaj aldonoj"
+msgstr ""
 
 #: front/src/components/library/Home.vue:11
 msgid "Recently favorited"
-msgstr "Novaj stelumoj"
+msgstr ""
 
 #: front/src/components/library/Home.vue:6
 msgid "Recently listened"
-msgstr "Lastatempaj aŭskultantoj"
+msgstr ""
 
 #: front/src/views/content/remote/Home.vue:15
 msgid "Refresh"
-msgstr "Ĝisdatigi"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:135
 msgid "Refresh node info"
-msgstr "Aktualigi instancinformon"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:272
 msgid "Refresh table content"
-msgstr "Aktualiĝi datumon de tabelo"
+msgstr ""
+
+#: front/src/components/auth/Profile.vue:12
+msgid "Registered since %{ date }"
+msgstr ""
 
 #: front/src/components/auth/Signup.vue:9
 msgid "Registration are closed on this instance, you will need an invitation code to signup."
-msgstr "Registrigadoj fermitas je tiu instanco, vi bezonos invitkodon por registrigi."
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:71
 msgid "regular user"
-msgstr "normala uzanto"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:51
 msgid "Reject"
-msgstr "Malakcepti"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:32
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:123
 msgid "Reject media"
-msgstr "Malakcepti aŭdovidaĵon"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:43
 msgid "Rejected"
-msgstr "Malakceptinta"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:234
 msgid "Relaunch import"
-msgstr "Rekomenci importadon"
+msgstr ""
 
 #: front/src/views/content/remote/Home.vue:6
 msgid "Remote libraries"
-msgstr "Mallokaj muzikejoj"
+msgstr ""
 
 #: front/src/views/content/remote/Home.vue:7
 msgid "Remote libraries are owned by other users on the network. You can access them as long as they are public or you are granted access."
-msgstr "Mallokaj muzikejoj apartenas al aliaj uzantoj el la reto. Vi povas atingi ilin se ili estas publika aŭ vi estas akceptinta."
+msgstr ""
 
 #: front/src/components/library/radios/Filter.vue:59
 msgid "Remove"
-msgstr "Forigi"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:58
 msgid "Remove avatar"
-msgstr "Forigi profilbildon"
+msgstr ""
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:26
 msgid "Remove from favorites"
-msgstr "Forigi el stelumoj"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:38
 msgid "Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota."
-msgstr "Forigas elŝutatajn sed jam procezontajn kantojn, aldonante tiu datumo al via kvoto."
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:64
 msgid "Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota."
-msgstr "Forigas elŝutatajn preterlasinta kantojn, aldonante tiu datumo al via kvoto."
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:90
 msgid "Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota."
-msgstr "Forigas elŝutatajn kantojn ke la servilo ne povis procezi, aldonante tiu datumo al via kvoto."
-
-#: front/src/components/auth/SubsonicTokenForm.vue:33
-#: front/src/components/auth/SubsonicTokenForm.vue:36
-msgid "Request a new password"
-msgstr "Demandi novan pasvorton"
+msgstr ""
 
 #: front/src/components/auth/SubsonicTokenForm.vue:34
+#: front/src/components/auth/SubsonicTokenForm.vue:37
+msgid "Request a new password"
+msgstr ""
+
+#: front/src/components/auth/SubsonicTokenForm.vue:35
 msgid "Request a new Subsonic API password?"
-msgstr "Demandi novan Subsonic API pasvorton?"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:42
+#: front/src/components/auth/SubsonicTokenForm.vue:43
 msgid "Request a password"
-msgstr "Demandi pasvorton"
+msgstr ""
 
-#: front/src/components/auth/Login.vue:35 src/views/auth/PasswordReset.vue:4
-#: front/src/views/auth/PasswordReset.vue:53
+#: front/src/components/auth/Login.vue:34 src/views/auth/PasswordReset.vue:4
+#: front/src/views/auth/PasswordReset.vue:52
 msgid "Reset your password"
-msgstr "Renuligadi vian pasvorton"
+msgstr ""
 
-#: front/src/components/favorites/List.vue:38
-#: src/components/library/Artists.vue:30
+#: front/src/components/favorites/List.vue:38 src/components/library/Artists.vue:30
 #: front/src/components/library/Radios.vue:52 src/views/playlists/List.vue:32
 msgid "Results per page"
-msgstr "Rezultoj per paĝo"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:17
 msgid "Return to login"
-msgstr "Reiru al ensalutpaĝo"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:16
 msgid "Rule"
-msgstr "Regulo"
+msgstr ""
 
-#: front/src/components/admin/SettingsGroup.vue:67
+#: front/src/components/admin/SettingsGroup.vue:63
 #: front/src/components/library/radios/Builder.vue:33
 msgid "Save"
-msgstr "Konservi"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:165
 msgid "Scan launched"
-msgstr "Skano komencis"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:63
 msgid "Scan now"
-msgstr "Skani nun"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:166
 msgid "Scan skipped (previous scan is too recent)"
-msgstr "Preterlasis skanon (antaŭa skano tro junas)"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:31
 msgid "Scan waiting"
-msgstr "Skano atendas"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:43
 msgid "Scanned"
-msgstr "Skana"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:47
 msgid "Scanned with errors"
-msgstr "Malsukcese skanis"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:35
 msgid "Scanning… (%{ progress }%)"
-msgstr "Skanas… (%{progress}%)"
+msgstr ""
 
-#: front/src/components/library/Artists.vue:10
-#: src/components/library/Radios.vue:29
+#: front/src/components/library/Artists.vue:10 src/components/library/Radios.vue:29
 #: front/src/components/manage/library/FilesTable.vue:5
 #: front/src/components/manage/moderation/AccountsTable.vue:5
 #: front/src/components/manage/moderation/DomainsTable.vue:5
 #: front/src/components/manage/users/InvitationsTable.vue:5
 #: front/src/components/manage/users/UsersTable.vue:5
-#: front/src/views/content/libraries/FilesTable.vue:5
-#: src/views/playlists/List.vue:13
+#: front/src/views/content/libraries/FilesTable.vue:5 src/views/playlists/List.vue:13
 msgid "Search"
-msgstr "Serĉi"
+msgstr ""
 
 #: front/src/views/content/remote/ScanForm.vue:9
 msgid "Search a remote library"
-msgstr "Serĉi mallokan muzikejon"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
-#, fuzzy
-msgid "Search by domain, username, bio…"
-msgstr "Serĉu per domajno, uzantnomo, biografio…"
+msgid "Search by domain, username, bio..."
+msgstr ""
 
 #: front/src/components/manage/moderation/DomainsTable.vue:151
-#, fuzzy
-msgid "Search by name…"
-msgstr "Serĉu per nomo…"
+msgid "Search by name..."
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:201
 msgid "Search by title, artist, album…"
-msgstr "Serĉu per titolo, artisto, albumo…"
+msgstr ""
 
 #: front/src/components/manage/library/FilesTable.vue:176
 msgid "Search by title, artist, domain…"
-msgstr "Serĉu per titolo, artisto, domajno…"
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:153
 msgid "Search by username, e-mail address, code…"
-msgstr "Serĉu per uzantnomo, retpoŝtdreso, kodo…"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:163
 msgid "Search by username, e-mail address, name…"
-msgstr "Serĉu per uzantnomo, retpoŝtadreso, nomo…"
+msgstr ""
 
 #: front/src/components/audio/SearchBar.vue:20
 msgid "Search for artists, albums, tracks…"
-msgstr "Serĉu artistoj, albumoj, kantoj…"
+msgstr ""
 
 #: front/src/components/audio/Search.vue:2
 msgid "Search for some music"
-msgstr "Serĉi muzikon"
+msgstr ""
 
 #: front/src/components/library/Track.vue:162
 msgid "Search on lyrics.wikia.com"
-msgstr "Serĉi je lyrics.wikia.com"
+msgstr ""
 
-#: front/src/components/library/Album.vue:27
-#: src/components/library/Artist.vue:31
+#: front/src/components/library/Album.vue:33 src/components/library/Artist.vue:31
 #: front/src/components/library/Track.vue:47
 msgid "Search on Wikipedia"
-msgstr "Serĉi je Vikipedio"
+msgstr ""
 
-#: front/src/components/library/Library.vue:32
-#: src/views/admin/library/Base.vue:17
-#: front/src/views/admin/moderation/Base.vue:22
-#: src/views/admin/users/Base.vue:21 front/src/views/content/Base.vue:19
+#: front/src/components/library/Library.vue:32 src/views/admin/library/Base.vue:17
+#: front/src/views/admin/moderation/Base.vue:22 src/views/admin/users/Base.vue:21
+#: front/src/views/content/Base.vue:19
 msgid "Secondary menu"
-msgstr "Dua menuo"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:15
 msgid "Sections"
-msgstr "Sekcioj"
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:45
 msgid "Select a filter"
-msgstr "Elekti filtrilon"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:77
 msgid "Select all %{ total } elements"
 msgid_plural "Select all %{ total } elements"
-msgstr[0] "Elekti unu eron"
-msgstr[1] "Elekti ĉiun la %{total} erojn"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/common/ActionTable.vue:86
 msgid "Select only current page"
-msgstr "Elekti nur la aktualan uzon"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:43 src/components/Sidebar.vue:85
 #: front/src/components/manage/users/UsersTable.vue:181
 #: front/src/views/admin/moderation/AccountsDetail.vue:472
 msgid "Settings"
-msgstr "Agordoj"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:10
 msgid "Settings updated"
-msgstr "Agordoj ĝisdatigas"
+msgstr ""
 
 #: front/src/components/admin/SettingsGroup.vue:11
 msgid "Settings updated successfully."
-msgstr "Agordoj sukcese ĝisdatigas."
+msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:27
 msgid "Share link"
-msgstr "Diskonigi ligilon"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:15
 msgid "Share this link with other users so they can request access to your library."
-msgstr "Diskonigu tiu ligilo kun aliaj uzantoj, do ili povas peti atingon al via muzikejo."
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
 msgid "Sharing link"
-msgstr "Diskoniga ligilo"
+msgstr ""
 
 #: front/src/components/audio/album/Card.vue:40
 msgid "Show %{ count } more track"
 msgid_plural "Show %{ count } more tracks"
-msgstr[0] "Afiŝi %{count} kanto"
-msgstr[1] "Afŝi %{count} kantoj"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/audio/artist/Card.vue:30
 msgid "Show 1 more album"
 msgid_plural "Show %{ count } more albums"
-msgstr[0] "Afiŝi unu alian albumon"
-msgstr[1] "Afiŝi %{count} aliajn albumojn"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/ShortcutsModal.vue:42
 msgid "Show available keyboard shortcuts"
-msgstr "Afiŝi disponeblajn fulmoklavojn"
+msgstr ""
 
 #: front/src/views/Notifications.vue:10
 msgid "Show read notifications"
-msgstr "Afiŝi mallegintajn sciigojn"
+msgstr ""
 
-#: front/src/components/forms/PasswordInput.vue:26
+#: front/src/components/forms/PasswordInput.vue:25
 msgid "Show/hide password"
-msgstr "Afiŝi/kaŝi pasvorton"
+msgstr ""
 
 #: front/src/components/manage/library/FilesTable.vue:97
 #: front/src/components/manage/moderation/AccountsTable.vue:88
@@ -2245,33 +2197,39 @@ msgstr "Afiŝi/kaŝi pasvorton"
 #: front/src/components/manage/users/UsersTable.vue:87
 #: front/src/views/content/libraries/FilesTable.vue:114
 msgid "Showing results %{ start }-%{ end } on %{ total }"
-msgstr "Afiŝas rezultoj de %{start} al %{end} de %{total}"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:83
 msgid "Shuffle queue"
-msgstr "Miksi atendocivo"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:365
+#: front/src/components/audio/Player.vue:362
 msgid "Shuffle your queue"
-msgstr "Miksi vian atendovico"
+msgstr ""
 
-#: front/src/components/auth/Signup.vue:97
+#: front/src/components/auth/Signup.vue:95
 msgid "Sign Up"
-msgstr "Registriĝi"
+msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:40
 msgid "Sign-up"
-msgstr "Registriĝi"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:31
 #: front/src/views/admin/moderation/AccountsDetail.vue:176
 #: front/src/components/mixins/Translations.vue:32
 msgid "Sign-up date"
-msgstr "Registrada dato"
+msgstr ""
 
+#: front/src/components/manage/moderation/InstancePolicyCard.vue:24
+#: front/src/components/manage/moderation/InstancePolicyForm.vue:115
+msgid "Silence activity"
+msgstr ""
+
+#: front/src/components/manage/moderation/InstancePolicyCard.vue:28
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:119
 msgid "Silence notifications"
-msgstr "Mutigi sciigojn"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:85
 #: front/src/components/library/Track.vue:120
@@ -2280,45 +2238,45 @@ msgstr "Mutigi sciigojn"
 #: front/src/views/content/libraries/FilesTable.vue:60
 #: front/src/components/mixins/Translations.vue:29
 msgid "Size"
-msgstr "Grando"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:15
 #: front/src/views/content/libraries/FilesTable.vue:204
 msgid "Skipped"
-msgstr "Preterlasinta"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:49
 msgid "Skipped files"
-msgstr "Preterlasintaj dosieroj"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:97
 msgid "Software"
-msgstr "Aplikaĵo"
+msgstr ""
 
 #: front/src/components/Footer.vue:49
 msgid "Source code"
-msgstr "Fontkodo"
+msgstr ""
 
 #: front/src/components/auth/Profile.vue:23
 #: front/src/components/manage/users/UsersTable.vue:70
 msgid "Staff member"
-msgstr "Skipano"
+msgstr ""
 
 #: front/src/components/radios/Button.vue:4
 msgid "Start"
-msgstr "Komenci"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:86
 msgid "Statistics"
-msgstr "Statistikoj"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:454
 msgid "Statistics are computed from known activity and content on your instance, and do not reflect general activity for this account"
-msgstr "Statistikoj estas kalkula el konata aktiveco kaj datumoj de via instanco, kaj ne kongruas la generalan aktivecon de tiu konto"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:358
 msgid "Statistics are computed from known activity and content on your instance, and do not reflect general activity for this domain"
-msgstr "Statistikoj estas kalkula el konata aktiveco kaj datumoj de via instanco, kaj ne kongruas la generalan aktivecon de tiu domajno"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:86
 #: front/src/components/manage/users/InvitationsTable.vue:17
@@ -2327,165 +2285,164 @@ msgstr "Statistikoj estas kalkula el konata aktiveco kaj datumoj de via instanco
 #: front/src/views/admin/moderation/DomainsDetail.vue:123
 #: front/src/views/content/libraries/Detail.vue:28
 msgid "Status"
-msgstr "Stato"
+msgstr ""
 
 #: front/src/components/radios/Button.vue:3
 msgid "Stop"
-msgstr "Stopi"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:161
 msgid "Stop radio"
-msgstr "Stopi radion"
+msgstr ""
 
 #: front/src/App.vue:22
 msgid "Submit"
-msgstr "Submeti"
+msgstr ""
 
 #: front/src/views/admin/Settings.vue:85
 msgid "Subsonic"
-msgstr "Subsono"
+msgstr ""
 
 #: front/src/components/auth/SubsonicTokenForm.vue:2
 msgid "Subsonic API password"
-msgstr "Subsona API pasvorto"
+msgstr ""
 
 #: front/src/App.vue:26
 msgid "Suggested choices"
-msgstr "Sugestaj elektoj"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:3
 msgid "Summary"
-msgstr "Resumo"
+msgstr ""
 
 #: front/src/components/Footer.vue:39
 msgid "Support forum"
-msgstr "Helpretejo"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:78
 msgid "Supported extensions: %{ extensions }"
-msgstr "Funkcianta sufikso: %{extensions}"
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:9
 msgid "Syncing changes to server…"
-msgstr "Sinkronigas ŝanĝojn al servilo…"
+msgstr ""
 
 #: front/src/components/common/CopyInput.vue:3
 msgid "Text copied to clipboard!"
-msgstr "Kopiis teksto al tondujo!"
+msgstr ""
 
 #: front/src/components/Home.vue:26
 msgid "That's simple: we loved Grooveshark and we want to build something even better."
-msgstr "Simplas: ni amis Grooveshark kaj ni volas konstrui iu plue bona."
+msgstr ""
 
 #: front/src/components/Footer.vue:53
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
-msgstr "La emblemo de Funkwhale estis dizajni kaj disponigi je Francis Gading."
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:34
 msgid "The library and all its tracks will be deleted. This can not be undone."
-msgstr "La muzikejo kaj ĉiuj ĝiaj kantoj forigos. Ne povos malfari."
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:39
 msgid "The music files you are uploading are tagged properly:"
-msgstr "La muzika dosiero vi elŝutas bone etikedas:"
+msgstr ""
 
 #: front/src/components/audio/Player.vue:67
-#, fuzzy
-msgid "The next track will play automatically in a few seconds…"
-msgstr "La sekva kanto ludos aŭtomate je kelkajn sekundoj…"
+msgid "The next track will play automatically in a few seconds..."
+msgstr ""
 
 #: front/src/components/Home.vue:121
 msgid "The plaform is free and open-source, you can install it and modify it without worries"
-msgstr "La platformo estas libera kaj malfermitkoda, vi povas instali ĝin malzorge"
+msgstr ""
 
 #: front/src/components/auth/SubsonicTokenForm.vue:4
 msgid "The Subsonic API is not available on this Funkwhale instance."
-msgstr "La Subsona API ne disponeblas en tiu Funkwhale instanco."
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:43
 msgid "The uploaded music files are in OGG, Flac or MP3 format"
-msgstr "La elŝutintaj muzikaj dosieroj estas OGG, Flac aŭ MP3"
+msgstr ""
 
 #: front/src/views/content/Home.vue:4
 msgid "There are various ways to grab new content and make it available here."
-msgstr "Estas multe vojoj akiri novan datumon kaj aldoni ĉi-tie."
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:66
 msgid "This action is irreversible."
-msgstr "Tiu akto ne estas malfaronta."
+msgstr ""
 
-#: front/src/components/library/Album.vue:85
+#: front/src/components/library/Album.vue:91
 msgid "This album is present in the following libraries:"
-msgstr "Tiu albumo estas en ĉi-tiuj muzikejoj:"
+msgstr ""
 
 #: front/src/components/library/Artist.vue:63
 msgid "This artist is present in the following libraries:"
-msgstr "Tiu artisto estas en ĉi-tiuj muzikejoj:"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:55
 #: front/src/views/admin/moderation/DomainsDetail.vue:48
 msgid "This domain is subject to specific moderation rules"
-msgstr "Tiu domajno havas specialajn moderecajn regulojn"
+msgstr ""
 
 #: front/src/views/content/Home.vue:9
 msgid "This instance offers up to %{quota} of storage space for every user."
-msgstr "Tiu instanco oferi ĝis %{quota} de memorado per uzanto."
+msgstr ""
 
 #: front/src/components/auth/Profile.vue:16
 msgid "This is you!"
-msgstr "Estas vin!"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:71
 msgid "This library contains my personal music, I hope you like it."
-msgstr "Tiu muzikejo enhavas mian personan muzikon, mi esperas vi ŝatas ĝin."
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:131
 msgid "This library is private and your approval from its owner is needed to access its content"
-msgstr "Tiu muzikejo estas privata kaj vi bezonas akceptadon el ĝia proprulo por vidi ĝia enhavo"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:132
 msgid "This library is public and you can access its content freely"
-msgstr "Tiu muzikejo estas publika do vi povas vidi ĝia enhavo libere"
+msgstr ""
 
 #: front/src/components/common/ActionTable.vue:45
 msgid "This may affect a lot of elements or have irreversible consequences, please double check this is really what you want."
-msgstr "Tiu efektus multe da ero aŭ havus malfarontajn konsekvencojn, bonvolu recertiĝi vi vere volas tiun."
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:52
 msgid "This reference will be used to group imported files together."
-msgstr "Tiu referenco estus uzonta por grupigi importadajn dosierojn kune."
+msgstr ""
 
 #: front/src/components/audio/PlayButton.vue:73
 msgid "This track is not available in any library you have access to"
-msgstr "Tiu kanto ne disponeblas en iu aj muzikejo vi povas atingi"
+msgstr ""
 
 #: front/src/components/library/Track.vue:171
 msgid "This track is present in the following libraries:"
-msgstr "Tiu kanto ne estas en ĉi-tiu muzikejoj:"
+msgstr ""
 
 #: front/src/views/playlists/Detail.vue:37
 msgid "This will completely delete this playlist and cannot be undone."
-msgstr "Tute forigos tiun ludliston kaj ne povus esti malfaronta."
+msgstr ""
 
 #: front/src/views/radios/Detail.vue:27
 msgid "This will completely delete this radio and cannot be undone."
-msgstr "Tute forigos tiun radion kaj ne povus esti malfaronta."
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:50
+#: front/src/components/auth/SubsonicTokenForm.vue:51
 msgid "This will completely disable access to the Subsonic API using from account."
-msgstr "Tute malaktivas atingo al la subsona API el tiu konto."
+msgstr ""
 
-#: front/src/App.vue:132 src/components/Footer.vue:72
+#: front/src/App.vue:129 src/components/Footer.vue:72
 msgid "This will erase your local data and disconnect you, do you want to continue?"
-msgstr "Forigos vian lokan datumon kaj elsalutos vin, ĉu vi volas kontinui?"
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:35
+#: front/src/components/auth/SubsonicTokenForm.vue:36
 msgid "This will log you out from existing devices that use the current password."
-msgstr "Elsalutos vin el ĉiu viaj aparatoj ke uzas la aktualan pasvorton."
+msgstr ""
 
 #: front/src/components/playlists/Editor.vue:44
 msgid "This will remove all tracks from this playlist and cannot be undone."
-msgstr "Forigos ĉiujn kantojn el tiu ludlisto kaj ne povus esti malfaronta."
+msgstr ""
 
 #: front/src/components/audio/track/Table.vue:6
 #: front/src/components/manage/library/FilesTable.vue:37
@@ -2493,187 +2450,185 @@ msgstr "Forigos ĉiujn kantojn el tiu ludlisto kaj ne povus esti malfaronta."
 #: front/src/views/content/libraries/FilesTable.vue:54
 #: front/src/components/mixins/Translations.vue:28
 msgid "Title"
-msgstr "Titolo"
+msgstr ""
 
 #: front/src/components/ShortcutsModal.vue:79
 msgid "Toggle queue looping"
-msgstr "Baskuli ripetadon de la atendovico"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:288
 #: front/src/views/admin/moderation/DomainsDetail.vue:225
 msgid "Total size"
-msgstr "Tuta grando"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:61
 msgid "Total size of the files in this library"
-msgstr "Tuta grando de tiu muzikejo"
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:113
 msgid "Total users"
-msgstr "Tutaj uzantoj"
+msgstr ""
 
-#: front/src/components/audio/SearchBar.vue:27
-#: src/components/library/Track.vue:262
+#: front/src/components/audio/SearchBar.vue:27 src/components/library/Track.vue:262
 #: front/src/components/metadata/Search.vue:138
 msgid "Track"
-msgstr "Kanto"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:205
 msgid "Track already present in one of your libraries"
-msgstr "Kanto jam estas en unu de viaj muzikejoj"
+msgstr ""
 
 #: front/src/components/library/Track.vue:85
 msgid "Track information"
-msgstr "Kantodatumo"
+msgstr ""
 
 #: front/src/components/library/radios/Filter.vue:44
 msgid "Track matching filter"
-msgstr "Kanto kongruanta filtrilo"
+msgstr ""
 
 #: front/src/components/mixins/Translations.vue:23
 #: front/src/components/mixins/Translations.vue:24
 msgid "Track name"
-msgstr "Nomo de kanto"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:209
 msgid "Track uploaded, but not processed by the server yet"
-msgstr "Kanto elŝutanta, sed la servilo ne jam procezis ĝin"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:54
 msgid "tracks"
-msgstr "kantoj"
+msgstr ""
 
-#: front/src/components/library/Album.vue:75
+#: front/src/components/library/Album.vue:81
 #: front/src/components/playlists/PlaylistModal.vue:33
 #: front/src/views/admin/moderation/AccountsDetail.vue:329
 #: front/src/views/admin/moderation/DomainsDetail.vue:265
 #: front/src/views/content/Base.vue:8 src/views/content/libraries/Detail.vue:8
 #: front/src/views/playlists/Detail.vue:50 src/views/radios/Detail.vue:34
 msgid "Tracks"
-msgstr "Kantoj"
+msgstr ""
 
 #: front/src/components/library/Artist.vue:54
 msgid "Tracks by this artist"
-msgstr "Kantoj je tiu artisto"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:25
 msgid "Tracks favorited"
-msgstr "Stelumantaj kantoj"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:19
 msgid "tracks listened"
-msgstr "aŭskultintaj kantoj"
+msgstr ""
 
 #: front/src/components/library/Track.vue:138
 #: front/src/components/manage/library/FilesTable.vue:41
 #: front/src/views/admin/moderation/AccountsDetail.vue:151
 msgid "Type"
-msgstr "Tipo"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:44
 #: front/src/components/manage/moderation/DomainsTable.vue:42
 msgid "Under moderation rule"
-msgstr "Moderece"
+msgstr ""
 
-#: front/src/views/content/remote/Card.vue:100
-#: src/views/content/remote/Card.vue:105
+#: front/src/views/content/remote/Card.vue:100 src/views/content/remote/Card.vue:105
 msgid "Unfollow"
-msgstr "Malsekvi"
+msgstr ""
 
 #: front/src/views/content/remote/Card.vue:101
 msgid "Unfollow this library?"
-msgstr "Malsekvi tiun muzikejon?"
+msgstr ""
 
-#: front/src/components/About.vue:17
+#: front/src/components/About.vue:15
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
-msgstr "Malfeliĉe, proprulo de tiu instanco ne jam plenigis tiu paĝon."
+msgstr ""
 
 #: front/src/components/Home.vue:37
 msgid "Unlimited music"
-msgstr "Infinita muziko"
+msgstr ""
 
-#: front/src/components/audio/Player.vue:354
+#: front/src/components/audio/Player.vue:351
 msgid "Unmute"
-msgstr "Malmutigi"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:45
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:57
 msgid "Update"
-msgstr "Ĝisdati"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:50
 msgid "Update avatar"
-msgstr "Ĝisdati avataron"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:25
 msgid "Update library"
-msgstr "Ĝisdati muzikejon"
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:3
 msgid "Update moderation rule"
-msgstr "Ĝisdati moderecan regulon"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:33
 msgid "Update playlist"
-msgstr "Ĝisdati ludliston"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:27
 msgid "Update settings"
-msgstr "Ĝisdati agordojn"
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:21
 msgid "Update your password"
-msgstr "Ĝisdati vian pasvorton"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:44
 #: front/src/views/content/libraries/DetailArea.vue:24
 msgid "Upload"
-msgstr "Elŝuti"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:45
 msgid "Upload a new avatar"
-msgstr "Elŝuti novan avataron"
+msgstr ""
 
 #: front/src/views/content/Home.vue:6
 msgid "Upload audio content"
-msgstr "Elŝuti aŭdon"
+msgstr ""
 
 #: front/src/views/content/libraries/FilesTable.vue:57
 msgid "Upload date"
-msgstr "Elŝutdato"
+msgstr ""
 
+#: front/src/components/library/FileUpload.vue:219
 #: front/src/components/library/FileUpload.vue:220
-#: front/src/components/library/FileUpload.vue:221
 msgid "Upload denied, ensure the file is not too big and that you have not reached your quota"
-msgstr "Malakcepti elŝuto, certiĝi la dosieron ne tro grandas kaj vi nur havas spaco"
+msgstr ""
 
 #: front/src/views/content/Home.vue:7
 msgid "Upload music files (MP3, OGG, FLAC, etc.) from your personal library directly from your browser to enjoy them here."
-msgstr "Elŝuti muzikajn dosierojn (MP3, OGG, FLAC, ktp.) el via persona muzika dosierujo direkte en via retumilo por ĝui ilin ĉi-tie."
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:31
 msgid "Upload new tracks"
-msgstr "Elŝuti novajn kantojn"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:269
 msgid "Upload quota"
-msgstr "Elŝutlimito"
+msgstr ""
 
-#: front/src/components/library/FileUpload.vue:229
+#: front/src/components/library/FileUpload.vue:228
 msgid "Upload timeout, please try again"
-msgstr "Elŝuto tempolimis, bonvolu reprovi"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:100
 msgid "Uploaded"
-msgstr "Elŝutinta"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:5
 msgid "Uploading"
-msgstr "Elŝutanta"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:103
 msgid "Uploading…"
-msgstr "Elŝutanta…"
+msgstr ""
 
 #: front/src/components/manage/moderation/AccountsTable.vue:41
 #: front/src/components/mixins/Translations.vue:37
@@ -2681,41 +2636,40 @@ msgstr "Elŝutanta…"
 #: front/src/views/admin/moderation/DomainsDetail.vue:241
 #: front/src/components/mixins/Translations.vue:38
 msgid "Uploads"
-msgstr "Elŝutoj"
+msgstr ""
 
 #: front/src/components/Footer.vue:16
 msgid "Use another instance"
-msgstr "Uzi alian instancon"
+msgstr ""
 
 #: front/src/views/auth/PasswordReset.vue:12
 msgid "Use this form to request a password reset. We will send an email to the given address with instructions to reset your password."
-msgstr "Uzu tiun formularo por peti pasvortnuligado. Ni sendos retpoŝtmesaĝon kun instrukcioj por nuligi vian pasvorton."
+msgstr ""
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:111
 msgid "Use this setting to temporarily enable/disable the policy without completely removing it."
-msgstr "Uzu tiun agordon por tempe aktivigi/malaktivigi la regularon sen tute forigi ĝin."
+msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgid "Used"
-msgstr "Uzinta"
+msgstr ""
 
 #: front/src/views/content/libraries/Detail.vue:26
 msgid "User"
-msgstr "Uzanto"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:5
 msgid "User activity"
-msgstr "Uzanta aktivado"
+msgstr ""
 
-#: front/src/components/library/Album.vue:82
-#: src/components/library/Artist.vue:60
+#: front/src/components/library/Album.vue:88 src/components/library/Artist.vue:60
 #: front/src/components/library/Track.vue:168
 msgid "User libraries"
-msgstr "Uzantaj muzikejoj"
+msgstr ""
 
 #: front/src/components/library/Radios.vue:20
 msgid "User radios"
-msgstr "Uzantaj radioj"
+msgstr ""
 
 #: front/src/components/auth/Signup.vue:19
 #: front/src/components/manage/users/UsersTable.vue:37
@@ -2723,226 +2677,224 @@ msgstr "Uzantaj radioj"
 #: front/src/views/admin/moderation/AccountsDetail.vue:85
 #: front/src/components/mixins/Translations.vue:34
 msgid "Username"
-msgstr "Uzantnomo"
+msgstr ""
 
 #: front/src/components/auth/Login.vue:15
 msgid "Username or email"
-msgstr "Uzantnomo aŭ retpoŝtadreso"
+msgstr ""
 
 #: front/src/components/instance/Stats.vue:13
 msgid "users"
-msgstr "uzantoj"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:91
 #: front/src/components/manage/moderation/DomainsTable.vue:39
-#: front/src/components/mixins/Translations.vue:35
-#: src/views/admin/Settings.vue:81 front/src/views/admin/users/Base.vue:5
-#: src/views/admin/users/UsersList.vue:3
+#: front/src/components/mixins/Translations.vue:35 src/views/admin/Settings.vue:81
+#: front/src/views/admin/users/Base.vue:5 src/views/admin/users/UsersList.vue:3
 #: front/src/views/admin/users/UsersList.vue:21
 #: front/src/components/mixins/Translations.vue:36
 msgid "Users"
-msgstr "Uzantoj"
+msgstr ""
 
 #: front/src/components/Footer.vue:29
 msgid "Using Funkwhale"
-msgstr "Uzi Funkwhale"
+msgstr ""
 
 #: front/src/components/Footer.vue:13
 msgid "Version %{version}"
-msgstr "Versio %{version}"
+msgstr ""
 
 #: front/src/views/content/libraries/Quota.vue:29
 #: front/src/views/content/libraries/Quota.vue:56
 #: front/src/views/content/libraries/Quota.vue:82
 msgid "View files"
-msgstr "Vidi dosierojn"
+msgstr ""
 
-#: front/src/components/library/Album.vue:31
-#: src/components/library/Artist.vue:35
+#: front/src/components/library/Album.vue:37 src/components/library/Artist.vue:35
 #: front/src/components/library/Track.vue:51
 #: front/src/components/metadata/ArtistCard.vue:49
 #: front/src/components/metadata/ReleaseCard.vue:53
 msgid "View on MusicBrainz"
-msgstr "Vidi en MusicBrainz"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:18
 msgid "Visibility"
-msgstr "Videblo"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:59
 msgid "Visibility: everyone on this instance"
-msgstr "Videblo: ĉiu en ĉi-tiu instanco"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:60
 msgid "Visibility: everyone, including other instances"
-msgstr "Videblo: ĉiu, enhave aliaj instancoj"
+msgstr ""
 
 #: front/src/views/content/libraries/Card.vue:58
 msgid "Visibility: nobody except me"
-msgstr "Videblo: neniu krom mi"
+msgstr ""
 
-#: front/src/components/library/Album.vue:61
+#: front/src/components/library/Album.vue:67
 msgid "Volume %{ number }"
-msgstr "Volumo %{number}"
+msgstr ""
 
 #: front/src/components/playlists/PlaylistModal.vue:20
 msgid "We cannot add the track to a playlist"
-msgstr "Ni ne povas aldoni kanton al ludlisto"
+msgstr ""
 
 #: front/src/components/playlists/Form.vue:14
 msgid "We cannot create the playlist"
-msgstr "Ni ne povis krei ludliston"
+msgstr ""
 
 #: front/src/components/auth/Signup.vue:13
 msgid "We cannot create your account"
-msgstr "Ni ne povis krei vian konton"
+msgstr ""
 
 #: front/src/components/audio/Player.vue:64
 msgid "We cannot load this track"
-msgstr "Ni ne povis ŝargi tiun kanton"
+msgstr ""
 
 #: front/src/components/auth/Login.vue:7
 msgid "We cannot log you in"
-msgstr "Ni ne povis ensaluti vin"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:38
 msgid "We cannot save your avatar"
-msgstr "Ni ne povis memori vian avataron"
+msgstr ""
 
 #: front/src/components/auth/Settings.vue:14
 msgid "We cannot save your settings"
-msgstr "Ni ne povis memori viajn agordojn"
+msgstr ""
 
 #: front/src/components/Home.vue:127
 msgid "We do not track you or bother you with ads"
-msgstr "Ni ne spionas vin aŭ ĝenas vin kun reklamoj"
+msgstr ""
 
 #: front/src/components/library/Track.vue:95
 msgid "We don't have any copyright information for this track"
-msgstr "Ni havas nenia kopirajta informado pri tiu kanto"
+msgstr ""
 
 #: front/src/components/library/Track.vue:106
 msgid "We don't have any licensing information for this track"
-msgstr "Ni havas nenia licenca informado pri tiu kanto"
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:40
 msgid "We recommend using Picard for that purpose."
-msgstr "Ni rekomendas Picard pro fari tiun."
+msgstr ""
 
 #: front/src/components/Home.vue:7
 msgid "We think listening to music should be simple."
-msgstr "Ni pensas ke aŭskulti muzikon devus simpli."
+msgstr ""
 
 #: front/src/components/PageNotFound.vue:10
 msgid "We're sorry, the page you asked for does not exist:"
-msgstr "Pardonon, la paĝo vi petis ne ekzistas:"
+msgstr ""
 
 #: front/src/components/Home.vue:153
 msgid "Welcome"
-msgstr "Bonvenon"
+msgstr ""
 
 #: front/src/components/Home.vue:5
 msgid "Welcome on Funkwhale"
-msgstr "Bonvenon en Funkwhale"
+msgstr ""
 
 #: front/src/components/Home.vue:24
 msgid "Why funkwhale?"
-msgstr "Kial Funkwhale?"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:13
 msgid "Widget height"
-msgstr "Alto de fenestraĵo"
+msgstr ""
 
 #: front/src/components/audio/EmbedWizard.vue:6
 msgid "Widget width"
-msgstr "Larĝo de fenestraĵo"
+msgstr ""
 
 #: front/src/components/Sidebar.vue:118
 #: front/src/components/manage/moderation/AccountsTable.vue:72
 #: front/src/components/manage/moderation/DomainsTable.vue:58
 msgid "Yes"
-msgstr "Jes"
+msgstr ""
 
 #: front/src/components/auth/Logout.vue:8
 msgid "Yes, log me out!"
-msgstr "Jes, elsaluti min!"
+msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:19
 msgid "You are able to share your library with other people, regardless of its visibility."
-msgstr "Vi povas diskonigi vian muzikejon kun aliaj uloj, sendepende ĝia videblo."
+msgstr ""
 
 #: front/src/components/library/FileUpload.vue:33
 msgid "You are about to upload music to your library. Before proceeding, please ensure that:"
-msgstr "Vi estas elŝutota muziko al via muzikejo. Antaŭ komenci, bonvolu certiĝi ke:"
+msgstr ""
 
 #: front/src/components/auth/Logout.vue:7
 msgid "You are currently logged in as %{ username }"
-msgstr "Vi aktuale estas ensaluta al %{username}"
+msgstr ""
 
 #: front/src/views/content/Home.vue:17
 msgid "You can follow libraries from other users to get access to new music. Public libraries can be followed immediatly, while following a private library requires approval from its owner."
-msgstr "Vi povas sekvi muzikejoj el aliaj uzantoj por atingi novan muzikon. Publikaj muzikejoj sekvadeblas rekte, sed sekvado de privataj muzikejoj bezonas akceptado el ĝia proprulo."
+msgstr ""
 
 #: front/src/components/Home.vue:133
 msgid "You can invite friends and family to your instance so they can enjoy your music"
-msgstr "Vi povas inviti amikojn kaj familio en via instanco do ili povas ĝui vian muzikon"
+msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:24
 msgid "You can now use the service without limitations."
-msgstr "Vi nun povas uzi la servico senlime."
+msgstr ""
 
 #: front/src/components/library/radios/Builder.vue:7
 msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
-msgstr "Vi povas uzi tiun interfaco por konstrui viajn proprajn radiojn, ke ludos kantojn laŭ viaj reguloj."
+msgstr ""
 
-#: front/src/components/auth/SubsonicTokenForm.vue:7
+#: front/src/components/auth/SubsonicTokenForm.vue:8
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
-msgstr "Vi povas uzi tiujn por ĝui vian muzikon kaj ludlistojn nekonektite, kun via poŝtelefono aŭ tabuleto ekzemple."
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:46
 msgid "You don't have any rule in place for this account."
-msgstr "Vi ne havas iu ajn regulon por tiu konto."
+msgstr ""
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:39
 msgid "You don't have any rule in place for this domain."
-msgstr "Vi ne havas iu ajn regulon por tiu domajno."
+msgstr ""
 
 #: front/src/components/Sidebar.vue:158
 msgid "You have a radio playing"
-msgstr "Vi ludas radion"
+msgstr ""
 
 #: front/src/components/audio/Player.vue:71
 msgid "You may have a connectivity issue."
-msgstr "Vi havus konekta problemo."
+msgstr ""
 
 #: front/src/App.vue:17
 msgid "You need to select an instance in order to continue"
-msgstr "Vi devu elekti instanco por kontinui"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:99
+#: front/src/components/auth/Settings.vue:100
 msgid "You will be logged out from this session and have to log in with the new one"
-msgstr "Vi estos elŝaluta el tiu seanco kaj devus ensaluti denove"
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:70
+#: front/src/components/auth/Settings.vue:71
 msgid "You will have to update your password on your clients that use this password."
-msgstr "Vi devos rekte ŝanĝi vian pasvorton en la aplikaĵo ke uzas ĝin."
+msgstr ""
 
-#: front/src/components/favorites/List.vue:115
+#: front/src/components/favorites/List.vue:112
 msgid "Your Favorites"
-msgstr "Viaj stelumoj"
+msgstr ""
 
 #: front/src/components/Home.vue:114
 msgid "Your music, your way"
-msgstr "Via muziko, via vojo"
+msgstr ""
 
 #: front/src/views/Notifications.vue:7
 msgid "Your notifications"
-msgstr "Viaj sciigoj"
+msgstr ""
 
 #: front/src/views/auth/PasswordResetConfirm.vue:29
 msgid "Your password has been updated successfully."
-msgstr "Via pasvorto sukcese ŝanĝis."
+msgstr ""
 
-#: front/src/components/auth/Settings.vue:100
+#: front/src/components/auth/Settings.vue:101
 msgid "Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password"
-msgstr "Via Subsona pasvorto ŝanĝos hazarde, elsalutontas vin el aparetoj ke uzis la malnovan pasvorton"
+msgstr ""

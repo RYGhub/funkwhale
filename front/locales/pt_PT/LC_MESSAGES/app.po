@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-11 15:55+0100\n"
+"POT-Creation-Date: 2019-01-29 10:47+0100\n"
 "PO-Revision-Date: 2019-01-18 21:50+0000\n"
 "Last-Translator: troll <my_name_is_troll@protonmail.com>\n"
 "Language-Team: none\n"
@@ -89,15 +89,14 @@ msgstr "%{ username } aceitou seu seguimento na biblioteca \"%{ library }\""
 msgid "%{ username } followed your library \"%{ library }\""
 msgstr "%{ username } seguiu a sua biblioteca \"%{ library }\""
 
+#: front/src/components/notifications/NotificationRow.vue:41
+#, fuzzy
+msgid "%{ username } wants to follow your library \"%{ library }\""
+msgstr "%{ username } seguiu a sua biblioteca \"%{ library }\""
+
 #: front/src/components/auth/Profile.vue:46
 msgid "%{ username }'s profile"
 msgstr "%{ username } perfil"
-
-#: front/src/components/Footer.vue:5
-msgid "<translate :translate-params=\"{instanceName: instanceHostname}\">About %{instanceName}</translate>"
-msgstr ""
-"<translate :translate-params=\"{instanceName: instanceHostname}\">Sobre "
-"%{instanceName}</translate>"
 
 #: front/src/components/audio/artist/Card.vue:41
 msgid "1 album"
@@ -111,8 +110,8 @@ msgid_plural "%{ count } favorites"
 msgstr[0] "1 preferida"
 msgstr[1] "%{ count } preferidas"
 
-#: front/src/components/library/FileUpload.vue:225
 #: front/src/components/library/FileUpload.vue:226
+#: front/src/components/library/FileUpload.vue:227
 msgid "A network error occured while uploading this file"
 msgstr "Ocorreu um erro durante o upload deste ficheiro"
 
@@ -132,7 +131,7 @@ msgstr "Sobre Funkwhale"
 msgid "About page"
 msgstr "Sobre a página"
 
-#: front/src/components/About.vue:8 src/components/About.vue:64
+#: front/src/components/About.vue:8 src/components/About.vue:67
 msgid "About this instance"
 msgstr "Sobre esta instância"
 
@@ -144,15 +143,13 @@ msgstr "Aceitar"
 msgid "Accepted"
 msgstr "Aceitado"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:111
+#: front/src/components/auth/SubsonicTokenForm.vue:110
 msgid "Access disabled"
 msgstr "Acesso desativado"
 
 #: front/src/components/Home.vue:106
 msgid "Access your music from a clean interface that focus on what really matters"
-msgstr ""
-"Aceda à sua música a partir de uma interface limpa que se concentra no que "
-"realmente importa"
+msgstr "Aceda à sua música a partir de uma interface limpa que se concentra no que realmente importa"
 
 #: front/src/components/mixins/Translations.vue:19
 #: front/src/components/mixins/Translations.vue:20
@@ -167,7 +164,7 @@ msgstr "Dados da conta"
 msgid "Account settings"
 msgstr "Configurações da conta"
 
-#: front/src/components/auth/Settings.vue:264
+#: front/src/components/auth/Settings.vue:263
 msgid "Account Settings"
 msgstr "Configurações da Conta"
 
@@ -278,14 +275,14 @@ msgstr "Administração"
 
 #: front/src/components/audio/SearchBar.vue:26
 #: src/components/audio/track/Table.vue:8
-#: front/src/components/library/Album.vue:159
+#: front/src/components/library/Album.vue:153
 #: front/src/components/manage/library/FilesTable.vue:39
 #: front/src/components/metadata/Search.vue:134
 #: front/src/views/content/libraries/FilesTable.vue:56
 msgid "Album"
 msgstr "Álbum"
 
-#: front/src/components/library/Album.vue:12
+#: front/src/components/library/Album.vue:183
 msgid "Album containing %{ count } track, by %{ artist }"
 msgid_plural "Album containing %{ count } tracks, by %{ artist }"
 msgstr[0] "Álbum contendo %{ count } pista, por %{ artist }"
@@ -324,7 +321,7 @@ msgstr "Ocorreu um erro ao salvar suas mudanças"
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
 msgstr "Um erro desconhecido aconteceu, isso pode significar que o servidor está inoperante ou não pode ser alcançado"
 
-#: front/src/components/notifications/NotificationRow.vue:62
+#: front/src/components/notifications/NotificationRow.vue:66
 msgid "Approve"
 msgstr "Aprovar"
 
@@ -346,7 +343,7 @@ msgstr "Artista"
 msgid "Artist name"
 msgstr "Nome do artista"
 
-#: front/src/components/library/Album.vue:22
+#: front/src/components/library/Album.vue:16
 #: src/components/library/Track.vue:33
 msgid "Artist page"
 msgstr "Página do artista"
@@ -376,7 +373,7 @@ msgstr "Artistas"
 msgid "Ascending"
 msgstr "Ascendente"
 
-#: front/src/views/auth/PasswordReset.vue:27
+#: front/src/views/auth/PasswordReset.vue:28
 msgid "Ask for a password reset"
 msgstr "Peça uma redefinição de senha"
 
@@ -397,7 +394,7 @@ msgstr "Playlists disponíveis"
 msgid "Avatar"
 msgstr "Avatar"
 
-#: front/src/views/auth/PasswordReset.vue:24
+#: front/src/views/auth/PasswordReset.vue:25
 #: front/src/views/auth/PasswordResetConfirm.vue:18
 msgid "Back to login"
 msgstr "Volte ao login"
@@ -416,10 +413,7 @@ msgstr "Bloquear tudo"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:112
 msgid "Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"
-msgstr ""
-"Bloquear tudo a partir desta conta ou domínio. Isso evitará qualquer "
-"interação com a entidade e eliminará conteúdo relacionado (uploads, "
-"bibliotecas, segue, etc.)"
+msgstr "Bloquear tudo a partir desta conta ou domínio. Isso evitará qualquer interação com a entidade e eliminará conteúdo relacionado (uploads, bibliotecas, segue, etc.)"
 
 #: front/src/components/Sidebar.vue:18 src/components/library/Library.vue:4
 msgid "Browse"
@@ -451,8 +445,7 @@ msgstr "Por %{ artist }"
 
 #: front/src/views/content/remote/Card.vue:103
 msgid "By unfollowing this library, you loose access to its content."
-msgstr ""
-"Ao deixar de seguir esta biblioteca, você perderá o acesso ao seu conteúdo."
+msgstr "Ao deixar de seguir esta biblioteca, você perderá o acesso ao seu conteúdo."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:261
 #: front/src/views/admin/moderation/DomainsDetail.vue:217
@@ -460,7 +453,7 @@ msgid "Cached size"
 msgstr "Tamanho em cache"
 
 #: front/src/components/common/DangerousButton.vue:17
-#: front/src/components/library/Album.vue:58
+#: front/src/components/library/Album.vue:52
 #: src/components/library/Track.vue:76
 #: front/src/components/library/radios/Filter.vue:53
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:54
@@ -472,15 +465,14 @@ msgstr "Cancelar"
 msgid "Candidates"
 msgstr "Candidatos"
 
-#: front/src/components/auth/Settings.vue:76
+#: front/src/components/auth/Settings.vue:75
 msgid "Cannot change your password"
 msgstr "Não é possível alterar sua senha"
 
-#: front/src/components/library/FileUpload.vue:222
 #: front/src/components/library/FileUpload.vue:223
+#: front/src/components/library/FileUpload.vue:224
 msgid "Cannot upload this file, ensure it is not too big"
-msgstr ""
-"Não é possível carregar este arquivo, assegure-se de que não é muito grande"
+msgstr "Não é possível carregar este arquivo, assegure-se de que não é muito grande"
 
 #: front/src/components/Footer.vue:21
 msgid "Change language"
@@ -490,7 +482,7 @@ msgstr "Mudar idioma"
 msgid "Change my password"
 msgstr "Mudar minha senha"
 
-#: front/src/components/auth/Settings.vue:95
+#: front/src/components/auth/Settings.vue:94
 msgid "Change password"
 msgstr "Mudar senha"
 
@@ -499,7 +491,7 @@ msgstr "Mudar senha"
 msgid "Change your password"
 msgstr "Mude sua senha"
 
-#: front/src/components/auth/Settings.vue:96
+#: front/src/components/auth/Settings.vue:95
 msgid "Change your password?"
 msgstr "Mude sua senha?"
 
@@ -511,7 +503,7 @@ msgstr "Modificações sincronizadas com o servidor"
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
 msgstr "Mudar sua senha também muda sua senha da API Subsonic se você tiver solicitado uma."
 
-#: front/src/components/auth/Settings.vue:98
+#: front/src/components/auth/Settings.vue:97
 msgid "Changing your password will have the following consequences"
 msgstr "Alterar sua senha terá as seguintes consequências"
 
@@ -536,7 +528,7 @@ msgstr "Claro"
 msgid "Clear playlist"
 msgstr "Limpar playlist"
 
-#: front/src/components/audio/Player.vue:363
+#: front/src/components/audio/Player.vue:366
 msgid "Clear your queue"
 msgstr "Limpar sua fila"
 
@@ -581,8 +573,7 @@ msgstr "Código de confirmação"
 
 #: front/src/components/common/ActionTable.vue:7
 msgid "Content have been updated, click refresh to see up-to-date content"
-msgstr ""
-"O conteúdo foi atualizado, clique em atualizar para ver o conteúdo atualizado"
+msgstr "O conteúdo foi atualizado, clique em atualizar para ver o conteúdo atualizado"
 
 #: front/src/components/Footer.vue:48
 msgid "Contribute"
@@ -594,7 +585,8 @@ msgid "Copy"
 msgstr "Cópia"
 
 #: front/src/components/playlists/Editor.vue:163
-msgid "Copy tracks from current queue to playlist"
+#, fuzzy
+msgid "Copy queued tracks to playlist"
 msgstr "Copiar músicas da fila atual para a playlist"
 
 #: front/src/components/audio/EmbedWizard.vue:21
@@ -615,9 +607,7 @@ msgstr "Não foi possível buscar a biblioteca remota"
 
 #: front/src/views/content/libraries/FilesTable.vue:213
 msgid "Could not process this track, ensure it is tagged correctly"
-msgstr ""
-"Não foi possível processar esta pista, certifique-se de que está "
-"correctamente etiquetada"
+msgstr "Não foi possível processar esta pista, certifique-se de que está correctamente etiquetada"
 
 #: front/src/components/Home.vue:85
 msgid "Covers, lyrics, our goal is to have them all ;)"
@@ -647,7 +637,7 @@ msgstr "Crie a sua conta"
 msgid "Create library"
 msgstr "Criar biblioteca"
 
-#: front/src/components/auth/Signup.vue:51
+#: front/src/components/auth/Signup.vue:53
 msgid "Create my account"
 msgstr "Criar a minha conta"
 
@@ -756,16 +746,16 @@ msgstr "Determine quanto conteúdo o usuário pode enviar. Deixe em branco para 
 msgid "Determine the visibility level of your activity"
 msgstr "Determinar o nível de visibilidade de sua atividade"
 
-#: front/src/components/auth/Settings.vue:104
-#: front/src/components/auth/SubsonicTokenForm.vue:52
+#: front/src/components/auth/Settings.vue:103
+#: front/src/components/auth/SubsonicTokenForm.vue:51
 msgid "Disable access"
 msgstr "Desativar acesso"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:49
+#: front/src/components/auth/SubsonicTokenForm.vue:48
 msgid "Disable Subsonic access"
 msgstr "Desativar o acesso a Subsonic"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:50
+#: front/src/components/auth/SubsonicTokenForm.vue:49
 msgid "Disable Subsonic API access?"
 msgstr "Desativar o acesso o API Subsonic?"
 
@@ -775,7 +765,7 @@ msgstr "Desativar o acesso o API Subsonic?"
 msgid "Disabled"
 msgstr "Desativado"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:14
+#: front/src/components/auth/SubsonicTokenForm.vue:13
 msgid "Discover how to use Funkwhale from other apps"
 msgstr "Descubra como usar o Funkwhale em outros aplicativos"
 
@@ -789,10 +779,7 @@ msgstr "Exibir publicamente"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
-msgstr ""
-"Não faça o download de nenhum arquivo de mídia (áudio, capa do álbum, avatar "
-"da conta ...) dessa conta ou domínio. Isso também limpará o conteúdo "
-"existente."
+msgstr "Não faça o download de nenhum arquivo de mídia (áudio, capa do álbum, avatar da conta ...) dessa conta ou domínio. Isso também limpará o conteúdo existente."
 
 #: front/src/components/playlists/Editor.vue:42
 msgid "Do you want to clear the playlist \"%{ playlist }\"?"
@@ -866,7 +853,7 @@ msgstr "Fácil de usar"
 msgid "Edit"
 msgstr "Editar"
 
-#: front/src/components/About.vue:21
+#: front/src/components/About.vue:22
 msgid "Edit instance info"
 msgstr "Editar informações da instância"
 
@@ -874,7 +861,7 @@ msgstr "Editar informações da instância"
 msgid "Edit…"
 msgstr "Modificar…"
 
-#: front/src/components/auth/Signup.vue:29
+#: front/src/components/auth/Signup.vue:30
 #: front/src/components/manage/users/UsersTable.vue:38
 msgid "Email"
 msgstr "Email"
@@ -883,7 +870,7 @@ msgstr "Email"
 msgid "Email address"
 msgstr "Endereço de e-mail"
 
-#: front/src/components/library/Album.vue:44
+#: front/src/components/library/Album.vue:38
 #: src/components/library/Track.vue:62
 msgid "Embed"
 msgstr "Incorporar"
@@ -892,7 +879,7 @@ msgstr "Incorporar"
 msgid "Embed code"
 msgstr "Código de incorporação"
 
-#: front/src/components/library/Album.vue:48
+#: front/src/components/library/Album.vue:42
 msgid "Embed this album on your website"
 msgstr "Incorpore este álbum no seu website"
 
@@ -937,11 +924,11 @@ msgstr "Indicar um nome de artista …"
 msgid "Enter playlist name…"
 msgstr "Indicar um nome de playlist…"
 
-#: front/src/components/auth/Signup.vue:100
+#: front/src/components/auth/Signup.vue:102
 msgid "Enter your email"
 msgstr "Insira seu email"
 
-#: front/src/components/auth/Signup.vue:96 src/components/auth/Signup.vue:97
+#: front/src/components/auth/Signup.vue:98 src/components/auth/Signup.vue:99
 msgid "Enter your invitation code (case insensitive)"
 msgstr "Indicar seu código de convite (não diferencia maiúsculas de minúsculas)"
 
@@ -949,15 +936,15 @@ msgstr "Indicar seu código de convite (não diferencia maiúsculas de minúscul
 msgid "Enter your search query…"
 msgstr "Insira sua consulta de pesquisa …"
 
-#: front/src/components/auth/Signup.vue:99
+#: front/src/components/auth/Signup.vue:101
 msgid "Enter your username"
 msgstr "Indicar seu nome de usuário"
 
-#: front/src/components/auth/Login.vue:77
+#: front/src/components/auth/Login.vue:83
 msgid "Enter your username or email"
 msgstr "Indicar seu nome de usuário ou email"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:20
+#: front/src/components/auth/SubsonicTokenForm.vue:19
 #: front/src/views/content/libraries/Form.vue:4
 msgid "Error"
 msgstr "Erro"
@@ -1041,11 +1028,7 @@ msgstr "Expirado / usados"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:110
 msgid "Explain why you're applying this policy. Depending on your instance configuration, this will help you remember why you acted on this account or domain, and may be displayed publicly to help users understand what moderation rules are in place."
-msgstr ""
-"Explique porque está a aplicar esta política. Dependendo da configuração da "
-"sua instância, isso o ajudará a lembrar por que você agiu nessa conta ou "
-"domínio e poderá ser exibido publicamente para ajudar os usuários a entender "
-"quais regras de moderação estão em vigor."
+msgstr "Explique porque está a aplicar esta política. Dependendo da configuração da sua instância, isso o ajudará a lembrar por que você agiu nessa conta ou domínio e poderá ser exibido publicamente para ajudar os usuários a entender quais regras de moderação estão em vigor."
 
 #: front/src/views/content/libraries/FilesTable.vue:16
 msgid "Failed"
@@ -1184,7 +1167,7 @@ msgstr "Casa"
 msgid "Hours of music"
 msgstr "Horas de música"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:11
+#: front/src/components/auth/SubsonicTokenForm.vue:10
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
 msgstr "No entanto, acessar o Funkwhale desses clientes requer uma senha separada que você pode definir abaixo."
 
@@ -1230,7 +1213,7 @@ msgstr "Inativo"
 msgid "Increase volume"
 msgstr "Aumentar o volume"
 
-#: front/src/views/auth/PasswordReset.vue:53
+#: front/src/views/auth/PasswordReset.vue:54
 msgid "Input the email address binded to your account"
 msgstr "Insira o endereço de e-mail associado à sua conta"
 
@@ -1256,21 +1239,15 @@ msgstr "Rádios da instância"
 msgid "Instance settings"
 msgstr "Configurações da instância"
 
-#: front/src/components/library/FileUpload.vue:229
 #: front/src/components/library/FileUpload.vue:230
+#: front/src/components/library/FileUpload.vue:231
 msgid "Invalid file type, ensure you are uploading an audio file. Supported file extensions are %{ extensions }"
-msgstr ""
-"Tipo de ficheiro inválido, certifique-se de que está a carregar um ficheiro "
-"de áudio. As extensões de arquivo suportadas são %{ extensions }"
+msgstr "Tipo de ficheiro inválido, certifique-se de que está a carregar um ficheiro de áudio. As extensões de arquivo suportadas são %{ extensions }"
 
-#: front/src/components/auth/Signup.vue:42
+#: front/src/components/auth/Signup.vue:44
 #: front/src/components/manage/users/InvitationForm.vue:11
 msgid "Invitation code"
 msgstr "Código de Convite"
-
-#: front/src/components/auth/Signup.vue:43
-msgid "Invitation code (optional)"
-msgstr "Código de convite (opcional)"
 
 #: front/src/views/admin/users/Base.vue:8
 #: src/views/admin/users/InvitationsList.vue:3
@@ -1397,7 +1374,8 @@ msgid "Loading notifications…"
 msgstr "Carregando notificações…"
 
 #: front/src/views/content/remote/Home.vue:3
-msgid "Loading remote libraries..."
+#, fuzzy
+msgid "Loading remote libraries…"
 msgstr "Carregando bibliotecas remotas..."
 
 #: front/src/views/content/libraries/Quota.vue:4
@@ -1413,7 +1391,7 @@ msgstr "Carregando seus favoritos …"
 msgid "Local account"
 msgstr "Conta local"
 
-#: front/src/components/auth/Login.vue:78
+#: front/src/components/auth/Login.vue:84
 msgid "Log In"
 msgstr "Autenticação"
 
@@ -1429,7 +1407,7 @@ msgstr "Sair"
 msgid "Logged in as %{ username }"
 msgstr "Conectado como %{ username }"
 
-#: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:41
+#: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:42
 msgid "Login"
 msgstr "Entrar"
 
@@ -1445,18 +1423,18 @@ msgstr "Sair"
 msgid "Looks like you don't have a library, it's time to create one."
 msgstr "Parece que você ainda não tem biblioteca, é hora de criar uma."
 
-#: front/src/components/audio/Player.vue:353
-#: src/components/audio/Player.vue:354
+#: front/src/components/audio/Player.vue:356
+#: src/components/audio/Player.vue:357
 msgid "Looping disabled. Click to switch to single-track looping."
 msgstr "Looping desativado. Clique para alternar para um loop de musica única."
 
-#: front/src/components/audio/Player.vue:356
-#: src/components/audio/Player.vue:357
+#: front/src/components/audio/Player.vue:359
+#: src/components/audio/Player.vue:360
 msgid "Looping on a single track. Click to switch to whole queue looping."
 msgstr "Looping em uma única música. Clique para alternar para todo o loop da fila."
 
-#: front/src/components/audio/Player.vue:359
-#: src/components/audio/Player.vue:360
+#: front/src/components/audio/Player.vue:362
+#: src/components/audio/Player.vue:363
 msgid "Looping on whole queue. Click to disable looping."
 msgstr "Looping na fila inteira. Clique para desativar o loop."
 
@@ -1488,11 +1466,11 @@ msgstr "Gerenciar suas playlists"
 msgid "Mark all as read"
 msgstr "Marque tudo como lido"
 
-#: front/src/components/notifications/NotificationRow.vue:44
+#: front/src/components/notifications/NotificationRow.vue:46
 msgid "Mark as read"
 msgstr "Marcar como lido"
 
-#: front/src/components/notifications/NotificationRow.vue:45
+#: front/src/components/notifications/NotificationRow.vue:47
 msgid "Mark as unread"
 msgstr "Marcar como não lido"
 
@@ -1500,9 +1478,14 @@ msgstr "Marcar como não lido"
 msgid "MB"
 msgstr "MB"
 
-#: front/src/components/audio/Player.vue:346
+#: front/src/components/audio/Player.vue:349
 msgid "Media player"
 msgstr "Leitor de mídia"
+
+#: front/src/components/auth/Profile.vue:12
+#, fuzzy
+msgid "Member since %{ date }"
+msgstr "Registrado desde %{ date }"
 
 #: front/src/components/Footer.vue:32
 msgid "Mobile and desktop apps"
@@ -1518,9 +1501,7 @@ msgstr "Moderação"
 #: front/src/views/admin/moderation/AccountsDetail.vue:49
 #: front/src/views/admin/moderation/DomainsDetail.vue:42
 msgid "Moderation policies help you control how your instance interact with a given domain or account."
-msgstr ""
-"As políticas de moderação ajudam a controlar como sua instância interage com "
-"um determinado domínio ou conta."
+msgstr "As políticas de moderação ajudam a controlar como sua instância interage com um determinado domínio ou conta."
 
 #: front/src/components/mixins/Translations.vue:20
 #: front/src/components/mixins/Translations.vue:21
@@ -1531,9 +1512,20 @@ msgstr "Data de modificação"
 msgid "Music"
 msgstr "Música"
 
-#: front/src/components/audio/Player.vue:352
+#: front/src/components/audio/Player.vue:355
 msgid "Mute"
 msgstr "Mudo"
+
+#: front/src/components/manage/moderation/InstancePolicyCard.vue:24
+#: front/src/components/manage/moderation/InstancePolicyForm.vue:115
+#, fuzzy
+msgid "Mute activity"
+msgstr "Ultima atividade"
+
+#: front/src/components/manage/moderation/InstancePolicyCard.vue:28
+#, fuzzy
+msgid "Mute notifications"
+msgstr "Suas notificações"
 
 #: front/src/components/Sidebar.vue:34
 msgid "My account"
@@ -1588,7 +1580,7 @@ msgstr ""
 msgid "Name"
 msgstr "Nome"
 
-#: front/src/components/auth/Settings.vue:88
+#: front/src/components/auth/Settings.vue:87
 #: front/src/views/auth/PasswordResetConfirm.vue:14
 msgid "New password"
 msgstr "Nova senha"
@@ -1597,7 +1589,7 @@ msgstr "Nova senha"
 msgid "New tracks will be appended here automatically."
 msgstr "Novas músicas serão adicionadas automaticamente aqui."
 
-#: front/src/components/audio/Player.vue:350
+#: front/src/components/audio/Player.vue:353
 msgid "Next track"
 msgstr "Música seguinte"
 
@@ -1626,7 +1618,8 @@ msgid "No matching library."
 msgstr "Nenhuma biblioteca correspondente."
 
 #: front/src/views/Notifications.vue:26
-msgid "No notifications yet."
+#, fuzzy
+msgid "No notification to show."
 msgstr "Ainda não há notificações."
 
 #: front/src/components/mixins/Translations.vue:10
@@ -1652,7 +1645,7 @@ msgstr "Notificações"
 msgid "Official website"
 msgstr "Website oficial"
 
-#: front/src/components/auth/Settings.vue:83
+#: front/src/components/auth/Settings.vue:82
 msgid "Old password"
 msgstr "Senha Antiga"
 
@@ -1716,11 +1709,11 @@ msgstr "Página não encontrada!"
 msgid "Pagination"
 msgstr "Paginação"
 
-#: front/src/components/auth/Login.vue:32 src/components/auth/Signup.vue:38
+#: front/src/components/auth/Login.vue:33 src/components/auth/Signup.vue:40
 msgid "Password"
 msgstr "Palavra-passe"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:95
+#: front/src/components/auth/SubsonicTokenForm.vue:94
 msgid "Password updated"
 msgstr "Senha atualizada"
 
@@ -1728,7 +1721,7 @@ msgstr "Senha atualizada"
 msgid "Password updated successfully"
 msgstr "Senha atualizada com sucesso"
 
-#: front/src/components/audio/Player.vue:349
+#: front/src/components/audio/Player.vue:352
 msgid "Pause track"
 msgstr "Parar música"
 
@@ -1740,7 +1733,7 @@ msgstr "Pausa/leitura da pista actual"
 msgid "Paused"
 msgstr "Pausa"
 
-#: front/src/components/library/FileUpload.vue:106
+#: front/src/components/library/FileUpload.vue:107
 #: front/src/views/content/libraries/FilesTable.vue:14
 #: front/src/views/content/libraries/FilesTable.vue:208
 msgid "Pending"
@@ -1770,8 +1763,8 @@ msgstr "Jogar"
 
 #: front/src/components/audio/album/Card.vue:50
 #: front/src/components/audio/artist/Card.vue:44
-#: src/components/library/Album.vue:28
-#: front/src/components/library/Album.vue:73 src/views/playlists/Detail.vue:23
+#: src/components/library/Album.vue:22
+#: front/src/components/library/Album.vue:67 src/views/playlists/Detail.vue:23
 msgid "Play all"
 msgstr "Jogar tudo"
 
@@ -1790,7 +1783,6 @@ msgstr "Jogar pista seguinte"
 
 #: front/src/components/audio/PlayButton.vue:16
 #: front/src/components/audio/PlayButton.vue:63
-#: front/src/components/audio/PlayButton.vue:70
 msgid "Play now"
 msgstr "Jogue agora"
 
@@ -1802,9 +1794,14 @@ msgstr "Jogar pista anterior"
 msgid "Play this track"
 msgstr "Jogar esta pista"
 
-#: front/src/components/audio/Player.vue:348
+#: front/src/components/audio/Player.vue:351
 msgid "Play track"
 msgstr "Jogar mũsica"
+
+#: front/src/components/audio/PlayButton.vue:70
+#, fuzzy
+msgid "Play..."
+msgstr "Jogar"
 
 #: front/src/views/playlists/Detail.vue:90
 msgid "Playlist"
@@ -1846,7 +1843,7 @@ msgstr "Playlists"
 msgid "Playlists? We got them"
 msgstr ""
 
-#: front/src/components/auth/Settings.vue:79
+#: front/src/components/auth/Settings.vue:78
 msgid "Please double-check your password is correct"
 msgstr "Por favor, verifique novamente se sua senha está correta"
 
@@ -1860,14 +1857,13 @@ msgstr "PNG, GIF ou JPG. No máximo 2MB. Será reduzido para 400x400px."
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:118
 msgid "Prevent account or domain from triggering notifications, except from followers."
-msgstr ""
-"Evite que uma conta ou domínio acione notificações, exceto de seguidores."
+msgstr "Evite que uma conta ou domínio acione notificações, exceto de seguidores."
 
 #: front/src/components/audio/EmbedWizard.vue:29
 msgid "Preview"
 msgstr "Pré-visualização"
 
-#: front/src/components/audio/Player.vue:347
+#: front/src/components/audio/Player.vue:350
 msgid "Previous track"
 msgstr "Música anterior"
 
@@ -1915,7 +1911,7 @@ msgstr "Limpar arquivos ignorados?"
 msgid "Queue"
 msgstr "Fila"
 
-#: front/src/components/audio/Player.vue:282
+#: front/src/components/audio/Player.vue:283
 msgid "Queue shuffled!"
 msgstr "Fila embaralhada!"
 
@@ -1984,10 +1980,6 @@ msgstr "Atualizar informações do nó"
 msgid "Refresh table content"
 msgstr "Atualizar o conteúdo da tabela"
 
-#: front/src/components/auth/Profile.vue:12
-msgid "Registered since %{ date }"
-msgstr "Registrado desde %{ date }"
-
 #: front/src/components/auth/Signup.vue:9
 msgid "Registration are closed on this instance, you will need an invitation code to signup."
 msgstr "As inscrições estão fechadas nesta instância, você precisará de um código de convite para inscrição."
@@ -2035,37 +2027,31 @@ msgstr "Remover dos favoritos"
 
 #: front/src/views/content/libraries/Quota.vue:38
 msgid "Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota."
-msgstr ""
-"Remove as pistas carregadas mas ainda a serem processadas completamente, "
-"adicionando os dados correspondentes à sua quota."
+msgstr "Remove as pistas carregadas mas ainda a serem processadas completamente, adicionando os dados correspondentes à sua quota."
 
 #: front/src/views/content/libraries/Quota.vue:64
 msgid "Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota."
-msgstr ""
-"Remove as pistas carregadas ignoradas durante os processos de importação "
-"completamente, adicionando os dados correspondentes à sua quota."
+msgstr "Remove as pistas carregadas ignoradas durante os processos de importação completamente, adicionando os dados correspondentes à sua quota."
 
 #: front/src/views/content/libraries/Quota.vue:90
 msgid "Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota."
-msgstr ""
-"Remove as pistas carregadas que não puderam ser processadas completamente "
-"pelo servidor, adicionando os dados correspondentes à sua quota."
+msgstr "Remove as pistas carregadas que não puderam ser processadas completamente pelo servidor, adicionando os dados correspondentes à sua quota."
 
-#: front/src/components/auth/SubsonicTokenForm.vue:34
-#: front/src/components/auth/SubsonicTokenForm.vue:37
+#: front/src/components/auth/SubsonicTokenForm.vue:33
+#: front/src/components/auth/SubsonicTokenForm.vue:36
 msgid "Request a new password"
 msgstr "Solicite uma nova senha"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:35
+#: front/src/components/auth/SubsonicTokenForm.vue:34
 msgid "Request a new Subsonic API password?"
 msgstr "Solicitar uma nova senha da Subsonic API?"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:43
+#: front/src/components/auth/SubsonicTokenForm.vue:42
 msgid "Request a password"
 msgstr "Solicite uma senha"
 
-#: front/src/components/auth/Login.vue:34 src/views/auth/PasswordReset.vue:4
-#: front/src/views/auth/PasswordReset.vue:52
+#: front/src/components/auth/Login.vue:35 src/views/auth/PasswordReset.vue:4
+#: front/src/views/auth/PasswordReset.vue:53
 msgid "Reset your password"
 msgstr "Redefinir sua senha"
 
@@ -2083,7 +2069,7 @@ msgstr "Voltar ao login"
 msgid "Rule"
 msgstr "Regra"
 
-#: front/src/components/admin/SettingsGroup.vue:63
+#: front/src/components/admin/SettingsGroup.vue:67
 #: front/src/components/library/radios/Builder.vue:33
 msgid "Save"
 msgstr "Salvar"
@@ -2133,11 +2119,13 @@ msgid "Search a remote library"
 msgstr "Pesquisar uma biblioteca remota"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
-msgid "Search by domain, username, bio..."
+#, fuzzy
+msgid "Search by domain, username, bio…"
 msgstr "Pesquisa por domínio, nome de utilizador, biografia..."
 
 #: front/src/components/manage/moderation/DomainsTable.vue:151
-msgid "Search by name..."
+#, fuzzy
+msgid "Search by name…"
 msgstr "Pesquisar por nome..."
 
 #: front/src/views/content/libraries/FilesTable.vue:201
@@ -2168,7 +2156,7 @@ msgstr "Procure alguma música"
 msgid "Search on lyrics.wikia.com"
 msgstr "Procurar em lyrics.wikia.com"
 
-#: front/src/components/library/Album.vue:33
+#: front/src/components/library/Album.vue:27
 #: src/components/library/Artist.vue:31
 #: front/src/components/library/Track.vue:47
 msgid "Search on Wikipedia"
@@ -2219,9 +2207,7 @@ msgstr "Compartilhe o link"
 
 #: front/src/views/content/libraries/Detail.vue:15
 msgid "Share this link with other users so they can request access to your library."
-msgstr ""
-"Compartilhe este link com outros usuários para que eles possam solicitar "
-"acesso à sua biblioteca."
+msgstr "Compartilhe este link com outros usuários para que eles possam solicitar acesso à sua biblioteca."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:73
@@ -2249,7 +2235,7 @@ msgstr "Mostrar atalhos de teclado disponíveis"
 msgid "Show read notifications"
 msgstr "Mostrar notificações antigas"
 
-#: front/src/components/forms/PasswordInput.vue:25
+#: front/src/components/forms/PasswordInput.vue:26
 msgid "Show/hide password"
 msgstr "Mostrar/ocultar senha"
 
@@ -2266,11 +2252,11 @@ msgstr "Mostrando resultados %{ start }-%{ end } em %{ total }"
 msgid "Shuffle queue"
 msgstr "Fila de embaralhamento"
 
-#: front/src/components/audio/Player.vue:362
+#: front/src/components/audio/Player.vue:365
 msgid "Shuffle your queue"
 msgstr "Embaralhe sua fila"
 
-#: front/src/components/auth/Signup.vue:95
+#: front/src/components/auth/Signup.vue:97
 msgid "Sign Up"
 msgstr "Inscrever-se"
 
@@ -2284,13 +2270,6 @@ msgstr "Inscrever-se"
 msgid "Sign-up date"
 msgstr "Data de inscrição"
 
-#: front/src/components/manage/moderation/InstancePolicyCard.vue:24
-#: front/src/components/manage/moderation/InstancePolicyForm.vue:115
-#, fuzzy
-msgid "Silence activity"
-msgstr "Atividade do usuário"
-
-#: front/src/components/manage/moderation/InstancePolicyCard.vue:28
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:119
 msgid "Silence notifications"
 msgstr "Notificações silenciosas"
@@ -2336,15 +2315,11 @@ msgstr "Estatisticas"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:454
 msgid "Statistics are computed from known activity and content on your instance, and do not reflect general activity for this account"
-msgstr ""
-"As estatísticas são calculadas a partir de atividade e conteúdo conhecidos "
-"em sua instância, e não refletem a atividade geral para esta conta"
+msgstr "As estatísticas são calculadas a partir de atividade e conteúdo conhecidos em sua instância, e não refletem a atividade geral para esta conta"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:358
 msgid "Statistics are computed from known activity and content on your instance, and do not reflect general activity for this domain"
-msgstr ""
-"As estatísticas são calculadas a partir da actividade e conteúdo conhecidos "
-"na sua instância e não reflectem a actividade geral para este domínio"
+msgstr "As estatísticas são calculadas a partir da actividade e conteúdo conhecidos na sua instância e não reflectem a actividade geral para este domínio"
 
 #: front/src/components/library/FileUpload.vue:86
 #: front/src/components/manage/users/InvitationsTable.vue:17
@@ -2409,16 +2384,15 @@ msgstr "O logótipo funkwhale foi gentilmente projetado e fornecido por Francis 
 
 #: front/src/views/content/libraries/Form.vue:34
 msgid "The library and all its tracks will be deleted. This can not be undone."
-msgstr ""
-"A biblioteca e todas as suas pistas serão removidas. Isto não pode ser "
-"desfeito."
+msgstr "A biblioteca e todas as suas pistas serão removidas. Isto não pode ser desfeito."
 
 #: front/src/components/library/FileUpload.vue:39
 msgid "The music files you are uploading are tagged properly:"
 msgstr "Os arquivos de música que você está enviando são marcados corretamente:"
 
 #: front/src/components/audio/Player.vue:67
-msgid "The next track will play automatically in a few seconds..."
+#, fuzzy
+msgid "The next track will play automatically in a few seconds…"
 msgstr "A próxima pista será jogada automaticamente em poucos segundos..."
 
 #: front/src/components/Home.vue:121
@@ -2435,15 +2409,13 @@ msgstr "Os arquivos de música enviados estão no formato OGG, Flac ou MP3"
 
 #: front/src/views/content/Home.vue:4
 msgid "There are various ways to grab new content and make it available here."
-msgstr ""
-"Existem várias maneiras de obter novos conteúdos e torná-los disponíveis "
-"aqui."
+msgstr "Existem várias maneiras de obter novos conteúdos e torná-los disponíveis aqui."
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:66
 msgid "This action is irreversible."
 msgstr "Esta acção é irreversível."
 
-#: front/src/components/library/Album.vue:91
+#: front/src/components/library/Album.vue:85
 msgid "This album is present in the following libraries:"
 msgstr "Este álbum está presente nas seguintes bibliotecas:"
 
@@ -2458,8 +2430,7 @@ msgstr "Este domínio está sujeito a regras de moderação específicas"
 
 #: front/src/views/content/Home.vue:9
 msgid "This instance offers up to %{quota} of storage space for every user."
-msgstr ""
-"Esta instância oferece até %{quota} de espaço de memória para cada usuário."
+msgstr "Esta instância oferece até %{quota} de espaço de memória para cada usuário."
 
 #: front/src/components/auth/Profile.vue:16
 msgid "This is you!"
@@ -2471,9 +2442,7 @@ msgstr "Esta biblioteca contém minha música pessoal, espero que você goste."
 
 #: front/src/views/content/remote/Card.vue:131
 msgid "This library is private and your approval from its owner is needed to access its content"
-msgstr ""
-"Esta biblioteca é privada e sua aprovação do proprietário é necessária para "
-"acessar seu conteúdo"
+msgstr "Esta biblioteca é privada e sua aprovação do proprietário é necessária para acessar seu conteúdo"
 
 #: front/src/views/content/remote/Card.vue:132
 msgid "This library is public and you can access its content freely"
@@ -2481,9 +2450,7 @@ msgstr "Esta biblioteca é pública e você pode acessar seu conteúdo livrement
 
 #: front/src/components/common/ActionTable.vue:45
 msgid "This may affect a lot of elements or have irreversible consequences, please double check this is really what you want."
-msgstr ""
-"Isso pode afetar muitos elementos ou ter consequências irreversíveis, por "
-"favor, verifique se isso é realmente o que você quer."
+msgstr "Isso pode afetar muitos elementos ou ter consequências irreversíveis, por favor, verifique se isso é realmente o que você quer."
 
 #: front/src/components/library/FileUpload.vue:52
 msgid "This reference will be used to group imported files together."
@@ -2505,15 +2472,15 @@ msgstr "Isso excluirá completamente essa playlist e não poderá ser desfeito."
 msgid "This will completely delete this radio and cannot be undone."
 msgstr "Isto irá remover completamente o rádio e não pode ser cancelado."
 
-#: front/src/components/auth/SubsonicTokenForm.vue:51
+#: front/src/components/auth/SubsonicTokenForm.vue:50
 msgid "This will completely disable access to the Subsonic API using from account."
 msgstr "Isso desativará completamente o acesso à API do Subsonic usando a conta."
 
-#: front/src/App.vue:129 src/components/Footer.vue:72
+#: front/src/App.vue:132 src/components/Footer.vue:72
 msgid "This will erase your local data and disconnect you, do you want to continue?"
 msgstr "Isso removerá seus dados locais e o desconectará, você quer continuar?"
 
-#: front/src/components/auth/SubsonicTokenForm.vue:36
+#: front/src/components/auth/SubsonicTokenForm.vue:35
 msgid "This will log you out from existing devices that use the current password."
 msgstr "Isto irá desconectá-lo a partir de dispositivos existentes que usam a senha atual."
 
@@ -2578,7 +2545,7 @@ msgstr "Pista carregada, mas ainda não tratada pelo servidor"
 msgid "tracks"
 msgstr "músicas"
 
-#: front/src/components/library/Album.vue:81
+#: front/src/components/library/Album.vue:75
 #: front/src/components/playlists/PlaylistModal.vue:33
 #: front/src/views/admin/moderation/AccountsDetail.vue:329
 #: front/src/views/admin/moderation/DomainsDetail.vue:265
@@ -2619,7 +2586,7 @@ msgstr "Deixar de seguir"
 msgid "Unfollow this library?"
 msgstr "Deixar de seguir esta biblioteca?"
 
-#: front/src/components/About.vue:15
+#: front/src/components/About.vue:17
 msgid "Unfortunately, owners of this instance did not yet take the time to complete this page."
 msgstr "Infelizmente, os proprietários desta instância não ainda ter o tempo para preencher esta página."
 
@@ -2627,7 +2594,7 @@ msgstr "Infelizmente, os proprietários desta instância não ainda ter o tempo 
 msgid "Unlimited music"
 msgstr "Música ilimitada"
 
-#: front/src/components/audio/Player.vue:351
+#: front/src/components/audio/Player.vue:354
 msgid "Unmute"
 msgstr "Cancelar mudo"
 
@@ -2677,18 +2644,14 @@ msgstr "Carregar conteúdo de áudio"
 msgid "Upload date"
 msgstr "Data de upload"
 
-#: front/src/components/library/FileUpload.vue:219
 #: front/src/components/library/FileUpload.vue:220
+#: front/src/components/library/FileUpload.vue:221
 msgid "Upload denied, ensure the file is not too big and that you have not reached your quota"
-msgstr ""
-"Carregamento recusado, garantir que o arquivo não é muito grande e que você "
-"não atingiu sua cota"
+msgstr "Carregamento recusado, garantir que o arquivo não é muito grande e que você não atingiu sua cota"
 
 #: front/src/views/content/Home.vue:7
 msgid "Upload music files (MP3, OGG, FLAC, etc.) from your personal library directly from your browser to enjoy them here."
-msgstr ""
-"Carregue arquivos de música (mp3, ogg, flac, etc.) da sua biblioteca pessoal "
-"diretamente de seu navegador para apreciá-los aqui."
+msgstr "Carregue arquivos de música (mp3, ogg, flac, etc.) da sua biblioteca pessoal diretamente de seu navegador para apreciá-los aqui."
 
 #: front/src/components/library/FileUpload.vue:31
 msgid "Upload new tracks"
@@ -2698,7 +2661,7 @@ msgstr "Carregar novas músicas"
 msgid "Upload quota"
 msgstr "Carregar quota"
 
-#: front/src/components/library/FileUpload.vue:228
+#: front/src/components/library/FileUpload.vue:229
 msgid "Upload timeout, please try again"
 msgstr "Tempo limite de upload, por favor, tente novamente"
 
@@ -2732,9 +2695,7 @@ msgstr "Use este formulário para solicitar uma redefinição de senha. Enviarem
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:111
 msgid "Use this setting to temporarily enable/disable the policy without completely removing it."
-msgstr ""
-"Use esta configuração para ativar/desativar temporariamente a política sem "
-"removê-la completamente."
+msgstr "Use esta configuração para ativar/desativar temporariamente a política sem removê-la completamente."
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgid "Used"
@@ -2748,7 +2709,7 @@ msgstr "Usuário"
 msgid "User activity"
 msgstr "Atividade do usuário"
 
-#: front/src/components/library/Album.vue:88
+#: front/src/components/library/Album.vue:82
 #: src/components/library/Artist.vue:60
 #: front/src/components/library/Track.vue:168
 msgid "User libraries"
@@ -2798,7 +2759,7 @@ msgstr "Versão %{version}"
 msgid "View files"
 msgstr "Ver ficheiros"
 
-#: front/src/components/library/Album.vue:37
+#: front/src/components/library/Album.vue:31
 #: src/components/library/Artist.vue:35
 #: front/src/components/library/Track.vue:51
 #: front/src/components/metadata/ArtistCard.vue:49
@@ -2822,7 +2783,7 @@ msgstr "Visibilidade: todos, incluindo outras instâncias"
 msgid "Visibility: nobody except me"
 msgstr "Visibilidade: ninguém exceto eu"
 
-#: front/src/components/library/Album.vue:67
+#: front/src/components/library/Album.vue:61
 msgid "Volume %{ number }"
 msgstr "Volume %{ number }"
 
@@ -2910,9 +2871,7 @@ msgstr "Sim, me desconecte!"
 
 #: front/src/views/content/libraries/Form.vue:19
 msgid "You are able to share your library with other people, regardless of its visibility."
-msgstr ""
-"Você pode compartilhar sua biblioteca com outras pessoas, independentemente "
-"de sua visibilidade."
+msgstr "Você pode compartilhar sua biblioteca com outras pessoas, independentemente de sua visibilidade."
 
 #: front/src/components/library/FileUpload.vue:33
 msgid "You are about to upload music to your library. Before proceeding, please ensure that:"
@@ -2938,7 +2897,7 @@ msgstr "Agora você pode usar o serviço sem limitações."
 msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
 msgstr "Você pode usar essa interface para construir a sua própria rádio que vai jogar músicas de acordo com seus critérios."
 
-#: front/src/components/auth/SubsonicTokenForm.vue:8
+#: front/src/components/auth/SubsonicTokenForm.vue:7
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
 msgstr "Você pode usá-los para curtir sua playlist e música no modo off-line, em seu smartphone ou tablet, por exemplo."
 
@@ -2962,15 +2921,15 @@ msgstr "Você pode ter um problema de conectividade."
 msgid "You need to select an instance in order to continue"
 msgstr "Você precisa selecionar uma instância para continuar"
 
-#: front/src/components/auth/Settings.vue:100
+#: front/src/components/auth/Settings.vue:99
 msgid "You will be logged out from this session and have to log in with the new one"
 msgstr "Você será desconectado desta sessão e precisará fazer login com o novo"
 
-#: front/src/components/auth/Settings.vue:71
+#: front/src/components/auth/Settings.vue:70
 msgid "You will have to update your password on your clients that use this password."
 msgstr "Você terá que atualizar sua senha em seus clientes que usam essa senha."
 
-#: front/src/components/favorites/List.vue:112
+#: front/src/components/favorites/List.vue:115
 msgid "Your Favorites"
 msgstr "Seus favoritos"
 
@@ -2986,6 +2945,6 @@ msgstr "Suas notificações"
 msgid "Your password has been updated successfully."
 msgstr "Sua senha foi atualizada com sucesso."
 
-#: front/src/components/auth/Settings.vue:101
+#: front/src/components/auth/Settings.vue:100
 msgid "Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password"
 msgstr "Sua senha do Subsonic será alterada para uma nova, aleatória, efetuando o logout de dispositivos que usaram a senha antiga do Subsonic"
