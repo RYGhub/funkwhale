@@ -7,10 +7,17 @@ info:
 servers:
   - url: https://demo.funkwhale.audio/api/v1
     description: Demo server
-  - url: https://open.audio/api/v1
-    description: Open Audio
-  - url: https://node1.funkwhale.test/api/v1
-    description: Node 1 (local)
+  - url: https://{domain}/api/v1
+    description: Custom server
+    variables:
+      domain:
+        default: yourdomain
+        description: Your Funkwhale Domain
+      protocol:
+        enum:
+          - 'http'
+          - 'https'
+        default: 'https'
 
 components:
   securitySchemes:
