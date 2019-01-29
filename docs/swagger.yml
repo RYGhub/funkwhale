@@ -434,6 +434,7 @@ parameters:
       required: false
       type: "boolean"
 
+properties:
   mbid:
     type: "string"
     formats: "uuid"
