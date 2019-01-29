@@ -1,1 +1,0 @@
-Disable makemigrations in production and misleading message when running migrate (#685)
