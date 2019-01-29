@@ -14,3 +14,4 @@ Funkwhale's users documentation
    :maxdepth: 2
 
    apps
+   upload
