@@ -7,6 +7,7 @@ import uuid
 
 import markdown
 import pendulum
+import pydub
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
@@ -780,6 +781,15 @@ class Upload(models.Model):
             "size": self.get_file_size(),
         }
 
+    def get_audio_segment(self):
+        input = self.get_audio_file()
+        if not input:
+            return
+
+        input_format = utils.MIMETYPE_TO_EXTENSION[self.mimetype]
+        audio = pydub.AudioSegment.from_file(input, format=input_format)
+        return audio
+
     def save(self, **kwargs):
         if not self.mimetype:
             if self.audio_file:
@@ -824,10 +834,9 @@ class Upload(models.Model):
             0
         ] + ".{}".format(format)
         version.audio_file.save(new_name, f)
-        utils.transcode_file(
-            input=self.audio_file,
+        utils.transcode_audio(
+            audio=self.get_audio_segment(),
             output=version.audio_file,
-            input_format=utils.MIMETYPE_TO_EXTENSION[self.mimetype],
             output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
         )
         version.size = version.audio_file.size
