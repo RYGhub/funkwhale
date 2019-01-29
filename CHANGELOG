@@ -10,6 +10,121 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.18.1 (2019-01-29)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+
+Fix Gzip compression to avoid BREACH exploit [security] [manual action required]
+--------------------------------------------------------------------------------
+
+In the 0.18 release, we've enabled Gzip compression by default for various
+content types, including HTML and JSON. Unfortunately, enabling Gzip compression
+on such content types could make BREACH-type exploits possible.
+
+We've removed the risky content-types from our nginx template files, to ensure new
+instances are safe, however, if you already have an instance, you need
+to double check that your host nginx virtualhost do not include the following
+values for the ``gzip_types`` settings::
+
+   application/atom+xml
+   application/json
+   application/ld+json
+   application/activity+json
+   application/manifest+json
+   application/rss+xml
+   application/xhtml+xml
+   application/xml
+
+For convenience, you can also replace the whole setting with the following snippet::
+
+   gzip_types
+      application/javascript
+      application/vnd.geo+json
+      application/vnd.ms-fontobject
+      application/x-font-ttf
+      application/x-web-app-manifest+json
+      font/opentype
+      image/bmp
+      image/svg+xml
+      image/x-icon
+      text/cache-manifest
+      text/css
+      text/plain
+      text/vcard
+      text/vnd.rim.location.xloc
+      text/vtt
+      text/x-component
+      text/x-cross-domain-policy;
+
+Many thanks to @jibec for the report!
+
+Fix Apache configuration file for 0.18 [manual action required]
+----------------------------------------------------------
+
+The way front is served has changed since 0.18. The Apache configuration can't serve 0.18 properly, leading to blank screens.
+
+If you are on an Apache setup, you will have to replace the `<Location "/api">` block with the following::
+
+   <Location "/">
+      # similar to nginx 'client_max_body_size 100M;'
+      LimitRequestBody 104857600
+
+      ProxyPass ${funkwhale-api}/
+      ProxyPassReverse ${funkwhale-api}/
+   </Location>
+
+And add some more `ProxyPass` directives so that the `Alias` part of your configuration file looks this way::
+
+   ProxyPass "/front" "!"
+   Alias /front /srv/funkwhale/front/dist
+
+   ProxyPass "/media" "!"
+   Alias /media /srv/funkwhale/data/media
+
+   ProxyPass "/staticfiles" "!"
+   Alias /staticfiles /srv/funkwhale/data/static
+
+In case you are using custom css and theming, you also need to match this block::
+
+   ProxyPass "/settings.json" "!"
+   Alias /settings.json /srv/funkwhale/custom/settings.json
+
+   ProxyPass "/custom" "!"
+   Alias /custom /srv/funkwhale/custom
+
+
+Enhancements:
+
+- Added name attributes on all inputs to improve UX, especially with password managers (#686)
+- Disable makemigrations in production and misleading message when running migrate (#685)
+- Display progress during file upload
+- Hide pagination when there is only one page of results (#681)
+- Include shared/public playlists in Subsonic API responses (#684)
+- Use proper locale for date-related/duration strings (#670)
+
+
+Bugfixes:
+
+- Fix transcoding of in-place imported tracks (#688)
+- Fixed celery worker defaulting to development settings instead of production
+- Fixed crashing Django admin when loading track detail page (#666)
+- Fixed list icon alignement on landing page (#668)
+- Fixed overescaping issue in notifications and album page (#676)
+- Fixed wrong number of affected elements in bulk action modal (#683)
+- Fixed wrong URL in documentation for funkwhale_proxy.conf file when deploying using Docker
+- Make Apache configuration file work with 0.18 changes (#667)
+- Removed potential BREACH exploit because of Gzip compression (#678)
+- Upgraded kombu to fix an incompatibility with redis>=3
+
+
+Documentation:
+
+- Added user upload documentation at https://docs.funkwhale.audio/users/upload.html
+
+
 0.18 "Naomi" (2019-01-22)
 -------------------------
 
