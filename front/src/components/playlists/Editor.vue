@@ -160,7 +160,7 @@ export default {
     }),
     labels () {
       return {
-        copyTitle: this.$gettext('Copy tracks from current queue to playlist')
+        copyTitle: this.$gettext('Copy queued tracks to playlist')
       }
     },
     status () {

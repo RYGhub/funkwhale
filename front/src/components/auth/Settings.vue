@@ -68,8 +68,7 @@
           <translate>Change my password</translate>
         </h2>
         <div class="ui message">
-          <translate>Changing your password will also change your Subsonic API password if you have requested one.</translate>
-          <translate>You will have to update your password on your clients that use this password.</translate>
+          <translate>Changing your password will also change your Subsonic API password if you have requested one.</translate>&nbsp;<translate>You will have to update your password on your clients that use this password.</translate>
         </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">

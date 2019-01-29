@@ -41,15 +41,19 @@ Setup front-end only development environment
 
     yarn install
 
-4. Launch the development server::
+4. Compile the translations::
+
+    yarn i18n-compile
+
+5. Launch the development server::
 
     # this will serve the front-end on http://localhost:8000/front/
     VUE_PORT=8000 yarn serve
 
-5. Make the front-end talk with an existing server (like https://demo.funkwhale.audio),
+6. Make the front-end talk with an existing server (like https://demo.funkwhale.audio or https://open.audio),
    by clicking on the corresponding link in the footer
 
-6. Start hacking!
+7. Start hacking!
 
 Setup your development environment
 ----------------------------------

@@ -374,6 +374,32 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker):
     )
 
 
+@pytest.mark.parametrize("serve_path", [("/host/music",), ("/app/music",)])
+def test_listen_transcode_in_place(
+    serve_path, factories, now, logged_in_api_client, mocker, settings
+):
+    settings.MUSIC_DIRECTORY_PATH = "/app/music"
+    settings.MUSIC_DIRECTORY_SERVE_PATH = serve_path
+    upload = factories["music.Upload"](
+        import_status="finished",
+        library__actor__user=logged_in_api_client.user,
+        audio_file=None,
+        source="file://" + os.path.join(DATA_DIR, "test.ogg"),
+    )
+
+    assert upload.get_audio_segment()
+
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    handle_serve = mocker.spy(views, "handle_serve")
+    response = logged_in_api_client.get(url, {"to": "mp3"})
+
+    assert response.status_code == 200
+
+    handle_serve.assert_called_once_with(
+        upload, user=logged_in_api_client.user, format="mp3"
+    )
+
+
 def test_user_can_create_library(factories, logged_in_api_client):
     actor = logged_in_api_client.user.create_actor()
     url = reverse("api:v1:libraries-list")

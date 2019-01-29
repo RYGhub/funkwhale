@@ -10,7 +10,7 @@
           <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
           <div class="content">
             {{ profile.username }}
-            <div class="sub header" v-translate="{date: signupDate}">Registered since %{ date }</div>
+            <div class="sub header" v-translate="{date: signupDate}">Member since %{ date }</div>
           </div>
         </h2>
         <div class="ui basic green label">

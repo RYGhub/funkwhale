@@ -168,7 +168,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by domain, username, bio...')
+        searchPlaceholder: this.$gettext('Search by domain, username, bio…')
       }
     },
     actionFilters () {
