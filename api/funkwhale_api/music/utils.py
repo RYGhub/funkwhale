@@ -75,5 +75,9 @@ def get_actor_from_request(request):
 def transcode_file(input, output, input_format, output_format, **kwargs):
     with input.open("rb"):
         audio = pydub.AudioSegment.from_file(input, format=input_format)
+    return transcode_audio(audio, output, output_format, **kwargs)
+
+
+def transcode_audio(audio, output, output_format, **kwargs):
     with output.open("wb"):
         return audio.export(output, format=output_format, **kwargs)
