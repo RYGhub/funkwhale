@@ -189,19 +189,11 @@ in the server block, then reload your nginx server::
         gzip_vary          on;
 
         gzip_types
-            application/atom+xml
             application/javascript
-            application/json
-            application/ld+json
-            application/activity+json
-            application/manifest+json
-            application/rss+xml
             application/vnd.geo+json
             application/vnd.ms-fontobject
             application/x-font-ttf
             application/x-web-app-manifest+json
-            application/xhtml+xml
-            application/xml
             font/opentype
             image/bmp
             image/svg+xml
