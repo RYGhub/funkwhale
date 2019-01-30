@@ -15,6 +15,7 @@
         <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></button>
         <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></button>
         <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></button>
+        <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio"><i class="feed icon"></i><translate>Start radio</translate></button>
       </div>
     </div>
   </span>
@@ -62,7 +63,8 @@ export default {
       return {
         playNow: this.$gettext('Play now'),
         addToQueue: this.$gettext('Add to current queue'),
-        playNext: this.$gettext('Play next')
+        playNext: this.$gettext('Play next'),
+        startRadio: this.$gettext('Play similar songs')
       }
     },
     title () {
