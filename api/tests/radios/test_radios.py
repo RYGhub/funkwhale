@@ -237,3 +237,20 @@ def test_can_start_less_listened_radio(factories):
 
     for i in range(5):
         assert radio.pick(filter_playable=False) in good_tracks
+
+
+def test_similar_radio_track(factories):
+    user = factories["users.User"]()
+    seed = factories["music.Track"]()
+    radio = radios.SimilarRadio()
+    radio.start_session(user, related_object=seed)
+
+    factories["music.Track"].create_batch(5)
+
+    # one user listened to this track
+    l1 = factories["history.Listening"](track=seed)
+
+    expected_next = factories["music.Track"]()
+    factories["history.Listening"](track=expected_next, user=l1.user)
+
+    assert radio.pick(filter_playable=False) == expected_next
