@@ -2,6 +2,7 @@ import memoize.djangocache
 
 import funkwhale_api
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import actors
 
 from . import stats
 
@@ -19,6 +20,7 @@ def get():
         "openRegistrations": preferences.get("users__registration_enabled"),
         "usage": {"users": {"total": 0, "activeHalfyear": 0, "activeMonth": 0}},
         "metadata": {
+            "actorId": actors.get_service_actor().fid,
             "private": preferences.get("instance__nodeinfo_private"),
             "shortDescription": preferences.get("instance__short_description"),
             "longDescription": preferences.get("instance__long_description"),

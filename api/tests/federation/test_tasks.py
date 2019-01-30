@@ -161,22 +161,32 @@ def test_fetch_nodeinfo(factories, r_mock, now):
 
 
 def test_update_domain_nodeinfo(factories, mocker, now):
-    domain = factories["federation.Domain"]()
-    mocker.patch.object(tasks, "fetch_nodeinfo", return_value={"hello": "world"})
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
+    actor = factories["federation.Actor"](fid="https://actor.id")
+    mocker.patch.object(
+        tasks,
+        "fetch_nodeinfo",
+        return_value={"hello": "world", "metadata": {"actorId": "https://actor.id"}},
+    )
 
     assert domain.nodeinfo == {}
     assert domain.nodeinfo_fetch_date is None
+    assert domain.service_actor is None
 
     tasks.update_domain_nodeinfo(domain_name=domain.name)
 
     domain.refresh_from_db()
 
     assert domain.nodeinfo_fetch_date == now
-    assert domain.nodeinfo == {"status": "ok", "payload": {"hello": "world"}}
+    assert domain.nodeinfo == {
+        "status": "ok",
+        "payload": {"hello": "world", "metadata": {"actorId": "https://actor.id"}},
+    }
+    assert domain.service_actor == actor
 
 
 def test_update_domain_nodeinfo_error(factories, r_mock, now):
-    domain = factories["federation.Domain"]()
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     wellknown_url = "https://{}/.well-known/nodeinfo".format(domain.name)
 
     r_mock.get(wellknown_url, status_code=500)

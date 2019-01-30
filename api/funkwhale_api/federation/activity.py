@@ -9,6 +9,8 @@ from django.db.models import Q
 from funkwhale_api.common import channels
 from funkwhale_api.common import utils as funkwhale_utils
 
+recursive_getattr = funkwhale_utils.recursive_getattr
+
 
 logger = logging.getLogger(__name__)
 PUBLIC_ADDRESS = "https://www.w3.org/ns/activitystreams#Public"
@@ -89,9 +91,9 @@ def should_reject(id, actor_id=None, payload={}):
 
     media_types = ["Audio", "Artist", "Album", "Track", "Library", "Image"]
     relevant_values = [
-        recursive_gettattr(payload, "type", permissive=True),
-        recursive_gettattr(payload, "object.type", permissive=True),
-        recursive_gettattr(payload, "target.type", permissive=True),
+        recursive_getattr(payload, "type", permissive=True),
+        recursive_getattr(payload, "object.type", permissive=True),
+        recursive_getattr(payload, "target.type", permissive=True),
     ]
     # if one of the payload types match our internal media types, then
     # we apply policies that reject media
@@ -343,7 +345,7 @@ class OutboxRouter(Router):
             return activities
 
 
-def recursive_gettattr(obj, key, permissive=False):
+def recursive_getattr(obj, key, permissive=False):
     """
     Given a dictionary such as {'user': {'name': 'Bob'}} and
     a dotted string such as user.name, returns 'Bob'.
@@ -366,7 +368,7 @@ def recursive_gettattr(obj, key, permissive=False):
 
 def match_route(route, payload):
     for key, value in route.items():
-        payload_value = recursive_gettattr(payload, key)
+        payload_value = recursive_getattr(payload, key)
         if payload_value != value:
             return False
 

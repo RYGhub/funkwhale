@@ -245,41 +245,52 @@ class Invitation(models.Model):
         return super().save(**kwargs)
 
 
-def get_actor_data(user):
-    username = federation_utils.slugify_username(user.username)
+def get_actor_data(username):
+    slugified_username = federation_utils.slugify_username(username)
     return {
-        "preferred_username": username,
+        "preferred_username": slugified_username,
         "domain": federation_models.Domain.objects.get_or_create(
             name=settings.FEDERATION_HOSTNAME
         )[0],
         "type": "Person",
-        "name": user.username,
+        "name": username,
         "manually_approves_followers": False,
         "fid": federation_utils.full_url(
-            reverse("federation:actors-detail", kwargs={"preferred_username": username})
+            reverse(
+                "federation:actors-detail",
+                kwargs={"preferred_username": slugified_username},
+            )
         ),
         "shared_inbox_url": federation_models.get_shared_inbox_url(),
         "inbox_url": federation_utils.full_url(
-            reverse("federation:actors-inbox", kwargs={"preferred_username": username})
+            reverse(
+                "federation:actors-inbox",
+                kwargs={"preferred_username": slugified_username},
+            )
         ),
         "outbox_url": federation_utils.full_url(
-            reverse("federation:actors-outbox", kwargs={"preferred_username": username})
+            reverse(
+                "federation:actors-outbox",
+                kwargs={"preferred_username": slugified_username},
+            )
         ),
         "followers_url": federation_utils.full_url(
             reverse(
-                "federation:actors-followers", kwargs={"preferred_username": username}
+                "federation:actors-followers",
+                kwargs={"preferred_username": slugified_username},
             )
         ),
         "following_url": federation_utils.full_url(
             reverse(
-                "federation:actors-following", kwargs={"preferred_username": username}
+                "federation:actors-following",
+                kwargs={"preferred_username": slugified_username},
             )
         ),
     }
 
 
 def create_actor(user):
-    args = get_actor_data(user)
+    args = get_actor_data(user.username)
     private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")

@@ -2,7 +2,7 @@ import pytest
 from django.core.paginator import Paginator
 from django.urls import reverse
 
-from funkwhale_api.federation import serializers, webfinger
+from funkwhale_api.federation import actors, serializers, webfinger
 
 
 def test_wellknown_webfinger_validates_resource(db, api_client, settings, mocker):
@@ -48,6 +48,19 @@ def test_local_actor_detail(factories, api_client):
         kwargs={"preferred_username": user.actor.preferred_username},
     )
     serializer = serializers.ActorSerializer(user.actor)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializer.data
+
+
+def test_service_actor_detail(factories, api_client):
+    actor = actors.get_service_actor()
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    serializer = serializers.ActorSerializer(actor)
     response = api_client.get(url)
 
     assert response.status_code == 200

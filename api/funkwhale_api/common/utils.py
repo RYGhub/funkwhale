@@ -147,3 +147,24 @@ def order_for_search(qs, field):
     this function will order the given qs based on the length of the given field
     """
     return qs.annotate(__size=models.functions.Length(field)).order_by("__size")
+
+
+def recursive_getattr(obj, key, permissive=False):
+    """
+    Given a dictionary such as {'user': {'name': 'Bob'}} and
+    a dotted string such as user.name, returns 'Bob'.
+
+    If the value is not present, returns None
+    """
+    v = obj
+    for k in key.split("."):
+        try:
+            v = v.get(k)
+        except (TypeError, AttributeError):
+            if not permissive:
+                raise
+            return
+        if v is None:
+            return
+
+    return v
