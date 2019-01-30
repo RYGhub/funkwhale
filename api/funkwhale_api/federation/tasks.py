@@ -11,6 +11,7 @@ from requests.exceptions import RequestException
 
 from funkwhale_api.common import preferences
 from funkwhale_api.common import session
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
@@ -18,6 +19,7 @@ from . import keys
 from . import models, signing
 from . import serializers
 from . import routes
+from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -184,9 +186,27 @@ def update_domain_nodeinfo(domain):
         nodeinfo = {"status": "ok", "payload": fetch_nodeinfo(domain.name)}
     except (requests.RequestException, serializers.serializers.ValidationError) as e:
         nodeinfo = {"status": "error", "error": str(e)}
+
+    service_actor_id = common_utils.recursive_getattr(
+        nodeinfo, "payload.metadata.actorId", permissive=True
+    )
+    try:
+        domain.service_actor = (
+            utils.retrieve_ap_object(
+                service_actor_id,
+                queryset=models.Actor,
+                serializer_class=serializers.ActorSerializer,
+            )
+            if service_actor_id
+            else None
+        )
+    except (serializers.serializers.ValidationError, RequestException) as e:
+        logger.warning(
+            "Cannot fetch system actor for domain %s: %s", domain.name, str(e)
+        )
     domain.nodeinfo_fetch_date = now
     domain.nodeinfo = nodeinfo
-    domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date"])
+    domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date", "service_actor"])
 
 
 def delete_qs(qs):

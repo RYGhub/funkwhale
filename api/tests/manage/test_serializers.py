@@ -40,7 +40,7 @@ def test_user_update_permission(factories):
 
 
 def test_manage_domain_serializer(factories, now):
-    domain = factories["federation.Domain"]()
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     setattr(domain, "actors_count", 42)
     setattr(domain, "outbox_activities_count", 23)
     expected = {

@@ -1,11 +1,13 @@
 import cryptography
 import logging
+import datetime
 
 from django.contrib.auth.models import AnonymousUser
-from rest_framework import authentication, exceptions as rest_exceptions
+from django.utils import timezone
 
+from rest_framework import authentication, exceptions as rest_exceptions
 from funkwhale_api.moderation import models as moderation_models
-from . import actors, exceptions, keys, signing, utils
+from . import actors, exceptions, keys, signing, tasks, utils
 
 
 logger = logging.getLogger(__name__)
@@ -57,6 +59,15 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             actor = actors.get_actor(actor_url, skip_cache=True)
             signing.verify_django(request, actor.public_key.encode("utf-8"))
 
+        # we trigger a nodeinfo update on the actor's domain, if needed
+        fetch_delay = 24 * 3600
+        now = timezone.now()
+        last_fetch = actor.domain.nodeinfo_fetch_date
+        if not last_fetch or (
+            last_fetch < (now - datetime.timedelta(seconds=fetch_delay))
+        ):
+            tasks.update_domain_nodeinfo(domain_name=actor.domain.name)
+            actor.domain.refresh_from_db()
         return actor
 
     def authenticate(self, request):

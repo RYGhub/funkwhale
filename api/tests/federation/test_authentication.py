@@ -5,6 +5,7 @@ from funkwhale_api.federation import authentication, exceptions, keys
 
 def test_authenticate(factories, mocker, api_request):
     private, public = keys.get_key_pair()
+    factories["federation.Domain"](name="test.federation", nodeinfo_fetch_date=None)
     actor_url = "https://test.federation/actor"
     mocker.patch(
         "funkwhale_api.federation.actors.get_actor_data",
@@ -22,6 +23,10 @@ def test_authenticate(factories, mocker, api_request):
             },
         },
     )
+    update_domain_nodeinfo = mocker.patch(
+        "funkwhale_api.federation.tasks.update_domain_nodeinfo"
+    )
+
     signed_request = factories["federation.SignedRequest"](
         auth__key=private, auth__key_id=actor_url + "#main-key", auth__headers=["date"]
     )
@@ -40,6 +45,7 @@ def test_authenticate(factories, mocker, api_request):
     assert user.is_anonymous is True
     assert actor.public_key == public.decode("utf-8")
     assert actor.fid == actor_url
+    update_domain_nodeinfo.assert_called_once_with(domain_name="test.federation")
 
 
 def test_authenticate_skips_blocked_domain(factories, api_request):

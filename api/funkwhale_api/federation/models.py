@@ -46,7 +46,9 @@ class FederationMixin(models.Model):
 
 class ActorQuerySet(models.QuerySet):
     def local(self, include=True):
-        return self.exclude(user__isnull=include)
+        if include:
+            return self.filter(domain__name=settings.FEDERATION_HOSTNAME)
+        return self.exclude(domain__name=settings.FEDERATION_HOSTNAME)
 
     def with_current_usage(self):
         qs = self
@@ -92,7 +94,13 @@ class Domain(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
     nodeinfo = JSONField(default=empty_dict, max_length=50000, blank=True)
-
+    service_actor = models.ForeignKey(
+        "Actor",
+        related_name="managed_domains",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     objects = DomainQuerySet.as_manager()
 
     def __str__(self):

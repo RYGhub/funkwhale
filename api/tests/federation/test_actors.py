@@ -46,3 +46,15 @@ def test_get_actor_refresh(factories, preferences, mocker):
     assert new_actor == actor
     assert new_actor.last_fetch_date > actor.last_fetch_date
     assert new_actor.preferred_username == "New me"
+
+
+def test_get_service_actor(db, settings):
+    settings.FEDERATION_HOSTNAME = "test.hello"
+    settings.FEDERATION_SERVICE_ACTOR_USERNAME = "bob"
+    actor = actors.get_service_actor()
+
+    assert actor.preferred_username == "bob"
+    assert actor.domain.name == "test.hello"
+    assert actor.private_key is not None
+    assert actor.type == "Service"
+    assert actor.public_key is not None
