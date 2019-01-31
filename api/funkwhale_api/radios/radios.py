@@ -221,7 +221,7 @@ class SimilarRadio(RelatedObjectRadio):
         next_candidates = [n for n in next_candidates if n[0] in matching_tracks]
         if not next_candidates:
             raise NextNotFound()
-        return weighted_choice(next_candidates)
+        return random.choice([c[0] for c in next_candidates])
 
 
 @registry.register(name="artist")
