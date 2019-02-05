@@ -7,15 +7,23 @@
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
-      <template v-if="!discrete && !iconOnly"><slot><translate>Play</translate></slot></template>
+      <template v-if="!discrete && !iconOnly"><slot><translate :v-context="'*/Queue/Button/Label/Short, Verb'">Play</translate></slot></template>
     </button>
     <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])"></i>
       <div class="menu">
-        <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></button>
-        <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></button>
-        <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></button>
-        <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio"><i class="feed icon"></i><translate>Start radio</translate></button>
+        <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue">
+          <i class="plus icon"></i><translate :v-context="'*/Queue/Dropdown/Button/Label/Short'">Add to queue</translate>
+        </button>
+        <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext">
+          <i class="step forward icon"></i><translate :v-context="'*/Queue/Dropdown/Button/Label/Short'">Play next</translate>
+        </button>
+        <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow">
+          <i class="play icon"></i><translate :v-context="'*/Queue/Dropdown/Button/Label/Short'">Play now</translate>
+        </button>
+        <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio">
+          <i class="feed icon"></i><translate :v-context="'*/Queue/Dropdown/Button/Label/Short'">Start radio</translate>
+        </button>
       </div>
     </div>
   </span>
@@ -61,18 +69,18 @@ export default {
   computed: {
     labels () {
       return {
-        playNow: this.$gettext('Play now'),
-        addToQueue: this.$gettext('Add to current queue'),
-        playNext: this.$gettext('Play next'),
-        startRadio: this.$gettext('Play similar songs')
+        playNow: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play now'),
+        addToQueue: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Add to current queue'),
+        playNext: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play next'),
+        startRadio: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play similar songs')
       }
     },
     title () {
       if (this.playable) {
-        return this.$gettext('Play...')
+        return this.$pgettext('*/Queue/Button/Title', 'Play...')
       } else {
         if (this.track) {
-          return this.$gettext('This track is not available in any library you have access to')
+          return this.$pgettext('*/Queue/Button/Title', 'This track is not available in any library you have access to')
         }
       }
     },
@@ -179,7 +187,7 @@ export default {
       if (tracks.length < 1) {
         return
       }
-      let msg = this.$ngettext('%{ count } track was added to your queue', '%{ count } tracks were added to your queue', tracks.length)
+      let msg = this.$npgettext('*/Queue/Message', '%{ count } track was added to your queue', '%{ count } tracks were added to your queue', tracks.length)
       this.$store.commit('ui/addMessage', {
         content: this.$gettextInterpolate(msg, {count: tracks.length}),
         date: new Date()
