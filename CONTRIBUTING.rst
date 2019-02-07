@@ -483,19 +483,19 @@ The detail part, which is optional and refers to the contents of the string itse
 
 Here are a few examples of valid context hierarchies:
 
-- ``Sidebar/Player/Button/Title``
+- ``Sidebar/Player/Button``
 - ``Content/Home/Button/Call to action``
 - ``Footer/*/Help text``
 - ``*/*/*/Verb, Short``
 - ``Modal/Playlist/Button``
 
-It's possible to nest multiple component parts to reach a higher level of detail:
+It's possible to nest multiple component parts to reach a higher level of detail. The component parts are then separated by a dot:
 
-- ``Sidebar/Queue/Tab/Title``
-- ``Content/*/Button/Title``
-- ``Content/*/Table/Header``
-- ``Footer/*/List item/Link``
-- ``Content/*/Form/Help text``
+- ``Sidebar/Queue/Tab.Title``
+- ``Content/*/Button.Title``
+- ``Content/*/Table.Header``
+- ``Footer/*/List item.Link``
+- ``Content/*/Form.Help text``
 
 Collecting translatable strings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
