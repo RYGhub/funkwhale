@@ -49,7 +49,8 @@ django-dynamic-preferences>=1.7,<1.8
 raven>=6.5,<7
 python-magic==0.4.15
 ffmpeg-python==0.1.10
-channels>=2.1,<2.2
+# XXX: until https://github.com/django/channels/issues/1240 is fixed
+channels==2.1.6
 channels_redis>=2.3,<2.4
 daphne>=2.2,<2.3
 

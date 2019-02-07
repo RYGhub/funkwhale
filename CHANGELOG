@@ -18,7 +18,7 @@ https://docs.funkwhale.audio/index.html
 
 
 Fix Gzip compression to avoid BREACH exploit [security] [manual action required]
---------------------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In the 0.18 release, we've enabled Gzip compression by default for various
 content types, including HTML and JSON. Unfortunately, enabling Gzip compression
@@ -62,7 +62,7 @@ For convenience, you can also replace the whole setting with the following snipp
 Many thanks to @jibec for the report!
 
 Fix Apache configuration file for 0.18 [manual action required]
-----------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The way front is served has changed since 0.18. The Apache configuration can't serve 0.18 properly, leading to blank screens.
 

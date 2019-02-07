@@ -1,4 +1,4 @@
-openapi: "3.0"
+openapi: "3.0.0"
 info:
   description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
   version: "1.0.0"
@@ -7,8 +7,17 @@ info:
 servers:
   - url: https://demo.funkwhale.audio/api/v1
     description: Demo server
-  - url: https://node1.funkwhale.test/api/v1
-    description: Node 1 (local)
+  - url: https://{domain}/api/v1
+    description: Custom server
+    variables:
+      domain:
+        default: yourdomain
+        description: Your Funkwhale Domain
+      protocol:
+        enum:
+          - 'http'
+          - 'https'
+        default: 'https'
 
 components:
   securitySchemes:
@@ -50,47 +59,472 @@ paths:
 
   /artists/:
     get:
+      summary: List artists
       tags:
         - "artists"
       parameters:
         - name: "q"
           in: "query"
+          default: null
           description: "Search query used to filter artists"
           schema:
             required: false
             type: "string"
             example: "carpenter"
-        - name: "listenable"
-          in: "query"
-          description: "Filter/exclude artists with listenable tracks"
-          schema:
-            required: false
-            type: "boolean"
+        - allOf:
+            - $ref: "#/parameters/Ordering"
+            - default: "-creation_date"
+              schema:
+                required: false
+                type: "string"
+                example: "creation_date"
+                enum:
+                  - creation_date
+                  - id
+                  - name
+        - $ref: "#/parameters/Playable"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
       responses:
         200:
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  count:
-                    $ref: "#/properties/resultsCount"
-                  results:
-                    type: "array"
-                    items:
-                      $ref: "#/definitions/ArtistWithAlbums"
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/Artist"
+  /artists/{id}/:
+    get:
+      summary: Retrieve a single artist
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+
+      tags:
+        - "artists"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Artist"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+  /artists/{id}/libraries/:
+    get:
+      summary: List available user libraries containing work from this artist
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
+      tags:
+        - "artists"
+        - "libraries"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/LibraryPage"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+  /albums/:
+    get:
+      summary: List albums
+      tags:
+        - "albums"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter albums"
+          schema:
+            required: false
+            type: "string"
+            example: "carpenter"
+        - name: "artist"
+          in: "query"
+          default: null
+          description: "Only include albums by the requested artist"
+          schema:
+            required: false
+            type: "integer"
+            format: "int64"
+        - allOf:
+            - $ref: "#/parameters/Ordering"
+            - default: "-creation_date"
+              schema:
+                required: false
+                type: "string"
+                example: "creation_date"
+                enum:
+                  - creation_date
+                  - release_date
+                  - title
+        - $ref: "#/parameters/Playable"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/Album"
+  /albums/{id}/:
+    get:
+      summary: Retrieve a single album
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+
+      tags:
+        - "albums"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Album"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+  /albums/{id}/libraries/:
+    get:
+      summary: List available user libraries containing tracks from this album
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
+      tags:
+        - "albums"
+        - "libraries"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/LibraryPage"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+  /tracks/:
+    get:
+      summary: List tracks
+      tags:
+        - "tracks"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter tracks"
+          schema:
+            required: false
+            type: "string"
+            example: "carpenter"
+        - name: "artist"
+          in: "query"
+          default: null
+          description: "Only include tracks by the requested artist"
+          schema:
+            required: false
+            type: "integer"
+            format: "int64"
+        - name: "album"
+          in: "query"
+          default: null
+          description: "Only include tracks from the requested album"
+          schema:
+            required: false
+            type: "integer"
+            format: "int64"
+        - name: "license"
+          in: "query"
+          description: "Only include tracks with the given license"
+          default: null
+          schema:
+            example: "cc-by-sa-4.0"
+            required: false
+            type: "string"
+        - allOf:
+            - $ref: "#/parameters/Ordering"
+            - default: "-creation_date"
+              schema:
+                required: false
+                type: "string"
+                example: "creation_date"
+                enum:
+                  - creation_date
+                  - release_date
+                  - title
+        - $ref: "#/parameters/Playable"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/Track"
+  /tracks/{id}/:
+    get:
+      summary: Retrieve a single track
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+
+      tags:
+        - "tracks"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Track"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+  /tracks/{id}/libraries/:
+    get:
+      summary: List available user libraries containing given track
+      parameters:
+        - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+
+      tags:
+        - "tracks"
+        - "libraries"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/LibraryPage"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+  /licenses/:
+    get:
+      summary: List licenses
+      tags:
+        - "licenses"
+      parameters:
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/License"
+
+  /licenses/{code}/:
+    get:
+      summary: Retrieve a single license
+      parameters:
+        - name: code
+          in: path
+          description: License code
+          required: true
+          schema:
+            type: string
+            example: cc0-1.0
+
+      tags:
+        - "licenses"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/License"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+
+
+parameters:
+  ObjectId:
+    name: id
+    in: path
+    description: Object ID
+    required: true
+    schema:
+      type: integer
+      format: int64
+  Ordering:
+    name: "ordering"
+    in: "query"
+    description: "Ordering for the results, prefix with - for DESC ordering"
+
+  PageNumber:
+    in: query
+    name: page
+    schema:
+      type: "integer"
+      format: "int64"
+      example: 1
+      default: 1
+      minimum: 1
+  PageSize:
+    in: query
+    name: page_size
+    schema:
+      type: "integer"
+      format: "int64"
+      example: 16
+      default: 25
+      minimum: 1
+      maximum: 25
+  Playable:
+    name: "playable"
+    in: "query"
+    default: null
+    description: "Filter/exclude resources with playable tracks"
+    schema:
+      required: false
+      type: "boolean"
 
 properties:
-  resultsCount:
-    type: "integer"
-    format: "int64"
-    description: "The total number of resources matching the request"
   mbid:
     type: "string"
     formats: "uuid"
     description: "A musicbrainz ID"
+
 definitions:
-  Artist:
+  ResultPage:
+    type: "object"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+        example: 42
+        description: "The total number of results (all pages included)"
+      next:
+        type: "string"
+        format: "uri"
+        description: "Link to the next page of results"
+      previous:
+        type: "string"
+        format: "uri"
+        description: "Link to the previous page of results"
+
+
+  Image:
+    type: "object"
+    properties:
+      original:
+        type: "string"
+        description: "URL to the original image"
+        example: "https://mydomain/media/albums/covers/ec2c53aeaac6.jpg"
+      small_square_crop:
+        type: "string"
+        description: "URL to a small, squared thumbnail of the image"
+        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-50x50-70.jpg"
+
+      medium_square_crop:
+        type: "string"
+        description: "URL to a medium, squared thumbnail of the image"
+        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-200x200-70.jpg"
+
+      square_crop:
+        type: "string"
+        description: "URL to a large, squared thumbnail of the image"
+        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-400x400-70.jpg"
+
+  Actor:
+    type: object
+    description: "A federation/ ActivityPub actor"
+    properties:
+      fid:
+        type: string
+        format: uri
+        description: "The actor Federation ID (unique accross federation)"
+      uuid:
+        type: string
+        format: uuid
+        description: "Local ID of the library"
+      creation_date:
+        type: "string"
+        format: "date-time"
+      preferred_username:
+        type: "string"
+        example: "alice"
+      name:
+        type: string
+        example: "Alice Unicorn"
+      last_fetch_date:
+        type: "string"
+        format: "date-time"
+        description: "Last time the actor profile was fetched on its origin server"
+      domain:
+        type: "string"
+        format: "hostname"
+        example: "open.audio"
+      type:
+        type: "string"
+        example: "Person"
+        enum:
+          - Person
+          - Application
+          - Group
+          - Organization
+      manually_approves_followers:
+        type: "boolean"
+      full_username:
+        type: string
+        example: "alice@open.audio"
+
+  BaseArtist:
     type: "object"
     properties:
       mbid:
@@ -106,10 +540,10 @@ definitions:
       creation_date:
         type: "string"
         format: "date-time"
-  ArtistWithAlbums:
+  Artist:
     type: "object"
     allOf:
-      - $ref: "#/definitions/Artist"
+      - $ref: "#/definitions/BaseArtist"
       - type: "object"
         properties:
           albums:
@@ -117,7 +551,7 @@ definitions:
             items:
               $ref: "#/definitions/ArtistAlbum"
 
-  Album:
+  BaseAlbum:
     type: "object"
     properties:
       mbid:
@@ -142,19 +576,112 @@ definitions:
         required: false
         format: "date"
         example: "2001-01-01"
+      is_playable:
+        type: "boolean"
+      cover:
+        $ref: "#/definitions/Image"
+
+  Album:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/BaseAlbum"
+      - type: "object"
+        properties:
+          tracks:
+            type: "array"
+            items:
+              $ref: "#/definitions/AlbumTrack"
 
   ArtistAlbum:
     type: "object"
     allOf:
-      - $ref: "#/definitions/Album"
+      - $ref: "#/definitions/BaseAlbum"
       - type: "object"
         properties:
           tracks_count:
             type: "integer"
             format: "int64"
             example: 16
+  Library:
+    type: "object"
+    properties:
+      fid:
+        type: string
+        format: uri
+        description: "The library Federation ID (unique accross federation)"
+      uuid:
+        type: string
+        format: uuid
+        description: "Local ID of the library"
+      name:
+        type: string
+        example: "My awesome library"
+      description:
+        type: string
+        nullable: true
+        example: "This library contains all the stuff I love!"
+      uploads_count:
+        type: "integer"
+        format: "int64"
+        example: 687
+      privacy_level:
+        type: string
+        example: "me"
+        enum:
+          - "me"
+          - "instance"
+          - "everyone"
+      actor:
+        $ref: "#/definitions/Actor"
+  LibraryPage:
+    allOf:
+      - $ref: "#/definitions/ResultPage"
+      - type: "object"
+        properties:
+          results:
+            type: "array"
+            items:
+              $ref: "#/definitions/Library"
 
-  Track:
+  License:
+    type: "object"
+    properties:
+      id:
+        type: string
+        format: uri
+        example: http://creativecommons.org/publicdomain/zero/1.0/
+        description: "The license ID"
+      url:
+        type: string
+        format: uri
+        example: http://creativecommons.org/publicdomain/zero/1.0/
+        description: "The license url (can be different than the ID)"
+      code:
+        type: string
+        description: "A unique code to identify the license"
+        example: cc0-1.0
+      redistribute:
+        type: boolean
+        example: true
+        description: "Does the license allow free redistribution?"
+      derivative:
+        type: boolean
+        example: true
+        description: "Does the license allow the creation of derivative work?"
+      commercial:
+        type: boolean
+        example: true
+        description: "Does the license allow commercial use?"
+      attribution:
+        type: boolean
+        example: false
+        description: "Does the license requires crediting the author?"
+      copyleft:
+        type: boolean
+        example: false
+        description: "Does the license enforce a similar license of derivative work?"
+
+  BaseTrack:
     type: "object"
     properties:
       mbid:
@@ -181,6 +708,94 @@ definitions:
         type: "number"
         minimum: 1
         example: 1
-      creation_date:
+      disc_number:
+        required: false
+        type: "number"
+        minimum: 1
+        example: 1
+      listen_url:
         type: "string"
-        format: "date-time"
+        format: "uri"
+        description: "URL to stream the track"
+      copyright:
+        type: "string"
+        example: "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0: http://creativecommons.org/licenses/by-nc-nd/4.0/"
+        description: "Copyright information as extracted from upload tags"
+      license:
+        type: "string"
+        description: "Identifier of the license that is linked to the track"
+        example: "cc-by-nc-nd-4.0"
+
+  AlbumTrack:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/BaseTrack"
+      - type: "object"
+        properties:
+          artist:
+            $ref: "#/definitions/BaseArtist"
+          uploads:
+            type: "array"
+            description: "List of uploads associated with this track"
+            items:
+              $ref: "#/definitions/Upload"
+  Track:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/BaseTrack"
+      - type: "object"
+        properties:
+          album:
+            $ref: "#/definitions/Album"
+          artist:
+            $ref: "#/definitions/BaseArtist"
+          uploads:
+            type: "array"
+            description: "List of uploads associated with this track"
+            items:
+              $ref: "#/definitions/Upload"
+  Upload:
+    type: "object"
+    properties:
+      uuid:
+        type: string
+        format: uuid
+      size:
+        type: "integer"
+        format: "int64"
+        example: 278987000
+        description: "Size of the file, in bytes"
+      duration:
+        type: "integer"
+        format: "int64"
+        example: 184
+        description: "Duration of the audio, in seconds"
+      bitrate:
+        type: "integer"
+        format: "int64"
+        example: 128000
+        description: "Bitrate of the file, in bytes/s"
+      mimetype:
+        type: string
+        example: "audio/ogg"
+        enum:
+          - "audio/ogg"
+          - "audio/mpeg"
+          - "audio/x-flac"
+          - "audio/flac"
+      extension:
+        type: string
+        example: "ogg"
+        description: "File extension of the upload"
+
+      listen_url:
+        type: "string"
+        format: "uri"
+        description: "URL to stream the upload"
+
+  ResourceNotFound:
+    type: "object"
+    properties:
+      detail:
+        type: "string"
+        example: "Not found."
