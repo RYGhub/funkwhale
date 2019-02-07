@@ -2,22 +2,22 @@
   <main class="main pusher" v-title="labels.title">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate>Create a funkwhale account</translate></h2>
+        <h2><translate :v-context="'Content/Signup/Header'">Create a funkwhale account</translate></h2>
         <form
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
           <p class="ui message" v-if="!$store.state.instance.settings.users.registration_enabled.value">
-            <translate>Registration are closed on this instance, you will need an invitation code to signup.</translate>
+            <translate :v-context="'Content/Signup/Form/Message'">Registration are closed on this instance, you will need an invitation code to signup.</translate>
           </p>
 
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><translate>We cannot create your account</translate></div>
+            <div class="header"><translate :v-context="'Content/Signup/Form/Message'">We cannot create your account</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label><translate>Username</translate></label>
+            <label><translate :v-context="'Content/Signup/Form/Label'">Username</translate></label>
             <input
             ref="username"
             name="username"
@@ -28,7 +28,7 @@
             v-model="username">
           </div>
           <div class="field">
-            <label><translate>Email</translate></label>
+            <label><translate :v-context="'Content/Signup/Form/Label'">Email</translate></label>
             <input
             ref="email"
             name="email"
@@ -38,11 +38,11 @@
             v-model="email">
           </div>
           <div class="field">
-            <label><translate>Password</translate></label>
+            <label><translate :v-context="'Content/Signup/Form/Label'">Password</translate></label>
             <password-input v-model="password" />
           </div>
           <div class="field" v-if="!$store.state.instance.settings.users.registration_enabled.value">
-            <label><translate>Invitation code</translate></label>
+            <label><translate :v-context="'Content/Signup/Form/Label'">Invitation code</translate></label>
             <input
             required
             type="text"
@@ -51,7 +51,7 @@
             v-model="invitation">
           </div>
           <button :class="['ui', 'green', {'loading': isLoading}, 'button']" type="submit">
-            <translate>Create my account</translate>
+            <translate :v-context="'Content/Signup/Form/Button'">Create my account</translate>
           </button>
         </form>
       </div>
@@ -94,12 +94,13 @@ export default {
   },
   computed: {
     labels() {
-      let title = this.$gettext("Sign Up")
-      let placeholder = this.$gettext(
+      let title = this.$pgettext("*/Signup/Title", "Sign Up")
+      let placeholder = this.$pgettext(
+        "Content/Signup/Form/Placeholder",
         "Enter your invitation code (case insensitive)"
       )
-      let usernamePlaceholder = this.$gettext("Enter your username")
-      let emailPlaceholder = this.$gettext("Enter your email")
+      let usernamePlaceholder = this.$pgettext("Content/Signup/Form/Placeholder", "Enter your username")
+      let emailPlaceholder = this.$pgettext("Content/Signup/Form/Placeholder", "Enter your email")
       return {
         title,
         usernamePlaceholder,
