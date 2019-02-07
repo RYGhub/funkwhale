@@ -483,7 +483,7 @@ The detail part, which is optional and refers to the contents of the string itse
 
 Here are a few examples of valid context hierarchies:
 
-- ``Sidebar/Player/Button/Title``
+- ``Sidebar/Player/Button``
 - ``Content/Home/Button/Call to action``
 - ``Footer/*/Help text``
 - ``*/*/*/Verb, Short``
