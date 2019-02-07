@@ -88,7 +88,7 @@ export default {
   computed: {
     labels() {
       return {
-        playlist: this.$gettext('"Playlist")
+        playlist: this.$gettext('Playlist')
       }
     }
   },
