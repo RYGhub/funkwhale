@@ -22,16 +22,14 @@
                 <td class="play-cell">
                   <play-button class="basic icon" :track="track" :discrete="true"></play-button>
                 </td>
-                <td colspan="6">
+                <td class="content-cell" colspan="5">
+                  <track-favorite-icon :track="track"></track-favorite-icon>
                   <router-link class="track discrete link" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
                     <template v-if="track.position">
                       {{ track.position }}.
                     </template>
                     {{ track.title }}
                   </router-link>
-                </td>
-                <td>
-                  <track-favorite-icon :track="track"></track-favorite-icon>
                 </td>
               </tr>
             </tbody>
@@ -92,16 +90,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
-table.fixed td.play-cell {
-  overflow: auto;
+.content-cell {
+  .link,
+  .button {
+    padding: 0.5em 0;
+  }
+  .link {
+    margin-left: 0.5em;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 tr {
   .favorite-icon:not(.favorited) {
-    display: none;
+    visibility: hidden;
   }
   &:hover .favorite-icon {
-    display: inherit;
+    visibility: visible;
+  }
+  .favorite-icon {
+    float: right;
   }
 }
 .expand {
