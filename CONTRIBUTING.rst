@@ -434,6 +434,7 @@ This hierarchical structure is made of several parts:
     - ``Menu``
     - ``Modal``
     - ``Sidebar``
+    - ``Popup``
     - ``*`` for strings that are not tied to a specific location
 
 - The feature part, which is required, and refers to the feature associated with the translated string:
