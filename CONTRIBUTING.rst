@@ -434,6 +434,7 @@ This hierarchical structure is made of several parts:
     - ``Menu``
     - ``Modal``
     - ``Sidebar``
+    - ``Head``
     - ``Popup``
     - ``*`` for strings that are not tied to a specific location
 
@@ -447,6 +448,7 @@ This hierarchical structure is made of several parts:
     - ``Moderation``
     - ``Player``
     - ``Playlist``
+    - ``Favorites``
     - ``Notifications``
     - ``Radio``
     - ``Settings``
