@@ -44,10 +44,8 @@
         <h2>
           <translate>Albums by this artist</translate>
         </h2>
-        <div class="ui stackable doubling three column grid">
-          <div class="column" :key="album.id" v-for="album in albums">
-            <album-card :mode="'rich'" class="fluid" :album="album"></album-card>
-          </div>
+        <div class="ui cards" >
+          <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in albums"></album-card>
         </div>
       </section>
       <section v-if="tracks.length > 0" class="ui vertical stripe segment">
