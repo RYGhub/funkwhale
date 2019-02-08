@@ -126,6 +126,12 @@ def test_get_spa_html_from_http(local_cache, r_mock, mocker, settings):
     )
 
 
+def test_get_spa_html_from_disk(tmpfile):
+    with open(tmpfile.name, "wb") as f:
+        f.write(b"hello world")
+    assert middleware.get_spa_html(tmpfile.name) == "hello world"
+
+
 def test_get_route_head_tags(mocker, settings):
     match = mocker.Mock(args=[], kwargs={"pk": 42}, func=mocker.Mock())
     resolve = mocker.patch("django.urls.resolve", return_value=match)

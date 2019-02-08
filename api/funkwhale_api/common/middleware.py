@@ -56,6 +56,10 @@ def serve_spa(request):
 
 
 def get_spa_html(spa_url):
+    if spa_url.startswith("/"):
+        # we try to open a local file
+        with open(spa_url) as f:
+            return f.read()
     cache_key = "spa-html:{}".format(spa_url)
     cached = caches["local"].get(cache_key)
     if cached:
