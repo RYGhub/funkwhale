@@ -470,6 +470,7 @@ This hierarchical structure is made of several parts:
     - ``Label``
     - ``Link``
     - ``List item``
+    - ``Menu``
     - ``Message``
     - ``Paragraph``
     - ``Placeholder``
