@@ -432,7 +432,7 @@ This hierarchical structure is made of several parts:
     - ``Content``
     - ``Footer``
     - ``Menu``
-    - ``Modal``
+    - ``Popup``
     - ``Sidebar``
     - ``*`` for strings that are not tied to a specific location
 
@@ -487,7 +487,7 @@ Here are a few examples of valid context hierarchies:
 - ``Content/Home/Button/Call to action``
 - ``Footer/*/Help text``
 - ``*/*/*/Verb, Short``
-- ``Modal/Playlist/Button``
+- ``Popup/Playlist/Button``
 
 It's possible to nest multiple component parts to reach a higher level of detail. The component parts are then separated by a dot:
 
