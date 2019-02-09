@@ -477,6 +477,7 @@ This hierarchical structure is made of several parts:
     - ``Table``
     - ``Title``
     - ``Tooltip``
+    - ``Hidden text``
     - ``*`` for strings that are not tied to a specific component
 
 The detail part, which is optional and refers to the contents of the string itself, such as:
