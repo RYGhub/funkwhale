@@ -18,7 +18,7 @@ export default {
     labels() {
       return {
         manageUsers: this.$pgettext('Head/Admin/Title', 'Manage users'),
-        secondaryMenu: this.$gettext('Menu/*/Hidden text','Secondary menu')
+        secondaryMenu: this.$pgettext('Menu/*/Hidden text','Secondary menu')
       }
     }
   }
