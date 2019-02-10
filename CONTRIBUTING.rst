@@ -479,6 +479,7 @@ This hierarchical structure is made of several parts:
 The detail part, which is optional and refers to the contents of the string itself, such as:
     - ``Call to action``
     - ``Verb``
+    - ``Noun``
     - ``Short``
 
 Here are a few examples of valid context hierarchies:
