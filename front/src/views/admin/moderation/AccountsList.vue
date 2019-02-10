@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.accounts">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate>Accounts</translate></h2>
+      <h2 class="ui header"><translate :translate-context="'Content/Moderation/Title'">Accounts</translate></h2>
       <div class="ui hidden divider"></div>
       <accounts-table :update-url="true" :default-query="defaultQuery"></accounts-table>
     </section>
@@ -21,7 +21,7 @@ export default {
   computed: {
     labels() {
       return {
-        accounts: this.$gettext("Accounts")
+        accounts: this.$pgettext('Head/Moderation/Title', "Accounts")
       }
     }
   }
