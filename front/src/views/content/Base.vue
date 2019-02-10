@@ -16,7 +16,7 @@ export default {
   computed: {
     labels() {
       let title = this.$gettext("Add content")
-      let secondaryMenu = this.$gettext("Secondary menu")
+      let secondaryMenu = this.$pgettext('Menu/*/Hidden text', "Secondary menu")
       return {
         title,
         secondaryMenu
