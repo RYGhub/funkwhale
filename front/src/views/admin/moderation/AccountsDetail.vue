@@ -16,12 +16,12 @@
                     <template v-if="object.user">
                       <span class="ui tiny teal icon label">
                         <i class="home icon"></i>
-                        <translate>Local account</translate>
+                        <translate :translate-context="'Content/Moderation/List item'">Local account</translate>
                       </span>
                       &nbsp;
                     </template>
                     <a :href="object.url || object.fid" target="_blank" rel="noopener noreferrer">
-                      <translate>Open profile</translate>&nbsp;
+                      <translate :translate-context="'Content/Moderation/Link/Verb'">Open profile</translate>&nbsp;
                       <i class="external icon"></i>
                     </a>
                   </div>
@@ -44,16 +44,16 @@
                 <header class="ui header">
                   <h3>
                     <i class="shield icon"></i>
-                    <translate>You don't have any rule in place for this account.</translate>
+                    <translate :translate-context="'Content/Moderation/Card.Title'">You don't have any rule in place for this account.</translate>
                   </h3>
                 </header>
-                <p><translate>Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
-                <button @click="showPolicyForm = true" class="ui primary button">Add a moderation policy</button>
+                <p><translate :translate-context="'Content/Moderation/Card.Paragraph'">Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
+								<button @click="showPolicyForm = true" class="ui primary button"><translate :translate-context="'Content/Moderation/Button/Verb'">Add a moderation policy</translate></button>
               </template>
               <instance-policy-card v-else-if="policy && !showPolicyForm" :object="policy" @update="showPolicyForm = true">
                 <header class="ui header">
                   <h3>
-                    <translate>This domain is subject to specific moderation rules</translate>
+                    <translate :translate-context="'Content/Moderation/Card.Title'">This domain is subject to specific moderation rules</translate>
                   </h3>
                 </header>
               </instance-policy-card>
@@ -76,14 +76,14 @@
               <h3 class="ui header">
                 <i class="info icon"></i>
                 <div class="content">
-                  <translate>Account data</translate>
+                  <translate :translate-context="'Content/Moderation/Title'">Account data</translate>
                 </div>
               </h3>
               <table class="ui very basic table">
                 <tbody>
                   <tr>
                     <td>
-                      <translate>Username</translate>
+                      <translate :translate-context="'Content/*/*'">Username</translate>
                     </td>
                     <td>
                       {{ object.preferred_username }}
@@ -91,7 +91,7 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate>Domain</translate>
+                      <translate :translate-context="'Content/*/*'">Domain</translate>
                     </td>
                     <td>
                       <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
@@ -101,7 +101,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Display name</translate>
+                      <translate translate-context="'Content/*/*/Noun'">Display name</translate>
                     </td>
                     <td>
                       {{ object.name }}
@@ -109,7 +109,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Email address</translate>
+                      <translate :translate-context="'Content/*/*'">Email address</translate>
                     </td>
                     <td>
                       {{ object.user.email }}
@@ -117,7 +117,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Login status</translate>
+                      <translate :translate-context="'Content/*/*/Noun'">Login status</translate>
                     </td>
                     <td>
                       <div class="ui toggle checkbox" v-if="object.user.username != $store.state.auth.profile.username">
@@ -125,17 +125,17 @@
                           @change="updateUser('is_active')"
                           v-model="object.user.is_active" type="checkbox">
                         <label>
-                          <translate v-if="object.user.is_active" key="1">Enabled</translate>
-                          <translate v-else key="2">Disabled</translate>
+                          <translate v-if="object.user.is_active" key="1" :translate-context="'Content/*/Label'">Enabled</translate>
+                          <translate v-else key="2" :translate-context="'Content/*/Label'">Disabled</translate>
                         </label>
                       </div>
-                      <translate v-else-if="object.user.is_active" key="1">Enabled</translate>
-                      <translate v-else key="2">Disabled</translate>
+                      <translate v-else-if="object.user.is_active" key="1" :translate-context="'Content/*/Label'">Enabled</translate>
+                      <translate v-else key="2" :translate-context="'Content/*/Label'">Disabled</translate>
                     </td>
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Permissions</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label'">Permissions</translate>
                     </td>
                     <td>
                       <select
@@ -149,7 +149,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Type</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Type</translate>
                     </td>
                     <td>
                       {{ object.type }}
@@ -157,7 +157,7 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate>First seen</translate>
+                      <translate :translate-context="'Content/*/Table.Label'">First seen</translate>
                     </td>
                     <td>
                       <human-date :date="object.creation_date"></human-date>
@@ -165,16 +165,16 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate>Last checked</translate>
+                      <translate :translate-context="'Content/*/Table.Label'">Last checked</translate>
                     </td>
                     <td>
                       <human-date v-if="object.last_fetch_date" :date="object.last_fetch_date"></human-date>
-                      <translate v-else>N/A</translate>
+                      <translate v-else :translate-context="'*/*/*'">N/A</translate>
                     </td>
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Sign-up date</translate>
+                      <translate :translate-context="'Content/*/Table.Label'">Sign-up date</translate>
                     </td>
                     <td>
                       <human-date :date="object.user.date_joined"></human-date>
@@ -182,7 +182,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Last activity</translate>
+                      <translate :translate-context="'Content/*/Table.Label'">Last activity</translate>
                     </td>
                     <td>
                       <human-date :date="object.user.last_activity"></human-date>
@@ -197,7 +197,7 @@
               <h3 class="ui header">
                 <i class="feed icon"></i>
                 <div class="content">
-                  <translate>Activity</translate>&nbsp;
+                  <translate :translate-context="'Content/Moderation/Title'">Activity</translate>&nbsp;
                   <span :data-tooltip="labels.statsWarning"><i class="question circle icon"></i></span>
 
                 </div>
@@ -212,7 +212,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate>Emitted messages</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Emitted messages</translate>
                     </td>
                     <td>
                       {{ stats.outbox_activities}}
@@ -220,7 +220,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Received library follows</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Received library follows</translate>
                     </td>
                     <td>
                       {{ stats.received_library_follows}}
@@ -228,7 +228,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Emitted library follows</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Emitted library follows</translate>
                     </td>
                     <td>
                       {{ stats.emitted_library_follows}}
@@ -243,7 +243,7 @@
               <h3 class="ui header">
                 <i class="music icon"></i>
                 <div class="content">
-                  <translate>Audio content</translate>&nbsp;
+                  <translate :translate-context="'Content/Moderation/Title'">Audio content</translate>&nbsp;
                   <span :data-tooltip="labels.statsWarning"><i class="question circle icon"></i></span>
 
                 </div>
@@ -259,7 +259,7 @@
 
                   <tr v-if="!object.user">
                     <td>
-                      <translate>Cached size</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Cached size</translate>
                     </td>
                     <td>
                       {{ stats.media_downloaded_size | humanSize }}
@@ -267,7 +267,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate>Upload quota</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'" >Upload quota</translate>
                       <span :data-tooltip="labels.uploadQuota"><i class="question circle icon"></i></span>
                     </td>
                     <td>
@@ -279,14 +279,14 @@
                           step="100"
                           type="number" />
                         <div class="ui basic label">
-                          <translate>MB</translate>
+                          <translate :translate-context="'Content/*/*/Unit'">MB</translate>
                         </div>
                       </div>
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <translate>Total size</translate>
+                      <translate :translate-context="'Content/*/*'">Total size</translate>
                     </td>
                     <td>
                       {{ stats.media_total_size | humanSize }}
@@ -295,7 +295,7 @@
 
                   <tr>
                     <td>
-                      <translate>Libraries</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label'">Libraries</translate>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -303,7 +303,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Uploads</translate>
+                      <translate :translate-context="'Content/Moderation/Table.Label/Noun'">Uploads</translate>
                     </td>
                     <td>
                       {{ stats.uploads }}
@@ -311,7 +311,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Artists</translate>
+                      <translate :translate-context="'Content/*/*'">Artists</translate>
                     </td>
                     <td>
                       {{ stats.artists }}
@@ -319,7 +319,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Albums</translate>
+                      <translate :translate-context="'Content/*/*'">Albums</translate>
                     </td>
                     <td>
                       {{ stats.albums}}
@@ -327,7 +327,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Tracks</translate>
+                      <translate :translate-context="'Content/*/*'">Tracks</translate>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -451,25 +451,23 @@ export default {
   computed: {
     labels() {
       return {
-        statsWarning: this.$gettext("Statistics are computed from known activity and content on your instance, and do not reflect general activity for this account"),
-        uploadQuota: this.$gettext(
-          "Determine how much content the user can upload. Leave empty to use the default value of the instance."
-        ),
+        statsWarning: this.$pgettext('Content/Moderation/Help text', 'Statistics are computed from known activity and content on your instance, and do not reflect general activity for this account'),
+        uploadQuota: this.$pgettext('Content/Moderation/Help text', 'Determine how much content the user can upload. Leave empty to use the default value of the instance.'),
       }
     },
     allPermissions() {
       return [
         {
           code: "library",
-          label: this.$gettext("Library")
+          label: this.$pgettext('Content/Moderation/Dropdown', "Library")
         },
         {
           code: "moderation",
-          label: this.$gettext("Moderation")
+          label: this.$pgettext('Content/Moderation/Dropdown', "Moderation")
         },
         {
           code: "settings",
-          label: this.$gettext("Settings")
+          label: this.$pgettext('Content/Moderation/Dropdown', "Settings")
         }
       ]
     }
