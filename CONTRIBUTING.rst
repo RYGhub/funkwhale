@@ -442,6 +442,7 @@ This hierarchical structure is made of several parts:
     - ``Admin``
     - ``Album``
     - ``Artist``
+    - ``Embed``
     - ``Home``
     - ``Login``
     - ``Moderation``
@@ -450,6 +451,7 @@ This hierarchical structure is made of several parts:
     - ``Favorites``
     - ``Notifications``
     - ``Radio``
+    - ``Search``
     - ``Settings``
     - ``Signup``
     - ``Track``
