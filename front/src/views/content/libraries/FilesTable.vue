@@ -206,7 +206,7 @@ export default {
           },
           pending: {
             label: this.$pgettext('Content/Library/Table/Short', 'Pending'),
-            help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn't been processed by the server yet'),
+            help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn\'t been processed by the server yet'),
           },
           errored: {
             label: this.$pgettext('Content/Library/Table/Short', 'Errored'),
