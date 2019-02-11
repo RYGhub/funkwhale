@@ -4,7 +4,7 @@
     v-if="button"
     :class="['ui', 'button']">
     <i class="list icon"></i>
-    <translate>Add to playlist…</translate>
+    <translate :translate-context="'Sidebar/Player/Icon.Tooltip/Verb'">Add to playlist…</translate>
   </button>
   <button
     v-else
@@ -31,7 +31,7 @@ export default {
   computed: {
     labels () {
       return {
-        addToPlaylist: this.$gettext('Add to playlist…')
+        addToPlaylist: this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', 'Add to playlist…')
       }
     }
   }
