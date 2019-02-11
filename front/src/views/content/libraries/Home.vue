@@ -1,18 +1,18 @@
 <template>
   <section class="ui vertical aligned stripe segment">
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading Libraries…</translate></div>
+      <div class="ui text loader"><translate :translate-context="'Content/Library/Paragraph'">Loading Libraries…</translate></div>
     </div>
     <div v-else class="ui text container">
-      <h1 class="ui header"><translate>My libraries</translate></h1>
+      <h1 class="ui header"><translate :translate-context="'Content/Library/Title'">My libraries</translate></h1>
 
       <p v-if="libraries.length == 0">
-        <translate>Looks like you don't have a library, it's time to create one.</translate>
+        <translate :translate-context="'Content/Library/Paragraph'">Looks like you don't have a library, it's time to create one.</translate>
       </p>
       <a @click="hiddenForm = !hiddenForm">
         <i class="plus icon" v-if="hiddenForm" />
         <i class="minus icon" v-else />
-        <translate>Create a new library</translate>
+        <translate :translate-context="'Content/Library/Link/Verb'">Create a new library</translate>
       </a>
       <library-form :library="null" v-if="!hiddenForm" @created="libraryCreated" />
       <div class="ui hidden divider"></div>
