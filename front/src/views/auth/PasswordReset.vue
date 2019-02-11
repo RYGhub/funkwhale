@@ -2,17 +2,17 @@
   <main class="main pusher" v-title="labels.reset">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate>Reset your password</translate></h2>
+        <h2><translate :translate-context="'Content/Signup/Title'">Reset your password</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><translate>Error while asking for a password reset</translate></div>
+            <div class="header"><translate :translate-context="'Content/Signup/Card.Title'">Error while asking for a password reset</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
-          <p><translate>Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.</translate></p>
+          <p><translate :translate-context="'Content/Signup/Paragraph'">Use this form to request a password reset. We will send an email to the given address with instructions to reset your password.</translate></p>
           <div class="field">
-            <label><translate>Account's email</translate></label>
+            <label><translate :translate-context="'Content/Signup/Input.Label'">Account's email</translate></label>
             <input
               required
               ref="email"
@@ -23,10 +23,10 @@
               v-model="email">
           </div>
           <router-link :to="{path: '/login'}">
-            <translate>Back to login</translate>
+            <translate :translate-context="'Content/Signup/Link'">Back to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            <translate>Ask for a password reset</translate></button>
+            <translate :translate-context="'Content/Signup/Button.Label/Verb'">Ask for a password reset</translate></button>
         </form>
       </div>
     </section>
@@ -50,9 +50,8 @@ export default {
   },
   computed: {
     labels() {
-      let reset = this.$gettext("Reset your password")
-      let placeholder = this.$gettext(
-        "Input the email address binded to your account"
+      let reset = this.$pgettext('Head/Signup/Title', "Reset your password")
+      let placeholder = this.$pgettext('Content/Signup/Input.Placeholder', "Enter the email address binded to your account"
       )
       return {
         reset,
