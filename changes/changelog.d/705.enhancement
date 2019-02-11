@@ -1,0 +1,1 @@
+Can now use a local file with FUNKWHALE_SPA_HTML_ROOT to avoid sending an HTTP request (#705)
