@@ -484,6 +484,7 @@ The detail part, which is optional and refers to the contents of the string itse
     - ``Call to action``
     - ``Verb``
     - ``Short``
+    - ``Unit``
 
 Here are a few examples of valid context hierarchies:
 
