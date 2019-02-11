@@ -1,15 +1,15 @@
 <template>
   <div class="ui segment">
-    <h3 class="ui header"><translate>Current usage</translate></h3>
+    <h3 class="ui header"><translate :translate-context="'Content/Library/Title'">Current usage</translate></h3>
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading usage data…</translate></div>
+      <div class="ui text loader"><translate :translate-context="'Content/Library/Paragraph'">Loading usage data…</translate></div>
     </div>
     <div :class="['ui', {'success': progress < 60}, {'yellow': progress >= 60 && progress < 96}, {'error': progress >= 95}, 'progress']">
       <div class="bar" :style="{width: `${progress}%`}">
         <div class="progress">{{ progress }}%</div>
       </div>
       <div class="label" v-if="quotaStatus">
-        <translate :translate-params="{max: humanSize(quotaStatus.max * 1000 * 1000), current: humanSize(quotaStatus.current * 1000 * 1000)}">%{ current } used on %{ max } allowed</translate>
+        <translate :translate-context="'Content/Library/Paragraph'" :translate-params="{max: humanSize(quotaStatus.max * 1000 * 1000), current: humanSize(quotaStatus.current * 1000 * 1000)}">%{ current } used on %{ max } allowed</translate>
       </div>
     </div>
     <div class="ui hidden divider"></div>
@@ -20,24 +20,24 @@
             {{ humanSize(quotaStatus.pending * 1000 * 1000) }}
           </div>
           <div class="label">
-            <translate>Pending files</translate>
+            <translate :translate-context="'Content/Library/Label'">Pending files</translate>
           </div>
         </div>
         <div>
           <router-link
             class="ui basic blue tiny button"
             :to="{name: 'content.libraries.files', query: {q: compileTokens([{field: 'status', value: 'pending'}])}}">
-            <translate>View files</translate>
+            <translate :translate-context="'Content/Library/Link/Verb'">View files</translate>
           </router-link>
 
           <dangerous-button
             color="grey"
             class="basic tiny"
             :action="purgePendingFiles">
-            <translate>Purge</translate>
-            <p slot="modal-header"><translate>Purge pending files?</translate></p>
-            <p slot="modal-content"><translate>Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota.</translate></p>
-            <p slot="modal-confirm"><translate>Purge</translate></p>
+            <translate :translate-context="'Content/Library/Button.Label/Verb'">Purge</translate>
+            <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Purge pending files?</translate></p>
+            <p slot="modal-content"><translate :translate-context="'Popup/Library/Paragraph'">Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota.</translate></p>
+            <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Purge</translate></p>
           </dangerous-button>
         </div>
       </div>
@@ -47,23 +47,23 @@
             {{ humanSize(quotaStatus.skipped * 1000 * 1000) }}
           </div>
           <div class="label">
-            <translate>Skipped files</translate>
+            <translate :translate-context="'Content/Library/Label'">Skipped files</translate>
           </div>
         </div>
         <div>
           <router-link
             class="ui basic blue tiny button"
             :to="{name: 'content.libraries.files', query: {q: compileTokens([{field: 'status', value: 'skipped'}])}}">
-            <translate>View files</translate>
+            <translate :translate-context="'Content/Library/Link/Verb'">View files</translate>
           </router-link>
           <dangerous-button
             color="grey"
             class="basic tiny"
             :action="purgeSkippedFiles">
-            <translate>Purge</translate>
-            <p slot="modal-header"><translate>Purge skipped files?</translate></p>
-            <p slot="modal-content"><translate>Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota.</translate></p>
-            <p slot="modal-confirm"><translate>Purge</translate></p>
+            <translate :translate-context="'Content/Library/Button.Label/Verb'">Purge</translate>
+            <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Purge skipped files?</translate></p>
+            <p slot="modal-content"><translate :translate-context="'Popup/Library/Paragraph'">Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota.</translate></p>
+            <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Purge</translate></p>
           </dangerous-button>
         </div>
       </div>
@@ -73,23 +73,23 @@
             {{ humanSize(quotaStatus.errored * 1000 * 1000) }}
           </div>
           <div class="label">
-            <translate>Errored files</translate>
+            <translate :translate-context="'Content/Library/Label'">Errored files</translate>
           </div>
         </div>
         <div>
           <router-link
             class="ui basic blue tiny button"
             :to="{name: 'content.libraries.files', query: {q: compileTokens([{field: 'status', value: 'errored'}])}}">
-            <translate>View files</translate>
+            <translate :translate-context="'Content/Library/Link/Verb'">View files</translate>
           </router-link>
           <dangerous-button
             color="grey"
             class="basic tiny"
             :action="purgeErroredFiles">
-            <translate>Purge</translate>
-            <p slot="modal-header"><translate>Purge errored files?</translate></p>
-            <p slot="modal-content"><translate>Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota.</translate></p>
-            <p slot="modal-confirm"><translate>Purge</translate></p>
+            <translate :translate-context="'Content/Library/Button.Label/Verb'">Purge</translate>
+            <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Purge errored files?</translate></p>
+            <p slot="modal-content"><translate :translate-context="'Popup/Library/Paragraph'">Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota.</translate></p>
+            <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Purge</translate></p>
           </dangerous-button>
         </div>
       </div>
