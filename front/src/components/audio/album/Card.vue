@@ -11,7 +11,7 @@
         <div class="meta">
           <span>
             <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-              <translate :translate-params="{artist: album.artist.name}">By %{ artist }</translate>
+              <translate :translate-context="'Content/Album/Card'" :translate-params="{artist: album.artist.name}">By %{ artist }</translate>
             </router-link>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>
@@ -36,21 +36,21 @@
           </table>
           <div class="center aligned segment" v-if="album.tracks.length > initialTracks">
             <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">
-              <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
+              <translate :translate-context="'Content/Album/Card.Link/Verb'" :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <translate>Collapse</translate>
+              <translate :translate-context="'Content/Album/Card.Link/Verb'">Collapse</translate>
             </em>
           </div>
         </div>
       </div>
       <div class="extra content">
         <play-button class="mini basic orange right floated" :tracks="album.tracks">
-          <translate>Play all</translate>
+          <translate :translate-context="'Content/Queue/Card.Button.Label/Short, Verb'">Play all</translate>
         </play-button>
         <span>
           <i class="music icon"></i>
-          <translate :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
+          <translate :translate-context="'Content/Album/Card'" :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
         </span>
       </div>
     </div>
