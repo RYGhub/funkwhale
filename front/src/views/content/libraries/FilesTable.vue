@@ -202,15 +202,15 @@ export default {
         importStatuses: {
           skipped: {
             label: this.$pgettext('Content/Library/Table/Short', 'Skipped'),
-            help: this.$pgettext('Content/Library/Help text', 'Track already present in one of your libraries'),
+            help: this.$pgettext('Content/Library/Help text', 'This track is already present in one of your libraries'),
           },
           pending: {
             label: this.$pgettext('Content/Library/Table/Short', 'Pending'),
-            help: this.$pgettext('Content/Library/Help text', 'Track uploaded, but not processed by the server yet'),
+            help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn't been processed by the server yet'),
           },
           errored: {
             label: this.$pgettext('Content/Library/Table/Short', 'Errored'),
-            help: this.$pgettext('Content/Library/Help text', 'Could not process this track, ensure it is tagged correctly'),
+            help: this.$pgettext('Content/Library/Help text', 'This track could not be processed, please it is tagged correctly'),
           },
           finished: {
             label: this.$pgettext('Content/Library/Table/Short', 'Finished'),
@@ -231,7 +231,7 @@ export default {
     },
     actions () {
       let deleteMsg = this.$pgettext('Content/Library/Dropdown/Verb', 'Delete')
-      let relaunchMsg = this.$pgettext('Content/Library/Dropdown/Verb', 'Relaunch import')
+      let relaunchMsg = this.$pgettext('Content/Library/Dropdown/Verb', 'Restart import')
       return [
         {
           name: 'delete',
