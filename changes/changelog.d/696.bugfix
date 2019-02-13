@@ -1,1 +1,0 @@
-Fixed Embed component name that could lead to issue when developping on OSX (#696)
