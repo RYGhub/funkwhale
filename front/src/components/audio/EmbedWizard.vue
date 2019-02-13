@@ -22,6 +22,9 @@
           <p><translate :translate-context="'Popup/Embed/Paragraph'">Copy/paste this code in your website HTML</translate></p>
           <textarea ref="textarea":value="embedCode" rows="5" readonly>
           </textarea>
+					<div class="ui right">
+					<p class="message" v-if=copied><translate :translate-context="'Content/*/Paragraph'">Text copied to clipboard!</translate></p>
+					</div>
         </div>
       </div>
     </div>
@@ -40,7 +43,8 @@ export default {
     let d = {
       width: null,
       height: 150,
-      minHeight: 100
+      minHeight: 100,
+			copied: false
     }
     if (this.type === 'album') {
       d.height = 330
@@ -69,6 +73,11 @@ export default {
     copy () {
       this.$refs.textarea.select()
       document.execCommand("Copy")
+			let self = this
+			self.copied = true
+			this.timeout = setTimeout(() => {
+				self.copied = false
+			}, 5000)
     }
   }
 }
@@ -76,4 +85,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.message {
+	position: absolute;
+	right: 0;
+	bottom: -2em;
+}
 </style>
