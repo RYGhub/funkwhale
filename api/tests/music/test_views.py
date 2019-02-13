@@ -108,6 +108,27 @@ def test_album_view_filter_playable(param, expected, factories, api_request):
     assert list(queryset) == expected
 
 
+@pytest.mark.parametrize(
+    "param", [("I've Got"), ("Français"), ("I've Got Everything : Spoken Word Poetry")]
+)
+def test_album_view_filter_query(param, factories, api_request):
+    # Test both partial and full search.
+    factories["music.Album"](title="I've Got Nothing : Original Soundtrack")
+    factories["music.Album"](title="I've Got Cake : Remix")
+    factories["music.Album"](title="Français Et Tu")
+    factories["music.Album"](title="I've Got Everything : Spoken Word Poetry")
+
+    request = api_request.get("/", {"q": param})
+    view = views.AlbumViewSet()
+    view.action_map = {"get": "list"}
+    view.request = view.initialize_request(request)
+    queryset = view.filter_queryset(view.get_queryset())
+
+    # Loop through our "expected list", and assert some string finds against our param.
+    for val in list(queryset):
+        assert val.title.find(param) != -1
+
+
 def test_can_serve_upload_as_remote_library(
     factories, authenticated_actor, logged_in_api_client, settings, preferences
 ):

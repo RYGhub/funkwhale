@@ -87,7 +87,7 @@ class UploadFilter(filters.FilterSet):
 
 class AlbumFilter(filters.FilterSet):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
-    q = fields.SearchFilter(search_fields=["title", "artist__name" "source"])
+    q = fields.SearchFilter(search_fields=["title", "artist__name"])
 
     class Meta:
         model = models.Album

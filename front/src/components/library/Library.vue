@@ -4,6 +4,9 @@
       <router-link class="ui item" to="/library" exact>
         <translate>Browse</translate>
       </router-link>
+      <router-link class="ui item" to="/library/albums" exact>
+        <translate>Albums</translate>
+      </router-link>
       <router-link class="ui item" to="/library/artists" exact>
         <translate>Artists</translate>
       </router-link>
