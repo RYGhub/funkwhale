@@ -9,9 +9,9 @@
     </div>
     <template v-if="query.length > 0">
       <h3 class="ui title"><translate :translate-context="'Content/Search/Title'">Artists</translate></h3>
-      <div v-if="results.artists.length > 0" class="ui stackable three column grid">
-        <div class="column" :key="artist.id" v-for="artist in results.artists">
-          <artist-card class="fluid" :artist="artist" ></artist-card>
+      <div v-if="results.artists.length > 0">
+        <div class="ui cards">
+          <artist-card :key="artist.id" v-for="artist in results.artists" :artist="artist" ></artist-card>
         </div>
       </div>
       <p v-else><translate :translate-context="'Content/Search/Paragraph'">No artist matched your query</translate></p>
@@ -101,5 +101,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

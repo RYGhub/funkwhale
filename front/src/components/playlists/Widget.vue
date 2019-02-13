@@ -10,7 +10,7 @@
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
-    <playlist-card class="fluid" v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
+    <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="ui fluid card">
+  <div class="ui card">
     <div class="content">
       <div class="header">
         {{ library.name }}

@@ -42,17 +42,15 @@
         v-if="result"
         v-masonry
         transition-duration="0"
-        item-selector=".column"
+        item-selector=".card"
         percent-position="true"
-        stagger="0"
-        class="ui stackable three column doubling grid">
-        <div
-          v-masonry-tile
-          v-if="result.results.length > 0"
-          v-for="artist in result.results"
-          :key="artist.id"
-          class="column">
-          <artist-card class="fluid" :artist="artist"></artist-card>
+        stagger="0">
+        <div v-if="result.results.length > 0" class="ui cards">
+          <artist-card
+            v-masonry-tile
+            v-for="artist in result.results"
+            :key="artist.id"
+            :artist="artist"></artist-card>
         </div>
       </div>
       <div class="ui center aligned basic segment">

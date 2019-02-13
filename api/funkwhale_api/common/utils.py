@@ -168,3 +168,28 @@ def recursive_getattr(obj, key, permissive=False):
             return
 
     return v
+
+
+def replace_prefix(queryset, field, old, new):
+    """
+    Given a queryset of objects and a field name, will find objects
+    for which the field have the given value, and replace the old prefix by
+    the new one.
+
+    This is especially useful to find/update bad federation ids, to replace:
+
+    http://wrongprotocolanddomain/path
+
+    by
+
+    https://goodprotocalanddomain/path
+
+    on a whole table with a single query.
+    """
+    qs = queryset.filter(**{"{}__startswith".format(field): old})
+    # we extract the part after the old prefix, and Concat it with our new prefix
+    update = models.functions.Concat(
+        models.Value(new),
+        models.functions.Substr(field, len(old) + 1, output_field=models.CharField()),
+    )
+    return qs.update(**{field: update})
