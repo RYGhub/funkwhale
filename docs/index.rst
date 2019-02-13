@@ -19,7 +19,7 @@ Funkwhale is a self-hosted, modern free and open-source music server, heavily in
    configuration
    troubleshooting
    importing-music
-   developpers/index
+   developers/index
    third-party
    contributing
    translators
