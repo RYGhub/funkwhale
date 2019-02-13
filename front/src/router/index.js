@@ -15,6 +15,7 @@ import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
 import LibraryArtist from '@/components/library/Artist'
 import LibraryArtists from '@/components/library/Artists'
+import LibraryAlbums from '@/components/library/Albums'
 import LibraryAlbum from '@/components/library/Album'
 import LibraryTrack from '@/components/library/Track'
 import LibraryRadios from '@/components/library/Radios'
@@ -270,6 +271,17 @@ export default new Router({
           path: 'artists/',
           name: 'library.artists.browse',
           component: LibraryArtists,
+          props: (route) => ({
+            defaultOrdering: route.query.ordering,
+            defaultQuery: route.query.query,
+            defaultPaginateBy: route.query.paginateBy,
+            defaultPage: route.query.page
+          })
+        },
+        {
+          path: 'albums/',
+          name: 'library.albums.browse',
+          component: LibraryAlbums,
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,
