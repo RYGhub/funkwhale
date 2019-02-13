@@ -16,7 +16,7 @@
         <duration :seconds="playlist.duration" />
          |
         <i class="sound icon"></i>
-        <translate
+        <translate :translate-context="'Content/*/Card/List item'"
           translate-plural="%{ count } tracks"
           :translate-n="playlist.tracks_count"
           :translate-params="{count: playlist.tracks_count}">

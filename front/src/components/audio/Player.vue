@@ -62,14 +62,14 @@
       </div>
       <div class="ui small warning message" v-if="currentTrack && errored">
         <div class="header">
-          <translate>We cannot load this track</translate>
+          <translate :translate-context="'Sidebar/Player/Error message.Title'">The track cannot be loaded</translate>
         </div>
         <p v-if="hasNext && playing && $store.state.player.errorCount < $store.state.player.maxConsecutiveErrors">
-          <translate>The next track will play automatically in a few seconds…</translate>
+          <translate :translate-context="'Sidebar/Player/Error message.Paragraph'">The next track will play automatically in a few seconds…</translate>
           <i class="loading spinner icon"></i>
         </p>
         <p>
-          <translate>You may have a connectivity issue.</translate>
+          <translate :translate-context="'Sidebar/Player/Error message.Paragraph'">You may have a connectivity issue.</translate>
         </p>
       </div>
       <div class="two wide column controls ui grid">
@@ -280,7 +280,7 @@ export default {
         return
       }
       let self = this
-      let msg = this.$gettext("Queue shuffled!")
+      let msg = this.$pgettext('Content/Queue/Message', "Queue shuffled!")
       this.isShuffling = true
       setTimeout(() => {
         self.$store.dispatch("queue/shuffle", () => {
@@ -346,24 +346,24 @@ export default {
       progress: "player/progress"
     }),
     labels() {
-      let audioPlayer = this.$gettext("Media player")
-      let previousTrack = this.$gettext("Previous track")
-      let play = this.$gettext("Play track")
-      let pause = this.$gettext("Pause track")
-      let next = this.$gettext("Next track")
-      let unmute = this.$gettext("Unmute")
-      let mute = this.$gettext("Mute")
-      let loopingDisabled = this.$gettext(
+      let audioPlayer = this.$pgettext('Sidebar/Player/Hidden text', "Media player")
+      let previousTrack = this.$pgettext('Sidebar/Player/Icon.Tooltip', "Previous track")
+      let play = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Play track")
+      let pause = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Pause track")
+      let next = this.$pgettext('Sidebar/Player/Icon.Tooltip', "Next track")
+      let unmute = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Unmute")
+      let mute = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Mute")
+      let loopingDisabled = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
         "Looping disabled. Click to switch to single-track looping."
       )
-      let loopingSingle = this.$gettext(
+      let loopingSingle = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
         "Looping on a single track. Click to switch to whole queue looping."
       )
-      let loopingWhole = this.$gettext(
+      let loopingWhole = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
         "Looping on whole queue. Click to disable looping."
       )
-      let shuffle = this.$gettext("Shuffle your queue")
-      let clear = this.$gettext("Clear your queue")
+      let shuffle = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Shuffle your queue")
+      let clear = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Clear your queue")
       return {
         audioPlayer,
         previousTrack,
