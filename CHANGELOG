@@ -10,6 +10,27 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.18.2 (2019-02-13)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+Enhancements:
+
+- Added a 'fix_federation_ids' management command to deal with protocol/domain issues in federation
+  IDs after deployments (#706)
+- Can now use a local file with FUNKWHALE_SPA_HTML_ROOT to avoid sending an HTTP request (#705)
+
+
+Bugfixes:
+
+- Downgraded channels dependency to 2.1.6 to fix denied uploads (#697)
+- Fixed cards display issues on medium/small screens (#707)
+- Fixed Embed component name that could lead to issue when developping on OSX (#696)
+- Fixed resizing issues for album cards on artist pages (#694)
+
+
 0.18.1 (2019-01-29)
 -------------------
 
