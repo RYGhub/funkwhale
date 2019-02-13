@@ -69,13 +69,19 @@ Ultrasonic (Android)
 - Google Play: https://play.google.com/store/apps/details?id=org.moire.ultrasonic
 - Sources: https://github.com/ultrasonic/ultrasonic
 
-
 Ultrasonic is a full-featured Subsonic client with Playlists, Stars, Search,
 Offline mode, etc.
 
 It's one of the recommended Android client to use with Funkwhale, as we are doing
 our Android tests on this one.
 
+To enable playback from Funkwhale, enter the following information in the server settings:
+
+- Server address: the root URL of your instance
+- Username: your username on the instance
+- Password: this will be your subsonic password
+
+Then in the general settings select "Browse Using ID3 Tags"
 
 DSub (Android)
 ^^^^^^^^^^^^^^
@@ -95,6 +101,13 @@ DSub is a full-featured Subsonic client that works great, and has a lot of featu
 It's one of the recommended Android client to use with Funkwhale, as we are doing
 our Android tests on this one.
 
+To enable playback from Funkwhale, enter the following information in the server settings:
+
+- Server address: the root URL of your instance
+- Username: your username on the instance
+- Password: this will be your subsonic password
+- Browse By Tags: enabled
+
 play:Sub (iOS)
 ^^^^^^^^^^^^^^
 
@@ -102,8 +115,7 @@ play:Sub (iOS)
 - App Store: https://itunes.apple.com/us/app/play-sub-subsonic-music-streamer/id955329386
 - Website: http://michaelsapps.dk/playsubapp/
 
-Although paying, this app is known to work great with Funkwhale as the maintainer, Michael Bech Hansen implements Funkwhale
-specific logic and checks.
+Although paid, this app is known to work great with Funkwhale as the maintainer, Michael Bech Hansen, implements Funkwhale-specific logic and checks.
 
 Substreamer (iOS)
 ^^^^^^^^^^^^^^^^^
@@ -122,3 +134,41 @@ music from your Funkwhale instance. However, it does not implement advanced
 features such as playlist management, search or stars.
 
 This is the client we use for our desktop tests.
+
+To enable playback from Funkwhale, enter the following information in the Internet -> subsonic settings:
+
+- Server address: the root URL of your instance
+- Username: your username on the instance
+- Password: this will be your subsonic password
+
+Mopidy (CLI)
+^^^^^^^^^^^^
+- Price: free
+- Website: https://www.mopidy.com/
+
+Mopidy is a Python-based music server which you can run on your machine in order
+to access your music through a CLI such as `ncmpcpp <https://github.com/arybczak/ncmpcpp>`_.
+
+In order to use Mopidy to stream from the CLI, you will need to install the following dependencies:
+
+- Mopidy
+- mopidy-subidy: a plugin for Subsonic https://github.com/Prior99/mopidy-subidy
+- ncmpcpp
+
+Once installed, add the following to your /etc/mopidy/mopidy.conf::
+
+    [subidy]
+    enabled=True
+    url=https://path.to/your/funkwhale/server
+    username=funkwhale
+    password=your_subsonic_password
+    #legacy_auth=(optional - setting to yes may solve some connection errors)
+    #api_version=(optional - specify which API version to use. Subsonic 6.2 uses 1.14.0)
+
+Then in your .config/ncmpcpp/config, change the startup_screen value so that it doesn't default to the built-in media library::
+
+   startup_screen = browser
+
+This will show your artists, albums, and playlists when you start ncmpcpp.
+
+[Optional]: enable and start mopidy as a service to start the server at boot.

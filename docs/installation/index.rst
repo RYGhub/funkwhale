@@ -154,7 +154,7 @@ On docker deployments, run the following commands:
 
     export FUNKWHALE_VERSION="|version|"
     # download the needed files
-    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/funkwhale_proxy.conf"
+    curl -L -o /etc/nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.funkwhale_proxy.conf"
     curl -L -o /etc/nginx/sites-available/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.proxy.template"
 
 .. code-block:: shell
