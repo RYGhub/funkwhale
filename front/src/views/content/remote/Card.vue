@@ -24,44 +24,44 @@
       </div>
       <div class="meta">
         <i class="music icon"></i>
-        <translate :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
       <div v-if="displayScan && latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
           <i class="hourglass icon"></i>
-          <translate>Scan waiting</translate>
+          <translate :translate-context="'Content/Library/Card.List item'">Scan pending</translate>
         </template>
         <template v-if="latestScan.status === 'scanning'">
           <i class="loading spinner icon"></i>
-          <translate :translate-params="{progress: scanProgress}">Scanning… (%{ progress }%)</translate>
+          <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{progress: scanProgress}">Scanning… (%{ progress }%)</translate>
         </template>
         <template v-else-if="latestScan.status === 'errored'">
           <i class="red download icon"></i>
-          <translate>Problem during scanning</translate>
+          <translate :translate-context="'Content/Library/Card.List item'">Problem during scanning</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files === 0">
           <i class="green download icon"></i>
-          <translate>Scanned</translate>
+          <translate :translate-context="'Content/Library/Card.List item'">Scanned</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files > 0">
           <i class="yellow download icon"></i>
-          <translate>Scanned with errors</translate>
+          <translate :translate-context="'Content/Library/Card.List item'">Scanned with errors</translate>
         </template>
         <span class="link right floated" @click="showScan = !showScan">
-          <translate>Details</translate>
+          <translate :translate-context="'Content/Library/Card.Link'">Details</translate>
           <i v-if="showScan" class="angle down icon" />
           <i v-else class="angle right icon" />
         </span>
         <div v-if="showScan">
           <template v-if="latestScan.modification_date">
-            <translate>Last update:</translate><human-date :date="latestScan.modification_date" /><br />
+            <translate :translate-context="'Content/Library/Card.List item/Noun'">Last update:</translate><human-date :date="latestScan.modification_date" /><br />
           </template>
-          <translate>Failed tracks:</translate> {{ latestScan.errored_files }}
+          <translate :translate-context="'Content/Library/Card.List item/Noun'">Failed tracks:</translate> {{ latestScan.errored_files }}
         </div>
       </div>
       <div v-if="displayScan && canLaunchScan" class="clearfix">
         <span class="right floated link" @click="launchScan">
-          <translate>Scan now</translate> <i class="paper plane icon" />
+          <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Scan now</translate> <i class="paper plane icon" />
         </span>
       </div>
     </div>
@@ -71,7 +71,7 @@
     <div v-if="displayCopyFid" class="extra content">
       <div class="ui form">
         <div class="field">
-          <label><translate>Sharing link</translate></label>
+          <label><translate :translate-context="'Content/Library/Title'">Sharing link</translate></label>
           <copy-input :button-classes="'basic'" :value="library.fid" />
         </div>
       </div>
@@ -81,29 +81,29 @@
         v-if="!library.follow"
         @click="follow()"
         :class="['ui', 'green', {'loading': isLoadingFollow}, 'button']">
-        <translate>Follow</translate>
+        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Follow</translate>
       </button>
       <button
         v-else-if="!library.follow.approved"
         class="ui disabled button"><i class="hourglass icon"></i>
-        <translate>Follow request pending approval</translate>
+        <translate :translate-context="'Content/Library/Card.Paragraph'">Follow request pending approval</translate>
       </button>
       <button
         v-else-if="!library.follow.approved"
         class="ui disabled button"><i class="check icon"></i>
-        <translate>Following</translate>
+        <translate :translate-context="'Content/Library/Card.Paragraph'">Following</translate>
       </button>
       <dangerous-button
         v-else-if="library.follow.approved"
         color=""
         :class="['ui', 'button']"
         :action="unfollow">
-        <translate>Unfollow</translate>
-        <p slot="modal-header"><translate>Unfollow this library?</translate></p>
+        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Unfollow</translate>
+        <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Unfollow this library?</translate></p>
         <div slot="modal-content">
-          <p><translate>By unfollowing this library, you loose access to its content.</translate></p>
+          <p><translate :translate-context="'Popup/Library/Paragraph'">By unfollowing this library, you loose access to its content.</translate></p>
         </div>
-        <p slot="modal-confirm"><translate>Unfollow</translate></p>
+        <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Unfollow</translate></p>
       </dangerous-button>
     </div>
   </div>
@@ -128,8 +128,8 @@ export default {
   },
   computed: {
     labels () {
-      let me = this.$gettext('This library is private and your approval from its owner is needed to access its content')
-      let everyone = this.$gettext('This library is public and you can access its content freely')
+      let me = this.$pgettext('Content/Library/Card.Help text', 'This library is private and your approval from its owner is needed to access its content')
+      let everyone = this.$pgettext('Content/Library/Card.Help text', 'This library is public and you can access its content freely')
 
       return {
         tooltips: {
@@ -162,8 +162,8 @@ export default {
   methods: {
     launchScan () {
       let self = this
-      let successMsg = this.$gettext('Scan launched')
-      let skippedMsg = this.$gettext('Scan skipped (previous scan is too recent)')
+      let successMsg = this.$pgettext('Content/Library/Message', 'Scan launched')
+      let skippedMsg = this.$pgettext('Content/Library/Message', 'Scan skipped (previous scan is too recent)')
       axios.post(`federation/libraries/${this.library.uuid}/scan/`).then((response) => {
         let msg
         if (response.data.status == 'skipped') {

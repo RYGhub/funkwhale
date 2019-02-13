@@ -445,6 +445,7 @@ This hierarchical structure is made of several parts:
     - ``Artist``
     - ``Home``
     - ``Login``
+    - ``Library``
     - ``Moderation``
     - ``Player``
     - ``Playlist``
@@ -461,6 +462,7 @@ This hierarchical structure is made of several parts:
     - ``Button``
     - ``Card``
     - ``Dropdown``
+    - ``Error message``
     - ``Form``
     - ``Header``
     - ``Help text``
