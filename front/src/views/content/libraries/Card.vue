@@ -37,15 +37,15 @@
           {{ library.size | humanSize }}
         </span>
         <i class="music icon"></i>
-        <translate :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
     </div>
     <div class="ui bottom basic attached buttons">
       <router-link :to="{name: 'content.libraries.detail.upload', params: {id: library.uuid}}" class="ui button">
-        <translate>Upload</translate>
+        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Upload</translate>
       </router-link>
       <router-link :to="{name: 'content.libraries.detail', params: {id: library.uuid}}" exact class="ui button">
-        <translate>Detail</translate>
+        <translate :translate-context="'Content/Library/Card.Button.Label/Noun'">Details</translate>
       </router-link>
     </div>
   </div>
@@ -55,10 +55,10 @@ export default {
   props: ['library'],
   computed: {
     labels () {
-      let me = this.$gettext('Visibility: nobody except me')
-      let instance = this.$gettext('Visibility: everyone on this instance')
-      let everyone = this.$gettext('Visibility: everyone, including other instances')
-      let size = this.$gettext('Total size of the files in this library')
+      let me = this.$pgettext('Content/Library/Card.Help text', 'Visibility: nobody except me')
+      let instance = this.$pgettext('Content/Library/Card.Help text', 'Visibility: everyone on this instance')
+      let everyone = this.$pgettext('Content/Library/Card.Help text', 'Visibility: everyone, including other instances')
+      let size = this.$pgettext('Content/Library/Card.Help text', 'Total size of the files in this library')
 
       return {
         tooltips: {

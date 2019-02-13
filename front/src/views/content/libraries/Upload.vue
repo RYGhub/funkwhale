@@ -1,7 +1,7 @@
 <template>
   <div class="ui vertical aligned stripe segment">
     <div v-if="isLoadingLibrary" :class="['ui', {'active': isLoadingLibrary}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading library data…</translate></div>
+      <div class="ui text loader"><translate :translate-context="'Content/Library/Paragraph'">Loading library data…</translate></div>
     </div>
     <detail-area v-else :library="library">
       <file-upload :default-import-reference="defaultImportReference" :library="library" />

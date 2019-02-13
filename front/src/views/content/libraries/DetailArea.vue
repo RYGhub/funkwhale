@@ -2,7 +2,7 @@
   <div>
     <div class="ui stackable grid">
       <div class="five wide column">
-        <h3 class="ui header"><translate>Current library</translate></h3>
+        <h3 class="ui header"><translate :translate-context="'Content/Library/Title'">Current library</translate></h3>
         <library-card :library="library" />
       </div>
     </div>
@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     links () {
-      let upload = this.$gettext('Upload')
+      let upload = this.$pgettext('Content/Library/Card.Button.Label/Verb', 'Upload')
       return [
         {
           name: 'libraries.detail.upload',
