@@ -3,16 +3,16 @@
     v-if="playlists.length > 0"
     v-masonry
     transition-duration="0"
-    item-selector=".column"
+    item-selector=".card"
     percent-position="true"
-    stagger="0"
-    class="ui stackable three column doubling grid">
-    <div
-      v-masonry-tile
-      v-for="playlist in playlists"
-      :key="playlist.id"
-      class="column">
-      <playlist-card class="fluid" :playlist="playlist"></playlist-card>
+    stagger="0">
+    <div class="ui cards">
+      <playlist-card
+        :playlist="playlist"
+        v-masonry-tile
+        v-for="playlist in playlists"
+        :key="playlist.id"
+      ></playlist-card>
     </div>
   </div>
 </template>

@@ -10,7 +10,7 @@
     <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'angle right', 'icon']">
     </i>
     <div class="ui hidden divider"></div>
-    <div class="ui three cards">
+    <div class="ui cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>
       </div>

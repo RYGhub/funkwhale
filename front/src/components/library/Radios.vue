@@ -64,17 +64,18 @@
         v-if="result"
         v-masonry
         transition-duration="0"
-        item-selector=".column"
+        item-selector=".card"
         percent-position="true"
-        stagger="0"
-        class="ui stackable three column doubling grid">
+        stagger="0">
         <div
-          v-masonry-tile
           v-if="result.results.length > 0"
-          v-for="radio in result.results"
-          :key="radio.id"
-          class="column">
-          <radio-card class="fluid" type="custom" :custom-radio="radio"></radio-card>
+          class="ui cards">
+          <radio-card
+            type="custom"
+            v-masonry-tile
+            v-for="radio in result.results"
+            :key="radio.id"
+            :custom-radio="radio"></radio-card>
         </div>
       </div>
       <div class="ui center aligned basic segment">
