@@ -1,0 +1,2 @@
+Added a 'fix_federation_ids' management command to deal with protocol/domain issues in federation
+IDs after deployments (#706)
