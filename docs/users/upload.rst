@@ -21,7 +21,7 @@ default upload quota (1GB by default). This default quota can be increased,
 reduced or completely removed by your instance admins depending on their policy.
 
 Additionnaly, instance admins can grant you storage space manually. Get in touch with them
-if you'd like some additionnal storage space.
+if you'd like some additional storage space.
 
 You can view your current quota and usage at any time by visiting ``/content/libraries/`` on your instance,
 or clicking the "Add content" link in the sidebar, then visiting the "Upload audio content" section.
@@ -31,13 +31,13 @@ or clicking the "Add content" link in the sidebar, then visiting the "Upload aud
 Creating a library
 ------------------
 
-In Funkwhale's world, a library is a collection of audio files with an associated visibility level. A library can either be:
+In Funkwhale's world, a library is a collection of audio files with an associated visibility level. A library can be:
 
 - Public: anyone can follow the library to automatically access its content (including users on other instances)
 - Local: other users from your instance can follow the library to automatically access its content
-- Private: nobody will access the library content
+- Private: nobody apart from you can access the library content
 
-Regardless of this visibility settings, you can share the library link to specific users
+Regardless of visibility settings, you can share the library link to specific users
 and accept their follow request in order to grant then access to its content. Typically, this
 is useful when you have a private library you want to share with friends or family.
 
@@ -68,7 +68,7 @@ The minimum required tags are:
 - Artist
 - Album
 
-However, Funkwhale can understand and use additionnal tags to enhance user experience and display more information. The full list of supported tags is available below:
+However, Funkwhale can understand and use additional tags to enhance user experience and display more information. The full list of supported tags is available below:
 
 +----------------------------------+--------------------------------------------+---------------------------------------------------------------+
 | Name                             | Example value                              | Description                                                   |
