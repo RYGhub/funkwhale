@@ -42,7 +42,7 @@
       </span>
       <modal v-if="checkResult" :show.sync="showCandidadesModal">
         <div class="header">
-          <translate>Track matching filter</translate>
+          <translate :translate-context="'Popup/Radio/Title/Noun'">Tracks matching filter</translate>
         </div>
         <div class="content">
           <div class="description">
@@ -51,13 +51,13 @@
         </div>
         <div class="actions">
           <div class="ui black deny button">
-            <translate>Cancel</translate>
+            <translate :translate-context="'Popup/Radio/Button.Label/Verb'">Cancel</translate>
           </div>
         </div>
       </modal>
     </td>
     <td>
-      <button @click="$emit('delete', index)" class="ui basic red button"><translate>Remove</translate></button>
+      <button @click="$emit('delete', index)" class="ui basic red button"><translate :translate-context="'Content/Radio/Button.Label/Verb'">Remove</translate></button>
     </td>
   </tr>
 </template>
