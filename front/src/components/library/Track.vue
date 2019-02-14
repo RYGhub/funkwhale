@@ -15,7 +15,7 @@
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                <translate
+                <translate :translate-context="'Content/Track/Paragraph'"
                   :translate-params="{album: track.album.title, artist: track.artist.name}"
                 >From album %{ album } by %{ artist }</translate>
               </div>
@@ -25,46 +25,46 @@
                   class="ui button"
                   :to="{name: 'library.albums.detail', params: {id: track.album.id }}"
                 >
-                  <translate>Album page</translate>
+                  <translate :translate-context="'Content/Track/Button.Label'">Album page</translate>
                 </router-link>
                 <router-link
                   class="ui button"
                   :to="{name: 'library.artists.detail', params: {id: track.artist.id }}"
                 >
-                  <translate>Artist page</translate>
+                  <translate :translate-context="'Content/Track/Button.Label'">Artist page</translate>
                 </router-link>
               </div>
             </div>
           </h2>
 
           <play-button class="orange" :track="track">
-            <translate>Play</translate>
+            <translate :translate-context="'*/Queue/Button.Label/Short, Verb'">Play</translate>
           </play-button>
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
           <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia w icon"></i>
-            <translate>Search on Wikipedia</translate>
+            <translate :translate-context="'Content/*/Link/Verb'">Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <translate>View on MusicBrainz</translate>
+            <translate :translate-context="'Content/*/Link/Verb'">View on MusicBrainz</translate>
           </a>
           <a v-if="upload" :href="downloadUrl" target="_blank" class="ui button">
             <i class="download icon"></i>
-            <translate>Download</translate>
+            <translate :translate-context="'Content/Track/Link/Verb'">Download</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
               @click="showEmbedModal = !showEmbedModal"
               class="ui button">
               <i class="code icon"></i>
-              <translate>Embed</translate>
+              <translate :translate-context="'Content/Track/Button.Label/Verb'">Embed</translate>
             </button>
             <modal :show.sync="showEmbedModal">
               <div class="header">
-                <translate>Embed this track on your website</translate>
+                <translate :translate-context="'Popup/Track/Title'">Embed this track on your website</translate>
               </div>
               <div class="content">
                 <div class="description">
@@ -74,7 +74,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate>Cancel</translate>
+                  <translate :translate-context="'Popup/Track/Button/Verb'">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -83,64 +83,64 @@
       </section>
       <section class="ui vertical stripe center aligned segment">
         <h2 class="ui header">
-          <translate>Track information</translate>
+          <translate :translate-context="'Content/Track/Title/Noun'">Track information</translate>
         </h2>
         <table class="ui very basic collapsing celled center aligned table">
           <tbody>
             <tr>
               <td>
-                <translate>Copyright</translate>
+                <translate :translate-context="'Content/Track/Table.Label/Noun'">Copyright</translate>
               </td>
               <td v-if="track.copyright" :title="track.copyright">{{ track.copyright|truncate(50) }}</td>
               <td v-else>
-                <translate>We don't have any copyright information for this track</translate>
+                <translate :translate-context="'Content/Track/Table.Paragraph'">No copyright information available for this track</translate>
               </td>
             </tr>
             <tr>
               <td>
-                <translate>License</translate>
+                <translate :translate-context="'Content/Track/Table.Label/Noun'">License</translate>
               </td>
               <td v-if="license">
                 <a :href="license.url" target="_blank" rel="noopener noreferrer">{{ license.name }}</a>
               </td>
               <td v-else>
-                <translate>We don't have any licensing information for this track</translate>
+                <translate :translate-context="'Content/Track/Table.Paragraph'">No licensing information for this track</translate>
               </td>
             </tr>
             <tr>
               <td>
-                <translate>Duration</translate>
+                <translate :translate-context="'Content/Track/Table.Label'">Duration</translate>
               </td>
               <td v-if="upload && upload.duration">{{ time.parse(upload.duration) }}</td>
               <td v-else>
-                <translate>N/A</translate>
+                <translate :translate-context="'*/*/*'">N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                <translate>Size</translate>
+                <translate :translate-context="'Content/Track/Table.Label'">Size</translate>
               </td>
               <td v-if="upload && upload.size">{{ upload.size | humanSize }}</td>
               <td v-else>
-                <translate>N/A</translate>
+                <translate :translate-context="'*/*/*'">N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                <translate>Bitrate</translate>
+                <translate :translate-context="'Content/Track/Table.Label'">Bitrate</translate>
               </td>
               <td v-if="upload && upload.bitrate">{{ upload.bitrate | humanSize }}/s</td>
               <td v-else>
-                <translate>N/A</translate>
+                <translate :translate-context="'*/*/*'">N/A</translate>
               </td>
             </tr>
             <tr>
               <td>
-                <translate>Type</translate>
+                <translate :translate-context="'Content/Track/Table.Label/Noun'">Type</translate>
               </td>
               <td v-if="upload && upload.extension">{{ upload.extension }}</td>
               <td v-else>
-                <translate>N/A</translate>
+                <translate :translate-context="'*/*/*'">N/A</translate>
               </td>
             </tr>
           </tbody>
@@ -148,7 +148,7 @@
       </section>
       <section class="ui vertical stripe center aligned segment">
         <h2>
-          <translate>Lyrics</translate>
+          <translate :translate-context="'Content/Track/Title'">Lyrics</translate>
         </h2>
         <div v-if="isLoadingLyrics" class="ui vertical segment">
           <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
@@ -156,20 +156,20 @@
         <div v-if="lyrics" v-html="lyrics.content_rendered"></div>
         <template v-if="!isLoadingLyrics & !lyrics">
           <p>
-            <translate>No lyrics available for this track.</translate>
+            <translate :translate-context="'Content/Track/Paragraph'">No lyrics available for this track.</translate>
           </p>
           <a class="ui button" target="_blank" :href="lyricsSearchUrl">
             <i class="search icon"></i>
-            <translate>Search on lyrics.wikia.com</translate>
+            <translate :translate-context="'Content/Track/Link/Verb'">Search on lyrics.wikia.com</translate>
           </a>
         </template>
       </section>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate>User libraries</translate>
+          <translate :translate-context="'Content/Track/Title'">User libraries</translate>
         </h2>
         <library-widget @loaded="libraries = $event" :url="'tracks/' + id + '/libraries/'">
-          <translate slot="subtitle">This track is present in the following libraries:</translate>
+          <translate :translate-context="'Content/Track/Paragraph'" slot="subtitle">This track is present in the following libraries:</translate>
         </library-widget>
       </section>
     </template>
@@ -259,7 +259,7 @@ export default {
     },
     labels() {
       return {
-        title: this.$gettext("Track")
+        title: this.$pgettext('Head/Track/Title', "Track")
       }
     },
     upload() {

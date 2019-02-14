@@ -4,17 +4,17 @@
       <div class="ui stackable three column grid">
         <div class="column">
           <track-widget :url="'history/listenings/'" :filters="{scope: 'user', ordering: '-creation_date'}">
-            <template slot="title"><translate>Recently listened</translate></template>
+            <template slot="title"><translate :translate-context="'Content/Home/Title'">Recently listened</translate></template>
           </track-widget>
         </div>
         <div class="column">
           <track-widget :url="'favorites/tracks/'" :filters="{scope: 'user', ordering: '-creation_date'}">
-            <template slot="title"><translate>Recently favorited</translate></template>
+            <template slot="title"><translate :translate-context="'Content/Home/Title'">Recently favorited</translate></template>
           </track-widget>
         </div>
         <div class="column">
           <playlist-widget :url="'playlists/'" :filters="{scope: 'user', playable: true, ordering: '-creation_date'}">
-            <template slot="title"><translate>Playlists</translate></template>
+            <template slot="title"><translate :translate-context="'Content/Home/Title'">Playlists</translate></template>
           </playlist-widget>
         </div>
       </div>
@@ -22,7 +22,7 @@
       <div class="ui grid">
         <div class="ui row">
           <album-widget :filters="{playable: true, ordering: '-creation_date'}">
-            <template slot="title"><translate>Recently added</translate></template>
+            <template slot="title"><translate :translate-context="'Content/Home/Title'">Recently added</translate></template>
           </album-widget>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$gettext("Home")
+        title: this.$pgettext('Head/Home/Title', "Home")
       }
     }
   },

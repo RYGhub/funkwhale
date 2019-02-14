@@ -1,9 +1,9 @@
   <template>
   <div>
     <div class="ui top attached tabular menu">
-      <a :class="['item', {active: currentTab === 'summary'}]" @click="currentTab = 'summary'"><translate>Summary</translate></a>
+      <a :class="['item', {active: currentTab === 'summary'}]" @click="currentTab = 'summary'"><translate :translate-context="'Content/Library/Tab.Title/Short'">Summary</translate></a>
       <a :class="['item', {active: currentTab === 'uploads'}]" @click="currentTab = 'uploads'">
-        <translate>Uploading</translate>
+        <translate :translate-context="'Content/Library/Tab.Title/Short'">Uploading</translate>
         <div v-if="files.length === 0" class="ui label">
           0
         </div>
@@ -15,7 +15,7 @@
         </div>
       </a>
       <a :class="['item', {active: currentTab === 'processing'}]" @click="currentTab = 'processing'">
-        <translate>Processing</translate>
+        <translate :translate-context="'Content/Library/Tab.Title/Short'">Processing</translate>
         <div v-if="processableFiles === 0" class="ui label">
           0
         </div>
@@ -29,19 +29,19 @@
     </div>
 
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'summary'}]">
-      <h2 class="ui header"><translate>Upload new tracks</translate></h2>
+      <h2 class="ui header"><translate :translate-context="'Content/Library/Title/Verb'">Upload new tracks</translate></h2>
       <div class="ui message">
-        <p><translate>You are about to upload music to your library. Before proceeding, please ensure that:</translate></p>
+        <p><translate :translate-context="'Content/Library/Paragraph'">You are about to upload music to your library. Before proceeding, please ensure that:</translate></p>
         <ul>
           <li v-if="library.privacy_level != 'me'">
-            You are not uploading copyrighted content in a public library, otherwise you may be infringing the law
+						<translate :translate-context="'Content/Library/List item'">You are not uploading copyrighted content in a public library, otherwise you may be infringing the law</translate>
           </li>
           <li>
-            <translate>The music files you are uploading are tagged properly:</translate>
-            <a href="http://picard.musicbrainz.org/" target='_blank'><translate>We recommend using Picard for that purpose.</translate></a>
+            <translate :translate-context="'Content/Library/List item'">The music files you are uploading are tagged properly.</translate>&nbsp;
+            <a href="http://picard.musicbrainz.org/" target='_blank'><translate :translate-context="'Content/Library/Link'">We recommend using Picard for that purpose.</translate></a>
           </li>
           <li>
-            <translate>The uploaded music files are in OGG, Flac or MP3 format</translate>
+            <translate :translate-context="'Content/Library/List item'">The uploaded music files are in OGG, Flac or MP3 format</translate>
           </li>
         </ul>
       </div>
@@ -49,14 +49,14 @@
       <div class="ui form">
         <div class="fields">
           <div class="ui four wide field">
-            <label><translate>Import reference</translate></label>
-            <p><translate>This reference will be used to group imported files together.</translate></p>
+            <label><translate :translate-context="'Content/Library/Input.Label/Noun'">Import reference</translate></label>
+            <p><translate :translate-context="'Content/Library/Paragraph'">This reference will be used to group imported files together.</translate></p>
             <input name="import-ref" type="text" v-model="importReference" />
           </div>
         </div>
 
       </div>
-      <div class="ui green button" @click="currentTab = 'uploads'"><translate>Proceed</translate></div>
+      <div class="ui green button" @click="currentTab = 'uploads'"><translate :translate-context="'Content/Library/Button.Label'">Proceed</translate></div>
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'uploads'}]">
       <div class="ui container">
@@ -73,18 +73,18 @@
           @input-file="inputFile"
           ref="upload">
           <i class="upload icon"></i>&nbsp;
-          <translate>Click to select files to upload or drag and drop files or directories</translate>
+          <translate :translate-context="'Content/Library/Paragraph/Call to action'">Click to select files to upload or drag and drop files or directories</translate>
           <br />
           <br />
-          <i><translate :translate-params="{extensions: supportedExtensions.join(', ')}">  Supported extensions: %{ extensions }</translate></i>
+          <i><translate :translate-context="'Content/Library/Paragraph'" :translate-params="{extensions: supportedExtensions.join(', ')}">Supported extensions: %{ extensions }</translate></i>
         </file-upload-widget>
       </div>
       <table v-if="files.length > 0" class="ui single line table">
         <thead>
           <tr>
-            <th><translate>Filename</translate></th>
-            <th><translate>Size</translate></th>
-            <th><translate>Status</translate></th>
+            <th><translate :translate-context="'Content/Library/Table.Label'">Filename</translate></th>
+            <th><translate :translate-context="'Content/Library/Table.Label'">Size</translate></th>
+            <th><translate :translate-context="'Content/Library/Table.Label'">Status</translate></th>
           </tr>
         </thead>
         <tbody>
@@ -98,14 +98,14 @@
                 </span>
               </span>
               <span v-else-if="file.success" class="ui green label">
-                <translate key="1">Uploaded</translate>
+                <translate :translate-context="'Content/Library/Table'" key="1">Uploaded</translate>
               </span>
               <span v-else-if="file.active" class="ui yellow label">
-                <translate key="2">Uploading…</translate>
+                <translate :translate-context="'Content/Library/Table'" key="2">Uploading…</translate>
                 ({{ parseInt(file.progress) }}%)
               </span>
               <template v-else>
-                <span class="ui label"><translate key="3">Pending</translate></span>
+                <span class="ui label"><translate :translate-context="'Content/Library/Table'" key="3">Pending</translate></span>
                 <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
               </template>
             </td>
@@ -217,17 +217,17 @@ export default {
   },
   computed: {
     labels() {
-      let denied = this.$gettext(
+      let denied = this.$pgettext('Content/Library/Help text', 
         "Upload denied, ensure the file is not too big and that you have not reached your quota"
       );
-      let server = this.$gettext(
+      let server = this.$pgettext('Content/Library/Help text', 
         "Cannot upload this file, ensure it is not too big"
       );
-      let network = this.$gettext(
+      let network = this.$pgettext('Content/Library/Help text', 
         "A network error occured while uploading this file"
       );
-      let timeout = this.$gettext("Upload timeout, please try again");
-      let extension = this.$gettext(
+      let timeout = this.$pgettext('Content/Library/Help text', "Upload timeout, please try again");
+      let extension = this.$pgettext('Content/Library/Help text', 
         "Invalid file type, ensure you are uploading an audio file. Supported file extensions are %{ extensions }"
       );
       return {

@@ -11,7 +11,7 @@
             <div class="content">
               {{ artist.name }}
               <div class="sub header" v-if="albums">
-                <translate
+                <translate :translate-context="'Content/Artist/Paragraph'"
                   tag="div"
                   translate-plural="%{ count } tracks in %{ albumsCount } albums"
                   :translate-n="totalTracks"
@@ -24,16 +24,16 @@
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
           <play-button :is-playable="isPlayable" class="orange" :artist="artist.id">
-            <translate>Play all albums</translate>
+            <translate :translate-context="'Content/Artist/Button.Label/Verb'">Play all albums</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui button">
             <i class="wikipedia w icon"></i>
-            <translate>Search on Wikipedia</translate>
+            <translate :translate-context="'Content/*/Button.Label/Verb'">Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <translate>View on MusicBrainz</translate>
+            <translate :translate-context="'Content/*/Button.Label/Verb'">View on MusicBrainz</translate>
           </a>
         </div>
       </section>
@@ -42,7 +42,7 @@
       </section>
       <section v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
         <h2>
-          <translate>Albums by this artist</translate>
+          <translate :translate-context="'Content/Artist/Title'">Albums by this artist</translate>
         </h2>
         <div class="ui cards" >
           <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in albums"></album-card>
@@ -50,16 +50,16 @@
       </section>
       <section v-if="tracks.length > 0" class="ui vertical stripe segment">
         <h2>
-          <translate>Tracks by this artist</translate>
+          <translate :translate-context="'Content/Artist/Title'">Tracks by this artist</translate>
         </h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </section>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate>User libraries</translate>
+          <translate :translate-context="'Content/Artist/Title'">User libraries</translate>
         </h2>
         <library-widget :url="'artists/' + id + '/libraries/'">
-          <translate slot="subtitle">This artist is present in the following libraries:</translate>
+          <translate :translate-context="'Content/Artist/Paragraph'" slot="subtitle">This artist is present in the following libraries:</translate>
         </library-widget>
       </section>
     </template>
@@ -132,7 +132,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$gettext("Artist")
+        title: this.$pgettext('Head/Artist/Title', "Artist")
       }
     },
     isPlayable() {
