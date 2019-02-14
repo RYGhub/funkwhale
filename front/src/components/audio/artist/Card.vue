@@ -21,7 +21,7 @@
                   {{ album.tracks_count }} tracks
                 </td>
                 <td>
-                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album.id"></play-button>
+                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album"></play-button>
                 </td>
               </tr>
             </tbody>
@@ -41,7 +41,7 @@
           <i class="sound icon"></i>
             <translate :translate-context="'Content/Artist/Card'" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
         </span>
-        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist.id">
+        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist">
           <translate :translate-context="'Content/Queue/Button.Label/Short, Verb'">Play all</translate>
         </play-button>
       </div>

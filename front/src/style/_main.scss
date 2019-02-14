@@ -271,3 +271,8 @@ canvas.color-thief {
 .ui.list .list.icon {
   padding-left: 0;
 }
+
+
+.ui.dropdown .item[disabled] {
+  display: none;
+}

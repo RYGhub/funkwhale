@@ -23,7 +23,7 @@
           </h2>
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
-          <play-button :is-playable="isPlayable" class="orange" :artist="artist.id">
+          <play-button :is-playable="isPlayable" class="orange" :artist="artist">
             <translate :translate-context="'Content/Artist/Button.Label/Verb'">Play all albums</translate>
           </play-button>
 
@@ -37,6 +37,20 @@
           </a>
         </div>
       </section>
+      <div class="ui small text container" v-if="contentFilter">
+        <div class="ui hidden divider"></div>
+        <div class="ui message">
+          <p>
+            <translate>You are currently hiding content related to this artist.</translate>
+          </p>
+          <router-link class="right floated" :to="{name: 'settings'}">
+            <translate :translate-context="'Content/Moderation/Link'">Review my filters</translate>
+          </router-link>
+          <button @click="$store.dispatch('moderation/deleteContentFilter', contentFilter.uuid)" class="ui basic tiny button">
+            <translate :translate-context="'Content/Moderation/Button.Label'">Remove filter</translate>
+          </button>
+        </div>
+      </div>
       <section v-if="isLoadingAlbums" class="ui vertical stripe segment">
         <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
       </section>
@@ -105,7 +119,7 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching artist "' + this.id + '"')
-      axios.get("tracks/", { params: { artist: this.id } }).then(response => {
+      axios.get("tracks/", { params: { artist: this.id, hidden: '' } }).then(response => {
         self.tracks = response.data.results
         self.totalTracks = response.data.count
       })
@@ -115,7 +129,7 @@ export default {
         self.isLoadingAlbums = true
         axios
           .get("albums/", {
-            params: { artist: self.id, ordering: "-release_date" }
+            params: { artist: self.id, ordering: "-release_date", hidden: '' }
           })
           .then(response => {
             self.totalAlbums = response.data.count
@@ -180,6 +194,12 @@ export default {
         this.$store.getters["instance/absoluteUrl"](this.cover.original) +
         ")"
       )
+    },
+    contentFilter () {
+      let self = this
+      return this.$store.getters['moderation/artistFilters']().filter((e) => {
+        return e.target.id === this.artist.id
+      })[0]
     }
   },
   watch: {

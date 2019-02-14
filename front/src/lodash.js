@@ -10,4 +10,5 @@ export default {
   sortBy: require('lodash/sortBy'),
   throttle: require('lodash/throttle'),
   uniq: require('lodash/uniq'),
+  remove: require('lodash/remove'),
 }

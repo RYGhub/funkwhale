@@ -117,9 +117,21 @@ class PlaylistSerializer(serializers.ModelSerializer):
         except AttributeError:
             return []
 
+        try:
+            user = self.context["request"].user
+        except (KeyError, AttributeError):
+            excluded_artists = []
+            user = None
+        if user and user.is_authenticated:
+            excluded_artists = list(
+                user.content_filters.values_list("target_artist", flat=True)
+            )
+
         covers = []
         max_covers = 5
         for plt in plts:
+            if plt.track.album.artist_id in excluded_artists:
+                continue
             url = plt.track.album.cover.crop["200x200"].url
             if url in covers:
                 continue

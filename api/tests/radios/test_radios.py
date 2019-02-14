@@ -254,3 +254,27 @@ def test_similar_radio_track(factories):
     factories["history.Listening"](track=expected_next, user=l1.user)
 
     assert radio.pick(filter_playable=False) == expected_next
+
+
+def test_session_radio_get_queryset_ignore_filtered_track_artist(
+    factories, queryset_equal_list
+):
+    cf = factories["moderation.UserFilter"](for_artist=True)
+    factories["music.Track"](artist=cf.target_artist)
+    valid_track = factories["music.Track"]()
+    radio = radios.RandomRadio()
+    radio.start_session(user=cf.user)
+
+    assert radio.get_queryset() == [valid_track]
+
+
+def test_session_radio_get_queryset_ignore_filtered_track_album_artist(
+    factories, queryset_equal_list
+):
+    cf = factories["moderation.UserFilter"](for_artist=True)
+    factories["music.Track"](album__artist=cf.target_artist)
+    valid_track = factories["music.Track"]()
+    radio = radios.RandomRadio()
+    radio.start_session(user=cf.user)
+
+    assert radio.get_queryset() == [valid_track]

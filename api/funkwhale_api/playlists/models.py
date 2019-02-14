@@ -17,7 +17,7 @@ class PlaylistQuerySet(models.QuerySet):
 
     def with_covers(self):
         album_prefetch = models.Prefetch(
-            "album", queryset=music_models.Album.objects.only("cover")
+            "album", queryset=music_models.Album.objects.only("cover", "artist_id")
         )
         track_prefetch = models.Prefetch(
             "track",

@@ -28,3 +28,10 @@ class InstancePolicyAdmin(admin.ModelAdmin):
         "summary",
     ]
     list_select_related = True
+
+
+@admin.register(models.UserFilter)
+class UserFilterAdmin(admin.ModelAdmin):
+    list_display = ["uuid", "user", "target_artist", "creation_date"]
+    search_fields = ["target_artist__name", "user__username", "user__email"]
+    list_select_related = True

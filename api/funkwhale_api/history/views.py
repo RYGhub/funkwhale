@@ -7,7 +7,7 @@ from funkwhale_api.activity import record
 from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
 from funkwhale_api.music import utils as music_utils
-from . import models, serializers
+from . import filters, models, serializers
 
 
 class ListeningViewSet(
@@ -25,6 +25,7 @@ class ListeningViewSet(
         IsAuthenticatedOrReadOnly,
     ]
     owner_checks = ["write"]
+    filterset_class = filters.ListeningFilter
 
     def get_serializer_class(self):
         if self.request.method.lower() in ["head", "get", "options"]:

@@ -2,6 +2,8 @@ import factory
 
 from funkwhale_api.factories import registry, NoUpdateOnCreate
 from funkwhale_api.federation import factories as federation_factories
+from funkwhale_api.music import factories as music_factories
+from funkwhale_api.users import factories as users_factories
 
 
 @registry.register
@@ -20,4 +22,18 @@ class InstancePolicyFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
         )
         for_actor = factory.Trait(
             target_actor=factory.SubFactory(federation_factories.ActorFactory)
+        )
+
+
+@registry.register
+class UserFilterFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
+    user = factory.SubFactory(users_factories.UserFactory)
+    target_artist = None
+
+    class Meta:
+        model = "moderation.UserFilter"
+
+    class Params:
+        for_artist = factory.Trait(
+            target_artist=factory.SubFactory(music_factories.ArtistFactory)
         )

@@ -29,8 +29,8 @@
           </button>
         </form>
       </section>
-      <div class="ui hidden divider"></div>
       <section class="ui small text container">
+        <div class="ui divider"></div>
         <h2 class="ui header">
           <translate :translate-context="'Content/Settings/Title'">Avatar</translate>
         </h2>
@@ -62,8 +62,9 @@
           </div>
         </div>
       </section>
-      <div class="ui hidden divider"></div>
+
       <section class="ui small text container">
+        <div class="ui divider"></div>
         <h2 class="ui header">
           <translate :translate-context="'Content/Settings/Title/Verb'">Change my password</translate>
         </h2>
@@ -106,6 +107,53 @@
         </form>
         <div class="ui hidden divider" />
         <subsonic-token-form />
+      </section>
+
+      <section class="ui small text container" id="content-filters">
+        <div class="ui divider"></div>
+        <h2 class="ui header">
+          <i class="eye slash outline icon"></i>
+          <div class="content">
+            <translate>Content filters</translate>
+          </div>
+        </h2>
+        <p><translate>Content filters help you hide content you don't want to see on the service.</translate></p>
+
+        <button
+          @click="$store.dispatch('moderation/fetchContentFilters')"
+          class="ui basic icon button">
+          <i class="refresh icon"></i>&nbsp;
+          <translate :translate-context="'Content/*/Button.Label'">Refresh</translate>
+        </button>
+        <h3 class="ui header">
+          <translate>Hidden artists</translate>
+        </h3>
+        <table class="ui compact very basic fixed single line unstackable table">
+          <thead>
+            <tr>
+              <th><translate :translate-context="'Content/*/Table.Label'">Name</translate></th>
+              <th><translate :translate-context="'Content/*/Table.Label'">Creation date</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="filter in $store.getters['moderation/artistFilters']()" :key='filter.uuid'>
+              <td>
+                <router-link :to="{name: 'library.artists.detail', params: {id: filter.target.id }}">
+                  {{ filter.target.name }}
+                </router-link>
+              </td>
+              <td>
+                <human-date :date="filter.creation_date"></human-date>
+              </td>
+              <td>
+                <button @click="$store.dispatch('moderation/deleteContentFilter', filter.uuid)" class="ui basic tiny button">
+                  <translate :translate-context="'Content/*/Button.Label'">Delete</translate>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
     </div>
   </main>
