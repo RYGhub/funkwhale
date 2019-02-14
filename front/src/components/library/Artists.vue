@@ -173,6 +173,9 @@ export default {
     query() {
       this.updateQueryString()
       this.fetchData()
+    },
+    "$store.state.moderation.lastUpdate": function () {
+      this.fetchData()
     }
   }
 }

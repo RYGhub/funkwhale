@@ -7,6 +7,7 @@ from django.utils import timezone
 from rest_framework.response import Response
 
 import funkwhale_api
+from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
 from funkwhale_api.subsonic import renderers, serializers
@@ -100,20 +101,31 @@ def test_ping(f, db, api_client):
 def test_get_artists(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
+    factories["moderation.UserFilter"](
+        user=logged_in_api_client.user,
+        target_artist=factories["music.Artist"](playable=True),
+    )
     url = reverse("api:subsonic-get_artists")
     assert url.endswith("getArtists") is True
     factories["music.Artist"].create_batch(size=3, playable=True)
     playable_by = mocker.spy(music_models.ArtistQuerySet, "playable_by")
+    exclude_query = moderation_filters.get_filtered_content_query(
+        moderation_filters.USER_FILTER_CONFIG["ARTIST"], logged_in_api_client.user
+    )
+    assert exclude_query is not None
     expected = {
         "artists": serializers.GetArtistsSerializer(
-            music_models.Artist.objects.all()
+            music_models.Artist.objects.all().exclude(exclude_query)
         ).data
     }
     response = logged_in_api_client.get(url, {"f": f})
 
     assert response.status_code == 200
     assert response.data == expected
-    playable_by.assert_called_once_with(music_models.Artist.objects.all(), None)
+    playable_by.assert_called_once_with(
+        music_models.Artist.objects.all().exclude(exclude_query),
+        logged_in_api_client.user.actor,
+    )
 
 
 @pytest.mark.parametrize("f", ["json"])
@@ -502,12 +514,20 @@ def test_get_music_folders(f, db, logged_in_api_client, factories):
 def test_get_indexes(
     f, db, logged_in_api_client, factories, mocker, queryset_equal_queries
 ):
+    factories["moderation.UserFilter"](
+        user=logged_in_api_client.user,
+        target_artist=factories["music.Artist"](playable=True),
+    )
+    exclude_query = moderation_filters.get_filtered_content_query(
+        moderation_filters.USER_FILTER_CONFIG["ARTIST"], logged_in_api_client.user
+    )
+
     url = reverse("api:subsonic-get_indexes")
     assert url.endswith("getIndexes") is True
     factories["music.Artist"].create_batch(size=3, playable=True)
     expected = {
         "indexes": serializers.GetArtistsSerializer(
-            music_models.Artist.objects.all()
+            music_models.Artist.objects.all().exclude(exclude_query)
         ).data
     }
     playable_by = mocker.spy(music_models.ArtistQuerySet, "playable_by")
@@ -516,7 +536,10 @@ def test_get_indexes(
     assert response.status_code == 200
     assert response.data == expected
 
-    playable_by.assert_called_once_with(music_models.Artist.objects.all(), None)
+    playable_by.assert_called_once_with(
+        music_models.Artist.objects.all().exclude(exclude_query),
+        logged_in_api_client.user.actor,
+    )
 
 
 def test_get_cover_art_album(factories, logged_in_api_client):

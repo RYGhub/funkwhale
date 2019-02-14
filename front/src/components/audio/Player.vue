@@ -38,6 +38,14 @@
                 v-if="$store.state.auth.authenticated"
                 :class="['inverted']"
                 :track="currentTrack"></track-playlist-icon>
+              <button
+                v-if="$store.state.auth.authenticated"
+                @click="$store.dispatch('moderation/hide', {type: 'artist', target: currentTrack.artist})"
+                :class="['ui', 'really', 'basic', 'circular', 'inverted', 'icon', 'button']"
+                :aria-label="labels.addArtistContentFilter"
+                :title="labels.addArtistContentFilter">
+                <i :class="['eye slash outline', 'basic', 'icon']"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -353,13 +361,13 @@ export default {
       let next = this.$pgettext('Sidebar/Player/Icon.Tooltip', "Next track")
       let unmute = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Unmute")
       let mute = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Mute")
-      let loopingDisabled = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
+      let loopingDisabled = this.$pgettext('Sidebar/Player/Icon.Tooltip',
         "Looping disabled. Click to switch to single-track looping."
       )
-      let loopingSingle = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
+      let loopingSingle = this.$pgettext('Sidebar/Player/Icon.Tooltip',
         "Looping on a single track. Click to switch to whole queue looping."
       )
-      let loopingWhole = this.$pgettext('Sidebar/Player/Icon.Tooltip', 
+      let loopingWhole = this.$pgettext('Sidebar/Player/Icon.Tooltip',
         "Looping on whole queue. Click to disable looping."
       )
       let shuffle = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Shuffle your queue")

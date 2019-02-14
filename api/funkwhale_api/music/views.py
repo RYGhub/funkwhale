@@ -18,6 +18,7 @@ from taggit.models import Tag
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import views as common_views
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
@@ -58,7 +59,7 @@ class TagViewSetMixin(object):
         return queryset
 
 
-class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
+class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [common_permissions.ConditionalAuthentication]
@@ -82,7 +83,7 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
 
-class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all().order_by("artist", "release_date").select_related()
     )
@@ -166,7 +167,9 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+    common_views.SkipFilterForGetObject, TagViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
     """
     A simple ViewSet for viewing and editing accounts.
     """

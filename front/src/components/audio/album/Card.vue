@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="extra content">
-        <play-button class="mini basic orange right floated" :tracks="album.tracks">
+        <play-button class="mini basic orange right floated" :tracks="album.tracks" :album="album">
           <translate :translate-context="'Content/Queue/Card.Button.Label/Short, Verb'">Play all</translate>
         </play-button>
         <span>

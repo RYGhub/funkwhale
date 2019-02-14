@@ -12,7 +12,7 @@
       </div>
       <div class="card" v-for="album in albums" :key="album.id">
         <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" v-lazy:background-image="getImageUrl(album)">
-          <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album.id"></play-button>
+          <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album"></play-button>
         </div>
         <div class="content">
           <router-link :title="album.title" :to="{name: 'library.albums.detail', params: {id: album.id}}">
@@ -28,7 +28,7 @@
         </div>
         <div class="extra content">
           <human-date class="left floated" :date="album.creation_date"></human-date>
-          <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="album.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :album="album.id"></play-button>
+          <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="album.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :album="album"></play-button>
         </div>
       </div>
     </div>
@@ -101,6 +101,9 @@ export default {
   watch: {
     offset () {
       this.fetchData()
+    },
+    "$store.state.moderation.lastUpdate": function () {
+      this.fetchData('albums/')
     }
   }
 }

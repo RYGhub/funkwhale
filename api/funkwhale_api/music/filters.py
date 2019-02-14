@@ -2,12 +2,13 @@ from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.common import search
+from funkwhale_api.moderation import filters as moderation_filters
 
 from . import models
 from . import utils
 
 
-class ArtistFilter(filters.FilterSet):
+class ArtistFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
 
@@ -17,13 +18,14 @@ class ArtistFilter(filters.FilterSet):
             "name": ["exact", "iexact", "startswith", "icontains"],
             "playable": "exact",
         }
+        hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ARTIST"]
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
         return queryset.playable_by(actor, value)
 
 
-class TrackFilter(filters.FilterSet):
+class TrackFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
 
@@ -36,6 +38,7 @@ class TrackFilter(filters.FilterSet):
             "album": ["exact"],
             "license": ["exact"],
         }
+        hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["TRACK"]
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
@@ -85,13 +88,14 @@ class UploadFilter(filters.FilterSet):
         return queryset.playable_by(actor, value)
 
 
-class AlbumFilter(filters.FilterSet):
+class AlbumFilter(moderation_filters.HiddenContentFilterSet):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SearchFilter(search_fields=["title", "artist__name"])
 
     class Meta:
         model = models.Album
         fields = ["playable", "q", "artist"]
+        hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ALBUM"]
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)

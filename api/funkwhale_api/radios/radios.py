@@ -5,6 +5,7 @@ from django.db import connection
 from rest_framework import serializers
 from taggit.models import Tag
 
+from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music.models import Artist, Track
 from funkwhale_api.users.models import User
 
@@ -43,7 +44,14 @@ class SessionRadio(SimpleRadio):
         return self.session
 
     def get_queryset(self, **kwargs):
-        return Track.objects.all()
+        qs = Track.objects.all()
+        if not self.session:
+            return qs
+        query = moderation_filters.get_filtered_content_query(
+            config=moderation_filters.USER_FILTER_CONFIG["TRACK"],
+            user=self.session.user,
+        )
+        return qs.exclude(query)
 
     def get_queryset_kwargs(self):
         return {}

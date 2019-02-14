@@ -259,6 +259,29 @@ export default {
           ? 0
           : container.clientHeight / 2
       container.scrollTop = container.scrollTop - scrollBack
+    },
+    applyContentFilters () {
+      let artistIds = this.$store.getters['moderation/artistFilters']().map((f) => {
+        return f.target.id
+      })
+
+      if (artistIds.length === 0) {
+        return
+      }
+      let self = this
+      let tracks = this.tracks.slice().reverse()
+      tracks.forEach(async (t, i) => {
+        // we loop from the end because removing index from the start can lead to removing the wrong tracks
+        let realIndex = tracks.length - i - 1
+        let matchArtist = artistIds.indexOf(t.artist.id) > -1
+        if (matchArtist) {
+          return await self.cleanTrack(realIndex)
+        }
+        if (t.album && artistIds.indexOf(t.album.artist.id) > -1) {
+          return await self.cleanTrack(realIndex)
+        }
+      })
+
     }
   },
   watch: {
@@ -274,6 +297,9 @@ export default {
       if (this.selectedTab !== "queue") {
         this.scrollToCurrent()
       }
+    },
+    "$store.state.moderation.lastUpdate": function () {
+      this.applyContentFilters()
     }
   }
 }

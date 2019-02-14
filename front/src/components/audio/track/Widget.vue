@@ -103,6 +103,9 @@ export default {
   watch: {
     offset () {
       this.fetchData()
+    },
+    "$store.state.moderation.lastUpdate": function () {
+      this.fetchData(this.url)
     }
   }
 }
