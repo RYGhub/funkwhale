@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate>Search</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Verb'">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Noun'">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering direction</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Noun'">Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate>Ascending</translate></option>
-            <option value="-"><translate>Descending</translate></option>
+            <option value="+"><translate :translate-context="'Content/Search/Dropdown'">Ascending</translate></option>
+            <option value="-"><translate :translate-context="'Content/Search/Dropdown'">Descending</translate></option>
           </select>
         </div>
       </div>
@@ -36,11 +36,11 @@
         idField="name"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Name</translate></th>
-          <th><translate>Users</translate></th>
-          <th><translate>Received messages</translate></th>
-          <th><translate>First seen</translate></th>
-          <th><translate>Under moderation rule</translate></th>
+          <th><translate :translate-context="'Content/Moderation/Table.Label'">Name</translate></th>
+          <th><translate :translate-context="'Content/Moderation/Table.Label'">Users</translate></th>
+          <th><translate :translate-context="'Content/Moderation/Table.Label/Short, Noun'">Received messages</translate></th>
+          <th><translate :translate-context="'Content/Moderation/Table.Label/Short, Noun'">First seen</translate></th>
+          <th><translate :translate-context="'Content/Moderation/Table.Label/Short'">Under moderation rule</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -56,7 +56,7 @@
             <human-date :date="scope.obj.creation_date"></human-date>
           </td>
           <td>
-            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate>Yes</translate></span>
+            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate :translate-context="'*/*/*'">Yes</translate></span>
           </td>
         </template>
       </action-table>
@@ -72,7 +72,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate :translate-context="'Content/Moderation/Paragraph'"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -148,7 +148,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by name…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by name…')
       }
     },
     actionFilters () {
@@ -165,7 +165,7 @@ export default {
       return [
         {
           name: 'purge',
-          label: this.$gettext('Purge'),
+          label: this.$pgettext('Content/Moderation/Dropdown/Verb', 'Purge'),
           isDangerous: true
         }
       ]

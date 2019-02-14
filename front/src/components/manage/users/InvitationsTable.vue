@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate>Search</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Verb'">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Noun'">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -15,11 +15,11 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Status</translate></label>
+          <label><translate :translate-context="'Content/Admin/Dropdown.Label'">Status</translate></label>
           <select class="ui dropdown" v-model="isOpen">
-            <option :value="null"><translate>All</translate></option>
-            <option :value="true"><translate>Open</translate></option>
-            <option :value="false"><translate>Expired/used</translate></option>
+            <option :value="null"><translate :translate-context="'Content/Admin/Dropdown'">All</translate></option>
+            <option :value="true"><translate :translate-context="'Content/Admin/Dropdown/Adjective'">Open</translate></option>
+            <option :value="false"><translate :translate-context="'Content/Admin/Dropdown/Adjective'">Expired/used</translate></option>
           </select>
         </div>
       </div>
@@ -36,20 +36,20 @@
         :action-url="'manage/users/invitations/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Owner</translate></th>
-          <th><translate>Status</translate></th>
-          <th><translate>Creation date</translate></th>
-          <th><translate>Expiration date</translate></th>
-          <th><translate>Code</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Owner</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Status</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Creation date</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Expiration date</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Code</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
             <router-link :to="{name: 'manage.users.users.detail', params: {id: scope.obj.id }}">{{ scope.obj.owner.username }}</router-link>
           </td>
           <td>
-            <span v-if="scope.obj.users.length > 0" class="ui green basic label"><translate>Used</translate></span>
-            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label"><translate>Expired</translate></span>
-            <span v-else class="ui basic label"><translate>Not used</translate></span>
+            <span v-if="scope.obj.users.length > 0" class="ui green basic label"><translate :translate-context="'Content/Admin/Table'">Used</translate></span>
+            <span v-else-if="moment().isAfter(scope.obj.expiration_date)" class="ui red basic label"><translate :translate-context="'Content/Admin/Table'">Expired</translate></span>
+            <span v-else class="ui basic label"><translate :translate-context="'Content/Admin/Table'">Not used</translate></span>
           </td>
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
@@ -74,7 +74,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate :translate-context="'Content/Admin/Paragraph'"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
