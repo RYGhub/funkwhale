@@ -14,14 +14,14 @@
           </div>
         </h2>
         <div class="ui basic green label">
-          <translate>This is you!</translate>
+          <translate :translate-context="'Content/Profile/Button.Paragraph'">This is you!</translate>
         </div>
         <a v-if="profile.is_staff"
           class="ui yellow label"
           :href="$store.getters['instance/absoluteUrl']('/api/admin')"
           target="_blank">
           <i class="star icon"></i>
-          <translate>Staff member</translate>
+          <translate :translate-context="'Content/Profile/Button.Label'">Staff member</translate>
         </a>
       </div>
     </template>
@@ -43,7 +43,7 @@ export default {
       profile: state => state.auth.profile
     }),
     labels() {
-      let msg = this.$gettext("%{ username }'s profile")
+      let msg = this.$pgettext('Head/Profile/Title', "%{ username }'s profile")
       let usernameProfile = this.$gettextInterpolate(msg, {
         username: this.username
       })

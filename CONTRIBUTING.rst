@@ -449,6 +449,7 @@ This hierarchical structure is made of several parts:
     - ``Moderation``
     - ``Player``
     - ``Playlist``
+    - ``Profile``
     - ``Favorites``
     - ``Notifications``
     - ``Radio``

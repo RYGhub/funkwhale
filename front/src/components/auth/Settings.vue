@@ -3,16 +3,16 @@
     <div class="ui vertical stripe segment">
       <section class="ui small text container">
         <h2 class="ui header">
-          <translate>Account settings</translate>
+          <translate :translate-context="'Content/Settings/Title'">Account settings</translate>
         </h2>
         <form class="ui form" @submit.prevent="submitSettings()">
           <div v-if="settings.success" class="ui positive message">
             <div class="header">
-              <translate>Settings updated</translate>
+              <translate :translate-context="'Content/Settings/Message'">Settings updated</translate>
             </div>
           </div>
           <div v-if="settings.errors.length > 0" class="ui negative message">
-            <div class="header"><translate>We cannot save your settings</translate></div>
+            <div class="header"><translate :translate-context="'Content/Settings/Error message.Title'">Your settings can't be updateds</translate></div>
             <ul class="list">
               <li v-for="error in settings.errors">{{ error }}</li>
             </ul>
@@ -25,38 +25,38 @@
             </select>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
-            <translate>Update settings</translate>
+            <translate :translate-context="'Content/Settings/Button.Label/Verb'">Update settings</translate>
           </button>
         </form>
       </section>
       <div class="ui hidden divider"></div>
       <section class="ui small text container">
         <h2 class="ui header">
-          <translate>Avatar</translate>
+          <translate :translate-context="'Content/Settings/Title'">Avatar</translate>
         </h2>
         <div class="ui form">
           <div v-if="avatarErrors.length > 0" class="ui negative message">
-            <div class="header"><translate>We cannot save your avatar</translate></div>
+            <div class="header"><translate :translate-context="'Content/Settings/Error message.Title'">Your avatar cannot be saved</translate></div>
             <ul class="list">
               <li v-for="error in avatarErrors">{{ error }}</li>
             </ul>
           </div>
           <div class="ui stackable grid">
             <div class="ui ten wide column">
-              <h3 class="ui header"><translate>Upload a new avatar</translate></h3>
-              <p><translate>PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
+              <h3 class="ui header"><translate :translate-context="'Content/Settings/Title/Verb'">Upload a new avatar</translate></h3>
+              <p><translate :translate-context="'Content/Settings/Paragraph'">PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
               <input class="ui input" ref="avatar" type="file" />
               <div class="ui hidden divider"></div>
               <button @click="submitAvatar" :class="['ui', {'loading': isLoadingAvatar}, 'button']">
-                <translate>Update avatar</translate>
+                <translate :translate-context="'Content/Settings/Button.Label/Verb'">Update avatar</translate>
               </button>
             </div>
             <div class="ui six wide column">
-              <h3 class="ui header"><translate>Current avatar</translate></h3>
+              <h3 class="ui header"><translate :translate-context="'Content/Settings/Title/Noun'">Current avatar</translate></h3>
               <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
               <div class="ui hidden divider"></div>
               <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
-                <translate>Remove avatar</translate>
+                <translate :translate-context="'Content/Settings/Button.Label/Verb'">Remove avatar</translate>
               </button>
             </div>
           </div>
@@ -65,43 +65,43 @@
       <div class="ui hidden divider"></div>
       <section class="ui small text container">
         <h2 class="ui header">
-          <translate>Change my password</translate>
+          <translate :translate-context="'Content/Settings/Title/Verb'">Change my password</translate>
         </h2>
         <div class="ui message">
-          <translate>Changing your password will also change your Subsonic API password if you have requested one.</translate>&nbsp;<translate>You will have to update your password on your clients that use this password.</translate>
+          <translate :translate-context="'Content/Settings/Paragraph'">Changing your password will also change your Subsonic API password if you have requested one.</translate>&nbsp;<translate :translate-context="'Content/Settings/Paragraph'">You will have to update your password on your clients that use this password.</translate>
         </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">
             <div class="header">
-              <translate>Cannot change your password</translate>
+              <translate :translate-context="'Content/Settings/Error message.Title'">Your password cannot be changed</translate>
             </div>
             <ul class="list">
-              <li v-if="passwordError == 'invalid_credentials'"><translate>Please double-check your password is correct</translate></li>
+              <li v-if="passwordError == 'invalid_credentials'"><translate :translate-context="'Content/Settings/Error message.List item/Call to action'">Please double-check your password is correct</translate></li>
             </ul>
           </div>
           <div class="field">
-            <label><translate>Old password</translate></label>
+            <label><translate :translate-context="'Content/Settings/Input.Label'">Old password</translate></label>
             <password-input required v-model="old_password" />
 
           </div>
           <div class="field">
-            <label><translate>New password</translate></label>
+            <label><translate :translate-context="'Content/Settings/Input.Label'">New password</translate></label>
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button
             color="yellow"
             :class="['ui', {'loading': isLoading}, 'button']"
             :action="submitPassword">
-            <translate>Change password</translate>
-            <p slot="modal-header"><translate>Change your password?</translate></p>
+            <translate :translate-context="'Content/Settings/Button.Label'">Change password</translate>
+            <p slot="modal-header"><translate :translate-context="'Popup/Settings/Title'">Change your password?</translate></p>
             <div slot="modal-content">
-              <p><translate>Changing your password will have the following consequences</translate></p>
+              <p><translate :translate-context="'Popup/Settings/Paragraph'">Changing your password will have the following consequences:</translate></p>
               <ul>
-                <li><translate>You will be logged out from this session and have to log in with the new one</translate></li>
-                <li><translate>Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
+                <li><translate :translate-context="'Popup/Settings/List item'">You will be logged out from this session and have to log in with the new one</translate></li>
+                <li><translate :translate-context="'Popup/Settings/List item'">Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
               </ul>
             </div>
-            <p slot="modal-confirm"><translate>Disable access</translate></p>
+            <p slot="modal-confirm"><translate :translate-context="'Popup/Setting/Button.Label'">Disable access</translate></p>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />
@@ -260,7 +260,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$gettext("Account Settings")
+        title: this.$pgettext('Head/Settings/Title', "Account Settings")
       }
     },
     orderedSettingsFields() {
