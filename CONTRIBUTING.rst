@@ -431,10 +431,10 @@ This hierarchical structure is made of several parts:
 - The location part, which is required and refers to the big blocks found in Funkwhale UI where the translated string is displayed:
     - ``Content``
     - ``Footer``
+    - ``Head``
     - ``Menu``
     - ``Popup``
     - ``Sidebar``
-    - ``Head``
     - ``*`` for strings that are not tied to a specific location
 
 - The feature part, which is required, and refers to the feature associated with the translated string:
@@ -462,11 +462,13 @@ This hierarchical structure is made of several parts:
 - The component part, which is required and refers to the type of element that contain the string:
     - ``Button``
     - ``Card``
+    - ``Checkbox``
     - ``Dropdown``
     - ``Error message``
     - ``Form``
     - ``Header``
     - ``Help text``
+    - ``Hidden text``
     - ``Icon``
     - ``Input``
     - ``Image``
@@ -481,15 +483,15 @@ This hierarchical structure is made of several parts:
     - ``Table``
     - ``Title``
     - ``Tooltip``
-    - ``Hidden text``
     - ``*`` for strings that are not tied to a specific component
 
 The detail part, which is optional and refers to the contents of the string itself, such as:
+    - ``Adjective``
     - ``Call to action``
-    - ``Verb``
     - ``Noun``
     - ``Short``
     - ``Unit``
+    - ``Verb``
 
 Here are a few examples of valid context hierarchies:
 
@@ -498,6 +500,7 @@ Here are a few examples of valid context hierarchies:
 - ``Footer/*/Help text``
 - ``*/*/*/Verb, Short``
 - ``Popup/Playlist/Button``
+- ``Content/Admin/Table.Label/Short, Noun (Value is a date)``
 
 It's possible to nest multiple component parts to reach a higher level of detail. The component parts are then separated by a dot:
 

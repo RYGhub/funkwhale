@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate>Search</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/verb'">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label/Noun'">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Order</translate></label>
+          <label><translate :translate-context="'Content/Search/Dropdown.Label/Noun'">Order</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate>Ascending</translate></option>
-            <option value="-"><translate>Descending</translate></option>
+            <option value="+"><translate :translate-context="'Content/Search/Dropdown'">Ascending</translate></option>
+            <option value="-"><translate :translate-context="'Content/Search/Dropdown'">Descending</translate></option>
           </select>
         </div>
       </div>
@@ -35,13 +35,13 @@
         :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Username</translate></th>
-          <th><translate>Email</translate></th>
-          <th><translate>Account status</translate></th>
-          <th><translate>Sign-up</translate></th>
-          <th><translate>Last activity</translate></th>
-          <th><translate>Permissions</translate></th>
-          <th><translate>Status</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Username</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label'">Email</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label/Short, Noun'">Account status</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label/Short, Noun (Value is a date)'">Sign-up</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label/Short, Noun (Value is a date)'">Last activity</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label/Noun'">Permissions</translate></th>
+          <th><translate :translate-context="'Content/Admin/Table.Label/Noun'">Status</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -51,15 +51,15 @@
             <span>{{ scope.obj.email }}</span>
           </td>
           <td>
-            <span v-if="scope.obj.is_active" class="ui basic green label"><translate>Active</translate></span>
-            <span v-else class="ui basic grey label"><translate>Inactive</translate></span>
+            <span v-if="scope.obj.is_active" class="ui basic green label"><translate :translate-context="'Content/Admin/Table'">Active</translate></span>
+            <span v-else class="ui basic grey label"><translate :translate-context="'Content/Admin/Table'">Inactive</translate></span>
           </td>
           <td>
             <human-date :date="scope.obj.date_joined"></human-date>
           </td>
           <td>
             <human-date v-if="scope.obj.last_activity" :date="scope.obj.last_activity"></human-date>
-            <template v-else><translate>N/A</translate></template>
+            <template v-else><translate :translate-context="'*/*/*'">N/A</translate></template>
           </td>
           <td>
             <template v-for="p in permissions">
@@ -67,9 +67,9 @@
             </template>
           </td>
           <td>
-            <span v-if="scope.obj.is_superuser" class="ui pink label"><translate>Admin</translate></span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate>Staff member</translate></span>
-            <span v-else class="ui basic label"><translate>regular user</translate></span>
+            <span v-if="scope.obj.is_superuser" class="ui pink label"><translate :translate-context="'Content/Admin/Table.User role'">Admin</translate></span>
+            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate :translate-context="'Content/Admin/Table.User role'">Staff member</translate></span>
+            <span v-else class="ui basic label"><translate :translate-context="'Content/Admin/Table, User role'">regular user</translate></span>
           </td>
         </template>
       </action-table>
@@ -85,7 +85,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate :translate-context="'Content/Admin/Paragraph'"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -160,7 +160,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by username, e-mail address, name…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by username, e-mail address, name…')
       }
     },
     privacyLevels () {
@@ -170,15 +170,15 @@ export default {
       return [
         {
           'code': 'library',
-          'label': this.$gettext('Library')
+          'label': this.$pgettext('Content/Admin/Table', 'Library')
         },
         {
           'code': 'moderation',
-          'label': this.$gettext('Moderation')
+          'label': this.$pgettext('Content/Admin/Table', 'Moderation')
         },
         {
           'code': 'settings',
-          'label': this.$gettext('Settings')
+          'label': this.$pgettext('Content/Admin/Table', 'Settings')
         }
       ]
     },
@@ -196,7 +196,7 @@ export default {
       return [
         // {
         //   name: 'delete',
-        //   label: this.$gettext('Delete'),
+        //   label: this.$pgettext('Content/Admin/Button.Label/Verb', 'Delete'),
         //   isDangerous: true
         // }
       ]

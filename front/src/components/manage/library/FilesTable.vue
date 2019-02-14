@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate>Search</translate></label>
+          <label><translate :translate-context="'Content/Search/Input.Label'">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate :translate-context="'Content/Search/Dropdown.Label'">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -15,10 +15,10 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Order</translate></label>
+          <label><translate :translate-context="'Content/Search/Dropdown.Label/Noun'">Order</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate>Ascending</translate></option>
-            <option value="-"><translate>Descending</translate></option>
+            <option value="+"><translate :translate-context="'Content/Search/Dropdown'">Ascending</translate></option>
+            <option value="-"><translate :translate-context="'Content/Search/Dropdown'">Descending</translate></option>
           </select>
         </div>
       </div>
@@ -35,14 +35,14 @@
         :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Title</translate></th>
-          <th><translate>Artist</translate></th>
-          <th><translate>Album</translate></th>
-          <th><translate>Import date</translate></th>
-          <th><translate>Type</translate></th>
-          <th><translate>Bitrate</translate></th>
-          <th><translate>Duration</translate></th>
-          <th><translate>Size</translate></th>
+          <th><translate :translate-context="'*/*/*/Short, Noun'">Title</translate></th>
+          <th><translate :translate-context="'*/*/*/Short, Noun'">Artist</translate></th>
+          <th><translate :translate-context="'*/*/*/Short, Noun'">Album</translate></th>
+          <th><translate :translate-context="'Content/Library/Table.Label/Short, Noun'">Import date</translate></th>
+          <th><translate :translate-context="'Content/Library/Table.Label/Short, Noun'">Type</translate></th>
+          <th><translate :translate-context="'Content/*/*/Short, Noun'">Bitrate</translate></th>
+          <th><translate :translate-context="'Content/*/*/Short, Noun'">Duration</translate></th>
+          <th><translate :translate-context="'Content/*/*/Short, Noun'">Size</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -61,25 +61,25 @@
             {{ scope.obj.mimetype }}
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate :translate-context="'*/*/*'">N/A</translate>
           </td>
           <td v-if="scope.obj.bitrate">
             {{ scope.obj.bitrate | humanSize }}/s
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate :translate-context="'*/*/*'">N/A</translate>
           </td>
           <td v-if="scope.obj.duration">
             {{ time.parse(scope.obj.duration) }}
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate :translate-context="'*/*/*'">N/A</translate>
           </td>
           <td v-if="scope.obj.size">
             {{ scope.obj.size | humanSize }}
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate :translate-context="'*/*/*'">N/A</translate>
           </td>
         </template>
       </action-table>
@@ -95,7 +95,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate :translate-context="'Content/Library/Paragraph'"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -173,7 +173,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by title, artist, domain…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by title, artist, domain…')
       }
     },
     actionFilters () {
@@ -187,7 +187,7 @@ export default {
       }
     },
     actions () {
-      let msg = this.$gettext('Delete')
+      let msg = this.$pgettext('Content/Library/Dropdown/Verb', 'Delete')
       return [
         {
           name: 'delete',
