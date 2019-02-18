@@ -2,7 +2,7 @@
   <button
     @click="$store.commit('playlists/chooseTrack', track)"
     v-if="button"
-    :class="['ui', 'button']">
+    :class="['ui', 'icon', 'labeled', 'button']">
     <i class="list icon"></i>
     <translate :translate-context="'Sidebar/Player/Icon.Tooltip/Verb'">Add to playlist…</translate>
   </button>

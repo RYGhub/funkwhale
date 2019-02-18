@@ -24,7 +24,7 @@
         <div class="ui hidden divider"></div>
         <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate></play-button>
         <button
-          class="ui icon button"
+          class="ui icon labeled button"
           v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>

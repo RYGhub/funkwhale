@@ -27,7 +27,7 @@
             <translate :translate-context="'Content/Artist/Button.Label/Verb'">Play all albums</translate>
           </play-button>
 
-          <a :href="wikipediaUrl" target="_blank" class="ui button">
+          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
             <translate :translate-context="'Content/*/Button.Label/Verb'">Search on Wikipedia</translate>
           </a>

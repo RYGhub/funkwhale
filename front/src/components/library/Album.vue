@@ -23,18 +23,18 @@
             <translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate>
           </play-button>
 
-          <a :href="wikipediaUrl" target="_blank" class="ui button">
+          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
             <translate :translate-context="'Content/*/Button.Label/Verb'">Search on Wikipedia</translate>
           </a>
-          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
             <i class="external icon"></i>
             <translate :translate-context="'Content/*/Button.Label/Verb'">View on MusicBrainz</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
               @click="showEmbedModal = !showEmbedModal"
-              class="ui button">
+              class="ui button icon labeled">
               <i class="code icon"></i>
               <translate :translate-context="'Content/*/Button.Label/Verb'">Embed</translate>
             </button>
