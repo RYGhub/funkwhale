@@ -43,22 +43,22 @@
           <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
           <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
 
-          <a :href="wikipediaUrl" target="_blank" class="ui button">
+          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
             <translate :translate-context="'Content/*/Link/Verb'">Search on Wikipedia</translate>
           </a>
-          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
+          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
             <i class="external icon"></i>
             <translate :translate-context="'Content/*/Link/Verb'">View on MusicBrainz</translate>
           </a>
-          <a v-if="upload" :href="downloadUrl" target="_blank" class="ui button">
+          <a v-if="upload" :href="downloadUrl" target="_blank" class="ui icon labeled button">
             <i class="download icon"></i>
             <translate :translate-context="'Content/Track/Link/Verb'">Download</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
               @click="showEmbedModal = !showEmbedModal"
-              class="ui button">
+              class="ui icon labeled button">
               <i class="code icon"></i>
               <translate :translate-context="'Content/Track/Button.Label/Verb'">Embed</translate>
             </button>

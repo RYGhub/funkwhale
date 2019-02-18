@@ -26,10 +26,11 @@
               <label for="description"><translate :translate-context="'Content/Radio/Input.Label'">Description</translate></label>
               <textarea rows="2" id="description" type="text" v-model="radioDesc" :placeholder="labels.placeholder.description" />
             </div>
-            <div class="inline field">
+            <div class="ui toggle checkbox">
               <input id="public" type="checkbox" v-model="isPublic" />
               <label for="public"><translate :translate-context="'Content/Radio/Checkbox.Label/Verb'">Display publicly</translate></label>
             </div>
+						<div class="ui hidden divider"></div>
             <button :disabled="!canSave" @click="save" :class="['ui', 'green', {loading: isLoading}, 'button']">
               <translate :translate-context="'Content/Radio/Button.Label/Verb'">Save</translate>
             </button>

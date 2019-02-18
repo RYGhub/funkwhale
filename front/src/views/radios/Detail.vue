@@ -18,7 +18,7 @@
         <div class="ui hidden divider"></div>
         <radio-button type="custom" :custom-radio-id="radio.id"></radio-button>
         <template v-if="$store.state.auth.username === radio.user.username">
-          <router-link class="ui icon button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
+          <router-link class="ui icon labeled button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
             <i class="pencil icon"></i>
             Edit…
           </router-link>
