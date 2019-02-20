@@ -15,3 +15,5 @@ Funkwhale's users documentation
 
    apps
    upload
+   tagging
+   django

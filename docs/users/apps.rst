@@ -40,10 +40,10 @@ Those features as missing:
 
 .. note::
 
-    If you know or use some recent, well-maintained, Subsonic clients,
+    If you know or use some recent, well-maintained Subsonic clients,
     please get in touch so we can add them to this list.
 
-    Especially we're still lacking an iOS client!
+    In particular we're still lacking an iOS client!
 
 
 Enabling Subsonic on your Funkwhale account
@@ -160,7 +160,7 @@ Once installed, add the following to your /etc/mopidy/mopidy.conf::
     [subidy]
     enabled=True
     url=https://path.to/your/funkwhale/server
-    username=funkwhale
+    username=your_funkwhale_username
     password=your_subsonic_password
     #legacy_auth=(optional - setting to yes may solve some connection errors)
     #api_version=(optional - specify which API version to use. Subsonic 6.2 uses 1.14.0)
