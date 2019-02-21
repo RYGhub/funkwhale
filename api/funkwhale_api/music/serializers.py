@@ -387,6 +387,10 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
         return "Audio"
 
 
+def get_embed_url(type, id):
+    return settings.FUNKWHALE_EMBED_URL + "?type={}&id={}".format(type, id)
+
+
 class OembedSerializer(serializers.Serializer):
     format = serializers.ChoiceField(choices=["json"])
     url = serializers.URLField()
@@ -473,10 +477,7 @@ class OembedSerializer(serializers.Serializer):
         data[
             "html"
         ] = '<iframe width="{}" height="{}" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
-            data["width"],
-            data["height"],
-            settings.FUNKWHALE_EMBED_URL
-            + "?type={}&id={}".format(embed_type, embed_id),
+            data["width"], data["height"], get_embed_url(embed_type, embed_id)
         )
         return data
 

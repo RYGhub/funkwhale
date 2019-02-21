@@ -6,6 +6,20 @@ from django.urls import reverse
 from funkwhale_api.common import utils
 
 from . import models
+from . import serializers
+
+
+def get_twitter_card_metas(type, id):
+    return [
+        {"tag": "meta", "property": "twitter:card", "content": "player"},
+        {
+            "tag": "meta",
+            "property": "twitter:player",
+            "content": serializers.get_embed_url(type, id),
+        },
+        {"tag": "meta", "property": "twitter:player:width", "content": "600"},
+        {"tag": "meta", "property": "twitter:player:height", "content": "400"},
+    ]
 
 
 def library_track(request, pk):
@@ -72,6 +86,8 @@ def library_track(request, pk):
                 ),
             }
         )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="track", id=obj.pk)
     return metas
 
 
@@ -131,6 +147,8 @@ def library_album(request, pk):
                 ),
             }
         )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="album", id=obj.pk)
     return metas
 
 
