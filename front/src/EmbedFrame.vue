@@ -395,6 +395,7 @@ a:hover {
 }
 section.controls {
   display: flex;
+  width: 100%;
 }
 .cover {
   max-width: 120px;
@@ -404,6 +405,9 @@ section.controls {
 .player {
   flex: 1;
   align-self: flex-end;
+}
+.player .plyr {
+  min-width: inherit;
 }
 article .content {
   flex: 1;
@@ -484,10 +488,16 @@ section .plyr--audio .plyr__controls {
 @media screen and (max-width: 460px) {
   article,
   article .content {
+    position: relative;
     display: block;
   }
+  .content header {
+    padding-right: 80px;
+  }
   .cover.main {
-    float: right;
+    position: absolute;
+    right: 0;
+    top: 0;
     img {
       height: 60px;
       width: 60px;
@@ -496,12 +506,67 @@ section .plyr--audio .plyr__controls {
 }
 
 @media screen and (max-width: 320px) {
+  .content header {
+    font-size: 14px;
+  }
+  .content h3 {
+    font-size: 15px;
+  }
   .logo-wrapper,
   .position-cell {
     display: none;
   }
+  .plyr__volume {
+    min-width: 70px;
+  }
+  .queue .artist {
+    display: none;
+  }
 }
 
+@media screen and (max-width: 200px) {
+  .content header {
+    padding-right: 1em;
+    font-size: 13px;
+  }
+  .content h3 {
+    font-size: 14px;
+  }
+  .cover.main {
+    display: none;
+  }
+  .plyr__progress {
+    display: none;
+  }
+  .controls .plyr__control,
+  .player .plyr__control {
+    padding: 3px;
+  }
+  .queue td:last-child {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 170px) {
+  .plyr__volume {
+    min-width: inherit;
+  }
+}
+
+@media screen and (max-height: 180px) {
+  .queue-wrapper {
+    display: none;
+  }
+  article .content {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    height: 100vh;
+  }
+  article .content header {
+    flex-grow: 1;
+  }
+}
 // themes
 
 .dark {
