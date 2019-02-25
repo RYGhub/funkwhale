@@ -63,7 +63,7 @@
             tag="h2"
             class="left floated"
             :translate-params="{number: disc_number + 1}"
-						:translate-context="'Content/Album/'"
+            :translate-context="'Content/Album/'"
           >Volume %{ number }</translate>
           <play-button class="right floated orange" :tracks="tracks">
             <translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate>

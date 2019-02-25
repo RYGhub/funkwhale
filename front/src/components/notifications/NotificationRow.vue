@@ -42,7 +42,7 @@ export default {
       return {
         libraryFollowMessage,
         libraryAcceptFollowMessage,
-				libraryPendingFollowMessage,
+        libraryPendingFollowMessage,
         markRead: this.$gettext('Mark as read'),
         markUnread: this.$gettext('Mark as unread'),
 
@@ -57,18 +57,18 @@ export default {
       if (a.type === 'Follow') {
         if (a.object && a.object.type === 'music.Library') {
           let action = null
-					let message = null
+          let message = null
           if (!a.related_object.approved) {
-						message = this.labels.libraryPendingFollowMessage
+            message = this.labels.libraryPendingFollowMessage
             action = {
               buttonClass: 'green',
               icon: 'check',
               label: this.$gettext('Approve'),
               handler: () => { self.approveLibraryFollow(a.related_object) }
             }
-					} else {
-						message = this.labels.libraryFollowMessage
-					}
+          } else {
+            message = this.labels.libraryFollowMessage
+          }
           return {
             action,
             detailUrl: {name: 'content.libraries.detail', params: {id: a.object.uuid}},

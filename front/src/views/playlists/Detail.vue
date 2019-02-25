@@ -14,7 +14,7 @@
                 translate-plural="Playlist containing %{ count } tracks, by %{ username }"
                 :translate-n="playlist.tracks_count"
                 :translate-params="{count: playlist.tracks_count, username: playlist.user.username}"
-								:translate-context="'Content/Playlist/Header.Subtitle'">
+                :translate-context="'Content/Playlist/Header.Subtitle'">
                 Playlist containing %{ count } track, by %{ username }
               </translate><br>
               <duration :seconds="playlist.duration" />

@@ -13,9 +13,9 @@
             <div class="item" v-if="version">
               <translate :translate-params="{version: version}" >Version %{version}</translate>
             </div>
-            <a @click="switchInstance" class="item" >
+            <div role="button" class="item" @click="$emit('show:set-instance-modal')" >
               <translate>Use another instance</translate>
-            </a>
+            </div>
           </div>
           <div class="ui form">
             <div class="ui field">
@@ -66,18 +66,6 @@ import axios from 'axios'
 
 export default {
   props: ["version"],
-  methods: {
-    switchInstance() {
-      let confirm = window.confirm(
-        this.$gettext(
-          "This will erase your local data and disconnect you, do you want to continue?"
-        )
-      )
-      if (confirm) {
-        this.$store.commit("instance/instanceUrl", null)
-      }
-    }
-  },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
@@ -88,13 +76,6 @@ export default {
       parser.href = url
       return parser.hostname
     },
-    suggestedInstances() {
-      let instances = [
-        this.$store.getters["instance/defaultUrl"](),
-        "https://demo.funkwhale.audio"
-      ]
-      return instances
-    }
   }
 }
 </script>

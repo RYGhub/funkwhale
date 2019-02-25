@@ -1,5 +1,5 @@
 <template>
-	<span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
+  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
     <button
       v-if="!dropdownOnly"
       :title="labels.playNow"
