@@ -117,10 +117,10 @@ class PlaylistSerializer(serializers.ModelSerializer):
         except AttributeError:
             return []
 
+        excluded_artists = []
         try:
             user = self.context["request"].user
         except (KeyError, AttributeError):
-            excluded_artists = []
             user = None
         if user and user.is_authenticated:
             excluded_artists = list(
