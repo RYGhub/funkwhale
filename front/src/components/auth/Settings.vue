@@ -102,7 +102,7 @@
                 <li><translate :translate-context="'Popup/Settings/List item'">Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
               </ul>
             </div>
-            <p slot="modal-confirm"><translate :translate-context="'Popup/Setting/Button.Label'">Disable access</translate></p>
+            <div slot="modal-confirm"><translate :translate-context="'Popup/Setting/Button.Label'">Disable access</translate></div>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />

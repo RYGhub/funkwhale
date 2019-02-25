@@ -66,9 +66,9 @@
       <p slot="modal-content">
         <translate :translate-context="'Popup/Moderation/Paragraph'">This action is irreversible.</translate>
       </p>
-      <p slot="modal-confirm">
+      <div slot="modal-confirm">
         <translate :translate-context="'Popup/Moderation/Button.Label/Verb'">Delete moderation rule</translate>
-      </p>
+      </div>
     </dangerous-button>
   </form>
 </template>

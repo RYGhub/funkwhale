@@ -36,9 +36,9 @@
           The library and all its tracks will be deleted. This can not be undone.
         </translate>
       </p>
-      <p slot="modal-confirm">
+      <div slot="modal-confirm">
         <translate :translate-context="'Popup/Library/Button.Label/Verb'">Delete library</translate>
-      </p>
+      </div>
     </dangerous-button>
   </form>
 </template>

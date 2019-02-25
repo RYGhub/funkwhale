@@ -43,7 +43,7 @@
           <translate :translate-context="'Popup/Playlist/Title'" :translate-params="{playlist: playlist.name}">Do you want to clear the playlist "%{ playlist }"?</translate>
         </p>
         <p slot="modal-content"><translate :translate-context="'Popup/Playlist/Paragraph'">This will remove all tracks from this playlist and cannot be undone.</translate></p>
-        <p slot="modal-confirm"><translate :translate-context="'Popup/Playlist/Button.Label'">Clear playlist</translate></p>
+        <div slot="modal-confirm"><translate :translate-context="'Popup/Playlist/Button.Label'">Clear playlist</translate></div>
       </dangerous-button>
       <div class="ui hidden divider"></div>
       <template v-if="plts.length > 0">
