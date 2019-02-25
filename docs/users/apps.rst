@@ -172,3 +172,12 @@ Then in your .config/ncmpcpp/config, change the startup_screen value so that it 
 This will show your artists, albums, and playlists when you start ncmpcpp.
 
 [Optional]: enable and start mopidy as a service to start the server at boot.
+
+Mobydick (Desktop)
+^^^^^^^^^^^^^^^^^^
+
+- Price: free
+- Website: https://github.com/BaptisteGelez/mobydick
+
+Mobydick is a free and open-source desktop application for linux (based on GTK+) to easily download
+tracks, albums and discography from a Funkwhale instance.
