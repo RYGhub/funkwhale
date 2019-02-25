@@ -12,11 +12,6 @@
               {{ album.title }}
               <div v-html="subtitle"></div>
             </div>
-            <div class="ui buttons">
-              <router-link class="ui button" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-                <translate :translate-context="'Content/*/Button.Label/Name'">Artist page</translate>
-              </router-link>
-            </div>
           </h2>
           <div class="ui hidden divider"></div>
           <play-button class="orange" :tracks="album.tracks">
@@ -181,8 +176,9 @@ export default {
       )
     },
     subtitle () {
-      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by %{ artist }', 'Album containing %{ count } tracks, by %{ artist }', this.album.tracks.length)
-      return this.$gettextInterpolate(msg, {count: this.album.tracks.length, artist: this.album.artist.name})
+      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.album.artist.id }})
+      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.album.tracks.length)
+      return this.$gettextInterpolate(msg, {count: this.album.tracks.length, artist: this.album.artist.name, artistUrl: route.location.path})
     }
   },
   watch: {

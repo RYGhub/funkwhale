@@ -15,24 +15,9 @@
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                <translate :translate-context="'Content/Track/Paragraph'"
-                  :translate-params="{album: track.album.title, artist: track.artist.name}"
-                >From album %{ album } by %{ artist }</translate>
-              </div>
-              <br>
-              <div class="ui basic buttons">
-                <router-link
-                  class="ui button"
-                  :to="{name: 'library.albums.detail', params: {id: track.album.id }}"
-                >
-                  <translate :translate-context="'Content/Track/Button.Label'">Album page</translate>
-                </router-link>
-                <router-link
-                  class="ui button"
-                  :to="{name: 'library.artists.detail', params: {id: track.artist.id }}"
-                >
-                  <translate :translate-context="'Content/Track/Button.Label'">Artist page</translate>
-                </router-link>
+                <div :translate-context="'Content/Track/Paragraph'"
+                  v-translate="{album: track.album.title, artist: track.artist.name, albumUrl: albumUrl, artistUrl: artistUrl}"
+                >From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a></div>
               </div>
             </div>
           </h2>
@@ -298,6 +283,14 @@ export default {
     },
     cover() {
       return null
+    },
+    albumUrl () {
+      let route = this.$router.resolve({name: 'library.albums.detail', params: {id: this.track.album.id }})
+      return route.location.path
+    },
+    artistUrl () {
+      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.track.artist.id }})
+      return route.location.path
     },
     headerStyle() {
       if (!this.cover) {
