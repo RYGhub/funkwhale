@@ -93,6 +93,18 @@ export default {
       handler: this.incrementNotificationCountInSidebar
     })
   },
+  mounted () {
+    let self = this
+
+    // slight hack to allow use to have internal links in <translate> tags
+    // while preserving router behaviour
+    document.documentElement.addEventListener('click', function (event) {
+      if (!event.target.matches('a.internal')) return;
+      self.$router.push(event.target.getAttribute('href'))
+      event.preventDefault();
+    }, false);
+
+  },
   destroyed () {
     this.$store.commit('ui/removeWebsocketEventHandler', {
       eventName: 'inbox.item_added',
