@@ -48,7 +48,7 @@
                   </h3>
                 </header>
                 <p><translate :translate-context="'Content/Moderation/Card.Paragraph'">Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
-								<button @click="showPolicyForm = true" class="ui primary button"><translate :translate-context="'Content/Moderation/Button/Verb'">Add a moderation policy</translate></button>
+                <button @click="showPolicyForm = true" class="ui primary button"><translate :translate-context="'Content/Moderation/Button/Verb'">Add a moderation policy</translate></button>
               </template>
               <instance-policy-card v-else-if="policy && !showPolicyForm" :object="policy" @update="showPolicyForm = true">
                 <header class="ui header">

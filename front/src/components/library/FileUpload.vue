@@ -34,7 +34,7 @@
         <p><translate :translate-context="'Content/Library/Paragraph'">You are about to upload music to your library. Before proceeding, please ensure that:</translate></p>
         <ul>
           <li v-if="library.privacy_level != 'me'">
-						<translate :translate-context="'Content/Library/List item'">You are not uploading copyrighted content in a public library, otherwise you may be infringing the law</translate>
+            <translate :translate-context="'Content/Library/List item'">You are not uploading copyrighted content in a public library, otherwise you may be infringing the law</translate>
           </li>
           <li>
             <translate :translate-context="'Content/Library/List item'">The music files you are uploading are tagged properly.</translate>&nbsp;
@@ -217,17 +217,17 @@ export default {
   },
   computed: {
     labels() {
-      let denied = this.$pgettext('Content/Library/Help text', 
+      let denied = this.$pgettext('Content/Library/Help text',
         "Upload denied, ensure the file is not too big and that you have not reached your quota"
       );
-      let server = this.$pgettext('Content/Library/Help text', 
+      let server = this.$pgettext('Content/Library/Help text',
         "Cannot upload this file, ensure it is not too big"
       );
-      let network = this.$pgettext('Content/Library/Help text', 
+      let network = this.$pgettext('Content/Library/Help text',
         "A network error occured while uploading this file"
       );
       let timeout = this.$pgettext('Content/Library/Help text', "Upload timeout, please try again");
-      let extension = this.$pgettext('Content/Library/Help text', 
+      let extension = this.$pgettext('Content/Library/Help text',
         "Invalid file type, ensure you are uploading an audio file. Supported file extensions are %{ extensions }"
       );
       return {

@@ -17,14 +17,14 @@
           </template>
         </div>
         <div class="field">
-					<button @click="copy" class="ui right teal labeled icon floated button"><i class="copy icon"></i><translate :translate-context="'Popup/*/Button.Label/Verb'">Copy</translate></button>
+          <button @click="copy" class="ui right teal labeled icon floated button"><i class="copy icon"></i><translate :translate-context="'Popup/*/Button.Label/Verb'">Copy</translate></button>
           <label for="embed-width"><translate :translate-context="'Popup/Embed/Input.Label/Noun'">Embed code</translate></label>
           <p><translate :translate-context="'Popup/Embed/Paragraph'">Copy/paste this code in your website HTML</translate></p>
           <textarea ref="textarea":value="embedCode" rows="5" readonly>
           </textarea>
-					<div class="ui right">
-					<p class="message" v-if=copied><translate :translate-context="'Content/*/Paragraph'">Text copied to clipboard!</translate></p>
-					</div>
+          <div class="ui right">
+          <p class="message" v-if=copied><translate :translate-context="'Content/*/Paragraph'">Text copied to clipboard!</translate></p>
+          </div>
         </div>
       </div>
     </div>
@@ -44,7 +44,7 @@ export default {
       width: null,
       height: 150,
       minHeight: 100,
-			copied: false
+      copied: false
     }
     if (this.type === 'album') {
       d.height = 330
@@ -73,11 +73,11 @@ export default {
     copy () {
       this.$refs.textarea.select()
       document.execCommand("Copy")
-			let self = this
-			self.copied = true
-			this.timeout = setTimeout(() => {
-				self.copied = false
-			}, 5000)
+      let self = this
+      self.copied = true
+      this.timeout = setTimeout(() => {
+        self.copied = false
+      }, 5000)
     }
   }
 }
@@ -86,8 +86,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .message {
-	position: absolute;
-	right: 0;
-	bottom: -2em;
+  position: absolute;
+  right: 0;
+  bottom: -2em;
 }
 </style>
