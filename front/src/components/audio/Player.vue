@@ -499,6 +499,7 @@ export default {
     bottom: 1.1rem;
     left: 25%;
     cursor: pointer;
+    background-color: transparent;
   }
   input[type="range"]:focus {
     outline: none;
