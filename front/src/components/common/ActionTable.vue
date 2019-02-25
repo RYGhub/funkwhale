@@ -45,7 +45,7 @@
                   <p slot="modal-content">
                     <translate>This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
                   </p>
-                  <p slot="modal-confirm"><translate>Launch</translate></p>
+                  <div slot="modal-confirm"><translate>Launch</translate></div>
                 </dangerous-button>
                 <div
                   v-else

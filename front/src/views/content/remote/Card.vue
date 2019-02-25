@@ -103,7 +103,7 @@
         <div slot="modal-content">
           <p><translate :translate-context="'Popup/Library/Paragraph'">By unfollowing this library, you loose access to its content.</translate></p>
         </div>
-        <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Unfollow</translate></p>
+        <div slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Unfollow</translate></div>
       </dangerous-button>
     </div>
   </div>
