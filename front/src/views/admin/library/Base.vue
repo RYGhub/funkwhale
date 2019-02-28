@@ -3,7 +3,7 @@
     <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.library.files'}"><translate :translate-context="'Menu/Admin/Link'">Files</translate></router-link>
+        :to="{name: 'manage.library.edits'}"><translate :translate-context="'Menu/Admin/Link'">Edits</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>

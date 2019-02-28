@@ -29,7 +29,6 @@ env_file = env("ENV_FILE", default=None)
 if env_file:
     # we have an explicitely specified env file
     # so we try to load and it fail loudly if it does not exist
-    print("ENV_FILE", env_file)
     env.read_env(env_file)
 else:
     # we try to load from .env and config/.env
@@ -150,7 +149,7 @@ if RAVEN_ENABLED:
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    "funkwhale_api.common",
+    "funkwhale_api.common.apps.CommonConfig",
     "funkwhale_api.activity.apps.ActivityConfig",
     "funkwhale_api.users",  # custom users app
     # Your stuff: custom apps go here

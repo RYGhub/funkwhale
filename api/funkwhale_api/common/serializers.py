@@ -10,6 +10,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
+from . import models
+
 
 class RelatedField(serializers.RelatedField):
     default_error_messages = {
@@ -216,3 +218,57 @@ class StripExifImageField(serializers.ImageField):
         return SimpleUploadedFile(
             file_obj.name, content, content_type=file_obj.content_type
         )
+
+
+from funkwhale_api.federation import serializers as federation_serializers  # noqa
+
+TARGET_ID_TYPE_MAPPING = {
+    "music.Track": ("id", "track"),
+    "music.Artist": ("id", "artist"),
+    "music.Album": ("id", "album"),
+}
+
+
+class APIMutationSerializer(serializers.ModelSerializer):
+    created_by = federation_serializers.APIActorSerializer(read_only=True)
+    target = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Mutation
+        fields = [
+            "fid",
+            "uuid",
+            "type",
+            "creation_date",
+            "applied_date",
+            "is_approved",
+            "is_applied",
+            "created_by",
+            "approved_by",
+            "summary",
+            "payload",
+            "previous_state",
+            "target",
+        ]
+        read_only_fields = [
+            "uuid",
+            "creation_date",
+            "fid",
+            "is_applied",
+            "created_by",
+            "approved_by",
+            "previous_state",
+        ]
+
+    def get_target(self, obj):
+        target = obj.target
+        if not target:
+            return
+
+        id_field, type = TARGET_ID_TYPE_MAPPING[target._meta.label]
+        return {"type": type, "id": getattr(target, id_field), "repr": str(target)}
+
+    def validate_type(self, value):
+        if value not in self.context["registry"]:
+            raise serializers.ValidationError("Invalid mutation type {}".format(value))
+        return value

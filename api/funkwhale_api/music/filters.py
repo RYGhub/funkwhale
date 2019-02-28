@@ -1,6 +1,7 @@
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import filters as common_filters
 from funkwhale_api.common import search
 from funkwhale_api.moderation import filters as moderation_filters
 
@@ -28,12 +29,14 @@ class ArtistFilter(moderation_filters.HiddenContentFilterSet):
 class TrackFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
+    id = common_filters.MultipleQueryFilter(coerce=int)
 
     class Meta:
         model = models.Track
         fields = {
             "title": ["exact", "iexact", "startswith", "icontains"],
             "playable": ["exact"],
+            "id": ["exact"],
             "artist": ["exact"],
             "album": ["exact"],
             "license": ["exact"],

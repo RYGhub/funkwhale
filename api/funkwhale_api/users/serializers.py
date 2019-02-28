@@ -94,6 +94,7 @@ class UserWriteSerializer(serializers.ModelSerializer):
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
+    full_username = serializers.SerializerMethodField()
     avatar = avatar_field
 
     class Meta:
@@ -101,6 +102,7 @@ class UserReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "username",
+            "full_username",
             "name",
             "email",
             "is_staff",
@@ -113,6 +115,10 @@ class UserReadSerializer(serializers.ModelSerializer):
 
     def get_permissions(self, o):
         return o.get_permissions()
+
+    def get_full_username(self, o):
+        if o.actor:
+            return o.actor.full_username
 
 
 class MeSerializer(UserReadSerializer):

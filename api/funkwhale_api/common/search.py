@@ -103,9 +103,7 @@ class SearchConfig:
             return
 
         matching = [t for t in tokens if t["key"] in self.filter_fields]
-        queries = [
-            Q(**{self.filter_fields[t["key"]]["to"]: t["value"]}) for t in matching
-        ]
+        queries = [self.get_filter_query(token) for token in matching]
         query = None
         for q in queries:
             if not query:
@@ -113,6 +111,26 @@ class SearchConfig:
             else:
                 query = query & q
         return query
+
+    def get_filter_query(self, token):
+        raw_value = token["value"]
+        try:
+            field = self.filter_fields[token["key"]]["field"]
+            value = field.clean(raw_value)
+        except KeyError:
+            # no cleaning to apply
+            value = raw_value
+        try:
+            query_field = self.filter_fields[token["key"]]["to"]
+            return Q(**{query_field: value})
+        except KeyError:
+            pass
+
+        # we don't have a basic filter -> field mapping, this likely means we
+        # have a dynamic handler in the config
+        handler = self.filter_fields[token["key"]]["handler"]
+        value = handler(value)
+        return value
 
     def clean_types(self, tokens):
         if not self.types:

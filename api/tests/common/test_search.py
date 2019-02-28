@@ -1,6 +1,7 @@
 import pytest
 
 from django.db.models import Q
+from django import forms
 
 from funkwhale_api.common import search
 from funkwhale_api.music import models as music_models
@@ -43,6 +44,24 @@ def test_search_config_query(query, expected):
 
     cleaned = s.clean(query)
     assert cleaned["search_query"] == expected
+
+
+def test_search_config_query_filter_field_handler():
+    s = search.SearchConfig(
+        filter_fields={"account": {"handler": lambda v: Q(hello="world")}}
+    )
+
+    cleaned = s.clean("account:noop")
+    assert cleaned["filter_query"] == Q(hello="world")
+
+
+def test_search_config_query_filter_field():
+    s = search.SearchConfig(
+        filter_fields={"account": {"to": "noop", "field": forms.BooleanField()}}
+    )
+
+    cleaned = s.clean("account:true")
+    assert cleaned["filter_query"] == Q(noop=True)
 
 
 @pytest.mark.parametrize(

@@ -1,4 +1,5 @@
 import django_filters
+from django import forms
 from django.db import models
 
 from . import search
@@ -46,5 +47,8 @@ class SmartSearchFilter(django_filters.CharFilter):
     def filter(self, qs, value):
         if not value:
             return qs
-        cleaned = self.config.clean(value)
+        try:
+            cleaned = self.config.clean(value)
+        except forms.ValidationError:
+            return qs.none()
         return search.apply(qs, cleaned)

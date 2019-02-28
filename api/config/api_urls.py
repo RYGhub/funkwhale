@@ -5,6 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework_jwt import views as jwt_views
 
 from funkwhale_api.activity import views as activity_views
+from funkwhale_api.common import views as common_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
@@ -24,6 +25,7 @@ router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
 router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
 )
+router.register(r"mutations", common_views.MutationViewSet, "mutations")
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)

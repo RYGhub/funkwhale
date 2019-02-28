@@ -62,19 +62,6 @@ CELERY_TASK_ALWAYS_EAGER = False
 
 # Your local stuff: Below this line define 3rd party library settings
 
-LOGGING = {
-    "version": 1,
-    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
-    "loggers": {
-        "django.request": {
-            "handlers": ["console"],
-            "propagate": True,
-            "level": "DEBUG",
-        },
-        "django_auth_ldap": {"handlers": ["console"], "level": "DEBUG"},
-        "": {"level": "DEBUG", "handlers": ["console"]},
-    },
-}
 CSRF_TRUSTED_ORIGINS = [o for o in ALLOWED_HOSTS]
 
 
