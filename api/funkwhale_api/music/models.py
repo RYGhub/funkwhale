@@ -24,6 +24,7 @@ from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import musicbrainz
 from funkwhale_api.common import fields
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -141,7 +142,7 @@ class License(models.Model):
         logger.warning("%s do not match any registered license", self.code)
 
 
-class ArtistQuerySet(models.QuerySet):
+class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count("albums"))
 
@@ -215,7 +216,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
 
 
-class AlbumQuerySet(models.QuerySet):
+class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def with_tracks_count(self):
         return self.annotate(_tracks_count=models.Count("tracks"))
 
@@ -416,7 +417,7 @@ class Lyrics(models.Model):
         )
 
 
-class TrackQuerySet(models.QuerySet):
+class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
         return self.select_related().select_related("album__artist", "artist")
 

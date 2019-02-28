@@ -522,3 +522,14 @@ def test_track_order_for_album(factories):
     t4 = factories["music.Track"](album=album, position=2, disc_number=2)
 
     assert list(models.Track.objects.order_for_album()) == [t1, t3, t2, t4]
+
+
+@pytest.mark.parametrize("factory", ["music.Artist", "music.Album", "music.Track"])
+def test_queryset_local_entities(factories, settings, factory):
+    settings.FEDERATION_HOSTNAME = "test.com"
+    obj1 = factories[factory](fid="http://test.com/1")
+    obj2 = factories[factory](fid="https://test.com/2")
+    factories[factory](fid="https://test.coma/3")
+    factories[factory](fid="https://noope/3")
+
+    assert list(obj1.__class__.objects.local().order_by("id")) == [obj1, obj2]
