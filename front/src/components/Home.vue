@@ -162,7 +162,7 @@ export default {
 .stripe p {
   font-size: 120%;
 }
-.list.icon {
+.ui.list .list.icon {
   padding: 0;
 }
 </style>
