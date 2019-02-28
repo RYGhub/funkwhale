@@ -97,7 +97,6 @@ export default {
         username: this.credentials.username,
         password: this.credentials.password
       }
-      console.log('NEXT', this.next)
       this.$store
         .dispatch("auth/login", {
           credentials,

@@ -64,99 +64,15 @@
               </div>
             </modal>
           </template>
+          <router-link
+            :to="{name: 'library.tracks.edit', params: {id: track.id }}"
+            class="ui icon labeled button">
+            <i class="edit icon"></i>
+            <translate :translate-context="'Content/Track/Button.Label/Verb'">Edit…</translate>
+          </router-link>
         </div>
       </section>
-      <section class="ui vertical stripe center aligned segment">
-        <h2 class="ui header">
-          <translate :translate-context="'Content/Track/Title/Noun'">Track information</translate>
-        </h2>
-        <table class="ui very basic collapsing celled center aligned table">
-          <tbody>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label/Noun'">Copyright</translate>
-              </td>
-              <td v-if="track.copyright" :title="track.copyright">{{ track.copyright|truncate(50) }}</td>
-              <td v-else>
-                <translate :translate-context="'Content/Track/Table.Paragraph'">No copyright information available for this track</translate>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label/Noun'">License</translate>
-              </td>
-              <td v-if="license">
-                <a :href="license.url" target="_blank" rel="noopener noreferrer">{{ license.name }}</a>
-              </td>
-              <td v-else>
-                <translate :translate-context="'Content/Track/Table.Paragraph'">No licensing information for this track</translate>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label'">Duration</translate>
-              </td>
-              <td v-if="upload && upload.duration">{{ time.parse(upload.duration) }}</td>
-              <td v-else>
-                <translate :translate-context="'*/*/*'">N/A</translate>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label'">Size</translate>
-              </td>
-              <td v-if="upload && upload.size">{{ upload.size | humanSize }}</td>
-              <td v-else>
-                <translate :translate-context="'*/*/*'">N/A</translate>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label'">Bitrate</translate>
-              </td>
-              <td v-if="upload && upload.bitrate">{{ upload.bitrate | humanSize }}/s</td>
-              <td v-else>
-                <translate :translate-context="'*/*/*'">N/A</translate>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <translate :translate-context="'Content/Track/Table.Label/Noun'">Type</translate>
-              </td>
-              <td v-if="upload && upload.extension">{{ upload.extension }}</td>
-              <td v-else>
-                <translate :translate-context="'*/*/*'">N/A</translate>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      <section class="ui vertical stripe center aligned segment">
-        <h2>
-          <translate :translate-context="'Content/Track/Title'">Lyrics</translate>
-        </h2>
-        <div v-if="isLoadingLyrics" class="ui vertical segment">
-          <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
-        </div>
-        <div v-if="lyrics" v-html="lyrics.content_rendered"></div>
-        <template v-if="!isLoadingLyrics & !lyrics">
-          <p>
-            <translate :translate-context="'Content/Track/Paragraph'">No lyrics available for this track.</translate>
-          </p>
-          <a class="ui button" target="_blank" :href="lyricsSearchUrl">
-            <i class="search icon"></i>
-            <translate :translate-context="'Content/Track/Link/Verb'">Search on lyrics.wikia.com</translate>
-          </a>
-        </template>
-      </section>
-      <section class="ui vertical stripe segment">
-        <h2>
-          <translate :translate-context="'Content/Track/Title'">User libraries</translate>
-        </h2>
-        <library-widget @loaded="libraries = $event" :url="'tracks/' + id + '/libraries/'">
-          <translate :translate-context="'Content/Track/Paragraph'" slot="subtitle">This track is present in the following libraries:</translate>
-        </library-widget>
-      </section>
+      <router-view v-if="track" @libraries-loaded="libraries = $event" :track="track" :object="track" object-type="track" :key="$route.fullPath"></router-view>
     </template>
   </main>
 </template>
@@ -169,7 +85,6 @@ import logger from "@/logging"
 import PlayButton from "@/components/audio/PlayButton"
 import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
-import LibraryWidget from "@/components/federation/LibraryWidget"
 import Modal from '@/components/semantic/Modal'
 import EmbedWizard from "@/components/audio/EmbedWizard"
 
@@ -181,7 +96,6 @@ export default {
     PlayButton,
     TrackPlaylistIcon,
     TrackFavoriteIcon,
-    LibraryWidget,
     Modal,
     EmbedWizard
   },
@@ -189,17 +103,13 @@ export default {
     return {
       time,
       isLoadingTrack: true,
-      isLoadingLyrics: true,
       track: null,
-      lyrics: null,
-      licenseData: null,
-      libraries: [],
-      showEmbedModal: false
+      showEmbedModal: false,
+      libraries: []
     }
   },
   created() {
     this.fetchData()
-    this.fetchLyrics()
   },
   methods: {
     fetchData() {
@@ -212,29 +122,6 @@ export default {
         self.isLoadingTrack = false
       })
     },
-    fetchLicenseData(licenseId) {
-      var self = this
-      let url = `licenses/${licenseId}/`
-      axios.get(url).then(response => {
-        self.licenseData = response.data
-      })
-    },
-    fetchLyrics() {
-      var self = this
-      this.isLoadingLyrics = true
-      let url = FETCH_URL + this.id + "/lyrics/"
-      logger.default.debug('Fetching lyrics for track "' + this.id + '"')
-      axios.get(url).then(
-        response => {
-          self.lyrics = response.data
-          self.isLoadingLyrics = false
-        },
-        response => {
-          console.error("No lyrics available")
-          self.isLoadingLyrics = false
-        }
-      )
-    }
   },
   computed: {
     publicLibraries () {
@@ -242,14 +129,14 @@ export default {
         return l.privacy_level === 'everyone'
       })
     },
-    labels() {
-      return {
-        title: this.$pgettext('Head/Track/Title', "Track")
-      }
-    },
     upload() {
       if (this.track.uploads) {
         return this.track.uploads[0]
+      }
+    },
+    labels() {
+      return {
+        title: this.$pgettext('Head/Track/Title', "Track")
       }
     },
     wikipediaUrl() {
@@ -276,11 +163,6 @@ export default {
       }
       return u
     },
-    lyricsSearchUrl() {
-      let base = "http://lyrics.wikia.com/wiki/Special:Search?query="
-      let query = this.track.artist.name + ":" + this.track.title
-      return base + encodeURI(query)
-    },
     cover() {
       return null
     },
@@ -302,30 +184,11 @@ export default {
         ")"
       )
     },
-    license() {
-      if (!this.track || !this.track.license) {
-        return null
-      }
-      return this.licenseData
-    }
   },
   watch: {
     id() {
       this.fetchData()
     },
-    track (v) {
-      if (v && v.license) {
-        this.fetchLicenseData(v.license)
-      }
-    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-.table.center.aligned {
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>

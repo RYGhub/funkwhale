@@ -44,5 +44,8 @@ import Tooltip from '@/components/common/Tooltip'
 
 Vue.component('tooltip', Tooltip)
 
+import EmptyState from '@/components/common/EmptyState'
+
+Vue.component('empty-state', EmptyState)
 
 export default {}

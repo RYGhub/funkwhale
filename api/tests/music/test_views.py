@@ -70,6 +70,19 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
     assert response.data == expected
 
 
+def test_track_list_filter_id(api_request, factories, logged_in_api_client):
+    track1 = factories["music.Track"]()
+    track2 = factories["music.Track"]()
+    factories["music.Track"]()
+    url = reverse("api:v1:tracks-list")
+    response = logged_in_api_client.get(url, {"id[]": [track1.id, track2.id]})
+
+    assert response.status_code == 200
+    assert response.data["count"] == 2
+    assert response.data["results"][0]["id"] == track2.id
+    assert response.data["results"][1]["id"] == track1.id
+
+
 @pytest.mark.parametrize("param,expected", [("true", "full"), ("false", "empty")])
 def test_artist_view_filter_playable(param, expected, factories, api_request):
     artists = {

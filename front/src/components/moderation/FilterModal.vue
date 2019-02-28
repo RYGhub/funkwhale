@@ -94,7 +94,6 @@ export default {
           date: new Date()
         })
       }, error => {
-        console.log('error', error)
         logger.default.error(`Error while hiding ${self.type} ${self.target.id}`)
         self.errors = error.backendErrors
         self.isLoading = false

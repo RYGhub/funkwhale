@@ -15,6 +15,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from taggit.models import Tag
 
+from funkwhale_api.common import decorators as common_decorators
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
@@ -185,6 +186,8 @@ class TrackViewSet(
         "size",
         "artist__name",
     )
+
+    mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
         queryset = super().get_queryset()

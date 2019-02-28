@@ -17,7 +17,10 @@ import LibraryArtist from '@/components/library/Artist'
 import LibraryArtists from '@/components/library/Artists'
 import LibraryAlbums from '@/components/library/Albums'
 import LibraryAlbum from '@/components/library/Album'
-import LibraryTrack from '@/components/library/Track'
+import LibraryTrackDetail from '@/components/library/TrackDetail'
+import LibraryTrackEdit from '@/components/library/TrackEdit'
+import EditDetail from '@/components/library/EditDetail'
+import LibraryTrackDetailBase from '@/components/library/TrackBase'
 import LibraryRadios from '@/components/library/Radios'
 import RadioBuilder from '@/components/library/radios/Builder'
 import RadioDetail from '@/views/radios/Detail'
@@ -26,7 +29,7 @@ import PlaylistList from '@/views/playlists/List'
 import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
-import AdminLibraryFilesList from '@/views/admin/library/FilesList'
+import AdminLibraryEditsList from '@/views/admin/library/EditsList'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
@@ -206,9 +209,14 @@ export default new Router({
       component: AdminLibraryBase,
       children: [
         {
-          path: 'files',
-          name: 'manage.library.files',
-          component: AdminLibraryFilesList
+          path: 'edits',
+          name: 'manage.library.edits',
+          component: AdminLibraryEditsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
         }
       ]
     },
@@ -324,7 +332,29 @@ export default new Router({
         },
         { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
         { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
-        { path: 'tracks/:id', name: 'library.tracks.detail', component: LibraryTrack, props: true },
+        {
+          path: 'tracks/:id',
+          component: LibraryTrackDetailBase,
+          props: true,
+          children: [
+            {
+              path: '',
+              name: 'library.tracks.detail',
+              component: LibraryTrackDetail
+            },
+            {
+              path: 'edit',
+              name: 'library.tracks.edit',
+              component: LibraryTrackEdit
+            },
+            {
+              path: 'edit/:editId',
+              name: 'library.tracks.edit.detail',
+              component: EditDetail,
+              props: true,
+            }
+          ]
+        },
       ]
     },
     { path: '*', component: PageNotFound }

@@ -92,6 +92,16 @@ export default {
       id: 'sidebarCount',
       handler: this.incrementNotificationCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'mutation.created',
+      id: 'sidebarReviewEditCount',
+      handler: this.incrementReviewEditCountInSidebar
+    })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarReviewEditCount',
+      handler: this.incrementReviewEditCountInSidebar
+    })
   },
   mounted () {
     let self = this
@@ -110,11 +120,22 @@ export default {
       eventName: 'inbox.item_added',
       id: 'sidebarCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.created',
+      id: 'sidebarReviewEditCount',
+    })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarReviewEditCount',
+    })
     this.disconnect()
   },
   methods: {
     incrementNotificationCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'inbox', count: 1})
+    },
+    incrementReviewEditCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewEdits', value: event.pending_review_count})
     },
     fetchNodeInfo () {
       let self = this
@@ -179,7 +200,6 @@ export default {
     }),
     suggestedInstances () {
       let instances = this.$store.state.instance.knownInstances.slice(0)
-      console.log('instance', instances)
       if (this.$store.state.instance.frontSettings.defaultServerUrl) {
         let serverUrl = this.$store.state.instance.frontSettings.defaultServerUrl
         if (!serverUrl.endsWith('/')) {
@@ -188,7 +208,6 @@ export default {
         instances.push(serverUrl)
       }
       instances.push(this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio/')
-      console.log('HELLO', instances)
       return _.uniq(instances.filter((e) => {return e}))
     },
     version () {

@@ -69,6 +69,15 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
         return response.Response({})
 
 
+class EditViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    lookup_field = "uuid"
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = [renderers.ActivityPubRenderer]
+    # queryset = common_models.Mutation.objects.local().select_related()
+    # serializer_class = serializers.ActorSerializer
+
+
 class WellKnownViewSet(viewsets.GenericViewSet):
     authentication_classes = []
     permission_classes = []

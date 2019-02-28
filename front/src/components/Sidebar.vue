@@ -97,6 +97,17 @@
               :to="{name: 'manage.moderation.domains.list'}">
               <i class="shield icon"></i><translate>Moderation</translate>
             </router-link>
+            <router-link
+              v-if="$store.state.auth.availablePermissions['library']"
+              class="item"
+              :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
+              <i class="book icon"></i><translate>Library</translate>
+              <div
+                v-if="$store.state.ui.notifications.pendingReviewEdits > 0"
+                :title="labels.pendingReviewEdits"
+                :class="['ui', 'teal', 'label']">
+                {{ $store.state.ui.notifications.pendingReviewEdits }}</div>
+            </router-link>
           </div>
         </div>
       </nav>
@@ -210,10 +221,12 @@ export default {
       let mainMenu = this.$gettext("Main menu")
       let selectTrack = this.$gettext("Play this track")
       let pendingFollows = this.$gettext("Pending follow requests")
+      let pendingReviewEdits = this.$gettext("Pending review edits")
       return {
         pendingFollows,
         mainMenu,
-        selectTrack
+        selectTrack,
+        pendingReviewEdits
       }
     },
     tracks: {

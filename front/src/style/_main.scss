@@ -276,3 +276,12 @@ canvas.color-thief {
 .ui.dropdown .item[disabled] {
   display: none;
 }
+
+span.diff.added {
+  background-color:rgba(0, 255, 0, 0.25);
+}
+
+
+span.diff.removed {
+  background-color: rgba(255, 0, 0, 0.25);
+}
