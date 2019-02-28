@@ -174,3 +174,75 @@ def test_music_library_retrieve_page_follow(
     response = api_client.get(url, {"page": 1})
 
     assert response.status_code == expected
+
+
+@pytest.mark.parametrize(
+    "factory, serializer_class, namespace",
+    [
+        ("music.Artist", serializers.ArtistSerializer, "artists"),
+        ("music.Album", serializers.AlbumSerializer, "albums"),
+        ("music.Track", serializers.TrackSerializer, "tracks"),
+    ],
+)
+def test_music_local_entity_detail(
+    factories, api_client, factory, serializer_class, namespace, settings
+):
+    obj = factories[factory](fid="http://{}/1".format(settings.FEDERATION_HOSTNAME))
+    url = reverse(
+        "federation:music:{}-detail".format(namespace), kwargs={"uuid": obj.uuid}
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializer_class(obj).data
+
+
+@pytest.mark.parametrize(
+    "factory, namespace",
+    [("music.Artist", "artists"), ("music.Album", "albums"), ("music.Track", "tracks")],
+)
+def test_music_non_local_entity_detail(
+    factories, api_client, factory, namespace, settings
+):
+    obj = factories[factory](fid="http://wrong-domain/1")
+    url = reverse(
+        "federation:music:{}-detail".format(namespace), kwargs={"uuid": obj.uuid}
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "privacy_level, expected", [("me", 404), ("instance", 404), ("everyone", 200)]
+)
+def test_music_upload_detail(factories, api_client, privacy_level, expected):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level,
+        library__actor__local=True,
+        import_status="finished",
+    )
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == expected
+    if expected == 200:
+        assert response.data == serializers.UploadSerializer(upload).data
+
+
+@pytest.mark.parametrize("privacy_level", ["me", "instance"])
+def test_music_upload_detail_private_approved_follow(
+    factories, api_client, authenticated_actor, privacy_level
+):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level,
+        library__actor__local=True,
+        import_status="finished",
+    )
+    factories["federation.LibraryFollow"](
+        actor=authenticated_actor, target=upload.library, approved=True
+    )
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == 200

@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import utils as music_utils
 
 from . import activity, authentication, models, renderers, serializers, utils, webfinger
 
@@ -202,8 +203,16 @@ class MusicUploadViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Upload.objects.none()
+    queryset = music_models.Upload.objects.local().select_related(
+        "library__actor", "track__artist", "track__album__artist"
+    )
+    serializer_class = serializers.UploadSerializer
     lookup_field = "uuid"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        actor = music_utils.get_actor_from_request(self.request)
+        return queryset.playable_by(actor)
 
 
 class MusicArtistViewSet(
@@ -212,7 +221,8 @@ class MusicArtistViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Artist.objects.none()
+    queryset = music_models.Artist.objects.local()
+    serializer_class = serializers.ArtistSerializer
     lookup_field = "uuid"
 
 
@@ -222,7 +232,8 @@ class MusicAlbumViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Album.objects.none()
+    queryset = music_models.Album.objects.local().select_related("artist")
+    serializer_class = serializers.AlbumSerializer
     lookup_field = "uuid"
 
 
@@ -232,5 +243,8 @@ class MusicTrackViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
     renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Track.objects.none()
+    queryset = music_models.Track.objects.local().select_related(
+        "album__artist", "artist"
+    )
+    serializer_class = serializers.TrackSerializer
     lookup_field = "uuid"

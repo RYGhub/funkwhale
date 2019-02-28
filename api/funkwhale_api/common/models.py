@@ -3,11 +3,24 @@ import uuid
 from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 from django.urls import reverse
 
 from funkwhale_api.federation import utils as federation_utils
+
+
+class LocalFromFidQuerySet:
+    def local(self, include=True):
+        host = settings.FEDERATION_HOSTNAME
+        query = models.Q(fid__startswith="http://{}/".format(host)) | models.Q(
+            fid__startswith="https://{}/".format(host)
+        )
+        if include:
+            return self.filter(query)
+        else:
+            return self.filter(~query)
 
 
 class MutationQuerySet(models.QuerySet):
