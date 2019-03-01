@@ -5,7 +5,7 @@
         <th colspan="1000">
           <div v-if="refreshable" class="right floated">
             <span v-if="needsRefresh">
-              <translate>Content have been updated, click refresh to see up-to-date content</translate>
+              <translate :translate-context="'Content/*/Button.Help text.Paragraph'">Content have been updated, click refresh to see up-to-date content</translate>
             </span>
             <button
               @click="$emit('refresh')"
@@ -19,7 +19,7 @@
           <div class="ui small left floated form" v-if="actionUrl && actions.length > 0">
             <div class="ui inline fields">
               <div class="field">
-                <label><translate>Actions</translate></label>
+                <label><translate :translate-context="'Content/*/Dropdown.Label/Noun'">Actions</translate></label>
                 <select class="ui dropdown" v-model="currentActionName">
                   <option v-for="action in actions" :value="action.name">
                     {{ action.label }}
@@ -32,9 +32,9 @@
                   confirm-color="green"
                   color=""
                   @confirm="launchAction">
-                  <translate>Go</translate>
+                  <translate :translate-context="'Content/*/Button.Label/Short, Verb'">Go</translate>
                   <p slot="modal-header">
-                    <translate
+                    <translate :translate-context="'Modal/*/Title'"
                       key="1"
                       :translate-n="affectedObjectsCount"
                       :translate-params="{count: affectedObjectsCount, action: currentActionName}"
@@ -43,28 +43,28 @@
                     </translate>
                   </p>
                   <p slot="modal-content">
-                    <translate>This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
+                    <translate :translate-context="'Modal/*/Paragraph'">This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
                   </p>
-                  <div slot="modal-confirm"><translate>Launch</translate></div>
+                  <div slot="modal-confirm"><translate :translate-context="'Modal/*/Button.Label/Short, Verb'">Launch</translate></div>
                 </dangerous-button>
                 <div
                   v-else
                   @click="launchAction"
                   :disabled="checked.length === 0"
                   :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']">
-                  <translate>Go</translate></div>
+                  <translate :translate-context="'Content/*/Button.Label/Short, Verb'">Go</translate></div>
               </div>
               <div class="count field">
-                <translate
+                <translate :translate-context="'Content/*/Paragraph'"
                   tag="span"
                   v-if="selectAll"
                   key="1"
                   :translate-n="objectsData.count"
                   :translate-params="{count: objectsData.count, total: objectsData.count}"
-                  translate-plural="%{ count } on %{ total } selected">
-                  %{ count } on %{ total } selected
+                  translate-plural="All %{ count } elements selected">
+                  All %{ count } element selected
                 </translate>
-                <translate
+                <translate :translate-context="'Content/*/Paragraph'"
                   tag="span"
                   v-else
                   key="2"
@@ -75,7 +75,7 @@
                 </translate>
                 <template v-if="currentAction.allowAll && checkable.length > 0 && checkable.length === checked.length">
                   <a @click="selectAll = true" v-if="!selectAll">
-                    <translate
+                    <translate :translate-context="'Content/*/Link/Verb'"
                       key="3"
                       :translate-n="objectsData.count"
                       :translate-params="{total: objectsData.count}"
@@ -84,20 +84,20 @@
                     </translate>
                   </a>
                   <a @click="selectAll = false" v-else>
-                    <translate key="4">Select only current page</translate>
+                    <translate :translate-context="'Content/*/Link/Verb'" key="4">Select only current page</translate>
                   </a>
                 </template>
               </div>
             </div>
             <div v-if="actionErrors.length > 0" class="ui negative message">
-              <div class="header"><translate>Error while applying action</translate></div>
+              <div class="header"><translate :translate-context="'Content/*/Error message/Header'">Error while applying action</translate></div>
               <ul class="list">
                 <li v-for="error in actionErrors">{{ error }}</li>
               </ul>
             </div>
             <div v-if="actionResult" class="ui positive message">
               <p>
-                <translate
+                <translate :translate-context="'Content/*/Paragraph'"
                   :translate-n="actionResult.updated"
                   :translate-params="{count: actionResult.updated, action: actionResult.action}"
                   translate-plural="Action %{ action } was launched successfully on %{ count } elements">
@@ -269,7 +269,7 @@ export default {
     },
     labels () {
       return {
-        refresh: this.$gettext('Refresh table content')
+        refresh: this.$pgettext('Content/*/Button.Tooltip/Verb', 'Refresh table content')
       }
     },
     affectedObjectsCount () {
