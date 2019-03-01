@@ -1,12 +1,12 @@
 <template>
   <div class="ui fluid action input">
     <p class="message" v-if="copied">
-      <translate>Text copied to clipboard!</translate>
+      <translate :translate-context="'Content/*/Paragraph/Short'">Text copied to clipboard!</translate>
     </p>
     <input ref="input" :value="value" type="text">
     <button @click="copy" :class="['ui', buttonClasses, 'right', 'labeled', 'icon', 'button']">
       <i class="copy icon"></i>
-      <translate>Copy</translate>
+      <translate :translate-context="'Content/*/Button.Label/Short, Verb'">Copy</translate>
     </button>
   </div>
 </template>
