@@ -159,7 +159,7 @@ export default {
       ordering: 'creation_date',
       orderingOptions: [
         ['creation_date', 'creation_date'],
-        ['title', 'title'],
+        ['title', 'track_title'],
         ['size', 'size'],
         ['duration', 'duration'],
         ['bitrate', 'bitrate'],
