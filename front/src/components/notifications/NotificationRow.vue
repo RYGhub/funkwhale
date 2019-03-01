@@ -36,15 +36,15 @@ export default {
       return 'plop'
     },
     labels () {
-      let libraryFollowMessage = this.$gettext('%{ username } followed your library "%{ library }"')
-      let libraryAcceptFollowMessage = this.$gettext('%{ username } accepted your follow on library "%{ library }"')
-      let libraryPendingFollowMessage = this.$gettext('%{ username } wants to follow your library "%{ library }"')
+      let libraryFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } followed your library "%{ library }"')
+      let libraryAcceptFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } accepted your follow on library "%{ library }"')
+      let libraryPendingFollowMessage = this.$pgettext('Content/Notifications/Paragraph', '%{ username } wants to follow your library "%{ library }"')
       return {
         libraryFollowMessage,
         libraryAcceptFollowMessage,
         libraryPendingFollowMessage,
-        markRead: this.$gettext('Mark as read'),
-        markUnread: this.$gettext('Mark as unread'),
+        markRead: this.$pgettext('Content/Notifications/Button.Tooltip/Verb', 'Mark as read'),
+        markUnread: this.$pgettext('Content/Notifications/Button.Tooltip/Verb', 'Mark as unread'),
 
       }
     },
@@ -63,7 +63,7 @@ export default {
             action = {
               buttonClass: 'green',
               icon: 'check',
-              label: this.$gettext('Approve'),
+              label: this.$pgettext('Content/Notifications/Button.Label/Short, Verb', 'Approve'),
               handler: () => { self.approveLibraryFollow(a.related_object) }
             }
           } else {

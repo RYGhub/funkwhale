@@ -4,7 +4,7 @@
       <slot name="title"></slot>
     </h3>
     <p v-if="!isLoading && libraries.length > 0" class="ui subtitle"><slot name="subtitle"></slot></p>
-    <p v-if="!isLoading && libraries.length === 0" class="ui subtitle"><translate>No matching library.</translate></p>
+    <p v-if="!isLoading && libraries.length === 0" class="ui subtitle"><translate :translate-context="'Content/Federation/Paragraph'">No matching library.</translate></p>
     <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'angle left', 'icon']">
     </i>
     <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'angle right', 'icon']">

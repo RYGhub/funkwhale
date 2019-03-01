@@ -16,13 +16,13 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate>Browse</translate></a>
+      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate :translate-context="'Sidebar/Library/Tab.Title/Verb'">Browse</translate></a>
       <a :class="[{active: selectedTab === 'queue'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
-        <translate>Queue</translate>&nbsp;
+        <translate :translate-context="'Sidebar/Queue/Tab.Title/Noun'">Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
-           <translate>(empty)</translate>
+           <translate :translate-context="'Sidebar/Queue/Tab.Title'">(empty)</translate>
          </template>
-         <translate v-else :translate-params="{index: queue.currentIndex + 1, length: queue.tracks.length}">
+         <translate :translate-context="'Sidebar/Queue/Tab.Title'" v-else :translate-params="{index: queue.currentIndex + 1, length: queue.tracks.length}">
           (%{ index } of %{ length })
          </translate>
       </a>
@@ -32,76 +32,76 @@
     <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'library'}, 'tab']" :aria-label="labels.mainMenu">
       <nav class="ui inverted vertical large fluid menu" role="navigation" :aria-label="labels.mainMenu">
         <div class="item">
-          <header class="header"><translate>My account</translate></header>
+          <header class="header"><translate :translate-context="'Sidebar/Profile/Title'">My account</translate></header>
           <div class="menu">
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'profile', params: {username: $store.state.auth.username}}">
               <i class="user icon"></i>
-              <translate :translate-params="{username: $store.state.auth.username}">
+              <translate :translate-context="'Sidebar/Profile/List item.Link'" :translate-params="{username: $store.state.auth.username}">
                 Logged in as %{ username }
               </translate>
               <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate>Settings</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate :translate-context="'Sidebar/Settings/List item.Link/Noun'">Settings</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'notifications'}">
               <i class="feed icon"></i>
-              <translate>Notifications</translate>
+              <translate :translate-context="'Sidebar/Notifications/List item.Link/Noun'">Notifications</translate>
               <div
                 v-if="$store.state.ui.notifications.inbox > 0"
                 :class="['ui', 'teal', 'label']">
                 {{ $store.state.ui.notifications.inbox }}</div>
             </router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate>Logout</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate :translate-context="'Sidebar/Login/List item.Link/Verb'">Logout</translate></router-link>
             <template v-else>
-              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate>Login</translate></router-link>
+              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate :translate-context="'Sidebar/Login/List item.Link/Verb'">Login</translate></router-link>
               <router-link class="item" :to="{path: '/signup'}">
                 <i class="corner add icon"></i>
-                <translate>Create an account</translate>
+                <translate :translate-context="'Sidebar/Login/List item.Link/Verb'">Create an account</translate>
               </router-link>
             </template>
           </div>
         </div>
         <div class="item">
-          <header class="header"><translate>Music</translate></header>
+          <header class="header"><translate :translate-context="'Sidebar/Library/Title'">Music</translate></header>
           <div class="menu">
-            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"></i><translate>Browse library</translate></router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i><translate>Favorites</translate></router-link>
+            <router-link class="item" :to="{path: '/library'}"><i class="sound icon"></i><translate :translate-context="'Sidebar/Library/List item.Link/Verb'">Browse library</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i><translate :translate-context="'Sidebar/Favorites/List item.Link/Noun'">Favorites</translate></router-link>
             <a
               @click="$store.commit('playlists/chooseTrack', null)"
               v-if="$store.state.auth.authenticated"
               class="item">
-              <i class="list icon"></i><translate>Playlists</translate>
+              <i class="list icon"></i><translate :translate-context="'Sidebar/Playlist/List item.Link/Noun'">Playlists</translate>
             </a>
             <router-link
               v-if="$store.state.auth.authenticated"
-              class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate>Add content</translate></router-link>
+              class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate :translate-context="'Sidebar/Library/List item.Link/Verb'">Add content</translate></router-link>
           </div>
         </div>
         <div class="item" v-if="$store.state.auth.availablePermissions['settings'] || $store.state.auth.availablePermissions['moderation']">
-          <header class="header"><translate>Administration</translate></header>
+          <header class="header"><translate :translate-context="'Sidebar/Admin/Title/Noun'">Administration</translate></header>
           <div class="menu">
             <router-link
               v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{path: '/manage/settings'}">
-              <i class="settings icon"></i><translate>Settings</translate>
+              <i class="settings icon"></i><translate :translate-context="'Sidebar/Admin/List item.Link/Noun'">Settings</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{name: 'manage.users.users.list'}">
-              <i class="users icon"></i><translate>Users</translate>
+              <i class="users icon"></i><translate :translate-context="'Sidebar/Admin/List item.Link/Noun'">Users</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['moderation']"
               class="item"
               :to="{name: 'manage.moderation.domains.list'}">
-              <i class="shield icon"></i><translate>Moderation</translate>
+              <i class="shield icon"></i><translate :translate-context="'Sidebar/Moderation/List item.Link/Noun'">Moderation</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['library']"
               class="item"
               :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
-              <i class="book icon"></i><translate>Library</translate>
+              <i class="book icon"></i><translate :translate-context="'Sidebar/Moderation/List item.Link/Noun'">Library</translate>
               <div
                 v-if="$store.state.ui.notifications.pendingReviewEdits > 0"
                 :title="labels.pendingReviewEdits"
@@ -116,10 +116,10 @@
       <i class="history icon"></i>
       <div class="content">
         <div class="header">
-          <translate>Do you want to restore your previous queue?</translate>
+          <translate :translate-context="'Sidebar/Queue/Message'">Do you want to restore your previous queue?</translate>
         </div>
         <p>
-          <translate
+          <translate :translate-context="'Sidebar/Queue/Message'"
             translate-plural="%{ count } tracks"
             :translate-n="queue.previousQueue.tracks.length"
             :translate-params="{count: queue.previousQueue.tracks.length}">
@@ -127,8 +127,8 @@
           </translate>
         </p>
         <div class="ui two buttons">
-          <div @click="queue.restore()" class="ui basic inverted green button"><translate>Yes</translate></div>
-          <div @click="queue.removePrevious()" class="ui basic inverted red button"><translate>No</translate></div>
+          <div @click="queue.restore()" class="ui basic inverted green button"><translate :translate-context="'*/*/*'">Yes</translate></div>
+          <div @click="queue.removePrevious()" class="ui basic inverted red button"><translate :translate-context="'*/*/*'">No</translate></div>
         </div>
       </div>
     </div>
@@ -167,10 +167,10 @@
       <div v-if="$store.state.radios.running" class="ui black message">
         <div class="content">
           <div class="header">
-            <i class="feed icon"></i> <translate>You have a radio playing</translate>
+            <i class="feed icon"></i> <translate :translate-context="'Sidebar/Player/Title'">You have a radio playing</translate>
           </div>
-          <p><translate>New tracks will be appended here automatically.</translate></p>
-          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button"><translate>Stop radio</translate></div>
+          <p><translate :translate-context="'Sidebar/Player/Paragraph'">New tracks will be appended here automatically.</translate></p>
+          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button"><translate :translate-context="'Sidebar/Player/Button.Label/Verb'">Stop radio</translate></div>
         </div>
       </div>
     </section>
@@ -218,10 +218,10 @@ export default {
       url: state => state.route.path
     }),
     labels() {
-      let mainMenu = this.$gettext("Main menu")
-      let selectTrack = this.$gettext("Play this track")
-      let pendingFollows = this.$gettext("Pending follow requests")
-      let pendingReviewEdits = this.$gettext("Pending review edits")
+      let mainMenu = this.$pgettext('Sidebar/*/Hidden text', "Main menu")
+      let selectTrack = this.$pgettext('Sidebar/Player/Hidden text', "Play this track")
+      let pendingFollows = this.$pgettext('Sidebar/Notifications/Hidden text', "Pending follow requests")
+      let pendingReviewEdits = this.$pgettext('Sidebar/Moderation/Hidden text', "Pending review edits")
       return {
         pendingFollows,
         mainMenu,
