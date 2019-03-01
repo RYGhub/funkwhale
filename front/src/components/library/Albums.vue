@@ -105,7 +105,7 @@ export default {
       paginateBy: parseInt(this.defaultPaginateBy || 25),
       orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
-      orderingOptions: [["creation_date", "creation_date"], ["title", "title"]]
+      orderingOptions: [["creation_date", "creation_date"], ["title", "album_title"]]
     }
   },
   created() {
