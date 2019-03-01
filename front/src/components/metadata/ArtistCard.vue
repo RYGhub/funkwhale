@@ -46,7 +46,7 @@ export default Vue.extend({
   computed: {
     labels() {
       return {
-        musicbrainz: this.$gettext("View on MusicBrainz")
+        musicbrainz: this.$pgettext('Content/*/Link.Tooltip/Verb', "View on MusicBrainz")
       }
     },
     type() {
