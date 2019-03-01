@@ -5,7 +5,7 @@
         <slot name="title">
 
           <i class="search icon"></i>
-          <translate :translate-context="'Content/*/Paragraph'" :translate-context="'Content/*/Paragraph'">
+          <translate :translate-context="'Content/*/Paragraph'">
             No results were found.
           </translate>
         </slot>
@@ -14,7 +14,7 @@
     <div class="inline">
       <slot></slot>
       <button v-if="refresh" class="ui button" @click="$emit('refresh')">
-        <translate :translate-context="'Content/*/Button.Label/Short, Verb'" :translate-context="'Content/Button/Label/Verb'">
+        <translate :translate-context="'Content/*/Button.Label/Short, Verb'">
           Refresh
         </translate></button>
       </button>
