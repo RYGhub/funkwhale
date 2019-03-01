@@ -23,7 +23,7 @@ export default {
   computed: {
     labels () {
       return {
-        title: this.$gettext('Show/hide password')
+        title: this.$pgettext('Content/Settings/Button.Tooltip/Verb', 'Show/hide password')
       }
     },
     passwordInputType () {

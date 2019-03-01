@@ -36,7 +36,7 @@ export default {
   computed: {
     labels() {
       return {
-        pagination: this.$gettext("Pagination")
+        pagination: this.$pgettext('Content/*/Hidden text/Noun', "Pagination")
       }
     },
     pages: function() {

@@ -3,13 +3,13 @@
     <div class="ui divider" />
     <h3 class="ui header">{{ group.label }}</h3>
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header"><translate>Error while saving settings</translate></div>
+      <div class="header"><translate :translate-context="'Content/Settings/Error message.Title'">Error while saving settings</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div v-if="result" class="ui positive message">
-      <translate>Settings updated successfully.</translate>
+      <translate :translate-context="'Content/Settings/Paragraph'">Settings updated successfully.</translate>
     </div>
     <p v-if="group.help">{{ group.help }}</p>
     <div v-for="setting in settings" class="ui field">
@@ -65,7 +65,7 @@
     <button
       type="submit"
       :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']">
-        <translate>Save</translate>
+        <translate :translate-context="'Content/Settings/Button.Label/Short, Verb'">Save</translate>
     </button>
   </form>
 </template>
