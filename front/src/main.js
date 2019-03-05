@@ -57,28 +57,17 @@ Vue.use(GetTextPlugin, {
 Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
-Vue.directive('title', {
-  inserted: (el, binding) => {
-    let parts = []
-    let instanceName = store.state.instance.settings.instance.name.value
-    if (instanceName.length === 0) {
-      instanceName = 'Funkwhale'
-    }
-    parts.unshift(instanceName)
-    parts.unshift(binding.value)
-    document.title = parts.join(' - ')
-  },
-  updated: (el, binding) => {
-    let parts = []
-    let instanceName = store.state.instance.settings.instance.name.value
-    if (instanceName.length === 0) {
-      instanceName = 'Funkwhale'
-    }
-    parts.unshift(instanceName)
-    parts.unshift(binding.value)
-    document.title = parts.join(' - ')
+Vue.directive('title', function (el, binding) {
+  let parts = []
+  let instanceName = store.state.instance.settings.instance.name.value
+  if (instanceName.length === 0) {
+    instanceName = 'Funkwhale'
   }
-})
+  parts.unshift(instanceName)
+  parts.unshift(binding.value)
+  document.title = parts.join(' - ')
+  }
+)
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   if (store.state.auth.token) {
