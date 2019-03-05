@@ -193,3 +193,11 @@ def replace_prefix(queryset, field, old, new):
         models.functions.Substr(field, len(old) + 1, output_field=models.CharField()),
     )
     return qs.update(**{field: update})
+
+
+def concat_dicts(*dicts):
+    n = {}
+    for d in dicts:
+        n.update(d)
+
+    return n

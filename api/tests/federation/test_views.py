@@ -93,6 +93,35 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
     )
 
 
+def test_local_actor_inbox_post_receive(
+    factories, api_client, mocker, authenticated_actor
+):
+    payload = {
+        "to": [
+            "https://test.server/federation/music/libraries/956af6c9-1eb9-4117-8d17-b15e7b34afeb/followers"
+        ],
+        "type": "Create",
+        "actor": authenticated_actor.fid,
+        "object": {
+            "id": "https://test.server/federation/music/uploads/fe564a47-b1d4-4596-bf96-008ccf407672",
+            "type": "Audio",
+        },
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+    }
+    user = factories["users.User"](with_actor=True)
+    url = reverse(
+        "federation:actors-inbox",
+        kwargs={"preferred_username": user.actor.preferred_username},
+    )
+    response = api_client.post(url, payload, format="json")
+
+    assert response.status_code == 200
+
+
 def test_shared_inbox_post(factories, api_client, mocker, authenticated_actor):
     patched_receive = mocker.patch("funkwhale_api.federation.activity.receive")
     url = reverse("federation:shared-inbox")

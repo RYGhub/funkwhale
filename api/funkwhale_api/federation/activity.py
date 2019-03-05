@@ -9,11 +9,13 @@ from django.db.models import Q
 from funkwhale_api.common import channels
 from funkwhale_api.common import utils as funkwhale_utils
 
+from . import contexts
+
 recursive_getattr = funkwhale_utils.recursive_getattr
 
 
 logger = logging.getLogger(__name__)
-PUBLIC_ADDRESS = "https://www.w3.org/ns/activitystreams#Public"
+PUBLIC_ADDRESS = contexts.AS.Public
 
 ACTIVITY_TYPES = [
     "Accept",
@@ -84,7 +86,10 @@ OBJECT_TYPES = (
 BROADCAST_TO_USER_ACTIVITIES = ["Follow", "Accept"]
 
 
-def should_reject(id, actor_id=None, payload={}):
+def should_reject(fid, actor_id=None, payload={}):
+    if fid is None and actor_id is None:
+        return False
+
     from funkwhale_api.moderation import models as moderation_models
 
     policies = moderation_models.InstancePolicy.objects.active()
@@ -102,9 +107,12 @@ def should_reject(id, actor_id=None, payload={}):
     else:
         policy_type = Q(block_all=True)
 
-    query = policies.matching_url_query(id) & policy_type
-    if actor_id:
+    if fid:
+        query = policies.matching_url_query(fid) & policy_type
+    if fid and actor_id:
         query |= policies.matching_url_query(actor_id) & policy_type
+    elif actor_id:
+        query = policies.matching_url_query(actor_id) & policy_type
     return policies.filter(query).exists()
 
 
@@ -121,7 +129,7 @@ def receive(activity, on_behalf_of):
     )
     serializer.is_valid(raise_exception=True)
     if should_reject(
-        id=serializer.validated_data["id"],
+        fid=serializer.validated_data.get("id"),
         actor_id=serializer.validated_data["actor"].fid,
         payload=activity,
     ):

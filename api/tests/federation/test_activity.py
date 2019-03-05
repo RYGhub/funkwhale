@@ -60,7 +60,7 @@ def test_receive_calls_should_reject(factories, now, mocker):
 
     copy = activity.receive(activity=a, on_behalf_of=remote_actor)
     should_reject.assert_called_once_with(
-        id=a["id"], actor_id=remote_actor.fid, payload=a
+        fid=a["id"], actor_id=remote_actor.fid, payload=a
     )
     assert copy is None
 
@@ -68,22 +68,28 @@ def test_receive_calls_should_reject(factories, now, mocker):
 @pytest.mark.parametrize(
     "params, policy_kwargs, expected",
     [
-        ({"id": "https://ok.test"}, {"target_domain__name": "notok.test"}, False),
+        ({"fid": "https://ok.test"}, {"target_domain__name": "notok.test"}, False),
         (
-            {"id": "https://ok.test"},
+            {"fid": "https://ok.test"},
             {"target_domain__name": "ok.test", "is_active": False},
             False,
         ),
         (
-            {"id": "https://ok.test"},
+            {"fid": "https://ok.test"},
             {"target_domain__name": "ok.test", "block_all": False},
             False,
         ),
         # id match blocked domain
-        ({"id": "http://notok.test"}, {"target_domain__name": "notok.test"}, True),
+        ({"fid": "http://notok.test"}, {"target_domain__name": "notok.test"}, True),
         # actor id match blocked domain
         (
-            {"id": "http://ok.test", "actor_id": "https://notok.test"},
+            {"fid": "http://ok.test", "actor_id": "https://notok.test"},
+            {"target_domain__name": "notok.test"},
+            True,
+        ),
+        # actor id match blocked domain
+        (
+            {"fid": None, "actor_id": "https://notok.test"},
             {"target_domain__name": "notok.test"},
             True,
         ),
@@ -91,7 +97,7 @@ def test_receive_calls_should_reject(factories, now, mocker):
         (
             {
                 "payload": {"type": "Library"},
-                "id": "http://ok.test",
+                "fid": "http://ok.test",
                 "actor_id": "http://notok.test",
             },
             {
