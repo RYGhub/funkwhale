@@ -73,7 +73,7 @@
             </td>
           </template>
           <template v-else>
-            <td>{{ scope.obj.source }}</td>
+            <td :title="scope.obj.source">{{ scope.obj.source | truncate(25) }}</td>
             <td></td>
             <td></td>
           </template>
