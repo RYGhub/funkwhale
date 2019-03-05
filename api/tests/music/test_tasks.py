@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 from funkwhale_api.federation import serializers as federation_serializers
+from funkwhale_api.federation import jsonld
 from funkwhale_api.music import licenses, metadata, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -400,6 +401,7 @@ def test_federation_audio_track_to_metadata(now):
     published = now
     released = now.date()
     payload = {
+        "@context": jsonld.get_default_context(),
         "type": "Track",
         "id": "http://hello.track",
         "musicbrainzId": str(uuid.uuid4()),
@@ -425,6 +427,11 @@ def test_federation_audio_track_to_metadata(now):
                     "musicbrainzId": str(uuid.uuid4()),
                 }
             ],
+            "cover": {
+                "type": "Link",
+                "href": "http://cover.test",
+                "mediaType": "image/png",
+            },
         },
         "artists": [
             {
@@ -464,6 +471,10 @@ def test_federation_audio_track_to_metadata(now):
             "published"
         ],
         "album_fdate": serializer.validated_data["album"]["published"],
+        "cover_data": {
+            "mimetype": serializer.validated_data["album"]["cover"]["mediaType"],
+            "url": serializer.validated_data["album"]["cover"]["href"],
+        },
     }
 
     result = tasks.federation_audio_track_to_metadata(serializer.validated_data)

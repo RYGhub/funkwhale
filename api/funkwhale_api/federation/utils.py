@@ -100,7 +100,7 @@ def retrieve_ap_object(
     except KeyError:
         pass
     else:
-        if apply_instance_policies and activity.should_reject(id=id, payload=data):
+        if apply_instance_policies and activity.should_reject(fid=id, payload=data):
             raise exceptions.BlockedActorOrDomain()
     if not serializer_class:
         return data

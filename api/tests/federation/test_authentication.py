@@ -1,6 +1,6 @@
 import pytest
 
-from funkwhale_api.federation import authentication, exceptions, keys
+from funkwhale_api.federation import authentication, exceptions, keys, jsonld
 
 
 def test_authenticate(factories, mocker, api_request):
@@ -10,6 +10,7 @@ def test_authenticate(factories, mocker, api_request):
     mocker.patch(
         "funkwhale_api.federation.actors.get_actor_data",
         return_value={
+            "@context": jsonld.get_default_context(),
             "id": actor_url,
             "type": "Person",
             "outbox": "https://test.com",
@@ -105,6 +106,7 @@ def test_authenticate_ignore_inactive_policy(factories, api_request, mocker):
     mocker.patch(
         "funkwhale_api.federation.actors.get_actor_data",
         return_value={
+            "@context": jsonld.get_default_context(),
             "id": actor_url,
             "type": "Person",
             "outbox": "https://test.com",
@@ -142,6 +144,7 @@ def test_autenthicate_supports_blind_key_rotation(factories, mocker, api_request
     mocker.patch(
         "funkwhale_api.federation.actors.get_actor_data",
         return_value={
+            "@context": jsonld.get_default_context(),
             "id": actor_url,
             "type": "Person",
             "outbox": "https://test.com",

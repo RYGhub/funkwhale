@@ -1,6 +1,6 @@
 import pytest
 
-from funkwhale_api.federation import routes, serializers
+from funkwhale_api.federation import jsonld, routes, serializers
 
 
 @pytest.mark.parametrize(
@@ -190,6 +190,7 @@ def test_inbox_create_audio(factories, mocker):
     activity = factories["federation.Activity"]()
     upload = factories["music.Upload"](bitrate=42, duration=55)
     payload = {
+        "@context": jsonld.get_default_context(),
         "type": "Create",
         "actor": upload.library.actor.fid,
         "object": serializers.UploadSerializer(upload).data,

@@ -22,12 +22,16 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.models import QuerySet
 
+from aioresponses import aioresponses
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.users.permissions import HasUserPermission
+
+
+pytest_plugins = "aiohttp.pytest_plugin"
 
 
 class FunkwhaleProvider(internet_provider.Provider):
@@ -416,3 +420,9 @@ def migrator(transactional_db):
 def rsa_small_key(settings):
     # smaller size for faster generation, since it's CPU hungry
     settings.RSA_KEY_SIZE = 512
+
+
+@pytest.fixture(autouse=True)
+def a_responses():
+    with aioresponses() as m:
+        yield m

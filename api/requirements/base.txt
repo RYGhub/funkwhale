@@ -64,3 +64,6 @@ django-cleanup==2.1.0
 python-ldap==3.1.0
 django-auth-ldap==1.7.0
 pydub==0.23.0
+
+pyld==1.0.4
+aiohttp==3.5.4
