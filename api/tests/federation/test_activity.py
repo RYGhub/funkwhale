@@ -190,6 +190,16 @@ def test_inbox_routing(factories, mocker):
     assert a.target == target
 
 
+def test_inbox_routing_no_handler(factories, mocker):
+    router = activity.InboxRouter()
+    a = factories["federation.Activity"](type="Follow")
+    handler = mocker.Mock()
+    router.connect({"type": "Follow"}, handler)
+
+    router.dispatch({"type": "Follow"}, context={"activity": a}, call_handlers=False)
+    handler.assert_not_called()
+
+
 def test_inbox_routing_send_to_channel(factories, mocker):
     group_send = mocker.patch("funkwhale_api.common.channels.group_send")
     a = factories["federation.Activity"](type="Follow")
