@@ -143,9 +143,12 @@ body {
 }
 .ui.stripe.segment,
 #footer {
-  padding: 2em;
+  padding: 1em;
   @include media(">tablet") {
-    padding: 4em;
+    padding: 2em;
+  }
+  @include media(">desktop") {
+    padding: 3em;
   }
 }
 
