@@ -183,69 +183,76 @@ class Router:
 
 
 class InboxRouter(Router):
+    def get_matching_handlers(self, payload):
+        return [
+            handler for route, handler in self.routes if match_route(route, payload)
+        ]
+
     @transaction.atomic
-    def dispatch(self, payload, context):
+    def dispatch(self, payload, context, call_handlers=True):
         """
         Receives an Activity payload and some context and trigger our
-        business logic
+        business logic.
+
+        call_handlers should be False when are delivering a local activity, because
+        we want only want to bind activities to their recipients, not reapply the changes.
         """
         from . import api_serializers
         from . import models
 
-        for route, handler in self.routes:
-            if match_route(route, payload):
+        handlers = self.get_matching_handlers(payload)
+        for handler in handlers:
+            if call_handlers:
                 r = handler(payload, context=context)
-                activity_obj = context.get("activity")
-                if activity_obj and r:
-                    # handler returned additional data we can use
-                    # to update the activity target
-                    for key, value in r.items():
-                        setattr(activity_obj, key, value)
+            else:
+                r = None
+            activity_obj = context.get("activity")
+            if activity_obj and r:
+                # handler returned additional data we can use
+                # to update the activity target
+                for key, value in r.items():
+                    setattr(activity_obj, key, value)
 
-                    update_fields = []
-                    for k in r.keys():
-                        if k in ["object", "target", "related_object"]:
-                            update_fields += [
-                                "{}_id".format(k),
-                                "{}_content_type".format(k),
-                            ]
-                        else:
-                            update_fields.append(k)
-                    activity_obj.save(update_fields=update_fields)
+                update_fields = []
+                for k in r.keys():
+                    if k in ["object", "target", "related_object"]:
+                        update_fields += [
+                            "{}_id".format(k),
+                            "{}_content_type".format(k),
+                        ]
+                    else:
+                        update_fields.append(k)
+                activity_obj.save(update_fields=update_fields)
 
-                if payload["type"] not in BROADCAST_TO_USER_ACTIVITIES:
-                    return
-
-                inbox_items = context.get(
-                    "inbox_items", models.InboxItem.objects.none()
-                )
-                inbox_items = (
-                    inbox_items.select_related()
-                    .select_related("actor__user")
-                    .prefetch_related(
-                        "activity__object",
-                        "activity__target",
-                        "activity__related_object",
-                    )
-                )
-
-                for ii in inbox_items:
-                    user = ii.actor.get_user()
-                    if not user:
-                        continue
-                    group = "user.{}.inbox".format(user.pk)
-                    channels.group_send(
-                        group,
-                        {
-                            "type": "event.send",
-                            "text": "",
-                            "data": {
-                                "type": "inbox.item_added",
-                                "item": api_serializers.InboxItemSerializer(ii).data,
-                            },
-                        },
-                    )
+            if payload["type"] not in BROADCAST_TO_USER_ACTIVITIES:
                 return
+
+            inbox_items = context.get("inbox_items", models.InboxItem.objects.none())
+            inbox_items = (
+                inbox_items.select_related()
+                .select_related("actor__user")
+                .prefetch_related(
+                    "activity__object", "activity__target", "activity__related_object"
+                )
+            )
+
+            for ii in inbox_items:
+                user = ii.actor.get_user()
+                if not user:
+                    continue
+                group = "user.{}.inbox".format(user.pk)
+                channels.group_send(
+                    group,
+                    {
+                        "type": "event.send",
+                        "text": "",
+                        "data": {
+                            "type": "inbox.item_added",
+                            "item": api_serializers.InboxItemSerializer(ii).data,
+                        },
+                    },
+                )
+            return
 
 
 ACTOR_KEY_ROTATION_LOCK_CACHE_KEY = "federation:actor-key-rotation-lock:{}"
