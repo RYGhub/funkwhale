@@ -19,8 +19,8 @@
         </div>
       </div>
       <div class="ui section hidden divider"></div>
-      <div class="ui grid">
-        <div class="ui row">
+      <div class="ui stackable one column grid">
+        <div class="column">
           <album-widget :filters="{playable: true, ordering: '-creation_date'}">
             <template slot="title"><translate :translate-context="'Content/Home/Title'">Recently added</translate></template>
           </album-widget>
