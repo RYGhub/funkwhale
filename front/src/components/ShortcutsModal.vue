@@ -5,7 +5,7 @@
     </header>
     <section class="scrolling content">
       <table
-        class="ui compact collapsing basic fixed single line table"
+        class="ui compact collapsing basic table"
         v-for="section in sections"
         :key="section.title">
       <caption>{{ section.title }}</caption>

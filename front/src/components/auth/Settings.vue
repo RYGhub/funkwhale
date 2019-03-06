@@ -128,7 +128,7 @@
         <h3 class="ui header">
           <translate>Hidden artists</translate>
         </h3>
-        <table class="ui compact very basic fixed single line unstackable table">
+        <table class="ui compact very basic unstackable table">
           <thead>
             <tr>
               <th><translate :translate-context="'Content/*/Table.Label'">Name</translate></th>

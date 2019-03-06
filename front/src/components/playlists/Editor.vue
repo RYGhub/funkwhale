@@ -48,24 +48,27 @@
       <div class="ui hidden divider"></div>
       <template v-if="plts.length > 0">
         <p><translate :translate-context="'Content/Playlist/Paragraph/Call to action'">Drag and drop rows to reorder tracks in the playlist</translate></p>
-        <table class="ui compact very basic fixed single line unstackable table">
-          <draggable v-model="plts" element="tbody" @update="reorder">
-            <tr v-for="(plt, index) in plts" :key="plt.id">
-              <td class="left aligned">{{ plt.index + 1}}</td>
-              <td class="center aligned">
-                <img class="ui mini image" v-if="plt.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](plt.track.album.cover.small_square_crop)">
-                <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
-              </td>
-              <td colspan="4">
-                <strong>{{ plt.track.title }}</strong><br />
-                  {{ plt.track.artist.name }}
-              </td>
-              <td class="right aligned">
-                <i @click.stop="removePlt(index)" class="circular red trash icon"></i>
-              </td>
-            </tr>
-          </draggable>
-        </table>
+        <div class="table-wrapper">
+          <table class="ui compact very basic unstackable table">
+            <draggable v-model="plts" element="tbody" @update="reorder">
+              <tr v-for="(plt, index) in plts" :key="plt.id">
+                <td class="left aligned">{{ plt.index + 1}}</td>
+                <td class="center aligned">
+                  <img class="ui mini image" v-if="plt.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](plt.track.album.cover.small_square_crop)">
+                  <img class="ui mini image" v-else src="../../assets/audio/default-cover.png">
+                </td>
+                <td colspan="4">
+                  <strong>{{ plt.track.title }}</strong><br />
+                    {{ plt.track.artist.name }}
+                </td>
+                <td class="right aligned">
+                  <i @click.stop="removePlt(index)" class="circular red trash icon"></i>
+                </td>
+              </tr>
+            </draggable>
+          </table>
+
+        </div>
       </template>
     </div>
   </div>

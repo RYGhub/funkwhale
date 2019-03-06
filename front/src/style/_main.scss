@@ -285,3 +285,19 @@ span.diff.added {
 span.diff.removed {
   background-color: rgba(255, 0, 0, 0.25);
 }
+
+.table-wrapper {
+  display: block;
+  overflow-x: auto;
+}
+
+td.align.right {
+  text-align: right;
+}
+
+.ui.pagination.menu {
+  margin-top: 1em;
+  + span {
+    margin-left: 1em;
+  }
+}
