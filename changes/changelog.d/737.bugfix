@@ -1,0 +1,1 @@
+Fixed delivering of local activities causing unintended side effects, such as rollbacking changes (#737)
