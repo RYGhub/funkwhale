@@ -206,21 +206,39 @@ Finally, enable the resulting configuration:
 .. code-block:: bash
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
-.. note::
-
-    At this point you will need a certificate to enable HTTPS on your server.
-    There are many ways to obtain this certificate. The most popular and free
-    way is to obtain it from Let's Encryt. To do this, you can use an utility
-    called certbot. You can find a complete documentation on how to use certbot
-    at the `certbot documentation <https://certbot.eff.org/docs/>`.
-
-Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``systemctl restart nginx``.
-
 .. warning::
 
     If you plan to use to in-place import, ensure the alias value
     in the ``_protected/music`` location matches your MUSIC_DIRECTORY_SERVE_PATH
     env var.
+
+HTTS Configuration
+::::::::::::::::::
+
+At this point you will need a SSL certificate to enable HTTPS on your server.
+The default nginx configuration assumes you have those available at ``/etc/letsencrypt/live/${FUNKWHALE_HOSTNAME}/``, which
+is the path used by `certbot <https://certbot.eff.org/docs/>`_ when generating certificates with Let's Encrypt.
+
+In you already have a certificate you'd like to use, simply update the nginx configuration
+and replace ``ssl_certificate`` and ``ssl_certificate_key`` values with the proper paths.
+
+If you don't have one, comment or remove the lines starting with ``ssl_certificate`` and ``ssl_certificate_key``. You can then proceed to generate
+a certificate, as shown below:
+
+.. code-block:: shell
+
+    # install certbot with nginx support
+    sudo apt install python-certbot-nginx
+    # generate the certificate
+    # (accept the terms of service if prompted)
+    sudo certbot --nginx -d yourfunkwhale.domain
+
+This should create a valid certificate and edit the nginx configuration to use the new certificate.
+
+Reloading
+:::::::::
+
+Check the configuration is valid with ``nginx -t`` then reload your nginx server with ``sudo systemctl reload nginx``.
 
 
 Apache2
