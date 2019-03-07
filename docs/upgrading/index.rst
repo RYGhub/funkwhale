@@ -36,6 +36,39 @@ Docker setup
 If you've followed the setup instructions in :doc:`Docker`, upgrade path is
 easy:
 
+Mono-container installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Basically, you need to pull the new container image, stop and delete your existing container,
+and relaunch a new one:
+
+.. parsed-literal::
+    export FUNKWHALE_VERSION="|version|"
+
+.. code-block:: shell
+
+    docker pull funkwhale/all-in-one:$FUNKWHALE_VERSION
+    docker stop funkwhale
+    docker rm funkwhale
+    docker run \
+        --name=funkwhale \
+        --restart=unless-stopped \
+        --env-file=/srv/funkwhale/.env \
+        -v /srv/funkwhale/data:/data \
+        -v /path/to/your/music/dir:/music:ro \
+        -e PUID=$UID \
+        -e PGID=$GID \
+        -p 5000:80 \
+        -d \
+        funkwhale/all-in-one:$FUNKWHALE_VERSION
+
+If you are not managing the container directly by hand, but use a third party tool such as Portainer,
+instructions will vary, but, as a rule of thumb, pulling the new version of the image, and relaunch
+a new container with the same arguments as the previous one (except for the image version) is enough.
+
+Multi-container installation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. parsed-literal::
 
     cd /srv/funkwhale
