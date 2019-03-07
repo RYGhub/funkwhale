@@ -79,39 +79,42 @@
           <i><translate :translate-context="'Content/Library/Paragraph'" :translate-params="{extensions: supportedExtensions.join(', ')}">Supported extensions: %{ extensions }</translate></i>
         </file-upload-widget>
       </div>
-      <table v-if="files.length > 0" class="ui single line table">
-        <thead>
-          <tr>
-            <th><translate :translate-context="'Content/Library/Table.Label'">Filename</translate></th>
-            <th><translate :translate-context="'Content/Library/Table.Label'">Size</translate></th>
-            <th><translate :translate-context="'Content/Library/Table.Label'">Status</translate></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(file, index) in sortedFiles" :key="file.id">
-            <td :title="file.name">{{ file.name | truncate(60) }}</td>
-            <td>{{ file.size | humanSize }}</td>
-            <td>
-              <span v-if="file.error" class="ui tooltip" :data-tooltip="labels.tooltips[file.error]">
-                <span class="ui red icon label">
-                  <i class="question circle outline icon" /> {{ file.error }}
+      <div v-if="files.length > 0" class="table-wrapper">
+        <div class="ui hidden divider"></div>
+        <table class="ui unstackable table">
+          <thead>
+            <tr>
+              <th><translate :translate-context="'Content/Library/Table.Label'">Filename</translate></th>
+              <th><translate :translate-context="'Content/Library/Table.Label'">Size</translate></th>
+              <th><translate :translate-context="'Content/Library/Table.Label'">Status</translate></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(file, index) in sortedFiles" :key="file.id">
+              <td :title="file.name">{{ file.name | truncate(60) }}</td>
+              <td>{{ file.size | humanSize }}</td>
+              <td>
+                <span v-if="file.error" class="ui tooltip" :data-tooltip="labels.tooltips[file.error]">
+                  <span class="ui red icon label">
+                    <i class="question circle outline icon" /> {{ file.error }}
+                  </span>
                 </span>
-              </span>
-              <span v-else-if="file.success" class="ui green label">
-                <translate :translate-context="'Content/Library/Table'" key="1">Uploaded</translate>
-              </span>
-              <span v-else-if="file.active" class="ui yellow label">
-                <translate :translate-context="'Content/Library/Table'" key="2">Uploading…</translate>
-                ({{ parseInt(file.progress) }}%)
-              </span>
-              <template v-else>
-                <span class="ui label"><translate :translate-context="'Content/Library/Table'" key="3">Pending</translate></span>
-                <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
-              </template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <span v-else-if="file.success" class="ui green label">
+                  <translate :translate-context="'Content/Library/Table'" key="1">Uploaded</translate>
+                </span>
+                <span v-else-if="file.active" class="ui yellow label">
+                  <translate :translate-context="'Content/Library/Table'" key="2">Uploading…</translate>
+                  ({{ parseInt(file.progress) }}%)
+                </span>
+                <template v-else>
+                  <span class="ui label"><translate :translate-context="'Content/Library/Table'" key="3">Pending</translate></span>
+                  <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
+                </template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'processing'}]">

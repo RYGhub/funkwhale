@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-
+import moment from 'moment'
 import {truncate, ago, capitalize, year} from '@/filters'
 
 describe('filters', () => {
@@ -24,7 +24,15 @@ describe('filters', () => {
     it('works', () => {
       const input = new Date()
       let output = ago(input)
-      expect(output).to.equal('a few seconds ago')
+      let expected = moment(input).calendar(input, {
+        sameDay: 'LT',
+        nextDay: 'L',
+        nextWeek: 'L',
+        lastDay: 'L',
+        lastWeek: 'L',
+        sameElse: 'L'
+    })
+      expect(output).to.equal(expected)
     })
   })
   describe('year', () => {

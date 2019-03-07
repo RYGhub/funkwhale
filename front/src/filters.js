@@ -17,7 +17,15 @@ export function ago (date, locale) {
   locale = locale || 'en'
   const m = moment(date)
   m.locale(locale)
-  return m.fromNow()
+  return m.calendar(null, {
+    sameDay: 'LT',
+    nextDay: 'L',
+    nextWeek: 'L',
+    lastDay: 'L',
+    lastWeek: 'L',
+    sameElse: 'L'
+})
+
 }
 
 Vue.filter('ago', ago)

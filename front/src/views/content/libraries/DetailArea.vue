@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="ui stackable grid">
-      <div class="five wide column">
+    <div class="ui two column row">
+      <div class="column">
         <h3 class="ui header"><translate :translate-context="'Content/Library/Title'">Current library</translate></h3>
         <library-card :library="library" />
       </div>

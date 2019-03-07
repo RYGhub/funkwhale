@@ -1,26 +1,28 @@
 <template>
-  <table class="ui compact very basic fixed single line unstackable table">
-    <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th colspan="6"><translate :translate-context="'Content/Track/Table.Label'">Title</translate></th>
-        <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Artist</translate></th>
-        <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Album</translate></th>
-        <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Duration</translate></th>
-        <th colspan="2"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <track-row
-        :playable="playable"
-        :display-position="displayPosition"
-        :track="track"
-        :artist="artist"
-        :key="index + '-' + track.id"
-        v-for="(track, index) in tracks"></track-row>
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table class="ui compact very basic unstackable table">
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th colspan="6"><translate :translate-context="'Content/Track/Table.Label'">Title</translate></th>
+          <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Artist</translate></th>
+          <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Album</translate></th>
+          <th colspan="4"><translate :translate-context="'Content/Track/Table.Label'">Duration</translate></th>
+          <th colspan="2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <track-row
+          :playable="playable"
+          :display-position="displayPosition"
+          :track="track"
+          :artist="artist"
+          :key="index + '-' + track.id"
+          v-for="(track, index) in tracks"></track-row>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>

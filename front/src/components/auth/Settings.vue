@@ -30,7 +30,7 @@
         </form>
       </section>
       <section class="ui small text container">
-        <div class="ui divider"></div>
+        <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <translate :translate-context="'Content/Settings/Title'">Avatar</translate>
         </h2>
@@ -64,7 +64,7 @@
       </section>
 
       <section class="ui small text container">
-        <div class="ui divider"></div>
+        <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <translate :translate-context="'Content/Settings/Title/Verb'">Change my password</translate>
         </h2>
@@ -110,7 +110,7 @@
       </section>
 
       <section class="ui small text container" id="content-filters">
-        <div class="ui divider"></div>
+        <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <i class="eye slash outline icon"></i>
           <div class="content">
@@ -128,7 +128,7 @@
         <h3 class="ui header">
           <translate>Hidden artists</translate>
         </h3>
-        <table class="ui compact very basic fixed single line unstackable table">
+        <table class="ui compact very basic unstackable table">
           <thead>
             <tr>
               <th><translate :translate-context="'Content/*/Table.Label'">Name</translate></th>
