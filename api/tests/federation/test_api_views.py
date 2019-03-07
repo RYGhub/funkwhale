@@ -123,9 +123,12 @@ def test_user_can_accept_or_reject_own_follows(
 
     assert follow.approved is expected
 
-    mocked_dispatch.assert_called_once_with(
-        {"type": "Accept"}, context={"follow": follow}
-    )
+    if action == "accept":
+        mocked_dispatch.assert_called_once_with(
+            {"type": "Accept"}, context={"follow": follow}
+        )
+    if action == "reject":
+        mocked_dispatch.assert_not_called()
 
 
 def test_user_can_list_inbox_items(factories, logged_in_api_client):

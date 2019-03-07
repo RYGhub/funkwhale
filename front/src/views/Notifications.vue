@@ -1,10 +1,7 @@
 <template>
   <main class="main pusher" v-title="labels.title">
     <section class="ui vertical aligned stripe segment">
-      <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
-        <div class="ui text loader"><translate :translate-context="'Content/Notifications/Paragraph'">Loading notifications…</translate></div>
-      </div>
-      <div v-else class="ui container">
+      <div class="ui container">
         <h1 class="ui header"><translate :translate-context="'Content/Notifications/Title'">Your notifications</translate></h1>
         <div class="ui toggle checkbox">
           <input v-model="filters.is_read" type="checkbox">
@@ -18,7 +15,12 @@
           <translate :translate-context="'Content/Notifications/Button.Label/Verb'">Mark all as read</translate>
         </div>
         <div class="ui hidden divider" />
-        <table v-if="notifications.count > 0" class="ui table">
+
+        <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
+          <div class="ui text loader"><translate :translate-context="'Content/Notifications/Paragraph'">Loading notifications…</translate></div>
+        </div>
+
+        <table v-else-if="notifications.count > 0" class="ui table">
           <tbody>
             <notification-row :item="item" v-for="item in notifications.results" :key="item.id" />
           </tbody>
@@ -42,7 +44,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      notifications: null,
+      notifications: {count: 0, results: []},
       filters: {
         is_read: false
       }
@@ -76,7 +78,8 @@ export default {
     }
   },
   methods: {
-    handleNewNotification(event) {
+    handleNewNotification (event) {
+      this.notifications.count += 1
       this.notifications.results.unshift(event.item)
     },
     fetch(params) {
