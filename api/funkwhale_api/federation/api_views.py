@@ -25,7 +25,8 @@ from . import utils
 def update_follow(follow, approved):
     follow.approved = approved
     follow.save(update_fields=["approved"])
-    routes.outbox.dispatch({"type": "Accept"}, context={"follow": follow})
+    if approved:
+        routes.outbox.dispatch({"type": "Accept"}, context={"follow": follow})
 
 
 class LibraryFollowViewSet(
