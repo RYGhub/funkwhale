@@ -279,15 +279,18 @@ export default {
     },
     sortedFiles() {
       // return errored files on top
-      return this.files.sort(f => {
+
+      return _.sortBy(this.files.map(f => {
+        let statusIndex = 0
         if (f.errored) {
-          return -5;
+          statusIndex = -1
         }
         if (f.success) {
-          return 5;
+          statusIndex = 1
         }
-        return 0;
-      });
+        f.statusIndex = statusIndex
+        return f
+      }), ['statusIndex', 'name'])
     }
   },
   watch: {
