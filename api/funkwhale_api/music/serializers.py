@@ -470,6 +470,36 @@ class OembedSerializer(serializers.Serializer):
                     "library_artist", kwargs={"pk": album.artist.pk}
                 )
             )
+        elif match.url_name == "library_artist":
+            qs = models.Artist.objects.filter(pk=int(match.kwargs["pk"]))
+            try:
+                artist = qs.get()
+            except models.Artist.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No artist matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "artist"
+            embed_id = artist.pk
+            album = (
+                artist.albums.filter(cover__isnull=False)
+                .exclude(cover="")
+                .order_by("-id")
+                .first()
+            )
+
+            if album and album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    album.cover.crop["400x400"].url
+                )
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
+            data["title"] = artist.name
+            data["description"] = artist.name
+            data["author_name"] = artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+            )
         else:
             raise serializers.ValidationError(
                 "Unsupported url: {}".format(validated_data["url"])

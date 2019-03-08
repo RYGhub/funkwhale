@@ -184,6 +184,8 @@ class TrackViewSet(
         "title",
         "album__release_date",
         "size",
+        "position",
+        "disc_number",
         "artist__name",
     )
 

@@ -139,7 +139,7 @@ export default {
   data () {
     return {
       time,
-      supportedTypes: ['track', 'album'],
+      supportedTypes: ['track', 'album', 'artist'],
       baseUrl: '',
       error: null,
       type: null,
@@ -158,6 +158,7 @@ export default {
   },
   created () {
     let params = getURLParams()
+    this.baseUrl = params.b || ''
     this.type = params.type
     if (this.supportedTypes.indexOf(this.type) === -1) {
       this.error = 'invalid_type'
@@ -229,7 +230,10 @@ export default {
         this.fetchTrack(id)
       }
       if (type === 'album') {
-        this.fetchTracks({album: id, playable: true})
+        this.fetchTracks({album: id, playable: true, ordering: ",disc_number,position"})
+      }
+      if (type === 'artist') {
+        this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
       }
     },
     play (index) {

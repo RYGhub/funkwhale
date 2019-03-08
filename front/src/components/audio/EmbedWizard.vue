@@ -29,7 +29,11 @@
       </div>
     </div>
     <div class="preview">
-      <h3><translate :translate-context="'Popup/Embed/Title/Noun'">Preview</translate></h3>
+      <h3>
+        <a :href="iframeSrc" target="_blank">
+          <translate :translate-context="'Popup/Embed/Title/Noun'">Preview</translate>
+        </a>
+      </h3>
       <iframe :width="frameWidth" :height="height" scrolling="no" frameborder="no" :src="iframeSrc"></iframe>
     </div>
   </div>
