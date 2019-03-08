@@ -32,8 +32,8 @@
         </button>
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
           <i class="trash icon"></i> <translate>Delete</translate>
-          <p slot="modal-header">
-            <translate :translate-params="{playlist: playlist.name}">Do you want to delete the playlist "%{ playlist }"?</translate>
+          <p slot="modal-header" v-translate="{playlist: playlist.name}" :translate-params="{playlist: playlist.name}">
+            Do you want to delete the playlist "%{ playlist }"?
           </p>
           <p slot="modal-content"><translate>This will completely delete this playlist and cannot be undone.</translate></p>
           <p slot="modal-confirm"><translate>Delete playlist</translate></p>

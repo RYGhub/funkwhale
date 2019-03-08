@@ -39,8 +39,8 @@
 
       <dangerous-button :disabled="plts.length === 0" class="labeled right floated icon" color='yellow' :action="clearPlaylist">
         <i class="eraser icon"></i> <translate>Clear playlist</translate>
-        <p slot="modal-header">
-          <translate :translate-params="{playlist: playlist.name}">Do you want to clear the playlist "%{ playlist }"?</translate>
+        <p slot="modal-header" v-translate="{playlist: playlist.name}" :translate-params="{playlist: playlist.name}">
+          Do you want to clear the playlist "%{ playlist }"?
         </p>
         <p slot="modal-content"><translate>This will remove all tracks from this playlist and cannot be undone.</translate></p>
         <p slot="modal-confirm"><translate>Clear playlist</translate></p>
