@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-29 10:47+0100\n"
-"PO-Revision-Date: 2019-01-20 10:50+0000\n"
-"Last-Translator: Elza Gelez <elza@gelez.xyz>\n"
+"PO-Revision-Date: 2019-02-05 13:41+0000\n"
+"Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: none\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
@@ -90,9 +90,8 @@ msgid "%{ username } followed your library \"%{ library }\""
 msgstr "%{ username } sekvis vian muzikejon \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:41
-#, fuzzy
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } sekvis vian muzikejon \"%{ library }\""
+msgstr "%{ username } volas sekvi vian muzikejon “%{ library }”"
 
 #: front/src/components/auth/Profile.vue:46
 msgid "%{ username }'s profile"
