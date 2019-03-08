@@ -273,7 +273,7 @@ def federation_audio_track_to_metadata(payload):
     new_data = {
         "title": payload["name"],
         "album": payload["album"]["name"],
-        "track_number": payload["position"],
+        "track_number": payload.get("position") or 1,
         "disc_number": payload.get("disc"),
         "artist": payload["artists"][0]["name"],
         "album_artist": payload["album"]["artists"][0]["name"],
