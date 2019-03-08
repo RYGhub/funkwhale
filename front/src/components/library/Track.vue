@@ -15,9 +15,10 @@
             <div class="content">
               {{ track.title }}
               <div class="sub header">
-                <translate
+                <span
+                  v-translate="{album: track.album.title, artist: track.artist.name}"
                   :translate-params="{album: track.album.title, artist: track.artist.name}"
-                >From album %{ album } by %{ artist }</translate>
+                >From album %{ album } by %{ artist }</span>
               </div>
               <br>
               <div class="ui basic buttons">
