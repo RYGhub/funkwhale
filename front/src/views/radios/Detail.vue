@@ -24,15 +24,15 @@
           </router-link>
           <dangerous-button class="labeled icon" :action="deleteRadio">
             <i class="trash icon"></i> Delete
-            <p slot="modal-header"><translate :translate-context="'Popup/Radio/Title'" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</translate></p>
-            <p slot="modal-content"><translate :translate-context="'Popup/Radio/Paragraph'">This will completely delete this radio and cannot be undone.</translate></p>
-            <div slot="modal-confirm"><translate :translate-context="'Popup/Radio/Button.Label/Verb'">Delete radio</translate></div>
+            <p slot="modal-header"><translate translate-context="Popup/Radio/Title" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</translate></p>
+            <p slot="modal-content"><translate translate-context="Popup/Radio/Paragraph">This will completely delete this radio and cannot be undone.</translate></p>
+            <div slot="modal-confirm"><translate translate-context="Popup/Radio/Button.Label/Verb">Delete radio</translate></div>
           </dangerous-button>
         </template>
       </div>
     </section>
     <section class="ui vertical stripe segment">
-      <h2><translate :translate-context="'Content/*/*'">Tracks</translate></h2>
+      <h2><translate translate-context="Content/*/*">Tracks</translate></h2>
       <track-table :tracks="tracks"></track-table>
       <div class="ui center aligned basic segment">
         <pagination

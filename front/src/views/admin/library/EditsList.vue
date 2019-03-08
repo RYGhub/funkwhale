@@ -2,7 +2,7 @@
   <main v-title="labels.title">
     <section class="ui vertical stripe segment">
       <edits-card-list :update-url="true" :default-query="defaultQuery">
-        <h2 class="ui header"><translate :translate-context="'Content/Admin/Title/Noun'">Library edits</translate></h2>
+        <h2 class="ui header"><translate translate-context="Content/Admin/Title/Noun">Library edits</translate></h2>
       </edits-card-list>
     </section>
   </main>

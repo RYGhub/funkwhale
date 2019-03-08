@@ -1,27 +1,27 @@
 <template>
   <modal @update:show="$emit('update:show', $event); isError = false" :show="show">
-    <div class="header"><translate :translate-context="'Popup/Instance/Title'">Choose your instance</translate></div>
+    <div class="header"><translate translate-context="Popup/Instance/Title">Choose your instance</translate></div>
     <div class="scrolling content">
       <div v-if="isError" class="ui negative message">
-        <div class="header"><translate :translate-context="'Popup/Instance/Error message.Title'">It is not possible to connect to the given URL</translate></div>
+        <div class="header"><translate translate-context="Popup/Instance/Error message.Title">It is not possible to connect to the given URL</translate></div>
         <ul class="list">
-          <li><translate :translate-context="'Popup/Instance/Error message.List item'">The server might be down</translate></li>
-          <li><translate :translate-context="'Popup/Instance/Error message.List item'">The given address is not a Funkwhale server</translate></li>
+          <li><translate translate-context="Popup/Instance/Error message.List item">The server might be down</translate></li>
+          <li><translate translate-context="Popup/Instance/Error message.List item">The given address is not a Funkwhale server</translate></li>
         </ul>
       </div>
       <form class="ui form" @submit.prevent="checkAndSwitch(instanceUrl)">
-        <p v-if="$store.state.instance.instanceUrl" class="description" :translate-context="'Popup/Login/Paragraph'" v-translate="{url: $store.state.instance.instanceUrl, hostname: instanceHostname }">
+        <p v-if="$store.state.instance.instanceUrl" class="description" translate-context="Popup/Login/Paragraph" v-translate="{url: $store.state.instance.instanceUrl, hostname: instanceHostname }">
             You are currently connected to <a href="%{ url }" target="_blank">%{ hostname }&nbsp;<i class="external icon"></i></a>. If you continue, you will be disconnected from your current instance and all your local data will be deleted.
         </p>
         <p v-else>
-          <translate :translate-context="'Popup/Instance/Paragraph'">To continue, please select the Funkwhale instance you want to connect to. Enter the address directly, or select one of the suggested choices.</translate>
+          <translate translate-context="Popup/Instance/Paragraph">To continue, please select the Funkwhale instance you want to connect to. Enter the address directly, or select one of the suggested choices.</translate>
         </p>
         <div class="field">
-          <label><translate :translate-context="'Popup/Instance/Input.Label/Noun'">Instance URL</translate></label>
+          <label><translate translate-context="Popup/Instance/Input.Label/Noun">Instance URL</translate></label>
           <div class="ui action input">
             <input type="text" v-model="instanceUrl" placeholder="https://funkwhale.server">
             <button type="submit" :class="['ui', 'icon', {loading: isLoading}, 'button']">
-              <translate :translate-context="'*/*/Button.Label/Verb'">Submit</translate>
+              <translate translate-context="*/*/Button.Label/Verb">Submit</translate>
             </button>
           </div>
         </div>
@@ -29,13 +29,13 @@
       <div class="ui hidden divider"></div>
       <form class="ui form" @submit.prevent="">
         <div class="field">
-          <label><translate :translate-context="'Popup/Instance/List.Label'">Suggested choices</translate></label>
+          <label><translate translate-context="Popup/Instance/List.Label">Suggested choices</translate></label>
           <button v-for="url in suggestedInstances" @click="checkAndSwitch(url)" class="ui basic button">{{ url }}</button>
         </div>
       </form>
     </div>
     <div class="actions">
-      <div class="ui cancel button"><translate :translate-context="'*/*/Button.Label/Verb'">Cancel</translate></div>
+      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
     </div>
   </modal>
 </template>

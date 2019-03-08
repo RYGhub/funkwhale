@@ -1,13 +1,13 @@
 <template>
   <form class="ui form" @submit.prevent="scan">
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header"><translate :translate-context="'Content/Library/Error message.Title'">Could not fetch remote library</translate></div>
+      <div class="header"><translate translate-context="Content/Library/Error message.Title">Could not fetch remote library</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div class="ui field">
-      <label><translate :translate-context="'Content/Library/Input.Label/Verb'">Search a remote library</translate></label>
+      <label><translate translate-context="Content/Library/Input.Label/Verb">Search a remote library</translate></label>
       <div :class="['ui', 'action', {loading: isLoading}, 'input']">
         <input name="url" v-model="query" :placeholder="labels.placeholder" type="url">
         <button type="submit" class="ui icon button">

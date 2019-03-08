@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.users">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate :translate-context="'*/Admin/Title'">Users</translate></h2>
+      <h2 class="ui header"><translate translate-context="*/Admin/Title">Users</translate></h2>
       <div class="ui hidden divider"></div>
       <users-table></users-table>
     </section>

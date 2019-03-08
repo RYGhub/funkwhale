@@ -1,7 +1,7 @@
 <template>
   <modal @update:show="$emit('update:show', $event)" :show="show">
     <header class="header">
-      <translate :translate-context="'Popup/Keyboard shortcuts/Title'">Keyboard shortcuts</translate>
+      <translate translate-context="Popup/Keyboard shortcuts/Title">Keyboard shortcuts</translate>
     </header>
     <section class="scrolling content">
       <table
@@ -18,7 +18,7 @@
       </table>
     </section>
     <footer class="actions">
-      <div class="ui cancel button"><translate :translate-context="'Popup/Keyboard shortcuts/Button.Label/Verb'">Close</translate></div>
+      <div class="ui cancel button"><translate translate-context="Popup/Keyboard shortcuts/Button.Label/Verb">Close</translate></div>
     </footer>
   </modal>
 </template>

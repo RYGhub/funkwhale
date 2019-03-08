@@ -7,25 +7,25 @@
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
-      <template v-if="!discrete && !iconOnly"><slot><translate :translate-context="'*/Queue/Button/Label/Short, Verb'">Play</translate></slot></template>
+      <template v-if="!discrete && !iconOnly"><slot><translate translate-context="*/Queue/Button/Label/Short, Verb">Play</translate></slot></template>
     </button>
     <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])" :title="title" ></i>
       <div class="menu">
         <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue">
-          <i class="plus icon"></i><translate :translate-context="'*/Queue/Dropdown/Button/Label/Short'">Add to queue</translate>
+          <i class="plus icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Add to queue</translate>
         </button>
         <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext">
-          <i class="step forward icon"></i><translate :translate-context="'*/Queue/Dropdown/Button/Label/Short'">Play next</translate>
+          <i class="step forward icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Play next</translate>
         </button>
         <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow">
-          <i class="play icon"></i><translate :translate-context="'*/Queue/Dropdown/Button/Label/Short'">Play now</translate>
+          <i class="play icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Play now</translate>
         </button>
         <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio">
-          <i class="feed icon"></i><translate :translate-context="'*/Queue/Dropdown/Button/Label/Short'">Start radio</translate>
+          <i class="feed icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Start radio</translate>
         </button>
         <button v-if="filterableArtist" class="item basic" :disabled="!filterableArtist" @click.stop.prevent="filterArtist" :title="labels.hideArtist">
-          <i class="eye slash outline icon"></i><translate :translate-context="'*/Queue/Dropdown/Button/Label/Short'">Hide content from this artist</translate>
+          <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
         </button>
       </div>
     </div>

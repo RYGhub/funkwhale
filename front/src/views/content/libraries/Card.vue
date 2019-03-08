@@ -37,15 +37,15 @@
           {{ library.size | humanSize }}
         </span>
         <i class="music icon"></i>
-        <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate translate-context="Content/Library/Card.List item" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
     </div>
     <div class="ui bottom basic attached buttons">
       <router-link :to="{name: 'content.libraries.detail.upload', params: {id: library.uuid}}" class="ui button">
-        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Upload</translate>
+        <translate translate-context="Content/Library/Card.Button.Label/Verb">Upload</translate>
       </router-link>
       <router-link :to="{name: 'content.libraries.detail', params: {id: library.uuid}}" exact class="ui button">
-        <translate :translate-context="'Content/Library/Card.Button.Label/Noun'">Details</translate>
+        <translate translate-context="Content/Library/Card.Button.Label/Noun">Details</translate>
       </router-link>
     </div>
   </div>

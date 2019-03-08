@@ -1,11 +1,11 @@
 <template>
   <form class="ui form" @submit.prevent="createOrUpdate">
     <h3 class="ui header">
-      <translate :translate-context="'Content/Moderation/Card.Title/Verb'" v-if="object" key="1">Edit moderation rule</translate>
-      <translate :translate-context="'Content/Moderation/Card.Button.Label/Verb'" v-else key="2">Add a new moderation rule</translate>
+      <translate translate-context="Content/Moderation/Card.Title/Verb" v-if="object" key="1">Edit moderation rule</translate>
+      <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-else key="2">Add a new moderation rule</translate>
     </h3>
     <div v-if="errors && errors.length > 0" class="ui negative message">
-      <div class="header"><translate :translate-context="'Content/Moderation/Error message.Title'">Error while creating rule</translate></div>
+      <div class="header"><translate translate-context="Content/Moderation/Error message.Title">Error while creating rule</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
@@ -15,15 +15,15 @@
       <div class="ui toggle checkbox">
         <input id="policy-is-active" v-model="current.isActive" type="checkbox">
         <label for="policy-is-active">
-          <translate :translate-context="'*/*/*'" v-if="current.isActive" key="1">Enabled</translate>
-          <translate :translate-context="'*/*/*'" v-else key="2">Disabled</translate>
+          <translate translate-context="*/*/*" v-if="current.isActive" key="1">Enabled</translate>
+          <translate translate-context="*/*/*" v-else key="2">Disabled</translate>
           <tooltip :content="labels.isActiveHelp" />
         </label>
       </div>
     </div>
     <div class="field">
       <label for="policy-summary">
-        <translate :translate-context="'Content/Moderation/Input.Label/Noun'">Reason</translate>
+        <translate translate-context="Content/Moderation/Input.Label/Noun">Reason</translate>
         <tooltip :content="labels.summaryHelp" />
       </label>
       <textarea name="policy-summary" id="policy-summary" rows="5" v-model="current.summary"></textarea>
@@ -32,13 +32,13 @@
       <div class="ui toggle checkbox">
         <input id="policy-is-active" v-model="current.blockAll" type="checkbox">
         <label for="policy-is-active">
-          <translate :translate-context="'Content/Moderation/Checkbox.Label/Verb'">Block everything</translate>
+          <translate translate-context="Content/Moderation/Checkbox.Label/Verb">Block everything</translate>
           <tooltip :content="labels.blockAllHelp" />
         </label>
       </div>
     </div>
     <div class="ui horizontal divider">
-      <translate :translate-context="'Content/Moderation/Card.Title'">Or customize your rule</translate>
+      <translate translate-context="Content/Moderation/Card.Title">Or customize your rule</translate>
     </div>
     <div v-for="config in fieldConfig" :class="['field']">
       <div class="ui toggle checkbox">
@@ -52,22 +52,22 @@
     </div>
     <div class="ui hidden divider"></div>
     <button @click="$emit('cancel')" class="ui basic left floated button">
-      <translate :translate-context="'Content/Moderation/Card.Button.Label/Verb'">Cancel</translate>
+      <translate translate-context="Content/Moderation/Card.Button.Label/Verb">Cancel</translate>
     </button>
     <button :class="['ui', 'right', 'floated', 'green', {'disabled loading': isLoading}, 'button']" :disabled="isLoading">
-      <translate :translate-context="'Content/Moderation/Card.Button.Label/Verb'" v-if="object" key="1">Update</translate>
-      <translate :translate-context="'Content/Moderation/Card.Button.Label/Verb'" v-else key="2">Create</translate>
+      <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-if="object" key="1">Update</translate>
+      <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-else key="2">Create</translate>
     </button>
     <dangerous-button v-if="object" class="right floated basic button" color='red' @confirm="remove">
-      <translate :translate-context="'Content/Moderation/Card.Button.Label/Verb'">Delete</translate>
+      <translate translate-context="Content/Moderation/Card.Button.Label/Verb">Delete</translate>
       <p slot="modal-header">
-        <translate :translate-context="'Popup/Moderation/Title'">Delete this moderation rule?</translate>
+        <translate translate-context="Popup/Moderation/Title">Delete this moderation rule?</translate>
       </p>
       <p slot="modal-content">
-        <translate :translate-context="'Popup/Moderation/Paragraph'">This action is irreversible.</translate>
+        <translate translate-context="Popup/Moderation/Paragraph">This action is irreversible.</translate>
       </p>
       <div slot="modal-confirm">
-        <translate :translate-context="'Popup/Moderation/Button.Label/Verb'">Delete moderation rule</translate>
+        <translate translate-context="Popup/Moderation/Button.Label/Verb">Delete moderation rule</translate>
       </div>
     </dangerous-button>
   </form>

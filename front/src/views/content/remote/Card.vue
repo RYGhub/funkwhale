@@ -24,44 +24,44 @@
       </div>
       <div class="meta">
         <i class="music icon"></i>
-        <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate translate-context="Content/Library/Card.List item" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
       <div v-if="displayScan && latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
           <i class="hourglass icon"></i>
-          <translate :translate-context="'Content/Library/Card.List item'">Scan pending</translate>
+          <translate translate-context="Content/Library/Card.List item">Scan pending</translate>
         </template>
         <template v-if="latestScan.status === 'scanning'">
           <i class="loading spinner icon"></i>
-          <translate :translate-context="'Content/Library/Card.List item'" :translate-params="{progress: scanProgress}">Scanning… (%{ progress }%)</translate>
+          <translate translate-context="Content/Library/Card.List item" :translate-params="{progress: scanProgress}">Scanning… (%{ progress }%)</translate>
         </template>
         <template v-else-if="latestScan.status === 'errored'">
           <i class="red download icon"></i>
-          <translate :translate-context="'Content/Library/Card.List item'">Problem during scanning</translate>
+          <translate translate-context="Content/Library/Card.List item">Problem during scanning</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files === 0">
           <i class="green download icon"></i>
-          <translate :translate-context="'Content/Library/Card.List item'">Scanned</translate>
+          <translate translate-context="Content/Library/Card.List item">Scanned</translate>
         </template>
         <template v-else-if="latestScan.status === 'finished' && latestScan.errored_files > 0">
           <i class="yellow download icon"></i>
-          <translate :translate-context="'Content/Library/Card.List item'">Scanned with errors</translate>
+          <translate translate-context="Content/Library/Card.List item">Scanned with errors</translate>
         </template>
         <span class="link right floated" @click="showScan = !showScan">
-          <translate :translate-context="'Content/Library/Card.Link'">Details</translate>
+          <translate translate-context="Content/Library/Card.Link">Details</translate>
           <i v-if="showScan" class="angle down icon" />
           <i v-else class="angle right icon" />
         </span>
         <div v-if="showScan">
           <template v-if="latestScan.modification_date">
-            <translate :translate-context="'Content/Library/Card.List item/Noun'">Last update:</translate><human-date :date="latestScan.modification_date" /><br />
+            <translate translate-context="Content/Library/Card.List item/Noun">Last update:</translate><human-date :date="latestScan.modification_date" /><br />
           </template>
-          <translate :translate-context="'Content/Library/Card.List item/Noun'">Failed tracks:</translate> {{ latestScan.errored_files }}
+          <translate translate-context="Content/Library/Card.List item/Noun">Failed tracks:</translate> {{ latestScan.errored_files }}
         </div>
       </div>
       <div v-if="displayScan && canLaunchScan" class="clearfix">
         <span class="right floated link" @click="launchScan">
-          <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Scan now</translate> <i class="paper plane icon" />
+          <translate translate-context="Content/Library/Card.Button.Label/Verb">Scan now</translate> <i class="paper plane icon" />
         </span>
       </div>
     </div>
@@ -71,7 +71,7 @@
     <div v-if="displayCopyFid" class="extra content">
       <div class="ui form">
         <div class="field">
-          <label><translate :translate-context="'Content/Library/Title'">Sharing link</translate></label>
+          <label><translate translate-context="Content/Library/Title">Sharing link</translate></label>
           <copy-input :button-classes="'basic'" :value="library.fid" />
         </div>
       </div>
@@ -81,29 +81,29 @@
         v-if="!library.follow"
         @click="follow()"
         :class="['ui', 'green', {'loading': isLoadingFollow}, 'button']">
-        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Follow</translate>
+        <translate translate-context="Content/Library/Card.Button.Label/Verb">Follow</translate>
       </button>
       <button
         v-else-if="!library.follow.approved"
         class="ui disabled button"><i class="hourglass icon"></i>
-        <translate :translate-context="'Content/Library/Card.Paragraph'">Follow request pending approval</translate>
+        <translate translate-context="Content/Library/Card.Paragraph">Follow request pending approval</translate>
       </button>
       <button
         v-else-if="!library.follow.approved"
         class="ui disabled button"><i class="check icon"></i>
-        <translate :translate-context="'Content/Library/Card.Paragraph'">Following</translate>
+        <translate translate-context="Content/Library/Card.Paragraph">Following</translate>
       </button>
       <dangerous-button
         v-else-if="library.follow.approved"
         color=""
         :class="['ui', 'button']"
         :action="unfollow">
-        <translate :translate-context="'Content/Library/Card.Button.Label/Verb'">Unfollow</translate>
-        <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Unfollow this library?</translate></p>
+        <translate translate-context="Content/Library/Card.Button.Label/Verb">Unfollow</translate>
+        <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
         <div slot="modal-content">
-          <p><translate :translate-context="'Popup/Library/Paragraph'">By unfollowing this library, you loose access to its content.</translate></p>
+          <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
         </div>
-        <div slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Unfollow</translate></div>
+        <div slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Unfollow</translate></div>
       </dangerous-button>
     </div>
   </div>

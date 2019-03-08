@@ -4,7 +4,7 @@
     v-if="button"
     :class="['ui', 'icon', 'labeled', 'button']">
     <i class="list icon"></i>
-    <translate :translate-context="'Sidebar/Player/Icon.Tooltip/Verb'">Add to playlist…</translate>
+    <translate translate-context="Sidebar/Player/Icon.Tooltip/Verb">Add to playlist…</translate>
   </button>
   <button
     v-else

@@ -3,7 +3,7 @@
     <section class="ui vertical center aligned stripe segment">
       <div :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
         <div class="ui text loader">
-          <translate :translate-context="'Content/Favorites/Message'">Loading your favorites…</translate>
+          <translate translate-context="Content/Favorites/Message">Loading your favorites…</translate>
         </div>
       </div>
       <h2 v-if="results" class="ui center aligned icon header">
@@ -12,7 +12,7 @@
           translate-plural="%{ count } favorites"
           :translate-n="$store.state.favorites.count"
           :translate-params="{count: results.count}"
-          :translate-context="'Content/Favorites/Title'">
+          translate-context="Content/Favorites/Title">
           1 favorite
         </translate>
       </h2>
@@ -22,7 +22,7 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label><translate :translate-context="'Content/Favorites/Dropdown.Title/Short, Name'">Ordering</translate></label>
+            <label><translate translate-context="Content/Favorites/Dropdown.Title/Short, Name">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
@@ -30,14 +30,14 @@
             </select>
           </div>
           <div class="field">
-            <label><translate :translate-context="'Content/*/Dropdown.Label/Short, Name'">Order</translate></label>
+            <label><translate translate-context="Content/*/Dropdown.Label/Short, Name">Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+"><translate :translate-context="'Content/*/Dropdown/Short'">Ascending</translate></option>
-              <option value="-"><translate :translate-context="'Content/*/Short'">Descending</translate></option>
+              <option value="+"><translate translate-context="Content/*/Dropdown/Short">Ascending</translate></option>
+              <option value="-"><translate translate-context="Content/*/Short">Descending</translate></option>
             </select>
           </div>
           <div class="field">
-            <label><translate :translate-context="'Content/*/Dropdown.Label/Short, Name'">Results per page</translate></label>
+            <label><translate translate-context="Content/*/Dropdown.Label/Short, Name">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>

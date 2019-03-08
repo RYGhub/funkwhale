@@ -11,7 +11,7 @@
             <div class="content">
               {{ artist.name }}
               <div class="sub header" v-if="albums">
-                <translate :translate-context="'Content/Artist/Paragraph'"
+                <translate translate-context="Content/Artist/Paragraph"
                   tag="div"
                   translate-plural="%{ count } tracks in %{ albumsCount } albums"
                   :translate-n="totalTracks"
@@ -24,27 +24,27 @@
           <div class="ui hidden divider"></div>
           <radio-button type="artist" :object-id="artist.id"></radio-button>
           <play-button :is-playable="isPlayable" class="orange" :artist="artist">
-            <translate :translate-context="'Content/Artist/Button.Label/Verb'">Play all albums</translate>
+            <translate translate-context="Content/Artist/Button.Label/Verb">Play all albums</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
-            <translate :translate-context="'Content/*/Button.Label/Verb'">Search on Wikipedia</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <translate :translate-context="'Content/*/Button.Label/Verb'">View on MusicBrainz</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">View on MusicBrainz</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
               @click="showEmbedModal = !showEmbedModal"
               class="ui button icon labeled">
               <i class="code icon"></i>
-              <translate :translate-context="'Content/*/Button.Label/Verb'">Embed</translate>
+              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
             </button>
             <modal :show.sync="showEmbedModal">
               <div class="header">
-                <translate :translate-context="'Popup/Artist/Title/Verb'">Embed this artist work on your website</translate>
+                <translate translate-context="Popup/Artist/Title/Verb">Embed this artist work on your website</translate>
               </div>
               <div class="content">
                 <div class="description">
@@ -54,7 +54,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate :translate-context="'Popup/*/Button.Label/Verb'">Cancel</translate>
+                  <translate translate-context="Popup/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -68,10 +68,10 @@
             <translate>You are currently hiding content related to this artist.</translate>
           </p>
           <router-link class="right floated" :to="{name: 'settings'}">
-            <translate :translate-context="'Content/Moderation/Link'">Review my filters</translate>
+            <translate translate-context="Content/Moderation/Link">Review my filters</translate>
           </router-link>
           <button @click="$store.dispatch('moderation/deleteContentFilter', contentFilter.uuid)" class="ui basic tiny button">
-            <translate :translate-context="'Content/Moderation/Button.Label'">Remove filter</translate>
+            <translate translate-context="Content/Moderation/Button.Label">Remove filter</translate>
           </button>
         </div>
       </div>
@@ -80,7 +80,7 @@
       </section>
       <section v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
         <h2>
-          <translate :translate-context="'Content/Artist/Title'">Albums by this artist</translate>
+          <translate translate-context="Content/Artist/Title">Albums by this artist</translate>
         </h2>
         <div class="ui cards" >
           <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in albums"></album-card>
@@ -88,16 +88,16 @@
       </section>
       <section v-if="tracks.length > 0" class="ui vertical stripe segment">
         <h2>
-          <translate :translate-context="'Content/Artist/Title'">Tracks by this artist</translate>
+          <translate translate-context="Content/Artist/Title">Tracks by this artist</translate>
         </h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </section>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate :translate-context="'Content/Artist/Title'">User libraries</translate>
+          <translate translate-context="Content/Artist/Title">User libraries</translate>
         </h2>
         <library-widget @loaded="libraries = $event" :url="'artists/' + id + '/libraries/'">
-          <translate :translate-context="'Content/Artist/Paragraph'" slot="subtitle">This artist is present in the following libraries:</translate>
+          <translate translate-context="Content/Artist/Paragraph" slot="subtitle">This artist is present in the following libraries:</translate>
         </library-widget>
       </section>
     </template>

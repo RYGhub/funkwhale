@@ -2,7 +2,7 @@
   <div>
     <div class="ui two column row">
       <div class="column">
-        <h3 class="ui header"><translate :translate-context="'Content/Library/Title'">Current library</translate></h3>
+        <h3 class="ui header"><translate translate-context="Content/Library/Title">Current library</translate></h3>
         <library-card :library="library" />
       </div>
     </div>
