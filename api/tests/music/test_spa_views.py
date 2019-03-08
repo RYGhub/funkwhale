@@ -149,6 +149,7 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
 
 def test_library_artist(spa_html, no_api_auth, client, factories, settings):
     album = factories["music.Album"]()
+    factories["music.Upload"](playable=True, track__album=album)
     artist = album.artist
     url = "/library/artists/{}".format(artist.pk)
 
@@ -169,6 +170,25 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
                 settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
             ),
         },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/json+oembed",
+            "href": (
+                utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
+                + "?format=json&url={}".format(
+                    urllib.parse.quote_plus(utils.join_url(settings.FUNKWHALE_URL, url))
+                )
+            ),
+        },
+        {"tag": "meta", "property": "twitter:card", "content": "player"},
+        {
+            "tag": "meta",
+            "property": "twitter:player",
+            "content": serializers.get_embed_url("artist", id=artist.id),
+        },
+        {"tag": "meta", "property": "twitter:player:width", "content": "600"},
+        {"tag": "meta", "property": "twitter:player:height", "content": "400"},
     ]
 
     metas = utils.parse_meta(response.content.decode())

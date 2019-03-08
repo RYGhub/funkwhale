@@ -701,3 +701,38 @@ def test_oembed_album(factories, no_api_auth, api_client, settings):
     response = api_client.get(url, {"url": album_url, "format": "json"})
 
     assert response.data == expected
+
+
+def test_oembed_artist(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    track = factories["music.Track"]()
+    album = track.album
+    artist = track.artist
+    url = reverse("api:v1:oembed")
+    artist_url = "https://test.com/library/artists/{}".format(artist.pk)
+    iframe_src = "http://embed?type=artist&id={}".format(artist.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": artist.name,
+        "description": artist.name,
+        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": artist_url, "format": "json"})
+
+    assert response.data == expected

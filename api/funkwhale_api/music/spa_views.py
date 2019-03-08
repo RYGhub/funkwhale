@@ -2,6 +2,7 @@ import urllib.parse
 
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import Q
 
 from funkwhale_api.common import utils
 
@@ -183,4 +184,22 @@ def library_artist(request, pk):
             }
         )
 
+    if (
+        models.Upload.objects.filter(Q(track__artist=obj) | Q(track__album__artist=obj))
+        .playable_by(None)
+        .exists()
+    ):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/json+oembed",
+                "href": (
+                    utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
+                    + "?format=json&url={}".format(urllib.parse.quote_plus(artist_url))
+                ),
+            }
+        )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="artist", id=obj.pk)
     return metas

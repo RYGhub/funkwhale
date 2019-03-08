@@ -35,6 +35,30 @@
             <i class="external icon"></i>
             <translate :translate-context="'Content/*/Button.Label/Verb'">View on MusicBrainz</translate>
           </a>
+          <template v-if="publicLibraries.length > 0">
+            <button
+              @click="showEmbedModal = !showEmbedModal"
+              class="ui button icon labeled">
+              <i class="code icon"></i>
+              <translate :translate-context="'Content/*/Button.Label/Verb'">Embed</translate>
+            </button>
+            <modal :show.sync="showEmbedModal">
+              <div class="header">
+                <translate :translate-context="'Popup/Artist/Title/Verb'">Embed this artist work on your website</translate>
+              </div>
+              <div class="content">
+                <div class="description">
+                  <embed-wizard type="artist" :id="artist.id" />
+
+                </div>
+              </div>
+              <div class="actions">
+                <div class="ui deny button">
+                  <translate :translate-context="'Popup/*/Button.Label/Verb'">Cancel</translate>
+                </div>
+              </div>
+            </modal>
+          </template>
         </div>
       </section>
       <div class="ui small text container" v-if="contentFilter">
@@ -72,7 +96,7 @@
         <h2>
           <translate :translate-context="'Content/Artist/Title'">User libraries</translate>
         </h2>
-        <library-widget :url="'artists/' + id + '/libraries/'">
+        <library-widget @loaded="libraries = $event" :url="'artists/' + id + '/libraries/'">
           <translate :translate-context="'Content/Artist/Paragraph'" slot="subtitle">This artist is present in the following libraries:</translate>
         </library-widget>
       </section>
@@ -90,6 +114,8 @@ import RadioButton from "@/components/radios/Button"
 import PlayButton from "@/components/audio/PlayButton"
 import TrackTable from "@/components/audio/track/Table"
 import LibraryWidget from "@/components/federation/LibraryWidget"
+import EmbedWizard from "@/components/audio/EmbedWizard"
+import Modal from '@/components/semantic/Modal'
 
 export default {
   props: ["id"],
@@ -98,7 +124,9 @@ export default {
     RadioButton,
     PlayButton,
     TrackTable,
-    LibraryWidget
+    LibraryWidget,
+    EmbedWizard,
+    Modal
   },
   data() {
     return {
@@ -108,7 +136,9 @@ export default {
       albums: null,
       totalTracks: 0,
       totalAlbums: 0,
-      tracks: []
+      tracks: [],
+      libraries: [],
+      showEmbedModal: false
     }
   },
   created() {
@@ -184,6 +214,12 @@ export default {
         .map(album => {
           return album.cover
         })[0]
+    },
+
+    publicLibraries () {
+      return this.libraries.filter(l => {
+        return l.privacy_level === 'everyone'
+      })
     },
     headerStyle() {
       if (!this.cover || !this.cover.original) {
