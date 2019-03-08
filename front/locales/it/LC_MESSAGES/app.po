@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-29 10:47+0100\n"
-"PO-Revision-Date: 2019-01-15 08:57+0000\n"
+"PO-Revision-Date: 2019-02-02 07:51+0000\n"
 "Last-Translator: Sylke Vicious <silkevicious@tuta.io>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -90,9 +90,8 @@ msgid "%{ username } followed your library \"%{ library }\""
 msgstr "%{ username } segue la tua libreria \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:41
-#, fuzzy
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } segue la tua libreria \"%{ library }\""
+msgstr "%{ username } vuole seguire la tua libreria \"%{ library }\""
 
 #: front/src/components/auth/Profile.vue:46
 msgid "%{ username }'s profile"
@@ -585,9 +584,8 @@ msgid "Copy"
 msgstr "Copia"
 
 #: front/src/components/playlists/Editor.vue:163
-#, fuzzy
 msgid "Copy queued tracks to playlist"
-msgstr "Copia tracce dalla tua coda corrente alla playlist"
+msgstr "Copia tracce dalla coda alla playlist"
 
 #: front/src/components/audio/EmbedWizard.vue:21
 msgid "Copy/paste this code in your website HTML"
@@ -1374,9 +1372,8 @@ msgid "Loading notifications…"
 msgstr "Caricando le notifiche…"
 
 #: front/src/views/content/remote/Home.vue:3
-#, fuzzy
 msgid "Loading remote libraries…"
-msgstr "Caricando le librerie remote..."
+msgstr "Caricando le librerie remote…"
 
 #: front/src/views/content/libraries/Quota.vue:4
 msgid "Loading usage data…"
@@ -1483,9 +1480,8 @@ msgid "Media player"
 msgstr "Riproduttore musicale"
 
 #: front/src/components/auth/Profile.vue:12
-#, fuzzy
 msgid "Member since %{ date }"
-msgstr "Registrato da %{ date }"
+msgstr "Membro da %{ date }"
 
 #: front/src/components/Footer.vue:32
 msgid "Mobile and desktop apps"
@@ -1518,14 +1514,12 @@ msgstr "Muto"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:24
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:115
-#, fuzzy
 msgid "Mute activity"
-msgstr "Ultime attività"
+msgstr "Silenzia attività"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:28
-#, fuzzy
 msgid "Mute notifications"
-msgstr "Le tue notifiche"
+msgstr "Silenzia notifiche"
 
 #: front/src/components/Sidebar.vue:34
 msgid "My account"
@@ -1618,9 +1612,8 @@ msgid "No matching library."
 msgstr "Nessuna libreria corrispondente."
 
 #: front/src/views/Notifications.vue:26
-#, fuzzy
 msgid "No notification to show."
-msgstr "Ancora nessuna notifica."
+msgstr "Nessuna notifica da visualizzare."
 
 #: front/src/components/mixins/Translations.vue:10
 #: front/src/components/playlists/Form.vue:81
@@ -1799,9 +1792,8 @@ msgid "Play track"
 msgstr "Riproduci traccia"
 
 #: front/src/components/audio/PlayButton.vue:70
-#, fuzzy
 msgid "Play..."
-msgstr "Riproduci"
+msgstr "Riproduci..."
 
 #: front/src/views/playlists/Detail.vue:90
 msgid "Playlist"
@@ -2119,14 +2111,12 @@ msgid "Search a remote library"
 msgstr "Cerca una libreria remota"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
-#, fuzzy
 msgid "Search by domain, username, bio…"
-msgstr "Cerca per dominio, nome utente, descrizione..."
+msgstr "Cerca per dominio, nome utente, descrizione…"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:151
-#, fuzzy
 msgid "Search by name…"
-msgstr "Cerca per nome..."
+msgstr "Cerca per nome…"
 
 #: front/src/views/content/libraries/FilesTable.vue:201
 msgid "Search by title, artist, album…"
@@ -2390,9 +2380,8 @@ msgid "The music files you are uploading are tagged properly:"
 msgstr "I file musicali che stai caricando sono correttamente etichettati:"
 
 #: front/src/components/audio/Player.vue:67
-#, fuzzy
 msgid "The next track will play automatically in a few seconds…"
-msgstr "La traccia seguente verrà riprodotta automaticamente tra pochi secondi..."
+msgstr "La traccia seguente verrà riprodotta automaticamente tra pochi secondi…"
 
 #: front/src/components/Home.vue:121
 msgid "The plaform is free and open-source, you can install it and modify it without worries"

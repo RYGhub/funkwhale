@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-29 10:47+0100\n"
-"PO-Revision-Date: 2019-01-26 17:50+0000\n"
+"PO-Revision-Date: 2019-01-31 13:58+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -90,9 +90,8 @@ msgid "%{ username } followed your library \"%{ library }\""
 msgstr "%{ username } seguís vòstra bibliotèca « %{ library } »"
 
 #: front/src/components/notifications/NotificationRow.vue:41
-#, fuzzy
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } seguís vòstra bibliotèca « %{ library } »"
+msgstr "%{ username } vòl seguir vòstra bibliotèca « %{ library } »"
 
 #: front/src/components/auth/Profile.vue:46
 msgid "%{ username }'s profile"
@@ -585,7 +584,6 @@ msgid "Copy"
 msgstr "Copiar"
 
 #: front/src/components/playlists/Editor.vue:163
-#, fuzzy
 msgid "Copy queued tracks to playlist"
 msgstr "Copiar las pistas de la fila a la lista de lectura"
 
@@ -1374,9 +1372,8 @@ msgid "Loading notifications…"
 msgstr "Cargament de las notificacions…"
 
 #: front/src/views/content/remote/Home.vue:3
-#, fuzzy
 msgid "Loading remote libraries…"
-msgstr "Cargament de las bibliotècas alonhadas..."
+msgstr "Cargament de las bibliotècas alonhadas…"
 
 #: front/src/views/content/libraries/Quota.vue:4
 msgid "Loading usage data…"
@@ -1483,9 +1480,8 @@ msgid "Media player"
 msgstr "Lector mèdia"
 
 #: front/src/components/auth/Profile.vue:12
-#, fuzzy
 msgid "Member since %{ date }"
-msgstr "Marcat dempuèi %{ date }"
+msgstr "Membre dempuèi %{ date }"
 
 #: front/src/components/Footer.vue:32
 msgid "Mobile and desktop apps"
@@ -1518,14 +1514,12 @@ msgstr "Copar lo son"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:24
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:115
-#, fuzzy
 msgid "Mute activity"
-msgstr "Darrièra activitat"
+msgstr "Amagar l’activitat"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:28
-#, fuzzy
 msgid "Mute notifications"
-msgstr "Vòstras notificacions"
+msgstr "Amagar las notificacions"
 
 #: front/src/components/Sidebar.vue:34
 msgid "My account"
@@ -1618,9 +1612,8 @@ msgid "No matching library."
 msgstr "Cap de bibliotèca correspondenta."
 
 #: front/src/views/Notifications.vue:26
-#, fuzzy
 msgid "No notification to show."
-msgstr "Cap de notificacion pel moment."
+msgstr "Cap de notificacion de mostrar."
 
 #: front/src/components/mixins/Translations.vue:10
 #: front/src/components/playlists/Form.vue:81
@@ -1799,9 +1792,8 @@ msgid "Play track"
 msgstr "Legir"
 
 #: front/src/components/audio/PlayButton.vue:70
-#, fuzzy
 msgid "Play..."
-msgstr "Legir"
+msgstr "Legir…"
 
 #: front/src/views/playlists/Detail.vue:90
 msgid "Playlist"
@@ -2119,14 +2111,12 @@ msgid "Search a remote library"
 msgstr "Cercar una bibliotèca alonhada"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
-#, fuzzy
 msgid "Search by domain, username, bio…"
-msgstr "Recercar per domenu, nom d’utilizaire, bio…"
+msgstr "Recercar per domeni, nom d’utilizaire, bio…"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:151
-#, fuzzy
 msgid "Search by name…"
-msgstr "Recercar per nom d’utilizaire…"
+msgstr "Recercar per nom…"
 
 #: front/src/views/content/libraries/FilesTable.vue:201
 msgid "Search by title, artist, album…"
@@ -2390,9 +2380,8 @@ msgid "The music files you are uploading are tagged properly:"
 msgstr "Los fichièrs musicals que sètz a enviar son etiquetats coma cal :"
 
 #: front/src/components/audio/Player.vue:67
-#, fuzzy
 msgid "The next track will play automatically in a few seconds…"
-msgstr "La pista seguenta serà legida automaticament dins una estona..."
+msgstr "La pista seguenta serà legida automaticament dins una estona…"
 
 #: front/src/components/Home.vue:121
 msgid "The plaform is free and open-source, you can install it and modify it without worries"
