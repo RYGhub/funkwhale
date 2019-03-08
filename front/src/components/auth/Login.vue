@@ -2,20 +2,20 @@
   <main class="main pusher" v-title="labels.title">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate :translate-context="'Content/Login/Title/Verb'">Log in to your Funkwhale account</translate></h2>
+        <h2><translate translate-context="Content/Login/Title/Verb">Log in to your Funkwhale account</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="error" class="ui negative message">
-            <div class="header"><translate :translate-context="'Content/Login/Error message.Title'">We cannot log you in</translate></div>
+            <div class="header"><translate translate-context="Content/Login/Error message.Title">We cannot log you in</translate></div>
             <ul class="list">
-              <li v-if="error == 'invalid_credentials'"><translate :translate-context="'Content/Login/Error message.List item/Call to action'">Please double-check your username/password couple is correct</translate></li>
-              <li v-else><translate :translate-context="'Content/Login/Error message/List item'">An unknown error happend, this can mean the server is down or cannot be reached</translate></li>
+              <li v-if="error == 'invalid_credentials'"><translate translate-context="Content/Login/Error message.List item/Call to action">Please double-check your username/password couple is correct</translate></li>
+              <li v-else><translate translate-context="Content/Login/Error message/List item">An unknown error happend, this can mean the server is down or cannot be reached</translate></li>
             </ul>
           </div>
           <div class="field">
             <label>
-              <translate :translate-context="'Content/Login/Input.Label/Noun'">Username or email</translate> |
+              <translate translate-context="Content/Login/Input.Label/Noun">Username or email</translate> |
               <router-link :to="{path: '/signup'}">
-                <translate :translate-context="'Content/Login/Link/Verb'">Create an account</translate>
+                <translate translate-context="Content/Login/Link/Verb">Create an account</translate>
               </router-link>
             </label>
             <input
@@ -31,16 +31,16 @@
           </div>
           <div class="field">
             <label>
-              <translate :translate-context="'Content/Login/Input.Label'">Password</translate> |
+              <translate translate-context="Content/Login/Input.Label">Password</translate> |
               <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
-                <translate :translate-context="'Content/Login/Link/Verb'">Reset your password</translate>
+                <translate translate-context="Content/Login/Link/Verb">Reset your password</translate>
               </router-link>
             </label>
             <password-input :index="2" required v-model="credentials.password" />
 
           </div>
           <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-             <translate :translate-context="'Content/Login/Button.Label/Verb'">Login</translate>
+             <translate translate-context="Content/Login/Button.Label/Verb">Login</translate>
           </button>
         </form>
       </div>

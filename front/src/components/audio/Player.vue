@@ -70,14 +70,14 @@
       </div>
       <div class="ui small warning message" v-if="currentTrack && errored">
         <div class="header">
-          <translate :translate-context="'Sidebar/Player/Error message.Title'">The track cannot be loaded</translate>
+          <translate translate-context="Sidebar/Player/Error message.Title">The track cannot be loaded</translate>
         </div>
         <p v-if="hasNext && playing && $store.state.player.errorCount < $store.state.player.maxConsecutiveErrors">
-          <translate :translate-context="'Sidebar/Player/Error message.Paragraph'">The next track will play automatically in a few seconds…</translate>
+          <translate translate-context="Sidebar/Player/Error message.Paragraph">The next track will play automatically in a few seconds…</translate>
           <i class="loading spinner icon"></i>
         </p>
         <p>
-          <translate :translate-context="'Sidebar/Player/Error message.Paragraph'">You may have a connectivity issue.</translate>
+          <translate translate-context="Sidebar/Player/Error message.Paragraph">You may have a connectivity issue.</translate>
         </p>
       </div>
       <div class="two wide column controls ui grid">

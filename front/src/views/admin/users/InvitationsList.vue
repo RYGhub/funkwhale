@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.invitations">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate :translate-context="'*/Admin/Title'">Invitations</translate></h2>
+      <h2 class="ui header"><translate translate-context="*/Admin/Title">Invitations</translate></h2>
       <invitation-form></invitation-form>
       <div class="ui hidden divider"></div>
       <invitations-table></invitations-table>

@@ -14,7 +14,7 @@
                 translate-plural="Playlist containing %{ count } tracks, by %{ username }"
                 :translate-n="playlist.tracks_count"
                 :translate-params="{count: playlist.tracks_count, username: playlist.user.username}"
-                :translate-context="'Content/Playlist/Header.Subtitle'">
+                translate-context="Content/Playlist/Header.Subtitle">
                 Playlist containing %{ count } track, by %{ username }
               </translate><br>
               <duration :seconds="playlist.duration" />
@@ -22,22 +22,22 @@
           </div>
         </h2>
         <div class="ui hidden divider"></div>
-        <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate></play-button>
+        <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate></play-button>
         <button
           class="ui icon labeled button"
           v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>
-          <template v-if="edit"><translate :translate-context="'Content/Playlist/Button.Label/Verb'">End edition</translate></template>
-          <template v-else><translate :translate-context="'Content/*/Button.Label/Verb'">Edit…</translate></template>
+          <template v-if="edit"><translate translate-context="Content/Playlist/Button.Label/Verb">End edition</translate></template>
+          <template v-else><translate translate-context="Content/*/Button.Label/Verb">Edit…</translate></template>
         </button>
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
-          <i class="trash icon"></i> <translate :translate-context="'Content/*/Button.Label/Verb'">Delete</translate>
+          <i class="trash icon"></i> <translate translate-context="Content/*/Button.Label/Verb">Delete</translate>
           <p slot="modal-header">
-            <translate :translate-params="{playlist: playlist.name}" :translate-context="'Popup/Playlist/Title/Call to action'">Do you want to delete the playlist "%{ playlist }"?</translate>
+            <translate :translate-params="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action">Do you want to delete the playlist "%{ playlist }"?</translate>
           </p>
-          <p slot="modal-content"><translate :translate-context="'Popup/Playlist/Paragraph'">This will completely delete this playlist and cannot be undone.</translate></p>
-          <div slot="modal-confirm"><translate :translate-context="'Popup/Playlist/Button.Label/Verb'">Delete playlist</translate></div>
+          <p slot="modal-content"><translate translate-context="Popup/Playlist/Paragraph">This will completely delete this playlist and cannot be undone.</translate></p>
+          <div slot="modal-confirm"><translate translate-context="Popup/Playlist/Button.Label/Verb">Delete playlist</translate></div>
         </dangerous-button>
       </div>
     </section>
@@ -49,7 +49,7 @@
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
-        <h2><translate :translate-context="'Content/*/Title/Name'">Tracks</translate></h2>
+        <h2><translate translate-context="Content/*/Title/Name">Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
     </section>

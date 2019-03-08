@@ -13,7 +13,7 @@
           </div>
           <div class="four wide column">
             <div class="ui sticky vertical secondary menu">
-              <div class="header item"><translate :translate-context="'Content/Admin/Menu.Title'">Sections</translate></div>
+              <div class="header item"><translate translate-context="Content/Admin/Menu.Title">Sections</translate></div>
               <a :class="['menu', {active: group.id === current}, 'item']"
                 @click.prevent="scrollTo(group.id)"
                 :href="'#' + group.id"

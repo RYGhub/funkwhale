@@ -1,43 +1,43 @@
 <template>
   <form class="ui form" @submit.prevent="submit">
-    <p v-if="!library"><translate :translate-context="'Content/Library/Paragraph'">Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family.</translate></p>
+    <p v-if="!library"><translate translate-context="Content/Library/Paragraph">Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family.</translate></p>
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header"><translate :translate-context="'Content/Library/Error message.Title'">Error</translate></div>
+      <div class="header"><translate translate-context="Content/Library/Error message.Title">Error</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div class="required field">
-      <label><translate :translate-context="'Content/Library/Input.Label'">Name</translate></label>
+      <label><translate translate-context="Content/Library/Input.Label">Name</translate></label>
       <input name="name" v-model="currentName" :placeholder="labels.namePlaceholder" required maxlength="100">
     </div>
     <div class="field">
-      <label><translate :translate-context="'Content/Library/Input.Label'">Description</translate></label>
+      <label><translate translate-context="Content/Library/Input.Label">Description</translate></label>
       <textarea v-model="currentDescription" :placeholder="labels.descriptionPlaceholder" maxlength="2000"></textarea>
     </div>
     <div class="field">
-      <label><translate :translate-context="'Content/Library/Dropdown.Label'">Visibility</translate></label>
-      <p><translate :translate-context="'Content/Library/Paragraph'">You are able to share your library with other people, regardless of its visibility.</translate></p>
+      <label><translate translate-context="Content/Library/Dropdown.Label">Visibility</translate></label>
+      <p><translate translate-context="Content/Library/Paragraph">You are able to share your library with other people, regardless of its visibility.</translate></p>
       <select class="ui dropdown" v-model="currentVisibilityLevel">
         <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ labels.visibility[c] }}</option>
       </select>
     </div>
     <button class="ui submit button" type="submit">
-      <translate :translate-context="'Content/Library/Button.Label/Verb'" v-if="library">Update library</translate>
-      <translate :translate-context="'Content/Library/Button.Label/Verb'" v-else>Create library</translate>
+      <translate translate-context="Content/Library/Button.Label/Verb" v-if="library">Update library</translate>
+      <translate translate-context="Content/Library/Button.Label/Verb" v-else>Create library</translate>
     </button>
     <dangerous-button v-if="library" class="right floated basic button" color='red' @confirm="remove()">
-      <translate :translate-context="'Content/Library/Button.Label/Verb'">Delete</translate>
+      <translate translate-context="Content/Library/Button.Label/Verb">Delete</translate>
       <p slot="modal-header">
-        <translate :translate-context="'Popup/Library/Title'">Delete this library?</translate>
+        <translate translate-context="Popup/Library/Title">Delete this library?</translate>
       </p>
       <p slot="modal-content">
-        <translate :translate-context="'Popup/Library/Paragraph'">
+        <translate translate-context="Popup/Library/Paragraph">
           The library and all its tracks will be deleted. This can not be undone.
         </translate>
       </p>
       <div slot="modal-confirm">
-        <translate :translate-context="'Popup/Library/Button.Label/Verb'">Delete library</translate>
+        <translate translate-context="Popup/Library/Button.Label/Verb">Delete library</translate>
       </div>
     </dangerous-button>
   </form>

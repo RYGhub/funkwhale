@@ -3,53 +3,53 @@
     <div>
       <section>
         <h2 class="ui header">
-          <translate :translate-context="'Content/Radio/Title'">Builder</translate>
+          <translate translate-context="Content/Radio/Title">Builder</translate>
         </h2>
-        <p><translate :translate-context="'Content/Radio/Paragraph'">You can use this interface to build your own custom radio, which will play tracks according to your criteria.</translate></p>
+        <p><translate translate-context="Content/Radio/Paragraph">You can use this interface to build your own custom radio, which will play tracks according to your criteria.</translate></p>
         <div class="ui form">
           <div v-if="success" class="ui positive message">
             <div class="header">
               <template v-if="radioName">
-                <translate :translate-context="'Content/Radio/Message'">Radio updated</translate>
+                <translate translate-context="Content/Radio/Message">Radio updated</translate>
               </template>
               <template v-else>
-                <translate :translate-context="'Content/Radio/Message'">Radio created</translate>
+                <translate translate-context="Content/Radio/Message">Radio created</translate>
               </template>
             </div>
           </div>
           <div class="">
             <div class="field">
-              <label for="name"><translate :translate-context="'Content/Radio/Input.Label/Noun'">Radio name</translate></label>
+              <label for="name"><translate translate-context="Content/Radio/Input.Label/Noun">Radio name</translate></label>
               <input id="name" name="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
             </div>
             <div class="field">
-              <label for="description"><translate :translate-context="'Content/Radio/Input.Label'">Description</translate></label>
+              <label for="description"><translate translate-context="Content/Radio/Input.Label">Description</translate></label>
               <textarea rows="2" id="description" type="text" v-model="radioDesc" :placeholder="labels.placeholder.description" />
             </div>
             <div class="ui toggle checkbox">
               <input id="public" type="checkbox" v-model="isPublic" />
-              <label for="public"><translate :translate-context="'Content/Radio/Checkbox.Label/Verb'">Display publicly</translate></label>
+              <label for="public"><translate translate-context="Content/Radio/Checkbox.Label/Verb">Display publicly</translate></label>
             </div>
             <div class="ui hidden divider"></div>
             <button :disabled="!canSave" @click="save" :class="['ui', 'green', {loading: isLoading}, 'button']">
-              <translate :translate-context="'Content/Radio/Button.Label/Verb'">Save</translate>
+              <translate translate-context="Content/Radio/Button.Label/Verb">Save</translate>
             </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
         </div>
         <div class="ui form">
           <p>
-            <translate :translate-context="'Content/Radio/Paragraph'">Add filters to customize your radio</translate>
+            <translate translate-context="Content/Radio/Paragraph">Add filters to customize your radio</translate>
           </p>
           <div class="inline field">
             <select class="ui dropdown" v-model="currentFilterType">
               <option value="">
-                <translate :translate-context="'Content/Radio/Dropdown.Placeholder/Verb'">Select a filter</translate>
+                <translate translate-context="Content/Radio/Dropdown.Placeholder/Verb">Select a filter</translate>
               </option>
               <option v-for="f in availableFilters" :value="f.type">{{ f.label }}</option>
             </select>
             <button :disabled="!currentFilterType" @click="add" class="ui button">
-              <translate :translate-context="'Content/Radio/Button.Label/Verb'">Add filter</translate>
+              <translate translate-context="Content/Radio/Button.Label/Verb">Add filter</translate>
             </button>
           </div>
           <p v-if="currentFilter">
@@ -59,11 +59,11 @@
         <table class="ui table">
           <thead>
             <tr>
-              <th class="two wide"><translate :translate-context="'Content/Radio/Table.Label/Noun'">Filter name</translate></th>
-              <th class="one wide"><translate :translate-context="'Content/Radio/Table.Label/Verb'">Exclude</translate></th>
-              <th class="six wide"><translate :translate-context="'Content/Radio/Table.Label/Verb (Value is a List of Parameters)'">Config</translate></th>
-              <th class="five wide"><translate :translate-context="'Content/Radio/Table.Label/Noun (Value is a number of Tracks)'">Candidates</translate></th>
-              <th class="two wide"><translate :translate-context="'Content/Radio/Table.Label/Noun (Value is a Button)'">Actions</translate></th>
+              <th class="two wide"><translate translate-context="Content/Radio/Table.Label/Noun">Filter name</translate></th>
+              <th class="one wide"><translate translate-context="Content/Radio/Table.Label/Verb">Exclude</translate></th>
+              <th class="six wide"><translate translate-context="Content/Radio/Table.Label/Verb (Value is a List of Parameters)">Config</translate></th>
+              <th class="five wide"><translate translate-context="Content/Radio/Table.Label/Noun (Value is a number of Tracks)">Candidates</translate></th>
+              <th class="two wide"><translate translate-context="Content/Radio/Table.Label/Noun (Value is a Button)">Actions</translate></th>
             </tr>
           </thead>
           <tbody>

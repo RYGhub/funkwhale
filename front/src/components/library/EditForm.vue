@@ -1,11 +1,11 @@
 <template>
   <div v-if="submittedMutation">
     <div class="ui positive message">
-      <div class="header"><translate :translate-context="'Content/Library/Paragraph'">Your edit was successfully submitted.</translate></div>
+      <div class="header"><translate translate-context="Content/Library/Paragraph">Your edit was successfully submitted.</translate></div>
     </div>
     <edit-card :obj="submittedMutation" :current-state="currentState" />
     <button class="ui button" @click.prevent="submittedMutation = null">
-      <translate :translate-context="'Content/Library/Button.Label'">
+      <translate translate-context="Content/Library/Button.Label">
         Submit another edit
       </translate>
     </button>
@@ -15,28 +15,28 @@
     <edit-list :filters="editListFilters" :url="mutationsUrl" :obj="object" :currentState="currentState">
       <div slot="title">
         <template v-if="showPendingReview">
-          <translate :translate-context="'Content/Library/Paragraph'">
+          <translate translate-context="Content/Library/Paragraph">
             Recent edits awaiting review
           </translate>
           <button class="ui tiny basic right floated button" @click.prevent="showPendingReview = false">
-            <translate :translate-context="'Content/Library/Button.Label'">
+            <translate translate-context="Content/Library/Button.Label">
               Show all edits
             </translate>
           </button>
         </template>
         <template v-else>
-          <translate :translate-context="'Content/Library/Paragraph'">
+          <translate translate-context="Content/Library/Paragraph">
             Recent edits
           </translate>
           <button class="ui tiny basic right floated button" @click.prevent="showPendingReview = true">
-            <translate :translate-context="'Content/Library/Button.Label'">
+            <translate translate-context="Content/Library/Button.Label">
               Retrict to unreviewed edits
             </translate>
           </button>
         </template>
       </div>
       <empty-state slot="empty-state">
-        <translate :translate-context="'Content/Library/Paragraph'">
+        <translate translate-context="Content/Library/Paragraph">
           Suggest a change using the form below.
         </translate>
       </empty-state>
@@ -44,13 +44,13 @@
     <form class="ui form" @submit.prevent="submit()">
       <div class="ui hidden divider"></div>
       <div v-if="errors.length > 0" class="ui negative message">
-        <div class="header"><translate :translate-context="'Content/Library/Error message.Title'">Error while submitting edit</translate></div>
+        <div class="header"><translate translate-context="Content/Library/Error message.Title">Error while submitting edit</translate></div>
         <ul class="list">
           <li v-for="error in errors">{{ error }}</li>
         </ul>
       </div>
       <div v-if="!canEdit" class="ui message">
-        <translate :translate-context="'Content/Library/Paragraph'">
+        <translate translate-context="Content/Library/Paragraph">
           You don't have the permission to edit this object, but you can suggest changes. Once submitted, suggestions will be reviewed before approval.
         </translate>
       </div>
@@ -62,12 +62,12 @@
         <div v-if="values[fieldConfig.id] != initialValues[fieldConfig.id]">
           <button class="ui tiny basic right floated reset button" form="noop" @click.prevent="values[fieldConfig.id] = initialValues[fieldConfig.id]">
             <i class="undo icon"></i>
-            <translate :translate-context="'Content/Library/Button.Label'" :translate-params="{value: initialValues[fieldConfig.id]}">Reset to initial value: %{ value }</translate>
+            <translate translate-context="Content/Library/Button.Label" :translate-params="{value: initialValues[fieldConfig.id]}">Reset to initial value: %{ value }</translate>
           </button>
         </div>
       </div>
       <div class="field">
-        <label for="summary"><translate :translate-context="'*/*/*'">Summary (optional)</translate></label>
+        <label for="summary"><translate translate-context="*/*/*">Summary (optional)</translate></label>
         <textarea name="change-summary" v-model="summary" id="change-summary" rows="3" :placeholder="labels.summaryPlaceholder"></textarea>
       </div>
       <router-link
@@ -75,11 +75,11 @@
         v-if="objectType === 'track'"
         :to="{name: 'library.tracks.detail', params: {id: object.id }}"
       >
-        <translate :translate-context="'Content/*/Button.Label'">Cancel</translate>
+        <translate translate-context="Content/*/Button.Label">Cancel</translate>
       </router-link>
       <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit" :disabled="isLoading || !mutationPayload">
-        <translate v-if="canEdit" key="1" :translate-context="'Content/Library/Button.Label/Verb'">Submit and apply edit</translate>
-        <translate v-else key="2" :translate-context="'Content/Library/Button.Label/Verb'">Submit suggestion</translate>
+        <translate v-if="canEdit" key="1" translate-context="Content/Library/Button.Label/Verb">Submit and apply edit</translate>
+        <translate v-else key="2" translate-context="Content/Library/Button.Label/Verb">Submit suggestion</translate>
       </button>
       </form>
     </div>

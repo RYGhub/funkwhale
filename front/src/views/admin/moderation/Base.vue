@@ -3,10 +3,10 @@
     <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.moderation.domains.list'}"><translate :translate-context="'Menu/Moderation/Tab'">Domains</translate></router-link>
+        :to="{name: 'manage.moderation.domains.list'}"><translate translate-context="Menu/Moderation/Tab">Domains</translate></router-link>
       <router-link
         class="ui item"
-        :to="{name: 'manage.moderation.accounts.list'}"><translate :translate-context="'Menu/Moderation/Tab'">Accounts</translate></router-link>
+        :to="{name: 'manage.moderation.accounts.list'}"><translate translate-context="Menu/Moderation/Tab">Accounts</translate></router-link>
 
     </nav>
     <router-view :key="$route.fullPath"></router-view>

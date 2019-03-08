@@ -363,17 +363,17 @@ Translations in HTML use the ``<translate>`` tag::
 
     <template>
       <div>
-        <h1><translate :translate-context="'Content/Profile/Header'">User profile</translate></h1>
+        <h1><translate translate-context="Content/Profile/Header">User profile</translate></h1>
         <p>
           <translate
-            :translate-context="'Content/Profile/Paragraph'"
+            translate-context="Content/Profile/Paragraph"
             :translate-params="{username: 'alice'}">
             You are logged in as %{ username }
           </translate>
         </p>
          <p>
           <translate
-            :translate-context="'Content/Profile/Paragraph'"
+            translate-context="Content/Profile/Paragraph"
             translate-plural="You have %{ count } new messages, that's a lot!"
             :translate-n="unreadMessagesCount"
             :translate-params="{count: unreadMessagesCount}">

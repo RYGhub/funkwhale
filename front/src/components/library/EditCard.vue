@@ -3,7 +3,7 @@
     <div class="content">
       <div class="header">
         <router-link :to="detailUrl">
-          <translate :translate-context="'Content/Library/Card/Short'" :translate-params="{id: obj.uuid.substring(0, 8)}">Modification %{ id }</translate>
+          <translate translate-context="Content/Library/Card/Short" :translate-params="{id: obj.uuid.substring(0, 8)}">Modification %{ id }</translate>
         </router-link>
       </div>
       <div class="meta">
@@ -11,7 +11,7 @@
           v-if="obj.target && obj.target.type === 'track'"
           :to="{name: 'library.tracks.detail', params: {id: obj.target.id }}">
           <i class="music icon"></i>
-          <translate :translate-context="'Content/Library/Card/Short'" :translate-params="{id: obj.target.id, name: obj.target.repr}">Track #%{ id } - %{ name }</translate>
+          <translate translate-context="Content/Library/Card/Short" :translate-params="{id: obj.target.id, name: obj.target.repr}">Track #%{ id } - %{ name }</translate>
         </router-link>
         <br>
         <human-date :date="obj.creation_date" :icon="true"></human-date>
@@ -19,19 +19,19 @@
         <span class="right floated">
           <span v-if="obj.is_approved && obj.is_applied">
             <i class="green check icon"></i>
-            <translate :translate-context="'Content/Library/Card/Short'">Approved and applied</translate>
+            <translate translate-context="Content/Library/Card/Short">Approved and applied</translate>
           </span>
           <span v-else-if="obj.is_approved">
             <i class="green check icon"></i>
-            <translate :translate-context="'Content/Library/Card/Short'">Approved</translate>
+            <translate translate-context="Content/Library/Card/Short">Approved</translate>
           </span>
           <span v-else-if="obj.is_approved === null">
             <i class="yellow hourglass icon"></i>
-            <translate :translate-context="'Content/Library/Card/Short'">Pending review</translate>
+            <translate translate-context="Content/Library/Card/Short">Pending review</translate>
           </span>
           <span v-else-if="obj.is_approved === false">
             <i class="red x icon"></i>
-            <translate :translate-context="'Content/Library/Card/Short'">Rejected</translate>
+            <translate translate-context="Content/Library/Card/Short">Rejected</translate>
           </span>
         </span>
       </div>
@@ -43,9 +43,9 @@
       <table v-if="obj.type === 'update'" class="ui celled very basic fixed stacking table">
         <thead>
           <tr>
-            <th><translate :translate-context="'Content/Library/Card.Table.Header/Short'">Field</translate></th>
-            <th><translate :translate-context="'Content/Library/Card.Table.Header/Short'">Old value</translate></th>
-            <th><translate :translate-context="'Content/Library/Card.Table.Header/Short'">New value</translate></th>
+            <th><translate translate-context="Content/Library/Card.Table.Header/Short">Field</translate></th>
+            <th><translate translate-context="Content/Library/Card.Table.Header/Short">Old value</translate></th>
+            <th><translate translate-context="Content/Library/Card.Table.Header/Short">New value</translate></th>
           </tr>
         </thead>
         <tbody>
@@ -58,7 +58,7 @@
               </span>
             </td>
             <td v-else>
-              <translate :translate-context="'*/*/*'">N/A</translate>
+              <translate translate-context="*/*/*">N/A</translate>
             </td>
 
             <td v-if="field.diff">
@@ -79,24 +79,24 @@
         v-if="canApprove && obj.is_approved !== true"
         @click="approve(true)"
         :class="['ui', {loading: isLoading}, 'green', 'basic', 'button']">
-        <translate :translate-context="'Content/Library/Button.Label'">Approve</translate>
+        <translate translate-context="Content/Library/Button.Label">Approve</translate>
       </button>
       <button
         v-if="canApprove && obj.is_approved === null"
         @click="approve(false)"
         :class="['ui', {loading: isLoading}, 'yellow', 'basic', 'button']">
-        <translate :translate-context="'Content/Library/Button.Label'">Reject</translate>
+        <translate translate-context="Content/Library/Button.Label">Reject</translate>
       </button>
       <dangerous-button
         v-if="canDelete"
         :class="['ui', {loading: isLoading}, 'basic button']"
         :action="remove">
-        <translate :translate-context="'*/*/*/Verb'">Delete</translate>
-        <p slot="modal-header"><translate :translate-context="'Popup/Library/Title'">Delete this suggestion?</translate></p>
+        <translate translate-context="*/*/*/Verb">Delete</translate>
+        <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this suggestion?</translate></p>
         <div slot="modal-content">
-          <p><translate :translate-context="'Popup/Library/Paragraph'">The suggestion will be completely removed, this action is irreversible.</translate></p>
+          <p><translate translate-context="Popup/Library/Paragraph">The suggestion will be completely removed, this action is irreversible.</translate></p>
         </div>
-        <p slot="modal-confirm"><translate :translate-context="'Popup/Library/Button.Label'">Delete</translate></p>
+        <p slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Delete</translate></p>
       </dangerous-button>
     </div>
   </div>

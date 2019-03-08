@@ -4,30 +4,30 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate :translate-context="'Content/Search/Input.Label/Noun'">Search</translate></label>
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <form @submit.prevent="search.query = $refs.search.value">
             <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
           </form>
         </div>
         <div class="field">
-          <label><translate :translate-context="'Content/Search/Dropdown.Label'">Status</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label">Status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('is_approved', $event.target.value)" :value="getTokenValue('is_approved', '')">
             <option value="">
-              <translate :translate-context="'Content/Admin/Dropdown'">All</translate>
+              <translate translate-context="Content/Admin/Dropdown">All</translate>
             </option>
             <option value="null">
-              <translate :translate-context="'Content/Admin/Dropdown'">Pending review</translate>
+              <translate translate-context="Content/Admin/Dropdown">Pending review</translate>
             </option>
             <option value="yes">
-              <translate :translate-context="'Content/Admin/Dropdown'">Approved</translate>
+              <translate translate-context="Content/Admin/Dropdown">Approved</translate>
             </option>
             <option value="no">
-              <translate :translate-context="'Content/Admin/Dropdown'">Rejected</translate>
+              <translate translate-context="Content/Admin/Dropdown">Rejected</translate>
             </option>
           </select>
         </div>
         <div class="field">
-          <label><translate :translate-context="'Content/Search/Dropdown.Label'">Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -35,10 +35,10 @@
           </select>
         </div>
         <div class="field">
-          <label><translate :translate-context="'Content/Search/Dropdown.Label/Noun'">Order</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate :translate-context="'Content/Search/Dropdown'">Ascending</translate></option>
-            <option value="-"><translate :translate-context="'Content/Search/Dropdown'">Descending</translate></option>
+            <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+            <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
           </select>
         </div>
       </div>
@@ -70,7 +70,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate :translate-context="'Content/Library/Paragraph'"
+        <translate translate-context="Content/Library/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>

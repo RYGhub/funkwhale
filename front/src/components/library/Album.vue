@@ -15,27 +15,27 @@
           </h2>
           <div class="ui hidden divider"></div>
           <play-button class="orange" :tracks="album.tracks">
-            <translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate>
+            <translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
-            <translate :translate-context="'Content/*/Button.Label/Verb'">Search on Wikipedia</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
             <i class="external icon"></i>
-            <translate :translate-context="'Content/*/Button.Label/Verb'">View on MusicBrainz</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">View on MusicBrainz</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
               @click="showEmbedModal = !showEmbedModal"
               class="ui button icon labeled">
               <i class="code icon"></i>
-              <translate :translate-context="'Content/*/Button.Label/Verb'">Embed</translate>
+              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
             </button>
             <modal :show.sync="showEmbedModal">
               <div class="header">
-                <translate :translate-context="'Popup/Album/Title/Verb'">Embed this album on your website</translate>
+                <translate translate-context="Popup/Album/Title/Verb">Embed this album on your website</translate>
               </div>
               <div class="content">
                 <div class="description">
@@ -45,7 +45,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate :translate-context="'Popup/*/Button.Label/Verb'">Cancel</translate>
+                  <translate translate-context="Popup/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -58,10 +58,10 @@
             tag="h2"
             class="left floated"
             :translate-params="{number: disc_number + 1}"
-            :translate-context="'Content/Album/'"
+            translate-context="Content/Album/"
           >Volume %{ number }</translate>
           <play-button class="right floated orange" :tracks="tracks">
-            <translate :translate-context="'Content/*/Button.Label/Verb, Short'">Play all</translate>
+            <translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate>
           </play-button>
           <track-table :artist="album.artist" :display-position="true" :tracks="tracks"></track-table>
         </section>
@@ -69,17 +69,17 @@
       <template v-else>
         <section class="ui vertical stripe segment">
           <h2>
-            <translate :translate-context="'Content/*/Title/Name'">Tracks</translate>
+            <translate translate-context="Content/*/Title/Name">Tracks</translate>
           </h2>
           <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
         </section>
       </template>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate :translate-context="'Content/*/Title/Name'">User libraries</translate>
+          <translate translate-context="Content/*/Title/Name">User libraries</translate>
         </h2>
         <library-widget @loaded="libraries = $event" :url="'albums/' + id + '/libraries/'">
-          <translate slot="subtitle" :translate-context="'Content/Album/Paragraph'">This album is present in the following libraries:</translate>
+          <translate slot="subtitle" translate-context="Content/Album/Paragraph">This album is present in the following libraries:</translate>
         </library-widget>
       </section>
     </template>
