@@ -31,4 +31,4 @@ are outlined in `CONTRIBUTING <CONTRIBUTING.rst>`_.
 Translate
 ^^^^^^^^^
 
-Translators willing to help can refer to `TRANSLATORS <TRANSLATORS>`_ for instructions.
+Translators willing to help can refer to `TRANSLATORS <TRANSLATORS.rst>`_ for instructions.
