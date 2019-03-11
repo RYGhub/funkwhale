@@ -1,0 +1,1 @@
+Labels for privacy levels are now consistently grabbed from a common source instead of being hardcoded everytime they are needed.
