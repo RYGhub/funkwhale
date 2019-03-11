@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="ui hidden divider"></div>
-    <button @click="$emit('cancel')" class="ui basic left floated button">
+    <button @click.prevent="$emit('cancel')" class="ui basic left floated button">
       <translate>Cancel</translate>
     </button>
     <button :class="['ui', 'right', 'floated', 'green', {'disabled loading': isLoading}, 'button']" :disabled="isLoading">
