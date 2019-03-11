@@ -19,7 +19,7 @@
       <label><translate translate-context="Content/Library/Dropdown.Label">Visibility</translate></label>
       <p><translate translate-context="Content/Library/Paragraph">You are able to share your library with other people, regardless of its visibility.</translate></p>
       <select class="ui dropdown" v-model="currentVisibilityLevel">
-        <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ labels.visibility[c] }}</option>
+        <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ sharedLabels.fields.privacy_level.choices[c] }}</option>
       </select>
     </div>
     <button class="ui submit button" type="submit">
@@ -45,8 +45,10 @@
 
 <script>
 import axios from 'axios'
+import MixinsTranslation from '@/components/mixins/Translations.vue'
 
 export default {
+  mixins: [MixinsTranslation],
   props: ['library'],
   data () {
     let d = {
@@ -69,17 +71,9 @@ export default {
     labels () {
       let namePlaceholder = this.$pgettext('Content/Library/Input.Placeholder', 'My awesome library')
       let descriptionPlaceholder = this.$pgettext('Content/Library/Input.Placeholder', 'This library contains my personal music, I hope you like it.')
-      let me = this.$pgettext('Content/Library/Dropdown', 'Nobody except me')
-      let instance = this.$pgettext('Content/Library/Dropdown', 'Everyone on this instance')
-      let everyone = this.$pgettext('Content/Library/Dropdown', 'Everyone, across all instances')
       return {
         namePlaceholder,
         descriptionPlaceholder,
-        visibility: {
-          me,
-          instance,
-          everyone
-        }
       }
     }
   },

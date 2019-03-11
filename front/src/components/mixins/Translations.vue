@@ -10,6 +10,7 @@ export default {
             choices: {
               me: this.$pgettext('Content/Settings/Dropdown', 'Nobody except me'),
               instance: this.$pgettext('Content/Settings/Dropdown', 'Everyone on this instance'),
+              everyone: this.$pgettext('Content/Settings/Dropdown', 'Everyone, across all instances'),
             }
           }
         },

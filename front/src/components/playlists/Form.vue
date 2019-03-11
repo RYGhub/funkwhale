@@ -42,10 +42,12 @@
 <script>
 import $ from 'jquery'
 import axios from 'axios'
+import TranslationsMixin from "@/components/mixins/Translations"
 
 import logger from '@/logging'
 
 export default {
+  mixins: [TranslationsMixin],
   props: {
     title: {type: Boolean, default: true},
     playlist: {type: Object, default: null}
@@ -78,15 +80,15 @@ export default {
       return [
         {
           value: 'me',
-          label: this.$pgettext('Content/Playlist/Dropdown', 'Nobody except me')
+          label: this.sharedLabels.fields.privacy_level.choices['me']
         },
         {
           value: 'instance',
-          label: this.$pgettext('Content/Playlist/Dropdown', 'Everyone on this instance')
+          label: this.sharedLabels.fields.privacy_level.choices['instance']
         },
         {
           value: 'everyone',
-          label: this.$pgettext('Content/Playlist/Dropdown', 'Everyone')
+          label: this.sharedLabels.fields.privacy_level.choices['everyone']
         }
       ]
     }

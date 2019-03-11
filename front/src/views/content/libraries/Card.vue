@@ -6,19 +6,19 @@
         <span
           v-if="library.privacy_level === 'me'"
           class="right floated"
-          :data-tooltip="labels.tooltips.me">
+          :data-tooltip="privacy_tooltips('me')">
           <i class="small lock icon"></i>
         </span>
         <span
           v-else-if="library.privacy_level === 'instance'"
           class="right floated"
-          :data-tooltip="labels.tooltips.instance">
+          :data-tooltip="privacy_tooltips('instance')">
           <i class="small circle outline icon"></i>
         </span>
         <span
           v-else-if="library.privacy_level === 'everyone'"
           class="right floated"
-          :data-tooltip="labels.tooltips.everyone">
+          :data-tooltip="privacy_tooltips('everyone')">
           <i class="small globe icon"></i>
         </span>
       </div>
@@ -32,7 +32,7 @@
         <div class="ui hidden divider"></div>
       </div>
       <div class="content">
-        <span v-if="library.size" class="right floated" :data-tooltip="labels.tooltips.size">
+        <span v-if="library.size" class="right floated" :data-tooltip="size_label">
           <i class="database icon"></i>
           {{ library.size | humanSize }}
         </span>
@@ -50,25 +50,22 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  props: ['library'],
-  computed: {
-    labels () {
-      let me = this.$pgettext('Content/Library/Card.Help text', 'Visibility: nobody except me')
-      let instance = this.$pgettext('Content/Library/Card.Help text', 'Visibility: everyone on this instance')
-      let everyone = this.$pgettext('Content/Library/Card.Help text', 'Visibility: everyone, including other instances')
-      let size = this.$pgettext('Content/Library/Card.Help text', 'Total size of the files in this library')
 
-      return {
-        tooltips: {
-          me,
-          instance,
-          everyone,
-          size
-        }
-      }
-    }
+<script>
+import TranslationsMixin from '@/components/mixins/Translations'
+
+export default {
+  mixins: [TranslationsMixin],
+  props: ['library'],
+  methods: {
+    privacy_tooltips (level) {
+      return 'Visibility: ' + this.sharedLabels.fields.privacy_level.choices[level].toLowerCase()
+    },
+  },
+  computed: {
+    size_label () {
+      return this.$pgettext('Content/Library/Card.Help text', 'Total size of the files in this library')
+    },
   }
 }
 </script>
