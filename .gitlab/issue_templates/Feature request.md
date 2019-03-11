@@ -1,6 +1,10 @@
 <!--
 Hi there! You are about to share feature request or an idea, and we want to thank you!
 
+
+If it's the first time you post here, please take a moment to read our Code of Conduct
+(https://funkwhale.audio/code-of-conduct/) and ensure your issue respect our guidelines.
+
 To ensure we can deal with your idea or request, please try to stick
 to the following structure. You can leave the parts text between `<!- ->`
 markers untouched, they won't be displayed in your final message.
