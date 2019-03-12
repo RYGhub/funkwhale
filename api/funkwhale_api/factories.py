@@ -1,5 +1,8 @@
+import uuid
 import factory
 import persisting_theory
+
+from faker.providers import internet as internet_provider
 
 
 class FactoriesRegistry(persisting_theory.Registry):
@@ -39,3 +42,22 @@ class NoUpdateOnCreate:
     @classmethod
     def _after_postgeneration(cls, instance, create, results=None):
         return
+
+
+class FunkwhaleProvider(internet_provider.Provider):
+    """
+    Our own faker data generator, since built-in ones are sometimes
+    not random enough
+    """
+
+    def federation_url(self, prefix=""):
+        def path_generator():
+            return "{}/{}".format(prefix, uuid.uuid4())
+
+        domain = self.domain_name()
+        protocol = "https"
+        path = path_generator()
+        return "{}://{}/{}".format(protocol, domain, path)
+
+
+factory.Faker.add_provider(FunkwhaleProvider)
