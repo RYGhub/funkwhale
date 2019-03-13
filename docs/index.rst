@@ -11,14 +11,10 @@ Funkwhale is a self-hosted, modern free and open-source music server, heavily in
 .. toctree::
    :maxdepth: 2
 
-   users/index
    features
-   architecture
-   installation/index
-   upgrading/index
-   configuration
-   troubleshooting
-   importing-music
+   users/index
+   moderator/index
+   admin/index
    developers/index
    third-party
    contributing

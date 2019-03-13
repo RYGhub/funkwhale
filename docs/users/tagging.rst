@@ -13,7 +13,7 @@ To load a file into MusicBrainz Picard:
 
 * Click on "Add Files"
 * Select the files you want to tag from your computer
-* Picard should automatically start scanning the items. If nothing happenes, select the item(s) and click on "Scan"
+* Picard should automatically start scanning the items. If nothing happens, select the item(s) and click on "Scan"
 * Picard will start assigning suitable tags
 * Hit ctrl+s or click "Save" to save the tags to the file
 
@@ -22,7 +22,7 @@ Tagging a Directory
 
 * Click on "Add Folder"
 * Select the directory of files you want to tag from your computer
-* Picard should automatically start scanning the items. If nothing happenes, select the item(s) and click on "Scan"
+* Picard should automatically start scanning the items. If nothing happens, select the item(s) and click on "Scan"
 * Picard will start assigning suitable tags
 * Hit ctrl+s or click "Save" to save the tags to the file
 

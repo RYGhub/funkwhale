@@ -19,6 +19,8 @@
 #
 import os
 import sys
+import datetime
+from shutil import copyfile
 
 sys.path.insert(0, os.path.abspath("../api"))
 
@@ -48,8 +50,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
+year = datetime.datetime.now().year
 project = "funkwhale"
-copyright = "2017, Eliot Berriot"
+copyright = "{}, Eliot Berriot".format(year)
 author = "Eliot Berriot"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -81,7 +84,6 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -99,7 +101,6 @@ html_theme = "alabaster"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-
 
 # -- Options for HTMLHelp output ------------------------------------------
 
@@ -155,3 +156,48 @@ texinfo_documents = [
         "Miscellaneous",
     )
 ]
+
+# -- Build legacy redirect files -------------------------------------------
+
+# Define list of redirect files to be build in the Sphinx build process
+
+redirect_files = [
+
+    ('importing-music.html', 'admin/importing-music.html'),
+    ('architecture.html', 'developer/architecture.html'),
+    ('troubleshooting.html', 'admin/troubleshooting.html'),
+    ('configuration.html', 'admin/configuration.html'), 
+    ('upgrading/index.html', '../admin/upgrading.html'),
+    ('upgrading/0.17.html', '../admin/0.17.html'),
+    ('users/django.html', '../admin/django.html'),
+
+]
+
+# Generate redirect template
+
+redirect_template = """\
+<html>
+  <head>
+    <meta http-equiv="refresh" content="1; url={new}" />
+    <script>
+      window.location.href = "{new}"
+    </script>
+  </head>
+</html>
+"""
+
+# Tell Sphinx to copy the files
+
+def copy_legacy_redirects(app, docname):
+    if app.builder.name == 'html':
+        for html_src_path, new in redirect_files:
+            page = redirect_template.format(new=new)
+            target_path = app.outdir + '/' + html_src_path
+            if not os.path.exists(os.path.dirname(target_path)):
+               os.makedirs(os.path.dirname(target_path))
+            with open(target_path, 'w') as f:
+               f.write(page)
+
+
+def setup(app):
+    app.connect('build-finished', copy_legacy_redirects)
