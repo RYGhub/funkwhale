@@ -512,7 +512,7 @@ It's possible to nest multiple component parts to reach a higher level of detail
 - ``Content/*/Form.Help text``
 
 Collecting translatable strings
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to ensure your translatable strings are correctly marked for translation,
 you can try to extract them.

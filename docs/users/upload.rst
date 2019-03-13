@@ -1,15 +1,13 @@
-Uploading content on Funkwhale
+Uploading Content To Funkwhale
 ==============================
 
-To upload content on any Funkwhale instance, you need:
+To upload content to any Funkwhale instance, you need:
 
-1. An account on that instance
+1. :doc:`An account on that instance <create>`
 2. :ref:`Storage space <upload-storage>`
 3. :ref:`A library <upload-library>`
 4. :ref:`Properly tagged files <upload-tagging>`
 5. :ref:`To upload your files <upload-upload>`
-
-In this document, we'll guide you through steps 2 to 5.
 
 .. _upload-storage:
 
@@ -20,7 +18,7 @@ Once you have an account on a Funkwhale instance, as a user, you are granted the
 default upload quota (1GB by default). This default quota can be increased,
 reduced or completely removed by your instance admins depending on their policy.
 
-Additionnaly, instance admins can grant you storage space manually. Get in touch with them
+Additionally, instance admins can grant you storage space manually. Get in touch with them
 if you'd like some additional storage space.
 
 You can view your current quota and usage at any time by visiting ``/content/libraries/`` on your instance,
@@ -125,7 +123,8 @@ However, Funkwhale can understand and use additional tags to enhance user experi
 
 The easiest way to inspect and edit file tags is with `MusicBrainz Picard <https://picard.musicbrainz.org/>`_, a free
 software, that works on Windows, MacOS and Linux. Picard is able to automatically tag many files,
-and include non-necessary but nice to have information, such as album covers.
+and include non-necessary but nice to have information, such as album covers. For a guide on tagging content with Picard,
+see :doc:`tagging`.
 
 .. _upload-upload:
 

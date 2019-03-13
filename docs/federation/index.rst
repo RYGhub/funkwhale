@@ -317,7 +317,7 @@ Supported on
 - :ref:`object-Library` objects
 
 Example (on :ref:`object-Library`)
-************************
+**********************************
 
 .. code-block:: json
 
@@ -339,7 +339,7 @@ Example (on :ref:`object-Library`)
   }
 
 Example (on :ref:`object-audio`)
-**********************
+********************************
 
 .. code-block:: json
 

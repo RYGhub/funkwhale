@@ -1,5 +1,5 @@
 Using the Django Administration Backend
-=========================
+=======================================
 
 Funkwhale is being actively developed, and new features are being added to the frontend all the time. However, there are some administrative tasks that can only be undertaken in the Django Administration backend.
 
@@ -28,7 +28,7 @@ Deleting a Track
 * Click on "Go". You will be prompted to confirm the track's deletion
 
 Deleting an Album
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 * Navigate to ``https://yourdomain/api/admin/music/album``
 * Select the album(s) you wish to delete
