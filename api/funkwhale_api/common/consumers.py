@@ -1,16 +1,21 @@
+from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
-
+from channels import auth
 from funkwhale_api.common import channels
 
 
 class JsonAuthConsumer(JsonWebsocketConsumer):
     def connect(self):
-        try:
-            assert self.scope["user"].pk is not None
-        except (AssertionError, AttributeError, KeyError):
-            return self.close()
+        if "user" not in self.scope:
+            try:
+                self.scope["user"] = async_to_sync(auth.get_user)(self.scope)
+            except (ValueError, AssertionError, AttributeError, KeyError):
+                return self.close()
 
-        return self.accept()
+        if self.scope["user"] and self.scope["user"].is_authenticated:
+            return self.accept()
+        else:
+            return self.close()
 
     def accept(self):
         super().accept()

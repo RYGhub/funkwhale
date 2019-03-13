@@ -16,6 +16,7 @@ import GetTextPlugin from 'vue-gettext'
 import { sync } from 'vuex-router-sync'
 import locales from '@/locales'
 
+import cookie from '@/utils/cookie'
 import filters from '@/filters' // eslint-disable-line
 import globals from '@/components/globals' // eslint-disable-line
 
@@ -70,8 +71,9 @@ Vue.directive('title', function (el, binding) {
 )
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
-  if (store.state.auth.token) {
-    config.headers['Authorization'] = store.getters['auth/header']
+  let csrfToken = cookie.get('csrftoken')
+  if (csrfToken) {
+    config.headers['X-CSRFToken'] = csrfToken
   }
   return config
 }, function (error) {
@@ -85,9 +87,14 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   error.backendErrors = []
   if (error.response.status === 401) {
+    if (error.response.config.skipLoginRedirect) {
+      return Promise.reject(error)
+    }
     store.commit('auth/authenticated', false)
-    logger.default.warn('Received 401 response from API, redirecting to login form', router.currentRoute.fullPath)
-    router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
+    if (router.currentRoute.name !== 'login') {
+      logger.default.warn('Received 401 response from API, redirecting to login form', router.currentRoute.fullPath)
+      router.push({name: 'login', query: {next: router.currentRoute.fullPath}})
+    }
   }
   if (error.response.status === 404) {
     error.backendErrors.push('Resource not found')

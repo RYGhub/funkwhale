@@ -175,11 +175,9 @@ export default {
       }
       this.disconnect()
       let self = this
-      let token = this.$store.state.auth.token
-      // let token = 'test'
       const bridge = new WebSocketBridge()
       this.bridge = bridge
-      let url = this.$store.getters['instance/absoluteUrl'](`api/v1/activity?token=${token}`)
+      let url = this.$store.getters['instance/absoluteUrl'](`api/v1/activity`)
       url = url.replace('http://', 'ws://')
       url = url.replace('https://', 'wss://')
       bridge.connect(
