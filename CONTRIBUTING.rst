@@ -172,6 +172,10 @@ and metadata.
 Launch all services
 ^^^^^^^^^^^^^^^^^^^
 
+Before the first Funkwhale launch, it is required to run this::
+
+    docker-compose -f dev.yml run --rm front yarn run i18n-compile
+
 Then you can run everything with::
 
     docker-compose -f dev.yml up front api nginx celeryworker
