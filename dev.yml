@@ -60,7 +60,6 @@ services:
       - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-      - "FUNKWHALE_SPA_HTML_ROOT=http://nginx/front/"
 
     links:
       - postgres
