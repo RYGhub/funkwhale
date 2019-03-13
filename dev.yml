@@ -60,6 +60,8 @@ services:
       - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
+      - "FUNKWHALE_SPA_HTML_ROOT=http://nginx/front/"
+
     links:
       - postgres
       - redis
@@ -95,6 +97,8 @@ services:
       - .env.dev
       - .env
     image: nginx
+    ports:
+      - "${NGINX_PORTS_MAPPING-8000:80}"
     environment:
       - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-100M}"
       - "FUNKWHALE_API_IP=${FUNKHALE_API_IP-api}"
