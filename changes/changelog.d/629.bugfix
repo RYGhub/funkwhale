@@ -1,0 +1,1 @@
+Now use cookie-based auth in browser instead of JWT/LocalStorage in (#629)

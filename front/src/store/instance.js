@@ -114,7 +114,6 @@ export default {
         commit(`${m}/reset`, null, {root: true})
       })
     },
-    // Send a request to the login URL and save the returned JWT
     fetchSettings ({commit}, payload) {
       return axios.get('instance/settings/').then(response => {
         logger.default.info('Successfully fetched instance settings')

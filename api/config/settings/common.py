@@ -330,7 +330,7 @@ AUTHENTICATION_BACKENDS = (
     "funkwhale_api.users.auth_backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
-SESSION_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
 # Some really nice defaults
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
@@ -537,7 +537,7 @@ MUSICBRAINZ_HOSTNAME = env("MUSICBRAINZ_HOSTNAME", default="musicbrainz.org")
 
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env("DJANGO_ADMIN_URL", default="^api/admin/")
-CSRF_USE_SESSIONS = True
+CSRF_USE_SESSIONS = False
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # Playlist settings
