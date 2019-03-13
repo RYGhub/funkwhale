@@ -280,7 +280,8 @@ When working on federation with traefik, ensure you have this in your ``env``::
     EXTERNAL_REQUESTS_VERIFY_SSL=false
     # this ensure you don't have incorrect urls pointing to http resources
     FUNKWHALE_PROTOCOL=https
-
+    # Disable host ports binding for the nginx container, as traefik is serving everything
+    NGINX_PORTS_MAPPING=80
 
 Typical workflow for a contribution
 -----------------------------------
