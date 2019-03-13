@@ -1,17 +1,38 @@
-.. funkwhale documentation master file, created by
-   sphinx-quickstart on Sun Jun 25 18:49:23 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Funkwhale's users documentation
+User Documentation
 =====================================
 
-.. note::
+This documentation is targeted at Funkwhale users. In here you'll find guides for interacting with
+Funkwhale, uploading your music, and building a musical social network.
 
-  This documentation is meant for end-users of the platform.
+Getting Started
+---------------
 
 .. toctree::
    :maxdepth: 2
 
-   apps
+   create
+   tagging
    upload
+
+
+Using Funkwhale
+---------------
+
+.. toctree::
+   :maxdepth: 2
+
+   queue
+   managing
+   playlists
+   favorites
+   radios
+   follow
+   apps
+
+Troubleshooting Issues
+----------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   troubleshooting

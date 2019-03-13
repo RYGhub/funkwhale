@@ -50,7 +50,7 @@ or persist data.
 Third-party apps
 ----------------
 
-Since Funkwhale implements a subset of the Subsonic API, it's compatible with existing apps such
+Since Funkwhale implements a subset of the Subsonic API, it's compatible with existing :doc:`apps <../users/apps>` such
 as DSub, Ultrasonic or Clementine that support this API. Those apps can be used as a replacement
 or in conjunction of the web interface, but the underlying data is the same.
 

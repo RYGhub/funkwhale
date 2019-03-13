@@ -151,4 +151,4 @@ From other instances
 --------------------
 
 Funkwhale also supports importing music from other instances. Please refer
-to :doc:`federation` for more details.
+to :doc:`../federation/index` for more details.

@@ -24,7 +24,7 @@ Funkwhale is not bundled with any music, and you'll have to import your own musi
 
 At the moment, you can feed your existing music library to the server either by uploading it or by using :ref:`in-place-import` from a server-side directory. Assuming the files have the correct tags defined, they will be imported seamlessly.
 
-You can also access music being made available by other Funkwhale instances using :doc:`federation`.
+You can also access music being made available by other Funkwhale instances using :doc:`/federation/index`.
 
 Metadata
 ---------

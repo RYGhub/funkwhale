@@ -2203,7 +2203,7 @@ On both docker and non-docker setup, you'll also have to update your nginx
 configuration for websocket support. Ensure you have the following blocks
 included in your virtualhost file:
 
-.. code-block:: txt
+.. code-block:: text
 
     map $http_upgrade $connection_upgrade {
         default upgrade;
