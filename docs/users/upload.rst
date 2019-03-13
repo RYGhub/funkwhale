@@ -1,5 +1,5 @@
-Uploading content on Funkwhale
-==============================
+Uploading and removing content on Funkwhale
+===========================================
 
 To upload content on any Funkwhale instance, you need:
 
@@ -144,3 +144,14 @@ by instance admins.
 
 Once uploaded, your files should be processed shortly. It's usually a matter of seconds, but
 can vary depending on server load.
+
+.. _upload-remove:
+
+Removing files
+--------------
+
+If you want to remove some of the files you have uploaded, visit ``/content/libraries/tracks/`` or click "Add content" in the sidebar then "Tracks" in the top menu.
+Then select the files you want to delete using the checkboxes on the left ; you can filter the list of files using a search pattern.
+Finally, select "Delete" in the "Action" menu and click "Go".
+
+This operation does *not* remove metadata, meaning that deleted tracks will remain visible in your library. They just won't be playable anymore.
