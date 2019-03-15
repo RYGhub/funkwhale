@@ -154,6 +154,13 @@ export default {
       let u = this.$store.getters["instance/absoluteUrl"](
         this.upload.listen_url
       )
+      if (this.$store.state.auth.authenticated) {
+        u = url.updateQueryString(
+          u,
+          "jwt",
+          encodeURI(this.$store.state.auth.token)
+        )
+      }
       return u
     },
     cover() {
