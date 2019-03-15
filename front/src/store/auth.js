@@ -1,4 +1,5 @@
 import axios from 'axios'
+import jwtDecode from 'jwt-decode'
 import logger from '@/logging'
 import router from '@/router'
 
@@ -14,6 +15,13 @@ export default {
       moderation: false
     },
     profile: null,
+    token: '',
+    tokenData: {}
+  },
+  getters: {
+    header: state => {
+      return 'JWT ' + state.token
+    }
   },
   mutations: {
     reset (state) {
@@ -21,6 +29,8 @@ export default {
       state.profile = null
       state.username = ''
       state.fullUsername = ''
+      state.token = ''
+      state.tokenData = {}
       state.availablePermissions = {
         federation: false,
         settings: false,
@@ -36,6 +46,8 @@ export default {
       if (value === false) {
         state.username = null
         state.fullUsername = null
+        state.token = null
+        state.tokenData = null
         state.profile = null
         state.availablePermissions = {}
       }
@@ -51,15 +63,24 @@ export default {
         state.profile.avatar = value
       }
     },
+    token: (state, value) => {
+      state.token = value
+      if (value) {
+        state.tokenData = jwtDecode(value)
+      } else {
+        state.tokenData = {}
+      }
+    },
     permission: (state, {key, status}) => {
       state.availablePermissions[key] = status
     }
   },
   actions: {
-    // Send a request to the login URL
+    // Send a request to the login URL and save the returned JWT
     login ({commit, dispatch}, {next, credentials, onError}) {
-      return axios.post('auth/login/', credentials).then(response => {
+      return axios.post('token/', credentials).then(response => {
         logger.default.info('Successfully logged in as', credentials.username)
+        commit('token', response.data.token)
         dispatch('fetchProfile').then(() => {
           // Redirect to a specified route
           router.push(next)
@@ -81,28 +102,29 @@ export default {
       modules.forEach(m => {
         commit(`${m}/reset`, null, {root: true})
       })
-      return axios.post('auth/logout/').then(response => {
-        logger.default.info('Successfully logged out')
-      }, response => {
-        // we cannot contact the backend but we can at least clear our local cookies
-        logger.default.info('Backend unreachable, cleaning local cookies…')
-      }).finally(() => {
-        logger.default.info('Log out, goodbye!')
-        router.push({name: 'index'})
-      })
+      logger.default.info('Log out, goodbye!')
+      router.push({name: 'index'})
     },
     check ({commit, dispatch, state}) {
       logger.default.info('Checking authentication...')
-      dispatch('fetchProfile').then(() => {
-        logger.default.info('Welcome back!')
-      }).catch(() => {
+      var jwt = state.token
+      if (jwt) {
+        commit('token', jwt)
+        dispatch('fetchProfile')
+        dispatch('refreshToken')
+      } else {
         logger.default.info('Anonymous user')
         commit('authenticated', false)
-      })
+      }
     },
     fetchProfile ({commit, dispatch, state}) {
+      if (document) {
+        // this is to ensure we do not have any leaking cookie set by django
+        document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      }
+
       return new Promise((resolve, reject) => {
-        axios.get('users/users/me/', {skipLoginRedirect: true}).then((response) => {
+        axios.get('users/users/me/').then((response) => {
           logger.default.info('Successfully fetched user profile')
           dispatch('updateProfile', response.data).then(() => {
             resolve(response.data)
@@ -134,5 +156,13 @@ export default {
         resolve()
       })
     },
+    refreshToken ({commit, dispatch, state}) {
+      return axios.post('token/refresh/', {token: state.token}).then(response => {
+        logger.default.info('Refreshed auth token')
+        commit('token', response.data.token)
+      }, response => {
+        logger.default.error('Error while refreshing token', response.data)
+      })
+    }
   }
 }

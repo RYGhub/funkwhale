@@ -71,6 +71,15 @@ export default {
           'mp3'
         )
       })
+      if (this.$store.state.auth.authenticated) {
+        // we need to send the token directly in url
+        // so authentication can be checked by the backend
+        // because for audio files we cannot use the regular Authentication
+        // header
+        sources.forEach(e => {
+          e.url = url.updateQueryString(e.url, 'jwt', this.$store.state.auth.token)
+        })
+      }
       return sources
     },
     updateProgressThrottled () {
