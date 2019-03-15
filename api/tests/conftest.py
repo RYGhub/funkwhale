@@ -28,6 +28,7 @@ from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
+from funkwhale_api.federation import actors
 from funkwhale_api.users.permissions import HasUserPermission
 
 
@@ -426,3 +427,8 @@ def rsa_small_key(settings):
 def a_responses():
     with aioresponses() as m:
         yield m
+
+
+@pytest.fixture
+def service_actor(db):
+    return actors.get_service_actor()

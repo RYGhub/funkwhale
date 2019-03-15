@@ -703,12 +703,12 @@ class Upload(models.Model):
 
     objects = UploadQuerySet.as_manager()
 
-    def download_audio_from_remote(self, user):
+    def download_audio_from_remote(self, actor):
         from funkwhale_api.common import session
         from funkwhale_api.federation import signing
 
-        if user.is_authenticated and user.actor:
-            auth = signing.get_auth(user.actor.private_key, user.actor.private_key_id)
+        if actor:
+            auth = signing.get_auth(actor.private_key, actor.private_key_id)
         else:
             auth = None
 

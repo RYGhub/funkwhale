@@ -132,6 +132,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         try:
             library = utils.retrieve_ap_object(
                 fid,
+                actor=request.user.actor,
                 queryset=self.queryset,
                 serializer_class=serializers.LibrarySerializer,
             )

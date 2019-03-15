@@ -56,7 +56,7 @@ def test_extract_headers_from_meta():
 def test_retrieve_ap_object(db, r_mock):
     fid = "https://some.url"
     m = r_mock.get(fid, json={"hello": "world"})
-    result = utils.retrieve_ap_object(fid)
+    result = utils.retrieve_ap_object(fid, actor=None)
 
     assert result == {"hello": "world"}
     assert m.request_history[-1].headers["Accept"] == "application/activity+json"
@@ -69,7 +69,7 @@ def test_retrieve_ap_object_honor_instance_policy_domain(factories):
     fid = "https://{}/test".format(domain.name)
 
     with pytest.raises(exceptions.BlockedActorOrDomain):
-        utils.retrieve_ap_object(fid)
+        utils.retrieve_ap_object(fid, actor=None)
 
 
 def test_retrieve_ap_object_honor_instance_policy_different_url_and_id(
@@ -82,7 +82,7 @@ def test_retrieve_ap_object_honor_instance_policy_different_url_and_id(
     r_mock.get(fid, json={"id": "http://{}/test".format(domain.name)})
 
     with pytest.raises(exceptions.BlockedActorOrDomain):
-        utils.retrieve_ap_object(fid)
+        utils.retrieve_ap_object(fid, actor=None)
 
 
 def test_retrieve_with_actor(r_mock, factories):
@@ -99,7 +99,7 @@ def test_retrieve_with_actor(r_mock, factories):
 def test_retrieve_with_queryset(factories):
     actor = factories["federation.Actor"]()
 
-    assert utils.retrieve_ap_object(actor.fid, queryset=actor.__class__)
+    assert utils.retrieve_ap_object(actor.fid, actor=None, queryset=actor.__class__)
 
 
 def test_retrieve_with_serializer(db, r_mock):
@@ -109,6 +109,6 @@ def test_retrieve_with_serializer(db, r_mock):
 
     fid = "https://some.url"
     r_mock.get(fid, json={"hello": "world"})
-    result = utils.retrieve_ap_object(fid, serializer_class=S)
+    result = utils.retrieve_ap_object(fid, actor=None, serializer_class=S)
 
     assert result == {"persisted": "object"}
