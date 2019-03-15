@@ -21,6 +21,7 @@ from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import views as common_views
 from funkwhale_api.federation.authentication import SignatureAuthentication
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
 
@@ -303,7 +304,11 @@ def handle_serve(upload, user, format=None):
             # thus resulting in multiple downloads from the remote
             qs = f.__class__.objects.select_for_update()
             f = qs.get(pk=f.pk)
-            f.download_audio_from_remote(user=user)
+            if user.is_authenticated:
+                actor = user.actor
+            else:
+                actor = actors.get_service_actor()
+            f.download_audio_from_remote(actor=actor)
         data = f.get_audio_data()
         if data:
             f.duration = data["duration"]

@@ -5,7 +5,10 @@ import pytest
 
 from django.utils import timezone
 
+from funkwhale_api.federation import models
+from funkwhale_api.federation import serializers
 from funkwhale_api.federation import tasks
+from funkwhale_api.federation import utils
 
 
 def test_clean_federation_music_cache_if_no_listen(preferences, factories):
@@ -162,9 +165,11 @@ def test_fetch_nodeinfo(factories, r_mock, now):
     assert tasks.fetch_nodeinfo("test.test") == {"hello": "world"}
 
 
-def test_update_domain_nodeinfo(factories, mocker, now):
+def test_update_domain_nodeinfo(factories, mocker, now, service_actor):
     domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     actor = factories["federation.Actor"](fid="https://actor.id")
+    retrieve_ap_object = mocker.spy(utils, "retrieve_ap_object")
+
     mocker.patch.object(
         tasks,
         "fetch_nodeinfo",
@@ -185,6 +190,13 @@ def test_update_domain_nodeinfo(factories, mocker, now):
         "payload": {"hello": "world", "metadata": {"actorId": "https://actor.id"}},
     }
     assert domain.service_actor == actor
+
+    retrieve_ap_object.assert_called_once_with(
+        "https://actor.id",
+        actor=service_actor,
+        queryset=models.Actor,
+        serializer_class=serializers.ActorSerializer,
+    )
 
 
 def test_update_domain_nodeinfo_error(factories, r_mock, now):

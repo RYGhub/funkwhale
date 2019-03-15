@@ -61,7 +61,7 @@ def slugify_username(username):
 
 
 def retrieve_ap_object(
-    fid, actor=None, serializer_class=None, queryset=None, apply_instance_policies=True
+    fid, actor, serializer_class=None, queryset=None, apply_instance_policies=True
 ):
     from . import activity
 
@@ -104,6 +104,6 @@ def retrieve_ap_object(
             raise exceptions.BlockedActorOrDomain()
     if not serializer_class:
         return data
-    serializer = serializer_class(data=data)
+    serializer = serializer_class(data=data, context={"fetch_actor": actor})
     serializer.is_valid(raise_exception=True)
     return serializer.save()

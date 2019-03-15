@@ -15,6 +15,7 @@ from funkwhale_api.common import utils as common_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.taskapp import celery
 
+from . import actors
 from . import keys
 from . import models, signing
 from . import serializers
@@ -195,6 +196,7 @@ def update_domain_nodeinfo(domain):
         domain.service_actor = (
             utils.retrieve_ap_object(
                 service_actor_id,
+                actor=actors.get_service_actor(),
                 queryset=models.Actor,
                 serializer_class=serializers.ActorSerializer,
             )
