@@ -51,7 +51,7 @@
         </div>
         <div class="actions">
           <div class="ui black deny button">
-            <translate translate-context="Popup/Radio/Button.Label/Verb">Cancel</translate>
+            <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
           </div>
         </div>
       </modal>

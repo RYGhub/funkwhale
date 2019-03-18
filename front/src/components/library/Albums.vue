@@ -8,7 +8,7 @@
         <div class="fields">
           <div class="field">
             <label>
-              <translate translate-context="Content/Search/Input.Label/Verb">Search</translate>
+              <translate translate-context="Content/Search/Input.Label/Noun">Search</translate>
             </label>
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
@@ -117,7 +117,7 @@ export default {
   computed: {
     labels() {
       let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter album title...")
-      let title = this.$pgettext('Head/Album/Title', "Albums")
+      let title = this.$pgettext('*/*/*', "Albums")
       return {
         searchPlaceholder,
         title

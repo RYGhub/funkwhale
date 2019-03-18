@@ -16,7 +16,7 @@
                     <template v-if="object.user">
                       <span class="ui tiny teal icon label">
                         <i class="home icon"></i>
-                        <translate translate-context="Content/Moderation/List item">Local account</translate>
+                        <translate translate-context="Content/Moderation/*/Short, Noun">Local account</translate>
                       </span>
                       &nbsp;
                     </template>
@@ -91,7 +91,7 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate translate-context="Content/*/*">Domain</translate>
+                      <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
                     </td>
                     <td>
                       <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
@@ -125,17 +125,17 @@
                           @change="updateUser('is_active')"
                           v-model="object.user.is_active" type="checkbox">
                         <label>
-                          <translate v-if="object.user.is_active" key="1" translate-context="Content/*/Label">Enabled</translate>
-                          <translate v-else key="2" translate-context="Content/*/Label">Disabled</translate>
+                          <translate v-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
+                          <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
                         </label>
                       </div>
-                      <translate v-else-if="object.user.is_active" key="1" translate-context="Content/*/Label">Enabled</translate>
-                      <translate v-else key="2" translate-context="Content/*/Label">Disabled</translate>
+                      <translate v-else-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
+                      <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
                     </td>
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label">Permissions</translate>
+                      <translate translate-context="Content/Admin/Table.Label/Noun">Permissions</translate>
                     </td>
                     <td>
                       <select
@@ -157,7 +157,7 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate translate-context="Content/*/Table.Label">First seen</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
                     </td>
                     <td>
                       <human-date :date="object.creation_date"></human-date>
@@ -174,7 +174,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/*/Table.Label">Sign-up date</translate>
+                      <translate translate-context="Content/Admin/Table.Label/Noun">Sign-up date</translate>
                     </td>
                     <td>
                       <human-date :date="object.user.date_joined"></human-date>
@@ -182,7 +182,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/*/Table.Label">Last activity</translate>
+                      <translate translate-context="Content/Profile/Table.Label/Short, Noun (Value is a date)">Last activity</translate>
                     </td>
                     <td>
                       <human-date :date="object.user.last_activity"></human-date>
@@ -286,7 +286,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Total size</translate>
+                      <translate translate-context="Content/Moderation/Table.Label">Total size</translate>
                     </td>
                     <td>
                       {{ stats.media_total_size | humanSize }}
@@ -295,7 +295,7 @@
 
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label">Libraries</translate>
+                      <translate translate-context="*/*/*/Noun">Libraries</translate>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -311,7 +311,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Artists</translate>
+                      <translate translate-context="*/*/*/Noun">Artists</translate>
                     </td>
                     <td>
                       {{ stats.artists }}
@@ -319,7 +319,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Albums</translate>
+                      <translate translate-context="*/*/*">Albums</translate>
                     </td>
                     <td>
                       {{ stats.albums}}
@@ -327,7 +327,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Tracks</translate>
+                      <translate translate-context="*/*/*/Noun">Tracks</translate>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -459,15 +459,15 @@ export default {
       return [
         {
           code: "library",
-          label: this.$pgettext('Content/Moderation/Dropdown', "Library")
+          label: this.$pgettext('*/*/*', "Library")
         },
         {
           code: "moderation",
-          label: this.$pgettext('Content/Moderation/Dropdown', "Moderation")
+          label: this.$pgettext('*/Moderation/*', "Moderation")
         },
         {
           code: "settings",
-          label: this.$pgettext('Content/Moderation/Dropdown', "Settings")
+          label: this.$pgettext('*/*/*/Noun', "Settings")
         }
       ]
     }

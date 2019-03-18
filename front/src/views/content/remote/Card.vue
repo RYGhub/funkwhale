@@ -24,7 +24,7 @@
       </div>
       <div class="meta">
         <i class="music icon"></i>
-        <translate translate-context="Content/Library/Card.List item" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate translate-context="*/*/*" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
       <div v-if="displayScan && latestScan" class="meta">
         <template v-if="latestScan.status === 'pending'">
@@ -48,7 +48,7 @@
           <translate translate-context="Content/Library/Card.List item">Scanned with errors</translate>
         </template>
         <span class="link right floated" @click="showScan = !showScan">
-          <translate translate-context="Content/Library/Card.Link">Details</translate>
+          <translate translate-context="Content/Library/Card.Button.Label/Noun">Details</translate>
           <i v-if="showScan" class="angle down icon" />
           <i v-else class="angle right icon" />
         </span>
@@ -98,12 +98,12 @@
         color=""
         :class="['ui', 'button']"
         :action="unfollow">
-        <translate translate-context="Content/Library/Card.Button.Label/Verb">Unfollow</translate>
+        <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>
         <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
         <div slot="modal-content">
           <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
         </div>
-        <div slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Unfollow</translate></div>
+        <div slot="modal-confirm"><translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate></div>
       </dangerous-button>
     </div>
   </div>

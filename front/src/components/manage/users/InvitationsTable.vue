@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate translate-context="Content/Search/Input.Label/Verb">Search</translate></label>
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Input.Label/Noun">Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -15,9 +15,9 @@
           </select>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Admin/Dropdown.Label">Status</translate></label>
+          <label><translate translate-context="Content/Admin/*/Noun (Value is Used/Not used)">Status</translate></label>
           <select class="ui dropdown" v-model="isOpen">
-            <option :value="null"><translate translate-context="Content/Admin/Dropdown">All</translate></option>
+            <option :value="null"><translate translate-context="Content/*/Dropdown">All</translate></option>
             <option :value="true"><translate translate-context="Content/Admin/Dropdown/Adjective">Open</translate></option>
             <option :value="false"><translate translate-context="Content/Admin/Dropdown/Adjective">Expired/used</translate></option>
           </select>
@@ -37,10 +37,10 @@
         :filters="actionFilters">
         <template slot="header-cells">
           <th><translate translate-context="Content/Admin/Table.Label">Owner</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label">Status</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label">Creation date</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label">Expiration date</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label">Code</translate></th>
+          <th><translate translate-context="Content/Admin/*/Noun (Value is Used/Not used)">Status</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+          <th><translate translate-context="Content/Admin/Table.Label/Noun">Expiration date</translate></th>
+          <th><translate translate-context="Content/Admin/Table.Label/Noun">Code</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -74,7 +74,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate translate-context="Content/Admin/Paragraph"
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -150,7 +150,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by username, e-mail address, code…')
+        searchPlaceholder: this.$pgettext('Content/Admin/Input.Placeholder/Verb', 'Search by username, e-mail address, code…')
       }
     },
     actionFilters () {
@@ -164,7 +164,7 @@ export default {
       }
     },
     actions () {
-      let deleteLabel = this.$gettext('Delete')
+      let deleteLabel = this.$pgettext('*/*/*/Verb', 'Delete')
       return [
         {
           name: 'delete',

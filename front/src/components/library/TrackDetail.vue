@@ -18,7 +18,7 @@
           </tr>
           <tr>
             <td>
-              <translate translate-context="Content/Track/Table.Label/Noun">License</translate>
+              <translate translate-context="Content/*/*/Noun">License</translate>
             </td>
             <td v-if="license">
               <a :href="license.url" target="_blank" rel="noopener noreferrer">{{ license.name }}</a>
@@ -29,7 +29,7 @@
           </tr>
           <tr>
             <td>
-              <translate translate-context="Content/Track/Table.Label">Duration</translate>
+              <translate translate-context="Content/*/*">Duration</translate>
             </td>
             <td v-if="upload && upload.duration">{{ time.parse(upload.duration) }}</td>
             <td v-else>
@@ -38,7 +38,7 @@
           </tr>
           <tr>
             <td>
-              <translate translate-context="Content/Track/Table.Label">Size</translate>
+              <translate translate-context="Content/Library/*/in MB">Size</translate>
             </td>
             <td v-if="upload && upload.size">{{ upload.size | humanSize }}</td>
             <td v-else>
@@ -47,7 +47,7 @@
           </tr>
           <tr>
             <td>
-              <translate translate-context="Content/Track/Table.Label">Bitrate</translate>
+              <translate translate-context="Content/Track/*/Noun">Bitrate</translate>
             </td>
             <td v-if="upload && upload.bitrate">{{ upload.bitrate | humanSize }}/s</td>
             <td v-else>
@@ -86,7 +86,7 @@
     </section>
     <section class="ui vertical stripe segment">
       <h2>
-        <translate translate-context="Content/Track/Title">User libraries</translate>
+        <translate translate-context="Content/*/Title/Noun">User libraries</translate>
       </h2>
       <library-widget @loaded="$emit('libraries-loaded', $event)" :url="'tracks/' + id + '/libraries/'">
         <translate translate-context="Content/Track/Paragraph" slot="subtitle">This track is present in the following libraries:</translate>
@@ -152,7 +152,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('Head/Track/Title', "Track")
+        title: this.$pgettext('*/*/*/Noun', "Track")
       }
     },
     upload() {

@@ -75,7 +75,7 @@
         v-if="objectType === 'track'"
         :to="{name: 'library.tracks.detail', params: {id: object.id }}"
       >
-        <translate translate-context="Content/*/Button.Label">Cancel</translate>
+        <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
       </router-link>
       <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit" :disabled="isLoading || !mutationPayload">
         <translate v-if="canEdit" key="1" translate-context="Content/Library/Button.Label/Verb">Submit and apply edit</translate>

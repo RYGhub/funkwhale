@@ -9,7 +9,7 @@
       </div>
       <div class="inline fields">
         <div class="ui field">
-          <label><translate translate-context="$1">Invitation code</translate></label>
+          <label><translate translate-context="Content/*/Input.Label">Invitation code</translate></label>
           <input name="code" type="text" v-model="code" :placeholder="labels.placeholder" />
         </div>
         <div class="ui field">

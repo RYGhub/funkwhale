@@ -38,12 +38,12 @@
         </div>
 
       <dangerous-button :disabled="plts.length === 0" class="labeled right floated icon" color='yellow' :action="clearPlaylist">
-        <i class="eraser icon"></i> <translate translate-context="Content/Playlist/Button.Label/Verb">Clear playlist</translate>
+        <i class="eraser icon"></i> <translate translate-context="*/Playlist/Button.Label/Verb">Clear playlist</translate>
         <p slot="modal-header">
           <translate translate-context="Popup/Playlist/Title" :translate-params="{playlist: playlist.name}">Do you want to clear the playlist "%{ playlist }"?</translate>
         </p>
         <p slot="modal-content"><translate translate-context="Popup/Playlist/Paragraph">This will remove all tracks from this playlist and cannot be undone.</translate></p>
-        <div slot="modal-confirm"><translate translate-context="Popup/Playlist/Button.Label">Clear playlist</translate></div>
+        <div slot="modal-confirm"><translate translate-context="*/Playlist/Button.Label/Verb">Clear playlist</translate></div>
       </dangerous-button>
       <div class="ui hidden divider"></div>
       <template v-if="plts.length > 0">

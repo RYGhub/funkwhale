@@ -63,7 +63,7 @@ export default {
             action = {
               buttonClass: 'green',
               icon: 'check',
-              label: this.$pgettext('Content/Notifications/Button.Label/Short, Verb', 'Approve'),
+              label: this.$pgettext('Content/*/Button.Label/Verb', 'Approve'),
               handler: () => { self.approveLibraryFollow(a.related_object) }
             }
           } else {

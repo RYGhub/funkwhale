@@ -34,10 +34,10 @@
             color="grey"
             class="basic tiny"
             :action="purgePendingFiles">
-            <translate translate-context="Content/Library/Button.Label/Verb">Purge</translate>
+            <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge pending files?</translate></p>
             <p slot="modal-content"><translate translate-context="Popup/Library/Paragraph">Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota.</translate></p>
-            <div slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Purge</translate></div>
+            <div slot="modal-confirm"><translate translate-context="*/*/*/Verb">Purge</translate></div>
           </dangerous-button>
         </div>
       </div>
@@ -60,10 +60,10 @@
             color="grey"
             class="basic tiny"
             :action="purgeSkippedFiles">
-            <translate translate-context="Content/Library/Button.Label/Verb">Purge</translate>
+            <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge skipped files?</translate></p>
             <p slot="modal-content"><translate translate-context="Popup/Library/Paragraph">Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota.</translate></p>
-            <div slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Purge</translate></div>
+            <div slot="modal-confirm"><translate translate-context="*/*/*/Verb">Purge</translate></div>
           </dangerous-button>
         </div>
       </div>
@@ -86,10 +86,10 @@
             color="grey"
             class="basic tiny"
             :action="purgeErroredFiles">
-            <translate translate-context="Content/Library/Button.Label/Verb">Purge</translate>
+            <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge errored files?</translate></p>
             <p slot="modal-content"><translate translate-context="Popup/Library/Paragraph">Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota.</translate></p>
-            <div slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Purge</translate></div>
+            <div slot="modal-confirm"><translate translate-context="*/*/*/Verb">Purge</translate></div>
           </dangerous-button>
         </div>
       </div>

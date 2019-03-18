@@ -6,7 +6,7 @@
             <translate translate-context="Content/About/Title/Short, Noun" v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
              About %{ instance }
             </translate>
-            <translate translate-context="Content/About/Title/Short, Noun" v-else>About this instance</translate>
+            <translate translate-context="Content/About/Title" v-else>About this instance</translate>
         </h1>
         <stats></stats>
       </div>
@@ -64,7 +64,7 @@ export default {
     }),
     labels() {
       return {
-        title: this.$pgettext('Head/About/Title', "About this instance")
+        title: this.$pgettext('Content/About/Title', "About this instance")
       }
     }
   }

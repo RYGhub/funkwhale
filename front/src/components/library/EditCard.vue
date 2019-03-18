@@ -23,15 +23,15 @@
           </span>
           <span v-else-if="obj.is_approved">
             <i class="green check icon"></i>
-            <translate translate-context="Content/Library/Card/Short">Approved</translate>
+            <translate translate-context="Content/*/*/Short">Approved</translate>
           </span>
           <span v-else-if="obj.is_approved === null">
             <i class="yellow hourglass icon"></i>
-            <translate translate-context="Content/Library/Card/Short">Pending review</translate>
+            <translate translate-context="Content/Admin/*/Noun">Pending review</translate>
           </span>
           <span v-else-if="obj.is_approved === false">
             <i class="red x icon"></i>
-            <translate translate-context="Content/Library/Card/Short">Rejected</translate>
+            <translate translate-context="Content/Library/*/Short">Rejected</translate>
           </span>
         </span>
       </div>
@@ -79,7 +79,7 @@
         v-if="canApprove && obj.is_approved !== true"
         @click="approve(true)"
         :class="['ui', {loading: isLoading}, 'green', 'basic', 'button']">
-        <translate translate-context="Content/Library/Button.Label">Approve</translate>
+        <translate translate-context="Content/*/Button.Label/Verb">Approve</translate>
       </button>
       <button
         v-if="canApprove && obj.is_approved === null"
@@ -96,7 +96,7 @@
         <div slot="modal-content">
           <p><translate translate-context="Popup/Library/Paragraph">The suggestion will be completely removed, this action is irreversible.</translate></p>
         </div>
-        <p slot="modal-confirm"><translate translate-context="Popup/Library/Button.Label">Delete</translate></p>
+        <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
       </dangerous-button>
     </div>
   </div>

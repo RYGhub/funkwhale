@@ -23,7 +23,7 @@
               <input id="name" name="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
             </div>
             <div class="field">
-              <label for="description"><translate translate-context="Content/Radio/Input.Label">Description</translate></label>
+              <label for="description"><translate translate-context="Content/*/Input.Label/Noun">Description</translate></label>
               <textarea rows="2" id="description" type="text" v-model="radioDesc" :placeholder="labels.placeholder.description" />
             </div>
             <div class="ui toggle checkbox">
@@ -32,7 +32,7 @@
             </div>
             <div class="ui hidden divider"></div>
             <button :disabled="!canSave" @click="save" :class="['ui', 'green', {loading: isLoading}, 'button']">
-              <translate translate-context="Content/Radio/Button.Label/Verb">Save</translate>
+              <translate translate-context="Content/*/Button.Label/Verb">Save</translate>
             </button>
             <radio-button v-if="id" type="custom" :custom-radio-id="id"></radio-button>
           </div>
@@ -63,7 +63,7 @@
               <th class="one wide"><translate translate-context="Content/Radio/Table.Label/Verb">Exclude</translate></th>
               <th class="six wide"><translate translate-context="Content/Radio/Table.Label/Verb (Value is a List of Parameters)">Config</translate></th>
               <th class="five wide"><translate translate-context="Content/Radio/Table.Label/Noun (Value is a number of Tracks)">Candidates</translate></th>
-              <th class="two wide"><translate translate-context="Content/Radio/Table.Label/Noun (Value is a Button)">Actions</translate></th>
+              <th class="two wide"><translate translate-context="Content/*/*/Noun">Actions</translate></th>
             </tr>
           </thead>
           <tbody>
@@ -83,7 +83,8 @@
             class="ui header"
             v-translate="{count: checkResult.candidates.count}"
             :translate-n="checkResult.candidates.count"
-            translate-plural="%{ count } tracks matching combined filters">
+            translate-plural="%{ count } tracks matching combined filters"
+            translate-context="Content/Radio/Table.Paragraph/Short">
             %{ count } track matching combined filters
           </h3>
           <track-table v-if="checkResult.candidates.sample" :tracks="checkResult.candidates.sample" :playable="true"></track-table>

@@ -8,7 +8,7 @@
       </div>
     </div>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><translate translate-context="Content/Search/Title">Artists</translate></h3>
+      <h3 class="ui title"><translate translate-context="*/*/*/Noun">Artists</translate></h3>
       <div v-if="results.artists.length > 0">
         <div class="ui cards">
           <artist-card :key="artist.id" v-for="artist in results.artists" :artist="artist" ></artist-card>
@@ -17,7 +17,7 @@
       <p v-else><translate translate-context="Content/Search/Paragraph">No artist matched your query</translate></p>
     </template>
     <template v-if="query.length > 0">
-      <h3 class="ui title"><translate translate-context="Content/Search/Title">Albums</translate></h3>
+      <h3 class="ui title"><translate translate-context="*/*/*">Albums</translate></h3>
       <div v-if="results.albums.length > 0" class="ui stackable three column grid">
         <div class="column" :key="album.id" v-for="album in results.albums">
           <album-card class="fluid" :album="album" ></album-card>

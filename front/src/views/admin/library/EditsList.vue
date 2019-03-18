@@ -21,7 +21,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('Head/Admin/Title/Noun', 'Edits')
+        title: this.$pgettext('*/Admin/*/Noun', 'Edits')
       }
     }
   }

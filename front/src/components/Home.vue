@@ -76,7 +76,8 @@
             <i class="tag icon"></i>
             <div
               class="content"
-              v-translate="{url: musicbrainzUrl}">
+              v-translate="{url: musicbrainzUrl}"
+              translate-context="Content/Home/List item/Verb">
                 Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>
             </div>
           </div>

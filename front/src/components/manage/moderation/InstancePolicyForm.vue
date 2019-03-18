@@ -23,7 +23,7 @@
     </div>
     <div class="field">
       <label for="policy-summary">
-        <translate translate-context="Content/Moderation/Input.Label/Noun">Reason</translate>
+        <translate translate-context="Content/Moderation/*/Noun">Reason</translate>
         <tooltip :content="labels.summaryHelp" />
       </label>
       <textarea name="policy-summary" id="policy-summary" rows="5" v-model="current.summary"></textarea>
@@ -32,7 +32,7 @@
       <div class="ui toggle checkbox">
         <input id="policy-is-active" v-model="current.blockAll" type="checkbox">
         <label for="policy-is-active">
-          <translate translate-context="Content/Moderation/Checkbox.Label/Verb">Block everything</translate>
+          <translate translate-context="Content/Moderation/*/Verb">Block everything</translate>
           <tooltip :content="labels.blockAllHelp" />
         </label>
       </div>
@@ -52,14 +52,14 @@
     </div>
     <div class="ui hidden divider"></div>
     <button @click="$emit('cancel')" class="ui basic left floated button">
-      <translate translate-context="Content/Moderation/Card.Button.Label/Verb">Cancel</translate>
+      <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
     </button>
     <button :class="['ui', 'right', 'floated', 'green', {'disabled loading': isLoading}, 'button']" :disabled="isLoading">
       <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-if="object" key="1">Update</translate>
       <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-else key="2">Create</translate>
     </button>
     <dangerous-button v-if="object" class="right floated basic button" color='red' @confirm="remove">
-      <translate translate-context="Content/Moderation/Card.Button.Label/Verb">Delete</translate>
+      <translate translate-context="*/*/*/Verb">Delete</translate>
       <p slot="modal-header">
         <translate translate-context="Popup/Moderation/Title">Delete this moderation rule?</translate>
       </p>
@@ -112,15 +112,15 @@ export default {
         blockAllHelp: this.$pgettext('Content/Moderation/Help text', "Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"),
         silenceActivity: {
           help: this.$pgettext('Content/Moderation/Help text', "Hide account or domain content, except from followers."),
-          label: this.$pgettext('Content/Moderation/Checkbox.Label/Verb', "Mute activity"),
+          label: this.$pgettext('Content/Moderation/*/Verb', "Mute activity"),
         },
         silenceNotifications: {
           help: this.$pgettext('Content/Moderation/Help text', "Prevent account or domain from triggering notifications, except from followers."),
-          label: this.$pgettext('Content/Moderation/Checkbox.Label/Verb', "Mute notifications"),
+          label: this.$pgettext('Content/Moderation/*/Verb', "Mute notifications"),
         },
         rejectMedia: {
           help: this.$pgettext('Content/Moderation/Help text', "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."),
-          label: this.$pgettext('Content/Moderation/Checkbox.Label/Verb', "Reject media"),
+          label: this.$pgettext('Content/Moderation/*/Verb', "Reject media"),
         }
       }
     }

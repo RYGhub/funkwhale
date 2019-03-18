@@ -127,15 +127,15 @@ export default {
       return [
         {
           value: 'artist',
-          label: this.$pgettext('*/*/Noun', 'Artist')
+          label: this.$pgettext('*/*/*/Noun', 'Artist')
         },
         {
           value: 'release',
-          label: this.$pgettext('*/*/Noun', 'Album')
+          label: this.$pgettext('*/*/*', 'Album')
         },
         {
           value: 'recording',
-          label: this.$pgettext('*/*/*', 'Track')
+          label: this.$pgettext('*/*/*/Noun', 'Track')
         }
       ]
     }

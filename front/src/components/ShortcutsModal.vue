@@ -1,7 +1,7 @@
 <template>
   <modal @update:show="$emit('update:show', $event)" :show="show">
     <header class="header">
-      <translate translate-context="Popup/Keyboard shortcuts/Title">Keyboard shortcuts</translate>
+      <translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate>
     </header>
     <section class="scrolling content">
       <table

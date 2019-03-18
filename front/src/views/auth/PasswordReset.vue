@@ -2,7 +2,7 @@
   <main class="main pusher" v-title="labels.reset">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate translate-context="Content/Signup/Title">Reset your password</translate></h2>
+        <h2><translate translate-context="*/Login/*/Verb">Reset your password</translate></h2>
         <form class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
             <div class="header"><translate translate-context="Content/Signup/Card.Title">Error while asking for a password reset</translate></div>
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     labels() {
-      let reset = this.$pgettext('Head/Signup/Title', "Reset your password")
+      let reset = this.$pgettext('*/Login/*/Verb', "Reset your password")
       let placeholder = this.$pgettext('Content/Signup/Input.Placeholder', "Enter the email address binded to your account"
       )
       return {

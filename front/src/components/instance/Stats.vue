@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="column">
-        <h3 class="ui left aligned header"><translate translate-context="Content/About/Title/Noun">Library</translate></h3>
+        <h3 class="ui left aligned header"><translate translate-context="*/*/*">Library</translate></h3>
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
@@ -40,19 +40,19 @@
             <div class="value">
               {{ stats.artists }}
             </div>
-            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Artists</translate></div>
+            <div class="label"><translate translate-context="*/*/*/Noun">Artists</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.albums }}
             </div>
-            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Albums</translate></div>
+            <div class="label"><translate translate-context="*/*/*">Albums</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.tracks }}
             </div>
-            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Tracks</translate></div>
+            <div class="label"><translate translate-context="*/*/*/Noun">Tracks</translate></div>
           </div>
         </div>
       </div>
