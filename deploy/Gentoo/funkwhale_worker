@@ -1,0 +1,28 @@
+#!/sbin/openrc-run
+NAME=funkwhaleworker
+PIDFILE=/var/run/$NAME.pid
+USER=funkwhale
+WORKDIR=/srv/funkwhale/api 
+Celery=/srv/funkwhale/virtualenv/bin/celery 
+WORKER_ARGS=" -A funkwhale_api.taskapp worker -l INFO"
+
+depend() {
+        need net 
+}
+
+start() {
+	ebegin "Starting Funkwhale Worker"
+        cd /srv/funkwhale/api
+	set -a && source /srv/funkwhale/config/.env && set +a
+	echo ' start beat' 
+	start-stop-daemon --start --user $USER --make-pidfile --pidfile $PIDFILE  -d $WORKDIR  --exec $Celery -- $WORKER_ARGS >> /var/log/funk/worker.log 2>&1&
+        echo 'Started Worker'
+	echo
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping Funkwhale Worker"
+	start-stop-daemon --stop --pidfile $PIDFILE
+	eend $?
+}
