@@ -2,7 +2,7 @@
   <main class="main pusher" v-title="labels.confirm">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate translate-context="Content/Signup/Title">Confirm your e-mail address</translate></h2>
+        <h2>{{ labels.confirm }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
             <div class="header"><translate translate-context="Content/Signup/Paragraph">Could not confirm your e-mail address</translate></div>
@@ -18,7 +18,7 @@
             <translate translate-context="Content/Signup/Link/Verb">Return to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            <translate translate-context="Content/Signup/Button.Label/Verb">Confirm your e-mail address</translate></button>
+            {{ labels.confirm }}</button>
         </form>
         <div v-else class="ui positive message">
           <div class="header"><translate translate-context="Content/Signup/Message">E-mail address confirmed</translate></div>

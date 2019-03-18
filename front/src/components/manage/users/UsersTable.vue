@@ -3,11 +3,11 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui field">
-          <label><translate translate-context="Content/Search/Input.Label/verb">Search</translate></label>
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Input.Label/Noun">Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -35,13 +35,13 @@
         :action-url="'manage/library/uploads/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="Content/Admin/Table.Label">Username</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label">Email</translate></th>
+          <th><translate translate-context="Content/*/*">Username</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Email</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Short, Noun">Account status</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Short, Noun (Value is a date)">Sign-up</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label/Short, Noun (Value is a date)">Last activity</translate></th>
+          <th><translate translate-context="Content/Profile/Table.Label/Short, Noun (Value is a date)">Last activity</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Noun">Permissions</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label/Noun">Status</translate></th>
+          <th><translate translate-context="Content/Admin/Table.Label/Noun (Value is Regular user/Admin)">Status</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -68,8 +68,8 @@
           </td>
           <td>
             <span v-if="scope.obj.is_superuser" class="ui pink label"><translate translate-context="Content/Admin/Table.User role">Admin</translate></span>
-            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate translate-context="Content/Admin/Table.User role">Staff member</translate></span>
-            <span v-else class="ui basic label"><translate translate-context="Content/Admin/Table, User role">regular user</translate></span>
+            <span v-else-if="scope.obj.is_staff" class="ui purple label"><translate translate-context="Content/Profile/User role">Staff member</translate></span>
+            <span v-else class="ui basic label"><translate translate-context="Content/Admin/Table, User role">Regular user</translate></span>
           </td>
         </template>
       </action-table>
@@ -85,7 +85,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate translate-context="Content/Admin/Paragraph"
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -170,15 +170,15 @@ export default {
       return [
         {
           'code': 'library',
-          'label': this.$pgettext('Content/Admin/Table', 'Library')
+          'label': this.$pgettext('*/*/*', 'Library')
         },
         {
           'code': 'moderation',
-          'label': this.$pgettext('Content/Admin/Table', 'Moderation')
+          'label': this.$pgettext('*/Moderation/*', 'Moderation')
         },
         {
           'code': 'settings',
-          'label': this.$pgettext('Content/Admin/Table', 'Settings')
+          'label': this.$pgettext('*/*/*/Noun', 'Settings')
         }
       ]
     },

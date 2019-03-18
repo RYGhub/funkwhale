@@ -78,9 +78,9 @@ export default {
     groups() {
       // somehow, extraction fails if in the return block directly
       let instanceLabel = this.$pgettext('Content/Admin/Menu','Instance information')
-      let usersLabel = this.$pgettext('Content/Admin/Menu', 'Users')
-      let musicLabel = this.$pgettext('Content/Admin/Menu', 'Music')
-      let playlistsLabel = this.$pgettext('Content/Admin/Menu', 'Playlists')
+      let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
+      let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
+      let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
       let federationLabel = this.$pgettext('Content/Admin/Menu', 'Federation')
       let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
       let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')

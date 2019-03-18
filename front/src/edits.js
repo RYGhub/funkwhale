@@ -7,14 +7,14 @@ export default {
             id: 'title',
             type: 'text',
             required: true,
-            label: this.$pgettext('*/*/*/Short, Noun', 'Title'),
+            label: this.$pgettext('Content/Track/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
           {
             id: 'license',
             type: 'text',
             required: false,
-            label: this.$pgettext('*/*/*/Short, Noun', 'License'),
+            label: this.$pgettext('Content/*/*/Noun', 'License'),
             getValue: (obj) => { return obj.license }
           },
           {

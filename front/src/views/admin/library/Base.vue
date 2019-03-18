@@ -3,7 +3,7 @@
     <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
-        :to="{name: 'manage.library.edits'}"><translate translate-context="Menu/Admin/Link">Edits</translate></router-link>
+        :to="{name: 'manage.library.edits'}"><translate translate-context="*/Admin/*/Noun">Edits</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>
@@ -14,7 +14,7 @@ export default {
   computed: {
     labels() {
       let title = this.$pgettext('Head/Admin/Title', 'Manage library')
-      let secondaryMenu = this.$gettext('Menu/*/Hidden text', 'Secondary menu')
+      let secondaryMenu = this.$pgettext('Menu/*/Hidden text', 'Secondary menu')
       return {
         title,
         secondaryMenu

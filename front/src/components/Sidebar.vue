@@ -16,7 +16,7 @@
 
   <div class="menu-area">
     <div class="ui compact fluid two item inverted menu">
-      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate translate-context="Sidebar/Library/Tab.Title/Verb">Browse</translate></a>
+      <a :class="[{active: selectedTab === 'library'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'library'" data-tab="library"><translate translate-context="*/Library/*/Verb">Browse</translate></a>
       <a :class="[{active: selectedTab === 'queue'}, 'item']" role="button" @click.prevent.stop="selectedTab = 'queue'" data-tab="queue">
         <translate translate-context="Sidebar/Queue/Tab.Title/Noun">Queue</translate>&nbsp;
          <template v-if="queue.tracks.length === 0">
@@ -41,10 +41,10 @@
               </translate>
               <img class="ui right floated circular tiny avatar image" v-if="$store.state.auth.profile.avatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl']($store.state.auth.profile.avatar.square_crop)" />
             </router-link>
-            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate translate-context="Sidebar/Settings/List item.Link/Noun">Settings</translate></router-link>
+            <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/settings'}"><i class="setting icon"></i><translate translate-context="*/*/*/Noun">Settings</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'notifications'}">
               <i class="feed icon"></i>
-              <translate translate-context="Sidebar/Notifications/List item.Link/Noun">Notifications</translate>
+              <translate translate-context="*/Notifications/*">Notifications</translate>
               <div
                 v-if="$store.state.ui.notifications.inbox > 0"
                 :class="['ui', 'teal', 'label']">
@@ -52,16 +52,16 @@
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate translate-context="Sidebar/Login/List item.Link/Verb">Logout</translate></router-link>
             <template v-else>
-              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate translate-context="Sidebar/Login/List item.Link/Verb">Login</translate></router-link>
+              <router-link class="item" :to="{name: 'login'}"><i class="sign in icon"></i><translate translate-context="*/Login/*/Verb">Login</translate></router-link>
               <router-link class="item" :to="{path: '/signup'}">
                 <i class="corner add icon"></i>
-                <translate translate-context="Sidebar/Login/List item.Link/Verb">Create an account</translate>
+                <translate translate-context="*/Signup/Link/Verb">Create an account</translate>
               </router-link>
             </template>
           </div>
         </div>
         <div class="item">
-          <header class="header"><translate translate-context="Sidebar/Library/Title">Music</translate></header>
+          <header class="header"><translate translate-context="*/*/*/Noun">Music</translate></header>
           <div class="menu">
             <router-link class="item" :to="{path: '/library'}"><i class="sound icon"></i><translate translate-context="Sidebar/Library/List item.Link/Verb">Browse library</translate></router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{path: '/favorites'}"><i class="heart icon"></i><translate translate-context="Sidebar/Favorites/List item.Link/Noun">Favorites</translate></router-link>
@@ -69,11 +69,11 @@
               @click="$store.commit('playlists/chooseTrack', null)"
               v-if="$store.state.auth.authenticated"
               class="item">
-              <i class="list icon"></i><translate translate-context="Sidebar/Playlist/List item.Link/Noun">Playlists</translate>
+              <i class="list icon"></i><translate translate-context="*/*/*">Playlists</translate>
             </a>
             <router-link
               v-if="$store.state.auth.authenticated"
-              class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate translate-context="Sidebar/Library/List item.Link/Verb">Add content</translate></router-link>
+              class="item" :to="{name: 'content.index'}"><i class="upload icon"></i><translate translate-context="*/Library/*/Verb">Add content</translate></router-link>
           </div>
         </div>
         <div class="item" v-if="$store.state.auth.availablePermissions['settings'] || $store.state.auth.availablePermissions['moderation']">
@@ -83,25 +83,25 @@
               v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{path: '/manage/settings'}">
-              <i class="settings icon"></i><translate translate-context="Sidebar/Admin/List item.Link/Noun">Settings</translate>
+              <i class="settings icon"></i><translate translate-context="*/*/*/Noun">Settings</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['settings']"
               class="item"
               :to="{name: 'manage.users.users.list'}">
-              <i class="users icon"></i><translate translate-context="Sidebar/Admin/List item.Link/Noun">Users</translate>
+              <i class="users icon"></i><translate translate-context="*/*/*/Noun">Users</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['moderation']"
               class="item"
               :to="{name: 'manage.moderation.domains.list'}">
-              <i class="shield icon"></i><translate translate-context="Sidebar/Moderation/List item.Link/Noun">Moderation</translate>
+              <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['library']"
               class="item"
               :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
-              <i class="book icon"></i><translate translate-context="Sidebar/Moderation/List item.Link/Noun">Library</translate>
+              <i class="book icon"></i><translate translate-context="*/*/*">Library</translate>
               <div
                 v-if="$store.state.ui.notifications.pendingReviewEdits > 0"
                 :title="labels.pendingReviewEdits"
@@ -119,7 +119,7 @@
           <translate translate-context="Sidebar/Queue/Message">Do you want to restore your previous queue?</translate>
         </div>
         <p>
-          <translate translate-context="Sidebar/Queue/Message"
+          <translate translate-context="*/*/*"
             translate-plural="%{ count } tracks"
             :translate-n="queue.previousQueue.tracks.length"
             :translate-params="{count: queue.previousQueue.tracks.length}">
@@ -170,7 +170,7 @@
             <i class="feed icon"></i> <translate translate-context="Sidebar/Player/Title">You have a radio playing</translate>
           </div>
           <p><translate translate-context="Sidebar/Player/Paragraph">New tracks will be appended here automatically.</translate></p>
-          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button"><translate translate-context="Sidebar/Player/Button.Label/Verb">Stop radio</translate></div>
+          <div @click="$store.dispatch('radios/stop')" class="ui basic inverted red button"><translate translate-context="*/Player/Button.Label/Short, Verb">Stop radio</translate></div>
         </div>
       </div>
     </section>

@@ -37,7 +37,7 @@
           {{ library.size | humanSize }}
         </span>
         <i class="music icon"></i>
-        <translate translate-context="Content/Library/Card.List item" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+        <translate translate-context="*/*/*" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
       </div>
     </div>
     <div class="ui bottom basic attached buttons">

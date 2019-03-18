@@ -85,8 +85,8 @@
           <thead>
             <tr>
               <th><translate translate-context="Content/Library/Table.Label">Filename</translate></th>
-              <th><translate translate-context="Content/Library/Table.Label">Size</translate></th>
-              <th><translate translate-context="Content/Library/Table.Label">Status</translate></th>
+              <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
+              <th><translate translate-context="Content/Library/Table.Label (Value is Uploading/Uploaded/Error)">Status</translate></th>
             </tr>
           </thead>
           <tbody>
@@ -107,7 +107,7 @@
                   ({{ parseInt(file.progress) }}%)
                 </span>
                 <template v-else>
-                  <span class="ui label"><translate translate-context="Content/Library/Table" key="3">Pending</translate></span>
+                  <span class="ui label"><translate translate-context="Content/Library/*/Short" key="3">Pending</translate></span>
                   <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
                 </template>
               </td>

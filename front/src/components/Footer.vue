@@ -27,15 +27,15 @@
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">Using Funkwhale</h4>
+          <h4 v-translate class="ui header" translate-context="Footer/*/Title">Using Funkwhale</h4>
           <div class="ui link list">
             <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link/Short, Noun">Documentation</translate></a>
             <a href="https://docs.funkwhale.audio/users/apps.html" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Mobile and desktop apps</translate></a>
-            <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate translate-context="Footer/*/List item.Link/Short, Noun">Keyboard shortcuts</translate></div>
+            <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate></div>
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">Getting help</h4>
+          <h4 v-translate translate-context="Footer/*/Link" class="ui header">Getting help</h4>
           <div class="ui link list">
             <a href="https://socialhub.network/c/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/Listitem.Link">Support forum</translate></a>
             <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Chat room</translate></a>
@@ -43,7 +43,7 @@
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">About Funkwhale</h4>
+          <h4 v-translate class="ui header" translate-context="Footer/*/Title/Short">About Funkwhale</h4>
           <div class="ui link list">
             <a href="https://funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Official website</translate></a>
             <a href="https://contribute.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Contribute</translate></a>

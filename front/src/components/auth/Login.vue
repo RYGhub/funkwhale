@@ -15,7 +15,7 @@
             <label>
               <translate translate-context="Content/Login/Input.Label/Noun">Username or email</translate> |
               <router-link :to="{path: '/signup'}">
-                <translate translate-context="Content/Login/Link/Verb">Create an account</translate>
+                <translate translate-context="*/Signup/Link/Verb">Create an account</translate>
               </router-link>
             </label>
             <input
@@ -31,16 +31,16 @@
           </div>
           <div class="field">
             <label>
-              <translate translate-context="Content/Login/Input.Label">Password</translate> |
+              <translate translate-context="Content/*/Input.Label">Password</translate> |
               <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
-                <translate translate-context="Content/Login/Link/Verb">Reset your password</translate>
+                <translate translate-context="*/Login/*/Verb">Reset your password</translate>
               </router-link>
             </label>
             <password-input :index="2" required v-model="credentials.password" />
 
           </div>
           <button tabindex="3" :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-             <translate translate-context="Content/Login/Button.Label/Verb">Login</translate>
+             <translate translate-context="*/Login/*/Verb">Login</translate>
           </button>
         </form>
       </div>

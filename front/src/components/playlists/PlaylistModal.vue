@@ -29,9 +29,9 @@
           <thead>
             <tr>
               <th></th>
-              <th><translate translate-context="*/*/Table.Label">Name</translate></th>
+              <th><translate translate-context="*/*/*/Noun">Name</translate></th>
               <th class="sorted descending"><translate translate-context="Popup/Playlist/Table.Label/Short">Last modification</translate></th>
-              <th><translate translate-context="*/*/Table.Label">Tracks</translate></th>
+              <th><translate translate-context="*/*/*/Noun">Tracks</translate></th>
               <th></th>
             </tr>
           </thead>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button"><translate translate-context="Popup/Playlist/Button.Label">Cancel</translate></div>
+      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
     </div>
   </modal>
 </template>

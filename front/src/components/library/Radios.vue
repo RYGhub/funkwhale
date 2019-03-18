@@ -27,11 +27,11 @@
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label><translate translate-context="Content/Search/Input.Label/Verb">Search</translate></label>
+            <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
             <input name="search" type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
-            <label><translate translate-context="Content/Search/Dropdown.Label">Ordering</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
@@ -39,7 +39,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate translate-context="Content/Search/Dropdown.Label">Order</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">
                 <translate translate-context="Content/Search/Dropdown">Ascending</translate>
@@ -50,7 +50,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate translate-context="Content/Search/Dropdown.Label">Results per page</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -139,7 +139,7 @@ export default {
   computed: {
     labels() {
       let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter a radio name…")
-      let title = this.$pgettext('Head/Radio/Title', "Radios")
+      let title = this.$pgettext('*/*/*', "Radios")
       return {
         searchPlaceholder,
         title

@@ -22,9 +22,9 @@ export default {
     }
   },
   mounted () {
-    let artistLabel = this.$pgettext('Sidebar/Search/Title', 'Artist')
-    let albumLabel = this.$pgettext('Sidebar/Search/Title', 'Album')
-    let trackLabel = this.$pgettext('Sidebar/Search/Title', 'Track')
+    let artistLabel = this.$pgettext('*/*/*/Noun', 'Artist')
+    let albumLabel = this.$pgettext('*/*/*', 'Album')
+    let trackLabel = this.$pgettext('*/*/*/Noun', 'Track')
     let self = this
     jQuery(this.$el).search({
       type: 'category',

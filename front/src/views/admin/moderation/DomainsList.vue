@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.domains">
     <section class="ui vertical stripe segment">
-      <h2 class="ui left floated header"><translate translate-context="Content/Moderation/Title">Domains</translate></h2>
+      <h2 class="ui left floated header"><translate translate-context="*/Moderation/*/Noun">Domains</translate></h2>
       <form class="ui right floated form" @submit.prevent="createDomain">
         <div v-if="errors && errors.length > 0" class="ui negative message">
           <div class="header"><translate translate-context="Content/Moderation/Message.Title">Error while creating domain</translate></div>
@@ -45,7 +45,7 @@ export default {
   computed: {
     labels() {
       return {
-        domains: this.$pgettext('Head/Moderation/Title', "Domains")
+        domains: this.$pgettext('*/Moderation/*/Noun', "Domains")
       }
     }
   },

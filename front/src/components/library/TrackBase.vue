@@ -30,11 +30,11 @@
 
           <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
             <i class="wikipedia w icon"></i>
-            <translate translate-context="Content/*/Link/Verb">Search on Wikipedia</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
             <i class="external icon"></i>
-            <translate translate-context="Content/*/Link/Verb">View on MusicBrainz</translate>
+            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
           </a>
           <a v-if="upload" :href="downloadUrl" target="_blank" class="ui icon labeled button">
             <i class="download icon"></i>
@@ -45,7 +45,7 @@
               @click="showEmbedModal = !showEmbedModal"
               class="ui icon labeled button">
               <i class="code icon"></i>
-              <translate translate-context="Content/Track/Button.Label/Verb">Embed</translate>
+              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
             </button>
             <modal :show.sync="showEmbedModal">
               <div class="header">
@@ -59,7 +59,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate translate-context="Popup/Track/Button/Verb">Cancel</translate>
+                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -68,7 +68,7 @@
             :to="{name: 'library.tracks.edit', params: {id: track.id }}"
             class="ui icon labeled button">
             <i class="edit icon"></i>
-            <translate translate-context="Content/Track/Button.Label/Verb">Edit…</translate>
+            <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
           </router-link>
         </div>
       </section>
@@ -136,7 +136,7 @@ export default {
     },
     labels() {
       return {
-        title: this.$pgettext('Head/Track/Title', "Track")
+        title: this.$pgettext('*/*/*/Noun', "Track")
       }
     },
     wikipediaUrl() {

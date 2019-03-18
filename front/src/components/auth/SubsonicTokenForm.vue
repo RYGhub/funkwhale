@@ -17,7 +17,7 @@
       <div class="header">{{ successMessage }}</div>
     </div>
     <div v-if="subsonicEnabled && errors.length > 0" class="ui negative message">
-      <div class="header"><translate translate-context="Content/Settings/Error message.Title">Error</translate></div>
+      <div class="header"><translate translate-context="Content/*/Error message.Title">Error</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
@@ -31,10 +31,10 @@
         color="grey"
         :class="['ui', {'loading': isLoading}, 'button']"
         :action="requestNewToken">
-        <translate translate-context="Content/Settings/Button.Label/Verb">Request a new password</translate>
+        <translate translate-context="*/Settings/Button.Label/Verb">Request a new password</translate>
         <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Request a new Subsonic API password?</translate></p>
         <p slot="modal-content"><translate translate-context="Popup/Settings/Paragraph">This will log you out from existing devices that use the current password.</translate></p>
-        <div slot="modal-confirm"><translate translate-context="Popup/Settings/Button.Label/Verb">Request a new password</translate></div>
+        <div slot="modal-confirm"><translate translate-context="*/Settings/Button.Label/Verb">Request a new password</translate></div>
       </dangerous-button>
       <button
         v-else

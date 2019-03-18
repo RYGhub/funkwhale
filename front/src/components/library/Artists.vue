@@ -8,7 +8,7 @@
         <div class="fields">
           <div class="field">
             <label>
-              <translate translate-context="Content/Search/Input.Label/Verb">Search</translate>
+              <translate translate-context="Content/Search/Input.Label/Noun">Search</translate>
             </label>
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
@@ -28,7 +28,7 @@
             </select>
           </div>
           <div class="field">
-            <label><translate translate-context="Content/Search/Dropdown.Label">Results per page</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -114,7 +114,7 @@ export default {
   computed: {
     labels() {
       let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter artist name…")
-      let title = this.$pgettext('Head/Artist/Title', "Artists")
+      let title = this.$pgettext('*/*/*/Noun', "Artists")
       return {
         searchPlaceholder,
         title

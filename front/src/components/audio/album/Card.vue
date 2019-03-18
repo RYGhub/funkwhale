@@ -39,18 +39,18 @@
               <translate translate-context="Content/Album/Card.Link/Verb" :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <translate translate-context="Content/Album/Card.Link/Verb">Collapse</translate>
+              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
             </em>
           </div>
         </div>
       </div>
       <div class="extra content">
         <play-button class="mini basic orange right floated" :tracks="album.tracks" :album="album">
-          <translate translate-context="Content/Queue/Card.Button.Label/Short, Verb">Play all</translate>
+          <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
         </play-button>
         <span>
           <i class="music icon"></i>
-          <translate translate-context="Content/Album/Card" :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
+          <translate translate-context="*/*/*" :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
         </span>
       </div>
     </div>

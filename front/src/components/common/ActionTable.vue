@@ -20,7 +20,7 @@
             <div class="ui small left floated form" v-if="actionUrl && actions.length > 0">
               <div class="ui inline fields">
                 <div class="field">
-                  <label><translate translate-context="Content/*/Dropdown.Label/Noun">Actions</translate></label>
+                  <label><translate translate-context="Content/*/*/Noun">Actions</translate></label>
                   <select class="ui dropdown" v-model="currentActionName">
                     <option v-for="action in actions" :value="action.name">
                       {{ action.label }}

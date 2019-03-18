@@ -10,7 +10,7 @@
           <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](profile.avatar.square_crop)" />
           <div class="content">
             {{ profile.username }}
-            <div class="sub header" v-translate="{date: signupDate}">Member since %{ date }</div>
+            <div class="sub header" v-translate="{date: signupDate}" translate-context="Content/Profile/Paragraph">Member since %{ date }</div>
           </div>
         </h2>
         <div class="ui basic green label">
@@ -21,7 +21,7 @@
           :href="$store.getters['instance/absoluteUrl']('/api/admin')"
           target="_blank">
           <i class="star icon"></i>
-          <translate translate-context="Content/Profile/Button.Label">Staff member</translate>
+          <translate translate-context="Content/Profile/User role">Staff member</translate>
         </a>
       </div>
     </template>

@@ -2,7 +2,7 @@
   <main class="main pusher" v-title="labels.changePassword">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate translate-context="Content/Signup/Title">Change your password</translate></h2>
+        <h2>{{ labels.changePassword }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
             <div class="header"><translate translate-context="Content/Signup/Card.Title">Error while changing your password</translate></div>
@@ -12,7 +12,7 @@
           </div>
           <template v-if="token && uid">
             <div class="field">
-              <label><translate translate-context="Content/Signup/Input.Label">New password</translate></label>
+              <label><translate translate-context="Content/Settings/Input.Label">New password</translate></label>
               <password-input v-model="newPassword" />
             </div>
             <router-link :to="{path: '/login'}">
@@ -59,7 +59,7 @@ export default {
   computed: {
     labels() {
       return {
-        changePassword: this.$pgettext('Head/Signup/Title', "Change your password")
+        changePassword: this.$pgettext('*/Signup/Title', "Change your password")
       }
     }
   },

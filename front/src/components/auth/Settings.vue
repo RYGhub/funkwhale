@@ -102,7 +102,7 @@
                 <li><translate translate-context="Popup/Settings/List item">Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
               </ul>
             </div>
-            <div slot="modal-confirm"><translate translate-context="Popup/Setting/Button.Label">Disable access</translate></div>
+            <div slot="modal-confirm"><translate translate-context="Popup/Settings/Button.Label">Disable access</translate></div>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />
@@ -114,25 +114,25 @@
         <h2 class="ui header">
           <i class="eye slash outline icon"></i>
           <div class="content">
-            <translate>Content filters</translate>
+            <translate translate-context="Content/Settings/Title/Noun">Content filters</translate>
           </div>
         </h2>
-        <p><translate>Content filters help you hide content you don't want to see on the service.</translate></p>
+        <p><translate translate-context="Content/Settings/Paragraph">Content filters help you hide content you don't want to see on the service.</translate></p>
 
         <button
           @click="$store.dispatch('moderation/fetchContentFilters')"
           class="ui basic icon button">
           <i class="refresh icon"></i>&nbsp;
-          <translate translate-context="Content/*/Button.Label">Refresh</translate>
+          <translate translate-context="Content/*/Button.Label/Short, Verb">Refresh</translate>
         </button>
         <h3 class="ui header">
-          <translate>Hidden artists</translate>
+          <translate translate-context="Content/Settings/Title">Hidden artists</translate>
         </h3>
         <table class="ui compact very basic unstackable table">
           <thead>
             <tr>
-              <th><translate translate-context="Content/*/Table.Label">Name</translate></th>
-              <th><translate translate-context="Content/*/Table.Label">Creation date</translate></th>
+              <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
               <th></th>
             </tr>
           </thead>
@@ -148,7 +148,7 @@
               </td>
               <td>
                 <button @click="$store.dispatch('moderation/deleteContentFilter', filter.uuid)" class="ui basic tiny button">
-                  <translate translate-context="Content/*/Button.Label">Delete</translate>
+                  <translate translate-context="*/*/*/Verb">Delete</translate>
                 </button>
               </td>
             </tr>

@@ -73,7 +73,7 @@ export default {
     }),
     labels() {
       return {
-        title: this.$pgettext('Head/Notifications/Title', "Notifications")
+        title: this.$pgettext('*/Notifications/*', "Notifications")
       }
     }
   },

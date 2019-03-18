@@ -9,7 +9,7 @@
           </form>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Input.Label/Noun">Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -17,7 +17,7 @@
           </select>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Input.Label/Noun">Ordering direction</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
             <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
             <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
@@ -37,12 +37,12 @@
         action-url="manage/accounts/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="Content/Moderation/Table.Label">Name</translate></th>
-          <th><translate translate-context="Content/Moderation/Table.Label">Domain</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate></th>
-          <th><translate translate-context="Content/Moderation/Table.Label/Noun">First seen</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate></th>
           <th><translate translate-context="Content/Moderation/Table.Label/Noun">Last seen</translate></th>
-          <th><translate translate-context="Content/Moderation/Table.Label/Short, Noun">Under moderation rule</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Short">Under moderation rule</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -57,7 +57,7 @@
             </template>
             <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.domain)">
               <i class="home icon"></i>
-              <translate translate-context="Content/Moderation/Table/Short, Noun">Local account</translate>
+              <translate translate-context="Content/Moderation/*/Short, Noun">Local account</translate>
             </span>
           </td>
           <td>
@@ -86,7 +86,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate translate-context="Content/Moderation/Paragraph"
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -185,7 +185,7 @@ export default {
       return [
         {
           name: 'purge',
-          label: this.$pgettext('Content/Moderation/Dropdown/Verb', 'Purge'),
+          label: this.$pgettext('*/*/*/Verb', 'Purge'),
           isDangerous: true
         }
       ]

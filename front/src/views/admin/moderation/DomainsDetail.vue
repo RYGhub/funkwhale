@@ -76,7 +76,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/Table.Label">First seen</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
                     </td>
                     <td>
                       <human-date :date="object.creation_date"></human-date>
@@ -98,15 +98,15 @@
                         <translate translate-context="Content/Moderation/Table.Label">Software</translate>
                       </td>
                       <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.software.name', $gettext('N/A')) }} ({{ lodash.get(object, 'nodeinfo.payload.software.version', $gettext('N/A')) }})
+                        {{ lodash.get(object, 'nodeinfo.payload.software.name', $pgettext('*/*/*', 'N/A')) }} ({{ lodash.get(object, 'nodeinfo.payload.software.version', $pgettext('*/*/*', 'N/A')) }})
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        <translate translate-context="Content/Moderation/Table.Label">Name</translate>
+                        <translate translate-context="*/*/*/Noun">Name</translate>
                       </td>
                       <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.metadata.nodeName', $gettext('N/A')) }}
+                        {{ lodash.get(object, 'nodeinfo.payload.metadata.nodeName', $pgettext('*/*/*', 'N/A')) }}
                       </td>
                     </tr>
                     <tr>
@@ -114,14 +114,14 @@
                         <translate translate-context="Content/*/*">Total users</translate>
                       </td>
                       <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.usage.users.total', $gettext('N/A')) }}
+                        {{ lodash.get(object, 'nodeinfo.payload.usage.users.total', $pgettext('*/*/*', 'N/A')) }}
                       </td>
                     </tr>
                   </template>
                   <template v-if="object.nodeinfo && object.nodeinfo.status === 'error'">
                     <tr>
                       <td>
-                        <translate translate-context="Content/Moderation/Table.Label">Status</translate>
+                        <translate translate-context="Content/Moderation/Table.Label (Value is Error message)">Status</translate>
                       </td>
                       <td>
                         <translate translate-context="Content/Moderation/Table">Error while fetching node info</translate>&nbsp;
@@ -231,7 +231,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label">Libraries</translate>
+                      <translate translate-context="*/*/*/Noun">Libraries</translate>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -247,7 +247,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Artists</translate>
+                      <translate translate-context="*/*/*/Noun">Artists</translate>
                     </td>
                     <td>
                       {{ stats.artists }}
@@ -255,7 +255,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Albums</translate>
+                      <translate translate-context="*/*/*">Albums</translate>
                     </td>
                     <td>
                       {{ stats.albums}}
@@ -263,7 +263,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/*/*">Tracks</translate>
+                      <translate translate-context="*/*/*/Noun">Tracks</translate>
                     </td>
                     <td>
                       {{ stats.tracks }}

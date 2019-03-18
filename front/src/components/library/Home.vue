@@ -14,7 +14,7 @@
         </div>
         <div class="column">
           <playlist-widget :url="'playlists/'" :filters="{scope: 'user', playable: true, ordering: '-creation_date'}">
-            <template slot="title"><translate translate-context="Content/Home/Title">Playlists</translate></template>
+            <template slot="title"><translate translate-context="*/*/*">Playlists</translate></template>
           </playlist-widget>
         </div>
       </div>

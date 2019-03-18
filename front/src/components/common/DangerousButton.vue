@@ -15,7 +15,7 @@
       </div>
       <div class="actions">
         <div class="ui cancel button">
-          <translate translate-context="Modal/*/Button.Label/Short, Verb">Cancel</translate>
+          <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
         </div>
         <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
           <slot name="modal-confirm">

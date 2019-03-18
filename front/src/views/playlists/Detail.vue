@@ -22,17 +22,17 @@
           </div>
         </h2>
         <div class="ui hidden divider"></div>
-        <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate></play-button>
+        <play-button class="orange" :is-playable="playlist.is_playable" :tracks="tracks"><translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate></play-button>
         <button
           class="ui icon labeled button"
           v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>
           <template v-if="edit"><translate translate-context="Content/Playlist/Button.Label/Verb">End edition</translate></template>
-          <template v-else><translate translate-context="Content/*/Button.Label/Verb">Edit…</translate></template>
+          <template v-else><translate translate-context="Content/*/Button.Label/Verb">Edit</translate></template>
         </button>
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
-          <i class="trash icon"></i> <translate translate-context="Content/*/Button.Label/Verb">Delete</translate>
+          <i class="trash icon"></i> <translate translate-context="*/*/*/Verb">Delete</translate>
           <p slot="modal-header">
             <translate :translate-params="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action">Do you want to delete the playlist "%{ playlist }"?</translate>
           </p>
@@ -49,7 +49,7 @@
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
-        <h2><translate translate-context="Content/*/Title/Name">Tracks</translate></h2>
+        <h2><translate translate-context="*/*/*/Noun">Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
     </section>
@@ -88,7 +88,7 @@ export default {
   computed: {
     labels() {
       return {
-        playlist: this.$gettext('Playlist')
+        playlist: this.$pgettext('Head/Playlist/Title', 'Playlist')
       }
     }
   },

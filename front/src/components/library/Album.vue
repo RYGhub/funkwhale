@@ -15,7 +15,7 @@
           </h2>
           <div class="ui hidden divider"></div>
           <play-button class="orange" :tracks="album.tracks">
-            <translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate>
+            <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
           </play-button>
 
           <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
@@ -24,7 +24,7 @@
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
             <i class="external icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">View on MusicBrainz</translate>
+            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
@@ -45,7 +45,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate translate-context="Popup/*/Button.Label/Verb">Cancel</translate>
+                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -61,7 +61,7 @@
             translate-context="Content/Album/"
           >Volume %{ number }</translate>
           <play-button class="right floated orange" :tracks="tracks">
-            <translate translate-context="Content/*/Button.Label/Verb, Short">Play all</translate>
+            <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
           </play-button>
           <track-table :artist="album.artist" :display-position="true" :tracks="tracks"></track-table>
         </section>
@@ -69,14 +69,14 @@
       <template v-else>
         <section class="ui vertical stripe segment">
           <h2>
-            <translate translate-context="Content/*/Title/Name">Tracks</translate>
+            <translate translate-context="*/*/*/Noun">Tracks</translate>
           </h2>
           <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
         </section>
       </template>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate translate-context="Content/*/Title/Name">User libraries</translate>
+          <translate translate-context="Content/*/Title/Noun">User libraries</translate>
         </h2>
         <library-widget @loaded="libraries = $event" :url="'albums/' + id + '/libraries/'">
           <translate slot="subtitle" translate-context="Content/Album/Paragraph">This album is present in the following libraries:</translate>
@@ -146,7 +146,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('Head/Album/Title/Name', 'Album')
+        title: this.$pgettext('*/*/*', 'Album')
       }
     },
     publicLibraries () {

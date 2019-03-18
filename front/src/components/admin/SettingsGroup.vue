@@ -65,7 +65,7 @@
     <button
       type="submit"
       :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']">
-        <translate translate-context="Content/Settings/Button.Label/Short, Verb">Save</translate>
+        <translate translate-context="Content/*/Button.Label/Verb">Save</translate>
     </button>
   </form>
 </template>

@@ -33,7 +33,7 @@
           </a>
           <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
             <i class="external icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">View on MusicBrainz</translate>
+            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
           </a>
           <template v-if="publicLibraries.length > 0">
             <button
@@ -54,7 +54,7 @@
               </div>
               <div class="actions">
                 <div class="ui deny button">
-                  <translate translate-context="Popup/*/Button.Label/Verb">Cancel</translate>
+                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
             </modal>
@@ -65,7 +65,7 @@
         <div class="ui hidden divider"></div>
         <div class="ui message">
           <p>
-            <translate>You are currently hiding content related to this artist.</translate>
+            <translate translate-context="Content/Artist/Paragraph">You are currently hiding content related to this artist.</translate>
           </p>
           <router-link class="right floated" :to="{name: 'settings'}">
             <translate translate-context="Content/Moderation/Link">Review my filters</translate>
@@ -94,7 +94,7 @@
       </section>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate translate-context="Content/Artist/Title">User libraries</translate>
+          <translate translate-context="Content/*/Title/Noun">User libraries</translate>
         </h2>
         <library-widget @loaded="libraries = $event" :url="'artists/' + id + '/libraries/'">
           <translate translate-context="Content/Artist/Paragraph" slot="subtitle">This artist is present in the following libraries:</translate>
@@ -176,7 +176,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('Head/Artist/Title', "Artist")
+        title: this.$pgettext('*/*/*/Noun', "Artist")
       }
     },
     isPlayable() {

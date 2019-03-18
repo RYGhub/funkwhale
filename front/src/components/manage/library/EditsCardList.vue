@@ -10,24 +10,24 @@
           </form>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label">Status</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Pending review/Approved/Rejected)">Status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('is_approved', $event.target.value)" :value="getTokenValue('is_approved', '')">
             <option value="">
-              <translate translate-context="Content/Admin/Dropdown">All</translate>
+              <translate translate-context="Content/*/Dropdown">All</translate>
             </option>
             <option value="null">
-              <translate translate-context="Content/Admin/Dropdown">Pending review</translate>
+              <translate translate-context="Content/Admin/*/Noun">Pending review</translate>
             </option>
             <option value="yes">
-              <translate translate-context="Content/Admin/Dropdown">Approved</translate>
+              <translate translate-context="Content/*/*/Short">Approved</translate>
             </option>
             <option value="no">
-              <translate translate-context="Content/Admin/Dropdown">Rejected</translate>
+              <translate translate-context="Content/Library/*/Short">Rejected</translate>
             </option>
           </select>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label">Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -70,7 +70,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate translate-context="Content/Library/Paragraph"
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
