@@ -642,7 +642,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
             defaults={
                 "uploads_count": validated_data["totalItems"],
                 "name": validated_data["name"],
-                "description": validated_data["summary"],
+                "description": validated_data.get("summary"),
                 "followers_url": validated_data["followers"],
                 "privacy_level": privacy[validated_data["audience"]],
             },
