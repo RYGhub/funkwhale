@@ -67,3 +67,4 @@ pydub==0.23.0
 
 pyld==1.0.4
 aiohttp==3.5.4
+autobahn>=19.3.2
