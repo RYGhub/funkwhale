@@ -159,6 +159,6 @@ similar issues before doing that, and use the issue tracker only to report bugs,
 Improving this documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you feel like something should be improved in this document (and in the documentation in general), feel free to `edit
-it <https://dev.funkwhale.audio/funkwhale/funkwhale/tree/develop/docs>`_ and open a Merge Request. If you lack time or skills
-to do that, you can open an issue to discuss that, and someone else will do it.
+If you feel like something should be improved in this document (and in the documentation in general), feel free to :doc:`contribute to the documentation <../documentation/creating>`.
+If you're not comfortable contributing or would like to ask somebody else to do it, feel free to :doc:`request a change in documentation <../documentation/identifying>`.
+
