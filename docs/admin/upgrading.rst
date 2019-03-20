@@ -13,7 +13,7 @@ Upgrading your Funkwhale instance to a newer version
 Reading the release notes
 -------------------------
 
-Please take a few minutes to read the :doc:`changelog`: updates should work
+Please take a few minutes to read the :doc:`../changelog`: updates should work
 similarly from version to version, but some of them may require additional steps.
 Those steps would be described in the version release notes.
 
@@ -33,7 +33,7 @@ when possible.
 Docker setup
 ------------
 
-If you've followed the setup instructions in :doc:`Docker`, upgrade path is
+If you've followed the setup instructions in :doc:`../installation/docker`, upgrade path is
 easy:
 
 Mono-container installation

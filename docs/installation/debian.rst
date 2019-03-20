@@ -207,6 +207,7 @@ You can then edit the file: the file is heavily commented, and the most relevant
 configuration options are mentioned at the top of the file.
 
 .. code-block:: shell
+
     nano /srv/funkwhale/api/.env
 
 Paste the secret key you generated earlier at the entry

@@ -204,6 +204,7 @@ On non-docker deployments, run the following commands:
 Finally, enable the resulting configuration:
 
 .. code-block:: bash
+
     ln -s /etc/nginx/sites-available/funkwhale.conf /etc/nginx/sites-enabled/
 
 .. warning::
@@ -212,8 +213,8 @@ Finally, enable the resulting configuration:
     in the ``_protected/music`` location matches your MUSIC_DIRECTORY_SERVE_PATH
     env var.
 
-HTTS Configuration
-::::::::::::::::::
+HTTPS Configuration
+:::::::::::::::::::
 
 At this point you will need a SSL certificate to enable HTTPS on your server.
 The default nginx configuration assumes you have those available at ``/etc/letsencrypt/live/${FUNKWHALE_HOSTNAME}/``, which
@@ -274,7 +275,7 @@ Check the configuration is valid with ``apache2ctl configtest``, and once you're
 done, load the new configuration with ``service apache2 restart``.
 
 About internal locations
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Music (and other static) files are never served by the app itself, but by the reverse
 proxy. This is needed because a webserver is way more efficient at serving

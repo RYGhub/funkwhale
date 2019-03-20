@@ -14,7 +14,7 @@ and technical aspects of your instance, such as database credentials.
 
 .. note::
 
-    You should restart all funkwhale processes when you change the values
+    You should restart all Funkwhale processes when you change the values
     on environment variables.
 
 
@@ -38,7 +38,7 @@ settings in this interface.
 .. note::
 
     If you have any issue with the web application, a management interface is also
-    available for those settings from Django's administration interface. It's
+    available for those settings from :doc:`Django's administration interface <django>`. It's
     less user friendly, though, and we recommend you use the web app interface
     whenever possible.
 
@@ -110,7 +110,7 @@ for this value. For non-docker installation, you can use any absolute path.
 
 Default: :ref:`setting-MUSIC_DIRECTORY_PATH`
 
-When using Docker, the value of :ref:`MUSIC_DIRECTORY_PATH` in your containers
+When using Docker, the value of :ref:`setting-MUSIC_DIRECTORY_PATH` in your containers
 may differ from the real path on your host. Assuming you have the following directive
 in your :file:`docker-compose.yml` file::
 
@@ -156,7 +156,7 @@ permissions are:
   other instances, and accept/deny federation requests from other instances
 
 There is no dedicated interface to manage users permissions, but superusers
-can login on the Django's admin at ``/api/admin/`` and grant permissions
+can login on the :doc:`Django's admin <django>` at ``/api/admin/`` and grant permissions
 to users at ``/api/admin/users/user/``.
 
 Front-end settings

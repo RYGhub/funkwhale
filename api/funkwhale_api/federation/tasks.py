@@ -71,7 +71,7 @@ def get_files(storage, *parts):
 
 @celery.app.task(name="federation.dispatch_inbox")
 @celery.require_instance(models.Activity.objects.select_related(), "activity")
-def dispatch_inbox(activity):
+def dispatch_inbox(activity, call_handlers=True):
     """
     Given an activity instance, triggers our internal delivery logic (follow
     creation, etc.)
@@ -84,6 +84,7 @@ def dispatch_inbox(activity):
             "actor": activity.actor,
             "inbox_items": activity.inbox_items.filter(is_read=False),
         },
+        call_handlers=call_handlers,
     )
 
 
@@ -96,7 +97,7 @@ def dispatch_outbox(activity):
     inbox_items = activity.inbox_items.filter(is_read=False).select_related()
 
     if inbox_items.exists():
-        dispatch_inbox.delay(activity_id=activity.pk)
+        dispatch_inbox.delay(activity_id=activity.pk, call_handlers=False)
 
     if not preferences.get("federation__enabled"):
         # federation is disabled, we only deliver to local recipients

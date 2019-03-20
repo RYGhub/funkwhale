@@ -49,6 +49,12 @@ Those features as missing:
 Enabling Subsonic on your Funkwhale account
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. note::
+
+   Accessing Funkwhale from third party apps requires the instance administrator
+   to enable the Subsonic API setting. If you are unable to use Subsonic, please
+   contact your administrator.
+
 To log-in on your Funkwhale account from Subsonic clients, you will need to
 set a separate Subsonic API password by visiting your settings page.
 

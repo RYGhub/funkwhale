@@ -14,7 +14,7 @@ Diagnose problems
 ^^^^^^^^^^^^^^^^^
 
 Funkwhale is made of several components, each one being a potential cause for failure. Having an even basic overview
-of Funkwhale's technical architecture can help you understand what is going on. You can refer to :doc:`the technical architecture </architecture>` for that.
+of Funkwhale's technical architecture can help you understand what is going on. You can refer to :doc:`the technical architecture <../developers/architecture>` for that.
 
 Problems usually fall into one of those categories:
 
@@ -27,54 +27,6 @@ Problems usually fall into one of those categories:
 Each category comes with its own set of diagnose tools and/or commands we will detail below. We'll also give you simple
 steps for each type of problem. Please try those to see if it fix your issues. If none of those works, please report your issue on our
 issue tracker.
-
-Frontend issues
-^^^^^^^^^^^^^^^
-
-Diagnostic tools:
-
-- Javascript and network logs from your browser console (see instructions on how to open it in `Chrome <https://developers.google.com/web/tools/chrome-devtools/console/>`_ and  `Firefox <https://developer.mozilla.org/en-US/docs/Tools/Web_Console/Opening_the_Web_Console>`_
-- Proxy and API access and error logs (see :ref:`access-logs`)
-- The same operation works from a different browser
-
-Common problems
-***************
-
-The front-end is completely blank
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You are visiting Funkwhale, but you don't see anything.
-
-- Try from a different browser
-- Check network errors in your browser console. If you see responses with 40X or 50X statuses, there is probably an issue with the webserver configuration
-- If you don't see anything wrong in the network console, check the Javascript console
-- Disable your browser extensions (like adblockers)
-
-Music is not playing
-~~~~~~~~~~~~~~~~~~~~
-
-You have some tracks in your queue that don't play, or the queue is jumping from one track to the next until
-there is no more track available:
-
-- Try with other tracks. If it works with some tracks but not other tracks, this may means that the failing tracks are not probably imported
-  or that your browser does not support a specific audio format
-- Check the network and javascript console for potential errors
-
-Tracks are not appending to the queue
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When clicking on "Play", "Play all albums" or "Play all" buttons, some tracks are not appended to the queue. This is
-actually a feature of Funkwhale: those tracks have no file associated with them, so we cannot play them.
-
-Specific pages are loading forever or blank
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When viewing a given page, the page load never ends (you continue to see the spinner), or nothing seems to appear at all:
-
-- Ensure your internet connection is up and running
-- Ensure your instance is up and running
-- Check the network and javascript console for potential errors
-
 
 Backend issues
 ^^^^^^^^^^^^^^
@@ -207,6 +159,6 @@ similar issues before doing that, and use the issue tracker only to report bugs,
 Improving this documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you feel like something should be improved in this document (and in the documentation in general), feel free to `edit
-it <https://dev.funkwhale.audio/funkwhale/funkwhale/tree/develop/docs>`_ and open a Merge Request. If you lack time or skills
-to do that, you can open an issue to discuss that, and someone else will do it.
+If you feel like something should be improved in this document (and in the documentation in general), feel free to :doc:`contribute to the documentation <../documentation/creating>`.
+If you're not comfortable contributing or would like to ask somebody else to do it, feel free to :doc:`request a change in documentation <../documentation/identifying>`.
+

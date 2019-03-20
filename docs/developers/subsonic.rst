@@ -57,7 +57,6 @@ in our payload, which you can use to adapt your client behaviour if needed:
 
     {
         "subsonic-response": {
-            ...
             "type": "funkwhale",
             "funkwhaleVersion": "0.17"
         }

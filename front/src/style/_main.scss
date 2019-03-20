@@ -75,6 +75,9 @@
 // see https://github.com/webpack/webpack/issues/215
 @import "./vendor/media";
 
+$desktop-sidebar-width: 300px;
+$widedesktop-sidebar-width: 350px;
+
 html,
 body {
   @include media("<desktop") {
@@ -91,11 +94,24 @@ body {
   margin-top: 2em;
 }
 
+.ui.wide.left.sidebar {
+  @include media(">desktop") {
+    width: $desktop-sidebar-width;
+  }
+
+  @include media(">widedesktop") {
+    width: $widedesktop-sidebar-width;
+  }
+}
 .main.pusher,
 .footer {
   @include media(">desktop") {
-    margin-left: 350px !important;
+    margin-left: $desktop-sidebar-width !important;
     margin-top: 50px;
+  }
+
+  @include media(">widedesktop") {
+    margin-left: $widedesktop-sidebar-width !important;;
   }
   transform: none !important;
 }
@@ -118,10 +134,13 @@ body {
   }
   @include media(">desktop") {
     position: fixed;
-    left: 350px;
+    left: $desktop-sidebar-width;
     right: 0px;
     top: 0px;
     z-index: 99;
+  }
+  @include media(">widedesktop") {
+    left: $widedesktop-sidebar-width;
   }
   background-color: white;
   .item {
@@ -135,7 +154,10 @@ body {
   bottom: 1em;
   left: 1em;
   @include media(">desktop") {
-    left: 350px;
+    left: $desktop-sidebar-width;
+  }
+  @include media(">widedesktop") {
+    left: $widedesktop-sidebar-width;
   }
 }
 .main-pusher {
@@ -143,9 +165,12 @@ body {
 }
 .ui.stripe.segment,
 #footer {
-  padding: 2em;
+  padding: 1em;
   @include media(">tablet") {
-    padding: 4em;
+    padding: 2em;
+  }
+  @include media(">widedesktop") {
+    padding: 3em;
   }
 }
 

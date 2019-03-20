@@ -166,14 +166,24 @@ export default {
       id: "fileUpload",
       handler: this.handleImportEvent
     });
+    window.onbeforeunload = e => this.onBeforeUnload(e);
   },
   destroyed() {
     this.$store.commit("ui/removeWebsocketEventHandler", {
       eventName: "import.status_updated",
       id: "fileUpload"
     });
+    window.onbeforeunload = null;
   },
   methods: {
+    onBeforeUnload(e = {}) {
+      const returnValue = ('This page is asking you to confirm that you want to leave - data you have entered may not be saved.');
+      if (!this.hasActiveUploads) return null;
+      Object.assign(e, {
+        returnValue,
+      });
+      return returnValue;
+    },
     inputFile(newFile, oldFile) {
       this.$refs.upload.active = true;
     },
@@ -291,6 +301,9 @@ export default {
         f.statusIndex = statusIndex
         return f
       }), ['statusIndex', 'name'])
+    },
+    hasActiveUploads () {
+      return this.sortedFiles.filter((f) => { return f.active }).length > 0
     }
   },
   watch: {

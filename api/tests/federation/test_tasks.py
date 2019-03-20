@@ -74,10 +74,12 @@ def test_handle_in(factories, mocker, now, queryset_equal_list):
     a = factories["federation.Activity"](payload={"hello": "world"})
     ii1 = factories["federation.InboxItem"](activity=a, actor=r1)
     ii2 = factories["federation.InboxItem"](activity=a, actor=r2)
-    tasks.dispatch_inbox(activity_id=a.pk)
+    tasks.dispatch_inbox(activity_id=a.pk, call_handlers=False)
 
     mocked_dispatch.assert_called_once_with(
-        a.payload, context={"actor": a.actor, "activity": a, "inbox_items": [ii1, ii2]}
+        a.payload,
+        context={"actor": a.actor, "activity": a, "inbox_items": [ii1, ii2]},
+        call_handlers=False,
     )
 
 
@@ -90,7 +92,7 @@ def test_dispatch_outbox(factories, mocker):
     factories["federation.InboxItem"](activity=activity)
     delivery = factories["federation.Delivery"](activity=activity)
     tasks.dispatch_outbox(activity_id=activity.pk)
-    mocked_inbox.assert_called_once_with(activity_id=activity.pk)
+    mocked_inbox.assert_called_once_with(activity_id=activity.pk, call_handlers=False)
     mocked_deliver_to_remote.assert_called_once_with(delivery_id=delivery.pk)
 
 
@@ -104,7 +106,7 @@ def test_dispatch_outbox_disabled_federation(factories, mocker, preferences):
     factories["federation.InboxItem"](activity=activity)
     factories["federation.Delivery"](activity=activity)
     tasks.dispatch_outbox(activity_id=activity.pk)
-    mocked_inbox.assert_called_once_with(activity_id=activity.pk)
+    mocked_inbox.assert_called_once_with(activity_id=activity.pk, call_handlers=False)
     mocked_deliver_to_remote.assert_not_called()
 
 

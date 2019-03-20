@@ -196,4 +196,4 @@ Now, you just need to configure your :ref:`reverse-proxy <reverse-proxy-setup>`.
 About music acquisition
 -----------------------
 
-If you want to :doc:`import music located on the server </importing-music>`, you can put it in the ``data/music`` directory and it will become readable by the importer.
+If you want to :doc:`import music located on the server <../admin/importing-music>`, you can put it in the ``data/music`` directory and it will become readable by the importer.
