@@ -64,7 +64,7 @@ def test_get_artist_serializer(factories):
 def test_get_album_serializer(factories):
     artist = factories["music.Artist"]()
     album = factories["music.Album"](artist=artist)
-    track = factories["music.Track"](album=album)
+    track = factories["music.Track"](album=album, disc_number=42)
     upload = factories["music.Upload"](track=track, bitrate=42000, duration=43, size=44)
 
     expected = {
@@ -85,6 +85,7 @@ def test_get_album_serializer(factories):
                 "album": album.title,
                 "artist": artist.name,
                 "track": track.position,
+                "discNumber": track.disc_number,
                 "year": track.album.release_date.year,
                 "contentType": upload.mimetype,
                 "suffix": upload.extension or "",
