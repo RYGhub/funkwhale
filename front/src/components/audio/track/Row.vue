@@ -8,7 +8,7 @@
       <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
     </td>
     <td colspan="6">
-      <router-link class="track" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
+      <router-link class="track" :title="track.title" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
         <template v-if="displayPosition && track.position">
           {{ track.position }}.
         </template>
@@ -16,21 +16,21 @@
       </router-link>
     </td>
     <td colspan="4">
-      <router-link v-if="track.artist.id === albumArtist.id" class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+      <router-link v-if="track.artist.id === albumArtist.id" :title="track.artist.name" class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
         {{ track.artist.name }}
       </router-link>
       <template v-else>
-        <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: albumArtist.id }}">
+        <router-link class="artist discrete link" :title="albumArtist.name" :to="{name: 'library.artists.detail', params: {id: albumArtist.id }}">
           {{ albumArtist.name }}
         </router-link>
          /
-         <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+         <router-link class="artist discrete link" :title="track.artist.name" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
           {{ track.artist.name }}
         </router-link>
       </template>
     </td>
     <td colspan="4">
-      <router-link class="album discrete link" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
+      <router-link class="album discrete link" :title="track.album.title" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
         {{ track.album.title }}
       </router-link>
     </td>
