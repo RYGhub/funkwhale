@@ -11,7 +11,7 @@
         <div class="meta">
           <span>
             <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-              <translate translate-context="Content/Album/Card" :translate-params="{artist: album.artist.name}">By %{ artist }</translate>
+              <span v-translate="{artist: album.artist.name}" translate-context="Content/Album/Card" :translate-params="{artist: album.artist.name}">By %{ artist }</translate>
             </router-link>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>

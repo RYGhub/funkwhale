@@ -33,8 +33,8 @@
         </button>
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
           <i class="trash icon"></i> <translate translate-context="*/*/*/Verb">Delete</translate>
-          <p slot="modal-header">
-            <translate :translate-params="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action">Do you want to delete the playlist "%{ playlist }"?</translate>
+          <p slot="modal-header" v-translate="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action" :translate-params="{playlist: playlist.name}">
+            Do you want to delete the playlist "%{ playlist }"?
           </p>
           <p slot="modal-content"><translate translate-context="Popup/Playlist/Paragraph">This will completely delete this playlist and cannot be undone.</translate></p>
           <div slot="modal-confirm"><translate translate-context="Popup/Playlist/Button.Label/Verb">Delete playlist</translate></div>

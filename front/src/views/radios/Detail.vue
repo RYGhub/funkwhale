@@ -24,9 +24,9 @@
           </router-link>
           <dangerous-button class="labeled icon" :action="deleteRadio">
             <i class="trash icon"></i> Delete
-            <p slot="modal-header"><translate translate-context="Popup/Radio/Title" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</translate></p>
+            <p slot="modal-header" v-translate="{radio: radio.name}"  translate-context="Popup/Radio/Title" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</p>
             <p slot="modal-content"><translate translate-context="Popup/Radio/Paragraph">This will completely delete this radio and cannot be undone.</translate></p>
-            <div slot="modal-confirm"><translate translate-context="Popup/Radio/Button.Label/Verb">Delete radio</translate></div>
+            <p slot="modal-confirm"><translate translate-context="Popup/Radio/Button.Label/Verb">Delete radio</translate></p>
           </dangerous-button>
         </template>
       </div>

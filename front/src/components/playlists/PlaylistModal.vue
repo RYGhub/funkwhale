@@ -7,11 +7,12 @@
       <div class="description">
         <template v-if="track">
           <h4 class="ui header"><translate translate-context="Popup/Playlist/Title">Current track</translate></h4>
-          <translate translate-context="Popup/Playlist/Paragraph"
+          <span
+            translate-context="Popup/Playlist/Paragraph"
             v-translate="{artist: track.artist.name, title: track.title}"
             :translate-params="{artist: track.artist.name, title: track.title}">
             "%{ title }", by %{ artist }
-          </translate>
+          </span>
           <div class="ui divider"></div>
         </template>
 
