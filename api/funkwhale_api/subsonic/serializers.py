@@ -70,6 +70,7 @@ def get_track_data(album, track, upload):
         "album": album.title,
         "artist": album.artist.name,
         "track": track.position or 1,
+        "discNumber": track.disc_number or 1,
         "contentType": upload.mimetype,
         "suffix": upload.extension or "",
         "duration": upload.duration or 0,
