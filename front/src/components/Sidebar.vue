@@ -146,9 +146,11 @@
                   <img class="ui mini image" v-else src="../assets/audio/default-cover.png">
               </td>
               <td colspan="4">
-                  <button class="title reset ellipsis" :aria-label="labels.selectTrack">
+                  <button class="title reset ellipsis" :title="track.title" :aria-label="labels.selectTrack">
                     <strong>{{ track.title }}</strong><br />
-                    {{ track.artist.name }}
+                    <span>
+                      {{ track.artist.name }}
+                    </span>
                   </button>
               </td>
               <td>

@@ -33,8 +33,8 @@ class DomainAdmin(admin.ModelAdmin):
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ["type", "fid", "url", "actor", "creation_date"]
-    search_fields = ["payload", "fid", "url", "actor__domain"]
-    list_filter = ["type", "actor__domain"]
+    search_fields = ["payload", "fid", "url", "actor__domain__name"]
+    list_filter = ["type", "actor__domain__name"]
     actions = [redeliver_activities]
     list_select_related = True
 
@@ -49,7 +49,7 @@ class ActorAdmin(admin.ModelAdmin):
         "creation_date",
         "last_fetch_date",
     ]
-    search_fields = ["fid", "domain", "preferred_username"]
+    search_fields = ["fid", "domain__name", "preferred_username"]
     list_filter = ["type"]
 
 

@@ -859,7 +859,7 @@ class TrackSerializer(MusicEntitySerializer):
         from_activity = self.context.get("activity")
         if from_activity:
             metadata["from_activity_id"] = from_activity.pk
-        track = music_tasks.get_track_from_import_metadata(metadata)
+        track = music_tasks.get_track_from_import_metadata(metadata, update_cover=True)
         return track
 
 

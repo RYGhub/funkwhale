@@ -153,7 +153,7 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
     r_mock.get(metadata["cover_data"]["url"], body=io.BytesIO(b"coucou"))
     mocker.patch("funkwhale_api.music.metadata.Metadata.all", return_value=metadata)
 
-    track = tasks.get_track_from_import_metadata(metadata)
+    track = tasks.get_track_from_import_metadata(metadata, update_cover=True)
 
     assert track.title == metadata["title"]
     assert track.fid == metadata["fid"]
@@ -183,7 +183,9 @@ def test_sort_candidates(factories):
 
 def test_upload_import(now, factories, temp_signal, mocker):
     outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
-    track = factories["music.Track"]()
+    update_album_cover = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
+    get_picture = mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture")
+    track = factories["music.Track"](album__cover="")
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": str(track.uuid)}}}
     )
@@ -196,6 +198,10 @@ def test_upload_import(now, factories, temp_signal, mocker):
     assert upload.track == track
     assert upload.import_status == "finished"
     assert upload.import_date == now
+    get_picture.assert_called_once_with("cover_front", "other")
+    update_album_cover.assert_called_once_with(
+        upload.track.album, cover_data=get_picture.return_value, source=upload.source
+    )
     handler.assert_called_once_with(
         upload=upload,
         old_status="pending",

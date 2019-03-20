@@ -26,7 +26,9 @@ from . import serializers
 logger = logging.getLogger(__name__)
 
 
-def update_album_cover(album, source=None, cover_data=None, replace=False):
+def update_album_cover(
+    album, source=None, cover_data=None, musicbrainz=True, replace=False
+):
     if album.cover and not replace:
         return
     if cover_data:
@@ -39,7 +41,7 @@ def update_album_cover(album, source=None, cover_data=None, replace=False):
         cover = get_cover_from_fs(path)
         if cover:
             return album.get_image(data=cover)
-    if album.mbid:
+    if musicbrainz and album.mbid:
         try:
             logger.info(
                 "[Album %s] Fetching cover from musicbrainz release %s",
@@ -179,8 +181,8 @@ def process_upload(upload):
     import_metadata = upload.import_metadata or {}
     old_status = upload.import_status
     audio_file = upload.get_audio_file()
+    additional_data = {}
     try:
-        additional_data = {}
         if not audio_file:
             # we can only rely on user proveded data
             final_metadata = import_metadata
@@ -241,6 +243,15 @@ def process_upload(upload):
             "bitrate",
         ]
     )
+
+    # update album cover, if needed
+    if not track.album.cover:
+        update_album_cover(
+            track.album,
+            source=final_metadata.get("upload_source"),
+            cover_data=final_metadata.get("cover_data"),
+        )
+
     broadcast = getter(
         import_metadata, "funkwhale", "config", "broadcast", default=True
     )
@@ -369,7 +380,18 @@ def sort_candidates(candidates, important_fields):
 
 
 @transaction.atomic
-def get_track_from_import_metadata(data):
+def get_track_from_import_metadata(data, update_cover=False):
+    track = _get_track(data)
+    if update_cover and track and not track.album.cover:
+        update_album_cover(
+            track.album,
+            source=data.get("upload_source"),
+            cover_data=data.get("cover_data"),
+        )
+    return track
+
+
+def _get_track(data):
     track_uuid = getter(data, "funkwhale", "track", "uuid")
 
     if track_uuid:
@@ -380,12 +402,6 @@ def get_track_from_import_metadata(data):
         except models.Track.DoesNotExist:
             raise UploadImportError(code="track_uuid_not_found")
 
-        if not track.album.cover:
-            update_album_cover(
-                track.album,
-                source=data.get("upload_source"),
-                cover_data=data.get("cover_data"),
-            )
         return track
 
     from_activity_id = data.get("from_activity_id", None)
@@ -479,10 +495,6 @@ def get_track_from_import_metadata(data):
     album = get_best_candidate_or_create(
         models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
     )[0]
-    if not album.cover:
-        update_album_cover(
-            album, source=data.get("upload_source"), cover_data=data.get("cover_data")
-        )
 
     # get / create track
     track_title = data["title"]

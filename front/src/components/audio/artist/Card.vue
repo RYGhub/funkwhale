@@ -15,7 +15,7 @@
                   <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
                 </td>
                 <td colspan="4">
-                  <router-link class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">
+                  <router-link :title="album.title" class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">
                     <strong>{{ album.title }}</strong>
                   </router-link><br />
                   {{ album.tracks_count }} tracks

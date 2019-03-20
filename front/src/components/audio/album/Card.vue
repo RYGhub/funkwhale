@@ -10,7 +10,7 @@
         </div>
         <div class="meta">
           <span>
-            <router-link tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
+            <router-link :title="album.artist.name" tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
               <span v-translate="{artist: album.artist.name}" translate-context="Content/Album/Card" :translate-params="{artist: album.artist.name}">By %{ artist }</span>
             </router-link>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
@@ -24,7 +24,7 @@
                 </td>
                 <td class="content-cell" colspan="5">
                   <track-favorite-icon :track="track"></track-favorite-icon>
-                  <router-link class="track discrete link" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
+                  <router-link :title="track.title" class="track discrete link" :to="{name: 'library.tracks.detail', params: {id: track.id }}">
                     <template v-if="track.position">
                       {{ track.position }}.
                     </template>

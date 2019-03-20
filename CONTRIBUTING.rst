@@ -358,6 +358,344 @@ Internationalization
 --------------------
 
 We're using https://github.com/Polyconseil/vue-gettext to manage i18n in the project.
+<<<<<<< HEAD
+When working on the front-end, any end-user string should be marked as a translatable string,
+with the proper context, as described below.
+
+Translations in HTML
+^^^^^^^^^^^^^^^^^^^^
+
+Translations in HTML use the ``<translate>`` tag::
+
+    <template>
+      <div>
+        <h1><translate translate-context="Content/Profile/Header">User profile</translate></h1>
+        <p>
+          <translate
+            translate-context="Content/Profile/Paragraph"
+            :translate-params="{username: 'alice'}">
+            You are logged in as %{ username }
+          </translate>
+        </p>
+         <p>
+          <translate
+            translate-context="Content/Profile/Paragraph"
+            translate-plural="You have %{ count } new messages, that's a lot!"
+            :translate-n="unreadMessagesCount"
+            :translate-params="{count: unreadMessagesCount}">
+            You have 1 new message
+          </translate>
+        </p>
+      </div>
+    </template>
+
+Anything between the `<translate>` and `</translate>` delimiters will be considered as a translatable string.
+You can use variables in the translated string via the ``:translate-params="{var: 'value'}"`` directive, and reference them like this:
+``val value is %{ value }``.
+
+For pluralization, you need to use ``translate-params`` in conjunction with ``translate-plural`` and ``translate-n``:
+
+- ``translate-params`` should contain the variable you're using for pluralization (which is usually shown to the user)
+- ``translate-n`` should match the same variable
+- The ``<translate>`` delimiters contain the non-pluralized version of your string
+- The ``translate-plural`` directive contains the pluralized version of your string
+
+
+Translations in javascript
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Translations in javascript work by calling the ``this.$*gettext`` functions::
+
+    export default {
+      computed: {
+        strings () {
+          let tracksCount = 42
+          let playButton = this.$pgettext('Sidebar/Player/Button/Verb, Short', 'Play')
+          let loginMessage = this.$pgettext('*/Login/Message', 'Welcome back %{ username }')
+          let addedMessage = this.$npgettext('*/Player/Message', 'One track was queued', '%{ count } tracks were queued', tracksCount)
+          console.log(this.$gettextInterpolate(addedMessage, {count: tracksCount}))
+          console.log(this.$gettextInterpolate(loginMessage, {username: 'alice'}))
+        }
+      }
+    }
+
+The first argument of the ``$pgettext`` and ``$npgettext`` functions is the string context.
+
+Contextualization
+^^^^^^^^^^^^^^^^^
+
+Translation contexts provided via the ``translate-context`` directive and the ``$pgettext`` and ``$npgettext`` are never shown to end users
+but visible by Funkwhale translators. They help translators where and how the strings are used,
+especially with short or ambiguous strings, like ``May``, which can refer a month or a verb.
+
+While we could in theory use free form context, like ``This string is inside a button, in the main page, and is a call to action``,
+Funkwhale use a hierarchical structure to write contexts and keep them short and consistents accross the app. The previous context,
+rewritten correctly would be: ``Content/Home/Button/Call to action``.
+
+This hierarchical structure is made of several parts:
+
+- The location part, which is required and refers to the big blocks found in Funkwhale UI where the translated string is displayed:
+    - ``Content``
+    - ``Footer``
+    - ``Head``
+    - ``Menu``
+    - ``Popup``
+    - ``Sidebar``
+    - ``*`` for strings that are not tied to a specific location
+
+- The feature part, which is required, and refers to the feature associated with the translated string:
+    - ``About``
+    - ``Admin``
+    - ``Album``
+    - ``Artist``
+    - ``Embed``
+    - ``Home``
+    - ``Login``
+    - ``Library``
+    - ``Moderation``
+    - ``Player``
+    - ``Playlist``
+    - ``Profile``
+    - ``Favorites``
+    - ``Notifications``
+    - ``Radio``
+    - ``Search``
+    - ``Settings``
+    - ``Signup``
+    - ``Track``
+    - ``Queue``
+    - ``*`` for strings that are not tied to a specific feature
+
+- The component part, which is required and refers to the type of element that contain the string:
+    - ``Button``
+    - ``Card``
+    - ``Checkbox``
+    - ``Dropdown``
+    - ``Error message``
+    - ``Form``
+    - ``Header``
+    - ``Help text``
+    - ``Hidden text``
+    - ``Icon``
+    - ``Input``
+    - ``Image``
+    - ``Label``
+    - ``Link``
+    - ``List item``
+    - ``Menu``
+    - ``Message``
+    - ``Paragraph``
+    - ``Placeholder``
+    - ``Tab``
+    - ``Table``
+    - ``Title``
+    - ``Tooltip``
+    - ``*`` for strings that are not tied to a specific component
+
+The detail part, which is optional and refers to the contents of the string itself, such as:
+    - ``Adjective``
+    - ``Call to action``
+    - ``Noun``
+    - ``Short``
+    - ``Unit``
+    - ``Verb``
+
+Here are a few examples of valid context hierarchies:
+
+- ``Sidebar/Player/Button``
+- ``Content/Home/Button/Call to action``
+- ``Footer/*/Help text``
+- ``*/*/*/Verb, Short``
+- ``Popup/Playlist/Button``
+- ``Content/Admin/Table.Label/Short, Noun (Value is a date)``
+
+It's possible to nest multiple component parts to reach a higher level of detail. The component parts are then separated by a dot:
+
+- ``Sidebar/Queue/Tab.Title``
+- ``Content/*/Button.Title``
+- ``Content/*/Table.Header``
+- ``Footer/*/List item.Link``
+- ``Content/*/Form.Help text``
+
+Collecting translatable strings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to ensure your translatable strings are correctly marked for translation,
+you can try to extract them.
+||||||| merged common ancestors
+When working on the front-end, any end-user string should be translated
+using either ``<translate>yourstring</translate>`` or ``$gettext('yourstring')``
+function.
+=======
+<<<<<<< HEAD
+When working on the front-end, any end-user string should be translated
+using either ``<translate>yourstring</translate>`` or ``$gettext('yourstring')``
+function.
+||||||| parent of 21fb39dd... Update docs/developers/index.rst, docs/developers/subsonic.rst files
+When working on the front-end, any end-user string should be marked as a translatable string,
+with the proper context, as described below.
+
+Translations in HTML
+^^^^^^^^^^^^^^^^^^^^
+
+Translations in HTML use the ``<translate>`` tag::
+
+    <template>
+      <div>
+        <h1><translate translate-context="Content/Profile/Header">User profile</translate></h1>
+        <p>
+          <translate
+            translate-context="Content/Profile/Paragraph"
+            :translate-params="{username: 'alice'}">
+            You are logged in as %{ username }
+          </translate>
+        </p>
+         <p>
+          <translate
+            translate-context="Content/Profile/Paragraph"
+            translate-plural="You have %{ count } new messages, that's a lot!"
+            :translate-n="unreadMessagesCount"
+            :translate-params="{count: unreadMessagesCount}">
+            You have 1 new message
+          </translate>
+        </p>
+      </div>
+    </template>
+
+Anything between the `<translate>` and `</translate>` delimiters will be considered as a translatable string.
+You can use variables in the translated string via the ``:translate-params="{var: 'value'}"`` directive, and reference them like this:
+``val value is %{ value }``.
+
+For pluralization, you need to use ``translate-params`` in conjunction with ``translate-plural`` and ``translate-n``:
+
+- ``translate-params`` should contain the variable you're using for pluralization (which is usually shown to the user)
+- ``translate-n`` should match the same variable
+- The ``<translate>`` delimiters contain the non-pluralized version of your string
+- The ``translate-plural`` directive contains the pluralized version of your string
+
+
+Translations in javascript
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Translations in javascript work by calling the ``this.$*gettext`` functions::
+
+    export default {
+      computed: {
+        strings () {
+          let tracksCount = 42
+          let playButton = this.$pgettext('Sidebar/Player/Button/Verb, Short', 'Play')
+          let loginMessage = this.$pgettext('*/Login/Message', 'Welcome back %{ username }')
+          let addedMessage = this.$npgettext('*/Player/Message', 'One track was queued', '%{ count } tracks were queued', tracksCount)
+          console.log(this.$gettextInterpolate(addedMessage, {count: tracksCount}))
+          console.log(this.$gettextInterpolate(loginMessage, {username: 'alice'}))
+        }
+      }
+    }
+
+The first argument of the ``$pgettext`` and ``$npgettext`` functions is the string context.
+
+Contextualization
+^^^^^^^^^^^^^^^^^
+
+Translation contexts provided via the ``translate-context`` directive and the ``$pgettext`` and ``$npgettext`` are never shown to end users
+but visible by Funkwhale translators. They help translators where and how the strings are used,
+especially with short or ambiguous strings, like ``May``, which can refer a month or a verb.
+
+While we could in theory use free form context, like ``This string is inside a button, in the main page, and is a call to action``,
+Funkwhale use a hierarchical structure to write contexts and keep them short and consistents accross the app. The previous context,
+rewritten correctly would be: ``Content/Home/Button/Call to action``.
+
+This hierarchical structure is made of several parts:
+
+- The location part, which is required and refers to the big blocks found in Funkwhale UI where the translated string is displayed:
+    - ``Content``
+    - ``Footer``
+    - ``Head``
+    - ``Menu``
+    - ``Popup``
+    - ``Sidebar``
+    - ``*`` for strings that are not tied to a specific location
+
+- The feature part, which is required, and refers to the feature associated with the translated string:
+    - ``About``
+    - ``Admin``
+    - ``Album``
+    - ``Artist``
+    - ``Embed``
+    - ``Home``
+    - ``Login``
+    - ``Library``
+    - ``Moderation``
+    - ``Player``
+    - ``Playlist``
+    - ``Profile``
+    - ``Favorites``
+    - ``Notifications``
+    - ``Radio``
+    - ``Search``
+    - ``Settings``
+    - ``Signup``
+    - ``Track``
+    - ``Queue``
+    - ``*`` for strings that are not tied to a specific feature
+
+- The component part, which is required and refers to the type of element that contain the string:
+    - ``Button``
+    - ``Card``
+    - ``Checkbox``
+    - ``Dropdown``
+    - ``Error message``
+    - ``Form``
+    - ``Header``
+    - ``Help text``
+    - ``Hidden text``
+    - ``Icon``
+    - ``Input``
+    - ``Image``
+    - ``Label``
+    - ``Link``
+    - ``List item``
+    - ``Menu``
+    - ``Message``
+    - ``Paragraph``
+    - ``Placeholder``
+    - ``Tab``
+    - ``Table``
+    - ``Title``
+    - ``Tooltip``
+    - ``*`` for strings that are not tied to a specific component
+
+The detail part, which is optional and refers to the contents of the string itself, such as:
+    - ``Adjective``
+    - ``Call to action``
+    - ``Noun``
+    - ``Short``
+    - ``Unit``
+    - ``Verb``
+
+Here are a few examples of valid context hierarchies:
+
+- ``Sidebar/Player/Button``
+- ``Content/Home/Button/Call to action``
+- ``Footer/*/Help text``
+- ``*/*/*/Verb, Short``
+- ``Popup/Playlist/Button``
+- ``Content/Admin/Table.Label/Short, Noun (Value is a date)``
+
+It's possible to nest multiple component parts to reach a higher level of detail. The component parts are then separated by a dot:
+
+- ``Sidebar/Queue/Tab.Title``
+- ``Content/*/Button.Title``
+- ``Content/*/Table.Header``
+- ``Footer/*/List item.Link``
+- ``Content/*/Form.Help text``
+
+Collecting translatable strings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to ensure your translatable strings are correctly marked for translation,
+you can try to extract them.
+
 When working on the front-end, any end-user string should be marked as a translatable string,
 with the proper context, as described below.
 
