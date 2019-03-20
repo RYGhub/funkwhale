@@ -42,7 +42,7 @@
                   class="ui icon basic small button"
                   :to="{name: 'library.playlists.detail', params: {id: playlist.id }, query: {mode: 'edit'}}"><i class="ui pencil icon"></i></router-link>
               </td>
-              <td>
+              <td :title="playlist.name">
                 <router-link :to="{name: 'library.playlists.detail', params: {id: playlist.id }}">{{ playlist.name }}</router-link></td>
               <td><human-date :date="playlist.modification_date"></human-date></td>
               <td>{{ playlist.tracks_count }}</td>
