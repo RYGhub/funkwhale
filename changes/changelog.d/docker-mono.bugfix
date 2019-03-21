@@ -1,0 +1,1 @@
+Avoid mixed content when deploying mono-container behind HTTPS proxy (thetarkus/docker-funkwhale#19)
