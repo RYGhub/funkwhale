@@ -18,7 +18,7 @@ https://docs.funkwhale.audio/index.html
 
 
 Avoid mixed content when deploying mono-container behind proxy [Manual action required]
----------------------------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *You are only concerned if you use the mono-container docker deployment behind a reverse proxy*
 
