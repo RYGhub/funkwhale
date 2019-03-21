@@ -10,6 +10,57 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.18.3 (2019-03-21)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+
+Avoid mixed content when deploying mono-container behind proxy [Manual action required]
+---------------------------------------------------------------------------------------
+
+*You are only concerned if you use the mono-container docker deployment behind a reverse proxy*
+
+Because of `an issue in our mono-container configuration <https://github.com/thetarkus/docker-funkwhale/issues/19>`_, users deploying Funkwhale via docker
+using our `funkwhale/all-in-one` image could face some mixed content warnings (and possibly other troubles)
+when browsing the Web UI.
+
+This is fixed in this release, but on existing deployments, you'll need to add ``NESTED_PROXY=1`` in your container
+environment (either in your ``.env`` file, or via your container management tool), then recreate your funkwhale container.
+
+
+Enhancements:
+
+- Added title on hover for truncated content (#766)
+- Ask for confirmation before leaving upload page if there is a an upload in process (#630)
+- Exclude in-place imported files from quota computation (#570)
+- Truncate filename in library file table to ensure correct display of the table. (#735)
+
+
+Bugfixes:
+
+- Avoid mixed content when deploying mono-container behind HTTPS proxy (thetarkus/docker-funkwhale#19)
+- Display new notifications immediatly on notifications page (#729)
+- Ensure cover art from uploaded files is picked up properly on existing albums (#757)
+- Fixed a crash when federating a track with unspecified position
+- Fixed broken Activity and Actor modules in django admin (#767)
+- Fixed broken sample apache configuration (#764)
+- Fixed constant and unpredictable reordering during file upload (#716)
+- Fixed delivering of local activities causing unintended side effects, such as rollbacking changes (#737)
+- Fixed escaping issues in translated strings (#652)
+- Fixed saving moderation policy when clicking on "Cancel" (#751)
+- i18n: Update page title when changing the App's language. (#511)
+- Include disc number in Subsonic responses (#765)
+- Do not send notification when rejecting a follow on a local library (#743)
+
+
+Documentation:
+
+- Added documentation on mono-container docker upgrade (#713)
+- Added documentation to set up let's encrypt certificate (#745)
+
+
 0.18.2 (2019-02-13)
 -------------------
 

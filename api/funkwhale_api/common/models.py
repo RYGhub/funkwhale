@@ -5,10 +5,23 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models, transaction
+from django.db.models import Lookup
+from django.db.models.fields import Field
 from django.utils import timezone
 from django.urls import reverse
 
 from funkwhale_api.federation import utils as federation_utils
+
+
+@Field.register_lookup
+class NotEqual(Lookup):
+    lookup_name = "ne"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        return "%s <> %s" % (lhs, rhs), params
 
 
 class LocalFromFidQuerySet:

@@ -53,11 +53,15 @@ class ActorQuerySet(models.QuerySet):
     def with_current_usage(self):
         qs = self
         for s in ["pending", "skipped", "errored", "finished"]:
+            uploads_query = models.Q(
+                libraries__uploads__import_status=s,
+                libraries__uploads__audio_file__isnull=False,
+                libraries__uploads__audio_file__ne="",
+            )
             qs = qs.annotate(
                 **{
                     "_usage_{}".format(s): models.Sum(
-                        "libraries__uploads__size",
-                        filter=models.Q(libraries__uploads__import_status=s),
+                        "libraries__uploads__size", filter=uploads_query
                     )
                 }
             )

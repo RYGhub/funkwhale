@@ -53,6 +53,8 @@ Create an env file to store a few important configuration options:
     echo "FUNKWHALE_HOSTNAME=yourdomain.funkwhale" >> .env
     echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
     echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
+    # Remove this if you expose the container directly on ports 80/443
+    echo "NESTED_PROXY=1" >> .env
 
 Then start the container:
 
@@ -111,6 +113,31 @@ Useful commands:
             -p 5000:80 \
             -d \
             funkwhale/all-in-one:$FUNKWHALE_VERSION
+
+
+    You can use the following docker-compose file to make the management process easier:
+
+    .. code-block:: yaml
+
+        version: "3"
+
+        services:
+          funkwhale:
+            container_name: funkwhale
+            restart: unless-stopped
+            # add the version number in your .env file, or hardcode it
+            image: funkwhale/all-in-one:${FUNKWHALE_VERSION}
+            env_file: .env
+            environment:
+              # adapt to the pid/gid that own /srv/funkwhale/data
+              - PUID=1000
+              - PGID=1000
+            volumes:
+              - /srv/funkwhale/data:/data
+              - /path/to/your/music/dir:/music:ro
+            ports:
+              - "5000:80"
+
 
 .. _docker-multi-container:
 
