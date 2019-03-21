@@ -353,11 +353,7 @@ Internationalization
 --------------------
 
 We're using https://github.com/Polyconseil/vue-gettext to manage i18n in the project.
-<<<<<<< HEAD
-When working on the front-end, any end-user string should be translated
-using either ``<translate>yourstring</translate>`` or ``$gettext('yourstring')``
-function.
-||||||| parent of 21fb39dd... Update docs/developers/index.rst, docs/developers/subsonic.rst files
+
 When working on the front-end, any end-user string should be marked as a translatable string,
 with the proper context, as described below.
 
@@ -685,7 +681,6 @@ Collecting translatable strings
 
 If you want to ensure your translatable strings are correctly marked for translation,
 you can try to extract them.
->>>>>>> 21fb39dd... Update docs/developers/index.rst, docs/developers/subsonic.rst files
 
 Extraction is done by calling ``yarn run i18n-extract``, which
 will pull all the strings from source files and put them in a PO file.
