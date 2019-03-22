@@ -29,6 +29,7 @@
         </span>
       </div>
       <div class="description">
+        {{ library.description }}
         <div class="ui hidden divider"></div>
       </div>
       <div class="content">
