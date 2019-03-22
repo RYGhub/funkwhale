@@ -22,6 +22,10 @@
           <human-date :date="library.creation_date" />
         </span>
       </div>
+      <div class="description">
+        {{ library.description }}
+        <div class="ui hidden divider"></div>
+      </div>
       <div class="meta">
         <i class="music icon"></i>
         <translate translate-context="*/*/*" :translate-params="{count: library.uploads_count}" :translate-n="library.uploads_count" translate-plural="%{ count } tracks">%{ count } track</translate>
