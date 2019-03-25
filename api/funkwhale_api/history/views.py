@@ -1,5 +1,4 @@
 from rest_framework import mixins, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django.db.models import Prefetch
 
@@ -8,6 +7,8 @@ from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
 from funkwhale_api.music import utils as music_utils
 from . import filters, models, serializers
+
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 
 class ListeningViewSet(
@@ -19,11 +20,13 @@ class ListeningViewSet(
 
     serializer_class = serializers.ListeningSerializer
     queryset = models.Listening.objects.all().select_related("user")
+
     permission_classes = [
-        permissions.ConditionalAuthentication,
+        oauth_permissions.ScopePermission,
         permissions.OwnerPermission,
-        IsAuthenticatedOrReadOnly,
     ]
+    required_scope = "listenings"
+    anonymous_policy = "setting"
     owner_checks = ["write"]
     filterset_class = filters.ListeningFilter
 

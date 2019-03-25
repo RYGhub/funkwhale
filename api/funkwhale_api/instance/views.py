@@ -5,7 +5,7 @@ from rest_framework import views
 from rest_framework.response import Response
 
 from funkwhale_api.common import preferences
-from funkwhale_api.users.permissions import HasUserPermission
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import nodeinfo
 
@@ -14,8 +14,8 @@ NODEINFO_2_CONTENT_TYPE = "application/json; profile=http://nodeinfo.diaspora.so
 
 class AdminSettings(preferences_viewsets.GlobalPreferencesViewSet):
     pagination_class = None
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["settings"]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "instance:settings"
 
 
 class InstanceSettings(views.APIView):

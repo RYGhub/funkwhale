@@ -29,7 +29,6 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.federation import actors
-from funkwhale_api.users.permissions import HasUserPermission
 
 
 pytest_plugins = "aiohttp.pytest_plugin"
@@ -315,16 +314,6 @@ def authenticated_actor(factories, mocker):
         return_value=actor,
     )
     yield actor
-
-
-@pytest.fixture
-def assert_user_permission():
-    def inner(view, permissions, operator="and"):
-        assert HasUserPermission in view.permission_classes
-        assert getattr(view, "permission_operator", "and") == operator
-        assert set(view.required_permissions) == set(permissions)
-
-    return inner
 
 
 @pytest.fixture

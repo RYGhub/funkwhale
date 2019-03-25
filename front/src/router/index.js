@@ -3,10 +3,13 @@ import Router from 'vue-router'
 import PageNotFound from '@/components/PageNotFound'
 import About from '@/components/About'
 import Home from '@/components/Home'
+import Authorize from '@/components/auth/Authorize'
 import Login from '@/components/auth/Login'
 import Signup from '@/components/auth/Signup'
 import Profile from '@/components/auth/Profile'
 import Settings from '@/components/auth/Settings'
+import ApplicationNew from '@/components/auth/ApplicationNew'
+import ApplicationEdit from '@/components/auth/ApplicationEdit'
 import Logout from '@/components/auth/Logout'
 import PasswordReset from '@/views/auth/PasswordReset'
 import PasswordResetConfirm from '@/views/auth/PasswordResetConfirm'
@@ -105,6 +108,19 @@ export default new Router({
       })
     },
     {
+      path: '/authorize',
+      name: 'authorize',
+      component: Authorize,
+      props: (route) => ({
+        clientId: route.query.client_id,
+        redirectUri: route.query.redirect_uri,
+        scope: route.query.scope,
+        responseType: route.query.response_type,
+        nonce: route.query.nonce,
+        state: route.query.state,
+      })
+    },
+    {
       path: '/signup',
       name: 'signup',
       component: Signup,
@@ -121,6 +137,17 @@ export default new Router({
       path: '/settings',
       name: 'settings',
       component: Settings
+    },
+    {
+      path: '/settings/applications/new',
+      name: 'settings.applications.new',
+      component: ApplicationNew
+    },
+    {
+      path: '/settings/applications/:id/edit',
+      name: 'settings.applications.edit',
+      component: ApplicationEdit,
+      props: true
     },
     {
       path: '/@:username',

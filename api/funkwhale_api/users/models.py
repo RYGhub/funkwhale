@@ -18,6 +18,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from django_auth_ldap.backend import populate_user as ldap_populate_user
+from oauth2_provider import models as oauth2_models
+from oauth2_provider import validators as oauth2_validators
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
@@ -37,12 +39,37 @@ PERMISSIONS_CONFIGURATION = {
     "moderation": {
         "label": "Moderation",
         "help_text": "Block/mute/remove domains, users and content",
+        "scopes": {
+            "read:instance:policies",
+            "write:instance:policies",
+            "read:instance:accounts",
+            "write:instance:accounts",
+            "read:instance:domains",
+            "write:instance:domains",
+        },
     },
     "library": {
         "label": "Manage library",
         "help_text": "Manage library, delete files, tracks, artists, albums...",
+        "scopes": {
+            "read:instance:edits",
+            "write:instance:edits",
+            "read:instance:libraries",
+            "write:instance:libraries",
+        },
     },
-    "settings": {"label": "Manage instance-level settings", "help_text": ""},
+    "settings": {
+        "label": "Manage instance-level settings",
+        "help_text": "",
+        "scopes": {
+            "read:instance:settings",
+            "write:instance:settings",
+            "read:instance:users",
+            "write:instance:users",
+            "read:instance:invitations",
+            "write:instance:invitations",
+        },
+    },
 }
 
 PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
@@ -243,6 +270,45 @@ class Invitation(models.Model):
             )
 
         return super().save(**kwargs)
+
+
+class Application(oauth2_models.AbstractApplication):
+    scope = models.TextField(blank=True)
+
+    @property
+    def normalized_scopes(self):
+        from .oauth import permissions
+
+        raw_scopes = set(self.scope.split(" ") if self.scope else [])
+        return permissions.normalize(*raw_scopes)
+
+
+# oob schemes are not supported yet in oauth toolkit
+# (https://github.com/jazzband/django-oauth-toolkit/issues/235)
+# so in the meantime, we override their validation to add support
+OOB_SCHEMES = ["urn:ietf:wg:oauth:2.0:oob", "urn:ietf:wg:oauth:2.0:oob:auto"]
+
+
+class CustomRedirectURIValidator(oauth2_validators.RedirectURIValidator):
+    def __call__(self, value):
+        if value in OOB_SCHEMES:
+            return value
+        return super().__call__(value)
+
+
+oauth2_models.RedirectURIValidator = CustomRedirectURIValidator
+
+
+class Grant(oauth2_models.AbstractGrant):
+    pass
+
+
+class AccessToken(oauth2_models.AbstractAccessToken):
+    pass
+
+
+class RefreshToken(oauth2_models.AbstractRefreshToken):
+    pass
 
 
 def get_actor_data(username):

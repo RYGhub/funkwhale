@@ -8,7 +8,7 @@ from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import models as music_models
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.users import models as users_models
-from funkwhale_api.users.permissions import HasUserPermission
+
 
 from . import filters, serializers
 
@@ -23,8 +23,7 @@ class ManageUploadViewSet(
     )
     serializer_class = serializers.ManageUploadSerializer
     filterset_class = filters.ManageUploadFilterSet
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["library"]
+    required_scope = "instance:libraries"
     ordering_fields = [
         "accessed_date",
         "modification_date",
@@ -55,8 +54,7 @@ class ManageUserViewSet(
     queryset = users_models.User.objects.all().order_by("-id")
     serializer_class = serializers.ManageUserSerializer
     filterset_class = filters.ManageUserFilterSet
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["settings"]
+    required_scope = "instance:users"
     ordering_fields = ["date_joined", "last_activity", "username"]
 
     def get_serializer_context(self):
@@ -80,8 +78,7 @@ class ManageInvitationViewSet(
     )
     serializer_class = serializers.ManageInvitationSerializer
     filterset_class = filters.ManageInvitationFilterSet
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["settings"]
+    required_scope = "instance:invitations"
     ordering_fields = ["creation_date", "expiration_date"]
 
     def perform_create(self, serializer):
@@ -114,8 +111,7 @@ class ManageDomainViewSet(
     )
     serializer_class = serializers.ManageDomainSerializer
     filterset_class = filters.ManageDomainFilterSet
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["moderation"]
+    required_scope = "instance:domains"
     ordering_fields = [
         "name",
         "creation_date",
@@ -153,7 +149,7 @@ class ManageActorViewSet(
     )
     serializer_class = serializers.ManageActorSerializer
     filterset_class = filters.ManageActorFilterSet
-    permission_classes = (HasUserPermission,)
+    required_scope = "instance:accounts"
     required_permissions = ["moderation"]
     ordering_fields = [
         "name",
@@ -199,8 +195,7 @@ class ManageInstancePolicyViewSet(
     )
     serializer_class = serializers.ManageInstancePolicySerializer
     filterset_class = filters.ManageInstancePolicyFilterSet
-    permission_classes = (HasUserPermission,)
-    required_permissions = ["moderation"]
+    required_scope = "instance:policies"
     ordering_fields = ["id", "creation_date"]
 
     def perform_create(self, serializer):

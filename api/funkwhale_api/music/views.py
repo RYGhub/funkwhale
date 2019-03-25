@@ -8,7 +8,6 @@ from django.db.models.functions import Length
 from django.utils import timezone
 
 from rest_framework import mixins
-from rest_framework import permissions
 from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
@@ -24,6 +23,7 @@ from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import routes
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
 
@@ -64,7 +64,9 @@ class TagViewSetMixin(object):
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
@@ -90,7 +92,9 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
         models.Album.objects.all().order_by("artist", "release_date").select_related()
     )
     serializer_class = serializers.AlbumSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     ordering_fields = ("creation_date", "release_date", "title")
     filterset_class = filters.AlbumFilter
 
@@ -126,9 +130,11 @@ class LibraryViewSet(
     )
     serializer_class = serializers.LibraryForOwnerSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        oauth_permissions.ScopePermission,
         common_permissions.OwnerPermission,
     ]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     owner_field = "actor.user"
     owner_checks = ["read", "write"]
 
@@ -178,7 +184,9 @@ class TrackViewSet(
 
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     filterset_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
@@ -350,7 +358,9 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES
         + [SignatureAuthentication]
     )
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     lookup_field = "uuid"
 
     def retrieve(self, request, *args, **kwargs):
@@ -385,9 +395,11 @@ class UploadViewSet(
     )
     serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        oauth_permissions.ScopePermission,
         common_permissions.OwnerPermission,
     ]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
     filterset_class = filters.UploadFilter
@@ -432,12 +444,16 @@ class UploadViewSet(
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all().order_by("name")
     serializer_class = serializers.TagSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
 
 class Search(views.APIView):
     max_results = 3
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
         query = request.GET["query"]
@@ -502,7 +518,9 @@ class Search(views.APIView):
 
 
 class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     serializer_class = serializers.LicenseSerializer
     queryset = models.License.objects.all().order_by("code")
     lookup_value_regex = ".*"
@@ -527,7 +545,9 @@ class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class OembedView(views.APIView):
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
         serializer = serializers.OembedSerializer(data=request.GET)

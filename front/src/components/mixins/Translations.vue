@@ -35,6 +35,48 @@ export default {
           received_messages: this.$pgettext('Content/Moderation/*/Noun', 'Received messages'),
           uploads: this.$pgettext('Content/Moderation/Table.Label/Noun', 'Uploads'),
           followers: this.$pgettext('Content/Federation/*/Noun', 'Followers'),
+        },
+        scopes: {
+          profile: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Profile'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to email, username, and profile information'),
+          },
+          libraries: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Libraries and uploads'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to audio files, libraries, artists, albums and tracks'),
+          },
+          favorites: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Favorites'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to favorites'),
+          },
+          listenings: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Listenings'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to listening history'),
+          },
+          follows: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Follows'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to follows'),
+          },
+          playlists: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Playlists'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to playlists'),
+          },
+          radios: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Radios'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to radios'),
+          },
+          filters: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Content filters'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to content filters'),
+          },
+          notifications: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Notifications'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to notifications'),
+          },
+          edits: {
+            label: this.$pgettext('Content/OAuth Scopes/Label', 'Edits'),
+            description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to edits'),
+          }
         }
       }
     }

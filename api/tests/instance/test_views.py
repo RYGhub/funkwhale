@@ -1,12 +1,4 @@
-import pytest
 from django.urls import reverse
-
-from funkwhale_api.instance import views
-
-
-@pytest.mark.parametrize("view,permissions", [(views.AdminSettings, ["settings"])])
-def test_permissions(assert_user_permission, view, permissions):
-    assert_user_permission(view, permissions)
 
 
 def test_nodeinfo_endpoint(db, api_client, mocker):

@@ -92,7 +92,7 @@ def get_playlist_qs(request):
 class SubsonicViewSet(viewsets.GenericViewSet):
     content_negotiation_class = negotiation.SubsonicContentNegociation
     authentication_classes = [authentication.SubsonicAuthentication]
-    permissions_classes = [rest_permissions.IsAuthenticated]
+    permission_classes = [rest_permissions.IsAuthenticated]
 
     def dispatch(self, request, *args, **kwargs):
         if not preferences.get("subsonic__enabled"):
@@ -128,7 +128,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         detail=False,
         methods=["get", "post"],
         url_name="get_license",
-        permissions_classes=[],
+        permission_classes=[],
         url_path="getLicense",
     )
     def get_license(self, request, *args, **kwargs):
