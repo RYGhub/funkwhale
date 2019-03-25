@@ -75,6 +75,10 @@ v1_patterns += [
         r"^users/",
         include(("funkwhale_api.users.api_urls", "users"), namespace="users"),
     ),
+    url(
+        r"^oauth/",
+        include(("funkwhale_api.users.oauth.urls", "oauth"), namespace="oauth"),
+    ),
     url(r"^token/$", jwt_views.obtain_jwt_token, name="token"),
     url(r"^token/refresh/$", jwt_views.refresh_jwt_token, name="token_refresh"),
 ]

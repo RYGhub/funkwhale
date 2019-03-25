@@ -1,7 +1,7 @@
 <template>
   <main class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
-      <section class="ui small text container">
+      <section class="ui text container">
         <h2 class="ui header">
           <translate translate-context="Content/Settings/Title">Account settings</translate>
         </h2>
@@ -29,7 +29,7 @@
           </button>
         </form>
       </section>
-      <section class="ui small text container">
+      <section class="ui text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <translate translate-context="Content/Settings/Title">Avatar</translate>
@@ -63,7 +63,7 @@
         </div>
       </section>
 
-      <section class="ui small text container">
+      <section class="ui text container">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <translate translate-context="Content/Settings/Title/Verb">Change my password</translate>
@@ -109,7 +109,7 @@
         <subsonic-token-form />
       </section>
 
-      <section class="ui small text container" id="content-filters">
+      <section class="ui text container" id="content-filters">
         <div class="ui hidden divider"></div>
         <h2 class="ui header">
           <i class="eye slash outline icon"></i>
@@ -155,6 +155,118 @@
           </tbody>
         </table>
       </section>
+      <section class="ui text container" id="grants">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="open lock icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Noun">Authorized apps</translate>
+          </div>
+        </h2>
+        <p><translate translate-context="Content/Settings/Paragraph">This is the list of applications that have access to your account data.</translate></p>
+        <button
+          @click="fetchApps()"
+          class="ui basic icon button">
+          <i class="refresh icon"></i>&nbsp;
+          <translate translate-context="Content/*/Button.Label/Short, Verb">Refresh</translate>
+        </button>
+        <table v-if="apps.length > 0" class="ui compact very basic unstackable table">
+          <thead>
+            <tr>
+              <th><translate translate-context="*/*/*/Noun">Application</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Permissions</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="app in apps" :key='app.client_id'>
+              <td>
+                {{ app.name }}
+              </td>
+              <td>
+                {{ app.scopes }}
+              </td>
+              <td>
+                <dangerous-button
+                  class="ui tiny basic button"
+                  @confirm="revokeApp(app.client_id)">
+                  <translate translate-context="*/*/*/Verb">Revoke</translate>
+                  <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Revoke access for application "%{ application }"?</p>
+                  <p slot="modal-content"><translate translate-context="Popup/Settings/Paragraph">This will prevent this application from accessing the service on your behalf.</translate></p>
+                  <div slot="modal-confirm"><translate translate-context="*/Settings/Button.Label/Verb">Revoke access</translate></div>
+                </dangerous-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <empty-state v-else>
+          <translate slot="title" translate-context="Content/Applications/Paragraph">
+            You don't have any application connected with your account.
+          </translate>
+          <translate translate-context="Content/Applications/Paragraph">
+            If you authorize third-party applications to access your data, those applications will be listed here.
+          </translate>
+        </empty-state>
+      </section>
+      <section class="ui text container" id="apps">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="code icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Noun">Your applications</translate>
+          </div>
+        </h2>
+        <p><translate translate-context="Content/Settings/Paragraph">This is the list of applications that you have created.</translate></p>
+        <router-link class="ui basic green button" :to="{name: 'settings.applications.new'}">
+          <translate translate-context="Content/Settings/Button.Label">Create a new application</translate>
+        </router-link>
+        <table v-if="ownedApps.length > 0" class="ui compact very basic unstackable table">
+          <thead>
+            <tr>
+              <th><translate translate-context="*/*/*/Noun">Application</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Scopes</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="app in ownedApps" :key='app.client_id'>
+              <td>
+                <router-link :to="{name: 'settings.applications.edit', params: {id: app.client_id}}">
+                  {{ app.name }}
+                </router-link>
+              </td>
+              <td>
+                {{ app.scopes }}
+              </td>
+              <td>
+                <human-date :date="app.created" />
+              </td>
+              <td>
+                <router-link class="ui basic tiny green button" :to="{name: 'settings.applications.edit', params: {id: app.client_id}}">
+                  <translate translate-context="Content/Settings/Button.Label">Edit</translate>
+                </router-link>
+                <dangerous-button
+                  class="ui tiny basic button"
+                  @confirm="deleteApp(app.client_id)">
+                  <translate translate-context="*/*/*/Verb">Delete</translate>
+                  <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Delete application "%{ application }"?</p>
+                  <p slot="modal-content"><translate translate-context="Popup/Settings/Paragraph">This will permanently delete the application and all the associated tokens.</translate></p>
+                  <div slot="modal-confirm"><translate translate-context="*/Settings/Button.Label/Verb">Delete application</translate></div>
+                </dangerous-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <empty-state v-else>
+          <translate slot="title" translate-context="Content/Applications/Paragraph">
+            You don't have any configured application yet.
+          </translate>
+          <translate translate-context="Content/Applications/Paragraph">
+            Create one to integrate Funkwhale with third-party applications.
+          </translate>
+        </empty-state>
+      </section>
     </div>
   </main>
 </template>
@@ -185,6 +297,8 @@ export default {
       isLoadingAvatar: false,
       avatarErrors: [],
       avatar: null,
+      apps: [],
+      ownedApps: [],
       settings: {
         success: false,
         errors: [],
@@ -203,6 +317,10 @@ export default {
       d.settings.fields[id].id = id
     })
     return d
+  },
+  created () {
+    this.fetchApps()
+    this.fetchOwnedApps()
   },
   mounted() {
     $("select.dropdown").dropdown()
@@ -226,6 +344,56 @@ export default {
           logger.default.error("Error while updating settings")
           self.isLoading = false
           self.settings.errors = error.backendErrors
+        }
+      )
+    },
+    fetchApps() {
+      this.apps = []
+      let self = this
+      let url = `oauth/grants/`
+      return axios.get(url).then(
+        response => {
+          self.apps = response.data
+        },
+        error => {
+        }
+      )
+    },
+    fetchOwnedApps() {
+      this.ownedApps = []
+      let self = this
+      let url = `oauth/apps/`
+      return axios.get(url).then(
+        response => {
+          self.ownedApps = response.data.results
+        },
+        error => {
+        }
+      )
+    },
+    revokeApp (id) {
+      let self = this
+      let url = `oauth/grants/${id}/`
+      return axios.delete(url).then(
+        response => {
+          self.apps = self.apps.filter(a => {
+            return a.client_id != id
+          })
+        },
+        error => {
+        }
+      )
+    },
+    deleteApp (id) {
+      let self = this
+      let url = `oauth/apps/${id}/`
+      return axios.delete(url).then(
+        response => {
+          self.ownedApps = self.ownedApps.filter(a => {
+            return a.client_id != id
+          })
+        },
+        error => {
         }
       )
     },

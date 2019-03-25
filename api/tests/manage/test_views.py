@@ -3,22 +3,7 @@ from django.urls import reverse
 
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
-from funkwhale_api.manage import serializers, views
-
-
-@pytest.mark.parametrize(
-    "view,permissions,operator",
-    [
-        (views.ManageUploadViewSet, ["library"], "and"),
-        (views.ManageUserViewSet, ["settings"], "and"),
-        (views.ManageInvitationViewSet, ["settings"], "and"),
-        (views.ManageDomainViewSet, ["moderation"], "and"),
-        (views.ManageActorViewSet, ["moderation"], "and"),
-        (views.ManageInstancePolicyViewSet, ["moderation"], "and"),
-    ],
-)
-def test_permissions(assert_user_permission, view, permissions, operator):
-    assert_user_permission(view, permissions, operator)
+from funkwhale_api.manage import serializers
 
 
 @pytest.mark.skip(reason="Refactoring in progress")

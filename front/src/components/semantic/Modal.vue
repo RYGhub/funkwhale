@@ -21,7 +21,7 @@ export default {
   },
   beforeDestroy () {
     if (this.control) {
-      this.control.remove()
+      $(this.$el).modal('hide')
     }
   },
   methods: {
@@ -61,5 +61,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 </style>

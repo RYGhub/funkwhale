@@ -121,6 +121,7 @@ THIRD_PARTY_APPS = (
     "allauth.account",  # registration
     "allauth.socialaccount",  # registration
     "corsheaders",
+    "oauth2_provider",
     "rest_framework",
     "rest_framework.authtoken",
     "taggit",
@@ -152,6 +153,7 @@ LOCAL_APPS = (
     "funkwhale_api.common.apps.CommonConfig",
     "funkwhale_api.activity.apps.ActivityConfig",
     "funkwhale_api.users",  # custom users app
+    "funkwhale_api.users.oauth",
     # Your stuff: custom apps go here
     "funkwhale_api.instance",
     "funkwhale_api.music",
@@ -222,6 +224,14 @@ DATABASES = {
     "default": env.db("DATABASE_URL")
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+MIGRATION_MODULES = {
+    # see https://github.com/jazzband/django-oauth-toolkit/issues/634
+    # swappable models are badly designed in oauth2_provider
+    # ignore migrations and provide our own models.
+    "oauth2_provider": None
+}
+
 #
 # DATABASES = {
 #     'default': {
@@ -343,6 +353,22 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
 
+# OAuth configuration
+from funkwhale_api.users.oauth import scopes  # noqa
+
+OAUTH2_PROVIDER = {
+    "SCOPES": {s.id: s.label for s in scopes.SCOPES_BY_ID.values()},
+    "ALLOWED_REDIRECT_URI_SCHEMES": ["http", "https", "urn"],
+    # we keep expired tokens for 15 days, for tracability
+    "REFRESH_TOKEN_EXPIRE_SECONDS": 3600 * 24 * 15,
+    "AUTHORIZATION_CODE_EXPIRE_SECONDS": 5 * 60,
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 60 * 60 * 10,
+}
+OAUTH2_PROVIDER_APPLICATION_MODEL = "users.Application"
+OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = "users.AccessToken"
+OAUTH2_PROVIDER_GRANT_MODEL = "users.Grant"
+OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "users.RefreshToken"
+
 # LDAP AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTH_LDAP_ENABLED = env.bool("LDAP_ENABLED", default=False)
@@ -450,13 +476,18 @@ CELERY_TASK_TIME_LIMIT = 300
 CELERY_BEAT_SCHEDULE = {
     "federation.clean_music_cache": {
         "task": "federation.clean_music_cache",
-        "schedule": crontab(hour="*/2"),
+        "schedule": crontab(minute="0", hour="*/2"),
         "options": {"expires": 60 * 2},
     },
     "music.clean_transcoding_cache": {
         "task": "music.clean_transcoding_cache",
-        "schedule": crontab(hour="*"),
+        "schedule": crontab(minute="0", hour="*"),
         "options": {"expires": 60 * 2},
+    },
+    "oauth.clear_expired_tokens": {
+        "task": "oauth.clear_expired_tokens",
+        "schedule": crontab(minute="0", hour="0"),
+        "options": {"expires": 60 * 60 * 24},
     },
 }
 
@@ -477,7 +508,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "funkwhale_api.common.pagination.FunkwhalePagination",
     "PAGE_SIZE": 25,
     "DEFAULT_PARSER_CLASSES": (
@@ -487,11 +517,15 @@ REST_FRAMEWORK = {
         "funkwhale_api.federation.parsers.ActivityParser",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "rest_framework.authentication.SessionAuthentication",
         "funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS",
         "funkwhale_api.common.authentication.BearerTokenHeaderAuth",
         "funkwhale_api.common.authentication.JSONWebTokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "funkwhale_api.users.oauth.permissions.ScopePermission",
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework.filters.OrderingFilter",

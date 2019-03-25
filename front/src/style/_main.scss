@@ -330,3 +330,11 @@ td.align.right {
 .card .description {
   word-wrap: break-word;
 }
+
+.ui.checkbox label {
+  cursor: pointer;
+}
+
+input + .help {
+  margin-top: 0.5em;
+}

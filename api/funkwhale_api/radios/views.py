@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.music.serializers import TrackSerializer
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, filtersets, models, serializers
 
@@ -20,10 +21,11 @@ class RadioViewSet(
 
     serializer_class = serializers.RadioSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        oauth_permissions.ScopePermission,
         common_permissions.OwnerPermission,
     ]
     filterset_class = filtersets.RadioFilter
+    required_scope = "radios"
     owner_field = "user"
     owner_checks = ["write"]
 

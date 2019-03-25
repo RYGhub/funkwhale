@@ -2,11 +2,12 @@ from django.db import transaction
 from django.db.models import Count
 from rest_framework import exceptions, mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from funkwhale_api.common import fields, permissions
 from funkwhale_api.music import utils as music_utils
+from funkwhale_api.users.oauth import permissions as oauth_permissions
+
 from . import filters, models, serializers
 
 
@@ -28,10 +29,11 @@ class PlaylistViewSet(
         .with_duration()
     )
     permission_classes = [
-        permissions.ConditionalAuthentication,
+        oauth_permissions.ScopePermission,
         permissions.OwnerPermission,
-        IsAuthenticatedOrReadOnly,
     ]
+    required_scope = "playlists"
+    anonymous_policy = "setting"
     owner_checks = ["write"]
     filterset_class = filters.PlaylistFilter
     ordering_fields = ("id", "name", "creation_date", "modification_date")
@@ -101,10 +103,11 @@ class PlaylistTrackViewSet(
     serializer_class = serializers.PlaylistTrackSerializer
     queryset = models.PlaylistTrack.objects.all()
     permission_classes = [
-        permissions.ConditionalAuthentication,
+        oauth_permissions.ScopePermission,
         permissions.OwnerPermission,
-        IsAuthenticatedOrReadOnly,
     ]
+    required_scope = "playlists"
+    anonymous_policy = "setting"
     owner_field = "playlist.user"
     owner_checks = ["write"]
 

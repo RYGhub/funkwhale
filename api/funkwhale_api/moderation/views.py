@@ -1,7 +1,6 @@
 from django.db import IntegrityError
 
 from rest_framework import mixins
-from rest_framework import permissions
 from rest_framework import response
 from rest_framework import status
 from rest_framework import viewsets
@@ -24,7 +23,7 @@ class UserFilterViewSet(
         .select_related("target_artist")
     )
     serializer_class = serializers.UserFilterSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    required_scope = "filters"
     ordering_fields = ("creation_date",)
 
     def create(self, request, *args, **kwargs):

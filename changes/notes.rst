@@ -20,3 +20,17 @@ Content linked to hidden artists will not show up in the interface anymore. Espe
 - Hidden artists won't appear in Subsonic apps
 
 Results linked to hidden artists will continue to show up in search results and their profile page remains accessible.
+
+OAuth2 authorization for better integration with third-party apps
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale now support the OAuth2 authorization and authentication protocol which will allow
+third-party apps to interact with Funkwhale on behalf of users.
+
+This feature makes it possible to build third-party apps that have the same capabilities
+as Funkwhale's Web UI. The only exception at the moment is for actions that requires
+special permissions, such as modifying instance settings or moderation (but this will be
+enabled in a future release).
+
+If you want to start building an app on top of Funkwhale's API, please check-out
+`https://docs.funkwhale.audio/api.html`_ and `https://docs.funkwhale.audio/developers/authentication.html`_.

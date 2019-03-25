@@ -87,4 +87,6 @@ def mutations_route(types):
             )
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    return decorators.action(methods=["get", "post"], detail=True)(mutations)
+    return decorators.action(
+        methods=["get", "post"], detail=True, required_scope="edits"
+    )(mutations)

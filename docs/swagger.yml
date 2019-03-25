@@ -1,13 +1,13 @@
-openapi: "3.0.0"
+openapi: "3.0.2"
 info:
   description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
   version: "1.0.0"
   title: "Funkwhale API"
 
 servers:
-  - url: https://demo.funkwhale.audio/api/v1
+  - url: https://demo.funkwhale.audio
     description: Demo server
-  - url: https://{domain}/api/v1
+  - url: https://{domain}
     description: Custom server
     variables:
       domain:
@@ -21,6 +21,38 @@ servers:
 
 components:
   securitySchemes:
+    oauth2:
+      type: oauth2
+      description: This API uses OAuth 2 with the Authorization Code flow. You can register an app using the /oauth/apps/ endpoint.
+      flows:
+        authorizationCode:
+          # Swagger doesn't support relative URLs yet (cf https://github.com/swagger-api/swagger-ui/pull/5244)
+          authorizationUrl: /authorize
+          tokenUrl: /api/v1/oauth/token/
+          refreshUrl: /api/v1/oauth/token/
+          scopes:
+            "read": "Read-only access to all user data"
+            "write": "Write-only access on all user data"
+            "read:profile": "Read-only access to profile data"
+            "read:libraries": "Read-only access to library and uploads"
+            "read:playlists": "Read-only access to playlists"
+            "read:listenings": "Read-only access to listening history"
+            "read:favorites": "Read-only access to favorites"
+            "read:radios": "Read-only access to radios"
+            "read:edits": "Read-only access to edits"
+            "read:notifications": "Read-only access to notifications"
+            "read:follows": "Read-only to follows"
+            "read:filters": "Read-only to to content filters"
+            "write:profile": "Write-only access to profile data"
+            "write:libraries": "Write-only access to libraries"
+            "write:playlists": "Write-only access to playlists"
+            "write:follows": "Write-only access to follows"
+            "write:favorites": "Write-only access to favorits"
+            "write:notifications": "Write-only access to notifications"
+            "write:radios": "Write-only access to radios"
+            "write:edits": "Write-only access to edits"
+            "write:filters": "Write-only access to content-filters"
+            "write:listenings": "Write-only access to listening history"
     jwt:
       type: http
       scheme: bearer
@@ -29,9 +61,44 @@ components:
 
 security:
   - jwt: []
+  - oauth2: []
 
 paths:
-  /token/:
+  /api/v1/oauth/apps/:
+    post:
+      tags:
+        - "auth"
+      description:
+        Register an OAuth application
+      security: []
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/OAuthApplication"
+                  - $ref: "#/definitions/OAuthApplicationCreation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                  example: "My Awesome Funkwhale Client"
+                  summary: "A human readable name for your app"
+                redirect_uris:
+                  type: "string"
+                  example: "https://myapp/oauth2/funkwhale"
+                  summary: "A list of redirect uris, separated by spaces"
+                scopes:
+                  type: "string"
+                  summary: "A list of scopes requested by your app, separated by spaces"
+                  example: "read write:playlists write:favorites"
+  /api/v1/token/:
     post:
       tags:
         - "auth"
@@ -57,11 +124,14 @@ paths:
                   type: "string"
                   example: "demo"
 
-  /artists/:
+  /api/v1/artists/:
     get:
       summary: List artists
       tags:
         - "artists"
+      security:
+        - oauth2:
+          - "read:libraries"
       parameters:
         - name: "q"
           in: "query"
@@ -99,12 +169,14 @@ paths:
                         type: "array"
                         items:
                           $ref: "#/definitions/Artist"
-  /artists/{id}/:
+  /api/v1/artists/{id}/:
     get:
       summary: Retrieve a single artist
       parameters:
         - $ref: "#/parameters/ObjectId"
-
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "artists"
       responses:
@@ -118,9 +190,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
-  /artists/{id}/libraries/:
+  /api/v1/artists/{id}/libraries/:
     get:
       summary: List available user libraries containing work from this artist
+      security:
+        - oauth2:
+          - "read:libraries"
       parameters:
         - $ref: "#/parameters/ObjectId"
         - $ref: "#/parameters/PageNumber"
@@ -141,11 +216,15 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /albums/:
+  /api/v1/albums/:
     get:
       summary: List albums
       tags:
         - "albums"
+
+      security:
+        - oauth2:
+          - "read:libraries"
       parameters:
         - name: "q"
           in: "query"
@@ -191,12 +270,15 @@ paths:
                         type: "array"
                         items:
                           $ref: "#/definitions/Album"
-  /albums/{id}/:
+  /api/v1/albums/{id}/:
     get:
       summary: Retrieve a single album
       parameters:
         - $ref: "#/parameters/ObjectId"
 
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "albums"
       responses:
@@ -211,7 +293,7 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /albums/{id}/libraries/:
+  /api/v1/albums/{id}/libraries/:
     get:
       summary: List available user libraries containing tracks from this album
       parameters:
@@ -219,6 +301,9 @@ paths:
         - $ref: "#/parameters/PageNumber"
         - $ref: "#/parameters/PageSize"
 
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "albums"
         - "libraries"
@@ -234,11 +319,15 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /tracks/:
+  /api/v1/tracks/:
     get:
       summary: List tracks
       tags:
         - "tracks"
+
+      security:
+        - oauth2:
+          - "read:libraries"
       parameters:
         - name: "q"
           in: "query"
@@ -300,12 +389,15 @@ paths:
                         type: "array"
                         items:
                           $ref: "#/definitions/Track"
-  /tracks/{id}/:
+  /api/v1/tracks/{id}/:
     get:
       summary: Retrieve a single track
       parameters:
         - $ref: "#/parameters/ObjectId"
 
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "tracks"
       responses:
@@ -320,14 +412,16 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /tracks/{id}/libraries/:
+  /api/v1/tracks/{id}/libraries/:
     get:
       summary: List available user libraries containing given track
       parameters:
         - $ref: "#/parameters/ObjectId"
         - $ref: "#/parameters/PageNumber"
         - $ref: "#/parameters/PageSize"
-
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "tracks"
         - "libraries"
@@ -343,9 +437,12 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /licenses/:
+  /api/v1/licenses/:
     get:
       summary: List licenses
+      security:
+        - oauth2:
+          - "read:libraries"
       tags:
         - "licenses"
       parameters:
@@ -365,9 +462,12 @@ paths:
                         items:
                           $ref: "#/definitions/License"
 
-  /licenses/{code}/:
+  /api/v1/licenses/{code}/:
     get:
       summary: Retrieve a single license
+      security:
+        - oauth2:
+          - "read:libraries"
       parameters:
         - name: code
           in: path
@@ -441,6 +541,34 @@ properties:
     description: "A musicbrainz ID"
 
 definitions:
+  OAuthApplication:
+    type: "object"
+    properties:
+      client_id:
+        type: "string"
+        example: "VKIZWv7FwBq56UMfUtbCSIgSxzUTv1b6nMyOkJvP"
+      created:
+        type: "string"
+        format: "date-time"
+      updated:
+        type: "string"
+        format: "date-time"
+      scopes:
+        type: "string"
+        description: "Coma-separated list of scopes requested by the app"
+
+  OAuthApplicationCreation:
+    type: "object"
+    properties:
+      client_secret:
+        type: "string"
+        example: "qnKDX8zjIfC0BG4tUreKlqk3tNtuCfJdGsaEt5MIWrTv0YLLhGI6SGqCjs9kn12gyXtIg4FWfZqWMEckJmolCi7a6qew4LawPWMfnLDii4mQlY1eQG4BJbwPANOrDiTZ"
+      redirect_uris:
+        type: "string"
+        format: "uri"
+        description: "Coma-separated list of redirect uris allowed for the app"
+
+
   ResultPage:
     type: "object"
     properties:
