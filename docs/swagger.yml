@@ -1,7 +1,6 @@
 # Undocumented endpoints:
 #  /api/v1/settings
 #  /api/v1/activity
-#  /api/v1/listen
 #  /api/v1/playlists
 #  /api/v1/playlist-tracks
 #  /api/v1/search
@@ -374,7 +373,66 @@ paths:
             application/json:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
+  /listen/{uuid}/:
+    get:
+      summary: Download the audio file matching the given track uuid
+      description: |
+        Given a track uuid (and not ID), return the first found audio file
+        accessible by the user making the request.
 
+        In case of a remote upload, this endpoint will fetch the audio file from the remote
+        and cache it before sending the response.
+
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: Track uuid
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: to
+          in: query
+          required: false
+          description: |
+            If specified, the endpoint will return a transcoded version of the original
+            audio file.
+
+            Since transcoding happens on the fly, it can significantly increase response time,
+            and it's recommended to request transcoding only for files that are not playable
+            by the client.
+
+            This endpoint support bytess-range requests.
+          schema:
+            $ref: "#/properties/transcode_options"
+        - name: upload
+          in: query
+          required: false
+          summary: An upload uuid
+          description: |
+            If specified, will return the audio for the given upload uuid.
+
+            This is useful for tracks that have multiple uploads available.
+
+          schema:
+            type: string
+            format: uuid
+
+      tags:
+        - "Library and metadata"
+      responses:
+        200:
+          content:
+            '*/*':
+              description: "Audio file, as binary data"
+              schema:
+                type: string
+                format: binary
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
   /licenses/:
     get:
       summary: List licenses
@@ -776,6 +834,12 @@ properties:
      * `finished`: successfully processed by the server
      * `errored`: couldn't be processed by the server (e.g because of a tagging issue)
      * `skipped`: processed by the server but skipped, because considered as a duplicate of an existing upload
+
+  transcode_options:
+    type: string
+    enum:
+      - "ogg"
+      - "mp3"
 
 definitions:
   ResultPage:
