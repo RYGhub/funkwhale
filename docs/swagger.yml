@@ -15,6 +15,27 @@ info:
     The API is **not** freezed yet, but we will document breaking changes in our changelog,
     and try to avoid those as much as possible.
 
+    Usage
+    -----
+
+    Click on an endpoint name to inspect its properties, parameters and responses.
+
+    Use the "Try it out" button to send a real world payload to the endpoint and inspect
+    the corresponding response.
+
+    Authentication
+    --------------
+
+    To authenticate, use the `/token/` endpoint with a username and password, and copy/paste
+    the resulting JWT token in the `Authorize` modal. All subsequent requests made via the interactive
+    documentation will be authenticated.
+
+    If you keep the default server (https://demo.funkwhale.audio), the default username and password
+    couple is "demo" and "demo".
+
+    Resources
+    ---------
+
     For more targeted guides regarding API usage, and especially authentication, please
     refer to [https://docs.funkwhale.audio/api.html](https://docs.funkwhale.audio/api.html)
 
