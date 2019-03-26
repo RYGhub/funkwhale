@@ -4,7 +4,6 @@
 #  /api/v1/listen
 #  /api/v1/playlists
 #  /api/v1/playlist-tracks
-#  /api/v1/favorites
 #  /api/v1/search
 #  /api/v1/radios
 #  /api/v1/history
@@ -12,7 +11,15 @@
 
 openapi: "3.0.0"
 info:
-  description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
+  description: |
+    Interactive documentation for [Funkwhale](https://funkwhale.audio) API.
+
+    The API is **not** freezed yet, but we will document breaking changes in our changelog,
+    and try to avoid those as much as possible.
+
+    For more targeted guides regarding API usage, and especially authentication, please
+    refer to [https://docs.funkwhale.audio/api.html](https://docs.funkwhale.audio/api.html)
+
   version: "1.0.0"
   title: "Funkwhale API"
 
@@ -51,6 +58,8 @@ tags:
     description: Manipulation and uploading of audio files
     externalDocs:
       url: https://docs.funkwhale.audio/users/managing.html
+  - name: Content curation
+    description: Favorites, playlists, radios
 
 paths:
   /token/:
@@ -92,7 +101,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - allOf:
             - $ref: "#/parameters/Ordering"
             - default: "-creation_date"
@@ -175,7 +183,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - name: "artist"
           in: "query"
           default: null
@@ -267,7 +274,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - name: "artist"
           in: "query"
           default: null
@@ -276,6 +282,13 @@ paths:
             required: false
             type: "integer"
             format: "int64"
+        - name: "favorites"
+          in: "query"
+          default: null
+          description: "filter/exclude tracks favorited by the current user"
+          schema:
+            required: false
+            type: "boolean"
         - name: "album"
           in: "query"
           default: null
@@ -477,7 +490,7 @@ paths:
             schema:
               $ref: "#/definitions/OwnedLibraryCreate"
       responses:
-        200:
+        201:
           content:
             application/json:
               schema:
@@ -583,6 +596,91 @@ paths:
         204:
           $ref: "#/responses/204"
 
+  /favorites/tracks/:
+    get:
+      tags:
+        - "Content curation"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter favorites"
+          schema:
+            required: false
+            type: "string"
+        - name: "user"
+          in: "query"
+          default: null
+          description: "Limit results to favorites belonging to the given user"
+          schema:
+            $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/TrackFavorite"
+    post:
+      summary: Mark the given track as favorite
+      tags:
+        - "Content curation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                track:
+                  type: "integer"
+                  format: "int64"
+                  example: 98
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    format: "int64"
+                    example: 876
+                  track:
+                    type: "integer"
+                    format: "int64"
+                    example: 98
+                  creation_date:
+                    $ref: "#/properties/creation_date"
+  /favorites/tracks/remove/:
+    post:
+      summary: Remove the given track from favorites
+      tags:
+        - "Content curation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                track:
+                  type: "integer"
+                  format: "int64"
+                  example: 98
+      responses:
+        204:
+          $ref: "#/responses/204"
+
 parameters:
   ObjectId:
     name: id
@@ -644,7 +742,7 @@ properties:
   privacy_level:
     type: string
     example: "me"
-    description: >
+    description: |
      * `me`: private
      * `instance`: accessible by local users
      * `everyone`: public (including over federation)
@@ -673,7 +771,7 @@ properties:
       - "finished"
       - "errored"
       - "skipped"
-    description: >
+    description: |
      * `pending`: waiting to be processed by the server
      * `finished`: successfully processed by the server
      * `errored`: couldn't be processed by the server (e.g because of a tagging issue)
@@ -1087,6 +1185,58 @@ definitions:
           import_reference:
             type: "string"
             example: "Import launched via web UI on 03/18"
+  TrackFavorite:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 876
+      track:
+        $ref: "#/definitions/Track"
+      user:
+        $ref: "#/definitions/User"
+      creation_date:
+        $ref: "#/properties/creation_date"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 23
+      username:
+        type: "string"
+        example: "alice"
+      name:
+        type: "string"
+        example: "Alice Kingsley"
+      avatar:
+        $ref: "#/definitions/Avatar"
+
+  Avatar:
+    type: "object"
+    properties:
+      original:
+        type: "string"
+        format: "uri"
+        description: "Original image URL"
+        example: "http://yourinstance/media/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996.jpg"
+      square_crop:
+        type: "string"
+        format: "uri"
+        description: "400x400 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-400x400-70.jpg"
+      small_square_crop:
+        type: "string"
+        format: "uri"
+        description: "50x50 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-50x50-70.jpg"
+      medium_square_crop:
+        type: "string"
+        format: "uri"
+        description: "200x200 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-200x200-70.jpg"
 
   ResourceNotFound:
     type: "object"
