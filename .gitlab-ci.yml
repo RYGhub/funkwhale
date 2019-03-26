@@ -115,12 +115,7 @@ black:
     - pip install black
   script:
     - black --check --diff api/
-  only:
-    refs:
-      - merge_requests
-    changes:
-      - .gitlab-ci.yml
-      - api/**/*
+
 flake8:
   image: python:3.6
   stage: lint
@@ -134,12 +129,6 @@ flake8:
     key: "$CI_PROJECT_ID__flake8_pip_cache"
     paths:
       - "$PIP_CACHE_DIR"
-  only:
-    refs:
-      - merge_requests
-    changes:
-      - .gitlab-ci.yml
-      - api/**/*
 
 test_api:
   services:
@@ -156,14 +145,7 @@ test_api:
     FUNKWHALE_URL: "https://funkwhale.ci"
     DJANGO_SETTINGS_MODULE: config.settings.local
   only:
-    refs:
-      - develop@funkwhale/funkwhale
-      - master@funkwhale/funkwhale
-      - tags
-      - merge_requests
-    changes:
-      - .gitlab-ci.yml
-      - api/**/*
+    - branches
   before_script:
     - cd api
     - sed -i '/Pillow/d' requirements/base.txt
@@ -181,14 +163,7 @@ test_front:
   before_script:
     - cd front
   only:
-    refs:
-      - develop@funkwhale/funkwhale
-      - master@funkwhale/funkwhale
-      - tags
-      - merge_requests
-    changes:
-      - .gitlab-ci.yml
-      - front/**/*
+    - branches
   script:
     - yarn install --check-files
     - yarn test:unit
@@ -230,33 +205,6 @@ build_front:
   tags:
     - docker
 
-
-build-doc:
-  stage: test
-  image: python:3.6
-  variables:
-    BUILD_PATH: "../public"
-  before_script:
-    - cd docs
-    - apt-get update
-    - apt-get install -y graphviz
-    - pip install sphinx
-  script:
-    - ./build_docs.sh
-  cache:
-    key: "$CI_PROJECT_ID__sphinx"
-    paths:
-      - "$PIP_CACHE_DIR"
-  only:
-    refs:
-      - merge_requests
-    changes:
-      - .gitlab-ci.yml
-      - docs/**/*
-
-  tags:
-    - docker
-
 pages:
   stage: test
   image: python:3.6
@@ -278,7 +226,6 @@ pages:
       - public
   only:
     - master@funkwhale/funkwhale
-
   tags:
     - docker
 
