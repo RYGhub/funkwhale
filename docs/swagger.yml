@@ -1,7 +1,6 @@
 # Undocumented endpoints:
 #  /api/v1/settings
 #  /api/v1/activity
-#  /api/v1/uploads
 #  /api/v1/listen
 #  /api/v1/playlists
 #  /api/v1/playlist-tracks
@@ -437,7 +436,6 @@ paths:
         - "Uploads and audio content"
       description:
         Create a new library
-      security: []
       responses:
         201:
           $ref: "#/responses/201"
@@ -489,6 +487,96 @@ paths:
       description: |
         This will delete the library, all associated uploads, follows, and broadcast
         the event on the federation.
+      tags:
+        - "Uploads and audio content"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
+  /uploads/:
+    get:
+      summary: List owned uploads
+      tags:
+        - "Uploads and audio content"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter uploads"
+          schema:
+            required: false
+            type: "string"
+            example: "Dire straits"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/OwnedUpload"
+    post:
+      tags:
+        - "Uploads and audio content"
+      description:
+        Upload a new file in a library. The event will be broadcasted on federation,
+        according to the library visibility and followers.
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                library:
+                  type: string
+                  format: uuid
+                  description: "The library in which the audio should be stored"
+                import_reference:
+                  type: string
+                  example: "Import launched via API client on 04/19"
+                source:
+                  type: string
+                  example: "upload://filename.mp3"
+                audio_file:
+                  type: string
+                  format: binary
+
+  /uploads/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve an upload
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedUpload"
+    delete:
+      summary: Delete an upload
+      description: |
+        This will delete the upload from the server and broadcast the event
+        on the federation.
       tags:
         - "Uploads and audio content"
       responses:
@@ -556,7 +644,10 @@ properties:
   privacy_level:
     type: string
     example: "me"
-    description: "'me' means private, 'instance' means viewable by local users, 'everyone' means public"
+    description: >
+     * `me`: private
+     * `instance`: accessible by local users
+     * `everyone`: public (including over federation)
     enum:
       - "me"
       - "instance"
@@ -566,6 +657,27 @@ properties:
     format: "uri"
     description: "Federation ID"
     example: "https://my.instance/federation/music/libraries/3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  audio_mimetype:
+    type: string
+    example: "audio/ogg"
+    enum:
+      - "audio/ogg"
+      - "audio/mpeg"
+      - "audio/x-flac"
+      - "audio/flac"
+  import_status:
+    type: string
+    example: "finished"
+    enum:
+      - "pending"
+      - "finished"
+      - "errored"
+      - "skipped"
+    description: >
+     * `pending`: waiting to be processed by the server
+     * `finished`: successfully processed by the server
+     * `errored`: couldn't be processed by the server (e.g because of a tagging issue)
+     * `skipped`: processed by the server but skipped, because considered as a duplicate of an existing upload
 
 definitions:
   ResultPage:
@@ -903,18 +1015,14 @@ definitions:
         example: 128000
         description: "Bitrate of the file, in bytes/s"
       mimetype:
-        type: string
-        example: "audio/ogg"
-        enum:
-          - "audio/ogg"
-          - "audio/mpeg"
-          - "audio/x-flac"
-          - "audio/flac"
+        $ref: "#/properties/audio_mimetype"
       extension:
         type: string
         example: "ogg"
         description: "File extension of the upload"
-
+      filename:
+        type: "string"
+        example: "Myfile.mp3"
       listen_url:
         type: "string"
         format: "uri"
@@ -960,6 +1068,25 @@ definitions:
         format: "int64"
         example: 678917000
         description: "Total size of uploads in the library, in bytes"
+
+  OwnedUpload:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/Upload"
+      - type: "object"
+        properties:
+          import_status:
+            $ref: "#/properties/import_status"
+          track:
+            $ref: "#/definitions/Track"
+          library:
+            $ref: "#/definitions/OwnedLibrary"
+          source:
+            type: "string"
+            example: "upload://myfile.mp3"
+          import_reference:
+            type: "string"
+            example: "Import launched via web UI on 03/18"
 
   ResourceNotFound:
     type: "object"
