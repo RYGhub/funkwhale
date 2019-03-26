@@ -1,3 +1,16 @@
+# Undocumented endpoints:
+#  /api/v1/settings
+#  /api/v1/activity
+#  /api/v1/uploads
+#  /api/v1/listen
+#  /api/v1/playlists
+#  /api/v1/playlist-tracks
+#  /api/v1/favorites
+#  /api/v1/search
+#  /api/v1/radios
+#  /api/v1/history
+#  /api/v1/users
+
 openapi: "3.0.0"
 info:
   description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
@@ -30,11 +43,21 @@ components:
 security:
   - jwt: []
 
+tags:
+  - name: Auth and security
+    description: Login, logout and authorization endpoints
+  - name: Library and metadata
+    description: Information and metadata about musical and audio entities (albums, tracks, artists, etc.)
+  - name: Uploads and audio content
+    description: Manipulation and uploading of audio files
+    externalDocs:
+      url: https://docs.funkwhale.audio/users/managing.html
+
 paths:
   /token/:
     post:
       tags:
-        - "auth"
+        - "Auth and security"
       description:
         Obtain a JWT token you can use for authenticating your next requests.
       security: []
@@ -61,7 +84,7 @@ paths:
     get:
       summary: List artists
       tags:
-        - "artists"
+        - "Library and metadata"
       parameters:
         - name: "q"
           in: "query"
@@ -106,7 +129,7 @@ paths:
         - $ref: "#/parameters/ObjectId"
 
       tags:
-        - "artists"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -127,8 +150,7 @@ paths:
         - $ref: "#/parameters/PageSize"
 
       tags:
-        - "artists"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -145,7 +167,7 @@ paths:
     get:
       summary: List albums
       tags:
-        - "albums"
+        - "Library and metadata"
       parameters:
         - name: "q"
           in: "query"
@@ -198,7 +220,7 @@ paths:
         - $ref: "#/parameters/ObjectId"
 
       tags:
-        - "albums"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -220,8 +242,7 @@ paths:
         - $ref: "#/parameters/PageSize"
 
       tags:
-        - "albums"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -238,7 +259,7 @@ paths:
     get:
       summary: List tracks
       tags:
-        - "tracks"
+        - "Library and metadata"
       parameters:
         - name: "q"
           in: "query"
@@ -302,12 +323,12 @@ paths:
                           $ref: "#/definitions/Track"
   /tracks/{id}/:
     get:
-      summary: Retrieve a single track
       parameters:
         - $ref: "#/parameters/ObjectId"
+      summary: Retrieve a single track
 
       tags:
-        - "tracks"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -329,8 +350,7 @@ paths:
         - $ref: "#/parameters/PageSize"
 
       tags:
-        - "tracks"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -347,7 +367,7 @@ paths:
     get:
       summary: List licenses
       tags:
-        - "licenses"
+        - "Library and metadata"
       parameters:
         - $ref: "#/parameters/PageNumber"
         - $ref: "#/parameters/PageSize"
@@ -366,19 +386,19 @@ paths:
                           $ref: "#/definitions/License"
 
   /licenses/{code}/:
+    parameters:
+      - name: code
+        in: path
+        description: License code
+        required: true
+        schema:
+          type: string
+          example: cc0-1.0
     get:
       summary: Retrieve a single license
-      parameters:
-        - name: code
-          in: path
-          description: License code
-          required: true
-          schema:
-            type: string
-            example: cc0-1.0
 
       tags:
-        - "licenses"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -391,6 +411,89 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
+  /libraries/:
+    get:
+      summary: List owned libraries
+      tags:
+        - "Uploads and audio content"
+      parameters:
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/OwnedLibrary"
+    post:
+      tags:
+        - "Uploads and audio content"
+      description:
+        Create a new library
+      security: []
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/OwnedLibraryCreate"
+
+  /libraries/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve a library
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedLibrary"
+    post:
+      summary: Update a library
+      tags:
+        - "Uploads and audio content"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/OwnedLibraryCreate"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedLibrary"
+    delete:
+      summary: Delete a library and all associated uploads
+      description: |
+        This will delete the library, all associated uploads, follows, and broadcast
+        the event on the federation.
+      tags:
+        - "Uploads and audio content"
+      responses:
+        204:
+          $ref: "#/responses/204"
 
 parameters:
   ObjectId:
@@ -434,11 +537,35 @@ parameters:
       required: false
       type: "boolean"
 
+responses:
+  201:
+    description: Successfully created
+  204:
+    description: Successfully deleted
+  400:
+    description: Bad request
+
 properties:
   mbid:
     type: "string"
-    formats: "uuid"
+    format: "uuid"
     description: "A musicbrainz ID"
+  creation_date:
+    type: "string"
+    format: "date-time"
+  privacy_level:
+    type: string
+    example: "me"
+    description: "'me' means private, 'instance' means viewable by local users, 'everyone' means public"
+    enum:
+      - "me"
+      - "instance"
+      - "everyone"
+  fid:
+    type: "string"
+    format: "uri"
+    description: "Federation ID"
+    example: "https://my.instance/federation/music/libraries/3fa85f64-5717-4562-b3fc-2c963f66afa6"
 
 definitions:
   ResultPage:
@@ -792,6 +919,47 @@ definitions:
         type: "string"
         format: "uri"
         description: "URL to stream the upload"
+
+  OwnedLibraryCreate:
+    type: "object"
+    properties:
+      password:
+        type: "name"
+        example: "My new library"
+      description:
+        required: false
+        type: "string"
+        example: "Lots of interesting content"
+      privacy_level:
+        $ref: "#/properties/privacy_level"
+
+  OwnedLibrary:
+    type: "object"
+    properties:
+      uuid:
+        type: string
+        format: uuid
+      fid:
+        $ref: "#/properties/fid"
+      name:
+        type: "string"
+        example: "My Creative Commons library"
+      description:
+        type: "string"
+        example: "All content is under CC-BY"
+      creation_date:
+        $ref: "#/properties/creation_date"
+      privacy_level:
+        $ref: "#/properties/privacy_level"
+      uploads_count:
+        type: "integer"
+        format: "int64"
+        example: 34
+      size:
+        type: "integer"
+        format: "int64"
+        example: 678917000
+        description: "Total size of uploads in the library, in bytes"
 
   ResourceNotFound:
     type: "object"
