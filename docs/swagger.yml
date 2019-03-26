@@ -6,7 +6,6 @@
 #  /api/v1/search
 #  /api/v1/radios
 #  /api/v1/history
-#  /api/v1/users
 
 openapi: "3.0.0"
 info:
@@ -65,6 +64,7 @@ paths:
     post:
       tags:
         - "Auth and security"
+      summary: Get an API token
       description:
         Obtain a JWT token you can use for authenticating your next requests.
       security: []
@@ -86,6 +86,78 @@ paths:
                 password:
                   type: "string"
                   example: "demo"
+
+  /auth/registration/:
+    post:
+      summary: Create an account
+      description: |
+        Register a new account on this instance. An invitation code will be required
+        if sign up is disabled.
+      tags:
+        - "Auth and security"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                  example: "alice"
+                email:
+                  type: "string"
+                  format: "email"
+                invitation:
+                  type: "string"
+                  example: "INVITECODE"
+                  required: false
+                  description: An invitation code, required if signups are closed on the instance.
+                password1:
+                  type: "string"
+                  example: "passw0rd"
+                password2:
+                  type: "string"
+                  description: Must be identical to password1
+                  example: "passw0rd"
+      responses:
+        201:
+          $ref: "#/responses/201"
+  /auth/password/reset/:
+    post:
+      summary: Request a password reset
+      description: |
+        Request a password reset. An email with reset instructions will be sent to the provided email,
+        if it's associated with a user account.
+      tags:
+        - "Auth and security"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+      responses:
+        200:
+          $ref: "#/responses/200"
+  /users/users/me/:
+    get:
+      summary: Retrive profile information
+      description: |
+        Retrieve profile informations of the current user
+      tags:
+        - "Auth and security"
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Me"
 
   /artists/:
     get:
@@ -782,6 +854,8 @@ parameters:
       type: "boolean"
 
 responses:
+  200:
+    description: Success
   201:
     description: Successfully created
   204:
@@ -1278,6 +1352,37 @@ definitions:
       avatar:
         $ref: "#/definitions/Avatar"
 
+  Me:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/User"
+      - type: "object"
+        properties:
+          full_username:
+            type: "string"
+            description: Full username, for use on federation
+            example: "alice@yourdomain.com"
+          email:
+            type: "string"
+            format: "email"
+            description: Email address associated with the account
+            example: "alice@email.provider"
+          is_staff:
+            type: "boolean"
+            example: false
+          is_superuser:
+            type: "boolean"
+            example: false
+          date_joined:
+            type: "string"
+            format: "date-time"
+          privacy_level:
+            $ref: "#/properties/privacy_level"
+            description: Default privacy-level associated with the user account
+          quota_status:
+            $ref: "#/definitions/QuotaStatus"
+          permissions:
+            $ref: "#/definitions/Permissions"
   Avatar:
     type: "object"
     properties:
@@ -1301,6 +1406,59 @@ definitions:
         format: "uri"
         description: "200x200 thumbnail URL"
         example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-200x200-70.jpg"
+  QuotaStatus:
+    type: "object"
+    properties:
+      max:
+        type: "integer"
+        format: "int64"
+        description: Storage space allocated to this user, in MB
+        example: 5000
+      remaining:
+        type: "integer"
+        format: "int64"
+        description: Remaining storage space for this user, in MB
+        example: 4600
+      current:
+        type: "integer"
+        format: "int64"
+        description: Storage space used by this user, in MB
+        example: 400
+      skipped:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "skipped" import status, in MB
+        example: 30
+      finished:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "finished" import status, in MB
+        example: 350
+      pending:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "pending" import status, in MB
+        example: 15
+      errored:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "errored" import status, in MB
+        example: 5
+  Permissions:
+    type: "object"
+    properties:
+      library:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user can manage the instance library
+      moderation:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user has moderation permission
+      settings:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user can manage instance settings and users
 
   ResourceNotFound:
     type: "object"
