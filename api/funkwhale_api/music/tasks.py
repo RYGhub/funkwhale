@@ -431,9 +431,10 @@ def _get_track(data):
     artist_mbid = data.get("musicbrainz_artistid", None)
     artist_fid = data.get("artist_fid", None)
     artist_name = data["artist"]
-    query = Q(name__iexact=artist_name)
     if artist_mbid:
-        query |= Q(mbid=artist_mbid)
+        query = Q(mbid=artist_mbid)
+    else:
+        query = Q(name__iexact=artist_name)
     if artist_fid:
         query |= Q(fid=artist_fid)
     defaults = {
@@ -476,9 +477,12 @@ def _get_track(data):
     # get / create album
     album_title = data["album"]
     album_fid = data.get("album_fid", None)
-    query = Q(title__iexact=album_title, artist=album_artist)
+
     if album_mbid:
-        query |= Q(mbid=album_mbid)
+        query = Q(mbid=album_mbid)
+    else:
+        query = Q(title__iexact=album_title, artist=album_artist)
+
     if album_fid:
         query |= Q(fid=album_fid)
     defaults = {
