@@ -37,7 +37,7 @@
         <section class="four wide column">
           <h4 v-translate translate-context="Footer/*/Link" class="ui header">Getting help</h4>
           <div class="ui link list">
-            <a href="https://socialhub.network/c/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/Listitem.Link">Support forum</translate></a>
+            <a href="https://governance.funkwhale.audio/g/kQgxNq15/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/Listitem.Link">Support forum</translate></a>
             <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Chat room</translate></a>
             <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Issue tracker</translate></a>
           </div>
@@ -87,5 +87,4 @@ footer p {
 footer#footer div.item:hover {
   color: rgba(0, 0, 0, 0.87);
 }
-
 </style>

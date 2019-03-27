@@ -24,6 +24,5 @@ If you're not comfortable with writing documents or don't feel like you can, you
 by requesting a document be written. There are three ways to request new documents:
 
 - Open a new issue on `Gitlab <https://dev.funkwhale.audio/funkwhale/funkwhale/issues>`_, providing as much detail as possible
-- Start a new thread on `the forum <https://socialhub.network/c/funkwhale>`_ with more details about your requests
+- Start a new thread on `the forum <https://governance.funkwhale.audio/g/kQgxNq15/funkwhale>`_ with more details about your requests
 - Ask somebody on our `chat room <https://riot.im/app/#/room/#funkwhale:matrix.org>`_
-
