@@ -34,3 +34,13 @@ enabled in a future release).
 
 If you want to start building an app on top of Funkwhale's API, please check-out
 `https://docs.funkwhale.audio/api.html`_ and `https://docs.funkwhale.audio/developers/authentication.html`_.
+
+Prune library command
+^^^^^^^^^^^^^^^^^^^^^
+
+Users are often surprised by Funkwhale's tendency to keep track, album and artist
+metadata even if no associated files exist.
+
+To help with that, we now offer a ``prune_library`` management command you can run
+to purge your database from obsolete entry. `Please refer to our documentation
+for usage instructions <https://docs.funkwhale.audio/admin/commands.html#pruning-library>`_.

@@ -637,3 +637,72 @@ def test_clean_transcoding_cache(preferences, now, factories):
 
     with pytest.raises(u1.__class__.DoesNotExist):
         u1.refresh_from_db()
+
+
+def test_get_prunable_tracks(factories):
+    prunable_track = factories["music.Track"]()
+    # non prunable tracks
+    factories["music.Upload"]()
+    factories["favorites.TrackFavorite"]()
+    factories["history.Listening"]()
+    factories["playlists.PlaylistTrack"]()
+
+    assert list(tasks.get_prunable_tracks()) == [prunable_track]
+
+
+def test_get_prunable_tracks_include_favorites(factories):
+    prunable_track = factories["music.Track"]()
+    favorited = factories["favorites.TrackFavorite"]().track
+    # non prunable tracks
+    factories["favorites.TrackFavorite"](track__playable=True)
+    factories["music.Upload"]()
+    factories["history.Listening"]()
+    factories["playlists.PlaylistTrack"]()
+
+    qs = tasks.get_prunable_tracks(exclude_favorites=False).order_by("id")
+    assert list(qs) == [prunable_track, favorited]
+
+
+def test_get_prunable_tracks_include_playlists(factories):
+    prunable_track = factories["music.Track"]()
+    in_playlist = factories["playlists.PlaylistTrack"]().track
+    # non prunable tracks
+    factories["favorites.TrackFavorite"]()
+    factories["music.Upload"]()
+    factories["history.Listening"]()
+    factories["playlists.PlaylistTrack"](track__playable=True)
+
+    qs = tasks.get_prunable_tracks(exclude_playlists=False).order_by("id")
+    assert list(qs) == [prunable_track, in_playlist]
+
+
+def test_get_prunable_tracks_include_listenings(factories):
+    prunable_track = factories["music.Track"]()
+    listened = factories["history.Listening"]().track
+    # non prunable tracks
+    factories["favorites.TrackFavorite"]()
+    factories["music.Upload"]()
+    factories["history.Listening"](track__playable=True)
+    factories["playlists.PlaylistTrack"]()
+
+    qs = tasks.get_prunable_tracks(exclude_listenings=False).order_by("id")
+    assert list(qs) == [prunable_track, listened]
+
+
+def test_get_prunable_albums(factories):
+    prunable_album = factories["music.Album"]()
+    # non prunable album
+    factories["music.Track"]().album
+
+    assert list(tasks.get_prunable_albums()) == [prunable_album]
+
+
+def test_get_prunable_artists(factories):
+    prunable_artist = factories["music.Artist"]()
+    # non prunable artist
+    non_prunable_artist = factories["music.Artist"]()
+    non_prunable_album_artist = factories["music.Artist"]()
+    factories["music.Track"](artist=non_prunable_artist)
+    factories["music.Track"](album__artist=non_prunable_album_artist)
+
+    assert list(tasks.get_prunable_artists()) == [prunable_artist]
