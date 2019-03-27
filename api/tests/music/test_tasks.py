@@ -156,6 +156,25 @@ def test_can_create_track_from_file_metadata_distinct_release_mbid(factories):
     assert new_track != track
 
 
+def test_can_create_track_from_file_metadata_distinct_position(factories):
+    """Cf https://dev.funkwhale.audio/funkwhale/funkwhale/issues/740"""
+    artist = factories["music.Artist"]()
+    album = factories["music.Album"](artist=artist)
+    track = factories["music.Track"](album=album, artist=artist)
+    metadata = {
+        "artist": artist.name,
+        "album": album.title,
+        "title": track.title,
+        "track_number": track.position + 1,
+        "musicbrainz_artistid": artist.mbid,
+        "musicbrainz_albumid": album.mbid,
+    }
+
+    new_track = tasks.get_track_from_import_metadata(metadata)
+
+    assert new_track != track
+
+
 def test_can_create_track_from_file_metadata_federation(factories, mocker, r_mock):
     metadata = {
         "artist": "Artist",
