@@ -14,6 +14,9 @@ from funkwhale_api.federation import (
 
 
 def test_receive_validates_basic_attributes_and_stores_activity(factories, now, mocker):
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
     mocked_dispatch = mocker.patch("funkwhale_api.common.utils.on_commit")
     local_to_actor = factories["users.User"]().create_actor()
     local_cc_actor = factories["users.User"]().create_actor()
@@ -48,6 +51,9 @@ def test_receive_validates_basic_attributes_and_stores_activity(factories, now, 
 
 def test_receive_calls_should_reject(factories, now, mocker):
     should_reject = mocker.patch.object(activity, "should_reject", return_value=True)
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
     local_to_actor = factories["users.User"]().create_actor()
     remote_actor = factories["federation.Actor"]()
     a = {
@@ -63,6 +69,26 @@ def test_receive_calls_should_reject(factories, now, mocker):
         fid=a["id"], actor_id=remote_actor.fid, payload=a
     )
     assert copy is None
+
+
+def test_receive_skips_if_no_matching_route(factories, now, mocker):
+    get_matching_handlers = mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=[]
+    )
+    local_to_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    a = {
+        "@context": [],
+        "actor": remote_actor.fid,
+        "type": "Noop",
+        "id": "https://test.activity",
+        "to": [local_to_actor.fid, remote_actor.fid],
+    }
+
+    copy = activity.receive(activity=a, on_behalf_of=remote_actor)
+    get_matching_handlers.assert_called_once_with(a)
+    assert copy is None
+    assert models.Activity.objects.count() == 0
 
 
 @pytest.mark.parametrize(
