@@ -503,7 +503,9 @@ def _get_track(data):
     # get / create track
     track_title = data["title"]
     track_number = data.get("track_number", 1)
-    query = Q(title__iexact=track_title, artist=artist, album=album)
+    query = Q(
+        title__iexact=track_title, artist=artist, album=album, position=track_number
+    )
     if track_mbid:
         query |= Q(mbid=track_mbid)
     if track_fid:
