@@ -22,6 +22,7 @@ Administration
    :maxdepth: 2
 
    django
+   commands
    url
    upgrading
 

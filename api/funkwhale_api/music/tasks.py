@@ -568,3 +568,31 @@ def clean_transcoding_cache():
         .order_by("id")
     )
     return candidates.delete()
+
+
+def get_prunable_tracks(
+    exclude_favorites=True, exclude_playlists=True, exclude_listenings=True
+):
+    """
+    Returns a list of tracks with no associated uploads,
+    excluding the one that were listened/favorited/included in playlists.
+    """
+
+    queryset = models.Track.objects.all()
+    queryset = queryset.filter(uploads__isnull=True)
+    if exclude_favorites:
+        queryset = queryset.filter(track_favorites__isnull=True)
+    if exclude_playlists:
+        queryset = queryset.filter(playlist_tracks__isnull=True)
+    if exclude_listenings:
+        queryset = queryset.filter(listenings__isnull=True)
+
+    return queryset
+
+
+def get_prunable_albums():
+    return models.Album.objects.filter(tracks__isnull=True)
+
+
+def get_prunable_artists():
+    return models.Artist.objects.filter(tracks__isnull=True, albums__isnull=True)
