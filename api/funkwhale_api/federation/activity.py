@@ -121,6 +121,7 @@ def receive(activity, on_behalf_of):
     from . import models
     from . import serializers
     from . import tasks
+    from .routes import inbox
 
     # we ensure the activity has the bare minimum structure before storing
     # it in our database
@@ -128,6 +129,10 @@ def receive(activity, on_behalf_of):
         data=activity, context={"actor": on_behalf_of, "local_recipients": True}
     )
     serializer.is_valid(raise_exception=True)
+    if not inbox.get_matching_handlers(activity):
+        # discard unhandlable activity
+        return
+
     if should_reject(
         fid=serializer.validated_data.get("id"),
         actor_id=serializer.validated_data["actor"].fid,
