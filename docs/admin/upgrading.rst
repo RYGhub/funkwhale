@@ -164,7 +164,7 @@ match what is described in :doc:`/installation/debian`:
     # download more recent API files
     sudo -u funkwhale curl -L -o "api-$FUNKWHALE_VERSION.zip" "https://dev.funkwhale.audio/funkwhale/funkwhale/-/jobs/artifacts/$FUNKWHALE_VERSION/download?job=build_api"
     sudo -u funkwhale unzip "api-$FUNKWHALE_VERSION.zip" -d extracted
-    sudo -u funkwhale rm -rf api/ && mv extracted/api .
+    sudo -u funkwhale rm -rf api/ && sudo -u funkwhale mv extracted/api .
     sudo -u funkwhale rm -rf extracted
 
     # update os dependencies
