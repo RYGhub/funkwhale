@@ -100,8 +100,9 @@ you can create a symlink like this::
     ln -s /media/mynfsshare /srv/funkwhale/data/music/nfsshare
 
 And import music from this share with this command::
-
-    python api/manage.py import_files "/srv/funkwhale/data/music/nfsshare/**/*.ogg" --recursive --noinput --in-place
+    
+    export LIBRARY_ID="<your_libary_id>"
+    python api/manage.py import_files $LIBRARY_ID "/srv/funkwhale/data/music/nfsshare/**/*.ogg" --recursive --noinput --in-place
 
 On docker setups, it will require a bit more work, because while the ``/srv/funkwhale/data/music`` is mounted
 in containers, symlinked directories are not. To fix that, in your ``docker-compose.yml`` file, ensure each symlinked
