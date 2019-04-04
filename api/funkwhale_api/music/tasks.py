@@ -151,10 +151,11 @@ class UploadImportError(ValueError):
         super().__init__(code)
 
 
-def fail_import(upload, error_code):
+def fail_import(upload, error_code, detail=None, **fields):
     old_status = upload.import_status
     upload.import_status = "errored"
-    upload.import_details = {"error_code": error_code}
+    upload.import_details = {"error_code": error_code, "detail": detail}
+    upload.import_details.update(fields)
     upload.import_date = timezone.now()
     upload.save(update_fields=["import_details", "import_status", "import_date"])
 
@@ -182,19 +183,29 @@ def process_upload(upload):
     old_status = upload.import_status
     audio_file = upload.get_audio_file()
     additional_data = {}
+
+    m = metadata.Metadata(audio_file)
     try:
-        if not audio_file:
-            # we can only rely on user proveded data
-            final_metadata = import_metadata
-        else:
-            # we use user provided data and data from the file itself
-            m = metadata.Metadata(audio_file)
-            file_metadata = m.all()
-            final_metadata = collections.ChainMap(
-                additional_data, import_metadata, file_metadata
-            )
-            additional_data["cover_data"] = m.get_picture("cover_front", "other")
-        additional_data["upload_source"] = upload.source
+        serializer = metadata.TrackMetadataSerializer(data=m)
+        serializer.is_valid()
+    except Exception:
+        fail_import(upload, "unknown_error")
+        raise
+    if not serializer.is_valid():
+        detail = serializer.errors
+        try:
+            metadata_dump = m.all()
+        except Exception as e:
+            logger.warn("Cannot dump metadata for file %s: %s", audio_file, str(e))
+        return fail_import(
+            upload, "invalid_metadata", detail=detail, file_metadata=metadata_dump
+        )
+
+    final_metadata = collections.ChainMap(
+        additional_data, serializer.validated_data, import_metadata
+    )
+    additional_data["upload_source"] = upload.source
+    try:
         track = get_track_from_import_metadata(final_metadata)
     except UploadImportError as e:
         return fail_import(upload, e.code)
@@ -276,43 +287,45 @@ def federation_audio_track_to_metadata(payload):
     Given a valid payload as returned by federation.serializers.TrackSerializer.validated_data,
     returns a correct metadata payload for use with get_track_from_import_metadata.
     """
-    musicbrainz_recordingid = payload.get("musicbrainzId")
-    musicbrainz_artistid = payload["artists"][0].get("musicbrainzId")
-    musicbrainz_albumartistid = payload["album"]["artists"][0].get("musicbrainzId")
-    musicbrainz_albumid = payload["album"].get("musicbrainzId")
-
     new_data = {
         "title": payload["name"],
-        "album": payload["album"]["name"],
-        "track_number": payload.get("position") or 1,
+        "position": payload.get("position") or 1,
         "disc_number": payload.get("disc"),
-        "artist": payload["artists"][0]["name"],
-        "album_artist": payload["album"]["artists"][0]["name"],
-        "date": payload["album"].get("released"),
         "license": payload.get("license"),
         "copyright": payload.get("copyright"),
-        # musicbrainz
-        "musicbrainz_recordingid": str(musicbrainz_recordingid)
-        if musicbrainz_recordingid
+        "mbid": str(payload.get("musicbrainzId"))
+        if payload.get("musicbrainzId")
         else None,
-        "musicbrainz_artistid": str(musicbrainz_artistid)
-        if musicbrainz_artistid
-        else None,
-        "musicbrainz_albumartistid": str(musicbrainz_albumartistid)
-        if musicbrainz_albumartistid
-        else None,
-        "musicbrainz_albumid": str(musicbrainz_albumid)
-        if musicbrainz_albumid
-        else None,
+        "album": {
+            "title": payload["album"]["name"],
+            "fdate": payload["album"]["published"],
+            "fid": payload["album"]["id"],
+            "mbid": str(payload["album"]["musicbrainzId"])
+            if payload["album"].get("musicbrainzId")
+            else None,
+            "release_date": payload["album"].get("released"),
+            "artists": [
+                {
+                    "fid": a["id"],
+                    "name": a["name"],
+                    "fdate": a["published"],
+                    "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+                }
+                for a in payload["album"]["artists"]
+            ],
+        },
+        "artists": [
+            {
+                "fid": a["id"],
+                "name": a["name"],
+                "fdate": a["published"],
+                "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+            }
+            for a in payload["artists"]
+        ],
         # federation
         "fid": payload["id"],
-        "artist_fid": payload["artists"][0]["id"],
-        "album_artist_fid": payload["album"]["artists"][0]["id"],
-        "album_fid": payload["album"]["id"],
         "fdate": payload["published"],
-        "album_fdate": payload["album"]["published"],
-        "album_artist_fdate": payload["album"]["artists"][0]["published"],
-        "artist_fdate": payload["artists"][0]["published"],
     }
     cover = payload["album"].get("cover")
     if cover:
@@ -405,8 +418,8 @@ def _get_track(data):
         return track
 
     from_activity_id = data.get("from_activity_id", None)
-    track_mbid = data.get("musicbrainz_recordingid", None)
-    album_mbid = data.get("musicbrainz_albumid", None)
+    track_mbid = data.get("mbid", None)
+    album_mbid = getter(data, "album", "mbid")
     track_fid = getter(data, "fid")
 
     query = None
@@ -428,9 +441,12 @@ def _get_track(data):
             pass
 
     # get / create artist and album artist
-    artist_mbid = data.get("musicbrainz_artistid", None)
-    artist_fid = data.get("artist_fid", None)
-    artist_name = data["artist"]
+    artists = getter(data, "artists", default=[])
+    artist = artists[0]
+    artist_mbid = artist.get("mbid", None)
+    artist_fid = artist.get("fid", None)
+    artist_name = artist["name"]
+
     if artist_mbid:
         query = Q(mbid=artist_mbid)
     else:
@@ -443,20 +459,22 @@ def _get_track(data):
         "fid": artist_fid,
         "from_activity_id": from_activity_id,
     }
-    if data.get("artist_fdate"):
-        defaults["creation_date"] = data.get("artist_fdate")
+    if artist.get("fdate"):
+        defaults["creation_date"] = artist.get("fdate")
 
     artist = get_best_candidate_or_create(
         models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
     )[0]
 
-    album_artist_name = data.get("album_artist") or artist_name
+    album_artists = getter(data, "album", "artists", default=artists)
+    album_artist = album_artists[0]
+    album_artist_name = album_artist.get("name")
     if album_artist_name == artist_name:
         album_artist = artist
     else:
         query = Q(name__iexact=album_artist_name)
-        album_artist_mbid = data.get("musicbrainz_albumartistid", None)
-        album_artist_fid = data.get("album_artist_fid", None)
+        album_artist_mbid = album_artist.get("mbid", None)
+        album_artist_fid = album_artist.get("fid", None)
         if album_artist_mbid:
             query |= Q(mbid=album_artist_mbid)
         if album_artist_fid:
@@ -467,16 +485,17 @@ def _get_track(data):
             "fid": album_artist_fid,
             "from_activity_id": from_activity_id,
         }
-        if data.get("album_artist_fdate"):
-            defaults["creation_date"] = data.get("album_artist_fdate")
+        if album_artist.get("fdate"):
+            defaults["creation_date"] = album_artist.get("fdate")
 
         album_artist = get_best_candidate_or_create(
             models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
         )[0]
 
     # get / create album
-    album_title = data["album"]
-    album_fid = data.get("album_fid", None)
+    album = data["album"]
+    album_title = album["title"]
+    album_fid = album.get("fid", None)
 
     if album_mbid:
         query = Q(mbid=album_mbid)
@@ -489,12 +508,12 @@ def _get_track(data):
         "title": album_title,
         "artist": album_artist,
         "mbid": album_mbid,
-        "release_date": data.get("date"),
+        "release_date": album.get("release_date"),
         "fid": album_fid,
         "from_activity_id": from_activity_id,
     }
-    if data.get("album_fdate"):
-        defaults["creation_date"] = data.get("album_fdate")
+    if album.get("fdate"):
+        defaults["creation_date"] = album.get("fdate")
 
     album = get_best_candidate_or_create(
         models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
@@ -502,10 +521,8 @@ def _get_track(data):
 
     # get / create track
     track_title = data["title"]
-    track_number = data.get("track_number", 1)
-    query = Q(
-        title__iexact=track_title, artist=artist, album=album, position=track_number
-    )
+    position = data.get("position", 1)
+    query = Q(title__iexact=track_title, artist=artist, album=album, position=position)
     if track_mbid:
         query |= Q(mbid=track_mbid)
     if track_fid:
@@ -515,7 +532,7 @@ def _get_track(data):
         "album": album,
         "mbid": track_mbid,
         "artist": artist,
-        "position": track_number,
+        "position": position,
         "disc_number": data.get("disc_number"),
         "fid": track_fid,
         "from_activity_id": from_activity_id,
