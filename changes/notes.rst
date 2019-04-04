@@ -35,6 +35,15 @@ enabled in a future release).
 If you want to start building an app on top of Funkwhale's API, please check-out
 `https://docs.funkwhale.audio/api.html`_ and `https://docs.funkwhale.audio/developers/authentication.html`_.
 
+Better error handling and display during import
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale should now be more resilient to missing tags in imported files, and give
+you more insights when something goes wrong, including the specific tags that were missing
+or invalid, and additional debug information to share in your support requests.
+
+This information is available in all pages that list uploads, when clicking on the button next to the upload status.
+
 Prune library command
 ^^^^^^^^^^^^^^^^^^^^^
 

@@ -154,3 +154,30 @@ Then select the files you want to delete using the checkboxes on the left ; you 
 Finally, select "Delete" in the "Action" menu and click "Go".
 
 This operation does *not* remove metadata, meaning that deleted tracks will remain visible in your library. They just won't be playable anymore.
+
+
+Common errors during import
+---------------------------
+
+.. _invalid_metadata:
+
+Invalid metadata
+::::::::::::::::
+
+This error occurs when the uploaded file miss some mandatory tags, or when some tags have
+incorrect values (e.g an empty title or artist name).
+
+To fix this issue, please retag the file properly as described in :ref:`upload-tagging`
+and reupload it.
+
+
+.. _unknown_error:
+
+Unkwown error
+:::::::::::::
+
+This error can happen for multiple reasons and likely indicates an issue with the Funkwhale
+server (e.g. misconfiguration) or with Funkwhale itself.
+
+If the issue persists when you relaunch the import, get in touch with our instance admin
+or open a support thread on our forum.
