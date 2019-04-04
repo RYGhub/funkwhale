@@ -185,10 +185,6 @@ MIDDLEWARE = (
     "funkwhale_api.users.middleware.RecordActivityMiddleware",
 )
 
-# MIGRATIONS CONFIGURATION
-# ------------------------------------------------------------------------------
-MIGRATION_MODULES = {"sites": "funkwhale_api.contrib.sites.migrations"}
-
 # DEBUG
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -229,7 +225,8 @@ MIGRATION_MODULES = {
     # see https://github.com/jazzband/django-oauth-toolkit/issues/634
     # swappable models are badly designed in oauth2_provider
     # ignore migrations and provide our own models.
-    "oauth2_provider": None
+    "oauth2_provider": None,
+    "sites": "funkwhale_api.contrib.sites.migrations",
 }
 
 #
