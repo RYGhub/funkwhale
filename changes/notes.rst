@@ -51,5 +51,16 @@ Users are often surprised by Funkwhale's tendency to keep track, album and artis
 metadata even if no associated files exist.
 
 To help with that, we now offer a ``prune_library`` management command you can run
-to purge your database from obsolete entry. `Please refer to our documentation
+to purge your database from obsolete entries. `Please refer to our documentation
 for usage instructions <https://docs.funkwhale.audio/admin/commands.html#pruning-library>`_.
+
+Check in-place files command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When using in-place import with a living audio library, you'll quite often rename or
+remove files from the file system. Unfortunately, Funkwhale keeps a reference to those
+files in the database, which results in unplayable tracks.
+
+To help with that, we now offer a ``check_inplace_files`` management command you can run
+to purge your database from obsolete files. `Please refer to our documentation
+for usage instructions <https://docs.funkwhale.audio/admin/commands.html#remove-obsolete-files-from-database>`_.
