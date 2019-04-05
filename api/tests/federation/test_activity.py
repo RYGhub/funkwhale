@@ -91,6 +91,11 @@ def test_receive_skips_if_no_matching_route(factories, now, mocker):
     assert models.Activity.objects.count() == 0
 
 
+def test_match_route_ignore_payload_issues():
+    payload = {"object": "http://hello"}
+    assert activity.match_route({"object.type": "Test"}, payload) is False
+
+
 @pytest.mark.parametrize(
     "params, policy_kwargs, expected",
     [
