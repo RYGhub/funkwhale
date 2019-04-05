@@ -388,7 +388,7 @@ def recursive_getattr(obj, key, permissive=False):
 
 def match_route(route, payload):
     for key, value in route.items():
-        payload_value = recursive_getattr(payload, key)
+        payload_value = recursive_getattr(payload, key, permissive=True)
         if payload_value != value:
             return False
 
