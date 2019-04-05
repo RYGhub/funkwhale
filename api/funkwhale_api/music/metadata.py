@@ -431,7 +431,11 @@ class AlbumField(serializers.Field):
         }
         artists_field = ArtistField(for_album=True)
         payload = artists_field.get_value(data)
-        artists = artists_field.to_internal_value(payload)
+        try:
+            artists = artists_field.to_internal_value(payload)
+        except serializers.ValidationError as e:
+            artists = []
+            logger.debug("Ignoring validation error on album artists: %s", e)
         album_serializer = AlbumSerializer(data=final)
         album_serializer.is_valid(raise_exception=True)
         album_serializer.validated_data["artists"] = artists
@@ -513,3 +517,21 @@ class TrackMetadataSerializer(serializers.Serializer):
     album = AlbumField()
     artists = ArtistField()
     cover_data = CoverDataField()
+
+
+class FakeMetadata(Mapping):
+    def __init__(self, data, picture=None):
+        self.data = data
+        self.picture = None
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __len__(self):
+        return len(self.data)
+
+    def __iter__(self):
+        yield from self.data
+
+    def get_picture(self, *args):
+        return self.picture

@@ -462,3 +462,78 @@ def test_album_serializer_validation(data, errored_field):
 
     assert len(serializer.errors) == 1
     assert errored_field in serializer.errors
+
+
+def test_fake_metadata_with_serializer():
+    data = {
+        "title": "Peer Gynt Suite no. 1, op. 46: I. Morning",
+        "artist": "Edvard Grieg",
+        "album_artist": "Edvard Grieg; Musopen Symphony Orchestra",
+        "album": "Peer Gynt Suite no. 1, op. 46",
+        "date": "2012-08-15",
+        "position": "1",
+        "disc_number": "1",
+        "musicbrainz_albumid": "a766da8b-8336-47aa-a3ee-371cc41ccc75",
+        "mbid": "bd21ac48-46d8-4e78-925f-d9cc2a294656",
+        "musicbrainz_artistid": "013c8e5b-d72a-4cd3-8dee-6c64d6125823",
+        "musicbrainz_albumartistid": "013c8e5b-d72a-4cd3-8dee-6c64d6125823;5b4d7d2d-36df-4b38-95e3-a964234f520f",
+        "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "Someone",
+    }
+
+    expected = {
+        "title": "Peer Gynt Suite no. 1, op. 46: I. Morning",
+        "artists": [
+            {
+                "name": "Edvard Grieg",
+                "mbid": uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
+            }
+        ],
+        "album": {
+            "title": "Peer Gynt Suite no. 1, op. 46",
+            "mbid": uuid.UUID("a766da8b-8336-47aa-a3ee-371cc41ccc75"),
+            "release_date": datetime.date(2012, 8, 15),
+            "artists": [
+                {
+                    "name": "Edvard Grieg",
+                    "mbid": uuid.UUID("013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
+                },
+                {
+                    "name": "Musopen Symphony Orchestra",
+                    "mbid": uuid.UUID("5b4d7d2d-36df-4b38-95e3-a964234f520f"),
+                },
+            ],
+        },
+        "position": 1,
+        "disc_number": 1,
+        "mbid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
+        "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
+        "copyright": "Someone",
+        "cover_data": None,
+    }
+    serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
+
+
+def test_serializer_album_artist_missing():
+    data = {
+        "title": "Peer Gynt Suite no. 1, op. 46: I. Morning",
+        "artist": "Edvard Grieg",
+        "album": "Peer Gynt Suite no. 1, op. 46",
+    }
+
+    expected = {
+        "title": "Peer Gynt Suite no. 1, op. 46: I. Morning",
+        "artists": [{"name": "Edvard Grieg", "mbid": None}],
+        "album": {
+            "title": "Peer Gynt Suite no. 1, op. 46",
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+        },
+        "cover_data": None,
+    }
+    serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
