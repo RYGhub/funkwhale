@@ -1,6 +1,7 @@
 import os
 import pytest
 
+from funkwhale_api.music.management.commands import check_inplace_files
 from funkwhale_api.music.management.commands import fix_uploads
 from funkwhale_api.music.management.commands import prune_library
 
@@ -150,3 +151,35 @@ def test_prune_library(factories, mocker):
 
     for o in [not_prunable_track, not_prunable_album, not_prunable_artist]:
         o.refresh_from_db()
+
+
+def test_check_inplace_files_dry_run(factories, tmpfile):
+    prunable = factories["music.Upload"](source="file:///notfound", audio_file=None)
+    not_prunable = factories["music.Upload"](
+        source="file://{}".format(tmpfile.name), audio_file=None
+    )
+    c = check_inplace_files.Command()
+    c.handle(dry_run=True)
+
+    for u in [prunable, not_prunable]:
+        # nothing pruned, because dry run
+        u.refresh_from_db()
+
+
+def test_check_inplace_files_no_dry_run(factories, tmpfile):
+    prunable = factories["music.Upload"](source="file:///notfound", audio_file=None)
+    not_prunable = [
+        factories["music.Upload"](
+            source="file://{}".format(tmpfile.name), audio_file=None
+        ),
+        factories["music.Upload"](source="upload://"),
+        factories["music.Upload"](source="https://"),
+    ]
+    c = check_inplace_files.Command()
+    c.handle(dry_run=False)
+
+    with pytest.raises(prunable.DoesNotExist):
+        prunable.refresh_from_db()
+
+    for u in not_prunable:
+        u.refresh_from_db()

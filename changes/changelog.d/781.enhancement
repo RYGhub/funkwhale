@@ -1,0 +1,1 @@
+Added a `check_inplace_files` management command to remove purge the database from references to in-place imported files that don't exist on disk anymore (#781)

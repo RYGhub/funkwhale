@@ -55,3 +55,28 @@ the changes on the database.
     history by default. If you want to include those in the pruning process as well,
     add the corresponding ``--ignore-favorites``, ``--ignore-playlists`` and ``--ignore-listenings``
     flags.
+
+Remove obsolete files from database
+-----------------------------------
+
+When importing using the :ref:`in-place method <in-place-import>`, if you move or remove
+in-place imported files on disk, Funkwhale will still have a reference to those files and won't
+be able to serve them properly.
+
+To help with that, whenever you remove or move files that were previously imported
+with the ``--in-place`` flag, you can run the following command::
+
+    python manage.py check_inplace_files
+
+This command will loop through all the database objects that reference
+an in-place imported file, check that the file is accessible on disk,
+or delete the database object if it's not.
+
+Once you have reviewed the output and are comfortable with the changes, you should rerun
+the command with the ``--no-dry-run`` flag to disable dry run mode and actually delete the
+database objects.
+
+.. warning::
+
+    Running this command with ``--no-dry-run`` is irreversible. Unless you have a backup,
+    there will be no way to retrieve the deleted data.
