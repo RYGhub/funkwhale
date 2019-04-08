@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="extra content">
-        <play-button class="mini basic orange right floated" :tracks="album.tracks" :album="album">
+        <play-button class="mini basic orange right floated" :tracks="tracksWithAlbum" :album="album">
           <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
         </play-button>
         <span>
@@ -83,6 +83,20 @@ export default {
         return this.album.tracks
       }
       return this.album.tracks.slice(0, this.initialTracks)
+    },
+    tracksWithAlbum () {
+      // needed to include album data (especially cover)
+      // with tracks appended in queue (#795)
+      let self = this
+      return this.album.tracks.map(t => {
+        return  {
+          ...t,
+          album: {
+            ...self.album,
+            tracks: []
+          }
+        }
+      })
     }
   }
 }
