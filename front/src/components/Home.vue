@@ -67,12 +67,6 @@
         <p><translate translate-context="Content/Home/Paragraph">Funkwhale takes care of handling your music</translate>.</p>
         <div class="ui list">
           <div class="item">
-            <i class="download icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item/Verb">Import music from various platforms, such as YouTube or SoundCloud</translate>
-            </div>
-          </div>
-          <div class="item">
             <i class="tag icon"></i>
             <div
               class="content"
