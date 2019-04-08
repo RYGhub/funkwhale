@@ -338,3 +338,7 @@ td.align.right {
 input + .help {
   margin-top: 0.5em;
 }
+
+.table td .ui.dropdown {
+  min-width: auto;
+}
