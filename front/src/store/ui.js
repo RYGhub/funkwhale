@@ -19,7 +19,8 @@ export default {
       'import.status_updated': {},
       'mutation.created': {},
       'mutation.updated': {},
-    }
+    },
+    pageTitle: null
   },
   mutations: {
     addWebsocketEventHandler: (state, {eventName, id, handler}) => {
@@ -53,6 +54,9 @@ export default {
       } else {
         state.notifications[type] = Math.max(0, state.notifications[type] + count)
       }
+    },
+    pageTitle: (state, value) => {
+      state.pageTitle = value
     }
   },
   actions: {

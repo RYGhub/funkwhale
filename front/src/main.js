@@ -58,16 +58,8 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', function (el, binding) {
-  let parts = []
-  let instanceName = store.state.instance.settings.instance.name.value
-  if (instanceName.length === 0) {
-    instanceName = 'Funkwhale'
-  }
-  parts.unshift(instanceName)
-  parts.unshift(binding.value)
-  document.title = parts.join(' - ')
-  }
-)
+  store.commit('ui/pageTitle', binding.value)
+})
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   if (store.state.auth.token) {

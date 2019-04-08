@@ -31,7 +31,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import _ from '@/lodash'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
 import Sidebar from '@/components/Sidebar'
@@ -193,10 +193,34 @@ export default {
         console.log('Connected to WebSocket')
       })
     },
+    getTrackInformationText(track) {
+      const trackTitle = track.title
+      const artistName = (
+        (track.artist) ? track.artist.name : track.album.artist.name)
+      const text = `♫ ${trackTitle} – ${artistName} ♫`
+      return text
+    },
+    updateDocumentTitle() {
+      let parts = []
+      const currentTrackPart = (
+        (this.currentTrack) ? this.getTrackInformationText(this.currentTrack)
+        : null)
+      if (currentTrackPart) {
+        parts.push(currentTrackPart)
+      }
+      if (this.$store.state.ui.pageTitle) {
+        parts.push(this.$store.state.ui.pageTitle)
+      }
+      parts.push(this.$store.state.instance.settings.instance.name.value || 'Funkwhale')
+      document.title = parts.join(' – ')
+    },
   },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
+    }),
+    ...mapGetters({
+      currentTrack: 'queue/currentTrack'
     }),
     suggestedInstances () {
       let instances = this.$store.state.instance.knownInstances.slice(0)
@@ -262,7 +286,19 @@ export default {
           })
         })
       }
-    }
+    },
+    'currentTrack': {
+      immediate: true,
+      handler(newValue) {
+        this.updateDocumentTitle()
+      },
+    },
+    '$store.state.ui.pageTitle': {
+      immediate: true,
+      handler(newValue) {
+        this.updateDocumentTitle()
+      },
+    },
   }
 }
 </script>
