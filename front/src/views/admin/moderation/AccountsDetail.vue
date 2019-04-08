@@ -273,10 +273,10 @@
                     <td>
                       <div class="ui right labeled input">
                         <input
-                          class="ui input"
                           @change="updateUser('upload_quota', true)"
                           v-model.number="object.user.upload_quota"
                           step="100"
+                          name="quota"
                           type="number" />
                         <div class="ui basic label">
                           <translate translate-context="Content/*/*/Unit">MB</translate>
@@ -486,5 +486,8 @@ export default {
 <style scoped>
 .placeholder.segment {
   width: 100%;
+}
+.ui.input input[name="quota"] {
+  max-width: 7em;
 }
 </style>
