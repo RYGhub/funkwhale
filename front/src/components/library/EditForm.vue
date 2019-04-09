@@ -59,10 +59,28 @@
           <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
           <input :type="fieldConfig.inputType || 'text'" v-model="values[fieldConfig.id]" :required="fieldConfig.required" :name="fieldConfig.id" :id="fieldConfig.id">
         </template>
+        <template v-else-if="fieldConfig.type === 'license'">
+          <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
+
+          <select
+            ref="license"
+            v-model="values[fieldConfig.id]"
+            :required="fieldConfig.required"
+            :id="fieldConfig.id"
+            class="ui fluid search dropdown">
+              <option :value="null"><translate translate-context="*/*/*">N/A</translate></option>
+              <option v-for="license in licenses" :key="license.code" :value="license.code">{{ license.name}}</option>
+          </select>
+          <button class="ui tiny basic left floated button" form="noop" @click.prevent="values[fieldConfig.id] = null">
+            <i class="x icon"></i>
+            <translate translate-context="Content/Library/Button.Label">Clear</translate>
+          </button>
+
+        </template>
         <div v-if="values[fieldConfig.id] != initialValues[fieldConfig.id]">
           <button class="ui tiny basic right floated reset button" form="noop" @click.prevent="values[fieldConfig.id] = initialValues[fieldConfig.id]">
             <i class="undo icon"></i>
-            <translate translate-context="Content/Library/Button.Label" :translate-params="{value: initialValues[fieldConfig.id]}">Reset to initial value: %{ value }</translate>
+            <translate translate-context="Content/Library/Button.Label" :translate-params="{value: initialValues[fieldConfig.id] || ''}">Reset to initial value: %{ value }</translate>
           </button>
         </div>
       </div>
@@ -87,6 +105,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import _ from '@/lodash'
 import axios from "axios"
 import EditList from '@/components/library/EditList'
@@ -94,7 +113,7 @@ import EditCard from '@/components/library/EditCard'
 import edits from '@/edits'
 
 export default {
-  props: ["objectType", "object"],
+  props: ["objectType", "object", "licenses"],
   components: {
     EditList,
     EditCard
@@ -112,6 +131,9 @@ export default {
   },
   created () {
     this.setValues()
+  },
+  mounted() {
+    $(".ui.dropdown").dropdown({fullTextSearch: true})
   },
   computed: {
     configs: edits.getConfigs,
@@ -181,6 +203,15 @@ export default {
           self.isLoading = false
         }
       )
+    }
+  },
+  watch: {
+    'values.license' (newValue) {
+      if (newValue === null) {
+        $(this.$refs.license).dropdown('clear')
+      } else {
+        $(this.$refs.license).dropdown('set selected', newValue)
+      }
     }
   }
 }

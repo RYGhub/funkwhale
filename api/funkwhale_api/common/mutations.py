@@ -115,9 +115,13 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         # payload
         for field, attr in self.serialized_relations.items():
             try:
-                data[field] = getattr(data[field], attr)
+                obj = data[field]
             except KeyError:
                 continue
+            if obj is None:
+                data[field] = None
+            else:
+                data[field] = getattr(obj, attr)
         return data
 
     def create(self, validated_data):

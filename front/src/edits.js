@@ -12,10 +12,10 @@ export default {
           },
           {
             id: 'license',
-            type: 'text',
+            type: 'license',
             required: false,
             label: this.$pgettext('Content/*/*/Noun', 'License'),
-            getValue: (obj) => { return obj.license }
+            getValue: (obj) => { return obj.license },
           },
           {
             id: 'position',
