@@ -524,6 +524,7 @@ class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.LicenseSerializer
     queryset = models.License.objects.all().order_by("code")
     lookup_value_regex = ".*"
+    max_page_size = 1000
 
     def get_queryset(self):
         # ensure our licenses are up to date in DB
