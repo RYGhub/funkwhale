@@ -114,7 +114,10 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         # to ensure we store ids instead of model instances in our json
         # payload
         for field, attr in self.serialized_relations.items():
-            data[field] = getattr(data[field], attr)
+            try:
+                data[field] = getattr(data[field], attr)
+            except KeyError:
+                continue
         return data
 
     def create(self, validated_data):
