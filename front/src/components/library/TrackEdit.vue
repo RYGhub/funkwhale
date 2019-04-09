@@ -12,8 +12,11 @@
         :object="object"
         :can-edit="canEdit"
         :licenses="licenses"></edit-form>
+      <div v-else class="ui inverted active dimmer">
+        <div class="ui loader"></div>
       </div>
-    </section>
+    </div>
+  </section>
 </template>
 
 <script>

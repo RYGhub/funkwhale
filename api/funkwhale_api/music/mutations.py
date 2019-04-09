@@ -21,4 +21,4 @@ class TrackMutationSerializer(mutations.UpdateMutationSerializer):
 
     class Meta:
         model = models.Track
-        fields = ["license", "title", "position"]
+        fields = ["license", "title", "position", "copyright"]

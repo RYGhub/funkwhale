@@ -36,6 +36,17 @@ def test_track_title_mutation(factories, now):
     assert track.title == "bar"
 
 
+def test_track_copyright_mutation(factories, now):
+    track = factories["music.Track"](copyright="foo")
+    mutation = factories["common.Mutation"](
+        type="update", target=track, payload={"copyright": "bar"}
+    )
+    mutation.apply()
+    track.refresh_from_db()
+
+    assert track.copyright == "bar"
+
+
 def test_track_position_mutation(factories):
     track = factories["music.Track"](position=4)
     mutation = factories["common.Mutation"](
