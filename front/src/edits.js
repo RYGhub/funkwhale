@@ -11,20 +11,27 @@ export default {
             getValue: (obj) => { return obj.title }
           },
           {
-            id: 'license',
-            type: 'text',
-            required: false,
-            label: this.$pgettext('Content/*/*/Noun', 'License'),
-            getValue: (obj) => { return obj.license }
-          },
-          {
             id: 'position',
             type: 'text',
             inputType: 'number',
             required: false,
             label: this.$pgettext('*/*/*/Short, Noun', 'Position'),
             getValue: (obj) => { return obj.position }
-          }
+          },
+          {
+            id: 'copyright',
+            type: 'text',
+            required: false,
+            label: this.$pgettext('Content/Track/*/Noun', 'Copyright'),
+            getValue: (obj) => { return obj.copyright }
+          },
+          {
+            id: 'license',
+            type: 'license',
+            required: false,
+            label: this.$pgettext('Content/*/*/Noun', 'License'),
+            getValue: (obj) => { return obj.license },
+          },
         ]
       }
     }

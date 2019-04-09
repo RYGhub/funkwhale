@@ -612,7 +612,7 @@ def test_list_licenses(api_client, preferences, mocker):
 
     expected = [
         serializers.LicenseSerializer(l.conf).data
-        for l in models.License.objects.order_by("code")[:25]
+        for l in models.License.objects.order_by("code")
     ]
     url = reverse("api:v1:licenses-list")
 
