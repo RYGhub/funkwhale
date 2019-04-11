@@ -212,6 +212,22 @@ def update_domain_nodeinfo(domain):
     domain.save(update_fields=["nodeinfo", "nodeinfo_fetch_date", "service_actor"])
 
 
+@celery.app.task(name="federation.refresh_nodeinfo_known_nodes")
+def refresh_nodeinfo_known_nodes():
+    """
+    Trigger a node info refresh on all nodes that weren't refreshed since
+    settings.NODEINFO_REFRESH_DELAY
+    """
+    limit = timezone.now() - datetime.timedelta(seconds=settings.NODEINFO_REFRESH_DELAY)
+    candidates = models.Domain.objects.external().exclude(
+        nodeinfo_fetch_date__gte=limit
+    )
+    names = candidates.values_list("name", flat=True)
+    logger.info("Launching periodic nodeinfo refresh on %s domains", len(names))
+    for domain_name in names:
+        update_domain_nodeinfo.delay(domain_name=domain_name)
+
+
 def delete_qs(qs):
     label = qs.model._meta.label
     result = qs.delete()

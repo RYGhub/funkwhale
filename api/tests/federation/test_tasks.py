@@ -216,6 +216,31 @@ def test_update_domain_nodeinfo_error(factories, r_mock, now):
     }
 
 
+def test_refresh_nodeinfo_known_nodes(settings, factories, mocker, now):
+    settings.NODEINFO_REFRESH_DELAY = 666
+
+    refreshed = [
+        factories["federation.Domain"](nodeinfo_fetch_date=None),
+        factories["federation.Domain"](
+            nodeinfo_fetch_date=now
+            - datetime.timedelta(seconds=settings.NODEINFO_REFRESH_DELAY + 1)
+        ),
+    ]
+    factories["federation.Domain"](
+        nodeinfo_fetch_date=now
+        - datetime.timedelta(seconds=settings.NODEINFO_REFRESH_DELAY - 1)
+    )
+
+    update_domain_nodeinfo = mocker.patch.object(tasks.update_domain_nodeinfo, "delay")
+
+    tasks.refresh_nodeinfo_known_nodes()
+
+    assert update_domain_nodeinfo.call_count == len(refreshed)
+
+    for d in refreshed:
+        update_domain_nodeinfo.assert_any_call(domain_name=d.name)
+
+
 def test_handle_purge_actors(factories, mocker):
     to_purge = factories["federation.Actor"]()
     keeped = [
