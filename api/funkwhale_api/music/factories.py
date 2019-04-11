@@ -64,6 +64,12 @@ class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     class Meta:
         model = "music.Artist"
 
+    class Params:
+        attributed = factory.Trait(
+            attributed_to=factory.SubFactory(federation_factories.ActorFactory)
+        )
+        local = factory.Trait(fid=factory.Faker("federation_url", local=True))
+
 
 @registry.register
 class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
@@ -79,6 +85,15 @@ class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     class Meta:
         model = "music.Album"
 
+    class Params:
+        attributed = factory.Trait(
+            attributed_to=factory.SubFactory(federation_factories.ActorFactory)
+        )
+
+        local = factory.Trait(
+            fid=factory.Faker("federation_url", local=True), artist__local=True
+        )
+
 
 @registry.register
 class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
@@ -93,6 +108,15 @@ class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
     class Meta:
         model = "music.Track"
+
+    class Params:
+        attributed = factory.Trait(
+            attributed_to=factory.SubFactory(federation_factories.ActorFactory)
+        )
+
+        local = factory.Trait(
+            fid=factory.Faker("federation_url", local=True), album__local=True
+        )
 
     @factory.post_generation
     def license(self, created, extracted, **kwargs):

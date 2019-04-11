@@ -75,6 +75,15 @@ class DomainFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         model = "federation.Domain"
         django_get_or_create = ("name",)
 
+    @factory.post_generation
+    def with_service_actor(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        self.service_actor = ActorFactory(domain=self)
+        self.save(update_fields=["service_actor"])
+        return self.service_actor
+
 
 @registry.register
 class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):

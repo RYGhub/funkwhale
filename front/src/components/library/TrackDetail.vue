@@ -63,6 +63,16 @@
               <translate translate-context="*/*/*">N/A</translate>
             </td>
           </tr>
+          <tr>
+            <td>
+              <translate translate-context="Content/*/*/Noun">Federation ID</translate>
+            </td>
+            <td :title="track.fid">
+              <a :href="track.fid" target="_blank" rel="noopener noreferrer">
+                {{ track.fid|truncate(65)}}
+              </a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </section>

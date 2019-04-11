@@ -56,3 +56,16 @@ def test_track_position_mutation(factories):
     track.refresh_from_db()
 
     assert track.position == 12
+
+
+def test_track_mutation_apply_outbox(factories, mocker):
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    track = factories["music.Track"](position=4)
+    mutation = factories["common.Mutation"](
+        type="update", target=track, payload={"position": 12}
+    )
+    mutation.apply()
+
+    dispatch.assert_called_once_with(
+        {"type": "Update", "object": {"type": "Track"}}, context={"track": track}
+    )

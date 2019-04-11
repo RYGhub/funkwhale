@@ -43,6 +43,7 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
@@ -51,6 +52,7 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
             "creation_date",
             "tracks_count",
             "is_playable",
+            "is_local",
         )
 
     def get_tracks_count(self, o):
@@ -68,13 +70,13 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Artist
-        fields = ("id", "mbid", "name", "creation_date", "albums")
+        fields = ("id", "fid", "mbid", "name", "creation_date", "albums", "is_local")
 
 
 class ArtistSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Artist
-        fields = ("id", "mbid", "name", "creation_date")
+        fields = ("id", "fid", "mbid", "name", "creation_date", "is_local")
 
 
 class AlbumTrackSerializer(serializers.ModelSerializer):
@@ -87,6 +89,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
         model = models.Track
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "album",
@@ -99,6 +102,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "duration",
             "copyright",
             "license",
+            "is_local",
         )
 
     def get_uploads(self, obj):
@@ -125,6 +129,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
@@ -133,6 +138,7 @@ class AlbumSerializer(serializers.ModelSerializer):
             "cover",
             "creation_date",
             "is_playable",
+            "is_local",
         )
 
     def get_tracks(self, o):
@@ -156,12 +162,14 @@ class TrackAlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
             "release_date",
             "cover",
             "creation_date",
+            "is_local",
         )
 
 
@@ -190,6 +198,7 @@ class TrackSerializer(serializers.ModelSerializer):
         model = models.Track
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "album",
@@ -202,6 +211,7 @@ class TrackSerializer(serializers.ModelSerializer):
             "listen_url",
             "copyright",
             "license",
+            "is_local",
         )
 
     def get_lyrics(self, obj):

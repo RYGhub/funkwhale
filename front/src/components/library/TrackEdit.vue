@@ -6,8 +6,11 @@
         <translate v-if="canEdit" key="1" translate-context="Content/*/Title">Edit this track</translate>
         <translate v-else key="2" translate-context="Content/*/Title">Suggest an edit on this track</translate>
       </h2>
+      <div class="ui message" v-if="!object.is_local">
+        <translate translate-context="Content/*/Message">This object is managed by another server, you cannot edit it.</translate>
+      </div>
       <edit-form
-        v-if="!isLoadingLicenses"
+        v-else-if="!isLoadingLicenses"
         :object-type="objectType"
         :object="object"
         :can-edit="canEdit"

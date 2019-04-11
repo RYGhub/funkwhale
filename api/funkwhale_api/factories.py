@@ -2,6 +2,8 @@ import uuid
 import factory
 import persisting_theory
 
+from django.conf import settings
+
 from faker.providers import internet as internet_provider
 
 
@@ -50,11 +52,11 @@ class FunkwhaleProvider(internet_provider.Provider):
     not random enough
     """
 
-    def federation_url(self, prefix=""):
+    def federation_url(self, prefix="", local=False):
         def path_generator():
             return "{}/{}".format(prefix, uuid.uuid4())
 
-        domain = self.domain_name()
+        domain = settings.FEDERATION_HOSTNAME if local else self.domain_name()
         protocol = "https"
         path = path_generator()
         return "{}://{}/{}".format(protocol, domain, path)

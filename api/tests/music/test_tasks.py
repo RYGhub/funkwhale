@@ -42,7 +42,36 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     assert track.album.release_date == datetime.date(2012, 8, 15)
     assert track.artist.name == metadata["artists"][0]["name"]
     assert track.artist.mbid is None
+    assert track.artist.attributed_to is None
     match_license.assert_called_once_with(metadata["license"], metadata["copyright"])
+
+
+def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
+    actor = factories["federation.Actor"]()
+    metadata = {
+        "title": "Test track",
+        "artists": [{"name": "Test artist"}],
+        "album": {"title": "Test album", "release_date": datetime.date(2012, 8, 15)},
+        "position": 4,
+        "disc_number": 2,
+        "copyright": "2018 Someone",
+    }
+
+    track = tasks.get_track_from_import_metadata(metadata, attributed_to=actor)
+
+    assert track.title == metadata["title"]
+    assert track.mbid is None
+    assert track.position == 4
+    assert track.disc_number == 2
+    assert track.copyright == metadata["copyright"]
+    assert track.attributed_to == actor
+    assert track.album.title == metadata["album"]["title"]
+    assert track.album.mbid is None
+    assert track.album.release_date == datetime.date(2012, 8, 15)
+    assert track.album.attributed_to == actor
+    assert track.artist.name == metadata["artists"][0]["name"]
+    assert track.artist.mbid is None
+    assert track.artist.attributed_to == actor
 
 
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
@@ -229,6 +258,7 @@ def test_upload_import(now, factories, temp_signal, mocker):
     outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
     update_album_cover = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
     get_picture = mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture")
+    get_track_from_import_metadata = mocker.spy(tasks, "get_track_from_import_metadata")
     track = factories["music.Track"](album__cover="")
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": str(track.uuid)}}}
@@ -245,6 +275,10 @@ def test_upload_import(now, factories, temp_signal, mocker):
     get_picture.assert_called_once_with("cover_front", "other")
     update_album_cover.assert_called_once_with(
         upload.track.album, cover_data=get_picture.return_value, source=upload.source
+    )
+    assert (
+        get_track_from_import_metadata.call_args[-1]["attributed_to"]
+        == upload.library.actor
     )
     handler.assert_called_once_with(
         upload=upload,
@@ -478,9 +512,15 @@ def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, m
     )
 
 
-def test_federation_audio_track_to_metadata(now):
+def test_federation_audio_track_to_metadata(now, mocker):
     published = now
     released = now.date()
+    references = {
+        "http://track.attributed": mocker.Mock(),
+        "http://album.attributed": mocker.Mock(),
+        "http://album-artist.attributed": mocker.Mock(),
+        "http://artist.attributed": mocker.Mock(),
+    }
     payload = {
         "@context": jsonld.get_default_context(),
         "type": "Track",
@@ -492,6 +532,7 @@ def test_federation_audio_track_to_metadata(now):
         "published": published.isoformat(),
         "license": "http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
+        "attributedTo": "http://track.attributed",
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -499,6 +540,7 @@ def test_federation_audio_track_to_metadata(now):
             "name": "Purple album",
             "musicbrainzId": str(uuid.uuid4()),
             "released": released.isoformat(),
+            "attributedTo": "http://album.attributed",
             "artists": [
                 {
                     "type": "Artist",
@@ -506,6 +548,7 @@ def test_federation_audio_track_to_metadata(now):
                     "id": "http://hello.artist",
                     "name": "John Smith",
                     "musicbrainzId": str(uuid.uuid4()),
+                    "attributedTo": "http://album-artist.attributed",
                 }
             ],
             "cover": {
@@ -521,6 +564,7 @@ def test_federation_audio_track_to_metadata(now):
                 "id": "http://hello.trackartist",
                 "name": "Bob Smith",
                 "musicbrainzId": str(uuid.uuid4()),
+                "attributedTo": "http://artist.attributed",
             }
         ],
     }
@@ -535,8 +579,10 @@ def test_federation_audio_track_to_metadata(now):
         "mbid": payload["musicbrainzId"],
         "fdate": serializer.validated_data["published"],
         "fid": payload["id"],
+        "attributed_to": references["http://track.attributed"],
         "album": {
             "title": payload["album"]["name"],
+            "attributed_to": references["http://album.attributed"],
             "release_date": released,
             "mbid": payload["album"]["musicbrainzId"],
             "fid": payload["album"]["id"],
@@ -546,6 +592,7 @@ def test_federation_audio_track_to_metadata(now):
                     "name": a["name"],
                     "mbid": a["musicbrainzId"],
                     "fid": a["id"],
+                    "attributed_to": references["http://album-artist.attributed"],
                     "fdate": serializer.validated_data["album"]["artists"][i][
                         "published"
                     ],
@@ -561,6 +608,7 @@ def test_federation_audio_track_to_metadata(now):
                 "mbid": a["musicbrainzId"],
                 "fid": a["id"],
                 "fdate": serializer.validated_data["artists"][i]["published"],
+                "attributed_to": references["http://artist.attributed"],
             }
             for i, a in enumerate(payload["artists"])
         ],
@@ -570,7 +618,9 @@ def test_federation_audio_track_to_metadata(now):
         },
     }
 
-    result = tasks.federation_audio_track_to_metadata(serializer.validated_data)
+    result = tasks.federation_audio_track_to_metadata(
+        serializer.validated_data, references
+    )
     assert result == expected
 
 
@@ -747,3 +797,14 @@ def test_get_prunable_artists(factories):
     factories["music.Track"](album__artist=non_prunable_album_artist)
 
     assert list(tasks.get_prunable_artists()) == [prunable_artist]
+
+
+def test_update_library_entity(factories, mocker):
+    artist = factories["music.Artist"]()
+    save = mocker.spy(artist, "save")
+
+    tasks.update_library_entity(artist, {"name": "Hello"})
+    save.assert_called_once_with(update_fields=["name"])
+
+    artist.refresh_from_db()
+    assert artist.name == "Hello"

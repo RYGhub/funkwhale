@@ -114,6 +114,16 @@ class APIModelMixin(models.Model):
 
         return super().save(**kwargs)
 
+    @property
+    def is_local(self):
+        if not self.fid:
+            return True
+
+        d = settings.FEDERATION_HOSTNAME
+        return self.fid.startswith("http://{}/".format(d)) or self.fid.startswith(
+            "https://{}/".format(d)
+        )
+
 
 class License(models.Model):
     code = models.CharField(primary_key=True, max_length=100)
@@ -178,6 +188,16 @@ class Artist(APIModelMixin):
         "mbid": {"musicbrainz_field_name": "id"},
         "name": {"musicbrainz_field_name": "name"},
     }
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_artists",
+    )
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
 
@@ -254,6 +274,16 @@ class Album(APIModelMixin):
     TYPE_CHOICES = (("album", "Album"),)
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default="album")
 
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_albums",
+    )
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
     api = musicbrainz.api.releases
     federation_namespace = "albums"
@@ -475,6 +505,16 @@ class Track(APIModelMixin):
         blank=True,
         on_delete=models.DO_NOTHING,
         related_name="tracks",
+    )
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_tracks",
     )
     copyright = models.CharField(max_length=500, null=True, blank=True)
     federation_namespace = "tracks"

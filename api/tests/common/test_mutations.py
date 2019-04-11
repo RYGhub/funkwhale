@@ -10,7 +10,7 @@ def mutations_registry():
     return mutations.Registry()
 
 
-def test_apply_mutation(mutations_registry):
+def test_apply_mutation(mutations_registry, db):
     class Obj:
         pass
 
