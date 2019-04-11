@@ -486,7 +486,14 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="0", hour="0"),
         "options": {"expires": 60 * 60 * 24},
     },
+    "federation.refresh_nodeinfo_known_nodes": {
+        "task": "federation.refresh_nodeinfo_known_nodes",
+        "schedule": crontab(minute="0", hour="*"),
+        "options": {"expires": 60 * 60},
+    },
 }
+
+NODEINFO_REFRESH_DELAY = env.int("NODEINFO_REFRESH_DELAY", default=3600 * 24)
 
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,

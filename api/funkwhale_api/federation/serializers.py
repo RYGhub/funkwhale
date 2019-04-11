@@ -11,7 +11,7 @@ from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
 
-from . import activity, actors, contexts, jsonld, models, utils
+from . import activity, actors, contexts, jsonld, models, tasks, utils
 
 AP_CONTEXT = jsonld.get_default_context()
 
@@ -152,7 +152,12 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         if maf is not None:
             kwargs["manually_approves_followers"] = maf
         domain = urllib.parse.urlparse(kwargs["fid"]).netloc
-        kwargs["domain"] = models.Domain.objects.get_or_create(pk=domain)[0]
+        domain, domain_created = models.Domain.objects.get_or_create(pk=domain)
+        if domain_created and not domain.is_local:
+            # first time we see the domain, we trigger nodeinfo fetching
+            tasks.update_domain_nodeinfo(domain_name=domain.name)
+
+        kwargs["domain"] = domain
         for endpoint, url in self.validated_data.get("endpoints", {}).items():
             if endpoint == "sharedInbox":
                 kwargs["shared_inbox_url"] = url

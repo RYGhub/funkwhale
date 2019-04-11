@@ -14,7 +14,10 @@ def test_actor_fetching(r_mock):
     assert r == payload
 
 
-def test_get_actor(factories, r_mock):
+def test_get_actor(factories, r_mock, mocker):
+    update_domain_nodeinfo = mocker.patch(
+        "funkwhale_api.federation.tasks.update_domain_nodeinfo"
+    )
     actor = factories["federation.Actor"].build()
     payload = serializers.ActorSerializer(actor).data
     r_mock.get(actor.fid, json=payload)
@@ -22,6 +25,7 @@ def test_get_actor(factories, r_mock):
 
     assert new_actor.pk is not None
     assert serializers.ActorSerializer(new_actor).data == payload
+    update_domain_nodeinfo.assert_called_once_with(domain_name=new_actor.domain_id)
 
 
 def test_get_actor_use_existing(factories, preferences, mocker):
