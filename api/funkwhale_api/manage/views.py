@@ -121,6 +121,10 @@ class ManageDomainViewSet(
         "instance_policy",
     ]
 
+    def perform_create(self, serializer):
+        domain = serializer.save()
+        federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
+
     @rest_decorators.action(methods=["get"], detail=True)
     def nodeinfo(self, request, *args, **kwargs):
         domain = self.get_object()

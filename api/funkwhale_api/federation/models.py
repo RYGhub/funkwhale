@@ -151,6 +151,10 @@ class Domain(models.Model):
         )
         return data
 
+    @property
+    def is_local(self):
+        return self.name == settings.FEDERATION_HOSTNAME
+
 
 class Actor(models.Model):
     ap_type = "Actor"
