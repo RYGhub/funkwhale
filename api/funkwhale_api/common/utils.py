@@ -201,3 +201,30 @@ def concat_dicts(*dicts):
         n.update(d)
 
     return n
+
+
+def get_updated_fields(conf, data, obj):
+    """
+    Given a list of fields, a dict and an object, will return the dict keys/values
+    that differ from the corresponding fields on the object.
+    """
+    final_conf = []
+    for c in conf:
+        if isinstance(c, str):
+            final_conf.append((c, c))
+        else:
+            final_conf.append(c)
+
+    final_data = {}
+
+    for data_field, obj_field in final_conf:
+        try:
+            data_value = data[data_field]
+        except KeyError:
+            continue
+
+        obj_value = getattr(obj, obj_field)
+        if obj_value != data_value:
+            final_data[obj_field] = data_value
+
+    return final_data

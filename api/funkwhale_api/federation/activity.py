@@ -365,27 +365,6 @@ class OutboxRouter(Router):
             return activities
 
 
-def recursive_getattr(obj, key, permissive=False):
-    """
-    Given a dictionary such as {'user': {'name': 'Bob'}} and
-    a dotted string such as user.name, returns 'Bob'.
-
-    If the value is not present, returns None
-    """
-    v = obj
-    for k in key.split("."):
-        try:
-            v = v.get(k)
-        except (TypeError, AttributeError):
-            if not permissive:
-                raise
-            return
-        if v is None:
-            return
-
-    return v
-
-
 def match_route(route, payload):
     for key, value in route.items():
         payload_value = recursive_getattr(payload, key, permissive=True)
@@ -432,6 +411,27 @@ def prepare_deliveries_and_inbox_items(recipient_list, type):
                     remote_inbox_urls.add(actor.shared_inbox_url or actor.inbox_url)
             urls.append(r["target"].followers_url)
 
+        elif isinstance(r, dict) and r["type"] == "instances_with_followers":
+            # we want to broadcast the activity to other instances service actors
+            # when we have at least one follower from this instance
+            follows = (
+                models.LibraryFollow.objects.filter(approved=True)
+                .exclude(actor__domain_id=settings.FEDERATION_HOSTNAME)
+                .exclude(actor__domain=None)
+                .union(
+                    models.Follow.objects.filter(approved=True)
+                    .exclude(actor__domain_id=settings.FEDERATION_HOSTNAME)
+                    .exclude(actor__domain=None)
+                )
+            )
+            actors = models.Actor.objects.filter(
+                managed_domains__name__in=follows.values_list(
+                    "actor__domain_id", flat=True
+                )
+            )
+            values = actors.values("shared_inbox_url", "inbox_url")
+            for v in values:
+                remote_inbox_urls.add(v["shared_inbox_url"] or v["inbox_url"])
     deliveries = [models.Delivery(inbox_url=url) for url in remote_inbox_urls]
     inbox_items = [
         models.InboxItem(actor=actor, type=type) for actor in local_recipients

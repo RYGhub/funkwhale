@@ -2,7 +2,7 @@ import persisting_theory
 
 from rest_framework import serializers
 
-from django.db import models
+from django.db import models, transaction
 
 
 class ConfNotFound(KeyError):
@@ -23,6 +23,7 @@ class Registry(persisting_theory.Registry):
 
         return decorator
 
+    @transaction.atomic
     def apply(self, type, obj, payload):
         conf = self.get_conf(type, obj)
         serializer = conf["serializer_class"](obj, data=payload)
@@ -73,6 +74,9 @@ class MutationSerializer(serializers.Serializer):
     def apply(self, obj, validated_data):
         raise NotImplementedError()
 
+    def post_apply(self, obj, validated_data):
+        pass
+
     def get_previous_state(self, obj, validated_data):
         return
 
@@ -88,8 +92,11 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         kwargs.setdefault("partial", True)
         super().__init__(*args, **kwargs)
 
+    @transaction.atomic
     def apply(self, obj, validated_data):
-        return self.update(obj, validated_data)
+        r = self.update(obj, validated_data)
+        self.post_apply(r, validated_data)
+        return r
 
     def validate(self, validated_data):
         if not validated_data:

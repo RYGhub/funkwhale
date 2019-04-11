@@ -1,6 +1,6 @@
 import pytest
 
-from funkwhale_api.federation import jsonld, routes, serializers
+from funkwhale_api.federation import actors, contexts, jsonld, routes, serializers
 
 
 @pytest.mark.parametrize(
@@ -13,6 +13,9 @@ from funkwhale_api.federation import jsonld, routes, serializers
         ({"type": "Delete", "object.type": "Library"}, routes.inbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.inbox_delete_audio),
         ({"type": "Undo", "object.type": "Follow"}, routes.inbox_undo_follow),
+        ({"type": "Update", "object.type": "Artist"}, routes.inbox_update_artist),
+        ({"type": "Update", "object.type": "Album"}, routes.inbox_update_album),
+        ({"type": "Update", "object.type": "Track"}, routes.inbox_update_track),
     ],
 )
 def test_inbox_routes(route, handler):
@@ -34,6 +37,7 @@ def test_inbox_routes(route, handler):
         ({"type": "Delete", "object.type": "Library"}, routes.outbox_delete_library),
         ({"type": "Delete", "object.type": "Audio"}, routes.outbox_delete_audio),
         ({"type": "Undo", "object.type": "Follow"}, routes.outbox_undo_follow),
+        ({"type": "Update", "object.type": "Track"}, routes.outbox_update_track),
     ],
 )
 def test_outbox_routes(route, handler):
@@ -405,3 +409,89 @@ def test_outbox_delete_follow_library(factories):
     assert activity["actor"] == follow.actor
     assert activity["object"] == follow
     assert activity["related_object"] == follow.target
+
+
+def test_handle_library_entry_update_can_manage(factories, mocker):
+    update_library_entity = mocker.patch(
+        "funkwhale_api.music.tasks.update_library_entity"
+    )
+    activity = factories["federation.Activity"]()
+    obj = factories["music.Artist"]()
+    actor = factories["federation.Actor"]()
+    mocker.patch.object(actor, "can_manage", return_value=False)
+    data = serializers.ArtistSerializer(obj).data
+    data["name"] = "New name"
+    payload = {"type": "Update", "actor": actor, "object": data}
+
+    routes.inbox_update_artist(
+        payload, context={"actor": actor, "raise_exception": True, "activity": activity}
+    )
+
+    update_library_entity.assert_not_called()
+
+
+def test_inbox_update_artist(factories, mocker):
+    update_library_entity = mocker.patch(
+        "funkwhale_api.music.tasks.update_library_entity"
+    )
+    activity = factories["federation.Activity"]()
+    obj = factories["music.Artist"](attributed=True)
+    actor = obj.attributed_to
+    data = serializers.ArtistSerializer(obj).data
+    data["name"] = "New name"
+    payload = {"type": "Update", "actor": actor, "object": data}
+
+    routes.inbox_update_artist(
+        payload, context={"actor": actor, "raise_exception": True, "activity": activity}
+    )
+
+    update_library_entity.assert_called_once_with(obj, {"name": "New name"})
+
+
+def test_inbox_update_album(factories, mocker):
+    update_library_entity = mocker.patch(
+        "funkwhale_api.music.tasks.update_library_entity"
+    )
+    activity = factories["federation.Activity"]()
+    obj = factories["music.Album"](attributed=True)
+    actor = obj.attributed_to
+    data = serializers.AlbumSerializer(obj).data
+    data["name"] = "New title"
+    payload = {"type": "Update", "actor": actor, "object": data}
+
+    routes.inbox_update_album(
+        payload, context={"actor": actor, "raise_exception": True, "activity": activity}
+    )
+
+    update_library_entity.assert_called_once_with(obj, {"title": "New title"})
+
+
+def test_inbox_update_track(factories, mocker):
+    update_library_entity = mocker.patch(
+        "funkwhale_api.music.tasks.update_library_entity"
+    )
+    activity = factories["federation.Activity"]()
+    obj = factories["music.Track"](attributed=True)
+    actor = obj.attributed_to
+    data = serializers.TrackSerializer(obj).data
+    data["name"] = "New title"
+    payload = {"type": "Update", "actor": actor, "object": data}
+
+    routes.inbox_update_track(
+        payload, context={"actor": actor, "raise_exception": True, "activity": activity}
+    )
+
+    update_library_entity.assert_called_once_with(obj, {"title": "New title"})
+
+
+def test_outbox_update_track(factories):
+    track = factories["music.Track"]()
+    activity = list(routes.outbox_update_track({"track": track}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.TrackSerializer(track).data}
+    ).data
+
+    expected["to"] = [contexts.AS.Public, {"type": "instances_with_followers"}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == actors.get_service_actor()

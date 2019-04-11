@@ -65,6 +65,7 @@
             </modal>
           </template>
           <router-link
+            v-if="track.is_local"
             :to="{name: 'library.tracks.edit', params: {id: track.id }}"
             class="ui icon labeled button">
             <i class="edit icon"></i>

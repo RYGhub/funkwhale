@@ -533,3 +533,18 @@ def test_queryset_local_entities(factories, settings, factory):
     factories[factory](fid="https://noope/3")
 
     assert list(obj1.__class__.objects.local().order_by("id")) == [obj1, obj2]
+
+
+@pytest.mark.parametrize(
+    "federation_hostname, fid, expected",
+    [
+        ("test.domain", "http://test.domain/", True),
+        ("test.domain", None, True),
+        ("test.domain", "https://test.domain/", True),
+        ("test.otherdomain", "http://test.domain/", False),
+    ],
+)
+def test_api_model_mixin_is_local(federation_hostname, fid, expected, settings):
+    settings.FEDERATION_HOSTNAME = federation_hostname
+    obj = models.Track(fid=fid)
+    assert obj.is_local is expected

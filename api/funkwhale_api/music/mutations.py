@@ -1,14 +1,15 @@
 from funkwhale_api.common import mutations
+from funkwhale_api.federation import routes
 
 from . import models
 
 
 def can_suggest(obj, actor):
-    return True
+    return obj.is_local
 
 
 def can_approve(obj, actor):
-    return actor.user and actor.user.get_permissions()["library"]
+    return obj.is_local and actor.user and actor.user.get_permissions()["library"]
 
 
 @mutations.registry.connect(
@@ -22,3 +23,8 @@ class TrackMutationSerializer(mutations.UpdateMutationSerializer):
     class Meta:
         model = models.Track
         fields = ["license", "title", "position", "copyright"]
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
+        )

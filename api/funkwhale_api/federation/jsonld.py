@@ -57,7 +57,9 @@ def insert_context(ctx, doc):
     existing = doc["@context"]
     if isinstance(existing, list):
         if ctx not in existing:
+            existing = existing[:]
             existing.append(ctx)
+            doc["@context"] = existing
     else:
         doc["@context"] = [existing, ctx]
     return doc
@@ -213,6 +215,15 @@ def get_ids(v):
 
 def get_default_context():
     return ["https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1", {}]
+
+
+def get_default_context_fw():
+    return [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1",
+        {},
+        "https://funkwhale.audio/ns",
+    ]
 
 
 class JsonLdSerializer(serializers.Serializer):

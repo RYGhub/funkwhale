@@ -206,7 +206,9 @@ def process_upload(upload):
     )
     additional_data["upload_source"] = upload.source
     try:
-        track = get_track_from_import_metadata(final_metadata)
+        track = get_track_from_import_metadata(
+            final_metadata, attributed_to=upload.library.actor
+        )
     except UploadImportError as e:
         return fail_import(upload, e.code)
     except Exception:
@@ -282,7 +284,7 @@ def process_upload(upload):
         )
 
 
-def federation_audio_track_to_metadata(payload):
+def federation_audio_track_to_metadata(payload, references):
     """
     Given a valid payload as returned by federation.serializers.TrackSerializer.validated_data,
     returns a correct metadata payload for use with get_track_from_import_metadata.
@@ -293,6 +295,7 @@ def federation_audio_track_to_metadata(payload):
         "disc_number": payload.get("disc"),
         "license": payload.get("license"),
         "copyright": payload.get("copyright"),
+        "attributed_to": references.get(payload.get("attributedTo")),
         "mbid": str(payload.get("musicbrainzId"))
         if payload.get("musicbrainzId")
         else None,
@@ -300,6 +303,7 @@ def federation_audio_track_to_metadata(payload):
             "title": payload["album"]["name"],
             "fdate": payload["album"]["published"],
             "fid": payload["album"]["id"],
+            "attributed_to": references.get(payload["album"].get("attributedTo")),
             "mbid": str(payload["album"]["musicbrainzId"])
             if payload["album"].get("musicbrainzId")
             else None,
@@ -309,6 +313,7 @@ def federation_audio_track_to_metadata(payload):
                     "fid": a["id"],
                     "name": a["name"],
                     "fdate": a["published"],
+                    "attributed_to": references.get(a.get("attributedTo")),
                     "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
                 }
                 for a in payload["album"]["artists"]
@@ -319,6 +324,7 @@ def federation_audio_track_to_metadata(payload):
                 "fid": a["id"],
                 "name": a["name"],
                 "fdate": a["published"],
+                "attributed_to": references.get(a.get("attributedTo")),
                 "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
             }
             for a in payload["artists"]
@@ -393,8 +399,8 @@ def sort_candidates(candidates, important_fields):
 
 
 @transaction.atomic
-def get_track_from_import_metadata(data, update_cover=False):
-    track = _get_track(data)
+def get_track_from_import_metadata(data, update_cover=False, attributed_to=None):
+    track = _get_track(data, attributed_to=attributed_to)
     if update_cover and track and not track.album.cover:
         update_album_cover(
             track.album,
@@ -404,7 +410,7 @@ def get_track_from_import_metadata(data, update_cover=False):
     return track
 
 
-def _get_track(data):
+def _get_track(data, attributed_to=None):
     track_uuid = getter(data, "funkwhale", "track", "uuid")
 
     if track_uuid:
@@ -458,6 +464,7 @@ def _get_track(data):
         "mbid": artist_mbid,
         "fid": artist_fid,
         "from_activity_id": from_activity_id,
+        "attributed_to": artist.get("attributed_to", attributed_to),
     }
     if artist.get("fdate"):
         defaults["creation_date"] = artist.get("fdate")
@@ -484,6 +491,7 @@ def _get_track(data):
             "mbid": album_artist_mbid,
             "fid": album_artist_fid,
             "from_activity_id": from_activity_id,
+            "attributed_to": album_artist.get("attributed_to", attributed_to),
         }
         if album_artist.get("fdate"):
             defaults["creation_date"] = album_artist.get("fdate")
@@ -511,6 +519,7 @@ def _get_track(data):
         "release_date": album.get("release_date"),
         "fid": album_fid,
         "from_activity_id": from_activity_id,
+        "attributed_to": album.get("attributed_to", attributed_to),
     }
     if album.get("fdate"):
         defaults["creation_date"] = album.get("fdate")
@@ -536,6 +545,7 @@ def _get_track(data):
         "disc_number": data.get("disc_number"),
         "fid": track_fid,
         "from_activity_id": from_activity_id,
+        "attributed_to": data.get("attributed_to", attributed_to),
         "license": licenses.match(data.get("license"), data.get("copyright")),
         "copyright": data.get("copyright"),
     }
@@ -613,3 +623,18 @@ def get_prunable_albums():
 
 def get_prunable_artists():
     return models.Artist.objects.filter(tracks__isnull=True, albums__isnull=True)
+
+
+def update_library_entity(obj, data):
+    """
+    Given an obj and some updated fields, will persist the changes on the obj
+    and also check if the entity need to be aliased with existing objs (i.e
+    if a mbid was added on the obj, and match another entity with the same mbid)
+    """
+    for key, value in data.items():
+        setattr(obj, key, value)
+
+    # Todo: handle integrity error on unique fields (such as MBID)
+    obj.save(update_fields=list(data.keys()))
+
+    return obj

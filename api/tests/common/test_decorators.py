@@ -44,7 +44,7 @@ def test_mutations_route_create_success(factories, api_request, is_approved, moc
     on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
     user = factories["users.User"](permission_library=True)
     actor = user.create_actor()
-    track = factories["music.Track"](title="foo")
+    track = factories["music.Track"](title="foo", local=True)
     view = V.as_view({"post": "mutations"})
 
     request = api_request.post(

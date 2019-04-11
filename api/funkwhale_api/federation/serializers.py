@@ -7,9 +7,11 @@ from django.core.paginator import Paginator
 from rest_framework import serializers
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import tasks as music_tasks
 
-from . import activity, contexts, jsonld, models, utils
+from . import activity, actors, contexts, jsonld, models, utils
 
 AP_CONTEXT = jsonld.get_default_context()
 
@@ -670,7 +672,7 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
             "first": jsonld.first_id(contexts.AS.first),
             "last": jsonld.first_id(contexts.AS.last),
             "next": jsonld.first_id(contexts.AS.next),
-            "prev": jsonld.first_id(contexts.AS.next),
+            "prev": jsonld.first_id(contexts.AS.prev),
             "partOf": jsonld.first_id(contexts.AS.partOf),
         }
 
@@ -731,6 +733,7 @@ MUSIC_ENTITY_JSONLD_MAPPING = {
     "name": jsonld.first_val(contexts.AS.name),
     "published": jsonld.first_val(contexts.AS.published),
     "musicbrainzId": jsonld.first_val(contexts.FW.musicbrainzId),
+    "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
 }
 
 
@@ -739,9 +742,29 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
     published = serializers.DateTimeField()
     musicbrainzId = serializers.UUIDField(allow_null=True, required=False)
     name = serializers.CharField(max_length=1000)
+    attributedTo = serializers.URLField(max_length=500, allow_null=True, required=False)
+    updateable_fields = []
+
+    def update(self, instance, validated_data):
+        attributed_to_fid = validated_data.get("attributedTo")
+        if attributed_to_fid:
+            validated_data["attributedTo"] = actors.get_actor(attributed_to_fid)
+        updated_fields = funkwhale_utils.get_updated_fields(
+            self.updateable_fields, validated_data, instance
+        )
+        if updated_fields:
+            return music_tasks.update_library_entity(instance, updated_fields)
+
+        return instance
 
 
 class ArtistSerializer(MusicEntitySerializer):
+    updateable_fields = [
+        ("name", "name"),
+        ("musicbrainzId", "mbid"),
+        ("attributedTo", "attributed_to"),
+    ]
+
     class Meta:
         jsonld_mapping = MUSIC_ENTITY_JSONLD_MAPPING
 
@@ -752,6 +775,9 @@ class ArtistSerializer(MusicEntitySerializer):
             "name": instance.name,
             "published": instance.creation_date.isoformat(),
             "musicbrainzId": str(instance.mbid) if instance.mbid else None,
+            "attributedTo": instance.attributed_to.fid
+            if instance.attributed_to
+            else None,
         }
 
         if self.context.get("include_ap_context", self.parent is None):
@@ -765,6 +791,12 @@ class AlbumSerializer(MusicEntitySerializer):
     cover = LinkSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
+    updateable_fields = [
+        ("name", "title"),
+        ("musicbrainzId", "mbid"),
+        ("attributedTo", "attributed_to"),
+        ("released", "release_date"),
+    ]
 
     class Meta:
         jsonld_mapping = funkwhale_utils.concat_dicts(
@@ -791,6 +823,9 @@ class AlbumSerializer(MusicEntitySerializer):
                     instance.artist, context={"include_ap_context": False}
                 ).data
             ],
+            "attributedTo": instance.attributed_to.fid
+            if instance.attributed_to
+            else None,
         }
         if instance.cover:
             d["cover"] = {
@@ -811,6 +846,16 @@ class TrackSerializer(MusicEntitySerializer):
     album = AlbumSerializer()
     license = serializers.URLField(allow_null=True, required=False)
     copyright = serializers.CharField(allow_null=True, required=False)
+
+    updateable_fields = [
+        ("name", "title"),
+        ("musicbrainzId", "mbid"),
+        ("attributedTo", "attributed_to"),
+        ("disc", "disc_number"),
+        ("position", "position"),
+        ("copyright", "copyright"),
+        ("license", "license"),
+    ]
 
     class Meta:
         jsonld_mapping = funkwhale_utils.concat_dicts(
@@ -846,6 +891,9 @@ class TrackSerializer(MusicEntitySerializer):
             "album": AlbumSerializer(
                 instance.album, context={"include_ap_context": False}
             ).data,
+            "attributedTo": instance.attributed_to.fid
+            if instance.attributed_to
+            else None,
         }
 
         if self.context.get("include_ap_context", self.parent is None):
@@ -855,12 +903,52 @@ class TrackSerializer(MusicEntitySerializer):
     def create(self, validated_data):
         from funkwhale_api.music import tasks as music_tasks
 
-        metadata = music_tasks.federation_audio_track_to_metadata(validated_data)
+        references = {}
+        actors_to_fetch = set()
+        actors_to_fetch.add(
+            funkwhale_utils.recursive_getattr(
+                validated_data, "attributedTo", permissive=True
+            )
+        )
+        actors_to_fetch.add(
+            funkwhale_utils.recursive_getattr(
+                validated_data, "album.attributedTo", permissive=True
+            )
+        )
+        artists = (
+            funkwhale_utils.recursive_getattr(
+                validated_data, "artists", permissive=True
+            )
+            or []
+        )
+        album_artists = (
+            funkwhale_utils.recursive_getattr(
+                validated_data, "album.artists", permissive=True
+            )
+            or []
+        )
+        for artist in artists + album_artists:
+            actors_to_fetch.add(artist.get("attributedTo"))
+
+        for url in actors_to_fetch:
+            if not url:
+                continue
+            references[url] = actors.get_actor(url)
+
+        metadata = music_tasks.federation_audio_track_to_metadata(
+            validated_data, references
+        )
+
         from_activity = self.context.get("activity")
         if from_activity:
             metadata["from_activity_id"] = from_activity.pk
         track = music_tasks.get_track_from_import_metadata(metadata, update_cover=True)
         return track
+
+    def update(self, obj, validated_data):
+        if validated_data.get("license"):
+            validated_data["license"] = licenses.match(validated_data["license"])
+        return super().update(obj, validated_data)
 
 
 class UploadSerializer(jsonld.JsonLdSerializer):

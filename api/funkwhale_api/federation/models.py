@@ -264,6 +264,25 @@ class Actor(models.Model):
         self.private_key = v[0].decode("utf-8")
         self.public_key = v[1].decode("utf-8")
 
+    def can_manage(self, obj):
+        attributed_to = getattr(obj, "attributed_to_id", None)
+        if attributed_to is not None and attributed_to == self.pk:
+            # easiest case, the obj is attributed to the actor
+            return True
+
+        if self.domain.service_actor_id != self.pk:
+            # actor is not system actor, so there is no way the actor can manage
+            # the object
+            return False
+
+        # actor is service actor of its domain, so if the fid domain
+        # matches, we consider the actor has the permission to manage
+        # the object
+        domain = self.domain_id
+        return obj.fid.startswith("http://{}/".format(domain)) or obj.fid.startswith(
+            "https://{}/".format(domain)
+        )
+
 
 class InboxItem(models.Model):
     """

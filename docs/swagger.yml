@@ -662,12 +662,20 @@ definitions:
         type: "integer"
         format: "int64"
         example: 42
+      fid:
+        type: string
+        format: uri
+        description: "The artist Federation ID (unique accross federation)"
       name:
         type: "string"
         example: "System of a Down"
       creation_date:
         type: "string"
         format: "date-time"
+      is_local:
+        type: "boolean"
+        description: "Indicates if the object was initally created locally or on another server"
+
   Artist:
     type: "object"
     allOf:
@@ -689,6 +697,10 @@ definitions:
         type: "integer"
         format: "int64"
         example: 16
+      fid:
+        type: string
+        format: uri
+        description: "The album Federation ID (unique accross federation)"
       artist:
         type: "integer"
         format: "int64"
@@ -708,6 +720,9 @@ definitions:
         type: "boolean"
       cover:
         $ref: "#/definitions/Image"
+      is_local:
+        type: "boolean"
+        description: "Indicates if the object was initally created locally or on another server"
 
   Album:
     type: "object"
@@ -819,6 +834,10 @@ definitions:
         type: "integer"
         format: "int64"
         example: 66
+      fid:
+        type: string
+        format: uri
+        description: "The track Federation ID (unique accross federation)"
       artist:
         type: "integer"
         format: "int64"
@@ -853,6 +872,9 @@ definitions:
         type: "string"
         description: "Identifier of the license that is linked to the track"
         example: "cc-by-nc-nd-4.0"
+      is_local:
+        type: "boolean"
+        description: "Indicates if the object was initally created locally or on another server"
 
   AlbumTrack:
     type: "object"

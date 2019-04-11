@@ -3,6 +3,7 @@ import logging
 from funkwhale_api.music import models as music_models
 
 from . import activity
+from . import actors
 from . import serializers
 
 logger = logging.getLogger(__name__)
@@ -267,5 +268,81 @@ def outbox_delete_audio(context):
         "actor": library.actor,
         "payload": with_recipients(
             serializer.data, to=[{"type": "followers", "target": library}]
+        ),
+    }
+
+
+def handle_library_entry_update(payload, context, queryset, serializer_class):
+    actor = context["actor"]
+    obj_id = payload["object"].get("id")
+    if not obj_id:
+        logger.debug("Discarding update of empty obj")
+        return
+
+    try:
+        obj = queryset.select_related("attributed_to").get(fid=obj_id)
+    except queryset.model.DoesNotExist:
+        logger.debug("Discarding update of unkwnown obj %s", obj_id)
+        return
+    if not actor.can_manage(obj):
+        logger.debug(
+            "Discarding unauthorize update of obj %s from %s", obj_id, actor.fid
+        )
+        return
+
+    serializer = serializer_class(obj, data=payload["object"])
+    if serializer.is_valid():
+        serializer.save()
+    else:
+        logger.debug(
+            "Discarding update of obj %s because of payload errors: %s",
+            obj_id,
+            serializer.errors,
+        )
+
+
+@inbox.register({"type": "Update", "object.type": "Track"})
+def inbox_update_track(payload, context):
+    return handle_library_entry_update(
+        payload,
+        context,
+        queryset=music_models.Track.objects.all(),
+        serializer_class=serializers.TrackSerializer,
+    )
+
+
+@inbox.register({"type": "Update", "object.type": "Artist"})
+def inbox_update_artist(payload, context):
+    return handle_library_entry_update(
+        payload,
+        context,
+        queryset=music_models.Artist.objects.all(),
+        serializer_class=serializers.ArtistSerializer,
+    )
+
+
+@inbox.register({"type": "Update", "object.type": "Album"})
+def inbox_update_album(payload, context):
+    return handle_library_entry_update(
+        payload,
+        context,
+        queryset=music_models.Album.objects.all(),
+        serializer_class=serializers.AlbumSerializer,
+    )
+
+
+@outbox.register({"type": "Update", "object.type": "Track"})
+def outbox_update_track(context):
+    track = context["track"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.TrackSerializer(track).data}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": actors.get_service_actor(),
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
         ),
     }

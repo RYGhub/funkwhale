@@ -436,6 +436,53 @@ def test_prepare_deliveries_and_inbox_items(factories):
         assert inbox_item.type == "to"
 
 
+def test_prepare_deliveries_and_inbox_items_instances_with_followers(factories):
+
+    domain1 = factories["federation.Domain"](with_service_actor=True)
+    domain2 = factories["federation.Domain"](with_service_actor=True)
+    library = factories["music.Library"](actor__local=True)
+
+    factories["federation.LibraryFollow"](
+        target=library, actor__local=True, approved=True
+    ).actor
+    library_follower_remote = factories["federation.LibraryFollow"](
+        target=library, actor__domain=domain1, approved=True
+    ).actor
+
+    followed_actor = factories["federation.Actor"](local=True)
+    factories["federation.Follow"](
+        target=followed_actor, actor__local=True, approved=True
+    ).actor
+    actor_follower_remote = factories["federation.Follow"](
+        target=followed_actor, actor__domain=domain2, approved=True
+    ).actor
+
+    recipients = [activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}]
+
+    inbox_items, deliveries, urls = activity.prepare_deliveries_and_inbox_items(
+        recipients, "to"
+    )
+
+    expected_deliveries = sorted(
+        [
+            models.Delivery(
+                inbox_url=library_follower_remote.domain.service_actor.inbox_url
+            ),
+            models.Delivery(
+                inbox_url=actor_follower_remote.domain.service_actor.inbox_url
+            ),
+        ],
+        key=lambda v: v.inbox_url,
+    )
+    assert inbox_items == []
+    assert len(expected_deliveries) == len(deliveries)
+
+    for delivery, expected_delivery in zip(
+        sorted(deliveries, key=lambda v: v.inbox_url), expected_deliveries
+    ):
+        assert delivery.inbox_url == expected_delivery.inbox_url
+
+
 def test_should_rotate_actor_key(settings, cache, now):
     actor_id = 42
     settings.ACTOR_KEY_ROTATION_DELAY = 10
