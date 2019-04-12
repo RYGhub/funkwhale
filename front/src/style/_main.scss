@@ -88,8 +88,14 @@ body {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
+#app > main, #app > .main {
+  flex: 1;
+}
 .instance-chooser {
   margin-top: 2em;
 }
