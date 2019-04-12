@@ -74,6 +74,28 @@ def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
     assert track.artist.attributed_to == actor
 
 
+def test_can_create_track_from_file_metadata_featuring(factories):
+    metadata = {
+        "title": "Whole Lotta Love",
+        "position": 1,
+        "disc_number": 1,
+        "mbid": "508704c0-81d4-4c94-ba58-3fc0b7da23eb",
+        "album": {
+            "title": "Guitar Heaven: The Greatest Guitar Classics of All Time",
+            "mbid": "d06f2072-4148-488d-af6f-69ab6539ddb8",
+            "release_date": datetime.date(2010, 9, 17),
+            "artists": [
+                {"name": "Santana", "mbid": "9a3bf45c-347d-4630-894d-7cf3e8e0b632"}
+            ],
+        },
+        "artists": [{"name": "Santana feat. Chris Cornell", "mbid": None}],
+    }
+    track = tasks.get_track_from_import_metadata(metadata)
+
+    assert track.album.artist.name == "Santana"
+    assert track.artist.name == "Santana feat. Chris Cornell"
+
+
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     metadata = {
         "title": "Test track",

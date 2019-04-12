@@ -537,3 +537,18 @@ def test_serializer_album_artist_missing():
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
     assert serializer.validated_data == expected
+
+
+def test_artist_field_featuring():
+    data = {
+        "artist": "Santana feat. Chris Cornell",
+        # here is the tricky bit, note the slash
+        "musicbrainz_artistid": "9a3bf45c-347d-4630-894d-7cf3e8e0b632/cbf9738d-8f81-4a92-bc64-ede09341652d",
+    }
+
+    expected = [{"name": "Santana feat. Chris Cornell", "mbid": None}]
+
+    field = metadata.ArtistField()
+    value = field.get_value(data)
+
+    assert field.to_internal_value(value) == expected
