@@ -61,7 +61,7 @@ services:
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
 
-    links:
+    depends_on:
       - postgres
       - redis
     networks:
@@ -74,7 +74,7 @@ services:
       - .env.dev
       - .env
     build: *backend
-    links:
+    depends_on:
       - postgres
       - redis
     command: celery -A funkwhale_api.taskapp worker -l debug -B
