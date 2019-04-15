@@ -372,6 +372,7 @@ export default {
       )
       let shuffle = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Shuffle your queue")
       let clear = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', "Clear your queue")
+      let addArtistContentFilter = this.$pgettext('Sidebar/Player/Icon.Tooltip/Verb', 'Hide content from this artist…')
       return {
         audioPlayer,
         previousTrack,
@@ -384,7 +385,8 @@ export default {
         loopingSingle,
         loopingWhole,
         shuffle,
-        clear
+        clear,
+        addArtistContentFilter,
       }
     },
     style: function() {
