@@ -344,7 +344,7 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
 
     assert response.status_code == 200
     mocked_serve.assert_called_once_with(
-        upload2, user=logged_in_api_client.user, format=None
+        upload2, user=logged_in_api_client.user, format=None, max_bitrate=None
     )
 
 
@@ -365,6 +365,22 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
 def test_should_transcode(mimetype, format, expected, factories):
     upload = models.Upload(mimetype=mimetype)
     assert views.should_transcode(upload, format) is expected
+
+
+@pytest.mark.parametrize(
+    "bitrate,max_bitrate,expected",
+    [
+        # already in acceptable bitrate
+        (192000, 320000, False),
+        # No max bitrate specified
+        (192000, None, False),
+        # requested max below available
+        (192000, 128000, True),
+    ],
+)
+def test_should_transcode_bitrate(bitrate, max_bitrate, expected, factories):
+    upload = models.Upload(mimetype="audio/mpeg", bitrate=bitrate)
+    assert views.should_transcode(upload, "mp3", max_bitrate=max_bitrate) is expected
 
 
 @pytest.mark.parametrize("value", [True, False])
@@ -404,7 +420,35 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker):
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3"
+        upload, user=logged_in_api_client.user, format="mp3", max_bitrate=None
+    )
+
+
+@pytest.mark.parametrize(
+    "max_bitrate, expected",
+    [
+        ("", None),
+        ("", None),
+        ("-1", None),
+        ("128", 128000),
+        ("320", 320000),
+        ("460", 320000),
+    ],
+)
+def test_listen_transcode_bitrate(
+    max_bitrate, expected, factories, now, logged_in_api_client, mocker
+):
+    upload = factories["music.Upload"](
+        import_status="finished", library__actor__user=logged_in_api_client.user
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    handle_serve = mocker.spy(views, "handle_serve")
+    response = logged_in_api_client.get(url, {"max_bitrate": max_bitrate})
+
+    assert response.status_code == 200
+
+    handle_serve.assert_called_once_with(
+        upload, user=logged_in_api_client.user, format=None, max_bitrate=expected
     )
 
 
@@ -430,7 +474,7 @@ def test_listen_transcode_in_place(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3"
+        upload, user=logged_in_api_client.user, format="mp3", max_bitrate=None
     )
 
 

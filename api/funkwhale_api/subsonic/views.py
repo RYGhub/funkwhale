@@ -250,7 +250,18 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         format = data.get("format", "raw")
         if format == "raw":
             format = None
-        return music_views.handle_serve(upload=upload, user=request.user, format=format)
+
+        max_bitrate = data.get("maxBitRate")
+        try:
+            max_bitrate = min(max(int(max_bitrate), 0), 320) or None
+        except (TypeError, ValueError):
+            max_bitrate = None
+
+        if max_bitrate:
+            max_bitrate = max_bitrate * 1000
+        return music_views.handle_serve(
+            upload=upload, user=request.user, format=format, max_bitrate=max_bitrate
+        )
 
     @action(detail=False, methods=["get", "post"], url_name="star", url_path="star")
     @find_object(music_models.Track.objects.all())

@@ -853,23 +853,35 @@ class Upload(models.Model):
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
 
-    def get_transcoded_version(self, format):
-        mimetype = utils.EXTENSION_TO_MIMETYPE[format]
-        existing_versions = list(self.versions.filter(mimetype=mimetype))
+    def get_transcoded_version(self, format, max_bitrate=None):
+        if format:
+            mimetype = utils.EXTENSION_TO_MIMETYPE[format]
+        else:
+            mimetype = self.mimetype or "audio/mpeg"
+            format = utils.MIMETYPE_TO_EXTENSION[mimetype]
+
+        existing_versions = self.versions.filter(mimetype=mimetype)
+        if max_bitrate is not None:
+            # we don't want to transcode if a 320kbps version is available
+            # and we're requestiong 300kbps
+            acceptable_max_bitrate = max_bitrate * 1.2
+            acceptable_min_bitrate = max_bitrate * 0.8
+            existing_versions = existing_versions.filter(
+                bitrate__gte=acceptable_min_bitrate, bitrate__lte=acceptable_max_bitrate
+            ).order_by("-bitrate")
         if existing_versions:
             # we found an existing version, no need to transcode again
             return existing_versions[0]
 
-        return self.create_transcoded_version(mimetype, format)
+        return self.create_transcoded_version(mimetype, format, bitrate=max_bitrate)
 
     @transaction.atomic
-    def create_transcoded_version(self, mimetype, format):
+    def create_transcoded_version(self, mimetype, format, bitrate):
         # we create the version with an empty file, then
         # we'll write to it
         f = ContentFile(b"")
-        version = self.versions.create(
-            mimetype=mimetype, bitrate=self.bitrate or 128000, size=0
-        )
+        bitrate = min(bitrate or 320000, self.bitrate or 320000)
+        version = self.versions.create(mimetype=mimetype, bitrate=bitrate, size=0)
         # we keep the same name, but we update the extension
         new_name = os.path.splitext(os.path.basename(self.audio_file.name))[
             0
@@ -879,6 +891,7 @@ class Upload(models.Model):
             audio=self.get_audio_segment(),
             output=version.audio_file,
             output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
+            bitrate=str(bitrate),
         )
         version.size = version.audio_file.size
         version.save(update_fields=["size"])
