@@ -273,25 +273,35 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def should_transcode(upload, format):
+def should_transcode(upload, format, max_bitrate=None):
     if not preferences.get("music__transcoding_enabled"):
         return False
+    format_need_transcoding = True
+    bitrate_need_transcoding = True
     if format is None:
-        return False
-    if format not in utils.EXTENSION_TO_MIMETYPE:
+        format_need_transcoding = False
+    elif format not in utils.EXTENSION_TO_MIMETYPE:
         # format should match supported formats
-        return False
-    if upload.mimetype is None:
+        format_need_transcoding = False
+    elif upload.mimetype is None:
         # upload should have a mimetype, otherwise we cannot transcode
-        return False
-    if upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
+        format_need_transcoding = False
+    elif upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
         # requested format sould be different than upload mimetype, otherwise
         # there is no need to transcode
-        return False
-    return True
+        format_need_transcoding = False
+
+    if max_bitrate is None:
+        bitrate_need_transcoding = False
+    elif not upload.bitrate:
+        bitrate_need_transcoding = False
+    elif upload.bitrate <= max_bitrate:
+        bitrate_need_transcoding = False
+
+    return format_need_transcoding or bitrate_need_transcoding
 
 
-def handle_serve(upload, user, format=None):
+def handle_serve(upload, user, format=None, max_bitrate=None):
     f = upload
     # we update the accessed_date
     now = timezone.now()
@@ -328,8 +338,10 @@ def handle_serve(upload, user, format=None):
         file_path = get_file_path(f.source.replace("file://", "", 1))
     mt = f.mimetype
 
-    if should_transcode(f, format):
-        transcoded_version = upload.get_transcoded_version(format)
+    if should_transcode(f, format, max_bitrate=max_bitrate):
+        transcoded_version = upload.get_transcoded_version(
+            format, max_bitrate=max_bitrate
+        )
         transcoded_version.accessed_date = now
         transcoded_version.save(update_fields=["accessed_date"])
         f = transcoded_version
@@ -377,7 +389,17 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             return Response(status=404)
 
         format = request.GET.get("to")
-        return handle_serve(upload, user=request.user, format=format)
+        max_bitrate = request.GET.get("max_bitrate")
+        try:
+            max_bitrate = min(max(int(max_bitrate), 0), 320) or None
+        except (TypeError, ValueError):
+            max_bitrate = None
+
+        if max_bitrate:
+            max_bitrate = max_bitrate * 1000
+        return handle_serve(
+            upload, user=request.user, format=format, max_bitrate=max_bitrate
+        )
 
 
 class UploadViewSet(

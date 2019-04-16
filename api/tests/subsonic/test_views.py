@@ -226,7 +226,7 @@ def test_stream(f, db, logged_in_api_client, factories, mocker, queryset_equal_q
     response = logged_in_api_client.get(url, {"f": f, "id": upload.track.pk})
 
     mocked_serve.assert_called_once_with(
-        upload=upload, user=logged_in_api_client.user, format=None
+        upload=upload, user=logged_in_api_client.user, format=None, max_bitrate=None
     )
     assert response.status_code == 200
     playable_by.assert_called_once_with(music_models.Track.objects.all(), None)
@@ -242,7 +242,26 @@ def test_stream_format(format, expected, logged_in_api_client, factories, mocker
     response = logged_in_api_client.get(url, {"id": upload.track.pk, "format": format})
 
     mocked_serve.assert_called_once_with(
-        upload=upload, user=logged_in_api_client.user, format=expected
+        upload=upload, user=logged_in_api_client.user, format=expected, max_bitrate=None
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "max_bitrate,expected", [(0, None), (192, 192000), (2000, 320000)]
+)
+def test_stream_bitrate(max_bitrate, expected, logged_in_api_client, factories, mocker):
+    url = reverse("api:subsonic-stream")
+    mocked_serve = mocker.patch.object(
+        music_views, "handle_serve", return_value=Response()
+    )
+    upload = factories["music.Upload"](playable=True)
+    response = logged_in_api_client.get(
+        url, {"id": upload.track.pk, "maxBitRate": max_bitrate}
+    )
+
+    mocked_serve.assert_called_once_with(
+        upload=upload, user=logged_in_api_client.user, format=None, max_bitrate=expected
     )
     assert response.status_code == 200
 
