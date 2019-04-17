@@ -1,6 +1,7 @@
 import unicodedata
 import re
 from django.conf import settings
+from django.db.models import Q
 
 from funkwhale_api.common import session
 from funkwhale_api.moderation import models as moderation_models
@@ -107,3 +108,16 @@ def retrieve_ap_object(
     serializer = serializer_class(data=data, context={"fetch_actor": actor})
     serializer.is_valid(raise_exception=True)
     return serializer.save()
+
+
+def get_domain_query_from_url(domain, url_field="fid"):
+    """
+    Given a domain name and a field, will return a Q() object
+    to match objects that have this domain in the given field.
+    """
+
+    query = Q(**{"{}__startswith".format(url_field): "http://{}/".format(domain)})
+    query = query | Q(
+        **{"{}__startswith".format(url_field): "https://{}/".format(domain)}
+    )
+    return query

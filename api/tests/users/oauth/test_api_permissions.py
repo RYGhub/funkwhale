@@ -53,6 +53,7 @@ from funkwhale_api.users.oauth import scopes
             "read:instance:policies",
             "get",
         ),
+        ("api:v1:manage:library:artists-list", {}, "read:instance:libraries", "get"),
     ],
 )
 def test_views_permissions(

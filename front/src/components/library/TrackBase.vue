@@ -21,33 +21,27 @@
               </div>
             </div>
           </h2>
+          <div class="header-buttons">
+            <div class="ui buttons">
+              <play-button class="orange" :track="track">
+                <translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate>
+              </play-button>
+            </div>
+            <div class="ui buttons">
+              <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
+            </div>
+            <div class="ui buttons">
+              <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
+            </div>
 
-          <play-button class="orange" :track="track">
-            <translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate>
-          </play-button>
-          <track-favorite-icon :track="track" :button="true"></track-favorite-icon>
-          <track-playlist-icon :button="true" v-if="$store.state.auth.authenticated" :track="track"></track-playlist-icon>
+            <div class="ui buttons">
+              <a v-if="upload" :href="downloadUrl" target="_blank" class="ui icon labeled button">
+                <i class="download icon"></i>
+                <translate translate-context="Content/Track/Link/Verb">Download</translate>
+              </a>
+            </div>
 
-          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
-            <i class="wikipedia w icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
-          </a>
-          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
-            <i class="external icon"></i>
-            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
-          </a>
-          <a v-if="upload" :href="downloadUrl" target="_blank" class="ui icon labeled button">
-            <i class="download icon"></i>
-            <translate translate-context="Content/Track/Link/Verb">Download</translate>
-          </a>
-          <template v-if="publicLibraries.length > 0">
-            <button
-              @click="showEmbedModal = !showEmbedModal"
-              class="ui icon labeled button">
-              <i class="code icon"></i>
-              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
-            </button>
-            <modal :show.sync="showEmbedModal">
+            <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
               <div class="header">
                 <translate translate-context="Popup/Track/Title">Embed this track on your website</translate>
               </div>
@@ -63,14 +57,53 @@
                 </div>
               </div>
             </modal>
-          </template>
-          <router-link
-            v-if="track.is_local"
-            :to="{name: 'library.tracks.edit', params: {id: track.id }}"
-            class="ui icon labeled button">
-            <i class="edit icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
-          </router-link>
+            <div class="ui buttons">
+              <button class="ui button" @click="$refs.dropdown.click()">
+                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
+              </button>
+              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  <div
+                    role="button"
+                    v-if="publicLibraries.length > 0"
+                    @click="showEmbedModal = !showEmbedModal"
+                    class="basic item">
+                    <i class="code icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+                  </div>
+                  <a :href="wikipediaUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="wikipedia w icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
+                  </a>
+                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="external icon"></i>
+                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
+                  </a>
+                  <router-link
+                    v-if="track.is_local"
+                    :to="{name: 'library.tracks.edit', params: {id: track.id }}"
+                    class="basic item">
+                    <i class="edit icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
+                  </router-link>
+                  <div class="divider"></div>
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.tracks.detail', params: {id: track.id}}">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+                  </router-link>
+                  <a
+                    v-if="$store.state.auth.profile.is_superuser"
+                    class="basic item"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/track/${track.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <router-view v-if="track" @libraries-loaded="libraries = $event" :track="track" :object="track" object-type="track" :key="$route.fullPath"></router-view>

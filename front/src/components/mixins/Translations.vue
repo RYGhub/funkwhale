@@ -16,6 +16,7 @@ export default {
         },
         filters: {
           creation_date: this.$pgettext('Content/*/*/Noun', 'Creation date'),
+          release_date: this.$pgettext('Content/*/*/Noun', 'Release date'),
           first_seen: this.$pgettext('Content/Moderation/Dropdown/Noun', 'First seen date'),
           last_seen: this.$pgettext('Content/Moderation/Dropdown/Noun', 'Last seen date'),
           modification_date: this.$pgettext('Content/Playlist/Dropdown/Noun', 'Modification date'),

@@ -18,6 +18,7 @@ export default {
       return fallback
     },
     addSearchToken (key, value) {
+      value = String(value)
       if (!value) {
         // we remove existing matching tokens, if any
         this.search.tokens = this.search.tokens.filter(t => {
@@ -45,17 +46,19 @@ export default {
     },
     'search.tokens': {
       handler (newValue) {
-        this.search.query = compileTokens(newValue)
-        this.page = 1
-        this.fetchData()
+        let newQuery = compileTokens(newValue)
         if (this.updateUrl) {
           let params = {}
-          if (this.search.query) {
-            params.q = this.search.query
+          if (newQuery) {
+            params.q = newQuery
           }
           this.$router.replace({
             query: params
           })
+        } else {
+          this.search.query = newQuery
+          this.page = 1
+          this.fetchData()
         }
       },
       deep: true

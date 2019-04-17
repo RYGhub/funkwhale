@@ -80,24 +80,6 @@
           <header class="header"><translate translate-context="Sidebar/Admin/Title/Noun">Administration</translate></header>
           <div class="menu">
             <router-link
-              v-if="$store.state.auth.availablePermissions['settings']"
-              class="item"
-              :to="{path: '/manage/settings'}">
-              <i class="settings icon"></i><translate translate-context="*/*/*/Noun">Settings</translate>
-            </router-link>
-            <router-link
-              v-if="$store.state.auth.availablePermissions['settings']"
-              class="item"
-              :to="{name: 'manage.users.users.list'}">
-              <i class="users icon"></i><translate translate-context="*/*/*/Noun">Users</translate>
-            </router-link>
-            <router-link
-              v-if="$store.state.auth.availablePermissions['moderation']"
-              class="item"
-              :to="{name: 'manage.moderation.domains.list'}">
-              <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
-            </router-link>
-            <router-link
               v-if="$store.state.auth.availablePermissions['library']"
               class="item"
               :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
@@ -107,6 +89,24 @@
                 :title="labels.pendingReviewEdits"
                 :class="['ui', 'teal', 'label']">
                 {{ $store.state.ui.notifications.pendingReviewEdits }}</div>
+            </router-link>
+            <router-link
+              v-if="$store.state.auth.availablePermissions['moderation']"
+              class="item"
+              :to="{name: 'manage.moderation.domains.list'}">
+              <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
+            </router-link>
+            <router-link
+              v-if="$store.state.auth.availablePermissions['settings']"
+              class="item"
+              :to="{name: 'manage.users.users.list'}">
+              <i class="users icon"></i><translate translate-context="*/*/*/Noun">Users</translate>
+            </router-link>
+            <router-link
+              v-if="$store.state.auth.availablePermissions['settings']"
+              class="item"
+              :to="{path: '/manage/settings'}">
+              <i class="settings icon"></i><translate translate-context="*/*/*/Noun">Settings</translate>
             </router-link>
           </div>
         </div>
