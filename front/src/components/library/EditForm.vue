@@ -149,6 +149,12 @@ export default {
       if (this.objectType === 'track') {
         return `tracks/${this.object.id}/mutations/`
       }
+      if (this.objectType === 'album') {
+        return `albums/${this.object.id}/mutations/`
+      }
+      if (this.objectType === 'artist') {
+        return `artists/${this.object.id}/mutations/`
+      }
     },
     mutationPayload () {
       let self = this

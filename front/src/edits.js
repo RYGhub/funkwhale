@@ -1,13 +1,42 @@
 export default {
   getConfigs () {
     return {
+      artist: {
+        fields: [
+          {
+            id: 'name',
+            type: 'text',
+            required: true,
+            label: this.$pgettext('*/*/*/Noun', 'Name'),
+            getValue: (obj) => { return obj.name }
+          },
+        ]
+      },
+      album: {
+        fields: [
+          {
+            id: 'title',
+            type: 'text',
+            required: true,
+            label: this.$pgettext('*/*/*/Noun', 'Title'),
+            getValue: (obj) => { return obj.title }
+          },
+          {
+            id: 'release_date',
+            type: 'text',
+            required: false,
+            label: this.$pgettext('Content/*/*/Noun', 'Release date'),
+            getValue: (obj) => { return obj.release_date }
+          },
+        ]
+      },
       track: {
         fields: [
           {
             id: 'title',
             type: 'text',
             required: true,
-            label: this.$pgettext('Content/Track/*/Noun', 'Title'),
+            label: this.$pgettext('*/*/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
           {

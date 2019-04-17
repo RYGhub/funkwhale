@@ -346,3 +346,37 @@ def outbox_update_track(context):
             to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
         ),
     }
+
+
+@outbox.register({"type": "Update", "object.type": "Album"})
+def outbox_update_album(context):
+    album = context["album"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.AlbumSerializer(album).data}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": actors.get_service_actor(),
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }
+
+
+@outbox.register({"type": "Update", "object.type": "Artist"})
+def outbox_update_artist(context):
+    artist = context["artist"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.ArtistSerializer(artist).data}
+    )
+
+    yield {
+        "type": "Update",
+        "actor": actors.get_service_actor(),
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }

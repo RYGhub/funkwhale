@@ -3,13 +3,13 @@
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <template v-if="artist">
-      <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="artist.name">
+    <template v-if="object">
+      <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="object.name">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted users violet icon"></i>
             <div class="content">
-              {{ artist.name }}
+              {{ object.name }}
               <div class="sub header" v-if="albums">
                 <translate translate-context="Content/Artist/Paragraph"
                   tag="div"
@@ -24,11 +24,11 @@
           <div class="ui hidden divider"></div>
           <div class="header-buttons">
             <div class="ui buttons">
-              <radio-button type="artist" :object-id="artist.id"></radio-button>
+              <radio-button type="artist" :object-id="object.id"></radio-button>
 
             </div>
             <div class="ui buttons">
-              <play-button :is-playable="isPlayable" class="orange" :artist="artist">
+              <play-button :is-playable="isPlayable" class="orange" :artist="object">
                 <translate translate-context="Content/Artist/Button.Label/Verb">Play all albums</translate>
               </play-button>
             </div>
@@ -39,7 +39,7 @@
               </div>
               <div class="content">
                 <div class="description">
-                  <embed-wizard type="artist" :id="artist.id" />
+                  <embed-wizard type="artist" :id="object.id" />
 
                 </div>
               </div>
@@ -72,15 +72,22 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
+                  <router-link
+                    v-if="object.is_local"
+                    :to="{name: 'library.artists.edit', params: {id: object.id }}"
+                    class="basic item">
+                    <i class="edit icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
+                  </router-link>
                   <div class="divider"></div>
-                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.artists.detail', params: {id: artist.id}}">
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.artists.detail', params: {id: object.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
                   </router-link>
                   <a
                     v-if="$store.state.auth.profile.is_superuser"
                     class="basic item"
-                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/artist/${artist.id}`)"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/artist/${object.id}`)"
                     target="_blank" rel="noopener noreferrer">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
@@ -91,84 +98,40 @@
           </div>
         </div>
       </section>
-      <div class="ui small text container" v-if="contentFilter">
-        <div class="ui hidden divider"></div>
-        <div class="ui message">
-          <p>
-            <translate translate-context="Content/Artist/Paragraph">You are currently hiding content related to this artist.</translate>
-          </p>
-          <router-link class="right floated" :to="{name: 'settings'}">
-            <translate translate-context="Content/Moderation/Link">Review my filters</translate>
-          </router-link>
-          <button @click="$store.dispatch('moderation/deleteContentFilter', contentFilter.uuid)" class="ui basic tiny button">
-            <translate translate-context="Content/Moderation/Button.Label">Remove filter</translate>
-          </button>
-        </div>
-      </div>
-      <section v-if="isLoadingAlbums" class="ui vertical stripe segment">
-        <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
-      </section>
-      <section v-else-if="albums && albums.length > 0" class="ui vertical stripe segment">
-        <h2>
-          <translate translate-context="Content/Artist/Title">Albums by this artist</translate>
-        </h2>
-        <div class="ui cards" >
-          <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in albums"></album-card>
-        </div>
-      </section>
-      <section v-if="tracks.length > 0" class="ui vertical stripe segment">
-        <h2>
-          <translate translate-context="Content/Artist/Title">Tracks by this artist</translate>
-        </h2>
-        <track-table :display-position="true" :tracks="tracks"></track-table>
-      </section>
-      <section class="ui vertical stripe segment">
-        <h2>
-          <translate translate-context="Content/*/Title/Noun">User libraries</translate>
-        </h2>
-        <library-widget @loaded="libraries = $event" :url="'artists/' + id + '/libraries/'">
-          <translate translate-context="Content/Artist/Paragraph" slot="subtitle">This artist is present in the following libraries:</translate>
-        </library-widget>
-      </section>
+      <router-view v-if="object" :tracks="tracks" :albums="albums" :is-loading-albums="isLoadingAlbums" @libraries-loaded="libraries = $event" :object="object" object-type="artist" :key="$route.fullPath"></router-view>
     </template>
   </main>
 </template>
 
 <script>
-import _ from "@/lodash"
 import axios from "axios"
 import logger from "@/logging"
 import backend from "@/audio/backend"
-import AlbumCard from "@/components/audio/album/Card"
-import RadioButton from "@/components/radios/Button"
 import PlayButton from "@/components/audio/PlayButton"
-import TrackTable from "@/components/audio/track/Table"
-import LibraryWidget from "@/components/federation/LibraryWidget"
 import EmbedWizard from "@/components/audio/EmbedWizard"
 import Modal from '@/components/semantic/Modal'
+import RadioButton from "@/components/radios/Button"
+
+const FETCH_URL = "albums/"
+
 
 export default {
   props: ["id"],
   components: {
-    AlbumCard,
-    RadioButton,
     PlayButton,
-    TrackTable,
-    LibraryWidget,
     EmbedWizard,
-    Modal
+    Modal,
+    RadioButton
   },
   data() {
     return {
       isLoading: true,
       isLoadingAlbums: true,
-      artist: null,
+      object: null,
       albums: null,
-      totalTracks: 0,
-      totalAlbums: 0,
-      tracks: [],
       libraries: [],
-      showEmbedModal: false
+      showEmbedModal: false,
+      tracks: [],
     }
   },
   created() {
@@ -184,7 +147,7 @@ export default {
         self.totalTracks = response.data.count
       })
       axios.get("artists/" + this.id + "/").then(response => {
-        self.artist = response.data
+        self.object = response.data
         self.isLoading = false
         self.isLoadingAlbums = true
         axios
@@ -204,40 +167,31 @@ export default {
     }
   },
   computed: {
-    labels() {
-      return {
-        title: this.$pgettext('*/*/*/Noun', "Artist")
-      }
-    },
     isPlayable() {
       return (
-        this.artist.albums.filter(a => {
+        this.object.albums.filter(a => {
           return a.is_playable
         }).length > 0
       )
     },
+    labels() {
+      return {
+        title: this.$pgettext('*/*/*', 'Album')
+      }
+    },
     wikipediaUrl() {
       return (
         "https://en.wikipedia.org/w/index.php?search=" +
-        encodeURI(this.artist.name)
+        encodeURI(this.object.name)
       )
     },
     musicbrainzUrl() {
-      if (this.artist.mbid) {
-        return "https://musicbrainz.org/artist/" + this.artist.mbid
+      if (this.object.mbid) {
+        return "https://musicbrainz.org/artist/" + this.object.mbid
       }
     },
-    allTracks() {
-      let tracks = []
-      this.albums.forEach(album => {
-        album.tracks.forEach(track => {
-          tracks.push(track)
-        })
-      })
-      return tracks
-    },
     cover() {
-      return this.artist.albums
+      return this.object.albums
         .filter(album => {
           return album.cover
         })
@@ -264,7 +218,7 @@ export default {
     contentFilter () {
       let self = this
       return this.$store.getters['moderation/artistFilters']().filter((e) => {
-        return e.target.id === this.artist.id
+        return e.target.id === this.object.id
       })[0]
     }
   },
@@ -275,7 +229,3 @@ export default {
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>
