@@ -28,3 +28,35 @@ class TrackMutationSerializer(mutations.UpdateMutationSerializer):
         routes.outbox.dispatch(
             {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
         )
+
+
+@mutations.registry.connect(
+    "update",
+    models.Artist,
+    perm_checkers={"suggest": can_suggest, "approve": can_approve},
+)
+class ArtistMutationSerializer(mutations.UpdateMutationSerializer):
+    class Meta:
+        model = models.Artist
+        fields = ["name"]
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Artist"}}, context={"artist": obj}
+        )
+
+
+@mutations.registry.connect(
+    "update",
+    models.Album,
+    perm_checkers={"suggest": can_suggest, "approve": can_approve},
+)
+class AlbumMutationSerializer(mutations.UpdateMutationSerializer):
+    class Meta:
+        model = models.Album
+        fields = ["title", "release_date"]
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Album"}}, context={"album": obj}
+        )

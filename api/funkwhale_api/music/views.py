@@ -70,6 +70,8 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
+    mutations = common_decorators.mutations_route(types=["update"])
+
     def get_queryset(self):
         queryset = super().get_queryset()
         albums = models.Album.objects.with_tracks_count()
@@ -97,6 +99,8 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     anonymous_policy = "setting"
     ordering_fields = ("creation_date", "release_date", "title")
     filterset_class = filters.AlbumFilter
+
+    mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
         queryset = super().get_queryset()

@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
 from django.db.models import Lookup
 from django.db.models.fields import Field
@@ -70,8 +71,8 @@ class Mutation(models.Model):
     applied_date = models.DateTimeField(null=True, blank=True, db_index=True)
     summary = models.TextField(max_length=2000, null=True, blank=True)
 
-    payload = JSONField()
-    previous_state = JSONField(null=True, default=None)
+    payload = JSONField(encoder=DjangoJSONEncoder)
+    previous_state = JSONField(null=True, default=None, encoder=DjangoJSONEncoder)
 
     target_id = models.IntegerField(null=True)
     target_content_type = models.ForeignKey(

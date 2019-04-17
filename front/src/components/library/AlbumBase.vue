@@ -1,15 +1,15 @@
 <template>
   <main>
-    <div v-if="isLoading" class="ui vertical segment" v-title="">
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <template v-if="album">
-      <section :class="['ui', 'head', {'with-background': album.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="album.title">
+    <template v-if="object">
+      <section :class="['ui', 'head', {'with-background': object.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="object.title">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
             <i class="circular inverted sound yellow icon"></i>
             <div class="content">
-              {{ album.title }}
+              {{ object.title }}
               <div v-html="subtitle"></div>
             </div>
           </h2>
@@ -17,7 +17,7 @@
           <div class="header-buttons">
 
             <div class="ui buttons">
-              <play-button class="orange" :tracks="album.tracks">
+              <play-button class="orange" :tracks="object.tracks">
                 <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
               </play-button>
             </div>
@@ -28,7 +28,7 @@
               </div>
               <div class="content">
                 <div class="description">
-                  <embed-wizard type="album" :id="album.id" />
+                  <embed-wizard type="album" :id="object.id" />
 
                 </div>
               </div>
@@ -61,15 +61,22 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
+                  <router-link
+                    v-if="object.is_local"
+                    :to="{name: 'library.albums.edit', params: {id: object.id }}"
+                    class="basic item">
+                    <i class="edit icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
+                  </router-link>
                   <div class="divider"></div>
-                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.albums.detail', params: {id: album.id}}">
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.albums.detail', params: {id: object.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
                   </router-link>
                   <a
                     v-if="$store.state.auth.profile.is_superuser"
                     class="basic item"
-                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${album.id}`)"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${object.id}`)"
                     target="_blank" rel="noopener noreferrer">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
@@ -80,36 +87,7 @@
           </div>
         </div>
       </section>
-      <template v-if="discs && discs.length > 1">
-        <section v-for="(tracks, disc_number) in discs" class="ui vertical stripe segment">
-          <translate
-            tag="h2"
-            class="left floated"
-            :translate-params="{number: disc_number + 1}"
-            translate-context="Content/Album/"
-          >Volume %{ number }</translate>
-          <play-button class="right floated orange" :tracks="tracks">
-            <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
-          </play-button>
-          <track-table :artist="album.artist" :display-position="true" :tracks="tracks"></track-table>
-        </section>
-      </template>
-      <template v-else>
-        <section class="ui vertical stripe segment">
-          <h2>
-            <translate translate-context="*/*/*/Noun">Tracks</translate>
-          </h2>
-          <track-table v-if="album" :artist="album.artist" :display-position="true" :tracks="album.tracks"></track-table>
-        </section>
-      </template>
-      <section class="ui vertical stripe segment">
-        <h2>
-          <translate translate-context="Content/*/Title/Noun">User libraries</translate>
-        </h2>
-        <library-widget @loaded="libraries = $event" :url="'albums/' + id + '/libraries/'">
-          <translate slot="subtitle" translate-context="Content/Album/Paragraph">This album is present in the following libraries:</translate>
-        </library-widget>
-      </section>
+      <router-view v-if="object" :discs="discs" @libraries-loaded="libraries = $event" :object="object" object-type="album" :key="$route.fullPath"></router-view>
     </template>
   </main>
 </template>
@@ -119,12 +97,11 @@ import axios from "axios"
 import logger from "@/logging"
 import backend from "@/audio/backend"
 import PlayButton from "@/components/audio/PlayButton"
-import TrackTable from "@/components/audio/track/Table"
-import LibraryWidget from "@/components/federation/LibraryWidget"
 import EmbedWizard from "@/components/audio/EmbedWizard"
 import Modal from '@/components/semantic/Modal'
 
 const FETCH_URL = "albums/"
+
 
 function groupByDisc(acc, track) {
   var dn = track.disc_number - 1
@@ -141,15 +118,13 @@ export default {
   props: ["id"],
   components: {
     PlayButton,
-    TrackTable,
-    LibraryWidget,
     EmbedWizard,
     Modal
   },
   data() {
     return {
       isLoading: true,
-      album: null,
+      object: null,
       discs: [],
       libraries: [],
       showEmbedModal: false
@@ -165,8 +140,8 @@ export default {
       let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching album "' + this.id + '"')
       axios.get(url).then(response => {
-        self.album = backend.Album.clean(response.data)
-        self.discs = self.album.tracks.reduce(groupByDisc, [])
+        self.object = backend.Album.clean(response.data)
+        self.discs = self.object.tracks.reduce(groupByDisc, [])
         self.isLoading = false
       })
     }
@@ -185,28 +160,28 @@ export default {
     wikipediaUrl() {
       return (
         "https://en.wikipedia.org/w/index.php?search=" +
-        encodeURI(this.album.title + " " + this.album.artist.name)
+        encodeURI(this.object.title + " " + this.object.artist.name)
       )
     },
     musicbrainzUrl() {
-      if (this.album.mbid) {
-        return "https://musicbrainz.org/release/" + this.album.mbid
+      if (this.object.mbid) {
+        return "https://musicbrainz.org/release/" + this.object.mbid
       }
     },
     headerStyle() {
-      if (!this.album.cover.original) {
+      if (!this.object.cover.original) {
         return ""
       }
       return (
         "background-image: url(" +
-        this.$store.getters["instance/absoluteUrl"](this.album.cover.original) +
+        this.$store.getters["instance/absoluteUrl"](this.object.cover.original) +
         ")"
       )
     },
     subtitle () {
-      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.album.artist.id }})
-      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.album.tracks.length)
-      return this.$gettextInterpolate(msg, {count: this.album.tracks.length, artist: this.album.artist.name, artistUrl: route.location.path})
+      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.object.artist.id }})
+      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.object.tracks.length)
+      return this.$gettextInterpolate(msg, {count: this.object.tracks.length, artist: this.object.artist.name, artistUrl: route.location.path})
     }
   },
   watch: {
@@ -216,7 +191,3 @@ export default {
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-</style>

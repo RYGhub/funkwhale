@@ -448,6 +448,19 @@ def test_inbox_update_artist(factories, mocker):
     update_library_entity.assert_called_once_with(obj, {"name": "New name"})
 
 
+def test_outbox_update_artist(factories):
+    artist = factories["music.Artist"]()
+    activity = list(routes.outbox_update_artist({"artist": artist}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.ArtistSerializer(artist).data}
+    ).data
+
+    expected["to"] = [contexts.AS.Public, {"type": "instances_with_followers"}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == actors.get_service_actor()
+
+
 def test_inbox_update_album(factories, mocker):
     update_library_entity = mocker.patch(
         "funkwhale_api.music.tasks.update_library_entity"
@@ -464,6 +477,19 @@ def test_inbox_update_album(factories, mocker):
     )
 
     update_library_entity.assert_called_once_with(obj, {"title": "New title"})
+
+
+def test_outbox_update_album(factories):
+    album = factories["music.Album"]()
+    activity = list(routes.outbox_update_album({"album": album}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Update", "object": serializers.AlbumSerializer(album).data}
+    ).data
+
+    expected["to"] = [contexts.AS.Public, {"type": "instances_with_followers"}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == actors.get_service_actor()
 
 
 def test_inbox_update_track(factories, mocker):

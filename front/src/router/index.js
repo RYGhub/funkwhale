@@ -16,10 +16,14 @@ import PasswordResetConfirm from '@/views/auth/PasswordResetConfirm'
 import EmailConfirm from '@/views/auth/EmailConfirm'
 import Library from '@/components/library/Library'
 import LibraryHome from '@/components/library/Home'
-import LibraryArtist from '@/components/library/Artist'
 import LibraryArtists from '@/components/library/Artists'
+import LibraryArtistDetail from '@/components/library/ArtistDetail'
+import LibraryArtistEdit from '@/components/library/ArtistEdit'
+import LibraryArtistDetailBase from '@/components/library/ArtistBase'
 import LibraryAlbums from '@/components/library/Albums'
-import LibraryAlbum from '@/components/library/Album'
+import LibraryAlbumDetail from '@/components/library/AlbumDetail'
+import LibraryAlbumEdit from '@/components/library/AlbumEdit'
+import LibraryAlbumDetailBase from '@/components/library/AlbumBase'
 import LibraryTrackDetail from '@/components/library/TrackDetail'
 import LibraryTrackEdit from '@/components/library/TrackEdit'
 import EditDetail from '@/components/library/EditDetail'
@@ -411,8 +415,52 @@ export default new Router({
             id: route.params.id,
             defaultEdit: route.query.mode === 'edit' })
         },
-        { path: 'artists/:id', name: 'library.artists.detail', component: LibraryArtist, props: true },
-        { path: 'albums/:id', name: 'library.albums.detail', component: LibraryAlbum, props: true },
+        {
+          path: 'artists/:id',
+          component: LibraryArtistDetailBase,
+          props: true,
+          children: [
+            {
+              path: '',
+              name: 'library.artists.detail',
+              component: LibraryArtistDetail
+            },
+            {
+              path: 'edit',
+              name: 'library.artists.edit',
+              component: LibraryArtistEdit
+            },
+            {
+              path: 'edit/:editId',
+              name: 'library.artists.edit.detail',
+              component: EditDetail,
+              props: true,
+            }
+          ]
+        },
+        {
+          path: 'albums/:id',
+          component: LibraryAlbumDetailBase,
+          props: true,
+          children: [
+            {
+              path: '',
+              name: 'library.albums.detail',
+              component: LibraryAlbumDetail
+            },
+            {
+              path: 'edit',
+              name: 'library.albums.edit',
+              component: LibraryAlbumEdit
+            },
+            {
+              path: 'edit/:editId',
+              name: 'library.albums.edit.detail',
+              component: EditDetail,
+              props: true,
+            }
+          ]
+        },
         {
           path: 'tracks/:id',
           component: LibraryTrackDetailBase,
