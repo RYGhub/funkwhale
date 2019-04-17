@@ -14,26 +14,15 @@
             </div>
           </h2>
           <div class="ui hidden divider"></div>
-          <play-button class="orange" :tracks="album.tracks">
-            <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
-          </play-button>
+          <div class="header-buttons">
 
-          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
-            <i class="wikipedia w icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
-          </a>
-          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui icon labeled button">
-            <i class="external icon"></i>
-            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
-          </a>
-          <template v-if="publicLibraries.length > 0">
-            <button
-              @click="showEmbedModal = !showEmbedModal"
-              class="ui button icon labeled">
-              <i class="code icon"></i>
-              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
-            </button>
-            <modal :show.sync="showEmbedModal">
+            <div class="ui buttons">
+              <play-button class="orange" :tracks="album.tracks">
+                <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
+              </play-button>
+            </div>
+
+            <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
               <div class="header">
                 <translate translate-context="Popup/Album/Title/Verb">Embed this album on your website</translate>
               </div>
@@ -49,7 +38,46 @@
                 </div>
               </div>
             </modal>
-          </template>
+            <div class="ui buttons">
+              <button class="ui button" @click="$refs.dropdown.click()">
+                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
+              </button>
+              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  <div
+                    role="button"
+                    v-if="publicLibraries.length > 0"
+                    @click="showEmbedModal = !showEmbedModal"
+                    class="basic item">
+                    <i class="code icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+                  </div>
+                  <a :href="wikipediaUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="wikipedia w icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
+                  </a>
+                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="external icon"></i>
+                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
+                  </a>
+                  <div class="divider"></div>
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.albums.detail', params: {id: album.id}}">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+                  </router-link>
+                  <a
+                    v-if="$store.state.auth.profile.is_superuser"
+                    class="basic item"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${album.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <template v-if="discs && discs.length > 1">

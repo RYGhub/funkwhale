@@ -22,27 +22,18 @@
             </div>
           </h2>
           <div class="ui hidden divider"></div>
-          <radio-button type="artist" :object-id="artist.id"></radio-button>
-          <play-button :is-playable="isPlayable" class="orange" :artist="artist">
-            <translate translate-context="Content/Artist/Button.Label/Verb">Play all albums</translate>
-          </play-button>
+          <div class="header-buttons">
+            <div class="ui buttons">
+              <radio-button type="artist" :object-id="artist.id"></radio-button>
 
-          <a :href="wikipediaUrl" target="_blank" class="ui icon labeled button">
-            <i class="wikipedia w icon"></i>
-            <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
-          </a>
-          <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" class="ui button">
-            <i class="external icon"></i>
-            <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
-          </a>
-          <template v-if="publicLibraries.length > 0">
-            <button
-              @click="showEmbedModal = !showEmbedModal"
-              class="ui button icon labeled">
-              <i class="code icon"></i>
-              <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
-            </button>
-            <modal :show.sync="showEmbedModal">
+            </div>
+            <div class="ui buttons">
+              <play-button :is-playable="isPlayable" class="orange" :artist="artist">
+                <translate translate-context="Content/Artist/Button.Label/Verb">Play all albums</translate>
+              </play-button>
+            </div>
+
+            <modal :show.sync="showEmbedModal" v-if="publicLibraries.length > 0">
               <div class="header">
                 <translate translate-context="Popup/Artist/Title/Verb">Embed this artist work on your website</translate>
               </div>
@@ -58,7 +49,46 @@
                 </div>
               </div>
             </modal>
-          </template>
+            <div class="ui buttons">
+              <button class="ui button" @click="$refs.dropdown.click()">
+                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
+              </button>
+              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  <div
+                    role="button"
+                    v-if="publicLibraries.length > 0"
+                    @click="showEmbedModal = !showEmbedModal"
+                    class="basic item">
+                    <i class="code icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+                  </div>
+                  <a :href="wikipediaUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="wikipedia w icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
+                  </a>
+                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="external icon"></i>
+                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
+                  </a>
+                  <div class="divider"></div>
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.artists.detail', params: {id: artist.id}}">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+                  </router-link>
+                  <a
+                    v-if="$store.state.auth.profile.is_superuser"
+                    class="basic item"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/artist/${artist.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <div class="ui small text container" v-if="contentFilter">

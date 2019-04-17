@@ -33,6 +33,12 @@ import Favorites from '@/components/favorites/List'
 import AdminSettings from '@/views/admin/Settings'
 import AdminLibraryBase from '@/views/admin/library/Base'
 import AdminLibraryEditsList from '@/views/admin/library/EditsList'
+import AdminLibraryArtistsList from '@/views/admin/library/ArtistsList'
+import AdminLibraryArtistsDetail from '@/views/admin/library/ArtistDetail'
+import AdminLibraryAlbumsList from '@/views/admin/library/AlbumsList'
+import AdminLibraryAlbumDetail from '@/views/admin/library/AlbumDetail'
+import AdminLibraryTracksList from '@/views/admin/library/TracksList'
+import AdminLibraryTrackDetail from '@/views/admin/library/TrackDetail'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
@@ -244,7 +250,55 @@ export default new Router({
               defaultQuery: route.query.q,
             }
           }
-        }
+        },
+        {
+          path: 'artists',
+          name: 'manage.library.artists',
+          component: AdminLibraryArtistsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
+        },
+        {
+          path: 'artists/:id',
+          name: 'manage.library.artists.detail',
+          component: AdminLibraryArtistsDetail,
+          props: true
+        },
+        {
+          path: 'albums',
+          name: 'manage.library.albums',
+          component: AdminLibraryAlbumsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
+        },
+        {
+          path: 'albums/:id',
+          name: 'manage.library.albums.detail',
+          component: AdminLibraryAlbumDetail,
+          props: true
+        },
+        {
+          path: 'tracks',
+          name: 'manage.library.tracks',
+          component: AdminLibraryTracksList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
+        },
+        {
+          path: 'tracks/:id',
+          name: 'manage.library.tracks.detail',
+          component: AdminLibraryTrackDetail,
+          props: true
+        },
       ]
     },
     {

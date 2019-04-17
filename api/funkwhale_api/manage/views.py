@@ -1,12 +1,18 @@
 from rest_framework import mixins, response, viewsets
 from rest_framework import decorators as rest_decorators
+
+from django.db.models import Count, Prefetch, Q, Sum
 from django.shortcuts import get_object_or_404
 
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import preferences, decorators
+from funkwhale_api.favorites import models as favorites_models
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
+from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.playlists import models as playlists_models
 from funkwhale_api.users import models as users_models
 
 
@@ -38,6 +44,151 @@ class ManageUploadViewSet(
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = serializers.ManageUploadActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)
+
+
+def get_stats(tracks, target):
+    data = {}
+    tracks = list(tracks.values_list("pk", flat=True))
+    uploads = music_models.Upload.objects.filter(track__in=tracks)
+    data["listenings"] = history_models.Listening.objects.filter(
+        track__in=tracks
+    ).count()
+    data["mutations"] = common_models.Mutation.objects.get_for_target(target).count()
+    data["playlists"] = (
+        playlists_models.PlaylistTrack.objects.filter(track__in=tracks)
+        .values_list("playlist", flat=True)
+        .distinct()
+        .count()
+    )
+    data["track_favorites"] = favorites_models.TrackFavorite.objects.filter(
+        track__in=tracks
+    ).count()
+    data["libraries"] = uploads.values_list("library", flat=True).distinct().count()
+    data["uploads"] = uploads.count()
+    data["media_total_size"] = uploads.aggregate(v=Sum("size"))["v"] or 0
+    data["media_downloaded_size"] = (
+        uploads.with_file().aggregate(v=Sum("size"))["v"] or 0
+    )
+    return data
+
+
+class ManageArtistViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        music_models.Artist.objects.all()
+        .order_by("-id")
+        .select_related("attributed_to")
+        .prefetch_related(
+            "tracks",
+            Prefetch(
+                "albums",
+                queryset=music_models.Album.objects.annotate(
+                    tracks_count=Count("tracks")
+                ),
+            ),
+        )
+    )
+    serializer_class = serializers.ManageArtistSerializer
+    filterset_class = filters.ManageArtistFilterSet
+    required_scope = "instance:libraries"
+    ordering_fields = ["creation_date", "name"]
+
+    @rest_decorators.action(methods=["get"], detail=True)
+    def stats(self, request, *args, **kwargs):
+        artist = self.get_object()
+        tracks = music_models.Track.objects.filter(
+            Q(artist=artist) | Q(album__artist=artist)
+        )
+        data = get_stats(tracks, artist)
+        return response.Response(data, status=200)
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageArtistActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)
+
+
+class ManageAlbumViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        music_models.Album.objects.all()
+        .order_by("-id")
+        .select_related("attributed_to", "artist")
+        .prefetch_related("tracks")
+    )
+    serializer_class = serializers.ManageAlbumSerializer
+    filterset_class = filters.ManageAlbumFilterSet
+    required_scope = "instance:libraries"
+    ordering_fields = ["creation_date", "title", "release_date"]
+
+    @rest_decorators.action(methods=["get"], detail=True)
+    def stats(self, request, *args, **kwargs):
+        album = self.get_object()
+        data = get_stats(album.tracks.all(), album)
+        return response.Response(data, status=200)
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageAlbumActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)
+
+
+class ManageTrackViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = (
+        music_models.Track.objects.all()
+        .order_by("-id")
+        .select_related("attributed_to", "artist", "album__artist")
+        .annotate(uploads_count=Count("uploads"))
+    )
+    serializer_class = serializers.ManageTrackSerializer
+    filterset_class = filters.ManageTrackFilterSet
+    required_scope = "instance:libraries"
+    ordering_fields = [
+        "creation_date",
+        "title",
+        "album__release_date",
+        "position",
+        "disc_number",
+    ]
+
+    @rest_decorators.action(methods=["get"], detail=True)
+    def stats(self, request, *args, **kwargs):
+        track = self.get_object()
+        data = get_stats(track.__class__.objects.filter(pk=track.pk), track)
+        return response.Response(data, status=200)
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageTrackActionSerializer(
             request.data, queryset=queryset
         )
         serializer.is_valid(raise_exception=True)

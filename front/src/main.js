@@ -4,6 +4,7 @@ import logger from '@/logging'
 
 logger.default.info('Loading environment:', process.env.NODE_ENV)
 logger.default.debug('Environment variables:', process.env)
+import jQuery from "jquery"
 
 import Vue from 'vue'
 import App from './App'
@@ -59,6 +60,11 @@ Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', function (el, binding) {
   store.commit('ui/pageTitle', binding.value)
+})
+Vue.directive('dropdown', function (el, binding) {
+  jQuery(el).dropdown({
+    selectOnKeydown: false,
+  })
 })
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent

@@ -104,6 +104,31 @@ class MultipleQueryFilter(filters.TypedMultipleChoiceFilter):
         self.lookup_expr = "in"
 
 
+def filter_target(value):
+
+    config = {
+        "artist": ["artist", "target_id", int],
+        "album": ["album", "target_id", int],
+        "track": ["track", "target_id", int],
+    }
+    parts = value.lower().split(" ")
+    if parts[0].strip() not in config:
+        raise forms.ValidationError("Improper target")
+
+    conf = config[parts[0].strip()]
+
+    query = Q(target_content_type__model=conf[0])
+    if len(parts) > 1:
+        _, lookup_field, validator = conf
+        try:
+            lookup_value = validator(parts[1].strip())
+        except TypeError:
+            raise forms.ValidationError("Imparsable target id")
+        return query & Q(**{lookup_field: lookup_value})
+
+    return query
+
+
 class MutationFilter(filters.FilterSet):
     is_approved = NullBooleanFilter("is_approved")
     q = fields.SmartSearchFilter(
@@ -116,6 +141,7 @@ class MutationFilter(filters.FilterSet):
             filter_fields={
                 "domain": {"to": "created_by__domain__name__iexact"},
                 "is_approved": get_null_boolean_filter("is_approved"),
+                "target": {"handler": filter_target},
                 "is_applied": {"to": "is_applied"},
             },
         )

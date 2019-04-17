@@ -548,3 +548,9 @@ def test_api_model_mixin_is_local(federation_hostname, fid, expected, settings):
     settings.FEDERATION_HOSTNAME = federation_hostname
     obj = models.Track(fid=fid)
     assert obj.is_local is expected
+
+
+def test_api_model_mixin_domain_name():
+    obj = models.Track(fid="https://test.domain:543/something")
+
+    assert obj.domain_name == "test.domain"

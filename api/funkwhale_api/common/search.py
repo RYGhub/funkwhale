@@ -77,12 +77,15 @@ class SearchConfig:
     def clean(self, query):
         tokens = parse_query(query)
         cleaned_data = {}
-
         cleaned_data["types"] = self.clean_types(filter_tokens(tokens, ["is"]))
         cleaned_data["search_query"] = self.clean_search_query(
-            filter_tokens(tokens, [None, "in"])
+            filter_tokens(tokens, [None, "in"] + list(self.search_fields.keys()))
         )
-        unhandled_tokens = [t for t in tokens if t["key"] not in [None, "is", "in"]]
+        unhandled_tokens = [
+            t
+            for t in tokens
+            if t["key"] not in [None, "is", "in"] + list(self.search_fields.keys())
+        ]
         cleaned_data["filter_query"] = self.clean_filter_query(unhandled_tokens)
         return cleaned_data
 
@@ -95,8 +98,33 @@ class SearchConfig:
         } or set(self.search_fields.keys())
         fields_subset = set(self.search_fields.keys()) & fields_subset
         to_fields = [self.search_fields[k]["to"] for k in fields_subset]
+
+        specific_field_query = None
+        for token in tokens:
+            if token["key"] not in self.search_fields:
+                continue
+            to = self.search_fields[token["key"]]["to"]
+            try:
+                field = token["field"]
+                value = field.clean(token["value"])
+            except KeyError:
+                # no cleaning to apply
+                value = token["value"]
+            q = Q(**{"{}__icontains".format(to): value})
+            if not specific_field_query:
+                specific_field_query = q
+            else:
+                specific_field_query &= q
         query_string = " ".join([t["value"] for t in filter_tokens(tokens, [None])])
-        return get_query(query_string, sorted(to_fields))
+        unhandled_tokens_query = get_query(query_string, sorted(to_fields))
+
+        if specific_field_query and unhandled_tokens_query:
+            return unhandled_tokens_query & specific_field_query
+        elif specific_field_query:
+            return specific_field_query
+        elif unhandled_tokens_query:
+            return unhandled_tokens_query
+        return None
 
     def clean_filter_query(self, tokens):
         if not self.filter_fields or not tokens:

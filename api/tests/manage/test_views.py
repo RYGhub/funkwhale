@@ -148,3 +148,144 @@ def test_instance_policy_create(superuser_api_client, factories):
 
     policy = domain.instance_policy
     assert policy.actor == actor
+
+
+def test_artist_list(factories, superuser_api_client, settings):
+    artist = factories["music.Artist"]()
+    url = reverse("api:v1:manage:library:artists-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == artist.id
+
+
+def test_artist_detail(factories, superuser_api_client):
+    artist = factories["music.Artist"]()
+    url = reverse("api:v1:manage:library:artists-detail", kwargs={"pk": artist.pk})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == artist.id
+
+
+def test_artist_detail_stats(factories, superuser_api_client):
+    artist = factories["music.Artist"]()
+    url = reverse("api:v1:manage:library:artists-stats", kwargs={"pk": artist.pk})
+    response = superuser_api_client.get(url)
+    expected = {
+        "libraries": 0,
+        "uploads": 0,
+        "listenings": 0,
+        "playlists": 0,
+        "mutations": 0,
+        "track_favorites": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_artist_delete(factories, superuser_api_client):
+    artist = factories["music.Artist"]()
+    url = reverse("api:v1:manage:library:artists-detail", kwargs={"pk": artist.pk})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_album_list(factories, superuser_api_client, settings):
+    album = factories["music.Album"]()
+    factories["music.Album"]()
+    url = reverse("api:v1:manage:library:albums-list")
+    response = superuser_api_client.get(
+        url, {"q": 'artist:"{}"'.format(album.artist.name)}
+    )
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == album.id
+
+
+def test_album_detail(factories, superuser_api_client):
+    album = factories["music.Album"]()
+    url = reverse("api:v1:manage:library:albums-detail", kwargs={"pk": album.pk})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == album.id
+
+
+def test_album_detail_stats(factories, superuser_api_client):
+    album = factories["music.Album"]()
+    url = reverse("api:v1:manage:library:albums-stats", kwargs={"pk": album.pk})
+    response = superuser_api_client.get(url)
+    expected = {
+        "libraries": 0,
+        "uploads": 0,
+        "listenings": 0,
+        "playlists": 0,
+        "mutations": 0,
+        "track_favorites": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_album_delete(factories, superuser_api_client):
+    album = factories["music.Album"]()
+    url = reverse("api:v1:manage:library:albums-detail", kwargs={"pk": album.pk})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_track_list(factories, superuser_api_client, settings):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:manage:library:tracks-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == track.id
+
+
+def test_track_detail(factories, superuser_api_client):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:manage:library:tracks-detail", kwargs={"pk": track.pk})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == track.id
+
+
+def test_track_detail_stats(factories, superuser_api_client):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:manage:library:tracks-stats", kwargs={"pk": track.pk})
+    response = superuser_api_client.get(url)
+    expected = {
+        "libraries": 0,
+        "uploads": 0,
+        "listenings": 0,
+        "playlists": 0,
+        "mutations": 0,
+        "track_favorites": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_track_delete(factories, superuser_api_client):
+    track = factories["music.Track"]()
+    url = reverse("api:v1:manage:library:tracks-detail", kwargs={"pk": track.pk})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204

@@ -30,7 +30,7 @@
                 <div class="field">
                   <dangerous-button
                     v-if="selectAll || currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
-                    confirm-color="green"
+                    :confirm-color="currentAction.confirmColor || 'green'"
                     color=""
                     @confirm="launchAction">
                     <translate translate-context="Content/*/Button.Label/Short, Verb">Go</translate>
@@ -44,7 +44,8 @@
                       </translate>
                     </p>
                     <p slot="modal-content">
-                      <translate translate-context="Modal/*/Paragraph">This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
+                      <template v-if="currentAction.confirmationMessage">{{ currentAction.confirmationMessage }}</template>
+                      <translate v-else translate-context="Modal/*/Paragraph">This may affect a lot of elements or have irreversible consequences, please double check this is really what you want.</translate>
                     </p>
                     <div slot="modal-confirm"><translate translate-context="Modal/*/Button.Label/Short, Verb">Launch</translate></div>
                   </dangerous-button>

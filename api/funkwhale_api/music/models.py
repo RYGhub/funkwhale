@@ -3,6 +3,7 @@ import logging
 import mimetypes
 import os
 import tempfile
+import urllib.parse
 import uuid
 
 import markdown
@@ -123,6 +124,14 @@ class APIModelMixin(models.Model):
         return self.fid.startswith("http://{}/".format(d)) or self.fid.startswith(
             "https://{}/".format(d)
         )
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
 
 
 class License(models.Model):

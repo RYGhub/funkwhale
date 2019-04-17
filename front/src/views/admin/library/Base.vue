@@ -4,6 +4,15 @@
       <router-link
         class="ui item"
         :to="{name: 'manage.library.edits'}"><translate translate-context="*/Admin/*/Noun">Edits</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.artists'}"><translate translate-context="*/*/*">Artists</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.albums'}"><translate translate-context="*/*/*">Albums</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.tracks'}"><translate translate-context="*/*/*">Tracks</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>

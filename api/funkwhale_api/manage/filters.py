@@ -1,9 +1,11 @@
+from django import forms
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
 from funkwhale_api.common import search
 
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
@@ -22,6 +24,82 @@ class ManageUploadFilterSet(filters.FilterSet):
     class Meta:
         model = music_models.Upload
         fields = ["q", "track__album", "track__artist", "track"]
+
+
+class ManageArtistFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "name": {"to": "name"},
+                "fid": {"to": "fid"},
+                "mbid": {"to": "mbid"},
+            },
+            filter_fields={
+                "domain": {
+                    "handler": lambda v: federation_utils.get_domain_query_from_url(v)
+                }
+            },
+        )
+    )
+
+    class Meta:
+        model = music_models.Artist
+        fields = ["q", "name", "mbid", "fid"]
+
+
+class ManageAlbumFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "title": {"to": "title"},
+                "fid": {"to": "fid"},
+                "artist": {"to": "artist__name"},
+                "mbid": {"to": "mbid"},
+            },
+            filter_fields={
+                "artist_id": {"to": "artist_id", "field": forms.IntegerField()},
+                "domain": {
+                    "handler": lambda v: federation_utils.get_domain_query_from_url(v)
+                },
+            },
+        )
+    )
+
+    class Meta:
+        model = music_models.Album
+        fields = ["q", "title", "mbid", "fid", "artist"]
+
+
+class ManageTrackFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "title": {"to": "title"},
+                "fid": {"to": "fid"},
+                "mbid": {"to": "mbid"},
+                "artist": {"to": "artist__name"},
+                "album": {"to": "album__title"},
+                "album_artist": {"to": "album__artist__name"},
+                "copyright": {"to": "copyright"},
+            },
+            filter_fields={
+                "album_id": {"to": "album_id", "field": forms.IntegerField()},
+                "album_artist_id": {
+                    "to": "album__artist_id",
+                    "field": forms.IntegerField(),
+                },
+                "artist_id": {"to": "artist_id", "field": forms.IntegerField()},
+                "license": {"to": "license"},
+                "domain": {
+                    "handler": lambda v: federation_utils.get_domain_query_from_url(v)
+                },
+            },
+        )
+    )
+
+    class Meta:
+        model = music_models.Track
+        fields = ["q", "title", "mbid", "fid", "artist", "album", "license"]
 
 
 class ManageDomainFilterSet(filters.FilterSet):
@@ -60,7 +138,15 @@ class ManageActorFilterSet(filters.FilterSet):
 
 
 class ManageUserFilterSet(filters.FilterSet):
-    q = fields.SearchFilter(search_fields=["username", "email", "name"])
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "name": {"to": "name"},
+                "username": {"to": "username"},
+                "email": {"to": "email"},
+            }
+        )
+    )
 
     class Meta:
         model = users_models.User

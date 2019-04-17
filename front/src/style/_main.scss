@@ -231,8 +231,15 @@ body {
   justify-content: center;
 }
 
-.segment-content .button {
-  margin: 0.5em;
+.header-buttons > .buttons {
+  display: inline-block;
+  padding: 0.2em;
+  margin: 0;
+  font-size: 1em;
+  .buttons {
+    margin: 0;
+  }
+
 }
 
 a {

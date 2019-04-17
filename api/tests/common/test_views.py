@@ -7,7 +7,9 @@ from funkwhale_api.common import tasks
 
 
 def test_can_detail_mutation(logged_in_api_client, factories):
-    mutation = factories["common.Mutation"](payload={})
+    mutation = factories["common.Mutation"](
+        payload={}, target=factories["music.Artist"]()
+    )
     url = reverse("api:v1:mutations-detail", kwargs={"uuid": mutation.uuid})
 
     response = logged_in_api_client.get(url)
@@ -19,7 +21,9 @@ def test_can_detail_mutation(logged_in_api_client, factories):
 
 
 def test_can_list_mutations(logged_in_api_client, factories):
-    mutation = factories["common.Mutation"](payload={})
+    mutation = factories["common.Mutation"](
+        payload={}, target=factories["music.Artist"]()
+    )
     url = reverse("api:v1:mutations-list")
 
     response = logged_in_api_client.get(url)

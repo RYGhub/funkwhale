@@ -49,6 +49,6 @@ class SmartSearchFilter(django_filters.CharFilter):
             return qs
         try:
             cleaned = self.config.clean(value)
-        except forms.ValidationError:
+        except (forms.ValidationError):
             return qs.none()
         return search.apply(qs, cleaned)

@@ -36,6 +36,7 @@ class MutationViewSet(
     lookup_field = "uuid"
     queryset = (
         models.Mutation.objects.all()
+        .exclude(target_id=None)
         .order_by("-creation_date")
         .select_related("created_by", "approved_by")
         .prefetch_related("target")
