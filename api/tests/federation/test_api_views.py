@@ -167,3 +167,15 @@ def test_user_can_update_read_status_of_inbox_item(factories, logged_in_api_clie
     ii.refresh_from_db()
 
     assert ii.is_read is True
+
+
+def test_can_detail_fetch(logged_in_api_client, factories):
+    fetch = factories["federation.Fetch"](url="http://test.object")
+    url = reverse("api:v1:federation:fetches-detail", kwargs={"pk": fetch.pk})
+
+    response = logged_in_api_client.get(url)
+
+    expected = api_serializers.FetchSerializer(fetch).data
+
+    assert response.status_code == 200
+    assert response.data == expected

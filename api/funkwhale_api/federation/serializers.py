@@ -771,6 +771,7 @@ class ArtistSerializer(MusicEntitySerializer):
     ]
 
     class Meta:
+        model = music_models.Artist
         jsonld_mapping = MUSIC_ENTITY_JSONLD_MAPPING
 
     def to_representation(self, instance):
@@ -804,6 +805,7 @@ class AlbumSerializer(MusicEntitySerializer):
     ]
 
     class Meta:
+        model = music_models.Album
         jsonld_mapping = funkwhale_utils.concat_dicts(
             MUSIC_ENTITY_JSONLD_MAPPING,
             {
@@ -863,6 +865,7 @@ class TrackSerializer(MusicEntitySerializer):
     ]
 
     class Meta:
+        model = music_models.Track
         jsonld_mapping = funkwhale_utils.concat_dicts(
             MUSIC_ENTITY_JSONLD_MAPPING,
             {
@@ -970,6 +973,7 @@ class UploadSerializer(jsonld.JsonLdSerializer):
     track = TrackSerializer(required=True)
 
     class Meta:
+        model = music_models.Upload
         jsonld_mapping = {
             "track": jsonld.first_obj(contexts.FW.track),
             "library": jsonld.first_id(contexts.FW.library),

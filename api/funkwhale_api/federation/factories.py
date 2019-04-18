@@ -166,13 +166,21 @@ class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class LibraryScan(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class LibraryScanFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     library = factory.SubFactory(MusicLibraryFactory)
     actor = factory.SubFactory(ActorFactory)
     total_files = factory.LazyAttribute(lambda o: o.library.uploads_count)
 
     class Meta:
         model = "music.LibraryScan"
+
+
+@registry.register
+class FetchFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    actor = factory.SubFactory(ActorFactory)
+
+    class Meta:
+        model = "federation.Fetch"
 
 
 @registry.register

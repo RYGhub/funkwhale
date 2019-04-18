@@ -46,3 +46,14 @@ class InboxItemFilter(django_filters.FilterSet):
 
     def filter_before(self, queryset, field_name, value):
         return queryset.filter(pk__lte=value)
+
+
+class FetchFilter(django_filters.FilterSet):
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(("creation_date", "creation_date"), ("fetch_date", "fetch_date"))
+    )
+
+    class Meta:
+        model = models.Fetch
+        fields = ["status", "object_id", "url"]

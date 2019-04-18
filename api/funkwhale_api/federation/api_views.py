@@ -5,6 +5,7 @@ from django.db.models import Count
 
 from rest_framework import decorators
 from rest_framework import mixins
+from rest_framework import permissions
 from rest_framework import response
 from rest_framework import viewsets
 
@@ -189,3 +190,10 @@ class InboxItemViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+
+class FetchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+
+    queryset = models.Fetch.objects.select_related("actor")
+    serializer_class = api_serializers.FetchSerializer
+    permission_classes = [permissions.IsAuthenticated]
