@@ -144,3 +144,19 @@ class InboxItemActionSerializer(common_serializers.ActionSerializer):
 
     def handle_read(self, objects):
         return objects.update(is_read=True)
+
+
+class FetchSerializer(serializers.ModelSerializer):
+    actor = federation_serializers.APIActorSerializer()
+
+    class Meta:
+        model = models.Fetch
+        fields = [
+            "id",
+            "url",
+            "actor",
+            "status",
+            "detail",
+            "creation_date",
+            "fetch_date",
+        ]

@@ -23,6 +23,7 @@ export default {
     if (this.control) {
       $(this.$el).modal('hide')
     }
+    $(this.$el).remove()
   },
   methods: {
     initModal () {

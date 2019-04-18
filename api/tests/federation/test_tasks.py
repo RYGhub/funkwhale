@@ -5,6 +5,7 @@ import pytest
 
 from django.utils import timezone
 
+from funkwhale_api.federation import jsonld
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import tasks
@@ -332,3 +333,60 @@ def test_rotate_actor_key(factories, settings, mocker):
 
     assert actor.public_key == "public"
     assert actor.private_key == "private"
+
+
+def test_fetch_skipped(factories, r_mock):
+    url = "https://fetch.object"
+    fetch = factories["federation.Fetch"](url=url)
+    payload = {"@context": jsonld.get_default_context(), "type": "Unhandled"}
+    r_mock.get(url, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+
+    assert fetch.status == "skipped"
+    assert fetch.detail["reason"] == "unhandled_type"
+
+
+@pytest.mark.parametrize(
+    "r_mock_args, expected_error_code",
+    [
+        ({"json": {"type": "Unhandled"}}, "invalid_jsonld"),
+        ({"json": {"@context": jsonld.get_default_context()}}, "invalid_jsonld"),
+        ({"text": "invalidjson"}, "invalid_json"),
+        ({"status_code": 404}, "http"),
+        ({"status_code": 500}, "http"),
+    ],
+)
+def test_fetch_errored(factories, r_mock_args, expected_error_code, r_mock):
+    url = "https://fetch.object"
+    fetch = factories["federation.Fetch"](url=url)
+    r_mock.get(url, **r_mock_args)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == expected_error_code
+
+
+def test_fetch_success(factories, r_mock, mocker):
+    artist = factories["music.Artist"]()
+    fetch = factories["federation.Fetch"](url=artist.fid)
+    payload = serializers.ArtistSerializer(artist).data
+    init = mocker.spy(serializers.ArtistSerializer, "__init__")
+    save = mocker.spy(serializers.ArtistSerializer, "save")
+
+    r_mock.get(artist.fid, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+    payload["@context"].append("https://funkwhale.audio/ns")
+    assert fetch.status == "finished"
+    assert init.call_count == 1
+    assert init.call_args[0][1] == artist
+    assert init.call_args[1]["data"] == payload
+    assert save.call_count == 1

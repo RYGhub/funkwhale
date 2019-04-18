@@ -121,3 +121,13 @@ def get_domain_query_from_url(domain, url_field="fid"):
         **{"{}__startswith".format(url_field): "https://{}/".format(domain)}
     )
     return query
+
+
+def is_local(url):
+    if not url:
+        return True
+
+    d = settings.FEDERATION_HOSTNAME
+    return url.startswith("http://{}/".format(d)) or url.startswith(
+        "https://{}/".format(d)
+    )

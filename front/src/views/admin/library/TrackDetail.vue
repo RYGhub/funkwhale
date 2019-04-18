@@ -45,6 +45,10 @@
                         <i class="external icon"></i>
                         <translate translate-context="Content/Moderation/Link/Verb">Open on MusicBrainz</translate>&nbsp;
                       </a>
+                      <fetch-button @refresh="fetchData" v-if="!object.is_local" class="basic item" :url="`tracks/${object.id}/fetches/`">
+                        <i class="refresh icon"></i>&nbsp;
+                        <translate translate-context="Content/Moderation/Button/Verb">Refresh from remote server</translate>&nbsp;
+                      </fetch-button>
                       <a class="basic item" :href="object.url || object.fid" target="_blank" rel="noopener noreferrer">
                         <i class="external icon"></i>
                         <translate translate-context="Content/Moderation/Link/Verb">Open remote profile</translate>&nbsp;
@@ -306,10 +310,14 @@
 <script>
 import axios from "axios"
 import logger from "@/logging"
+import FetchButton from "@/components/federation/FetchButton"
 
 
 export default {
   props: ["id"],
+  components: {
+    FetchButton
+  },
   data() {
     return {
       isLoading: true,

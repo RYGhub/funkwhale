@@ -117,13 +117,7 @@ class APIModelMixin(models.Model):
 
     @property
     def is_local(self):
-        if not self.fid:
-            return True
-
-        d = settings.FEDERATION_HOSTNAME
-        return self.fid.startswith("http://{}/".format(d)) or self.fid.startswith(
-            "https://{}/".format(d)
-        )
+        return federation_utils.is_local(self.fid)
 
     @property
     def domain_name(self):

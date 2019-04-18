@@ -22,6 +22,7 @@ from funkwhale_api.common import views as common_views
 from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import decorators as federation_decorators
 from funkwhale_api.federation import routes
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
@@ -70,6 +71,7 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
 
+    fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
@@ -100,6 +102,7 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     ordering_fields = ("creation_date", "release_date", "title")
     filterset_class = filters.AlbumFilter
 
+    fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
@@ -201,7 +204,7 @@ class TrackViewSet(
         "disc_number",
         "artist__name",
     )
-
+    fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
@@ -436,6 +439,8 @@ class UploadViewSet(
         "size",
         "artist__name",
     )
+
+    fetches = federation_decorators.fetches_route()
 
     def get_queryset(self):
         qs = super().get_queryset()

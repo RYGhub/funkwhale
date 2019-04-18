@@ -288,6 +288,55 @@ class Actor(models.Model):
         )
 
 
+FETCH_STATUSES = [
+    ("pending", "Pending"),
+    ("errored", "Errored"),
+    ("finished", "Finished"),
+    ("skipped", "Skipped"),
+]
+
+
+class FetchQuerySet(models.QuerySet):
+    def get_for_object(self, object):
+        content_type = ContentType.objects.get_for_model(object)
+        return self.filter(object_content_type=content_type, object_id=object.pk)
+
+
+class Fetch(models.Model):
+    url = models.URLField(max_length=500, db_index=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    fetch_date = models.DateTimeField(null=True, blank=True)
+    object_id = models.IntegerField(null=True)
+    object_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    object = GenericForeignKey("object_content_type", "object_id")
+    status = models.CharField(default="pending", choices=FETCH_STATUSES, max_length=20)
+    detail = JSONField(default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder)
+    actor = models.ForeignKey(Actor, related_name="fetches", on_delete=models.CASCADE)
+
+    objects = FetchQuerySet.as_manager()
+
+    def save(self, **kwargs):
+        if not self.url and self.object:
+            self.url = self.object.fid
+
+        super().save(**kwargs)
+
+    @property
+    def serializers(self):
+        from . import contexts
+        from . import serializers
+
+        return {
+            contexts.FW.Artist: serializers.ArtistSerializer,
+            contexts.FW.Album: serializers.AlbumSerializer,
+            contexts.FW.Track: serializers.TrackSerializer,
+            contexts.AS.Audio: serializers.UploadSerializer,
+            contexts.FW.Library: serializers.LibrarySerializer,
+        }
+
+
 class InboxItem(models.Model):
     """
     Store activities binding to local actors, with read/unread status.
