@@ -58,6 +58,7 @@ class ManageArtistFilterSet(filters.FilterSet):
                 "library_id": {
                     "to": "tracks__uploads__library_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
                 },
             },
         )
@@ -85,6 +86,7 @@ class ManageAlbumFilterSet(filters.FilterSet):
                 "library_id": {
                     "to": "tracks__uploads__library_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
                 },
             },
         )
@@ -121,6 +123,7 @@ class ManageTrackFilterSet(filters.FilterSet):
                 "library_id": {
                     "to": "uploads__library_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
                 },
             },
         )
@@ -151,12 +154,18 @@ class ManageLibraryFilterSet(filters.FilterSet):
                 "artist_id": {
                     "to": "uploads__track__artist_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
                 },
                 "album_id": {
                     "to": "uploads__track__album_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
                 },
-                "track_id": {"to": "uploads__track__id", "field": forms.IntegerField()},
+                "track_id": {
+                    "to": "uploads__track__id",
+                    "field": forms.IntegerField(),
+                    "distinct": True,
+                },
                 "domain": {"to": "actor__domain_id"},
                 "account": get_actor_filter("actor"),
                 "privacy_level": {"to": "privacy_level"},

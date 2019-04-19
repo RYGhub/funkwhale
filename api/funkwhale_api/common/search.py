@@ -65,6 +65,9 @@ def apply(qs, config_data):
         q = config_data.get(k)
         if q:
             qs = qs.filter(q)
+    distinct = config_data.get("distinct", False)
+    if distinct:
+        qs = qs.distinct()
     return qs
 
 
@@ -86,7 +89,19 @@ class SearchConfig:
             for t in tokens
             if t["key"] not in [None, "is", "in"] + list(self.search_fields.keys())
         ]
-        cleaned_data["filter_query"] = self.clean_filter_query(unhandled_tokens)
+        cleaned_data["filter_query"], matching_filters = self.clean_filter_query(
+            unhandled_tokens
+        )
+        if matching_filters:
+            cleaned_data["distinct"] = any(
+                [
+                    self.filter_fields[k].get("distinct", False)
+                    for k in matching_filters
+                    if k in self.filter_fields
+                ]
+            )
+        else:
+            cleaned_data["distinct"] = False
         return cleaned_data
 
     def clean_search_query(self, tokens):
@@ -128,7 +143,7 @@ class SearchConfig:
 
     def clean_filter_query(self, tokens):
         if not self.filter_fields or not tokens:
-            return
+            return None, []
 
         matching = [t for t in tokens if t["key"] in self.filter_fields]
         queries = [self.get_filter_query(token) for token in matching]
@@ -138,7 +153,7 @@ class SearchConfig:
                 query = q
             else:
                 query = query & q
-        return query
+        return query, [m["key"] for m in matching]
 
     def get_filter_query(self, token):
         raw_value = token["value"]
