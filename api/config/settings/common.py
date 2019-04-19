@@ -220,6 +220,7 @@ DATABASES = {
     "default": env.db("DATABASE_URL")
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+DATABASES["default"]["CONN_MAX_AGE"] = env("DB_CONN_MAX_AGE", default=60 * 60)
 
 MIGRATION_MODULES = {
     # see https://github.com/jazzband/django-oauth-toolkit/issues/634
