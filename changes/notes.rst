@@ -6,6 +6,41 @@ Next release notes
     Those release notes refer to the current development branch and are reset
     after each release.
 
+Edits on tracks, albums and artists
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale was a bit annoying when it camed to metadata. Tracks, albums and artists profiles
+were created from audio file tags, but basically immutable after that (unless you had
+admin access to Django's UI, which wasn't ideal to do this kind of changes).
+
+With this release, everyone can suggest changes on track, album and artist pages. Users
+with the "library" permission can review suggested edits in a dedicated interface
+and apply/reject them.
+
+Approved edits are broadcasted via federation, to ensure other instances get the information
+too.
+
+Not all fields are currently modifiable using this feature. Especially, it's not possible
+to suggest a new album cover, or reassign a track to a different album or artist. Those will
+be implemented in a future release.
+
+Admin UI for tracks, albums, artists, libraries and uploads
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As part of our ongoing effort to make Funkwhale easier to manage for instance owners,
+this release includes a brand new administration interface to deal with:
+
+- tracks
+- albums
+- artists
+- libraries
+- uploads
+
+You can use this UI to quickly search for any object, delete objects in batch, understand
+where they are coming from etc. This new UI should remove the need to go through Django's
+admin in the vast majority of cases (but also includes a link to Django's admin when needed).
+
+
 Artist hiding in the interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
