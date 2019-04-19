@@ -1,24 +1,8 @@
-import pytest
 from django.urls import reverse
 
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.manage import serializers
-
-
-@pytest.mark.skip(reason="Refactoring in progress")
-def test_upload_view(factories, superuser_api_client):
-    uploads = factories["music.Upload"].create_batch(size=5)
-    qs = uploads[0].__class__.objects.order_by("-creation_date")
-    url = reverse("api:v1:manage:library:uploads-list")
-
-    response = superuser_api_client.get(url, {"sort": "-creation_date"})
-    expected = serializers.ManageUploadSerializer(
-        qs, many=True, context={"request": response.wsgi_request}
-    ).data
-
-    assert response.data["count"] == len(uploads)
-    assert response.data["results"] == expected
 
 
 def test_user_view(factories, superuser_api_client, mocker):
@@ -286,6 +270,85 @@ def test_track_detail_stats(factories, superuser_api_client):
 def test_track_delete(factories, superuser_api_client):
     track = factories["music.Track"]()
     url = reverse("api:v1:manage:library:tracks-detail", kwargs={"pk": track.pk})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_library_list(factories, superuser_api_client, settings):
+    library = factories["music.Library"]()
+    url = reverse("api:v1:manage:library:libraries-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == library.id
+
+
+def test_library_detail(factories, superuser_api_client):
+    library = factories["music.Library"]()
+    url = reverse(
+        "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
+    )
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == library.id
+
+
+def test_library_detail_stats(factories, superuser_api_client):
+    library = factories["music.Library"]()
+    url = reverse(
+        "api:v1:manage:library:libraries-stats", kwargs={"uuid": library.uuid}
+    )
+    response = superuser_api_client.get(url)
+    expected = {
+        "uploads": 0,
+        "followers": 0,
+        "tracks": 0,
+        "albums": 0,
+        "artists": 0,
+        "media_total_size": 0,
+        "media_downloaded_size": 0,
+    }
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_library_delete(factories, superuser_api_client):
+    library = factories["music.Library"]()
+    url = reverse(
+        "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
+    )
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_upload_list(factories, superuser_api_client, settings):
+    upload = factories["music.Upload"]()
+    url = reverse("api:v1:manage:library:uploads-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["id"] == upload.id
+
+
+def test_upload_detail(factories, superuser_api_client):
+    upload = factories["music.Upload"]()
+    url = reverse("api:v1:manage:library:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["id"] == upload.id
+
+
+def test_upload_delete(factories, superuser_api_client):
+    upload = factories["music.Upload"]()
+    url = reverse("api:v1:manage:library:uploads-detail", kwargs={"uuid": upload.uuid})
     response = superuser_api_client.delete(url)
 
     assert response.status_code == 204

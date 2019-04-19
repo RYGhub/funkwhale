@@ -440,8 +440,6 @@ class UploadViewSet(
         "artist__name",
     )
 
-    fetches = federation_decorators.fetches_route()
-
     def get_queryset(self):
         qs = super().get_queryset()
         return qs.filter(library__actor=self.request.user.actor)

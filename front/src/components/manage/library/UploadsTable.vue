@@ -9,6 +9,15 @@
           </form>
         </div>
         <div class="field">
+          <label><translate translate-context="*/*/*">Visibility</translate></label>
+          <select class="ui dropdown" @change="addSearchToken('privacy_level', $event.target.value)" :value="getTokenValue('privacy_level', '')">
+            <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
+            <option value="me">{{ sharedLabels.fields.privacy_level.shortChoices.me }}</option>
+            <option value="instance">{{ sharedLabels.fields.privacy_level.shortChoices.instance }}</option>
+            <option value="everyone">{{ sharedLabels.fields.privacy_level.shortChoices.everyone }}</option>
+          </select>
+        </div>
+        <div class="field">
           <label><translate translate-context="Content/Library/*/Noun">Import status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('status', $event.target.value)" :value="getTokenValue('status', '')">
             <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
@@ -43,43 +52,62 @@
       <action-table
         v-if="result"
         @action-launched="fetchData"
-        :id-field="'uuid'"
         :objects-data="result"
-        :custom-objects="customObjects"
         :actions="actions"
-        :refreshable="true"
-        :needs-refresh="needsRefresh"
-        :action-url="'uploads/action/'"
-        @refresh="fetchData"
+        action-url="manage/library/uploads/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="Content/Track/*/Noun">Title</translate></th>
-          <th><translate translate-context="*/*/*/Noun">Artist</translate></th>
-          <th><translate translate-context="*/*/*">Album</translate></th>
-          <th><translate translate-context="*/*/*/Noun">Upload date</translate></th>
-          <th><translate translate-context="Content/Library/*/Noun">Import status</translate></th>
-          <th><translate translate-context="Content/*/*">Duration</translate></th>
-          <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
+          <th><translate translate-context="*/*/*">Name</translate></th>
+          <th><translate translate-context="*/*/*">Library</translate></th>
+          <th><translate translate-context="*/*/*">Account</translate></th>
+          <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
+          <th><translate translate-context="*/*/*">Visibility</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Import status</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Size</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Accessed date</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
-          <template v-if="scope.obj.track">
-            <td>
-              <span :title="scope.obj.track.title">{{ scope.obj.track.title|truncate(25) }}</span>
-            </td>
-            <td>
-              <span class="discrete link" @click="addSearchToken('artist', scope.obj.track.artist.name)" :title="scope.obj.track.artist.name">{{ scope.obj.track.artist.name|truncate(20) }}</span>
-            </td>
-            <td>
-              <span class="discrete link" @click="addSearchToken('album', scope.obj.track.album.title)" :title="scope.obj.track.album.title">{{ scope.obj.track.album.title|truncate(20) }}</span>
-            </td>
-          </template>
-          <template v-else>
-            <td :title="scope.obj.source">{{ scope.obj.source | truncate(25) }}</td>
-            <td></td>
-            <td></td>
-          </template>
           <td>
-            <human-date :date="scope.obj.creation_date"></human-date>
+            <router-link :to="{name: 'manage.library.uploads.detail', params: {id: scope.obj.uuid }}" :title="displayName(scope.obj)">
+              {{ displayName(scope.obj)|truncate(30, "…", true) }}
+            </router-link>
+          </td>
+          <td>
+            <router-link :to="{name: 'manage.library.libraries.detail', params: {id: scope.obj.library.uuid }}">
+              <i class="wrench icon"></i>
+            </router-link>
+            <span role="button" class="discrete link"
+              @click="addSearchToken('library_id', scope.obj.library.id)"
+              :title="scope.obj.library.name">
+              {{ scope.obj.library.name | truncate(20) }}
+            </span>
+          </td>
+          <td>
+            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.library.actor.full_username }}">
+            </router-link>
+            <span role="button" class="discrete link" @click="addSearchToken('account', scope.obj.library.actor.full_username)" :title="scope.obj.library.actor.full_username">{{ scope.obj.library.actor.preferred_username }}</span>
+          </td>
+          <td>
+            <template v-if="!scope.obj.is_local">
+              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.domain }}">
+                <i class="wrench icon"></i>
+              </router-link>
+              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.domain)" :title="scope.obj.domain">{{ scope.obj.domain }}</span>
+            </template>
+            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.domain)">
+              <i class="home icon"></i>
+              <translate translate-context="Content/Moderation/*/Short, Noun">Local</translate>
+            </span>
+          </td>
+          <td>
+            <span
+              role="button"
+              class="discrete link"
+              @click="addSearchToken('privacy_level', scope.obj.library.privacy_level)"
+              :title="sharedLabels.fields.privacy_level.shortChoices[scope.obj.library.privacy_level]">
+              {{ sharedLabels.fields.privacy_level.shortChoices[scope.obj.library.privacy_level] }}
+            </span>
           </td>
           <td>
             <span class="discrete link" @click="addSearchToken('status', scope.obj.import_status)" :title="sharedLabels.fields.import_status.choices[scope.obj.import_status].help">
@@ -89,17 +117,16 @@
               <i class="question circle outline icon"></i>
             </button>
           </td>
-          <td v-if="scope.obj.duration">
-            {{ time.parse(scope.obj.duration) }}
+          <td>
+            <span v-if="scope.obj.size">{{ scope.obj.size | humanSize }}</span>
+            <translate v-else translate-context="*/*/*">N/A</translate>
           </td>
-          <td v-else>
-            <translate translate-context="*/*/*">N/A</translate>
+          <td>
+            <human-date :date="scope.obj.creation_date"></human-date>
           </td>
-          <td v-if="scope.obj.size">
-            {{ scope.obj.size | humanSize }}
-          </td>
-          <td v-else>
-            <translate translate-context="*/*/*">N/A</translate>
+          <td>
+            <human-date v-if="scope.obj.accessed_date" :date="scope.obj.accessed_date"></human-date>
+            <translate v-else translate-context="*/*/*">N/A</translate>
           </td>
         </template>
       </action-table>
@@ -129,7 +156,6 @@ import axios from 'axios'
 import _ from '@/lodash'
 import time from '@/utils/time'
 import {normalizeQuery, parseTokens} from '@/search'
-
 import Pagination from '@/components/Pagination'
 import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
@@ -137,12 +163,11 @@ import TranslationsMixin from '@/components/mixins/Translations'
 import SmartSearchMixin from '@/components/mixins/SmartSearch'
 import ImportStatusModal from '@/components/library/ImportStatusModal'
 
+
 export default {
   mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   props: {
     filters: {type: Object, required: false},
-    needsRefresh: {type: Boolean, required: false, default: false},
-    customObjects: {type: Array, required: false, default: () => { return [] }}
   },
   components: {
     Pagination,
@@ -150,28 +175,28 @@ export default {
     ImportStatusModal
   },
   data () {
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
     return {
-      time,
       detailedUpload: null,
       showUploadDetailModal: false,
+      time,
       isLoading: false,
       result: null,
       page: 1,
-      paginateBy: 25,
+      paginateBy: 50,
       search: {
         query: this.defaultQuery,
         tokens: parseTokens(normalizeQuery(this.defaultQuery))
       },
-      orderingDirection: '-',
-      ordering: 'creation_date',
+      orderingDirection: defaultOrdering.direction || '+',
+      ordering: defaultOrdering.field,
       orderingOptions: [
         ['creation_date', 'creation_date'],
-        ['title', 'track_title'],
+        ['modification_date', 'modification_date'],
+        ['accessed_date', 'accessed_date'],
         ['size', 'size'],
-        ['duration', 'duration'],
         ['bitrate', 'bitrate'],
-        ['album_title', 'album_title'],
-        ['artist_name', 'artist_name']
+        ['duration', 'duration'],
       ]
     }
   },
@@ -180,17 +205,16 @@ export default {
   },
   methods: {
     fetchData () {
-      this.$emit('fetch-start')
       let params = _.merge({
         'page': this.page,
         'page_size': this.paginateBy,
-        'ordering': this.getOrderingAsString(),
-        'q': this.search.query
-      }, this.filters || {})
+        'q': this.search.query,
+        'ordering': this.getOrderingAsString()
+      }, this.filters)
       let self = this
       self.isLoading = true
       self.checked = []
-      axios.get('/uploads/', {params: params}).then((response) => {
+      axios.get('/manage/library/uploads/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
       }, error => {
@@ -201,11 +225,20 @@ export default {
     selectPage: function (page) {
       this.page = page
     },
+    displayName (upload) {
+      if (upload.filename) {
+        return upload.filename
+      }
+      if (upload.source) {
+        return upload.source
+      }
+      return upload.uuid
+    }
   },
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$pgettext('Content/Library/Input.Placeholder', 'Search by title, artist, album…'),
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by domain, actor, name, reference, source…')
       }
     },
     actionFilters () {
@@ -219,41 +252,32 @@ export default {
       }
     },
     actions () {
-      let deleteMsg = this.$pgettext('*/*/*/Verb', 'Delete')
-      let relaunchMsg = this.$pgettext('Content/Library/Dropdown/Verb', 'Restart import')
+      let deleteLabel = this.$pgettext('*/*/*/Verb', 'Delete')
+      let confirmationMessage = this.$pgettext('Popup/*/Paragraph', 'The selected upload will be removed. This action is irreversible.')
       return [
         {
           name: 'delete',
-          label: deleteMsg,
+          label: deleteLabel,
+          confirmationMessage: confirmationMessage,
           isDangerous: true,
-          allowAll: true
+          allowAll: false,
+          confirmColor: 'red',
         },
-        {
-          name: 'relaunch_import',
-          label: relaunchMsg,
-          isDangerous: true,
-          allowAll: true,
-          filterCheckable: f => {
-            return f.import_status != 'finished'
-          }
-        }
       ]
     }
   },
   watch: {
-    orderingDirection: function () {
-      this.page = 1
-      this.fetchData()
-    },
-    page: function () {
-      this.fetchData()
-    },
-    ordering: function () {
-      this.page = 1
-      this.fetchData()
-    },
     search (newValue) {
       this.page = 1
+      this.fetchData()
+    },
+    page () {
+      this.fetchData()
+    },
+    ordering () {
+      this.fetchData()
+    },
+    orderingDirection () {
       this.fetchData()
     }
   }

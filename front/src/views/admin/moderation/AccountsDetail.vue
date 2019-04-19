@@ -91,12 +91,12 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
+                      <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
+                        <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
+                      </router-link>
                     </td>
                     <td>
-                      <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
-                        {{ object.domain }}
-                      </router-link>
+                      {{ object.domain }}
                     </td>
                   </tr>
                   <tr>
@@ -157,14 +157,6 @@
                   </tr>
                   <tr v-if="!object.user">
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
-                    </td>
-                    <td>
-                      <human-date :date="object.creation_date"></human-date>
-                    </td>
-                  </tr>
-                  <tr v-if="!object.user">
-                    <td>
                       <translate translate-context="Content/*/Table.Label">Last checked</translate>
                     </td>
                     <td>
@@ -210,6 +202,14 @@
               </div>
               <table v-else class="ui very basic table">
                 <tbody>
+                  <tr v-if="!object.user">
+                    <td>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
+                    </td>
+                    <td>
+                      <human-date :date="object.creation_date"></human-date>
+                    </td>
+                  </tr>
                   <tr>
                     <td>
                       <translate translate-context="Content/Moderation/Table.Label/Noun">Emitted messages</translate>
@@ -295,7 +295,9 @@
 
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('account', object.full_username) }}">
+                        <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -303,7 +305,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('account', object.full_username) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.uploads }}
@@ -446,6 +450,9 @@ export default {
           )
         }
       )
+    },
+    getQuery (field, value) {
+      return `${field}:"${value}"`
     }
   },
   computed: {

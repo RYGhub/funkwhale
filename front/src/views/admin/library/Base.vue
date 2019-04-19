@@ -13,6 +13,12 @@
       <router-link
         class="ui item"
         :to="{name: 'manage.library.tracks'}"><translate translate-context="*/*/*">Tracks</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.libraries'}"><translate translate-context="*/*/*">Libraries</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.uploads'}"><translate translate-context="*/*/*">Uploads</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>

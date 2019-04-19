@@ -399,12 +399,73 @@ def test_manage_track_serializer(factories, now):
     assert s.data == expected
 
 
+def test_manage_library_serializer(factories, now):
+    library = factories["music.Library"]()
+    setattr(library, "followers_count", 42)
+    setattr(library, "_uploads_count", 44)
+    expected = {
+        "id": library.id,
+        "fid": library.fid,
+        "url": library.url,
+        "uuid": str(library.uuid),
+        "followers_url": library.followers_url,
+        "domain": library.domain_name,
+        "is_local": library.is_local,
+        "name": library.name,
+        "description": library.description,
+        "privacy_level": library.privacy_level,
+        "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
+        "actor": serializers.ManageBaseActorSerializer(library.actor).data,
+        "uploads_count": 44,
+        "followers_count": 42,
+    }
+    s = serializers.ManageLibrarySerializer(library)
+
+    assert s.data == expected
+
+
+def test_manage_upload_serializer(factories, now):
+    upload = factories["music.Upload"]()
+
+    expected = {
+        "id": upload.id,
+        "fid": upload.fid,
+        "audio_file": upload.audio_file.url,
+        "listen_url": upload.listen_url,
+        "uuid": str(upload.uuid),
+        "domain": upload.domain_name,
+        "is_local": upload.is_local,
+        "duration": upload.duration,
+        "size": upload.size,
+        "bitrate": upload.bitrate,
+        "mimetype": upload.mimetype,
+        "source": upload.source,
+        "filename": upload.filename,
+        "metadata": upload.metadata,
+        "creation_date": upload.creation_date.isoformat().split("+")[0] + "Z",
+        "modification_date": upload.modification_date.isoformat().split("+")[0] + "Z",
+        "accessed_date": None,
+        "import_date": None,
+        "import_metadata": upload.import_metadata,
+        "import_status": upload.import_status,
+        "import_reference": upload.import_reference,
+        "import_details": upload.import_details,
+        "library": serializers.ManageNestedLibrarySerializer(upload.library).data,
+        "track": serializers.ManageNestedTrackSerializer(upload.track).data,
+    }
+    s = serializers.ManageUploadSerializer(upload)
+
+    assert s.data == expected
+
+
 @pytest.mark.parametrize(
     "factory, serializer_class",
     [
         ("music.Track", serializers.ManageTrackActionSerializer),
         ("music.Album", serializers.ManageAlbumActionSerializer),
         ("music.Artist", serializers.ManageArtistActionSerializer),
+        ("music.Library", serializers.ManageLibraryActionSerializer),
+        ("music.Upload", serializers.ManageUploadActionSerializer),
     ],
 )
 def test_action_serializer_delete(factory, serializer_class, factories):

@@ -15,67 +15,6 @@ from funkwhale_api.users import models as users_models
 from . import filters
 
 
-class ManageUploadArtistSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = music_models.Artist
-        fields = ["id", "mbid", "creation_date", "name"]
-
-
-class ManageUploadAlbumSerializer(serializers.ModelSerializer):
-    artist = ManageUploadArtistSerializer()
-
-    class Meta:
-        model = music_models.Album
-        fields = (
-            "id",
-            "mbid",
-            "title",
-            "artist",
-            "release_date",
-            "cover",
-            "creation_date",
-        )
-
-
-class ManageUploadTrackSerializer(serializers.ModelSerializer):
-    artist = ManageUploadArtistSerializer()
-    album = ManageUploadAlbumSerializer()
-
-    class Meta:
-        model = music_models.Track
-        fields = ("id", "mbid", "title", "album", "artist", "creation_date", "position")
-
-
-class ManageUploadSerializer(serializers.ModelSerializer):
-    track = ManageUploadTrackSerializer()
-
-    class Meta:
-        model = music_models.Upload
-        fields = (
-            "id",
-            "path",
-            "source",
-            "filename",
-            "mimetype",
-            "track",
-            "duration",
-            "mimetype",
-            "creation_date",
-            "bitrate",
-            "size",
-            "path",
-        )
-
-
-class ManageUploadActionSerializer(common_serializers.ActionSerializer):
-    actions = [common_serializers.Action("delete", allow_all=False)]
-    filterset_class = filters.ManageUploadFilterSet
-
-    @transaction.atomic
-    def handle_delete(self, objects):
-        return objects.delete()
-
-
 class PermissionsSerializer(serializers.Serializer):
     def to_representation(self, o):
         return o.get_permissions(defaults=self.context.get("default_permissions"))
@@ -493,3 +432,111 @@ class ManageArtistActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
+
+
+class ManageLibraryActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageLibraryFilterSet
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()
+
+
+class ManageUploadActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageUploadFilterSet
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()
+
+
+class ManageLibrarySerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(source="domain_name")
+    actor = ManageBaseActorSerializer()
+    uploads_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = music_models.Library
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "url",
+            "name",
+            "description",
+            "domain",
+            "is_local",
+            "creation_date",
+            "privacy_level",
+            "uploads_count",
+            "followers_count",
+            "followers_url",
+            "actor",
+        ]
+
+    def get_uploads_count(self, obj):
+        return getattr(obj, "_uploads_count", obj.uploads_count)
+
+    def get_followers_count(self, obj):
+        return getattr(obj, "followers_count", None)
+
+
+class ManageNestedLibrarySerializer(serializers.ModelSerializer):
+    domain = serializers.CharField(source="domain_name")
+    actor = ManageBaseActorSerializer()
+
+    class Meta:
+        model = music_models.Library
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "url",
+            "name",
+            "description",
+            "domain",
+            "is_local",
+            "creation_date",
+            "privacy_level",
+            "followers_url",
+            "actor",
+        ]
+
+
+class ManageUploadSerializer(serializers.ModelSerializer):
+    track = ManageNestedTrackSerializer()
+    library = ManageNestedLibrarySerializer()
+    domain = serializers.CharField(source="domain_name")
+
+    class Meta:
+        model = music_models.Upload
+        fields = (
+            "id",
+            "uuid",
+            "fid",
+            "domain",
+            "is_local",
+            "audio_file",
+            "listen_url",
+            "source",
+            "filename",
+            "mimetype",
+            "duration",
+            "mimetype",
+            "bitrate",
+            "size",
+            "creation_date",
+            "accessed_date",
+            "modification_date",
+            "metadata",
+            "import_date",
+            "import_details",
+            "import_status",
+            "import_metadata",
+            "import_reference",
+            "track",
+            "library",
+        )

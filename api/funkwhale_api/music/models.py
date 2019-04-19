@@ -649,7 +649,7 @@ class Track(APIModelMixin):
         return licenses.LICENSES_BY_ID.get(self.license_id)
 
 
-class UploadQuerySet(models.QuerySet):
+class UploadQuerySet(common_models.NullsLastQuerySet):
     def playable_by(self, actor, include=True):
         libraries = Library.objects.viewable_by(actor)
 
@@ -745,6 +745,18 @@ class Upload(models.Model):
     )
 
     objects = UploadQuerySet.as_manager()
+
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
 
     def download_audio_from_remote(self, actor):
         from funkwhale_api.common import session

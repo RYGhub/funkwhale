@@ -43,6 +43,10 @@ import AdminLibraryAlbumsList from '@/views/admin/library/AlbumsList'
 import AdminLibraryAlbumDetail from '@/views/admin/library/AlbumDetail'
 import AdminLibraryTracksList from '@/views/admin/library/TracksList'
 import AdminLibraryTrackDetail from '@/views/admin/library/TrackDetail'
+import AdminLibraryLibrariesList from '@/views/admin/library/LibrariesList'
+import AdminLibraryLibraryDetail from '@/views/admin/library/LibraryDetail'
+import AdminLibraryUploadsList from '@/views/admin/library/UploadsList'
+import AdminLibraryUploadDetail from '@/views/admin/library/UploadDetail'
 import AdminUsersBase from '@/views/admin/users/Base'
 import AdminUsersList from '@/views/admin/users/UsersList'
 import AdminInvitationsList from '@/views/admin/users/InvitationsList'
@@ -301,6 +305,38 @@ export default new Router({
           path: 'tracks/:id',
           name: 'manage.library.tracks.detail',
           component: AdminLibraryTrackDetail,
+          props: true
+        },
+        {
+          path: 'libraries',
+          name: 'manage.library.libraries',
+          component: AdminLibraryLibrariesList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
+        },
+        {
+          path: 'libraries/:id',
+          name: 'manage.library.libraries.detail',
+          component: AdminLibraryLibraryDetail,
+          props: true
+        },
+        {
+          path: 'uploads',
+          name: 'manage.library.uploads',
+          component: AdminLibraryUploadsList,
+          props: (route) => {
+            return {
+              defaultQuery: route.query.q,
+            }
+          }
+        },
+        {
+          path: 'uploads/:id',
+          name: 'manage.library.uploads.detail',
+          component: AdminLibraryUploadDetail,
           props: true
         },
       ]
