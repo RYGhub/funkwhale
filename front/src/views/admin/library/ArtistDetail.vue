@@ -102,22 +102,14 @@
                       {{ object.name }}
                     </td>
                   </tr>
-                  <tr>
-                    <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
-                    </td>
-                    <td>
-                      <human-date :date="object.creation_date"></human-date>
-                    </td>
-                  </tr>
                   <tr v-if="!object.is_local">
                     <td>
-                      <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
+                      <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
+                        <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
+                      </router-link>
                     </td>
                     <td>
-                      <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: object.domain }}">
-                        {{ object.domain }}
-                      </router-link>
+                      {{ object.domain }}
                     </td>
                   </tr>
                 </tbody>
@@ -142,6 +134,14 @@
               </div>
               <table v-else class="ui very basic table">
                 <tbody>
+                  <tr>
+                    <td>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
+                    </td>
+                    <td>
+                      <human-date :date="object.creation_date"></human-date>
+                    </td>
+                  </tr>
                   <tr>
                     <td>
                       <translate translate-context="*/*/*/Noun">Listenings</translate>
@@ -218,7 +218,9 @@
 
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('artist_id', object.id) }}">
+                        <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -226,7 +228,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('artist_id', object.id) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.uploads }}

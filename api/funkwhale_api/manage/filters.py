@@ -1,4 +1,8 @@
 from django import forms
+from django.db.models import Q
+from django.conf import settings
+
+import django_filters
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
@@ -11,19 +15,32 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 
 
-class ManageUploadFilterSet(filters.FilterSet):
-    q = fields.SearchFilter(
-        search_fields=[
-            "track__title",
-            "track__album__title",
-            "track__artist__name",
-            "source",
-        ]
-    )
+class ActorField(forms.CharField):
+    def clean(self, value):
+        value = super().clean(value)
+        if not value:
+            return value
 
-    class Meta:
-        model = music_models.Upload
-        fields = ["q", "track__album", "track__artist", "track"]
+        parts = value.split("@")
+
+        return {
+            "username": parts[0],
+            "domain": parts[1] if len(parts) > 1 else settings.FEDERATION_HOSTNAME,
+        }
+
+
+def get_actor_filter(actor_field):
+    def handler(v):
+        if not v:
+            return Q(**{actor_field: None})
+        return Q(
+            **{
+                "{}__preferred_username__iexact".format(actor_field): v["username"],
+                "{}__domain__name__iexact".format(actor_field): v["domain"],
+            }
+        )
+
+    return {"field": ActorField(), "handler": handler}
 
 
 class ManageArtistFilterSet(filters.FilterSet):
@@ -37,7 +54,11 @@ class ManageArtistFilterSet(filters.FilterSet):
             filter_fields={
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
-                }
+                },
+                "library_id": {
+                    "to": "tracks__uploads__library_id",
+                    "field": forms.IntegerField(),
+                },
             },
         )
     )
@@ -60,6 +81,10 @@ class ManageAlbumFilterSet(filters.FilterSet):
                 "artist_id": {"to": "artist_id", "field": forms.IntegerField()},
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
+                },
+                "library_id": {
+                    "to": "tracks__uploads__library_id",
+                    "field": forms.IntegerField(),
                 },
             },
         )
@@ -93,6 +118,10 @@ class ManageTrackFilterSet(filters.FilterSet):
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
                 },
+                "library_id": {
+                    "to": "uploads__library_id",
+                    "field": forms.IntegerField(),
+                },
             },
         )
     )
@@ -100,6 +129,96 @@ class ManageTrackFilterSet(filters.FilterSet):
     class Meta:
         model = music_models.Track
         fields = ["q", "title", "mbid", "fid", "artist", "album", "license"]
+
+
+class ManageLibraryFilterSet(filters.FilterSet):
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ("creation_date", "creation_date"),
+            ("_uploads_count", "uploads_count"),
+            ("followers_count", "followers_count"),
+        )
+    )
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "name": {"to": "name"},
+                "description": {"to": "description"},
+                "fid": {"to": "fid"},
+            },
+            filter_fields={
+                "artist_id": {
+                    "to": "uploads__track__artist_id",
+                    "field": forms.IntegerField(),
+                },
+                "album_id": {
+                    "to": "uploads__track__album_id",
+                    "field": forms.IntegerField(),
+                },
+                "track_id": {"to": "uploads__track__id", "field": forms.IntegerField()},
+                "domain": {"to": "actor__domain_id"},
+                "account": get_actor_filter("actor"),
+                "privacy_level": {"to": "privacy_level"},
+            },
+        )
+    )
+    domain = filters.CharFilter("actor__domain_id")
+
+    class Meta:
+        model = music_models.Library
+        fields = ["q", "name", "fid", "privacy_level", "domain"]
+
+
+class ManageUploadFilterSet(filters.FilterSet):
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ("creation_date", "creation_date"),
+            ("modification_date", "modification_date"),
+            ("accessed_date", "accessed_date"),
+            ("size", "size"),
+            ("bitrate", "bitrate"),
+            ("duration", "duration"),
+        )
+    )
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "source": {"to": "source"},
+                "fid": {"to": "fid"},
+                "track": {"to": "track__title"},
+                "album": {"to": "track__album__title"},
+                "artist": {"to": "track__artist__name"},
+            },
+            filter_fields={
+                "library_id": {"to": "library_id", "field": forms.IntegerField()},
+                "artist_id": {"to": "track__artist_id", "field": forms.IntegerField()},
+                "album_id": {"to": "track__album_id", "field": forms.IntegerField()},
+                "track_id": {"to": "track__id", "field": forms.IntegerField()},
+                "domain": {"to": "library__actor__domain_id"},
+                "import_reference": {"to": "import_reference"},
+                "type": {"to": "mimetype"},
+                "status": {"to": "import_status"},
+                "account": get_actor_filter("library__actor"),
+                "privacy_level": {"to": "library__privacy_level"},
+            },
+        )
+    )
+    domain = filters.CharFilter("library__actor__domain_id")
+    privacy_level = filters.CharFilter("library__privacy_level")
+
+    class Meta:
+        model = music_models.Upload
+        fields = [
+            "q",
+            "fid",
+            "privacy_level",
+            "domain",
+            "mimetype",
+            "import_reference",
+            "import_status",
+        ]
 
 
 class ManageDomainFilterSet(filters.FilterSet):

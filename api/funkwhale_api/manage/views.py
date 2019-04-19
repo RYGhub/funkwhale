@@ -19,38 +19,6 @@ from funkwhale_api.users import models as users_models
 from . import filters, serializers
 
 
-class ManageUploadViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
-    queryset = (
-        music_models.Upload.objects.all()
-        .select_related("track__artist", "track__album__artist")
-        .order_by("-id")
-    )
-    serializer_class = serializers.ManageUploadSerializer
-    filterset_class = filters.ManageUploadFilterSet
-    required_scope = "instance:libraries"
-    ordering_fields = [
-        "accessed_date",
-        "modification_date",
-        "creation_date",
-        "track__artist__name",
-        "bitrate",
-        "size",
-        "duration",
-    ]
-
-    @rest_decorators.action(methods=["post"], detail=False)
-    def action(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = serializers.ManageUploadActionSerializer(
-            request.data, queryset=queryset
-        )
-        serializer.is_valid(raise_exception=True)
-        result = serializer.save()
-        return response.Response(result, status=200)
-
-
 def get_stats(tracks, target):
     data = {}
     tracks = list(tracks.values_list("pk", flat=True))
@@ -70,6 +38,12 @@ def get_stats(tracks, target):
     ).count()
     data["libraries"] = uploads.values_list("library", flat=True).distinct().count()
     data["uploads"] = uploads.count()
+    data.update(get_media_stats(uploads))
+    return data
+
+
+def get_media_stats(uploads):
+    data = {}
     data["media_total_size"] = uploads.aggregate(v=Sum("size"))["v"] or 0
     data["media_downloaded_size"] = (
         uploads.with_file().aggregate(v=Sum("size"))["v"] or 0
@@ -85,6 +59,7 @@ class ManageArtistViewSet(
 ):
     queryset = (
         music_models.Artist.objects.all()
+        .distinct()
         .order_by("-id")
         .select_related("attributed_to")
         .prefetch_related(
@@ -130,6 +105,7 @@ class ManageAlbumViewSet(
 ):
     queryset = (
         music_models.Album.objects.all()
+        .distinct()
         .order_by("-id")
         .select_related("attributed_to", "artist")
         .prefetch_related("tracks")
@@ -164,6 +140,7 @@ class ManageTrackViewSet(
 ):
     queryset = (
         music_models.Track.objects.all()
+        .distinct()
         .order_by("-id")
         .select_related("attributed_to", "artist", "album__artist")
         .annotate(uploads_count=Count("uploads"))
@@ -184,6 +161,96 @@ class ManageTrackViewSet(
         track = self.get_object()
         data = get_stats(track.__class__.objects.filter(pk=track.pk), track)
         return response.Response(data, status=200)
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageTrackActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)
+
+
+class ManageLibraryViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        music_models.Library.objects.all()
+        .distinct()
+        .order_by("-id")
+        .select_related("actor")
+        .annotate(
+            followers_count=Count("received_follows", distinct=True),
+            _uploads_count=Count("uploads", distinct=True),
+        )
+    )
+    serializer_class = serializers.ManageLibrarySerializer
+    filterset_class = filters.ManageLibraryFilterSet
+    required_scope = "instance:libraries"
+
+    @rest_decorators.action(methods=["get"], detail=True)
+    def stats(self, request, *args, **kwargs):
+        library = self.get_object()
+        uploads = library.uploads.all()
+        tracks = uploads.values_list("track", flat=True).distinct()
+        albums = (
+            music_models.Track.objects.filter(pk__in=tracks)
+            .values_list("album", flat=True)
+            .distinct()
+        )
+        artists = set(
+            music_models.Album.objects.filter(pk__in=albums).values_list(
+                "artist", flat=True
+            )
+        ) | set(
+            music_models.Track.objects.filter(pk__in=tracks).values_list(
+                "artist", flat=True
+            )
+        )
+
+        data = {
+            "uploads": uploads.count(),
+            "followers": library.received_follows.count(),
+            "tracks": tracks.count(),
+            "albums": albums.count(),
+            "artists": len(artists),
+        }
+        data.update(get_media_stats(uploads.all()))
+        return response.Response(data, status=200)
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageTrackActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)
+
+
+class ManageUploadViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        music_models.Upload.objects.all()
+        .distinct()
+        .order_by("-id")
+        .select_related("library__actor", "track__artist", "track__album__artist")
+    )
+    serializer_class = serializers.ManageUploadSerializer
+    filterset_class = filters.ManageUploadFilterSet
+    required_scope = "instance:libraries"
 
     @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):

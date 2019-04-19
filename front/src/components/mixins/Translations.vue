@@ -11,12 +11,39 @@ export default {
               me: this.$pgettext('Content/Settings/Dropdown', 'Nobody except me'),
               instance: this.$pgettext('Content/Settings/Dropdown', 'Everyone on this instance'),
               everyone: this.$pgettext('Content/Settings/Dropdown', 'Everyone, across all instances'),
+            },
+            shortChoices: {
+              me: this.$pgettext('Content/Settings/Dropdown/Short', 'Private'),
+              instance: this.$pgettext('Content/Settings/Dropdown/Short', 'Instance'),
+              everyone: this.$pgettext('Content/Settings/Dropdown/Short', 'Everyone'),
             }
-          }
+          },
+          import_status: {
+            detailTitle: this.$pgettext('Content/Library/Link.Title', 'Click to display more information about the import process for this upload'),
+            choices: {
+              skipped: {
+                label: this.$pgettext('Content/Library/*', 'Skipped'),
+                help: this.$pgettext('Content/Library/Help text', 'This track is already present in one of your libraries'),
+              },
+              pending: {
+                label: this.$pgettext('Content/Library/*/Short', 'Pending'),
+                help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn\'t been processed by the server yet'),
+              },
+              errored: {
+                label: this.$pgettext('Content/Library/Table/Short', 'Errored'),
+                help: this.$pgettext('Content/Library/Help text', 'This track could not be processed, please it is tagged correctly'),
+              },
+              finished: {
+                label: this.$pgettext('Content/Library/*', 'Finished'),
+                help: this.$pgettext('Content/Library/Help text', 'Imported'),
+              },
+            }
+          },
         },
         filters: {
           creation_date: this.$pgettext('Content/*/*/Noun', 'Creation date'),
           release_date: this.$pgettext('Content/*/*/Noun', 'Release date'),
+          accessed_date: this.$pgettext('Content/*/*/Noun', 'Accessed date'),
           first_seen: this.$pgettext('Content/Moderation/Dropdown/Noun', 'First seen date'),
           last_seen: this.$pgettext('Content/Moderation/Dropdown/Noun', 'Last seen date'),
           modification_date: this.$pgettext('Content/Playlist/Dropdown/Noun', 'Modification date'),

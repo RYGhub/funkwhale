@@ -1,4 +1,5 @@
 import tempfile
+import urllib.parse
 import uuid
 
 from django.conf import settings
@@ -42,6 +43,18 @@ class FederationMixin(models.Model):
 
     class Meta:
         abstract = True
+
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
 
 
 class ActorQuerySet(models.QuerySet):

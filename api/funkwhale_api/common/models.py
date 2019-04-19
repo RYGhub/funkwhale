@@ -5,9 +5,10 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models, transaction
+from django.db import connections, models, transaction
 from django.db.models import Lookup
 from django.db.models.fields import Field
+from django.db.models.sql.compiler import SQLCompiler
 from django.utils import timezone
 from django.urls import reverse
 
@@ -23,6 +24,41 @@ class NotEqual(Lookup):
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
         return "%s <> %s" % (lhs, rhs), params
+
+
+class NullsLastSQLCompiler(SQLCompiler):
+    def get_order_by(self):
+        result = super().get_order_by()
+        if result and self.connection.vendor == "postgresql":
+            return [
+                (
+                    expr,
+                    (
+                        sql + " NULLS LAST" if not sql.endswith(" NULLS LAST") else sql,
+                        params,
+                        is_ref,
+                    ),
+                )
+                for (expr, (sql, params, is_ref)) in result
+            ]
+        return result
+
+
+class NullsLastQuery(models.sql.query.Query):
+    """Use a custom compiler to inject 'NULLS LAST' (for PostgreSQL)."""
+
+    def get_compiler(self, using=None, connection=None):
+        if using is None and connection is None:
+            raise ValueError("Need either using or connection")
+        if using:
+            connection = connections[using]
+        return NullsLastSQLCompiler(self, connection, using)
+
+
+class NullsLastQuerySet(models.QuerySet):
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        super().__init__(model, query, using, hints)
+        self.query = query or NullsLastQuery(self.model)
 
 
 class LocalFromFidQuerySet:

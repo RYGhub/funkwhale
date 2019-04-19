@@ -7,10 +7,11 @@ federation_router = routers.SimpleRouter()
 federation_router.register(r"domains", views.ManageDomainViewSet, "domains")
 
 library_router = routers.SimpleRouter()
-library_router.register(r"uploads", views.ManageUploadViewSet, "uploads")
-library_router.register(r"artists", views.ManageArtistViewSet, "artists")
 library_router.register(r"albums", views.ManageAlbumViewSet, "albums")
+library_router.register(r"artists", views.ManageArtistViewSet, "artists")
+library_router.register(r"libraries", views.ManageLibraryViewSet, "libraries")
 library_router.register(r"tracks", views.ManageTrackViewSet, "tracks")
+library_router.register(r"uploads", views.ManageUploadViewSet, "uploads")
 
 moderation_router = routers.SimpleRouter()
 moderation_router.register(

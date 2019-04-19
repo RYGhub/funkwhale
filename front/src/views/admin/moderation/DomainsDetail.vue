@@ -76,14 +76,6 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
-                    </td>
-                    <td>
-                      <human-date :date="object.creation_date"></human-date>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
                       <translate translate-context="Content/*/Table.Label">Last checked</translate>
                     </td>
                     <td>
@@ -155,6 +147,14 @@
               </div>
               <table v-else class="ui very basic table">
                 <tbody>
+                  <tr>
+                    <td>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
+                    </td>
+                    <td>
+                      <human-date :date="object.creation_date"></human-date>
+                    </td>
+                  </tr>
                   <tr>
                     <td>
                       <router-link
@@ -231,7 +231,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -239,7 +241,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.uploads }}
@@ -247,7 +251,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Artists</translate>
+                      <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Artists</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.artists }}
@@ -255,7 +261,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*">Albums</translate>
+                      <router-link :to="{name: 'manage.library.albums', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*">Albums</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.albums}}
@@ -263,7 +271,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Tracks</translate>
+                      <router-link :to="{name: 'manage.library.tracks', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Tracks</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -350,6 +360,9 @@ export default {
     updatePolicy (policy) {
       this.policy = policy
       this.showPolicyForm = false
+    },
+    getQuery (field, value) {
+      return `${field}:"${value}"`
     }
   },
   computed: {
