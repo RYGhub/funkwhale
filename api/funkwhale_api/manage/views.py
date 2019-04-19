@@ -255,7 +255,7 @@ class ManageUploadViewSet(
     @rest_decorators.action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = serializers.ManageTrackActionSerializer(
+        serializer = serializers.ManageUploadActionSerializer(
             request.data, queryset=queryset
         )
         serializer.is_valid(raise_exception=True)
