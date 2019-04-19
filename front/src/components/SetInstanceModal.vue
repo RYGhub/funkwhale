@@ -43,6 +43,7 @@
 <script>
 import Modal from '@/components/semantic/Modal'
 import axios from 'axios'
+import _ from "@/lodash"
 
 export default {
   props: ['show'],
