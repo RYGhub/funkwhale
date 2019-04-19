@@ -1,7 +1,8 @@
 from rest_framework import mixins, response, viewsets
 from rest_framework import decorators as rest_decorators
 
-from django.db.models import Count, Prefetch, Q, Sum
+from django.db.models import Count, Prefetch, Q, Sum, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import models as common_models
@@ -59,7 +60,6 @@ class ManageArtistViewSet(
 ):
     queryset = (
         music_models.Artist.objects.all()
-        .distinct()
         .order_by("-id")
         .select_related("attributed_to")
         .prefetch_related(
@@ -105,7 +105,6 @@ class ManageAlbumViewSet(
 ):
     queryset = (
         music_models.Album.objects.all()
-        .distinct()
         .order_by("-id")
         .select_related("attributed_to", "artist")
         .prefetch_related("tracks")
@@ -132,6 +131,15 @@ class ManageAlbumViewSet(
         return response.Response(result, status=200)
 
 
+uploads_subquery = (
+    music_models.Upload.objects.filter(track_id=OuterRef("pk"))
+    .order_by()
+    .values("track_id")
+    .annotate(track_count=Count("track_id"))
+    .values("track_count")
+)
+
+
 class ManageTrackViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -140,10 +148,9 @@ class ManageTrackViewSet(
 ):
     queryset = (
         music_models.Track.objects.all()
-        .distinct()
         .order_by("-id")
         .select_related("attributed_to", "artist", "album__artist")
-        .annotate(uploads_count=Count("uploads"))
+        .annotate(uploads_count=Coalesce(Subquery(uploads_subquery), 0))
     )
     serializer_class = serializers.ManageTrackSerializer
     filterset_class = filters.ManageTrackFilterSet
@@ -173,6 +180,23 @@ class ManageTrackViewSet(
         return response.Response(result, status=200)
 
 
+uploads_subquery = (
+    music_models.Upload.objects.filter(library_id=OuterRef("pk"))
+    .order_by()
+    .values("library_id")
+    .annotate(library_count=Count("library_id"))
+    .values("library_count")
+)
+
+follows_subquery = (
+    federation_models.LibraryFollow.objects.filter(target_id=OuterRef("pk"))
+    .order_by()
+    .values("target_id")
+    .annotate(library_count=Count("target_id"))
+    .values("library_count")
+)
+
+
 class ManageLibraryViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -182,12 +206,11 @@ class ManageLibraryViewSet(
     lookup_field = "uuid"
     queryset = (
         music_models.Library.objects.all()
-        .distinct()
         .order_by("-id")
         .select_related("actor")
         .annotate(
-            followers_count=Count("received_follows", distinct=True),
-            _uploads_count=Count("uploads", distinct=True),
+            followers_count=Coalesce(Subquery(follows_subquery), 0),
+            _uploads_count=Coalesce(Subquery(uploads_subquery), 0),
         )
     )
     serializer_class = serializers.ManageLibrarySerializer
@@ -244,7 +267,6 @@ class ManageUploadViewSet(
     lookup_field = "uuid"
     queryset = (
         music_models.Upload.objects.all()
-        .distinct()
         .order_by("-id")
         .select_related("library__actor", "track__artist", "track__album__artist")
     )
