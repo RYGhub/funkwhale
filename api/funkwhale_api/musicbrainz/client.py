@@ -40,10 +40,6 @@ class API(object):
             _api.get_recording_by_id, max_age=settings.MUSICBRAINZ_CACHE_DURATION
         )
 
-    class works(object):
-        search = memo(_api.search_works, max_age=settings.MUSICBRAINZ_CACHE_DURATION)
-        get = memo(_api.get_work_by_id, max_age=settings.MUSICBRAINZ_CACHE_DURATION)
-
     class releases(object):
         search = memo(_api.search_releases, max_age=settings.MUSICBRAINZ_CACHE_DURATION)
         get = memo(_api.get_release_by_id, max_age=settings.MUSICBRAINZ_CACHE_DURATION)

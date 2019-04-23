@@ -6,7 +6,6 @@ import tempfile
 import urllib.parse
 import uuid
 
-import markdown
 import pendulum
 import pydub
 from django.conf import settings
@@ -379,77 +378,6 @@ def import_album(v):
     return a
 
 
-def link_recordings(instance, cleaned_data, raw_data):
-    tracks = [r["target"] for r in raw_data["recording-relation-list"]]
-    Track.objects.filter(mbid__in=tracks).update(work=instance)
-
-
-def import_lyrics(instance, cleaned_data, raw_data):
-    try:
-        url = [
-            url_data
-            for url_data in raw_data["url-relation-list"]
-            if url_data["type"] == "lyrics"
-        ][0]["target"]
-    except (IndexError, KeyError):
-        return
-    l, _ = Lyrics.objects.get_or_create(work=instance, url=url)
-
-    return l
-
-
-class Work(APIModelMixin):
-    language = models.CharField(max_length=20)
-    nature = models.CharField(max_length=50)
-    title = models.CharField(max_length=255)
-
-    api = musicbrainz.api.works
-    api_includes = ["url-rels", "recording-rels"]
-    musicbrainz_model = "work"
-    federation_namespace = "works"
-
-    musicbrainz_mapping = {
-        "mbid": {"musicbrainz_field_name": "id"},
-        "title": {"musicbrainz_field_name": "title"},
-        "language": {"musicbrainz_field_name": "language"},
-        "nature": {"musicbrainz_field_name": "type", "converter": lambda v: v.lower()},
-    }
-    import_hooks = [import_lyrics, link_recordings]
-
-    def fetch_lyrics(self):
-        lyric = self.lyrics.first()
-        if lyric:
-            return lyric
-        data = self.api.get(self.mbid, includes=["url-rels"])["work"]
-        lyric = import_lyrics(self, {}, data)
-
-        return lyric
-
-    def get_federation_id(self):
-        if self.fid:
-            return self.fid
-
-        return None
-
-
-class Lyrics(models.Model):
-    uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
-    work = models.ForeignKey(
-        Work, related_name="lyrics", null=True, blank=True, on_delete=models.CASCADE
-    )
-    url = models.URLField(unique=True)
-    content = models.TextField(null=True, blank=True)
-
-    @property
-    def content_rendered(self):
-        return markdown.markdown(
-            self.content,
-            safe_mode=True,
-            enable_attributes=False,
-            extensions=["markdown.extensions.nl2br"],
-        )
-
-
 class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
         return self.select_related().select_related("album__artist", "artist")
@@ -499,9 +427,6 @@ class Track(APIModelMixin):
     album = models.ForeignKey(
         Album, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
     )
-    work = models.ForeignKey(
-        Work, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
-    )
     license = models.ForeignKey(
         License,
         null=True,
@@ -523,7 +448,7 @@ class Track(APIModelMixin):
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
-    api_includes = ["artist-credits", "releases", "media", "tags", "work-rels"]
+    api_includes = ["artist-credits", "releases", "media", "tags"]
     musicbrainz_mapping = {
         "mbid": {"musicbrainz_field_name": "id"},
         "title": {"musicbrainz_field_name": "title"},
@@ -551,20 +476,6 @@ class Track(APIModelMixin):
         except Artist.DoesNotExist:
             self.artist = self.album.artist
         super().save(**kwargs)
-
-    def get_work(self):
-        if self.work:
-            return self.work
-        data = self.api.get(self.mbid, includes=["work-rels"])
-        try:
-            work_data = data["recording"]["work-relation-list"][0]["work"]
-        except (IndexError, KeyError):
-            return
-        work, _ = Work.get_or_create_from_api(mbid=work_data["id"])
-        return work
-
-    def get_lyrics_url(self):
-        return reverse("api:v1:tracks-lyrics", kwargs={"pk": self.pk})
 
     @property
     def full_name(self):

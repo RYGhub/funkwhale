@@ -219,31 +219,6 @@ class TrackViewSet(
         )
         return queryset
 
-    @action(methods=["get"], detail=True)
-    @transaction.non_atomic_requests
-    def lyrics(self, request, *args, **kwargs):
-        try:
-            track = models.Track.objects.get(pk=kwargs["pk"])
-        except models.Track.DoesNotExist:
-            return Response(status=404)
-
-        work = track.work
-        if not work:
-            work = track.get_work()
-
-        if not work:
-            return Response({"error": "unavailable work "}, status=404)
-
-        lyrics = work.fetch_lyrics()
-        try:
-            if not lyrics.content:
-                tasks.fetch_content(lyrics_id=lyrics.pk)
-                lyrics.refresh_from_db()
-        except AttributeError:
-            return Response({"error": "unavailable lyrics"}, status=404)
-        serializer = serializers.LyricsSerializer(lyrics)
-        return Response(serializer.data)
-
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
     )

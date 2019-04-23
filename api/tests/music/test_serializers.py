@@ -198,7 +198,6 @@ def test_track_serializer(factories, to_api_date):
         "disc_number": track.disc_number,
         "uploads": [serializers.TrackUploadSerializer(upload).data],
         "creation_date": to_api_date(track.creation_date),
-        "lyrics": track.get_lyrics_url(),
         "listen_url": track.listen_url,
         "license": upload.track.license.code,
         "copyright": upload.track.copyright,
