@@ -19,14 +19,18 @@
           :track="track"
           :artist="artist"
           :key="index + '-' + track.id"
-          v-for="(track, index) in tracks"></track-row>
+          v-for="(track, index) in allTracks"></track-row>
       </tbody>
     </table>
+    <button :class="['ui', {loading: isLoadingMore}, 'button']" v-if="loadMoreUrl" @click="loadMore(loadMoreUrl)">
+      <translate translate-context="Content/*/Button.Label">Load more…</translate>
+    </button>
   </div>
 </template>
 
 <script>
 import backend from '@/audio/backend'
+import axios from 'axios'
 
 import TrackRow from '@/components/audio/track/Row'
 import Modal from '@/components/semantic/Modal'
@@ -35,6 +39,7 @@ export default {
   props: {
     tracks: {type: Array, required: true},
     playable: {type: Boolean, required: false, default: false},
+    nextUrl: {type: String, required: false, default: null},
     artist: {type: Object, required: false},
     displayPosition: {type: Boolean, default: false}
   },
@@ -44,7 +49,29 @@ export default {
   },
   data () {
     return {
-      backend: backend
+      backend: backend,
+      loadMoreUrl: this.nextUrl,
+      isLoadingMore: false,
+      additionalTracks: []
+    }
+  },
+  computed: {
+    allTracks () {
+      return this.tracks.concat(this.additionalTracks)
+    }
+  },
+  methods: {
+    loadMore (url) {
+      let self = this
+      self.isLoadingMore = true
+      axios.get(url).then((response) => {
+        self.additionalTracks = self.additionalTracks.concat(response.data.results)
+        self.loadMoreUrl = response.data.next
+        self.isLoadingMore = false
+      }, (error) => {
+        self.isLoadingMore = false
+
+      })
     }
   }
 }

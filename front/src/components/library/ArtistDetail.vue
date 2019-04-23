@@ -21,15 +21,19 @@
       <h2>
         <translate translate-context="Content/Artist/Title">Albums by this artist</translate>
       </h2>
-      <div class="ui cards" >
-        <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in albums"></album-card>
+      <div class="ui cards">
+        <album-card :mode="'rich'" :album="album" :key="album.id" v-for="album in allAlbums"></album-card>
       </div>
+      <div class="ui hidden divider"></div>
+      <button :class="['ui', {loading: isLoadingMoreAlbums}, 'button']" v-if="nextAlbumsUrl && loadMoreAlbumsUrl" @click="loadMoreAlbums(loadMoreAlbumsUrl)">
+        <translate translate-context="Content/*/Button.Label">Load more…</translate>
+      </button>
     </section>
     <section v-if="tracks.length > 0" class="ui vertical stripe segment">
       <h2>
         <translate translate-context="Content/Artist/Title">Tracks by this artist</translate>
       </h2>
-      <track-table :display-position="true" :tracks="tracks"></track-table>
+      <track-table :display-position="true" :tracks="tracks" :next-url="nextTracksUrl"></track-table>
     </section>
     <section class="ui vertical stripe segment">
       <h2>
@@ -52,11 +56,18 @@ import TrackTable from "@/components/audio/track/Table"
 import LibraryWidget from "@/components/federation/LibraryWidget"
 
 export default {
-  props: ["object", "tracks", "albums", "isLoadingAlbums"],
+  props: ["object", "tracks", "albums", "isLoadingAlbums", "nextTracksUrl", "nextAlbumsUrl"],
   components: {
     AlbumCard,
     TrackTable,
     LibraryWidget,
+  },
+  data () {
+    return {
+      loadMoreAlbumsUrl: this.nextAlbumsUrl,
+      additionalAlbums: [],
+      isLoadingMoreAlbums: false
+    }
   },
   computed: {
     contentFilter () {
@@ -64,11 +75,23 @@ export default {
       return this.$store.getters['moderation/artistFilters']().filter((e) => {
         return e.target.id === this.object.id
       })[0]
+    },
+     allAlbums () {
+      return this.albums.concat(this.additionalAlbums)
     }
   },
-  watch: {
-    id() {
-      this.fetchData()
+  methods: {
+    loadMoreAlbums (url) {
+      let self = this
+      self.isLoadingMoreAlbums = true
+      axios.get(url).then((response) => {
+        self.additionalAlbums = self.additionalAlbums.concat(response.data.results)
+        self.loadMoreAlbumsUrl = response.data.next
+        self.isLoadingMoreAlbums = false
+      }, (error) => {
+        self.isLoadingMoreAlbums = false
+
+      })
     }
   }
 }
