@@ -838,7 +838,7 @@ class AlbumSerializer(MusicEntitySerializer):
             d["cover"] = {
                 "type": "Link",
                 "href": utils.full_url(instance.cover.url),
-                "mediaType": mimetypes.guess_type(instance.cover.path)[0]
+                "mediaType": mimetypes.guess_type(instance.cover_path)[0]
                 or "image/jpeg",
             }
         if self.context.get("include_ap_context", self.parent is None):
