@@ -39,22 +39,6 @@ class ImportJobAdmin(admin.ModelAdmin):
     list_filter = ["status"]
 
 
-@admin.register(models.Work)
-class WorkAdmin(admin.ModelAdmin):
-    list_display = ["title", "mbid", "language", "nature"]
-    list_select_related = True
-    search_fields = ["title"]
-    list_filter = ["language", "nature"]
-
-
-@admin.register(models.Lyrics)
-class LyricsAdmin(admin.ModelAdmin):
-    list_display = ["url", "id", "url"]
-    list_select_related = True
-    search_fields = ["url", "work__title"]
-    list_filter = ["work__language"]
-
-
 @admin.register(models.Upload)
 class UploadAdmin(admin.ModelAdmin):
     list_display = [

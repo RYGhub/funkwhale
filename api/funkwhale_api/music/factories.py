@@ -165,27 +165,6 @@ class UploadVersionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class WorkFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
-    mbid = factory.Faker("uuid4")
-    language = "eng"
-    nature = "song"
-    title = factory.Faker("sentence", nb_words=3)
-
-    class Meta:
-        model = "music.Work"
-
-
-@registry.register
-class LyricsFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
-    work = factory.SubFactory(WorkFactory)
-    url = factory.Faker("url")
-    content = factory.Faker("paragraphs", nb=4)
-
-    class Meta:
-        model = "music.Lyrics"
-
-
-@registry.register
 class TagFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.SelfAttribute("slug")
     slug = factory.Faker("slug")

@@ -190,7 +190,6 @@ class TrackUploadSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     album = TrackAlbumSerializer(read_only=True)
-    lyrics = serializers.SerializerMethodField()
     uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
 
@@ -206,16 +205,12 @@ class TrackSerializer(serializers.ModelSerializer):
             "creation_date",
             "position",
             "disc_number",
-            "lyrics",
             "uploads",
             "listen_url",
             "copyright",
             "license",
             "is_local",
         )
-
-    def get_lyrics(self, obj):
-        return obj.get_lyrics_url()
 
     def get_listen_url(self, obj):
         return obj.listen_url
@@ -375,12 +370,6 @@ class SimpleAlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Album
         fields = ("id", "mbid", "title", "release_date", "cover")
-
-
-class LyricsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Lyrics
-        fields = ("id", "work", "content", "content_rendered")
 
 
 class TrackActivitySerializer(activity_serializers.ModelSerializer):

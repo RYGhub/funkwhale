@@ -76,24 +76,6 @@
         </tbody>
       </table>
     </section>
-    <section class="ui vertical stripe center aligned segment">
-      <h2>
-        <translate translate-context="Content/Track/Title">Lyrics</translate>
-      </h2>
-      <div v-if="isLoadingLyrics" class="ui vertical segment">
-        <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
-      </div>
-      <div v-if="lyrics" v-html="lyrics.content_rendered"></div>
-      <template v-if="!isLoadingLyrics & !lyrics">
-        <p>
-          <translate translate-context="Content/Track/Paragraph">No lyrics available for this track.</translate>
-        </p>
-        <a class="ui button" target="_blank" :href="lyricsSearchUrl">
-          <i class="search icon"></i>
-          <translate translate-context="Content/Track/Link/Verb">Search on lyrics.wikia.com</translate>
-        </a>
-      </template>
-    </section>
     <section class="ui vertical stripe segment">
       <h2>
         <translate translate-context="Content/*/Title/Noun">User libraries</translate>
@@ -123,13 +105,10 @@ export default {
     return {
       time,
       id: this.track.id,
-      isLoadingLyrics: true,
-      lyrics: null,
       licenseData: null
     }
   },
   created() {
-    this.fetchLyrics()
     if (this.track && this.track.license) {
       this.fetchLicenseData(this.track.license)
     }
@@ -142,22 +121,6 @@ export default {
         self.licenseData = response.data
       })
     },
-    fetchLyrics() {
-      var self = this
-      this.isLoadingLyrics = true
-      let url = FETCH_URL + this.id + "/lyrics/"
-      logger.default.debug('Fetching lyrics for track "' + this.id + '"')
-      axios.get(url).then(
-        response => {
-          self.lyrics = response.data
-          self.isLoadingLyrics = false
-        },
-        response => {
-          console.error("No lyrics available")
-          self.isLoadingLyrics = false
-        }
-      )
-    }
   },
   computed: {
     labels() {
@@ -169,11 +132,6 @@ export default {
       if (this.track.uploads) {
         return this.track.uploads[0]
       }
-    },
-    lyricsSearchUrl() {
-      let base = "http://lyrics.wikia.com/wiki/Special:Search?query="
-      let query = this.track.artist.name + ":" + this.track.title
-      return base + encodeURI(query)
     },
     license() {
       if (!this.track || !this.track.license) {

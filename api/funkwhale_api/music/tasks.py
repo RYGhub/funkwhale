@@ -17,7 +17,6 @@ from funkwhale_api.federation import library as lb
 from funkwhale_api.taskapp import celery
 
 from . import licenses
-from . import lyrics as lyrics_utils
 from . import models
 from . import metadata
 from . import signals
@@ -68,16 +67,6 @@ def get_cover_from_fs(dir_path):
             with open(cover_path, "rb") as c:
                 logger.info("Found cover at %s", cover_path)
                 return {"mimetype": m, "content": c.read()}
-
-
-@celery.app.task(name="Lyrics.fetch_content")
-@celery.require_instance(models.Lyrics, "lyrics")
-def fetch_content(lyrics):
-    html = lyrics_utils._get_html(lyrics.url)
-    content = lyrics_utils.extract_content(html)
-    cleaned_content = lyrics_utils.clean_content(content)
-    lyrics.content = cleaned_content
-    lyrics.save(update_fields=["content"])
 
 
 @celery.app.task(name="music.start_library_scan")
