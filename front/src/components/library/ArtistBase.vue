@@ -3,7 +3,7 @@
     <div v-if="isLoading" class="ui vertical segment">
       <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
     </div>
-    <template v-if="object">
+    <template v-if="object && !isLoading">
       <section :class="['ui', 'head', {'with-background': cover}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="object.name">
         <div class="segment-content">
           <h2 class="ui center aligned icon header">
@@ -98,7 +98,15 @@
           </div>
         </div>
       </section>
-      <router-view v-if="object" :tracks="tracks" :albums="albums" :is-loading-albums="isLoadingAlbums" @libraries-loaded="libraries = $event" :object="object" object-type="artist" :key="$route.fullPath"></router-view>
+      <router-view
+        :tracks="tracks"
+        :next-tracks-url="nextTracksUrl"
+        :next-albums-url="nextAlbumsUrl"
+        :albums="albums"
+        :is-loading-albums="isLoadingAlbums"
+        @libraries-loaded="libraries = $event"
+        :object="object" object-type="artist"
+        :key="$route.fullPath"></router-view>
     </template>
   </main>
 </template>
@@ -132,38 +140,45 @@ export default {
       libraries: [],
       showEmbedModal: false,
       tracks: [],
+      nextAlbumsUrl: null,
+      nextTracksUrl: null,
+      totalAlbums: null,
+      totalTracks: null,
     }
   },
-  created() {
-    this.fetchData()
+  async created() {
+    await this.fetchData()
   },
   methods: {
-    fetchData() {
+    async fetchData() {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching artist "' + this.id + '"')
-      axios.get("tracks/", { params: { artist: this.id, hidden: '' } }).then(response => {
+      let trackPromise = axios.get("tracks/", { params: { artist: this.id, hidden: '' } }).then(response => {
         self.tracks = response.data.results
+        self.nextTracksUrl = response.data.next
         self.totalTracks = response.data.count
       })
-      axios.get("artists/" + this.id + "/").then(response => {
-        self.object = response.data
-        self.isLoading = false
-        self.isLoadingAlbums = true
-        axios
-          .get("albums/", {
-            params: { artist: self.id, ordering: "-release_date", hidden: '' }
-          })
-          .then(response => {
-            self.totalAlbums = response.data.count
-            let parsed = JSON.parse(JSON.stringify(response.data.results))
-            self.albums = parsed.map(album => {
-              return backend.Album.clean(album)
-            })
+      let albumPromise = axios.get("albums/", {
+        params: { artist: self.id, ordering: "-release_date", hidden: '' }
+      }).then(response => {
+        self.nextAlbumsUrl = response.data.next
+        self.totalAlbums = response.data.count
+        let parsed = JSON.parse(JSON.stringify(response.data.results))
+        self.albums = parsed.map(album => {
+          return backend.Album.clean(album)
+        })
 
-            self.isLoadingAlbums = false
-          })
       })
+
+      let artistPromise = axios.get("artists/" + this.id + "/").then(response => {
+        self.object = response.data
+      })
+      await trackPromise
+      await albumPromise
+      await artistPromise
+      self.isLoadingAlbums = false
+      self.isLoading = false
     }
   },
   computed: {
