@@ -1,6 +1,5 @@
 import re
 
-from django.conf import settings
 from django.core import validators
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +11,7 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
+from . import adapters
 from . import models
 
 
@@ -133,4 +133,4 @@ class MeSerializer(UserReadSerializer):
 
 class PasswordResetSerializer(PRS):
     def get_email_options(self):
-        return {"extra_email_context": {"funkwhale_url": settings.FUNKWHALE_URL}}
+        return {"extra_email_context": adapters.get_email_context()}
