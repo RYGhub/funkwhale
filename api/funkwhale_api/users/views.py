@@ -28,6 +28,7 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserWriteSerializer
     lookup_field = "username"
+    lookup_value_regex = r"[a-zA-Z0-9-_.]+"
     required_scope = "profile"
 
     @action(methods=["get"], detail=False)
