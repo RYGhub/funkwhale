@@ -18,13 +18,23 @@
           </ul>
         </div>
       </template>
+      <div v-else-if="status === 'confirmDuplicateAdd'" class="ui warning message">
+        <p translate-context="Content/Playlist/Paragraph"
+            v-translate="{playlist: playlist.name}">Some tracks in your queue are already in this playlist:</p>
+        <ul id="duplicateTrackList" class="ui relaxed divided list">
+          <li v-for="track in duplicateTrackAddInfo.tracks" class="ui item">{{ track }}</li>
+        </ul>
+        <button
+          class="ui small green button"
+          @click="insertMany(queueTracks, true)"><translate translate-context="*/Playlist/Button.Label/Verb">Add anyways</translate></button>
+      </div>
       <template v-else-if="status === 'saved'">
         <i class="green check icon"></i> <translate translate-context="Content/Playlist/Paragraph">Changes synced with server</translate>
       </template>
     </div>
     <div class="ui bottom attached segment">
       <div
-        @click="insertMany(queueTracks)"
+        @click="insertMany(queueTracks, false)"
         :disabled="queueTracks.length === 0"
         :class="['ui', {disabled: queueTracks.length === 0}, 'labeled', 'icon', 'button']"
         :title="labels.copyTitle">
@@ -91,17 +101,25 @@ export default {
     return {
       plts: this.playlistTracks,
       isLoading: false,
-      errors: []
+      errors: [],
+      duplicateTrackAddInfo: {},
+      showDuplicateTrackAddConfirmation: false
     }
   },
   methods: {
     success () {
       this.isLoading = false
       this.errors = []
+      this.showDuplicateTrackAddConfirmation = false
     },
     errored (errors) {
       this.isLoading = false
-      this.errors = errors
+      if (errors.length == 1 && errors[0].code == 'tracks_already_exist_in_playlist') {
+        this.duplicateTrackAddInfo = errors[0]
+        this.showDuplicateTrackAddConfirmation = true
+      } else {
+        this.errors = errors
+      }
     },
     reorder ({oldIndex, newIndex}) {
       let self = this
@@ -139,21 +157,31 @@ export default {
         self.errored(error.backendErrors)
       })
     },
-    insertMany (tracks) {
+    insertMany (tracks, allowDuplicates) {
       let self = this
       let ids = tracks.map(t => {
         return t.id
       })
+      let payload = {
+        tracks: ids,
+        allow_duplicates: allowDuplicates
+      }
       self.isLoading = true
       let url = 'playlists/' + this.playlist.id + '/add/'
-      axios.post(url, {tracks: ids}).then((response) => {
+      axios.post(url, payload).then((response) => {
         response.data.results.forEach(r => {
           self.plts.push(r)
         })
         self.success()
         self.$store.dispatch('playlists/fetchOwn')
       }, error => {
-        self.errored(error.backendErrors)
+        // if backendErrors isn't populated (e.g. duplicate track exceptions raised by
+        // the playlist model), read directly from the response
+        if (error.rawPayload.playlist) {
+          self.errored(error.rawPayload.playlist.non_field_errors)
+        } else {
+          self.errored(error.backendErrors)
+        }
       })
     }
   },
@@ -172,6 +200,9 @@ export default {
       }
       if (this.errors.length > 0) {
         return 'errored'
+      }
+      if (this.showDuplicateTrackAddConfirmation) {
+        return 'confirmDuplicateAdd'
       }
       return 'saved'
     }
@@ -192,4 +223,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#duplicateTrackList {
+  max-height: 10em;
+  overflow-y: auto;
+}
 </style>
