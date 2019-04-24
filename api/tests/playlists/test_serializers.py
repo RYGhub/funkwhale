@@ -24,7 +24,7 @@ def test_create_insert_is_called_when_index_is_None(factories, mocker):
     assert serializer.is_valid() is True
 
     plt = serializer.save()
-    insert.assert_called_once_with(playlist, plt, None)
+    insert.assert_called_once_with(playlist, plt, None, True)
     assert plt.index == 0
 
 
@@ -41,7 +41,7 @@ def test_create_insert_is_called_when_index_is_provided(factories, mocker):
 
     plt = serializer.save()
     first.refresh_from_db()
-    insert.assert_called_once_with(playlist, plt, 0)
+    insert.assert_called_once_with(playlist, plt, 0, True)
     assert plt.index == 0
     assert first.index == 1
 
@@ -60,9 +60,33 @@ def test_update_insert_is_called_when_index_is_provided(factories, mocker):
 
     plt = serializer.save()
     first.refresh_from_db()
-    insert.assert_called_once_with(playlist, plt, 0)
+    insert.assert_called_once_with(playlist, plt, 0, True)
     assert plt.index == 0
     assert first.index == 1
+
+
+def test_update_insert_is_called_with_duplicate_override_when_duplicates_allowed(
+    factories, mocker
+):
+    playlist = factories["playlists.Playlist"]()
+    plt = factories["playlists.PlaylistTrack"](playlist=playlist, index=0)
+    insert = mocker.spy(models.Playlist, "insert")
+    factories["playlists.Playlist"]()
+    factories["music.Track"]()
+
+    serializer = serializers.PlaylistTrackWriteSerializer(
+        plt,
+        data={
+            "playlist": playlist.pk,
+            "track": plt.track.pk,
+            "index": 0,
+            "allow_duplicates": True,
+        },
+    )
+    assert serializer.is_valid() is True
+    plt = serializer.save()
+
+    insert.assert_called_once_with(playlist, plt, 0, True)
 
 
 def test_playlist_serializer_include_covers(factories, api_request):

@@ -97,8 +97,11 @@ axios.interceptors.response.use(function (response) {
     if (error.response.data.detail) {
       error.backendErrors.push(error.response.data.detail)
     } else {
+      error.rawPayload = error.response.data
       for (var field in error.response.data) {
-        if (error.response.data.hasOwnProperty(field)) {
+        // some views (e.g. v1/playlists/{id}/add) have deeper nested data (e.g. data[field]
+        // is another object), so don't try to unpack non-array fields
+        if (error.response.data.hasOwnProperty(field) && error.response.data[field].forEach) {
           error.response.data[field].forEach(e => {
             error.backendErrors.push(e)
           })

@@ -124,6 +124,139 @@ def test_insert_many_honor_max_tracks(preferences, factories):
         playlist.insert_many([track, track, track])
 
 
+def test_can_insert_duplicate_by_default(factories):
+    playlist = factories["playlists.Playlist"]()
+    track = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=track)
+
+    new = factories["playlists.PlaylistTrack"](playlist=playlist, index=1, track=track)
+    playlist.insert(new)
+
+    new.refresh_from_db()
+    assert new.index == 1
+
+
+def test_cannot_insert_duplicate(factories):
+    playlist = factories["playlists.Playlist"](name="playlist")
+    track = factories["music.Track"]()
+
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=track)
+
+    with pytest.raises(exceptions.ValidationError) as e:
+        new = factories["playlists.PlaylistTrack"](
+            playlist=playlist, index=1, track=track
+        )
+        playlist.insert(new, allow_duplicates=False)
+
+    errors = e.value.detail["non_field_errors"]
+    assert len(errors) == 1
+
+    err = errors[0]
+    assert err["code"] == "tracks_already_exist_in_playlist"
+    assert err["playlist_name"] == "playlist"
+    assert err["tracks"] == [track.title]
+
+
+def test_can_insert_track_to_playlist_with_existing_duplicates(factories):
+    playlist = factories["playlists.Playlist"]()
+    existing_duplicate = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](
+        playlist=playlist, index=0, track=existing_duplicate
+    )
+    factories["playlists.PlaylistTrack"](
+        playlist=playlist, index=1, track=existing_duplicate
+    )
+    factories["playlists.PlaylistTrack"](
+        playlist=playlist, index=2, track=existing_duplicate
+    )
+
+    new_track = factories["music.Track"]()
+    new_plt = factories["playlists.PlaylistTrack"](
+        playlist=playlist, index=3, track=new_track
+    )
+
+    # no error
+    playlist.insert(new_plt, allow_duplicates=False)
+
+
+def test_can_insert_duplicate_with_override(factories):
+    playlist = factories["playlists.Playlist"]()
+    track = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=track)
+
+    new = factories["playlists.PlaylistTrack"](playlist=playlist, index=1, track=track)
+    playlist.insert(new, allow_duplicates=True)
+
+    new.refresh_from_db()
+    assert new.index == 1
+
+
+def test_can_insert_many_duplicates_by_default(factories):
+    playlist = factories["playlists.Playlist"]()
+
+    t1 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=t1)
+
+    t2 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=1, track=t2)
+
+    t4 = factories["music.Track"]()
+
+    tracks = [t1, t4, t2]
+
+    plts = playlist.insert_many(tracks)
+
+    assert len(plts) == 3
+    assert plts[0].track == t1
+    assert plts[1].track == t4
+    assert plts[2].track == t2
+
+
+def test_cannot_insert_many_duplicates(factories):
+    playlist = factories["playlists.Playlist"](name="playlist")
+
+    t1 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=t1)
+
+    t2 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=1, track=t2)
+
+    t4 = factories["music.Track"]()
+
+    with pytest.raises(exceptions.ValidationError) as e:
+        tracks = [t1, t4, t2]
+        playlist.insert_many(tracks, allow_duplicates=False)
+
+    errors = e.value.detail["non_field_errors"]
+    assert len(errors) == 1
+
+    err = errors[0]
+    assert err["code"] == "tracks_already_exist_in_playlist"
+    assert err["playlist_name"] == "playlist"
+    assert err["tracks"] == [t1.title, t2.title]
+
+
+def test_can_insert_many_duplicates_with_override(factories):
+    playlist = factories["playlists.Playlist"]()
+
+    t1 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=0, track=t1)
+
+    t2 = factories["music.Track"]()
+    factories["playlists.PlaylistTrack"](playlist=playlist, index=1, track=t2)
+
+    t4 = factories["music.Track"]()
+
+    tracks = [t1, t4, t2]
+
+    plts = playlist.insert_many(tracks, allow_duplicates=True)
+
+    assert len(plts) == 3
+    assert plts[0].track == t1
+    assert plts[1].track == t4
+    assert plts[2].track == t2
+
+
 @pytest.mark.parametrize(
     "privacy_level,expected", [("me", False), ("instance", False), ("everyone", True)]
 )

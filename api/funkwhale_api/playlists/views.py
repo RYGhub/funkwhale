@@ -55,7 +55,10 @@ class PlaylistViewSet(
         serializer = serializers.PlaylistAddManySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            plts = playlist.insert_many(serializer.validated_data["tracks"])
+            plts = playlist.insert_many(
+                serializer.validated_data["tracks"],
+                serializer.validated_data["allow_duplicates"],
+            )
         except exceptions.ValidationError as e:
             payload = {"playlist": e.detail}
             return Response(payload, status=400)
