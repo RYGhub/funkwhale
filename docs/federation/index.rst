@@ -585,7 +585,7 @@ Example
   {
     "type": "Library",
     "id": "https://awesome.music/federation/music/libraries/dc702491-f6ce-441b-9da0-cecbed08bcc6",
-    "actor": "https://awesome.music/federation/actors/MyNameIsTroll",
+    "attributedTo": "https://awesome.music/federation/actors/Alice",
     "name": "My awesome library",
     "followers": "https://awesome.music/federation/music/libraries/dc702491-f6ce-441b-9da0-cecbed08bcc6/followers",
     "summary": "This library is for restricted use only",

@@ -334,6 +334,7 @@ def test_paginated_collection_serializer(factories):
         "type": "Collection",
         "id": conf["id"],
         "actor": actor.fid,
+        "attributedTo": actor.fid,
         "totalItems": len(uploads),
         "current": conf["id"] + "?page=1",
         "last": conf["id"] + "?page=3",
@@ -352,6 +353,7 @@ def test_paginated_collection_serializer_validation():
         "id": "https://test.federation/test",
         "totalItems": 5,
         "actor": "http://test.actor",
+        "attributedTo": "http://test.actor",
         "first": "https://test.federation/test?page=1",
         "last": "https://test.federation/test?page=1",
         "items": [],
@@ -362,7 +364,7 @@ def test_paginated_collection_serializer_validation():
     assert serializer.is_valid(raise_exception=True) is True
     assert serializer.validated_data["totalItems"] == 5
     assert serializer.validated_data["id"] == data["id"]
-    assert serializer.validated_data["actor"] == data["actor"]
+    assert serializer.validated_data["attributedTo"] == data["actor"]
 
 
 def test_collection_page_serializer_validation():
@@ -373,6 +375,7 @@ def test_collection_page_serializer_validation():
         "id": base + "?page=2",
         "totalItems": 5,
         "actor": "https://test.actor",
+        "attributedTo": "https://test.actor",
         "items": [],
         "first": "https://test.federation/test?page=1",
         "last": "https://test.federation/test?page=3",
@@ -386,7 +389,7 @@ def test_collection_page_serializer_validation():
     assert serializer.is_valid(raise_exception=True) is True
     assert serializer.validated_data["totalItems"] == 5
     assert serializer.validated_data["id"] == data["id"]
-    assert serializer.validated_data["actor"] == data["actor"]
+    assert serializer.validated_data["attributedTo"] == data["actor"]
     assert serializer.validated_data["items"] == []
     assert serializer.validated_data["prev"] == data["prev"]
     assert serializer.validated_data["next"] == data["next"]
@@ -398,7 +401,7 @@ def test_collection_page_serializer_can_validate_child():
         "@context": jsonld.get_default_context(),
         "type": "CollectionPage",
         "id": "https://test.page?page=2",
-        "actor": "https://test.actor",
+        "attributedTo": "https://test.actor",
         "first": "https://test.page?page=1",
         "last": "https://test.page?page=3",
         "partOf": "https://test.page",
@@ -430,6 +433,7 @@ def test_collection_page_serializer(factories):
         "type": "CollectionPage",
         "id": conf["id"] + "?page=2",
         "actor": actor.fid,
+        "attributedTo": actor.fid,
         "totalItems": len(uploads),
         "partOf": conf["id"],
         "prev": conf["id"] + "?page=1",
@@ -464,6 +468,7 @@ def test_music_library_serializer_to_ap(factories):
         "name": library.name,
         "summary": library.description,
         "actor": library.actor.fid,
+        "attributedTo": library.actor.fid,
         "totalItems": 0,
         "current": library.fid + "?page=1",
         "last": library.fid + "?page=1",
@@ -487,7 +492,7 @@ def test_music_library_serializer_from_public(factories, mocker):
         "type": "Library",
         "id": "https://library.id",
         "followers": "https://library.id/followers",
-        "actor": actor.fid,
+        "attributedTo": actor.fid,
         "totalItems": 12,
         "first": "https://library.id?page=1",
         "last": "https://library.id?page=2",
@@ -527,7 +532,7 @@ def test_music_library_serializer_from_private(factories, mocker):
         "type": "Library",
         "id": "https://library.id",
         "followers": "https://library.id/followers",
-        "actor": actor.fid,
+        "attributedTo": actor.fid,
         "totalItems": 12,
         "first": "https://library.id?page=1",
         "last": "https://library.id?page=2",

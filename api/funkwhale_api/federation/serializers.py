@@ -556,6 +556,7 @@ def get_additional_fields(data):
 PAGINATED_COLLECTION_JSONLD_MAPPING = {
     "totalItems": jsonld.first_val(contexts.AS.totalItems),
     "actor": jsonld.first_id(contexts.AS.actor),
+    "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
     "first": jsonld.first_id(contexts.AS.first),
     "last": jsonld.first_id(contexts.AS.last),
     "partOf": jsonld.first_id(contexts.AS.partOf),
@@ -565,13 +566,26 @@ PAGINATED_COLLECTION_JSONLD_MAPPING = {
 class PaginatedCollectionSerializer(jsonld.JsonLdSerializer):
     type = serializers.ChoiceField(choices=[contexts.AS.Collection])
     totalItems = serializers.IntegerField(min_value=0)
-    actor = serializers.URLField(max_length=500)
+    actor = serializers.URLField(max_length=500, required=False)
+    attributedTo = serializers.URLField(max_length=500, required=False)
     id = serializers.URLField(max_length=500)
     first = serializers.URLField(max_length=500)
     last = serializers.URLField(max_length=500)
 
     class Meta:
         jsonld_mapping = PAGINATED_COLLECTION_JSONLD_MAPPING
+
+    def validate(self, validated_data):
+        d = super().validate(validated_data)
+        actor = d.get("actor")
+        attributed_to = d.get("attributedTo")
+        if not actor and not attributed_to:
+            raise serializers.ValidationError(
+                "You need to provide at least actor or attributedTo"
+            )
+
+        d["attributedTo"] = attributed_to or actor
+        return d
 
     def to_representation(self, conf):
         paginator = Paginator(conf["items"], conf.get("page_size", 20))
@@ -580,7 +594,9 @@ class PaginatedCollectionSerializer(jsonld.JsonLdSerializer):
         last = funkwhale_utils.set_query_parameter(conf["id"], page=paginator.num_pages)
         d = {
             "id": conf["id"],
+            # XXX Stable release: remove the obsolete actor field
             "actor": conf["actor"].fid,
+            "attributedTo": conf["actor"].fid,
             "totalItems": paginator.count,
             "type": conf.get("type", "Collection"),
             "current": current,
@@ -624,7 +640,9 @@ class LibrarySerializer(PaginatedCollectionSerializer):
             "name": library.name,
             "summary": library.description,
             "page_size": 100,
+            # XXX Stable release: remove the obsolete actor field
             "actor": library.actor,
+            "attributedTo": library.actor,
             "items": library.uploads.for_federation(),
             "type": "Library",
         }
@@ -637,7 +655,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
 
     def create(self, validated_data):
         actor = utils.retrieve_ap_object(
-            validated_data["actor"],
+            validated_data["attributedTo"],
             actor=self.context.get("fetch_actor"),
             queryset=models.Actor,
             serializer_class=ActorSerializer,
@@ -661,7 +679,8 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
     type = serializers.ChoiceField(choices=[contexts.AS.CollectionPage])
     totalItems = serializers.IntegerField(min_value=0)
     items = serializers.ListField()
-    actor = serializers.URLField(max_length=500)
+    actor = serializers.URLField(max_length=500, required=False)
+    attributedTo = serializers.URLField(max_length=500, required=False)
     id = serializers.URLField(max_length=500)
     first = serializers.URLField(max_length=500)
     last = serializers.URLField(max_length=500)
@@ -674,6 +693,7 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
             "totalItems": jsonld.first_val(contexts.AS.totalItems),
             "items": jsonld.raw(contexts.AS.items),
             "actor": jsonld.first_id(contexts.AS.actor),
+            "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
             "first": jsonld.first_id(contexts.AS.first),
             "last": jsonld.first_id(contexts.AS.last),
             "next": jsonld.first_id(contexts.AS.next),
@@ -706,7 +726,9 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
         d = {
             "id": id,
             "partOf": conf["id"],
+            # XXX Stable release: remove the obsolete actor field
             "actor": conf["actor"].fid,
+            "attributedTo": conf["actor"].fid,
             "totalItems": page.paginator.count,
             "type": "CollectionPage",
             "first": first,
