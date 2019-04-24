@@ -255,7 +255,7 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
     assert track.creation_date == metadata["fdate"]
     assert track.position == 4
     assert track.album.cover.read() == b"coucou"
-    assert track.album.cover.path.endswith(".png")
+    assert track.album.cover_path.endswith(".png")
     assert track.album.fid == metadata["album"]["fid"]
     assert track.album.title == metadata["album"]["title"]
     assert track.album.creation_date == metadata["album"]["fdate"]

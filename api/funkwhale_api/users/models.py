@@ -234,6 +234,16 @@ class User(AbstractUser):
     def full_username(self):
         return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
 
+    @property
+    def avatar_path(self):
+        if not self.avatar:
+            return None
+        try:
+            return self.avatar.path
+        except NotImplementedError:
+            # external storage
+            return self.avatar.name
+
 
 def generate_code(length=10):
     return "".join(

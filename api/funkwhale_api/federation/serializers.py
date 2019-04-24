@@ -129,7 +129,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             if instance.user.avatar:
                 ret["icon"] = {
                     "type": "Image",
-                    "mediaType": mimetypes.guess_type(instance.user.avatar.path)[0],
+                    "mediaType": mimetypes.guess_type(instance.user.avatar_path)[0],
                     "url": utils.full_url(instance.user.avatar.crop["400x400"].url),
                 }
         except ObjectDoesNotExist:

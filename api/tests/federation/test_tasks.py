@@ -26,10 +26,10 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     # local upload, should not be cleaned
     upload4 = factories["music.Upload"](library__actor__local=True, accessed_date=None)
 
-    path1 = upload1.audio_file.path
-    path2 = upload2.audio_file.path
-    path3 = upload3.audio_file.path
-    path4 = upload4.audio_file.path
+    path1 = upload1.audio_file_path
+    path2 = upload2.audio_file_path
+    path3 = upload3.audio_file_path
+    path4 = upload4.audio_file_path
 
     tasks.clean_music_cache()
 
@@ -66,7 +66,7 @@ def test_clean_federation_music_cache_orphaned(settings, preferences, factories)
     upload.refresh_from_db()
 
     assert bool(upload.audio_file) is True
-    assert os.path.exists(upload.audio_file.path) is True
+    assert os.path.exists(upload.audio_file_path) is True
     assert os.path.exists(remove_path) is False
 
 

@@ -402,7 +402,7 @@ def test_handle_serve_create_mp3_version(factories, now):
     assert version.mimetype == "audio/mpeg"
     assert version.accessed_date == now
     assert version.bitrate == upload.bitrate
-    assert version.audio_file.path.endswith(".mp3")
+    assert version.audio_file_path.endswith(".mp3")
     assert version.size == version.audio_file.size
     assert magic.from_buffer(version.audio_file.read(), mime=True) == "audio/mpeg"
 
