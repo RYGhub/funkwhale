@@ -706,7 +706,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
 
     assert album.from_activity == activity
     assert album.cover.read() == b"coucou"
-    assert album.cover.path.endswith(".png")
+    assert album.cover_path.endswith(".png")
     assert album.title == data["album"]["name"]
     assert album.fid == data["album"]["id"]
     assert str(album.mbid) == data["album"]["musicbrainzId"]

@@ -1,7 +1,5 @@
 import datetime
 
-import pytest
-
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models
 
@@ -40,8 +38,6 @@ def test_can_create_album_from_api(artists, albums, mocker, db):
 
     assert album.mbid, data["id"]
     assert album.title, "Hypnotize"
-    with pytest.raises(ValueError):
-        assert album.cover.path is not None
     assert album.release_date, datetime.date(2005, 1, 1)
     assert album.artist.name, "System of a Down"
     assert album.artist.mbid, data["artist-credit"][0]["artist"]["id"]

@@ -840,6 +840,16 @@ class Upload(models.Model):
             return
         return self.source.lstrip("file://")
 
+    @property
+    def audio_file_path(self):
+        if not self.audio_file:
+            return None
+        try:
+            return self.audio_file.path
+        except NotImplementedError:
+            # external storage
+            return self.audio_file.name
+
 
 MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]
 
@@ -861,6 +871,16 @@ class UploadVersion(models.Model):
     @property
     def filename(self):
         return self.upload.filename
+
+    @property
+    def audio_file_path(self):
+        if not self.audio_file:
+            return None
+        try:
+            return self.audio_file.path
+        except NotImplementedError:
+            # external storage
+            return self.audio_file.name
 
 
 IMPORT_STATUS_CHOICES = (
