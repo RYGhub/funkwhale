@@ -79,6 +79,16 @@ or invalid, and additional debug information to share in your support requests.
 
 This information is available in all pages that list uploads, when clicking on the button next to the upload status.
 
+Support for S3-compatible storages to store media files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Storing all media files on the Funkwhale server itself may not be possible or desirable
+in all scenarios. You can now configure Funkwhale to store those files in a S3
+bucket instead.
+
+Check-out `https://docs.funkwhale.audio/admin/external-storages.html`_ if you want to use
+this feature.
+
 Prune library command
 ^^^^^^^^^^^^^^^^^^^^^
 

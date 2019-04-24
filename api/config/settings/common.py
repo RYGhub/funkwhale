@@ -306,6 +306,19 @@ STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR("staticfiles")))
 STATIC_URL = env("STATIC_URL", default="/staticfiles/")
 DEFAULT_FILE_STORAGE = "funkwhale_api.common.storage.ASCIIFileSystemStorage"
 
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
+
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default=None)
+
+if AWS_ACCESS_KEY_ID:
+    AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default=None)
+    AWS_LOCATION = env("AWS_LOCATION", default="")
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (str(APPS_DIR.path("static")),)
 

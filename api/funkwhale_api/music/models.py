@@ -347,6 +347,16 @@ class Album(APIModelMixin):
         return self.title
 
     @property
+    def cover_path(self):
+        if not self.cover:
+            return None
+        try:
+            return self.cover.path
+        except NotImplementedError:
+            # external storage
+            return self.cover.name
+
+    @property
     def tags(self):
         t = []
         for track in self.tracks.all():

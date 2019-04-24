@@ -14,6 +14,7 @@ Setup Guides
    ../installation/index
    configuration
    importing-music
+   external-storages
 
 Administration
 --------------

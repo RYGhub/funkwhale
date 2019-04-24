@@ -109,8 +109,22 @@ server {
         # audio files once correct permission / authentication
         # has been checked on API side
         internal;
-        alias   ${MEDIA_ROOT};
     }
+
+    # this is an internal location that is used to serve
+    # audio files once correct permission / authentication
+    # has been checked on API side
+    location /_protected/media {
+        internal;
+        alias   ${MEDIA_ROOT};
+
+    }
+    # Comment the previous location and uncomment this one if you're storing
+    # media files in a S3 bucket
+    # location ~ /_protected/media/(.+) {
+    #     internal;
+    #     proxy_pass $1;
+    # }
 
     location /_protected/music {
         # this is an internal location that is used to serve
