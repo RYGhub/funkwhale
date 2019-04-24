@@ -241,7 +241,6 @@ def get_file_path(audio_file):
                 )
             path = "/music" + audio_file.replace(prefix, "", 1)
         if path.startswith("http://") or path.startswith("https://"):
-            raise
             return (settings.PROTECT_FILES_PATH + "/media/" + path).encode("utf-8")
         return (settings.PROTECT_FILES_PATH + path).encode("utf-8")
     if t == "apache2":
