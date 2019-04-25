@@ -99,7 +99,7 @@
           <div class="item">
             <i class="wizard icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item">Access your music from a clean interface that focus on what really matters</translate>
+              <translate translate-context="Content/Home/List item">Access your music from a clean interface that focuses on what really matters</translate>
             </div>
           </div>
         </div>
