@@ -74,7 +74,7 @@
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
                   </router-link>
                   <a
-                    v-if="$store.state.auth.profile.is_superuser"
+                    v-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
                     class="basic item"
                     :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${object.id}`)"
                     target="_blank" rel="noopener noreferrer">
