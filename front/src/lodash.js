@@ -11,4 +11,5 @@ export default {
   throttle: require('lodash/throttle'),
   uniq: require('lodash/uniq'),
   remove: require('lodash/remove'),
+  reverse: require('lodash/reverse'),
 }
