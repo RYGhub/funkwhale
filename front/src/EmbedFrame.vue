@@ -357,7 +357,8 @@ export default {
       this.$nextTick(() => {
         self.bindEvents()
         if (self.tracks.length > 0) {
-          var topPos = document.getElementById(`queue-item-${v}`).offsetTop;
+          let el = document.getElementById(`queue-item-${v}`);
+          var topPos = el.offsetTop;
           document.getElementById('queue').scrollTop = topPos-10;
         }
       })
