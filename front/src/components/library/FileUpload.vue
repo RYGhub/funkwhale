@@ -27,7 +27,6 @@
         </div>
       </a>
     </div>
-
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'summary'}]">
       <h2 class="ui header"><translate translate-context="Content/Library/Title/Verb">Upload new tracks</translate></h2>
       <div class="ui message">
@@ -59,7 +58,15 @@
       <div class="ui green button" @click="currentTab = 'uploads'"><translate translate-context="Content/Library/Button.Label">Proceed</translate></div>
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'uploads'}]">
-      <div class="ui container">
+      <div :class="['ui', {loading: isLoadingQuota}, 'container']">
+        <div :class="['ui', {red: remainingSpace === 0}, {yellow: remainingSpace > 0 && remainingSpace <= 50}, 'small', 'statistic']">
+          <div class="label">
+            <translate translate-context="Content/Library/Paragraph">Remaining storage space</translate>
+          </div>
+          <div class="value">
+            {{ remainingSpace * 1000 * 1000 | humanSize}}
+          </div>
+        </div>
         <file-upload-widget
           :class="['ui', 'icon', 'basic', 'button']"
           :post-action="uploadUrl"
@@ -152,6 +159,8 @@ export default {
       uploadUrl: this.$store.getters['instance/absoluteUrl']("/api/v1/uploads/"),
       importReference,
       supportedExtensions: ["flac", "ogg", "mp3", "opus"],
+      isLoadingQuota: false,
+      quotaStatus: null,
       uploads: {
         pending: 0,
         finished: 0,
@@ -164,6 +173,7 @@ export default {
   },
   created() {
     this.fetchStatus();
+    this.fetchQuota();
     this.$store.commit("ui/addWebsocketEventHandler", {
       eventName: "import.status_updated",
       id: "fileUpload",
@@ -187,8 +197,23 @@ export default {
       });
       return returnValue;
     },
+    fetchQuota () {
+      let self = this
+      self.isLoadingQuota = true
+      axios.get('users/users/me/').then((response) => {
+        self.quotaStatus = response.data.quota_status
+        self.isLoadingQuota = false
+      })
+    },
     inputFile(newFile, oldFile) {
-      this.$refs.upload.active = true;
+      if (!newFile) {
+        return
+      }
+      if (this.remainingSpace < newFile.size / (1000 * 1000)) {
+        newFile.error = 'denied'
+      } else {
+        this.$refs.upload.active = true;
+      }
     },
     fetchStatus() {
       let self = this;
@@ -307,6 +332,19 @@ export default {
     },
     hasActiveUploads () {
       return this.sortedFiles.filter((f) => { return f.active }).length > 0
+    },
+    remainingSpace () {
+      if (!this.quotaStatus) {
+        return 0
+      }
+      return Math.max(0, this.quotaStatus.remaining - (this.uploadedSize / (1000 * 1000)))
+    },
+    uploadedSize () {
+      let uploaded = 0
+      this.files.forEach((f) => {
+        uploaded += f.size * (f.progress / 100)
+      })
+      return uploaded
     }
   },
   watch: {
@@ -318,7 +356,12 @@ export default {
     },
     importReference: _.debounce(function() {
       this.$router.replace({ query: { import: this.importReference } });
-    }, 500)
+    }, 500),
+    remainingSpace (newValue) {
+      if (newValue <= 0) {
+        this.$refs.upload.active = false;
+      }
+    }
   }
 };
 </script>
