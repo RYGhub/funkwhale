@@ -27,6 +27,35 @@
                   </div>
                 </div>
               </h2>
+              <div class="header-buttons">
+                <div class="ui icon buttons">
+                  <a
+                    v-if="object.user && $store.state.auth.profile && $store.state.auth.profile.is_superuser"
+                    class="ui labeled icon button"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/users/user/${object.user.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                  <a
+                    v-else-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
+                    class="ui labeled icon button"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/federation/actor/${object.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                  <div class="ui floating dropdown icon button" v-dropdown>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      <a class="basic item" :href="object.url || object.fid" target="_blank" rel="noopener noreferrer">
+                        <i class="external icon"></i>
+                        <translate translate-context="Content/Moderation/Link/Verb">Open remote profile</translate>&nbsp;
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="ui column">
