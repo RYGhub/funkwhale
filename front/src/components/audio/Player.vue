@@ -657,7 +657,7 @@ export default {
     currentTrack: {
       async handler (newValue, oldValue) {
         await this.loadSound(newValue, oldValue)
-        if (!newValue || !trackData.album.cover) {
+        if (!newValue || !newValue.album.cover) {
           this.ambiantColors = this.defaultAmbiantColors
         }
       },
