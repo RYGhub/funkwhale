@@ -27,7 +27,7 @@
 
                 <div class="ui icon buttons">
                   <a
-                    v-if="$store.state.auth.profile.is_superuser"
+                    v-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
                     class="ui labeled icon button"
                     :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/library/${object.id}`)"
                     target="_blank" rel="noopener noreferrer">
@@ -38,7 +38,7 @@
                     <i class="dropdown icon"></i>
                     <div class="menu">
                       <a
-                        v-if="$store.state.auth.profile.is_superuser"
+                        v-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
                         class="basic item"
                         :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/library/${object.id}`)"
                         target="_blank" rel="noopener noreferrer">

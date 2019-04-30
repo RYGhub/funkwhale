@@ -54,8 +54,7 @@ export default new Vuex.Store({
       paths: [
         'player.looping',
         'player.volume',
-        'player.duration',
-        'player.errored'],
+        'player.duration'],
       filter: (mutation) => {
         return mutation.type.startsWith('player/') && mutation.type !== 'player/currentTime'
       }
