@@ -33,6 +33,20 @@ class MyUserCreationForm(UserCreationForm):
         raise forms.ValidationError(self.error_messages["duplicate_username"])
 
 
+def disable(modeladmin, request, queryset):
+    queryset.exclude(pk=request.user.pk).update(is_active=False)
+
+
+disable.short_description = "Disable login"
+
+
+def enable(modeladmin, request, queryset):
+    queryset.update(is_active=True)
+
+
+enable.short_description = "Enable login"
+
+
 @admin.register(models.User)
 class UserAdmin(AuthUserAdmin):
     form = MyUserChangeForm
@@ -40,6 +54,7 @@ class UserAdmin(AuthUserAdmin):
     list_display = [
         "username",
         "email",
+        "is_active",
         "date_joined",
         "last_login",
         "is_staff",
@@ -53,7 +68,7 @@ class UserAdmin(AuthUserAdmin):
         "permission_library",
         "permission_moderation",
     ]
-
+    actions = [disable, enable]
     fieldsets = (
         (None, {"fields": ("username", "password", "privacy_level")}),
         (
