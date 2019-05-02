@@ -118,10 +118,6 @@ export default {
       }
     },
     fetchProfile ({commit, dispatch, state}) {
-      if (document) {
-        // this is to ensure we do not have any leaking cookie set by django
-        document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      }
 
       return new Promise((resolve, reject) => {
         axios.get('users/users/me/').then((response) => {
