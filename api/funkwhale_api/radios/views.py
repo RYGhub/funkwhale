@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.music.serializers import TrackSerializer
+from funkwhale_api.music import utils as music_utils
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, filtersets, models, serializers
@@ -47,7 +48,9 @@ class RadioViewSet(
     def tracks(self, request, *args, **kwargs):
         radio = self.get_object()
         tracks = radio.get_candidates().for_nested_serialization()
-
+        actor = music_utils.get_actor_from_request(self.request)
+        tracks = tracks.with_playable_uploads(actor)
+        tracks = tracks.playable_by(actor)
         page = self.paginate_queryset(tracks)
         if page is not None:
             serializer = TrackSerializer(page, many=True)
@@ -110,7 +113,9 @@ class RadioSessionViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["user"] = self.request.user
+        context["user"] = (
+            self.request.user if self.request.user.is_authenticated else None
+        )
         return context
 
 
