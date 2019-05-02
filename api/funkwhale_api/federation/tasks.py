@@ -103,7 +103,8 @@ def dispatch_outbox(activity):
     inbox_items = activity.inbox_items.filter(is_read=False).select_related()
 
     if inbox_items.exists():
-        dispatch_inbox.delay(activity_id=activity.pk, call_handlers=False)
+        call_handlers = activity.type in ["Follow"]
+        dispatch_inbox.delay(activity_id=activity.pk, call_handlers=call_handlers)
 
     if not preferences.get("federation__enabled"):
         # federation is disabled, we only deliver to local recipients
