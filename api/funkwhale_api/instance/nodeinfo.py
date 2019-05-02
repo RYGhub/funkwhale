@@ -3,6 +3,7 @@ import memoize.djangocache
 import funkwhale_api
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import actors
+from funkwhale_api.music import utils as music_utils
 
 from . import stats
 
@@ -34,6 +35,7 @@ def get():
                     "common__api_authentication_required"
                 ),
             },
+            "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
         },
     }
     if share_stats:
