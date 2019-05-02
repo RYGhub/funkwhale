@@ -1,6 +1,7 @@
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
+from funkwhale_api.music import utils as music_utils
 
 
 def test_nodeinfo_dump(preferences, mocker):
@@ -46,6 +47,7 @@ def test_nodeinfo_dump(preferences, mocker):
                 "favorites": {"tracks": {"total": stats["track_favorites"]}},
                 "listenings": {"total": stats["listenings"]},
             },
+            "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
         },
     }
     assert nodeinfo.get() == expected
@@ -76,6 +78,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                     "common__api_authentication_required"
                 ],
             },
+            "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
         },
     }
     assert nodeinfo.get() == expected
