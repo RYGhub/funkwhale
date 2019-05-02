@@ -87,16 +87,21 @@ def test_handle_in(factories, mocker, now, queryset_equal_list):
     )
 
 
-def test_dispatch_outbox(factories, mocker):
+@pytest.mark.parametrize(
+    "type, call_handlers", [("Noop", False), ("Update", False), ("Follow", True)]
+)
+def test_dispatch_outbox(factories, mocker, type, call_handlers):
     mocked_inbox = mocker.patch("funkwhale_api.federation.tasks.dispatch_inbox.delay")
     mocked_deliver_to_remote = mocker.patch(
         "funkwhale_api.federation.tasks.deliver_to_remote.delay"
     )
-    activity = factories["federation.Activity"](actor__local=True)
+    activity = factories["federation.Activity"](actor__local=True, type=type)
     factories["federation.InboxItem"](activity=activity)
     delivery = factories["federation.Delivery"](activity=activity)
     tasks.dispatch_outbox(activity_id=activity.pk)
-    mocked_inbox.assert_called_once_with(activity_id=activity.pk, call_handlers=False)
+    mocked_inbox.assert_called_once_with(
+        activity_id=activity.pk, call_handlers=call_handlers
+    )
     mocked_deliver_to_remote.assert_called_once_with(delivery_id=delivery.pk)
 
 
