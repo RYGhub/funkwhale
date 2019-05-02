@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-10-05 20:10+0200\n"
-"PO-Revision-Date: 2019-03-01 08:33+0000\n"
-"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
+"PO-Revision-Date: 2019-04-08 08:01+0000\n"
+"Last-Translator: Koen <koen.glotzbach@gmail.com>\n"
 "Language-Team: none\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgstr "%{ user } heeft een nummer beluisterd"
 #: front/src/components/audio/artist/Card.vue:41
 msgid "1 album"
 msgid_plural "%{ count } albums"
-msgstr[0] "%{ count } album"
+msgstr[0] "1 album"
 msgstr[1] "%{ count } albums"
 
 #: front/src/components/favorites/List.vue:10
@@ -1239,7 +1239,7 @@ msgstr "Afspeellijsten"
 
 #: front/src/components/Home.vue:56
 msgid "Playlists? We got them"
-msgstr "Afspeellijsten? Die hebben we!"
+msgstr "Afspeellijsten? Die hebben we"
 
 #: front/src/components/auth/Settings.vue:79
 msgid "Please double-check your password is correct"
