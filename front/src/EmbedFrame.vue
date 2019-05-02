@@ -358,6 +358,9 @@ export default {
         self.bindEvents()
         if (self.tracks.length > 0) {
           let el = document.getElementById(`queue-item-${v}`);
+          if (!el) {
+            return
+          }
           var topPos = el.offsetTop;
           document.getElementById('queue').scrollTop = topPos-10;
         }
