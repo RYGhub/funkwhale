@@ -254,9 +254,11 @@ export default {
       maxPreloaded: 3,
       preloadDelay: 15,
       soundsCache: [],
+      soundId: null
     }
   },
   mounted() {
+    Howler.unload()  // clear existing cache, if any
     // we trigger the watcher explicitely it does not work otherwise
     this.sliderVolume = this.volume
     // this is needed to unlock audio playing under some browsers,
@@ -369,7 +371,7 @@ export default {
         },
         onunlock: function () {
           if (this.$store.state.player.playing) {
-            self.sound.play()
+            self.soundId = self.sound.play()
           }
         },
         onload: function () {
@@ -506,7 +508,7 @@ export default {
       let onlyTrack = this.$store.state.queue.tracks.length === 1
       if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
         this.currentSound.seek(0)
-        this.currentSound.play()
+        this.soundId = this.currentSound.play()
       } else {
         this.$store.dispatch('player/trackEnded', this.currentTrack)
       }
@@ -546,7 +548,8 @@ export default {
       let trackData = newValue
       let oldSound = this.currentSound
       if (oldSound && trackData !== oldValue) {
-        oldSound.pause()
+        oldSound.stop(this.soundId)
+        this.soundId = null
       }
       if (!trackData) {
         return
@@ -559,7 +562,7 @@ export default {
         this.currentSound = this.getSound(trackData)
         this.$store.commit('player/isLoadingAudio', true)
         if (this.playing) {
-          this.currentSound.play()
+          this.soundId = this.currentSound.play()
           this.$store.commit('player/playing', true)
           this.observeProgress(true)
         }
@@ -675,9 +678,9 @@ export default {
     playing: async function (newValue) {
       if (this.currentSound) {
         if (newValue === true) {
-          this.currentSound.play()
+          this.soundId = this.currentSound.play(this.soundId)
         } else {
-          this.currentSound.pause()
+          this.currentSound.pause(this.soundId)
         }
       } else {
         await this.loadSound(this.currentTrack, null)
@@ -690,6 +693,11 @@ export default {
         this.setCurrentTime(newValue)
       }
       this.isUpdatingTime = false
+    },
+    emptyQueue (newValue) {
+      if (newValue) {
+        Howler.unload()
+      }
     }
   }
 }
