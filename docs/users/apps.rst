@@ -179,6 +179,10 @@ This will show your artists, albums, and playlists when you start ncmpcpp.
 
 [Optional]: enable and start mopidy as a service to start the server at boot.
 
+.. note::
+
+   This also works with the `mopidy-funkwhale plugin <https://dev.funkwhale.audio/funkwhale/mopidy>`_
+
 Mobydick (Desktop)
 ^^^^^^^^^^^^^^^^^^
 

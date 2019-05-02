@@ -27,18 +27,17 @@ Add an Album to the Queue
 
 To add a whole album to the queue:
 
-- Navigate to ``https://your-instance/library/playlists`` or click on "Browse" in the "Music" library on the left-hand side then select "Playlists" along the top
-- Find the playlist you wish to add
-- Click on the three dot menu  to "Play" and select "Add to Queue", "Play Next", or "Play Now"
+- Search for an album, or navigate to its album page in the library
+- Click on the down arrow next to "Play" and select "Add to Queue", "Play Next", or "Play Now"
 
 Add a Playlist to the Queue
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To add a playlist to the queue:
 
-- Search for an album, or navigate to its album page in the library
-- Click on the down arrow next to "Play" and select "Add to Queue", "Play Next", or "Play Now"
-
+- Navigate to ``https://your-instance/library/playlists`` or click on "Browse" in the "Music" library on the left-hand side then select "Playlists" along the top
+- Find the playlist you wish to add
+- Click on the three dot menu  to "Play" and select "Add to Queue", "Play Next", or "Play Now"
 
 Rearrange Tracks in Your Queue
 ------------------------------
