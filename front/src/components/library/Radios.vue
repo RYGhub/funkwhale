@@ -10,9 +10,9 @@
           <translate translate-context="Content/Radio/Title">Instance radios</translate>
         </h3>
         <div class="ui cards">
-          <radio-card :type="'favorites'"></radio-card>
+          <radio-card v-if="$store.state.auth.authenticated" :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
-          <radio-card :type="'less-listened'"></radio-card>
+          <radio-card v-if="$store.state.auth.authenticated" :type="'less-listened'"></radio-card>
         </div>
       </div>
 

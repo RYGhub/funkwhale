@@ -70,7 +70,7 @@ class RadioSessionSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data["user"] = self.context["user"]
+        validated_data["user"] = self.context.get("user")
         if validated_data.get("related_object_id"):
             radio = registry[validated_data["radio_type"]]()
             validated_data["related_object"] = radio.get_related_object(

@@ -47,6 +47,8 @@ class SessionRadio(SimpleRadio):
         qs = Track.objects.all()
         if not self.session:
             return qs
+        if not self.session.user:
+            return qs
         query = moderation_filters.get_filtered_content_query(
             config=moderation_filters.USER_FILTER_CONFIG["TRACK"],
             user=self.session.user,
@@ -62,7 +64,9 @@ class SessionRadio(SimpleRadio):
         if self.session:
             queryset = self.filter_from_session(queryset)
             if kwargs.pop("filter_playable", True):
-                queryset = queryset.playable_by(self.session.user.actor)
+                queryset = queryset.playable_by(
+                    self.session.user.actor if self.session.user else None
+                )
         queryset = self.filter_queryset(queryset)
         return queryset
 
@@ -129,7 +133,7 @@ class CustomRadio(SessionRadio):
         try:
             user = data["user"]
         except KeyError:
-            user = context["user"]
+            user = context.get("user")
         try:
             assert data["custom_radio"].user == user or data["custom_radio"].is_public
         except KeyError:
