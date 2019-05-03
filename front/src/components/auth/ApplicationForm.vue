@@ -77,17 +77,19 @@ import TranslationsMixin from "@/components/mixins/Translations"
 export default {
   mixins: [TranslationsMixin],
   props: {
-    app: {type: Object, required: false}
+    app: {type: Object, required: false},
+    defaults: {type: Object, required: false}
   },
   data() {
     let app = this.app || {}
+    let defaults = this.defaults || {}
     return {
       isLoading: false,
       errors: [],
       fields: {
-        name: app.name || '',
-        redirect_uris: app.redirect_uris || 'urn:ietf:wg:oauth:2.0:oob',
-        scopes: app.scopes || 'read'
+        name: app.name || defaults.name || '',
+        redirect_uris: app.redirect_uris || defaults.redirect_uris || 'urn:ietf:wg:oauth:2.0:oob',
+        scopes: app.scopes || defaults.scopes || 'read'
       },
       scopes: [
         {id: "profile", icon: 'user'},

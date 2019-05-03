@@ -104,6 +104,11 @@ export default new Router({
     {
       path: '/settings/applications/new',
       name: 'settings.applications.new',
+      props: (route) => ({
+        scopes: route.query.scopes,
+        name: route.query.name,
+        redirect_uris: route.query.redirect_uris,
+      }),
       component: () =>
         import(/* webpackChunkName: "core" */ "@/components/auth/ApplicationNew"),
     },

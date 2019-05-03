@@ -9,6 +9,7 @@
           <translate translate-context="Content/Applications/Title">Create a new application</translate>
         </h2>
         <application-form
+          :defaults="defaults"
           @created="$router.push({name: 'settings.applications.edit', params: {id: $event.client_id}})" />
       </section>
     </div>
@@ -19,6 +20,7 @@
 import ApplicationForm from "@/components/auth/ApplicationForm"
 
 export default {
+  props: ['name', 'redirect_uris', 'scopes'],
   components: {
     ApplicationForm
   },
@@ -26,6 +28,11 @@ export default {
     return {
       application: null,
       isLoading: false,
+      defaults: {
+        name: this.name,
+        redirect_uris: this.redirect_uris,
+        scopes: this.scopes,
+      }
     }
   },
   computed: {
