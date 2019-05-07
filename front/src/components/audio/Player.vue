@@ -255,11 +255,16 @@ export default {
       preloadDelay: 15,
       soundsCache: [],
       soundId: null,
-      playTimeout: null
+      playTimeout: null,
+      nextTrackPreloaded: false
     }
   },
   mounted() {
+    this.$store.dispatch('player/updateProgress', 0)
+    this.$store.commit('player/playing', false)
+    this.$store.commit("player/isLoadingAudio", false)
     Howler.unload()  // clear existing cache, if any
+    this.nextTrackPreloaded = false
     // we trigger the watcher explicitely it does not work otherwise
     this.sliderVolume = this.volume
     // this is needed to unlock audio playing under some browsers,
@@ -274,9 +279,11 @@ export default {
       this.getSound(this.currentTrack)
     }
   },
-  destroyed() {
+  beforeDestroy () {
     this.dummyAudio.unload()
     this.observeProgress(false)
+  },
+  destroyed() {
   },
   methods: {
     ...mapActions({
@@ -473,8 +480,9 @@ export default {
         this.$store.dispatch('player/updateProgress', t)
         this.updateBuffer(this.currentSound._sounds[0]._node)
         let toPreload = this.$store.state.queue.tracks[this.currentIndex + 1]
-        if (toPreload && !this.getSoundFromCache(toPreload) && (t > this.preloadDelay || d - t < 30)) {
+        if (!this.nextTrackPreloaded && toPreload && !this.getSoundFromCache(toPreload) && (t > this.preloadDelay || d - t < 30)) {
           this.getSound(toPreload)
+          this.nextTrackPreloaded = true
         }
       }
     },
@@ -677,6 +685,7 @@ export default {
         if (newValue === oldValue) {
           return
         }
+        this.nextTrackPreloaded = false
         clearTimeout(this.playTimeout)
         let self = this
         if (this.currentSound) {
