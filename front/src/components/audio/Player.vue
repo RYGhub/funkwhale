@@ -674,6 +674,9 @@ export default {
   watch: {
     currentTrack: {
       async handler (newValue, oldValue) {
+        if (newValue === oldValue) {
+          return
+        }
         clearTimeout(this.playTimeout)
         let self = this
         if (this.currentSound) {
