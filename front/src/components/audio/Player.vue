@@ -391,6 +391,7 @@ export default {
           self.$store.commit('player/duration', this.duration())
         },
         onloaderror: function (sound, error) {
+          self.removeFromCache(this)
           if (this != self.currentSound) {
             return
           }
@@ -543,6 +544,17 @@ export default {
         }
       })
       this.soundsCache = _.reverse(toKeep)
+    },
+    removeFromCache (sound) {
+      let toKeep = []
+      this.soundsCache.forEach((e) => {
+        if (e.sound === sound) {
+          e.sound.unload()
+        } else {
+          toKeep.push(e)
+        }
+      })
+      this.soundsCache = toKeep
     },
     async loadSound (newValue, oldValue) {
       let trackData = newValue
