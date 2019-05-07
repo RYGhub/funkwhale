@@ -575,6 +575,7 @@ export default {
         this.$store.commit('player/isLoadingAudio', true)
         if (this.playing) {
           this.soundId = this.currentSound.play()
+          this.$store.commit('player/errored', false)
           this.$store.commit('player/playing', true)
           this.observeProgress(true)
         }
