@@ -254,7 +254,8 @@ export default {
       maxPreloaded: 3,
       preloadDelay: 15,
       soundsCache: [],
-      soundId: null
+      soundId: null,
+      playTimeout: null
     }
   },
   mounted() {
@@ -577,6 +578,7 @@ export default {
           this.soundId = this.currentSound.play()
           this.$store.commit('player/errored', false)
           this.$store.commit('player/playing', true)
+          this.$store.dispatch('player/updateProgress', 0)
           this.observeProgress(true)
         }
       }
@@ -672,10 +674,18 @@ export default {
   watch: {
     currentTrack: {
       async handler (newValue, oldValue) {
-        await this.loadSound(newValue, oldValue)
-        if (!newValue || !newValue.album.cover) {
-          this.ambiantColors = this.defaultAmbiantColors
+        clearTimeout(this.playTimeout)
+        let self = this
+        if (this.currentSound) {
+          this.currentSound.pause()
         }
+        this.$store.commit("player/isLoadingAudio", true)
+        this.playTimeout = setTimeout(async () => {
+          await self.loadSound(newValue, oldValue)
+          if (!newValue || !newValue.album.cover) {
+            self.ambiantColors = self.defaultAmbiantColors
+          }
+        }, 500);
       },
       immediate: false
     },
