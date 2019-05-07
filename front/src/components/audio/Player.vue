@@ -254,11 +254,17 @@ export default {
       maxPreloaded: 3,
       preloadDelay: 15,
       soundsCache: [],
-      soundId: null
+      soundId: null,
+      playTimeout: null,
+      nextTrackPreloaded: false
     }
   },
   mounted() {
+    this.$store.dispatch('player/updateProgress', 0)
+    this.$store.commit('player/playing', false)
+    this.$store.commit("player/isLoadingAudio", false)
     Howler.unload()  // clear existing cache, if any
+    this.nextTrackPreloaded = false
     // we trigger the watcher explicitely it does not work otherwise
     this.sliderVolume = this.volume
     // this is needed to unlock audio playing under some browsers,
@@ -273,9 +279,11 @@ export default {
       this.getSound(this.currentTrack)
     }
   },
-  destroyed() {
+  beforeDestroy () {
     this.dummyAudio.unload()
     this.observeProgress(false)
+  },
+  destroyed() {
   },
   methods: {
     ...mapActions({
@@ -391,6 +399,7 @@ export default {
           self.$store.commit('player/duration', this.duration())
         },
         onloaderror: function (sound, error) {
+          self.removeFromCache(this)
           if (this != self.currentSound) {
             return
           }
@@ -471,8 +480,9 @@ export default {
         this.$store.dispatch('player/updateProgress', t)
         this.updateBuffer(this.currentSound._sounds[0]._node)
         let toPreload = this.$store.state.queue.tracks[this.currentIndex + 1]
-        if (toPreload && !this.getSoundFromCache(toPreload) && (t > this.preloadDelay || d - t < 30)) {
+        if (!this.nextTrackPreloaded && toPreload && !this.getSoundFromCache(toPreload) && (t > this.preloadDelay || d - t < 30)) {
           this.getSound(toPreload)
+          this.nextTrackPreloaded = true
         }
       }
     },
@@ -544,6 +554,17 @@ export default {
       })
       this.soundsCache = _.reverse(toKeep)
     },
+    removeFromCache (sound) {
+      let toKeep = []
+      this.soundsCache.forEach((e) => {
+        if (e.sound === sound) {
+          e.sound.unload()
+        } else {
+          toKeep.push(e)
+        }
+      })
+      this.soundsCache = toKeep
+    },
     async loadSound (newValue, oldValue) {
       let trackData = newValue
       let oldSound = this.currentSound
@@ -563,7 +584,9 @@ export default {
         this.$store.commit('player/isLoadingAudio', true)
         if (this.playing) {
           this.soundId = this.currentSound.play()
+          this.$store.commit('player/errored', false)
           this.$store.commit('player/playing', true)
+          this.$store.dispatch('player/updateProgress', 0)
           this.observeProgress(true)
         }
       }
@@ -659,10 +682,22 @@ export default {
   watch: {
     currentTrack: {
       async handler (newValue, oldValue) {
-        await this.loadSound(newValue, oldValue)
-        if (!newValue || !newValue.album.cover) {
-          this.ambiantColors = this.defaultAmbiantColors
+        if (newValue === oldValue) {
+          return
         }
+        this.nextTrackPreloaded = false
+        clearTimeout(this.playTimeout)
+        let self = this
+        if (this.currentSound) {
+          this.currentSound.pause()
+        }
+        this.$store.commit("player/isLoadingAudio", true)
+        this.playTimeout = setTimeout(async () => {
+          await self.loadSound(newValue, oldValue)
+          if (!newValue || !newValue.album.cover) {
+            self.ambiantColors = self.defaultAmbiantColors
+          }
+        }, 500);
       },
       immediate: false
     },

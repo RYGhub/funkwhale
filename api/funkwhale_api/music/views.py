@@ -323,9 +323,7 @@ def handle_serve(upload, user, format=None, max_bitrate=None):
     mt = f.mimetype
 
     if should_transcode(f, format, max_bitrate=max_bitrate):
-        transcoded_version = upload.get_transcoded_version(
-            format, max_bitrate=max_bitrate
-        )
+        transcoded_version = f.get_transcoded_version(format, max_bitrate=max_bitrate)
         transcoded_version.accessed_date = now
         transcoded_version.save(update_fields=["accessed_date"])
         f = transcoded_version
