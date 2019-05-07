@@ -52,6 +52,7 @@ class ManageArtistFilterSet(filters.FilterSet):
                 "mbid": {"to": "mbid"},
             },
             filter_fields={
+                "uuid": {"to": "uuid"},
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
                 },
@@ -79,6 +80,7 @@ class ManageAlbumFilterSet(filters.FilterSet):
                 "mbid": {"to": "mbid"},
             },
             filter_fields={
+                "uuid": {"to": "uuid"},
                 "artist_id": {"to": "artist_id", "field": forms.IntegerField()},
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
@@ -116,6 +118,7 @@ class ManageTrackFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                 },
                 "artist_id": {"to": "artist_id", "field": forms.IntegerField()},
+                "uuid": {"to": "uuid"},
                 "license": {"to": "license"},
                 "domain": {
                     "handler": lambda v: federation_utils.get_domain_query_from_url(v)
@@ -151,6 +154,7 @@ class ManageLibraryFilterSet(filters.FilterSet):
                 "fid": {"to": "fid"},
             },
             filter_fields={
+                "uuid": {"to": "uuid"},
                 "artist_id": {
                     "to": "uploads__track__artist_id",
                     "field": forms.IntegerField(),
@@ -201,6 +205,7 @@ class ManageUploadFilterSet(filters.FilterSet):
                 "artist": {"to": "track__artist__name"},
             },
             filter_fields={
+                "uuid": {"to": "uuid"},
                 "library_id": {"to": "library_id", "field": forms.IntegerField()},
                 "artist_id": {"to": "track__artist_id", "field": forms.IntegerField()},
                 "album_id": {"to": "track__album_id", "field": forms.IntegerField()},
@@ -249,6 +254,7 @@ class ManageActorFilterSet(filters.FilterSet):
                 "type": {"to": "type"},
             },
             filter_fields={
+                "uuid": {"to": "uuid"},
                 "domain": {"to": "domain__name__iexact"},
                 "username": {"to": "preferred_username__iexact"},
                 "email": {"to": "user__email__iexact"},
