@@ -217,7 +217,12 @@ def test_get_song(
 
 
 @pytest.mark.parametrize("f", ["json"])
-def test_stream(f, db, logged_in_api_client, factories, mocker, queryset_equal_queries):
+def test_stream(
+    f, db, logged_in_api_client, factories, mocker, queryset_equal_queries, settings
+):
+    # Even with this settings set to false, we proxy media in the subsonic API
+    # Because clients don't expect a 302 redirect
+    settings.PROXY_MEDIA = False
     url = reverse("api:subsonic-stream")
     mocked_serve = mocker.spy(music_views, "handle_serve")
     assert url.endswith("stream") is True
@@ -226,7 +231,11 @@ def test_stream(f, db, logged_in_api_client, factories, mocker, queryset_equal_q
     response = logged_in_api_client.get(url, {"f": f, "id": upload.track.pk})
 
     mocked_serve.assert_called_once_with(
-        upload=upload, user=logged_in_api_client.user, format=None, max_bitrate=None
+        upload=upload,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=None,
+        proxy_media=True,
     )
     assert response.status_code == 200
     playable_by.assert_called_once_with(music_models.Track.objects.all(), None)
@@ -242,7 +251,11 @@ def test_stream_format(format, expected, logged_in_api_client, factories, mocker
     response = logged_in_api_client.get(url, {"id": upload.track.pk, "format": format})
 
     mocked_serve.assert_called_once_with(
-        upload=upload, user=logged_in_api_client.user, format=expected, max_bitrate=None
+        upload=upload,
+        user=logged_in_api_client.user,
+        format=expected,
+        max_bitrate=None,
+        proxy_media=True,
     )
     assert response.status_code == 200
 
@@ -261,7 +274,11 @@ def test_stream_bitrate(max_bitrate, expected, logged_in_api_client, factories, 
     )
 
     mocked_serve.assert_called_once_with(
-        upload=upload, user=logged_in_api_client.user, format=None, max_bitrate=expected
+        upload=upload,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=expected,
+        proxy_media=True,
     )
     assert response.status_code == 200
 

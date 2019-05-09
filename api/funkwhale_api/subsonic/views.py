@@ -260,7 +260,13 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
         return music_views.handle_serve(
-            upload=upload, user=request.user, format=format, max_bitrate=max_bitrate
+            upload=upload,
+            user=request.user,
+            format=format,
+            max_bitrate=max_bitrate,
+            # Subsonic clients don't expect 302 redirection unfortunately,
+            # So we have to proxy media files
+            proxy_media=True,
         )
 
     @action(detail=False, methods=["get", "post"], url_name="star", url_path="star")
