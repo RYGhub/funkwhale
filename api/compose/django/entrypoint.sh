@@ -22,5 +22,6 @@ fi
 if [ -d "frontend" ]; then
   mkdir -p /frontend
   cp -r frontend/* /frontend/
+  export FUNKWHALE_SPA_HTML_ROOT=/frontend/index.html
 fi
 exec "$@"
