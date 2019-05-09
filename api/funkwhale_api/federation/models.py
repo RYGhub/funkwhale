@@ -325,7 +325,9 @@ class Fetch(models.Model):
     )
     object = GenericForeignKey("object_content_type", "object_id")
     status = models.CharField(default="pending", choices=FETCH_STATUSES, max_length=20)
-    detail = JSONField(default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder)
+    detail = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
+    )
     actor = models.ForeignKey(Actor, related_name="fetches", on_delete=models.CASCADE)
 
     objects = FetchQuerySet.as_manager()
@@ -390,7 +392,9 @@ class Activity(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     fid = models.URLField(unique=True, max_length=500, null=True, blank=True)
     url = models.URLField(max_length=500, null=True, blank=True)
-    payload = JSONField(default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder)
+    payload = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
+    )
     creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     type = models.CharField(db_index=True, null=True, max_length=100)
 
@@ -506,7 +510,7 @@ class LibraryTrack(models.Model):
     album_title = models.CharField(max_length=500)
     title = models.CharField(max_length=500)
     metadata = JSONField(
-        default=empty_dict, max_length=10000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=10000, encoder=DjangoJSONEncoder, blank=True
     )
 
     @property

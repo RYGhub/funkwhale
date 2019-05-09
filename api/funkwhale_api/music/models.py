@@ -642,12 +642,12 @@ class Upload(models.Model):
 
     # metadata from federation
     metadata = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     import_date = models.DateTimeField(null=True, blank=True)
     # optionnal metadata provided during import
     import_metadata = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     # status / error details for the import
     import_status = models.CharField(
@@ -659,10 +659,10 @@ class Upload(models.Model):
 
     # optionnal metadata about import results (error messages, etc.)
     import_details = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     from_activity = models.ForeignKey(
-        "federation.Activity", null=True, on_delete=models.SET_NULL
+        "federation.Activity", null=True, on_delete=models.SET_NULL, blank=True
     )
 
     objects = UploadQuerySet.as_manager()
