@@ -379,7 +379,7 @@ export default {
         },
         onunlock: function () {
           if (this.$store.state.player.playing) {
-            self.soundId = self.sound.play()
+            self.soundId = self.sound.play(self.soundId)
           }
         },
         onload: function () {
@@ -518,7 +518,8 @@ export default {
       let onlyTrack = this.$store.state.queue.tracks.length === 1
       if (this.looping === 1 || (onlyTrack && this.looping === 2)) {
         this.currentSound.seek(0)
-        this.soundId = this.currentSound.play()
+        this.$store.dispatch('player/updateProgress', 0)
+        this.soundId = this.currentSound.play(this.soundId)
       } else {
         this.$store.dispatch('player/trackEnded', this.currentTrack)
       }
