@@ -30,7 +30,7 @@
           <h4 v-translate class="ui header" translate-context="Footer/*/Title">Using Funkwhale</h4>
           <div class="ui link list">
             <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link/Short, Noun">Documentation</translate></a>
-            <a href="https://docs.funkwhale.audio/users/apps.html" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Mobile and desktop apps</translate></a>
+            <a href="https://funkwhale.audio/apps" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Mobile and desktop apps</translate></a>
             <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate></div>
           </div>
         </section>
