@@ -78,7 +78,7 @@ FUNKWHALE_SPA_HTML_CACHE_DURATION = env.int(
     "FUNKWHALE_SPA_HTML_CACHE_DURATION", default=60 * 15
 )
 FUNKWHALE_EMBED_URL = env(
-    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_SPA_HTML_ROOT + "embed.html"
+    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_URL + "/front/embed.html"
 )
 APP_NAME = "Funkwhale"
 
