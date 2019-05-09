@@ -198,7 +198,11 @@
           v-if="!showVolume"
           @click.prevent.stop="clean()"
           class="two wide column control">
-          <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          <i class="icons">
+
+            <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+            <i :class="['ui corner large inverted', 'list', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          </i>
         </span>
       </div>
       <GlobalEvents
@@ -920,5 +924,9 @@ export default {
   animation-duration: 2s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+i.icons .corner.icon {
+  font-size: 1em;
+  right: -0.3em;
 }
 </style>
