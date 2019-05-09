@@ -104,8 +104,13 @@ And import music from this share with this command::
     python api/manage.py import_files "/srv/funkwhale/data/music/nfsshare/**/*.ogg" --recursive --noinput --in-place
 
 On docker setups, it will require a bit more work, because while the ``/srv/funkwhale/data/music`` is mounted
-in containers, symlinked directories are not. To fix that, in your ``docker-compose.yml`` file, ensure each symlinked
-directory is mounted as a volume as well::
+in containers, symlinked directories are not.
+
+To fix that, you can use bind mounts instead of symbolic links, as it replicates the source directory tree. With the previous NFS share, it would go this way::
+
+    mount --bind /media/mynfsshare /srv/funkwhale/data/music/nfsshare
+
+If you want to go with symlinks, ensure each symlinked directory is mounted as a volume as well in your ``docker-compose.yml`` file::
 
     celeryworker:
       volumes:
