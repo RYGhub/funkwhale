@@ -331,7 +331,7 @@ def test_listen_correct_access(factories, logged_in_api_client):
     assert response.status_code == 200
 
 
-def test_listen_explicit_file(factories, logged_in_api_client, mocker):
+def test_listen_explicit_file(factories, logged_in_api_client, mocker, settings):
     mocked_serve = mocker.spy(views, "handle_serve")
     upload1 = factories["music.Upload"](
         library__privacy_level="everyone", import_status="finished"
@@ -344,8 +344,24 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
 
     assert response.status_code == 200
     mocked_serve.assert_called_once_with(
-        upload2, user=logged_in_api_client.user, format=None, max_bitrate=None
+        upload2,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
     )
+
+
+def test_listen_no_proxy(factories, logged_in_api_client, settings):
+    settings.PROXY_MEDIA = False
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    response = logged_in_api_client.get(url, {"upload": upload.uuid})
+
+    assert response.status_code == 302
+    assert response["Location"] == upload.audio_file.url
 
 
 @pytest.mark.parametrize(
@@ -409,7 +425,7 @@ def test_handle_serve_create_mp3_version(factories, now):
     assert response.status_code == 200
 
 
-def test_listen_transcode(factories, now, logged_in_api_client, mocker):
+def test_listen_transcode(factories, now, logged_in_api_client, mocker, settings):
     upload = factories["music.Upload"](
         import_status="finished", library__actor__user=logged_in_api_client.user
     )
@@ -420,7 +436,11 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker):
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3", max_bitrate=None
+        upload,
+        user=logged_in_api_client.user,
+        format="mp3",
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
     )
 
 
@@ -436,7 +456,7 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker):
     ],
 )
 def test_listen_transcode_bitrate(
-    max_bitrate, expected, factories, now, logged_in_api_client, mocker
+    max_bitrate, expected, factories, now, logged_in_api_client, mocker, settings
 ):
     upload = factories["music.Upload"](
         import_status="finished", library__actor__user=logged_in_api_client.user
@@ -448,7 +468,11 @@ def test_listen_transcode_bitrate(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format=None, max_bitrate=expected
+        upload,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=expected,
+        proxy_media=settings.PROXY_MEDIA,
     )
 
 
@@ -474,7 +498,11 @@ def test_listen_transcode_in_place(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3", max_bitrate=None
+        upload,
+        user=logged_in_api_client.user,
+        format="mp3",
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
     )
 
 

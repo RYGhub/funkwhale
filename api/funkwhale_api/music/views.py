@@ -285,7 +285,7 @@ def should_transcode(upload, format, max_bitrate=None):
     return format_need_transcoding or bitrate_need_transcoding
 
 
-def handle_serve(upload, user, format=None, max_bitrate=None):
+def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     f = upload
     # we update the accessed_date
     now = timezone.now()
@@ -329,6 +329,11 @@ def handle_serve(upload, user, format=None, max_bitrate=None):
         f = transcoded_version
         file_path = get_file_path(f.audio_file)
         mt = f.mimetype
+    if not proxy_media:
+        # we simply issue a 302 redirect to the real URL
+        response = Response(status=302)
+        response["Location"] = f.audio_file.url
+        return response
     if mt:
         response = Response(content_type=mt)
     else:
@@ -380,7 +385,11 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
         return handle_serve(
-            upload, user=request.user, format=format, max_bitrate=max_bitrate
+            upload,
+            user=request.user,
+            format=format,
+            max_bitrate=max_bitrate,
+            proxy_media=settings.PROXY_MEDIA,
         )
 
 

@@ -55,6 +55,26 @@ by hand (which is outside the scope of this guide).
 
     At the moment, we do not support S3 when using Apache as a reverse proxy.
 
+Serving audio files directly from the bucket
+********************************************
+
+Depending on your setup, you may want to serve audio fils directly from the S3 bucket
+instead of proxying them through Funkwhale, e.g to reduce the bandwidth consumption on your server,
+or get better performance.
+
+You can achieve that by adding ``PROXY_MEDIA=false`` to your ``.env`` file.
+
+When receiving a request on the stream endpoint, Funkwhale will check for authentication and permissions,
+then issue a 302 redirect to the file URL in the bucket.
+
+This URL is actually be visible by the client, but contains a signature valid only for one hour, to ensure
+no one can reuse this URL or share it publicly to distribute unauthorized content.
+
+.. note::
+
+    Since some Subsonic clients don't support 302 redirections, Funkwhale will ignore
+    the ``PROXY_MEDIA`` setting and always proxy file when accessed through the Subsonic API.
+
 
 Securing your S3 bucket
 ***********************
