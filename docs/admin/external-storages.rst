@@ -71,6 +71,11 @@ This URL is actually be visible by the client, but contains a signature valid on
 no one can reuse this URL or share it publicly to distribute unauthorized content.
 
 .. note::
+   
+   If you are using Amazon S3, you will need to set your ``AWS_S3_REGION_NAME`` in the ``.env`` file to
+   use this feature. 
+
+.. note::
 
     Since some Subsonic clients don't support 302 redirections, Funkwhale will ignore
     the ``PROXY_MEDIA`` setting and always proxy file when accessed through the Subsonic API.
