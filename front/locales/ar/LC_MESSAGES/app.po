@@ -4,14 +4,16 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-02 14:06+0200\n"
-"PO-Revision-Date: 2019-02-07 14:16+0000\n"
+"PO-Revision-Date: 2019-05-07 09:29+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
+"funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: Weblate 3.2.2\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -223,7 +225,7 @@ msgstr "عُطّل النفاذ"
 #: front/src/components/mixins/Translations.vue:74
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to audio files, libraries, artists, albums and tracks"
-msgstr ""
+msgstr "الوصول إلى الملفات الصوتية والمكتبات والفنانين والألبومات والمَقاطِع"
 
 #: front/src/components/mixins/Translations.vue:97
 #: front/src/components/mixins/Translations.vue:98
@@ -564,7 +566,7 @@ msgstr[5] ""
 #: front/src/components/auth/Authorize.vue:107
 msgctxt "Head/Authorize/Title"
 msgid "Allow application"
-msgstr ""
+msgstr "ترخيص التطبيق"
 
 #: front/src/components/library/ImportStatusModal.vue:17
 msgctxt "Popup/Import/Message"
@@ -596,7 +598,7 @@ msgstr "طرأ هناك خطأ ما، ذلك قد يعني أن السيرفر �
 #: front/src/components/library/ImportStatusModal.vue:145
 msgctxt "Popup/Import/Error.Label"
 msgid "An unkwown error occured"
-msgstr ""
+msgstr "حدث خطأ مجهول"
 
 #: front/src/components/auth/Settings.vue:175
 #: src/components/auth/Settings.vue:225
@@ -608,12 +610,12 @@ msgstr "الإجراء"
 #: front/src/components/auth/ApplicationEdit.vue:12
 msgctxt "Content/Applications/Title"
 msgid "Application details"
-msgstr ""
+msgstr "تفاصيل التطبيق"
 
 #: front/src/components/auth/ApplicationEdit.vue:21
 msgctxt "Content/Applications/Label"
 msgid "Application ID"
-msgstr ""
+msgstr "مُعرِّف التطبيق"
 
 #: front/src/components/auth/ApplicationEdit.vue:16
 msgctxt "Content/Application/Paragraph/"
@@ -745,7 +747,7 @@ msgstr "اختصارات المُشغّل الصوتي"
 #: front/src/components/auth/Authorize.vue:47
 msgctxt "Content/Signup/Button.Label/Verb"
 msgid "Authorize %{ app }"
-msgstr ""
+msgstr "ترخيص %{ app }"
 
 #: front/src/components/auth/Authorize.vue:4
 msgctxt "Content/Auth/Title/Verb"
@@ -755,7 +757,7 @@ msgstr ""
 #: front/src/components/auth/Settings.vue:162
 msgctxt "Content/Settings/Title/Noun"
 msgid "Authorized apps"
-msgstr ""
+msgstr "التطبيقات المُرخّصة"
 
 #: front/src/components/playlists/PlaylistModal.vue:40
 msgctxt "Popup/Playlist/Title"
@@ -996,7 +998,7 @@ msgstr "إغلاق"
 #: front/src/components/federation/FetchButton.vue:88
 msgctxt "*/*/Button.Label/Verb"
 msgid "Close and reload page"
-msgstr ""
+msgstr "إغلاق وإعادة إنعاش الصفحة"
 
 #: front/src/components/manage/users/InvitationForm.vue:26
 #: front/src/components/manage/users/InvitationsTable.vue:42
@@ -1277,7 +1279,7 @@ msgstr "حذف قائمة الأغاني"
 #: front/src/components/auth/Settings.vue:252
 msgctxt "Popup/Settings/Title"
 msgid "Delete application \"%{ application }\"?"
-msgstr ""
+msgstr "حذف تطبيق \"%{ application }\"؟"
 
 #: front/src/views/content/libraries/Form.vue:39
 msgctxt "Popup/Library/Button.Label/Verb"
@@ -1410,7 +1412,7 @@ msgstr "معطل"
 #: front/src/views/admin/library/TrackDetail.vue:145
 msgctxt "*/*/*/Noun"
 msgid "Disc number"
-msgstr ""
+msgstr "القرص رقم"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:13
 msgctxt "Content/Settings/Link"
@@ -1688,7 +1690,7 @@ msgstr "أدخِل إسم إذاعة…"
 #: front/src/components/library/Albums.vue:119
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter album title..."
-msgstr ""
+msgstr "أدخل اسم ألبوم ما…"
 
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
@@ -1930,7 +1932,7 @@ msgstr "الفديرالية"
 #: front/src/components/library/EditCard.vue:45
 msgctxt "Content/Library/Card.Table.Header/Short"
 msgid "Field"
-msgstr ""
+msgstr "الحقل"
 
 #: front/src/components/library/FileUpload.vue:93
 msgctxt "Content/Library/Table.Label"
@@ -2184,7 +2186,7 @@ msgstr "تم استيراده"
 #: front/src/components/federation/FetchButton.vue:47
 msgctxt "*/*/Error"
 msgid "Impossible to connect to the remote server"
-msgstr ""
+msgstr "تعذر الاتصال بالخادم البُعدي"
 
 #: front/src/components/moderation/FilterModal.vue:26
 #, fuzzy
@@ -2210,7 +2212,7 @@ msgstr ""
 #: front/src/components/moderation/FilterModal.vue:28
 msgctxt "Popup/Moderation/List item"
 msgid "In radio suggestions"
-msgstr ""
+msgstr "في اقتراحات الإذاعات"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgctxt "Content/Admin/Table"
