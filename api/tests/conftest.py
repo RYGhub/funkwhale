@@ -390,6 +390,7 @@ def stdout():
 
 @pytest.fixture
 def spa_html(r_mock, settings):
+    settings.FUNKWHALE_SPA_HTML_ROOT = "http://noop/"
     yield r_mock.get(
         settings.FUNKWHALE_SPA_HTML_ROOT + "index.html", text="<head></head>"
     )
