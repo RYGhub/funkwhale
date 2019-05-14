@@ -117,6 +117,44 @@ def test_inbox_follow_library_manual_approve(factories, mocker):
     mocked_outbox_dispatch.assert_not_called()
 
 
+def test_inbox_follow_library_already_approved(factories, mocker):
+    """Cf #830, out of sync follows"""
+    mocked_outbox_dispatch = mocker.patch(
+        "funkwhale_api.federation.activity.OutboxRouter.dispatch"
+    )
+
+    local_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    library = factories["music.Library"](actor=local_actor, privacy_level="me")
+    ii = factories["federation.InboxItem"](actor=local_actor)
+    existing_follow = factories["federation.LibraryFollow"](
+        target=library, actor=remote_actor, approved=True
+    )
+    payload = {
+        "type": "Follow",
+        "id": "https://test.follow",
+        "actor": remote_actor.fid,
+        "object": library.fid,
+    }
+
+    result = routes.inbox_follow(
+        payload,
+        context={"actor": remote_actor, "inbox_items": [ii], "raise_exception": True},
+    )
+    follow = library.received_follows.latest("id")
+
+    assert result["object"] == library
+    assert result["related_object"] == follow
+
+    assert follow.fid == payload["id"]
+    assert follow.actor == remote_actor
+    assert follow.approved is True
+    assert follow.uuid != existing_follow.uuid
+    mocked_outbox_dispatch.assert_called_once_with(
+        {"type": "Accept"}, context={"follow": follow}
+    )
+
+
 def test_outbox_accept(factories, mocker):
     remote_actor = factories["federation.Actor"]()
     follow = factories["federation.LibraryFollow"](actor=remote_actor)
