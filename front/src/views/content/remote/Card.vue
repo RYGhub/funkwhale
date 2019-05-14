@@ -80,35 +80,41 @@
         </div>
       </div>
     </div>
-    <div v-if="displayFollow" class="ui bottom attached buttons">
+    <div v-if="displayFollow" :class="['ui', 'bottom', {two: library.follow}, 'attached', 'buttons']">
       <button
         v-if="!library.follow"
         @click="follow()"
         :class="['ui', 'green', {'loading': isLoadingFollow}, 'button']">
         <translate translate-context="Content/Library/Card.Button.Label/Verb">Follow</translate>
       </button>
-      <button
-        v-else-if="!library.follow.approved"
-        class="ui disabled button"><i class="hourglass icon"></i>
-        <translate translate-context="Content/Library/Card.Paragraph">Follow request pending approval</translate>
-      </button>
-      <button
-        v-else-if="!library.follow.approved"
-        class="ui disabled button"><i class="check icon"></i>
-        <translate translate-context="Content/Library/Card.Paragraph">Following</translate>
-      </button>
-      <dangerous-button
-        v-else-if="library.follow.approved"
-        color=""
-        :class="['ui', 'button']"
-        :action="unfollow">
-        <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>
-        <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
-        <div slot="modal-content">
-          <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
-        </div>
-        <div slot="modal-confirm"><translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate></div>
-      </dangerous-button>
+      <template v-else-if="!library.follow.approved">
+        <button
+          class="ui disabled button"><i class="hourglass icon"></i>
+          <translate translate-context="Content/Library/Card.Paragraph">Follow request pending approval</translate>
+        </button>
+        <button
+          @click="unfollow"
+          class="ui button">
+          <translate translate-context="Content/Library/Card.Paragraph">Cancel follow request</translate>
+        </button>
+      </template>
+      <template v-else-if="library.follow.approved">
+        <button
+          class="ui disabled button"><i class="check icon"></i>
+          <translate translate-context="Content/Library/Card.Paragraph">Following</translate>
+        </button>
+        <dangerous-button
+          color=""
+          :class="['ui', 'button']"
+          :action="unfollow">
+          <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>
+          <p slot="modal-header"><translate translate-context="Popup/Library/Title">Unfollow this library?</translate></p>
+          <div slot="modal-content">
+            <p><translate translate-context="Popup/Library/Paragraph">By unfollowing this library, you loose access to its content.</translate></p>
+          </div>
+          <div slot="modal-confirm"><translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate></div>
+        </dangerous-button>
+      </template>
     </div>
   </div>
 </template>
@@ -199,6 +205,7 @@ export default {
       this.isLoadingFollow = true
       axios.delete(`federation/follows/library/${this.library.follow.uuid}/`).then((response) => {
         self.$emit('deleted')
+        self.library.follow = null
         self.isLoadingFollow = false
       }, error => {
         self.isLoadingFollow = false

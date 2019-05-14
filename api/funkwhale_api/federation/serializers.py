@@ -1,6 +1,7 @@
 import logging
 import mimetypes
 import urllib.parse
+import uuid
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
@@ -297,11 +298,29 @@ class FollowSerializer(serializers.Serializer):
             follow_class = models.Follow
         defaults = kwargs
         defaults["fid"] = self.validated_data["id"]
-        return follow_class.objects.update_or_create(
+        approved = kwargs.pop("approved", None)
+        follow, created = follow_class.objects.update_or_create(
             actor=self.validated_data["actor"],
             target=self.validated_data["object"],
             defaults=defaults,
-        )[0]
+        )
+        if not created:
+            # We likely received a new follow when we had an existing one in database
+            # this can happen when two instances are out of sync, e.g because some
+            # messages are not delivered properly. In this case, we don't change
+            # the follow approved status and return the follow as is.
+            # We set a new UUID to ensure the follow urls are updated properly
+            # cf #830
+            follow.uuid = uuid.uuid4()
+            follow.save(update_fields=["uuid"])
+            return follow
+
+        # it's a brand new follow, we use the approved value stored earlier
+        if approved != follow.approved:
+            follow.approved = approved
+            follow.save(update_fields=["approved"])
+
+        return follow
 
     def to_representation(self, instance):
         return {

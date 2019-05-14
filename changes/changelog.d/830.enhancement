@@ -1,0 +1,1 @@
+Better handling of follow/accept messages to avoid and recover from desync between instances (#830)
