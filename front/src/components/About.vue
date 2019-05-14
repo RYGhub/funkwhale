@@ -3,9 +3,9 @@
     <section class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <translate translate-context="Content/About/Title/Short, Noun" v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
+            <span v-translate="{instance: instance.name.value}" translate-context="Content/About/Title/Short, Noun" v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
              About %{ instance }
-            </translate>
+            </span>
             <translate translate-context="Content/About/Title" v-else>About this instance</translate>
         </h1>
         <stats></stats>
