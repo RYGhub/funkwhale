@@ -25,6 +25,10 @@ export default {
       "label": "Español"
     },
     {
+      "code": "eu",
+      "label": "Euskara"
+    },
+    {
       "code": "fr_FR",
       "label": "Français"
     },
@@ -37,12 +41,24 @@ export default {
       "label": "Italiano"
     },
     {
+      "code": "nb_NO",
+      "label": "Bokmål"
+    },
+    {
+      "code": "nl",
+      "label": "Nederlands"
+    },
+    {
       "code": "oc",
       "label": "Occitan"
     },
     {
       "code": "pl",
       "label": "Polszczyzna"
+    },
+    {
+      "code": "pt_BR",
+      "label": "Português (Brasil)"
     },
     {
       "code": "pt_PT",
