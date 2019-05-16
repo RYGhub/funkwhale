@@ -3,10 +3,10 @@
     <section class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-            <translate v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
+            <span v-translate="{instance: instance.name.value}" translate-context="Content/About/Title/Short, Noun" v-if="instance.name.value" :translate-params="{instance: instance.name.value}">
              About %{ instance }
-            </translate>
-            <translate v-else>About this instance</translate>
+            </span>
+            <translate translate-context="Content/About/Title" v-else>About this instance</translate>
         </h1>
         <stats></stats>
       </div>
@@ -15,12 +15,12 @@
       <div
         class="ui middle aligned stackable text container">
         <p
-        v-if="!instance.short_description.value && !instance.long_description.value"><translate>Unfortunately, owners of this instance did not yet take the time to complete this page.</translate></p>
+        v-if="!instance.short_description.value && !instance.long_description.value"><translate translate-context="Content/About/Paragraph">Unfortunately, the owners of this instance did not yet take the time to complete this page.</translate></p>
         <router-link
           class="ui button"
           v-if="$store.state.auth.availablePermissions['settings']"
           :to="{path: '/manage/settings', hash: 'instance'}">
-          <i class="pencil icon"></i><translate>Edit instance info</translate>
+          <i class="pencil icon"></i><translate translate-context="Content/Settings/Button.Label/Verb">Edit instance info</translate>
         </router-link>
         <div class="ui hidden divider"></div>
       </div>
@@ -64,7 +64,7 @@ export default {
     }),
     labels() {
       return {
-        title: this.$gettext("About this instance")
+        title: this.$pgettext('Content/About/Title', "About this instance")
       }
     }
   }

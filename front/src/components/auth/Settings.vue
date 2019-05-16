@@ -1,18 +1,18 @@
 <template>
   <main class="main pusher" v-title="labels.title">
     <div class="ui vertical stripe segment">
-      <section class="ui small text container">
+      <section class="ui text container">
         <h2 class="ui header">
-          <translate>Account settings</translate>
+          <translate translate-context="Content/Settings/Title">Account settings</translate>
         </h2>
         <form class="ui form" @submit.prevent="submitSettings()">
           <div v-if="settings.success" class="ui positive message">
             <div class="header">
-              <translate>Settings updated</translate>
+              <translate translate-context="Content/Settings/Message">Settings updated</translate>
             </div>
           </div>
           <div v-if="settings.errors.length > 0" class="ui negative message">
-            <div class="header"><translate>We cannot save your settings</translate></div>
+            <div class="header"><translate translate-context="Content/Settings/Error message.Title">Your settings can't be updateds</translate></div>
             <ul class="list">
               <li v-for="error in settings.errors">{{ error }}</li>
             </ul>
@@ -25,87 +25,247 @@
             </select>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
-            <translate>Update settings</translate>
+            <translate translate-context="Content/Settings/Button.Label/Verb">Update settings</translate>
           </button>
         </form>
       </section>
-      <div class="ui hidden divider"></div>
-      <section class="ui small text container">
+      <section class="ui text container">
+        <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          <translate>Avatar</translate>
+          <translate translate-context="Content/Settings/Title">Avatar</translate>
         </h2>
         <div class="ui form">
           <div v-if="avatarErrors.length > 0" class="ui negative message">
-            <div class="header"><translate>We cannot save your avatar</translate></div>
+            <div class="header"><translate translate-context="Content/Settings/Error message.Title">Your avatar cannot be saved</translate></div>
             <ul class="list">
               <li v-for="error in avatarErrors">{{ error }}</li>
             </ul>
           </div>
           <div class="ui stackable grid">
             <div class="ui ten wide column">
-              <h3 class="ui header"><translate>Upload a new avatar</translate></h3>
-              <p><translate>PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
+              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Verb">Upload a new avatar</translate></h3>
+              <p><translate translate-context="Content/Settings/Paragraph">PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
               <input class="ui input" ref="avatar" type="file" />
               <div class="ui hidden divider"></div>
               <button @click="submitAvatar" :class="['ui', {'loading': isLoadingAvatar}, 'button']">
-                <translate>Update avatar</translate>
+                <translate translate-context="Content/Settings/Button.Label/Verb">Update avatar</translate>
               </button>
             </div>
             <div class="ui six wide column">
-              <h3 class="ui header"><translate>Current avatar</translate></h3>
+              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Noun">Current avatar</translate></h3>
               <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
               <div class="ui hidden divider"></div>
               <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
-                <translate>Remove avatar</translate>
+                <translate translate-context="Content/Settings/Button.Label/Verb">Remove avatar</translate>
               </button>
             </div>
           </div>
         </div>
       </section>
-      <div class="ui hidden divider"></div>
-      <section class="ui small text container">
+
+      <section class="ui text container">
+        <div class="ui hidden divider"></div>
         <h2 class="ui header">
-          <translate>Change my password</translate>
+          <translate translate-context="Content/Settings/Title/Verb">Change my password</translate>
         </h2>
         <div class="ui message">
-          <translate>Changing your password will also change your Subsonic API password if you have requested one.</translate>&nbsp;<translate>You will have to update your password on your clients that use this password.</translate>
+          <translate translate-context="Content/Settings/Paragraph'">Changing your password will also change your Subsonic API password if you have requested one.</translate>&nbsp;<translate translate-context="Content/Settings/Paragraph">You will have to update your password on your clients that use this password.</translate>
         </div>
         <form class="ui form" @submit.prevent="submitPassword()">
           <div v-if="passwordError" class="ui negative message">
             <div class="header">
-              <translate>Cannot change your password</translate>
+              <translate translate-context="Content/Settings/Error message.Title">Your password cannot be changed</translate>
             </div>
             <ul class="list">
-              <li v-if="passwordError == 'invalid_credentials'"><translate>Please double-check your password is correct</translate></li>
+              <li v-if="passwordError == 'invalid_credentials'"><translate translate-context="Content/Settings/Error message.List item/Call to action">Please double-check your password is correct</translate></li>
             </ul>
           </div>
           <div class="field">
-            <label><translate>Old password</translate></label>
+            <label><translate translate-context="Content/Settings/Input.Label">Old password</translate></label>
             <password-input required v-model="old_password" />
 
           </div>
           <div class="field">
-            <label><translate>New password</translate></label>
+            <label><translate translate-context="Content/Settings/Input.Label">New password</translate></label>
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button
             color="yellow"
             :class="['ui', {'loading': isLoading}, 'button']"
             :action="submitPassword">
-            <translate>Change password</translate>
-            <p slot="modal-header"><translate>Change your password?</translate></p>
+            <translate translate-context="Content/Settings/Button.Label">Change password</translate>
+            <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Change your password?</translate></p>
             <div slot="modal-content">
-              <p><translate>Changing your password will have the following consequences</translate></p>
+              <p><translate translate-context="Popup/Settings/Paragraph">Changing your password will have the following consequences:</translate></p>
               <ul>
-                <li><translate>You will be logged out from this session and have to log in with the new one</translate></li>
-                <li><translate>Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
+                <li><translate translate-context="Popup/Settings/List item">You will be logged out from this session and have to log in with the new one</translate></li>
+                <li><translate translate-context="Popup/Settings/List item">Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password</translate></li>
               </ul>
             </div>
-            <p slot="modal-confirm"><translate>Disable access</translate></p>
+            <div slot="modal-confirm"><translate translate-context="Popup/Settings/Button.Label">Disable access</translate></div>
           </dangerous-button>
         </form>
         <div class="ui hidden divider" />
         <subsonic-token-form />
+      </section>
+
+      <section class="ui text container" id="content-filters">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="eye slash outline icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Noun">Content filters</translate>
+          </div>
+        </h2>
+        <p><translate translate-context="Content/Settings/Paragraph">Content filters help you hide content you don't want to see on the service.</translate></p>
+
+        <button
+          @click="$store.dispatch('moderation/fetchContentFilters')"
+          class="ui basic icon button">
+          <i class="refresh icon"></i>&nbsp;
+          <translate translate-context="Content/*/Button.Label/Short, Verb">Refresh</translate>
+        </button>
+        <h3 class="ui header">
+          <translate translate-context="Content/Settings/Title">Hidden artists</translate>
+        </h3>
+        <table class="ui compact very basic unstackable table">
+          <thead>
+            <tr>
+              <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="filter in $store.getters['moderation/artistFilters']()" :key='filter.uuid'>
+              <td>
+                <router-link :to="{name: 'library.artists.detail', params: {id: filter.target.id }}">
+                  {{ filter.target.name }}
+                </router-link>
+              </td>
+              <td>
+                <human-date :date="filter.creation_date"></human-date>
+              </td>
+              <td>
+                <button @click="$store.dispatch('moderation/deleteContentFilter', filter.uuid)" class="ui basic tiny button">
+                  <translate translate-context="*/*/*/Verb">Delete</translate>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="ui text container" id="grants">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="open lock icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Noun">Authorized apps</translate>
+          </div>
+        </h2>
+        <p><translate translate-context="Content/Settings/Paragraph">This is the list of applications that have access to your account data.</translate></p>
+        <button
+          @click="fetchApps()"
+          class="ui basic icon button">
+          <i class="refresh icon"></i>&nbsp;
+          <translate translate-context="Content/*/Button.Label/Short, Verb">Refresh</translate>
+        </button>
+        <table v-if="apps.length > 0" class="ui compact very basic unstackable table">
+          <thead>
+            <tr>
+              <th><translate translate-context="*/*/*/Noun">Application</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Permissions</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="app in apps" :key='app.client_id'>
+              <td>
+                {{ app.name }}
+              </td>
+              <td>
+                {{ app.scopes }}
+              </td>
+              <td>
+                <dangerous-button
+                  class="ui tiny basic button"
+                  @confirm="revokeApp(app.client_id)">
+                  <translate translate-context="*/*/*/Verb">Revoke</translate>
+                  <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Revoke access for application "%{ application }"?</p>
+                  <p slot="modal-content"><translate translate-context="Popup/Settings/Paragraph">This will prevent this application from accessing the service on your behalf.</translate></p>
+                  <div slot="modal-confirm"><translate translate-context="*/Settings/Button.Label/Verb">Revoke access</translate></div>
+                </dangerous-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <empty-state v-else>
+          <translate slot="title" translate-context="Content/Applications/Paragraph">
+            You don't have any application connected with your account.
+          </translate>
+          <translate translate-context="Content/Applications/Paragraph">
+            If you authorize third-party applications to access your data, those applications will be listed here.
+          </translate>
+        </empty-state>
+      </section>
+      <section class="ui text container" id="apps">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="code icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Noun">Your applications</translate>
+          </div>
+        </h2>
+        <p><translate translate-context="Content/Settings/Paragraph">This is the list of applications that you have created.</translate></p>
+        <router-link class="ui basic green button" :to="{name: 'settings.applications.new'}">
+          <translate translate-context="Content/Settings/Button.Label">Create a new application</translate>
+        </router-link>
+        <table v-if="ownedApps.length > 0" class="ui compact very basic unstackable table">
+          <thead>
+            <tr>
+              <th><translate translate-context="*/*/*/Noun">Application</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Scopes</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="app in ownedApps" :key='app.client_id'>
+              <td>
+                <router-link :to="{name: 'settings.applications.edit', params: {id: app.client_id}}">
+                  {{ app.name }}
+                </router-link>
+              </td>
+              <td>
+                {{ app.scopes }}
+              </td>
+              <td>
+                <human-date :date="app.created" />
+              </td>
+              <td>
+                <router-link class="ui basic tiny green button" :to="{name: 'settings.applications.edit', params: {id: app.client_id}}">
+                  <translate translate-context="Content/Settings/Button.Label">Edit</translate>
+                </router-link>
+                <dangerous-button
+                  class="ui tiny basic button"
+                  @confirm="deleteApp(app.client_id)">
+                  <translate translate-context="*/*/*/Verb">Delete</translate>
+                  <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Delete application "%{ application }"?</p>
+                  <p slot="modal-content"><translate translate-context="Popup/Settings/Paragraph">This will permanently delete the application and all the associated tokens.</translate></p>
+                  <div slot="modal-confirm"><translate translate-context="*/Settings/Button.Label/Verb">Delete application</translate></div>
+                </dangerous-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <empty-state v-else>
+          <translate slot="title" translate-context="Content/Applications/Paragraph">
+            You don't have any configured application yet.
+          </translate>
+          <translate translate-context="Content/Applications/Paragraph">
+            Create one to integrate Funkwhale with third-party applications.
+          </translate>
+        </empty-state>
       </section>
     </div>
   </main>
@@ -137,6 +297,8 @@ export default {
       isLoadingAvatar: false,
       avatarErrors: [],
       avatar: null,
+      apps: [],
+      ownedApps: [],
       settings: {
         success: false,
         errors: [],
@@ -155,6 +317,10 @@ export default {
       d.settings.fields[id].id = id
     })
     return d
+  },
+  created () {
+    this.fetchApps()
+    this.fetchOwnedApps()
   },
   mounted() {
     $("select.dropdown").dropdown()
@@ -178,6 +344,56 @@ export default {
           logger.default.error("Error while updating settings")
           self.isLoading = false
           self.settings.errors = error.backendErrors
+        }
+      )
+    },
+    fetchApps() {
+      this.apps = []
+      let self = this
+      let url = `oauth/grants/`
+      return axios.get(url).then(
+        response => {
+          self.apps = response.data
+        },
+        error => {
+        }
+      )
+    },
+    fetchOwnedApps() {
+      this.ownedApps = []
+      let self = this
+      let url = `oauth/apps/`
+      return axios.get(url).then(
+        response => {
+          self.ownedApps = response.data.results
+        },
+        error => {
+        }
+      )
+    },
+    revokeApp (id) {
+      let self = this
+      let url = `oauth/grants/${id}/`
+      return axios.delete(url).then(
+        response => {
+          self.apps = self.apps.filter(a => {
+            return a.client_id != id
+          })
+        },
+        error => {
+        }
+      )
+    },
+    deleteApp (id) {
+      let self = this
+      let url = `oauth/apps/${id}/`
+      return axios.delete(url).then(
+        response => {
+          self.ownedApps = self.ownedApps.filter(a => {
+            return a.client_id != id
+          })
+        },
+        error => {
         }
       )
     },
@@ -260,7 +476,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$gettext("Account Settings")
+        title: this.$pgettext('Head/Settings/Title', "Account Settings")
       }
     },
     orderedSettingsFields() {

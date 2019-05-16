@@ -1,7 +1,7 @@
+import pytz
 import factory
 from django.contrib.auth.models import Permission
 from django.utils import timezone
-
 from funkwhale_api.factories import ManyToManyFromList, registry, NoUpdateOnCreate
 
 from . import models
@@ -87,3 +87,49 @@ class UserFactory(factory.django.DjangoModelFactory):
 class SuperUserFactory(UserFactory):
     is_staff = True
     is_superuser = True
+
+
+@registry.register
+class ApplicationFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker("name")
+    redirect_uris = factory.Faker("url")
+    client_type = models.Application.CLIENT_CONFIDENTIAL
+    authorization_grant_type = models.Application.GRANT_AUTHORIZATION_CODE
+    scope = "read"
+
+    class Meta:
+        model = "users.Application"
+
+
+@registry.register
+class GrantFactory(factory.django.DjangoModelFactory):
+    application = factory.SubFactory(ApplicationFactory)
+    scope = factory.SelfAttribute(".application.scope")
+    redirect_uri = factory.SelfAttribute(".application.redirect_uris")
+    user = factory.SubFactory(UserFactory)
+    expires = factory.Faker("future_datetime", end_date="+15m")
+    code = factory.Faker("uuid4")
+
+    class Meta:
+        model = "users.Grant"
+
+
+@registry.register
+class AccessTokenFactory(factory.django.DjangoModelFactory):
+    application = factory.SubFactory(ApplicationFactory)
+    user = factory.SubFactory(UserFactory)
+    expires = factory.Faker("future_datetime", tzinfo=pytz.UTC)
+    token = factory.Faker("uuid4")
+
+    class Meta:
+        model = "users.AccessToken"
+
+
+@registry.register
+class RefreshTokenFactory(factory.django.DjangoModelFactory):
+    application = factory.SubFactory(ApplicationFactory)
+    user = factory.SubFactory(UserFactory)
+    token = factory.Faker("uuid4")
+
+    class Meta:
+        model = "users.RefreshToken"

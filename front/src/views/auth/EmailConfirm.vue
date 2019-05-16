@@ -2,29 +2,29 @@
   <main class="main pusher" v-title="labels.confirm">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate>Confirm your e-mail address</translate></h2>
+        <h2>{{ labels.confirm }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><translate>Could not confirm your e-mail address</translate></div>
+            <div class="header"><translate translate-context="Content/Signup/Paragraph">Could not confirm your e-mail address</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <div class="field">
-            <label><translate>Confirmation code</translate></label>
+            <label><translate translate-context="Content/Signup/Form.Label">Confirmation code</translate></label>
             <input name="confirmation-code" type="text" required v-model="key" />
           </div>
           <router-link :to="{path: '/login'}">
-            <translate>Return to login</translate>
+            <translate translate-context="Content/Signup/Link/Verb">Return to login</translate>
           </router-link>
           <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-            <translate>Confirm your e-mail address</translate></button>
+            {{ labels.confirm }}</button>
         </form>
         <div v-else class="ui positive message">
-          <div class="header"><translate>E-mail address confirmed</translate></div>
-          <p><translate>You can now use the service without limitations.</translate></p>
+          <div class="header"><translate translate-context="Content/Signup/Message">E-mail address confirmed</translate></div>
+          <p><translate translate-context="Content/Signup/Paragraph">You can now use the service without limitations.</translate></p>
           <router-link :to="{name: 'login'}">
-            <translate>Proceed to login</translate>
+            <translate translate-context="Content/Signup/Link/Verb">Proceed to login</translate>
           </router-link>
         </div>
       </div>
@@ -48,7 +48,7 @@ export default {
   computed: {
     labels() {
       return {
-        confirm: this.$gettext("Confirm your e-mail address")
+        confirm: this.$pgettext('Head/Signup/Title', "Confirm your e-mail address")
       }
     }
   },

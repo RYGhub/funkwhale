@@ -2,34 +2,34 @@
   <main class="main pusher" v-title="labels.changePassword">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <h2><translate>Change your password</translate></h2>
+        <h2>{{ labels.changePassword }}</h2>
         <form v-if="!success" class="ui form" @submit.prevent="submit()">
           <div v-if="errors.length > 0" class="ui negative message">
-            <div class="header"><translate>Error while changing your password</translate></div>
+            <div class="header"><translate translate-context="Content/Signup/Card.Title">Error while changing your password</translate></div>
             <ul class="list">
               <li v-for="error in errors">{{ error }}</li>
             </ul>
           </div>
           <template v-if="token && uid">
             <div class="field">
-              <label><translate>New password</translate></label>
+              <label><translate translate-context="Content/Settings/Input.Label">New password</translate></label>
               <password-input v-model="newPassword" />
             </div>
             <router-link :to="{path: '/login'}">
-              <translate>Back to login</translate>
+              <translate translate-context="Content/Signup/Link">Back to login</translate>
             </router-link>
             <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'green', 'button']" type="submit">
-              <translate>Update your password</translate></button>
+              <translate translate-context="Content/Signup/Button.Label">Update your password</translate></button>
           </template>
           <template v-else>
-            <p><translate>If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes.</translate></p>
+            <p><translate translate-context="Content/Signup/Paragraph">If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes.</translate></p>
           </template>
         </form>
         <div v-else class="ui positive message">
-          <div class="header"><translate>Password updated successfully</translate></div>
-          <p><translate>Your password has been updated successfully.</translate></p>
+          <div class="header"><translate translate-context="Content/Signup/Card.Title">Password updated successfully</translate></div>
+          <p><translate translate-context="Content/Signup/Card.Paragraph">Your password has been updated successfully.</translate></p>
           <router-link :to="{name: 'login'}">
-            <translate>Proceed to login</translate>
+            <translate translate-context="Content/Signup/Link/Verb">Proceed to login</translate>
           </router-link>
         </div>
       </div>
@@ -59,7 +59,7 @@ export default {
   computed: {
     labels() {
       return {
-        changePassword: this.$gettext("Change your password")
+        changePassword: this.$pgettext('*/Signup/Title', "Change your password")
       }
     }
   },

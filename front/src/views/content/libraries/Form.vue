@@ -1,52 +1,54 @@
 <template>
   <form class="ui form" @submit.prevent="submit">
-    <p v-if="!library"><translate>Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family.</translate></p>
+    <p v-if="!library"><translate translate-context="Content/Library/Paragraph">Libraries help you organize and share your music collections. You can upload your own music collection to Funkwhale and share it with your friends and family.</translate></p>
     <div v-if="errors.length > 0" class="ui negative message">
-      <div class="header"><translate>Error</translate></div>
+      <div class="header"><translate translate-context="Content/*/Error message.Title">Error</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
     <div class="required field">
-      <label><translate>Name</translate></label>
+      <label><translate translate-context="*/*/*/Noun">Name</translate></label>
       <input name="name" v-model="currentName" :placeholder="labels.namePlaceholder" required maxlength="100">
     </div>
     <div class="field">
-      <label><translate>Description</translate></label>
+      <label><translate translate-context="Content/*/Input.Label/Noun">Description</translate></label>
       <textarea v-model="currentDescription" :placeholder="labels.descriptionPlaceholder" maxlength="2000"></textarea>
     </div>
     <div class="field">
-      <label><translate>Visibility</translate></label>
-      <p><translate>You are able to share your library with other people, regardless of its visibility.</translate></p>
+      <label><translate translate-context="Content/Library/Dropdown.Label">Visibility</translate></label>
+      <p><translate translate-context="Content/Library/Paragraph">You are able to share your library with other people, regardless of its visibility.</translate></p>
       <select class="ui dropdown" v-model="currentVisibilityLevel">
-        <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ labels.visibility[c] }}</option>
+        <option :value="c" v-for="c in ['me', 'instance', 'everyone']">{{ sharedLabels.fields.privacy_level.choices[c] }}</option>
       </select>
     </div>
     <button class="ui submit button" type="submit">
-      <translate v-if="library">Update library</translate>
-      <translate v-else>Create library</translate>
+      <translate translate-context="Content/Library/Button.Label/Verb" v-if="library">Update library</translate>
+      <translate translate-context="Content/Library/Button.Label/Verb" v-else>Create library</translate>
     </button>
     <dangerous-button v-if="library" class="right floated basic button" color='red' @confirm="remove()">
-      <translate>Delete</translate>
+      <translate translate-context="*/*/*/Verb">Delete</translate>
       <p slot="modal-header">
-        <translate>Delete this library?</translate>
+        <translate translate-context="Popup/Library/Title">Delete this library?</translate>
       </p>
       <p slot="modal-content">
-        <translate>
+        <translate translate-context="Popup/Library/Paragraph">
           The library and all its tracks will be deleted. This can not be undone.
         </translate>
       </p>
-      <p slot="modal-confirm">
-        <translate>Delete library</translate>
-      </p>
+      <div slot="modal-confirm">
+        <translate translate-context="Popup/Library/Button.Label/Verb">Delete library</translate>
+      </div>
     </dangerous-button>
   </form>
 </template>
 
 <script>
 import axios from 'axios'
+import MixinsTranslation from '@/components/mixins/Translations.vue'
 
 export default {
+  mixins: [MixinsTranslation],
   props: ['library'],
   data () {
     let d = {
@@ -67,19 +69,11 @@ export default {
   },
   computed: {
     labels () {
-      let namePlaceholder = this.$gettext('My awesome library')
-      let descriptionPlaceholder = this.$gettext('This library contains my personal music, I hope you like it.')
-      let me = this.$gettext('Nobody except me')
-      let instance = this.$gettext('Everyone on this instance')
-      let everyone = this.$gettext('Everyone, across all instances')
+      let namePlaceholder = this.$pgettext('Content/Library/Input.Placeholder', 'My awesome library')
+      let descriptionPlaceholder = this.$pgettext('Content/Library/Input.Placeholder', 'This library contains my personal music, I hope you like it.')
       return {
         namePlaceholder,
         descriptionPlaceholder,
-        visibility: {
-          me,
-          instance,
-          everyone
-        }
       }
     }
   },
@@ -103,10 +97,10 @@ export default {
         let msg
         if (self.library) {
           self.$emit('updated', response.data)
-          msg = this.$gettext('Library updated')
+          msg = this.$pgettext('Content/Library/Message', 'Library updated')
         } else {
           self.$emit('created', response.data)
-          msg = this.$gettext('Library created')
+          msg = this.$pgettext('Content/Library/Message', 'Library created')
         }
         self.$store.commit('ui/addMessage', {
           content: msg,
@@ -126,7 +120,7 @@ export default {
       let self = this
       axios.delete(`libraries/${this.library.uuid}/`).then((response) => {
         self.isLoading = false
-        let msg = this.$gettext('Library deleted')
+        let msg = this.$pgettext('Content/Library/Message', 'Library deleted')
         self.$emit('deleted', {})
         self.$store.commit('ui/addMessage', {
           content: msg,

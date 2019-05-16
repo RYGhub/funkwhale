@@ -2,7 +2,7 @@ import pytest
 from django.core.paginator import Paginator
 from django.urls import reverse
 
-from funkwhale_api.federation import serializers, webfinger
+from funkwhale_api.federation import actors, serializers, webfinger
 
 
 def test_wellknown_webfinger_validates_resource(db, api_client, settings, mocker):
@@ -54,6 +54,19 @@ def test_local_actor_detail(factories, api_client):
     assert response.data == serializer.data
 
 
+def test_service_actor_detail(factories, api_client):
+    actor = actors.get_service_actor()
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    serializer = serializers.ActorSerializer(actor)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializer.data
+
+
 def test_local_actor_inbox_post_requires_auth(factories, api_client):
     user = factories["users.User"](with_actor=True)
     url = reverse(
@@ -78,6 +91,35 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
     patched_receive.assert_called_once_with(
         activity={"hello": "world"}, on_behalf_of=authenticated_actor
     )
+
+
+def test_local_actor_inbox_post_receive(
+    factories, api_client, mocker, authenticated_actor
+):
+    payload = {
+        "to": [
+            "https://test.server/federation/music/libraries/956af6c9-1eb9-4117-8d17-b15e7b34afeb/followers"
+        ],
+        "type": "Create",
+        "actor": authenticated_actor.fid,
+        "object": {
+            "id": "https://test.server/federation/music/uploads/fe564a47-b1d4-4596-bf96-008ccf407672",
+            "type": "Audio",
+        },
+        "@context": [
+            "https://www.w3.org/ns/activitystreams",
+            "https://w3id.org/security/v1",
+            {},
+        ],
+    }
+    user = factories["users.User"](with_actor=True)
+    url = reverse(
+        "federation:actors-inbox",
+        kwargs={"preferred_username": user.actor.preferred_username},
+    )
+    response = api_client.post(url, payload, format="json")
+
+    assert response.status_code == 200
 
 
 def test_shared_inbox_post(factories, api_client, mocker, authenticated_actor):
@@ -161,3 +203,75 @@ def test_music_library_retrieve_page_follow(
     response = api_client.get(url, {"page": 1})
 
     assert response.status_code == expected
+
+
+@pytest.mark.parametrize(
+    "factory, serializer_class, namespace",
+    [
+        ("music.Artist", serializers.ArtistSerializer, "artists"),
+        ("music.Album", serializers.AlbumSerializer, "albums"),
+        ("music.Track", serializers.TrackSerializer, "tracks"),
+    ],
+)
+def test_music_local_entity_detail(
+    factories, api_client, factory, serializer_class, namespace, settings
+):
+    obj = factories[factory](fid="http://{}/1".format(settings.FEDERATION_HOSTNAME))
+    url = reverse(
+        "federation:music:{}-detail".format(namespace), kwargs={"uuid": obj.uuid}
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializer_class(obj).data
+
+
+@pytest.mark.parametrize(
+    "factory, namespace",
+    [("music.Artist", "artists"), ("music.Album", "albums"), ("music.Track", "tracks")],
+)
+def test_music_non_local_entity_detail(
+    factories, api_client, factory, namespace, settings
+):
+    obj = factories[factory](fid="http://wrong-domain/1")
+    url = reverse(
+        "federation:music:{}-detail".format(namespace), kwargs={"uuid": obj.uuid}
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "privacy_level, expected", [("me", 404), ("instance", 404), ("everyone", 200)]
+)
+def test_music_upload_detail(factories, api_client, privacy_level, expected):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level,
+        library__actor__local=True,
+        import_status="finished",
+    )
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == expected
+    if expected == 200:
+        assert response.data == serializers.UploadSerializer(upload).data
+
+
+@pytest.mark.parametrize("privacy_level", ["me", "instance"])
+def test_music_upload_detail_private_approved_follow(
+    factories, api_client, authenticated_actor, privacy_level
+):
+    upload = factories["music.Upload"](
+        library__privacy_level=privacy_level,
+        library__actor__local=True,
+        import_status="finished",
+    )
+    factories["federation.LibraryFollow"](
+        actor=authenticated_actor, target=upload.library, approved=True
+    )
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == 200

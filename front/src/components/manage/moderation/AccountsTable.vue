@@ -3,13 +3,13 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui six wide field">
-          <label><translate>Search</translate></label>
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <form @submit.prevent="search.query = $refs.search.value">
             <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
           </form>
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -17,10 +17,10 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering direction</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate>Ascending</translate></option>
-            <option value="-"><translate>Descending</translate></option>
+            <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+            <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
           </select>
         </div>
       </div>
@@ -37,12 +37,12 @@
         action-url="manage/accounts/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Name</translate></th>
-          <th><translate>Domain</translate></th>
-          <th><translate>Uploads</translate></th>
-          <th><translate>First seen</translate></th>
-          <th><translate>Last seen</translate></th>
-          <th><translate>Under moderation rule</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Noun">Last seen</translate></th>
+          <th><translate translate-context="Content/Moderation/Table.Label/Short">Under moderation rule</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -57,7 +57,7 @@
             </template>
             <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.domain)">
               <i class="home icon"></i>
-              <translate>Local account</translate>
+              <translate translate-context="Content/Moderation/*/Short, Noun">Local account</translate>
             </span>
           </td>
           <td>
@@ -70,7 +70,7 @@
             <human-date v-if="scope.obj.last_fetch_date" :date="scope.obj.last_fetch_date"></human-date>
           </td>
           <td>
-            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate>Yes</translate></span>
+            <span v-if="scope.obj.instance_policy"><i class="shield icon"></i> <translate translate-context="*/*/*">Yes</translate></span>
           </td>
         </template>
       </action-table>
@@ -86,7 +86,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -168,7 +168,7 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by domain, username, bio…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by domain, username, bio…')
       }
     },
     actionFilters () {
@@ -185,7 +185,7 @@ export default {
       return [
         {
           name: 'purge',
-          label: this.$gettext('Purge'),
+          label: this.$pgettext('*/*/*/Verb', 'Purge'),
           isDangerous: true
         }
       ]

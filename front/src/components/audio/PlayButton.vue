@@ -1,5 +1,5 @@
 <template>
-  <span :title="title" :class="['ui', {'tiny': discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
+  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
     <button
       v-if="!dropdownOnly"
       :title="labels.playNow"
@@ -7,14 +7,25 @@
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
-      <template v-if="!discrete && !iconOnly"><slot><translate>Play</translate></slot></template>
+      <template v-if="!discrete && !iconOnly"><slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
     </button>
-    <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
-      <i :class="dropdownIconClasses.concat(['icon'])"></i>
+    <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
+      <i :class="dropdownIconClasses.concat(['icon'])" :title="title" ></i>
       <div class="menu">
-        <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue"><i class="plus icon"></i><translate>Add to queue</translate></button>
-        <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext"><i class="step forward icon"></i><translate>Play next</translate></button>
-        <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow"><i class="play icon"></i><translate>Play now</translate></button>
+        <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue">
+          <i class="plus icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Add to queue</translate>
+        </button>
+        <button class="item basic" ref="addNext" data-ref="addNext" :disabled="!playable" @click.stop.prevent="addNext()" :title="labels.playNext">
+          <i class="step forward icon"></i>{{ labels.playNext }}
+        </button>
+        <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow">
+          <i class="play icon"></i>{{ labels.playNow }}</button>
+        <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio">
+          <i class="feed icon"></i><translate translate-context="*/Queue/Button.Label/Short, Verb">Start radio</translate>
+        </button>
+        <button v-if="filterableArtist" class="item basic" :disabled="!filterableArtist" @click.stop.prevent="filterArtist" :title="labels.hideArtist">
+          <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
+        </button>
       </div>
     </div>
   </span>
@@ -36,13 +47,13 @@ export default {
     discrete: {type: Boolean, default: false},
     dropdownOnly: {type: Boolean, default: false},
     iconOnly: {type: Boolean, default: false},
-    artist: {type: Number, required: false},
-    album: {type: Number, required: false},
+    artist: {type: Object, required: false},
+    album: {type: Object, required: false},
     isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
     return {
-      isLoading: false
+      isLoading: false,
     }
   },
   mounted () {
@@ -60,17 +71,18 @@ export default {
   computed: {
     labels () {
       return {
-        playNow: this.$gettext('Play now'),
-        addToQueue: this.$gettext('Add to current queue'),
-        playNext: this.$gettext('Play next')
+        playNow: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play now'),
+        addToQueue: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Add to current queue'),
+        playNext: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play next'),
+        startRadio: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play similar songs')
       }
     },
     title () {
       if (this.playable) {
-        return this.$gettext('Play...')
+        return this.$pgettext('*/Queue/Button/Title', 'Play...')
       } else {
         if (this.track) {
-          return this.$gettext('This track is not available in any library you have access to')
+          return this.$pgettext('*/Queue/Button/Title', 'This track is not available in any library you have access to')
         }
       }
     },
@@ -81,7 +93,7 @@ export default {
       if (this.track) {
         return this.track.uploads && this.track.uploads.length > 0
       } else if (this.artist) {
-        return this.albums.filter((a) => {
+        return this.artist.albums.filter((a) => {
           return a.is_playable === true
         }).length > 0
       } else if (this.tracks) {
@@ -90,9 +102,24 @@ export default {
         }).length > 0
       }
       return false
+    },
+    filterableArtist () {
+      if (this.track) {
+        return this.track.artist
+      }
+      if (this.album) {
+        return this.album.artist
+      }
+      if (this.artist) {
+        return this.artist
+      }
     }
   },
   methods: {
+
+    filterArtist () {
+      this.$store.dispatch('moderation/hide', {type: 'artist', target: this.filterableArtist})
+    },
     getTracksPage (page, params, resolve, tracks) {
       if (page > 10) {
         // it's 10 * 100 tracks already, let's stop here
@@ -103,6 +130,7 @@ export default {
       let self = this
       params['page_size'] = 100
       params['page'] = page
+      params['hidden'] = ''
       tracks = tracks || []
       axios.get('tracks/', {params: params}).then((response) => {
         response.data.results.forEach(t => {
@@ -133,15 +161,27 @@ export default {
         } else if (self.playlist) {
           let url = 'playlists/' + self.playlist.id + '/'
           axios.get(url + 'tracks/').then((response) => {
-            resolve(response.data.results.map(plt => {
+            let artistIds = self.$store.getters['moderation/artistFilters']().map((f) => {
+              return f.target.id
+            })
+            let tracks = response.data.results.map(plt => {
               return plt.track
-            }))
+            })
+            if (artistIds.length > 0) {
+              // skip tracks from hidden artists
+              tracks = tracks.filter((t) => {
+                let matchArtist = artistIds.indexOf(t.artist.id) > -1
+                return !(matchArtist || t.album && artistIds.indexOf(t.album.artist.id) > -1)
+              })
+            }
+
+            resolve(tracks)
           })
         } else if (self.artist) {
-          let params = {'artist': self.artist, 'ordering': 'album__release_date,position'}
+          let params = {'artist': self.artist.id, 'ordering': 'album__release_date,position'}
           self.getTracksPage(1, params, resolve)
         } else if (self.album) {
-          let params = {'album': self.album, 'ordering': 'position'}
+          let params = {'album': self.album.id, 'ordering': 'position'}
           self.getTracksPage(1, params, resolve)
         }
       })
@@ -177,12 +217,12 @@ export default {
       if (tracks.length < 1) {
         return
       }
-      let msg = this.$ngettext('%{ count } track was added to your queue', '%{ count } tracks were added to your queue', tracks.length)
+      let msg = this.$npgettext('*/Queue/Message', '%{ count } track was added to your queue', '%{ count } tracks were added to your queue', tracks.length)
       this.$store.commit('ui/addMessage', {
         content: this.$gettextInterpolate(msg, {count: tracks.length}),
         date: new Date()
       })
-    }
+    },
   }
 }
 </script>

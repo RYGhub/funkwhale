@@ -30,6 +30,14 @@ class DomainAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 
+@admin.register(models.Fetch)
+class FetchAdmin(admin.ModelAdmin):
+    list_display = ["url", "actor", "status", "creation_date", "fetch_date", "detail"]
+    search_fields = ["url", "actor__username"]
+    list_filter = ["status"]
+    list_select_related = True
+
+
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ["type", "fid", "url", "actor", "creation_date"]

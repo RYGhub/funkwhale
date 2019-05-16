@@ -1,22 +1,22 @@
 <template>
   <main v-title="labels.domains">
     <section class="ui vertical stripe segment">
-      <h2 class="ui left floated header"><translate>Domains</translate></h2>
+      <h2 class="ui left floated header"><translate translate-context="*/Moderation/*/Noun">Domains</translate></h2>
       <form class="ui right floated form" @submit.prevent="createDomain">
         <div v-if="errors && errors.length > 0" class="ui negative message">
-          <div class="header"><translate>Error while creating domain</translate></div>
+          <div class="header"><translate translate-context="Content/Moderation/Message.Title">Error while creating domain</translate></div>
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
           </ul>
         </div>
         <div class="inline fields">
           <div class="field">
-            <label for="domain"><translate>Add a domain</translate></label>
+            <label for="domain"><translate translate-context="Content/Moderation/Form.Label/Verb">Add a domain</translate></label>
             <input type="text" name="domain" id="domain" v-model="domainName">
           </div>
           <div class="field">
             <button :class="['ui', {'loading': isCreating}, 'green', 'button']" type="submit" :disabled="isCreating">
-              <label for="domain"><translate>Add</translate></label>
+              <label for="domain"><translate translate-context="Content/Moderation/Button/Verb">Add</translate></label>
             </button>
           </div>
         </div>
@@ -45,7 +45,7 @@ export default {
   computed: {
     labels() {
       return {
-        domains: this.$gettext("Domains")
+        domains: this.$pgettext('*/Moderation/*/Noun', "Domains")
       }
     }
   },

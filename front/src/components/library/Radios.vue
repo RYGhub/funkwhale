@@ -2,36 +2,36 @@
   <main v-title="labels.title">
     <section class="ui vertical stripe segment">
       <h2 class="ui header">
-        <translate>Browsing radios</translate>
+        <translate translate-context="Content/Radio/Title">Browsing radios</translate>
       </h2>
       <div class="ui hidden divider"></div>
       <div class="ui row">
         <h3 class="ui header">
-          <translate>Instance radios</translate>
+          <translate translate-context="Content/Radio/Title">Instance radios</translate>
         </h3>
         <div class="ui cards">
-          <radio-card :type="'favorites'"></radio-card>
+          <radio-card v-if="$store.state.auth.authenticated" :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
-          <radio-card :type="'less-listened'"></radio-card>
+          <radio-card v-if="$store.state.auth.authenticated" :type="'less-listened'"></radio-card>
         </div>
       </div>
 
       <div class="ui hidden divider"></div>
       <h3 class="ui header">
-        <translate>User radios</translate>
+        <translate translate-context="Content/Radio/Title">User radios</translate>
       </h3>
       <router-link class="ui green basic button" to="/library/radios/build" exact>
-        <translate>Create your own radio</translate>
+        <translate translate-context="Content/Radio/Button.Label/Verb">Create your own radio</translate>
       </router-link>
       <div class="ui hidden divider"></div>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
-            <label><translate>Search</translate></label>
+            <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
             <input name="search" type="text" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
-            <label><translate>Ordering</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
@@ -39,18 +39,18 @@
             </select>
           </div>
           <div class="field">
-            <label><translate>Order</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
               <option value="+">
-                <translate>Ascending</translate>
+                <translate translate-context="Content/Search/Dropdown">Ascending</translate>
               </option>
               <option value="-">
-                <translate>Descending</translate>
+                <translate translate-context="Content/Search/Dropdown">Descending</translate>
               </option>
             </select>
           </div>
           <div class="field">
-            <label><translate>Results per page</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -138,8 +138,8 @@ export default {
   },
   computed: {
     labels() {
-      let searchPlaceholder = this.$gettext("Enter a radio name…")
-      let title = this.$gettext("Radios")
+      let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter a radio name…")
+      let title = this.$pgettext('*/*/*', "Radios")
       return {
         searchPlaceholder,
         title

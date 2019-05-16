@@ -168,15 +168,20 @@ def test_changing_password_updates_secret_key(logged_in_api_client):
     assert user.password != password
 
 
-def test_can_request_password_reset(factories, api_client, mailoutbox):
+def test_can_request_password_reset(
+    factories, preferences, settings, api_client, mailoutbox
+):
     user = factories["users.User"]()
     payload = {"email": user.email}
-    emails = len(mailoutbox)
     url = reverse("rest_password_reset")
+    preferences["instance__name"] = "Hello world"
 
     response = api_client.post(url, payload)
     assert response.status_code == 200
-    assert len(mailoutbox) > emails
+
+    confirmation_message = mailoutbox[-1]
+    assert "Hello world" in confirmation_message.body
+    assert settings.FUNKWHALE_HOSTNAME in confirmation_message.body
 
 
 def test_user_can_patch_his_own_settings(logged_in_api_client):
@@ -223,6 +228,21 @@ def test_user_can_get_subsonic_token(logged_in_api_client):
 
     assert response.status_code == 200
     assert response.data == {"subsonic_api_token": "test"}
+
+
+def test_user_can_request_new_subsonic_token_uncommon_username(logged_in_api_client):
+    user = logged_in_api_client.user
+    user.username = "firstname.lastname"
+    user.subsonic_api_token = "test"
+    user.save()
+
+    url = reverse(
+        "api:v1:users:users-subsonic-token", kwargs={"username": user.username}
+    )
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 200
 
 
 def test_user_can_delete_subsonic_token(logged_in_api_client):
@@ -287,3 +307,24 @@ def test_creating_user_creates_actor_as_well(
     user = User.objects.get(username="test1")
 
     assert user.actor == actor
+
+
+def test_creating_user_sends_confirmation_email(
+    api_client, db, settings, preferences, mailoutbox
+):
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "testtest",
+        "password2": "testtest",
+    }
+    preferences["users__registration_enabled"] = True
+    preferences["instance__name"] = "Hello world"
+    response = api_client.post(url, data)
+
+    assert response.status_code == 201
+
+    confirmation_message = mailoutbox[-1]
+    assert "Hello world" in confirmation_message.body
+    assert settings.FUNKWHALE_HOSTNAME in confirmation_message.body

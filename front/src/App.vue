@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :key="String($store.state.instance.instanceUrl)">
     <!-- here, we display custom stylesheets, if any -->
     <link
       v-for="url in customStylesheets"
@@ -8,42 +8,19 @@
       :href="url"
       :key="url"
     >
-    <div class="ui main text container instance-chooser" v-if="!$store.state.instance.instanceUrl">
-      <div class="ui padded segment">
-        <h1 class="ui header">
-          <translate>Choose your instance</translate>
-        </h1>
-        <form class="ui form" @submit.prevent="$store.dispatch('instance/setUrl', instanceUrl)">
-          <p>
-            <translate>You need to select an instance in order to continue</translate>
-          </p>
-          <div class="ui action input">
-            <input type="text" v-model="instanceUrl">
-            <button type="submit" class="ui button">
-              <translate>Submit</translate>
-            </button>
-          </div>
-          <p>
-            <translate>Suggested choices</translate>
-          </p>
-          <div class="ui bulleted list">
-            <div class="ui item" v-for="url in suggestedInstances">
-              <a @click="instanceUrl = url; $store.dispatch('instance/setUrl', url)">{{ url }}</a>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-    <template v-else>
+    <template>
       <sidebar></sidebar>
+      <set-instance-modal @update:show="showSetInstanceModal = $event" :show="showSetInstanceModal"></set-instance-modal>
       <service-messages v-if="messages.length > 0"/>
       <router-view :key="$route.fullPath"></router-view>
       <div class="ui fitted divider"></div>
       <app-footer
         :version="version"
         @show:shortcuts-modal="showShortcutsModal = !showShortcutsModal"
+        @show:set-instance-modal="showSetInstanceModal = !showSetInstanceModal"
       ></app-footer>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+      <filter-modal v-if="$store.state.auth.authenticated"></filter-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
       <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
     </template>
@@ -54,7 +31,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import _ from '@/lodash'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
 import Sidebar from '@/components/Sidebar'
@@ -63,17 +40,21 @@ import ServiceMessages from '@/components/ServiceMessages'
 import moment from  'moment'
 import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
+import FilterModal from '@/components/moderation/FilterModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
+import SetInstanceModal from '@/components/SetInstanceModal'
 
 export default {
   name: 'app',
   components: {
     Sidebar,
     AppFooter,
+    FilterModal,
     PlaylistModal,
     ShortcutsModal,
     GlobalEvents,
-    ServiceMessages
+    ServiceMessages,
+    SetInstanceModal,
   },
   data () {
     return {
@@ -81,6 +62,7 @@ export default {
       nodeinfo: null,
       instanceUrl: null,
       showShortcutsModal: false,
+      showSetInstanceModal: false,
     }
   },
   created () {
@@ -110,11 +92,41 @@ export default {
       id: 'sidebarCount',
       handler: this.incrementNotificationCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'mutation.created',
+      id: 'sidebarReviewEditCount',
+      handler: this.incrementReviewEditCountInSidebar
+    })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarReviewEditCount',
+      handler: this.incrementReviewEditCountInSidebar
+    })
+  },
+  mounted () {
+    let self = this
+
+    // slight hack to allow use to have internal links in <translate> tags
+    // while preserving router behaviour
+    document.documentElement.addEventListener('click', function (event) {
+      if (!event.target.matches('a.internal')) return;
+      self.$router.push(event.target.getAttribute('href'))
+      event.preventDefault();
+    }, false);
+
   },
   destroyed () {
     this.$store.commit('ui/removeWebsocketEventHandler', {
       eventName: 'inbox.item_added',
       id: 'sidebarCount',
+    })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.created',
+      id: 'sidebarReviewEditCount',
+    })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarReviewEditCount',
     })
     this.disconnect()
   },
@@ -122,17 +134,14 @@ export default {
     incrementNotificationCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'inbox', count: 1})
     },
+    incrementReviewEditCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewEdits', value: event.pending_review_count})
+    },
     fetchNodeInfo () {
       let self = this
       axios.get('instance/nodeinfo/2.0/').then(response => {
         self.nodeinfo = response.data
       })
-    },
-    switchInstance () {
-      let confirm = window.confirm(this.$gettext('This will erase your local data and disconnect you, do you want to continue?'))
-      if (confirm) {
-        this.$store.commit('instance/instanceUrl', null)
-      }
     },
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
@@ -184,14 +193,37 @@ export default {
         console.log('Connected to WebSocket')
       })
     },
+    getTrackInformationText(track) {
+      const trackTitle = track.title
+      const artistName = (
+        (track.artist) ? track.artist.name : track.album.artist.name)
+      const text = `♫ ${trackTitle} – ${artistName} ♫`
+      return text
+    },
+    updateDocumentTitle() {
+      let parts = []
+      const currentTrackPart = (
+        (this.currentTrack) ? this.getTrackInformationText(this.currentTrack)
+        : null)
+      if (currentTrackPart) {
+        parts.push(currentTrackPart)
+      }
+      if (this.$store.state.ui.pageTitle) {
+        parts.push(this.$store.state.ui.pageTitle)
+      }
+      parts.push(this.$store.state.instance.settings.instance.name.value || 'Funkwhale')
+      document.title = parts.join(' – ')
+    },
   },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
     }),
+    ...mapGetters({
+      currentTrack: 'queue/currentTrack'
+    }),
     suggestedInstances () {
       let instances = this.$store.state.instance.knownInstances.slice(0)
-      console.log('instance', instances)
       if (this.$store.state.instance.frontSettings.defaultServerUrl) {
         let serverUrl = this.$store.state.instance.frontSettings.defaultServerUrl
         if (!serverUrl.endsWith('/')) {
@@ -200,7 +232,6 @@ export default {
         instances.push(serverUrl)
       }
       instances.push(this.$store.getters['instance/defaultUrl'](), 'https://demo.funkwhale.audio/')
-      console.log('HELLO', instances)
       return _.uniq(instances.filter((e) => {return e}))
     },
     version () {
@@ -254,9 +285,20 @@ export default {
             console.log('No momentjs locale available for', shortLocale)
           })
         })
-        console.log(moment.locales())
       }
-    }
+    },
+    'currentTrack': {
+      immediate: true,
+      handler(newValue) {
+        this.updateDocumentTitle()
+      },
+    },
+    '$store.state.ui.pageTitle': {
+      immediate: true,
+      handler(newValue) {
+        this.updateDocumentTitle()
+      },
+    },
   }
 }
 </script>

@@ -3,7 +3,7 @@
     <div v-if="stats" class="ui stackable two column grid">
       <div class="column">
         <h3 class="ui left aligned header">
-          <translate>User activity</translate>
+          <translate translate-context="Content/About/Title/Noun">User activity</translate>
         </h3>
         <div v-if="stats" class="ui mini horizontal statistics">
           <div class="statistic">
@@ -11,48 +11,48 @@
               <i class="green user icon"></i>
               {{ stats.users }}
             </div>
-            <div class="label"><translate>users</translate></div>
+            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">users</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="orange sound icon"></i> {{ stats.listenings }}
             </div>
-            <div class="label"><translate>tracks listened</translate></div>
+            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">tracks listened</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               <i class="pink heart icon"></i> {{ stats.trackFavorites }}
             </div>
-            <div class="label"><translate>Tracks favorited</translate></div>
+            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Tracks favorited</translate></div>
           </div>
         </div>
       </div>
       <div class="column">
-        <h3 class="ui left aligned header"><translate>Library</translate></h3>
+        <h3 class="ui left aligned header"><translate translate-context="*/*/*">Library</translate></h3>
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
               {{ parseInt(stats.musicDuration) }}
             </div>
-            <div class="label"><translate>Hours of music</translate></div>
+            <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Hours of music</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.artists }}
             </div>
-            <div class="label"><translate>Artists</translate></div>
+            <div class="label"><translate translate-context="*/*/*/Noun">Artists</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.albums }}
             </div>
-            <div class="label"><translate>Albums</translate></div>
+            <div class="label"><translate translate-context="*/*/*">Albums</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
               {{ stats.tracks }}
             </div>
-            <div class="label"><translate>tracks</translate></div>
+            <div class="label"><translate translate-context="*/*/*/Noun">Tracks</translate></div>
           </div>
         </div>
       </div>

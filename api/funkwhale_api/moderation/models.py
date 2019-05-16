@@ -73,3 +73,22 @@ class InstancePolicy(models.Model):
             return {"type": "actor", "obj": self.target_actor}
         if self.target_domain_id:
             return {"type": "domain", "obj": self.target_domain}
+
+
+class UserFilter(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    target_artist = models.ForeignKey(
+        "music.Artist", on_delete=models.CASCADE, related_name="user_filters"
+    )
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="content_filters"
+    )
+
+    class Meta:
+        unique_together = ("user", "target_artist")
+
+    @property
+    def target(self):
+        if self.target_artist:
+            return {"type": "artist", "obj": self.target_artist}

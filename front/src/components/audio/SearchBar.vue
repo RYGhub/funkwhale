@@ -17,14 +17,14 @@ export default {
   computed: {
     labels () {
       return {
-        placeholder: this.$gettext('Search for artists, albums, tracks…')
+        placeholder: this.$pgettext('Sidebar/Search/Input.Placeholder', 'Search for artists, albums, tracks…')
       }
     }
   },
   mounted () {
-    let artistLabel = this.$gettext('Artist')
-    let albumLabel = this.$gettext('Album')
-    let trackLabel = this.$gettext('Track')
+    let artistLabel = this.$pgettext('*/*/*/Noun', 'Artist')
+    let albumLabel = this.$pgettext('*/*/*', 'Album')
+    let trackLabel = this.$pgettext('*/*/*/Noun', 'Track')
     let self = this
     jQuery(this.$el).search({
       type: 'category',

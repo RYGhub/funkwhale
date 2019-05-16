@@ -3,9 +3,9 @@ import logging
 import mimetypes
 import os
 import tempfile
+import urllib.parse
 import uuid
 
-import markdown
 import pendulum
 import pydub
 from django.conf import settings
@@ -24,6 +24,7 @@ from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import musicbrainz
 from funkwhale_api.common import fields
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -113,6 +114,18 @@ class APIModelMixin(models.Model):
 
         return super().save(**kwargs)
 
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
+
 
 class License(models.Model):
     code = models.CharField(primary_key=True, max_length=100)
@@ -141,7 +154,7 @@ class License(models.Model):
         logger.warning("%s do not match any registered license", self.code)
 
 
-class ArtistQuerySet(models.QuerySet):
+class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def with_albums_count(self):
         return self.annotate(_albums_count=models.Count("albums"))
 
@@ -177,6 +190,16 @@ class Artist(APIModelMixin):
         "mbid": {"musicbrainz_field_name": "id"},
         "name": {"musicbrainz_field_name": "name"},
     }
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_artists",
+    )
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
 
@@ -215,7 +238,7 @@ def import_tracks(instance, cleaned_data, raw_data):
         importers.load(Track, track_cleaned_data, track_data, Track.import_hooks)
 
 
-class AlbumQuerySet(models.QuerySet):
+class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def with_tracks_count(self):
         return self.annotate(_tracks_count=models.Count("tracks"))
 
@@ -253,6 +276,16 @@ class Album(APIModelMixin):
     TYPE_CHOICES = (("album", "Album"),)
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default="album")
 
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_albums",
+    )
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
     api = musicbrainz.api.releases
     federation_namespace = "albums"
@@ -314,6 +347,16 @@ class Album(APIModelMixin):
         return self.title
 
     @property
+    def cover_path(self):
+        if not self.cover:
+            return None
+        try:
+            return self.cover.path
+        except NotImplementedError:
+            # external storage
+            return self.cover.name
+
+    @property
     def tags(self):
         t = []
         for track in self.tracks.all():
@@ -345,78 +388,7 @@ def import_album(v):
     return a
 
 
-def link_recordings(instance, cleaned_data, raw_data):
-    tracks = [r["target"] for r in raw_data["recording-relation-list"]]
-    Track.objects.filter(mbid__in=tracks).update(work=instance)
-
-
-def import_lyrics(instance, cleaned_data, raw_data):
-    try:
-        url = [
-            url_data
-            for url_data in raw_data["url-relation-list"]
-            if url_data["type"] == "lyrics"
-        ][0]["target"]
-    except (IndexError, KeyError):
-        return
-    l, _ = Lyrics.objects.get_or_create(work=instance, url=url)
-
-    return l
-
-
-class Work(APIModelMixin):
-    language = models.CharField(max_length=20)
-    nature = models.CharField(max_length=50)
-    title = models.CharField(max_length=255)
-
-    api = musicbrainz.api.works
-    api_includes = ["url-rels", "recording-rels"]
-    musicbrainz_model = "work"
-    federation_namespace = "works"
-
-    musicbrainz_mapping = {
-        "mbid": {"musicbrainz_field_name": "id"},
-        "title": {"musicbrainz_field_name": "title"},
-        "language": {"musicbrainz_field_name": "language"},
-        "nature": {"musicbrainz_field_name": "type", "converter": lambda v: v.lower()},
-    }
-    import_hooks = [import_lyrics, link_recordings]
-
-    def fetch_lyrics(self):
-        lyric = self.lyrics.first()
-        if lyric:
-            return lyric
-        data = self.api.get(self.mbid, includes=["url-rels"])["work"]
-        lyric = import_lyrics(self, {}, data)
-
-        return lyric
-
-    def get_federation_id(self):
-        if self.fid:
-            return self.fid
-
-        return None
-
-
-class Lyrics(models.Model):
-    uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
-    work = models.ForeignKey(
-        Work, related_name="lyrics", null=True, blank=True, on_delete=models.CASCADE
-    )
-    url = models.URLField(unique=True)
-    content = models.TextField(null=True, blank=True)
-
-    @property
-    def content_rendered(self):
-        return markdown.markdown(
-            self.content,
-            safe_mode=True,
-            enable_attributes=False,
-            extensions=["markdown.extensions.nl2br"],
-        )
-
-
-class TrackQuerySet(models.QuerySet):
+class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
         return self.select_related().select_related("album__artist", "artist")
 
@@ -465,9 +437,6 @@ class Track(APIModelMixin):
     album = models.ForeignKey(
         Album, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
     )
-    work = models.ForeignKey(
-        Work, related_name="tracks", null=True, blank=True, on_delete=models.CASCADE
-    )
     license = models.ForeignKey(
         License,
         null=True,
@@ -475,11 +444,21 @@ class Track(APIModelMixin):
         on_delete=models.DO_NOTHING,
         related_name="tracks",
     )
+    # Music entities are attributed to actors, to validate that updates occur
+    # from an authorized account. On top of that, we consider the instance actor
+    # can update anything under it's own domain
+    attributed_to = models.ForeignKey(
+        "federation.Actor",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_tracks",
+    )
     copyright = models.CharField(max_length=500, null=True, blank=True)
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
-    api_includes = ["artist-credits", "releases", "media", "tags", "work-rels"]
+    api_includes = ["artist-credits", "releases", "media", "tags"]
     musicbrainz_mapping = {
         "mbid": {"musicbrainz_field_name": "id"},
         "title": {"musicbrainz_field_name": "title"},
@@ -507,20 +486,6 @@ class Track(APIModelMixin):
         except Artist.DoesNotExist:
             self.artist = self.album.artist
         super().save(**kwargs)
-
-    def get_work(self):
-        if self.work:
-            return self.work
-        data = self.api.get(self.mbid, includes=["work-rels"])
-        try:
-            work_data = data["recording"]["work-relation-list"][0]["work"]
-        except (IndexError, KeyError):
-            return
-        work, _ = Work.get_or_create_from_api(mbid=work_data["id"])
-        return work
-
-    def get_lyrics_url(self):
-        return reverse("api:v1:tracks-lyrics", kwargs={"pk": self.pk})
 
     @property
     def full_name(self):
@@ -605,7 +570,7 @@ class Track(APIModelMixin):
         return licenses.LICENSES_BY_ID.get(self.license_id)
 
 
-class UploadQuerySet(models.QuerySet):
+class UploadQuerySet(common_models.NullsLastQuerySet):
     def playable_by(self, actor, include=True):
         libraries = Library.objects.viewable_by(actor)
 
@@ -677,12 +642,12 @@ class Upload(models.Model):
 
     # metadata from federation
     metadata = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     import_date = models.DateTimeField(null=True, blank=True)
     # optionnal metadata provided during import
     import_metadata = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     # status / error details for the import
     import_status = models.CharField(
@@ -694,20 +659,32 @@ class Upload(models.Model):
 
     # optionnal metadata about import results (error messages, etc.)
     import_details = JSONField(
-        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
     from_activity = models.ForeignKey(
-        "federation.Activity", null=True, on_delete=models.SET_NULL
+        "federation.Activity", null=True, on_delete=models.SET_NULL, blank=True
     )
 
     objects = UploadQuerySet.as_manager()
 
-    def download_audio_from_remote(self, user):
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
+
+    def download_audio_from_remote(self, actor):
         from funkwhale_api.common import session
         from funkwhale_api.federation import signing
 
-        if user.is_authenticated and user.actor:
-            auth = signing.get_auth(user.actor.private_key, user.actor.private_key_id)
+        if actor:
+            auth = signing.get_auth(actor.private_key, actor.private_key_id)
         else:
             auth = None
 
@@ -812,23 +789,35 @@ class Upload(models.Model):
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
 
-    def get_transcoded_version(self, format):
-        mimetype = utils.EXTENSION_TO_MIMETYPE[format]
-        existing_versions = list(self.versions.filter(mimetype=mimetype))
+    def get_transcoded_version(self, format, max_bitrate=None):
+        if format:
+            mimetype = utils.EXTENSION_TO_MIMETYPE[format]
+        else:
+            mimetype = self.mimetype or "audio/mpeg"
+            format = utils.MIMETYPE_TO_EXTENSION[mimetype]
+
+        existing_versions = self.versions.filter(mimetype=mimetype)
+        if max_bitrate is not None:
+            # we don't want to transcode if a 320kbps version is available
+            # and we're requestiong 300kbps
+            acceptable_max_bitrate = max_bitrate * 1.2
+            acceptable_min_bitrate = max_bitrate * 0.8
+            existing_versions = existing_versions.filter(
+                bitrate__gte=acceptable_min_bitrate, bitrate__lte=acceptable_max_bitrate
+            ).order_by("-bitrate")
         if existing_versions:
             # we found an existing version, no need to transcode again
             return existing_versions[0]
 
-        return self.create_transcoded_version(mimetype, format)
+        return self.create_transcoded_version(mimetype, format, bitrate=max_bitrate)
 
     @transaction.atomic
-    def create_transcoded_version(self, mimetype, format):
+    def create_transcoded_version(self, mimetype, format, bitrate):
         # we create the version with an empty file, then
         # we'll write to it
         f = ContentFile(b"")
-        version = self.versions.create(
-            mimetype=mimetype, bitrate=self.bitrate or 128000, size=0
-        )
+        bitrate = min(bitrate or 320000, self.bitrate or 320000)
+        version = self.versions.create(mimetype=mimetype, bitrate=bitrate, size=0)
         # we keep the same name, but we update the extension
         new_name = os.path.splitext(os.path.basename(self.audio_file.name))[
             0
@@ -838,6 +827,7 @@ class Upload(models.Model):
             audio=self.get_audio_segment(),
             output=version.audio_file,
             output_format=utils.MIMETYPE_TO_EXTENSION[mimetype],
+            bitrate=str(bitrate),
         )
         version.size = version.audio_file.size
         version.save(update_fields=["size"])
@@ -849,6 +839,16 @@ class Upload(models.Model):
         if not self.source or not self.source.startswith("file://"):
             return
         return self.source.lstrip("file://")
+
+    @property
+    def audio_file_path(self):
+        if not self.audio_file:
+            return None
+        try:
+            return self.audio_file.path
+        except NotImplementedError:
+            # external storage
+            return self.audio_file.name
 
 
 MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]
@@ -871,6 +871,16 @@ class UploadVersion(models.Model):
     @property
     def filename(self):
         return self.upload.filename
+
+    @property
+    def audio_file_path(self):
+        if not self.audio_file:
+            return None
+        try:
+            return self.audio_file.path
+        except NotImplementedError:
+            # external storage
+            return self.audio_file.name
 
 
 IMPORT_STATUS_CHOICES = (

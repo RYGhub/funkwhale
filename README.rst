@@ -31,4 +31,9 @@ are outlined in `CONTRIBUTING <CONTRIBUTING.rst>`_.
 Translate
 ^^^^^^^^^
 
-Translators willing to help can refer to `TRANSLATORS <TRANSLATORS>`_ for instructions.
+Translators willing to help can refer to `TRANSLATORS <TRANSLATORS.rst>`_ for instructions.
+
+Code of Conduct
+---------------
+
+`Our Code of Conduct <https://funkwhale.audio/code-of-conduct/>`_ applies to all the community spaces, including our GitLab instance. Please, take a moment to read it.

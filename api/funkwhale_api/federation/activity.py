@@ -9,9 +9,13 @@ from django.db.models import Q
 from funkwhale_api.common import channels
 from funkwhale_api.common import utils as funkwhale_utils
 
+from . import contexts
+
+recursive_getattr = funkwhale_utils.recursive_getattr
+
 
 logger = logging.getLogger(__name__)
-PUBLIC_ADDRESS = "https://www.w3.org/ns/activitystreams#Public"
+PUBLIC_ADDRESS = contexts.AS.Public
 
 ACTIVITY_TYPES = [
     "Accept",
@@ -82,16 +86,19 @@ OBJECT_TYPES = (
 BROADCAST_TO_USER_ACTIVITIES = ["Follow", "Accept"]
 
 
-def should_reject(id, actor_id=None, payload={}):
+def should_reject(fid, actor_id=None, payload={}):
+    if fid is None and actor_id is None:
+        return False
+
     from funkwhale_api.moderation import models as moderation_models
 
     policies = moderation_models.InstancePolicy.objects.active()
 
     media_types = ["Audio", "Artist", "Album", "Track", "Library", "Image"]
     relevant_values = [
-        recursive_gettattr(payload, "type", permissive=True),
-        recursive_gettattr(payload, "object.type", permissive=True),
-        recursive_gettattr(payload, "target.type", permissive=True),
+        recursive_getattr(payload, "type", permissive=True),
+        recursive_getattr(payload, "object.type", permissive=True),
+        recursive_getattr(payload, "target.type", permissive=True),
     ]
     # if one of the payload types match our internal media types, then
     # we apply policies that reject media
@@ -100,9 +107,12 @@ def should_reject(id, actor_id=None, payload={}):
     else:
         policy_type = Q(block_all=True)
 
-    query = policies.matching_url_query(id) & policy_type
-    if actor_id:
+    if fid:
+        query = policies.matching_url_query(fid) & policy_type
+    if fid and actor_id:
         query |= policies.matching_url_query(actor_id) & policy_type
+    elif actor_id:
+        query = policies.matching_url_query(actor_id) & policy_type
     return policies.filter(query).exists()
 
 
@@ -111,6 +121,7 @@ def receive(activity, on_behalf_of):
     from . import models
     from . import serializers
     from . import tasks
+    from .routes import inbox
 
     # we ensure the activity has the bare minimum structure before storing
     # it in our database
@@ -118,8 +129,12 @@ def receive(activity, on_behalf_of):
         data=activity, context={"actor": on_behalf_of, "local_recipients": True}
     )
     serializer.is_valid(raise_exception=True)
+    if not inbox.get_matching_handlers(activity):
+        # discard unhandlable activity
+        return
+
     if should_reject(
-        id=serializer.validated_data["id"],
+        fid=serializer.validated_data.get("id"),
         actor_id=serializer.validated_data["actor"].fid,
         payload=activity,
     ):
@@ -350,30 +365,9 @@ class OutboxRouter(Router):
             return activities
 
 
-def recursive_gettattr(obj, key, permissive=False):
-    """
-    Given a dictionary such as {'user': {'name': 'Bob'}} and
-    a dotted string such as user.name, returns 'Bob'.
-
-    If the value is not present, returns None
-    """
-    v = obj
-    for k in key.split("."):
-        try:
-            v = v.get(k)
-        except (TypeError, AttributeError):
-            if not permissive:
-                raise
-            return
-        if v is None:
-            return
-
-    return v
-
-
 def match_route(route, payload):
     for key, value in route.items():
-        payload_value = recursive_gettattr(payload, key)
+        payload_value = recursive_getattr(payload, key, permissive=True)
         if payload_value != value:
             return False
 
@@ -417,6 +411,27 @@ def prepare_deliveries_and_inbox_items(recipient_list, type):
                     remote_inbox_urls.add(actor.shared_inbox_url or actor.inbox_url)
             urls.append(r["target"].followers_url)
 
+        elif isinstance(r, dict) and r["type"] == "instances_with_followers":
+            # we want to broadcast the activity to other instances service actors
+            # when we have at least one follower from this instance
+            follows = (
+                models.LibraryFollow.objects.filter(approved=True)
+                .exclude(actor__domain_id=settings.FEDERATION_HOSTNAME)
+                .exclude(actor__domain=None)
+                .union(
+                    models.Follow.objects.filter(approved=True)
+                    .exclude(actor__domain_id=settings.FEDERATION_HOSTNAME)
+                    .exclude(actor__domain=None)
+                )
+            )
+            actors = models.Actor.objects.filter(
+                managed_domains__name__in=follows.values_list(
+                    "actor__domain_id", flat=True
+                )
+            )
+            values = actors.values("shared_inbox_url", "inbox_url")
+            for v in values:
+                remote_inbox_urls.add(v["shared_inbox_url"] or v["inbox_url"])
     deliveries = [models.Delivery(inbox_url=url) for url in remote_inbox_urls]
     inbox_items = [
         models.InboxItem(actor=actor, type=type) for actor in local_recipients

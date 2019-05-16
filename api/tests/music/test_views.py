@@ -70,6 +70,19 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
     assert response.data == expected
 
 
+def test_track_list_filter_id(api_request, factories, logged_in_api_client):
+    track1 = factories["music.Track"]()
+    track2 = factories["music.Track"]()
+    factories["music.Track"]()
+    url = reverse("api:v1:tracks-list")
+    response = logged_in_api_client.get(url, {"id[]": [track1.id, track2.id]})
+
+    assert response.status_code == 200
+    assert response.data["count"] == 2
+    assert response.data["results"][0]["id"] == track2.id
+    assert response.data["results"][1]["id"] == track1.id
+
+
 @pytest.mark.parametrize("param,expected", [("true", "full"), ("false", "empty")])
 def test_artist_view_filter_playable(param, expected, factories, api_request):
     artists = {
@@ -106,6 +119,27 @@ def test_album_view_filter_playable(param, expected, factories, api_request):
     queryset = view.filter_queryset(view.get_queryset())
 
     assert list(queryset) == expected
+
+
+@pytest.mark.parametrize(
+    "param", [("I've Got"), ("Français"), ("I've Got Everything : Spoken Word Poetry")]
+)
+def test_album_view_filter_query(param, factories, api_request):
+    # Test both partial and full search.
+    factories["music.Album"](title="I've Got Nothing : Original Soundtrack")
+    factories["music.Album"](title="I've Got Cake : Remix")
+    factories["music.Album"](title="Français Et Tu")
+    factories["music.Album"](title="I've Got Everything : Spoken Word Poetry")
+
+    request = api_request.get("/", {"q": param})
+    view = views.AlbumViewSet()
+    view.action_map = {"get": "list"}
+    view.request = view.initialize_request(request)
+    queryset = view.filter_queryset(view.get_queryset())
+
+    # Loop through our "expected list", and assert some string finds against our param.
+    for val in list(queryset):
+        assert val.title.find(param) != -1
 
 
 def test_can_serve_upload_as_remote_library(
@@ -297,7 +331,7 @@ def test_listen_correct_access(factories, logged_in_api_client):
     assert response.status_code == 200
 
 
-def test_listen_explicit_file(factories, logged_in_api_client, mocker):
+def test_listen_explicit_file(factories, logged_in_api_client, mocker, settings):
     mocked_serve = mocker.spy(views, "handle_serve")
     upload1 = factories["music.Upload"](
         library__privacy_level="everyone", import_status="finished"
@@ -310,8 +344,24 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker):
 
     assert response.status_code == 200
     mocked_serve.assert_called_once_with(
-        upload2, user=logged_in_api_client.user, format=None
+        upload2,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
     )
+
+
+def test_listen_no_proxy(factories, logged_in_api_client, settings):
+    settings.PROXY_MEDIA = False
+    upload = factories["music.Upload"](
+        library__privacy_level="everyone", import_status="finished"
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    response = logged_in_api_client.get(url, {"upload": upload.uuid})
+
+    assert response.status_code == 302
+    assert response["Location"] == upload.audio_file.url
 
 
 @pytest.mark.parametrize(
@@ -333,6 +383,22 @@ def test_should_transcode(mimetype, format, expected, factories):
     assert views.should_transcode(upload, format) is expected
 
 
+@pytest.mark.parametrize(
+    "bitrate,max_bitrate,expected",
+    [
+        # already in acceptable bitrate
+        (192000, 320000, False),
+        # No max bitrate specified
+        (192000, None, False),
+        # requested max below available
+        (192000, 128000, True),
+    ],
+)
+def test_should_transcode_bitrate(bitrate, max_bitrate, expected, factories):
+    upload = models.Upload(mimetype="audio/mpeg", bitrate=bitrate)
+    assert views.should_transcode(upload, "mp3", max_bitrate=max_bitrate) is expected
+
+
 @pytest.mark.parametrize("value", [True, False])
 def test_should_transcode_according_to_preference(value, preferences, factories):
     upload = models.Upload(mimetype="audio/ogg")
@@ -352,14 +418,14 @@ def test_handle_serve_create_mp3_version(factories, now):
     assert version.mimetype == "audio/mpeg"
     assert version.accessed_date == now
     assert version.bitrate == upload.bitrate
-    assert version.audio_file.path.endswith(".mp3")
+    assert version.audio_file_path.endswith(".mp3")
     assert version.size == version.audio_file.size
     assert magic.from_buffer(version.audio_file.read(), mime=True) == "audio/mpeg"
 
     assert response.status_code == 200
 
 
-def test_listen_transcode(factories, now, logged_in_api_client, mocker):
+def test_listen_transcode(factories, now, logged_in_api_client, mocker, settings):
     upload = factories["music.Upload"](
         import_status="finished", library__actor__user=logged_in_api_client.user
     )
@@ -370,7 +436,43 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker):
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3"
+        upload,
+        user=logged_in_api_client.user,
+        format="mp3",
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
+    )
+
+
+@pytest.mark.parametrize(
+    "max_bitrate, expected",
+    [
+        ("", None),
+        ("", None),
+        ("-1", None),
+        ("128", 128000),
+        ("320", 320000),
+        ("460", 320000),
+    ],
+)
+def test_listen_transcode_bitrate(
+    max_bitrate, expected, factories, now, logged_in_api_client, mocker, settings
+):
+    upload = factories["music.Upload"](
+        import_status="finished", library__actor__user=logged_in_api_client.user
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    handle_serve = mocker.spy(views, "handle_serve")
+    response = logged_in_api_client.get(url, {"max_bitrate": max_bitrate})
+
+    assert response.status_code == 200
+
+    handle_serve.assert_called_once_with(
+        upload,
+        user=logged_in_api_client.user,
+        format=None,
+        max_bitrate=expected,
+        proxy_media=settings.PROXY_MEDIA,
     )
 
 
@@ -396,7 +498,11 @@ def test_listen_transcode_in_place(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload, user=logged_in_api_client.user, format="mp3"
+        upload,
+        user=logged_in_api_client.user,
+        format="mp3",
+        max_bitrate=None,
+        proxy_media=settings.PROXY_MEDIA,
     )
 
 
@@ -578,7 +684,7 @@ def test_list_licenses(api_client, preferences, mocker):
 
     expected = [
         serializers.LicenseSerializer(l.conf).data
-        for l in models.License.objects.order_by("code")[:25]
+        for l in models.License.objects.order_by("code")
     ]
     url = reverse("api:v1:licenses-list")
 
@@ -665,5 +771,40 @@ def test_oembed_album(factories, no_api_auth, api_client, settings):
     }
 
     response = api_client.get(url, {"url": album_url, "format": "json"})
+
+    assert response.data == expected
+
+
+def test_oembed_artist(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    track = factories["music.Track"]()
+    album = track.album
+    artist = track.artist
+    url = reverse("api:v1:oembed")
+    artist_url = "https://test.com/library/artists/{}".format(artist.pk)
+    iframe_src = "http://embed?type=artist&id={}".format(artist.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": artist.name,
+        "description": artist.name,
+        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": artist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": artist_url, "format": "json"})
 
     assert response.data == expected

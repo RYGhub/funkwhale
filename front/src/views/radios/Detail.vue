@@ -18,21 +18,21 @@
         <div class="ui hidden divider"></div>
         <radio-button type="custom" :custom-radio-id="radio.id"></radio-button>
         <template v-if="$store.state.auth.username === radio.user.username">
-          <router-link class="ui icon button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
+          <router-link class="ui icon labeled button" :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
             <i class="pencil icon"></i>
             Edit…
           </router-link>
           <dangerous-button class="labeled icon" :action="deleteRadio">
             <i class="trash icon"></i> Delete
-            <p slot="modal-header" v-translate="{radio: radio.name}" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</p>
-            <p slot="modal-content"><translate>This will completely delete this radio and cannot be undone.</translate></p>
-            <p slot="modal-confirm"><translate>Delete radio</translate></p>
+            <p slot="modal-header" v-translate="{radio: radio.name}"  translate-context="Popup/Radio/Title" :translate-params="{radio: radio.name}">Do you want to delete the radio "%{ radio }"?</p>
+            <p slot="modal-content"><translate translate-context="Popup/Radio/Paragraph">This will completely delete this radio and cannot be undone.</translate></p>
+            <p slot="modal-confirm"><translate translate-context="Popup/Radio/Button.Label/Verb">Delete radio</translate></p>
           </dangerous-button>
         </template>
       </div>
     </section>
     <section class="ui vertical stripe segment">
-      <h2><translate>Tracks</translate></h2>
+      <h2><translate translate-context="*/*/*/Noun">Tracks</translate></h2>
       <track-table :tracks="tracks"></track-table>
       <div class="ui center aligned basic segment">
         <pagination
@@ -77,7 +77,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$gettext("Radio")
+        title: this.$pgettext('Head/Radio/Title', "Radio")
       }
     }
   },

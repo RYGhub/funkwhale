@@ -93,13 +93,22 @@ http {
             alias /protected/media/;
         }
 
+        # this is an internal location that is used to serve
+        # audio files once correct permission / authentication
+        # has been checked on API side
         location /_protected/media {
-            # this is an internal location that is used to serve
-            # audio files once correct permission / authentication
-            # has been checked on API side
             internal;
             alias   /protected/media;
+
         }
+        # Comment the previous location and uncomment this one if you're storing
+        # media files in a S3 bucket
+        # location ~ /_protected/media/(.+) {
+        #     internal;
+        #     resolver 127.0.0.11;
+        #     proxy_pass $1;
+        #     add_header X-Remote-URL "$1";
+        # }
 
         location /_protected/music {
             # this is an internal location that is used to serve

@@ -5,6 +5,7 @@ import createPersistedState from 'vuex-persistedstate'
 import favorites from './favorites'
 import auth from './auth'
 import instance from './instance'
+import moderation from './moderation'
 import queue from './queue'
 import radios from './radios'
 import player from './player'
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     auth,
     favorites,
     instance,
+    moderation,
     queue,
     radios,
     playlists,
@@ -52,8 +54,7 @@ export default new Vuex.Store({
       paths: [
         'player.looping',
         'player.volume',
-        'player.duration',
-        'player.errored'],
+        'player.duration'],
       filter: (mutation) => {
         return mutation.type.startsWith('player/') && mutation.type !== 'player/currentTime'
       }

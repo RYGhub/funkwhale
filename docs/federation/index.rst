@@ -88,8 +88,7 @@ to posting an activity to an outbox, we create an object, with the proper payloa
 Receiving an activity from a remote actor in a local inbox is basically the same, but we skip step 2.
 
 Funkwhale does not support all activities, and we have a basic routing logic to handle
-specific activities, and discard unsupported ones. Unsupported activities are still
-received and stored though.
+specific activities, and discard unsupported ones.
 
 If a delivered activity matches one of our routes, a dedicated handler is called,
 which can trigger additional logic. For instance, if we receive a :ref:`activity-create` activity
@@ -100,6 +99,24 @@ Links:
 
 - `Routing logic for activities <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/routes.py>`_
 - `Delivery logic for activities <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/api/funkwhale_api/federation/tasks.py>`_
+
+
+.. _service-actor:
+
+Service actor
+-------------
+
+In some situations, we will send messages or authenticate our fetches using what we call
+the service actor. A service actor is an ActivityPub actor object that acts on behalf
+of a Funkwhale server.
+
+The actor id usually looks like ``https://yourdomain.com/federation/actors/service``, but
+the reliable way to determine it is to query the nodeinfo endpoint and use the value
+available in the ``metadata > actorId`` field.
+
+Funkwhale generally considers that the service actor has authority to send activities
+associated with any object on the same domain. For instance, the service actor
+could send a :ref:`activity-delete` activity linked to another users' library on the same domain.
 
 
 Supported activities
@@ -304,6 +321,59 @@ Before handling the activity, Funkwhale will ensure the activity actor and
 the audio library's actor are the same.
 
 If no local actor follows the audio's library, the activity will be discarded.
+
+.. _activity-update:
+
+
+Update
+^^^^^^
+
+Supported on
+************
+
+- :ref:`object-library` objects
+- :ref:`object-track` objects
+
+Example
+*******
+
+.. code-block:: json
+
+  {
+    "@context": [
+      "https://www.w3.org/ns/activitystreams",
+      "https://w3id.org/security/v1",
+      {}
+    ],
+    "to": [
+      "https://awesome.music/federation/music/libraries/dc702491-f6ce-441b-9da0-cecbed08bcc6/followers"
+    ],
+    "type": "Update",
+    "actor": "https://awesome.music/federation/actors/Bob",
+    "object": {}
+  }
+
+.. note::
+
+  Refer to :ref:`object-library` or :ref:`object-track` to see the structure of the ``object`` attribute.
+
+Internal logic
+**************
+
+When a :ref:`activity-update` is received with a :ref:`object-library` or :ref:`object-track` object,
+Funkwhale will try to update the local copy of the corresponding object in it's database.
+
+
+Checks
+******
+
+Checks vary depending of the type of object associated with the update.
+
+For :ref:`object-library` objects, we ensure the actor sending the message is the owner of the library.
+
+For musical entities such as :ref:`object-track`, we ensure the actor sending the message
+matches the :ref:`property-attributedTo` property declared on the local copy on the object,
+or the :ref:`service-actor`.
 
 .. _activity-delete:
 
@@ -515,7 +585,7 @@ Example
   {
     "type": "Library",
     "id": "https://awesome.music/federation/music/libraries/dc702491-f6ce-441b-9da0-cecbed08bcc6",
-    "actor": "https://awesome.music/federation/actors/MyNameIsTroll",
+    "attributedTo": "https://awesome.music/federation/actors/Alice",
     "name": "My awesome library",
     "followers": "https://awesome.music/federation/music/libraries/dc702491-f6ce-441b-9da0-cecbed08bcc6/followers",
     "summary": "This library is for restricted use only",
@@ -613,3 +683,19 @@ For :ref:`object-audio` url objects:
 
 - If the audio's library is public, audio file can be accessed without restriction
 - Otherwise, the HTTP request must be signed by an actor with an approved follow on the audio's library
+
+
+Properties
+----------
+
+.. _property-attributedTo:
+
+attributedTo
+------------
+
+Funkwhale will generally use the ``attributedTo`` property to communicate
+who is responsible for a given object. When an object has the ``attributedTo`` attribute,
+the associated actor has the permission to :ref:`activity-update`, :ref:`activity-delete` or
+more generally apply any kind of activity on the object.
+
+In addition, Funkwhale consider all the objects of a domain as attributed to its corresponding :ref:`service-actor`.

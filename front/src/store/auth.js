@@ -8,6 +8,7 @@ export default {
   state: {
     authenticated: false,
     username: '',
+    fullUsername: '',
     availablePermissions: {
       settings: false,
       library: false,
@@ -27,6 +28,7 @@ export default {
       state.authenticated = false
       state.profile = null
       state.username = ''
+      state.fullUsername = ''
       state.token = ''
       state.tokenData = {}
       state.availablePermissions = {
@@ -43,6 +45,7 @@ export default {
       state.authenticated = value
       if (value === false) {
         state.username = null
+        state.fullUsername = null
         state.token = null
         state.tokenData = null
         state.profile = null
@@ -51,6 +54,9 @@ export default {
     },
     username: (state, value) => {
       state.username = value
+    },
+    fullUsername: (state, value) => {
+      state.fullUsername = value
     },
     avatar: (state, value) => {
       if (state.profile) {
@@ -112,10 +118,6 @@ export default {
       }
     },
     fetchProfile ({commit, dispatch, state}) {
-      if (document) {
-        // this is to ensure we do not have any leaking cookie set by django
-        document.cookie = 'sessionid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      }
 
       return new Promise((resolve, reject) => {
         axios.get('users/users/me/').then((response) => {
@@ -124,7 +126,9 @@ export default {
             resolve(response.data)
           })
           dispatch('ui/fetchUnreadNotifications', null, { root: true })
+          dispatch('ui/fetchPendingReviewEdits', null, { root: true })
           dispatch('favorites/fetch', null, { root: true })
+          dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })
         }, (response) => {
           logger.default.info('Error while fetching user profile')
@@ -137,6 +141,7 @@ export default {
         commit("authenticated", true)
         commit("profile", data)
         commit("username", data.username)
+        commit("fullUsername", data.full_username)
         Object.keys(data.permissions).forEach(function(key) {
           // this makes it easier to check for permissions in templates
           commit("permission", {

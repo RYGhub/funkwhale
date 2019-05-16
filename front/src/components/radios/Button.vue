@@ -1,9 +1,8 @@
 <template>
-  <button @click="toggleRadio" :class="['ui', 'blue', {'inverted': running}, 'button']">
+  <button @click="toggleRadio" :class="['ui', 'blue', {'inverted': running}, 'icon', 'labeled', 'button']">
     <i class="ui feed icon"></i>
-    <template v-if="running"><translate>Stop</translate></template>
-    <template v-else><translate>Start</translate></template>
-    radio
+    <template v-if="running"><translate translate-context="*/Player/Button.Label/Short, Verb">Stop radio</translate></template>
+    <template v-else><translate translate-context="*/Queue/Button.Label/Short, Verb">Start radio</translate></template>
   </button>
 </template>
 

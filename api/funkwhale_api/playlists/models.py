@@ -17,7 +17,7 @@ class PlaylistQuerySet(models.QuerySet):
 
     def with_covers(self):
         album_prefetch = models.Prefetch(
-            "album", queryset=music_models.Album.objects.only("cover")
+            "album", queryset=music_models.Album.objects.only("cover", "artist_id")
         )
         track_prefetch = models.Prefetch(
             "track",
@@ -70,7 +70,7 @@ class Playlist(models.Model):
         return self.name
 
     @transaction.atomic
-    def insert(self, plt, index=None):
+    def insert(self, plt, index=None, allow_duplicates=True):
         """
         Given a PlaylistTrack, insert it at the correct index in the playlist,
         and update other tracks index if necessary.
@@ -95,6 +95,10 @@ class Playlist(models.Model):
 
         if index < 0:
             raise exceptions.ValidationError("Index must be zero or positive")
+
+        if not allow_duplicates:
+            existing_without_current_plt = existing.exclude(pk=plt.pk)
+            self._check_duplicate_add(existing_without_current_plt, [plt.track])
 
         if move:
             # we remove the index temporarily, to avoid integrity errors
@@ -125,7 +129,7 @@ class Playlist(models.Model):
         return to_update.update(index=models.F("index") - 1)
 
     @transaction.atomic
-    def insert_many(self, tracks):
+    def insert_many(self, tracks, allow_duplicates=True):
         existing = self.playlist_tracks.select_for_update()
         now = timezone.now()
         total = existing.filter(index__isnull=False).count()
@@ -134,6 +138,10 @@ class Playlist(models.Model):
             raise exceptions.ValidationError(
                 "Playlist would reach the maximum of {} tracks".format(max_tracks)
             )
+
+        if not allow_duplicates:
+            self._check_duplicate_add(existing, tracks)
+
         self.save(update_fields=["modification_date"])
         start = total
         plts = [
@@ -143,6 +151,26 @@ class Playlist(models.Model):
             for i, track in enumerate(tracks)
         ]
         return PlaylistTrack.objects.bulk_create(plts)
+
+    def _check_duplicate_add(self, existing_playlist_tracks, tracks_to_add):
+        track_ids = [t.pk for t in tracks_to_add]
+
+        duplicates = existing_playlist_tracks.filter(
+            track__pk__in=track_ids
+        ).values_list("track__pk", flat=True)
+        if duplicates:
+            duplicate_tracks = [t for t in tracks_to_add if t.pk in duplicates]
+            raise exceptions.ValidationError(
+                {
+                    "non_field_errors": [
+                        {
+                            "tracks": duplicate_tracks,
+                            "playlist_name": self.name,
+                            "code": "tracks_already_exist_in_playlist",
+                        }
+                    ]
+                }
+            )
 
 
 class PlaylistTrackQuerySet(models.QuerySet):

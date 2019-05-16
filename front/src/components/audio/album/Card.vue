@@ -11,7 +11,7 @@
         <div class="meta">
           <span>
             <router-link :title="album.artist.name" tag="span" :to="{name: 'library.artists.detail', params: {id: album.artist.id }}">
-              <span v-translate="{artist: album.artist.name}" :translate-params="{artist: album.artist.name}">By %{ artist }</span>
+              <span v-translate="{artist: album.artist.name}" translate-context="Content/Album/Card" :translate-params="{artist: album.artist.name}">By %{ artist }</span>
             </router-link>
           </span><span class="time" v-if="album.release_date">– {{ album.release_date | year }}</span>
         </div>
@@ -36,21 +36,21 @@
           </table>
           <div class="center aligned segment" v-if="album.tracks.length > initialTracks">
             <em v-if="!showAllTracks" @click="showAllTracks = true" class="expand">
-              <translate :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
+              <translate translate-context="Content/Album/Card.Link/Verb" :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <translate>Collapse</translate>
+              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
             </em>
           </div>
         </div>
       </div>
       <div class="extra content">
-        <play-button class="mini basic orange right floated" :tracks="album.tracks">
-          <translate>Play all</translate>
+        <play-button class="mini basic orange right floated" :tracks="tracksWithAlbum" :album="album">
+          <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
         </play-button>
         <span>
           <i class="music icon"></i>
-          <translate :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
+          <translate translate-context="*/*/*" :translate-params="{count: album.tracks.length}" :translate-n="album.tracks.length" translate-plural="%{ count } tracks">%{ count } track</translate>
         </span>
       </div>
     </div>
@@ -83,6 +83,20 @@ export default {
         return this.album.tracks
       }
       return this.album.tracks.slice(0, this.initialTracks)
+    },
+    tracksWithAlbum () {
+      // needed to include album data (especially cover)
+      // with tracks appended in queue (#795)
+      let self = this
+      return this.album.tracks.map(t => {
+        return  {
+          ...t,
+          album: {
+            ...self.album,
+            tracks: []
+          }
+        }
+      })
     }
   }
 }

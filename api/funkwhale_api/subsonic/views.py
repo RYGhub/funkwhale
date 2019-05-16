@@ -13,6 +13,7 @@ import funkwhale_api
 from funkwhale_api.activity import record
 from funkwhale_api.common import fields, preferences, utils as common_utils
 from funkwhale_api.favorites.models import TrackFavorite
+from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
@@ -91,7 +92,7 @@ def get_playlist_qs(request):
 class SubsonicViewSet(viewsets.GenericViewSet):
     content_negotiation_class = negotiation.SubsonicContentNegociation
     authentication_classes = [authentication.SubsonicAuthentication]
-    permissions_classes = [rest_permissions.IsAuthenticated]
+    permission_classes = [rest_permissions.IsAuthenticated]
 
     def dispatch(self, request, *args, **kwargs):
         if not preferences.get("subsonic__enabled"):
@@ -127,7 +128,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         detail=False,
         methods=["get", "post"],
         url_name="get_license",
-        permissions_classes=[],
+        permission_classes=[],
         url_path="getLicense",
     )
     def get_license(self, request, *args, **kwargs):
@@ -152,8 +153,14 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         url_path="getArtists",
     )
     def get_artists(self, request, *args, **kwargs):
-        artists = music_models.Artist.objects.all().playable_by(
-            utils.get_actor_from_request(request)
+        artists = (
+            music_models.Artist.objects.all()
+            .exclude(
+                moderation_filters.get_filtered_content_query(
+                    moderation_filters.USER_FILTER_CONFIG["ARTIST"], request.user
+                )
+            )
+            .playable_by(utils.get_actor_from_request(request))
         )
         data = serializers.GetArtistsSerializer(artists).data
         payload = {"artists": data}
@@ -167,8 +174,14 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         url_path="getIndexes",
     )
     def get_indexes(self, request, *args, **kwargs):
-        artists = music_models.Artist.objects.all().playable_by(
-            utils.get_actor_from_request(request)
+        artists = (
+            music_models.Artist.objects.all()
+            .exclude(
+                moderation_filters.get_filtered_content_query(
+                    moderation_filters.USER_FILTER_CONFIG["ARTIST"], request.user
+                )
+            )
+            .playable_by(utils.get_actor_from_request(request))
         )
         data = serializers.GetArtistsSerializer(artists).data
         payload = {"indexes": data}
@@ -237,7 +250,24 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         format = data.get("format", "raw")
         if format == "raw":
             format = None
-        return music_views.handle_serve(upload=upload, user=request.user, format=format)
+
+        max_bitrate = data.get("maxBitRate")
+        try:
+            max_bitrate = min(max(int(max_bitrate), 0), 320) or None
+        except (TypeError, ValueError):
+            max_bitrate = None
+
+        if max_bitrate:
+            max_bitrate = max_bitrate * 1000
+        return music_views.handle_serve(
+            upload=upload,
+            user=request.user,
+            format=format,
+            max_bitrate=max_bitrate,
+            # Subsonic clients don't expect 302 redirection unfortunately,
+            # So we have to proxy media files
+            proxy_media=True,
+        )
 
     @action(detail=False, methods=["get", "post"], url_name="star", url_path="star")
     @find_object(music_models.Track.objects.all())
@@ -273,7 +303,11 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     def get_random_songs(self, request, *args, **kwargs):
         data = request.GET or request.POST
         actor = utils.get_actor_from_request(request)
-        queryset = music_models.Track.objects.all()
+        queryset = music_models.Track.objects.all().exclude(
+            moderation_filters.get_filtered_content_query(
+                moderation_filters.USER_FILTER_CONFIG["TRACK"], request.user
+            )
+        )
         queryset = queryset.playable_by(actor)
         try:
             size = int(data["size"])
@@ -308,8 +342,14 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         url_path="getAlbumList2",
     )
     def get_album_list2(self, request, *args, **kwargs):
-        queryset = music_models.Album.objects.with_tracks_count().order_by(
-            "artist__name"
+        queryset = (
+            music_models.Album.objects.exclude(
+                moderation_filters.get_filtered_content_query(
+                    moderation_filters.USER_FILTER_CONFIG["ALBUM"], request.user
+                )
+            )
+            .with_tracks_count()
+            .order_by("artist__name")
         )
         data = request.GET or request.POST
         filterset = filters.AlbumList2FilterSet(data, queryset=queryset)

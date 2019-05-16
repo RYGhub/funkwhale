@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "dateformat": "^3.0.3",
+    "diff": "^4.0.1",
     "django-channels": "^1.1.6",
     "howler": "^2.0.14",
     "js-logger": "^1.4.1",

@@ -22,12 +22,16 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.models import QuerySet
 
+from aioresponses import aioresponses
 from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
-from funkwhale_api.users.permissions import HasUserPermission
+from funkwhale_api.federation import actors
+
+
+pytest_plugins = "aiohttp.pytest_plugin"
 
 
 class FunkwhaleProvider(internet_provider.Provider):
@@ -313,16 +317,6 @@ def authenticated_actor(factories, mocker):
 
 
 @pytest.fixture
-def assert_user_permission():
-    def inner(view, permissions, operator="and"):
-        assert HasUserPermission in view.permission_classes
-        assert getattr(view, "permission_operator", "and") == operator
-        assert set(view.required_permissions) == set(permissions)
-
-    return inner
-
-
-@pytest.fixture
 def to_api_date():
     def inner(value):
         if isinstance(value, datetime.datetime):
@@ -396,6 +390,7 @@ def stdout():
 
 @pytest.fixture
 def spa_html(r_mock, settings):
+    settings.FUNKWHALE_SPA_HTML_ROOT = "http://noop/"
     yield r_mock.get(
         settings.FUNKWHALE_SPA_HTML_ROOT + "index.html", text="<head></head>"
     )
@@ -416,3 +411,14 @@ def migrator(transactional_db):
 def rsa_small_key(settings):
     # smaller size for faster generation, since it's CPU hungry
     settings.RSA_KEY_SIZE = 512
+
+
+@pytest.fixture(autouse=True)
+def a_responses():
+    with aioresponses() as m:
+        yield m
+
+
+@pytest.fixture
+def service_actor(db):
+    return actors.get_service_actor()

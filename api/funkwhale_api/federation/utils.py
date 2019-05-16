@@ -1,6 +1,7 @@
 import unicodedata
 import re
 from django.conf import settings
+from django.db.models import Q
 
 from funkwhale_api.common import session
 from funkwhale_api.moderation import models as moderation_models
@@ -61,7 +62,7 @@ def slugify_username(username):
 
 
 def retrieve_ap_object(
-    fid, actor=None, serializer_class=None, queryset=None, apply_instance_policies=True
+    fid, actor, serializer_class=None, queryset=None, apply_instance_policies=True
 ):
     from . import activity
 
@@ -100,10 +101,33 @@ def retrieve_ap_object(
     except KeyError:
         pass
     else:
-        if apply_instance_policies and activity.should_reject(id=id, payload=data):
+        if apply_instance_policies and activity.should_reject(fid=id, payload=data):
             raise exceptions.BlockedActorOrDomain()
     if not serializer_class:
         return data
-    serializer = serializer_class(data=data)
+    serializer = serializer_class(data=data, context={"fetch_actor": actor})
     serializer.is_valid(raise_exception=True)
     return serializer.save()
+
+
+def get_domain_query_from_url(domain, url_field="fid"):
+    """
+    Given a domain name and a field, will return a Q() object
+    to match objects that have this domain in the given field.
+    """
+
+    query = Q(**{"{}__startswith".format(url_field): "http://{}/".format(domain)})
+    query = query | Q(
+        **{"{}__startswith".format(url_field): "https://{}/".format(domain)}
+    )
+    return query
+
+
+def is_local(url):
+    if not url:
+        return True
+
+    d = settings.FEDERATION_HOSTNAME
+    return url.startswith("http://{}/".format(d)) or url.startswith(
+        "https://{}/".format(d)
+    )

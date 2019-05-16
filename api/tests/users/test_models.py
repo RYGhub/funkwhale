@@ -219,3 +219,13 @@ def test_user_get_quota_status(factories, preferences, mocker):
         "errored": 3,
         "finished": 4,
     }
+
+
+def test_deleting_users_deletes_associated_actor(factories):
+    actor = factories["federation.Actor"]()
+    user = factories["users.User"](actor=actor)
+
+    user.delete()
+
+    with pytest.raises(actor.DoesNotExist):
+        actor.refresh_from_db()

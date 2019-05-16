@@ -1,21 +1,21 @@
 <template>
   <main v-title="labels.playlists">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate>Browsing playlists</translate></h2>
+      <h2 class="ui header"><translate translate-context="Content/Playlist/Title">Browsing playlists</translate></h2>
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <template v-if="$store.state.auth.authenticated">
           <button
             @click="$store.commit('playlists/chooseTrack', null)"
-            class="ui basic green button"><translate>Manage your playlists</translate></button>
+            class="ui basic green button"><translate translate-context="Content/Playlist/Button.Label/Verb">Manage your playlists</translate></button>
           <div class="ui hidden divider"></div>
         </template>
         <div class="fields">
           <div class="field">
-            <label><translate>Search</translate></label>
+            <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
-            <label><translate>Ordering</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
@@ -23,14 +23,14 @@
             </select>
           </div>
           <div class="field">
-            <label><translate>Order</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
             <select class="ui dropdown" v-model="orderingDirection">
-              <option value="+"><translate>Ascending</translate></option>
-              <option value="-"><translate>Descending</translate></option>
+              <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+              <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
             </select>
           </div>
           <div class="field">
-            <label><translate>Results per page</translate></label>
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
               <option :value="parseInt(25)">25</option>
@@ -103,8 +103,8 @@ export default {
   },
   computed: {
     labels() {
-      let playlists = this.$gettext("Playlists")
-      let searchPlaceholder = this.$gettext("Enter playlist name…")
+      let playlists = this.$pgettext('*/*/*', 'Playlists')
+      let searchPlaceholder = this.$pgettext('Content/Playlist/Placeholder/Call to action', 'Enter playlist name…')
       return {
         playlists,
         searchPlaceholder

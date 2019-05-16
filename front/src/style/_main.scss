@@ -88,8 +88,14 @@ body {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
+#app > main, #app > .main {
+  flex: 1;
+}
 .instance-chooser {
   margin-top: 2em;
 }
@@ -225,8 +231,15 @@ body {
   justify-content: center;
 }
 
-.segment-content .button {
-  margin: 0.5em;
+.header-buttons > .buttons {
+  display: inline-block;
+  padding: 0.2em;
+  margin: 0;
+  font-size: 1em;
+  .buttons {
+    margin: 0;
+  }
+
 }
 
 a {
@@ -295,4 +308,50 @@ canvas.color-thief {
 
 .ui.list .list.icon {
   padding-left: 0;
+}
+
+
+.ui.dropdown .item[disabled] {
+  display: none;
+}
+
+span.diff.added {
+  background-color:rgba(0, 255, 0, 0.25);
+}
+
+
+span.diff.removed {
+  background-color: rgba(255, 0, 0, 0.25);
+}
+
+.table-wrapper {
+  display: block;
+  overflow-x: auto;
+}
+
+td.align.right {
+  text-align: right;
+}
+
+.ui.pagination.menu {
+  margin-top: 1em;
+  + span {
+    margin-left: 1em;
+  }
+}
+
+.card .description {
+  word-wrap: break-word;
+}
+
+.ui.checkbox label {
+  cursor: pointer;
+}
+
+input + .help {
+  margin-top: 0.5em;
+}
+
+.table td .ui.dropdown {
+  min-width: 150px;
 }

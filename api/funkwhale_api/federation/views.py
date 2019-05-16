@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import utils as music_utils
 
 from . import activity, authentication, models, renderers, serializers, utils, webfinger
 
@@ -21,7 +22,7 @@ class FederationMixin(object):
 class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
     permission_classes = []
     authentication_classes = [authentication.SignatureAuthentication]
-    renderer_classes = [renderers.ActivityPubRenderer]
+    renderer_classes = renderers.get_ap_renderers()
 
     @action(methods=["post"], detail=False)
     def inbox(self, request, *args, **kwargs):
@@ -38,7 +39,7 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     lookup_field = "preferred_username"
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
+    renderer_classes = renderers.get_ap_renderers()
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
 
@@ -67,6 +68,15 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
         self.get_object()
         # XXX to implement
         return response.Response({})
+
+
+class EditViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    lookup_field = "uuid"
+    authentication_classes = [authentication.SignatureAuthentication]
+    permission_classes = []
+    renderer_classes = renderers.get_ap_renderers()
+    # queryset = common_models.Mutation.objects.local().select_related()
+    # serializer_class = serializers.ActorSerializer
 
 
 class WellKnownViewSet(viewsets.GenericViewSet):
@@ -137,7 +147,7 @@ class MusicLibraryViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
+    renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
     queryset = music_models.Library.objects.all().select_related("actor")
     lookup_field = "uuid"
@@ -192,9 +202,17 @@ class MusicUploadViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Upload.objects.none()
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = music_models.Upload.objects.local().select_related(
+        "library__actor", "track__artist", "track__album__artist"
+    )
+    serializer_class = serializers.UploadSerializer
     lookup_field = "uuid"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        actor = music_utils.get_actor_from_request(self.request)
+        return queryset.playable_by(actor)
 
 
 class MusicArtistViewSet(
@@ -202,8 +220,9 @@ class MusicArtistViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Artist.objects.none()
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = music_models.Artist.objects.local()
+    serializer_class = serializers.ArtistSerializer
     lookup_field = "uuid"
 
 
@@ -212,8 +231,9 @@ class MusicAlbumViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Album.objects.none()
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = music_models.Album.objects.local().select_related("artist")
+    serializer_class = serializers.AlbumSerializer
     lookup_field = "uuid"
 
 
@@ -222,6 +242,9 @@ class MusicTrackViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     permission_classes = []
-    renderer_classes = [renderers.ActivityPubRenderer]
-    queryset = music_models.Track.objects.none()
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = music_models.Track.objects.local().select_related(
+        "album__artist", "artist"
+    )
+    serializer_class = serializers.TrackSerializer
     lookup_field = "uuid"

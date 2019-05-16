@@ -1,8 +1,8 @@
  <template>
-  <button @click="$store.dispatch('favorites/toggle', track.id)" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'button']">
+  <button @click="$store.dispatch('favorites/toggle', track.id)" v-if="button" :class="['ui', 'pink', {'inverted': isFavorite}, {'favorited': isFavorite}, 'icon', 'labeled', 'button']">
     <i class="heart icon"></i>
-    <translate v-if="isFavorite">In favorites</translate>
-    <translate v-else>Add to favorites</translate>
+    <translate v-if="isFavorite" translate-context="Content/Track/Button.Message">In favorites</translate>
+    <translate v-else translate-context="Content/Track/*/Verb">Add to favorites</translate>
   </button>
   <button
     v-else
@@ -23,9 +23,9 @@ export default {
   computed: {
     title () {
       if (this.isFavorite) {
-        return this.$gettext('Remove from favorites')
+        return this.$pgettext('Content/Track/Icon.Tooltip/Verb', 'Remove from favorites')
       } else {
-        return this.$gettext('Add to favorites')
+        return this.$pgettext('Content/Track/*/Verb', 'Add to favorites')
       }
     },
     isFavorite () {

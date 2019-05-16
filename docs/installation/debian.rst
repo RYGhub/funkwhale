@@ -51,7 +51,7 @@ Create the user and the directory:
 
 .. code-block:: shell
 
-    sudo useradd -r -s /usr/bin/nologin -d /srv/funkwhale -m funkwhale
+    sudo useradd -r -s /usr/sbin/nologin -d /srv/funkwhale -m funkwhale
     cd /srv/funkwhale
 
 Log in as the newly created user from now on:

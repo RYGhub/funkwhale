@@ -29,7 +29,6 @@ env_file = env("ENV_FILE", default=None)
 if env_file:
     # we have an explicitely specified env file
     # so we try to load and it fail loudly if it does not exist
-    print("ENV_FILE", env_file)
     env.read_env(env_file)
 else:
     # we try to load from .env and config/.env
@@ -79,7 +78,7 @@ FUNKWHALE_SPA_HTML_CACHE_DURATION = env.int(
     "FUNKWHALE_SPA_HTML_CACHE_DURATION", default=60 * 15
 )
 FUNKWHALE_EMBED_URL = env(
-    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_SPA_HTML_ROOT + "embed.html"
+    "FUNKWHALE_EMBED_URL", default=FUNKWHALE_URL + "/front/embed.html"
 )
 APP_NAME = "Funkwhale"
 
@@ -94,6 +93,9 @@ FEDERATION_MUSIC_NEEDS_APPROVAL = env.bool(
 )
 # XXX: deprecated, see #186
 FEDERATION_ACTOR_FETCH_DELAY = env.int("FEDERATION_ACTOR_FETCH_DELAY", default=60 * 12)
+FEDERATION_SERVICE_ACTOR_USERNAME = env(
+    "FEDERATION_SERVICE_ACTOR_USERNAME", default="service"
+)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[]) + [FUNKWHALE_HOSTNAME]
 
 # APP CONFIGURATION
@@ -119,6 +121,7 @@ THIRD_PARTY_APPS = (
     "allauth.account",  # registration
     "allauth.socialaccount",  # registration
     "corsheaders",
+    "oauth2_provider",
     "rest_framework",
     "rest_framework.authtoken",
     "taggit",
@@ -147,9 +150,10 @@ if RAVEN_ENABLED:
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    "funkwhale_api.common",
+    "funkwhale_api.common.apps.CommonConfig",
     "funkwhale_api.activity.apps.ActivityConfig",
     "funkwhale_api.users",  # custom users app
+    "funkwhale_api.users.oauth",
     # Your stuff: custom apps go here
     "funkwhale_api.instance",
     "funkwhale_api.music",
@@ -180,10 +184,6 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "funkwhale_api.users.middleware.RecordActivityMiddleware",
 )
-
-# MIGRATIONS CONFIGURATION
-# ------------------------------------------------------------------------------
-MIGRATION_MODULES = {"sites": "funkwhale_api.contrib.sites.migrations"}
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -220,6 +220,16 @@ DATABASES = {
     "default": env.db("DATABASE_URL")
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+DATABASES["default"]["CONN_MAX_AGE"] = env("DB_CONN_MAX_AGE", default=60 * 60)
+
+MIGRATION_MODULES = {
+    # see https://github.com/jazzband/django-oauth-toolkit/issues/634
+    # swappable models are badly designed in oauth2_provider
+    # ignore migrations and provide our own models.
+    "oauth2_provider": None,
+    "sites": "funkwhale_api.contrib.sites.migrations",
+}
+
 #
 # DATABASES = {
 #     'default': {
@@ -296,6 +306,25 @@ STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR("staticfiles")))
 STATIC_URL = env("STATIC_URL", default="/staticfiles/")
 DEFAULT_FILE_STORAGE = "funkwhale_api.common.storage.ASCIIFileSystemStorage"
 
+PROXY_MEDIA = env.bool("PROXY_MEDIA", default=True)
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = env.bool("AWS_QUERYSTRING_AUTH", default=not PROXY_MEDIA)
+AWS_S3_MAX_MEMORY_SIZE = env.int(
+    "AWS_S3_MAX_MEMORY_SIZE", default=1000 * 1000 * 1000 * 20
+)
+AWS_QUERYSTRING_EXPIRE = env.int("AWS_QUERYSTRING_EXPIRE", default=3600)
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default=None)
+
+if AWS_ACCESS_KEY_ID:
+    AWS_ACCESS_KEY_ID = AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default=None)
+    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default=None)
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_LOCATION = env("AWS_LOCATION", default="")
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (str(APPS_DIR.path("static")),)
 
@@ -340,6 +369,23 @@ ACCOUNT_USERNAME_VALIDATORS = "funkwhale_api.users.serializers.username_validato
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
+
+# OAuth configuration
+from funkwhale_api.users.oauth import scopes  # noqa
+
+OAUTH2_PROVIDER = {
+    "SCOPES": {s.id: s.label for s in scopes.SCOPES_BY_ID.values()},
+    "ALLOWED_REDIRECT_URI_SCHEMES": ["http", "https", "urn"],
+    # we keep expired tokens for 15 days, for tracability
+    "REFRESH_TOKEN_EXPIRE_SECONDS": 3600 * 24 * 15,
+    "AUTHORIZATION_CODE_EXPIRE_SECONDS": 5 * 60,
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 60 * 60 * 10,
+    "OAUTH2_SERVER_CLASS": "funkwhale_api.users.oauth.server.OAuth2Server",
+}
+OAUTH2_PROVIDER_APPLICATION_MODEL = "users.Application"
+OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = "users.AccessToken"
+OAUTH2_PROVIDER_GRANT_MODEL = "users.Grant"
+OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "users.RefreshToken"
 
 # LDAP AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -448,15 +494,27 @@ CELERY_TASK_TIME_LIMIT = 300
 CELERY_BEAT_SCHEDULE = {
     "federation.clean_music_cache": {
         "task": "federation.clean_music_cache",
-        "schedule": crontab(hour="*/2"),
+        "schedule": crontab(minute="0", hour="*/2"),
         "options": {"expires": 60 * 2},
     },
     "music.clean_transcoding_cache": {
         "task": "music.clean_transcoding_cache",
-        "schedule": crontab(hour="*"),
+        "schedule": crontab(minute="0", hour="*"),
         "options": {"expires": 60 * 2},
     },
+    "oauth.clear_expired_tokens": {
+        "task": "oauth.clear_expired_tokens",
+        "schedule": crontab(minute="0", hour="0"),
+        "options": {"expires": 60 * 60 * 24},
+    },
+    "federation.refresh_nodeinfo_known_nodes": {
+        "task": "federation.refresh_nodeinfo_known_nodes",
+        "schedule": crontab(minute="0", hour="*"),
+        "options": {"expires": 60 * 60},
+    },
 }
+
+NODEINFO_REFRESH_DELAY = env.int("NODEINFO_REFRESH_DELAY", default=3600 * 24)
 
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
@@ -475,7 +533,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "funkwhale_api.common.pagination.FunkwhalePagination",
     "PAGE_SIZE": 25,
     "DEFAULT_PARSER_CLASSES": (
@@ -485,11 +542,15 @@ REST_FRAMEWORK = {
         "funkwhale_api.federation.parsers.ActivityParser",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         "funkwhale_api.common.authentication.JSONWebTokenAuthenticationQS",
         "funkwhale_api.common.authentication.BearerTokenHeaderAuth",
         "funkwhale_api.common.authentication.JSONWebTokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "funkwhale_api.users.oauth.permissions.ScopePermission",
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework.filters.OrderingFilter",

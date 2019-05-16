@@ -38,9 +38,9 @@
       {{ time.parse(track.uploads[0].duration) }}
     </td>
     <td colspan="4" v-else>
-      <translate>N/A</translate>
+      <translate translate-context="*/*/*">N/A</translate>
     </td>
-    <td colspan="2">
+    <td colspan="2" class="align right">
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
       <track-playlist-icon
         v-if="$store.state.auth.authenticated"

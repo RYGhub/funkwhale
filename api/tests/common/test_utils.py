@@ -1,3 +1,5 @@
+import pytest
+
 from funkwhale_api.common import utils
 
 
@@ -42,3 +44,44 @@ def test_update_prefix(factories):
         old = n.fid
         n.refresh_from_db()
         assert n.fid == old.replace("http://", "https://")
+
+
+@pytest.mark.parametrize(
+    "conf, mock_args, data, expected",
+    [
+        (
+            ["field1", "field2"],
+            {"field1": "foo", "field2": "test"},
+            {"field1": "bar"},
+            {"field1": "bar"},
+        ),
+        (
+            ["field1", "field2"],
+            {"field1": "foo", "field2": "test"},
+            {"field1": "foo"},
+            {},
+        ),
+        (
+            ["field1", "field2"],
+            {"field1": "foo", "field2": "test"},
+            {"field1": "foo", "field2": "test"},
+            {},
+        ),
+        (
+            ["field1", "field2"],
+            {"field1": "foo", "field2": "test"},
+            {"field1": "bar", "field2": "test1"},
+            {"field1": "bar", "field2": "test1"},
+        ),
+        (
+            [("field1", "Hello"), ("field2", "World")],
+            {"Hello": "foo", "World": "test"},
+            {"field1": "bar", "field2": "test1"},
+            {"Hello": "bar", "World": "test1"},
+        ),
+    ],
+)
+def test_get_updated_fields(conf, mock_args, data, expected, mocker):
+    obj = mocker.Mock(**mock_args)
+
+    assert utils.get_updated_fields(conf, data, obj) == expected

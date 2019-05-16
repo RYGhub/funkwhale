@@ -13,7 +13,7 @@
           </div>
           <div class="four wide column">
             <div class="ui sticky vertical secondary menu">
-              <div class="header item"><translate>Sections</translate></div>
+              <div class="header item"><translate translate-context="Content/Admin/Menu.Title">Sections</translate></div>
               <a :class="['menu', {active: group.id === current}, 'item']"
                 @click.prevent="scrollTo(group.id)"
                 :href="'#' + group.id"
@@ -72,19 +72,19 @@ export default {
   computed: {
     labels() {
       return {
-        settings: this.$gettext("Instance settings")
+        settings: this.$pgettext('Head/Admin/Title', 'Instance settings')
       }
     },
     groups() {
       // somehow, extraction fails if in the return block directly
-      let instanceLabel = this.$gettext("Instance information")
-      let usersLabel = this.$gettext("Users")
-      let musicLabel = this.$gettext("Music")
-      let playlistsLabel = this.$gettext("Playlists")
-      let federationLabel = this.$gettext("Federation")
-      let subsonicLabel = this.$gettext("Subsonic")
-      let statisticsLabel = this.$gettext("Statistics")
-      let errorLabel = this.$gettext("Error reporting")
+      let instanceLabel = this.$pgettext('Content/Admin/Menu','Instance information')
+      let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
+      let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
+      let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
+      let federationLabel = this.$pgettext('Content/Admin/Menu', 'Federation')
+      let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
+      let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')
+      let errorLabel = this.$pgettext('Content/Admin/Menu', 'Error reporting')
       return [
         {
           label: instanceLabel,

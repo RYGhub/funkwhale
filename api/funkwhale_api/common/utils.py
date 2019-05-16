@@ -149,6 +149,27 @@ def order_for_search(qs, field):
     return qs.annotate(__size=models.functions.Length(field)).order_by("__size")
 
 
+def recursive_getattr(obj, key, permissive=False):
+    """
+    Given a dictionary such as {'user': {'name': 'Bob'}} and
+    a dotted string such as user.name, returns 'Bob'.
+
+    If the value is not present, returns None
+    """
+    v = obj
+    for k in key.split("."):
+        try:
+            v = v.get(k)
+        except (TypeError, AttributeError):
+            if not permissive:
+                raise
+            return
+        if v is None:
+            return
+
+    return v
+
+
 def replace_prefix(queryset, field, old, new):
     """
     Given a queryset of objects and a field name, will find objects
@@ -172,3 +193,38 @@ def replace_prefix(queryset, field, old, new):
         models.functions.Substr(field, len(old) + 1, output_field=models.CharField()),
     )
     return qs.update(**{field: update})
+
+
+def concat_dicts(*dicts):
+    n = {}
+    for d in dicts:
+        n.update(d)
+
+    return n
+
+
+def get_updated_fields(conf, data, obj):
+    """
+    Given a list of fields, a dict and an object, will return the dict keys/values
+    that differ from the corresponding fields on the object.
+    """
+    final_conf = []
+    for c in conf:
+        if isinstance(c, str):
+            final_conf.append((c, c))
+        else:
+            final_conf.append(c)
+
+    final_data = {}
+
+    for data_field, obj_field in final_conf:
+        try:
+            data_value = data[data_field]
+        except KeyError:
+            continue
+
+        obj_value = getattr(obj, obj_field)
+        if obj_value != data_value:
+            final_data[obj_field] = data_value
+
+    return final_data

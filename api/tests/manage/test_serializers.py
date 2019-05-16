@@ -40,7 +40,7 @@ def test_user_update_permission(factories):
 
 
 def test_manage_domain_serializer(factories, now):
-    domain = factories["federation.Domain"]()
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     setattr(domain, "actors_count", 42)
     setattr(domain, "outbox_activities_count", 23)
     expected = {
@@ -257,3 +257,221 @@ def test_instance_policy_serializer_purges_target_actor(
 
     assert getattr(policy, param) is False
     assert on_commit.call_count == 0
+
+
+def test_manage_artist_serializer(factories, now):
+    artist = factories["music.Artist"](attributed=True)
+    track = factories["music.Track"](artist=artist)
+    album = factories["music.Album"](artist=artist)
+    expected = {
+        "id": artist.id,
+        "domain": artist.domain_name,
+        "is_local": artist.is_local,
+        "fid": artist.fid,
+        "name": artist.name,
+        "mbid": artist.mbid,
+        "creation_date": artist.creation_date.isoformat().split("+")[0] + "Z",
+        "albums": [serializers.ManageNestedAlbumSerializer(album).data],
+        "tracks": [serializers.ManageNestedTrackSerializer(track).data],
+        "attributed_to": serializers.ManageBaseActorSerializer(
+            artist.attributed_to
+        ).data,
+    }
+    s = serializers.ManageArtistSerializer(artist)
+
+    assert s.data == expected
+
+
+def test_manage_nested_track_serializer(factories, now):
+    track = factories["music.Track"]()
+    expected = {
+        "id": track.id,
+        "domain": track.domain_name,
+        "is_local": track.is_local,
+        "fid": track.fid,
+        "title": track.title,
+        "mbid": track.mbid,
+        "creation_date": track.creation_date.isoformat().split("+")[0] + "Z",
+        "position": track.position,
+        "disc_number": track.disc_number,
+        "copyright": track.copyright,
+        "license": track.license,
+    }
+    s = serializers.ManageNestedTrackSerializer(track)
+
+    assert s.data == expected
+
+
+def test_manage_nested_album_serializer(factories, now):
+    album = factories["music.Album"]()
+    setattr(album, "tracks_count", 44)
+    expected = {
+        "id": album.id,
+        "domain": album.domain_name,
+        "is_local": album.is_local,
+        "fid": album.fid,
+        "title": album.title,
+        "mbid": album.mbid,
+        "creation_date": album.creation_date.isoformat().split("+")[0] + "Z",
+        "release_date": album.release_date.isoformat(),
+        "cover": {
+            "original": album.cover.url,
+            "square_crop": album.cover.crop["400x400"].url,
+            "medium_square_crop": album.cover.crop["200x200"].url,
+            "small_square_crop": album.cover.crop["50x50"].url,
+        },
+        "tracks_count": 44,
+    }
+    s = serializers.ManageNestedAlbumSerializer(album)
+
+    assert s.data == expected
+
+
+def test_manage_nested_artist_serializer(factories, now):
+    artist = factories["music.Artist"]()
+    expected = {
+        "id": artist.id,
+        "domain": artist.domain_name,
+        "is_local": artist.is_local,
+        "fid": artist.fid,
+        "name": artist.name,
+        "mbid": artist.mbid,
+        "creation_date": artist.creation_date.isoformat().split("+")[0] + "Z",
+    }
+    s = serializers.ManageNestedArtistSerializer(artist)
+
+    assert s.data == expected
+
+
+def test_manage_album_serializer(factories, now):
+    album = factories["music.Album"](attributed=True)
+    track = factories["music.Track"](album=album)
+    expected = {
+        "id": album.id,
+        "domain": album.domain_name,
+        "is_local": album.is_local,
+        "fid": album.fid,
+        "title": album.title,
+        "mbid": album.mbid,
+        "creation_date": album.creation_date.isoformat().split("+")[0] + "Z",
+        "release_date": album.release_date.isoformat(),
+        "cover": {
+            "original": album.cover.url,
+            "square_crop": album.cover.crop["400x400"].url,
+            "medium_square_crop": album.cover.crop["200x200"].url,
+            "small_square_crop": album.cover.crop["50x50"].url,
+        },
+        "artist": serializers.ManageNestedArtistSerializer(album.artist).data,
+        "tracks": [serializers.ManageNestedTrackSerializer(track).data],
+        "attributed_to": serializers.ManageBaseActorSerializer(
+            album.attributed_to
+        ).data,
+    }
+    s = serializers.ManageAlbumSerializer(album)
+
+    assert s.data == expected
+
+
+def test_manage_track_serializer(factories, now):
+    track = factories["music.Track"](attributed=True)
+    setattr(track, "uploads_count", 44)
+    expected = {
+        "id": track.id,
+        "domain": track.domain_name,
+        "is_local": track.is_local,
+        "fid": track.fid,
+        "title": track.title,
+        "mbid": track.mbid,
+        "disc_number": track.disc_number,
+        "position": track.position,
+        "copyright": track.copyright,
+        "license": track.license,
+        "creation_date": track.creation_date.isoformat().split("+")[0] + "Z",
+        "artist": serializers.ManageNestedArtistSerializer(track.artist).data,
+        "album": serializers.ManageTrackAlbumSerializer(track.album).data,
+        "attributed_to": serializers.ManageBaseActorSerializer(
+            track.attributed_to
+        ).data,
+        "uploads_count": 44,
+    }
+    s = serializers.ManageTrackSerializer(track)
+
+    assert s.data == expected
+
+
+def test_manage_library_serializer(factories, now):
+    library = factories["music.Library"]()
+    setattr(library, "followers_count", 42)
+    setattr(library, "_uploads_count", 44)
+    expected = {
+        "id": library.id,
+        "fid": library.fid,
+        "url": library.url,
+        "uuid": str(library.uuid),
+        "followers_url": library.followers_url,
+        "domain": library.domain_name,
+        "is_local": library.is_local,
+        "name": library.name,
+        "description": library.description,
+        "privacy_level": library.privacy_level,
+        "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
+        "actor": serializers.ManageBaseActorSerializer(library.actor).data,
+        "uploads_count": 44,
+        "followers_count": 42,
+    }
+    s = serializers.ManageLibrarySerializer(library)
+
+    assert s.data == expected
+
+
+def test_manage_upload_serializer(factories, now):
+    upload = factories["music.Upload"]()
+
+    expected = {
+        "id": upload.id,
+        "fid": upload.fid,
+        "audio_file": upload.audio_file.url,
+        "listen_url": upload.listen_url,
+        "uuid": str(upload.uuid),
+        "domain": upload.domain_name,
+        "is_local": upload.is_local,
+        "duration": upload.duration,
+        "size": upload.size,
+        "bitrate": upload.bitrate,
+        "mimetype": upload.mimetype,
+        "source": upload.source,
+        "filename": upload.filename,
+        "metadata": upload.metadata,
+        "creation_date": upload.creation_date.isoformat().split("+")[0] + "Z",
+        "modification_date": upload.modification_date.isoformat().split("+")[0] + "Z",
+        "accessed_date": None,
+        "import_date": None,
+        "import_metadata": upload.import_metadata,
+        "import_status": upload.import_status,
+        "import_reference": upload.import_reference,
+        "import_details": upload.import_details,
+        "library": serializers.ManageNestedLibrarySerializer(upload.library).data,
+        "track": serializers.ManageNestedTrackSerializer(upload.track).data,
+    }
+    s = serializers.ManageUploadSerializer(upload)
+
+    assert s.data == expected
+
+
+@pytest.mark.parametrize(
+    "factory, serializer_class",
+    [
+        ("music.Track", serializers.ManageTrackActionSerializer),
+        ("music.Album", serializers.ManageAlbumActionSerializer),
+        ("music.Artist", serializers.ManageArtistActionSerializer),
+        ("music.Library", serializers.ManageLibraryActionSerializer),
+        ("music.Upload", serializers.ManageUploadActionSerializer),
+    ],
+)
+def test_action_serializer_delete(factory, serializer_class, factories):
+    objects = factories[factory].create_batch(size=5)
+    s = serializer_class(queryset=None)
+
+    s.handle_delete(objects[0].__class__.objects.all())
+
+    assert objects[0].__class__.objects.count() == 0

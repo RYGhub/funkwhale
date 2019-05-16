@@ -14,6 +14,7 @@ Setup Guides
    ../installation/index
    configuration
    importing-music
+   external-storages
 
 Administration
 --------------
@@ -22,6 +23,7 @@ Administration
    :maxdepth: 2
 
    django
+   commands
    url
    upgrading
 

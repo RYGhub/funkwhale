@@ -111,7 +111,7 @@ export default {
   computed: {
     labels () {
       return {
-        placeholder: this.$gettext('Enter your search query…')
+        placeholder: this.$pgettext('Content/Library/Input.Placeholder/Verb', 'Enter your search query…')
       }
     },
     currentTypeObject: function () {
@@ -127,15 +127,15 @@ export default {
       return [
         {
           value: 'artist',
-          label: this.$gettext('Artist')
+          label: this.$pgettext('*/*/*/Noun', 'Artist')
         },
         {
           value: 'release',
-          label: this.$gettext('Album')
+          label: this.$pgettext('*/*/*', 'Album')
         },
         {
           value: 'recording',
-          label: this.$gettext('Track')
+          label: this.$pgettext('*/*/*/Noun', 'Track')
         }
       ]
     }

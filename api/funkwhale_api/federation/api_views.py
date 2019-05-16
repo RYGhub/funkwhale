@@ -10,6 +10,7 @@ from rest_framework import response
 from rest_framework import viewsets
 
 from funkwhale_api.music import models as music_models
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import activity
 from . import api_serializers
@@ -43,7 +44,8 @@ class LibraryFollowViewSet(
         .select_related("actor", "target__actor")
     )
     serializer_class = api_serializers.LibraryFollowSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "follows"
     filterset_class = filters.LibraryFollowFilter
     ordering_fields = ("creation_date",)
 
@@ -100,7 +102,8 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         .annotate(_uploads_count=Count("uploads"))
     )
     serializer_class = api_serializers.LibrarySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -132,6 +135,7 @@ class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         try:
             library = utils.retrieve_ap_object(
                 fid,
+                actor=request.user.actor,
                 queryset=self.queryset,
                 serializer_class=serializers.LibrarySerializer,
             )
@@ -168,7 +172,8 @@ class InboxItemViewSet(
         .order_by("-activity__creation_date")
     )
     serializer_class = api_serializers.InboxItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "notifications"
     filterset_class = filters.InboxItemFilter
     ordering_fields = ("activity__creation_date",)
 
@@ -185,3 +190,10 @@ class InboxItemViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+
+class FetchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+
+    queryset = models.Fetch.objects.select_related("actor")
+    serializer_class = api_serializers.FetchSerializer
+    permission_classes = [permissions.IsAuthenticated]

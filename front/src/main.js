@@ -4,6 +4,7 @@ import logger from '@/logging'
 
 logger.default.info('Loading environment:', process.env.NODE_ENV)
 logger.default.debug('Environment variables:', process.env)
+import jQuery from "jquery"
 
 import Vue from 'vue'
 import App from './App'
@@ -58,16 +59,13 @@ Vue.use(VueMasonryPlugin)
 Vue.use(VueLazyload)
 Vue.config.productionTip = false
 Vue.directive('title', function (el, binding) {
-  let parts = []
-  let instanceName = store.state.instance.settings.instance.name.value
-  if (instanceName.length === 0) {
-    instanceName = 'Funkwhale'
-  }
-  parts.unshift(instanceName)
-  parts.unshift(binding.value)
-  document.title = parts.join(' - ')
-  }
-)
+  store.commit('ui/pageTitle', binding.value)
+})
+Vue.directive('dropdown', function (el, binding) {
+  jQuery(el).dropdown({
+    selectOnKeydown: false,
+  })
+})
 axios.interceptors.request.use(function (config) {
   // Do something before request is sent
   if (store.state.auth.token) {
@@ -99,8 +97,11 @@ axios.interceptors.response.use(function (response) {
     if (error.response.data.detail) {
       error.backendErrors.push(error.response.data.detail)
     } else {
+      error.rawPayload = error.response.data
       for (var field in error.response.data) {
-        if (error.response.data.hasOwnProperty(field)) {
+        // some views (e.g. v1/playlists/{id}/add) have deeper nested data (e.g. data[field]
+        // is another object), so don't try to unpack non-array fields
+        if (error.response.data.hasOwnProperty(field) && error.response.data[field].forEach) {
           error.response.data[field].forEach(e => {
             error.backendErrors.push(e)
           })

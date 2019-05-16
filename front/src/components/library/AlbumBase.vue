@@ -1,0 +1,193 @@
+<template>
+  <main>
+    <div v-if="isLoading" class="ui vertical segment" v-title="labels.title">
+      <div :class="['ui', 'centered', 'active', 'inline', 'loader']"></div>
+    </div>
+    <template v-if="object">
+      <section :class="['ui', 'head', {'with-background': object.cover.original}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle" v-title="object.title">
+        <div class="segment-content">
+          <h2 class="ui center aligned icon header">
+            <i class="circular inverted sound yellow icon"></i>
+            <div class="content">
+              {{ object.title }}
+              <div v-html="subtitle"></div>
+            </div>
+          </h2>
+          <div class="ui hidden divider"></div>
+          <div class="header-buttons">
+
+            <div class="ui buttons">
+              <play-button class="orange" :tracks="object.tracks">
+                <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
+              </play-button>
+            </div>
+
+            <modal v-if="publicLibraries.length > 0" :show.sync="showEmbedModal">
+              <div class="header">
+                <translate translate-context="Popup/Album/Title/Verb">Embed this album on your website</translate>
+              </div>
+              <div class="content">
+                <div class="description">
+                  <embed-wizard type="album" :id="object.id" />
+
+                </div>
+              </div>
+              <div class="actions">
+                <div class="ui deny button">
+                  <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
+                </div>
+              </div>
+            </modal>
+            <div class="ui buttons">
+              <button class="ui button" @click="$refs.dropdown.click()">
+                <translate translate-context="*/*/Button.Label/Noun">More…</translate>
+              </button>
+              <div class="ui floating dropdown icon button" ref="dropdown" v-dropdown>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  <div
+                    role="button"
+                    v-if="publicLibraries.length > 0"
+                    @click="showEmbedModal = !showEmbedModal"
+                    class="basic item">
+                    <i class="code icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+                  </div>
+                  <a :href="wikipediaUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="wikipedia w icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Search on Wikipedia</translate>
+                  </a>
+                  <a v-if="musicbrainzUrl" :href="musicbrainzUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+                    <i class="external icon"></i>
+                    <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
+                  </a>
+                  <router-link
+                    v-if="object.is_local"
+                    :to="{name: 'library.albums.edit', params: {id: object.id }}"
+                    class="basic item">
+                    <i class="edit icon"></i>
+                    <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
+                  </router-link>
+                  <div class="divider"></div>
+                  <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.albums.detail', params: {id: object.id}}">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+                  </router-link>
+                  <a
+                    v-if="$store.state.auth.profile && $store.state.auth.profile.is_superuser"
+                    class="basic item"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/music/album/${object.id}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <router-view v-if="object" :discs="discs" @libraries-loaded="libraries = $event" :object="object" object-type="album" :key="$route.fullPath"></router-view>
+    </template>
+  </main>
+</template>
+
+<script>
+import axios from "axios"
+import logger from "@/logging"
+import backend from "@/audio/backend"
+import PlayButton from "@/components/audio/PlayButton"
+import EmbedWizard from "@/components/audio/EmbedWizard"
+import Modal from '@/components/semantic/Modal'
+
+const FETCH_URL = "albums/"
+
+
+function groupByDisc(acc, track) {
+  var dn = track.disc_number - 1
+  if (dn < 0) dn = 0
+  if (acc[dn] == undefined) {
+    acc.push([track])
+  } else {
+    acc[dn].push(track)
+  }
+  return acc
+}
+
+export default {
+  props: ["id"],
+  components: {
+    PlayButton,
+    EmbedWizard,
+    Modal
+  },
+  data() {
+    return {
+      isLoading: true,
+      object: null,
+      discs: [],
+      libraries: [],
+      showEmbedModal: false
+    }
+  },
+  created() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+      var self = this
+      this.isLoading = true
+      let url = FETCH_URL + this.id + "/"
+      logger.default.debug('Fetching album "' + this.id + '"')
+      axios.get(url).then(response => {
+        self.object = backend.Album.clean(response.data)
+        self.discs = self.object.tracks.reduce(groupByDisc, [])
+        self.isLoading = false
+      })
+    }
+  },
+  computed: {
+    labels() {
+      return {
+        title: this.$pgettext('*/*/*', 'Album')
+      }
+    },
+    publicLibraries () {
+      return this.libraries.filter(l => {
+        return l.privacy_level === 'everyone'
+      })
+    },
+    wikipediaUrl() {
+      return (
+        "https://en.wikipedia.org/w/index.php?search=" +
+        encodeURI(this.object.title + " " + this.object.artist.name)
+      )
+    },
+    musicbrainzUrl() {
+      if (this.object.mbid) {
+        return "https://musicbrainz.org/release/" + this.object.mbid
+      }
+    },
+    headerStyle() {
+      if (!this.object.cover.original) {
+        return ""
+      }
+      return (
+        "background-image: url(" +
+        this.$store.getters["instance/absoluteUrl"](this.object.cover.original) +
+        ")"
+      )
+    },
+    subtitle () {
+      let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.object.artist.id }})
+      let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.object.tracks.length)
+      return this.$gettextInterpolate(msg, {count: this.object.tracks.length, artist: this.object.artist.name, artistUrl: route.location.path})
+    }
+  },
+  watch: {
+    id() {
+      this.fetchData()
+    }
+  }
+}
+</script>

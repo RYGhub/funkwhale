@@ -5,7 +5,7 @@
     <modal class="small" :show.sync="showModal">
       <div class="header">
         <slot name="modal-header">
-          <translate>Do you want to confirm this action?</translate>
+          <translate translate-context="Modal/*/Title">Do you want to confirm this action?</translate>
         </slot>
       </div>
       <div class="scrolling content">
@@ -15,11 +15,11 @@
       </div>
       <div class="actions">
         <div class="ui cancel button">
-          <translate>Cancel</translate>
+          <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
         </div>
         <div :class="['ui', 'confirm', confirmButtonColor, 'button']" @click="confirm">
           <slot name="modal-confirm">
-            <translate>Confirm</translate>
+            <translate translate-context="Modal/*/Button.Label/Short, Verb">Confirm</translate>
           </slot>
         </div>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.users">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate>Users</translate></h2>
+      <h2 class="ui header">{{ labels.users }}</h2>
       <div class="ui hidden divider"></div>
       <users-table></users-table>
     </section>
@@ -18,7 +18,7 @@ export default {
   computed: {
     labels() {
       return {
-        users: this.$gettext("Users")
+        users: this.$pgettext('*/*/*/Noun', 'Users')
       }
     }
   }

@@ -5,7 +5,11 @@ import pytest
 
 from django.utils import timezone
 
+from funkwhale_api.federation import jsonld
+from funkwhale_api.federation import models
+from funkwhale_api.federation import serializers
 from funkwhale_api.federation import tasks
+from funkwhale_api.federation import utils
 
 
 def test_clean_federation_music_cache_if_no_listen(preferences, factories):
@@ -22,10 +26,10 @@ def test_clean_federation_music_cache_if_no_listen(preferences, factories):
     # local upload, should not be cleaned
     upload4 = factories["music.Upload"](library__actor__local=True, accessed_date=None)
 
-    path1 = upload1.audio_file.path
-    path2 = upload2.audio_file.path
-    path3 = upload3.audio_file.path
-    path4 = upload4.audio_file.path
+    path1 = upload1.audio_file_path
+    path2 = upload2.audio_file_path
+    path3 = upload3.audio_file_path
+    path4 = upload4.audio_file_path
 
     tasks.clean_music_cache()
 
@@ -62,7 +66,7 @@ def test_clean_federation_music_cache_orphaned(settings, preferences, factories)
     upload.refresh_from_db()
 
     assert bool(upload.audio_file) is True
-    assert os.path.exists(upload.audio_file.path) is True
+    assert os.path.exists(upload.audio_file_path) is True
     assert os.path.exists(remove_path) is False
 
 
@@ -83,16 +87,21 @@ def test_handle_in(factories, mocker, now, queryset_equal_list):
     )
 
 
-def test_dispatch_outbox(factories, mocker):
+@pytest.mark.parametrize(
+    "type, call_handlers", [("Noop", False), ("Update", False), ("Follow", True)]
+)
+def test_dispatch_outbox(factories, mocker, type, call_handlers):
     mocked_inbox = mocker.patch("funkwhale_api.federation.tasks.dispatch_inbox.delay")
     mocked_deliver_to_remote = mocker.patch(
         "funkwhale_api.federation.tasks.deliver_to_remote.delay"
     )
-    activity = factories["federation.Activity"](actor__local=True)
+    activity = factories["federation.Activity"](actor__local=True, type=type)
     factories["federation.InboxItem"](activity=activity)
     delivery = factories["federation.Delivery"](activity=activity)
     tasks.dispatch_outbox(activity_id=activity.pk)
-    mocked_inbox.assert_called_once_with(activity_id=activity.pk, call_handlers=False)
+    mocked_inbox.assert_called_once_with(
+        activity_id=activity.pk, call_handlers=call_handlers
+    )
     mocked_deliver_to_remote.assert_called_once_with(delivery_id=delivery.pk)
 
 
@@ -162,23 +171,42 @@ def test_fetch_nodeinfo(factories, r_mock, now):
     assert tasks.fetch_nodeinfo("test.test") == {"hello": "world"}
 
 
-def test_update_domain_nodeinfo(factories, mocker, now):
-    domain = factories["federation.Domain"]()
-    mocker.patch.object(tasks, "fetch_nodeinfo", return_value={"hello": "world"})
+def test_update_domain_nodeinfo(factories, mocker, now, service_actor):
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
+    actor = factories["federation.Actor"](fid="https://actor.id")
+    retrieve_ap_object = mocker.spy(utils, "retrieve_ap_object")
+
+    mocker.patch.object(
+        tasks,
+        "fetch_nodeinfo",
+        return_value={"hello": "world", "metadata": {"actorId": "https://actor.id"}},
+    )
 
     assert domain.nodeinfo == {}
     assert domain.nodeinfo_fetch_date is None
+    assert domain.service_actor is None
 
     tasks.update_domain_nodeinfo(domain_name=domain.name)
 
     domain.refresh_from_db()
 
     assert domain.nodeinfo_fetch_date == now
-    assert domain.nodeinfo == {"status": "ok", "payload": {"hello": "world"}}
+    assert domain.nodeinfo == {
+        "status": "ok",
+        "payload": {"hello": "world", "metadata": {"actorId": "https://actor.id"}},
+    }
+    assert domain.service_actor == actor
+
+    retrieve_ap_object.assert_called_once_with(
+        "https://actor.id",
+        actor=service_actor,
+        queryset=models.Actor,
+        serializer_class=serializers.ActorSerializer,
+    )
 
 
 def test_update_domain_nodeinfo_error(factories, r_mock, now):
-    domain = factories["federation.Domain"]()
+    domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     wellknown_url = "https://{}/.well-known/nodeinfo".format(domain.name)
 
     r_mock.get(wellknown_url, status_code=500)
@@ -192,6 +220,31 @@ def test_update_domain_nodeinfo_error(factories, r_mock, now):
         "status": "error",
         "error": "500 Server Error: None for url: {}".format(wellknown_url),
     }
+
+
+def test_refresh_nodeinfo_known_nodes(settings, factories, mocker, now):
+    settings.NODEINFO_REFRESH_DELAY = 666
+
+    refreshed = [
+        factories["federation.Domain"](nodeinfo_fetch_date=None),
+        factories["federation.Domain"](
+            nodeinfo_fetch_date=now
+            - datetime.timedelta(seconds=settings.NODEINFO_REFRESH_DELAY + 1)
+        ),
+    ]
+    factories["federation.Domain"](
+        nodeinfo_fetch_date=now
+        - datetime.timedelta(seconds=settings.NODEINFO_REFRESH_DELAY - 1)
+    )
+
+    update_domain_nodeinfo = mocker.patch.object(tasks.update_domain_nodeinfo, "delay")
+
+    tasks.refresh_nodeinfo_known_nodes()
+
+    assert update_domain_nodeinfo.call_count == len(refreshed)
+
+    for d in refreshed:
+        update_domain_nodeinfo.assert_any_call(domain_name=d.name)
 
 
 def test_handle_purge_actors(factories, mocker):
@@ -285,3 +338,60 @@ def test_rotate_actor_key(factories, settings, mocker):
 
     assert actor.public_key == "public"
     assert actor.private_key == "private"
+
+
+def test_fetch_skipped(factories, r_mock):
+    url = "https://fetch.object"
+    fetch = factories["federation.Fetch"](url=url)
+    payload = {"@context": jsonld.get_default_context(), "type": "Unhandled"}
+    r_mock.get(url, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+
+    assert fetch.status == "skipped"
+    assert fetch.detail["reason"] == "unhandled_type"
+
+
+@pytest.mark.parametrize(
+    "r_mock_args, expected_error_code",
+    [
+        ({"json": {"type": "Unhandled"}}, "invalid_jsonld"),
+        ({"json": {"@context": jsonld.get_default_context()}}, "invalid_jsonld"),
+        ({"text": "invalidjson"}, "invalid_json"),
+        ({"status_code": 404}, "http"),
+        ({"status_code": 500}, "http"),
+    ],
+)
+def test_fetch_errored(factories, r_mock_args, expected_error_code, r_mock):
+    url = "https://fetch.object"
+    fetch = factories["federation.Fetch"](url=url)
+    r_mock.get(url, **r_mock_args)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == expected_error_code
+
+
+def test_fetch_success(factories, r_mock, mocker):
+    artist = factories["music.Artist"]()
+    fetch = factories["federation.Fetch"](url=artist.fid)
+    payload = serializers.ArtistSerializer(artist).data
+    init = mocker.spy(serializers.ArtistSerializer, "__init__")
+    save = mocker.spy(serializers.ArtistSerializer, "save")
+
+    r_mock.get(artist.fid, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+    payload["@context"].append("https://funkwhale.audio/ns")
+    assert fetch.status == "finished"
+    assert init.call_count == 1
+    assert init.call_args[0][1] == artist
+    assert init.call_args[1]["data"] == payload
+    assert save.call_count == 1

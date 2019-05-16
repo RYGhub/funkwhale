@@ -47,4 +47,4 @@ class Mapping(object):
         )
 
 
-registry = {"Artist": Importer, "Track": Importer, "Album": Importer, "Work": Importer}
+registry = {"Artist": Importer, "Track": Importer, "Album": Importer}

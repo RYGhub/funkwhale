@@ -1,11 +1,11 @@
 <template>
   <modal @update:show="$emit('update:show', $event)" :show="show">
     <header class="header">
-      <translate>Keyboard shortcuts</translate>
+      <translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate>
     </header>
     <section class="scrolling content">
       <table
-        class="ui compact collapsing basic fixed single line table"
+        class="ui compact collapsing basic table"
         v-for="section in sections"
         :key="section.title">
       <caption>{{ section.title }}</caption>
@@ -18,7 +18,7 @@
       </table>
     </section>
     <footer class="actions">
-      <div class="ui cancel button"><translate>Close</translate></div>
+      <div class="ui cancel button"><translate translate-context="Popup/Keyboard shortcuts/Button.Label/Verb">Close</translate></div>
     </footer>
   </modal>
 </template>
@@ -35,11 +35,11 @@ export default {
     sections () {
       return [
         {
-          title: this.$gettext('General shortcuts'),
+          title: this.$pgettext('Popup/Keyboard shortcuts/Title', 'General shortcuts'),
           shortcuts: [
             {
               key: 'h',
-              summary: this.$gettext('Show available keyboard shortcuts')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Show available keyboard shortcuts')
             }
           ]
         },
@@ -52,35 +52,35 @@ export default {
         // s.prevent.exact="shuffle"
 
         {
-          title: this.$gettext('Audio player shortcuts'),
+          title: this.$pgettext('Popup/Keyboard shortcuts/Title', 'Audio player shortcuts'),
           shortcuts: [
             {
               key: 'space',
-              summary: this.$gettext('Pause/play the current track')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Pause/play the current track')
             },
             {
               key: 'ctrl left',
-              summary: this.$gettext('Play previous track')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Play previous track')
             },
             {
               key: 'ctrl right',
-              summary: this.$gettext('Play next track')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Play next track')
             },
             {
               key: 'ctrl up',
-              summary: this.$gettext('Increase volume')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Increase volume')
             },
             {
               key: 'ctrl down',
-              summary: this.$gettext('Decrease volume')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Decrease volume')
             },
             {
               key: 'l',
-              summary: this.$gettext('Toggle queue looping')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Toggle queue looping')
             },
             {
               key: 's',
-              summary: this.$gettext('Shuffle queue')
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Shuffle queue')
             },
           ]
         }

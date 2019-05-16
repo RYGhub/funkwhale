@@ -11,6 +11,7 @@ from . import models, serializers
 
 class RegisterView(BaseRegisterView):
     serializer_class = serializers.RegisterSerializer
+    permission_classes = []
 
     def create(self, request, *args, **kwargs):
         invitation_code = request.data.get("invitation")
@@ -27,6 +28,8 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserWriteSerializer
     lookup_field = "username"
+    lookup_value_regex = r"[a-zA-Z0-9-_.]+"
+    required_scope = "profile"
 
     @action(methods=["get"], detail=False)
     def me(self, request, *args, **kwargs):
@@ -34,7 +37,12 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         serializer = serializers.MeSerializer(request.user)
         return Response(serializer.data)
 
-    @action(methods=["get", "post", "delete"], url_path="subsonic-token", detail=True)
+    @action(
+        methods=["get", "post", "delete"],
+        required_scope="security",
+        url_path="subsonic-token",
+        detail=True,
+    )
     def subsonic_token(self, request, *args, **kwargs):
         if not self.request.user.username == kwargs.get("username"):
             return Response(status=403)

@@ -2,16 +2,19 @@
   <div class="main library pusher">
     <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link class="ui item" to="/library" exact>
-        <translate>Browse</translate>
+        <translate translate-context="*/Library/*/Verb">Browse</translate>
+      </router-link>
+      <router-link class="ui item" to="/library/albums" exact>
+        <translate translate-context="*/*/*">Albums</translate>
       </router-link>
       <router-link class="ui item" to="/library/artists" exact>
-        <translate>Artists</translate>
+        <translate translate-context="*/*/*/Noun">Artists</translate>
       </router-link>
       <router-link class="ui item" to="/library/radios" exact>
-        <translate>Radios</translate>
+        <translate translate-context="*/*/*">Radios</translate>
       </router-link>
       <router-link class="ui item" to="/library/playlists" exact>
-        <translate>Playlists</translate>
+        <translate translate-context="*/*/*">Playlists</translate>
       </router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
@@ -29,7 +32,7 @@ export default {
     },
     labels() {
       return {
-        secondaryMenu: this.$gettext("Secondary menu")
+        secondaryMenu: this.$pgettext('Menu/*/Hidden text', "Secondary menu")
       }
     }
   }

@@ -2,10 +2,25 @@ import urllib.parse
 
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import Q
 
 from funkwhale_api.common import utils
 
 from . import models
+from . import serializers
+
+
+def get_twitter_card_metas(type, id):
+    return [
+        {"tag": "meta", "property": "twitter:card", "content": "player"},
+        {
+            "tag": "meta",
+            "property": "twitter:player",
+            "content": serializers.get_embed_url(type, id),
+        },
+        {"tag": "meta", "property": "twitter:player:width", "content": "600"},
+        {"tag": "meta", "property": "twitter:player:height", "content": "400"},
+    ]
 
 
 def library_track(request, pk):
@@ -72,6 +87,8 @@ def library_track(request, pk):
                 ),
             }
         )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="track", id=obj.pk)
     return metas
 
 
@@ -131,6 +148,8 @@ def library_album(request, pk):
                 ),
             }
         )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="album", id=obj.pk)
     return metas
 
 
@@ -165,4 +184,22 @@ def library_artist(request, pk):
             }
         )
 
+    if (
+        models.Upload.objects.filter(Q(track__artist=obj) | Q(track__album__artist=obj))
+        .playable_by(None)
+        .exists()
+    ):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/json+oembed",
+                "href": (
+                    utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
+                    + "?format=json&url={}".format(urllib.parse.quote_plus(artist_url))
+                ),
+            }
+        )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="artist", id=obj.pk)
     return metas

@@ -14,6 +14,9 @@ from funkwhale_api.federation import (
 
 
 def test_receive_validates_basic_attributes_and_stores_activity(factories, now, mocker):
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
     mocked_dispatch = mocker.patch("funkwhale_api.common.utils.on_commit")
     local_to_actor = factories["users.User"]().create_actor()
     local_cc_actor = factories["users.User"]().create_actor()
@@ -48,6 +51,9 @@ def test_receive_validates_basic_attributes_and_stores_activity(factories, now, 
 
 def test_receive_calls_should_reject(factories, now, mocker):
     should_reject = mocker.patch.object(activity, "should_reject", return_value=True)
+    mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=True
+    )
     local_to_actor = factories["users.User"]().create_actor()
     remote_actor = factories["federation.Actor"]()
     a = {
@@ -60,30 +66,61 @@ def test_receive_calls_should_reject(factories, now, mocker):
 
     copy = activity.receive(activity=a, on_behalf_of=remote_actor)
     should_reject.assert_called_once_with(
-        id=a["id"], actor_id=remote_actor.fid, payload=a
+        fid=a["id"], actor_id=remote_actor.fid, payload=a
     )
     assert copy is None
+
+
+def test_receive_skips_if_no_matching_route(factories, now, mocker):
+    get_matching_handlers = mocker.patch.object(
+        activity.InboxRouter, "get_matching_handlers", return_value=[]
+    )
+    local_to_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    a = {
+        "@context": [],
+        "actor": remote_actor.fid,
+        "type": "Noop",
+        "id": "https://test.activity",
+        "to": [local_to_actor.fid, remote_actor.fid],
+    }
+
+    copy = activity.receive(activity=a, on_behalf_of=remote_actor)
+    get_matching_handlers.assert_called_once_with(a)
+    assert copy is None
+    assert models.Activity.objects.count() == 0
+
+
+def test_match_route_ignore_payload_issues():
+    payload = {"object": "http://hello"}
+    assert activity.match_route({"object.type": "Test"}, payload) is False
 
 
 @pytest.mark.parametrize(
     "params, policy_kwargs, expected",
     [
-        ({"id": "https://ok.test"}, {"target_domain__name": "notok.test"}, False),
+        ({"fid": "https://ok.test"}, {"target_domain__name": "notok.test"}, False),
         (
-            {"id": "https://ok.test"},
+            {"fid": "https://ok.test"},
             {"target_domain__name": "ok.test", "is_active": False},
             False,
         ),
         (
-            {"id": "https://ok.test"},
+            {"fid": "https://ok.test"},
             {"target_domain__name": "ok.test", "block_all": False},
             False,
         ),
         # id match blocked domain
-        ({"id": "http://notok.test"}, {"target_domain__name": "notok.test"}, True),
+        ({"fid": "http://notok.test"}, {"target_domain__name": "notok.test"}, True),
         # actor id match blocked domain
         (
-            {"id": "http://ok.test", "actor_id": "https://notok.test"},
+            {"fid": "http://ok.test", "actor_id": "https://notok.test"},
+            {"target_domain__name": "notok.test"},
+            True,
+        ),
+        # actor id match blocked domain
+        (
+            {"fid": None, "actor_id": "https://notok.test"},
             {"target_domain__name": "notok.test"},
             True,
         ),
@@ -91,7 +128,7 @@ def test_receive_calls_should_reject(factories, now, mocker):
         (
             {
                 "payload": {"type": "Library"},
-                "id": "http://ok.test",
+                "fid": "http://ok.test",
                 "actor_id": "http://notok.test",
             },
             {
@@ -397,6 +434,53 @@ def test_prepare_deliveries_and_inbox_items(factories):
     ):
         assert inbox_item.actor == expected_inbox_item.actor
         assert inbox_item.type == "to"
+
+
+def test_prepare_deliveries_and_inbox_items_instances_with_followers(factories):
+
+    domain1 = factories["federation.Domain"](with_service_actor=True)
+    domain2 = factories["federation.Domain"](with_service_actor=True)
+    library = factories["music.Library"](actor__local=True)
+
+    factories["federation.LibraryFollow"](
+        target=library, actor__local=True, approved=True
+    ).actor
+    library_follower_remote = factories["federation.LibraryFollow"](
+        target=library, actor__domain=domain1, approved=True
+    ).actor
+
+    followed_actor = factories["federation.Actor"](local=True)
+    factories["federation.Follow"](
+        target=followed_actor, actor__local=True, approved=True
+    ).actor
+    actor_follower_remote = factories["federation.Follow"](
+        target=followed_actor, actor__domain=domain2, approved=True
+    ).actor
+
+    recipients = [activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}]
+
+    inbox_items, deliveries, urls = activity.prepare_deliveries_and_inbox_items(
+        recipients, "to"
+    )
+
+    expected_deliveries = sorted(
+        [
+            models.Delivery(
+                inbox_url=library_follower_remote.domain.service_actor.inbox_url
+            ),
+            models.Delivery(
+                inbox_url=actor_follower_remote.domain.service_actor.inbox_url
+            ),
+        ],
+        key=lambda v: v.inbox_url,
+    )
+    assert inbox_items == []
+    assert len(expected_deliveries) == len(deliveries)
+
+    for delivery, expected_delivery in zip(
+        sorted(deliveries, key=lambda v: v.inbox_url), expected_deliveries
+    ):
+        assert delivery.inbox_url == expected_delivery.inbox_url
 
 
 def test_should_rotate_actor_key(settings, cache, now):

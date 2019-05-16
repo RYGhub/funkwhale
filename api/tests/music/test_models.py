@@ -522,3 +522,35 @@ def test_track_order_for_album(factories):
     t4 = factories["music.Track"](album=album, position=2, disc_number=2)
 
     assert list(models.Track.objects.order_for_album()) == [t1, t3, t2, t4]
+
+
+@pytest.mark.parametrize("factory", ["music.Artist", "music.Album", "music.Track"])
+def test_queryset_local_entities(factories, settings, factory):
+    settings.FEDERATION_HOSTNAME = "test.com"
+    obj1 = factories[factory](fid="http://test.com/1")
+    obj2 = factories[factory](fid="https://test.com/2")
+    factories[factory](fid="https://test.coma/3")
+    factories[factory](fid="https://noope/3")
+
+    assert list(obj1.__class__.objects.local().order_by("id")) == [obj1, obj2]
+
+
+@pytest.mark.parametrize(
+    "federation_hostname, fid, expected",
+    [
+        ("test.domain", "http://test.domain/", True),
+        ("test.domain", None, True),
+        ("test.domain", "https://test.domain/", True),
+        ("test.otherdomain", "http://test.domain/", False),
+    ],
+)
+def test_api_model_mixin_is_local(federation_hostname, fid, expected, settings):
+    settings.FEDERATION_HOSTNAME = federation_hostname
+    obj = models.Track(fid=fid)
+    assert obj.is_local is expected
+
+
+def test_api_model_mixin_domain_name():
+    obj = models.Track(fid="https://test.domain:543/something")
+
+    assert obj.domain_name == "test.domain"

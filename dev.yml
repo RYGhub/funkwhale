@@ -60,8 +60,10 @@ services:
       - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
-    links:
+
+    depends_on:
       - postgres
+      # - minio
       - redis
     networks:
       - internal
@@ -73,8 +75,9 @@ services:
       - .env.dev
       - .env
     build: *backend
-    links:
+    depends_on:
       - postgres
+      # - minio
       - redis
     command: celery -A funkwhale_api.taskapp worker -l debug -B
     environment:
@@ -95,6 +98,8 @@ services:
       - .env.dev
       - .env
     image: nginx
+    ports:
+      - "${NGINX_PORTS_MAPPING-8000:80}"
     environment:
       - "NGINX_MAX_BODY_SIZE=${NGINX_MAX_BODY_SIZE-100M}"
       - "FUNKWHALE_API_IP=${FUNKHALE_API_IP-api}"
@@ -135,13 +140,30 @@ services:
       - "8001:8001"
 
   api-docs:
-    image: swaggerapi/swagger-ui
+    image: swaggerapi/swagger-ui:v3.21.0
     environment:
       - "API_URL=/swagger.yml"
     ports:
       - "8002:8080"
     volumes:
       - "./docs/swagger.yml:/usr/share/nginx/html/swagger.yml"
+
+  # minio:
+  #   image: minio/minio
+  #   command: server /data
+  #   volumes:
+  #     - "./data/${COMPOSE_PROJECT_NAME-node1}/minio:/data"
+  #   environment:
+  #     - "MINIO_ACCESS_KEY=${AWS_ACCESS_KEY_ID-access_key}"
+  #     - "MINIO_SECRET_KEY=${AWS_SECRET_ACCESS_KEY-secret_key}"
+  #     - "MINIO_HTTP_TRACE: /dev/stdout"
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - federation
+  #     - internal
+
+
 
 networks:
   ? internal

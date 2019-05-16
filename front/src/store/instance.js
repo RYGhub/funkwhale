@@ -104,6 +104,7 @@ export default {
       let modules = [
         'auth',
         'favorites',
+        'moderation',
         'player',
         'playlists',
         'queue',

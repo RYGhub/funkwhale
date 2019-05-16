@@ -134,3 +134,42 @@ def test_actor_stats(factories):
     actor = factories["federation.Actor"]()
 
     assert actor.get_stats() == expected
+
+
+def test_actor_can_manage_false(mocker, factories):
+    obj = mocker.Mock()
+    actor = factories["federation.Actor"]()
+
+    assert actor.can_manage(obj) is False
+
+
+def test_actor_can_manage_attributed_to(mocker, factories):
+    actor = factories["federation.Actor"]()
+    obj = mocker.Mock(attributed_to_id=actor.pk)
+
+    assert actor.can_manage(obj) is True
+
+
+def test_actor_can_manage_domain_not_service_actor(mocker, factories):
+    actor = factories["federation.Actor"]()
+    obj = mocker.Mock(fid="https://{}/hello".format(actor.domain_id))
+
+    assert actor.can_manage(obj) is False
+
+
+def test_actor_can_manage_domain_service_actor(mocker, factories):
+    actor = factories["federation.Actor"]()
+    actor.domain.service_actor = actor
+    actor.domain.save()
+    obj = mocker.Mock(fid="https://{}/hello".format(actor.domain_id))
+
+    assert actor.can_manage(obj) is True
+
+
+def test_can_create_fetch_for_object(factories):
+    track = factories["music.Track"](fid="http://test.domain")
+    fetch = factories["federation.Fetch"](object=track)
+    assert fetch.url == "http://test.domain"
+    assert fetch.status == "pending"
+    assert fetch.detail == {}
+    assert fetch.object == track

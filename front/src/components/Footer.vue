@@ -3,23 +3,23 @@
     <div class="ui container">
       <div class="ui stackable equal height stackable grid">
         <section class="four wide column">
-          <h4 v-translate class="ui header">
-            <translate :translate-params="{instanceName: instanceHostname}" >About %{instanceName}</translate>
+          <h4 class="ui header">
+            <translate translate-context="Footer/About/Title" :translate-params="{instanceName: instanceHostname}" >About %{instanceName}</translate>
           </h4>
           <div class="ui link list">
             <router-link class="item" to="/about">
-              <translate>About page</translate>
+              <translate translate-context="Footer/About/List item.Link">About page</translate>
             </router-link>
-            <div class="item" v-if="version">
-              <translate :translate-params="{version: version}" >Version %{version}</translate>
+              <a v-if="version" class="item" href="https://docs.funkwhale.audio/changelog.html" target="_blank">
+                <translate translate-context="Footer/*/List item" :translate-params="{version: version}" >Version %{version}</translate>
+              </a>
+            <div role="button" class="item" @click="$emit('show:set-instance-modal')" >
+              <translate translate-context="Footer/*/List item.Link">Use another instance</translate>
             </div>
-            <a @click="switchInstance" class="item" >
-              <translate>Use another instance</translate>
-            </a>
           </div>
           <div class="ui form">
             <div class="ui field">
-              <label><translate>Change language</translate></label>
+              <label><translate translate-context="Footer/Settings/Dropdown.Label/Short, Verb">Change language</translate></label>
               <select class="ui dropdown" :value="$language.current" @change="$store.commit('ui/currentLanguage', $event.target.value)">
                 <option v-for="(language, key) in $language.available" :key="key" :value="key">{{ language }}</option>
               </select>
@@ -27,31 +27,31 @@
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">Using Funkwhale</h4>
+          <h4 v-translate class="ui header" translate-context="Footer/*/Title">Using Funkwhale</h4>
           <div class="ui link list">
-            <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate>Documentation</translate></a>
-            <a href="https://docs.funkwhale.audio/users/apps.html" class="item" target="_blank"><translate>Mobile and desktop apps</translate></a>
-            <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate>Keyboard shortcuts</translate></div>
+            <a href="https://docs.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link/Short, Noun">Documentation</translate></a>
+            <a href="https://funkwhale.audio/apps" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Mobile and desktop apps</translate></a>
+            <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate></div>
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">Getting help</h4>
+          <h4 v-translate translate-context="Footer/*/Link" class="ui header">Getting help</h4>
           <div class="ui link list">
-            <a href="https://socialhub.network/c/funkwhale" class="item" target="_blank"><translate>Support forum</translate></a>
-            <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate>Chat room</translate></a>
-            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate>Issue tracker</translate></a>
+            <a href="https://governance.funkwhale.audio/g/kQgxNq15/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/Listitem.Link">Support forum</translate></a>
+            <a href="https://riot.im/app/#/room/#funkwhale-troubleshooting:matrix.org" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Chat room</translate></a>
+            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale/issues" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Issue tracker</translate></a>
           </div>
         </section>
         <section class="four wide column">
-          <h4 v-translate class="ui header">About Funkwhale</h4>
+          <h4 v-translate class="ui header" translate-context="Footer/*/Title/Short">About Funkwhale</h4>
           <div class="ui link list">
-            <a href="https://funkwhale.audio" class="item" target="_blank"><translate>Official website</translate></a>
-            <a href="https://contribute.funkwhale.audio" class="item" target="_blank"><translate>Contribute</translate></a>
-            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale" class="item" target="_blank"><translate>Source code</translate></a>
+            <a href="https://funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Official website</translate></a>
+            <a href="https://contribute.funkwhale.audio" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Contribute</translate></a>
+            <a href="https://dev.funkwhale.audio/funkwhale/funkwhale" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Source code</translate></a>
           </div>
           <div class="ui hidden divider"></div>
           <p>
-            <translate>The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
+            <translate translate-context="Footer/*/List item.Link">The funkwhale logo was kindly designed and provided by Francis Gading.</translate>
           </p>
         </section>
       </div>
@@ -66,18 +66,6 @@ import axios from 'axios'
 
 export default {
   props: ["version"],
-  methods: {
-    switchInstance() {
-      let confirm = window.confirm(
-        this.$gettext(
-          "This will erase your local data and disconnect you, do you want to continue?"
-        )
-      )
-      if (confirm) {
-        this.$store.commit("instance/instanceUrl", null)
-      }
-    }
-  },
   computed: {
     ...mapState({
       messages: state => state.ui.messages
@@ -88,18 +76,15 @@ export default {
       parser.href = url
       return parser.hostname
     },
-    suggestedInstances() {
-      let instances = [
-        this.$store.getters["instance/defaultUrl"](),
-        "https://demo.funkwhale.audio"
-      ]
-      return instances
-    }
   }
 }
 </script>
 <style scoped>
 footer p {
   color: grey;
+}
+
+footer#footer div.item:hover {
+  color: rgba(0, 0, 0, 0.87);
 }
 </style>

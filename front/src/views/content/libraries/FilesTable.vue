@@ -3,23 +3,23 @@
     <div class="ui inline form">
       <div class="fields">
         <div class="ui six wide field">
-          <label><translate>Search</translate></label>
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <form @submit.prevent="search.query = $refs.search.value">
             <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
           </form>
         </div>
         <div class="field">
-          <label><translate>Import status</translate></label>
+          <label><translate translate-context="Content/Library/*/Noun">Import status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('status', $event.target.value)" :value="getTokenValue('status', '')">
-            <option value=""><translate>All</translate></option>
-            <option value="pending"><translate>Pending</translate></option>
-            <option value="skipped"><translate>Skipped</translate></option>
-            <option value="errored"><translate>Failed</translate></option>
-            <option value="finished"><translate>Finished</translate></option>
+            <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
+            <option value="pending"><translate translate-context="Content/Library/*/Short">Pending</translate></option>
+            <option value="skipped"><translate translate-context="Content/Library/*">Skipped</translate></option>
+            <option value="errored"><translate translate-context="Content/Library/Dropdown">Failed</translate></option>
+            <option value="finished"><translate translate-context="Content/Library/*">Finished</translate></option>
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
               {{ sharedLabels.filters[option[1]] }}
@@ -27,14 +27,15 @@
           </select>
         </div>
         <div class="field">
-          <label><translate>Ordering direction</translate></label>
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering direction</translate></label>
           <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate>Ascending</translate></option>
-            <option value="-"><translate>Descending</translate></option>
+            <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+            <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
           </select>
         </div>
       </div>
     </div>
+    <import-status-modal :upload="detailedUpload" :show.sync="showUploadDetailModal" />
     <div class="dimmable">
       <div v-if="isLoading" class="ui active inverted dimmer">
           <div class="ui loader"></div>
@@ -52,13 +53,13 @@
         @refresh="fetchData"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate>Title</translate></th>
-          <th><translate>Artist</translate></th>
-          <th><translate>Album</translate></th>
-          <th><translate>Upload date</translate></th>
-          <th><translate>Import status</translate></th>
-          <th><translate>Duration</translate></th>
-          <th><translate>Size</translate></th>
+          <th><translate translate-context="Content/Track/*/Noun">Title</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Artist</translate></th>
+          <th><translate translate-context="*/*/*">Album</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Upload date</translate></th>
+          <th><translate translate-context="Content/Library/*/Noun">Import status</translate></th>
+          <th><translate translate-context="Content/*/*">Duration</translate></th>
+          <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <template v-if="scope.obj.track">
@@ -80,23 +81,25 @@
           <td>
             <human-date :date="scope.obj.creation_date"></human-date>
           </td>
-          <td :title="labels.importStatuses[scope.obj.import_status].help">
-            <span class="discrete link" @click="addSearchToken('status', scope.obj.import_status)">
-              {{ labels.importStatuses[scope.obj.import_status].label }}
-              <i class="question circle outline icon"></i>
+          <td>
+            <span class="discrete link" @click="addSearchToken('status', scope.obj.import_status)" :title="sharedLabels.fields.import_status.choices[scope.obj.import_status].help">
+              {{ sharedLabels.fields.import_status.choices[scope.obj.import_status].label }}
             </span>
+            <button class="ui tiny basic icon button" :title="sharedLabels.fields.import_status.detailTitle" @click="detailedUpload = scope.obj; showUploadDetailModal = true">
+              <i class="question circle outline icon"></i>
+            </button>
           </td>
           <td v-if="scope.obj.duration">
             {{ time.parse(scope.obj.duration) }}
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate translate-context="*/*/*">N/A</translate>
           </td>
           <td v-if="scope.obj.size">
             {{ scope.obj.size | humanSize }}
           </td>
           <td v-else>
-            <translate>N/A</translate>
+            <translate translate-context="*/*/*">N/A</translate>
           </td>
         </template>
       </action-table>
@@ -112,7 +115,7 @@
         ></pagination>
 
       <span v-if="result && result.results.length > 0">
-        <translate
+        <translate translate-context="Content/*/Paragraph"
           :translate-params="{start: ((page-1) * paginateBy) + 1, end: ((page-1) * paginateBy) + result.results.length, total: result.count}">
           Showing results %{ start }-%{ end } on %{ total }
         </translate>
@@ -132,6 +135,7 @@ import ActionTable from '@/components/common/ActionTable'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
 import SmartSearchMixin from '@/components/mixins/SmartSearch'
+import ImportStatusModal from '@/components/library/ImportStatusModal'
 
 export default {
   mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
@@ -142,11 +146,14 @@ export default {
   },
   components: {
     Pagination,
-    ActionTable
+    ActionTable,
+    ImportStatusModal
   },
   data () {
     return {
       time,
+      detailedUpload: null,
+      showUploadDetailModal: false,
       isLoading: false,
       result: null,
       page: 1,
@@ -159,7 +166,7 @@ export default {
       ordering: 'creation_date',
       orderingOptions: [
         ['creation_date', 'creation_date'],
-        ['title', 'title'],
+        ['title', 'track_title'],
         ['size', 'size'],
         ['duration', 'duration'],
         ['bitrate', 'bitrate'],
@@ -193,30 +200,12 @@ export default {
     },
     selectPage: function (page) {
       this.page = page
-    }
+    },
   },
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$gettext('Search by title, artist, album…'),
-        importStatuses: {
-          skipped: {
-            label: this.$gettext('Skipped'),
-            help: this.$gettext('Track already present in one of your libraries'),
-          },
-          pending: {
-            label: this.$gettext('Pending'),
-            help: this.$gettext('Track uploaded, but not processed by the server yet'),
-          },
-          errored: {
-            label: this.$gettext('Errored'),
-            help: this.$gettext('Could not process this track, ensure it is tagged correctly'),
-          },
-          finished: {
-            label: this.$gettext('Finished'),
-            help: this.$gettext('Imported'),
-          },
-        }
+        searchPlaceholder: this.$pgettext('Content/Library/Input.Placeholder', 'Search by title, artist, album…'),
       }
     },
     actionFilters () {
@@ -230,8 +219,8 @@ export default {
       }
     },
     actions () {
-      let deleteMsg = this.$gettext('Delete')
-      let relaunchMsg = this.$gettext('Relaunch import')
+      let deleteMsg = this.$pgettext('*/*/*/Verb', 'Delete')
+      let relaunchMsg = this.$pgettext('Content/Library/Dropdown/Verb', 'Restart import')
       return [
         {
           name: 'delete',

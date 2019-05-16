@@ -6,7 +6,6 @@
     <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
     <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
     <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
-
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
@@ -71,6 +70,9 @@ export default {
   watch: {
     offset () {
       this.fetchData()
+    },
+    "$store.state.moderation.lastUpdate": function () {
+      this.fetchData(this.url)
     }
   }
 }

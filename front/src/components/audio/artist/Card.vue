@@ -21,17 +21,17 @@
                   {{ album.tracks_count }} tracks
                 </td>
                 <td>
-                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album.id"></play-button>
+                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album"></play-button>
                 </td>
               </tr>
             </tbody>
           </table>
           <div class="center aligned segment" v-if="artist.albums.length > initialAlbums">
             <em v-if="!showAllAlbums" @click="showAllAlbums = true" class="expand">
-              <translate :translate-params="{count: artist.albums.length - initialAlbums}" :translate-n="artist.albums.length - initialAlbums" translate-plural="Show %{ count } more albums">Show 1 more album</translate>
+              <translate translate-context="Content/Artist/Card.Link" :translate-params="{count: artist.albums.length - initialAlbums}" :translate-n="artist.albums.length - initialAlbums" translate-plural="Show %{ count } more albums">Show 1 more album</translate>
             </em>
             <em v-else @click="showAllAlbums = false" class="expand">
-              <translate>Collapse</translate>
+              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
             </em>
           </div>
         </div>
@@ -39,10 +39,10 @@
     <div class="extra content">
         <span>
           <i class="sound icon"></i>
-            <translate :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
+            <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
         </span>
-        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist.id">
-          <translate>Play all</translate>
+        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist">
+          <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
         </play-button>
       </div>
     </div>

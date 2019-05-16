@@ -1,4 +1,5 @@
 import tempfile
+import urllib.parse
 import uuid
 
 from django.conf import settings
@@ -43,10 +44,24 @@ class FederationMixin(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    @property
+    def domain_name(self):
+        if not self.fid:
+            return
+
+        parsed = urllib.parse.urlparse(self.fid)
+        return parsed.hostname
+
 
 class ActorQuerySet(models.QuerySet):
     def local(self, include=True):
-        return self.exclude(user__isnull=include)
+        if include:
+            return self.filter(domain__name=settings.FEDERATION_HOSTNAME)
+        return self.exclude(domain__name=settings.FEDERATION_HOSTNAME)
 
     def with_current_usage(self):
         qs = self
@@ -96,7 +111,13 @@ class Domain(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     nodeinfo_fetch_date = models.DateTimeField(default=None, null=True, blank=True)
     nodeinfo = JSONField(default=empty_dict, max_length=50000, blank=True)
-
+    service_actor = models.ForeignKey(
+        "Actor",
+        related_name="managed_domains",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     objects = DomainQuerySet.as_manager()
 
     def __str__(self):
@@ -142,6 +163,10 @@ class Domain(models.Model):
             uploads.with_file().aggregate(v=models.Sum("size"))["v"] or 0
         )
         return data
+
+    @property
+    def is_local(self):
+        return self.name == settings.FEDERATION_HOSTNAME
 
 
 class Actor(models.Model):
@@ -256,6 +281,76 @@ class Actor(models.Model):
         self.private_key = v[0].decode("utf-8")
         self.public_key = v[1].decode("utf-8")
 
+    def can_manage(self, obj):
+        attributed_to = getattr(obj, "attributed_to_id", None)
+        if attributed_to is not None and attributed_to == self.pk:
+            # easiest case, the obj is attributed to the actor
+            return True
+
+        if self.domain.service_actor_id != self.pk:
+            # actor is not system actor, so there is no way the actor can manage
+            # the object
+            return False
+
+        # actor is service actor of its domain, so if the fid domain
+        # matches, we consider the actor has the permission to manage
+        # the object
+        domain = self.domain_id
+        return obj.fid.startswith("http://{}/".format(domain)) or obj.fid.startswith(
+            "https://{}/".format(domain)
+        )
+
+
+FETCH_STATUSES = [
+    ("pending", "Pending"),
+    ("errored", "Errored"),
+    ("finished", "Finished"),
+    ("skipped", "Skipped"),
+]
+
+
+class FetchQuerySet(models.QuerySet):
+    def get_for_object(self, object):
+        content_type = ContentType.objects.get_for_model(object)
+        return self.filter(object_content_type=content_type, object_id=object.pk)
+
+
+class Fetch(models.Model):
+    url = models.URLField(max_length=500, db_index=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    fetch_date = models.DateTimeField(null=True, blank=True)
+    object_id = models.IntegerField(null=True)
+    object_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    object = GenericForeignKey("object_content_type", "object_id")
+    status = models.CharField(default="pending", choices=FETCH_STATUSES, max_length=20)
+    detail = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
+    )
+    actor = models.ForeignKey(Actor, related_name="fetches", on_delete=models.CASCADE)
+
+    objects = FetchQuerySet.as_manager()
+
+    def save(self, **kwargs):
+        if not self.url and self.object:
+            self.url = self.object.fid
+
+        super().save(**kwargs)
+
+    @property
+    def serializers(self):
+        from . import contexts
+        from . import serializers
+
+        return {
+            contexts.FW.Artist: serializers.ArtistSerializer,
+            contexts.FW.Album: serializers.AlbumSerializer,
+            contexts.FW.Track: serializers.TrackSerializer,
+            contexts.AS.Audio: serializers.UploadSerializer,
+            contexts.FW.Library: serializers.LibrarySerializer,
+        }
+
 
 class InboxItem(models.Model):
     """
@@ -297,7 +392,9 @@ class Activity(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     fid = models.URLField(unique=True, max_length=500, null=True, blank=True)
     url = models.URLField(max_length=500, null=True, blank=True)
-    payload = JSONField(default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder)
+    payload = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
+    )
     creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     type = models.CharField(db_index=True, null=True, max_length=100)
 
@@ -413,7 +510,7 @@ class LibraryTrack(models.Model):
     album_title = models.CharField(max_length=500)
     title = models.CharField(max_length=500)
     metadata = JSONField(
-        default=empty_dict, max_length=10000, encoder=DjangoJSONEncoder
+        default=empty_dict, max_length=10000, encoder=DjangoJSONEncoder, blank=True
     )
 
     @property

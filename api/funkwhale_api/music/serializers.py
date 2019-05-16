@@ -43,6 +43,7 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
@@ -51,6 +52,7 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
             "creation_date",
             "tracks_count",
             "is_playable",
+            "is_local",
         )
 
     def get_tracks_count(self, o):
@@ -68,13 +70,13 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Artist
-        fields = ("id", "mbid", "name", "creation_date", "albums")
+        fields = ("id", "fid", "mbid", "name", "creation_date", "albums", "is_local")
 
 
 class ArtistSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Artist
-        fields = ("id", "mbid", "name", "creation_date")
+        fields = ("id", "fid", "mbid", "name", "creation_date", "is_local")
 
 
 class AlbumTrackSerializer(serializers.ModelSerializer):
@@ -87,6 +89,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
         model = models.Track
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "album",
@@ -99,6 +102,7 @@ class AlbumTrackSerializer(serializers.ModelSerializer):
             "duration",
             "copyright",
             "license",
+            "is_local",
         )
 
     def get_uploads(self, obj):
@@ -125,6 +129,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
@@ -133,6 +138,7 @@ class AlbumSerializer(serializers.ModelSerializer):
             "cover",
             "creation_date",
             "is_playable",
+            "is_local",
         )
 
     def get_tracks(self, o):
@@ -156,12 +162,14 @@ class TrackAlbumSerializer(serializers.ModelSerializer):
         model = models.Album
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "artist",
             "release_date",
             "cover",
             "creation_date",
+            "is_local",
         )
 
 
@@ -182,7 +190,6 @@ class TrackUploadSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     album = TrackAlbumSerializer(read_only=True)
-    lyrics = serializers.SerializerMethodField()
     uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
 
@@ -190,6 +197,7 @@ class TrackSerializer(serializers.ModelSerializer):
         model = models.Track
         fields = (
             "id",
+            "fid",
             "mbid",
             "title",
             "album",
@@ -197,15 +205,12 @@ class TrackSerializer(serializers.ModelSerializer):
             "creation_date",
             "position",
             "disc_number",
-            "lyrics",
             "uploads",
             "listen_url",
             "copyright",
             "license",
+            "is_local",
         )
-
-    def get_lyrics(self, obj):
-        return obj.get_lyrics_url()
 
     def get_listen_url(self, obj):
         return obj.listen_url
@@ -367,12 +372,6 @@ class SimpleAlbumSerializer(serializers.ModelSerializer):
         fields = ("id", "mbid", "title", "release_date", "cover")
 
 
-class LyricsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Lyrics
-        fields = ("id", "work", "content", "content_rendered")
-
-
 class TrackActivitySerializer(activity_serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     name = serializers.CharField(source="title")
@@ -385,6 +384,10 @@ class TrackActivitySerializer(activity_serializers.ModelSerializer):
 
     def get_type(self, obj):
         return "Audio"
+
+
+def get_embed_url(type, id):
+    return settings.FUNKWHALE_EMBED_URL + "?type={}&id={}".format(type, id)
 
 
 class OembedSerializer(serializers.Serializer):
@@ -466,6 +469,36 @@ class OembedSerializer(serializers.Serializer):
                     "library_artist", kwargs={"pk": album.artist.pk}
                 )
             )
+        elif match.url_name == "library_artist":
+            qs = models.Artist.objects.filter(pk=int(match.kwargs["pk"]))
+            try:
+                artist = qs.get()
+            except models.Artist.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No artist matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "artist"
+            embed_id = artist.pk
+            album = (
+                artist.albums.filter(cover__isnull=False)
+                .exclude(cover="")
+                .order_by("-id")
+                .first()
+            )
+
+            if album and album.cover:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    album.cover.crop["400x400"].url
+                )
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
+            data["title"] = artist.name
+            data["description"] = artist.name
+            data["author_name"] = artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+            )
         else:
             raise serializers.ValidationError(
                 "Unsupported url: {}".format(validated_data["url"])
@@ -473,10 +506,7 @@ class OembedSerializer(serializers.Serializer):
         data[
             "html"
         ] = '<iframe width="{}" height="{}" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
-            data["width"],
-            data["height"],
-            settings.FUNKWHALE_EMBED_URL
-            + "?type={}&id={}".format(embed_type, embed_id),
+            data["width"], data["height"], get_embed_url(embed_type, embed_id)
         )
         return data
 

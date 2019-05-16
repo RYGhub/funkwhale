@@ -1,6 +1,5 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from django.db.models import Prefetch
@@ -9,6 +8,7 @@ from funkwhale_api.activity import record
 from funkwhale_api.common import fields, permissions
 from funkwhale_api.music.models import Track
 from funkwhale_api.music import utils as music_utils
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, models, serializers
 
@@ -24,10 +24,11 @@ class TrackFavoriteViewSet(
     serializer_class = serializers.UserTrackFavoriteSerializer
     queryset = models.TrackFavorite.objects.all().select_related("user")
     permission_classes = [
-        permissions.ConditionalAuthentication,
+        oauth_permissions.ScopePermission,
         permissions.OwnerPermission,
-        IsAuthenticatedOrReadOnly,
     ]
+    required_scope = "favorites"
+    anonymous_policy = "setting"
     owner_checks = ["write"]
 
     def get_serializer_class(self):

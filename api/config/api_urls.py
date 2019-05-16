@@ -5,6 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework_jwt import views as jwt_views
 
 from funkwhale_api.activity import views as activity_views
+from funkwhale_api.common import views as common_views
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
@@ -24,6 +25,7 @@ router.register(r"playlists", playlists_views.PlaylistViewSet, "playlists")
 router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
 )
+router.register(r"mutations", common_views.MutationViewSet, "mutations")
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)
@@ -39,6 +41,12 @@ v1_patterns += [
     url(
         r"^manage/",
         include(("funkwhale_api.manage.urls", "manage"), namespace="manage"),
+    ),
+    url(
+        r"^moderation/",
+        include(
+            ("funkwhale_api.moderation.urls", "moderation"), namespace="moderation"
+        ),
     ),
     url(
         r"^federation/",
@@ -66,6 +74,10 @@ v1_patterns += [
     url(
         r"^users/",
         include(("funkwhale_api.users.api_urls", "users"), namespace="users"),
+    ),
+    url(
+        r"^oauth/",
+        include(("funkwhale_api.users.oauth.urls", "oauth"), namespace="oauth"),
     ),
     url(r"^token/$", jwt_views.obtain_jwt_token, name="token"),
     url(r"^token/refresh/$", jwt_views.refresh_jwt_token, name="token_refresh"),

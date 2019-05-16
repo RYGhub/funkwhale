@@ -1,33 +1,33 @@
 <template>
   <section class="ui vertical aligned stripe segment">
     <div v-if="isLoadingLibrary" :class="['ui', {'active': isLoadingLibrary}, 'inverted', 'dimmer']">
-      <div class="ui text loader"><translate>Loading library data…</translate></div>
+      <div class="ui text loader"><translate translate-context="Content/Library/Paragraph">Loading library data…</translate></div>
     </div>
     <detail-area v-else :library="library">
       <div class="ui top attached tabular menu">
-        <a :class="['item', {active: currentTab === 'follows'}]" @click="currentTab = 'follows'"><translate>Followers</translate></a>
-        <a :class="['item', {active: currentTab === 'tracks'}]" @click="currentTab = 'tracks'"><translate>Tracks</translate></a>
-        <a :class="['item', {active: currentTab === 'edit'}]" @click="currentTab = 'edit'"><translate>Edit</translate></a>
+        <a :class="['item', {active: currentTab === 'follows'}]" @click="currentTab = 'follows'"><translate translate-context="Content/Federation/*/Noun">Followers</translate></a>
+        <a :class="['item', {active: currentTab === 'tracks'}]" @click="currentTab = 'tracks'"><translate translate-context="*/*/*/Noun">Tracks</translate></a>
+        <a :class="['item', {active: currentTab === 'edit'}]" @click="currentTab = 'edit'"><translate translate-context="Content/*/Button.Label/Verb">Edit</translate></a>
       </div>
       <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'follows'}]">
         <div class="ui form">
           <div class="field">
-            <label><translate>Sharing link</translate></label>
-            <p><translate>Share this link with other users so they can request access to your library.</translate></p>
+            <label><translate translate-context="Content/Library/Title">Sharing link</translate></label>
+            <p><translate translate-context="Content/Library/Paragraph">Share this link with other users so they can request access to your library.</translate></p>
             <copy-input :value="library.fid" />
           </div>
         </div>
         <div class="ui hidden divider"></div>
         <div v-if="isLoadingFollows" :class="['ui', {'active': isLoadingFollows}, 'inverted', 'dimmer']">
-          <div class="ui text loader"><translate>Loading followers…</translate></div>
+          <div class="ui text loader"><translate translate-context="Content/Library/Paragraph">Loading followers…</translate></div>
         </div>
         <table v-else-if="follows && follows.count > 0" class="ui table">
           <thead>
             <tr>
-              <th><translate>User</translate></th>
-              <th><translate>Date</translate></th>
-              <th><translate>Status</translate></th>
-              <th><translate>Action</translate></th>
+              <th><translate translate-context="Content/Library/Table.Label">User</translate></th>
+              <th><translate translate-context="Content/Library/Table.Label">Date</translate></th>
+              <th><translate translate-context="Content/Library.Federation/Table.Label (Value is Approved/Rejected)">Status</translate></th>
+              <th><translate translate-context="Content/Library/Table.Label">Action</translate></th>
             </tr>
           </thead>
           <tr v-for="follow in follows.results" :key="follow.fid">
@@ -35,27 +35,27 @@
             <td><human-date :date="follow.creation_date" /></td>
             <td>
               <span :class="['ui', 'yellow', 'basic', 'label']" v-if="follow.approved === null">
-                <translate>Pending approval</translate>
+                <translate translate-context="Content/Library/Table/Short">Pending approval</translate>
               </span>
               <span :class="['ui', 'green', 'basic', 'label']" v-else-if="follow.approved === true">
-                <translate>Accepted</translate>
+                <translate translate-context="Content/Library/Table/Short">Accepted</translate>
               </span>
               <span :class="['ui', 'red', 'basic', 'label']" v-else-if="follow.approved === false">
-                <translate>Rejected</translate>
+                <translate translate-context="Content/Library/*/Short">Rejected</translate>
               </span>
             </td>
             <td>
               <div @click="updateApproved(follow, true)" :class="['ui', 'mini', 'icon', 'labeled', 'green', 'button']" v-if="follow.approved === null || follow.approved === false">
-                <i class="ui check icon"></i> <translate>Accept</translate>
+                <i class="ui check icon"></i> <translate translate-context="Content/Library/Button.Label">Accept</translate>
               </div>
               <div @click="updateApproved(follow, false)" :class="['ui', 'mini', 'icon', 'labeled', 'red', 'button']" v-if="follow.approved === null || follow.approved === true">
-                <i class="ui x icon"></i> <translate>Reject</translate>
+                <i class="ui x icon"></i> <translate translate-context="Content/Library/Button.Label">Reject</translate>
               </div>
             </td>
           </tr>
 
         </table>
-        <p v-else><translate>Nobody is following this library</translate></p>
+        <p v-else><translate translate-context="Content/Library/Paragraph">Nobody is following this library</translate></p>
       </div>
       <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'tracks'}]">
         <library-files-table :filters="{library: library.uuid}"></library-files-table>

@@ -24,10 +24,11 @@ class PlaylistTrackSerializer(serializers.ModelSerializer):
 
 class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
     index = serializers.IntegerField(required=False, min_value=0, allow_null=True)
+    allow_duplicates = serializers.BooleanField(required=False)
 
     class Meta:
         model = models.PlaylistTrack
-        fields = ("id", "track", "playlist", "index")
+        fields = ("id", "track", "playlist", "index", "allow_duplicates")
 
     def validate_playlist(self, value):
         if self.context.get("request"):
@@ -47,17 +48,21 @@ class PlaylistTrackWriteSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         index = validated_data.pop("index", None)
+        allow_duplicates = validated_data.pop("allow_duplicates", True)
         instance = super().create(validated_data)
-        instance.playlist.insert(instance, index)
+
+        instance.playlist.insert(instance, index, allow_duplicates)
         return instance
 
     @transaction.atomic
     def update(self, instance, validated_data):
         update_index = "index" in validated_data
         index = validated_data.pop("index", None)
+        allow_duplicates = validated_data.pop("allow_duplicates", True)
         super().update(instance, validated_data)
         if update_index:
-            instance.playlist.insert(instance, index)
+            instance.playlist.insert(instance, index, allow_duplicates)
+
         return instance
 
     def get_unique_together_validators(self):
@@ -117,9 +122,21 @@ class PlaylistSerializer(serializers.ModelSerializer):
         except AttributeError:
             return []
 
+        excluded_artists = []
+        try:
+            user = self.context["request"].user
+        except (KeyError, AttributeError):
+            user = None
+        if user and user.is_authenticated:
+            excluded_artists = list(
+                user.content_filters.values_list("target_artist", flat=True)
+            )
+
         covers = []
         max_covers = 5
         for plt in plts:
+            if plt.track.album.artist_id in excluded_artists:
+                continue
             url = plt.track.album.cover.crop["200x200"].url
             if url in covers:
                 continue
@@ -139,3 +156,7 @@ class PlaylistAddManySerializer(serializers.Serializer):
     tracks = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Track.objects.for_nested_serialization()
     )
+    allow_duplicates = serializers.BooleanField(required=False)
+
+    class Meta:
+        fields = "allow_duplicates"

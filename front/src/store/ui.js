@@ -12,11 +12,15 @@ export default {
     messages: [],
     notifications: {
       inbox: 0,
+      pendingReviewEdits: 0,
     },
     websocketEventsHandlers: {
       'inbox.item_added': {},
       'import.status_updated': {},
-    }
+      'mutation.created': {},
+      'mutation.updated': {},
+    },
+    pageTitle: null
   },
   mutations: {
     addWebsocketEventHandler: (state, {eventName, id, handler}) => {
@@ -44,14 +48,26 @@ export default {
     notifications (state, {type, count}) {
       state.notifications[type] = count
     },
-    incrementNotifications (state, {type, count}) {
-      state.notifications[type] = Math.max(0, state.notifications[type] + count)
+    incrementNotifications (state, {type, count, value}) {
+      if (value != undefined) {
+          state.notifications[type] = Math.max(0, value)
+      } else {
+        state.notifications[type] = Math.max(0, state.notifications[type] + count)
+      }
+    },
+    pageTitle: (state, value) => {
+      state.pageTitle = value
     }
   },
   actions: {
     fetchUnreadNotifications ({commit}, payload) {
       axios.get('federation/inbox/', {params: {is_read: false, page_size: 1}}).then((response) => {
         commit('notifications', {type: 'inbox', count: response.data.count})
+      })
+    },
+    fetchPendingReviewEdits ({commit, rootState}, payload) {
+      axios.get('mutations/', {params: {is_approved: 'null', page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'pendingReviewEdits', count: response.data.count})
       })
     },
     websocketEvent ({state}, event) {

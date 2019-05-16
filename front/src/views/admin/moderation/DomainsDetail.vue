@@ -14,7 +14,7 @@
                   {{ object.name }}
                   <div class="sub header">
                     <a :href="externalUrl" target="_blank" rel="noopener noreferrer" class="logo-wrapper">
-                      <translate>Open website</translate>&nbsp;
+                      <translate translate-context="Content/Moderation/Link/Verb">Open website</translate>&nbsp;
                       <i class="external icon"></i>
                     </a>
                   </div>
@@ -37,16 +37,16 @@
                 <header class="ui header">
                   <h3>
                     <i class="shield icon"></i>
-                    <translate>You don't have any rule in place for this domain.</translate>
+                    <translate translate-context="Content/Moderation/Card.Title">You don't have any rule in place for this domain.</translate>
                   </h3>
                 </header>
-                <p><translate>Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
+                <p><translate translate-context="Content/Moderation/Card.Paragraph">Moderation policies help you control how your instance interact with a given domain or account.</translate></p>
                 <button @click="showPolicyForm = true" class="ui primary button">Add a moderation policy</button>
               </template>
               <instance-policy-card v-else-if="policy && !showPolicyForm" :object="policy" @update="showPolicyForm = true">
                 <header class="ui header">
                   <h3>
-                    <translate>This domain is subject to specific moderation rules</translate>
+                    <translate translate-context="Content/Moderation/Card.Title">This domain is subject to specific moderation rules</translate>
                   </h3>
                 </header>
               </instance-policy-card>
@@ -69,62 +69,54 @@
               <h3 class="ui header">
                 <i class="info icon"></i>
                 <div class="content">
-                  <translate>Instance data</translate>
+                  <translate translate-context="Content/Moderation/Title">Instance data</translate>
                 </div>
               </h3>
               <table class="ui very basic table">
                 <tbody>
                   <tr>
                     <td>
-                      <translate>First seen</translate>
-                    </td>
-                    <td>
-                      <human-date :date="object.creation_date"></human-date>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <translate>Last checked</translate>
+                      <translate translate-context="Content/*/Table.Label">Last checked</translate>
                     </td>
                     <td>
                       <human-date v-if="object.nodeinfo_fetch_date" :date="object.nodeinfo_fetch_date"></human-date>
-                      <translate v-else>N/A</translate>
+                      <translate v-else translate-context="*/*/*">N/A</translate>
                     </td>
                   </tr>
 
                   <template v-if="object.nodeinfo && object.nodeinfo.status === 'ok'">
                     <tr>
                       <td>
-                        <translate>Software</translate>
+                        <translate translate-context="Content/Moderation/Table.Label">Software</translate>
                       </td>
                       <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.software.name', $gettext('N/A')) }} ({{ lodash.get(object, 'nodeinfo.payload.software.version', $gettext('N/A')) }})
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <translate>Name</translate>
-                      </td>
-                      <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.metadata.nodeName', $gettext('N/A')) }}
+                        {{ lodash.get(object, 'nodeinfo.payload.software.name', $pgettext('*/*/*', 'N/A')) }} ({{ lodash.get(object, 'nodeinfo.payload.software.version', $pgettext('*/*/*', 'N/A')) }})
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        <translate>Total users</translate>
+                        <translate translate-context="*/*/*/Noun">Name</translate>
                       </td>
                       <td>
-                        {{ lodash.get(object, 'nodeinfo.payload.usage.users.total', $gettext('N/A')) }}
+                        {{ lodash.get(object, 'nodeinfo.payload.metadata.nodeName', $pgettext('*/*/*', 'N/A')) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <translate translate-context="Content/*/*">Total users</translate>
+                      </td>
+                      <td>
+                        {{ lodash.get(object, 'nodeinfo.payload.usage.users.total', $pgettext('*/*/*', 'N/A')) }}
                       </td>
                     </tr>
                   </template>
                   <template v-if="object.nodeinfo && object.nodeinfo.status === 'error'">
                     <tr>
                       <td>
-                        <translate>Status</translate>
+                        <translate translate-context="Content/Moderation/Table.Label (Value is Error message)">Status</translate>
                       </td>
                       <td>
-                        <translate>Error while fetching node info</translate>&nbsp;
+                        <translate translate-context="Content/Moderation/Table">Error while fetching node info</translate>&nbsp;
 
                         <span :data-tooltip="object.nodeinfo.error"><i class="question circle icon"></i></span>
                       </td>
@@ -133,7 +125,7 @@
                 </tbody>
               </table>
               <ajax-button @action-done="refreshNodeInfo" method="get" :url="'manage/federation/domains/' + object.name + '/nodeinfo/'">
-                <translate>Refresh node info</translate>
+                <translate translate-context="Content/Moderation/Button.Label/Verb">Refresh node info</translate>
               </ajax-button>
             </section>
           </div>
@@ -142,7 +134,7 @@
               <h3 class="ui header">
                 <i class="feed icon"></i>
                 <div class="content">
-                  <translate>Activity</translate>&nbsp;
+                  <translate translate-context="Content/Moderation/Title">Activity</translate>&nbsp;
                   <span :data-tooltip="labels.statsWarning"><i class="question circle icon"></i></span>
 
                 </div>
@@ -157,9 +149,17 @@
                 <tbody>
                   <tr>
                     <td>
+                      <translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate>
+                    </td>
+                    <td>
+                      <human-date :date="object.creation_date"></human-date>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <router-link
                         :to="{name: 'manage.moderation.accounts.list', query: {q: 'domain:' + object.name }}">
-                        <translate>Known accounts</translate>
+                        <translate translate-context="Content/Moderation/Table.Label.Link">Known accounts</translate>
                         </router-link>
 
                     </td>
@@ -169,7 +169,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Emitted messages</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Noun">Emitted messages</translate>
                     </td>
                     <td>
                       {{ stats.outbox_activities}}
@@ -177,7 +177,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Received library follows</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Noun">Received library follows</translate>
                     </td>
                     <td>
                       {{ stats.received_library_follows}}
@@ -185,7 +185,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Emitted library follows</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Noun">Emitted library follows</translate>
                     </td>
                     <td>
                       {{ stats.emitted_library_follows}}
@@ -200,7 +200,7 @@
               <h3 class="ui header">
                 <i class="music icon"></i>
                 <div class="content">
-                  <translate>Audio content</translate>&nbsp;
+                  <translate translate-context="Content/Moderation/Title">Audio content</translate>&nbsp;
                   <span :data-tooltip="labels.statsWarning"><i class="question circle icon"></i></span>
 
                 </div>
@@ -215,7 +215,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <translate>Cached size</translate>
+                      <translate translate-context="Content/Moderation/Table.Label/Noun">Cached size</translate>
                     </td>
                     <td>
                       {{ stats.media_downloaded_size | humanSize }}
@@ -223,7 +223,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Total size</translate>
+                      <translate translate-context="Content/Moderation/Table.Label">Total size</translate>
                     </td>
                     <td>
                       {{ stats.media_total_size | humanSize }}
@@ -231,7 +231,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Libraries</translate>
+                      <router-link :to="{name: 'manage.library.libraries', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Libraries</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.libraries }}
@@ -239,7 +241,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Uploads</translate>
+                      <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.uploads }}
@@ -247,7 +251,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Artists</translate>
+                      <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Artists</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.artists }}
@@ -255,7 +261,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Albums</translate>
+                      <router-link :to="{name: 'manage.library.albums', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*">Albums</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.albums}}
@@ -263,7 +271,9 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate>Tracks</translate>
+                      <router-link :to="{name: 'manage.library.tracks', query: {q: getQuery('domain', object.name) }}">
+                        <translate translate-context="*/*/*/Noun">Tracks</translate>
+                      </router-link>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -350,12 +360,15 @@ export default {
     updatePolicy (policy) {
       this.policy = policy
       this.showPolicyForm = false
+    },
+    getQuery (field, value) {
+      return `${field}:"${value}"`
     }
   },
   computed: {
     labels() {
       return {
-        statsWarning: this.$gettext("Statistics are computed from known activity and content on your instance, and do not reflect general activity for this domain")
+        statsWarning: this.$pgettext('Content/Moderation/Help text', "Statistics are computed from known activity and content on your instance, and do not reflect general activity for this domain")
       }
     },
     externalUrl () {

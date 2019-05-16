@@ -79,7 +79,7 @@ Multi-container installation
     source .env
     # Download newest nginx configuration file
     curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/funkwhale_proxy.conf"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.funkwhale_proxy.conf"
     # Pull the new version containers
     docker-compose pull
     # Apply the database migrations

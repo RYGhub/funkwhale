@@ -47,6 +47,6 @@ class OwnerPermission(BasePermission):
 
         owner_field = getattr(view, "owner_field", "user")
         owner = operator.attrgetter(owner_field)(obj)
-        if owner != request.user:
+        if not owner or not request.user.is_authenticated or owner != request.user:
             raise Http404
         return True

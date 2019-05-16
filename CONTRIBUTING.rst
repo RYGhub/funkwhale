@@ -172,6 +172,10 @@ and metadata.
 Launch all services
 ^^^^^^^^^^^^^^^^^^^
 
+Before the first Funkwhale launch, it is required to run this::
+
+    docker-compose -f dev.yml run --rm front yarn run i18n-compile
+
 Then you can run everything with::
 
     docker-compose -f dev.yml up front api nginx celeryworker
@@ -276,7 +280,8 @@ When working on federation with traefik, ensure you have this in your ``env``::
     EXTERNAL_REQUESTS_VERIFY_SSL=false
     # this ensure you don't have incorrect urls pointing to http resources
     FUNKWHALE_PROTOCOL=https
-
+    # Disable host ports binding for the nginx container, as traefik is serving everything
+    NGINX_PORTS_MAPPING=80
 
 Typical workflow for a contribution
 -----------------------------------
@@ -513,13 +518,15 @@ It's possible to nest multiple component parts to reach a higher level of detail
 - ``Content/*/Form.Help text``
 
 Collecting translatable strings
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to ensure your translatable strings are correctly marked for translation,
 you can try to extract them.
 
 Extraction is done by calling ``yarn run i18n-extract``, which
-will pull all the strings from source files and put them in a PO file.
+will pull all the strings from source files and put them in a PO files.
+
+You can then inspect the PO files to ensure everything is fine (but don't commit them, it's not needed).
 
 Contributing to the API
 -----------------------

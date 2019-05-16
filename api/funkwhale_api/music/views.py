@@ -8,19 +8,23 @@ from django.db.models.functions import Length
 from django.utils import timezone
 
 from rest_framework import mixins
-from rest_framework import permissions
 from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from taggit.models import Tag
 
+from funkwhale_api.common import decorators as common_decorators
 from funkwhale_api.common import permissions as common_permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.common import views as common_views
 from funkwhale_api.federation.authentication import SignatureAuthentication
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
+from funkwhale_api.federation import decorators as federation_decorators
 from funkwhale_api.federation import routes
+from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
 
@@ -58,12 +62,17 @@ class TagViewSetMixin(object):
         return queryset
 
 
-class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
+class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistWithAlbumsSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     filterset_class = filters.ArtistFilter
     ordering_fields = ("id", "name", "creation_date")
+
+    fetches = federation_decorators.fetches_route()
+    mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -82,14 +91,19 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
 
-class AlbumViewSet(viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all().order_by("artist", "release_date").select_related()
     )
     serializer_class = serializers.AlbumSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     ordering_fields = ("creation_date", "release_date", "title")
     filterset_class = filters.AlbumFilter
+
+    fetches = federation_decorators.fetches_route()
+    mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -123,9 +137,11 @@ class LibraryViewSet(
     )
     serializer_class = serializers.LibraryForOwnerSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        oauth_permissions.ScopePermission,
         common_permissions.OwnerPermission,
     ]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     owner_field = "actor.user"
     owner_checks = ["read", "write"]
 
@@ -166,22 +182,30 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+    common_views.SkipFilterForGetObject, TagViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
     """
     A simple ViewSet for viewing and editing accounts.
     """
 
     queryset = models.Track.objects.all().for_nested_serialization()
     serializer_class = serializers.TrackSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     filterset_class = filters.TrackFilter
     ordering_fields = (
         "creation_date",
         "title",
         "album__release_date",
         "size",
+        "position",
+        "disc_number",
         "artist__name",
     )
+    fetches = federation_decorators.fetches_route()
+    mutations = common_decorators.mutations_route(types=["update"])
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -194,31 +218,6 @@ class TrackViewSet(TagViewSetMixin, viewsets.ReadOnlyModelViewSet):
             utils.get_actor_from_request(self.request)
         )
         return queryset
-
-    @action(methods=["get"], detail=True)
-    @transaction.non_atomic_requests
-    def lyrics(self, request, *args, **kwargs):
-        try:
-            track = models.Track.objects.get(pk=kwargs["pk"])
-        except models.Track.DoesNotExist:
-            return Response(status=404)
-
-        work = track.work
-        if not work:
-            work = track.get_work()
-
-        if not work:
-            return Response({"error": "unavailable work "}, status=404)
-
-        lyrics = work.fetch_lyrics()
-        try:
-            if not lyrics.content:
-                tasks.fetch_content(lyrics_id=lyrics.pk)
-                lyrics.refresh_from_db()
-        except AttributeError:
-            return Response({"error": "unavailable lyrics"}, status=404)
-        serializer = serializers.LyricsSerializer(lyrics)
-        return Response(serializer.data)
 
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
@@ -241,6 +240,8 @@ def get_file_path(audio_file):
                     "MUSIC_DIRECTORY_PATH to serve in-place imported files"
                 )
             path = "/music" + audio_file.replace(prefix, "", 1)
+        if path.startswith("http://") or path.startswith("https://"):
+            return (settings.PROTECT_FILES_PATH + "/media/" + path).encode("utf-8")
         return (settings.PROTECT_FILES_PATH + path).encode("utf-8")
     if t == "apache2":
         try:
@@ -256,25 +257,35 @@ def get_file_path(audio_file):
         return path.encode("utf-8")
 
 
-def should_transcode(upload, format):
+def should_transcode(upload, format, max_bitrate=None):
     if not preferences.get("music__transcoding_enabled"):
         return False
+    format_need_transcoding = True
+    bitrate_need_transcoding = True
     if format is None:
-        return False
-    if format not in utils.EXTENSION_TO_MIMETYPE:
+        format_need_transcoding = False
+    elif format not in utils.EXTENSION_TO_MIMETYPE:
         # format should match supported formats
-        return False
-    if upload.mimetype is None:
+        format_need_transcoding = False
+    elif upload.mimetype is None:
         # upload should have a mimetype, otherwise we cannot transcode
-        return False
-    if upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
+        format_need_transcoding = False
+    elif upload.mimetype == utils.EXTENSION_TO_MIMETYPE[format]:
         # requested format sould be different than upload mimetype, otherwise
         # there is no need to transcode
-        return False
-    return True
+        format_need_transcoding = False
+
+    if max_bitrate is None:
+        bitrate_need_transcoding = False
+    elif not upload.bitrate:
+        bitrate_need_transcoding = False
+    elif upload.bitrate <= max_bitrate:
+        bitrate_need_transcoding = False
+
+    return format_need_transcoding or bitrate_need_transcoding
 
 
-def handle_serve(upload, user, format=None):
+def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     f = upload
     # we update the accessed_date
     now = timezone.now()
@@ -295,7 +306,11 @@ def handle_serve(upload, user, format=None):
             # thus resulting in multiple downloads from the remote
             qs = f.__class__.objects.select_for_update()
             f = qs.get(pk=f.pk)
-            f.download_audio_from_remote(user=user)
+            if user.is_authenticated:
+                actor = user.actor
+            else:
+                actor = actors.get_service_actor()
+            f.download_audio_from_remote(actor=actor)
         data = f.get_audio_data()
         if data:
             f.duration = data["duration"]
@@ -307,13 +322,18 @@ def handle_serve(upload, user, format=None):
         file_path = get_file_path(f.source.replace("file://", "", 1))
     mt = f.mimetype
 
-    if should_transcode(f, format):
-        transcoded_version = upload.get_transcoded_version(format)
+    if should_transcode(f, format, max_bitrate=max_bitrate):
+        transcoded_version = f.get_transcoded_version(format, max_bitrate=max_bitrate)
         transcoded_version.accessed_date = now
         transcoded_version.save(update_fields=["accessed_date"])
         f = transcoded_version
         file_path = get_file_path(f.audio_file)
         mt = f.mimetype
+    if not proxy_media:
+        # we simply issue a 302 redirect to the real URL
+        response = Response(status=302)
+        response["Location"] = f.audio_file.url
+        return response
     if mt:
         response = Response(content_type=mt)
     else:
@@ -337,7 +357,9 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         rest_settings.api_settings.DEFAULT_AUTHENTICATION_CLASSES
         + [SignatureAuthentication]
     )
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     lookup_field = "uuid"
 
     def retrieve(self, request, *args, **kwargs):
@@ -354,7 +376,21 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             return Response(status=404)
 
         format = request.GET.get("to")
-        return handle_serve(upload, user=request.user, format=format)
+        max_bitrate = request.GET.get("max_bitrate")
+        try:
+            max_bitrate = min(max(int(max_bitrate), 0), 320) or None
+        except (TypeError, ValueError):
+            max_bitrate = None
+
+        if max_bitrate:
+            max_bitrate = max_bitrate * 1000
+        return handle_serve(
+            upload,
+            user=request.user,
+            format=format,
+            max_bitrate=max_bitrate,
+            proxy_media=settings.PROXY_MEDIA,
+        )
 
 
 class UploadViewSet(
@@ -372,9 +408,11 @@ class UploadViewSet(
     )
     serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        oauth_permissions.ScopePermission,
         common_permissions.OwnerPermission,
     ]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     owner_field = "library.actor.user"
     owner_checks = ["read", "write"]
     filterset_class = filters.UploadFilter
@@ -419,12 +457,16 @@ class UploadViewSet(
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all().order_by("name")
     serializer_class = serializers.TagSerializer
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
 
 class Search(views.APIView):
     max_results = 3
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
         query = request.GET["query"]
@@ -489,10 +531,13 @@ class Search(views.APIView):
 
 
 class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
     serializer_class = serializers.LicenseSerializer
     queryset = models.License.objects.all().order_by("code")
     lookup_value_regex = ".*"
+    max_page_size = 1000
 
     def get_queryset(self):
         # ensure our licenses are up to date in DB
@@ -514,7 +559,9 @@ class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class OembedView(views.APIView):
-    permission_classes = [common_permissions.ConditionalAuthentication]
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
         serializer = serializers.OembedSerializer(data=request.GET)

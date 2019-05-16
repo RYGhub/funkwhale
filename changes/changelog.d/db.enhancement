@@ -1,0 +1,1 @@
+Keep persistent connections to the database instead of recreating a new one for each request

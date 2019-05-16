@@ -164,7 +164,7 @@ texinfo_documents = [
 redirect_files = [
 
     ('importing-music.html', 'admin/importing-music.html'),
-    ('architecture.html', 'developer/architecture.html'),
+    ('architecture.html', 'developers/architecture.html'),
     ('troubleshooting.html', 'admin/troubleshooting.html'),
     ('configuration.html', 'admin/configuration.html'), 
     ('upgrading/index.html', '../admin/upgrading.html'),

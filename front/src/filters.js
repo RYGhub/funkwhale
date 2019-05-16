@@ -2,13 +2,24 @@ import Vue from 'vue'
 
 import moment from 'moment'
 
-export function truncate (str, max, ellipsis) {
+export function truncate (str, max, ellipsis, middle) {
   max = max || 100
   ellipsis = ellipsis || '…'
   if (str.length <= max) {
     return str
   }
-  return str.slice(0, max) + ellipsis
+  if (middle) {
+    var sepLen = 1,
+        charsToShow = max - sepLen,
+        frontChars = Math.ceil(charsToShow/2),
+        backChars = Math.floor(charsToShow/2);
+
+    return str.substr(0, frontChars) +
+           ellipsis +
+           str.substr(str.length - backChars);
+  } else {
+    return str.slice(0, max) + ellipsis
+  }
 }
 
 Vue.filter('truncate', truncate)

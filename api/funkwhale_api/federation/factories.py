@@ -69,10 +69,20 @@ def create_user(actor):
 @registry.register
 class DomainFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     name = factory.Faker("domain_name")
+    nodeinfo_fetch_date = factory.LazyFunction(lambda: timezone.now())
 
     class Meta:
         model = "federation.Domain"
         django_get_or_create = ("name",)
+
+    @factory.post_generation
+    def with_service_actor(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        self.service_actor = ActorFactory(domain=self)
+        self.save(update_fields=["service_actor"])
+        return self.service_actor
 
 
 @registry.register
@@ -156,13 +166,21 @@ class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class LibraryScan(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class LibraryScanFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     library = factory.SubFactory(MusicLibraryFactory)
     actor = factory.SubFactory(ActorFactory)
     total_files = factory.LazyAttribute(lambda o: o.library.uploads_count)
 
     class Meta:
         model = "music.LibraryScan"
+
+
+@registry.register
+class FetchFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    actor = factory.SubFactory(ActorFactory)
+
+    class Meta:
+        model = "federation.Fetch"
 
 
 @registry.register
