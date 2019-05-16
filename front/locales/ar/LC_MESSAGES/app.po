@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-16 13:14+0000\n"
+"PO-Revision-Date: 2019-05-16 13:20+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
 "Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
 "funkwhale/front/ar/>\n"
@@ -953,7 +953,7 @@ msgstr "إضغط مرة واحدة و استمع لساعات مِن الموس�
 msgctxt "Content/Library/Link.Title"
 msgid ""
 "Click to display more information about the import process for this upload"
-msgstr ""
+msgstr "اضغط لعرض المزيد من المعلومات حول عملية استيراد هذا التحميل"
 
 #: front/src/components/library/FileUpload.vue:82
 msgctxt "Content/Library/Paragraph/Call to action"
@@ -4752,7 +4752,7 @@ msgstr ""
 #: front/src/components/library/ImportStatusModal.vue:11
 msgctxt "Popup/Import/Message"
 msgid "Upload was successfully processed by the server."
-msgstr ""
+msgstr "تم تحميله بنجاح على الخادم."
 
 #: front/src/components/library/FileUpload.vue:109
 msgctxt "Content/Library/Table"
