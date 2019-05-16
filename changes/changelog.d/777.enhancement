@@ -1,1 +1,0 @@
-Added a prune_library management command to remove obsolete metadata from the database (#777)

@@ -10,6 +10,196 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.19.0 (2019-05-16)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+
+Edits on tracks, albums and artists
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale was a bit annoying when it camed to metadata. Tracks, albums and artists profiles
+were created from audio file tags, but basically immutable after that (unless you had
+admin access to Django's UI, which wasn't ideal to do this kind of changes).
+
+With this release, everyone can suggest changes on track, album and artist pages. Users
+with the "library" permission can review suggested edits in a dedicated interface
+and apply/reject them.
+
+Approved edits are broadcasted via federation, to ensure other instances get the information
+too.
+
+Not all fields are currently modifiable using this feature. Especially, it's not possible
+to suggest a new album cover, or reassign a track to a different album or artist. Those will
+be implemented in a future release.
+
+Admin UI for tracks, albums, artists, libraries and uploads
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As part of our ongoing effort to make Funkwhale easier to manage for instance owners,
+this release includes a brand new administration interface to deal with:
+
+- tracks
+- albums
+- artists
+- libraries
+- uploads
+
+You can use this UI to quickly search for any object, delete objects in batch, understand
+where they are coming from etc. This new UI should remove the need to go through Django's
+admin in the vast majority of cases (but also includes a link to Django's admin when needed).
+
+Artist hiding in the interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It's now possible for users to hide artists they don't want to see.
+
+Content linked to hidden artists will not show up in the interface anymore. Especially:
+
+- Hidden artists tracks are removed from the current queue
+- Starting a playlist will skip tracks from hidden artists
+- Recently favorited, recently listened and recently added widgets on the homepage won't include content from hidden artists
+- Radio suggestions will exclude tracks from hidden artists
+- Hidden artists won't appear in Subsonic apps
+
+Results linked to hidden artists will continue to show up in search results and their profile page remains accessible.
+
+OAuth2 authorization for better integration with third-party apps
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale now support the OAuth2 authorization and authentication protocol which will allow
+third-party apps to interact with Funkwhale on behalf of users.
+
+This feature makes it possible to build third-party apps that have the same capabilities
+as Funkwhale's Web UI. The only exception at the moment is for actions that requires
+special permissions, such as modifying instance settings or moderation (but this will be
+enabled in a future release).
+
+If you want to start building an app on top of Funkwhale's API, please check-out
+`https://docs.funkwhale.audio/api.html`_ and `https://docs.funkwhale.audio/developers/authentication.html`_.
+
+Better error handling and display during import
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale should now be more resilient to missing tags in imported files, and give
+you more insights when something goes wrong, including the specific tags that were missing
+or invalid, and additional debug information to share in your support requests.
+
+This information is available in all pages that list uploads, when clicking on the button next to the upload status.
+
+Support for S3-compatible storages to store media files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Storing all media files on the Funkwhale server itself may not be possible or desirable
+in all scenarios. You can now configure Funkwhale to store those files in a S3
+bucket instead.
+
+Check-out `https://docs.funkwhale.audio/admin/external-storages.html`_ if you want to use
+this feature.
+
+Prune library command
+^^^^^^^^^^^^^^^^^^^^^
+
+Users are often surprised by Funkwhale's tendency to keep track, album and artist
+metadata even if no associated files exist.
+
+To help with that, we now offer a ``prune_library`` management command you can run
+to purge your database from obsolete entries. `Please refer to our documentation
+for usage instructions <https://docs.funkwhale.audio/admin/commands.html#pruning-library>`_.
+
+Check in-place files command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When using in-place import with a living audio library, you'll quite often rename or
+remove files from the file system. Unfortunately, Funkwhale keeps a reference to those
+files in the database, which results in unplayable tracks.
+
+To help with that, we now offer a ``check_inplace_files`` management command you can run
+to purge your database from obsolete files. `Please refer to our documentation
+for usage instructions <https://docs.funkwhale.audio/admin/commands.html#remove-obsolete-files-from-database>`_.
+
+
+Features:
+
+- Added albums view. Similar to artists view, it's viewable by clicking on the "Albums" link on the top bar. (#356)
+- Allow artists hiding (#701)
+- Change the document title to display current track information. (#359)
+- Display a confirmation dialog when adding duplicate songs to a playlist (#784)
+- Improved error handling and display during import (#252, #718, #583, #501, #544)
+- Support embedding full artist discographies (#747)
+- Support metadata update on tracks, albums and artists and broadcast those on the federation (#689)
+- Support OAuth2 authorization for better integration with third-party apps (#752)
+- Support S3-compatible storages for media files (#565)
+
+
+Enhancements:
+
+- [Experimental] Added a new "Similar" radio based on users history (suggested by @gordon)
+- Added a "load more" button on artist pages to load more tracks/albums (#719)
+- Added a `check_inplace_files` management command to remove purge the database from references to in-place imported files that don't exist on disk anymore (#781)
+- Added a prune_library management command to remove obsolete metadata from the database (#777)
+- Added admin options to disable login for users, ensure related content is deleted when deleting a user account (#809)
+- Added standardized translation context for all strings in the frontend to give accurate hints to translators.
+- Added twitter:* meta tags to detect tracks and albums players automatically on more sites (#578)
+  Improved responsiveness of embedded player
+- Advertise the list of supported upload extensions in the Nodeinfo endpoint (#808)
+- Better handling of follow/accept messages to avoid and recover from desync between instances (#830)
+- Better workflow for connecting to another instance (#715)
+
+  Changing the instance used is now better integrated in the App, and it is checked that the chosen instance and the suggested instances are valid and running Funkwhale servers.
+- Bumped dependencies to latest versions (#815)
+- Descriptions will now be shown underneath user libraries (#768)
+- Don't store unhandled ActivityPub messages in database (#776)
+- Enhanced the design of the embed wizard. (!619)
+- Ensure the footer always stays at the bottom of the page
+- Expose an instance-level actor (service@domain) in nodeinfo endpoint (#689)
+- Improved readability of logo (#385)
+- Keep persistent connections to the database instead of recreating a new one for each request
+- Labels for privacy levels are now consistently grabbed from a common source instead of being hardcoded everytime they are needed.
+- Merged artist/album buttons with title text on artist and album pages (#725)
+- Now honor maxBitrate parameter in Subsonic API (#802)
+- Preload next track in queue (#572)
+- Reduced app size for regular users by moving admin-related code in a dedicated chunk (#805)
+- Removed broken/instable lyrics feature (#799)
+- Show remaining storage space during import and prevent file upload if not enough space is remaining (#550)
+- The buttons displaying an icon now always show a little divider between the icon and the text. (!620)
+- Use attributedTo instead of actor in library ActivityPub payload (#619)
+- Use network/depends_on instead of links in docker-compose.yml (!716)
+
+
+Bugfixes:
+
+- Add missing command from contributing file (#754)
+- Add required envvar for dev environment (!668)
+- Added env variable to set AWS region and signature version to serve media without proxy (#826)
+- Allow users with dots in their usernames to request a subsonic password (#798)
+- Better handling of featuring/multi-artist tracks tagged with MusicBrainz (#782)
+- Do not consider tracks as duplicates during import if they have different positions (#740)
+- Ensure all our ActivityPub fetches are authenticated (#758)
+- Ensure correct track duration and playable status when browsing radios (#812)
+- Fixed alignement/size issue with some buttons (#702)
+- Fixed an encoding issue with instance name on about page (#828)
+- Fixed cover not showing in queue/player when playing tracks from "albums" tab (#795)
+- Fixed crashing upload processing on invalid date format (#718)
+- Fixed dev command for fake data creation (!664)
+- Fixed invalid OEmbed URL when using a local FUNKWHALE_SPA_HTML_ROOT (#824)
+- Fixed invalid required fields in Upload django's admin (#819)
+- Fixed issue with querying the albums api endpoint (#356)
+- Fixed non-transparent background for volume range on Firefox (#722)
+- Fixed overflowing input on account detail page (#791)
+- Fixed unplayable radios for anonymous users (#563)
+- Prevent skipping on file import if album_mbid is different (#772)
+- Use proper site name/domain in emails (#806)
+- Width of filter menus for radios has been set to stop text from overlapping the borders
+
+
+Documentation:
+
+- Document how to use Redis over unix sockets (#770)
+
+
 0.18.3 (2019-03-21)
 -------------------
 

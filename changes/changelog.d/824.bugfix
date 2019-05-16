@@ -1,1 +1,0 @@
-Fixed invalid OEmbed URL when using a local FUNKWHALE_SPA_HTML_ROOT (#824)
