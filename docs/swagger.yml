@@ -175,7 +175,7 @@ paths:
                   type: "string"
                   example: "demo"
 
-  /auth/registration/:
+  /api/v1/auth/registration/:
     post:
       summary: Create an account
       description: |
@@ -211,7 +211,7 @@ paths:
       responses:
         201:
           $ref: "#/responses/201"
-  /auth/password/reset/:
+  /api/v1/auth/password/reset/:
     post:
       summary: Request a password reset
       description: |
@@ -232,7 +232,7 @@ paths:
       responses:
         200:
           $ref: "#/responses/200"
-  /users/users/me/:
+  /api/v1/users/users/me/:
     get:
       summary: Retrive profile information
       description: |
@@ -560,7 +560,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
-  /listen/{uuid}/:
+  /api/v1/listen/{uuid}/:
     get:
       summary: Download the audio file matching the given track uuid
       description: |
@@ -675,7 +675,7 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
-  /libraries/:
+  /api/v1/libraries/:
     get:
       summary: List owned libraries
       tags:
@@ -713,7 +713,7 @@ paths:
             schema:
               $ref: "#/definitions/OwnedLibraryCreate"
 
-  /libraries/{uuid}/:
+  /api/v1/libraries/{uuid}/:
     parameters:
       - name: uuid
         in: path
@@ -758,7 +758,7 @@ paths:
         204:
           $ref: "#/responses/204"
 
-  /uploads/:
+  /api/v1/uploads/:
     get:
       summary: List owned uploads
       tags:
@@ -819,7 +819,7 @@ paths:
                   type: string
                   format: binary
 
-  /uploads/{uuid}/:
+  /api/v1/uploads/{uuid}/:
     parameters:
       - name: uuid
         in: path
@@ -848,7 +848,7 @@ paths:
         204:
           $ref: "#/responses/204"
 
-  /favorites/tracks/:
+  /api/v1/favorites/tracks/:
     get:
       tags:
         - "Content curation"
@@ -913,7 +913,7 @@ paths:
                     example: 98
                   creation_date:
                     $ref: "#/properties/creation_date"
-  /favorites/tracks/remove/:
+  /api/v1/favorites/tracks/remove/:
     post:
       summary: Remove the given track from favorites
       tags:
