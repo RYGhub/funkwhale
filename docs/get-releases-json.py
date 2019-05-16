@@ -21,7 +21,15 @@ def get_versions():
             continue
 
         tags.append({"id": tag, "date": date})
-    return sorted(tags, key=lambda tag: StrictVersion(tag["id"]), reverse=True)
+    valid = []
+    for tag in tags:
+        try:
+            StrictVersion(tag["id"])
+            valid.append(tag)
+        except ValueError:
+            continue
+
+    return sorted(valid, key=lambda tag: StrictVersion(tag["id"]), reverse=True)
 
 
 def main():
