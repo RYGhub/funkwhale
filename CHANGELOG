@@ -14,7 +14,7 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 -------------------
 
 Upgrade instructions are available at
-https://docs.funkwhale.audio/index.html
+https://docs.funkwhale.audio/admin/upgrading.html
 
 
 Edits on tracks, albums and artists
@@ -234,7 +234,7 @@ Contributors to this release (commiters and translators):
 -------------------
 
 Upgrade instructions are available at
-https://docs.funkwhale.audio/index.html
+https://docs.funkwhale.audio/admin/upgrading.html
 
 
 Avoid mixed content when deploying mono-container behind proxy [Manual action required]
@@ -285,7 +285,7 @@ Documentation:
 -------------------
 
 Upgrade instructions are available at
-https://docs.funkwhale.audio/index.html
+https://docs.funkwhale.audio/admin/upgrading.html
 
 Enhancements:
 
@@ -306,7 +306,7 @@ Bugfixes:
 -------------------
 
 Upgrade instructions are available at
-https://docs.funkwhale.audio/index.html
+https://docs.funkwhale.audio/admin/upgrading.html
 
 
 Fix Gzip compression to avoid BREACH exploit [security] [manual action required]
@@ -428,7 +428,7 @@ Many thanks to the dozens of people that contributed to this release: translator
 bug hunters, admins and backers. You made it possible!
 
 Upgrade instructions are available at
-https://docs.funkwhale.audio/index.html, ensure you also execute the intructions
+https://docs.funkwhale.audio/admin/upgrading.html, ensure you also execute the intructions
 marked with ``[manual action required]`` and ``[manual action suggested]``.
 
 See ``Full changelog`` below for an exhaustive list of changes!
