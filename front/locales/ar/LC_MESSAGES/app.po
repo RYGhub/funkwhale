@@ -4,14 +4,16 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-13 13:31+0000\n"
+"PO-Revision-Date: 2019-05-16 13:14+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
+"funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: Weblate 3.2.2\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -94,7 +96,7 @@ msgstr[5] "%{ count } مَقاطِع"
 #: front/src/views/content/libraries/Quota.vue:11
 msgctxt "Content/Library/Paragraph"
 msgid "%{ current } used on %{ max } allowed"
-msgstr ""
+msgstr "%{ current } مُستعمَلة مِن أصل %{ max } المسموح بها"
 
 #: front/src/components/common/Duration.vue:2
 msgctxt "Content/*/Paragraph"
@@ -611,7 +613,7 @@ msgstr "قبول"
 #: front/src/components/manage/library/EditsCardList.vue:21
 msgctxt "Content/*/*/Short"
 msgid "Approved"
-msgstr "قبول"
+msgstr "التي تم قبولها"
 
 #: front/src/components/library/EditCard.vue:21
 msgctxt "Content/Library/Card/Short"
@@ -705,7 +707,7 @@ msgstr "أطلب إعادة تعيين كلمة المرور"
 #: front/src/views/admin/moderation/DomainsDetail.vue:202
 msgctxt "Content/Moderation/Title"
 msgid "Audio content"
-msgstr "محتوى مسموع"
+msgstr "المحتوى الصوتي"
 
 #: front/src/components/ShortcutsModal.vue:55
 msgctxt "Popup/Keyboard shortcuts/Title"
@@ -2789,7 +2791,7 @@ msgstr "ليس هناك أي إشعار للعرض."
 #: front/src/components/common/EmptyState.vue:7
 msgctxt "Content/*/Paragraph"
 msgid "No results were found."
-msgstr ""
+msgstr "لم يتم العثور على أية نتيجة."
 
 #: front/src/components/mixins/Translations.vue:10
 #: front/src/components/mixins/Translations.vue:11
@@ -4723,7 +4725,7 @@ msgid ""
 "directly from your browser to enjoy them here."
 msgstr ""
 "ارسل ملفات موسيقية (MP3, OGG, FLAC, etc.) مِن مكتبتك الشخصية مباشرة مِن "
-"متصفحك للإستمتاع بها هنا."
+"متصفحك للاستمتاع بها هنا."
 
 #: front/src/components/library/FileUpload.vue:30
 msgctxt "Content/Library/Title/Verb"
