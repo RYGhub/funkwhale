@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-16 13:20+0000\n"
+"PO-Revision-Date: 2019-05-23 08:37+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
 "Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
 "funkwhale/front/ar/>\n"
@@ -3467,7 +3467,7 @@ msgstr "آخِر زيارة"
 #: front/src/components/library/FileUpload.vue:63
 msgctxt "Content/Library/Paragraph"
 msgid "Remaining storage space"
-msgstr ""
+msgstr "مساحة التخزين المتبقية"
 
 #: front/src/views/content/remote/Home.vue:6
 msgctxt "Content/Library/Title/Noun"
@@ -4105,7 +4105,7 @@ msgstr "المنتدى"
 #: front/src/components/library/FileUpload.vue:85
 msgctxt "Content/Library/Paragraph"
 msgid "Supported extensions: %{ extensions }"
-msgstr ""
+msgstr "امتدادات الملفات المدعومة: %{ extensions }"
 
 #: front/src/components/playlists/Editor.vue:9
 msgctxt "Content/Playlist/Paragraph"
