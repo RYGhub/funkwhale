@@ -62,7 +62,8 @@ Available installation methods
 -------------------------------
 
 Docker is the recommended and easiest way to setup your Funkwhale instance.
-We also maintain an installation guide for Debian 9 and Arch Linux.
+We also maintain an installation guide for Debian 9 and Arch Linux, and `an
+Ansible role <https://dev.funkwhale.audio/funkwhale/ansible/>`_.
 
 .. toctree::
    :maxdepth: 1
