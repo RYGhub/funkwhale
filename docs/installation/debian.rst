@@ -199,6 +199,7 @@ Download the sample environment file:
 
         cp /srv/funkwhale/deploy/env.prod.sample /srv/funkwhale/config/.env
 
+
 Generate a secret key for Django::
 
     openssl rand -base64 45
@@ -208,7 +209,8 @@ configuration options are mentioned at the top of the file.
 
 .. code-block:: shell
 
-    nano /srv/funkwhale/api/.env
+    chmod 600 /srv/funkwhale/config/.env  # reduce permissions on the .env file since it contains sensitive data
+    nano /srv/funkwhale/config/.env
 
 Paste the secret key you generated earlier at the entry
 ``DJANGO_SECRET_KEY`` and populate the ``DATABASE_URL``

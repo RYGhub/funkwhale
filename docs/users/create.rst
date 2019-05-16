@@ -2,10 +2,10 @@ Creating a Funkwhale Account
 ============================
 
 Before you can start using Funkwhale, you will need to set up an account on an instance. While
-some instances allow you to listen to public music anonymously, you will need to create account
+some instances allow you to listen to public music anonymously, you will need to create an account
 to benefit from the full Funkwhale experience.
 
-A list of instances along with other useful information such as version and enabled features can be found
+A list of instances along with other useful informations such as version and enabled features can be found
 `here <https://network.funkwhale.audio/dashboards/d/overview/network-overview>`_. Servers marked with
 "Open registrations" are available to sign up to.
 

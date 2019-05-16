@@ -59,10 +59,10 @@ The reverse proxy
 
 Funkwhale's API server should never be exposed directly to the internet, as we require
 a reverse proxy (Apache or Nginx) for performance and security reasons. The reverse proxy
-will receive client HTTP requests, and:
+will receive client HTTP or HTTPS requests, and:
 
 - Proxy them to the API server
-- Serve requested static files (Audio files, stylesheets, javascript, fonts...)
+- Serve requested static files (audio files, stylesheets, javascript, fonts...)
 
 The API server
 --------------

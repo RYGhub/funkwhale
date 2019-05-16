@@ -1,6 +1,44 @@
+# Undocumented endpoints:
+#  /api/v1/settings
+#  /api/v1/activity
+#  /api/v1/playlists
+#  /api/v1/playlist-tracks
+#  /api/v1/search
+#  /api/v1/radios
+#  /api/v1/history
+
 openapi: "3.0.2"
 info:
-  description: "Documentation for [Funkwhale](https://funkwhale.audio) API. The API is **not** stable yet."
+  description: |
+    Interactive documentation for [Funkwhale](https://funkwhale.audio) API.
+
+    The API is **not** freezed yet, but we will document breaking changes in our changelog,
+    and try to avoid those as much as possible.
+
+    Usage
+    -----
+
+    Click on an endpoint name to inspect its properties, parameters and responses.
+
+    Use the "Try it out" button to send a real world payload to the endpoint and inspect
+    the corresponding response.
+
+    Authentication
+    --------------
+
+    To authenticate, use the `/token/` endpoint with a username and password, and copy/paste
+    the resulting JWT token in the `Authorize` modal. All subsequent requests made via the interactive
+    documentation will be authenticated.
+
+    If you keep the default server (https://demo.funkwhale.audio), the default username and password
+    couple is "demo" and "demo".
+
+    Resources
+    ---------
+
+    For more targeted guides regarding API usage, and especially authentication, please
+    refer to [https://docs.funkwhale.audio/api.html](https://docs.funkwhale.audio/api.html)
+
   version: "1.0.0"
   title: "Funkwhale API"
 
@@ -63,6 +101,18 @@ security:
   - jwt: []
   - oauth2: []
 
+tags:
+  - name: Auth and security
+    description: Login, logout and authorization endpoints
+  - name: Library and metadata
+    description: Information and metadata about musical and audio entities (albums, tracks, artists, etc.)
+  - name: Uploads and audio content
+    description: Manipulation and uploading of audio files
+    externalDocs:
+      url: https://docs.funkwhale.audio/users/managing.html
+  - name: Content curation
+    description: Favorites, playlists, radios
+
 paths:
   /api/v1/oauth/apps/:
     post:
@@ -101,7 +151,8 @@ paths:
   /api/v1/token/:
     post:
       tags:
-        - "auth"
+        - "Auth and security"
+      summary: Get an API token
       description:
         Obtain a JWT token you can use for authenticating your next requests.
       security: []
@@ -124,11 +175,83 @@ paths:
                   type: "string"
                   example: "demo"
 
+  /api/v1/auth/registration/:
+    post:
+      summary: Create an account
+      description: |
+        Register a new account on this instance. An invitation code will be required
+        if sign up is disabled.
+      tags:
+        - "Auth and security"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                  example: "alice"
+                email:
+                  type: "string"
+                  format: "email"
+                invitation:
+                  type: "string"
+                  example: "INVITECODE"
+                  required: false
+                  description: An invitation code, required if signups are closed on the instance.
+                password1:
+                  type: "string"
+                  example: "passw0rd"
+                password2:
+                  type: "string"
+                  description: Must be identical to password1
+                  example: "passw0rd"
+      responses:
+        201:
+          $ref: "#/responses/201"
+  /api/v1/auth/password/reset/:
+    post:
+      summary: Request a password reset
+      description: |
+        Request a password reset. An email with reset instructions will be sent to the provided email,
+        if it's associated with a user account.
+      tags:
+        - "Auth and security"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+      responses:
+        200:
+          $ref: "#/responses/200"
+  /api/v1/users/users/me/:
+    get:
+      summary: Retrive profile information
+      description: |
+        Retrieve profile informations of the current user
+      tags:
+        - "Auth and security"
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Me"
+
   /api/v1/artists/:
     get:
       summary: List artists
       tags:
-        - "artists"
+        - "Library and metadata"
       security:
         - oauth2:
           - "read:libraries"
@@ -140,7 +263,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - allOf:
             - $ref: "#/parameters/Ordering"
             - default: "-creation_date"
@@ -178,7 +300,7 @@ paths:
         - oauth2:
           - "read:libraries"
       tags:
-        - "artists"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -202,8 +324,7 @@ paths:
         - $ref: "#/parameters/PageSize"
 
       tags:
-        - "artists"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -220,7 +341,7 @@ paths:
     get:
       summary: List albums
       tags:
-        - "albums"
+        - "Library and metadata"
 
       security:
         - oauth2:
@@ -233,7 +354,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - name: "artist"
           in: "query"
           default: null
@@ -280,7 +400,7 @@ paths:
         - oauth2:
           - "read:libraries"
       tags:
-        - "albums"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -305,8 +425,7 @@ paths:
         - oauth2:
           - "read:libraries"
       tags:
-        - "albums"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -323,7 +442,7 @@ paths:
     get:
       summary: List tracks
       tags:
-        - "tracks"
+        - "Library and metadata"
 
       security:
         - oauth2:
@@ -336,7 +455,6 @@ paths:
           schema:
             required: false
             type: "string"
-            example: "carpenter"
         - name: "artist"
           in: "query"
           default: null
@@ -345,6 +463,13 @@ paths:
             required: false
             type: "integer"
             format: "int64"
+        - name: "favorites"
+          in: "query"
+          default: null
+          description: "filter/exclude tracks favorited by the current user"
+          schema:
+            required: false
+            type: "boolean"
         - name: "album"
           in: "query"
           default: null
@@ -391,15 +516,15 @@ paths:
                           $ref: "#/definitions/Track"
   /api/v1/tracks/{id}/:
     get:
-      summary: Retrieve a single track
       parameters:
         - $ref: "#/parameters/ObjectId"
+      summary: Retrieve a single track
 
       security:
         - oauth2:
           - "read:libraries"
       tags:
-        - "tracks"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -423,14 +548,73 @@ paths:
         - oauth2:
           - "read:libraries"
       tags:
-        - "tracks"
-        - "libraries"
+        - "Library and metadata"
       responses:
         200:
           content:
             application/json:
               schema:
                 $ref: "#/definitions/LibraryPage"
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ResourceNotFound"
+  /api/v1/listen/{uuid}/:
+    get:
+      summary: Download the audio file matching the given track uuid
+      description: |
+        Given a track uuid (and not ID), return the first found audio file
+        accessible by the user making the request.
+
+        In case of a remote upload, this endpoint will fetch the audio file from the remote
+        and cache it before sending the response.
+
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: Track uuid
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: to
+          in: query
+          required: false
+          description: |
+            If specified, the endpoint will return a transcoded version of the original
+            audio file.
+
+            Since transcoding happens on the fly, it can significantly increase response time,
+            and it's recommended to request transcoding only for files that are not playable
+            by the client.
+
+            This endpoint support bytess-range requests.
+          schema:
+            $ref: "#/properties/transcode_options"
+        - name: upload
+          in: query
+          required: false
+          summary: An upload uuid
+          description: |
+            If specified, will return the audio for the given upload uuid.
+
+            This is useful for tracks that have multiple uploads available.
+
+          schema:
+            type: string
+            format: uuid
+
+      tags:
+        - "Library and metadata"
+      responses:
+        200:
+          content:
+            '*/*':
+              description: "Audio file, as binary data"
+              schema:
+                type: string
+                format: binary
         404:
           content:
             application/json:
@@ -444,7 +628,7 @@ paths:
         - oauth2:
           - "read:libraries"
       tags:
-        - "licenses"
+        - "Library and metadata"
       parameters:
         - $ref: "#/parameters/PageNumber"
         - $ref: "#/parameters/PageSize"
@@ -478,7 +662,7 @@ paths:
             example: cc0-1.0
 
       tags:
-        - "licenses"
+        - "Library and metadata"
       responses:
         200:
           content:
@@ -491,6 +675,263 @@ paths:
               schema:
                 $ref: "#/definitions/ResourceNotFound"
 
+  /api/v1/libraries/:
+    get:
+      summary: List owned libraries
+      tags:
+        - "Uploads and audio content"
+      parameters:
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/OwnedLibrary"
+    post:
+      tags:
+        - "Uploads and audio content"
+      description:
+        Create a new library
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/OwnedLibraryCreate"
+
+  /api/v1/libraries/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve a library
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedLibrary"
+    post:
+      summary: Update a library
+      tags:
+        - "Uploads and audio content"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/OwnedLibraryCreate"
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedLibrary"
+    delete:
+      summary: Delete a library and all associated uploads
+      description: |
+        This will delete the library, all associated uploads, follows, and broadcast
+        the event on the federation.
+      tags:
+        - "Uploads and audio content"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
+  /api/v1/uploads/:
+    get:
+      summary: List owned uploads
+      tags:
+        - "Uploads and audio content"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter uploads"
+          schema:
+            required: false
+            type: "string"
+            example: "Dire straits"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/OwnedUpload"
+    post:
+      tags:
+        - "Uploads and audio content"
+      description:
+        Upload a new file in a library. The event will be broadcasted on federation,
+        according to the library visibility and followers.
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                library:
+                  type: string
+                  format: uuid
+                  description: "The library in which the audio should be stored"
+                import_reference:
+                  type: string
+                  example: "Import launched via API client on 04/19"
+                source:
+                  type: string
+                  example: "upload://filename.mp3"
+                audio_file:
+                  type: string
+                  format: binary
+
+  /api/v1/uploads/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve an upload
+      tags:
+        - "Uploads and audio content"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/OwnedUpload"
+    delete:
+      summary: Delete an upload
+      description: |
+        This will delete the upload from the server and broadcast the event
+        on the federation.
+      tags:
+        - "Uploads and audio content"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
+  /api/v1/favorites/tracks/:
+    get:
+      tags:
+        - "Content curation"
+      parameters:
+        - name: "q"
+          in: "query"
+          default: null
+          description: "Search query used to filter favorites"
+          schema:
+            required: false
+            type: "string"
+        - name: "user"
+          in: "query"
+          default: null
+          description: "Limit results to favorites belonging to the given user"
+          schema:
+            $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/PageNumber"
+        - $ref: "#/parameters/PageSize"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ResultPage"
+                  - type: "object"
+                    properties:
+                      results:
+                        type: "array"
+                        items:
+                          $ref: "#/definitions/TrackFavorite"
+    post:
+      summary: Mark the given track as favorite
+      tags:
+        - "Content curation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                track:
+                  type: "integer"
+                  format: "int64"
+                  example: 98
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    format: "int64"
+                    example: 876
+                  track:
+                    type: "integer"
+                    format: "int64"
+                    example: 98
+                  creation_date:
+                    $ref: "#/properties/creation_date"
+  /api/v1/favorites/tracks/remove/:
+    post:
+      summary: Remove the given track from favorites
+      tags:
+        - "Content curation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                track:
+                  type: "integer"
+                  format: "int64"
+                  example: 98
+      responses:
+        204:
+          $ref: "#/responses/204"
 
 parameters:
   ObjectId:
@@ -534,11 +975,67 @@ parameters:
       required: false
       type: "boolean"
 
+responses:
+  200:
+    description: Success
+  201:
+    description: Successfully created
+  204:
+    description: Successfully deleted
+  400:
+    description: Bad request
+
 properties:
   mbid:
     type: "string"
-    formats: "uuid"
+    format: "uuid"
     description: "A musicbrainz ID"
+  creation_date:
+    type: "string"
+    format: "date-time"
+  privacy_level:
+    type: string
+    example: "me"
+    description: |
+     * `me`: private
+     * `instance`: accessible by local users
+     * `everyone`: public (including over federation)
+    enum:
+      - "me"
+      - "instance"
+      - "everyone"
+  fid:
+    type: "string"
+    format: "uri"
+    description: "Federation ID"
+    example: "https://my.instance/federation/music/libraries/3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  audio_mimetype:
+    type: string
+    example: "audio/ogg"
+    enum:
+      - "audio/ogg"
+      - "audio/mpeg"
+      - "audio/x-flac"
+      - "audio/flac"
+  import_status:
+    type: string
+    example: "finished"
+    enum:
+      - "pending"
+      - "finished"
+      - "errored"
+      - "skipped"
+    description: |
+     * `pending`: waiting to be processed by the server
+     * `finished`: successfully processed by the server
+     * `errored`: couldn't be processed by the server (e.g because of a tagging issue)
+     * `skipped`: processed by the server but skipped, because considered as a duplicate of an existing upload
+
+  transcode_options:
+    type: string
+    enum:
+      - "ogg"
+      - "mp3"
 
 definitions:
   OAuthApplication:
@@ -926,22 +1423,214 @@ definitions:
         example: 128000
         description: "Bitrate of the file, in bytes/s"
       mimetype:
-        type: string
-        example: "audio/ogg"
-        enum:
-          - "audio/ogg"
-          - "audio/mpeg"
-          - "audio/x-flac"
-          - "audio/flac"
+        $ref: "#/properties/audio_mimetype"
       extension:
         type: string
         example: "ogg"
         description: "File extension of the upload"
-
+      filename:
+        type: "string"
+        example: "Myfile.mp3"
       listen_url:
         type: "string"
         format: "uri"
         description: "URL to stream the upload"
+
+  OwnedLibraryCreate:
+    type: "object"
+    properties:
+      password:
+        type: "name"
+        example: "My new library"
+      description:
+        required: false
+        type: "string"
+        example: "Lots of interesting content"
+      privacy_level:
+        $ref: "#/properties/privacy_level"
+
+  OwnedLibrary:
+    type: "object"
+    properties:
+      uuid:
+        type: string
+        format: uuid
+      fid:
+        $ref: "#/properties/fid"
+      name:
+        type: "string"
+        example: "My Creative Commons library"
+      description:
+        type: "string"
+        example: "All content is under CC-BY"
+      creation_date:
+        $ref: "#/properties/creation_date"
+      privacy_level:
+        $ref: "#/properties/privacy_level"
+      uploads_count:
+        type: "integer"
+        format: "int64"
+        example: 34
+      size:
+        type: "integer"
+        format: "int64"
+        example: 678917000
+        description: "Total size of uploads in the library, in bytes"
+
+  OwnedUpload:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/Upload"
+      - type: "object"
+        properties:
+          import_status:
+            $ref: "#/properties/import_status"
+          track:
+            $ref: "#/definitions/Track"
+          library:
+            $ref: "#/definitions/OwnedLibrary"
+          source:
+            type: "string"
+            example: "upload://myfile.mp3"
+          import_reference:
+            type: "string"
+            example: "Import launched via web UI on 03/18"
+  TrackFavorite:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 876
+      track:
+        $ref: "#/definitions/Track"
+      user:
+        $ref: "#/definitions/User"
+      creation_date:
+        $ref: "#/properties/creation_date"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 23
+      username:
+        type: "string"
+        example: "alice"
+      name:
+        type: "string"
+        example: "Alice Kingsley"
+      avatar:
+        $ref: "#/definitions/Avatar"
+
+  Me:
+    type: "object"
+    allOf:
+      - $ref: "#/definitions/User"
+      - type: "object"
+        properties:
+          full_username:
+            type: "string"
+            description: Full username, for use on federation
+            example: "alice@yourdomain.com"
+          email:
+            type: "string"
+            format: "email"
+            description: Email address associated with the account
+            example: "alice@email.provider"
+          is_staff:
+            type: "boolean"
+            example: false
+          is_superuser:
+            type: "boolean"
+            example: false
+          date_joined:
+            type: "string"
+            format: "date-time"
+          privacy_level:
+            $ref: "#/properties/privacy_level"
+            description: Default privacy-level associated with the user account
+          quota_status:
+            $ref: "#/definitions/QuotaStatus"
+          permissions:
+            $ref: "#/definitions/Permissions"
+  Avatar:
+    type: "object"
+    properties:
+      original:
+        type: "string"
+        format: "uri"
+        description: "Original image URL"
+        example: "http://yourinstance/media/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996.jpg"
+      square_crop:
+        type: "string"
+        format: "uri"
+        description: "400x400 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-400x400-70.jpg"
+      small_square_crop:
+        type: "string"
+        format: "uri"
+        description: "50x50 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-50x50-70.jpg"
+      medium_square_crop:
+        type: "string"
+        format: "uri"
+        description: "200x200 thumbnail URL"
+        example: "http://yourinstance/media/__sized__/users/avatars/92/49/60/b3c-4736-43b3-bb5c-ed7a99ac6996-crop-c0-5__0-5-200x200-70.jpg"
+  QuotaStatus:
+    type: "object"
+    properties:
+      max:
+        type: "integer"
+        format: "int64"
+        description: Storage space allocated to this user, in MB
+        example: 5000
+      remaining:
+        type: "integer"
+        format: "int64"
+        description: Remaining storage space for this user, in MB
+        example: 4600
+      current:
+        type: "integer"
+        format: "int64"
+        description: Storage space used by this user, in MB
+        example: 400
+      skipped:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "skipped" import status, in MB
+        example: 30
+      finished:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "finished" import status, in MB
+        example: 350
+      pending:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "pending" import status, in MB
+        example: 15
+      errored:
+        type: "integer"
+        format: "int64"
+        description: Storage space occupied by uploads with "errored" import status, in MB
+        example: 5
+  Permissions:
+    type: "object"
+    properties:
+      library:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user can manage the instance library
+      moderation:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user has moderation permission
+      settings:
+        type: "boolean"
+        example: false
+        description: A boolean indicating if the user can manage instance settings and users
 
   ResourceNotFound:
     type: "object"

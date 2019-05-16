@@ -52,9 +52,14 @@ Create an env file to store a few important configuration options:
     touch .env
     echo "FUNKWHALE_HOSTNAME=yourdomain.funkwhale" >> .env
     echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
+    echo "NGINX_MAX_BODY_SIZE=100M" >> .env
+    echo "FUNKWHALE_API_IP=127.0.0.1" >> .env
+    echo "FUNKWHALE_API_PORT=5000" >> .env  # or the container port you want to expose on the host
     echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
     # Remove this if you expose the container directly on ports 80/443
     echo "NESTED_PROXY=1" >> .env
+
+    chmod 600 .env  # reduce permissions on the .env file since it contains sensitive data
 
 Then start the container:
 
@@ -179,7 +184,9 @@ Create your env file:
 
     curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
+    chmod 600 .env  # reduce permissions on the .env file since it contains sensitive data
     sudo nano .env
+
 
 Ensure to edit it to match your needs (this file is heavily commented), in particular ``DJANGO_SECRET_KEY`` and ``FUNKWHALE_HOSTNAME``.
 You should take a look at the `configuration reference <https://docs.funkwhale.audio/configuration.html#configuration-reference>`_ for more detailed information regarding each setting.
