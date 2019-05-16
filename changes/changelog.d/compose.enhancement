@@ -1,1 +1,0 @@
-Use network/depends_on instead of links in docker-compose.yml (!716)

@@ -1,1 +1,0 @@
-Added albums view. Similar to artists view, it's viewable by clicking on the "Albums" link on the top bar. (#356)
