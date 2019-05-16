@@ -1,1 +1,0 @@
-Don't store unhandled ActivityPub messages in database (#776)

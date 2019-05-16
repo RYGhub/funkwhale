@@ -1,3 +1,0 @@
-Better workflow for connecting to another instance (#715)
-
-Changing the instance used is now better integrated in the App, and it is checked that the chosen instance and the suggested instances are valid and running Funkwhale servers.

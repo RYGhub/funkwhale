@@ -1,1 +1,0 @@
-Reduced app size for regular users by moving admin-related code in a dedicated chunk (#805)
