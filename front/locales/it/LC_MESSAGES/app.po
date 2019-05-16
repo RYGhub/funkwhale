@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-03 10:33+0000\n"
+"PO-Revision-Date: 2019-05-23 08:37+0000\n"
 "Last-Translator: Sylke Vicious <silkevicious@tuta.io>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -828,10 +828,9 @@ msgid "Cancel"
 msgstr "Annulla"
 
 #: front/src/views/content/remote/Card.vue:97
-#, fuzzy
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Cancel follow request"
-msgstr "Richiesta di seguire in sospeso"
+msgstr "Annulla richiesta di seguire"
 
 #: front/src/components/library/radios/Builder.vue:64
 msgctxt "Content/Radio/Table.Label/Noun (Value is a number of Tracks)"
