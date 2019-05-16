@@ -199,6 +199,36 @@ Documentation:
 
 - Document how to use Redis over unix sockets (#770)
 
+Contributors to this release (commiters and translators):
+
+- Ale London
+- Alexander
+- Ben Finney
+- ButterflyOfFire
+- Ciarán Ainsworth
+- Damien Nicolas
+- Daniele Lira Mereb
+- Eliot Berriot
+- Elza Gelez
+- gerry_the_hat
+- gordon
+- interfect
+- jake
+- Jee
+- jovuit
+- Mélanie Chauvel
+- nouts
+- Pierrick
+- Qasim Ali
+- Quentí
+- Renon
+- Rodrigo Leite
+- Sylke Vicious
+- Thomas Brockmöller
+- Tixie
+- Vierkantor
+- Von
+- Zach Halasz
 
 0.18.3 (2019-03-21)
 -------------------
