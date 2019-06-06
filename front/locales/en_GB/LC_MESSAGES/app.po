@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-06 12:44+0100\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2019-06-07 14:45+0000\n"
+"Last-Translator: Ciarán Ainsworth <ciaranainsworth@posteo.net>\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.3\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.2.2\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -370,7 +370,7 @@ msgstr "Add and manage content"
 #: front/src/components/playlists/PlaylistModal.vue:31
 msgctxt "*/Playlist/Button.Label/Verb"
 msgid "Add anyways"
-msgstr "Add anyways"
+msgstr "Add anyway"
 
 #: front/src/components/Sidebar.vue:75 src/views/content/Base.vue:18
 msgctxt "*/Library/*/Verb"
@@ -769,7 +769,7 @@ msgstr "By %{ artist }"
 #: front/src/views/content/remote/Card.vue:112
 msgctxt "Popup/Library/Paragraph"
 msgid "By unfollowing this library, you loose access to its content."
-msgstr "By unfollowing this library, you loose access to its content."
+msgstr "By unfollowing this library, you lose access to its content."
 
 #: front/src/views/admin/library/AlbumDetail.vue:214
 #: front/src/views/admin/library/ArtistDetail.vue:203
@@ -1589,7 +1589,7 @@ msgstr "Enter playlist name…"
 #: front/src/views/auth/PasswordReset.vue:54
 msgctxt "Content/Signup/Input.Placeholder"
 msgid "Enter the email address binded to your account"
-msgstr "Enter the email address binded to your account"
+msgstr "Enter the email address bound to your account"
 
 #: front/src/components/auth/Signup.vue:103
 msgctxt "Content/Signup/Form/Placeholder"
@@ -1652,7 +1652,7 @@ msgstr "Error while asking for a password reset"
 #: front/src/components/auth/Authorize.vue:6
 msgctxt "Popup/Moderation/Error message"
 msgid "Error while authorizing application"
-msgstr "Error while authorizing application"
+msgstr "Error while authorising application"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgctxt "Content/Signup/Card.Title"
@@ -1743,7 +1743,7 @@ msgstr "Exclude"
 #: front/src/components/mixins/Translations.vue:50
 msgctxt "Content/Admin/Table.Label/Noun"
 msgid "Expiration date"
-msgstr "Expiration date"
+msgstr "Expiry date"
 
 #: front/src/components/manage/users/InvitationsTable.vue:50
 msgctxt "Content/Admin/Table"
@@ -1776,18 +1776,18 @@ msgstr "Failed tracks:"
 #: front/src/views/admin/library/TrackDetail.vue:217
 msgctxt "*/*/*"
 msgid "Favorited tracks"
-msgstr "Favorited tracks"
+msgstr "Favourited tracks"
 
 #: front/src/components/Sidebar.vue:66
 msgctxt "Sidebar/Favorites/List item.Link/Noun"
 msgid "Favorites"
-msgstr "Favorites"
+msgstr "Favourites"
 
 #: front/src/components/mixins/Translations.vue:76
 #: front/src/components/mixins/Translations.vue:77
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Favorites"
-msgstr "Favorites"
+msgstr "Favourites"
 
 #: front/src/views/admin/Settings.vue:84
 msgctxt "Content/Admin/Menu"
@@ -2004,7 +2004,10 @@ msgstr "However, accessing Funkwhale from those clients require a separate passw
 #: front/src/views/auth/PasswordResetConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
 msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
-msgstr "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
+msgstr ""
+"If the email address provided in the previous step is valid and bound to a "
+"user account, you should receive an email with reset instructions in the "
+"next couple of minutes."
 
 #: front/src/components/auth/Settings.vue:205
 msgctxt "Content/Applications/Paragraph"
@@ -2063,7 +2066,7 @@ msgstr "In favourites"
 #: front/src/components/moderation/FilterModal.vue:25
 msgctxt "Popup/Moderation/List item"
 msgid "In other users favorites and listening history"
-msgstr "In other users favourites and listening history"
+msgstr "In other users' favourites and listening history"
 
 #: front/src/components/moderation/FilterModal.vue:28
 msgctxt "Popup/Moderation/List item"
@@ -3443,7 +3446,7 @@ msgstr "Results per page"
 #: front/src/components/library/EditForm.vue:31
 msgctxt "Content/Library/Button.Label"
 msgid "Retrict to unreviewed edits"
-msgstr "Retrict to unreviewed edits"
+msgstr "Restrict to unreviewed edits"
 
 #: front/src/views/auth/EmailConfirm.vue:17
 msgctxt "Content/Signup/Link/Verb"
@@ -4045,7 +4048,7 @@ msgstr "The remote server answered, but returned data was unsupported by Funkwha
 #: front/src/components/federation/FetchButton.vue:44
 msgctxt "*/*/Error"
 msgid "The remote server didn't answered fast enough"
-msgstr "The remote server didn't answered fast enough"
+msgstr "The remote server didn't answer fast enough"
 
 #: front/src/components/federation/FetchButton.vue:50
 msgctxt "*/*/Error"
@@ -4199,7 +4202,7 @@ msgstr "This reference will be used to group imported files together."
 #: front/src/components/mixins/Translations.vue:34
 msgctxt "Content/Library/Help text"
 msgid "This track could not be processed, please it is tagged correctly"
-msgstr "This track could not be processed, please it is tagged correctly"
+msgstr "This track could not be processed, please ensure it is tagged correctly"
 
 #: front/src/components/mixins/Translations.vue:29
 #: front/src/components/mixins/Translations.vue:30
@@ -4425,7 +4428,7 @@ msgstr "Unknown error"
 #: front/src/components/library/ImportStatusModal.vue:144
 msgctxt "Popup/Import/Error.Label"
 msgid "Unkwown error"
-msgstr "Unkwown error"
+msgstr "Unknown error"
 
 #: front/src/components/Home.vue:37
 msgctxt "Content/Home/Title"
@@ -4753,7 +4756,7 @@ msgstr "Welcome"
 #: front/src/components/Home.vue:5
 msgctxt "Content/Home/Title/Verb"
 msgid "Welcome on Funkwhale"
-msgstr "Welcome on Funkwhale"
+msgstr "Welcome to Funkwhale"
 
 #: front/src/components/Home.vue:24
 msgctxt "Content/Home/Title"
@@ -4835,7 +4838,10 @@ msgstr "You are now using the Funkwhale instance at %{ url }"
 #: front/src/views/content/Home.vue:17
 msgctxt "Content/Library/Paragraph"
 msgid "You can follow libraries from other users to get access to new music. Public libraries can be followed immediatly, while following a private library requires approval from its owner."
-msgstr "You can follow libraries from other users to get access to new music. Public libraries can be followed immediatly, while following a private library requires approval from its owner."
+msgstr ""
+"You can follow libraries from other users to get access to new music. Public "
+"libraries can be followed immediately, while following a private library "
+"requires approval from its owner."
 
 #: front/src/components/Home.vue:128
 msgctxt "Content/Home/List item"
@@ -4845,7 +4851,8 @@ msgstr "You can invite friends and family to your instance so they can enjoy you
 #: front/src/components/moderation/FilterModal.vue:31
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You can manage and update your filters anytime from your account settings."
-msgstr "You can manage and update your filters anytime from your account settings."
+msgstr ""
+"You can manage and update your filters any time from your account settings."
 
 #: front/src/views/auth/EmailConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
@@ -4870,7 +4877,7 @@ msgstr "You don't have any application connected with your account."
 #: front/src/components/auth/Settings.vue:261
 msgctxt "Content/Applications/Paragraph"
 msgid "You don't have any configured application yet."
-msgstr "You don't have any configured application yet."
+msgstr "You don't have any configured applications yet."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:75
 msgctxt "Content/Moderation/Card.Title"
@@ -4920,7 +4927,9 @@ msgstr "You will have to update your password on your clients that use this pass
 #: front/src/components/moderation/FilterModal.vue:20
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You will not see tracks, albums and user activity linked to this artist anymore:"
-msgstr "You will not see tracks, albums and user activity linked to this artist anymore:"
+msgstr ""
+"You will not see tracks, albums and user activity linked to this artist any "
+"more:"
 
 #: front/src/components/auth/Signup.vue:13
 msgctxt "Content/Signup/Form/Paragraph"
@@ -4945,7 +4954,7 @@ msgstr "Your edit was successfully submitted."
 #: front/src/components/favorites/List.vue:116
 msgctxt "Head/Favorites/Title"
 msgid "Your Favorites"
-msgstr "Your Favorites"
+msgstr "Your Favourites"
 
 #: front/src/components/Home.vue:109
 msgctxt "Content/Home/Title"
@@ -4970,7 +4979,7 @@ msgstr "Your password has been updated successfully."
 #: front/src/components/auth/Settings.vue:14
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your settings can't be updateds"
-msgstr "Your settings can't be updateds"
+msgstr "Your settings can't be updated"
 
 #: front/src/components/auth/Settings.vue:101
 msgctxt "Popup/Settings/List item"
