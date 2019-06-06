@@ -8,14 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-16 10:35+0200\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2019-06-06 12:07+0000\n"
+"Last-Translator: Xaloc <xaloc@tutanota.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.2.2\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -30,7 +31,7 @@ msgstr ""
 #: front/src/components/Sidebar.vue:22
 msgctxt "Sidebar/Queue/Tab.Title"
 msgid "(empty)"
-msgstr ""
+msgstr "(buit)"
 
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
