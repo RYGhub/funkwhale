@@ -3986,7 +3986,7 @@ msgstr "Membre de l'équipe"
 #: src/components/radios/Button.vue:4
 msgctxt "*/Queue/Button.Label/Short, Verb"
 msgid "Start radio"
-msgstr "Arrêter la radio"
+msgstr "Démarrer la radio"
 
 #: front/src/views/admin/Settings.vue:86
 msgctxt "Content/Admin/Menu"
