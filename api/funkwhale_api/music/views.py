@@ -285,6 +285,11 @@ def should_transcode(upload, format, max_bitrate=None):
     return format_need_transcoding or bitrate_need_transcoding
 
 
+def get_content_disposition(filename):
+    filename = "filename*=UTF-8''{}".format(urllib.parse.quote(filename))
+    return "attachment; {}".format(filename)
+
+
 def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     f = upload
     # we update the accessed_date
@@ -342,8 +347,7 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
     file_header = mapping[settings.REVERSE_PROXY_TYPE]
     response[file_header] = file_path
-    filename = "filename*=UTF-8''{}".format(urllib.parse.quote(filename))
-    response["Content-Disposition"] = "attachment; {}".format(filename)
+    response["Content-Disposition"] = get_content_disposition(filename)
     if mt:
         response["Content-Type"] = mt
 

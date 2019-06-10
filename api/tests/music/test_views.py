@@ -1,6 +1,7 @@
 import io
 import magic
 import os
+import urllib.parse
 
 import pytest
 from django.urls import reverse
@@ -412,7 +413,7 @@ def test_handle_serve_create_mp3_version(factories, now):
     user = factories["users.User"]()
     upload = factories["music.Upload"](bitrate=42)
     response = views.handle_serve(upload, user, format="mp3")
-
+    expected_filename = upload.track.full_name + ".mp3"
     version = upload.versions.latest("id")
 
     assert version.mimetype == "audio/mpeg"
@@ -421,7 +422,9 @@ def test_handle_serve_create_mp3_version(factories, now):
     assert version.audio_file_path.endswith(".mp3")
     assert version.size == version.audio_file.size
     assert magic.from_buffer(version.audio_file.read(), mime=True) == "audio/mpeg"
-
+    assert response["Content-Disposition"] == "attachment; filename*=UTF-8''{}".format(
+        urllib.parse.quote(expected_filename)
+    )
     assert response.status_code == 200
 
 

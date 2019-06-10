@@ -870,7 +870,14 @@ class UploadVersion(models.Model):
 
     @property
     def filename(self):
-        return self.upload.filename
+        try:
+            return (
+                self.upload.track.full_name
+                + "."
+                + utils.MIMETYPE_TO_EXTENSION[self.mimetype]
+            )
+        except KeyError:
+            return self.upload.filename
 
     @property
     def audio_file_path(self):
