@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-10 07:37+0000\n"
+"PO-Revision-Date: 2019-06-10 10:14+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -498,8 +498,8 @@ msgstr "Tot"
 msgctxt "Content/*/Paragraph"
 msgid "All %{ count } element selected"
 msgid_plural "All %{ count } elements selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Únic element seleccionat"
+msgstr[1] "Tots els %{ count } elements seleccionats"
 
 #: front/src/components/auth/Authorize.vue:107
 msgctxt "Head/Authorize/Title"
@@ -530,6 +530,8 @@ msgstr "Un error HTTP s'ha produït al conectar-se al servidor remot"
 msgctxt "Content/Login/Error message/List item"
 msgid "An unknown error happend, this can mean the server is down or cannot be reached"
 msgstr ""
+"Un error desconegut s'ha produït, el servidor potser ha caigut o  no s'hi "
+"pot accedir"
 
 #: front/src/components/library/ImportStatusModal.vue:145
 msgctxt "Popup/Import/Error.Label"
@@ -655,7 +657,7 @@ msgstr "Ascendent"
 #: front/src/views/auth/PasswordReset.vue:28
 msgctxt "Content/Signup/Button.Label/Verb"
 msgid "Ask for a password reset"
-msgstr ""
+msgstr "Restablir la contrasenya"
 
 #: front/src/views/admin/library/AlbumDetail.vue:198
 #: front/src/views/admin/library/ArtistDetail.vue:187
@@ -702,13 +704,13 @@ msgstr "Perfil"
 #: front/src/views/auth/PasswordResetConfirm.vue:18
 msgctxt "Content/Signup/Link"
 msgid "Back to login"
-msgstr ""
+msgstr "Tornar a la pàgina d'inici de sessió"
 
 #: front/src/components/auth/ApplicationEdit.vue:9
 #: front/src/components/auth/ApplicationNew.vue:5
 msgctxt "Content/Applications/Link"
 msgid "Back to settings"
-msgstr ""
+msgstr "Tornar a la configuració"
 
 #: front/src/components/library/TrackDetail.vue:48
 #: front/src/components/mixins/Translations.vue:55
@@ -716,7 +718,7 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:56
 msgctxt "Content/Track/*/Noun"
 msgid "Bitrate"
-msgstr ""
+msgstr "Taxa de bits"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:19
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:34
@@ -737,27 +739,27 @@ msgstr "Explorar"
 #: front/src/components/Sidebar.vue:65
 msgctxt "Sidebar/Library/List item.Link/Verb"
 msgid "Browse library"
-msgstr ""
+msgstr "Navegueu per la biblioteca"
 
 #: front/src/components/library/Albums.vue:4
 msgctxt "Content/Album/Title"
 msgid "Browsing albums"
-msgstr ""
+msgstr "Navegueu pels àlbums"
 
 #: front/src/components/library/Artists.vue:4
 msgctxt "Content/Artist/Title"
 msgid "Browsing artists"
-msgstr ""
+msgstr "Navegueu pels artistes"
 
 #: front/src/views/playlists/List.vue:3
 msgctxt "Content/Playlist/Title"
 msgid "Browsing playlists"
-msgstr ""
+msgstr "Navegueu per la llista de reproducció"
 
 #: front/src/components/library/Radios.vue:4
 msgctxt "Content/Radio/Title"
 msgid "Browsing radios"
-msgstr ""
+msgstr "Navegueu per les ràdios"
 
 #: front/src/components/library/radios/Builder.vue:5
 msgctxt "Content/Radio/Title"
@@ -782,10 +784,9 @@ msgstr ""
 #: front/src/views/admin/library/UploadDetail.vue:208
 #: front/src/views/admin/moderation/AccountsDetail.vue:290
 #: front/src/views/admin/moderation/DomainsDetail.vue:217
-#, fuzzy
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Cached size"
-msgstr "Mida del cache"
+msgstr "Mida de la memòria cau"
 
 #: front/src/components/SetInstanceModal.vue:37
 #: front/src/components/common/DangerousButton.vue:17
@@ -805,7 +806,7 @@ msgstr "Cancelar"
 #: front/src/views/content/remote/Card.vue:97
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Cancel follow request"
-msgstr ""
+msgstr "Cancel·lar la petició de seguiment"
 
 #: front/src/components/library/radios/Builder.vue:64
 msgctxt "Content/Radio/Table.Label/Noun (Value is a number of Tracks)"
@@ -1011,10 +1012,9 @@ msgstr "Còpia i enganxa aquest codi dins l'HTML de la vostra web"
 
 #: front/src/components/library/TrackDetail.vue:10
 #: front/src/views/admin/library/TrackDetail.vue:153
-#, fuzzy
 msgctxt "Content/Track/Table.Label/Noun"
 msgid "Copyright"
-msgstr "Copyright"
+msgstr "Drets d'autor"
 
 #: front/src/views/auth/EmailConfirm.vue:7
 msgctxt "Content/Signup/Paragraph"
@@ -1565,7 +1565,7 @@ msgstr ""
 #: front/src/views/playlists/Detail.vue:30
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "End edition"
-msgstr ""
+msgstr "Acabar l'edició"
 
 #: front/src/views/content/remote/ScanForm.vue:50
 msgctxt "Content/Library/Input.Placeholder"
@@ -1626,24 +1626,24 @@ msgstr ""
 #: front/src/views/content/libraries/Form.vue:4
 msgctxt "Content/*/Error message.Title"
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: front/src/components/federation/FetchButton.vue:34
 #: front/src/components/library/ImportStatusModal.vue:32
 msgctxt "Popup/Import/Table.Label/Noun"
 msgid "Error detail"
-msgstr ""
+msgstr "Detalls de l'error"
 
 #: front/src/views/admin/Settings.vue:87
 msgctxt "Content/Admin/Menu"
 msgid "Error reporting"
-msgstr ""
+msgstr "Informe de l'error"
 
 #: front/src/components/federation/FetchButton.vue:26
 #: front/src/components/library/ImportStatusModal.vue:24
 msgctxt "Popup/Import/Table.Label/Noun"
 msgid "Error type"
-msgstr ""
+msgstr "Tipus d'error"
 
 #: front/src/components/common/ActionTable.vue:94
 msgctxt "Content/*/Error message/Header"
@@ -1944,7 +1944,7 @@ msgstr ""
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Get started"
-msgstr ""
+msgstr "Començar"
 
 #: front/src/components/Footer.vue:37
 msgctxt "Footer/*/Link"
@@ -1970,7 +1970,7 @@ msgstr "Tornar a la pàgina d'inici"
 #: front/src/components/auth/Settings.vue:128
 msgctxt "Content/Settings/Title"
 msgid "Hidden artists"
-msgstr ""
+msgstr "Ocultar artistes"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:114
 msgctxt "Content/Moderation/Help text"
@@ -1978,10 +1978,9 @@ msgid "Hide account or domain content, except from followers."
 msgstr ""
 
 #: front/src/components/moderation/FilterModal.vue:40
-#, fuzzy
 msgctxt "Popup/*/Button.Label"
 msgid "Hide content"
-msgstr "Amagar contingut"
+msgstr "Amagar el contingut"
 
 #: front/src/components/audio/PlayButton.vue:26
 msgctxt "*/Queue/Dropdown/Button/Label/Short"
