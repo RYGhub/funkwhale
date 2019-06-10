@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-10 10:14+0000\n"
+"PO-Revision-Date: 2019-06-11 07:58+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -558,6 +558,8 @@ msgstr "ID de l'aplicació"
 msgctxt "Content/Application/Paragraph/"
 msgid "Application ID and secret are really sensitive values and must be treated like passwords. Do not share those with anyone else."
 msgstr ""
+"L'ID i el secret de l'aplicació són valors realment sensibles i han de ser "
+"tractats com les contrasenyes. No els comparteixis amb ningú."
 
 #: front/src/components/auth/ApplicationEdit.vue:25
 msgctxt "Content/Applications/Label"
@@ -730,6 +732,9 @@ msgstr "Bloquejar-ho tot"
 msgctxt "Content/Moderation/Help text"
 msgid "Block everything from this account or domain. This will prevent any interaction with the entity, and purge related content (uploads, libraries, follows, etc.)"
 msgstr ""
+"Bloquejar-ho tot d'aquest compte o domini. Això evitarà qualsevol interacció "
+"amb l’entitat, i purga el contingut relacionat (pistes, llibreries, "
+"seguidors, ...)"
 
 #: front/src/components/Sidebar.vue:18 src/components/library/Library.vue:4
 msgctxt "*/Library/*/Verb"
@@ -811,7 +816,7 @@ msgstr "Cancel·lar la petició de seguiment"
 #: front/src/components/library/radios/Builder.vue:64
 msgctxt "Content/Radio/Table.Label/Noun (Value is a number of Tracks)"
 msgid "Candidates"
-msgstr ""
+msgstr "Candidats"
 
 #: front/src/components/library/FileUpload.vue:261
 msgctxt "Content/Library/Help text"
@@ -852,6 +857,8 @@ msgstr "Canvis sincronitzadas amb el servidor"
 msgctxt "Content/Settings/Paragraph'"
 msgid "Changing your password will also change your Subsonic API password if you have requested one."
 msgstr ""
+"Si canvieu la vostra contrasenya també canviarà la vostra contrasenya de l’"
+"API Subsonic si l’heu sol·licitat."
 
 #: front/src/components/auth/Settings.vue:98
 msgctxt "Popup/Settings/Paragraph"
@@ -861,12 +868,14 @@ msgstr "Canviar la teva contrasenya tindrà les següents conseqüències:"
 #: front/src/components/Footer.vue:40
 msgctxt "Footer/*/List item.Link"
 msgid "Chat room"
-msgstr ""
+msgstr "Sala de xat"
 
 #: front/src/components/auth/ApplicationForm.vue:24
 msgctxt "Content/Applications/Paragraph/"
 msgid "Checking the parent \"Read\" or \"Write\" scopes implies access to all the corresponding children scopes."
 msgstr ""
+"La comprovació dels àmbits \"Llegir\" o \"Escriu\" dels pares implica "
+"l'accés a tots els àmbits d’administració corresponents."
 
 #: front/src/components/SetInstanceModal.vue:2
 msgctxt "Popup/Instance/Title"
@@ -892,23 +901,27 @@ msgstr "Buidar la llista de reproducció"
 #: front/src/components/audio/Player.vue:642
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Clear your queue"
-msgstr ""
+msgstr "Neteja la llista de reproducció"
 
 #: front/src/components/Home.vue:44
 msgctxt "Content/Home/List item/Verb"
 msgid "Click once, listen for hours using built-in radios"
-msgstr ""
+msgstr "Cliqueu, escolteu hores de musica utilitzant les ràdios integrades"
 
 #: front/src/components/mixins/Translations.vue:21
 #: front/src/components/mixins/Translations.vue:22
 msgctxt "Content/Library/Link.Title"
 msgid "Click to display more information about the import process for this upload"
 msgstr ""
+"Feu clic per mostrar més informació sobre el procés d'importació per a "
+"aquesta càrrega"
 
 #: front/src/components/library/FileUpload.vue:82
 msgctxt "Content/Library/Paragraph/Call to action"
 msgid "Click to select files to upload or drag and drop files or directories"
 msgstr ""
+"Feu clic per seleccionar fitxers per carregar o arrossega i deixa anar els "
+"fitxers i els directoris"
 
 #: front/src/components/federation/FetchButton.vue:85
 #: front/src/components/library/ImportStatusModal.vue:79
@@ -961,7 +974,7 @@ msgstr "Codi de confirmació"
 #: front/src/components/moderation/FilterModal.vue:90
 msgctxt "*/Moderation/Message"
 msgid "Content filter successfully added"
-msgstr ""
+msgstr "S'ha afegit el filtre de contingut"
 
 #: front/src/components/mixins/Translations.vue:96
 #: front/src/components/mixins/Translations.vue:97
@@ -2016,6 +2029,8 @@ msgstr ""
 msgctxt "Content/Applications/Paragraph"
 msgid "If you authorize third-party applications to access your data, those applications will be listed here."
 msgstr ""
+"Si autoritzes  a donar les teves dades a aplicacions de tercers, aquestes "
+"aplicacions seran llistades aquí."
 
 #: front/src/components/library/ImportStatusModal.vue:3
 msgctxt "Popup/Import/Title"
@@ -2049,7 +2064,7 @@ msgstr "Importat"
 #: front/src/components/federation/FetchButton.vue:47
 msgctxt "*/*/Error"
 msgid "Impossible to connect to the remote server"
-msgstr ""
+msgstr "Impossible conectar amb el servidor remot"
 
 #: front/src/components/moderation/FilterModal.vue:26
 msgctxt "Popup/Moderation/List item"
@@ -2059,7 +2074,7 @@ msgstr ""
 #: front/src/components/moderation/FilterModal.vue:27
 msgctxt "Popup/Moderation/List item"
 msgid "In artists and album listings"
-msgstr ""
+msgstr "Dins les llistes d'artistes i àlbums"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgctxt "Content/Track/Button.Message"
@@ -2132,19 +2147,19 @@ msgstr ""
 #: front/src/components/library/ImportStatusModal.vue:139
 msgctxt "Popup/Import/Error.Label"
 msgid "Invalid metadata"
-msgstr ""
+msgstr "Metadades invàlides"
 
 #: front/src/components/auth/Signup.vue:44
 #: front/src/components/manage/users/InvitationForm.vue:11
 msgctxt "Content/*/Input.Label"
 msgid "Invitation code"
-msgstr ""
+msgstr "Codi d'invitació"
 
 #: front/src/views/admin/users/Base.vue:8
 #: front/src/views/admin/users/InvitationsList.vue:24
 msgctxt "*/Admin/*/Noun"
 msgid "Invitations"
-msgstr ""
+msgstr "Invitacions"
 
 #: front/src/components/Footer.vue:41
 msgctxt "Footer/*/List item.Link"
@@ -2169,12 +2184,12 @@ msgstr ""
 #: front/src/views/admin/moderation/DomainsDetail.vue:161
 msgctxt "Content/Moderation/Table.Label.Link"
 msgid "Known accounts"
-msgstr ""
+msgstr "Comptes conegut s"
 
 #: front/src/views/content/remote/Home.vue:14
 msgctxt "Content/Library/Title"
 msgid "Known libraries"
-msgstr ""
+msgstr "Biblioteques conegudes"
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/components/mixins/Translations.vue:58
@@ -2182,18 +2197,18 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:59
 msgctxt "Content/Profile/Table.Label/Short, Noun (Value is a date)"
 msgid "Last activity"
-msgstr ""
+msgstr "Última activitat"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:188
 #: front/src/views/admin/moderation/DomainsDetail.vue:78
 msgctxt "Content/*/Table.Label"
 msgid "Last checked"
-msgstr ""
+msgstr "Última comprovació"
 
 #: front/src/components/playlists/PlaylistModal.vue:46
 msgctxt "Popup/Playlist/Table.Label/Short"
 msgid "Last modification"
-msgstr ""
+msgstr "Última modificació"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:43
 msgctxt "Content/Moderation/Table.Label/Noun"
@@ -2209,7 +2224,7 @@ msgstr ""
 #: front/src/views/content/remote/Card.vue:60
 msgctxt "Content/Library/Card.List item/Noun"
 msgid "Last update:"
-msgstr ""
+msgstr "Última actualització:"
 
 #: front/src/components/common/ActionTable.vue:49
 msgctxt "Modal/*/Button.Label/Short, Verb"
@@ -2239,13 +2254,13 @@ msgstr ""
 #: front/src/views/content/Base.vue:5
 msgctxt "*/*/*/Noun"
 msgid "Libraries"
-msgstr ""
+msgstr "Biblioteques"
 
 #: front/src/views/admin/library/Base.vue:17
 #: front/src/views/admin/library/LibrariesList.vue:24
 msgctxt "*/*/*"
 msgid "Libraries"
-msgstr ""
+msgstr "Biblioteques"
 
 #: front/src/components/mixins/Translations.vue:72
 #: front/src/components/mixins/Translations.vue:73
@@ -2265,39 +2280,39 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:498
 msgctxt "*/*/*"
 msgid "Library"
-msgstr ""
+msgstr "Biblioteca"
 
 #: front/src/views/content/libraries/Form.vue:103
 msgctxt "Content/Library/Message"
 msgid "Library created"
-msgstr ""
+msgstr "Biblioteca creada"
 
 #: front/src/views/admin/library/LibraryDetail.vue:78
 msgctxt "Content/Moderation/Title"
 msgid "Library data"
-msgstr ""
+msgstr "Dades de la biblioteca"
 
 #: front/src/views/content/libraries/Form.vue:123
 msgctxt "Content/Library/Message"
 msgid "Library deleted"
-msgstr ""
+msgstr "Biblioteca suprimida"
 
 #: front/src/views/admin/library/EditsList.vue:4
 msgctxt "Content/Admin/Title/Noun"
 msgid "Library edits"
-msgstr ""
+msgstr "Modificacions de la biblioteca"
 
 #: front/src/views/content/libraries/Form.vue:100
 msgctxt "Content/Library/Message"
 msgid "Library updated"
-msgstr ""
+msgstr "Biblioteca actualitzada"
 
 #: front/src/components/library/TrackDetail.vue:19
 #: front/src/components/manage/library/TracksTable.vue:43
 #: front/src/views/admin/library/TrackDetail.vue:159 src/edits.js:61
 msgctxt "Content/*/*/Noun"
 msgid "License"
-msgstr ""
+msgstr "Llicència"
 
 #: front/src/views/admin/library/AlbumDetail.vue:157
 #: front/src/views/admin/library/ArtistDetail.vue:146
@@ -2321,38 +2336,38 @@ msgstr ""
 #: front/src/views/content/libraries/Detail.vue:21
 msgctxt "Content/Library/Paragraph"
 msgid "Loading followers…"
-msgstr ""
+msgstr "Carregant els seguidors …"
 
 #: front/src/views/content/libraries/Home.vue:3
 msgctxt "Content/Library/Paragraph"
 msgid "Loading Libraries…"
-msgstr ""
+msgstr "Carregant les biblioteques …"
 
 #: front/src/views/content/libraries/Detail.vue:3
 #: front/src/views/content/libraries/Upload.vue:3
 msgctxt "Content/Library/Paragraph"
 msgid "Loading library data…"
-msgstr ""
+msgstr "Carregant les dades de la biblioteca …"
 
 #: front/src/views/Notifications.vue:19
 msgctxt "Content/Notifications/Paragraph"
 msgid "Loading notifications…"
-msgstr ""
+msgstr "Carregant les notificacions …"
 
 #: front/src/views/content/remote/Home.vue:3
 msgctxt "Content/Library/Paragraph"
 msgid "Loading remote libraries…"
-msgstr ""
+msgstr "Carregant les biblioteques remotes …"
 
 #: front/src/views/content/libraries/Quota.vue:4
 msgctxt "Content/Library/Paragraph"
 msgid "Loading usage data…"
-msgstr ""
+msgstr "Carregant dades d'utilització …"
 
 #: front/src/components/favorites/List.vue:5
 msgctxt "Content/Favorites/Message"
 msgid "Loading your favorites…"
-msgstr ""
+msgstr "Carregant els vostres favorits …"
 
 #: front/src/components/manage/library/AlbumsTable.vue:65
 #: front/src/components/manage/library/ArtistsTable.vue:58
@@ -2364,15 +2379,16 @@ msgstr ""
 #: front/src/views/admin/library/LibraryDetail.vue:18
 #: front/src/views/admin/library/TrackDetail.vue:18
 #: front/src/views/admin/library/UploadDetail.vue:19
+#, fuzzy
 msgctxt "Content/Moderation/*/Short, Noun"
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:59
 #: front/src/views/admin/moderation/AccountsDetail.vue:18
 msgctxt "Content/Moderation/*/Short, Noun"
 msgid "Local account"
-msgstr ""
+msgstr "Comparte local"
 
 #: front/src/components/auth/Login.vue:84
 msgctxt "Head/Login/Title"
