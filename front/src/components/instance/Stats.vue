@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="stats" class="ui stackable two column grid">
+    <div v-if="stats && stats.trackFavorites !== undefined" class="ui stackable two column grid">
       <div class="column">
         <h3 class="ui left aligned header">
           <translate translate-context="Content/About/Title/Noun">User activity</translate>
