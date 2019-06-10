@@ -115,3 +115,29 @@ If you are using ``awscli``, you can store this policy in a ``/tmp/policy`` file
 apply it using the following command::
 
     aws s3api put-bucket-policy --bucket <yourbucketname> --policy file:///tmp/policy
+
+Troubleshooting
+***************
+
+No Resolver Found
+^^^^^^^^^^^^^^^^^
+
+Depending on your setup, you may experience the following issue when trying to stream
+music directly from your S3-compatible store.
+
+.. code-block:: shell
+
+    [error] 2832#2832: *1 no resolver defined to resolve [address] client: [IP], server: [servername], request: "GET API request", host: "[your_domain]", referrer: "[your_domain/library]"
+
+This happpens when the nginx config is unable to use your server's DNS resolver. This issue
+is still under investigation, but in the meantime can be worked around by specifying a resolver
+in your ``funkwhale.template`` under the ``location ~/_protected/media/(.+)`` section.
+
+.. code-block:: shell
+
+    location ~ /_protected/media/(.+) {
+     resolver 1.1.1.1;
+     internal;
+     proxy_pass $1;
+    }
+

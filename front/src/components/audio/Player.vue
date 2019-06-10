@@ -199,7 +199,6 @@
           @click.prevent.stop="clean()"
           class="two wide column control">
           <i class="icons">
-
             <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
             <i :class="['ui corner large inverted', 'list', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
           </i>
@@ -926,6 +925,11 @@ export default {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
+
+.icons {
+  position: absolute;
+}
+
 i.icons .corner.icon {
   font-size: 1em;
   right: -0.3em;
