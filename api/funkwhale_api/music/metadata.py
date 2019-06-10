@@ -481,14 +481,26 @@ class PermissiveDateField(serializers.CharField):
         return None
 
 
+class MBIDField(serializers.UUIDField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_null", True)
+        kwargs.setdefault("required", False)
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, v):
+        if v in ["", None]:
+            return None
+        return super().to_internal_value(v)
+
+
 class ArtistSerializer(serializers.Serializer):
     name = serializers.CharField()
-    mbid = serializers.UUIDField(required=False, allow_null=True)
+    mbid = MBIDField()
 
 
 class AlbumSerializer(serializers.Serializer):
     title = serializers.CharField()
-    mbid = serializers.UUIDField(required=False, allow_null=True)
+    mbid = MBIDField()
     release_date = PermissiveDateField(required=False, allow_null=True)
 
 
@@ -512,15 +524,34 @@ class PositionField(serializers.CharField):
 
 class TrackMetadataSerializer(serializers.Serializer):
     title = serializers.CharField()
-    position = PositionField(allow_null=True, required=False)
-    disc_number = PositionField(allow_null=True, required=False)
-    copyright = serializers.CharField(allow_null=True, required=False)
-    license = serializers.CharField(allow_null=True, required=False)
-    mbid = serializers.UUIDField(allow_null=True, required=False)
+    position = PositionField(allow_blank=True, allow_null=True, required=False)
+    disc_number = PositionField(allow_blank=True, allow_null=True, required=False)
+    copyright = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    license = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    mbid = MBIDField()
 
     album = AlbumField()
     artists = ArtistField()
     cover_data = CoverDataField()
+
+    remove_blank_null_fields = [
+        "copyright",
+        "license",
+        "position",
+        "disc_number",
+        "mbid",
+    ]
+
+    def validate(self, validated_data):
+        validated_data = super().validate(validated_data)
+        for field in self.remove_blank_null_fields:
+            try:
+                v = validated_data[field]
+            except KeyError:
+                continue
+            if v in ["", None]:
+                validated_data.pop(field)
+        return validated_data
 
 
 class FakeMetadata(Mapping):

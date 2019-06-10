@@ -1,0 +1,1 @@
+Ensure empty but optional fields in file metadata don't error during import (#850)

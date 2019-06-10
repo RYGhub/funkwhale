@@ -539,6 +539,33 @@ def test_serializer_album_artist_missing():
     assert serializer.validated_data == expected
 
 
+@pytest.mark.parametrize(
+    "field_name", ["copyright", "license", "mbid", "position", "disc_number"]
+)
+def test_serializer_empty_fields(field_name):
+    data = {
+        "title": "Track Title",
+        "artist": "Track Artist",
+        "album": "Track Album",
+        # empty copyright/license field shouldn't fail, cf #850
+        field_name: "",
+    }
+    expected = {
+        "title": "Track Title",
+        "artists": [{"name": "Track Artist", "mbid": None}],
+        "album": {
+            "title": "Track Album",
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+        },
+        "cover_data": None,
+    }
+    serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
+
+
 def test_artist_field_featuring():
     data = {
         "artist": "Santana feat. Chris Cornell",
