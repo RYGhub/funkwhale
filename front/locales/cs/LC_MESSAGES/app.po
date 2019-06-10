@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-10 07:37+0000\n"
+"PO-Revision-Date: 2019-06-10 14:31+0000\n"
 "Last-Translator: jiri-novacek <gfreshman@gmail.com>\n"
 "Language-Team: none\n"
 "Language: cs\n"
@@ -880,6 +880,8 @@ msgstr "Diskuzní místnost"
 msgctxt "Content/Applications/Paragraph/"
 msgid "Checking the parent \"Read\" or \"Write\" scopes implies access to all the corresponding children scopes."
 msgstr ""
+"Povolení čtení nebo zápisu na předkovi implikuje totéž pro všechny jeho "
+"potomky."
 
 #: front/src/components/SetInstanceModal.vue:2
 msgctxt "Popup/Instance/Title"
@@ -4200,186 +4202,196 @@ msgstr "Stopu nelze načíst"
 msgctxt "Content/Moderation/Paragraph"
 msgid "The track will be removed, as well as associated uploads, favorites and listening history. This action is irreversible."
 msgstr ""
+"Stopa bude odstraněna, společně se všemi souvisejícími nahranými soubory, "
+"oblíbenými a historií poslechů. Tato akce je nevratná."
 
 #: front/src/views/admin/library/UploadDetail.vue:68
 msgctxt "Content/Moderation/Paragraph"
 msgid "The upload will be removed. This action is irreversible."
-msgstr ""
+msgstr "Nahraný soubor bude odstraněn. Tato akce je nevratná."
 
 #: front/src/components/library/FileUpload.vue:42
 msgctxt "Content/Library/List item"
 msgid "The uploaded music files are in OGG, Flac or MP3 format"
-msgstr ""
+msgstr "Nahrané soubory jsou ve formátu OGG, Flac nebo MP3"
 
 #: front/src/views/content/Home.vue:4
 msgctxt "Content/Library/Paragraph"
 msgid "There are various ways to grab new content and make it available here."
-msgstr ""
+msgstr "Jsou různé cesty jak získat nový obsah a zpřístupnit ho zde."
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:66
 msgctxt "Popup/Moderation/Paragraph"
 msgid "This action is irreversible."
-msgstr ""
+msgstr "Tato akce je nevratná."
 
 #: front/src/components/library/AlbumDetail.vue:29
 msgctxt "Content/Album/Paragraph"
 msgid "This album is present in the following libraries:"
-msgstr ""
+msgstr "Toto album se vyskytuje v následujících knihovnách:"
 
 #: front/src/components/library/ArtistDetail.vue:42
 msgctxt "Content/Artist/Paragraph"
 msgid "This artist is present in the following libraries:"
-msgstr ""
+msgstr "Tento umělec se vyskytuje v následujících knihovnách:"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:84
 #: front/src/views/admin/moderation/DomainsDetail.vue:48
 msgctxt "Content/Moderation/Card.Title"
 msgid "This domain is subject to specific moderation rules"
-msgstr ""
+msgstr "Na tuto doménu jsou aplikována specifická pravidla moderace"
 
 #: front/src/views/content/Home.vue:9
 msgctxt "Content/Library/Paragraph"
 msgid "This instance offers up to %{quota} of storage space for every user."
-msgstr ""
+msgstr "Tato instance nabízí každému uživateli až %{quota} diskového prostoru."
 
 #: front/src/components/auth/Settings.vue:165
 msgctxt "Content/Settings/Paragraph"
 msgid "This is the list of applications that have access to your account data."
 msgstr ""
+"Tento seznam obsahuje všechny aplikace které mají přístup k datům vašeho "
+"účtu."
 
 #: front/src/components/auth/Settings.vue:218
 msgctxt "Content/Settings/Paragraph"
 msgid "This is the list of applications that you have created."
-msgstr ""
+msgstr "Tento seznam obsahuje všechny aplikace které jste vytvořili."
 
 #: front/src/components/auth/Profile.vue:16
 msgctxt "Content/Profile/Button.Paragraph"
 msgid "This is you!"
-msgstr ""
+msgstr "To jste vy!"
 
 #: front/src/views/content/libraries/Form.vue:73
 msgctxt "Content/Library/Input.Placeholder"
 msgid "This library contains my personal music, I hope you like it."
-msgstr ""
+msgstr "Tato knihovna obsahuje mou hudbu, doufám že se vám líbí."
 
 #: front/src/views/content/remote/Card.vue:141
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is private and your approval from its owner is needed to access its content"
-msgstr ""
+msgstr "Tato knihovna je soukromá a pro přístup k ní je nutný souhlas vlastníka"
 
 #: front/src/views/content/remote/Card.vue:142
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is public and you can access its content freely"
-msgstr ""
+msgstr "Tato knihovna je veřejná a její obsah je volně přístupný"
 
 #: front/src/components/common/ActionTable.vue:47
 msgctxt "Modal/*/Paragraph"
 msgid "This may affect a lot of elements or have irreversible consequences, please double check this is really what you want."
 msgstr ""
+"Tato akce může ovlivnit mnoho prvků nebo může mít nevratné následky - prosím "
+"ujistěte se, že si to opravdu přejete."
 
 #: front/src/components/library/AlbumEdit.vue:8
 #: front/src/components/library/ArtistEdit.vue:8
 #: front/src/components/library/TrackEdit.vue:8
 msgctxt "Content/*/Message"
 msgid "This object is managed by another server, you cannot edit it."
-msgstr ""
+msgstr "Tento objekt je spravován jiným serverem, nemůžete ho upravovat."
 
 #: front/src/components/library/FileUpload.vue:51
 msgctxt "Content/Library/Paragraph"
 msgid "This reference will be used to group imported files together."
-msgstr ""
+msgstr "Tento odkaz bude použit pro seskupení importovaných souborů."
 
 #: front/src/components/mixins/Translations.vue:33
 #: front/src/components/mixins/Translations.vue:34
 msgctxt "Content/Library/Help text"
 msgid "This track could not be processed, please it is tagged correctly"
 msgstr ""
+"Tato stopa nemůže být zpracována, prosím zajistěte její korektní otagování"
 
 #: front/src/components/mixins/Translations.vue:29
 #: front/src/components/mixins/Translations.vue:30
 msgctxt "Content/Library/Help text"
 msgid "This track has been uploaded, but hasn't been processed by the server yet"
-msgstr ""
+msgstr "Tato stopa byla nahrána a čeká na zpracování serverem"
 
 #: front/src/components/mixins/Translations.vue:25
 #: front/src/components/mixins/Translations.vue:26
 msgctxt "Content/Library/Help text"
 msgid "This track is already present in one of your libraries"
-msgstr ""
+msgstr "Tato stopa se již nachází v některé z vašich knihoven"
 
 #: front/src/components/audio/PlayButton.vue:85
 msgctxt "*/Queue/Button/Title"
 msgid "This track is not available in any library you have access to"
-msgstr ""
+msgstr "Tato stopa není dostupná v žádné vám přístupné knihovně"
 
 #: front/src/components/library/TrackDetail.vue:82
 msgctxt "Content/Track/Paragraph"
 msgid "This track is present in the following libraries:"
-msgstr ""
+msgstr "Tato stopa se nachází v následujících knihovnách:"
 
 #: front/src/views/playlists/Detail.vue:38
 msgctxt "Popup/Playlist/Paragraph"
 msgid "This will completely delete this playlist and cannot be undone."
-msgstr ""
+msgstr "Kompletně a nevratně smaže tento playlist."
 
 #: front/src/views/radios/Detail.vue:27
 msgctxt "Popup/Radio/Paragraph"
 msgid "This will completely delete this radio and cannot be undone."
-msgstr ""
+msgstr "Kompletně a nevratně smaže toto rádio."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:50
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will completely disable access to the Subsonic API using from account."
-msgstr ""
+msgstr "Kompletně zakáže přístup k Subsonic API pro tento účet."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:35
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will log you out from existing devices that use the current password."
 msgstr ""
+"Toto vás odhlásí z existujících zařízení, které používají současné heslo."
 
 #: front/src/components/auth/Settings.vue:253
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will permanently delete the application and all the associated tokens."
-msgstr ""
+msgstr "Kompletně odstraní aplikaci a všechny přidružené tokeny."
 
 #: front/src/components/auth/Settings.vue:194
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will prevent this application from accessing the service on your behalf."
-msgstr ""
+msgstr "Zabrání této aplikaci v přístupu ke službě pod vaším účtem."
 
 #: front/src/components/playlists/Editor.vue:54
 msgctxt "Popup/Playlist/Paragraph"
 msgid "This will remove all tracks from this playlist and cannot be undone."
-msgstr ""
+msgstr "Odstraní nevratně všechny stopy z tohoto playlistu."
 
 #: front/src/views/admin/library/AlbumDetail.vue:99
 #: front/src/views/admin/library/TrackDetail.vue:98 src/edits.js:21
 #: src/edits.js:39
 msgctxt "*/*/*/Noun"
 msgid "Title"
-msgstr ""
+msgstr "Název"
 
 #: front/src/components/audio/track/Table.vue:7
 #: front/src/views/content/libraries/FilesTable.vue:55
 msgctxt "Content/Track/*/Noun"
 msgid "Title"
-msgstr ""
+msgstr "Název"
 
 #: front/src/components/manage/library/AlbumsTable.vue:39
 #: front/src/components/manage/library/TracksTable.vue:39
 msgctxt "*/*/*"
 msgid "Title"
-msgstr ""
+msgstr "Název"
 
 #: front/src/components/SetInstanceModal.vue:16
 msgctxt "Popup/Instance/Paragraph"
 msgid "To continue, please select the Funkwhale instance you want to connect to. Enter the address directly, or select one of the suggested choices."
 msgstr ""
+"Pro pokračování prosím zvolte Funkwhale instanci ke které se chcete "
+"připojit. Zadejte adresu přímo, nebo vyberte jednu z nabízených možností."
 
 #: front/src/components/ShortcutsModal.vue:79
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle queue looping"
-msgstr ""
+msgstr "Přepnout opakování fronty"
 
 #: front/src/views/admin/library/AlbumDetail.vue:222
 #: front/src/views/admin/library/ArtistDetail.vue:211
@@ -4389,22 +4401,22 @@ msgstr ""
 #: front/src/views/admin/moderation/DomainsDetail.vue:225
 msgctxt "Content/Moderation/Table.Label"
 msgid "Total size"
-msgstr ""
+msgstr "Celková velikost"
 
 #: front/src/views/content/libraries/Card.vue:68
 msgctxt "Content/Library/Card.Help text"
 msgid "Total size of the files in this library"
-msgstr ""
+msgstr "Celková velikost souborů v této knihovně"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:105
 msgctxt "Content/*/*"
 msgid "Total users"
-msgstr ""
+msgstr "Celkem uživatelů"
 
 #: front/src/views/admin/library/UploadDetail.vue:199
 msgctxt "*/*/*"
 msgid "Track"
-msgstr ""
+msgstr "Stopa"
 
 #: front/src/components/audio/SearchBar.vue:27
 #: front/src/components/library/TrackBase.vue:173
@@ -4412,28 +4424,28 @@ msgstr ""
 #: front/src/components/metadata/Search.vue:138
 msgctxt "*/*/*/Noun"
 msgid "Track"
-msgstr ""
+msgstr "Stopa"
 
 #: front/src/components/library/EditCard.vue:13
 msgctxt "Content/Library/Card/Short"
 msgid "Track #%{ id } - %{ name }"
-msgstr ""
+msgstr "Stopa #%{ id } - %{ name }"
 
 #: front/src/views/admin/library/TrackDetail.vue:91
 msgctxt "Content/Moderation/Title"
 msgid "Track data"
-msgstr ""
+msgstr "Data stopy"
 
 #: front/src/components/library/TrackDetail.vue:4
 msgctxt "Content/Track/Title/Noun"
 msgid "Track information"
-msgstr ""
+msgstr "Informace stopy"
 
 #: front/src/components/mixins/Translations.vue:50
 #: front/src/components/mixins/Translations.vue:51
 msgctxt "Content/*/Dropdown/Noun"
 msgid "Track name"
-msgstr ""
+msgstr "Název stopy"
 
 #: front/src/components/instance/Stats.vue:54
 #: front/src/components/library/AlbumDetail.vue:19
@@ -4444,7 +4456,7 @@ msgstr ""
 #: front/src/views/playlists/Detail.vue:51 src/views/radios/Detail.vue:34
 msgctxt "*/*/*/Noun"
 msgid "Tracks"
-msgstr ""
+msgstr "Stopy"
 
 #: front/src/components/manage/library/AlbumsTable.vue:42
 #: front/src/components/manage/library/ArtistsTable.vue:42
@@ -4455,203 +4467,210 @@ msgstr ""
 #: front/src/views/admin/library/TracksList.vue:24
 msgctxt "*/*/*"
 msgid "Tracks"
-msgstr ""
+msgstr "Stopy"
 
 #: front/src/components/library/ArtistDetail.vue:33
 msgctxt "Content/Artist/Title"
 msgid "Tracks by this artist"
-msgstr ""
+msgstr "Stopy od tohoto umělce"
 
 #: front/src/components/instance/Stats.vue:25
 msgctxt "Content/About/Paragraph/Unit"
 msgid "Tracks favorited"
-msgstr ""
+msgstr "Oblíbené stopy"
 
 #: front/src/components/instance/Stats.vue:19
 msgctxt "Content/About/Paragraph/Unit"
 msgid "tracks listened"
-msgstr ""
+msgstr "poslechnuté stopy"
 
 #: front/src/components/library/radios/Filter.vue:44
 msgctxt "Popup/Radio/Title/Noun"
 msgid "Tracks matching filter"
-msgstr ""
+msgstr "Stopy které odpovídají filtru"
 
 #: front/src/components/library/TrackDetail.vue:57
 #: front/src/views/admin/library/UploadDetail.vue:250
 msgctxt "Content/Track/Table.Label/Noun"
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:180
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:44
 #: front/src/components/manage/moderation/DomainsTable.vue:42
 msgctxt "Content/Moderation/Table.Label/Short"
 msgid "Under moderation rule"
-msgstr ""
+msgstr "Pod moderačním pravidlem"
 
 #: front/src/views/content/remote/Card.vue:109
 #: src/views/content/remote/Card.vue:114
 msgctxt "*/Library/Button.Label/Verb"
 msgid "Unfollow"
-msgstr ""
+msgstr "Přestat sledovat"
 
 #: front/src/views/content/remote/Card.vue:110
 msgctxt "Popup/Library/Title"
 msgid "Unfollow this library?"
-msgstr ""
+msgstr "Přestat sledovat tuto knihovnu?"
 
 #: front/src/components/About.vue:17
 msgctxt "Content/About/Paragraph"
 msgid "Unfortunately, the owners of this instance did not yet take the time to complete this page."
 msgstr ""
+"Vlastník této instance si bohužel zatím nenašel čas vyplnit tuto stránku."
 
 #: front/src/components/federation/FetchButton.vue:54
 #: front/src/components/federation/FetchButton.vue:55
 msgctxt "*/*/Error"
 msgid "Unknowkn error"
-msgstr ""
+msgstr "Neznámá chyba"
 
 #: front/src/components/library/ImportStatusModal.vue:144
 msgctxt "Popup/Import/Error.Label"
 msgid "Unkwown error"
-msgstr ""
+msgstr "Neznámá chyba"
 
 #: front/src/components/Home.vue:37
 msgctxt "Content/Home/Title"
 msgid "Unlimited music"
-msgstr ""
+msgstr "Neomezená hudba"
 
 #: front/src/components/audio/Player.vue:630
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Unmute"
-msgstr ""
+msgstr "Zrušit ztišení"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:57
 msgctxt "Content/Moderation/Card.Button.Label/Verb"
 msgid "Update"
-msgstr ""
+msgstr "Aktualizovat"
 
 #: front/src/components/auth/ApplicationForm.vue:64
 msgctxt "Content/Applications/Button.Label/Verb"
 msgid "Update application"
-msgstr ""
+msgstr "Aktualizovat aplikaci"
 
 #: front/src/components/auth/Settings.vue:50
 msgctxt "Content/Settings/Button.Label/Verb"
 msgid "Update avatar"
-msgstr ""
+msgstr "Aktualizovat avatara"
 
 #: front/src/views/content/libraries/Form.vue:25
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Update library"
-msgstr ""
+msgstr "Aktualizovat knihovnu"
 
 #: front/src/components/playlists/Form.vue:33
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "Update playlist"
-msgstr ""
+msgstr "Aktualizovat playlist"
 
 #: front/src/components/auth/Settings.vue:27
 msgctxt "Content/Settings/Button.Label/Verb"
 msgid "Update settings"
-msgstr ""
+msgstr "Aktualizovat nastavení"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:21
 msgctxt "Content/Signup/Button.Label"
 msgid "Update your password"
-msgstr ""
+msgstr "Aktualizovat vaše heslo"
 
 #: front/src/views/content/libraries/Card.vue:45
 #: front/src/views/content/libraries/DetailArea.vue:24
 msgctxt "Content/Library/Card.Button.Label/Verb"
 msgid "Upload"
-msgstr ""
+msgstr "Nahrát"
 
 #: front/src/components/auth/Settings.vue:45
 msgctxt "Content/Settings/Title/Verb"
 msgid "Upload a new avatar"
-msgstr ""
+msgstr "Nahrát nového avatara"
 
 #: front/src/views/content/Home.vue:6
 msgctxt "Content/Library/Title/Verb"
 msgid "Upload audio content"
-msgstr ""
+msgstr "Nahrát nový hudební obsah"
 
 #: front/src/views/admin/library/UploadDetail.vue:85
 msgctxt "Content/Moderation/Title"
 msgid "Upload data"
-msgstr ""
+msgstr "Nahrát data"
 
 #: front/src/views/content/libraries/FilesTable.vue:58
 msgctxt "*/*/*/Noun"
 msgid "Upload date"
-msgstr ""
+msgstr "Datum nahrání"
 
 #: front/src/components/library/FileUpload.vue:258
 msgctxt "Content/Library/Help text"
 msgid "Upload denied, ensure the file is not too big and that you have not reached your quota"
 msgstr ""
+"Nahrání zamítnuto, zkontrolujte zda soubor není příliš velký a že nedošlo k "
+"vyčerpání povolené kapacity"
 
 #: front/src/components/library/ImportStatusModal.vue:8
 msgctxt "Popup/Import/Message"
 msgid "Upload is still pending and will soon be processed by the server."
-msgstr ""
+msgstr "Nahrávání je ve frontě a bude brzy serverem zpracováno."
 
 #: front/src/views/content/Home.vue:7
 msgctxt "Content/Library/Paragraph"
 msgid "Upload music files (MP3, OGG, FLAC, etc.) from your personal library directly from your browser to enjoy them here."
 msgstr ""
+"Nahrajte hudební soubory (MP3, OGG, FLAC a další) z vaší osobní sbírky přímo "
+"ze svého prohlížeče a mějte je tu k dispozici."
 
 #: front/src/components/library/FileUpload.vue:30
 msgctxt "Content/Library/Title/Verb"
 msgid "Upload new tracks"
-msgstr ""
+msgstr "Nahrát nové stopy"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:298
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Upload quota"
-msgstr ""
+msgstr "Vyhrazený prostor pro nahrávání"
 
 #: front/src/components/library/FileUpload.vue:267
 msgctxt "Content/Library/Help text"
 msgid "Upload timeout, please try again"
-msgstr ""
+msgstr "Vypršel čas nahrávání, zkuste to prosím znovu"
 
 #: front/src/components/library/ImportStatusModal.vue:14
 msgctxt "Popup/Import/Message"
 msgid "Upload was skipped because a similar one is already available in one of your libraries."
 msgstr ""
+"Nahrávání bylo přeskočeno, protože podobný soubor se již nachází v jedné z "
+"vašich knihoven."
 
 #: front/src/components/library/ImportStatusModal.vue:11
 msgctxt "Popup/Import/Message"
 msgid "Upload was successfully processed by the server."
-msgstr ""
+msgstr "Nahrávání bylo serverem úspěšně zpracováno."
 
 #: front/src/components/library/FileUpload.vue:109
 msgctxt "Content/Library/Table"
 msgid "Uploaded"
-msgstr ""
+msgstr "Nahráno"
 
 #: front/src/components/library/FileUpload.vue:5
 msgctxt "Content/Library/Tab.Title/Short"
 msgid "Uploading"
-msgstr ""
+msgstr "Nahrávání"
 
 #: front/src/components/library/FileUpload.vue:112
 msgctxt "Content/Library/Table"
 msgid "Uploading…"
-msgstr ""
+msgstr "Nahrávání…"
 
 #: front/src/views/admin/library/Base.vue:20
 #: front/src/views/admin/library/UploadsList.vue:24
 msgctxt "*/*/*"
 msgid "Uploads"
-msgstr ""
+msgstr "Nahrané soubory"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:41
 #: front/src/components/mixins/Translations.vue:63
@@ -4664,59 +4683,64 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:64
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Uploads"
-msgstr ""
+msgstr "Nahrané soubory"
 
 #: front/src/components/manage/library/LibrariesTable.vue:52
 msgctxt "Content/*/*/Noun"
 msgid "Uploads"
-msgstr ""
+msgstr "Nahrané soubory"
 
 #: front/src/components/auth/ApplicationForm.vue:16
 msgctxt "Content/Applications/Help Text"
 msgid "Use \"urn:ietf:wg:oauth:2.0:oob\" as a redirect URI if your application is not served on the web."
 msgstr ""
+"Použijte \"urn:ietf:wg:oauth:2.0:oob\" jako URI pro přesměrování, pokud vaše "
+"aplikace není přístupná na webu."
 
 #: front/src/components/Footer.vue:16
 msgctxt "Footer/*/List item.Link"
 msgid "Use another instance"
-msgstr ""
+msgstr "Použít jinou instanci"
 
 #: front/src/views/auth/PasswordReset.vue:12
 msgctxt "Content/Signup/Paragraph"
 msgid "Use this form to request a password reset. We will send an email to the given address with instructions to reset your password."
 msgstr ""
+"Použijte tento formulář pro žádost o reset hesla. Na zadanou adresu bude "
+"odeslán email s instrukcemi pro změnu vašeho hesla."
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:111
 msgctxt "Content/Moderation/Help text"
 msgid "Use this setting to temporarily enable/disable the policy without completely removing it."
 msgstr ""
+"Použijte tuto volbu pro dočasnou (de)aktivaci zásady, bez jejího odstranění."
 
 #: front/src/components/manage/users/InvitationsTable.vue:49
 msgctxt "Content/Admin/Table"
 msgid "Used"
-msgstr ""
+msgstr "Využito"
 
 #: front/src/views/content/libraries/Detail.vue:26
 msgctxt "Content/Library/Table.Label"
 msgid "User"
-msgstr ""
+msgstr "Uživatel"
 
 #: front/src/components/instance/Stats.vue:5
 msgctxt "Content/About/Title/Noun"
 msgid "User activity"
-msgstr ""
+msgstr "Aktivita uživatele"
 
 #: front/src/components/library/AlbumDetail.vue:26
 #: front/src/components/library/ArtistDetail.vue:39
 #: front/src/components/library/TrackDetail.vue:79
 msgctxt "Content/*/Title/Noun"
 msgid "User libraries"
-msgstr ""
+msgstr "Knihovny uživatele"
 
 #: front/src/components/library/Radios.vue:20
 msgctxt "Content/Radio/Title"
 msgid "User radios"
-msgstr ""
+msgstr "Rádia uživatele"
 
 #: front/src/components/auth/Signup.vue:19
 #: front/src/components/manage/users/UsersTable.vue:37
@@ -4725,17 +4749,17 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:60
 msgctxt "Content/*/*"
 msgid "Username"
-msgstr ""
+msgstr "Uživatelské jméno"
 
 #: front/src/components/auth/Login.vue:15
 msgctxt "Content/Login/Input.Label/Noun"
 msgid "Username or email"
-msgstr ""
+msgstr "Uživatelské jméno nebo email"
 
 #: front/src/components/instance/Stats.vue:13
 msgctxt "Content/About/Paragraph/Unit"
 msgid "users"
-msgstr ""
+msgstr "uživatelé"
 
 #: front/src/components/Sidebar.vue:102
 #: front/src/components/manage/moderation/DomainsTable.vue:39
@@ -4745,24 +4769,24 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:62
 msgctxt "*/*/*/Noun"
 msgid "Users"
-msgstr ""
+msgstr "Uživatelé"
 
 #: front/src/components/Footer.vue:29
 msgctxt "Footer/*/Title"
 msgid "Using Funkwhale"
-msgstr ""
+msgstr "Použití Funkwhale"
 
 #: front/src/components/Footer.vue:13
 msgctxt "Footer/*/List item"
 msgid "Version %{version}"
-msgstr ""
+msgstr "Verze %{version}"
 
 #: front/src/views/content/libraries/Quota.vue:29
 #: front/src/views/content/libraries/Quota.vue:56
 #: front/src/views/content/libraries/Quota.vue:82
 msgctxt "Content/Library/Link/Verb"
 msgid "View files"
-msgstr ""
+msgstr "Zobrazit soubory"
 
 #: front/src/components/library/AlbumBase.vue:81
 #: front/src/components/library/ArtistBase.vue:92
@@ -4778,7 +4802,7 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:45
 msgctxt "Content/Moderation/Link/Verb"
 msgid "View in Django's admin"
-msgstr ""
+msgstr "Zobrazit v administraci Django"
 
 #: front/src/components/library/AlbumBase.vue:61
 #: front/src/components/library/ArtistBase.vue:72
@@ -4787,7 +4811,7 @@ msgstr ""
 #: front/src/components/metadata/ReleaseCard.vue:53
 msgctxt "Content/*/*/Clickable, Verb"
 msgid "View on MusicBrainz"
-msgstr ""
+msgstr "Zobrazit na MusicBrainz"
 
 #: front/src/components/manage/library/LibrariesTable.vue:11
 #: front/src/components/manage/library/LibrariesTable.vue:51
@@ -4797,52 +4821,52 @@ msgstr ""
 #: front/src/views/admin/library/UploadDetail.vue:101
 msgctxt "*/*/*"
 msgid "Visibility"
-msgstr ""
+msgstr "Viditelnost"
 
 #: front/src/views/content/libraries/Form.vue:18
 msgctxt "Content/Library/Dropdown.Label"
 msgid "Visibility"
-msgstr ""
+msgstr "Viditelnost"
 
 #: front/src/components/library/AlbumDetail.vue:4
 msgctxt "Content/Album/"
 msgid "Volume %{ number }"
-msgstr ""
+msgstr "Hlasitost %{ number }"
 
 #: front/src/components/federation/FetchButton.vue:69
 msgctxt "Popup/*/Loading.Title"
 msgid "Waiting for result…"
-msgstr ""
+msgstr "Čekání na výsledek…"
 
 #: front/src/components/auth/Login.vue:7
 msgctxt "Content/Login/Error message.Title"
 msgid "We cannot log you in"
-msgstr ""
+msgstr "Nemůžeme vás přihlásit"
 
 #: front/src/components/auth/ApplicationForm.vue:3
 msgctxt "Content/*/Error message.Title"
 msgid "We cannot save your changes"
-msgstr ""
+msgstr "Nemůžeme uložit vaše změny"
 
 #: front/src/components/Home.vue:122
 msgctxt "Content/Home/List item"
 msgid "We do not track you or bother you with ads"
-msgstr ""
+msgstr "Nesledujeme vás ani vás neotravujeme reklamami"
 
 #: front/src/components/library/FileUpload.vue:39
 msgctxt "Content/Library/Link"
 msgid "We recommend using Picard for that purpose."
-msgstr ""
+msgstr "Doporučujeme pro tyto účely použít MusicBrainz Picard."
 
 #: front/src/components/Home.vue:7
 msgctxt "Content/Home/Title"
 msgid "We think listening to music should be simple."
-msgstr ""
+msgstr "Myslíme si, že poslouchat hudbu by mělo být snadné."
 
 #: front/src/components/Home.vue:148
 msgctxt "Head/Home/Title"
 msgid "Welcome"
-msgstr ""
+msgstr "Vítejte"
 
 #: front/src/components/Home.vue:5
 msgctxt "Content/Home/Title/Verb"
@@ -4852,79 +4876,88 @@ msgstr "Vítejte ve Funkwhale"
 #: front/src/components/Home.vue:24
 msgctxt "Content/Home/Title"
 msgid "Why funkwhale?"
-msgstr ""
+msgstr "Proč Funkwhale?"
 
 #: front/src/components/audio/EmbedWizard.vue:13
 msgctxt "Popup/Embed/Input.Label"
 msgid "Widget height"
-msgstr ""
+msgstr "Výška widgetu"
 
 #: front/src/components/audio/EmbedWizard.vue:6
 msgctxt "Popup/Embed/Input.Label"
 msgid "Widget width"
-msgstr ""
+msgstr "Šířka widgetu"
 
 #: front/src/components/auth/ApplicationForm.vue:157
 msgctxt "Content/OAuth Scopes/Label/Verb"
 msgid "Write"
-msgstr ""
+msgstr "Zapsat"
 
 #: front/src/components/auth/Authorize.vue:21
 msgctxt "Content/Auth/Label/Noun"
 msgid "Write-only"
-msgstr ""
+msgstr "Pouze pro zápis"
 
 #: front/src/components/auth/ApplicationForm.vue:158
 msgctxt "Content/OAuth Scopes/Help Text"
 msgid "Write-only access to user data"
-msgstr ""
+msgstr "Přístup k uživatelským datům pouze pro zápis"
 
 #: front/src/components/Sidebar.vue:129
 #: front/src/components/manage/moderation/AccountsTable.vue:72
 #: front/src/components/manage/moderation/DomainsTable.vue:58
 msgctxt "*/*/*"
 msgid "Yes"
-msgstr ""
+msgstr "Ano"
 
 #: front/src/components/auth/Logout.vue:8
 msgctxt "Content/Login/Button.Label"
 msgid "Yes, log me out!"
-msgstr ""
+msgstr "Ano, odhlaste mě!"
 
 #: front/src/views/content/libraries/Form.vue:19
 msgctxt "Content/Library/Paragraph"
 msgid "You are able to share your library with other people, regardless of its visibility."
 msgstr ""
+"Můžete sdílet svou knihovnu s jinými lidmi, bez ohledu na její viditelnost."
 
 #: front/src/components/library/FileUpload.vue:32
 msgctxt "Content/Library/Paragraph"
 msgid "You are about to upload music to your library. Before proceeding, please ensure that:"
 msgstr ""
+"Chystáte se nahrát hudbu do své knihovny. Před zahájením prosím zajistěte, "
+"že:"
 
 #: front/src/components/SetInstanceModal.vue:12
 msgctxt "Popup/Login/Paragraph"
 msgid "You are currently connected to <a href=\"%{ url }\" target=\"_blank\">%{ hostname }&nbsp;<i class=\"external icon\"/></a>. If you continue, you will be disconnected from your current instance and all your local data will be deleted."
 msgstr ""
+"Momentálně jste připojen k <a href=\"%{ url }\" target=\"_blank\">%{ "
+"hostname }&nbsp;<i class=\"external icon\"/></a>. Pokud budete pokračovat "
+"budete odpojeni z vaší současné instance a všechna vaše místní data budou "
+"odstraněna."
 
 #: front/src/components/library/ArtistDetail.vue:6
 msgctxt "Content/Artist/Paragraph"
 msgid "You are currently hiding content related to this artist."
-msgstr ""
+msgstr "Některý obsah související s tímto umělcem je nastaven jako skrytý."
 
 #: front/src/components/auth/Logout.vue:7
 msgctxt "Content/Login/Paragraph"
 msgid "You are currently logged in as %{ username }"
-msgstr ""
+msgstr "Jste přihlášen jako %{ username }"
 
 #: front/src/components/library/FileUpload.vue:35
 msgctxt "Content/Library/List item"
 msgid "You are not uploading copyrighted content in a public library, otherwise you may be infringing the law"
 msgstr ""
+"Nenahrávejte obsah chráněný copyrightem do veřejné knihovny, mohlo by dojít "
+"k porušení zákona"
 
 #: front/src/components/SetInstanceModal.vue:98
 msgctxt "*/Instance/Message"
 msgid "You are now using the Funkwhale instance at %{ url }"
-msgstr ""
+msgstr "Právě využíváte Funkwhale instanci na adrese %{ url }"
 
 #: front/src/views/content/Home.vue:17
 msgctxt "Content/Library/Paragraph"
@@ -4938,6 +4971,8 @@ msgstr ""
 msgctxt "Content/Home/List item"
 msgid "You can invite friends and family to your instance so they can enjoy your music"
 msgstr ""
+"Můžete pozvat přátele a rodinu na svou instanci, aby si mohli užívat vaši "
+"hudbu"
 
 #: front/src/components/moderation/FilterModal.vue:31
 msgctxt "Popup/Moderation/Paragraph"
@@ -4948,72 +4983,78 @@ msgstr ""
 #: front/src/views/auth/EmailConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
 msgid "You can now use the service without limitations."
-msgstr ""
+msgstr "Nyní můžete službu využívat bez omezení."
 
 #: front/src/components/library/radios/Builder.vue:7
 msgctxt "Content/Radio/Paragraph"
 msgid "You can use this interface to build your own custom radio, which will play tracks according to your criteria."
 msgstr ""
+"Můžete použít toto rozhraní k výrobě vlastního rádia, které bude hrát hudbu "
+"dle vašich kritérií."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:7
 msgctxt "Content/Settings/Paragraph"
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
 msgstr ""
+"Můžete je použít k poslechu oblíbené hudby v offline režimu, například na "
+"telefonu nebo tabletu."
 
 #: front/src/components/auth/Settings.vue:202
 msgctxt "Content/Applications/Paragraph"
 msgid "You don't have any application connected with your account."
-msgstr ""
+msgstr "K vašemu účtu nejsou připojeny žádné aplikace."
 
 #: front/src/components/auth/Settings.vue:261
 msgctxt "Content/Applications/Paragraph"
 msgid "You don't have any configured application yet."
-msgstr ""
+msgstr "Zatím nemáte nastaveny žádné aplikace."
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:75
 msgctxt "Content/Moderation/Card.Title"
 msgid "You don't have any rule in place for this account."
-msgstr ""
+msgstr "Pro tento účet nemáte aplikována žádná pravidla."
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:39
 msgctxt "Content/Moderation/Card.Title"
 msgid "You don't have any rule in place for this domain."
-msgstr ""
+msgstr "Pro tuto doménu nemáte aplikována žádná pravidla."
 
 #: front/src/components/library/EditForm.vue:52
 msgctxt "Content/Library/Paragraph"
 msgid "You don't have the permission to edit this object, but you can suggest changes. Once submitted, suggestions will be reviewed before approval."
 msgstr ""
+"Nemáte oprávnění upravovat tento objekt, ale můžete navrhnout jeho změnu. "
+"Návrh na změnu bude po odeslání zkontrolován a případně schválen."
 
 #: front/src/components/Sidebar.vue:171
 msgctxt "Sidebar/Player/Title"
 msgid "You have a radio playing"
-msgstr ""
+msgstr "Hraje vám rádio"
 
 #: front/src/components/audio/Player.vue:69
 msgctxt "Sidebar/Player/Error message.Paragraph"
 msgid "You may have a connectivity issue."
-msgstr ""
+msgstr "Možná máte problémy s připojením."
 
 #: front/src/components/auth/Settings.vue:100
 msgctxt "Popup/Settings/List item"
 msgid "You will be logged out from this session and have to log in with the new one"
-msgstr ""
+msgstr "Budete odhlášeni z tohoto sezení a musíte se přihlásit znovu"
 
 #: front/src/components/auth/Authorize.vue:51
 msgctxt "Content/Auth/Paragraph"
 msgid "You will be redirected to <strong>%{ url }</strong>"
-msgstr ""
+msgstr "Budete přesměrováni na <strong>%{ url }</strong>"
 
 #: front/src/components/auth/Authorize.vue:49
 msgctxt "Content/Auth/Paragraph"
 msgid "You will be shown a code to copy-paste in the application."
-msgstr ""
+msgstr "Zobrazí se vám kód pro vložení do aplikace."
 
 #: front/src/components/auth/Settings.vue:71
 msgctxt "Content/Settings/Paragraph"
 msgid "You will have to update your password on your clients that use this password."
-msgstr ""
+msgstr "Budete muset aktualizovat heslo na všech klientech kde je používáno."
 
 #: front/src/components/moderation/FilterModal.vue:20
 msgctxt "Popup/Moderation/Paragraph"
@@ -5023,80 +5064,88 @@ msgstr "Neuvidíte stopy, alba a uživatelskou aktivitu spojenou s tímto umělc
 #: front/src/components/auth/Signup.vue:13
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account cannot be created."
-msgstr ""
+msgstr "Váš účet nemůže být vytvořen."
 
 #: front/src/components/auth/Settings.vue:215
 msgctxt "Content/Settings/Title/Noun"
 msgid "Your applications"
-msgstr ""
+msgstr "Vaše aplikace"
 
 #: front/src/components/auth/Settings.vue:38
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your avatar cannot be saved"
-msgstr ""
+msgstr "Váš avatar nemůže být uložen"
 
 #: front/src/components/library/EditForm.vue:3
 msgctxt "Content/Library/Paragraph"
 msgid "Your edit was successfully submitted."
-msgstr ""
+msgstr "Vaše úprava byla úspěšně odeslána."
 
 #: front/src/components/favorites/List.vue:116
 msgctxt "Head/Favorites/Title"
 msgid "Your Favorites"
-msgstr ""
+msgstr "Vaše Oblíbené"
 
 #: front/src/components/Home.vue:109
 msgctxt "Content/Home/Title"
 msgid "Your music, your way"
-msgstr ""
+msgstr "Vaše hudba, po vašem"
 
 #: front/src/views/Notifications.vue:4
 msgctxt "Content/Notifications/Title"
 msgid "Your notifications"
-msgstr ""
+msgstr "Vaše oznámení"
 
 #: front/src/components/auth/Settings.vue:76
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your password cannot be changed"
-msgstr ""
+msgstr "Vaše heslo nemůže být změněno"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:29
 msgctxt "Content/Signup/Card.Paragraph"
 msgid "Your password has been updated successfully."
-msgstr ""
+msgstr "Vaše heslo bylo úspěšně změněno."
 
 #: front/src/components/auth/Settings.vue:14
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your settings can't be updateds"
-msgstr ""
+msgstr "Vaše nastavení nemůže být aktualizováno"
 
 #: front/src/components/auth/Settings.vue:101
 msgctxt "Popup/Settings/List item"
 msgid "Your Subsonic password will be changed to a new, random one, logging you out from devices that used the old Subsonic password"
 msgstr ""
+"Vaše Subsonic heslo bude změněno na nové, náhodně vygenerované. Všechna "
+"zařízení využívající původní heslo se odhlásí."
 
 #: front/src/edits.js:47
 msgctxt "*/*/*/Short, Noun"
 msgid "Position"
-msgstr ""
+msgstr "Pozice"
 
 #: front/src/edits.js:54
 msgctxt "Content/Track/*/Noun"
 msgid "Copyright"
-msgstr ""
+msgstr "Copyright"
 
 #: front/src/components/library/AlbumBase.vue:183
 msgctxt "Content/Album/Header.Title"
 msgid "Album containing %{ count } track, by <a class=\"internal\" href=\"%{ artistUrl }\">%{ artist }</a>"
 msgid_plural "Album containing %{ count } tracks, by <a class=\"internal\" href=\"%{ artistUrl }\">%{ artist }</a>"
 msgstr[0] ""
+"Album obsahuje %{ count } stopu, od <a class=\"internal\" href=\"%{ "
+"artistUrl }\">%{ artist }</a>"
 msgstr[1] ""
+"Album obsahuje %{ count } stopy, od <a class=\"internal\" href=\"%{ "
+"artistUrl }\">%{ artist }</a>"
 msgstr[2] ""
+"Album obsahuje %{ count } stop, od <a class=\"internal\" href=\"%{ artistUrl "
+"}\">%{ artist }</a>"
 
 #: front/src/components/audio/PlayButton.vue:220
 msgctxt "*/Queue/Message"
 msgid "%{ count } track was added to your queue"
 msgid_plural "%{ count } tracks were added to your queue"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%{ count } stopa byla přidána do fronty"
+msgstr[1] "%{ count } stopy byly přidány do fronty"
+msgstr[2] "%{ count } stop bylo přidáno do fronty"
