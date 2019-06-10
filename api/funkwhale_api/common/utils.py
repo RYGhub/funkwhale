@@ -113,6 +113,9 @@ def chunk_queryset(source_qs, chunk_size):
 
 
 def join_url(start, end):
+    if end.startswith("http://") or end.startswith("https://"):
+        # alread a full URL, joining makes no sense
+        return end
     if start.endswith("/") and end.startswith("/"):
         return start + end[1:]
 
