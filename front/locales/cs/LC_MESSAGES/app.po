@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-10 14:31+0000\n"
+"PO-Revision-Date: 2019-06-11 07:58+0000\n"
 "Last-Translator: jiri-novacek <gfreshman@gmail.com>\n"
 "Language-Team: none\n"
 "Language: cs\n"
@@ -36,7 +36,7 @@ msgstr "(prázdné)"
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr "%{ app } chce přístup k vašemu Funkwhale účtu"
+msgstr "%{ app } chce přistupovat k vašemu Funkwhale účtu"
 
 #: front/src/components/common/ActionTable.vue:68
 msgctxt "Content/*/Paragraph"
