@@ -85,3 +85,17 @@ def test_get_updated_fields(conf, mock_args, data, expected, mocker):
     obj = mocker.Mock(**mock_args)
 
     assert utils.get_updated_fields(conf, data, obj) == expected
+
+
+@pytest.mark.parametrize(
+    "start, end, expected",
+    [
+        ("https://domain", "/api", "https://domain/api"),
+        ("https://domain/", "/api", "https://domain/api"),
+        ("https://domain", "api", "https://domain/api"),
+        ("https://domain", "https://api", "https://api"),
+        ("https://domain", "http://api", "http://api"),
+    ],
+)
+def test_join_url(start, end, expected):
+    assert utils.join_url(start, end) == expected
