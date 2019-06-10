@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-05-07 09:29+0000\n"
+"PO-Revision-Date: 2019-06-11 07:58+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -827,10 +827,9 @@ msgid "Cancel"
 msgstr "Anullar"
 
 #: front/src/views/content/remote/Card.vue:97
-#, fuzzy
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Cancel follow request"
-msgstr "Demandas d’abonament en espèra"
+msgstr "Anullar lad emanda d’abonament"
 
 #: front/src/components/library/radios/Builder.vue:64
 msgctxt "Content/Radio/Table.Label/Noun (Value is a number of Tracks)"
@@ -2177,12 +2176,11 @@ msgid "Increase volume"
 msgstr "Aumentar lo volum"
 
 #: front/src/components/playlists/Editor.vue:41
-#, fuzzy
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "Insert from queue (%{ count } track)"
 msgid_plural "Insert from queue (%{ count } tracks)"
-msgstr[0] "Inserir de la fila (%{ count } pista)"
-msgstr[1] "Inserir de la fila (%{ count } pistas)"
+msgstr[0] "Inserir de la fila estant (%{ count } pista)"
+msgstr[1] "Inserir de la fila estant (%{ count } pistas)"
 
 #: front/src/components/mixins/Translations.vue:16
 #: front/src/components/mixins/Translations.vue:17
@@ -3788,7 +3786,6 @@ msgid "Select a filter"
 msgstr "Seleccionar un filtre"
 
 #: front/src/components/common/ActionTable.vue:79
-#, fuzzy
 msgctxt "Content/*/Link/Verb"
 msgid "Select all %{ total } elements"
 msgid_plural "Select all %{ total } elements"
@@ -3837,12 +3834,11 @@ msgid "Sharing link"
 msgstr "Ligam de partatge"
 
 #: front/src/components/audio/album/Card.vue:38
-#, fuzzy
 msgctxt "Content/Album/Card.Link/Verb"
 msgid "Show %{ count } more track"
 msgid_plural "Show %{ count } more tracks"
-msgstr[0] "%{ count } pista mai"
-msgstr[1] "%{ count } pistas mai"
+msgstr[0] "Mostrar %{ count } pista mai"
+msgstr[1] "Mostrar %{ count } pistas mai"
 
 #: front/src/components/audio/artist/Card.vue:30
 #, fuzzy
@@ -5249,7 +5245,7 @@ msgstr ""
 #: front/src/components/auth/Signup.vue:13
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account cannot be created."
-msgstr "L’avatar pòt pas èsser enregistrat"
+msgstr "Lo compte pòt pas èsser creat."
 
 #: front/src/components/auth/Settings.vue:215
 msgctxt "Content/Settings/Title/Noun"
@@ -5328,7 +5324,6 @@ msgstr[0] "Album contenent %{ count } pista, de %{ artist }"
 msgstr[1] "Album contenent %{ count } pistas, de %{ artist }"
 
 #: front/src/components/audio/PlayButton.vue:220
-#, fuzzy
 msgctxt "*/Queue/Message"
 msgid "%{ count } track was added to your queue"
 msgid_plural "%{ count } tracks were added to your queue"
