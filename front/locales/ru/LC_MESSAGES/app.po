@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-11 07:58+0000\n"
+"PO-Revision-Date: 2019-06-11 08:08+0000\n"
 "Last-Translator: SpcCw <ravnina@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -260,7 +260,7 @@ msgctxt "Content/Home/List item"
 msgid ""
 "Access your music from a clean interface that focuses on what really matters"
 msgstr ""
-"Получайте доступ к вашей музыке из простого интерфейса который сфокусирован "
+"Получайте доступ к вашей музыке из простого интерфейса, который сфокусирован "
 "на том что действительно важно"
 
 #: front/src/components/manage/library/UploadsTable.vue:67
@@ -269,7 +269,7 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:46
 msgctxt "Content/*/*/Noun"
 msgid "Accessed date"
-msgstr "Доступ отключен"
+msgstr "Время доступа"
 
 #: front/src/views/admin/library/LibraryDetail.vue:104
 #: front/src/views/admin/library/UploadDetail.vue:111
@@ -286,7 +286,7 @@ msgstr "Статус аккаунта"
 #: front/src/views/admin/moderation/AccountsDetail.vue:107
 msgctxt "Content/Moderation/Title"
 msgid "Account data"
-msgstr "Аккаунт активен"
+msgstr "Данные аккаунта"
 
 #: front/src/components/auth/Settings.vue:5
 msgctxt "Content/Settings/Title"
@@ -306,14 +306,14 @@ msgstr "Статус аккаунта"
 #: front/src/views/auth/PasswordReset.vue:14
 msgctxt "Content/Signup/Input.Label"
 msgid "Account's email"
-msgstr "Электронная почта аккаунта"
+msgstr "Электронная почта"
 
 #: front/src/views/admin/moderation/AccountsList.vue:3
 #: front/src/views/admin/moderation/AccountsList.vue:24
 #: front/src/views/admin/moderation/Base.vue:8
 msgctxt "*/Moderation/Title"
 msgid "Accounts"
-msgstr "Статус аккаунта"
+msgstr "Аккаунты"
 
 #: front/src/views/content/libraries/Detail.vue:29
 msgctxt "Content/Library/Table.Label"
