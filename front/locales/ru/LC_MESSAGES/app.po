@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-06 09:17+0000\n"
+"PO-Revision-Date: 2019-06-11 07:58+0000\n"
 "Last-Translator: SpcCw <ravnina@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -37,7 +37,7 @@ msgstr "(пусто)"
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr "Войти в ваш аккаунт Funkwhale"
+msgstr "%{ app } хочет получить доступ к вашему аккаунту Funkwhale"
 
 #: front/src/components/common/ActionTable.vue:68
 msgctxt "Content/*/Paragraph"
@@ -120,7 +120,9 @@ msgstr "Профиль %{ username }"
 msgctxt "Popup/Playlist/Paragraph"
 msgid ""
 "<strong>%{ track }</strong> is already in <strong>%{ playlist }</strong>."
-msgstr "<strong>трек</strong> уже <strong> в списке воспроизведения </strong>."
+msgstr ""
+"<strong>%{ track }</strong> уже в списке воспроизведения <strong>%{ playlist "
+"}</strong>."
 
 #: front/src/components/audio/artist/Card.vue:41
 msgctxt "Content/Artist/Card"
@@ -141,7 +143,7 @@ msgstr[2] "%{ count } избранных"
 #: front/src/components/Home.vue:64
 msgctxt "Content/Home/Title"
 msgid "A clean library"
-msgstr "Очистить библиотеку"
+msgstr "Чистая библиотека"
 
 #: front/src/components/library/FileUpload.vue:264
 msgctxt "Content/Library/Help text"
@@ -171,7 +173,7 @@ msgstr "О Funkwhale"
 #: front/src/components/Footer.vue:10
 msgctxt "Footer/About/List item.Link"
 msgid "About page"
-msgstr "Страница альбома"
+msgstr "Информация"
 
 #: front/src/components/About.vue:8 src/components/About.vue:67
 msgctxt "Content/About/Title"
@@ -203,13 +205,13 @@ msgstr "Доступ к аудио файлам, библиотекам, исп�
 #: front/src/components/mixins/Translations.vue:98
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to content filters"
-msgstr "Выберите фильтр"
+msgstr "Доступ к фильтрам содержимого"
 
 #: front/src/components/mixins/Translations.vue:105
 #: front/src/components/mixins/Translations.vue:106
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to edits"
-msgstr "Доступ отключен"
+msgstr "Доступ к правкам"
 
 #: front/src/components/mixins/Translations.vue:69
 #: front/src/components/mixins/Translations.vue:70
@@ -221,7 +223,7 @@ msgstr "Доступ к электронной почте, имени польз
 #: front/src/components/mixins/Translations.vue:78
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to favorites"
-msgstr "Добавить в избранное"
+msgstr "Доступ к избранному"
 
 #: front/src/components/mixins/Translations.vue:85
 #: front/src/components/mixins/Translations.vue:86
@@ -239,7 +241,7 @@ msgstr "Доступ к истории прослушивания"
 #: front/src/components/mixins/Translations.vue:102
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to notifications"
-msgstr "Ваши уведомления"
+msgstr "Доступ к уведомлениям"
 
 #: front/src/components/mixins/Translations.vue:89
 #: front/src/components/mixins/Translations.vue:90
@@ -251,7 +253,7 @@ msgstr "Доступ к спискам воспроизведения"
 #: front/src/components/mixins/Translations.vue:94
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to radios"
-msgstr "Доступ отключен"
+msgstr "Доступ к радио"
 
 #: front/src/components/Home.vue:101
 msgctxt "Content/Home/List item"
