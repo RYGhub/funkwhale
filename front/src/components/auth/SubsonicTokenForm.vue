@@ -24,7 +24,12 @@
     </div>
     <template v-if="subsonicEnabled">
       <div v-if="token" class="field">
-        <password-input v-model="token" />
+        <password-input
+          ref="passwordInput"
+          v-model="token"
+          :key="token"
+          :copy-button="true"
+          :default-show="showToken"/>
       </div>
       <dangerous-button
         v-if="token"
@@ -69,7 +74,8 @@ export default {
       errors: [],
       success: false,
       isLoading: false,
-      successMessage: ''
+      successMessage: '',
+      showToken: false
     }
   },
   created () {
@@ -98,6 +104,7 @@ export default {
       let self = this
       let url = `users/users/${this.$store.state.auth.username}/subsonic-token/`
       return axios.post(url, {}).then(response => {
+        self.showToken = true
         self.token = response.data['subsonic_api_token']
         self.isLoading = false
         self.success = true
