@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-11 07:58+0000\n"
+"PO-Revision-Date: 2019-06-13 13:18+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -72,7 +72,7 @@ msgstr[1] "%{ count } pistes corresponents als filtres seleccionats"
 msgctxt "Content/*/Card/List item"
 msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "%{ count} canço"
+msgstr[0] "%{ count} cançó"
 msgstr[1] "%{ count } cançons"
 
 #: front/src/views/content/libraries/Quota.vue:11
@@ -104,7 +104,7 @@ msgstr "%{ username } ha seguit la teva biblioteca \"%{ library }\""
 #: front/src/components/notifications/NotificationRow.vue:41
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } vol seguir la teva llibreria \"%{ library }\""
+msgstr "%{ username } vol seguir la teva biblioteca \"%{ library }\""
 
 #: front/src/components/auth/Profile.vue:46
 msgctxt "Head/Profile/Title"
@@ -231,19 +231,19 @@ msgstr "Accés a l'historial de reproduccions"
 #: front/src/components/mixins/Translations.vue:102
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to notifications"
-msgstr "Silenciar les notificacions"
+msgstr "Accés a les notificacions"
 
 #: front/src/components/mixins/Translations.vue:89
 #: front/src/components/mixins/Translations.vue:90
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to playlists"
-msgstr "Afegir a la llista de reproducció"
+msgstr "Accés a la llista de reproducció"
 
 #: front/src/components/mixins/Translations.vue:93
 #: front/src/components/mixins/Translations.vue:94
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to radios"
-msgstr "Accés a la ràdio"
+msgstr "Accés a les ràdios"
 
 #: front/src/components/Home.vue:101
 msgctxt "Content/Home/List item"
@@ -280,12 +280,12 @@ msgstr "Dades del compte"
 #: front/src/components/auth/Settings.vue:5
 msgctxt "Content/Settings/Title"
 msgid "Account settings"
-msgstr "Configuració de la compte"
+msgstr "Configuració del compte"
 
 #: front/src/components/auth/Settings.vue:479
 msgctxt "Head/Settings/Title"
 msgid "Account Settings"
-msgstr "Paràmetres del compte"
+msgstr "Configuració del compte"
 
 #: front/src/components/manage/users/UsersTable.vue:39
 msgctxt "Content/Admin/Table.Label/Short, Noun"
@@ -388,7 +388,7 @@ msgstr "Afegir filtre"
 #: front/src/components/library/radios/Builder.vue:41
 msgctxt "Content/Radio/Paragraph"
 msgid "Add filters to customize your radio"
-msgstr "Afegir filtre per personalitzar la radio"
+msgstr "Afegir filtres per personalitzar la teva radio"
 
 #: front/src/components/audio/PlayButton.vue:75
 msgctxt "*/Queue/Dropdown/Button/Title"
@@ -874,8 +874,8 @@ msgstr "Sala de xat"
 msgctxt "Content/Applications/Paragraph/"
 msgid "Checking the parent \"Read\" or \"Write\" scopes implies access to all the corresponding children scopes."
 msgstr ""
-"La comprovació dels àmbits \"Llegir\" o \"Escriu\" dels pares implica "
-"l'accés a tots els àmbits d’administració corresponents."
+"Comprovar els àmbits pare “Llegir” o “Escriure” implica l’accés a tots els "
+"àmbits fill que en deriven."
 
 #: front/src/components/SetInstanceModal.vue:2
 msgctxt "Popup/Instance/Title"
@@ -901,7 +901,7 @@ msgstr "Buidar la llista de reproducció"
 #: front/src/components/audio/Player.vue:642
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Clear your queue"
-msgstr "Neteja la llista de reproducció"
+msgstr "Neteja la cua de reproducció"
 
 #: front/src/components/Home.vue:44
 msgctxt "Content/Home/List item/Verb"
@@ -991,11 +991,14 @@ msgstr "Filtres de continguts"
 msgctxt "Content/Settings/Paragraph"
 msgid "Content filters help you hide content you don't want to see on the service."
 msgstr ""
+"Els filtres de contingut us ajuden a amagar el contingut que no voleu veure "
+"al servei."
 
 #: front/src/components/common/ActionTable.vue:8
 msgctxt "Content/*/Button.Help text.Paragraph"
 msgid "Content have been updated, click refresh to see up-to-date content"
 msgstr ""
+"S'ha actualitzat el contingut, refresca per veure el contingut actualitzat"
 
 #: front/src/components/Footer.vue:48
 msgctxt "Footer/*/List item.Link"
@@ -1037,12 +1040,12 @@ msgstr "No hem pogut confirmar la teva adreça de correu electrònic"
 #: front/src/views/content/remote/ScanForm.vue:3
 msgctxt "Content/Library/Error message.Title"
 msgid "Could not fetch remote library"
-msgstr ""
+msgstr "Impossible recuperar la biblioteca remota"
 
 #: front/src/components/Home.vue:80
 msgctxt "Content/Home/List item"
 msgid "Covers, lyrics, our goal is to have them all ;)"
-msgstr ""
+msgstr "Portades, lletres, el nostre objectiu és aconseguir-ho tot ;)"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:58
 msgctxt "Content/Moderation/Card.Button.Label/Verb"
@@ -1098,7 +1101,7 @@ msgstr "Crear el meu compte"
 #: front/src/components/auth/Settings.vue:264
 msgctxt "Content/Applications/Paragraph"
 msgid "Create one to integrate Funkwhale with third-party applications."
-msgstr ""
+msgstr "Creeu-ne un per integrar Funkwhale amb aplicacions de tercers."
 
 #: front/src/components/playlists/Form.vue:34
 msgctxt "Content/Playlist/Button.Label/Verb"
@@ -1127,7 +1130,7 @@ msgstr "Data de creació"
 #: front/src/components/auth/Settings.vue:54
 msgctxt "Content/Settings/Title/Noun"
 msgid "Current avatar"
-msgstr ""
+msgstr "Avatar actual"
 
 #: front/src/views/content/libraries/DetailArea.vue:4
 msgctxt "Content/Library/Title"
@@ -1148,26 +1151,28 @@ msgstr "Ús actual"
 msgctxt "*/*/Error"
 msgid "Data returned by the remote server had invalid or missing attributes"
 msgstr ""
+"Les dades retornades pel servidor remot tenien atributs invàlids o en "
+"faltaven"
 
 #: front/src/components/federation/FetchButton.vue:17
 msgctxt "Popup/*/Message.Content"
 msgid "Data was refreshed successfully from remote server."
-msgstr ""
+msgstr "Les dades s'han actualitzat correctament des del servidor remot."
 
 #: front/src/views/content/libraries/Detail.vue:27
 msgctxt "Content/Library/Table.Label"
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: front/src/components/library/ImportStatusModal.vue:64
 msgctxt "Popup/Import/Table.Label/Noun"
 msgid "Debug information"
-msgstr ""
+msgstr "Informació de depuració"
 
 #: front/src/components/ShortcutsModal.vue:75
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Decrease volume"
-msgstr ""
+msgstr "Disminueix el volum"
 
 #: front/src/components/auth/Settings.vue:150
 #: src/components/auth/Settings.vue:251
@@ -1195,69 +1200,69 @@ msgstr ""
 #: src/views/playlists/Detail.vue:34
 msgctxt "*/*/*/Verb"
 msgid "Delete"
-msgstr ""
+msgstr "Suprimir"
 
 #: front/src/components/auth/Settings.vue:254
 msgctxt "*/Settings/Button.Label/Verb"
 msgid "Delete application"
-msgstr ""
+msgstr "Suprimir l'aplicació"
 
 #: front/src/components/auth/Settings.vue:252
 msgctxt "Popup/Settings/Title"
 msgid "Delete application \"%{ application }\"?"
-msgstr ""
+msgstr "Suprimir l'aplicació \"%{ application }\"?"
 
 #: front/src/views/content/libraries/Form.vue:39
 msgctxt "Popup/Library/Button.Label/Verb"
 msgid "Delete library"
-msgstr ""
+msgstr "Suprimir la llibreria"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:69
 msgctxt "Popup/Moderation/Button.Label/Verb"
 msgid "Delete moderation rule"
-msgstr ""
+msgstr "Suprimir la regla de moderació"
 
 #: front/src/views/playlists/Detail.vue:39
 msgctxt "Popup/Playlist/Button.Label/Verb"
 msgid "Delete playlist"
-msgstr ""
+msgstr "Suprimir la llista de reproducció"
 
 #: front/src/views/radios/Detail.vue:28
 msgctxt "Popup/Radio/Button.Label/Verb"
 msgid "Delete radio"
-msgstr ""
+msgstr "Suprimir la ràdio"
 
 #: front/src/views/admin/library/AlbumDetail.vue:73
 #: front/src/views/admin/library/TrackDetail.vue:72
 msgctxt "Popup/Library/Title"
 msgid "Delete this album?"
-msgstr ""
+msgstr "Suprimir aquest àlbum?"
 
 #: front/src/views/admin/library/ArtistDetail.vue:72
 msgctxt "Popup/Library/Title"
 msgid "Delete this artist?"
-msgstr ""
+msgstr "Suprimir aquest artista?"
 
 #: front/src/views/admin/library/LibraryDetail.vue:59
 #: front/src/views/content/libraries/Form.vue:31
 msgctxt "Popup/Library/Title"
 msgid "Delete this library?"
-msgstr ""
+msgstr "Suprimir la biblioteca?"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:63
 msgctxt "Popup/Moderation/Title"
 msgid "Delete this moderation rule?"
-msgstr ""
+msgstr "Suprimir la regla de moderació?"
 
 #: front/src/components/library/EditCard.vue:94
 msgctxt "Popup/Library/Title"
 msgid "Delete this suggestion?"
-msgstr ""
+msgstr "Suprimir aquesta suggerència?"
 
 #: front/src/views/admin/library/UploadDetail.vue:66
 msgctxt "Popup/Library/Title"
 msgid "Delete this upload?"
-msgstr ""
+msgstr "Suprimir aquest enviament?"
 
 #: front/src/components/favorites/List.vue:35
 #: src/components/library/Albums.vue:26
@@ -1276,125 +1281,130 @@ msgstr ""
 #: front/src/views/playlists/List.vue:28
 msgctxt "Content/Search/Dropdown"
 msgid "Descending"
-msgstr ""
+msgstr "Descendent"
 
 #: front/src/views/admin/library/LibraryDetail.vue:123
 msgctxt "*/*/*/Noun"
 msgid "Description"
-msgstr ""
+msgstr "Descripció"
 
 #: front/src/components/library/radios/Builder.vue:25
 #: front/src/views/content/libraries/Form.vue:14
 msgctxt "Content/*/Input.Label/Noun"
 msgid "Description"
-msgstr ""
+msgstr "Descripció"
 
 #: front/src/views/content/libraries/Card.vue:48
 #: src/views/content/remote/Card.vue:54
 msgctxt "Content/Library/Card.Button.Label/Noun"
 msgid "Details"
-msgstr ""
+msgstr "Detalls"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:491
 msgctxt "Content/Moderation/Help text"
 msgid "Determine how much content the user can upload. Leave empty to use the default value of the instance."
 msgstr ""
+"Determineu la quantitat de contingut que l'usuari pot carregar. Deixeu-ho en "
+"blanc per utilitzar el valor per defecte de la instància."
 
 #: front/src/components/mixins/Translations.vue:8
 #: front/src/components/mixins/Translations.vue:9
 msgctxt "Content/Settings/Dropdown.Help text"
 msgid "Determine the visibility level of your activity"
-msgstr ""
+msgstr "Determina el nivell de la visibilitat de la teva activitat"
 
 #: front/src/components/auth/Settings.vue:104
 #: front/src/components/auth/SubsonicTokenForm.vue:51
 msgctxt "Popup/Settings/Button.Label"
 msgid "Disable access"
-msgstr ""
+msgstr "Desactivar l'accés"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:48
 msgctxt "Content/Settings/Button.Label/Verb"
 msgid "Disable Subsonic access"
-msgstr ""
+msgstr "Desactivar l'accés via Subsonic"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:49
 msgctxt "Popup/Settings/Title"
 msgid "Disable Subsonic API access?"
-msgstr ""
+msgstr "Desactivar l'accés a l'API Subsonic?"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:18
 #: front/src/views/admin/moderation/AccountsDetail.vue:157
 #: front/src/views/admin/moderation/AccountsDetail.vue:161
 msgctxt "*/*/*"
 msgid "Disabled"
-msgstr ""
+msgstr "Desactivat"
 
 #: front/src/views/admin/library/TrackDetail.vue:145
 msgctxt "*/*/*/Noun"
 msgid "Disc number"
-msgstr ""
+msgstr "Número de disc"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:13
 msgctxt "Content/Settings/Link"
 msgid "Discover how to use Funkwhale from other apps"
-msgstr ""
+msgstr "Descobreix com utilitzar Funkwhale des d'altres aplicacions"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:132
 msgctxt "'Content/*/*/Noun'"
 msgid "Display name"
-msgstr ""
+msgstr "Mostra el nom"
 
 #: front/src/components/library/radios/Builder.vue:30
 msgctxt "Content/Radio/Checkbox.Label/Verb"
 msgid "Display publicly"
-msgstr ""
+msgstr "Mostrar públicament"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgctxt "Content/Moderation/Help text"
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
 msgstr ""
+"No descarregueu cap fitxer multimèdia (àudio, portada, avatar del compte, "
+"...) des d'aquest compte o domini. Això també eliminarà el contingut "
+"existent."
 
 #: front/src/components/playlists/Editor.vue:51
 msgctxt "Popup/Playlist/Title"
 msgid "Do you want to clear the playlist \"%{ playlist }\"?"
-msgstr ""
+msgstr "Vols buidar la llista de reproducció \"%{ playlist }\"?"
 
 #: front/src/components/common/DangerousButton.vue:7
 msgctxt "Modal/*/Title"
 msgid "Do you want to confirm this action?"
-msgstr ""
+msgstr "Vols confirmar aquesta acció?"
 
 #: front/src/views/playlists/Detail.vue:35
 msgctxt "Popup/Playlist/Title/Call to action"
 msgid "Do you want to delete the playlist \"%{ playlist }\"?"
-msgstr ""
+msgstr "Vols eliminar aquesta llista de reproducció \"%{ playlist }\"?"
 
 #: front/src/views/radios/Detail.vue:26
 msgctxt "Popup/Radio/Title"
 msgid "Do you want to delete the radio \"%{ radio }\"?"
-msgstr ""
+msgstr "Vols suprimir aquesta ràdio \"%{ radio }\"?"
 
 #: front/src/components/moderation/FilterModal.vue:3
 msgctxt "Popup/Moderation/Title/Verb"
 msgid "Do you want to hide content from artist \"%{ name }\"?"
-msgstr ""
+msgstr "Vols ocultar el contingut de l’artista \"%{ name }\"?"
 
 #: front/src/components/common/ActionTable.vue:37
 msgctxt "Modal/*/Title"
 msgid "Do you want to launch %{ action } on %{ count } element?"
 msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Vols executar l'acció %{ action } de %{ count } element?"
+msgstr[1] "Vols executar l'acció %{ action } de %{ count } elements?"
 
 #: front/src/components/Sidebar.vue:118
 msgctxt "Sidebar/Queue/Message"
 msgid "Do you want to restore your previous queue?"
-msgstr ""
+msgstr "Voleu restaurar la darrera cua de reproducció?"
 
 #: front/src/components/Footer.vue:31
 msgctxt "Footer/*/List item.Link/Short, Noun"
 msgid "Documentation"
-msgstr ""
+msgstr "Documentació"
 
 #: front/src/components/manage/library/AlbumsTable.vue:41
 #: front/src/components/manage/library/ArtistsTable.vue:40
@@ -1412,25 +1422,27 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:61
 msgctxt "Content/Moderation/*/Noun"
 msgid "Domain"
-msgstr ""
+msgstr "Domini"
 
 #: front/src/views/admin/moderation/Base.vue:5
 #: front/src/views/admin/moderation/DomainsList.vue:3
 #: front/src/views/admin/moderation/DomainsList.vue:48
 msgctxt "*/Moderation/*/Noun"
 msgid "Domains"
-msgstr ""
+msgstr "Dominis"
 
 #: front/src/components/library/TrackBase.vue:39
 #: front/src/views/admin/library/UploadDetail.vue:58
 msgctxt "Content/Track/Link/Verb"
 msgid "Download"
-msgstr ""
+msgstr "Descarregar"
 
 #: front/src/components/playlists/Editor.vue:59
 msgctxt "Content/Playlist/Paragraph/Call to action"
 msgid "Drag and drop rows to reorder tracks in the playlist"
 msgstr ""
+"Arrossega i deixa anar les files per reordenar les cançons de lla llista de "
+"reproducció"
 
 #: front/src/components/audio/track/Table.vue:10
 #: front/src/components/library/TrackDetail.vue:30
@@ -1440,17 +1452,17 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:57
 msgctxt "Content/*/*"
 msgid "Duration"
-msgstr ""
+msgstr "Durada"
 
 #: front/src/views/auth/EmailConfirm.vue:23
 msgctxt "Content/Signup/Message"
 msgid "E-mail address confirmed"
-msgstr ""
+msgstr "Correu electrònic confirmat"
 
 #: front/src/components/Home.vue:88
 msgctxt "Content/Home/Title"
 msgid "Easy to use"
-msgstr ""
+msgstr "Fàcil d'utilizar"
 
 #: front/src/components/library/AlbumBase.vue:68
 #: front/src/components/library/ArtistBase.vue:79
@@ -1464,43 +1476,43 @@ msgstr ""
 #: src/views/playlists/Detail.vue:31
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: front/src/components/auth/Settings.vue:246
 msgctxt "Content/Settings/Button.Label"
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: front/src/components/auth/ApplicationEdit.vue:30
 #: front/src/components/auth/ApplicationEdit.vue:75
 msgctxt "Content/Applications/Title"
 msgid "Edit application"
-msgstr ""
+msgstr "Editar l'aplicació"
 
 #: front/src/components/About.vue:22
 msgctxt "Content/Settings/Button.Label/Verb"
 msgid "Edit instance info"
-msgstr ""
+msgstr "Editar la informació d'aquesta instància"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:3
 msgctxt "Content/Moderation/Card.Title/Verb"
 msgid "Edit moderation rule"
-msgstr ""
+msgstr "Editar les regles de moderació"
 
 #: front/src/components/library/AlbumEdit.vue:4
 msgctxt "Content/*/Title"
 msgid "Edit this album"
-msgstr ""
+msgstr "Editar aquest àlbum"
 
 #: front/src/components/library/ArtistEdit.vue:4
 msgctxt "Content/*/Title"
 msgid "Edit this artist"
-msgstr ""
+msgstr "Editar l'artista"
 
 #: front/src/components/library/TrackEdit.vue:4
 msgctxt "Content/*/Title"
 msgid "Edit this track"
-msgstr ""
+msgstr "Edita la pista"
 
 #: front/src/views/admin/library/AlbumDetail.vue:182
 #: front/src/views/admin/library/ArtistDetail.vue:171
@@ -1509,63 +1521,63 @@ msgstr ""
 #: front/src/views/admin/library/TrackDetail.vue:234
 msgctxt "*/Admin/*/Noun"
 msgid "Edits"
-msgstr ""
+msgstr "Modificacions"
 
 #: front/src/components/mixins/Translations.vue:104
 #: front/src/components/mixins/Translations.vue:105
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Edits"
-msgstr ""
+msgstr "Modificacions"
 
 #: front/src/components/auth/Signup.vue:30
 #: front/src/components/manage/users/UsersTable.vue:38
 msgctxt "Content/*/*/Noun"
 msgid "Email"
-msgstr ""
+msgstr "Correu electrònic"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:140
 msgctxt "Content/*/*"
 msgid "Email address"
-msgstr ""
+msgstr "Adreça de correu electrònic"
 
 #: front/src/components/library/AlbumBase.vue:53
 #: front/src/components/library/ArtistBase.vue:64
 #: front/src/components/library/TrackBase.vue:72
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Embed"
-msgstr ""
+msgstr "Incrustar"
 
 #: front/src/components/audio/EmbedWizard.vue:20
 msgctxt "Popup/Embed/Input.Label/Noun"
 msgid "Embed code"
-msgstr ""
+msgstr "Codi incrustat"
 
 #: front/src/components/library/AlbumBase.vue:26
 msgctxt "Popup/Album/Title/Verb"
 msgid "Embed this album on your website"
-msgstr ""
+msgstr "Inserir aquest àlbum a la teva pàgina"
 
 #: front/src/components/library/ArtistBase.vue:37
 msgctxt "Popup/Artist/Title/Verb"
 msgid "Embed this artist work on your website"
-msgstr ""
+msgstr "Incrusta l'obra d'aquest artista a la teva pàgina web"
 
 #: front/src/components/library/TrackBase.vue:45
 msgctxt "Popup/Track/Title"
 msgid "Embed this track on your website"
-msgstr ""
+msgstr "Incrusta aquesta pista a la teva pàgina web"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:259
 #: front/src/views/admin/moderation/DomainsDetail.vue:187
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Emitted library follows"
-msgstr ""
+msgstr "Segueix la biblioteca emesa"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:243
 #: front/src/views/admin/moderation/DomainsDetail.vue:171
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Emitted messages"
-msgstr ""
+msgstr "Missatges emesos"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:8
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:17
@@ -1573,7 +1585,7 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:160
 msgctxt "*/*/*"
 msgid "Enabled"
-msgstr ""
+msgstr "Activat"
 
 #: front/src/views/playlists/Detail.vue:30
 msgctxt "Content/Playlist/Button.Label/Verb"
@@ -1583,57 +1595,58 @@ msgstr "Acabar l'edició"
 #: front/src/views/content/remote/ScanForm.vue:50
 msgctxt "Content/Library/Input.Placeholder"
 msgid "Enter a library URL"
-msgstr ""
+msgstr "Introduir la URL de la biblioteca"
 
 #: front/src/components/library/Radios.vue:141
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter a radio name…"
-msgstr ""
+msgstr "Introdueix un nom per la radio …"
 
 #: front/src/components/library/Albums.vue:119
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter album title..."
-msgstr ""
+msgstr "Introduir el nom de l'àlbum ..."
 
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter artist name…"
-msgstr ""
+msgstr "Introduir el nom d'artista …"
 
 #: front/src/views/playlists/List.vue:107
 msgctxt "Content/Playlist/Placeholder/Call to action"
 msgid "Enter playlist name…"
-msgstr ""
+msgstr "Introduir el nom de la llista de reproducció …"
 
 #: front/src/views/auth/PasswordReset.vue:54
 msgctxt "Content/Signup/Input.Placeholder"
 msgid "Enter the email address binded to your account"
-msgstr ""
+msgstr "Introdueix el correu electrònic associat al vostre compte"
 
 #: front/src/components/auth/Signup.vue:103
 msgctxt "Content/Signup/Form/Placeholder"
 msgid "Enter your email"
-msgstr ""
+msgstr "Introdueix el teu correu electrònic"
 
 #: front/src/components/auth/Signup.vue:98 src/components/auth/Signup.vue:100
 msgctxt "Content/Signup/Form/Placeholder"
 msgid "Enter your invitation code (case insensitive)"
 msgstr ""
+"Introdueix el codi d'invitació (No distingeix entre majúscules i minúscules)"
 
 #: front/src/components/metadata/Search.vue:114
 msgctxt "Content/Library/Input.Placeholder/Verb"
 msgid "Enter your search query…"
-msgstr ""
+msgstr "Introdueix la vostra cerca …"
 
 #: front/src/components/auth/Signup.vue:102
 msgctxt "Content/Signup/Form/Placeholder"
 msgid "Enter your username"
-msgstr ""
+msgstr "Introdueix el nom del teu usuari"
 
 #: front/src/components/auth/Login.vue:83
 msgctxt "Content/Login/Input.Placeholder"
 msgid "Enter your username or email"
-msgstr ""
+msgstr "Introdueix el teu nom d'usuari o bé el teu correu electrònic"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:19
 #: front/src/views/content/libraries/Form.vue:4
@@ -1661,177 +1674,181 @@ msgstr "Tipus d'error"
 #: front/src/components/common/ActionTable.vue:94
 msgctxt "Content/*/Error message/Header"
 msgid "Error while applying action"
-msgstr ""
+msgstr "Error aplicant l’acció"
 
 #: front/src/views/auth/PasswordReset.vue:7
 msgctxt "Content/Signup/Card.Title"
 msgid "Error while asking for a password reset"
-msgstr ""
+msgstr "Error demanant el restabliment de la contrasenya"
 
 #: front/src/components/auth/Authorize.vue:6
 msgctxt "Popup/Moderation/Error message"
 msgid "Error while authorizing application"
-msgstr ""
+msgstr "Error autoritzant l'aplicació"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgctxt "Content/Signup/Card.Title"
 msgid "Error while changing your password"
-msgstr ""
+msgstr "Error al canviar de contrasenya"
 
 #: front/src/views/admin/moderation/DomainsList.vue:6
 msgctxt "Content/Moderation/Message.Title"
 msgid "Error while creating domain"
-msgstr ""
+msgstr "Error creant el domini"
 
 #: front/src/components/moderation/FilterModal.vue:13
 msgctxt "Popup/Moderation/Error message"
 msgid "Error while creating filter"
-msgstr ""
+msgstr "Error creant el filtre"
 
 #: front/src/components/manage/users/InvitationForm.vue:4
 msgctxt "Content/Admin/Error message.Title"
 msgid "Error while creating invitation"
-msgstr ""
+msgstr "Error creant la invitació"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:7
 msgctxt "Content/Moderation/Error message.Title"
 msgid "Error while creating rule"
-msgstr ""
+msgstr "Error creant la regla"
 
 #: front/src/components/auth/Authorize.vue:7
 msgctxt "Popup/Moderation/Error message"
 msgid "Error while fetching application data"
-msgstr ""
+msgstr "Error obtenint les dades de l'aplicació"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:118
 msgctxt "Content/Moderation/Table"
 msgid "Error while fetching node info"
-msgstr ""
+msgstr "Error obtenint informació del node"
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgctxt "Content/Settings/Error message.Title"
 msgid "Error while saving settings"
-msgstr ""
+msgstr "Error guardant els canvis"
 
 #: front/src/components/federation/FetchButton.vue:73
 msgctxt "Content/*/Error message.Title"
 msgid "Error while saving settings"
-msgstr ""
+msgstr "Error guardant els canvis"
 
 #: front/src/components/library/EditForm.vue:46
 msgctxt "Content/Library/Error message.Title"
 msgid "Error while submitting edit"
-msgstr ""
+msgstr "Error trametent les modificaions"
 
 #: front/src/components/mixins/Translations.vue:32
 #: front/src/components/mixins/Translations.vue:33
 msgctxt "Content/Library/Table/Short"
 msgid "Errored"
-msgstr ""
+msgstr "Per error"
 
 #: front/src/views/content/libraries/Quota.vue:75
 msgctxt "Content/Library/Label"
 msgid "Errored files"
-msgstr ""
+msgstr "Arxius erronis"
 
 #: front/src/components/mixins/Translations.vue:17
 #: front/src/components/mixins/Translations.vue:18
 msgctxt "Content/Settings/Dropdown/Short"
 msgid "Everyone"
-msgstr ""
+msgstr "Tothom"
 
 #: front/src/components/mixins/Translations.vue:11
 #: front/src/components/mixins/Translations.vue:12
 msgctxt "Content/Settings/Dropdown"
 msgid "Everyone on this instance"
-msgstr ""
+msgstr "Tothom d'aquesta instància"
 
 #: front/src/components/mixins/Translations.vue:12
 #: front/src/components/mixins/Translations.vue:13
 msgctxt "Content/Settings/Dropdown"
 msgid "Everyone, across all instances"
-msgstr ""
+msgstr "Tothom, en totes les instàncies"
 
 #: front/src/components/library/radios/Builder.vue:62
 msgctxt "Content/Radio/Table.Label/Verb"
 msgid "Exclude"
-msgstr ""
+msgstr "Excloure"
 
 #: front/src/components/manage/users/InvitationsTable.vue:41
 #: front/src/components/mixins/Translations.vue:49
 #: front/src/components/mixins/Translations.vue:50
 msgctxt "Content/Admin/Table.Label/Noun"
 msgid "Expiration date"
-msgstr ""
+msgstr "Data de caducitat"
 
 #: front/src/components/manage/users/InvitationsTable.vue:50
 msgctxt "Content/Admin/Table"
 msgid "Expired"
-msgstr ""
+msgstr "Caducat"
 
 #: front/src/components/manage/users/InvitationsTable.vue:21
 msgctxt "Content/Admin/Dropdown/Adjective"
 msgid "Expired/used"
-msgstr ""
+msgstr "Caducat/utilitzat"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:110
 msgctxt "Content/Moderation/Help text"
 msgid "Explain why you're applying this policy. Depending on your instance configuration, this will help you remember why you acted on this account or domain, and may be displayed publicly to help users understand what moderation rules are in place."
 msgstr ""
+"Explica perquè utilitzes aquesta regla. En funció de la configuració de la "
+"vostra instància,  això us ajudarà a recordar per què heu actuat així en "
+"aquest compte o aquest domini i que es pot mostrar públicament per ajudar "
+"als usuaris a entendre quines són les normes de moderació."
 
 #: front/src/components/manage/library/UploadsTable.vue:25
 #: front/src/views/content/libraries/FilesTable.vue:16
 msgctxt "Content/Library/Dropdown"
 msgid "Failed"
-msgstr ""
+msgstr "Fallat"
 
 #: front/src/views/content/remote/Card.vue:62
 msgctxt "Content/Library/Card.List item/Noun"
 msgid "Failed tracks:"
-msgstr ""
+msgstr "Pistes fallides:"
 
 #: front/src/views/admin/library/AlbumDetail.vue:165
 #: front/src/views/admin/library/ArtistDetail.vue:154
 #: front/src/views/admin/library/TrackDetail.vue:217
 msgctxt "*/*/*"
 msgid "Favorited tracks"
-msgstr ""
+msgstr "Pistes preferides"
 
 #: front/src/components/Sidebar.vue:66
 msgctxt "Sidebar/Favorites/List item.Link/Noun"
 msgid "Favorites"
-msgstr ""
+msgstr "Preferides"
 
 #: front/src/components/mixins/Translations.vue:76
 #: front/src/components/mixins/Translations.vue:77
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Favorites"
-msgstr ""
+msgstr "Preferides"
 
 #: front/src/views/admin/Settings.vue:84
 msgctxt "Content/Admin/Menu"
 msgid "Federation"
-msgstr ""
+msgstr "Federació"
 
 #: front/src/components/library/TrackDetail.vue:66
 msgctxt "Content/*/*/Noun"
 msgid "Federation ID"
-msgstr ""
+msgstr "ID de federació"
 
 #: front/src/components/library/EditCard.vue:45
 msgctxt "Content/Library/Card.Table.Header/Short"
 msgid "Field"
-msgstr ""
+msgstr "Camp"
 
 #: front/src/components/library/FileUpload.vue:93
 msgctxt "Content/Library/Table.Label"
 msgid "Filename"
-msgstr ""
+msgstr "Nom del fitxer"
 
 #: front/src/components/library/radios/Builder.vue:61
 msgctxt "Content/Radio/Table.Label/Noun"
 msgid "Filter name"
-msgstr ""
+msgstr "Nom del filtre"
 
 #: front/src/components/manage/library/UploadsTable.vue:26
 #: front/src/components/mixins/Translations.vue:36
@@ -1839,7 +1856,7 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:37
 msgctxt "Content/Library/*"
 msgid "Finished"
-msgstr ""
+msgstr "Acabat"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:42
 #: front/src/components/manage/moderation/DomainsTable.vue:41
@@ -1852,28 +1869,28 @@ msgstr ""
 #: front/src/views/admin/moderation/DomainsDetail.vue:151
 msgctxt "Content/Moderation/Table.Label/Short (Value is a date)"
 msgid "First seen"
-msgstr ""
+msgstr "Vist per primera vegada"
 
 #: front/src/components/mixins/Translations.vue:46
 #: front/src/components/mixins/Translations.vue:47
 msgctxt "Content/Moderation/Dropdown/Noun"
 msgid "First seen date"
-msgstr ""
+msgstr "Data de descoberta"
 
 #: front/src/views/content/remote/Card.vue:87
 msgctxt "Content/Library/Card.Button.Label/Verb"
 msgid "Follow"
-msgstr ""
+msgstr "Seguir"
 
 #: front/src/views/content/Home.vue:16
 msgctxt "Content/Library/Title/Verb"
 msgid "Follow remote libraries"
-msgstr ""
+msgstr "Seguir les llibreries remotes"
 
 #: front/src/views/content/remote/Card.vue:92
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Follow request pending approval"
-msgstr ""
+msgstr "Petició de seguiment pendent d'aprovació"
 
 #: front/src/components/mixins/Translations.vue:64
 #: front/src/views/admin/library/LibraryDetail.vue:161
@@ -1881,78 +1898,86 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:65
 msgctxt "Content/Federation/*/Noun"
 msgid "Followers"
-msgstr ""
+msgstr "Seguidors"
 
 #: front/src/components/manage/library/LibrariesTable.vue:53
 msgctxt "Content/*/*/Noun"
 msgid "Followers"
-msgstr ""
+msgstr "Seguidors"
 
 #: front/src/views/content/remote/Card.vue:103
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Following"
-msgstr ""
+msgstr "Seguidor"
 
 #: front/src/components/mixins/Translations.vue:84
 #: front/src/components/mixins/Translations.vue:85
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Follows"
-msgstr ""
+msgstr "Seguidors"
 
 #: front/src/components/library/TrackBase.vue:17
 msgctxt "Content/Track/Paragraph"
 msgid "From album <a class=\"internal\" href=\"%{ albumUrl }\">%{ album }</a> by <a class=\"internal\" href=\"%{ artistUrl }\">%{ artist }</a>"
 msgstr ""
+"De l'àlbum <a class=\"internal\" href=\"%{ albumUrl }\">%{ album }</a> de <a "
+"class=\"internal\" href=\"%{ artistUrl }\">%{ artist }</a>"
 
 #: front/src/components/auth/Authorize.vue:28
 msgctxt "Content/Auth/Label/Noun"
 msgid "Full access"
-msgstr ""
+msgstr "Accés total"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:7
 msgctxt "Content/Settings/Paragraph'"
 msgid "Funkwhale is compatible with other music players that support the Subsonic API."
 msgstr ""
+"Funkwhale és compatible amb altres reproductors de música que suporten l'API "
+"Subsonic."
 
 #: front/src/components/Home.vue:90
 msgctxt "Content/Home/Paragraph"
 msgid "Funkwhale is dead simple to use."
-msgstr ""
+msgstr "Funkwahale és molt senzill d'utilitzar."
 
 #: front/src/components/Home.vue:39
 msgctxt "Content/Home/Paragraph"
 msgid "Funkwhale is designed to make it easy to listen to music you like, or to discover new artists."
 msgstr ""
+"Funkwhale està dissenyat per escoltar fàcilment les músiques que t'agraden i "
+"descobrir nous artistes."
 
 #: front/src/components/Home.vue:111
 msgctxt "Content/Home/Paragraph"
 msgid "Funkwhale is free and gives you control on your music."
-msgstr ""
+msgstr "Funkwahale és gratuïti et dona el control d ela teva música."
 
 #: front/src/components/Home.vue:66
 msgctxt "Content/Home/Paragraph"
 msgid "Funkwhale takes care of handling your music"
-msgstr ""
+msgstr "Funkwhale t'ajuda a gestionar la teva música"
 
 #: front/src/components/ShortcutsModal.vue:38
 msgctxt "Popup/Keyboard shortcuts/Title"
 msgid "General shortcuts"
-msgstr ""
+msgstr "Dreceres principals"
 
 #: front/src/components/manage/users/InvitationForm.vue:16
 msgctxt "Content/Admin/Button.Label/Verb"
 msgid "Get a new invitation"
-msgstr ""
+msgstr "Obtenir una nova invitació"
 
 #: front/src/components/Home.vue:13
 msgctxt "Content/Home/Button.Label/Verb"
 msgid "Get me to the library"
-msgstr ""
+msgstr "Porta'm a la biblioteca"
 
 #: front/src/components/Home.vue:70
 msgctxt "Content/Home/List item/Verb"
 msgid "Get quality metadata about your music thanks to <a href=\"%{ url }\" target=\"_blank\">MusicBrainz</a>"
 msgstr ""
+"Obté metadades de qualitat de la teva música gràcies a <a href=\"%{ url }\" "
+"target=\"_blank\">MusicBrainz</a>"
 
 #: front/src/views/content/Home.vue:12 src/views/content/Home.vue:19
 msgctxt "Content/Library/Button.Label/Verb"
@@ -1988,7 +2013,7 @@ msgstr "Ocultar artistes"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:114
 msgctxt "Content/Moderation/Help text"
 msgid "Hide account or domain content, except from followers."
-msgstr ""
+msgstr "Amagar el contingut del compte o domini excepte pels seguidors."
 
 #: front/src/components/moderation/FilterModal.vue:40
 msgctxt "Popup/*/Button.Label"
@@ -1998,12 +2023,12 @@ msgstr "Amagar el contingut"
 #: front/src/components/audio/PlayButton.vue:26
 msgctxt "*/Queue/Dropdown/Button/Label/Short"
 msgid "Hide content from this artist"
-msgstr ""
+msgstr "Amagar la informació d'aquest artista"
 
 #: front/src/components/audio/Player.vue:643
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Hide content from this artist…"
-msgstr ""
+msgstr "Amagar la informació d'aquest artista …"
 
 #: front/src/components/library/Home.vue:65
 msgctxt "Head/Home/Title"
@@ -2019,6 +2044,8 @@ msgstr "Hores de música"
 msgctxt "Content/Settings/Paragraph"
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
 msgstr ""
+"Tanmateix, accedir a Funkwhale des d’aquests clients requereix una "
+"contrasenya separada que pots definir a continuació."
 
 #: front/src/views/auth/PasswordResetConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
@@ -2084,12 +2111,12 @@ msgstr "A favorits"
 #: front/src/components/moderation/FilterModal.vue:25
 msgctxt "Popup/Moderation/List item"
 msgid "In other users favorites and listening history"
-msgstr ""
+msgstr "Dins els preferits d'altres usuaris i l'historiador de reproduccions"
 
 #: front/src/components/moderation/FilterModal.vue:28
 msgctxt "Popup/Moderation/List item"
 msgid "In radio suggestions"
-msgstr ""
+msgstr "Dins les sugerències de la ràdio"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgctxt "Content/Admin/Table"
@@ -2105,8 +2132,8 @@ msgstr "Augmentar el volum"
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "Insert from queue (%{ count } track)"
 msgid_plural "Insert from queue (%{ count } tracks)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Insereix des de la cua (%{ count } pista)"
+msgstr[1] "Insereix des de la cua (%{ count } pistes)"
 
 #: front/src/components/mixins/Translations.vue:16
 #: front/src/components/mixins/Translations.vue:17
@@ -2164,12 +2191,12 @@ msgstr "Invitacions"
 #: front/src/components/Footer.vue:41
 msgctxt "Footer/*/List item.Link"
 msgid "Issue tracker"
-msgstr ""
+msgstr "Seguiment de problemes"
 
 #: front/src/components/SetInstanceModal.vue:5
 msgctxt "Popup/Instance/Error message.Title"
 msgid "It is not possible to connect to the given URL"
-msgstr ""
+msgstr "No és possible conectar-se a la URL assenyalada"
 
 #: front/src/components/Home.vue:50
 msgctxt "Content/Home/List item/Verb"
@@ -2179,7 +2206,7 @@ msgstr ""
 #: front/src/components/Footer.vue:33 src/components/ShortcutsModal.vue:3
 msgctxt "*/*/*/Noun"
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "Dreceres de teclat"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:161
 msgctxt "Content/Moderation/Table.Label.Link"
@@ -2213,7 +2240,7 @@ msgstr "Última modificació"
 #: front/src/components/manage/moderation/AccountsTable.vue:43
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Last seen"
-msgstr ""
+msgstr "Vist la darrera vegada"
 
 #: front/src/components/mixins/Translations.vue:47
 #: front/src/components/mixins/Translations.vue:48
@@ -2234,12 +2261,12 @@ msgstr ""
 #: front/src/components/Home.vue:10
 msgctxt "Content/Home/Button.Label/Verb"
 msgid "Learn more about this instance"
-msgstr ""
+msgstr "Per saber-ne més d'aquesta instància"
 
 #: front/src/components/manage/users/InvitationForm.vue:58
 msgctxt "Content/Admin/Input.Placeholder"
 msgid "Leave empty for a random code"
-msgstr ""
+msgstr "Deixar en blanc per obtenir un codi aleatori"
 
 #: front/src/components/audio/EmbedWizard.vue:7
 msgctxt "Popup/Embed/Paragraph"
@@ -2379,7 +2406,6 @@ msgstr "Carregant els vostres favorits …"
 #: front/src/views/admin/library/LibraryDetail.vue:18
 #: front/src/views/admin/library/TrackDetail.vue:18
 #: front/src/views/admin/library/UploadDetail.vue:19
-#, fuzzy
 msgctxt "Content/Moderation/*/Short, Noun"
 msgid "Local"
 msgstr "Local"
@@ -2393,7 +2419,7 @@ msgstr "Comparte local"
 #: front/src/components/auth/Login.vue:84
 msgctxt "Head/Login/Title"
 msgid "Log In"
-msgstr ""
+msgstr "Iniciar sessió"
 
 #: front/src/components/auth/Login.vue:4
 msgctxt "Content/Login/Title/Verb"
@@ -2403,50 +2429,51 @@ msgstr ""
 #: front/src/components/auth/Logout.vue:20
 msgctxt "Head/Login/Title"
 msgid "Log Out"
-msgstr ""
+msgstr "Tancar sessió"
 
 #: front/src/components/Sidebar.vue:38
 msgctxt "Sidebar/Profile/List item.Link"
 msgid "Logged in as %{ username }"
-msgstr ""
+msgstr "Sessió iniciada com a %{ username }"
 
 #: front/src/components/Sidebar.vue:54 src/components/auth/Login.vue:42
 msgctxt "*/Login/*/Verb"
 msgid "Login"
-msgstr ""
+msgstr "Iniciar sessió"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:148
 msgctxt "Content/*/*/Noun"
 msgid "Login status"
-msgstr ""
+msgstr "Estat de la sessió"
 
 #: front/src/components/Sidebar.vue:52
 msgctxt "Sidebar/Login/List item.Link/Verb"
 msgid "Logout"
-msgstr ""
+msgstr "Tancar sessió"
 
 #: front/src/views/content/libraries/Home.vue:9
 msgctxt "Content/Library/Paragraph"
 msgid "Looks like you don't have a library, it's time to create one."
-msgstr ""
+msgstr "Sembla que no tens biblioteca, és hora de crear-ne una."
 
 #: front/src/components/audio/Player.vue:632
 #: src/components/audio/Player.vue:633
 msgctxt "Sidebar/Player/Icon.Tooltip"
 msgid "Looping disabled. Click to switch to single-track looping."
-msgstr ""
+msgstr "Bucle desactivat. Clica per activar el bucle d'una sola pista."
 
 #: front/src/components/audio/Player.vue:635
 #: src/components/audio/Player.vue:636
 msgctxt "Sidebar/Player/Icon.Tooltip"
 msgid "Looping on a single track. Click to switch to whole queue looping."
 msgstr ""
+"Bucle en una sola pista. Cliqueu per canviar al bucle complet de la cua."
 
 #: front/src/components/audio/Player.vue:638
 #: src/components/audio/Player.vue:639
 msgctxt "Sidebar/Player/Icon.Tooltip"
 msgid "Looping on whole queue. Click to disable looping."
-msgstr ""
+msgstr "Bucle a tota la cua. Cliqueu per inhabilitar el bucle."
 
 #: front/src/components/Sidebar.vue:223
 msgctxt "Sidebar/*/Hidden text"
@@ -2456,7 +2483,7 @@ msgstr ""
 #: front/src/views/admin/library/Base.vue:31
 msgctxt "Head/Admin/Title"
 msgid "Manage library"
-msgstr ""
+msgstr "Gestionar la biblioteca"
 
 #: front/src/components/playlists/PlaylistModal.vue:3
 msgctxt "Popup/Playlist/Title/Verb"
@@ -2575,12 +2602,12 @@ msgstr ""
 #: front/src/views/content/libraries/Form.vue:72
 msgctxt "Content/Library/Input.Placeholder"
 msgid "My awesome library"
-msgstr ""
+msgstr "La meva impressionant biblioteca"
 
 #: front/src/components/playlists/Form.vue:76
 msgctxt "Content/Playlist/Input.Placeholder"
 msgid "My awesome playlist"
-msgstr ""
+msgstr "La meva impressionant llista de reproducció"
 
 #: front/src/components/library/radios/Builder.vue:237
 msgctxt "Content/Radio/Input.Placeholder"
@@ -2674,6 +2701,7 @@ msgstr ""
 msgctxt "Content/Home/List item"
 msgid "No add-ons, no plugins : you only need a web library"
 msgstr ""
+"Sense complements ni extensions: n'hi ha prou amb la biblioteca de la web"
 
 #: front/src/components/audio/Search.vue:25
 msgctxt "Content/Search/Paragraph"
@@ -2698,7 +2726,7 @@ msgstr ""
 #: front/src/components/federation/LibraryWidget.vue:6
 msgctxt "Content/Federation/Paragraph"
 msgid "No matching library."
-msgstr ""
+msgstr "Sense biblioteques coincidents."
 
 #: front/src/views/Notifications.vue:28
 msgctxt "Content/Notifications/Paragraph"
@@ -2719,7 +2747,7 @@ msgstr ""
 #: front/src/views/content/libraries/Detail.vue:57
 msgctxt "Content/Library/Paragraph"
 msgid "Nobody is following this library"
-msgstr ""
+msgstr "Ningú segueix aquesta biblioteca"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgctxt "Content/Admin/Table"
@@ -2786,7 +2814,7 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:23
 msgctxt "Content/Moderation/Link/Verb"
 msgid "Open profile"
-msgstr ""
+msgstr "Obrir el perfil"
 
 #: front/src/views/admin/library/AlbumDetail.vue:54
 #: front/src/views/admin/library/ArtistDetail.vue:53
@@ -2796,12 +2824,12 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:52
 msgctxt "Content/Moderation/Link/Verb"
 msgid "Open remote profile"
-msgstr ""
+msgstr "Obrir el perfil remot"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:16
 msgctxt "Content/Moderation/Link/Verb"
 msgid "Open website"
-msgstr ""
+msgstr "Obrir la web"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:40
 msgctxt "Content/Moderation/Card.Title"
@@ -2815,7 +2843,7 @@ msgstr ""
 #: front/src/views/playlists/List.vue:25
 msgctxt "Content/Search/Dropdown.Label/Noun"
 msgid "Order"
-msgstr ""
+msgstr "Ordre"
 
 #: front/src/components/favorites/List.vue:24
 #: src/components/library/Albums.vue:15
@@ -2859,12 +2887,12 @@ msgstr ""
 #: front/src/components/PageNotFound.vue:33
 msgctxt "Head/*/Title"
 msgid "Page Not Found"
-msgstr ""
+msgstr "Pàgina no trobada"
 
 #: front/src/components/PageNotFound.vue:7
 msgctxt "Content/*/Title"
 msgid "Page not found!"
-msgstr ""
+msgstr "Pàgina no trobada!"
 
 #: front/src/components/Pagination.vue:39
 msgctxt "Content/*/Hidden text/Noun"
@@ -2874,32 +2902,33 @@ msgstr ""
 #: front/src/components/auth/Login.vue:33 src/components/auth/Signup.vue:40
 msgctxt "Content/*/Input.Label"
 msgid "Password"
-msgstr ""
+msgstr "Contrasenya"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:94
 msgctxt "Content/Settings/Message"
 msgid "Password updated"
-msgstr ""
+msgstr "Contrasenya actualitzada"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:28
+#, fuzzy
 msgctxt "Content/Signup/Card.Title"
 msgid "Password updated successfully"
-msgstr ""
+msgstr "Contrasenya actualitzada correctament"
 
 #: front/src/components/audio/Player.vue:628
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Pause track"
-msgstr ""
+msgstr "Pausa de la pista"
 
 #: front/src/components/ShortcutsModal.vue:59
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Pause/play the current track"
-msgstr ""
+msgstr "Para/reproduir la pista actual"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:12
 msgctxt "Content/Moderation/Card.List item"
 msgid "Paused"
-msgstr ""
+msgstr "Parada"
 
 #: front/src/components/library/FileUpload.vue:116
 #: front/src/components/manage/library/UploadsTable.vue:23
@@ -2960,27 +2989,27 @@ msgstr ""
 #: src/views/playlists/Detail.vue:24
 msgctxt "Content/Queue/Button.Label/Short, Verb"
 msgid "Play all"
-msgstr ""
+msgstr "Reproduir-ho tot"
 
 #: front/src/components/library/ArtistBase.vue:31
 msgctxt "Content/Artist/Button.Label/Verb"
 msgid "Play all albums"
-msgstr ""
+msgstr "Reproduir tots els àlbums"
 
 #: front/src/components/audio/PlayButton.vue:76
 msgctxt "*/Queue/Dropdown/Button/Title"
 msgid "Play next"
-msgstr ""
+msgstr "Reproduir el següent"
 
 #: front/src/components/ShortcutsModal.vue:67
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Play next track"
-msgstr ""
+msgstr "Reproduir la següent pista"
 
 #: front/src/components/audio/PlayButton.vue:74
 msgctxt "*/Queue/Dropdown/Button/Title"
 msgid "Play now"
-msgstr ""
+msgstr "Reproduir ara"
 
 #: front/src/components/ShortcutsModal.vue:63
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -3010,45 +3039,45 @@ msgstr ""
 #: front/src/views/playlists/Detail.vue:91
 msgctxt "Head/Playlist/Title"
 msgid "Playlist"
-msgstr ""
+msgstr "Llista de reproducció"
 
 #: front/src/views/playlists/Detail.vue:12
 msgctxt "Content/Playlist/Header.Subtitle"
 msgid "Playlist containing %{ count } track, by %{ username }"
 msgid_plural "Playlist containing %{ count } tracks, by %{ username }"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "La llista de reproducció conté %{ count } cançó, de %{ username }"
+msgstr[1] "La llista de reproducció conté %{ count } cançons, de %{ username }"
 
 #: front/src/components/playlists/Form.vue:9
 msgctxt "Content/Playlist/Message"
 msgid "Playlist created"
-msgstr ""
+msgstr "Llista de reproducció creada"
 
 #: front/src/components/playlists/Editor.vue:4
 msgctxt "Content/Playlist/Title"
 msgid "Playlist editor"
-msgstr ""
+msgstr "Editor de lla llista de reproducció"
 
 #: front/src/components/playlists/Form.vue:21
 msgctxt "Content/Playlist/Input.Label"
 msgid "Playlist name"
-msgstr ""
+msgstr "Nom de la llista de reproducció"
 
 #: front/src/components/playlists/Form.vue:6
 msgctxt "Content/Playlist/Message"
 msgid "Playlist updated"
-msgstr ""
+msgstr "Llista de reproducció actualitzada"
 
 #: front/src/components/playlists/Form.vue:25
 msgctxt "Content/Playlist/Dropdown.Label"
 msgid "Playlist visibility"
-msgstr ""
+msgstr "Visibilitat de la llista de reproducció"
 
 #: front/src/components/mixins/Translations.vue:88
 #: front/src/components/mixins/Translations.vue:89
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Playlists"
-msgstr ""
+msgstr "Llistes de reproducció"
 
 #: front/src/components/Sidebar.vue:71 src/components/library/Home.vue:16
 #: front/src/components/library/Library.vue:16 src/views/admin/Settings.vue:83
@@ -3058,7 +3087,7 @@ msgstr ""
 #: src/views/playlists/List.vue:106
 msgctxt "*/*/*"
 msgid "Playlists"
-msgstr ""
+msgstr "Llistes de reproducció"
 
 #: front/src/components/Home.vue:56
 msgctxt "Content/Home/List item"
@@ -3078,7 +3107,7 @@ msgstr ""
 #: front/src/components/auth/Settings.vue:46
 msgctxt "Content/Settings/Paragraph"
 msgid "PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px."
-msgstr ""
+msgstr "PNG, GIF o JPG. Màxim de 2MB. Seràn reduïts a 400x400px."
 
 #: front/src/views/admin/library/TrackDetail.vue:137
 msgctxt "*/*/*/Noun"
@@ -3093,34 +3122,34 @@ msgstr ""
 #: front/src/components/audio/EmbedWizard.vue:33
 msgctxt "Popup/Embed/Title/Noun"
 msgid "Preview"
-msgstr ""
+msgstr "Previsualització"
 
 #: front/src/components/audio/Player.vue:626
 msgctxt "Sidebar/Player/Icon.Tooltip"
 msgid "Previous track"
-msgstr ""
+msgstr "Pista anterior"
 
 #: front/src/components/mixins/Translations.vue:15
 #: front/src/components/mixins/Translations.vue:16
 msgctxt "Content/Settings/Dropdown/Short"
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #: front/src/views/content/remote/Card.vue:43
 msgctxt "Content/Library/Card.List item"
 msgid "Problem during scanning"
-msgstr ""
+msgstr "Problema durant l'anàlisi"
 
 #: front/src/components/library/FileUpload.vue:57
 msgctxt "Content/Library/Button.Label"
 msgid "Proceed"
-msgstr ""
+msgstr "Continuar"
 
 #: front/src/views/auth/EmailConfirm.vue:26
 #: front/src/views/auth/PasswordResetConfirm.vue:31
 msgctxt "Content/Signup/Link/Verb"
 msgid "Proceed to login"
-msgstr ""
+msgstr "Continuar a la pàgina de conexió"
 
 #: front/src/components/library/FileUpload.vue:17
 msgctxt "Content/Library/Tab.Title/Short"
@@ -3131,7 +3160,7 @@ msgstr ""
 #: front/src/components/mixins/Translations.vue:69
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
 #: front/src/components/manage/moderation/DomainsTable.vue:168
@@ -3143,17 +3172,17 @@ msgstr ""
 #: front/src/views/content/libraries/Quota.vue:91
 msgctxt "*/*/*/Verb"
 msgid "Purge"
-msgstr ""
+msgstr "Netejar"
 
 #: front/src/views/content/libraries/Quota.vue:89
 msgctxt "Popup/Library/Title"
 msgid "Purge errored files?"
-msgstr ""
+msgstr "Suprimir els fitxers erronis?"
 
 #: front/src/views/content/libraries/Quota.vue:37
 msgctxt "Popup/Library/Title"
 msgid "Purge pending files?"
-msgstr ""
+msgstr "Suprimir els fitxers pendents?"
 
 #: front/src/views/content/libraries/Quota.vue:63
 msgctxt "Popup/Library/Title"
@@ -3163,108 +3192,109 @@ msgstr ""
 #: front/src/components/Sidebar.vue:20
 msgctxt "Sidebar/Queue/Tab.Title/Noun"
 msgid "Queue"
-msgstr ""
+msgstr "Cua de reproducció"
 
 #: front/src/components/audio/Player.vue:322
 msgctxt "Content/Queue/Message"
 msgid "Queue shuffled!"
-msgstr ""
+msgstr "La cua ha estat barrejada!"
 
 #: front/src/views/radios/Detail.vue:80
 msgctxt "Head/Radio/Title"
 msgid "Radio"
-msgstr ""
+msgstr "Ràdio"
 
 #: front/src/components/library/radios/Builder.vue:235
 msgctxt "Head/Radio/Title"
 msgid "Radio Builder"
-msgstr ""
+msgstr "Editor de ràdio"
 
 #: front/src/components/library/radios/Builder.vue:15
 msgctxt "Content/Radio/Message"
 msgid "Radio created"
-msgstr ""
+msgstr "Ràdio creada"
 
 #: front/src/components/library/radios/Builder.vue:21
 msgctxt "Content/Radio/Input.Label/Noun"
 msgid "Radio name"
-msgstr ""
+msgstr "Nom de la ràdio"
 
 #: front/src/components/library/radios/Builder.vue:12
 msgctxt "Content/Radio/Message"
 msgid "Radio updated"
-msgstr ""
+msgstr "Ràdio actualitzada"
 
 #: front/src/components/library/Library.vue:13
 #: src/components/library/Radios.vue:142
 msgctxt "*/*/*"
 msgid "Radios"
-msgstr ""
+msgstr "Ràdios"
 
 #: front/src/components/mixins/Translations.vue:92
 #: front/src/components/mixins/Translations.vue:93
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Radios"
-msgstr ""
+msgstr "Ràdios"
 
 #: front/src/components/auth/ApplicationForm.vue:151
 msgctxt "Content/OAuth Scopes/Label/Verb"
 msgid "Read"
-msgstr ""
+msgstr "Llegir"
 
 #: front/src/components/library/ImportStatusModal.vue:51
 msgctxt "Popup/Import/Table.Label/Value"
 msgid "Read our documentation for this error"
-msgstr ""
+msgstr "Llegir la documentació d'aquest error"
 
 #: front/src/components/auth/Authorize.vue:24
 msgctxt "Content/Auth/Label/Noun"
 msgid "Read-only"
-msgstr ""
+msgstr "Només llegir"
 
 #: front/src/components/auth/ApplicationForm.vue:152
 msgctxt "Content/OAuth Scopes/Help Text"
 msgid "Read-only access to user data"
-msgstr ""
+msgstr "Accés a llegir només les dades d'utilització"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:39
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:25
+#, fuzzy
 msgctxt "Content/Moderation/*/Noun"
 msgid "Reason"
-msgstr ""
+msgstr "Raó"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:251
 #: front/src/views/admin/moderation/DomainsDetail.vue:179
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Received library follows"
-msgstr ""
+msgstr "Seguidors de la biblioteca rebuts"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:40
 #: front/src/components/mixins/Translations.vue:62
 #: front/src/components/mixins/Translations.vue:63
 msgctxt "Content/Moderation/*/Noun"
 msgid "Received messages"
-msgstr ""
+msgstr "Missatges rebuts"
 
 #: front/src/components/library/EditForm.vue:27
 msgctxt "Content/Library/Paragraph"
 msgid "Recent edits"
-msgstr ""
+msgstr "Modificacions recents"
 
 #: front/src/components/library/EditForm.vue:17
 msgctxt "Content/Library/Paragraph"
 msgid "Recent edits awaiting review"
-msgstr ""
+msgstr "Modificacions recents pendents de revisió"
 
 #: front/src/components/library/Home.vue:24
 msgctxt "Content/Home/Title"
 msgid "Recently added"
-msgstr ""
+msgstr "Afegit recentment"
 
 #: front/src/components/library/Home.vue:11
 msgctxt "Content/Home/Title"
 msgid "Recently favorited"
-msgstr ""
+msgstr "Afegit a preferits recentment"
 
 #: front/src/components/library/Home.vue:6
 msgctxt "Content/Home/Title"
@@ -3570,7 +3600,7 @@ msgstr ""
 #: front/src/views/content/remote/ScanForm.vue:9
 msgctxt "Content/Library/Input.Label/Verb"
 msgid "Search a remote library"
-msgstr ""
+msgstr "Busca una biblioteca remota"
 
 #: front/src/components/manage/library/EditsCardList.vue:211
 msgctxt "Content/Search/Input.Placeholder"
@@ -3700,6 +3730,8 @@ msgstr ""
 msgctxt "Content/Library/Paragraph"
 msgid "Share this link with other users so they can request access to your library."
 msgstr ""
+"Comparteix aquest enllaç amb d'altres usuaris perquè puguin sol·licitar "
+"l'accés a la vostra biblioteca."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:77
@@ -3759,12 +3791,12 @@ msgstr ""
 #: front/src/components/ShortcutsModal.vue:83
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Shuffle queue"
-msgstr ""
+msgstr "Cua barrejada"
 
 #: front/src/components/audio/Player.vue:641
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Shuffle your queue"
-msgstr ""
+msgstr "Barreja la teva cua"
 
 #: front/src/components/auth/Signup.vue:97
 msgctxt "*/Signup/Title"
@@ -3820,6 +3852,8 @@ msgstr ""
 msgctxt "Content/Playlist/Paragraph"
 msgid "Some tracks in your queue are already in this playlist:"
 msgstr ""
+"Algunes pistes de la vostra cua ja es troben en aquesta llista de "
+"reproducció:"
 
 #: front/src/components/PageNotFound.vue:10
 msgctxt "Content/*/Paragraph"
@@ -4023,11 +4057,15 @@ msgstr ""
 msgctxt "Popup/Library/Paragraph"
 msgid "The library and all its tracks will be deleted. This can not be undone."
 msgstr ""
+"La biblioteca i totes les seves pistes seran suprimides. Aquesta acció és "
+"irreversible."
 
 #: front/src/views/admin/library/LibraryDetail.vue:61
 msgctxt "Content/Moderation/Paragraph"
 msgid "The library will be removed, as well as associated uploads, and follows. This action is irreversible."
 msgstr ""
+"La biblioteca serà suprimida, així com les càrregues associades, i els "
+"seguidors. Aquesta acció és irreversible."
 
 #: front/src/components/library/ImportStatusModal.vue:140
 msgctxt "Popup/Import/Error.Label"
@@ -4052,7 +4090,7 @@ msgstr ""
 #: front/src/components/playlists/Form.vue:14
 msgctxt "Content/Playlist/Error message.Title"
 msgid "The playlist could not be created"
-msgstr ""
+msgstr "No s’ha pogut crear la llista de reproducció"
 
 #: front/src/components/federation/FetchButton.vue:37
 msgctxt "*/*/Error"
@@ -4088,6 +4126,8 @@ msgstr ""
 msgctxt "Popup/*/Paragraph"
 msgid "The selected library will be removed, as well as associated uploads and follows. This action is irreversible."
 msgstr ""
+"La biblioteca seleccionada serà suprimida, així com les càrregues associades "
+"i els seguidors."
 
 #: front/src/components/manage/library/TracksTable.vue:189
 msgctxt "Popup/*/Paragraph"
@@ -4117,7 +4157,7 @@ msgstr ""
 #: front/src/components/playlists/PlaylistModal.vue:34
 msgctxt "Popup/Playlist/Error message.Title"
 msgid "The track can't be added to a playlist"
-msgstr ""
+msgstr "La pista no es pot afegir a la llista de reproducció"
 
 #: front/src/components/audio/Player.vue:62
 msgctxt "Sidebar/Player/Error message.Title"
@@ -4188,17 +4228,20 @@ msgstr ""
 #: front/src/views/content/libraries/Form.vue:73
 msgctxt "Content/Library/Input.Placeholder"
 msgid "This library contains my personal music, I hope you like it."
-msgstr ""
+msgstr "Aquesta biblioteca conté la meva música personal, desitjo que t'agradi."
 
 #: front/src/views/content/remote/Card.vue:141
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is private and your approval from its owner is needed to access its content"
 msgstr ""
+"Aquesta biblioteca és privada i es necessita l'aprovació del seu propietari "
+"per tal d'accedir al seu contingut"
 
 #: front/src/views/content/remote/Card.vue:142
 msgctxt "Content/Library/Card.Help text"
 msgid "This library is public and you can access its content freely"
 msgstr ""
+"Aquesta biblioteca és pública i pots accedir lliurement al seu contingut"
 
 #: front/src/components/common/ActionTable.vue:47
 msgctxt "Modal/*/Paragraph"
@@ -4238,7 +4281,7 @@ msgstr ""
 #: front/src/components/audio/PlayButton.vue:85
 msgctxt "*/Queue/Button/Title"
 msgid "This track is not available in any library you have access to"
-msgstr ""
+msgstr "Aquesta pista no està disponible en cap la biblioteca on hi tens accés"
 
 #: front/src/components/library/TrackDetail.vue:82
 msgctxt "Content/Track/Paragraph"
@@ -4249,6 +4292,8 @@ msgstr ""
 msgctxt "Popup/Playlist/Paragraph"
 msgid "This will completely delete this playlist and cannot be undone."
 msgstr ""
+"Això eliminarà completament aquesta llista de reproducció i no es podrà "
+"desfer l'acció."
 
 #: front/src/views/radios/Detail.vue:27
 msgctxt "Popup/Radio/Paragraph"
@@ -4279,6 +4324,8 @@ msgstr ""
 msgctxt "Popup/Playlist/Paragraph"
 msgid "This will remove all tracks from this playlist and cannot be undone."
 msgstr ""
+"Això eliminarà totes les pistes d'aquesta llista de reproducció i aquesta "
+"acció no es podrà desfer."
 
 #: front/src/views/admin/library/AlbumDetail.vue:99
 #: front/src/views/admin/library/TrackDetail.vue:98 src/edits.js:21
@@ -4307,7 +4354,7 @@ msgstr ""
 #: front/src/components/ShortcutsModal.vue:79
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle queue looping"
-msgstr ""
+msgstr "Canvia el bucle de la cua"
 
 #: front/src/views/admin/library/AlbumDetail.vue:222
 #: front/src/views/admin/library/ArtistDetail.vue:211
@@ -4322,7 +4369,7 @@ msgstr ""
 #: front/src/views/content/libraries/Card.vue:68
 msgctxt "Content/Library/Card.Help text"
 msgid "Total size of the files in this library"
-msgstr ""
+msgstr "Mida total dels fitxers en aquesta biblioteca"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:105
 msgctxt "Content/*/*"
@@ -4431,7 +4478,7 @@ msgstr ""
 #: front/src/views/content/remote/Card.vue:110
 msgctxt "Popup/Library/Title"
 msgid "Unfollow this library?"
-msgstr ""
+msgstr "Vols deixar de seguir aquesta biblioteca?"
 
 #: front/src/components/About.vue:17
 msgctxt "Content/About/Paragraph"
@@ -4477,12 +4524,12 @@ msgstr ""
 #: front/src/views/content/libraries/Form.vue:25
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Update library"
-msgstr ""
+msgstr "Actualitzar la biblioteca"
 
 #: front/src/components/playlists/Form.vue:33
 msgctxt "Content/Playlist/Button.Label/Verb"
 msgid "Update playlist"
-msgstr ""
+msgstr "Actualitzar la llista de reproducció"
 
 #: front/src/components/auth/Settings.vue:27
 msgctxt "Content/Settings/Button.Label/Verb"
@@ -4534,6 +4581,8 @@ msgstr ""
 msgctxt "Content/Library/Paragraph"
 msgid "Upload music files (MP3, OGG, FLAC, etc.) from your personal library directly from your browser to enjoy them here."
 msgstr ""
+"Carrega fitxers de música (MP3, OGG, FLAC, ...) directament a la teva "
+"llibreria personal des del teu navegador per gaudir-ne aquí."
 
 #: front/src/components/library/FileUpload.vue:30
 msgctxt "Content/Library/Title/Verb"
@@ -4823,11 +4872,15 @@ msgstr ""
 msgctxt "Content/Library/Paragraph"
 msgid "You are able to share your library with other people, regardless of its visibility."
 msgstr ""
+"Pots compartir la teva biblioteca amb altres persones, independentment de la "
+"seva visibilitat."
 
 #: front/src/components/library/FileUpload.vue:32
 msgctxt "Content/Library/Paragraph"
 msgid "You are about to upload music to your library. Before proceeding, please ensure that:"
 msgstr ""
+"Estàs apunt de carregar música a la teva biblioteca. Abans de començar, "
+"assegurat de:"
 
 #: front/src/components/SetInstanceModal.vue:12
 msgctxt "Popup/Login/Paragraph"
@@ -4848,6 +4901,8 @@ msgstr ""
 msgctxt "Content/Library/List item"
 msgid "You are not uploading copyrighted content in a public library, otherwise you may be infringing the law"
 msgstr ""
+"No pengis contingut amb drets d'autor en una biblioteca pública, en cas "
+"contrari, podries infringir la llei"
 
 #: front/src/components/SetInstanceModal.vue:98
 msgctxt "*/Instance/Message"
@@ -4858,6 +4913,9 @@ msgstr ""
 msgctxt "Content/Library/Paragraph"
 msgid "You can follow libraries from other users to get access to new music. Public libraries can be followed immediatly, while following a private library requires approval from its owner."
 msgstr ""
+"Pots seguir biblioteques d'altres usuaris per tenir accés a nova música. Les "
+"llibreries públiques poder seguir-se immediatament, però seguir les "
+"biblioteques privades requereix l'aprovació del seu propietari."
 
 #: front/src/components/Home.vue:128
 msgctxt "Content/Home/List item"
@@ -4883,6 +4941,9 @@ msgstr ""
 msgctxt "Content/Settings/Paragraph"
 msgid "You can use those to enjoy your playlist and music in offline mode, on your smartphone or tablet, for instance."
 msgstr ""
+"Pots utilitzar-lo per gaudir, per exemple, de la vostra llista de "
+"reproducció i de la música sense connexió, al telèfon intel·ligent o a la "
+"tauleta."
 
 #: front/src/components/auth/Settings.vue:202
 msgctxt "Content/Applications/Paragraph"
@@ -5020,5 +5081,5 @@ msgstr[1] ""
 msgctxt "*/Queue/Message"
 msgid "%{ count } track was added to your queue"
 msgid_plural "%{ count } tracks were added to your queue"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } pista ha estat afegida a la teva cua"
+msgstr[1] "%{ count } pistes han estat afegides a la teva cua"
