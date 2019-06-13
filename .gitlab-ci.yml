@@ -55,6 +55,39 @@ review_front:
     url: http://$CI_PROJECT_NAMESPACE.pages.funkwhale.audio/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/front-review/index.html
 
 
+review_docs:
+  stage: review
+  when: manual
+  allow_failure: true
+  image: python:3.6
+  variables:
+    BUILD_PATH: "../docs-review"
+  before_script:
+    - rm -rf docs-review
+    - mkdir docs-review
+    - cd docs
+    - apt-get update
+    - apt-get install -y graphviz
+    - pip install sphinx
+  script:
+    - ./build_docs.sh
+  cache:
+    key: "$CI_PROJECT_ID__sphinx"
+    paths:
+      - "$PIP_CACHE_DIR"
+  artifacts:
+    expire_in: 2 weeks
+    paths:
+      - docs-review
+  only:
+    - branches
+  tags:
+    - docker
+  environment:
+    name: review/docs/$CI_COMMIT_REF_NAME
+    url: http://$CI_PROJECT_NAMESPACE.pages.funkwhale.audio/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs-review/index.html
+
+
 black:
   image: python:3.6
   stage: lint
