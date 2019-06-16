@@ -72,6 +72,10 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
+		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+		    <i class="external icon"></i>
+		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
+		  </a>
                   <router-link
                     v-if="object.is_local"
                     :to="{name: 'library.artists.edit', params: {id: object.id }}"
@@ -204,6 +208,12 @@ export default {
       if (this.object.mbid) {
         return "https://musicbrainz.org/artist/" + this.object.mbid
       }
+    },
+    discogsUrl() {
+      return (
+        "https://discogs.com/search/?type=artist&title=" +
+	encodeURI(this.object.name)
+      )
     },
     cover() {
       return this.object.albums

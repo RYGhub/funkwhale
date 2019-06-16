@@ -76,6 +76,10 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
+		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+		    <i class="external icon"></i>
+		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
+		  </a>
                   <router-link
                     v-if="track.is_local"
                     :to="{name: 'library.tracks.edit', params: {id: track.id }}"
@@ -179,6 +183,14 @@ export default {
       if (this.track.mbid) {
         return "https://musicbrainz.org/recording/" + this.track.mbid
       }
+    },
+    discogsUrl() {
+      return (
+        "https://discogs.com/search/?type=release&title=" +
+	encodeURI(this.track.album.title) + "&artist=" +
+	encodeURI(this.track.artist.name) + "&track=" +
+	encodeURI(this.track.title)
+      )
     },
     downloadUrl() {
       let u = this.$store.getters["instance/absoluteUrl"](
