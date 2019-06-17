@@ -118,6 +118,9 @@ class Domain(models.Model):
         null=True,
         blank=True,
     )
+    # are interactions with this domain allowed (only applies when allow-listing is on)
+    allowed = models.BooleanField(default=None, null=True)
+
     objects = DomainQuerySet.as_manager()
 
     def __str__(self):

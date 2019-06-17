@@ -339,6 +339,7 @@ class ManageDomainViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
     lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
@@ -360,6 +361,13 @@ class ManageDomainViewSet(
         "outbox_activities_count",
         "instance_policy",
     ]
+
+    def get_serializer_class(self):
+        if self.action in ["update", "partial_update"]:
+            # A dedicated serializer for update
+            # to ensure domain name can't be changed
+            return serializers.ManageDomainUpdateSerializer
+        return super().get_serializer_class()
 
     def perform_create(self, serializer):
         domain = serializer.save()

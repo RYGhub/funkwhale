@@ -26,7 +26,8 @@ redeliver_activities.short_description = "Redeliver"
 
 @admin.register(models.Domain)
 class DomainAdmin(admin.ModelAdmin):
-    list_display = ["name", "creation_date"]
+    list_display = ["name", "allowed", "creation_date"]
+    list_filter = ["allowed"]
     search_fields = ["name"]
 
 

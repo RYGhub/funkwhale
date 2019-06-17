@@ -51,6 +51,7 @@ def test_manage_domain_serializer(factories, now):
         "nodeinfo": {},
         "nodeinfo_fetch_date": None,
         "instance_policy": None,
+        "allowed": None,
     }
     s = serializers.ManageDomainSerializer(domain)
 
