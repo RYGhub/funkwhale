@@ -130,6 +130,7 @@ class ManageDomainSerializer(serializers.ModelSerializer):
             "nodeinfo",
             "nodeinfo_fetch_date",
             "instance_policy",
+            "allowed",
         ]
         read_only_fields = [
             "creation_date",
@@ -143,6 +144,11 @@ class ManageDomainSerializer(serializers.ModelSerializer):
 
     def get_outbox_activities_count(self, o):
         return getattr(o, "outbox_activities_count", 0)
+
+
+class ManageDomainUpdateSerializer(ManageDomainSerializer):
+    class Meta(ManageDomainSerializer.Meta):
+        read_only_fields = ["name"] + ManageDomainSerializer.Meta.read_only_fields
 
 
 class ManageDomainActionSerializer(common_serializers.ActionSerializer):

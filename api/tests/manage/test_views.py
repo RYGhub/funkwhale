@@ -73,6 +73,31 @@ def test_domain_create(superuser_api_client, mocker):
     update_domain_nodeinfo.assert_called_once_with(domain_name="test.federation")
 
 
+def test_domain_update_allowed(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": domain.name})
+    response = superuser_api_client.put(url, {"allowed": True})
+
+    assert response.status_code == 200
+    domain.refresh_from_db()
+    assert domain.allowed is True
+
+
+def test_domain_update_cannot_change_name(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    old_name = domain.name
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": old_name})
+    response = superuser_api_client.put(url, {"name": "something.else"})
+
+    domain.refresh_from_db()
+
+    assert response.status_code == 200
+    assert domain.name == old_name
+    # changing the pk of a model and saving results in a new DB entry in django,
+    # so we check that no other entry was created
+    assert domain.__class__.objects.count() == 1
+
+
 def test_domain_nodeinfo(factories, superuser_api_client, mocker):
     domain = factories["federation.Domain"]()
     url = reverse(
