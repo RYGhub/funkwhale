@@ -36,3 +36,12 @@ def test_get_audio_file_data(name, expected):
         result = utils.get_audio_file_data(f)
 
     assert result == expected
+
+
+def test_guess_mimetype_dont_crash_with_s3(factories, mocker, settings):
+    """See #857"""
+    settings.DEFAULT_FILE_STORAGE = "funkwhale_api.common.storage.ASCIIS3Boto3Storage"
+    mocker.patch("magic.from_buffer", return_value="none")
+    f = factories["music.Upload"].build(audio_file__filename="test.mp3")
+
+    assert utils.guess_mimetype(f.audio_file) == "audio/mpeg"
