@@ -59,12 +59,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-
 .playlist.card .header .ellipsis.vertical.large.grey {
   font-size: 1.2em;
   margin-right: 0;
 }
-
 </style>
 <style scoped>
 .card .header {
@@ -72,8 +70,7 @@ export default {
 }
 
 .attached.button {
-  background-color: rgb(243, 244, 245);
-  background-size: 25% ;
+  background-size: 25%;
   background-repeat: no-repeat;
   background-origin: border-box;
   background-position: 0 0, 33.33% 0, 66.67% 0, 100% 0;
@@ -82,5 +79,4 @@ export default {
   font-size: 4em;
   box-shadow: 0px 0px 0px 1px rgba(34, 36, 38, 0.15) inset !important;
 }
-
 </style>

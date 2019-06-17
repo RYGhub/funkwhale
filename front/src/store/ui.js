@@ -10,6 +10,7 @@ export default {
     maxMessages: 100,
     messageDisplayDuration: 10000,
     messages: [],
+    theme: 'light',
     notifications: {
       inbox: 0,
       pendingReviewEdits: 0,
@@ -38,6 +39,9 @@ export default {
     },
     computeLastDate: (state) => {
       state.lastDate = new Date()
+    },
+    theme: (state, value) => {
+      state.theme = value
     },
     addMessage (state, message) {
       state.messages.push(message)

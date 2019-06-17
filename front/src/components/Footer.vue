@@ -33,6 +33,14 @@
             <a href="https://funkwhale.audio/apps" class="item" target="_blank"><translate translate-context="Footer/*/List item.Link">Mobile and desktop apps</translate></a>
             <div role="button" class="item" @click="$emit('show:shortcuts-modal')"><translate translate-context="*/*/*/Noun">Keyboard shortcuts</translate></div>
           </div>
+          <div class="ui form">
+            <div class="ui field">
+              <label><translate translate-context="Footer/Settings/Dropdown.Label/Short, Verb">Change theme</translate></label>
+              <select class="ui dropdown" :value="$store.state.ui.theme" @change="$store.commit('ui/theme', $event.target.value)">
+                <option v-for="theme in themes" :key="theme.key" :value="theme.key">{{ theme.name }}</option>
+              </select>
+            </div>
+          </div>
         </section>
         <section class="four wide column">
           <h4 v-translate translate-context="Footer/*/Link" class="ui header">Getting help</h4>
@@ -76,15 +84,18 @@ export default {
       parser.href = url
       return parser.hostname
     },
+    themes () {
+      return [
+        {
+          name: this.$pgettext('Footer/Settings/Dropdown.Label/Theme name', 'Light'),
+          key: 'light'
+        },
+        {
+          name: this.$pgettext('Footer/Settings/Dropdown.Label/Theme name', 'Dark'),
+          key: 'dark'
+        }
+      ]
+    }
   }
 }
 </script>
-<style scoped>
-footer p {
-  color: grey;
-}
-
-footer#footer div.item:hover {
-  color: rgba(0, 0, 0, 0.87);
-}
-</style>
