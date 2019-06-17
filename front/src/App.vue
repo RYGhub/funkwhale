@@ -251,6 +251,14 @@ export default {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
     },
+    '$store.state.ui.theme': {
+      immediate: true,
+      handler (newValue, oldValue) {
+        let oldTheme = oldValue || 'light'
+        document.body.classList.remove(`theme-${oldTheme}`)
+        document.body.classList.add(`theme-${newValue}`)
+      },
+    },
     '$store.state.auth.authenticated' (newValue) {
       if (!newValue) {
         this.disconnect()

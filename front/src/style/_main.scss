@@ -10,6 +10,10 @@
   Import this file into your LESS project to use Semantic UI without build tools
 */
 
+// Those semantic-ui-css/*.scss don't exist in the package, but we create them
+// via scripts/link-scss-files.sh on postinstall, so we can include theme
+// under a class namespace
+
 /* Global */
 @import "~semantic-ui-css/components/reset.css";
 // we use our custom site css here to avoid loading google font
@@ -96,6 +100,7 @@ body {
 #app > main, #app > .main {
   flex: 1;
 }
+
 .instance-chooser {
   margin-top: 2em;
 }
@@ -126,14 +131,10 @@ body {
   margin-left: 0;
   margin-right: 0;
   border: none;
-  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
   .ui.item {
     border: none;
     border-bottom-style: none;
     margin-bottom: 0px;
-    &.active {
-      box-shadow: inset 0px -2px 0px 0px #000;
-    }
   }
   @include media(">tablet") {
     padding: 0 2.5rem;
@@ -148,7 +149,6 @@ body {
   @include media(">widedesktop") {
     left: $widedesktop-sidebar-width;
   }
-  background-color: white;
   .item {
     padding-top: 1.5em;
     padding-bottom: 1.5em;
@@ -208,9 +208,6 @@ body {
   }
 }
 
-.discrete {
-  color: rgba(0, 0, 0, 0.87);
-}
 .link {
   cursor: pointer;
 }
@@ -355,3 +352,8 @@ input + .help {
 .table td .ui.dropdown {
   min-width: 150px;
 }
+
+
+
+@import "./themes/_light.scss";
+@import "./themes/_dark.scss";

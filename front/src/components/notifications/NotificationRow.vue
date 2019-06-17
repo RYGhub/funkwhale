@@ -126,7 +126,4 @@ export default {
 .read > span {
   cursor: pointer;
 }
-.disabled-row {
-  color: rgba(40, 40, 40, 0.3);
-}
 </style>
