@@ -68,12 +68,7 @@
         <div class="ui list">
           <div class="item">
             <i class="tag icon"></i>
-            <div
-              class="content"
-              v-translate="{url: musicbrainzUrl}"
-              translate-context="Content/Home/List item/Verb">
-                Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>
-            </div>
+            <div class="content" v-html="musicbrainzItem"></div>
           </div>
           <div class="item">
             <i class="plus icon"></i>
@@ -147,6 +142,10 @@ export default {
       return {
         title: this.$pgettext('Head/Home/Title', "Welcome")
       }
+    },
+    musicbrainzItem () {
+      let msg = this.$pgettext('Content/Home/List item/Verb', 'Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>')
+      return this.$gettextInterpolate(msg, {url: this.musicbrainzUrl})
     }
   }
 }
