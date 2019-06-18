@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-18 13:03+0000\n"
-"Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
+"PO-Revision-Date: 2019-06-19 07:58+0000\n"
+"Last-Translator: Xaloc <xaloc@tutanota.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -3459,12 +3459,9 @@ msgstr ""
 "servidor s’eliminaran completament. Es tornrà la quota corresponent."
 
 #: front/src/views/content/libraries/Quota.vue:64
-#, fuzzy
 msgctxt "Popup/Library/Paragraph"
 msgid "Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota."
 msgstr ""
-"Elimina les pistes carregades omeses durant els processos d'importació "
-"completament, afegint les dades corresponents a la vostra quota.\n"
 "Les pistes carregades però ignorades durant la importació per diversos "
 "motius s’eliminaran completament. Us retornarà l’espai d’emmagatzematge "
 "corresponent."
@@ -4733,12 +4730,11 @@ msgid "Uploads"
 msgstr "Pujades"
 
 #: front/src/components/auth/ApplicationForm.vue:16
-#, fuzzy
 msgctxt "Content/Applications/Help Text"
 msgid "Use \"urn:ietf:wg:oauth:2.0:oob\" as a redirect URI if your application is not served on the web."
 msgstr ""
-"Utilitza \"urn: ietf: wg: oauth: 2.0: oob\" com a URI de redirecció si la "
-"vostra aplicació no s’ha servit del web."
+"Utilitza \"urn:ietf:wg:oauth:2.0:oob\" com a URI de redirecció si la vostra "
+"aplicació no es serveix al web."
 
 #: front/src/components/Footer.vue:16
 msgctxt "Footer/*/List item.Link"
