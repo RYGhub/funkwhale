@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-11 07:58+0000\n"
+"PO-Revision-Date: 2019-06-19 07:58+0000\n"
 "Last-Translator: jiri-novacek <gfreshman@gmail.com>\n"
 "Language-Team: none\n"
 "Language: cs\n"
@@ -196,7 +196,7 @@ msgstr "Přístup odepřen"
 #: front/src/components/mixins/Translations.vue:74
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to audio files, libraries, artists, albums and tracks"
-msgstr "Přístup k hudebním souborům, knihovnám, umělcům, albům a stopám"
+msgstr "Přístup k hudebním souborům, knihovnám, interpretům, albům a stopám"
 
 #: front/src/components/mixins/Translations.vue:97
 #: front/src/components/mixins/Translations.vue:98
@@ -459,7 +459,7 @@ msgstr "Album"
 #: front/src/views/admin/library/TrackDetail.vue:128
 msgctxt "*/*/*/Noun"
 msgid "Album artist"
-msgstr "Umělec alba"
+msgstr "Interpret alba"
 
 #: front/src/views/admin/library/AlbumDetail.vue:92
 msgctxt "Content/Moderation/Title"
@@ -490,7 +490,7 @@ msgstr "Alba"
 #: front/src/components/library/ArtistDetail.vue:21
 msgctxt "Content/Artist/Title"
 msgid "Albums by this artist"
-msgstr "Alba tohoto umělce"
+msgstr "Alba tohoto interpreta"
 
 #: front/src/components/manage/library/EditsCardList.vue:15
 #: front/src/components/manage/library/LibrariesTable.vue:13
@@ -600,7 +600,7 @@ msgstr "Opravdu se chcete odhlásit?"
 #: front/src/components/manage/library/TracksTable.vue:41
 msgctxt "*/*/*"
 msgid "Artist"
-msgstr "Umělec"
+msgstr "Interpret"
 
 #: front/src/components/audio/SearchBar.vue:25
 #: src/components/audio/track/Table.vue:8
@@ -610,30 +610,30 @@ msgstr "Umělec"
 #: front/src/views/content/libraries/FilesTable.vue:56
 msgctxt "*/*/*/Noun"
 msgid "Artist"
-msgstr "Umělec"
+msgstr "Interpret"
 
 #: front/src/views/admin/library/ArtistDetail.vue:91
 msgctxt "Content/Moderation/Title"
 msgid "Artist data"
-msgstr "Data o umělci"
+msgstr "Data interpreta"
 
 #: front/src/components/mixins/Translations.vue:52
 #: front/src/components/mixins/Translations.vue:53
 msgctxt "Content/*/Dropdown/Noun"
 msgid "Artist name"
-msgstr "Jméno umělce"
+msgstr "Jméno interpreta"
 
 #: front/src/components/audio/Search.vue:65
 msgctxt "*/Search/Input.Placeholder"
 msgid "Artist, album, track…"
-msgstr "Umělec, album, stopa…"
+msgstr "Interpret, album, stopa…"
 
 #: front/src/views/admin/library/ArtistsList.vue:24
 #: front/src/views/admin/library/Base.vue:8
 #: front/src/views/admin/library/LibraryDetail.vue:209
 msgctxt "*/*/*"
 msgid "Artists"
-msgstr "Umělci"
+msgstr "Interpreti"
 
 #: front/src/components/audio/Search.vue:10
 #: src/components/instance/Stats.vue:42
@@ -643,7 +643,7 @@ msgstr "Umělci"
 #: front/src/views/admin/moderation/DomainsDetail.vue:254
 msgctxt "*/*/*/Noun"
 msgid "Artists"
-msgstr "Umělci"
+msgstr "Interpreti"
 
 #: front/src/components/favorites/List.vue:34
 #: src/components/library/Albums.vue:25
@@ -761,7 +761,7 @@ msgstr "Procházení alb"
 #: front/src/components/library/Artists.vue:4
 msgctxt "Content/Artist/Title"
 msgid "Browsing artists"
-msgstr "Procházení umělců"
+msgstr "Procházení interpretů"
 
 #: front/src/views/playlists/List.vue:3
 msgctxt "Content/Playlist/Title"
@@ -1243,7 +1243,7 @@ msgstr "Odstranit toto album?"
 #: front/src/views/admin/library/ArtistDetail.vue:72
 msgctxt "Popup/Library/Title"
 msgid "Delete this artist?"
-msgstr "Odstranit tohoto umělce?"
+msgstr "Odstranit tohoto interpreta?"
 
 #: front/src/views/admin/library/LibraryDetail.vue:59
 #: front/src/views/content/libraries/Form.vue:31
@@ -1388,7 +1388,7 @@ msgstr "Přejete si odstranit rádio \"%{ radio }\"?"
 #: front/src/components/moderation/FilterModal.vue:3
 msgctxt "Popup/Moderation/Title/Verb"
 msgid "Do you want to hide content from artist \"%{ name }\"?"
-msgstr "Přejete si skrýt obsah od umělce \"%{ name }\"?"
+msgstr "Přejete si skrýt obsah od interpreta \"%{ name }\"?"
 
 #: front/src/components/common/ActionTable.vue:37
 msgctxt "Modal/*/Title"
@@ -1507,7 +1507,7 @@ msgstr "Upravit toto album"
 #: front/src/components/library/ArtistEdit.vue:4
 msgctxt "Content/*/Title"
 msgid "Edit this artist"
-msgstr "Upravit tohoto umělce"
+msgstr "Upravit tohoto interpreta"
 
 #: front/src/components/library/TrackEdit.vue:4
 msgctxt "Content/*/Title"
@@ -1560,7 +1560,7 @@ msgstr "Vložit toto album do webové stránky"
 #: front/src/components/library/ArtistBase.vue:37
 msgctxt "Popup/Artist/Title/Verb"
 msgid "Embed this artist work on your website"
-msgstr "Vložit díla tohoto umělce do webové stránky"
+msgstr "Vložit díla tohoto interpreta do webové stránky"
 
 #: front/src/components/library/TrackBase.vue:45
 msgctxt "Popup/Track/Title"
@@ -1610,7 +1610,7 @@ msgstr "Zadejte název alba..."
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter artist name…"
-msgstr "Zadejte jméno umělce…"
+msgstr "Zadejte jméno interpreta…"
 
 #: front/src/views/playlists/List.vue:107
 msgctxt "Content/Playlist/Placeholder/Call to action"
@@ -2004,7 +2004,7 @@ msgstr "Přejít na domovskou stránku"
 #: front/src/components/auth/Settings.vue:128
 msgctxt "Content/Settings/Title"
 msgid "Hidden artists"
-msgstr "Skrytí umělci"
+msgstr "Skrytí interpreti"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:114
 msgctxt "Content/Moderation/Help text"
@@ -2019,12 +2019,12 @@ msgstr "Skrýt obsah"
 #: front/src/components/audio/PlayButton.vue:26
 msgctxt "*/Queue/Dropdown/Button/Label/Short"
 msgid "Hide content from this artist"
-msgstr "Skrýt obsah od tohoto umělce"
+msgstr "Skrýt obsah od tohoto interpreta"
 
 #: front/src/components/audio/Player.vue:643
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Hide content from this artist…"
-msgstr "Skrýt obsah od tohoto umělce…"
+msgstr "Skrýt obsah od tohoto interpreta…"
 
 #: front/src/components/library/Home.vue:65
 msgctxt "Head/Home/Title"
@@ -2100,7 +2100,7 @@ msgstr "Ve widgetu \"Poslední přidané\""
 #: front/src/components/moderation/FilterModal.vue:27
 msgctxt "Popup/Moderation/List item"
 msgid "In artists and album listings"
-msgstr "Ve výpisu umělců a alb"
+msgstr "Ve výpisu interpretů a alb"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgctxt "Content/Track/Button.Message"
@@ -2716,7 +2716,7 @@ msgstr "Žádné album neodpovídá zadání"
 #: front/src/components/audio/Search.vue:16
 msgctxt "Content/Search/Paragraph"
 msgid "No artist matched your query"
-msgstr "Žádný umělec neodpovídá zadání"
+msgstr "Žádný interpret neodpovídá zadání"
 
 #: front/src/components/library/TrackDetail.vue:14
 msgctxt "Content/Track/Table.Paragraph"
@@ -3637,12 +3637,12 @@ msgstr "Hledat dle domény, názvu, MusicBrainz ID…"
 #: front/src/components/manage/library/TracksTable.vue:174
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, album, MusicBrainz ID…"
-msgstr "Hledat dle domény, názvu, umělce, alba, MusicBrainz ID…"
+msgstr "Hledat dle domény, názvu, interpreta, alba, MusicBrainz ID…"
 
 #: front/src/components/manage/library/AlbumsTable.vue:174
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, MusicBrainz ID…"
-msgstr "Hledat dle domény, názvu, umělce, MusicBrainz ID…"
+msgstr "Hledat dle domény, názvu, interpreta, MusicBrainz ID…"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
 msgctxt "Content/Search/Input.Placeholder"
@@ -3657,7 +3657,7 @@ msgstr "Hledat dle názvu…"
 #: front/src/views/content/libraries/FilesTable.vue:208
 msgctxt "Content/Library/Input.Placeholder"
 msgid "Search by title, artist, album…"
-msgstr "Hledat dle názvu, umělce, alba…"
+msgstr "Hledat dle názvu, interpreta, alba…"
 
 #: front/src/components/manage/users/InvitationsTable.vue:153
 msgctxt "Content/Admin/Input.Placeholder/Verb"
@@ -3672,7 +3672,7 @@ msgstr "Hledat dle uživatele, emailové adresy, názvu…"
 #: front/src/components/audio/SearchBar.vue:20
 msgctxt "Sidebar/Search/Input.Placeholder"
 msgid "Search for artists, albums, tracks…"
-msgstr "Hledat umělce, alba, stopy…"
+msgstr "Hledat interprety, alba, stopy…"
 
 #: front/src/components/audio/Search.vue:2
 msgctxt "Content/Search/Title"
@@ -3999,7 +3999,7 @@ msgstr "Navrhněte úpravu u tohoto alba"
 #: front/src/components/library/ArtistEdit.vue:5
 msgctxt "Content/*/Title"
 msgid "Suggest an edit on this artist"
-msgstr "Navrhněte úpravu u tohoto umělce"
+msgstr "Navrhněte úpravu u tohoto interpreta"
 
 #: front/src/components/library/TrackEdit.vue:5
 msgctxt "Content/*/Title"
@@ -4065,7 +4065,7 @@ msgstr "Aplikace dále požaduje následující neznámá oprávnění:"
 msgctxt "Content/Moderation/Paragraph"
 msgid "The artist will be removed, as well as associated uploads, tracks, albums, favorites and listening history. This action is irreversible."
 msgstr ""
-"Umělec bude odstraněn, společně se  souvisejícími nahranými soubory, "
+"Interpret bude odstraněn, společně se  souvisejícími nahranými soubory, "
 "stopami, alby, oblíbenými položkami a historií poslechu. Tato akce je "
 "nevratná."
 
@@ -4150,9 +4150,9 @@ msgstr ""
 msgctxt "Popup/*/Paragraph"
 msgid "The selected artist will be removed, as well as associated uploads, tracks, albums, favorites and listening history. This action is irreversible."
 msgstr ""
-"Vybraný umělec bude odstraněn, společně se  souvisejícími nahranými soubory, "
-"stopami, alby, oblíbenými položkami a historií poslechu. Tato akce je "
-"nevratná."
+"Vybraný interpret bude odstraněn, společně se  souvisejícími nahranými "
+"soubory, stopami, alby, oblíbenými položkami a historií poslechu. Tato akce "
+"je nevratná."
 
 #: front/src/components/manage/library/LibrariesTable.vue:206
 msgctxt "Popup/*/Paragraph"
@@ -4233,7 +4233,7 @@ msgstr "Toto album se vyskytuje v následujících knihovnách:"
 #: front/src/components/library/ArtistDetail.vue:42
 msgctxt "Content/Artist/Paragraph"
 msgid "This artist is present in the following libraries:"
-msgstr "Tento umělec se vyskytuje v následujících knihovnách:"
+msgstr "Tento interpret se vyskytuje v následujících knihovnách:"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:84
 #: front/src/views/admin/moderation/DomainsDetail.vue:48
@@ -4472,7 +4472,7 @@ msgstr "Stopy"
 #: front/src/components/library/ArtistDetail.vue:33
 msgctxt "Content/Artist/Title"
 msgid "Tracks by this artist"
-msgstr "Stopy od tohoto umělce"
+msgstr "Stopy od tohoto interpreta"
 
 #: front/src/components/instance/Stats.vue:25
 msgctxt "Content/About/Paragraph/Unit"
@@ -4940,7 +4940,7 @@ msgstr ""
 #: front/src/components/library/ArtistDetail.vue:6
 msgctxt "Content/Artist/Paragraph"
 msgid "You are currently hiding content related to this artist."
-msgstr "Některý obsah související s tímto umělcem je nastaven jako skrytý."
+msgstr "Některý obsah související s tímto interpretem je nastaven jako skrytý."
 
 #: front/src/components/auth/Logout.vue:7
 msgctxt "Content/Login/Paragraph"
@@ -5059,7 +5059,8 @@ msgstr "Budete muset aktualizovat heslo na všech klientech kde je používáno.
 #: front/src/components/moderation/FilterModal.vue:20
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You will not see tracks, albums and user activity linked to this artist anymore:"
-msgstr "Neuvidíte stopy, alba a uživatelskou aktivitu spojenou s tímto umělcem:"
+msgstr ""
+"Neuvidíte stopy, alba a uživatelskou aktivitu spojenou s tímto interpretem:"
 
 #: front/src/components/auth/Signup.vue:13
 msgctxt "Content/Signup/Form/Paragraph"
