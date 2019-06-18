@@ -226,7 +226,7 @@ class Command(BaseCommand):
             urllib.parse.urlencode([("import", reference)]),
         )
         self.stdout.write(
-            "For details, please refer to import refrence '{}' or URL {}".format(
+            "For details, please refer to import reference '{}' or URL {}".format(
                 reference, import_url
             )
         )
@@ -246,7 +246,7 @@ class Command(BaseCommand):
                 self.stderr.write("- {}: {}".format(path, error))
 
         self.stdout.write(
-            "For details, please refer to import refrence '{}' or URL {}".format(
+            "For details, please refer to import reference '{}' or URL {}".format(
                 reference, import_url
             )
         )
