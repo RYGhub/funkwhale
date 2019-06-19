@@ -14,11 +14,7 @@
             <i class="circular inverted music orange icon"></i>
             <div class="content">
               {{ track.title }}
-              <div class="sub header">
-                <div translate-context="Content/Track/Paragraph"
-                  v-translate="{album: track.album.title, artist: track.artist.name, albumUrl: albumUrl, artistUrl: artistUrl}"
-                >From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a></div>
-              </div>
+              <div class="sub header" v-html="subtitle"></div>
             </div>
           </h2>
           <div class="header-buttons">
@@ -230,6 +226,10 @@ export default {
         ")"
       )
     },
+    subtitle () {
+      let msg = this.$pgettext('Content/Track/Paragraph', 'From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a>')
+      return this.$gettextInterpolate(msg, {album: this.track.album.title, artist: this.track.artist.name, albumUrl: this.albumUrl, artistUrl: this.artistUrl})
+    }
   },
   watch: {
     id() {

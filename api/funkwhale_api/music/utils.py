@@ -12,7 +12,7 @@ def guess_mimetype(f):
     t = magic.from_buffer(f.read(b), mime=True)
     if not t.startswith("audio/"):
         # failure, we try guessing by extension
-        mt, _ = mimetypes.guess_type(f.path)
+        mt, _ = mimetypes.guess_type(f.name)
         if mt:
             t = mt
     return t
