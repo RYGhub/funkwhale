@@ -17,6 +17,7 @@ RUN \
     libpq              \
     libmagic           \
     libffi-dev         \
+    make         \
     zlib-dev           \
     openldap-dev && \
     \
