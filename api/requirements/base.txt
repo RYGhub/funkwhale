@@ -50,6 +50,8 @@ python-magic==0.4.15
 channels==2.1.6
 channels_redis>=2.3,<2.4
 daphne>=2.2,<2.3
+uvicorn
+gunicorn
 
 cryptography>=2,<3
 # requests-http-signature==0.0.3

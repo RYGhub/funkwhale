@@ -129,6 +129,7 @@ test_api:
   only:
     - branches
   before_script:
+    - apk add make
     - cd api
     - sed -i '/Pillow/d' requirements/base.txt
     - pip3 install -r requirements/base.txt

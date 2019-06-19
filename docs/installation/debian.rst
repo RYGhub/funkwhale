@@ -24,7 +24,7 @@ On Debian-like systems, you can install them using:
     # Install dependencies
     sudo apt-get install curl python3-pip python3-venv git unzip libldap2-dev libsasl2-dev
     # Funkwhale dependencies
-    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev
+    sudo apt install build-essential ffmpeg libjpeg-dev libmagic-dev libpq-dev postgresql-client python3-dev make
 
 On Arch Linux and its derivatives:
 
