@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-04-08 08:01+0000\n"
+"PO-Revision-Date: 2019-06-20 08:27+0000\n"
 "Last-Translator: Koen <koen.glotzbach@gmail.com>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -34,23 +34,20 @@ msgid "(empty)"
 msgstr "(leeg)"
 
 #: front/src/components/auth/Authorize.vue:16
-#, fuzzy
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr "Log in op je Funkwhale-account"
+msgstr "%{ app } wil toegang tot je Funkwhale account"
 
 #: front/src/components/common/ActionTable.vue:68
-#, fuzzy
 msgctxt "Content/*/Paragraph"
 msgid "%{ count } on %{ total } selected"
 msgid_plural "%{ count } on %{ total } selected"
-msgstr[0] "%{ count } van %{ total } element geselecteerd"
-msgstr[1] "%{ count } van %{ total } elementen geselecteerd"
+msgstr[0] "%{ count } van %{ total } geselecteerd"
+msgstr[1] "%{ count } van %{ total } geselecteerd"
 
 #: front/src/components/Sidebar.vue:121 src/components/audio/album/Card.vue:52
 #: front/src/views/content/libraries/Card.vue:40
 #: src/views/content/remote/Card.vue:30
-#, fuzzy
 msgctxt "*/*/*"
 msgid "%{ count } track"
 msgid_plural "%{ count } tracks"
@@ -66,7 +63,6 @@ msgstr[0] "% { count } nummer in %{ albumsCount } albums"
 msgstr[1] "% { count } nummers in %{ albumsCount } albums"
 
 #: front/src/components/library/radios/Builder.vue:81
-#, fuzzy
 msgctxt "Content/Radio/Table.Paragraph/Short"
 msgid "%{ count } track matching combined filters"
 msgid_plural "%{ count } tracks matching combined filters"
@@ -74,7 +70,6 @@ msgstr[0] "% { count } nummer komt overeen met de gecombineerde filters"
 msgstr[1] "% { count } nummers komen overeen met de gecombineerde filters"
 
 #: front/src/components/playlists/Card.vue:18
-#, fuzzy
 msgctxt "Content/*/Card/List item"
 msgid "%{ count} track"
 msgid_plural "%{ count } tracks"
@@ -100,16 +95,18 @@ msgstr "%{ minutes } min"
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } accepted your follow on library \"%{ library }\""
 msgstr ""
+"%{ username } heeft je volgverzoek voor de bibliotheek \"%{ library }\" "
+"geaccepteerd"
 
 #: front/src/components/notifications/NotificationRow.vue:39
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } followed your library \"%{ library }\""
-msgstr ""
+msgstr "%{ username } volgt nu je bibliotheek \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:41
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr ""
+msgstr "%{ username } wil je bibliotheek \"%{ library }\" volgen"
 
 #: front/src/components/auth/Profile.vue:46
 msgctxt "Head/Profile/Title"
@@ -120,10 +117,9 @@ msgstr "%{ username }'s profiel"
 msgctxt "Popup/Playlist/Paragraph"
 msgid ""
 "<strong>%{ track }</strong> is already in <strong>%{ playlist }</strong>."
-msgstr ""
+msgstr "<strong>%{ track }</strong> staat al in <strong>%{ playlist }</strong>."
 
 #: front/src/components/audio/artist/Card.vue:41
-#, fuzzy
 msgctxt "Content/Artist/Card"
 msgid "1 album"
 msgid_plural "%{ count } albums"
@@ -131,18 +127,16 @@ msgstr[0] "1 album"
 msgstr[1] "%{ count } albums"
 
 #: front/src/components/favorites/List.vue:10
-#, fuzzy
 msgctxt "Content/Favorites/Title"
 msgid "1 favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "%{ count } favoriet"
+msgstr[0] "1 favoriet"
 msgstr[1] "%{ count } favorieten"
 
 #: front/src/components/Home.vue:64
-#, fuzzy
 msgctxt "Content/Home/Title"
 msgid "A clean library"
-msgstr "Een nette verzameling"
+msgstr "Een georganiseerde verzameling"
 
 #: front/src/components/library/FileUpload.vue:264
 msgctxt "Content/Library/Help text"
@@ -150,10 +144,9 @@ msgid "A network error occured while uploading this file"
 msgstr "Er is een netwerkfout opgetreden tijdens het uploaden van dit bestand"
 
 #: front/src/components/library/EditForm.vue:145
-#, fuzzy
 msgctxt "*/*/Placeholder"
 msgid "A short summary describing your changes."
-msgstr "Er is een fout opgetreden tijdens het opslaan van de wijzigingen"
+msgstr "Een korte samenvatting van je aanpassingen."
 
 #: front/src/components/About.vue:5
 msgctxt "Content/About/Title/Short, Noun"
@@ -161,10 +154,9 @@ msgid "About %{ instance }"
 msgstr "Over %{ instance }"
 
 #: front/src/components/Footer.vue:6
-#, fuzzy
 msgctxt "Footer/About/Title"
 msgid "About %{instanceName}"
-msgstr "Over %{ instance }"
+msgstr "Over %{instanceName}"
 
 #: front/src/components/Footer.vue:45
 msgctxt "Footer/*/Title/Short"
@@ -201,7 +193,7 @@ msgstr "Toegang uitgeschakeld"
 #: front/src/components/mixins/Translations.vue:74
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to audio files, libraries, artists, albums and tracks"
-msgstr ""
+msgstr "Toegang tot audiobestanden, bibliotheken, artiesten, albums, en nummers"
 
 #: front/src/components/mixins/Translations.vue:97
 #: front/src/components/mixins/Translations.vue:98
@@ -214,62 +206,57 @@ msgstr ""
 #, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to edits"
-msgstr "Toegang uitgeschakeld"
+msgstr "Toegang tot bewerkingen"
 
 #: front/src/components/mixins/Translations.vue:69
 #: front/src/components/mixins/Translations.vue:70
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to email, username, and profile information"
-msgstr ""
+msgstr "Toegang tot je emailadres, gebruikersnaam en profiel"
 
 #: front/src/components/mixins/Translations.vue:77
 #: front/src/components/mixins/Translations.vue:78
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to favorites"
-msgstr "Toevoegen aan favorieten"
+msgstr "Toegang tot favorieten"
 
 #: front/src/components/mixins/Translations.vue:85
 #: front/src/components/mixins/Translations.vue:86
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to follows"
-msgstr ""
+msgstr "Toegang tot je volg-lijst"
 
 #: front/src/components/mixins/Translations.vue:81
 #: front/src/components/mixins/Translations.vue:82
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to listening history"
-msgstr ""
+msgstr "Toegang tot je luistergeschiedenis"
 
 #: front/src/components/mixins/Translations.vue:101
 #: front/src/components/mixins/Translations.vue:102
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to notifications"
-msgstr "Je meldingen"
+msgstr "Toegang tot notificaties"
 
 #: front/src/components/mixins/Translations.vue:89
 #: front/src/components/mixins/Translations.vue:90
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to playlists"
-msgstr "Toevoegen aan afspeellijst…"
+msgstr "Toegang tot afspeellijsten"
 
 #: front/src/components/mixins/Translations.vue:93
 #: front/src/components/mixins/Translations.vue:94
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to radios"
-msgstr "Toegang uitgeschakeld"
+msgstr "Toegang tot radio's"
 
 #: front/src/components/Home.vue:101
-#, fuzzy
 msgctxt "Content/Home/List item"
 msgid ""
 "Access your music from a clean interface that focuses on what really matters"
 msgstr ""
-"Toegang tot je muziek, met een nette gebruikersomgeving die de nadruk legt "
-"op wat écht belangrijk is"
+"Al je muziek, beschikbaar in een georganiseerde omgeving dat focust op wat "
+"écht belangrijk is"
 
 #: front/src/components/manage/library/UploadsTable.vue:67
 #: front/src/components/mixins/Translations.vue:45
@@ -281,23 +268,20 @@ msgstr "Benaderd op"
 
 #: front/src/views/admin/library/LibraryDetail.vue:104
 #: front/src/views/admin/library/UploadDetail.vue:111
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Account"
-msgstr "Mijn account"
+msgstr "Account"
 
 #: front/src/components/manage/library/LibrariesTable.vue:49
 #: front/src/components/manage/library/UploadsTable.vue:61
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Account"
-msgstr "Mijn account"
+msgstr "Account"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:107
-#, fuzzy
 msgctxt "Content/Moderation/Title"
 msgid "Account data"
-msgstr "Actief account"
+msgstr "Accountgegevens"
 
 #: front/src/components/auth/Settings.vue:5
 msgctxt "Content/Settings/Title"
@@ -322,10 +306,9 @@ msgstr "E-mailadres van account"
 #: front/src/views/admin/moderation/AccountsList.vue:3
 #: front/src/views/admin/moderation/AccountsList.vue:24
 #: front/src/views/admin/moderation/Base.vue:8
-#, fuzzy
 msgctxt "*/Moderation/Title"
 msgid "Accounts"
-msgstr "Accountstatus"
+msgstr "Accounts"
 
 #: front/src/views/content/libraries/Detail.vue:29
 msgctxt "Content/Library/Table.Label"
@@ -372,12 +355,12 @@ msgstr "Zichtbaarheid van activiteit"
 #: front/src/views/admin/moderation/DomainsList.vue:18
 msgctxt "Content/Moderation/Button/Verb"
 msgid "Add"
-msgstr ""
+msgstr "Toevoegen"
 
 #: front/src/views/admin/moderation/DomainsList.vue:13
 msgctxt "Content/Moderation/Form.Label/Verb"
 msgid "Add a domain"
-msgstr ""
+msgstr "Domein toevoegen"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:79
 msgctxt "Content/Moderation/Button/Verb"
@@ -398,7 +381,7 @@ msgstr "Inhoud toevoegen en beheren"
 #: front/src/components/playlists/PlaylistModal.vue:31
 msgctxt "*/Playlist/Button.Label/Verb"
 msgid "Add anyways"
-msgstr ""
+msgstr "Toch toevoegen"
 
 #: front/src/components/Sidebar.vue:75 src/views/content/Base.vue:18
 msgctxt "*/Library/*/Verb"
@@ -416,10 +399,9 @@ msgid "Add filters to customize your radio"
 msgstr "Voeg filters toe om je radio te personaliseren"
 
 #: front/src/components/audio/PlayButton.vue:75
-#, fuzzy
 msgctxt "*/Queue/Dropdown/Button/Title"
 msgid "Add to current queue"
-msgstr "Toevoegen aan wachtrij"
+msgstr "Aan huidige wachtrij toevoegen"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:4
 #: front/src/components/favorites/TrackFavoriteIcon.vue:28
@@ -429,10 +411,9 @@ msgstr "Toevoegen aan favorieten"
 
 #: front/src/components/playlists/TrackPlaylistIcon.vue:6
 #: front/src/components/playlists/TrackPlaylistIcon.vue:34
-#, fuzzy
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Add to playlist…"
-msgstr "Toevoegen aan afspeellijst…"
+msgstr "Aan afspeellijst toevoegen…"
 
 #: front/src/components/audio/PlayButton.vue:15
 msgctxt "*/Queue/Dropdown/Button/Label/Short"
@@ -476,16 +457,14 @@ msgid "Album"
 msgstr "Album"
 
 #: front/src/views/admin/library/TrackDetail.vue:128
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Album artist"
-msgstr "Albums van deze artiest"
+msgstr "Albumartiest"
 
 #: front/src/views/admin/library/AlbumDetail.vue:92
-#, fuzzy
 msgctxt "Content/Moderation/Title"
 msgid "Album data"
-msgstr "Albumpagina"
+msgstr "Albumgegevens"
 
 #: front/src/components/mixins/Translations.vue:51
 #: front/src/components/mixins/Translations.vue:52
@@ -524,17 +503,16 @@ msgid "All"
 msgstr "Alles"
 
 #: front/src/components/common/ActionTable.vue:59
-#, fuzzy
 msgctxt "Content/*/Paragraph"
 msgid "All %{ count } element selected"
 msgid_plural "All %{ count } elements selected"
-msgstr[0] "%{ count } van %{ total } element geselecteerd"
-msgstr[1] "%{ count } van %{ total } elementen geselecteerd"
+msgstr[0] "Één element geselecteerd"
+msgstr[1] "Alle %{ count } elementen geselecteerd"
 
 #: front/src/components/auth/Authorize.vue:107
 msgctxt "Head/Authorize/Title"
 msgid "Allow application"
-msgstr ""
+msgstr "Deze app toestaan"
 
 #: front/src/components/library/ImportStatusModal.vue:17
 msgctxt "Popup/Import/Message"
@@ -542,6 +520,7 @@ msgid ""
 "An error occured during upload processing. You will find more information "
 "below."
 msgstr ""
+"Er ging iets fout bij het verwerken van je upload. Meer informatie hieronder."
 
 #: front/src/components/playlists/Editor.vue:13
 msgctxt "Content/Playlist/Error message.Title"
@@ -549,16 +528,14 @@ msgid "An error occured while saving your changes"
 msgstr "Er is een fout opgetreden tijdens het opslaan van de wijzigingen"
 
 #: front/src/components/federation/FetchButton.vue:21
-#, fuzzy
 msgctxt "Popup/*/Message.Content"
 msgid "An error occured while trying to refresh data:"
-msgstr "Er is een fout opgetreden tijdens het opslaan van de wijzigingen"
+msgstr "Er ging iets fout tijdens het vernieuwen van de gegevens:"
 
 #: front/src/components/federation/FetchButton.vue:41
-#, fuzzy
 msgctxt "*/*/Error"
 msgid "An HTTP error occured while contacting the remote server"
-msgstr "Er is een fout opgetreden tijdens het opslaan van de wijzigingen"
+msgstr "Er ging iets fout bij het contact maken met de externe server"
 
 #: front/src/components/auth/Login.vue:10
 msgctxt "Content/Login/Error message/List item"
@@ -572,25 +549,23 @@ msgstr ""
 #: front/src/components/library/ImportStatusModal.vue:145
 msgctxt "Popup/Import/Error.Label"
 msgid "An unkwown error occured"
-msgstr ""
+msgstr "Er is een onbekende fout opgetreden"
 
 #: front/src/components/auth/Settings.vue:175
 #: src/components/auth/Settings.vue:225
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Application"
-msgstr "Actie"
+msgstr "Applicatie"
 
 #: front/src/components/auth/ApplicationEdit.vue:12
 msgctxt "Content/Applications/Title"
 msgid "Application details"
-msgstr ""
+msgstr "Applicatie-details"
 
 #: front/src/components/auth/ApplicationEdit.vue:21
-#, fuzzy
 msgctxt "Content/Applications/Label"
 msgid "Application ID"
-msgstr "Actie"
+msgstr "Applicatie-ID"
 
 #: front/src/components/auth/ApplicationEdit.vue:16
 msgctxt "Content/Application/Paragraph/"
@@ -598,11 +573,13 @@ msgid ""
 "Application ID and secret are really sensitive values and must be treated "
 "like passwords. Do not share those with anyone else."
 msgstr ""
+"De applicatie-ID en sleutel zijn gevoelige gegevens en moet je als "
+"wachtwoord beschouwen. Deel ze niet met anderen."
 
 #: front/src/components/auth/ApplicationEdit.vue:25
 msgctxt "Content/Applications/Label"
 msgid "Application secret"
-msgstr ""
+msgstr "Applicatie-sleutel"
 
 #: front/src/components/library/EditCard.vue:81
 #: front/src/components/notifications/NotificationRow.vue:66
@@ -643,10 +620,9 @@ msgid "Artist"
 msgstr "Artiest"
 
 #: front/src/views/admin/library/ArtistDetail.vue:91
-#, fuzzy
 msgctxt "Content/Moderation/Title"
 msgid "Artist data"
-msgstr "Artiestnaam"
+msgstr "Artiestgegevens"
 
 #: front/src/components/mixins/Translations.vue:52
 #: front/src/components/mixins/Translations.vue:53
@@ -655,10 +631,9 @@ msgid "Artist name"
 msgstr "Artiestnaam"
 
 #: front/src/components/audio/Search.vue:65
-#, fuzzy
 msgctxt "*/Search/Input.Placeholder"
 msgid "Artist, album, track…"
-msgstr "Artiest, album, nummer..."
+msgstr "Artiest, album, nummer…"
 
 #: front/src/views/admin/library/ArtistsList.vue:24
 #: front/src/views/admin/library/Base.vue:8
