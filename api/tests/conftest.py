@@ -29,6 +29,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.federation import actors
+from funkwhale_api.moderation import mrf
 
 
 pytest_plugins = "aiohttp.pytest_plugin"
@@ -422,3 +423,17 @@ def a_responses():
 @pytest.fixture
 def service_actor(db):
     return actors.get_service_actor()
+
+
+@pytest.fixture
+def mrf_inbox_registry(mocker):
+    registry = mrf.Registry()
+    mocker.patch("funkwhale_api.moderation.mrf.inbox", registry)
+    return registry
+
+
+@pytest.fixture
+def mrf_outbox_registry(mocker):
+    registry = mrf.Registry()
+    mocker.patch("funkwhale_api.moderation.mrf.outbox", registry)
+    return registry

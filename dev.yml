@@ -53,6 +53,7 @@ services:
     volumes:
       - ./api:/app
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
+      - "./data/plugins:/srv/funkwhale/plugins"
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
@@ -90,6 +91,7 @@ services:
     volumes:
       - ./api:/app
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
+      - "./data/plugins:/srv/funkwhale/plugins"
     networks:
       - internal
   nginx:

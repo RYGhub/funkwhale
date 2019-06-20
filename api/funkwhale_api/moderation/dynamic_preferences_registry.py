@@ -1,7 +1,7 @@
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
-moderation = types.Section("Moderation")
+moderation = types.Section("moderation")
 
 
 @global_preferences_registry.register
