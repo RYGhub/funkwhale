@@ -1,3 +1,5 @@
+import pytest
+
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
@@ -48,6 +50,7 @@ def test_nodeinfo_dump(preferences, mocker):
                 "listenings": {"total": stats["listenings"]},
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
+            "allowList": {"enabled": False, "domains": None},
         },
     }
     assert nodeinfo.get() == expected
@@ -79,6 +82,25 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 ],
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
+            "allowList": {"enabled": False, "domains": None},
         },
     }
     assert nodeinfo.get() == expected
+
+
+@pytest.mark.parametrize(
+    "enabled, public, expected",
+    [
+        (True, True, {"enabled": True, "domains": ["allowed.example"]}),
+        (True, False, {"enabled": True, "domains": None}),
+        (False, False, {"enabled": False, "domains": None}),
+    ],
+)
+def test_nodeinfo_allow_list_enabled(preferences, factories, enabled, public, expected):
+    preferences["moderation__allow_list_enabled"] = enabled
+    preferences["moderation__allow_list_public"] = public
+    factories["federation.Domain"](name="allowed.example", allowed=True)
+    factories["federation.Domain"](allowed=False)
+    factories["federation.Domain"](allowed=None)
+
+    assert nodeinfo.get()["metadata"]["allowList"] == expected
