@@ -60,7 +60,7 @@
         <p><translate translate-context="Content/Playlist/Paragraph/Call to action">Drag and drop rows to reorder tracks in the playlist</translate></p>
         <div class="table-wrapper">
           <table class="ui compact very basic unstackable table">
-            <draggable v-model="plts" element="tbody" @update="reorder">
+            <draggable v-model="plts" tag="tbody" @update="reorder">
               <tr v-for="(plt, index) in plts" :key="plt.id">
                 <td class="left aligned">{{ plt.index + 1}}</td>
                 <td class="center aligned">

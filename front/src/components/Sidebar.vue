@@ -134,7 +134,7 @@
     </div>
     <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'queue'}, 'tab']">
       <table class="ui compact inverted very basic fixed single line unstackable table">
-        <draggable v-model="tracks" element="tbody" @update="reorder">
+        <draggable v-model="tracks" tag="tbody" @update="reorder">
           <tr
               @click="$store.dispatch('queue/currentIndex', index)"
               v-for="(track, index) in tracks"
