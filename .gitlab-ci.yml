@@ -17,7 +17,7 @@ stages:
 
 review_front:
   stage: review
-  image: node:9
+  image: node:10
   when: manual
   allow_failure: true
   variables:
@@ -142,7 +142,7 @@ test_api:
 
 test_front:
   stage: test
-  image: node:9
+  image: node:10
   before_script:
     - cd front
   only:
@@ -164,7 +164,7 @@ test_front:
 
 build_front:
   stage: build
-  image: node:9
+  image: node:10
   before_script:
     - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
     - chmod +x /usr/local/bin/jq
