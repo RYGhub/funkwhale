@@ -46,7 +46,7 @@ logging.config.dictConfig(
         },
         "loggers": {
             "funkwhale_api": {
-                "level": logging.getLevelName("LOGLEVEL"),
+                "level": LOGLEVEL,
                 "handlers": ["console"],
                 # required to avoid double logging with root logger
                 "propagate": False,

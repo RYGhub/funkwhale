@@ -14,10 +14,6 @@
             <label for="domain"><translate translate-context="Content/Moderation/Form.Label/Verb">Add a domain</translate></label>
             <input type="text" name="domain" id="domain" v-model="domainName">
           </div>
-          <div class="field" v-if="allowListEnabled">
-            <input type="checkbox" name="allowed" id="allowed" v-model="domainAllowed">
-            <label for="allowed"><translate translate-context="Content/Moderation/Form.Label/Verb">Add to allow-list</translate></label>
-          </div>
           <div class="field">
             <button :class="['ui', {'loading': isCreating}, 'green', 'button']" type="submit" :disabled="isCreating">
               <label for="domain"><translate translate-context="Content/Moderation/Button/Verb">Add</translate></label>
@@ -26,7 +22,7 @@
         </div>
       </form>
       <div class="ui clearing hidden divider"></div>
-      <domains-table :allow-list-enabled="allowListEnabled"></domains-table>
+      <domains-table></domains-table>
     </section>
   </main>
 </template>
@@ -36,14 +32,12 @@ import axios from 'axios'
 
 import DomainsTable from "@/components/manage/moderation/DomainsTable"
 export default {
-  props: ['allowListEnabled'],
   components: {
     DomainsTable
   },
   data () {
     return {
       domainName: '',
-      domainAllowed: this.allowListEnabled ? true : null,
       isCreating: false,
       errors: []
     }
@@ -60,7 +54,7 @@ export default {
       let self = this
       this.isCreating = true
       this.errors = []
-      axios.post('manage/federation/domains/', {name: this.domainName, allowed: this.domainAllowed}).then((response) => {
+      axios.post('manage/federation/domains/', {name: this.domainName}).then((response) => {
         this.isCreating = false
         this.$router.push({
           name: "manage.moderation.domains.detail",
