@@ -147,7 +147,19 @@ export default {
       let msg = this.$pgettext('Content/Home/List item/Verb', 'Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>')
       return this.$gettextInterpolate(msg, {url: this.musicbrainzUrl})
     }
+  },
+  watch: {
+    '$store.state.auth.authenticated': {
+      handler (v) {
+        if (v) {
+          console.log('Authenticated, redirecting to /library…')
+          this.$router.push('/library')
+        }
+      },
+      immediate: true
+    }
   }
+
 }
 </script>
 
