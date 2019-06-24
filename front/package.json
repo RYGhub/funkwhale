@@ -85,9 +85,20 @@
     }
   },
   "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
+    "IE >= 11",
+    "Firefox >= 52",
+    "ChromeAndroid >= 70",
+    "Chrome >= 49",
+    "Safari >= 9",
+    "Edge >= 16",
+    "Opera >= 57",
+    "OperaMini >= 57",
+    "Samsung >= 7",
+    "FirefoxAndroid >= 63",
+    "UCAndroid >= 11",
+    "iOS >= 9",
+    "Android >= 4",
+    "not dead"
   ],
   "author": "Eliot Berriot <contact@eliotberriot.com>",
   "description": "Funkwhale front-end"
