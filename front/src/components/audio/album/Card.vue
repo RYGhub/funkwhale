@@ -20,7 +20,7 @@
             <tbody>
               <tr v-for="track in tracks">
                 <td class="play-cell">
-                  <play-button class="basic icon" :track="track" :discrete="true"></play-button>
+                  <play-button :class="['basic', {orange: isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :track="track"></play-button>
                 </td>
                 <td class="content-cell" colspan="5">
                   <track-favorite-icon :track="track"></track-favorite-icon>
@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import backend from '@/audio/backend'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import PlayButton from '@/components/audio/PlayButton'
@@ -64,7 +65,7 @@ import PlayButton from '@/components/audio/PlayButton'
 export default {
   props: {
     album: {type: Object},
-    mode: {type: String, default: 'rich'}
+    mode: {type: String, default: 'rich'},
   },
   components: {
     TrackFavoriteIcon,
@@ -83,6 +84,12 @@ export default {
         return this.album.tracks
       }
       return this.album.tracks.slice(0, this.initialTracks)
+    },
+    ...mapGetters({
+      currentTrack: "queue/currentTrack",
+    }),
+    isPlaying () {
+      return this.$store.state.player.playing
     },
     tracksWithAlbum () {
       // needed to include album data (especially cover)
