@@ -20,6 +20,34 @@
                   </div>
                 </div>
               </h2>
+              <div class="header-buttons">
+                <div class="ui icon buttons">
+                  <a
+                    v-if="$store.state.auth.profile.is_superuser"
+                    class="ui labeled icon button"
+                    :href="$store.getters['instance/absoluteUrl'](`/api/admin/federation/domain/${object.name}`)"
+                    target="_blank" rel="noopener noreferrer">
+                    <i class="wrench icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">View in Django's admin</translate>&nbsp;
+                  </a>
+                </div>
+                <div v-if="allowListEnabled" class="ui icon buttons">
+                  <button
+                    v-if="object.allowed"
+                    @click.prevent="setAllowList(false)"
+                    :class="['ui', 'labeled', {loading: isLoadingAllowList}, 'icon', 'button']">
+                    <i class="x icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">Remove from allow-list</translate>
+                  </button>
+                  <button
+                    v-else
+                    @click.prevent="setAllowList(true)"
+                    :class="['ui', 'labeled', {loading: isLoadingAllowList}, 'icon', 'button']">
+                    <i class="check icon"></i>
+                    <translate translate-context="Content/Moderation/Link/Verb">Add to allow-list</translate>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="ui column">
@@ -74,6 +102,15 @@
               </h3>
               <table class="ui very basic table">
                 <tbody>
+                  <tr v-if="allowListEnabled">
+                    <td>
+                      <translate translate-context="Content/Moderation/*/Adjective">Is present on allow-list</translate>
+                    </td>
+                    <td>
+                      <translate v-if="object.allowed" translate-context="*/*/*">Yes</translate>
+                      <translate v-else translate-context="*/*/*">No</translate>
+                    </td>
+                  </tr>
                   <tr>
                     <td>
                       <translate translate-context="Content/*/Table.Label">Last checked</translate>
@@ -300,7 +337,7 @@ import InstancePolicyForm from "@/components/manage/moderation/InstancePolicyFor
 import InstancePolicyCard from "@/components/manage/moderation/InstancePolicyCard"
 
 export default {
-  props: ["id"],
+  props: ["id", "allowListEnabled"],
   components: {
     InstancePolicyForm,
     InstancePolicyCard,
@@ -311,6 +348,7 @@ export default {
       isLoading: true,
       isLoadingStats: false,
       isLoadingPolicy: false,
+      isLoadingAllowList: false,
       policy: null,
       object: null,
       stats: null,
@@ -351,6 +389,15 @@ export default {
       axios.get(url).then(response => {
         self.policy = response.data
         self.isLoadingPolicy = false
+      })
+    },
+    setAllowList(value) {
+      var self = this
+      this.isLoadingAllowList = true
+      let url = `manage/federation/domains/${this.id}/`
+      axios.patch(url, {allowed: value}).then(response => {
+        self.object = response.data
+        self.isLoadingAllowList = false
       })
     },
     refreshNodeInfo (data) {

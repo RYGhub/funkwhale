@@ -7,6 +7,14 @@
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
         <div class="field">
+          <label><translate translate-context="Content/Moderation/*/Adjective">Is present on allow-list</translate></label>
+          <select class="ui dropdown" v-model="allowed">
+            <option :value="null"><translate translate-context="*/*/*">All</translate></option>
+            <option :value="true"><translate translate-context="*/*/*">Yes</translate></option>
+            <option :value="false"><translate translate-context="*/*/*">No</translate></option>
+          </select>
+        </div>
+        <div class="field">
           <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
             <option v-for="option in orderingOptions" :value="option[0]">
@@ -93,7 +101,8 @@ import TranslationsMixin from '@/components/mixins/Translations'
 export default {
   mixins: [OrderingMixin, TranslationsMixin],
   props: {
-    filters: {type: Object, required: false}
+    filters: {type: Object, required: false},
+    allowListEnabled: {type: Boolean, default: false},
   },
   components: {
     Pagination,
@@ -108,6 +117,7 @@ export default {
       page: 1,
       paginateBy: 50,
       search: '',
+      allowed: null,
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
@@ -124,12 +134,16 @@ export default {
   },
   methods: {
     fetchData () {
-      let params = _.merge({
+      let baseFilters = {
         'page': this.page,
         'page_size': this.paginateBy,
         'q': this.search,
-        'ordering': this.getOrderingAsString()
-      }, this.filters)
+        'ordering': this.getOrderingAsString(),
+      }
+      if (this.allowed !== null) {
+        baseFilters.allowed = this.allowed
+      }
+      let params = _.merge(baseFilters, this.filters)
       let self = this
       self.isLoading = true
       self.checked = []
@@ -177,6 +191,9 @@ export default {
       this.fetchData()
     },
     page () {
+      this.fetchData()
+    },
+    allowed () {
       this.fetchData()
     },
     ordering () {
