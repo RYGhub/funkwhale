@@ -63,7 +63,7 @@ def test_domain_detail(factories, superuser_api_client):
 
 def test_domain_create(superuser_api_client, mocker):
     update_domain_nodeinfo = mocker.patch(
-        "funkwhale_api.federation.tasks.update_domain_nodeinfo.delay"
+        "funkwhale_api.federation.tasks.update_domain_nodeinfo"
     )
     url = reverse("api:v1:manage:federation:domains-list")
     response = superuser_api_client.post(url, {"name": "test.federation"})
