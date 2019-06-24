@@ -371,7 +371,7 @@ class ManageDomainViewSet(
 
     def perform_create(self, serializer):
         domain = serializer.save()
-        federation_tasks.update_domain_nodeinfo(domain_name=domain.name)
+        federation_tasks.update_domain_nodeinfo.delay(domain_name=domain.name)
 
     @rest_decorators.action(methods=["get"], detail=True)
     def nodeinfo(self, request, *args, **kwargs):
