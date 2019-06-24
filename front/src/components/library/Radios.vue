@@ -10,7 +10,7 @@
           <translate translate-context="Content/Radio/Title">Instance radios</translate>
         </h3>
         <div class="ui cards">
-          <radio-card v-if="$store.state.auth.authenticated" :type="'favorites'"></radio-card>
+          <radio-card v-if="isAuthenticated && hasFavorites" :type="'favorites'"></radio-card>
           <radio-card :type="'random'"></radio-card>
           <radio-card v-if="$store.state.auth.authenticated" :type="'less-listened'"></radio-card>
         </div>
@@ -144,7 +144,13 @@ export default {
         searchPlaceholder,
         title
       }
-    }
+    },
+    isAuthenticated () {
+      return this.$store.state.auth.authenticated
+    },
+    hasFavorites () {
+      return this.$store.state.favorites.count > 0
+    },
   },
   methods: {
     updateQueryString: _.debounce(function() {
