@@ -206,12 +206,19 @@
       </div>
       <GlobalEvents
         @keydown.space.prevent.exact="togglePlay"
-        @keydown.ctrl.left.prevent.exact="previous"
-        @keydown.ctrl.right.prevent.exact="next"
-        @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
-        @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
+        @keydown.ctrl.shift.left.prevent.exact="previous"
+        @keydown.ctrl.shift.right.prevent.exact="next"
+        @keydown.shift.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
+        @keydown.shift.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
+        @keydown.right.prevent.exact="seek (5)"
+        @keydown.left.prevent.exact="seek (-5)"
+        @keydown.shift.right.prevent.exact="seek (30)"
+        @keydown.shift.left.prevent.exact="seek (-30)"
+        @keydown.m.prevent.exact="toggleMute"
         @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
         @keydown.s.prevent.exact="shuffle"
+        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
+        @keydown.q.prevent.exact="clean"
         />
     </div>
   </section>
@@ -294,6 +301,7 @@ export default {
       mute: "player/mute",
       unmute: "player/unmute",
       clean: "queue/clean",
+      toggleMute: "player/toggleMute",
     }),
     async getTrackData (trackData) {
       let data = null
@@ -487,6 +495,21 @@ export default {
           this.getSound(toPreload)
           this.nextTrackPreloaded = true
         }
+      }
+    },
+    seek (step) {
+      if (step > 0) {
+        // seek right
+        if (this.currentTime + step < this.duration) {
+        this.$store.dispatch('player/updateProgress', (this.currentTime + step))
+        } else {
+        this.next() // parenthesis where missing here
+        }
+      }
+      else {
+        // seek left
+        let position = Math.max(this.currentTime + step, 0)
+        this.$store.dispatch('player/updateProgress', position)
       }
     },
     observeProgress: function (enable) {
