@@ -1,19 +1,26 @@
 <template>
   <div class="ui fluid category search">
     <slot></slot><div class="ui icon input">
-      <input class="prompt" name="search" :placeholder="labels.placeholder" type="text">
+      <input class="prompt" ref="search" name="search" :placeholder="labels.placeholder" type="text" @keydown.esc="$event.target.blur()">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
     <slot name="after"></slot>
+    <GlobalEvents
+      @keydown.shift.f.prevent.exact="focusSearch"
+    />
   </div>
 </template>
 
 <script>
 import jQuery from 'jquery'
 import router from '@/router'
+import GlobalEvents from "@/components/utils/global-events"
 
 export default {
+  components: {
+  GlobalEvents,
+  },
   computed: {
     labels () {
       return {
@@ -104,6 +111,11 @@ export default {
         url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }
     })
+  },
+  methods: {
+    focusSearch () {
+      this.$refs.search.focus()
+    },
   }
 }
 </script>
