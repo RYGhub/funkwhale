@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <play-button class="basic icon" :discrete="true" :is-playable="playable" :track="track"></play-button>
+      <play-button :class="['basic', {orange: isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :is-playable="playable" :track="track"></play-button>
     </td>
     <td>
       <img class="ui mini image" v-if="track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-
+import { mapGetters } from "vuex"
 import time from '@/utils/time'
 import TrackFavoriteIcon from '@/components/favorites/TrackFavoriteIcon'
 import TrackPlaylistIcon from '@/components/playlists/TrackPlaylistIcon'
@@ -74,13 +74,19 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      currentTrack: "queue/currentTrack",
+    }),
+    isPlaying () {
+      return this.$store.state.player.playing
+    },
     albumArtist () {
       if (this.artist) {
         return this.artist
       } else {
         return this.track.album.artist
       }
-    }
+    },
   }
 }
 </script>

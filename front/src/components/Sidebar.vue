@@ -466,6 +466,12 @@ $sidebar-color: #3d3e3f;
       border-radius: 0;
     }
   }
+  .ui.search .results {
+    vertical-align: middle;
+  }
+  .ui.search .name {
+    vertical-align: middle;
+  }
 }
 .ui.tiny.avatar.image {
   position: relative;

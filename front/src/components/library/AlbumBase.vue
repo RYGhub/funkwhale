@@ -61,7 +61,11 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
-                  <router-link
+		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+		    <i class="external icon"></i>
+		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
+                  </a>
+		  <router-link
                     v-if="object.is_local"
                     :to="{name: 'library.albums.edit', params: {id: object.id }}"
                     class="basic item">
@@ -167,6 +171,13 @@ export default {
       if (this.object.mbid) {
         return "https://musicbrainz.org/release/" + this.object.mbid
       }
+    },
+    discogsUrl() {
+      return (
+        "https://discogs.com/search/?type=release&title=" +
+	encodeURI(this.object.title) + "&artist=" +
+	encodeURI(this.object.artist.name)
+	)
     },
     headerStyle() {
       if (!this.object.cover.original) {

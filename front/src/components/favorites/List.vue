@@ -16,7 +16,7 @@
           1 favorite
         </translate>
       </h2>
-      <radio-button type="favorites"></radio-button>
+      <radio-button v-if="hasFavorites" type="favorites"></radio-button>
     </section>
     <section class="ui vertical stripe segment">
       <div :class="['ui', {'loading': isLoading}, 'form']">
@@ -115,7 +115,10 @@ export default {
       return {
         title: this.$pgettext('Head/Favorites/Title', 'Your Favorites')
       }
-    }
+    },
+    hasFavorites () {
+      return this.$store.state.favorites.count > 0
+    },
   },
   methods: {
     updateQueryString: function() {
