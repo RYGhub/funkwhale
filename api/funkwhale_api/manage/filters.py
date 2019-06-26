@@ -235,12 +235,23 @@ class ManageUploadFilterSet(filters.FilterSet):
         ]
 
 
+def filter_allowed(queryset, name, value):
+    """
+    If value=false, we want to include object with value=null as well
+    """
+    if value:
+        return queryset.filter(allowed=True)
+    else:
+        return queryset.filter(Q(allowed=False) | Q(allowed__isnull=True))
+
+
 class ManageDomainFilterSet(filters.FilterSet):
     q = fields.SearchFilter(search_fields=["name"])
+    allowed = filters.BooleanFilter(method=filter_allowed)
 
     class Meta:
         model = federation_models.Domain
-        fields = ["name"]
+        fields = ["name", "allowed"]
 
 
 class ManageActorFilterSet(filters.FilterSet):

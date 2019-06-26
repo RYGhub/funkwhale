@@ -152,7 +152,11 @@ class ManageDomainUpdateSerializer(ManageDomainSerializer):
 
 
 class ManageDomainActionSerializer(common_serializers.ActionSerializer):
-    actions = [common_serializers.Action("purge", allow_all=False)]
+    actions = [
+        common_serializers.Action("purge", allow_all=False),
+        common_serializers.Action("allow_list_add", allow_all=True),
+        common_serializers.Action("allow_list_remove", allow_all=True),
+    ]
     filterset_class = filters.ManageDomainFilterSet
     pk_field = "name"
 
@@ -160,6 +164,14 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
     def handle_purge(self, objects):
         ids = objects.values_list("pk", flat=True)
         common_utils.on_commit(federation_tasks.purge_actors.delay, domains=list(ids))
+
+    @transaction.atomic
+    def handle_allow_list_add(self, objects):
+        objects.update(allowed=True)
+
+    @transaction.atomic
+    def handle_allow_list_remove(self, objects):
+        objects.update(allowed=False)
 
 
 class ManageBaseActorSerializer(serializers.ModelSerializer):

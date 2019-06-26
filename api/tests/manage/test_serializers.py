@@ -176,6 +176,26 @@ def test_manage_domain_action_purge(factories, mocker):
     )
 
 
+def test_manage_domain_action_allow_list_add(factories, mocker):
+    domains = factories["federation.Domain"].create_batch(size=3, allowed=False)
+    s = serializers.ManageDomainActionSerializer(queryset=None)
+    s.handle_allow_list_add(domains[0].__class__.objects.all())
+
+    for domain in domains:
+        domain.refresh_from_db()
+        assert domain.allowed is True
+
+
+def test_manage_domain_action_allow_list_remove(factories, mocker):
+    domains = factories["federation.Domain"].create_batch(size=3, allowed=True)
+    s = serializers.ManageDomainActionSerializer(queryset=None)
+    s.handle_allow_list_remove(domains[0].__class__.objects.all())
+
+    for domain in domains:
+        domain.refresh_from_db()
+        assert domain.allowed is False
+
+
 @pytest.mark.parametrize(
     "param,expected_only", [("block_all", []), ("reject_media", ["media"])]
 )
