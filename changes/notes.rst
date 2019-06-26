@@ -7,6 +7,24 @@ Next release notes
     after each release.
 
 
+Allow-list to restrict federation to trusted domains
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Allow-Listing feature grants pod moderators
+and administrators greater control over federation
+by allowing you to create a pod-wide allow-list.
+
+When allow-listing is enabled, your pod's users will only
+be able to interact with pods included in the allow-list.
+Any messages, activity, uploads, or modifications to
+libraries and playlists will only be shared with pods
+on the allow-list. Pods which are not included in the
+allow-list will not have access to your pod's content
+or messages and will not be able to send anything to
+your pod.
+
+If you want to enable this feature on your pod, or learn more, please refer to `our documentation <https://docs.funkwhale.audio/moderator/listing.html>`_!
+
 Replaced Daphne by Gunicorn/Uvicorn [manual action required, non-docker only]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
