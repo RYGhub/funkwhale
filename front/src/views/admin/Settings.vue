@@ -82,6 +82,7 @@ export default {
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
       let federationLabel = this.$pgettext('Content/Admin/Menu', 'Federation')
+      let moderationLabel = this.$pgettext('Content/Admin/Menu', 'Moderation')
       let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
       let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')
       let errorLabel = this.$pgettext('Content/Admin/Menu', 'Error reporting')
@@ -117,6 +118,14 @@ export default {
           label: playlistsLabel,
           id: "playlists",
           settings: ["playlists__max_tracks"]
+        },
+        {
+          label: moderationLabel,
+          id: "moderation",
+          settings: [
+            "moderation__allow_list_enabled",
+            "moderation__allow_list_public",
+          ]
         },
         {
           label: federationLabel,

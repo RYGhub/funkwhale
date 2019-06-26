@@ -6,6 +6,14 @@
           <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
           <input name="search" type="text" v-model="search" :placeholder="labels.searchPlaceholder" />
         </div>
+        <div class="field" v-if="allowListEnabled">
+          <label><translate translate-context="Content/Moderation/*/Adjective">Is present on allow-list</translate></label>
+          <select class="ui dropdown" v-model="allowed">
+            <option :value="null"><translate translate-context="*/*/*">All</translate></option>
+            <option :value="true"><translate translate-context="*/*/*">Yes</translate></option>
+            <option :value="false"><translate translate-context="*/*/*">No</translate></option>
+          </select>
+        </div>
         <div class="field">
           <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
           <select class="ui dropdown" v-model="ordering">
@@ -44,7 +52,10 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.name }}">{{ scope.obj.name }}</router-link>
+            <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.name }}">
+              {{ scope.obj.name }}
+              <i v-if="allowListEnabled && scope.obj.allowed" class="green check icon" :title="labels.allowListTitle"></i>
+            </router-link>
           </td>
           <td>
             {{ scope.obj.actors_count }}
@@ -93,7 +104,8 @@ import TranslationsMixin from '@/components/mixins/Translations'
 export default {
   mixins: [OrderingMixin, TranslationsMixin],
   props: {
-    filters: {type: Object, required: false}
+    filters: {type: Object, required: false},
+    allowListEnabled: {type: Boolean, default: false},
   },
   components: {
     Pagination,
@@ -108,6 +120,7 @@ export default {
       page: 1,
       paginateBy: 50,
       search: '',
+      allowed: null,
       orderingDirection: defaultOrdering.direction || '+',
       ordering: defaultOrdering.field,
       orderingOptions: [
@@ -124,12 +137,16 @@ export default {
   },
   methods: {
     fetchData () {
-      let params = _.merge({
+      let baseFilters = {
         'page': this.page,
         'page_size': this.paginateBy,
         'q': this.search,
-        'ordering': this.getOrderingAsString()
-      }, this.filters)
+        'ordering': this.getOrderingAsString(),
+      }
+      if (this.allowed !== null) {
+        baseFilters.allowed = this.allowed
+      }
+      let params = _.merge(baseFilters, this.filters)
       let self = this
       self.isLoading = true
       self.checked = []
@@ -148,7 +165,8 @@ export default {
   computed: {
     labels () {
       return {
-        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by name…')
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by name…'),
+        allowListTitle: this.$pgettext('Content/Moderation/Popup', 'This domain is present in your allow-list'),
       }
     },
     actionFilters () {
@@ -167,7 +185,21 @@ export default {
           name: 'purge',
           label: this.$pgettext('*/*/*/Verb', 'Purge'),
           isDangerous: true
-        }
+        },
+        {
+          name: 'allow_list_add',
+          label: this.$pgettext('Content/Moderation/Action/Verb', 'Add to allow-list'),
+          filterCheckable: (obj) => {
+            return !obj.allowed
+          }
+        },
+        {
+          name: 'allow_list_remove',
+          label: this.$pgettext('Content/Moderation/Action/Verb', 'Remove from allow-list'),
+          filterCheckable: (obj) => {
+            return obj.allowed
+          }
+        },
       ]
     }
   },
@@ -177,6 +209,9 @@ export default {
       this.fetchData()
     },
     page () {
+      this.fetchData()
+    },
+    allowed () {
       this.fetchData()
     },
     ordering () {
