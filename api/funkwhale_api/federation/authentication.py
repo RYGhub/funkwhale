@@ -1,13 +1,14 @@
 import cryptography
 import logging
 import datetime
-
+import urllib.parse
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 
 from rest_framework import authentication, exceptions as rest_exceptions
+from funkwhale_api.common import preferences
 from funkwhale_api.moderation import models as moderation_models
-from . import actors, exceptions, keys, signing, tasks, utils
+from . import actors, exceptions, keys, models, signing, tasks, utils
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,16 @@ class SignatureAuthentication(authentication.BaseAuthentication):
         )
         if policies.exists():
             raise exceptions.BlockedActorOrDomain()
+
+        if request.method.lower() == "get" and preferences.get(
+            "moderation__allow_list_enabled"
+        ):
+            # Only GET requests because POST requests with messages will be handled through
+            # MRF
+            domain = urllib.parse.urlparse(actor_url).hostname
+            allowed = models.Domain.objects.filter(name=domain, allowed=True).exists()
+            if not allowed:
+                raise exceptions.BlockedActorOrDomain()
 
         try:
             actor = actors.get_actor(actor_url)
