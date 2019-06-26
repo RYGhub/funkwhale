@@ -13,6 +13,8 @@ from rest_framework.compat import Mapping
 
 logger = logging.getLogger(__name__)
 NODEFAULT = object()
+# default title used when imported tracks miss the `Album` tag, see #122
+UNKWOWN_ALBUM = "[Unknown Album]"
 
 
 class TagNotFound(KeyError):
@@ -425,9 +427,11 @@ class AlbumField(serializers.Field):
 
     def to_internal_value(self, data):
         try:
-            title = data.get("album")
+            title = data.get("album") or ""
         except TagNotFound:
-            raise serializers.ValidationError("Missing album tag")
+            title = ""
+
+        title = title.strip() or UNKWOWN_ALBUM
         final = {
             "title": title,
             "release_date": data.get("date", None),
