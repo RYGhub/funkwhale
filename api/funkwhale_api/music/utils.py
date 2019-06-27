@@ -31,6 +31,7 @@ def compute_status(jobs):
 
 AUDIO_EXTENSIONS_AND_MIMETYPE = [
     ("ogg", "audio/ogg"),
+    ("opus", "audio/opus"),
     ("mp3", "audio/mpeg"),
     ("flac", "audio/x-flac"),
     ("flac", "audio/flac"),
