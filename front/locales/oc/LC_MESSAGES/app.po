@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-11 07:58+0000\n"
+"PO-Revision-Date: 2019-06-28 07:39+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 3.2.2\n"
+"X-Generator: Weblate 3.7\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -2856,6 +2856,8 @@ msgctxt "Popup/Import/Table.Label/Value"
 msgid ""
 "Open a support thread (include the debug information below in your message)"
 msgstr ""
+"Dobrir un fil de discutida d’assisténcia (donatz las informacions de "
+"desbugatge dins vòstre messatge)"
 
 #: front/src/components/library/AlbumBase.vue:73
 #: front/src/components/library/ArtistBase.vue:84
@@ -3412,6 +3414,8 @@ msgid ""
 "Refresh request wasn't proceed in time by our server. It will be processed "
 "later."
 msgstr ""
+"La requèsta d’actualizacion es pas estada tractada a temps per nòstre "
+"servidor. Serà executada mai tard."
 
 #: front/src/components/federation/FetchButton.vue:16
 msgctxt "Popup/*/Message.Title"
@@ -3431,7 +3435,7 @@ msgstr "L’actualizada es estada passada"
 #: front/src/components/federation/FetchButton.vue:7
 msgctxt "Popup/*/Title"
 msgid "Refreshing object from remote…"
-msgstr ""
+msgstr "Actualizacion de l’objècte del servidor alonhat estant…"
 
 #: front/src/components/auth/Signup.vue:9
 msgctxt "Content/Signup/Form/Paragraph"
@@ -3559,7 +3563,7 @@ msgstr "Demandar un senhal"
 #: front/src/components/federation/FetchButton.vue:64
 msgctxt "Popup/*/Loading.Title"
 msgid "Requesting a fetch…"
-msgstr ""
+msgstr "Demanda de recuperacion…"
 
 #: front/src/components/library/EditForm.vue:82
 msgctxt "Content/Library/Button.Label"
@@ -3841,12 +3845,11 @@ msgstr[0] "Mostrar %{ count } pista mai"
 msgstr[1] "Mostrar %{ count } pistas mai"
 
 #: front/src/components/audio/artist/Card.vue:30
-#, fuzzy
 msgctxt "Content/Artist/Card.Link"
 msgid "Show 1 more album"
 msgid_plural "Show %{ count } more albums"
-msgstr[0] "Mostrar 1 album mai"
-msgstr[1] "Mostrar %{ count } albums mai"
+msgstr[0] "Mostrar 1 album de mai"
+msgstr[1] "Mostrar %{ count } albums de mai"
 
 #: front/src/components/library/EditForm.vue:21
 msgctxt "Content/Library/Button.Label"
@@ -4228,11 +4231,13 @@ msgctxt "Popup/*/Message.Content"
 msgid ""
 "The remote server answered, but returned data was unsupported by Funkwhale."
 msgstr ""
+"Lo servidor alonhat a respondut, mas las donadas enviadas son pas suportadas "
+"er Funkwhale."
 
 #: front/src/components/federation/FetchButton.vue:44
 msgctxt "*/*/Error"
 msgid "The remote server didn't answered fast enough"
-msgstr ""
+msgstr "Lo servidor alonhat a tròp tardat a respondre"
 
 #: front/src/components/federation/FetchButton.vue:50
 msgctxt "*/*/Error"
@@ -4361,7 +4366,7 @@ msgstr ""
 #: front/src/components/auth/Settings.vue:218
 msgctxt "Content/Settings/Paragraph"
 msgid "This is the list of applications that you have created."
-msgstr ""
+msgstr "Aquò es la lista de las aplicacions qu’avètz creadas."
 
 #: front/src/components/auth/Profile.vue:16
 msgctxt "Content/Profile/Button.Paragraph"
@@ -4404,6 +4409,7 @@ msgstr ""
 msgctxt "Content/*/Message"
 msgid "This object is managed by another server, you cannot edit it."
 msgstr ""
+"Aqueste objècte es gerit per un autre servidor, podètz pas lo modificar."
 
 #: front/src/components/library/FileUpload.vue:51
 msgctxt "Content/Library/Paragraph"
@@ -4789,7 +4795,7 @@ msgstr ""
 #: front/src/components/library/ImportStatusModal.vue:11
 msgctxt "Popup/Import/Message"
 msgid "Upload was successfully processed by the server."
-msgstr ""
+msgstr "Lo mandadís es estat corrèctament tractat pel servidor."
 
 #: front/src/components/library/FileUpload.vue:109
 msgctxt "Content/Library/Table"
@@ -5046,7 +5052,7 @@ msgstr "Escritura sola"
 #: front/src/components/auth/ApplicationForm.vue:158
 msgctxt "Content/OAuth Scopes/Help Text"
 msgid "Write-only access to user data"
-msgstr ""
+msgstr "Accès escritura sola de las donadas utilizaire"
 
 #: front/src/components/Sidebar.vue:129
 #: front/src/components/manage/moderation/AccountsTable.vue:72
@@ -5217,7 +5223,7 @@ msgstr ""
 #: front/src/components/auth/Authorize.vue:51
 msgctxt "Content/Auth/Paragraph"
 msgid "You will be redirected to <strong>%{ url }</strong>"
-msgstr ""
+msgstr "Seretz mandat a <strong>%{ url }</strong>"
 
 #: front/src/components/auth/Authorize.vue:49
 msgctxt "Content/Auth/Paragraph"
@@ -5312,7 +5318,6 @@ msgid "Copyright"
 msgstr "Copyright"
 
 #: front/src/components/library/AlbumBase.vue:183
-#, fuzzy
 msgctxt "Content/Album/Header.Title"
 msgid ""
 "Album containing %{ count } track, by <a class=\"internal\" href=\"%{ "
@@ -5320,8 +5325,12 @@ msgid ""
 msgid_plural ""
 "Album containing %{ count } tracks, by <a class=\"internal\" href=\"%{ "
 "artistUrl }\">%{ artist }</a>"
-msgstr[0] "Album contenent %{ count } pista, de %{ artist }"
-msgstr[1] "Album contenent %{ count } pistas, de %{ artist }"
+msgstr[0] ""
+"Album contenent %{ count } pista, de <a class=\"internal\" href=\"%{ "
+"artistUrl }\">%{ artist }</a>"
+msgstr[1] ""
+"Album contenent %{ count } pistas, de <a class=\"internal\" href=\"%{ "
+"artistUrl }\">%{ artist }</a>"
 
 #: front/src/components/audio/PlayButton.vue:220
 msgctxt "*/Queue/Message"
