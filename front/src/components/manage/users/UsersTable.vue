@@ -45,7 +45,8 @@
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
-            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.full_username }}">{{ scope.obj.username }}</router-link>
+            <router-link v-if="scope.obj.actor" :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.actor.full_username }}">{{ scope.obj.username }}</router-link>
+            <router-link v-else :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.full_username }}">{{ scope.obj.username }}</router-link>
           </td>
           <td>
             <span>{{ scope.obj.email }}</span>
