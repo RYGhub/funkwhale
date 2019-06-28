@@ -247,10 +247,6 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         if not upload:
             return response.Response(status=404)
 
-        format = data.get("format", "raw")
-        if format == "raw":
-            format = None
-
         max_bitrate = data.get("maxBitRate")
         try:
             max_bitrate = min(max(int(max_bitrate), 0), 320) or None
@@ -259,6 +255,16 @@ class SubsonicViewSet(viewsets.GenericViewSet):
 
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
+
+        format = data.get("format", "raw") or None
+        if max_bitrate and not format:
+            # specific bitrate requested, but no format specified
+            # so we use a default one, cf #867. This helps with clients
+            # that don't send the format parameter, such as DSub.
+            format = settings.SUBSONIC_DEFAULT_TRANSCODING_FORMAT
+        elif format == "raw":
+            format = None
+
         return music_views.handle_serve(
             upload=upload,
             user=request.user,
