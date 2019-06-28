@@ -1,5 +1,6 @@
 import argparse
 import requests
+import os
 
 GITLAB_URL = "https://dev.funkwhale.audio"
 GITLAB_PROJECT_ID = 17
@@ -82,6 +83,14 @@ def get_translations_stats(translations):
     return stats
 
 
+def get_group_usernames(group):
+    url = GITLAB_URL + "/api/v4/groups/{}/members".format(group)
+    response = requests.get(url, headers={"PRIVATE-TOKEN": os.environ["PRIVATE_TOKEN"]})
+    response.raise_for_status()
+    data = response.json()
+    return [r["name"] for r in data]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("ref_name")
@@ -90,9 +99,15 @@ def main():
     since = get_tag_date(args.last_tag)
     commits = get_commits(args.ref_name, since)
     commits_stats = get_commit_stats(commits)
-
+    groups = [(588, "funkwhale/reviewers-python"), (589, "funkwhale/reviewers-front")]
+    reviewers = []
+    for id, _ in groups:
+        reviewers += get_group_usernames(id)
+    print("\nReviewers:\n")
+    for reviewer in reviewers:
+        print(reviewer)
     commiter_names = commits_stats["commiters"].keys()
-    print("Commiters:")
+    print("\nCommiters:\n")
     for commiter in sorted(commits_stats["commiters"].keys(), key=lambda v: v.upper()):
         print(commiter)
     translations = get_translations(since)
@@ -100,7 +115,7 @@ def main():
     translators_ids = sorted(translations_stats["translators"].keys())
     # There is no way to query user/author info via weblate API and we need the names…
     print(
-        "Execute the following SQL query on the weblate server to get the translators names:"
+        "\nExecute the following SQL query on the weblate server to get the translators names:"
     )
     print("$ weblate dbshell")
     print(

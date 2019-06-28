@@ -1,1 +1,0 @@
-Fixed broken user admin for users with non-digit or letters in their username (#869)
