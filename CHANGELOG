@@ -10,6 +10,55 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.19.1 (2018-06-28)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+Enhancements:
+
+- The currently playing track is now highlighted with an orange play icon (#832)
+- Support for importing files with no album tag (#122)
+- Redirect from / to /library when user is logged in (#864)
+- Added a SUBSONIC_DEFAULT_TRANSCODING_FORMAT env var to support clients that don't provide the format parameter (#867)
+- Added button to search for objects on Discogs (#368)
+- Added copy-to-clipboard button with Subsonic password input (#814)
+- Added opus to the list of supported mimetypes and extensions (#868)
+- Aligned search headers with search results in the sidebar (#708)
+- Clicking on the currently selected playlist in the Playlist popup will now close the popup (#807)
+- Favorites radio will not be visible if the user does not have any favorites (#419)
+
+
+Bugfixes:
+
+- Ensure empty but optional fields in file metadata don't error during import (#850)
+- Fix broken upload for specific files when using S3 storage (#857)
+- Fixed broken translation on home and track detail page (#833)
+- Fixed broken user admin for users with non-digit or letters in their username (#869)
+- Fixed invalid file extension for transcoded tracks (#848)
+- Fixed issue with French translation for "Start radio" (#849)
+- Fixed issue with player changing height when hovering over the volume slider (#838)
+- Fixed secondary menus truncated on narrow screens (#855)
+- Fixed wrong og:image url when using S3 storage (#851)
+- Hide pod statistics on about page if those are disabled (#835)
+- Use ASCII filename before upload to S3 to avoid playback issues (#847)
+
+
+Contributors to this release (commiters and reviewers):
+
+- Ciarán Ainsworth
+- Creak
+- ealgase
+- Eliot Berriot
+- Esteban
+- Freyja Wildes
+- hellekin
+- Johannes H.
+- Mehdi
+- Reg
+
+
 0.19.0 (2019-05-16)
 -------------------
 
