@@ -291,7 +291,7 @@ class ManageUserViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = users_models.User.objects.all().order_by("-id")
+    queryset = users_models.User.objects.all().select_related("actor").order_by("-id")
     serializer_class = serializers.ManageUserSerializer
     filterset_class = filters.ManageUserFilterSet
     required_scope = "instance:users"

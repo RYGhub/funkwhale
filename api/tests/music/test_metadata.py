@@ -540,6 +540,34 @@ def test_serializer_album_artist_missing():
 
 
 @pytest.mark.parametrize(
+    "data",
+    [
+        # no album tag
+        {"title": "Track", "artist": "Artist"},
+        # empty/null values
+        {"title": "Track", "artist": "Artist", "album": ""},
+        {"title": "Track", "artist": "Artist", "album": " "},
+        {"title": "Track", "artist": "Artist", "album": None},
+    ],
+)
+def test_serializer_album_default_title_when_missing_or_empty(data):
+    expected = {
+        "title": "Track",
+        "artists": [{"name": "Artist", "mbid": None}],
+        "album": {
+            "title": metadata.UNKWOWN_ALBUM,
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+        },
+        "cover_data": None,
+    }
+    serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
+
+
+@pytest.mark.parametrize(
     "field_name", ["copyright", "license", "mbid", "position", "disc_number"]
 )
 def test_serializer_empty_fields(field_name):

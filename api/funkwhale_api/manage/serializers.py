@@ -44,12 +44,14 @@ class ManageUserSimpleSerializer(serializers.ModelSerializer):
 class ManageUserSerializer(serializers.ModelSerializer):
     permissions = PermissionsSerializer(source="*")
     upload_quota = serializers.IntegerField(allow_null=True)
+    actor = serializers.SerializerMethodField()
 
     class Meta:
         model = users_models.User
         fields = (
             "id",
             "username",
+            "actor",
             "email",
             "name",
             "is_active",
@@ -81,6 +83,10 @@ class ManageUserSerializer(serializers.ModelSerializer):
                 update_fields=["permission_{}".format(p) for p in permissions.keys()]
             )
         return instance
+
+    def get_actor(self, obj):
+        if obj.actor:
+            return ManageBaseActorSerializer(obj.actor).data
 
 
 class ManageInvitationSerializer(serializers.ModelSerializer):
