@@ -261,23 +261,48 @@ def test_stream_format(format, expected, logged_in_api_client, factories, mocker
 
 
 @pytest.mark.parametrize(
-    "max_bitrate,expected", [(0, None), (192, 192000), (2000, 320000)]
+    "max_bitrate,format,default_transcoding_format,expected_bitrate,expected_format",
+    [
+        # no max bitrate, no format, so no transcoding should happen
+        (0, "", "ogg", None, None),
+        # same using "raw" format
+        (0, "raw", "ogg", None, None),
+        # specified bitrate, but no format, so fallback to default transcoding format
+        (192, "", "ogg", 192000, "ogg"),
+        # specified bitrate, but over limit
+        (2000, "", "ogg", 320000, "ogg"),
+        # specified format, we use that one
+        (192, "opus", "ogg", 192000, "opus"),
+        # No default transcoding format set and no format requested
+        (192, "", None, 192000, None),
+    ],
 )
-def test_stream_bitrate(max_bitrate, expected, logged_in_api_client, factories, mocker):
+def test_stream_transcode(
+    max_bitrate,
+    format,
+    default_transcoding_format,
+    expected_bitrate,
+    expected_format,
+    logged_in_api_client,
+    factories,
+    mocker,
+    settings,
+):
+    settings.SUBSONIC_DEFAULT_TRANSCODING_FORMAT = default_transcoding_format
     url = reverse("api:subsonic-stream")
     mocked_serve = mocker.patch.object(
         music_views, "handle_serve", return_value=Response()
     )
     upload = factories["music.Upload"](playable=True)
     response = logged_in_api_client.get(
-        url, {"id": upload.track.pk, "maxBitRate": max_bitrate}
+        url, {"id": upload.track.pk, "maxBitRate": max_bitrate, "format": format}
     )
 
     mocked_serve.assert_called_once_with(
         upload=upload,
         user=logged_in_api_client.user,
-        format=None,
-        max_bitrate=expected,
+        format=expected_format,
+        max_bitrate=expected_bitrate,
         proxy_media=True,
     )
     assert response.status_code == 200
