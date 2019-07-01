@@ -192,7 +192,7 @@ export default {
     subtitle () {
       let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.object.artist.id }})
       let msg = this.$npgettext('Content/Album/Header.Title', 'Album containing %{ count } track, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', 'Album containing %{ count } tracks, by <a class="internal" href="%{ artistUrl }">%{ artist }</a>', this.object.tracks.length)
-      return this.$gettextInterpolate(msg, {count: this.object.tracks.length, artist: this.object.artist.name, artistUrl: route.location.path})
+      return this.$gettextInterpolate(msg, {count: this.object.tracks.length, artist: this.object.artist.name, artistUrl: route.href})
     }
   },
   watch: {
