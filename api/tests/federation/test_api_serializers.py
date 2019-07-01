@@ -72,9 +72,10 @@ def test_library_follow_serializer_do_not_allow_own_library(factories):
     library = factories["music.Library"](actor=actor)
     serializer = api_serializers.LibraryFollowSerializer(context={"actor": actor})
 
-    with pytest.raises(api_serializers.serializers.ValidationError) as e:
+    with pytest.raises(
+        api_serializers.serializers.ValidationError, match=r".*own library.*"
+    ):
         serializer.validate_target(library)
-    assert "own library" in str(e)
 
 
 def test_manage_upload_action_read(factories):
