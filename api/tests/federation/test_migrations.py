@@ -5,13 +5,19 @@ def test_domain_14_migration(migrator):
     old_apps = migrator.loader.project_state([(a, f)]).apps
     Actor = old_apps.get_model(a, "Actor")
     a1 = Actor.objects.create(
-        fid="http://test1.com", preferred_username="test1", old_domain="dOmaiN1.com"
+        fid="http://testmigration1.com",
+        preferred_username="test1",
+        old_domain="dOmaiN1.com",
     )
     a2 = Actor.objects.create(
-        fid="http://test2.com", preferred_username="test2", old_domain="domain1.com"
+        fid="http://testmigration2.com",
+        preferred_username="test2",
+        old_domain="domain1.com",
     )
     a3 = Actor.objects.create(
-        fid="http://test3.com", preferred_username="test2", old_domain="domain2.com"
+        fid="http://testmigration3.com",
+        preferred_username="test2",
+        old_domain="domain2.com",
     )
 
     migrator.loader.build_graph()

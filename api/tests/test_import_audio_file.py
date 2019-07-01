@@ -11,21 +11,20 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 def test_management_command_requires_a_valid_library_id(factories):
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
 
-    with pytest.raises(CommandError) as e:
+    with pytest.raises(CommandError, match=r".*Invalid library id.*"):
         call_command("import_files", "wrong_id", path, interactive=False)
-    assert "Invalid library id" in str(e)
 
 
 def test_in_place_import_only_from_music_dir(factories, settings):
     library = factories["music.Library"](actor__local=True)
     settings.MUSIC_DIRECTORY_PATH = "/nope"
     path = os.path.join(DATA_DIR, "dummy_file.ogg")
-    with pytest.raises(CommandError) as e:
+    with pytest.raises(
+        CommandError, match=r".*Importing in-place only works if importing.*"
+    ):
         call_command(
             "import_files", str(library.uuid), path, in_place=True, interactive=False
         )
-
-    assert "Importing in-place only works if importing" in str(e)
 
 
 def test_import_with_multiple_argument(factories, mocker):

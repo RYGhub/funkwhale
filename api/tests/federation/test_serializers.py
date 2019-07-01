@@ -561,7 +561,7 @@ def test_music_library_serializer_from_private(factories, mocker):
 def test_activity_pub_artist_serializer_to_ap(factories):
     artist = factories["music.Artist"](attributed=True)
     expected = {
-        "@context": serializers.AP_CONTEXT,
+        "@context": jsonld.get_default_context(),
         "type": "Artist",
         "id": artist.fid,
         "name": artist.name,
@@ -578,7 +578,7 @@ def test_activity_pub_album_serializer_to_ap(factories):
     album = factories["music.Album"](attributed=True)
 
     expected = {
-        "@context": serializers.AP_CONTEXT,
+        "@context": jsonld.get_default_context(),
         "type": "Album",
         "id": album.fid,
         "name": album.title,
@@ -607,7 +607,7 @@ def test_activity_pub_track_serializer_to_ap(factories):
         license="cc-by-4.0", copyright="test", disc_number=3, attributed=True
     )
     expected = {
-        "@context": serializers.AP_CONTEXT,
+        "@context": jsonld.get_default_context(),
         "published": track.creation_date.isoformat(),
         "type": "Track",
         "musicbrainzId": track.mbid,
@@ -737,7 +737,7 @@ def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
     updated = timezone.now()
     released = timezone.now().date()
     data = {
-        "@context": serializers.AP_CONTEXT,
+        "@context": jsonld.get_default_context(),
         "type": "Audio",
         "id": "https://track.file",
         "name": "Ignored",
@@ -825,7 +825,7 @@ def test_activity_pub_audio_serializer_to_ap(factories):
         mimetype="audio/mp3", bitrate=42, duration=43, size=44
     )
     expected = {
-        "@context": serializers.AP_CONTEXT,
+        "@context": jsonld.get_default_context(),
         "type": "Audio",
         "id": upload.fid,
         "name": upload.track.full_name,
