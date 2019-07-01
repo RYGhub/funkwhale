@@ -132,13 +132,13 @@ def test_expand_remote_doc(r_mock):
 
 async def test_fetch_many(a_responses):
     doc = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop/federation/actors/demo",
         "type": "Person",
         "followers": "https://noop/federation/actors/demo/followers",
     }
     followers_doc = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop/federation/actors/demo/followers",
         "type": "Collection",
     }
@@ -152,13 +152,13 @@ async def test_fetch_many(a_responses):
 def test_dereference():
 
     followers_doc = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop/federation/actors/demo/followers",
         "type": "Collection",
     }
 
     actor_doc = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop/federation/actors/demo",
         "type": "Person",
         "followers": "https://noop/federation/actors/demo/followers",
@@ -281,7 +281,7 @@ def test_jsonld_serializer_fallback():
             }
 
     payload = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop.url/federation/actors/demo",
         "type": "Person",
         "name": "Hello",
@@ -313,14 +313,14 @@ def test_jsonld_serializer_dereference(a_responses):
             }
 
     payload = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop.url/federation/actors/demo",
         "type": "Person",
         "followers": "https://noop.url/federation/actors/demo/followers",
     }
 
     followers_doc = {
-        "@context": ["https://www.w3.org/ns/activitystreams", {}],
+        "@context": jsonld.get_default_context(),
         "id": "https://noop.url/federation/actors/demo/followers",
         "type": "Collection",
     }

@@ -10,7 +10,7 @@ def populate_domains(apps, schema_editor):
     Actor = apps.get_model("federation", "Actor")
 
     domains = set(
-        [v.lower() for v in Actor.objects.values_list("old_domain", flat=True)]
+        [v.lower() for v in Actor.objects.values_list("old_domain", flat=True) if v]
     )
     for domain in sorted(domains):
         print("Populating domain {}...".format(domain))

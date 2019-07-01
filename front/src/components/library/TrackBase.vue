@@ -210,11 +210,11 @@ export default {
     },
     albumUrl () {
       let route = this.$router.resolve({name: 'library.albums.detail', params: {id: this.track.album.id }})
-      return route.location.path
+      return route.href
     },
     artistUrl () {
       let route = this.$router.resolve({name: 'library.artists.detail', params: {id: this.track.artist.id }})
-      return route.location.path
+      return route.href
     },
     headerStyle() {
       if (!this.cover) {

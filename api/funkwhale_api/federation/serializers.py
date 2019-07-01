@@ -14,8 +14,6 @@ from funkwhale_api.music import tasks as music_tasks
 
 from . import activity, actors, contexts, jsonld, models, tasks, utils
 
-AP_CONTEXT = jsonld.get_default_context()
-
 logger = logging.getLogger(__name__)
 
 
@@ -116,7 +114,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         if instance.manually_approves_followers is not None:
             ret["manuallyApprovesFollowers"] = instance.manually_approves_followers
 
-        ret["@context"] = AP_CONTEXT
+        ret["@context"] = jsonld.get_default_context()
         if instance.public_key:
             ret["publicKey"] = {
                 "owner": instance.fid,
@@ -324,7 +322,7 @@ class FollowSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return {
-            "@context": AP_CONTEXT,
+            "@context": jsonld.get_default_context(),
             "actor": instance.actor.fid,
             "id": instance.get_federation_id(),
             "object": instance.target.fid,
@@ -396,7 +394,7 @@ class AcceptFollowSerializer(serializers.Serializer):
             actor = instance.target
 
         return {
-            "@context": AP_CONTEXT,
+            "@context": jsonld.get_default_context(),
             "id": instance.get_federation_id() + "/accept",
             "type": "Accept",
             "actor": actor.fid,
@@ -450,7 +448,7 @@ class UndoFollowSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return {
-            "@context": AP_CONTEXT,
+            "@context": jsonld.get_default_context(),
             "id": instance.get_federation_id() + "/undo",
             "type": "Undo",
             "actor": instance.actor.fid,
@@ -530,7 +528,7 @@ class ActivitySerializer(serializers.Serializer):
         d.update(conf)
 
         if self.context.get("include_ap_context", True):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
@@ -624,7 +622,7 @@ class PaginatedCollectionSerializer(jsonld.JsonLdSerializer):
         }
         d.update(get_additional_fields(conf))
         if self.context.get("include_ap_context", True):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
@@ -771,7 +769,7 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
             )
         d.update(get_additional_fields(conf))
         if self.context.get("include_ap_context", True):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
@@ -828,7 +826,7 @@ class ArtistSerializer(MusicEntitySerializer):
         }
 
         if self.context.get("include_ap_context", self.parent is None):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
@@ -883,7 +881,7 @@ class AlbumSerializer(MusicEntitySerializer):
                 or "image/jpeg",
             }
         if self.context.get("include_ap_context", self.parent is None):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
@@ -946,7 +944,7 @@ class TrackSerializer(MusicEntitySerializer):
         }
 
         if self.context.get("include_ap_context", self.parent is None):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
     def create(self, validated_data):
@@ -1106,7 +1104,7 @@ class UploadSerializer(jsonld.JsonLdSerializer):
             d["updated"] = instance.modification_date.isoformat()
 
         if self.context.get("include_ap_context", self.parent is None):
-            d["@context"] = AP_CONTEXT
+            d["@context"] = jsonld.get_default_context()
         return d
 
 
