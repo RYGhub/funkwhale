@@ -33,6 +33,18 @@ export default {
     let albumLabel = this.$pgettext('*/*/*', 'Album')
     let trackLabel = this.$pgettext('*/*/*/Noun', 'Track')
     let self = this
+    var searchQuery;
+
+    jQuery(this.$el).keypress(function(e) {
+      if(e.which == 13) {
+        // Cancel any API search request to backend...
+        jQuery(this.$el).search('cancel query');
+        // Go direct to the artist page...
+        router.push("/library/artists?query=" + searchQuery + "&page=1&paginateBy=25&ordering=name");
+	}
+    });
+
+
     jQuery(this.$el).search({
       type: 'category',
       minCharacters: 3,
@@ -41,6 +53,7 @@ export default {
       },
       onSearchQuery (query) {
         self.$emit('search')
+        searchQuery = query;
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
