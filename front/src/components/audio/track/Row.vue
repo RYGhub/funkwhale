@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <play-button :class="['basic', {orange: isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :is-playable="playable" :track="track"></play-button>
+      <play-button :class="['basic', {orange: currentTrack && isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :is-playable="playable" :track="track"></play-button>
     </td>
     <td>
       <img class="ui mini image" v-if="track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">

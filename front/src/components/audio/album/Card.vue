@@ -20,7 +20,7 @@
             <tbody>
               <tr v-for="track in tracks">
                 <td class="play-cell">
-                  <play-button :class="['basic', {orange: isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :track="track"></play-button>
+                  <play-button :class="['basic', {orange: currentTrack && isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :track="track"></play-button>
                 </td>
                 <td class="content-cell" colspan="5">
                   <track-favorite-icon :track="track"></track-favorite-icon>
