@@ -1,8 +1,8 @@
-from rest_framework import routers
+from funkwhale_api.common import routers
 
 from . import api_views
 
-router = routers.SimpleRouter()
+router = routers.OptionalSlashRouter()
 router.register(r"fetches", api_views.FetchViewSet, "fetches")
 router.register(r"follows/library", api_views.LibraryFollowViewSet, "library-follows")
 router.register(r"inbox", api_views.InboxItemViewSet, "inbox")

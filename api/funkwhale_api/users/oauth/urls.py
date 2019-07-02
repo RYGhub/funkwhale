@@ -1,11 +1,11 @@
 from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework import routers
+from funkwhale_api.common import routers
 
 from . import views
 
-router = routers.SimpleRouter()
+router = routers.OptionalSlashRouter()
 router.register(r"apps", views.ApplicationViewSet, "apps")
 router.register(r"grants", views.GrantViewSet, "grants")
 
