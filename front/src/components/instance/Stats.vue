@@ -9,19 +9,19 @@
           <div class="statistic">
             <div class="value">
               <i class="green user icon"></i>
-              {{ stats.users }}
+              {{ stats.users.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="Content/About/Paragraph/Unit">users</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
-              <i class="orange sound icon"></i> {{ stats.listenings }}
+              <i class="orange sound icon"></i> {{ stats.listenings.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="Content/About/Paragraph/Unit">tracks listened</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
-              <i class="pink heart icon"></i> {{ stats.trackFavorites }}
+              <i class="pink heart icon"></i> {{ stats.trackFavorites.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Tracks favorited</translate></div>
           </div>
@@ -32,25 +32,25 @@
         <div class="ui mini horizontal statistics">
           <div class="statistic">
             <div class="value">
-              {{ parseInt(stats.musicDuration) }}
+              {{ stats.musicDuration.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="Content/About/Paragraph/Unit">Hours of music</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
-              {{ stats.artists }}
+              {{ stats.artists.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="*/*/*/Noun">Artists</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
-              {{ stats.albums }}
+              {{ stats.albums.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="*/*/*">Albums</translate></div>
           </div>
           <div class="statistic">
             <div class="value">
-              {{ stats.tracks }}
+              {{ stats.tracks.toLocaleString($store.state.ui.momentLocale) }}
             </div>
             <div class="label"><translate translate-context="*/*/*/Noun">Tracks</translate></div>
           </div>
@@ -85,13 +85,13 @@ export default {
         self.stats.users = _.get(d, 'usage.users.total')
         self.stats.listenings = _.get(d, 'metadata.usage.listenings.total')
         self.stats.trackFavorites = _.get(d, 'metadata.usage.favorites.tracks.total')
-        self.stats.musicDuration = _.get(d, 'metadata.library.music.hours')
+        self.stats.musicDuration = Math.round(_.get(d, 'metadata.library.music.hours'))
         self.stats.artists = _.get(d, 'metadata.library.artists.total')
         self.stats.albums = _.get(d, 'metadata.library.albums.total')
         self.stats.tracks = _.get(d, 'metadata.library.tracks.total')
         self.isLoading = false
       })
-    }
+    },
   }
 }
 </script>
