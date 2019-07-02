@@ -29,6 +29,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.federation import actors
+from funkwhale_api.music import licenses
 
 
 pytest_plugins = "aiohttp.pytest_plugin"
@@ -422,3 +423,10 @@ def a_responses():
 @pytest.fixture
 def service_actor(db):
     return actors.get_service_actor()
+
+
+@pytest.fixture(autouse=True)
+def clear_license_cache(db):
+    licenses._cache = None
+    yield
+    licenses._cache = None
