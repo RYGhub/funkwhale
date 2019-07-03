@@ -1,5 +1,6 @@
 import html
 import requests
+import xml.sax.saxutils
 
 from django import http
 from django.conf import settings
@@ -51,7 +52,13 @@ def serve_spa(request):
 
     # let's inject our meta tags in the HTML
     head += "\n" + "\n".join(render_tags(final_tags)) + "\n</head>"
-
+    css = get_custom_css() or ""
+    if css:
+        # We add the style add the end of the body to ensure it has the highest
+        # priority (since it will come after other stylesheets)
+        body, tail = tail.split("</body>", 1)
+        css = "<style>{}</style>".format(css)
+        tail = body + "\n" + css + "\n</body>" + tail
     return http.HttpResponse(head + tail)
 
 
@@ -126,6 +133,14 @@ def render_tags(tags):
 def get_request_head_tags(request):
     match = urls.resolve(request.path, urlconf=settings.SPA_URLCONF)
     return match.func(request, *match.args, **match.kwargs)
+
+
+def get_custom_css():
+    css = preferences.get("ui__custom_css").strip()
+    if not css:
+        return
+
+    return xml.sax.saxutils.escape(css)
 
 
 class SPAFallbackMiddleware:
