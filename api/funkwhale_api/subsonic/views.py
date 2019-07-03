@@ -256,7 +256,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
 
-        format = data.get("format", "raw") or None
+        format = data.get("format") or None
         if max_bitrate and not format:
             # specific bitrate requested, but no format specified
             # so we use a default one, cf #867. This helps with clients
