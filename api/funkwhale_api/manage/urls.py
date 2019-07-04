@@ -1,28 +1,28 @@
 from django.conf.urls import include, url
-from rest_framework import routers
+from funkwhale_api.common import routers
 
 from . import views
 
-federation_router = routers.SimpleRouter()
+federation_router = routers.OptionalSlashRouter()
 federation_router.register(r"domains", views.ManageDomainViewSet, "domains")
 
-library_router = routers.SimpleRouter()
+library_router = routers.OptionalSlashRouter()
 library_router.register(r"albums", views.ManageAlbumViewSet, "albums")
 library_router.register(r"artists", views.ManageArtistViewSet, "artists")
 library_router.register(r"libraries", views.ManageLibraryViewSet, "libraries")
 library_router.register(r"tracks", views.ManageTrackViewSet, "tracks")
 library_router.register(r"uploads", views.ManageUploadViewSet, "uploads")
 
-moderation_router = routers.SimpleRouter()
+moderation_router = routers.OptionalSlashRouter()
 moderation_router.register(
     r"instance-policies", views.ManageInstancePolicyViewSet, "instance-policies"
 )
 
-users_router = routers.SimpleRouter()
+users_router = routers.OptionalSlashRouter()
 users_router.register(r"users", views.ManageUserViewSet, "users")
 users_router.register(r"invitations", views.ManageInvitationViewSet, "invitations")
 
-other_router = routers.SimpleRouter()
+other_router = routers.OptionalSlashRouter()
 other_router.register(r"accounts", views.ManageActorViewSet, "accounts")
 
 urlpatterns = [

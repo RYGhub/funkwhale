@@ -6,11 +6,12 @@ from rest_framework_jwt import views as jwt_views
 
 from funkwhale_api.activity import views as activity_views
 from funkwhale_api.common import views as common_views
+from funkwhale_api.common import routers as common_routers
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
 
-router = routers.SimpleRouter()
+router = common_routers.OptionalSlashRouter()
 router.register(r"settings", GlobalPreferencesViewSet, basename="settings")
 router.register(r"activity", activity_views.ActivityViewSet, "activity")
 router.register(r"tags", views.TagViewSet, "tags")
@@ -79,8 +80,8 @@ v1_patterns += [
         r"^oauth/",
         include(("funkwhale_api.users.oauth.urls", "oauth"), namespace="oauth"),
     ),
-    url(r"^token/$", jwt_views.obtain_jwt_token, name="token"),
-    url(r"^token/refresh/$", jwt_views.refresh_jwt_token, name="token_refresh"),
+    url(r"^token/?$", jwt_views.obtain_jwt_token, name="token"),
+    url(r"^token/refresh/?$", jwt_views.refresh_jwt_token, name="token_refresh"),
 ]
 
 urlpatterns = [

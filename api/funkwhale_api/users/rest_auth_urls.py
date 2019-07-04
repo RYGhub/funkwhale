@@ -8,12 +8,12 @@ from . import views
 urlpatterns = [
     url(r"^$", views.RegisterView.as_view(), name="rest_register"),
     url(
-        r"^verify-email/$",
+        r"^verify-email/?$",
         registration_views.VerifyEmailView.as_view(),
         name="rest_verify_email",
     ),
     url(
-        r"^change-password/$",
+        r"^change-password/?$",
         rest_auth_views.PasswordChangeView.as_view(),
         name="change_password",
     ),
@@ -28,7 +28,7 @@ urlpatterns = [
     # view from:
     # djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
     url(
-        r"^account-confirm-email/(?P<key>\w+)/$",
+        r"^account-confirm-email/(?P<key>\w+)/?$",
         TemplateView.as_view(),
         name="account_confirm_email",
     ),

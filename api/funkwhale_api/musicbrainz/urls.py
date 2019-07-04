@@ -1,9 +1,9 @@
 from django.conf.urls import url
-from rest_framework import routers
+from funkwhale_api.common import routers
 
 from . import views
 
-router = routers.SimpleRouter()
+router = routers.OptionalSlashRouter()
 router.register(r"search", views.SearchViewSet, "search")
 urlpatterns = [
     url(
