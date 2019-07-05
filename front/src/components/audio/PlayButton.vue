@@ -19,7 +19,11 @@
           <i class="step forward icon"></i>{{ labels.playNext }}
         </button>
         <button class="item basic" ref="playNow" data-ref="playNow" :disabled="!playable" @click.stop.prevent="addNext(true)" :title="labels.playNow">
-          <i class="play icon"></i>{{ labels.playNow }}</button>
+          <i class="play icon"></i>{{ labels.playNow }}
+        </button>
+        <button class="item basic" ref="replacePlay" data-ref="replacePlay" :disabled="!playable" @click.stop.prevent="replacePlay()" :title="labels.replacePlay">
+          <i class="list icon"></i>{{ labels.replacePlay }}
+        </button>
         <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio">
           <i class="feed icon"></i><translate translate-context="*/Queue/Button.Label/Short, Verb">Start radio</translate>
         </button>
@@ -74,7 +78,8 @@ export default {
         playNow: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play now'),
         addToQueue: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Add to current queue'),
         playNext: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play next'),
-        startRadio: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play similar songs')
+        startRadio: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play similar songs'),
+        replacePlay: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Replace current queue')
       }
     },
     title () {
@@ -196,6 +201,14 @@ export default {
     },
     add () {
       let self = this
+      this.getPlayableTracks().then((tracks) => {
+        self.$store.dispatch('queue/appendMany', {tracks: tracks}).then(() => self.addMessage(tracks))
+      })
+      jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+    },
+    replacePlay () {
+      let self = this
+      self.$store.dispatch('queue/clean')
       this.getPlayableTracks().then((tracks) => {
         self.$store.dispatch('queue/appendMany', {tracks: tracks}).then(() => self.addMessage(tracks))
       })
