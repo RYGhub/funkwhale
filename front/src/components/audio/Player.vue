@@ -364,7 +364,11 @@ export default {
         return
       }
       let image = this.$refs.cover
-      this.ambiantColors = ColorThief.prototype.getPalette(image, 4).slice(0, 4)
+      try {
+        this.ambiantColors = ColorThief.prototype.getPalette(image, 4).slice(0, 4)
+      } catch (e) {
+        console.log('Cannot generate player background from cover image, likely a cross-origin tainted canvas issue')
+      }
     },
     handleError({ sound, error }) {
       this.$store.commit("player/isLoadingAudio", false)

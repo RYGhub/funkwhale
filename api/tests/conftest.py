@@ -29,8 +29,8 @@ from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.federation import actors
-from funkwhale_api.music import licenses
 from funkwhale_api.moderation import mrf
+from funkwhale_api.music import licenses
 
 
 pytest_plugins = "aiohttp.pytest_plugin"

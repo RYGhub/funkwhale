@@ -85,6 +85,7 @@ export default {
       let moderationLabel = this.$pgettext('Content/Admin/Menu', 'Moderation')
       let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
       let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')
+      let uiLabel = this.$pgettext('Content/Admin/Menu', 'User Interface')
       let errorLabel = this.$pgettext('Content/Admin/Menu', 'Error reporting')
       return [
         {
@@ -142,6 +143,11 @@ export default {
           label: subsonicLabel,
           id: "subsonic",
           settings: ["subsonic__enabled"]
+        },
+        {
+          label: uiLabel,
+          id: "ui",
+          settings: ["ui__custom_css"]
         },
         {
           label: statisticsLabel,

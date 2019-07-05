@@ -288,15 +288,16 @@ def test_stream_transcode(
     mocker,
     settings,
 ):
+    upload = factories["music.Upload"](playable=True)
+    params = {"id": upload.track.pk, "maxBitRate": max_bitrate}
+    if format:
+        params["format"] = format
     settings.SUBSONIC_DEFAULT_TRANSCODING_FORMAT = default_transcoding_format
     url = reverse("api:subsonic-stream")
     mocked_serve = mocker.patch.object(
         music_views, "handle_serve", return_value=Response()
     )
-    upload = factories["music.Upload"](playable=True)
-    response = logged_in_api_client.get(
-        url, {"id": upload.track.pk, "maxBitRate": max_bitrate, "format": format}
-    )
+    response = logged_in_api_client.get(url, params)
 
     mocked_serve.assert_called_once_with(
         upload=upload,
