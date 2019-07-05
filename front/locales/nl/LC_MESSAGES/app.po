@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-30 08:22+0000\n"
+"PO-Revision-Date: 2019-07-05 07:47+0000\n"
 "Last-Translator: Koen <koen.glotzbach@gmail.com>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -1039,26 +1039,23 @@ msgstr ""
 #: front/src/components/audio/EmbedWizard.vue:21
 msgctxt "Popup/Embed/Paragraph"
 msgid "Copy/paste this code in your website HTML"
-msgstr ""
+msgstr "Kopieer/plak deze HTML-code in je website"
 
 #: front/src/components/library/TrackDetail.vue:10
 #: front/src/views/admin/library/TrackDetail.vue:153
-#, fuzzy
 msgctxt "Content/Track/Table.Label/Noun"
 msgid "Copyright"
-msgstr "Kopiëren"
+msgstr "Copyright"
 
 #: front/src/views/auth/EmailConfirm.vue:7
-#, fuzzy
 msgctxt "Content/Signup/Paragraph"
 msgid "Could not confirm your e-mail address"
-msgstr "Bevestig je e-mailadres"
+msgstr "We konden je e-mailadres niet bevestigen"
 
 #: front/src/views/content/remote/ScanForm.vue:3
-#, fuzzy
 msgctxt "Content/Library/Error message.Title"
 msgid "Could not fetch remote library"
-msgstr "Fout tijdens ophalen van externe verzameling"
+msgstr "Externe verzameling kon niet opgehaald worden"
 
 #: front/src/components/Home.vue:80
 msgctxt "Content/Home/List item"
@@ -1172,12 +1169,12 @@ msgstr "Huidig verbruik"
 #: front/src/components/federation/FetchButton.vue:53
 msgctxt "*/*/Error"
 msgid "Data returned by the remote server had invalid or missing attributes"
-msgstr ""
+msgstr "Gegevens verkregen van de externe server waren onvolledig of incorrect"
 
 #: front/src/components/federation/FetchButton.vue:17
 msgctxt "Popup/*/Message.Content"
 msgid "Data was refreshed successfully from remote server."
-msgstr ""
+msgstr "Gegevens van externe server succesvol vernieuwd."
 
 #: front/src/views/content/libraries/Detail.vue:27
 msgctxt "Content/Library/Table.Label"
@@ -1193,7 +1190,7 @@ msgstr "Nummerinformatie"
 #: front/src/components/ShortcutsModal.vue:75
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Decrease volume"
-msgstr ""
+msgstr "Volume verlagen"
 
 #: front/src/components/auth/Settings.vue:150
 #: src/components/auth/Settings.vue:251
@@ -1240,10 +1237,9 @@ msgid "Delete library"
 msgstr "Verzameling verwijderen"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:69
-#, fuzzy
 msgctxt "Popup/Moderation/Button.Label/Verb"
 msgid "Delete moderation rule"
-msgstr "Radiostation verwijderen"
+msgstr "Moderatie-regel verwijderen"
 
 #: front/src/views/playlists/Detail.vue:39
 msgctxt "Popup/Playlist/Button.Label/Verb"
@@ -1362,15 +1358,14 @@ msgstr "Subsonic-API-toegang uitschakelen?"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:18
 #: front/src/views/admin/moderation/AccountsDetail.vue:157
 #: front/src/views/admin/moderation/AccountsDetail.vue:161
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Disabled"
-msgstr "Toegang uitschakelen"
+msgstr "Uitgeschakeld"
 
 #: front/src/views/admin/library/TrackDetail.vue:145
 msgctxt "*/*/*/Noun"
 msgid "Disc number"
-msgstr ""
+msgstr "CD-nummer"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:13
 msgctxt "Content/Settings/Link"
@@ -1378,10 +1373,9 @@ msgid "Discover how to use Funkwhale from other apps"
 msgstr "Ontdek hoe je Funkwhale met andere apps kunt gebruiken"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:132
-#, fuzzy
 msgctxt "'Content/*/*/Noun'"
 msgid "Display name"
-msgstr "Bestandsnaam"
+msgstr "Weergavenaam"
 
 #: front/src/components/library/radios/Builder.vue:30
 msgctxt "Content/Radio/Checkbox.Label/Verb"
@@ -1394,6 +1388,8 @@ msgid ""
 "Do not download any media file (audio, album cover, account avatar…) from "
 "this account or domain. This will purge existing content as well."
 msgstr ""
+"Geen mediabestanden (audio, albumhoes, profielfoto…) downloaden van dit "
+"account of domein. Hiermee wordt ook bestaande content verwijderd."
 
 #: front/src/components/playlists/Editor.vue:51
 msgctxt "Popup/Playlist/Title"
@@ -1416,13 +1412,11 @@ msgid "Do you want to delete the radio \"%{ radio }\"?"
 msgstr "Weet je zeker dat je het radiostation \"%{ radio }\" wilt verwijderen?"
 
 #: front/src/components/moderation/FilterModal.vue:3
-#, fuzzy
 msgctxt "Popup/Moderation/Title/Verb"
 msgid "Do you want to hide content from artist \"%{ name }\"?"
-msgstr "Weet je zeker dat je het radiostation \"%{ radio }\" wilt verwijderen?"
+msgstr "Wil je content van de artiest \"%{ name }\" verbergen?"
 
 #: front/src/components/common/ActionTable.vue:37
-#, fuzzy
 msgctxt "Modal/*/Title"
 msgid "Do you want to launch %{ action } on %{ count } element?"
 msgid_plural "Do you want to launch %{ action } on %{ count } elements?"
@@ -1455,14 +1449,14 @@ msgstr "Documentatie"
 #: front/src/components/mixins/Translations.vue:61
 msgctxt "Content/Moderation/*/Noun"
 msgid "Domain"
-msgstr ""
+msgstr "Domein"
 
 #: front/src/views/admin/moderation/Base.vue:5
 #: front/src/views/admin/moderation/DomainsList.vue:3
 #: front/src/views/admin/moderation/DomainsList.vue:48
 msgctxt "*/Moderation/*/Noun"
 msgid "Domains"
-msgstr ""
+msgstr "Domeinen"
 
 #: front/src/components/library/TrackBase.vue:39
 #: front/src/views/admin/library/UploadDetail.vue:58
@@ -1486,7 +1480,6 @@ msgid "Duration"
 msgstr "Duur"
 
 #: front/src/views/auth/EmailConfirm.vue:23
-#, fuzzy
 msgctxt "Content/Signup/Message"
 msgid "E-mail address confirmed"
 msgstr "E-mailadres bevestigd"
@@ -1530,7 +1523,7 @@ msgstr "Instantie-informatie bewerken"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:3
 msgctxt "Content/Moderation/Card.Title/Verb"
 msgid "Edit moderation rule"
-msgstr ""
+msgstr "Moderatie-regel aanpassen"
 
 #: front/src/components/library/AlbumEdit.vue:4
 msgctxt "Content/*/Title"
@@ -1554,17 +1547,15 @@ msgstr "Instantie-informatie bewerken"
 #: front/src/views/admin/library/Base.vue:5
 #: src/views/admin/library/EditsList.vue:24
 #: front/src/views/admin/library/TrackDetail.vue:234
-#, fuzzy
 msgctxt "*/Admin/*/Noun"
 msgid "Edits"
-msgstr "Bewerken"
+msgstr "Wijzigingen"
 
 #: front/src/components/mixins/Translations.vue:104
 #: front/src/components/mixins/Translations.vue:105
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Edits"
-msgstr "Bewerken"
+msgstr "Wijzigingen"
 
 #: front/src/components/auth/Signup.vue:30
 #: front/src/components/manage/users/UsersTable.vue:38
@@ -1582,27 +1573,27 @@ msgstr "E-mailadres"
 #: front/src/components/library/TrackBase.vue:72
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Embed"
-msgstr ""
+msgstr "Embedden"
 
 #: front/src/components/audio/EmbedWizard.vue:20
 msgctxt "Popup/Embed/Input.Label/Noun"
 msgid "Embed code"
-msgstr ""
+msgstr "Embed-code"
 
 #: front/src/components/library/AlbumBase.vue:26
 msgctxt "Popup/Album/Title/Verb"
 msgid "Embed this album on your website"
-msgstr ""
+msgstr "Embed dit album op je website"
 
 #: front/src/components/library/ArtistBase.vue:37
 msgctxt "Popup/Artist/Title/Verb"
 msgid "Embed this artist work on your website"
-msgstr ""
+msgstr "Embed deze artiest op je website"
 
 #: front/src/components/library/TrackBase.vue:45
 msgctxt "Popup/Track/Title"
 msgid "Embed this track on your website"
-msgstr ""
+msgstr "Embed dit nummer op je website"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:259
 #: front/src/views/admin/moderation/DomainsDetail.vue:187
