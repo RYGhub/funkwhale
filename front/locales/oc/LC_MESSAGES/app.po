@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-06-28 07:39+0000\n"
+"PO-Revision-Date: 2019-07-07 20:23+0000\n"
 "Last-Translator: Quentí <quentin_antonin@hotmail.com>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -4150,6 +4150,8 @@ msgid ""
 "The album will be removed, as well as associated uploads, tracks, favorites "
 "and listening history. This action is irreversible."
 msgstr ""
+"L’album serà tirat, e mai los mandadisses, pistas, favorits e istorics d’"
+"escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/components/auth/Authorize.vue:39
 msgctxt "Content/Auth/Paragraph"
@@ -4163,6 +4165,8 @@ msgid ""
 "The artist will be removed, as well as associated uploads, tracks, albums, "
 "favorites and listening history. This action is irreversible."
 msgstr ""
+"L’artista serà tirat, e mai los mandadisses, pistas, albums, favorits e "
+"istorics d’escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/components/Footer.vue:53
 msgctxt "Footer/*/List item.Link"
@@ -4189,6 +4193,8 @@ msgid ""
 "The library will be removed, as well as associated uploads, and follows. "
 "This action is irreversible."
 msgstr ""
+"Aquesta bibliotèca serà tirada, e mai los mandadisses e abonaments ligats. "
+"Aquesta accions es irreversibla."
 
 #: front/src/components/library/ImportStatusModal.vue:140
 msgctxt "Popup/Import/Error.Label"
@@ -4196,6 +4202,8 @@ msgid ""
 "The metadata included in the file is invalid or some mandatory fields are "
 "missing."
 msgstr ""
+"La metadonada inclusa al fichièr es invalida o de camps obligatòris son "
+"absents."
 
 #: front/src/components/library/FileUpload.vue:38
 msgctxt "Content/Library/List item"
@@ -4224,7 +4232,7 @@ msgstr "Lista de lectura creada"
 #: front/src/components/federation/FetchButton.vue:37
 msgctxt "*/*/Error"
 msgid "The remote server answered with HTTP %{ status }"
-msgstr ""
+msgstr "Lo servidor alonhat a respondut amb lo còdi HTTP %{ status }"
 
 #: front/src/components/federation/FetchButton.vue:13
 msgctxt "Popup/*/Message.Content"
@@ -4243,6 +4251,7 @@ msgstr "Lo servidor alonhat a tròp tardat a respondre"
 msgctxt "*/*/Error"
 msgid "The return server returned invalid JSON or JSON-LD data"
 msgstr ""
+"Lo servidor alonhat a respondut amb un JSON o de donadas JSON-LD invalidas"
 
 #: front/src/components/manage/library/AlbumsTable.vue:189
 msgctxt "Popup/*/Paragraph"
@@ -4250,6 +4259,8 @@ msgid ""
 "The selected albums will be removed, as well as associated tracks, uploads, "
 "favorites and listening history. This action is irreversible."
 msgstr ""
+"Los albums seleccionats seràn tirats, e mai las pistas, mandadisses e "
+"istorics d’escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/components/manage/library/ArtistsTable.vue:179
 msgctxt "Popup/*/Paragraph"
@@ -4257,6 +4268,8 @@ msgid ""
 "The selected artist will be removed, as well as associated uploads, tracks, "
 "albums, favorites and listening history. This action is irreversible."
 msgstr ""
+"Los artistas seleccionats seràs tirats, e mai los mandadisses, pistas, "
+"albums, favorits e istorics d’escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/components/manage/library/LibrariesTable.vue:206
 msgctxt "Popup/*/Paragraph"
@@ -4264,6 +4277,8 @@ msgid ""
 "The selected library will be removed, as well as associated uploads and "
 "follows. This action is irreversible."
 msgstr ""
+"Las bibliotècas seleccionadas seràs tiradas, e mai los mandadisses e "
+"abonaments ligats. Aquesta accions es irreversibla."
 
 #: front/src/components/manage/library/TracksTable.vue:189
 msgctxt "Popup/*/Paragraph"
@@ -4271,6 +4286,8 @@ msgid ""
 "The selected tracks will be removed, as well as associated uploads, "
 "favorites and listening history. This action is irreversible."
 msgstr ""
+"Las pistas seleccionadas seràn tiradas, e mai las pistas, mandadisses e "
+"istorics d’escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/components/manage/library/UploadsTable.vue:256
 msgctxt "Popup/*/Paragraph"
@@ -4311,6 +4328,8 @@ msgid ""
 "The track will be removed, as well as associated uploads, favorites and "
 "listening history. This action is irreversible."
 msgstr ""
+"La pista serà tirada, e mai las pistas, mandadisses, favorits e istorics d’"
+"escota ligats. Aquesta accion es irreversibla."
 
 #: front/src/views/admin/library/UploadDetail.vue:68
 msgctxt "Content/Moderation/Paragraph"
@@ -4362,6 +4381,8 @@ msgctxt "Content/Settings/Paragraph"
 msgid ""
 "This is the list of applications that have access to your account data."
 msgstr ""
+"Aquò es la lista de las aplicacions qu’an accès a las donadas de vòstre "
+"compte."
 
 #: front/src/components/auth/Settings.vue:218
 msgctxt "Content/Settings/Paragraph"
@@ -4488,7 +4509,7 @@ msgctxt "Popup/Settings/Paragraph"
 msgid ""
 "This will prevent this application from accessing the service on your "
 "behalf."
-msgstr ""
+msgstr "Aquò empacha aquesta aplicacion d’accedir al servici en vòstre nom."
 
 #: front/src/components/playlists/Editor.vue:54
 msgctxt "Popup/Playlist/Paragraph"
@@ -4758,7 +4779,7 @@ msgstr ""
 #: front/src/components/library/ImportStatusModal.vue:8
 msgctxt "Popup/Import/Message"
 msgid "Upload is still pending and will soon be processed by the server."
-msgstr ""
+msgstr "Lo mandadís es encara en espèra e serà lèu tractat pel servidor."
 
 #: front/src/views/content/Home.vue:7
 msgctxt "Content/Library/Paragraph"
@@ -4791,6 +4812,8 @@ msgid ""
 "Upload was skipped because a similar one is already available in one of your"
 " libraries."
 msgstr ""
+"Lo mandadís es estat sautat perque un que li sembla es ja disponible dins "
+"una de vòstras bibliotèca."
 
 #: front/src/components/library/ImportStatusModal.vue:11
 msgctxt "Popup/Import/Message"
@@ -4842,6 +4865,8 @@ msgid ""
 "Use \"urn:ietf:wg:oauth:2.0:oob\" as a redirect URI if your application is "
 "not served on the web."
 msgstr ""
+"Utilizatz « urn:ietf:wg:oauth:2.0:oob » coma URI de redireccion se vòstra "
+"aplicacion es pas disponibla en linha."
 
 #: front/src/components/Footer.vue:16
 msgctxt "Footer/*/List item.Link"
