@@ -161,7 +161,6 @@ THIRD_PARTY_APPS = (
     "oauth2_provider",
     "rest_framework",
     "rest_framework.authtoken",
-    "taggit",
     "rest_auth",
     "rest_auth.registration",
     "dynamic_preferences",
@@ -201,6 +200,7 @@ LOCAL_APPS = (
     "funkwhale_api.history",
     "funkwhale_api.playlists",
     "funkwhale_api.subsonic",
+    "funkwhale_api.tags",
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

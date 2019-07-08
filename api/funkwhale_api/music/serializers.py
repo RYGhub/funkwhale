@@ -4,7 +4,6 @@ from django.db import transaction
 from django import urls
 from django.conf import settings
 from rest_framework import serializers
-from taggit.models import Tag
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
@@ -12,6 +11,7 @@ from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.tags.models import Tag
 
 from . import filters, models, tasks
 
@@ -361,7 +361,7 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ("id", "name", "slug")
+        fields = ("id", "name", "creation_date")
 
 
 class SimpleAlbumSerializer(serializers.ModelSerializer):

@@ -2,10 +2,11 @@ import os
 
 import factory
 
-from funkwhale_api.factories import ManyToManyFromList, registry, NoUpdateOnCreate
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import factories as users_factories
 
 SAMPLES_PATH = os.path.join(
@@ -103,7 +104,6 @@ class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     album = factory.SubFactory(AlbumFactory)
     artist = factory.SelfAttribute("album.artist")
     position = 1
-    tags = ManyToManyFromList("tags")
     playable = playable_factory("track")
 
     class Meta:
@@ -126,6 +126,15 @@ class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         if extracted:
             self.license = LicenseFactory(code=extracted)
             self.save()
+
+    @factory.post_generation
+    def set_tags(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            tags_models.set_tags(self, *extracted)
 
 
 @registry.register
@@ -162,18 +171,6 @@ class UploadVersionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
     class Meta:
         model = "music.UploadVersion"
-
-
-@registry.register
-class TagFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
-    name = factory.SelfAttribute("slug")
-    slug = factory.Faker("slug")
-
-    class Meta:
-        model = "taggit.Tag"
-
-
-# XXX To remove
 
 
 class ImportBatchFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):

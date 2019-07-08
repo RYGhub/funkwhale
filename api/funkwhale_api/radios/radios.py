@@ -3,10 +3,10 @@ import random
 from django.core.exceptions import ValidationError
 from django.db import connection
 from rest_framework import serializers
-from taggit.models import Tag
 
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music.models import Artist, Track
+from funkwhale_api.tags.models import Tag
 from funkwhale_api.users.models import User
 
 from . import filters, models
@@ -165,7 +165,7 @@ class TagRadio(RelatedObjectRadio):
 
     def get_queryset(self, **kwargs):
         qs = super().get_queryset(**kwargs)
-        return qs.filter(tags__in=[self.session.related_object])
+        return qs.filter(tagged_items__tag=self.session.related_object)
 
 
 def weighted_choice(choices):

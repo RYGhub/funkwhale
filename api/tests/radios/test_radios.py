@@ -197,14 +197,15 @@ def test_can_start_artist_radio(factories):
 
 def test_can_start_tag_radio(factories):
     user = factories["users.User"]()
-    tag = factories["taggit.Tag"]()
     factories["music.Upload"].create_batch(5)
-    good_files = factories["music.Upload"].create_batch(5, track__tags=[tag])
+    tag = factories["tags.Tag"]()
+    good_files = factories["music.Upload"].create_batch(5, track__set_tags=[tag])
     good_tracks = [f.track for f in good_files]
 
     radio = radios.TagRadio()
     session = radio.start_session(user, related_object=tag)
     assert session.radio_type == "tag"
+
     for i in range(5):
         assert radio.pick(filter_playable=False) in good_tracks
 

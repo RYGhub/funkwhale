@@ -321,13 +321,16 @@ class RefreshToken(oauth2_models.AbstractRefreshToken):
     pass
 
 
-def get_actor_data(username):
+def get_actor_data(username, **kwargs):
     slugified_username = federation_utils.slugify_username(username)
+    domain = kwargs.get("domain")
+    if not domain:
+        domain = federation_models.Domain.objects.get_or_create(
+            name=settings.FEDERATION_HOSTNAME
+        )[0]
     return {
         "preferred_username": slugified_username,
-        "domain": federation_models.Domain.objects.get_or_create(
-            name=settings.FEDERATION_HOSTNAME
-        )[0],
+        "domain": domain,
         "type": "Person",
         "name": username,
         "manually_approves_followers": False,

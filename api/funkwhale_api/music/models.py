@@ -9,6 +9,7 @@ import uuid
 import pendulum
 import pydub
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,7 +18,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from taggit.managers import TaggableManager
 
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
@@ -29,6 +29,7 @@ from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.tags import models as tags_models
 from . import importers, metadata, utils
 
 logger = logging.getLogger(__name__)
@@ -206,14 +207,6 @@ class Artist(APIModelMixin):
     def __str__(self):
         return self.name
 
-    @property
-    def tags(self):
-        t = []
-        for album in self.albums.all():
-            for tag in album.tags:
-                t.append(tag)
-        return set(t)
-
     @classmethod
     def get_or_create_from_name(cls, name, **kwargs):
         kwargs.update({"name": name})
@@ -356,14 +349,6 @@ class Album(APIModelMixin):
             # external storage
             return self.cover.name
 
-    @property
-    def tags(self):
-        t = []
-        for track in self.tracks.all():
-            for tag in track.tags.all():
-                t.append(tag)
-        return set(t)
-
     @classmethod
     def get_or_create_from_title(cls, title, **kwargs):
         kwargs.update({"title": title})
@@ -380,7 +365,8 @@ def import_tags(instance, cleaned_data, raw_data):
         except ValueError:
             continue
         tags_to_add.append(tag_data["name"])
-    instance.tags.add(*tags_to_add)
+
+    tags_models.add_tags(instance, *tags_to_add)
 
 
 def import_album(v):
@@ -472,7 +458,7 @@ class Track(APIModelMixin):
     }
     import_hooks = [import_tags]
     objects = TrackQuerySet.as_manager()
-    tags = TaggableManager(blank=True)
+    tagged_items = GenericRelation(tags_models.TaggedItem)
 
     class Meta:
         ordering = ["album", "disc_number", "position"]
