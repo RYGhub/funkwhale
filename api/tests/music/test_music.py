@@ -91,7 +91,7 @@ def test_can_create_track_from_api_with_corresponding_tags(
     )
     track = models.Track.create_from_api(id="9968a9d6-8d92-4051-8f76-674e157b6eed")
     expected_tags = ["techno", "good-music"]
-    track_tags = [tag.slug for tag in track.tags.all()]
+    track_tags = track.tagged_items.values_list("tag__name", flat=True)
     for tag in expected_tags:
         assert tag in track_tags
 
@@ -121,31 +121,6 @@ def test_can_get_or_create_track_from_api(artists, albums, tracks, mocker, db):
     track2, created = models.Track.get_or_create_from_api(mbid=data["id"])
     assert not created
     assert track == track2
-
-
-def test_album_tags_deduced_from_tracks_tags(factories, django_assert_num_queries):
-    tag = factories["taggit.Tag"]()
-    album = factories["music.Album"]()
-    factories["music.Track"].create_batch(5, album=album, tags=[tag])
-
-    album = models.Album.objects.prefetch_related("tracks__tags").get(pk=album.pk)
-
-    with django_assert_num_queries(0):
-        assert tag in album.tags
-
-
-def test_artist_tags_deduced_from_album_tags(factories, django_assert_num_queries):
-    tag = factories["taggit.Tag"]()
-    album = factories["music.Album"]()
-    artist = album.artist
-    factories["music.Track"].create_batch(5, album=album, tags=[tag])
-
-    artist = models.Artist.objects.prefetch_related("albums__tracks__tags").get(
-        pk=artist.pk
-    )
-
-    with django_assert_num_queries(0):
-        assert tag in artist.tags
 
 
 def test_can_download_image_file_for_album(binary_cover, mocker, factories):

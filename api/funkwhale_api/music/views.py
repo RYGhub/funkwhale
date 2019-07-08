@@ -12,7 +12,6 @@ from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from taggit.models import Tag
 
 from funkwhale_api.common import decorators as common_decorators
 from funkwhale_api.common import permissions as common_permissions
@@ -24,6 +23,7 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import decorators as federation_decorators
 from funkwhale_api.federation import routes
+from funkwhale_api.tags.models import Tag
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
@@ -51,15 +51,6 @@ def get_libraries(filter_uploads):
         return Response(serializer.data)
 
     return libraries
-
-
-class TagViewSetMixin(object):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        tag = self.request.query_params.get("tag")
-        if tag:
-            queryset = queryset.filter(tags__pk=tag)
-        return queryset
 
 
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
@@ -182,9 +173,7 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(
-    common_views.SkipFilterForGetObject, TagViewSetMixin, viewsets.ReadOnlyModelViewSet
-):
+class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
@@ -521,14 +510,14 @@ class Search(views.APIView):
         return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):
-        search_fields = ["slug", "name__unaccent"]
+        search_fields = ["name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
 
         # We want the shortest tag first
         qs = (
             Tag.objects.all()
-            .annotate(slug_length=Length("slug"))
-            .order_by("slug_length")
+            .annotate(name_length=Length("name"))
+            .order_by("name_length")
         )
 
         return qs.filter(query_obj)[: self.max_results]

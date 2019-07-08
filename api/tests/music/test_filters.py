@@ -52,3 +52,33 @@ def test_artist_filter_track_album_artist(factories, mocker, queryset_equal_list
     )
 
     assert filterset.qs == [hidden_track]
+
+
+def test_track_filter_tag_single(
+    factories, mocker, queryset_equal_list, anonymous_user
+):
+    factories["music.Track"]()
+    # tag name partially match the query, so this shouldn't match
+    factories["music.Track"](set_tags=["TestTag1"])
+    tagged = factories["music.Track"](set_tags=["TestTag"])
+    qs = models.Track.objects.all()
+    filterset = filters.TrackFilter(
+        {"tag": "testTaG"}, request=mocker.Mock(user=anonymous_user), queryset=qs
+    )
+
+    assert filterset.qs == [tagged]
+
+
+def test_track_filter_tag_multiple(
+    factories, mocker, queryset_equal_list, anonymous_user
+):
+    factories["music.Track"](set_tags=["TestTag1"])
+    tagged = factories["music.Track"](set_tags=["TestTag1", "TestTag2"])
+    qs = models.Track.objects.all()
+    filterset = filters.TrackFilter(
+        {"tag": ["testTaG1", "TestTag2"]},
+        request=mocker.Mock(user=anonymous_user),
+        queryset=qs,
+    )
+
+    assert filterset.qs == [tagged]

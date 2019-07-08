@@ -39,8 +39,6 @@ django-rest-auth>=0.9,<0.10
 ipython>=7,<8
 mutagen>=1.42,<1.43
 
-
-django-taggit>=0.24,<0.25
 pymemoize==1.0.3
 
 django-dynamic-preferences>=1.7,<1.8
