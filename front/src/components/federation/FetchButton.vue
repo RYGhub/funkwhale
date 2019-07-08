@@ -50,7 +50,7 @@
                       translate-context="*/*/Error">Impossible to connect to the remote server</translate>
                     <translate
                       v-else-if="['invalid_json', 'invalid_jsonld', 'missing_jsonld_type'].indexOf(fetch.detail.error_code) > -1"
-                      translate-context="*/*/Error">The return server returned invalid JSON or JSON-LD data</translate>
+                      translate-context="*/*/Error">The remote server returned invalid JSON or JSON-LD data</translate>
                     <translate v-else-if="fetch.detail.error_code === 'validation'" translate-context="*/*/Error">Data returned by the remote server had invalid or missing attributes</translate>
                     <translate v-else-if="fetch.detail.error_code === 'unhandled'" translate-context="*/*/Error">Unknowkn error</translate>
                     <translate v-else translate-context="*/*/Error">Unknowkn error</translate>
