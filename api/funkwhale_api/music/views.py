@@ -447,14 +447,6 @@ class UploadViewSet(
         instance.delete()
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Tag.objects.all().order_by("name")
-    serializer_class = serializers.TagSerializer
-    permission_classes = [oauth_permissions.ScopePermission]
-    required_scope = "libraries"
-    anonymous_policy = "setting"
-
-
 class Search(views.APIView):
     max_results = 3
     permission_classes = [oauth_permissions.ScopePermission]

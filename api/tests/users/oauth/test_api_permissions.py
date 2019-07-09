@@ -35,6 +35,7 @@ from funkwhale_api.users.oauth import scopes
             "get",
         ),
         ("api:v1:federation:library-follows-list", {}, "read:follows", "get"),
+        ("api:v1:tags-list", {}, "read:libraries", "get"),
         # admin / privileged stuff
         ("api:v1:instance:admin-settings-list", {}, "read:instance:settings", "get"),
         (
