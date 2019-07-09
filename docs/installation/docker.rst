@@ -29,8 +29,7 @@ Create the user and the directory:
 
 .. code-block:: shell
 
-    sudo useradd -r -s /usr/bin/nologin -d /srv/funkwhale -m funkwhale
-    sudo adduser funkwhale docker
+    sudo useradd -r -s /usr/bin/nologin -m -d /srv/funkwhale -U -G docker funkwhale
     cd /srv/funkwhale
 
 Log in as the newly created user from now on:
@@ -39,7 +38,7 @@ Log in as the newly created user from now on:
 
     sudo -u funkwhale -H bash
 
-Export the version you want to deploy:
+Export the `version you want <https://hub.docker.com/r/funkwhale/all-in-one/tags>`_ to deploy (e.g., ``0.19.1``):
 
 .. parsed-literal::
 
@@ -50,16 +49,24 @@ Create an env file to store a few important configuration options:
 .. code-block:: shell
 
     touch .env
-    echo "FUNKWHALE_HOSTNAME=yourdomain.funkwhale" >> .env
-    echo "FUNKWHALE_PROTOCOL=https" >> .env  # or http
-    echo "NGINX_MAX_BODY_SIZE=100M" >> .env
-    echo "FUNKWHALE_API_IP=127.0.0.1" >> .env
-    echo "FUNKWHALE_API_PORT=5000" >> .env  # or the container port you want to expose on the host
-    echo "DJANGO_SECRET_KEY=$(openssl rand -hex 45)" >> .env  # generate and store a secure secret key for your instance
-    # Remove this if you expose the container directly on ports 80/443
-    echo "NESTED_PROXY=1" >> .env
-
     chmod 600 .env  # reduce permissions on the .env file since it contains sensitive data
+    cat > .env <<EOD
+    # Replace 'your.funkwhale.example' with your actual domain
+    FUNKWHALE_HOSTNAME=your.funkwhale.example
+    # Protocol may also be: http
+    FUNKWHALE_PROTOCOL=https
+    # This limits the upload size
+    NGINX_MAX_BODY_SIZE=100M
+    # Bind to localhost
+    FUNKWHALE_API_IP=127.0.0.1
+    # Container port you want to expose on the host
+    FUNKWHALE_API_PORT=5000
+    # Generate and store a secure secret key for your instance
+    DJANGO_SECRET_KEY=$(openssl rand -hex 45)
+    # Remove this if you expose the container directly on ports 80/443
+    NESTED_PROXY=1
+    EOD
+
 
 Then start the container:
 
@@ -151,7 +158,7 @@ Multi-container installation
 
 First, ensure you have `Docker <https://docs.docker.com/engine/installation/>`_ and `docker-compose <https://docs.docker.com/compose/install/>`_ installed.
 
-Export the version you want to deploy:
+Export the `version you want <https://hub.docker.com/r/funkwhale/all-in-one/tags>`_ to deploy (e.g., ``0.19.1``):
 
 .. parsed-literal::
 
@@ -164,9 +171,9 @@ Download the sample docker-compose file:
     mkdir /srv/funkwhale
     cd /srv/funkwhale
     mkdir nginx
-    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker.funkwhale_proxy.conf"
-    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/docker-compose.yml"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/${FUNKWHALE_VERSION}/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/${FUNKWHALE_VERSION}/deploy/docker.funkwhale_proxy.conf"
+    curl -L -o docker-compose.yml "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/${FUNKWHALE_VERSION}/deploy/docker-compose.yml"
 
 At this point, the architecture of ``/srv/funkwhale``  should look like that:
 
@@ -182,7 +189,7 @@ Create your env file:
 
 .. parsed-literal::
 
-    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/|version|/deploy/env.prod.sample"
+    curl -L -o .env "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/${FUNKWHALE_VERSION}/deploy/env.prod.sample"
     sed -i "s/FUNKWHALE_VERSION=latest/FUNKWHALE_VERSION=$FUNKWHALE_VERSION/" .env
     chmod 600 .env  # reduce permissions on the .env file since it contains sensitive data
     sudo nano .env
