@@ -43,3 +43,18 @@ Then, edit your ``/etc/systemd/system/funkwhale-server.service`` and replace the
 ``ExecStart=/srv/funkwhale/virtualenv/bin/gunicorn config.asgi:application -w ${FUNKWHALE_WEB_WORKERS} -k uvicorn.workers.UvicornWorker -b ${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}``
 
 Then reload the configuration change with ``sudo systemctl daemon-reload`` and ``sudo systemctl restart funkwhale-server``.
+
+
+Content-Security-Policy [manual action suggested]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To improve the security and reduce the attack surface in case of a successfull exploit, we suggest
+you add the following Content-Security-Policy to the Nginx configuration of your proxy (same value
+for both Docker and non-Docker deployments)::
+
+    server {
+        # Security related headers
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+    }
+
+Then reload nginx with ``systemctl reload nginx``.

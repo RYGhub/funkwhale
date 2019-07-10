@@ -29,6 +29,9 @@ server {
     # HSTS
     add_header Strict-Transport-Security "max-age=31536000";
 
+    # Security related headers
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+
     # compression settings
     gzip on;
     gzip_comp_level    5;

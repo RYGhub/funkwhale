@@ -69,6 +69,8 @@ http {
             text/x-component
             text/x-cross-domain-policy;
 
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+
         location /front/ {
             # uncomment the following line and comment the proxy-pass one
             # to use the frontend build with "yarn build"
