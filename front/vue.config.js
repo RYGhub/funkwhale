@@ -11,6 +11,7 @@ if (process.env.BUNDLE_ANALYZE === '1') {
 }
 module.exports = {
   baseUrl: process.env.BASE_URL || '/front/',
+  productionSourceMap: false,
   pages: {
     embed: {
       entry: 'src/embed.js',
@@ -30,6 +31,7 @@ module.exports = {
   },
   configureWebpack: {
     plugins: plugins,
+    devtool: false
   },
   devServer: {
     disableHostCheck: true,
