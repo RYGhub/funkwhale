@@ -222,6 +222,7 @@ INSTALLED_APPS = (
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
+    "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "funkwhale_api.common.middleware.SPAFallbackMiddleware",
@@ -398,6 +399,8 @@ ASGI_APPLICATION = "config.routing.application"
 
 # This ensures that Django will be able to detect a secure connection
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
