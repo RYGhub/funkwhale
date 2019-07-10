@@ -185,9 +185,9 @@ If you prefer to launch them in the background instead, use the ``-d`` flag, and
 
 Once everything is up, you can access the various funkwhale's components:
 
-- The Vue webapp, on http://localhost:8080
-- The API, on http://localhost:8080/api/v1/
-- The django admin, on http://localhost:8080/api/admin/
+- The Vue webapp, on http://localhost:8000
+- The API, on http://localhost:8000/api/v1/
+- The django admin, on http://localhost:800/api/admin/
 
 Stopping everything
 ^^^^^^^^^^^^^^^^^^^
