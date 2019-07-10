@@ -30,11 +30,6 @@ module.exports = {
   },
   configureWebpack: {
     plugins: plugins,
-    resolve: {
-      alias: {
-        'vue$': 'vue/dist/vue.esm.js'
-      }
-    }
   },
   devServer: {
     disableHostCheck: true,
