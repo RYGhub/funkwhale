@@ -11,6 +11,7 @@ from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
+from funkwhale_api.tags import models as tags_models
 
 from . import activity, actors, contexts, jsonld, models, tasks, utils
 
@@ -781,6 +782,20 @@ MUSIC_ENTITY_JSONLD_MAPPING = {
 }
 
 
+class TagSerializer(jsonld.JsonLdSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Hashtag])
+    name = serializers.CharField(max_length=100)
+
+    class Meta:
+        jsonld_mapping = {"name": jsonld.first_val(contexts.AS.name)}
+
+    def validate_name(self, value):
+        if value.startswith("#"):
+            # remove trailing #
+            value = value[1:]
+        return value
+
+
 class MusicEntitySerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
     published = serializers.DateTimeField()
@@ -797,8 +812,10 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
             self.updateable_fields, validated_data, instance
         )
         if updated_fields:
-            return music_tasks.update_library_entity(instance, updated_fields)
+            music_tasks.update_library_entity(instance, updated_fields)
 
+        tags = [t["name"] for t in validated_data.get("tags", []) or []]
+        tags_models.set_tags(instance, *tags)
         return instance
 
 
@@ -892,6 +909,9 @@ class TrackSerializer(MusicEntitySerializer):
     album = AlbumSerializer()
     license = serializers.URLField(allow_null=True, required=False)
     copyright = serializers.CharField(allow_null=True, required=False)
+    tags = serializers.ListField(
+        child=TagSerializer(), min_length=0, required=False, allow_null=True
+    )
 
     updateable_fields = [
         ("name", "title"),
@@ -914,6 +934,7 @@ class TrackSerializer(MusicEntitySerializer):
                 "disc": jsonld.first_val(contexts.FW.disc),
                 "license": jsonld.first_id(contexts.FW.license),
                 "position": jsonld.first_val(contexts.FW.position),
+                "tags": jsonld.raw(contexts.AS.tag),
             },
         )
 
@@ -941,6 +962,12 @@ class TrackSerializer(MusicEntitySerializer):
             "attributedTo": instance.attributed_to.fid
             if instance.attributed_to
             else None,
+            "tag": [
+                {"type": "Hashtag", "name": "#{}".format(tag)}
+                for tag in sorted(
+                    instance.tagged_items.values_list("tag__name", flat=True)
+                )
+            ],
         }
 
         if self.context.get("include_ap_context", self.parent is None):
@@ -950,6 +977,7 @@ class TrackSerializer(MusicEntitySerializer):
     def create(self, validated_data):
         from funkwhale_api.music import tasks as music_tasks
 
+        tags = [t["name"] for t in validated_data.get("tags", []) or []]
         references = {}
         actors_to_fetch = set()
         actors_to_fetch.add(
@@ -981,7 +1009,6 @@ class TrackSerializer(MusicEntitySerializer):
             if not url:
                 continue
             references[url] = actors.get_actor(url)
-
         metadata = music_tasks.federation_audio_track_to_metadata(
             validated_data, references
         )
@@ -990,6 +1017,7 @@ class TrackSerializer(MusicEntitySerializer):
         if from_activity:
             metadata["from_activity_id"] = from_activity.pk
         track = music_tasks.get_track_from_import_metadata(metadata, update_cover=True)
+        tags_models.add_tags(track, *tags)
         return track
 
     def update(self, obj, validated_data):
