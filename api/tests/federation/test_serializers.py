@@ -604,7 +604,11 @@ def test_activity_pub_album_serializer_to_ap(factories):
 
 def test_activity_pub_track_serializer_to_ap(factories):
     track = factories["music.Track"](
-        license="cc-by-4.0", copyright="test", disc_number=3, attributed=True
+        license="cc-by-4.0",
+        copyright="test",
+        disc_number=3,
+        attributed=True,
+        set_tags=["Punk", "Rock"],
     )
     expected = {
         "@context": jsonld.get_default_context(),
@@ -626,6 +630,10 @@ def test_activity_pub_track_serializer_to_ap(factories):
             track.album, context={"include_ap_context": False}
         ).data,
         "attributedTo": track.attributed_to.fid,
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
     }
     serializer = serializers.TrackSerializer(track)
 
@@ -633,6 +641,7 @@ def test_activity_pub_track_serializer_to_ap(factories):
 
 
 def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
+    add_tags = mocker.patch("funkwhale_api.tags.models.add_tags")
     track_attributed_to = factories["federation.Actor"]()
     album_attributed_to = factories["federation.Actor"]()
     album_artist_attributed_to = factories["federation.Actor"]()
@@ -685,6 +694,10 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                 "published": published.isoformat(),
             }
         ],
+        "tag": [
+            {"type": "Hashtag", "name": "#Hello"},
+            {"type": "Hashtag", "name": "World"},
+        ],
     }
     r_mock.get(data["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
     serializer = serializers.TrackSerializer(data=data, context={"activity": activity})
@@ -727,6 +740,48 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert str(album_artist.mbid) == data["album"]["artists"][0]["musicbrainzId"]
     assert album_artist.creation_date == published
     assert album_artist.attributed_to == album_artist_attributed_to
+
+    add_tags.assert_called_once_with(track, *["Hello", "World"])
+
+
+def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker):
+    set_tags = mocker.patch("funkwhale_api.tags.models.set_tags")
+    track_attributed_to = factories["federation.Actor"]()
+    track = factories["music.Track"]()
+
+    published = timezone.now()
+    data = {
+        "@context": jsonld.get_default_context(),
+        "type": "Track",
+        "id": track.fid,
+        "published": published.isoformat(),
+        "musicbrainzId": str(uuid.uuid4()),
+        "name": "Black in back",
+        "position": 5,
+        "disc": 2,
+        "attributedTo": track_attributed_to.fid,
+        "album": serializers.AlbumSerializer(track.album).data,
+        "artists": [serializers.ArtistSerializer(track.artist).data],
+        "tag": [
+            {"type": "Hashtag", "name": "#Hello"},
+            # Ensure we can handle tags without a leading #
+            {"type": "Hashtag", "name": "World"},
+        ],
+    }
+    serializer = serializers.TrackSerializer(track, data=data)
+    assert serializer.is_valid(raise_exception=True)
+
+    serializer.save()
+    track.refresh_from_db()
+
+    assert track.fid == data["id"]
+    assert track.title == data["name"]
+    assert track.position == data["position"]
+    assert track.disc_number == data["disc"]
+    assert track.attributed_to == track_attributed_to
+    assert str(track.mbid) == data["musicbrainzId"]
+
+    set_tags.assert_called_once_with(track, *["Hello", "World"])
 
 
 def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
