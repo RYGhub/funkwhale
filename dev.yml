@@ -119,6 +119,7 @@ services:
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro
       - "${MEDIA_ROOT-./api/funkwhale_api/media}:/protected/media:ro"
+      - "./front:/frontend:ro"
     networks:
       - federation
       - internal

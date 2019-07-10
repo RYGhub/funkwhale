@@ -70,6 +70,9 @@ http {
             text/x-cross-domain-policy;
 
         location /front/ {
+            # uncomment the following line and comment the proxy-pass one
+            # to use the frontend build with "yarn build"
+            #alias /frontend/dist/;
             proxy_pass   http://funkwhale-front/front/;
         }
         location /front-server/ {
