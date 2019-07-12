@@ -2,6 +2,7 @@ import base64
 import datetime
 import logging
 import pendulum
+import re
 
 import mutagen._util
 import mutagen.oggtheora
@@ -144,6 +145,7 @@ CONF = {
             "mbid": {"field": "musicbrainz_trackid"},
             "license": {},
             "copyright": {},
+            "genre": {},
         },
     },
     "OggVorbis": {
@@ -162,6 +164,7 @@ CONF = {
             "mbid": {"field": "musicbrainz_trackid"},
             "license": {},
             "copyright": {},
+            "genre": {},
             "pictures": {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
@@ -184,6 +187,7 @@ CONF = {
             "mbid": {"field": "MusicBrainz Track Id"},
             "license": {},
             "copyright": {},
+            "genre": {},
         },
     },
     "MP3": {
@@ -199,6 +203,7 @@ CONF = {
             "date": {"field": "TDRC"},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
+            "genre": {"field": "TCON"},
             "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "mbid": {"field": "UFID", "getter": get_mp3_recording_id},
             "pictures": {},
@@ -220,6 +225,7 @@ CONF = {
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
             "musicbrainz_albumartistid": {},
+            "genre": {},
             "mbid": {"field": "musicbrainz_trackid"},
             "test": {},
             "pictures": {},
@@ -485,6 +491,61 @@ class PermissiveDateField(serializers.CharField):
         return None
 
 
+TAG_REGEX = re.compile(r"^((\w+)([\d_]*))$")
+
+
+def extract_tags_from_genre(string):
+    tags = []
+    delimiter = "@@@@@"
+    for d in [" - ", ",", ";", "/"]:
+        # Replace common tags separators by a custom delimiter
+        string = string.replace(d, delimiter)
+
+    # loop on the parts (splitting on our custom delimiter)
+    for tag in string.split(delimiter):
+        tag = tag.strip()
+        for d in ["-"]:
+            # preparation for replacement so that Pop-Rock becomes Pop Rock, then PopRock
+            # (step 1, step 2 happens below)
+            tag = tag.replace(d, " ")
+        if not tag:
+            continue
+        final_tag = ""
+        if not TAG_REGEX.match(tag.replace(" ", "")):
+            # the string contains some non words chars ($, €, etc.), right now
+            # we simply skip such tags
+            continue
+        # concatenate the parts and uppercase them so that 'pop rock' becomes 'PopRock'
+        if len(tag.split(" ")) == 1:
+            # we append the tag "as is", because it doesn't contain any space
+            tags.append(tag)
+            continue
+        for part in tag.split(" "):
+            # the tag contains space, there's work to do to have consistent case
+            # 'pop rock' -> 'PopRock'
+            # (step 2)
+            if not part:
+                continue
+            final_tag += part[0].upper() + part[1:]
+        if final_tag:
+            tags.append(final_tag)
+    return tags
+
+
+class TagsField(serializers.CharField):
+    def get_value(self, data):
+        return data
+
+    def to_internal_value(self, data):
+        try:
+            value = data.get("genre") or ""
+        except TagNotFound:
+            return []
+        value = super().to_internal_value(str(value))
+
+        return extract_tags_from_genre(value)
+
+
 class MBIDField(serializers.UUIDField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("allow_null", True)
@@ -533,6 +594,7 @@ class TrackMetadataSerializer(serializers.Serializer):
     copyright = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     license = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     mbid = MBIDField()
+    tags = TagsField(allow_blank=True, allow_null=True, required=False)
 
     album = AlbumField()
     artists = ArtistField()
@@ -544,6 +606,7 @@ class TrackMetadataSerializer(serializers.Serializer):
         "position",
         "disc_number",
         "mbid",
+        "tags",
     ]
 
     def validate(self, validated_data):
@@ -553,7 +616,7 @@ class TrackMetadataSerializer(serializers.Serializer):
                 v = validated_data[field]
             except KeyError:
                 continue
-            if v in ["", None]:
+            if v in ["", None, []]:
                 validated_data.pop(field)
         return validated_data
 

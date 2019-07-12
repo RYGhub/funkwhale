@@ -18,6 +18,7 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
+    add_tags = mocker.patch("funkwhale_api.tags.models.add_tags")
     metadata = {
         "title": "Test track",
         "artists": [{"name": "Test artist"}],
@@ -26,6 +27,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
         "disc_number": 2,
         "license": "Hello world: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
+        "tags": ["Punk", "Rock"],
     }
     match_license = mocker.spy(licenses, "match")
 
@@ -44,6 +46,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     assert track.artist.mbid is None
     assert track.artist.attributed_to is None
     match_license.assert_called_once_with(metadata["license"], metadata["copyright"])
+    add_tags.assert_called_once_with(track, *metadata["tags"])
 
 
 def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):

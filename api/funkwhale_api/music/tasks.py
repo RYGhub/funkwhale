@@ -14,6 +14,7 @@ from requests.exceptions import RequestException
 from funkwhale_api.common import channels, preferences
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.taskapp import celery
 
 from . import licenses
@@ -541,10 +542,12 @@ def _get_track(data, attributed_to=None):
     if data.get("fdate"):
         defaults["creation_date"] = data.get("fdate")
 
-    track = get_best_candidate_or_create(
+    track, created = get_best_candidate_or_create(
         models.Track, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
 
+    if created:
+        tags_models.add_tags(track, *data.get("tags", []))
     return track
 
 
