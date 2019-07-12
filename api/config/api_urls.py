@@ -10,11 +10,12 @@ from funkwhale_api.common import routers as common_routers
 from funkwhale_api.music import views
 from funkwhale_api.playlists import views as playlists_views
 from funkwhale_api.subsonic.views import SubsonicViewSet
+from funkwhale_api.tags import views as tags_views
 
 router = common_routers.OptionalSlashRouter()
 router.register(r"settings", GlobalPreferencesViewSet, basename="settings")
 router.register(r"activity", activity_views.ActivityViewSet, "activity")
-router.register(r"tags", views.TagViewSet, "tags")
+router.register(r"tags", tags_views.TagViewSet, "tags")
 router.register(r"tracks", views.TrackViewSet, "tracks")
 router.register(r"uploads", views.UploadViewSet, "uploads")
 router.register(r"libraries", views.LibraryViewSet, "libraries")

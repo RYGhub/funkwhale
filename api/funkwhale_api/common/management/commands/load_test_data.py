@@ -51,7 +51,7 @@ def create_tagged_tracks(factories, count, dependencies):
     objs = []
     for track in dependencies["tracks"]:
         tag = random.choice(dependencies["tags"])
-        objs.append(factories["tags.TaggedItem"](content_object=track, tag=tag))
+        objs.append(factories["tags.TaggedItem"].build(content_object=track, tag=tag))
 
     return tags_models.TaggedItem.objects.bulk_create(
         objs, batch_size=BATCH_SIZE, ignore_conflicts=True
@@ -217,27 +217,24 @@ class Command(BaseCommand):
         if not count:
             return []
         dependencies = row.get("depends_on", [])
-        dependencies_results = {}
         create_dependencies = options.get("create_dependencies")
         for dependency in dependencies:
-            if not create_dependencies:
-                continue
             dep_count = options.get(dependency["id"])
+            if not create_dependencies and dep_count is None:
+                continue
             if dep_count is None:
                 factor = options[
                     "{}_{}_factor".format(row["id"], dependency["field"])
                 ] or dependency.get("default_factor")
                 dep_count = math.ceil(factor * count)
 
-            dependencies_results[dependency["id"]] = self.create_batch(
+            results[dependency["id"]] = self.create_batch(
                 CONFIG_BY_ID[dependency["id"]], results, options, count=dep_count
             )
         self.stdout.write("Creating {} {}…".format(count, row["id"]))
         handler = row.get("handler")
         if handler:
-            objects = handler(
-                factories.registry, count, dependencies=dependencies_results
-            )
+            objects = handler(factories.registry, count, dependencies=results)
         else:
             objects = create_objects(
                 row, factories.registry, count, **row.get("factory_kwargs", {})
@@ -246,7 +243,7 @@ class Command(BaseCommand):
             if not dependency.get("set", True):
                 continue
             if create_dependencies:
-                candidates = dependencies_results[dependency["id"]]
+                candidates = results[dependency["id"]]
             else:
                 # we use existing objects in the database
                 queryset = dependency.get(
