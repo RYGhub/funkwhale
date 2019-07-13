@@ -22,3 +22,22 @@ def test_can_invalidate_token_when_changing_user_secret_key(factories):
     # token should be invalid
     with pytest.raises(DecodeError):
         api_settings.JWT_DECODE_HANDLER(payload)
+
+
+def test_can_invalidate_token_when_changing_settings_secret_key(factories, settings):
+    settings.SECRET_KEY = "test1"
+    user = factories["users.User"]()
+    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+    payload = jwt_payload_handler(user)
+    payload = jwt_encode_handler(payload)
+
+    # this should work
+    api_settings.JWT_DECODE_HANDLER(payload)
+
+    # now we update the secret key
+    settings.SECRET_KEY = "test2"
+
+    # token should be invalid
+    with pytest.raises(DecodeError):
+        api_settings.JWT_DECODE_HANDLER(payload)

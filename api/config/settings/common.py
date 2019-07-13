@@ -564,12 +564,19 @@ CELERY_BEAT_SCHEDULE = {
 
 NODEINFO_REFRESH_DELAY = env.int("NODEINFO_REFRESH_DELAY", default=3600 * 24)
 
+
+def get_user_secret_key(user):
+    from django.conf import settings
+
+    return settings.SECRET_KEY + str(user.secret_key)
+
+
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
     "JWT_EXPIRATION_DELTA": datetime.timedelta(days=7),
     "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(days=30),
     "JWT_AUTH_HEADER_PREFIX": "JWT",
-    "JWT_GET_USER_SECRET_KEY": lambda user: user.secret_key,
+    "JWT_GET_USER_SECRET_KEY": get_user_secret_key,
 }
 OLD_PASSWORD_FIELD_ENABLED = True
 ACCOUNT_ADAPTER = "funkwhale_api.users.adapters.FunkwhaleAccountAdapter"
