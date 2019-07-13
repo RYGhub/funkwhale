@@ -1012,12 +1012,13 @@ class TrackSerializer(MusicEntitySerializer):
         metadata = music_tasks.federation_audio_track_to_metadata(
             validated_data, references
         )
+        metadata['tags'] = tags
 
         from_activity = self.context.get("activity")
         if from_activity:
             metadata["from_activity_id"] = from_activity.pk
         track = music_tasks.get_track_from_import_metadata(metadata, update_cover=True)
-        tags_models.add_tags(track, *tags)
+
         return track
 
     def update(self, obj, validated_data):
