@@ -69,6 +69,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "is_local": artist.is_local,
         "creation_date": to_api_date(artist.creation_date),
         "albums": [serializers.ArtistAlbumSerializer(album).data],
+        "tags": [],
     }
     serializer = serializers.ArtistWithAlbumsSerializer(artist)
     assert serializer.data == expected
@@ -175,6 +176,7 @@ def test_album_serializer(factories, to_api_date):
         "release_date": to_api_date(album.release_date),
         "tracks": serializers.AlbumTrackSerializer([track2, track1], many=True).data,
         "is_local": album.is_local,
+        "tags": [],
     }
     serializer = serializers.AlbumSerializer(album)
 
@@ -202,6 +204,7 @@ def test_track_serializer(factories, to_api_date):
         "license": upload.track.license.code,
         "copyright": upload.track.copyright,
         "is_local": upload.track.is_local,
+        "tags": [],
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected

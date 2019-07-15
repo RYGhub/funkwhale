@@ -16,8 +16,11 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_artist_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__album__artist__set_tags=tags,
     ).track
     artist = track.artist
     request = api_request.get("/")
@@ -27,8 +30,10 @@ def test_artist_list_serializer(api_request, factories, logged_in_api_client):
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
     for artist in serializer.data:
+        artist["tags"] = tags
         for album in artist["albums"]:
             album["is_playable"] = True
+
     url = reverse("api:v1:artists-list")
     response = logged_in_api_client.get(url)
 
@@ -37,8 +42,11 @@ def test_artist_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_album_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__album__set_tags=tags,
     ).track
     album = track.album
     request = api_request.get("/")
@@ -47,6 +55,8 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
+    for album in serializer.data:
+        album["tags"] = tags
     url = reverse("api:v1:albums-list")
     response = logged_in_api_client.get(url)
 
@@ -55,8 +65,11 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_track_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__set_tags=tags,
     ).track
     request = api_request.get("/")
     qs = track.__class__.objects.with_playable_uploads(None)
@@ -64,6 +77,8 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
+    for track in serializer.data:
+        track["tags"] = tags
     url = reverse("api:v1:tracks-list")
     response = logged_in_api_client.get(url)
 
