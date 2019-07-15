@@ -716,3 +716,6 @@ ACTOR_KEY_ROTATION_DELAY = env.int("ACTOR_KEY_ROTATION_DELAY", default=3600 * 48
 SUBSONIC_DEFAULT_TRANSCODING_FORMAT = (
     env("SUBSONIC_DEFAULT_TRANSCODING_FORMAT", default="mp3") or None
 )
+
+# extra tags will be ignored
+TAGS_MAX_BY_OBJ = env.int("TAGS_MAX_BY_OBJ", default=30)
