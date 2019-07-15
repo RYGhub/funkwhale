@@ -51,7 +51,7 @@ def test_apply_update_mutation(factories, mutations_registry, mocker):
     )
     assert previous_state == get_update_previous_state.return_value
     get_update_previous_state.assert_called_once_with(
-        user, "username", serialized_relations={}
+        user, "username", serialized_relations={}, handlers={}
     )
     user.refresh_from_db()
 
