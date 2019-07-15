@@ -18,4 +18,4 @@ class TagFilter(filters.FilterSet):
 
     class Meta:
         model = models.Tag
-        fields = ["q"]
+        fields = {"q": ["exact"], "name": ["exact", "startswith"]}
