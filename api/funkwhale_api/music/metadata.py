@@ -2,7 +2,6 @@ import base64
 import datetime
 import logging
 import pendulum
-import re
 
 import mutagen._util
 import mutagen.oggtheora
@@ -11,6 +10,8 @@ import mutagen.flac
 
 from rest_framework import serializers
 from rest_framework.compat import Mapping
+
+from funkwhale_api.tags import models as tags_models
 
 logger = logging.getLogger(__name__)
 NODEFAULT = object()
@@ -491,9 +492,6 @@ class PermissiveDateField(serializers.CharField):
         return None
 
 
-TAG_REGEX = re.compile(r"^((\w+)([\d_]*))$")
-
-
 def extract_tags_from_genre(string):
     tags = []
     delimiter = "@@@@@"
@@ -511,7 +509,7 @@ def extract_tags_from_genre(string):
         if not tag:
             continue
         final_tag = ""
-        if not TAG_REGEX.match(tag.replace(" ", "")):
+        if not tags_models.TAG_REGEX.match(tag.replace(" ", "")):
             # the string contains some non words chars ($, €, etc.), right now
             # we simply skip such tags
             continue

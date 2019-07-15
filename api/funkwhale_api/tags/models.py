@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import CICharField
@@ -6,6 +8,9 @@ from django.db import transaction
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+
+TAG_REGEX = re.compile(r"^((\w+)([\d_]*))$")
 
 
 class Tag(models.Model):
