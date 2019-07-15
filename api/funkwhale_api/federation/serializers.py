@@ -1012,7 +1012,7 @@ class TrackSerializer(MusicEntitySerializer):
         metadata = music_tasks.federation_audio_track_to_metadata(
             validated_data, references
         )
-        metadata['tags'] = tags
+        metadata["tags"] = tags
 
         from_activity = self.context.get("activity")
         if from_activity:
