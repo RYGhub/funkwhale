@@ -51,3 +51,11 @@ def test_set_tags(factories, existing, given, expected):
     for tag in expected:
         match = tagged_items.get(tag__name=tag)
         assert match.content_object == obj
+
+
+@pytest.mark.parametrize("factory_name", ["music.Track", "music.Album", "music.Artist"])
+def test_models_that_support_tags(factories, factory_name):
+    tags = ["tag1", "tag2"]
+    obj = factories[factory_name](set_tags=tags)
+
+    assert sorted(obj.tagged_items.all().values_list("tag__name", flat=True)) == tags

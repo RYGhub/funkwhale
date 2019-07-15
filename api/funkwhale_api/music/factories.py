@@ -6,7 +6,7 @@ from funkwhale_api.factories import registry, NoUpdateOnCreate
 
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
-from funkwhale_api.tags import models as tags_models
+from funkwhale_api.tags import factories as tags_factories
 from funkwhale_api.users import factories as users_factories
 
 SAMPLES_PATH = os.path.join(
@@ -56,7 +56,9 @@ class LicenseFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class ArtistFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
@@ -73,7 +75,9 @@ class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class AlbumFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
@@ -97,7 +101,9 @@ class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class TrackFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     fid = factory.Faker("federation_url")
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
@@ -126,15 +132,6 @@ class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         if extracted:
             self.license = LicenseFactory(code=extracted)
             self.save()
-
-    @factory.post_generation
-    def set_tags(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        if extracted:
-            tags_models.set_tags(self, *extracted)
 
 
 @registry.register

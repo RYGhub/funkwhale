@@ -201,6 +201,8 @@ class Artist(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_artists",
     )
+    tagged_items = GenericRelation(tags_models.TaggedItem)
+
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
 
@@ -279,6 +281,8 @@ class Album(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_albums",
     )
+    tagged_items = GenericRelation(tags_models.TaggedItem)
+
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
     api = musicbrainz.api.releases
     federation_namespace = "albums"
