@@ -49,7 +49,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="field in getUpdatedFields(obj.payload, previousState)" :key="field.id">
+          <tr v-for="field in updatedFields" :key="field.id">
             <td>{{ field.id }}</td>
 
             <td v-if="field.diff">
@@ -61,12 +61,12 @@
               <translate translate-context="*/*/*">N/A</translate>
             </td>
 
-            <td v-if="field.diff">
+            <td v-if="field.diff" :title="field.newRepr">
               <span v-if="!part.removed" v-for="part in field.diff" :class="['diff', {added: part.added}]">
                 {{ part.value }}
               </span>
             </td>
-            <td v-else>{{ field.new }}</td>
+            <td v-else :title="field.newRepr">{{ field.newRepr }}</td>
           </tr>
         </tbody>
       </table>
@@ -126,6 +126,7 @@ export default {
     }
   },
   computed: {
+    configs: edits.getConfigs,
     canApprove: edits.getCanApprove,
     canDelete: edits.getCanDelete,
     previousState () {
@@ -154,6 +155,32 @@ export default {
         namespace = 'library.artists.edit.detail'
       }
       return this.$router.resolve({name: namespace, params: {id, editId: this.obj.uuid}}).href
+    },
+
+    updatedFields () {
+      let payload = this.obj.payload
+      let previousState = this.previousState
+      let fields = Object.keys(payload)
+      let self = this
+      return fields.map((f) => {
+        let fieldConfig = edits.getFieldConfig(self.configs, this.obj.target.type, f)
+        let dummyRepr = (v) => { return v }
+        let getValueRepr = fieldConfig.getValueRepr || dummyRepr
+        let d = {
+          id: f,
+        }
+        if (previousState && previousState[f]) {
+          d.old = previousState[f]
+          d.oldRepr = castValue(getValueRepr(d.old.value))
+        }
+        d.new = payload[f]
+        d.newRepr = castValue(getValueRepr(d.new))
+        if (d.old) {
+          // we compute the diffs between the old and new values
+          d.diff = diffWordsWithSpace(d.oldRepr, d.newRepr)
+        }
+        return d
+      })
     }
   },
   methods: {
@@ -184,26 +211,6 @@ export default {
         self.isLoading = false
       })
     },
-    getUpdatedFields (payload, previousState) {
-      let fields = Object.keys(payload)
-      return fields.map((f) => {
-        let d = {
-          id: f,
-        }
-        if (previousState && previousState[f]) {
-          d.old = previousState[f]
-        }
-        d.new = payload[f]
-        if (d.old) {
-          // we compute the diffs between the old and new values
-
-          let oldValue = castValue(d.old.value)
-          let newValue = castValue(d.new)
-          d.diff = diffWordsWithSpace(oldValue, newValue)
-        }
-        return d
-      })
-    }
   }
 }
 </script>

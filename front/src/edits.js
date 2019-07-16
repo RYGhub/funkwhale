@@ -1,3 +1,10 @@
+function getTagsValueRepr (val) {
+  if (!val) {
+    return ''
+  }
+  return val.slice().sort().join('\n')
+}
+
 export default {
   getConfigs () {
     return {
@@ -10,6 +17,14 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Name'),
             getValue: (obj) => { return obj.name }
           },
+          {
+            id: 'tags',
+            type: 'tags',
+            required: true,
+            label: this.$pgettext('*/*/*/Noun', 'Tags'),
+            getValue: (obj) => { return obj.tags },
+            getValueRepr: getTagsValueRepr
+          }
         ]
       },
       album: {
@@ -28,6 +43,14 @@ export default {
             label: this.$pgettext('Content/*/*/Noun', 'Release date'),
             getValue: (obj) => { return obj.release_date }
           },
+          {
+            id: 'tags',
+            type: 'tags',
+            required: true,
+            label: this.$pgettext('*/*/*/Noun', 'Tags'),
+            getValue: (obj) => { return obj.tags },
+            getValueRepr: getTagsValueRepr
+          }
         ]
       },
       track: {
@@ -61,6 +84,14 @@ export default {
             label: this.$pgettext('Content/*/*/Noun', 'License'),
             getValue: (obj) => { return obj.license },
           },
+          {
+            id: 'tags',
+            type: 'tags',
+            required: true,
+            label: this.$pgettext('*/*/*/Noun', 'Tags'),
+            getValue: (obj) => { return obj.tags },
+            getValueRepr: getTagsValueRepr
+          }
         ]
       }
     }
@@ -69,7 +100,12 @@ export default {
   getConfig () {
     return this.configs[this.objectType]
   },
-
+  getFieldConfig (configs, type, fieldId) {
+    let c = configs[type]
+    return c.fields.filter((f) => {
+      return f.id == fieldId
+    })[0]
+  },
   getCurrentState () {
     let self = this
     let s = {}
