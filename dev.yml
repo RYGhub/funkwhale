@@ -57,6 +57,7 @@ services:
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - "./data/plugins:/srv/funkwhale/plugins"
       - "./data/staticfiles:/staticfiles"
+      - "./data/media:/data/media"
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
@@ -65,6 +66,7 @@ services:
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
       - "STATIC_ROOT=/staticfiles"
+      - "MEDIA_ROOT=/data/media"
 
     depends_on:
       - postgres
@@ -92,10 +94,12 @@ services:
       - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
+      - "MEDIA_ROOT=/data/media"
     volumes:
       - ./api:/app
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - "./data/plugins:/srv/funkwhale/plugins"
+      - "./data/media:/data/media"
     networks:
       - internal
   nginx:
@@ -122,9 +126,9 @@ services:
       - ./docker/nginx/entrypoint.sh:/entrypoint.sh:ro
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro
-      - "${MEDIA_ROOT-./api/funkwhale_api/media}:/protected/media:ro"
       - "./front:/frontend:ro"
       - "./data/staticfiles:/staticfiles:ro"
+      - "./data/media:/protected/media:ro"
     networks:
       - federation
       - internal
