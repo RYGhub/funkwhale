@@ -13,6 +13,10 @@
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
+            <label><translate translate-context="*/*/*/Noun">Tags</translate></label>
+            <tags-selector v-model="tags"></tags-selector>
+          </div>
+          <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
@@ -67,6 +71,7 @@
 </template>
 
 <script>
+import qs from 'qs'
 import axios from "axios"
 import _ from "@/lodash"
 import $ from "jquery"
@@ -78,17 +83,20 @@ import PaginationMixin from "@/components/mixins/Pagination"
 import TranslationsMixin from "@/components/mixins/Translations"
 import ArtistCard from "@/components/audio/artist/Card"
 import Pagination from "@/components/Pagination"
+import TagsSelector from '@/components/library/TagsSelector'
 
 const FETCH_URL = "artists/"
 
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
-    defaultQuery: { type: String, required: false, default: "" }
+    defaultQuery: { type: String, required: false, default: "" },
+    defaultTags: { type: Array, required: false, default: () => { return [] } },
   },
   components: {
     ArtistCard,
-    Pagination
+    Pagination,
+    TagsSelector,
   },
   data() {
     let defaultOrdering = this.getOrderingFromString(
@@ -99,6 +107,7 @@ export default {
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
+      tags: this.defaultTags.filter((t) => { return t.length > 0 }) || [],
       paginateBy: parseInt(this.defaultPaginateBy || 12),
       orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
@@ -127,6 +136,7 @@ export default {
         query: {
           query: this.query,
           page: this.page,
+          tag: this.tags,
           paginateBy: this.paginateBy,
           ordering: this.getOrderingAsString()
         }
@@ -141,10 +151,19 @@ export default {
         page_size: this.paginateBy,
         name__icontains: this.query,
         ordering: this.getOrderingAsString(),
-        playable: "true"
+        playable: "true",
+        tag: this.tags,
       }
       logger.default.debug("Fetching artists")
-      axios.get(url, { params: params }).then(response => {
+      axios.get(
+        url,
+        {
+          params: params,
+          paramsSerializer: function(params) {
+            return qs.stringify(params, { indices: false })
+          }
+        }
+      ).then(response => {
         self.result = response.data
         self.isLoading = false
       })
@@ -171,6 +190,10 @@ export default {
       this.fetchData()
     },
     query() {
+      this.updateQueryString()
+      this.fetchData()
+    },
+    tags() {
       this.updateQueryString()
       this.fetchData()
     },

@@ -401,6 +401,7 @@ export default new Router({
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,
+            defaultTags: Array.isArray(route.query.tag || []) ? route.query.tag : [route.query.tag],
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page
           })
@@ -413,6 +414,7 @@ export default new Router({
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,
+            defaultTags: Array.isArray(route.query.tag || []) ? route.query.tag : [route.query.tag],
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page
           })
