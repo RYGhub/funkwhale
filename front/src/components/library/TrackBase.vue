@@ -17,6 +17,8 @@
               <div class="sub header" v-html="subtitle"></div>
             </div>
           </h2>
+          <tags-list v-if="track.tags && track.tags.length > 0" :tags="track.tags"></tags-list>
+          <div class="ui hidden divider"></div>
           <div class="header-buttons">
             <div class="ui buttons">
               <play-button class="orange" :track="track">
@@ -121,6 +123,7 @@ import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import Modal from '@/components/semantic/Modal'
 import EmbedWizard from "@/components/audio/EmbedWizard"
+import TagsList from "@/components/tags/List"
 
 const FETCH_URL = "tracks/"
 
@@ -131,7 +134,8 @@ export default {
     TrackPlaylistIcon,
     TrackFavoriteIcon,
     Modal,
-    EmbedWizard
+    EmbedWizard,
+    TagsList,
   },
   data() {
     return {
