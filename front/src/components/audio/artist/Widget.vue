@@ -142,8 +142,14 @@ export default {
   right: 0;
   bottom: 0;
 }
+
 .ui.three.cards .card {
-  width: 25em;
+  width: 100%;
+}
+@include media(">tablet") {
+  .ui.three.cards .card {
+    width: 25em;
+  }
 }
 .with-overlay {
   background-size: cover !important;

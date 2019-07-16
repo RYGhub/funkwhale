@@ -474,6 +474,13 @@ export default new Router({
             defaultEdit: route.query.mode === 'edit' })
         },
         {
+          path: 'tags/:id',
+          name: 'library.tags.detail',
+          component: () =>
+            import(/* webpackChunkName: "core" */ "@/components/library/TagDetail"),
+          props: true,
+        },
+        {
           path: 'artists/:id',
           component: () =>
             import(/* webpackChunkName: "core" */ "@/components/library/ArtistBase"),

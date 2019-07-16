@@ -2,12 +2,13 @@
   <div>
     <h3 class="ui header">
       <slot name="title"></slot>
+      <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
     <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
     <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
     <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui divided unstackable items">
-      <div class="item" v-for="object in objects" :key="object.id">
+      <div :class="['item', itemClasses]" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
           <img v-if="object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
           <img v-else src="../../../assets/audio/default-cover.png">
@@ -28,7 +29,9 @@
                   </router-link>
                 </span>
               </div>
-              <div class="extra">
+              <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="object.track.tags"></tags-list>
+
+              <div class="extra" v-if="isActivity">
                 <span class="left floated">@{{ object.user.username }}</span>
                 <span class="right floated"><human-date :date="object.creation_date" /></span>
               </div>
@@ -50,19 +53,25 @@
 import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
+import TagsList from "@/components/tags/List"
 
 export default {
   props: {
     filters: {type: Object, required: true},
-    url: {type: String, required: true}
+    url: {type: String, required: true},
+    isActivity: {type: Boolean, default: true},
+    showCount: {type: Boolean, default: false},
+    limit: {type: Number, default: 5},
+    itemClasses: {type: String, default: ''},
   },
   components: {
-    PlayButton
+    PlayButton,
+    TagsList
   },
   data () {
     return {
       objects: [],
-      limit: 5,
+      count: 0,
       isLoading: false,
       errors: null,
       previousPage: null,
@@ -86,7 +95,15 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.objects = response.data.results
+        self.count = response.data.count
+        if (self.isActivity) {
+          // we have listening/favorites objects, not directly tracks
+          self.objects = response.data.results
+        } else {
+          self.objects = response.data.results.map((r) => {
+            return {track: r}
+          })
+        }
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors
@@ -128,5 +145,19 @@ export default {
 }
 .ui.divided.items > .item:last-child {
   padding-bottom: 1em !important;
+}
+
+@include media(">tablet") {
+  .divided.items > .track-item.inline {
+    width: 25em;
+    float: left;
+    border-top: none;
+    &,
+    &:first-child {
+      margin-top: 0.5em !important;
+      margin-right: 0.5em !important;
+      padding: 1em 0 !important;
+    }
+  }
 }
 </style>

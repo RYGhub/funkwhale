@@ -1,0 +1,79 @@
+<template>
+  <main v-title="labels.title">
+    <section class="ui vertical stripe segment">
+      <h2 class="ui header">
+        <span class="ui circular huge hashtag label">
+          {{ labels.title }}
+        </span>
+      </h2>
+      <div class="ui hidden divider"></div>
+      <div class="ui row">
+        <artist-widget :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+          <template slot="title">
+            <router-link :to="{name: 'library.artists.browse', query: {tag: id}}">
+              <translate translate-context="*/*/*">Artists</translate>
+            </router-link>
+          </template>
+        </artist-widget>
+        <div class="ui hidden divider"></div>
+        <div class="ui hidden divider"></div>
+        <album-widget :show-count="true" :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+          <template slot="title">
+            <router-link :to="{name: 'library.albums.browse', query: {tag: id}}">
+              <translate translate-context="*/*/*">Albums</translate>
+            </router-link>
+          </template>
+        </album-widget>
+        <div class="ui hidden divider"></div>
+        <div class="ui hidden divider"></div>
+        <track-widget :show-count="true" :limit="12" item-classes="track-item inline" :url="'/tracks/'" :is-activity="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
+          <template slot="title">
+            <translate translate-context="*/*/*">Tracks</translate>
+          </template>
+        </track-widget>
+        <div class="ui clearing hidden divider"></div>
+      </div>
+    </section>
+  </main>
+</template>
+
+<script>
+
+
+import TrackWidget from "@/components/audio/track/Widget"
+import AlbumWidget from "@/components/audio/album/Widget"
+import ArtistWidget from "@/components/audio/artist/Widget"
+
+export default {
+  props: {
+    id: { type: String, required: true }
+  },
+  components: {
+    ArtistWidget,
+    AlbumWidget,
+    TrackWidget,
+  },
+  computed: {
+    labels() {
+      let title = `#${this.id}`
+      return {
+        title
+      }
+    },
+    isAuthenticated () {
+      return this.$store.state.auth.authenticated
+    },
+    hasFavorites () {
+      return this.$store.state.favorites.count > 0
+    },
+  },
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.ui.circular.label {
+  padding-left: 1em !important;
+  padding-right: 1em !important;
+}
+</style>
