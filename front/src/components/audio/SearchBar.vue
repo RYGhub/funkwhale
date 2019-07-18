@@ -32,6 +32,7 @@ export default {
     let artistLabel = this.$pgettext('*/*/*/Noun', 'Artist')
     let albumLabel = this.$pgettext('*/*/*', 'Album')
     let trackLabel = this.$pgettext('*/*/*/Noun', 'Track')
+    let tagLabel = this.$pgettext('*/*/*/Noun', 'Tag')
     let self = this
     var searchQuery;
 
@@ -75,6 +76,9 @@ export default {
               },
               getDescription (r) {
                 return ''
+              },
+              getId (t) {
+                return t.id
               }
             },
             {
@@ -86,6 +90,9 @@ export default {
               },
               getDescription (r) {
                 return ''
+              },
+              getId (t) {
+                return t.id
               }
             },
             {
@@ -97,6 +104,23 @@ export default {
               },
               getDescription (r) {
                 return ''
+              },
+              getId (t) {
+                return t.id
+              }
+            },
+            {
+              code: 'tags',
+              route: 'library.tags.detail',
+              name: tagLabel,
+              getTitle (r) {
+                return r.name
+              },
+              getDescription (r) {
+                return ''
+              },
+              getId (t) {
+                return t.name
               }
             }
           ]
@@ -106,13 +130,14 @@ export default {
               results: []
             }
             initialResponse[category.code].forEach(result => {
+              let id = category.getId(result)
               results[category.code].results.push({
                 title: category.getTitle(result),
-                id: result.id,
+                id,
                 routerUrl: {
                   name: category.route,
                   params: {
-                    id: result.id
+                    id
                   }
                 },
                 description: category.getDescription(result)
