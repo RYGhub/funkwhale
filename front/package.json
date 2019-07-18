@@ -21,7 +21,7 @@
     "lodash": "^4.17.10",
     "masonry-layout": "^4.2.2",
     "moment": "^2.22.2",
-    "semantic-ui-css": "^2.4.1",
+    "fomantic-ui-css": "^2.7",
     "showdown": "^1.8.6",
     "vue": "^2.5.17",
     "vue-gettext": "^2.1.0",
