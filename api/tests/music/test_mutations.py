@@ -2,6 +2,8 @@ import datetime
 import pytest
 
 from funkwhale_api.music import licenses
+from funkwhale_api.music import mutations
+
 from funkwhale_api.tags import models as tags_models
 
 
@@ -140,3 +142,37 @@ def test_mutation_set_tags(factory_name, factories, now, mocker):
         {"type": "Update", "object": {"type": obj_type}},
         context={obj_type.lower(): obj},
     )
+
+
+@pytest.mark.parametrize("is_local, expected", [(True, True), (False, False)])
+def test_perm_checkers_can_suggest(factories, is_local, expected):
+    obj = factories["music.Track"](local=is_local)
+    assert mutations.can_suggest(obj, actor=None) is expected
+
+
+@pytest.mark.parametrize(
+    "is_local, permission_library, actor_is_attributed, expected",
+    [
+        # Not local object, so local users can't edit
+        (False, False, False, False),
+        (False, True, False, False),
+        # Local but no specific conditions met for permission
+        (True, False, False, False),
+        # Local and attributed_to -> ok
+        (True, False, True, True),
+        # Local and library permission -> ok
+        (True, True, False, True),
+    ],
+)
+def test_perm_checkers_can_approve(
+    factories, is_local, permission_library, actor_is_attributed, expected
+):
+    actor = factories["users.User"](
+        permission_library=permission_library
+    ).create_actor()
+    obj_kwargs = {"local": is_local}
+    if actor_is_attributed:
+        obj_kwargs["attributed_to"] = actor
+    obj = factories["music.Track"](**obj_kwargs)
+
+    assert mutations.can_approve(obj, actor=actor) is expected

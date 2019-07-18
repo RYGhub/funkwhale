@@ -60,7 +60,7 @@ def get_libraries(filter_uploads):
 
 
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
-    queryset = models.Artist.objects.all()
+    queryset = models.Artist.objects.all().select_related("attributed_to")
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
@@ -92,7 +92,9 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
 
 class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
-        models.Album.objects.all().order_by("artist", "release_date").select_related()
+        models.Album.objects.all()
+        .order_by("artist", "release_date")
+        .select_related("artist", "attributed_to")
     )
     serializer_class = serializers.AlbumSerializer
     permission_classes = [oauth_permissions.ScopePermission]
@@ -188,7 +190,11 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     A simple ViewSet for viewing and editing accounts.
     """
 
-    queryset = models.Track.objects.all().for_nested_serialization()
+    queryset = (
+        models.Track.objects.all()
+        .for_nested_serialization()
+        .select_related("attributed_to")
+    )
     serializer_class = serializers.TrackSerializer
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
