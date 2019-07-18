@@ -333,7 +333,7 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
         f = transcoded_version
         file_path = get_file_path(f.audio_file)
         mt = f.mimetype
-    if not proxy_media:
+    if not proxy_media and f.audio_file:
         # we simply issue a 302 redirect to the real URL
         response = Response(status=302)
         response["Location"] = f.audio_file.url
