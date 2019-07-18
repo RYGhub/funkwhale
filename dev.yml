@@ -49,11 +49,14 @@ services:
       args:
         install_dev_deps: 1
     entrypoint: compose/django/dev-entrypoint.sh
-    command: uvicorn --reload config.asgi:application --host 0.0.0.0 --port 5000  --reload-dir config/ --reload-dir=funkwhale_api/
+    command: >
+      bash -c "python manage.py collectstatic --no-input
+      && uvicorn --reload config.asgi:application --host 0.0.0.0 --port 5000  --reload-dir config/ --reload-dir=funkwhale_api/"
     volumes:
       - ./api:/app
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - "./data/plugins:/srv/funkwhale/plugins"
+      - "./data/staticfiles:/staticfiles"
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
@@ -61,6 +64,7 @@ services:
       - "FUNKWHALE_PROTOCOL=${FUNKWHALE_PROTOCOL-http}"
       - "DATABASE_URL=postgresql://postgres@postgres/postgres"
       - "CACHE_URL=redis://redis:6379/0"
+      - "STATIC_ROOT=/staticfiles"
 
     depends_on:
       - postgres
@@ -120,6 +124,7 @@ services:
       - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro
       - "${MEDIA_ROOT-./api/funkwhale_api/media}:/protected/media:ro"
       - "./front:/frontend:ro"
+      - "./data/staticfiles:/staticfiles:ro"
     networks:
       - federation
       - internal

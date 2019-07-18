@@ -136,5 +136,8 @@ http {
             internal;
             alias   /music;
         }
+        location /staticfiles/ {
+            alias /staticfiles/;
+        }
     }
 }
