@@ -55,7 +55,7 @@
           :class="['ui', 'small', 'orange', 'inverted', {'indicating': isLoadingAudio}, 'progress']"
           @click="touchProgress">
           <div class="buffer bar" :data-percent="bufferProgress" :style="{ 'width': bufferProgress + '%' }"></div>
-          <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
+          <div class="position bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
       <div class="ui small warning message" v-if="currentTrack && errored">
@@ -825,6 +825,10 @@ export default {
 }
 .progress-area .actions {
   text-align: center;
+}
+.ui.progress:not([data-percent]):not(.indeterminate)
+  .bar.position:not(.buffer) {
+  background: #ff851b;
 }
 .volume-control {
   position: relative;
