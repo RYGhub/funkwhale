@@ -43,3 +43,58 @@ Then, edit your ``/etc/systemd/system/funkwhale-server.service`` and replace the
 ``ExecStart=/srv/funkwhale/virtualenv/bin/gunicorn config.asgi:application -w ${FUNKWHALE_WEB_WORKERS} -k uvicorn.workers.UvicornWorker -b ${FUNKWHALE_API_IP}:${FUNKWHALE_API_PORT}``
 
 Then reload the configuration change with ``sudo systemctl daemon-reload`` and ``sudo systemctl restart funkwhale-server``.
+
+
+Content-Security-Policy and additional security headers [manual action suggested]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To improve the security and reduce the attack surface in case of a successfull exploit, we suggest
+you add the following Content-Security-Policy to your nginx configuration.
+
+**On non-docker setups**, in ``/etc/nginx/sites-available/funkwhale.conf``::
+
+    server {
+
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+        add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+        location /front/ {
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+            add_header Referrer-Policy "strict-origin-when-cross-origin";
+            add_header X-Frame-Options "SAMEORIGIN";
+            # … existing content here
+        }
+
+        # Also create a new location for the embeds to ensure external iframes work
+        # Simply copy-paste the /front/ location, but replace the following lines:
+        location /front/embed.html {
+            add_header X-Frame-Options "ALLOW";
+            alias ${FUNKWHALE_FRONTEND_PATH}/embed.html;
+        }
+    }
+
+Then reload nginx with ``systemctl reload nginx``.
+
+**On docker setups**, in ``/srv/funkwhalenginx/funkwhale.template``::
+
+    server {
+
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+        add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+        location /front/ {
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+            add_header Referrer-Policy "strict-origin-when-cross-origin";
+            add_header X-Frame-Options "SAMEORIGIN";
+            # … existing content here
+        }
+
+        # Also create a new location for the embeds to ensure external iframes work
+        # Simply copy-paste the /front/ location, but replace the following lines:
+        location /front/embed.html {
+            add_header X-Frame-Options "ALLOW";
+            alias /frontent/embed.html;
+        }
+    }
+
+Then reload nginx with ``docker-compose restart nginx``.

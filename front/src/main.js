@@ -122,7 +122,9 @@ store.dispatch('instance/fetchFrontSettings').finally(() => {
     el: '#app',
     router,
     store,
-    template: '<App/>',
+    render (h) {
+      return h('App')
+    },
     components: { App }
   })
 

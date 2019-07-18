@@ -49,7 +49,7 @@ services:
       args:
         install_dev_deps: 1
     entrypoint: compose/django/dev-entrypoint.sh
-    command: python /app/manage.py runserver 0.0.0.0:${FUNKWHALE_API_PORT-5000}
+    command: uvicorn --reload config.asgi:application --host 0.0.0.0 --port 5000  --reload-dir config/ --reload-dir=funkwhale_api/
     volumes:
       - ./api:/app
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
@@ -119,6 +119,7 @@ services:
       - "${MUSIC_DIRECTORY_SERVE_PATH-./data/music}:/music:ro"
       - ./deploy/funkwhale_proxy.conf:/etc/nginx/funkwhale_proxy.conf:ro
       - "${MEDIA_ROOT-./api/funkwhale_api/media}:/protected/media:ro"
+      - "./front:/frontend:ro"
     networks:
       - federation
       - internal
