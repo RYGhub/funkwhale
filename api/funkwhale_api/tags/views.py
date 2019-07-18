@@ -1,6 +1,8 @@
 from django.db.models import functions
 from rest_framework import viewsets
 
+import django_filters.rest_framework
+
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters
@@ -20,3 +22,4 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     required_scope = "libraries"
     anonymous_policy = "setting"
     filterset_class = filters.TagFilter
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]

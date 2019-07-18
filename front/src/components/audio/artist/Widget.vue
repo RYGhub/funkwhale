@@ -2,39 +2,40 @@
   <div class="wrapper">
     <h3 class="ui header">
       <slot name="title"></slot>
-      <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
+      <span class="ui tiny circular label">{{ count }}</span>
     </h3>
     <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
     <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
-    <button v-if="controls" @click="fetchData('albums/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
+    <button v-if="controls" @click="fetchData('artists/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
-    <div class="ui five cards">
+    <div class="ui three cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>
       </div>
-      <div class="card" v-for="album in albums" :key="album.id">
-        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !album.cover.original}]" v-lazy:background-image="getImageUrl(album)">
-          <play-button class="play-overlay" :icon-only="true" :is-playable="album.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :album="album"></play-button>
+      <div class="flat inline card" v-for="object in objects" :key="object.id">
+        <div :class="['ui', 'image', 'with-overlay', {'default-cover': !getCover(object).original}]" v-lazy:background-image="getImageUrl(object)">
+          <play-button class="play-overlay" :icon-only="true" :is-playable="object.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="object"></play-button>
         </div>
         <div class="content">
-          <router-link :title="album.title" :to="{name: 'library.albums.detail', params: {id: album.id}}">
-            {{ album.title|truncate(25) }}
+          <router-link :title="object.name" :to="{name: 'library.artists.detail', params: {id: object.id}}">
+            {{ object.name|truncate(30) }}
           </router-link>
-          <div class="description">
-            <span>
-              <router-link :title="album.artist.name" class="discrete link" :to="{name: 'library.artists.detail', params: {id: album.artist.id}}">
-                {{ album.artist.name|truncate(23) }}
-              </router-link>
-            </span>
+          <div>
+            <i class="small sound icon"></i>
+            <translate translate-context="Content/Artist/Card" :translate-params="{count: object.albums.length}" :translate-n="object.albums.length" translate-plural="%{ count } albums">1 album</translate>
           </div>
-        </div>
-        <div class="extra content">
-          <human-date class="left floated" :date="album.creation_date"></human-date>
-          <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="album.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :album="album"></play-button>
+          <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="object.tags"></tags-list>
+
+          <play-button
+            class="play-button basic icon"
+            :dropdown-only="true"
+            :is-playable="object.is_playable"
+            :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']"
+            :artist="object"></play-button>
         </div>
       </div>
     </div>
-    <div v-if="!isLoading && albums.length === 0">No results matching your query.</div>
+    <div v-if="!isLoading && objects.length === 0">No results matching your query.</div>
   </div>
 </template>
 
@@ -42,19 +43,20 @@
 import _ from '@/lodash'
 import axios from 'axios'
 import PlayButton from '@/components/audio/PlayButton'
+import TagsList from "@/components/tags/List"
 
 export default {
   props: {
     filters: {type: Object, required: true},
     controls: {type: Boolean, default: true},
-    showCount: {type: Boolean, default: false},
   },
   components: {
-    PlayButton
+    PlayButton,
+    TagsList
   },
   data () {
     return {
-      albums: [],
+      objects: [],
       limit: 12,
       count: 0,
       isLoading: false,
@@ -64,7 +66,7 @@ export default {
     }
   },
   created () {
-    this.fetchData('albums/')
+    this.fetchData('artists/')
   },
   methods: {
     fetchData (url) {
@@ -80,7 +82,7 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.albums = response.data.results
+        self.objects = response.data.results
         self.count = response.data.count
       }, error => {
         self.isLoading = false
@@ -94,15 +96,22 @@ export default {
         this.offset = Math.max(this.offset - this.limit, 0)
       }
     },
-    getImageUrl (album) {
+    getImageUrl (object) {
       let url = '../../../assets/audio/default-cover.png'
-
-      if (album.cover.original) {
-        url = this.$store.getters['instance/absoluteUrl'](album.cover.medium_square_crop)
+      let cover = this.getCover(object)
+      if (cover.original) {
+        url = this.$store.getters['instance/absoluteUrl'](cover.medium_square_crop)
       } else {
         return null
       }
       return url
+    },
+    getCover (object) {
+      return object.albums.map((a) => {
+        return a.cover
+      }).filter((c) => {
+        return !!c
+      })[0] || {}
     }
   },
   watch: {
@@ -110,7 +119,7 @@ export default {
       this.fetchData()
     },
     "$store.state.moderation.lastUpdate": function () {
-      this.fetchData('albums/')
+      this.fetchData('objects/')
     }
   }
 }
@@ -128,17 +137,32 @@ export default {
 .ui.cards {
   justify-content: flex-start;
 }
-.ui.five.cards > .card {
-  width: 15em;
+.play-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.ui.three.cards .card {
+  width: 100%;
+}
+@include media(">tablet") {
+  .ui.three.cards .card {
+    width: 25em;
+  }
 }
 .with-overlay {
   background-size: cover !important;
   background-position: center !important;
-  height: 15em;
-  width: 15em;
+  height: 8em;
+  width: 8em;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+}
+.flat.card .with-overlay.image {
+  border-radius: 50% !important;
+  margin: 0 auto;
 }
 </style>
 <style>

@@ -12,4 +12,5 @@ export default {
   uniq: require('lodash/uniq'),
   remove: require('lodash/remove'),
   reverse: require('lodash/reverse'),
+  isEqual: require('lodash/isEqual'),
 }

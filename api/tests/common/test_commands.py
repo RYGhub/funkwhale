@@ -81,11 +81,7 @@ def test_load_test_data_dry_run(factories, mocker):
         ),
         (
             {"create_dependencies": True, "track_tags": 3},
-            [
-                (tags_models.Tag.objects.all(), 1),
-                (tags_models.TaggedItem.objects.all(), 3),
-                (music_models.Track.objects.all(), 3),
-            ],
+            [(tags_models.Tag.objects.all(), 1), (music_models.Track.objects.all(), 3)],
         ),
     ],
 )

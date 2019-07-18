@@ -342,6 +342,20 @@ td.align.right {
   word-wrap: break-word;
 }
 
+.ui.cards > .flat.card, .flat.card {
+  box-shadow: none;
+  .content {
+    border: none;
+  }
+}
+
+.ui.cards > .inline.card {
+  flex-direction: row;
+  .content {
+    padding: 0.5em 0.75em;
+  }
+}
+
 .ui.checkbox label {
   cursor: pointer;
 }
@@ -355,6 +369,9 @@ input + .help {
 }
 
 
+.tag-list {
+  margin-top: 0.5em;
+}
 
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

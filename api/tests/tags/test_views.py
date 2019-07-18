@@ -23,18 +23,21 @@ def test_tags_list_ordering_length(factories, logged_in_api_client):
     url = reverse("api:v1:tags-list")
     tags = [
         factories["tags.Tag"](name="iamareallylongtag"),
-        factories["tags.Tag"](name="reallylongtag"),
         factories["tags.Tag"](name="short"),
+        factories["tags.Tag"](name="reallylongtag"),
         factories["tags.Tag"](name="bar"),
     ]
     expected = {
         "count": 4,
         "next": None,
         "previous": None,
-        "results": [serializers.TagSerializer(tag).data for tag in tags],
+        "results": [
+            serializers.TagSerializer(tag).data
+            for tag in [tags[3], tags[1], tags[2], tags[0]]
+        ],
     }
 
-    response = logged_in_api_client.get(url, {"ordering": "-length"})
+    response = logged_in_api_client.get(url, {"ordering": "length"})
 
     assert response.data == expected
 

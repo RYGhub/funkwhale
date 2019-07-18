@@ -401,6 +401,7 @@ export default new Router({
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,
+            defaultTags: Array.isArray(route.query.tag || []) ? route.query.tag : [route.query.tag],
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page
           })
@@ -413,6 +414,7 @@ export default new Router({
           props: (route) => ({
             defaultOrdering: route.query.ordering,
             defaultQuery: route.query.query,
+            defaultTags: Array.isArray(route.query.tag || []) ? route.query.tag : [route.query.tag],
             defaultPaginateBy: route.query.paginateBy,
             defaultPage: route.query.page
           })
@@ -470,6 +472,13 @@ export default new Router({
           props: (route) => ({
             id: route.params.id,
             defaultEdit: route.query.mode === 'edit' })
+        },
+        {
+          path: 'tags/:id',
+          name: 'library.tags.detail',
+          component: () =>
+            import(/* webpackChunkName: "core" */ "@/components/library/TagDetail"),
+          props: true,
         },
         {
           path: 'artists/:id',

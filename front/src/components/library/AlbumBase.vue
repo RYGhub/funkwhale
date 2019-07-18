@@ -13,6 +13,7 @@
               <div v-html="subtitle"></div>
             </div>
           </h2>
+          <tags-list v-if="object.tags && object.tags.length > 0" :tags="object.tags"></tags-list>
           <div class="ui hidden divider"></div>
           <div class="header-buttons">
 
@@ -103,6 +104,7 @@ import backend from "@/audio/backend"
 import PlayButton from "@/components/audio/PlayButton"
 import EmbedWizard from "@/components/audio/EmbedWizard"
 import Modal from '@/components/semantic/Modal'
+import TagsList from "@/components/tags/List"
 
 const FETCH_URL = "albums/"
 
@@ -123,7 +125,8 @@ export default {
   components: {
     PlayButton,
     EmbedWizard,
-    Modal
+    Modal,
+    TagsList,
   },
   data() {
     return {
