@@ -111,7 +111,14 @@ export default {
     if (!this.$store.state.auth.authenticated) {
       return false
     }
-    return this.$store.state.auth.availablePermissions['library']
+
+    let libraryPermission = this.$store.state.auth.availablePermissions['library']
+    let objData = this.object || {}
+    let isOwner = false
+    if (objData.attributed_to) {
+      isOwner = this.$store.state.auth.fullUsername === objData.attributed_to.full_username
+    }
+    return libraryPermission || isOwner
   },
 
 }
