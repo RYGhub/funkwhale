@@ -67,10 +67,24 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
 
 class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
     albums = ArtistAlbumSerializer(many=True, read_only=True)
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Artist
-        fields = ("id", "fid", "mbid", "name", "creation_date", "albums", "is_local")
+        fields = (
+            "id",
+            "fid",
+            "mbid",
+            "name",
+            "creation_date",
+            "albums",
+            "is_local",
+            "tags",
+        )
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ArtistSimpleSerializer(serializers.ModelSerializer):
@@ -124,6 +138,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     artist = ArtistSimpleSerializer(read_only=True)
     cover = cover_field
     is_playable = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Album
@@ -139,6 +154,7 @@ class AlbumSerializer(serializers.ModelSerializer):
             "creation_date",
             "is_playable",
             "is_local",
+            "tags",
         )
 
     def get_tracks(self, o):
@@ -152,6 +168,10 @@ class AlbumSerializer(serializers.ModelSerializer):
             )
         except AttributeError:
             return None
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class TrackAlbumSerializer(serializers.ModelSerializer):
@@ -192,6 +212,7 @@ class TrackSerializer(serializers.ModelSerializer):
     album = TrackAlbumSerializer(read_only=True)
     uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -210,6 +231,7 @@ class TrackSerializer(serializers.ModelSerializer):
             "copyright",
             "license",
             "is_local",
+            "tags",
         )
 
     def get_listen_url(self, obj):
@@ -218,6 +240,10 @@ class TrackSerializer(serializers.ModelSerializer):
     def get_uploads(self, obj):
         uploads = getattr(obj, "playable_uploads", [])
         return TrackUploadSerializer(uploads, many=True).data
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 @common_serializers.track_fields_for_update("name", "description", "privacy_level")

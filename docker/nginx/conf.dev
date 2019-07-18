@@ -75,6 +75,9 @@ http {
         location /front-server/ {
             proxy_pass   http://funkwhale-front/;
         }
+        location /sockjs-node/ {
+            proxy_pass   http://funkwhale-front/sockjs-node/;
+        }
 
         location / {
             include /etc/nginx/funkwhale_proxy.conf;

@@ -23,12 +23,18 @@ from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import decorators as federation_decorators
 from funkwhale_api.federation import routes
-from funkwhale_api.tags.models import Tag
+from funkwhale_api.tags.models import Tag, TaggedItem
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
+
+TAG_PREFETCH = Prefetch(
+    "tagged_items",
+    queryset=TaggedItem.objects.all().select_related().order_by("tag__name"),
+    to_attr="_prefetched_tagged_items",
+)
 
 
 def get_libraries(filter_uploads):
@@ -71,7 +77,9 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
-        return queryset.prefetch_related(Prefetch("albums", queryset=albums))
+        return queryset.prefetch_related(
+            Prefetch("albums", queryset=albums), TAG_PREFETCH
+        )
 
     libraries = action(methods=["get"], detail=True)(
         get_libraries(
@@ -103,7 +111,9 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
             .with_playable_uploads(utils.get_actor_from_request(self.request))
             .order_for_album()
         )
-        qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
+        qs = queryset.prefetch_related(
+            Prefetch("tracks", queryset=tracks), TAG_PREFETCH
+        )
         return qs
 
     libraries = action(methods=["get"], detail=True)(
@@ -206,7 +216,7 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
         queryset = queryset.with_playable_uploads(
             utils.get_actor_from_request(self.request)
         )
-        return queryset
+        return queryset.prefetch_related(TAG_PREFETCH)
 
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))

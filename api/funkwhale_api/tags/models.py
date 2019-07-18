@@ -1,3 +1,6 @@
+import re
+
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import CICharField
@@ -6,6 +9,9 @@ from django.db import transaction
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+
+TAG_REGEX = re.compile(r"^((\w+)([\d_]*))$")
 
 
 class Tag(models.Model):
@@ -60,6 +66,9 @@ def add_tags(obj, *tags):
 
 @transaction.atomic
 def set_tags(obj, *tags):
+    # we ignore any extra tags if the length of the list is higher
+    # than our accepted size
+    tags = tags[: settings.TAGS_MAX_BY_OBJ]
     tags = set(tags)
     existing = set(
         TaggedItem.objects.for_content_object(obj).values_list("tag__name", flat=True)
