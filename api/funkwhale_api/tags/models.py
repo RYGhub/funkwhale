@@ -33,14 +33,12 @@ class TaggedItemQuerySet(models.QuerySet):
 
 class TaggedItem(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
-    tag = models.ForeignKey(
-        Tag, related_name="%(app_label)s_%(class)s_items", on_delete=models.CASCADE
-    )
+    tag = models.ForeignKey(Tag, related_name="tagged_items", on_delete=models.CASCADE)
     content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         verbose_name=_("Content type"),
-        related_name="%(app_label)s_%(class)s_tagged_items",
+        related_name="tagged_items",
     )
     object_id = models.IntegerField(verbose_name=_("Object id"), db_index=True)
     content_object = GenericForeignKey()
