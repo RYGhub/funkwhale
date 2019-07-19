@@ -19,6 +19,16 @@ from . import filters, models, tasks
 cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
 
 
+def serialize_attributed_to(self, obj):
+    # Import at runtime to avoid a circular import issue
+    from funkwhale_api.federation import serializers as federation_serializers
+
+    if not obj.attributed_to_id:
+        return
+
+    return federation_serializers.APIActorSerializer(obj.attributed_to).data
+
+
 class LicenseSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     url = serializers.URLField()
@@ -68,6 +78,7 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
 class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
     albums = ArtistAlbumSerializer(many=True, read_only=True)
     tags = serializers.SerializerMethodField()
+    attributed_to = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Artist
@@ -80,11 +91,14 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
             "albums",
             "is_local",
             "tags",
+            "attributed_to",
         )
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
         return [ti.tag.name for ti in tagged_items]
+
+    get_attributed_to = serialize_attributed_to
 
 
 class ArtistSimpleSerializer(serializers.ModelSerializer):
@@ -139,6 +153,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     cover = cover_field
     is_playable = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    attributed_to = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Album
@@ -155,7 +170,10 @@ class AlbumSerializer(serializers.ModelSerializer):
             "is_playable",
             "is_local",
             "tags",
+            "attributed_to",
         )
+
+    get_attributed_to = serialize_attributed_to
 
     def get_tracks(self, o):
         ordered_tracks = o.tracks.all()
@@ -213,6 +231,7 @@ class TrackSerializer(serializers.ModelSerializer):
     uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    attributed_to = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Track
@@ -232,7 +251,10 @@ class TrackSerializer(serializers.ModelSerializer):
             "license",
             "is_local",
             "tags",
+            "attributed_to",
         )
+
+    get_attributed_to = serialize_attributed_to
 
     def get_listen_url(self, obj):
         return obj.listen_url

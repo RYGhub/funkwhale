@@ -11,7 +11,12 @@ def can_suggest(obj, actor):
 
 
 def can_approve(obj, actor):
-    return obj.is_local and actor.user and actor.user.get_permissions()["library"]
+    if not obj.is_local or not actor.user:
+        return False
+
+    return (
+        actor.id is not None and actor.id == obj.attributed_to_id
+    ) or actor.user.get_permissions()["library"]
 
 
 class TagMutation(mutations.UpdateMutationSerializer):

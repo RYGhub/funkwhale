@@ -1,5 +1,6 @@
 import pytest
 
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models
 from funkwhale_api.music import serializers
@@ -56,7 +57,8 @@ def test_artist_album_serializer(factories, to_api_date):
 
 
 def test_artist_with_albums_serializer(factories, to_api_date):
-    track = factories["music.Track"]()
+    actor = factories["federation.Actor"]()
+    track = factories["music.Track"](album__artist__attributed_to=actor)
     artist = track.artist
     artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
     album = list(artist.albums.all())[0]
@@ -70,6 +72,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "creation_date": to_api_date(artist.creation_date),
         "albums": [serializers.ArtistAlbumSerializer(album).data],
         "tags": [],
+        "attributed_to": federation_serializers.APIActorSerializer(actor).data,
     }
     serializer = serializers.ArtistWithAlbumsSerializer(artist)
     assert serializer.data == expected
@@ -156,7 +159,8 @@ def test_upload_owner_serializer(factories, to_api_date):
 
 
 def test_album_serializer(factories, to_api_date):
-    track1 = factories["music.Track"](position=2)
+    actor = factories["federation.Actor"]()
+    track1 = factories["music.Track"](position=2, album__attributed_to=actor)
     track2 = factories["music.Track"](position=1, album=track1.album)
     album = track1.album
     expected = {
@@ -177,6 +181,7 @@ def test_album_serializer(factories, to_api_date):
         "tracks": serializers.AlbumTrackSerializer([track2, track1], many=True).data,
         "is_local": album.is_local,
         "tags": [],
+        "attributed_to": federation_serializers.APIActorSerializer(actor).data,
     }
     serializer = serializers.AlbumSerializer(album)
 
@@ -184,8 +189,12 @@ def test_album_serializer(factories, to_api_date):
 
 
 def test_track_serializer(factories, to_api_date):
+    actor = factories["federation.Actor"]()
     upload = factories["music.Upload"](
-        track__license="cc-by-4.0", track__copyright="test", track__disc_number=2
+        track__license="cc-by-4.0",
+        track__copyright="test",
+        track__disc_number=2,
+        track__attributed_to=actor,
     )
     track = upload.track
     setattr(track, "playable_uploads", [upload])
@@ -205,6 +214,7 @@ def test_track_serializer(factories, to_api_date):
         "copyright": upload.track.copyright,
         "is_local": upload.track.is_local,
         "tags": [],
+        "attributed_to": federation_serializers.APIActorSerializer(actor).data,
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected
