@@ -54,6 +54,9 @@ class RadioSessionTrackSerializer(serializers.ModelSerializer):
 
 
 class RadioSessionSerializer(serializers.ModelSerializer):
+
+    related_object_id = serializers.CharField(required=False, allow_null=True)
+
     class Meta:
         model = models.RadioSession
         fields = (
@@ -66,7 +69,17 @@ class RadioSessionSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        registry[data["radio_type"]]().validate_session(data, **self.context)
+        radio_conf = registry[data["radio_type"]]()
+        if radio_conf.related_object_field:
+            try:
+                data[
+                    "related_object_id"
+                ] = radio_conf.related_object_field.to_internal_value(
+                    data["related_object_id"]
+                )
+            except KeyError:
+                raise serializers.ValidationError("Radio requires a related object")
+        radio_conf.validate_session(data, **self.context)
         return data
 
     def create(self, validated_data):
@@ -77,3 +90,11 @@ class RadioSessionSerializer(serializers.ModelSerializer):
                 validated_data["related_object_id"]
             )
         return super().create(validated_data)
+
+    def to_representation(self, instance):
+        repr = super().to_representation(instance)
+        radio_conf = registry[repr["radio_type"]]()
+        handler = getattr(radio_conf, "get_related_object_id_repr", None)
+        if handler and instance.related_object:
+            repr["related_object_id"] = handler(instance.related_object)
+        return repr

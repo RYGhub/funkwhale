@@ -6,6 +6,7 @@
           {{ labels.title }}
         </span>
       </h2>
+      <radio-button type="tag" :object-id="id"></radio-button>
       <div class="ui hidden divider"></div>
       <div class="ui row">
         <artist-widget :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
@@ -39,10 +40,10 @@
 
 <script>
 
-
 import TrackWidget from "@/components/audio/track/Widget"
 import AlbumWidget from "@/components/audio/album/Widget"
 import ArtistWidget from "@/components/audio/artist/Widget"
+import RadioButton from "@/components/radios/Button"
 
 export default {
   props: {
@@ -52,6 +53,7 @@ export default {
     ArtistWidget,
     AlbumWidget,
     TrackWidget,
+    RadioButton,
   },
   computed: {
     labels() {

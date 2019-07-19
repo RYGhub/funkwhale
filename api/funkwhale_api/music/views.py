@@ -4,7 +4,6 @@ import urllib
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch, Sum, F, Q
-from django.db.models.functions import Length
 from django.utils import timezone
 
 from rest_framework import mixins
@@ -24,6 +23,7 @@ from funkwhale_api.federation import api_serializers as federation_api_serialize
 from funkwhale_api.federation import decorators as federation_decorators
 from funkwhale_api.federation import routes
 from funkwhale_api.tags.models import Tag, TaggedItem
+from funkwhale_api.tags.serializers import TagSerializer
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
@@ -339,7 +339,7 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
         f = transcoded_version
         file_path = get_file_path(f.audio_file)
         mt = f.mimetype
-    if not proxy_media:
+    if not proxy_media and f.audio_file:
         # we simply issue a 302 redirect to the real URL
         response = Response(status=302)
         response["Location"] = f.audio_file.url
@@ -482,6 +482,7 @@ class Search(views.APIView):
             "albums": serializers.AlbumSerializer(
                 self.get_albums(query), many=True
             ).data,
+            "tags": TagSerializer(self.get_tags(query), many=True).data,
         }
         return Response(results, status=200)
 
@@ -520,15 +521,8 @@ class Search(views.APIView):
     def get_tags(self, query):
         search_fields = ["name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-
-        # We want the shortest tag first
-        qs = (
-            Tag.objects.all()
-            .annotate(name_length=Length("name"))
-            .order_by("name_length")
-        )
-
-        return qs.filter(query_obj)[: self.max_results]
+        qs = Tag.objects.all().filter(query_obj)
+        return common_utils.order_for_search(qs, "name")[: self.max_results]
 
 
 class LicenseViewSet(viewsets.ReadOnlyModelViewSet):
