@@ -2,6 +2,8 @@ import datetime
 import functools
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count, Q
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
@@ -18,6 +20,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
 from funkwhale_api.playlists import models as playlists_models
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
 
 from . import authentication, filters, negotiation, serializers
@@ -362,6 +365,26 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         queryset = filterset.qs
         actor = utils.get_actor_from_request(request)
         queryset = queryset.playable_by(actor)
+        type = data.get("type", "alphabeticalByArtist")
+
+        if type == "alphabeticalByArtist":
+            queryset = queryset.order_by("artist__name")
+        elif type == "random":
+            queryset = queryset.order_by("?")
+        elif type == "alphabeticalByName" or not type:
+            queryset = queryset.order_by("artist__title")
+        elif type == "recent" or not type:
+            queryset = queryset.exclude(release_date__in=["", None]).order_by(
+                "-release_date"
+            )
+        elif type == "newest" or not type:
+            queryset = queryset.order_by("-creation_date")
+        elif type == "byGenre" and data.get("genre"):
+            genre = data.get("genre")
+            queryset = queryset.filter(
+                Q(tagged_items__tag__name=genre)
+                | Q(artist__tagged_items__tag__name=genre)
+            )
 
         try:
             offset = int(data["offset"])
@@ -669,3 +692,29 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             listening = serializer.save()
             record.send(listening)
         return response.Response({})
+
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_genres",
+        url_path="getGenres",
+    )
+    def get_genres(self, request, *args, **kwargs):
+        album_ct = ContentType.objects.get_for_model(music_models.Album)
+        track_ct = ContentType.objects.get_for_model(music_models.Track)
+        queryset = (
+            tags_models.Tag.objects.annotate(
+                _albums_count=Count(
+                    "tagged_items", filter=Q(tagged_items__content_type=album_ct)
+                ),
+                _tracks_count=Count(
+                    "tagged_items", filter=Q(tagged_items__content_type=track_ct)
+                ),
+            )
+            .exclude(_tracks_count=0, _albums_count=0)
+            .order_by("name")
+        )
+        data = {
+            "genres": {"genre": [serializers.get_genre_data(tag) for tag in queryset]}
+        }
+        return response.Response(data)

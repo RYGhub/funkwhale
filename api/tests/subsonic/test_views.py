@@ -376,6 +376,28 @@ def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
 
 
 @pytest.mark.parametrize("f", ["json"])
+def test_get_genres(f, db, logged_in_api_client, factories, mocker):
+    url = reverse("api:subsonic-get_genres")
+    assert url.endswith("getGenres") is True
+    tag1 = factories["tags.Tag"](name="Pop")
+    tag2 = factories["tags.Tag"](name="Rock")
+
+    factories["music.Album"](set_tags=[tag1.name, tag2.name])
+    factories["music.Track"](set_tags=[tag1.name])
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "genres": {
+            "genre": [
+                {"songCount": 1, "albumCount": 1, "value": tag1.name},
+                {"songCount": 0, "albumCount": 1, "value": tag2.name},
+            ]
+        }
+    }
+
+
+@pytest.mark.parametrize("f", ["json"])
 def test_get_starred(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get_starred")
     assert url.endswith("getStarred") is True
@@ -423,6 +445,27 @@ def test_get_album_list2_pagination(f, db, logged_in_api_client, factories):
     assert response.status_code == 200
     assert response.data == {
         "albumList2": {"album": serializers.get_album_list2_data([album1])}
+    }
+
+
+@pytest.mark.parametrize("f", ["json"])
+def test_get_album_list2_by_genre(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get_album_list2")
+    assert url.endswith("getAlbumList2") is True
+    album1 = factories["music.Album"](
+        artist__name="Artist1", playable=True, set_tags=["Rock"]
+    )
+    album2 = factories["music.Album"](
+        artist__name="Artist2", playable=True, artist__set_tags=["Rock"]
+    )
+    factories["music.Album"](playable=True, set_tags=["Pop"])
+    response = logged_in_api_client.get(
+        url, {"f": f, "type": "byGenre", "size": 5, "offset": 0, "genre": "rock"}
+    )
+
+    assert response.status_code == 200
+    assert response.data == {
+        "albumList2": {"album": serializers.get_album_list2_data([album1, album2])}
     }
 
 

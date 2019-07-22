@@ -263,3 +263,11 @@ class ScrobbleSerializer(serializers.Serializer):
         return history_models.Listening.objects.create(
             user=self.context["user"], track=data["id"]
         )
+
+
+def get_genre_data(tag):
+    return {
+        "songCount": getattr(tag, "_tracks_count", 0),
+        "albumCount": getattr(tag, "_albums_count", 0),
+        "value": tag.name,
+    }

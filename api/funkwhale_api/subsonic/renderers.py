@@ -53,5 +53,8 @@ def dict_to_xml_tree(root_tag, d, parent=None):
             for obj in value:
                 root.append(dict_to_xml_tree(key, obj, parent=root))
         else:
-            root.set(key, str(value))
+            if key == "value":
+                root.text = str(value)
+            else:
+                root.set(key, str(value))
     return root
