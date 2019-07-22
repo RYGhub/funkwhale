@@ -296,6 +296,7 @@ paths:
       summary: Retrieve a single artist
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
       security:
         - oauth2:
           - "read:libraries"
@@ -395,6 +396,7 @@ paths:
       summary: Retrieve a single album
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
 
       security:
         - oauth2:
@@ -518,6 +520,7 @@ paths:
     get:
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
       summary: Retrieve a single track
 
       security:
@@ -971,6 +974,14 @@ parameters:
     in: "query"
     default: null
     description: "Filter/exclude resources with playable tracks"
+    schema:
+      required: false
+      type: "boolean"
+  Refresh:
+    name: "refresh"
+    in: "query"
+    default: false
+    description: "Trigger an ActivityPub fetch to refresh local data"
     schema:
       required: false
       type: "boolean"

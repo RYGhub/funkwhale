@@ -202,6 +202,11 @@ class Artist(APIModelMixin):
         related_name="attributed_artists",
     )
     tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
 
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
@@ -282,6 +287,11 @@ class Album(APIModelMixin):
         related_name="attributed_albums",
     )
     tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
 
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
     api = musicbrainz.api.releases
@@ -463,6 +473,11 @@ class Track(APIModelMixin):
     import_hooks = [import_tags]
     objects = TrackQuerySet.as_manager()
     tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
 
     class Meta:
         ordering = ["album", "disc_number", "position"]

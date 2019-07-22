@@ -179,7 +179,7 @@ export default {
 
       })
 
-      let artistPromise = axios.get("artists/" + this.id + "/").then(response => {
+      let artistPromise = axios.get("artists/" + this.id + "/", {params: {refresh: 'true'}}).then(response => {
         self.object = response.data
       })
       await trackPromise

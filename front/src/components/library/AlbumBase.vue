@@ -146,7 +146,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching album "' + this.id + '"')
-      axios.get(url).then(response => {
+      axios.get(url, {params: {refresh: 'true'}}).then(response => {
         self.object = backend.Album.clean(response.data)
         self.discs = self.object.tracks.reduce(groupByDisc, [])
         self.isLoading = false

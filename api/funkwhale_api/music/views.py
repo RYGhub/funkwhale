@@ -1,3 +1,4 @@
+import datetime
 import logging
 import urllib
 
@@ -21,7 +22,9 @@ from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import decorators as federation_decorators
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.tags.models import Tag, TaggedItem
 from funkwhale_api.tags.serializers import TagSerializer
 from funkwhale_api.users.oauth import permissions as oauth_permissions
@@ -59,6 +62,37 @@ def get_libraries(filter_uploads):
     return libraries
 
 
+def refetch_obj(obj, queryset):
+    """
+    Given an Artist/Album/Track instance, if the instance is from a remote pod,
+    will attempt to update local data with the latest ActivityPub representation.
+    """
+    if obj.is_local:
+        return obj
+
+    now = timezone.now()
+    limit = now - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY)
+    last_fetch = obj.fetches.order_by("-creation_date").first()
+    if last_fetch is not None and last_fetch.creation_date > limit:
+        # we fetched recently, no need to do it again
+        return obj
+
+    logger.info("Refetching %s:%s at %s…", obj._meta.label, obj.pk, obj.fid)
+    actor = actors.get_service_actor()
+    fetch = federation_models.Fetch.objects.create(actor=actor, url=obj.fid, object=obj)
+    try:
+        federation_tasks.fetch(fetch_id=fetch.pk)
+    except Exception:
+        logger.exception(
+            "Error while refetching %s:%s at %s…", obj._meta.label, obj.pk, obj.fid
+        )
+    else:
+        fetch.refresh_from_db()
+        if fetch.status == "finished":
+            obj = queryset.get(pk=obj.pk)
+    return obj
+
+
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = models.Artist.objects.all().select_related("attributed_to")
     serializer_class = serializers.ArtistWithAlbumsSerializer
@@ -70,6 +104,16 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
 
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
+
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -105,6 +149,16 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
 
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
+
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -211,6 +265,16 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     )
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
+
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
 
     def get_queryset(self):
         queryset = super().get_queryset()
