@@ -559,7 +559,7 @@ def test_music_library_serializer_from_private(factories, mocker):
 
 
 def test_activity_pub_artist_serializer_to_ap(factories):
-    artist = factories["music.Artist"](attributed=True)
+    artist = factories["music.Artist"](attributed=True, set_tags=["Punk", "Rock"])
     expected = {
         "@context": jsonld.get_default_context(),
         "type": "Artist",
@@ -568,6 +568,10 @@ def test_activity_pub_artist_serializer_to_ap(factories):
         "musicbrainzId": artist.mbid,
         "published": artist.creation_date.isoformat(),
         "attributedTo": artist.attributed_to.fid,
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
     }
     serializer = serializers.ArtistSerializer(artist)
 
@@ -575,7 +579,7 @@ def test_activity_pub_artist_serializer_to_ap(factories):
 
 
 def test_activity_pub_album_serializer_to_ap(factories):
-    album = factories["music.Album"](attributed=True)
+    album = factories["music.Album"](attributed=True, set_tags=["Punk", "Rock"])
 
     expected = {
         "@context": jsonld.get_default_context(),
@@ -596,6 +600,10 @@ def test_activity_pub_album_serializer_to_ap(factories):
             ).data
         ],
         "attributedTo": album.attributed_to.fid,
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
     }
     serializer = serializers.AlbumSerializer(album)
 
@@ -673,6 +681,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                 "href": "https://cover.image/test.png",
                 "mediaType": "image/png",
             },
+            "tag": [{"type": "Hashtag", "name": "AlbumTag"}],
             "artists": [
                 {
                     "type": "Artist",
@@ -681,6 +690,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                     "musicbrainzId": str(uuid.uuid4()),
                     "published": published.isoformat(),
                     "attributedTo": album_artist_attributed_to.fid,
+                    "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
                 }
             ],
         },
@@ -692,6 +702,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": artist_attributed_to.fid,
                 "published": published.isoformat(),
+                "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
             }
         ],
         "tag": [
@@ -741,7 +752,10 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert album_artist.creation_date == published
     assert album_artist.attributed_to == album_artist_attributed_to
 
-    add_tags.assert_called_once_with(track, *["Hello", "World"])
+    add_tags.assert_any_call(track, *["Hello", "World"])
+    add_tags.assert_any_call(album, *["AlbumTag"])
+    add_tags.assert_any_call(album_artist, *["AlbumArtistTag"])
+    add_tags.assert_any_call(artist, *["ArtistTag"])
 
 
 def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker):

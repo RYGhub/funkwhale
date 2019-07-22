@@ -298,6 +298,7 @@ def federation_audio_track_to_metadata(payload, references):
             if payload["album"].get("musicbrainzId")
             else None,
             "release_date": payload["album"].get("released"),
+            "tags": [t["name"] for t in payload["album"].get("tags", []) or []],
             "artists": [
                 {
                     "fid": a["id"],
@@ -305,6 +306,7 @@ def federation_audio_track_to_metadata(payload, references):
                     "fdate": a["published"],
                     "attributed_to": references.get(a.get("attributedTo")),
                     "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+                    "tags": [t["name"] for t in a.get("tags", []) or []],
                 }
                 for a in payload["album"]["artists"]
             ],
@@ -316,12 +318,14 @@ def federation_audio_track_to_metadata(payload, references):
                 "fdate": a["published"],
                 "attributed_to": references.get(a.get("attributedTo")),
                 "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+                "tags": [t["name"] for t in a.get("tags", []) or []],
             }
             for a in payload["artists"]
         ],
         # federation
         "fid": payload["id"],
         "fdate": payload["published"],
+        "tags": [t["name"] for t in payload.get("tags", []) or []],
     }
     cover = payload["album"].get("cover")
     if cover:
@@ -438,10 +442,10 @@ def _get_track(data, attributed_to=None):
 
     # get / create artist and album artist
     artists = getter(data, "artists", default=[])
-    artist = artists[0]
-    artist_mbid = artist.get("mbid", None)
-    artist_fid = artist.get("fid", None)
-    artist_name = artist["name"]
+    artist_data = artists[0]
+    artist_mbid = artist_data.get("mbid", None)
+    artist_fid = artist_data.get("fid", None)
+    artist_name = artist_data["name"]
 
     if artist_mbid:
         query = Q(mbid=artist_mbid)
@@ -454,24 +458,26 @@ def _get_track(data, attributed_to=None):
         "mbid": artist_mbid,
         "fid": artist_fid,
         "from_activity_id": from_activity_id,
-        "attributed_to": artist.get("attributed_to", attributed_to),
+        "attributed_to": artist_data.get("attributed_to", attributed_to),
     }
-    if artist.get("fdate"):
-        defaults["creation_date"] = artist.get("fdate")
+    if artist_data.get("fdate"):
+        defaults["creation_date"] = artist_data.get("fdate")
 
-    artist = get_best_candidate_or_create(
+    artist, created = get_best_candidate_or_create(
         models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
+    if created:
+        tags_models.add_tags(artist, *artist_data.get("tags", []))
 
     album_artists = getter(data, "album", "artists", default=artists) or artists
-    album_artist = album_artists[0]
-    album_artist_name = album_artist.get("name")
+    album_artist_data = album_artists[0]
+    album_artist_name = album_artist_data.get("name")
     if album_artist_name == artist_name:
         album_artist = artist
     else:
         query = Q(name__iexact=album_artist_name)
-        album_artist_mbid = album_artist.get("mbid", None)
-        album_artist_fid = album_artist.get("fid", None)
+        album_artist_mbid = album_artist_data.get("mbid", None)
+        album_artist_fid = album_artist_data.get("fid", None)
         if album_artist_mbid:
             query |= Q(mbid=album_artist_mbid)
         if album_artist_fid:
@@ -481,19 +487,21 @@ def _get_track(data, attributed_to=None):
             "mbid": album_artist_mbid,
             "fid": album_artist_fid,
             "from_activity_id": from_activity_id,
-            "attributed_to": album_artist.get("attributed_to", attributed_to),
+            "attributed_to": album_artist_data.get("attributed_to", attributed_to),
         }
-        if album_artist.get("fdate"):
-            defaults["creation_date"] = album_artist.get("fdate")
+        if album_artist_data.get("fdate"):
+            defaults["creation_date"] = album_artist_data.get("fdate")
 
-        album_artist = get_best_candidate_or_create(
+        album_artist, created = get_best_candidate_or_create(
             models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
-        )[0]
+        )
+        if created:
+            tags_models.add_tags(album_artist, *album_artist_data.get("tags", []))
 
     # get / create album
-    album = data["album"]
-    album_title = album["title"]
-    album_fid = album.get("fid", None)
+    album_data = data["album"]
+    album_title = album_data["title"]
+    album_fid = album_data.get("fid", None)
 
     if album_mbid:
         query = Q(mbid=album_mbid)
@@ -506,17 +514,19 @@ def _get_track(data, attributed_to=None):
         "title": album_title,
         "artist": album_artist,
         "mbid": album_mbid,
-        "release_date": album.get("release_date"),
+        "release_date": album_data.get("release_date"),
         "fid": album_fid,
         "from_activity_id": from_activity_id,
-        "attributed_to": album.get("attributed_to", attributed_to),
+        "attributed_to": album_data.get("attributed_to", attributed_to),
     }
-    if album.get("fdate"):
-        defaults["creation_date"] = album.get("fdate")
+    if album_data.get("fdate"):
+        defaults["creation_date"] = album_data.get("fdate")
 
-    album = get_best_candidate_or_create(
+    album, created = get_best_candidate_or_create(
         models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
+    if created:
+        tags_models.add_tags(album, *album_data.get("tags", []))
 
     # get / create track
     track_title = data["title"]
