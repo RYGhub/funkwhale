@@ -24,6 +24,7 @@ users_router.register(r"invitations", views.ManageInvitationViewSet, "invitation
 
 other_router = routers.OptionalSlashRouter()
 other_router.register(r"accounts", views.ManageActorViewSet, "accounts")
+other_router.register(r"tags", views.ManageTagViewSet, "tags")
 
 urlpatterns = [
     url(

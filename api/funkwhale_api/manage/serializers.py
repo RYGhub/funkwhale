@@ -10,6 +10,7 @@ from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
 
 from . import filters
@@ -564,3 +565,30 @@ class ManageUploadSerializer(serializers.ModelSerializer):
             "track",
             "library",
         )
+
+
+class ManageTagSerializer(ManageBaseAlbumSerializer):
+
+    tracks_count = serializers.SerializerMethodField()
+    albums_count = serializers.SerializerMethodField()
+    artists_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = tags_models.Tag
+        fields = [
+            "id",
+            "name",
+            "creation_date",
+            "tracks_count",
+            "albums_count",
+            "artists_count",
+        ]
+
+    def get_tracks_count(self, obj):
+        return getattr(obj, "_tracks_count", None)
+
+    def get_albums_count(self, obj):
+        return getattr(obj, "_albums_count", None)
+
+    def get_artists_count(self, obj):
+        return getattr(obj, "_artists_count", None)

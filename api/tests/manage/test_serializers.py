@@ -496,3 +496,22 @@ def test_action_serializer_delete(factory, serializer_class, factories):
     s.handle_delete(objects[0].__class__.objects.all())
 
     assert objects[0].__class__.objects.count() == 0
+
+
+def test_manage_tag_serializer(factories):
+    tag = factories["tags.Tag"]()
+
+    setattr(tag, "_tracks_count", 42)
+    setattr(tag, "_albums_count", 54)
+    setattr(tag, "_artists_count", 66)
+    expected = {
+        "id": tag.id,
+        "name": tag.name,
+        "creation_date": tag.creation_date.isoformat().split("+")[0] + "Z",
+        "tracks_count": 42,
+        "albums_count": 54,
+        "artists_count": 66,
+    }
+    s = serializers.ManageTagSerializer(tag)
+
+    assert s.data == expected
