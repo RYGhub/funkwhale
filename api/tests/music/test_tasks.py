@@ -46,7 +46,9 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     assert track.artist.mbid is None
     assert track.artist.attributed_to is None
     match_license.assert_called_once_with(metadata["license"], metadata["copyright"])
-    add_tags.assert_called_once_with(track, *metadata["tags"])
+    add_tags.assert_any_call(track, *metadata["tags"])
+    add_tags.assert_any_call(track.artist, *[])
+    add_tags.assert_any_call(track.album, *[])
 
 
 def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
@@ -558,6 +560,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "license": "http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
         "attributedTo": "http://track.attributed",
+        "tag": [{"type": "Hashtag", "name": "TrackTag"}],
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -565,6 +568,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "name": "Purple album",
             "musicbrainzId": str(uuid.uuid4()),
             "released": released.isoformat(),
+            "tag": [{"type": "Hashtag", "name": "AlbumTag"}],
             "attributedTo": "http://album.attributed",
             "artists": [
                 {
@@ -574,6 +578,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "name": "John Smith",
                     "musicbrainzId": str(uuid.uuid4()),
                     "attributedTo": "http://album-artist.attributed",
+                    "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
                 }
             ],
             "cover": {
@@ -590,6 +595,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "name": "Bob Smith",
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": "http://artist.attributed",
+                "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
             }
         ],
     }
@@ -605,6 +611,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "fdate": serializer.validated_data["published"],
         "fid": payload["id"],
         "attributed_to": references["http://track.attributed"],
+        "tags": ["TrackTag"],
         "album": {
             "title": payload["album"]["name"],
             "attributed_to": references["http://album.attributed"],
@@ -612,6 +619,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "mbid": payload["album"]["musicbrainzId"],
             "fid": payload["album"]["id"],
             "fdate": serializer.validated_data["album"]["published"],
+            "tags": ["AlbumTag"],
             "artists": [
                 {
                     "name": a["name"],
@@ -621,6 +629,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "fdate": serializer.validated_data["album"]["artists"][i][
                         "published"
                     ],
+                    "tags": ["AlbumArtistTag"],
                 }
                 for i, a in enumerate(payload["album"]["artists"])
             ],
@@ -634,6 +643,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "fid": a["id"],
                 "fdate": serializer.validated_data["artists"][i]["published"],
                 "attributed_to": references["http://artist.attributed"],
+                "tags": ["ArtistTag"],
             }
             for i, a in enumerate(payload["artists"])
         ],
