@@ -722,3 +722,6 @@ SUBSONIC_DEFAULT_TRANSCODING_FORMAT = (
 
 # extra tags will be ignored
 TAGS_MAX_BY_OBJ = env.int("TAGS_MAX_BY_OBJ", default=30)
+FEDERATION_OBJECT_FETCH_DELAY = env.int(
+    "FEDERATION_OBJECT_FETCH_DELAY", default=60 * 24 * 3
+)

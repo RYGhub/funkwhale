@@ -155,7 +155,7 @@ export default {
       this.isLoadingTrack = true
       let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching track "' + this.id + '"')
-      axios.get(url).then(response => {
+      axios.get(url, {params: {refresh: 'true'}}).then(response => {
         self.track = response.data
         self.isLoadingTrack = false
       })

@@ -1,7 +1,9 @@
+import datetime
 import io
 import magic
 import os
 import urllib.parse
+import uuid
 
 import pytest
 from django.urls import reverse
@@ -10,6 +12,7 @@ from django.utils import timezone
 from funkwhale_api.common import utils
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import licenses, models, serializers, tasks, views
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -826,3 +829,94 @@ def test_oembed_artist(factories, no_api_auth, api_client, settings):
     response = api_client.get(url, {"url": artist_url, "format": "json"})
 
     assert response.data == expected
+
+
+@pytest.mark.parametrize(
+    "factory_name, url_name",
+    [
+        ("music.Artist", "api:v1:artists-detail"),
+        ("music.Album", "api:v1:albums-detail"),
+        ("music.Track", "api:v1:tracks-detail"),
+    ],
+)
+def test_refresh_remote_entity_when_param_is_true(
+    factories,
+    factory_name,
+    url_name,
+    mocker,
+    logged_in_api_client,
+    queryset_equal_queries,
+):
+    obj = factories[factory_name](mbid=None)
+
+    assert obj.is_local is False
+
+    new_mbid = uuid.uuid4()
+
+    def fake_refetch(obj, queryset):
+        obj.mbid = new_mbid
+        return obj
+
+    refetch_obj = mocker.patch.object(views, "refetch_obj", side_effect=fake_refetch)
+    url = reverse(url_name, kwargs={"pk": obj.pk})
+    response = logged_in_api_client.get(url, {"refresh": "true"})
+
+    assert response.status_code == 200
+    assert response.data["mbid"] == str(new_mbid)
+    assert refetch_obj.call_count == 1
+    assert refetch_obj.call_args[0][0] == obj
+
+
+@pytest.mark.parametrize("param", ["false", "0", ""])
+def test_refresh_remote_entity_no_param(
+    factories, param, mocker, logged_in_api_client, service_actor
+):
+    obj = factories["music.Artist"](mbid=None)
+
+    assert obj.is_local is False
+
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    url = reverse("api:v1:artists-detail", kwargs={"pk": obj.pk})
+    response = logged_in_api_client.get(url, {"refresh": param})
+
+    assert response.status_code == 200
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj_not_local(mocker, factories, service_actor):
+    obj = factories["music.Artist"](local=True)
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    assert views.refetch_obj(obj, obj.__class__.objects.all()) == obj
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj_last_fetch_date_too_close(
+    mocker, factories, settings, service_actor
+):
+    settings.FEDERATION_OBJECT_FETCH_DELAY = 300
+    obj = factories["music.Artist"]()
+    factories["federation.Fetch"](
+        object=obj,
+        creation_date=timezone.now()
+        - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY - 1),
+    )
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    assert views.refetch_obj(obj, obj.__class__.objects.all()) == obj
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj(mocker, factories, settings, service_actor):
+    settings.FEDERATION_OBJECT_FETCH_DELAY = 300
+    obj = factories["music.Artist"]()
+    factories["federation.Fetch"](
+        object=obj,
+        creation_date=timezone.now()
+        - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY + 1),
+    )
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    views.refetch_obj(obj, obj.__class__.objects.all())
+    fetch = obj.fetches.filter(actor=service_actor).order_by("-creation_date").first()
+    fetch_task.assert_called_once_with(fetch_id=fetch.pk)
