@@ -322,6 +322,18 @@ def test_library_detail(factories, superuser_api_client):
     assert response.data["id"] == library.id
 
 
+def test_library_update(factories, superuser_api_client):
+    library = factories["music.Library"](privacy_level="public")
+    url = reverse(
+        "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
+    )
+    response = superuser_api_client.patch(url, {"privacy_level": "me"})
+
+    assert response.status_code == 200
+    library.refresh_from_db()
+    assert library.privacy_level == "me"
+
+
 def test_library_detail_stats(factories, superuser_api_client):
     library = factories["music.Library"]()
     url = reverse(

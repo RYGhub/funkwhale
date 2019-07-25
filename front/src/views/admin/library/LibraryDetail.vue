@@ -96,7 +96,16 @@
                       </router-link>
                     </td>
                     <td>
-                      {{ sharedLabels.fields.privacy_level.shortChoices[object.privacy_level] }}
+                      <select
+                        v-dropdown
+                        v-if="object.is_local"
+                        @change="updateObj('privacy_level')"
+                        v-model="object.privacy_level"
+
+                        class="ui search selection dropdown">
+                        <option v-for="p in ['me', 'instance', 'everyone']" :value="p">{{ sharedLabels.fields.privacy_level.shortChoices[p] }}</option>
+                      </select>
+                      <template v-else>{{ sharedLabels.fields.privacy_level.shortChoices[object.privacy_level] }}</template>
                     </td>
                   </tr>
                   <tr>
@@ -308,7 +317,28 @@ export default {
     },
     getQuery (field, value) {
       return `${field}:"${value}"`
-    }
+    },
+    updateObj(attr, toNull) {
+      let newValue = this.object[attr]
+      if (toNull && !newValue) {
+        newValue = null
+      }
+      let params = {}
+      params[attr] = newValue
+      axios.patch(`manage/library/libraries/${this.id}/`, params).then(
+        response => {
+          logger.default.info(
+            `${attr} was updated succcessfully to ${newValue}`
+          )
+        },
+        error => {
+          logger.default.error(
+            `Error while setting ${attr} to ${newValue}`,
+            error
+          )
+        }
+      )
+    },
   },
   computed: {
     labels() {
