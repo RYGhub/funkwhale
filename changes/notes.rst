@@ -7,6 +7,33 @@ Next release notes
     after each release.
 
 
+Support for genres via tags
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One of our most requested missing features is now available!
+
+Starting with Funkwhale 0.20,
+Funkwhale will automatically extract genre information from uploaded files and associate it
+with the corresponding tracks in the form of tags (similar to Mastodon or Twitter hashtags).
+Please refer to `our tagging documentation <https://docs.funkwhale.audio/users/upload.html#tagging-files>`_
+for more information regarding the tagging process.
+
+Tags can also be associated with artists and albums, and updated after upload through the UI using
+the edit system released in Funkwhale 0.19. Tags are also fetched when retrieving content
+via federation.
+
+Tags are used in various places to enhance user experience:
+
+- Tags are listed on tracks, albums and artist profiles
+- Each tag has a dedicated page were you can browse corresponding content and quickly start a radio
+- The custom radio builder now supports using tags
+- Subsonic apps that support genres - such as DSub or Ultrasonic - should display this information as well
+
+If you are a pod admin and want to extract tags from already uploaded content, you run `this snippet <https://dev.funkwhale.audio/funkwhale/funkwhale/snippets/43>`_
+and `this snippet <https://dev.funkwhale.audio/funkwhale/funkwhale/snippets/44>`_ in a ``python manage.py shell``.
+
+
+
 Allow-list to restrict federation to trusted domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
