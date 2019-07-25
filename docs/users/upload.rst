@@ -74,15 +74,18 @@ However, Funkwhale can understand and use additional tags to enhance user experi
 | ``Title`` (required)             | ``Letting you``                            | The track title                                               |
 |                                  |                                            |                                                               |
 +----------------------------------+--------------------------------------------+---------------------------------------------------------------+
-| ``Album`` (required)             | ``The Slip``                               | The album title                                               |
-|                                  |                                            |                                                               |
-+----------------------------------+--------------------------------------------+---------------------------------------------------------------+
 | ``Artist`` (required)            | ``Nine Inch Nails``                        | The artist name                                               |
 |                                  |                                            |                                                               |
++----------------------------------+--------------------------------------------+---------------------------------------------------------------+
+| ``Album``                        | ``The Slip``                               | The album title. If none is provided, an [Unknown Album]     |
+|                                  |                                            | entry will be created                                         |
 +----------------------------------+--------------------------------------------+---------------------------------------------------------------+
 | ``Album artist``                 | ``Trent Reznor``                           | The album artist name (can be different than the track        |
 |                                  |                                            | artist)                                                       |
 |                                  |                                            |                                                               |
++----------------------------------+--------------------------------------------+---------------------------------------------------------------+
+| ``Genre``                        | ``Industrial, Metal``                      | A comma separated list of tags to associate with the track     |
+|                                  |                                            | Other supported separators: ``;`` and ``/``                   |
 +----------------------------------+--------------------------------------------+---------------------------------------------------------------+
 | ``Track number``                 | ``4``                                      | The position of the track in the album/release                |
 |                                  |                                            |                                                               |
