@@ -89,7 +89,7 @@ export default {
                 return r.title
               },
               getDescription (r) {
-                return ''
+                return r.artist.name
               },
               getId (t) {
                 return t.id
@@ -103,7 +103,7 @@ export default {
                 return r.title
               },
               getDescription (r) {
-                return ''
+                return `${r.album.artist.name} - ${r.album.title}`
               },
               getId (t) {
                 return t.id
@@ -114,7 +114,7 @@ export default {
               route: 'library.tags.detail',
               name: tagLabel,
               getTitle (r) {
-                return r.name
+                return `#${r.name}`
               },
               getDescription (r) {
                 return ''
