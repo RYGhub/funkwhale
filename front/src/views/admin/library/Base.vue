@@ -19,6 +19,9 @@
       <router-link
         class="ui item"
         :to="{name: 'manage.library.uploads'}"><translate translate-context="*/*/*">Uploads</translate></router-link>
+      <router-link
+        class="ui item"
+        :to="{name: 'manage.library.tags'}"><translate translate-context="*/*/*">Tags</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>

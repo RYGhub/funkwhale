@@ -7,6 +7,11 @@
         </span>
       </h2>
       <radio-button type="tag" :object-id="id"></radio-button>
+      <router-link class="ui right floated button" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.tags.detail', params: {id: id}}">
+        <i class="wrench icon"></i>
+        <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+      </router-link>
+
       <div class="ui hidden divider"></div>
       <div class="ui row">
         <artist-widget :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
