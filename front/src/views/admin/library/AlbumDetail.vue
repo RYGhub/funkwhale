@@ -24,6 +24,12 @@
                   </div>
                 </div>
               </h2>
+
+              <template v-if="object.tags && object.tags.length > 0">
+                <tags-list :limit="5" detail-route="manage.library.tags.detail" :tags="object.tags"></tags-list>
+                <div class="ui hidden divider"></div>
+              </template>
+
               <div class="header-buttons">
 
                 <div class="ui icon buttons">
@@ -273,12 +279,13 @@
 import axios from "axios"
 import logger from "@/logging"
 import FetchButton from "@/components/federation/FetchButton"
-
+import TagsList from "@/components/tags/List"
 
 export default {
   props: ["id"],
   components: {
-    FetchButton
+    FetchButton,
+    TagsList
   },
   data() {
     return {
