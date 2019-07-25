@@ -62,6 +62,10 @@ class ManageArtistFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                     "distinct": True,
                 },
+                "tag": {
+                    "to": "tagged_items__tag__name",
+                    "distinct": True,
+                },
             },
         )
     )
@@ -89,6 +93,10 @@ class ManageAlbumFilterSet(filters.FilterSet):
                 "library_id": {
                     "to": "tracks__uploads__library_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
+                },
+                "tag": {
+                    "to": "tagged_items__tag__name",
                     "distinct": True,
                 },
             },
@@ -127,6 +135,10 @@ class ManageTrackFilterSet(filters.FilterSet):
                 "library_id": {
                     "to": "uploads__library_id",
                     "field": forms.IntegerField(),
+                    "distinct": True,
+                },
+                "tag": {
+                    "to": "tagged_items__tag__name",
                     "distinct": True,
                 },
             },
