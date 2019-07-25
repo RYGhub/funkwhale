@@ -30,6 +30,7 @@ def compute_status(jobs):
 
 
 AUDIO_EXTENSIONS_AND_MIMETYPE = [
+    ("ogg", "video/ogg"),
     ("ogg", "audio/ogg"),
     ("opus", "audio/opus"),
     ("mp3", "audio/mpeg"),
