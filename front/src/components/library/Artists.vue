@@ -35,27 +35,18 @@
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Results per page</translate></label>
             <select class="ui dropdown" v-model="paginateBy">
               <option :value="parseInt(12)">12</option>
-              <option :value="parseInt(25)">25</option>
+              <option :value="parseInt(30)">30</option>
               <option :value="parseInt(50)">50</option>
             </select>
           </div>
         </div>
       </div>
       <div class="ui hidden divider"></div>
-      <div
-        v-if="result"
-        v-masonry
-        transition-duration="0"
-        item-selector=".card"
-        percent-position="true"
-        stagger="0">
-        <div v-if="result.results.length > 0" class="ui cards">
-          <artist-card
-            v-masonry-tile
-            v-for="artist in result.results"
-            :key="artist.id"
-            :artist="artist"></artist-card>
+      <div v-if="result && result.results.length > 0" class="ui three cards">
+        <div v-if="isLoading" class="ui inverted active dimmer">
+          <div class="ui loader"></div>
         </div>
+        <artist-card :artist="artist" v-for="artist in result.results" :key="artist.id"></artist-card>
       </div>
       <div class="ui center aligned basic segment">
         <pagination
@@ -108,7 +99,7 @@ export default {
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       tags: this.defaultTags.filter((t) => { return t.length > 0 }) || [],
-      paginateBy: parseInt(this.defaultPaginateBy || 12),
+      paginateBy: parseInt(this.defaultPaginateBy || 30),
       orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
       orderingOptions: [["creation_date", "creation_date"], ["name", "name"]]
@@ -205,5 +196,22 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+@import "../../style/vendor/media";
+
+.wrapper {
+  width: 100%;
+}
+.ui.cards {
+  justify-content: flex-start;
+}
+
+.ui.three.cards .card {
+  width: 100%;
+}
+@include media(">tablet") {
+  .ui.three.cards .card {
+    width: 25em;
+  }
+}
 </style>
