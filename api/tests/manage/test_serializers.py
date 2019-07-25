@@ -487,6 +487,7 @@ def test_manage_upload_serializer(factories, now):
         ("music.Artist", serializers.ManageArtistActionSerializer),
         ("music.Library", serializers.ManageLibraryActionSerializer),
         ("music.Upload", serializers.ManageUploadActionSerializer),
+        ("tags.Tag", serializers.ManageTagActionSerializer),
     ],
 )
 def test_action_serializer_delete(factory, serializer_class, factories):

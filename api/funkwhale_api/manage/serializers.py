@@ -592,3 +592,13 @@ class ManageTagSerializer(ManageBaseAlbumSerializer):
 
     def get_artists_count(self, obj):
         return getattr(obj, "_artists_count", None)
+
+
+class ManageTagActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageTagFilterSet
+    pk_field = "name"
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()
