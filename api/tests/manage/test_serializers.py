@@ -297,6 +297,7 @@ def test_manage_artist_serializer(factories, now):
         "attributed_to": serializers.ManageBaseActorSerializer(
             artist.attributed_to
         ).data,
+        "tags": [],
     }
     s = serializers.ManageArtistSerializer(artist)
 
@@ -387,6 +388,7 @@ def test_manage_album_serializer(factories, now):
         "attributed_to": serializers.ManageBaseActorSerializer(
             album.attributed_to
         ).data,
+        "tags": [],
     }
     s = serializers.ManageAlbumSerializer(album)
 
@@ -414,6 +416,7 @@ def test_manage_track_serializer(factories, now):
             track.attributed_to
         ).data,
         "uploads_count": 44,
+        "tags": [],
     }
     s = serializers.ManageTrackSerializer(track)
 

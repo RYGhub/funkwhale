@@ -377,6 +377,7 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
     albums = ManageNestedAlbumSerializer(many=True)
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Artist
@@ -384,7 +385,12 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
             "albums",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageNestedArtistSerializer(ManageBaseArtistSerializer):
@@ -395,6 +401,7 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     artist = ManageNestedArtistSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Album
@@ -402,7 +409,12 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
             "artist",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackAlbumSerializer(ManageBaseAlbumSerializer):
@@ -418,6 +430,7 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
     album = ManageTrackAlbumSerializer()
     attributed_to = ManageBaseActorSerializer()
     uploads_count = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Track
@@ -426,10 +439,15 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
             "album",
             "attributed_to",
             "uploads_count",
+            "tags",
         ]
 
     def get_uploads_count(self, obj):
         return getattr(obj, "uploads_count", None)
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackActionSerializer(common_serializers.ActionSerializer):

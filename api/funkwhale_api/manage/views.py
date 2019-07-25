@@ -12,6 +12,7 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import views as music_views
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.playlists import models as playlists_models
 from funkwhale_api.tags import models as tags_models
@@ -71,6 +72,7 @@ class ManageArtistViewSet(
                     tracks_count=Count("tracks")
                 ),
             ),
+            music_views.TAG_PREFETCH,
         )
     )
     serializer_class = serializers.ManageArtistSerializer
@@ -108,7 +110,7 @@ class ManageAlbumViewSet(
         music_models.Album.objects.all()
         .order_by("-id")
         .select_related("attributed_to", "artist")
-        .prefetch_related("tracks")
+        .prefetch_related("tracks", music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageAlbumSerializer
     filterset_class = filters.ManageAlbumFilterSet
@@ -152,6 +154,7 @@ class ManageTrackViewSet(
         .order_by("-id")
         .select_related("attributed_to", "artist", "album__artist")
         .annotate(uploads_count=Coalesce(Subquery(uploads_subquery), 0))
+        .prefetch_related(music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageTrackSerializer
     filterset_class = filters.ManageTrackFilterSet
