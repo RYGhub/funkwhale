@@ -39,13 +39,13 @@ def test_user_update_permission(factories):
     assert user.permission_settings is False
 
 
-def test_manage_domain_serializer(factories, now):
+def test_manage_domain_serializer(factories, now, to_api_date):
     domain = factories["federation.Domain"](nodeinfo_fetch_date=None)
     setattr(domain, "actors_count", 42)
     setattr(domain, "outbox_activities_count", 23)
     expected = {
         "name": domain.name,
-        "creation_date": domain.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(domain.creation_date),
         "actors_count": 42,
         "outbox_activities_count": 23,
         "nodeinfo": {},
@@ -65,14 +65,14 @@ def test_manage_domain_serializer_validates_hostname(db):
         s.is_valid(raise_exception=True)
 
 
-def test_manage_actor_serializer(factories, now):
+def test_manage_actor_serializer(factories, now, to_api_date):
     actor = factories["federation.Actor"]()
     setattr(actor, "uploads_count", 66)
     expected = {
         "id": actor.id,
         "name": actor.name,
-        "creation_date": actor.creation_date.isoformat().split("+")[0] + "Z",
-        "last_fetch_date": actor.last_fetch_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(actor.creation_date),
+        "last_fetch_date": to_api_date(actor.last_fetch_date),
         "uploads_count": 66,
         "fid": actor.fid,
         "url": actor.url,
@@ -110,13 +110,15 @@ def test_manage_actor_serializer(factories, now):
         ),
     ],
 )
-def test_instance_policy_serializer_repr(factories, factory_kwargs, expected):
+def test_instance_policy_serializer_repr(
+    factories, factory_kwargs, expected, to_api_date
+):
     policy = factories["moderation.InstancePolicy"](block_all=True, **factory_kwargs)
 
     e = {
         "id": policy.id,
         "uuid": str(policy.uuid),
-        "creation_date": policy.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(policy.creation_date),
         "actor": policy.actor.full_username,
         "block_all": True,
         "silence_activity": False,
@@ -280,7 +282,7 @@ def test_instance_policy_serializer_purges_target_actor(
     assert on_commit.call_count == 0
 
 
-def test_manage_artist_serializer(factories, now):
+def test_manage_artist_serializer(factories, now, to_api_date):
     artist = factories["music.Artist"](attributed=True)
     track = factories["music.Track"](artist=artist)
     album = factories["music.Album"](artist=artist)
@@ -291,7 +293,7 @@ def test_manage_artist_serializer(factories, now):
         "fid": artist.fid,
         "name": artist.name,
         "mbid": artist.mbid,
-        "creation_date": artist.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(artist.creation_date),
         "albums": [serializers.ManageNestedAlbumSerializer(album).data],
         "tracks": [serializers.ManageNestedTrackSerializer(track).data],
         "attributed_to": serializers.ManageBaseActorSerializer(
@@ -304,7 +306,7 @@ def test_manage_artist_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_nested_track_serializer(factories, now):
+def test_manage_nested_track_serializer(factories, now, to_api_date):
     track = factories["music.Track"]()
     expected = {
         "id": track.id,
@@ -313,7 +315,7 @@ def test_manage_nested_track_serializer(factories, now):
         "fid": track.fid,
         "title": track.title,
         "mbid": track.mbid,
-        "creation_date": track.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(track.creation_date),
         "position": track.position,
         "disc_number": track.disc_number,
         "copyright": track.copyright,
@@ -324,7 +326,7 @@ def test_manage_nested_track_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_nested_album_serializer(factories, now):
+def test_manage_nested_album_serializer(factories, now, to_api_date):
     album = factories["music.Album"]()
     setattr(album, "tracks_count", 44)
     expected = {
@@ -334,7 +336,7 @@ def test_manage_nested_album_serializer(factories, now):
         "fid": album.fid,
         "title": album.title,
         "mbid": album.mbid,
-        "creation_date": album.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
         "cover": {
             "original": album.cover.url,
@@ -349,7 +351,7 @@ def test_manage_nested_album_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_nested_artist_serializer(factories, now):
+def test_manage_nested_artist_serializer(factories, now, to_api_date):
     artist = factories["music.Artist"]()
     expected = {
         "id": artist.id,
@@ -358,14 +360,14 @@ def test_manage_nested_artist_serializer(factories, now):
         "fid": artist.fid,
         "name": artist.name,
         "mbid": artist.mbid,
-        "creation_date": artist.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(artist.creation_date),
     }
     s = serializers.ManageNestedArtistSerializer(artist)
 
     assert s.data == expected
 
 
-def test_manage_album_serializer(factories, now):
+def test_manage_album_serializer(factories, now, to_api_date):
     album = factories["music.Album"](attributed=True)
     track = factories["music.Track"](album=album)
     expected = {
@@ -375,7 +377,7 @@ def test_manage_album_serializer(factories, now):
         "fid": album.fid,
         "title": album.title,
         "mbid": album.mbid,
-        "creation_date": album.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
         "cover": {
             "original": album.cover.url,
@@ -395,7 +397,7 @@ def test_manage_album_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_track_serializer(factories, now):
+def test_manage_track_serializer(factories, now, to_api_date):
     track = factories["music.Track"](attributed=True)
     setattr(track, "uploads_count", 44)
     expected = {
@@ -409,7 +411,7 @@ def test_manage_track_serializer(factories, now):
         "position": track.position,
         "copyright": track.copyright,
         "license": track.license,
-        "creation_date": track.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(track.creation_date),
         "artist": serializers.ManageNestedArtistSerializer(track.artist).data,
         "album": serializers.ManageTrackAlbumSerializer(track.album).data,
         "attributed_to": serializers.ManageBaseActorSerializer(
@@ -423,7 +425,7 @@ def test_manage_track_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_library_serializer(factories, now):
+def test_manage_library_serializer(factories, now, to_api_date):
     library = factories["music.Library"]()
     setattr(library, "followers_count", 42)
     setattr(library, "_uploads_count", 44)
@@ -438,7 +440,7 @@ def test_manage_library_serializer(factories, now):
         "name": library.name,
         "description": library.description,
         "privacy_level": library.privacy_level,
-        "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(library.creation_date),
         "actor": serializers.ManageBaseActorSerializer(library.actor).data,
         "uploads_count": 44,
         "followers_count": 42,
@@ -448,7 +450,7 @@ def test_manage_library_serializer(factories, now):
     assert s.data == expected
 
 
-def test_manage_upload_serializer(factories, now):
+def test_manage_upload_serializer(factories, now, to_api_date):
     upload = factories["music.Upload"]()
 
     expected = {
@@ -466,8 +468,8 @@ def test_manage_upload_serializer(factories, now):
         "source": upload.source,
         "filename": upload.filename,
         "metadata": upload.metadata,
-        "creation_date": upload.creation_date.isoformat().split("+")[0] + "Z",
-        "modification_date": upload.modification_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(upload.creation_date),
+        "modification_date": to_api_date(upload.modification_date),
         "accessed_date": None,
         "import_date": None,
         "import_metadata": upload.import_metadata,
@@ -502,7 +504,7 @@ def test_action_serializer_delete(factory, serializer_class, factories):
     assert objects[0].__class__.objects.count() == 0
 
 
-def test_manage_tag_serializer(factories):
+def test_manage_tag_serializer(factories, to_api_date):
     tag = factories["tags.Tag"]()
 
     setattr(tag, "_tracks_count", 42)
@@ -511,7 +513,7 @@ def test_manage_tag_serializer(factories):
     expected = {
         "id": tag.id,
         "name": tag.name,
-        "creation_date": tag.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(tag.creation_date),
         "tracks_count": 42,
         "albums_count": 54,
         "artists_count": 66,

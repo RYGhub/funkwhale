@@ -3,15 +3,12 @@ import pytest
 from funkwhale_api.tags import serializers
 
 
-def test_tag_serializer(factories):
+def test_tag_serializer(factories, to_api_date):
     tag = factories["tags.Tag"]()
 
     serializer = serializers.TagSerializer(tag)
 
-    expected = {
-        "name": tag.name,
-        "creation_date": tag.creation_date.isoformat().split("+")[0] + "Z",
-    }
+    expected = {"name": tag.name, "creation_date": to_api_date(tag.creation_date)}
 
     assert serializer.data == expected
 

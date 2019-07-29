@@ -118,7 +118,7 @@ def test_upload_serializer(factories, to_api_date):
         "bitrate": upload.bitrate,
         "size": upload.size,
         "library": serializers.LibraryForOwnerSerializer(upload.library).data,
-        "creation_date": upload.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(upload.creation_date),
         "import_date": None,
         "import_status": "pending",
     }
@@ -145,7 +145,7 @@ def test_upload_owner_serializer(factories, to_api_date):
         "bitrate": upload.bitrate,
         "size": upload.size,
         "library": serializers.LibraryForOwnerSerializer(upload.library).data,
-        "creation_date": upload.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(upload.creation_date),
         "metadata": {"test": "metadata"},
         "import_metadata": {"import": "metadata"},
         "import_date": None,

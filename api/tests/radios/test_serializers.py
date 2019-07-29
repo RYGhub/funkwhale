@@ -29,7 +29,7 @@ def test_create_artist_radio(factories):
     assert session.related_object == artist
 
 
-def test_tag_radio_repr(factories):
+def test_tag_radio_repr(factories, to_api_date):
     tag = factories["tags.Tag"]()
     session = factories["radios.RadioSession"](related_object=tag, radio_type="tag")
 
@@ -39,6 +39,6 @@ def test_tag_radio_repr(factories):
         "custom_radio": None,
         "user": session.user.pk,
         "related_object_id": tag.name,
-        "creation_date": session.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(session.creation_date),
     }
     assert serializers.RadioSessionSerializer(session).data == expected
