@@ -148,8 +148,8 @@ export default {
       self.isLoading = true
       self.checked = []
       axios.get('/manage/tags/', {params: params}).then((response) => {
-        self.result = response.data
         self.isLoading = false
+        self.result = response.data
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors
