@@ -8,40 +8,56 @@ $discrete-text-color: rgba(223, 235, 240, 0.904);
 $border-color: rgb(63, 88, 102);
 $light-shadow-color: rgba(223, 235, 240, 0.15);
 $shadow-color: rgba(63, 102, 97, 0.95);
-$box-shadow: 0px 1px 3px 0px rgba(63, 88, 102, 0.95), 0px 0px 0px 1px rgba(63, 88, 102, 0.98);
+$box-shadow: 0px 1px 3px 0px rgba(63, 88, 102, 0.95),
+  0px 0px 0px 1px rgba(63, 88, 102, 0.98);
 $link-color: rgb(255, 144, 0);
 
 .theme-dark {
   background-color: $background-color;
   .ui.labeled.input {
-    input, .label {
+    input,
+    .label {
       background-color: $input-background-color;
       &::placeholder {
         color: $light-background-color;
-
       }
-
     }
   }
   .ui.statistics .statistic {
-    > .label, > .value {
+    > .label,
+    > .value {
       color: $text-color;
     }
   }
-  .ui.link.list.list .active.item, .ui.link.list.list .active.item a:not(.ui) {
+  .ui.link.list.list .active.item,
+  .ui.link.list.list .active.item a:not(.ui) {
     color: inherit;
   }
-  .ui.form textarea, .ui.form select, .ui.selection.dropdown, .ui.dropdown.selected, .ui.dropdown .menu .selected.item, .ui.form input:not([type]), .ui.form input[type="date"], .ui.form input[type="datetime-local"], .ui.form input[type="email"], .ui.form input[type="number"], .ui.form input[type="password"], .ui.form input[type="search"], .ui.form input[type="tel"], .ui.form input[type="time"], .ui.form input[type="text"], .ui.form input[type="file"], .ui.form input[type="url"] {
+  .ui.form textarea,
+  .ui.form select,
+  .ui.selection.dropdown,
+  .ui.dropdown.selected,
+  .ui.dropdown .menu .selected.item,
+  .ui.form input:not([type]),
+  .ui.form input[type="date"],
+  .ui.form input[type="datetime-local"],
+  .ui.form input[type="email"],
+  .ui.form input[type="number"],
+  .ui.form input[type="password"],
+  .ui.form input[type="search"],
+  .ui.form input[type="tel"],
+  .ui.form input[type="time"],
+  .ui.form input[type="text"],
+  .ui.form input[type="file"],
+  .ui.form input[type="url"] {
     background-color: $input-background-color;
     &::placeholder {
       color: $light-background-color;
-
     }
   }
   .ui.dropdown .menu .item:hover {
     background-color: $light-background-color;
     color: $text-color;
-
   }
   .main.pusher > .ui.secondary.menu {
     background-color: $background-color;
@@ -54,7 +70,9 @@ $link-color: rgb(255, 144, 0);
     }
   }
   .ui.modal {
-    > .header, > .content, > .actions {
+    > .header,
+    > .content,
+    > .actions {
       background-color: $background-color;
     }
     > .header {
@@ -65,29 +83,36 @@ $link-color: rgb(255, 144, 0);
       border-top: 1px solid $border-color;
     }
   }
-  main, .main, footer, .modal {
-
+  main,
+  .main,
+  footer,
+  .modal {
     .ui.menu {
       background-color: $light-background-color;
       .item {
-
         color: $text-color;
       }
     }
-    .ui.secondary.menu .dropdown.item:hover, .ui.secondary.menu .link.item:hover, .ui.secondary.menu a.item:hover {
+    .ui.secondary.menu .dropdown.item:hover,
+    .ui.secondary.menu .link.item:hover,
+    .ui.secondary.menu a.item:hover {
       background: $background-color;
       color: $text-color;
     }
-    .header, .ui.form .field > label, .sub.header {
+    .header,
+    .ui.form .field > label,
+    .sub.header {
       color: $text-color;
     }
     .ui.attached.header {
       background-color: transparent;
     }
-    .ui.toggle.checkbox input:checked ~ .box, .ui.toggle.checkbox input:checked ~ label {
+    .ui.toggle.checkbox input:checked ~ .box,
+    .ui.toggle.checkbox input:checked ~ label {
       color: $text-color !important;
     }
-    .ui.toggle.checkbox .box::before, .ui.toggle.checkbox label::before {
+    .ui.toggle.checkbox .box::before,
+    .ui.toggle.checkbox label::before {
       background-color: $light-background-color;
     }
     a:not(.ui):not(.discrete) {
@@ -96,8 +121,12 @@ $link-color: rgb(255, 144, 0);
     .ui.segment:not(.basic) {
       background-color: $light-background-color;
     }
-    .ui.list, .ui.dropdown {
-      .item, div.item, a.item, .button.item {
+    .ui.list,
+    .ui.dropdown {
+      .item,
+      div.item,
+      a.item,
+      .button.item {
         background-color: $background-color;
         color: $discrete-text-color;
       }
@@ -113,10 +142,13 @@ $link-color: rgb(255, 144, 0);
         color: $discrete-text-color;
       }
     }
-    label, .toggle label {
+    label,
+    .toggle label {
       color: $text-color !important;
     }
-    &, .main.pusher, .ui.vertical.segment {
+    &,
+    .main.pusher,
+    .ui.vertical.segment {
       color: $text-color;
       background-color: $background-color;
     }
@@ -125,21 +157,28 @@ $link-color: rgb(255, 144, 0);
       color: $discrete-text-color;
     }
 
-    .ui.table thead th, .ui.table {
+    .ui.table thead th,
+    .ui.table {
       color: $text-color;
     }
     .ui.divider:not(.vertical):not(.horizontal) {
       border-top: 1px solid $border-color;
       border-bottom: 1px solid $border-color;
     }
-    .ui.cards > .card, .ui.card {
+    .ui.cards > .card,
+    .ui.card {
       color: $text-color;
       background-color: $background-color;
-      box-shadow: $box-shadow;
-      .content, .header, .description {
+      &:not(.flat) {
+        box-shadow: $box-shadow;
+      }
+      .content,
+      .header,
+      .description {
         color: $text-color;
       }
-      .extra, .meta {
+      .extra,
+      .meta {
         color: $discrete-text-color;
       }
     }
@@ -150,31 +189,40 @@ $link-color: rgb(255, 144, 0);
     }
 
     // buttons
-    [class='ui button ui button'], [class='ui button'], [class='ui icon button'], [class='ui fluid button'], [class='ui cancel button'] {
+    [class="ui button ui button"],
+    [class="ui button"],
+    [class="ui icon button"],
+    [class="ui fluid button"],
+    [class="ui cancel button"] {
       background-color: $light-background-color;
       color: $text-color;
       &:hover {
         background-color: $button-hover-color;
-
       }
     }
-    .ui.buttons > .ui.button:not(.basic):not(.inverted), .ui.buttons:not(.basic):not(.inverted) > .button {
+    .ui.buttons > .ui.button:not(.basic):not(.inverted),
+    .ui.buttons:not(.basic):not(.inverted) > .button {
       box-shadow: 0px 0px 0px 1px $light-shadow-color inset;
-
     }
-    .ui.basic.buttons:not(:hover):not(.green):not(.orange):not(.yellow):not(.red) .button, .ui.basic.button {
+    .ui.basic.buttons:not(:hover):not(.green):not(.orange):not(.yellow):not(.red)
+      .button,
+    .ui.basic.button {
       box-shadow: 0px 0px 0px 1px $text-color inset;
       &:not(:hover):not(.green):not(.orange):not(.yellow):not(.red) {
         color: $text-color !important;
       }
     }
-    .ui.basic.buttons .button, .ui.basic.button {
+    .ui.basic.buttons .button,
+    .ui.basic.button {
       &:hover {
         color: $text-color !important;
       }
-
     }
-    .ui.basic.buttons:not(.green):not(.orange):not(.yellow):not(.red) .button:hover, .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):hover, .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):active, .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):focus {
+    .ui.basic.buttons:not(.green):not(.orange):not(.yellow):not(.red)
+      .button:hover,
+    .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):hover,
+    .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):active,
+    .ui.basic.button:not(.green):not(.orange):not(.yellow):not(.red):focus {
       color: $background-color !important;
     }
     // loading /dimmers
@@ -185,7 +233,8 @@ $link-color: rgb(255, 144, 0);
       background-color: $loading-background-color;
     }
     // table
-    .ui.basic.table tbody tr, .ui.table tr td {
+    .ui.basic.table tbody tr,
+    .ui.table tr td {
       border-bottom: 1px solid $border-color;
     }
     .ui.table thead th {
@@ -193,13 +242,15 @@ $link-color: rgb(255, 144, 0);
     }
     .ui.table {
       &:not(.basic) {
-        &, thead th {
+        &,
+        thead th {
           background-color: $light-background-color;
         }
       }
     }
   }
-  .ui.link.list.list a.item:hover, .ui.link.list.list .item a:not(.ui):not(.button):hover {
+  .ui.link.list.list a.item:hover,
+  .ui.link.list.list .item a:not(.ui):not(.button):hover {
     color: $link-color;
   }
   [data-tooltip]::after {
@@ -208,13 +259,13 @@ $link-color: rgb(255, 144, 0);
   }
   .ui.progress > .label {
     color: $text-color;
-
   }
   i.grey.icon {
     color: $text-color !important;
   }
   input {
-    &::selection, &::-moz-selection {
+    &::selection,
+    &::-moz-selection {
       background: $background-color;
       color: $text-color;
     }
