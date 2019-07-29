@@ -17,7 +17,7 @@ stages:
 
 review_front:
   stage: review
-  image: node:10
+  image: node:11
   when: manual
   allow_failure: true
   variables:
@@ -54,7 +54,6 @@ review_front:
     name: review/front/$CI_COMMIT_REF_NAME
     url: http://$CI_PROJECT_NAMESPACE.pages.funkwhale.audio/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/front-review/index.html
 
-
 review_docs:
   stage: review
   when: manual
@@ -86,7 +85,6 @@ review_docs:
   environment:
     name: review/docs/$CI_COMMIT_REF_NAME
     url: http://$CI_PROJECT_NAMESPACE.pages.funkwhale.audio/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/docs-review/index.html
-
 
 black:
   image: python:3.6
@@ -142,7 +140,7 @@ test_api:
 
 test_front:
   stage: test
-  image: node:10
+  image: node:11
   before_script:
     - cd front
   only:
@@ -164,7 +162,7 @@ test_front:
 
 build_front:
   stage: build
-  image: node:10
+  image: node:11
   before_script:
     - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
     - chmod +x /usr/local/bin/jq
