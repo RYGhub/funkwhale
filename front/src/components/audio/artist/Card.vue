@@ -73,7 +73,7 @@ export default {
 .play-button {
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 40%;
 }
 
 .with-overlay {
