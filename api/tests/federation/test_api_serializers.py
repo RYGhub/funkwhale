@@ -4,7 +4,7 @@ from funkwhale_api.federation import api_serializers
 from funkwhale_api.federation import serializers
 
 
-def test_library_serializer(factories):
+def test_library_serializer(factories, to_api_date):
     library = factories["music.Library"](uploads_count=5678)
     expected = {
         "fid": library.fid,
@@ -12,7 +12,7 @@ def test_library_serializer(factories):
         "actor": serializers.APIActorSerializer(library.actor).data,
         "name": library.name,
         "description": library.description,
-        "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(library.creation_date),
         "uploads_count": library.uploads_count,
         "privacy_level": library.privacy_level,
         "follow": None,
@@ -34,7 +34,7 @@ def test_library_serializer_latest_scan(factories):
     assert serializer.data["latest_scan"] == expected
 
 
-def test_library_serializer_with_follow(factories):
+def test_library_serializer_with_follow(factories, to_api_date):
     library = factories["music.Library"](uploads_count=5678)
     follow = factories["federation.LibraryFollow"](target=library)
 
@@ -45,7 +45,7 @@ def test_library_serializer_with_follow(factories):
         "actor": serializers.APIActorSerializer(library.actor).data,
         "name": library.name,
         "description": library.description,
-        "creation_date": library.creation_date.isoformat().split("+")[0] + "Z",
+        "creation_date": to_api_date(library.creation_date),
         "uploads_count": library.uploads_count,
         "privacy_level": library.privacy_level,
         "follow": api_serializers.NestedLibraryFollowSerializer(follow).data,

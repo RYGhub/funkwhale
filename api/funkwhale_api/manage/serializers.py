@@ -10,6 +10,7 @@ from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
 
 from . import filters
@@ -376,6 +377,7 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
     albums = ManageNestedAlbumSerializer(many=True)
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Artist
@@ -383,7 +385,12 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
             "albums",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageNestedArtistSerializer(ManageBaseArtistSerializer):
@@ -394,6 +401,7 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     artist = ManageNestedArtistSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Album
@@ -401,7 +409,12 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
             "artist",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackAlbumSerializer(ManageBaseAlbumSerializer):
@@ -417,6 +430,7 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
     album = ManageTrackAlbumSerializer()
     attributed_to = ManageBaseActorSerializer()
     uploads_count = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Track
@@ -425,10 +439,15 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
             "album",
             "attributed_to",
             "uploads_count",
+            "tags",
         ]
 
     def get_uploads_count(self, obj):
         return getattr(obj, "uploads_count", None)
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackActionSerializer(common_serializers.ActionSerializer):
@@ -564,3 +583,40 @@ class ManageUploadSerializer(serializers.ModelSerializer):
             "track",
             "library",
         )
+
+
+class ManageTagSerializer(ManageBaseAlbumSerializer):
+
+    tracks_count = serializers.SerializerMethodField()
+    albums_count = serializers.SerializerMethodField()
+    artists_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = tags_models.Tag
+        fields = [
+            "id",
+            "name",
+            "creation_date",
+            "tracks_count",
+            "albums_count",
+            "artists_count",
+        ]
+
+    def get_tracks_count(self, obj):
+        return getattr(obj, "_tracks_count", None)
+
+    def get_albums_count(self, obj):
+        return getattr(obj, "_albums_count", None)
+
+    def get_artists_count(self, obj):
+        return getattr(obj, "_artists_count", None)
+
+
+class ManageTagActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageTagFilterSet
+    pk_field = "name"
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()

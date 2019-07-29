@@ -1,5 +1,4 @@
 import contextlib
-import datetime
 import io
 import os
 import PIL
@@ -22,7 +21,6 @@ from django.db.models import QuerySet
 
 from aioresponses import aioresponses
 from dynamic_preferences.registries import global_preferences_registry
-from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
@@ -30,6 +28,7 @@ from funkwhale_api.federation import actors
 from funkwhale_api.moderation import mrf
 from funkwhale_api.music import licenses
 
+from . import utils as test_utils
 
 pytest_plugins = "aiohttp.pytest_plugin"
 
@@ -297,18 +296,9 @@ def authenticated_actor(factories, mocker):
     yield actor
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def to_api_date():
-    def inner(value):
-        if isinstance(value, datetime.datetime):
-            f = rest_fields.DateTimeField()
-            return f.to_representation(value)
-        if isinstance(value, datetime.date):
-            f = rest_fields.DateField()
-            return f.to_representation(value)
-        raise ValueError("Invalid value: {}".format(value))
-
-    return inner
+    return test_utils.to_api_date
 
 
 @pytest.fixture()

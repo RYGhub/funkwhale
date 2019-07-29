@@ -52,6 +52,8 @@ export default {
           album_title: this.$pgettext('Content/*/Dropdown/Noun', 'Album name'),
           artist_name: this.$pgettext('Content/*/Dropdown/Noun', 'Artist name'),
           name: this.$pgettext('*/*/*/Noun', 'Name'),
+          length: this.$pgettext('*/*/*/Noun', 'Length'),
+          items_count: this.$pgettext('*/*/*/Noun', 'Items'),
           size: this.$pgettext('Content/Library/*/in MB', 'Size'),
           bitrate: this.$pgettext('Content/Track/*/Noun', 'Bitrate'),
           duration: this.$pgettext('Content/*/*', 'Duration'),

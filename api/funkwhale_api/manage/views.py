@@ -2,7 +2,7 @@ from rest_framework import mixins, response, viewsets
 from rest_framework import decorators as rest_decorators
 
 from django.db.models import Count, Prefetch, Q, Sum, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Length
 from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import models as common_models
@@ -12,8 +12,10 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import views as music_views
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.playlists import models as playlists_models
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
 
 
@@ -70,6 +72,7 @@ class ManageArtistViewSet(
                     tracks_count=Count("tracks")
                 ),
             ),
+            music_views.TAG_PREFETCH,
         )
     )
     serializer_class = serializers.ManageArtistSerializer
@@ -107,7 +110,7 @@ class ManageAlbumViewSet(
         music_models.Album.objects.all()
         .order_by("-id")
         .select_related("attributed_to", "artist")
-        .prefetch_related("tracks")
+        .prefetch_related("tracks", music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageAlbumSerializer
     filterset_class = filters.ManageAlbumFilterSet
@@ -151,6 +154,7 @@ class ManageTrackViewSet(
         .order_by("-id")
         .select_related("attributed_to", "artist", "album__artist")
         .annotate(uploads_count=Coalesce(Subquery(uploads_subquery), 0))
+        .prefetch_related(music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageTrackSerializer
     filterset_class = filters.ManageTrackFilterSet
@@ -452,3 +456,53 @@ class ManageInstancePolicyViewSet(
 
     def perform_create(self, serializer):
         serializer.save(actor=self.request.user.actor)
+
+
+class ManageTagViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "name"
+    queryset = (
+        tags_models.Tag.objects.all()
+        .order_by("-creation_date")
+        .annotate(items_count=Count("tagged_items"))
+        .annotate(length=Length("name"))
+    )
+    serializer_class = serializers.ManageTagSerializer
+    filterset_class = filters.ManageTagFilterSet
+    required_scope = "instance:libraries"
+    ordering_fields = ["id", "creation_date", "name", "items_count", "length"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        from django.contrib.contenttypes.models import ContentType
+
+        album_ct = ContentType.objects.get_for_model(music_models.Album)
+        track_ct = ContentType.objects.get_for_model(music_models.Track)
+        artist_ct = ContentType.objects.get_for_model(music_models.Artist)
+        queryset = queryset.annotate(
+            _albums_count=Count(
+                "tagged_items", filter=Q(tagged_items__content_type=album_ct)
+            ),
+            _tracks_count=Count(
+                "tagged_items", filter=Q(tagged_items__content_type=track_ct)
+            ),
+            _artists_count=Count(
+                "tagged_items", filter=Q(tagged_items__content_type=artist_ct)
+            ),
+        )
+        return queryset
+
+    @rest_decorators.action(methods=["post"], detail=False)
+    def action(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = serializers.ManageTagActionSerializer(
+            request.data, queryset=queryset
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return response.Response(result, status=200)

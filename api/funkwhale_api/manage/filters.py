@@ -13,6 +13,7 @@ from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
+from funkwhale_api.tags import models as tags_models
 
 
 class ActorField(forms.CharField):
@@ -61,6 +62,7 @@ class ManageArtistFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                     "distinct": True,
                 },
+                "tag": {"to": "tagged_items__tag__name", "distinct": True},
             },
         )
     )
@@ -90,6 +92,7 @@ class ManageAlbumFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                     "distinct": True,
                 },
+                "tag": {"to": "tagged_items__tag__name", "distinct": True},
             },
         )
     )
@@ -128,6 +131,7 @@ class ManageTrackFilterSet(filters.FilterSet):
                     "field": forms.IntegerField(),
                     "distinct": True,
                 },
+                "tag": {"to": "tagged_items__tag__name", "distinct": True},
             },
         )
     )
@@ -340,3 +344,11 @@ class ManageInstancePolicyFilterSet(filters.FilterSet):
             "silence_notifications",
             "reject_media",
         ]
+
+
+class ManageTagFilterSet(filters.FilterSet):
+    q = fields.SearchFilter(search_fields=["name"])
+
+    class Meta:
+        model = tags_models.Tag
+        fields = ["q"]

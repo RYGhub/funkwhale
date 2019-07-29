@@ -1,7 +1,7 @@
 <template>
   <div class="tag-list">
     <router-link
-      :to="{name: 'library.tags.detail', params: {id: tag}}"
+      :to="{name: detailRoute, params: {id: tag}}"
       :class="['ui', 'circular', 'hashtag', 'label', labelClasses]"
       v-for="tag in toDisplay"
       :title="tag"
@@ -21,6 +21,7 @@ export default {
     truncateSize: {type: Number, default: 25},
     limit: {type: Number, default: 5},
     labelClasses: {type: String, default: ''},
+    detailRoute: {type: String, default: 'library.tags.detail'},
   },
   data () {
     return {

@@ -377,3 +377,31 @@ def test_upload_delete(factories, superuser_api_client):
     response = superuser_api_client.delete(url)
 
     assert response.status_code == 204
+
+
+def test_tag_detail(factories, superuser_api_client):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-detail", kwargs={"name": tag.name})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["name"] == tag.name
+
+
+def test_tag_list(factories, superuser_api_client, settings):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == tag.name
+
+
+def test_tag_delete(factories, superuser_api_client):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-detail", kwargs={"name": tag.name})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
