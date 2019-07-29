@@ -519,6 +519,15 @@ class ManageLibrarySerializer(serializers.ModelSerializer):
             "followers_url",
             "actor",
         ]
+        read_only_fields = [
+            "fid",
+            "uuid",
+            "id",
+            "url",
+            "domain",
+            "actor",
+            "creation_date",
+        ]
 
     def get_uploads_count(self, obj):
         return getattr(obj, "_uploads_count", obj.uploads_count)
