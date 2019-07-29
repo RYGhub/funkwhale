@@ -66,3 +66,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+.ui.form .field > .selection.dropdown {
+  min-width: 200px;
+}
+
+</style>
+
