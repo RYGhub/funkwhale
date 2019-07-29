@@ -43,6 +43,7 @@ Basically, you need to pull the new container image, stop and delete your existi
 and relaunch a new one:
 
 .. parsed-literal::
+    # this assumes you want to upgrade to version "|version|"
     export FUNKWHALE_VERSION="|version|"
 
 .. code-block:: shell
@@ -70,6 +71,10 @@ Multi-container installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. parsed-literal::
+    # this assumes you want to upgrade to version "|version|"
+    export FUNKWHALE_VERSION="|version|"
+
+.. code-block:: shell
 
     cd /srv/funkwhale
     # hardcode the targeted version your env file
@@ -78,8 +83,8 @@ Multi-container installation
     # Load your environment variables
     source .env
     # Download newest nginx configuration file
-    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.nginx.template"
-    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/develop/deploy/docker.funkwhale_proxy.conf"
+    curl -L -o nginx/funkwhale.template "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$FUNKWHALE_VERSION/deploy/docker.nginx.template"
+    curl -L -o nginx/funkwhale_proxy.conf "https://dev.funkwhale.audio/funkwhale/funkwhale/raw/$FUNKWHALE_VERSION/deploy/docker.funkwhale_proxy.conf"
     # Pull the new version containers
     docker-compose pull
     # Apply the database migrations
