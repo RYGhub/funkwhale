@@ -1,4 +1,5 @@
 import base64
+from collections.abc import Mapping
 import datetime
 import logging
 import pendulum
@@ -9,7 +10,6 @@ import mutagen.oggvorbis
 import mutagen.flac
 
 from rest_framework import serializers
-from rest_framework.compat import Mapping
 
 from funkwhale_api.tags import models as tags_models
 
