@@ -1,8 +1,10 @@
 variables:
   IMAGE_NAME: funkwhale/funkwhale
   IMAGE: $IMAGE_NAME:$CI_COMMIT_REF_NAME
+  IMAGE_LATEST: $IMAGE_NAME:latest
   ALL_IN_ONE_IMAGE_NAME: funkwhale/all-in-one
   ALL_IN_ONE_IMAGE: $ALL_IN_ONE_IMAGE_NAME:$CI_COMMIT_REF_NAME
+  ALL_IN_ONE_IMAGE_LATEST: $ALL_IN_ONE_IMAGE_NAME:latest
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
   PYTHONDONTWRITEBYTECODE: "true"
   REVIEW_DOMAIN: preview.funkwhale.audio
@@ -236,10 +238,12 @@ docker_release:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - cp -r front/dist api/frontend
     - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $(echo $CI_COMMIT_SHA | cut -c 1-8); fi);
-    - cd api
   script:
-    - docker build -t $IMAGE .
+    - if [[ ! -z "$CI_COMMIT_TAG" ]]; then (./docs/get-releases-json.py | scripts/is-docker-latest.py $CI_COMMIT_TAG -) && export DOCKER_LATEST_TAG="-t $IMAGE_LATEST" || export DOCKER_LATEST_TAG=; fi
+    - cd api
+    - docker build -t $IMAGE $DOCKER_LATEST_TAG .
     - docker push $IMAGE
+    - if [[ ! -z "$DOCKER_LATEST_TAG" ]]; then docker push $IMAGE_LATEST; fi
   only:
     - develop@funkwhale/funkwhale
     - tags@funkwhale/funkwhale
@@ -257,6 +261,7 @@ docker_all_in_one_release:
     - docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
     - (if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then ./scripts/set-api-build-metadata.sh $(echo $CI_COMMIT_SHA | cut -c 1-8); fi);
   script:
+    - if [[ ! -z "$CI_COMMIT_TAG" ]]; then (./docs/get-releases-json.py | scripts/is-docker-latest.py $CI_COMMIT_TAG -) && export DOCKER_LATEST_TAG="-t $ALL_IN_ONE_IMAGE_LATEST" || export DOCKER_LATEST_TAG=; fi
     - wget $ALL_IN_ONE_ARTIFACT_URL -O all_in_one.zip
     - unzip -o all_in_one.zip -d tmpdir
     - mv tmpdir/docker-funkwhale-$ALL_IN_ONE_REF $BUILD_PATH && rmdir tmpdir
@@ -264,8 +269,9 @@ docker_all_in_one_release:
     - cp -r front $BUILD_PATH/src/front
     - cd $BUILD_PATH
     - ./scripts/download-nginx-template.sh src/ $CI_COMMIT_REF_NAME
-    - docker build -t $ALL_IN_ONE_IMAGE .
+    - docker build -t $ALL_IN_ONE_IMAGE $DOCKER_LATEST_TAG .
     - docker push $ALL_IN_ONE_IMAGE
+    - if [[ ! -z "$DOCKER_LATEST_TAG" ]]; then docker push $ALL_IN_ONE_IMAGE_LATEST; fi
   only:
     - develop@funkwhale/funkwhale
     - tags@funkwhale/funkwhale
