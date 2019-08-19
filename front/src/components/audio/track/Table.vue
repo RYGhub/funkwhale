@@ -85,4 +85,7 @@ tr:not(:hover) .favorite-icon:not(.favorited) {
 pre {
   overflow-x: scroll;
 }
+.table-wrapper {
+  overflow: visible;
+}
 </style>

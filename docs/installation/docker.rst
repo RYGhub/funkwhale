@@ -150,6 +150,11 @@ Useful commands:
             ports:
               - "5000:80"
 
+    Then start the container:
+
+    .. code-block:: shell
+
+        docker-compose up -d
 
 .. _docker-multi-container:
 
