@@ -78,6 +78,14 @@ Content-Security-Policy and additional security headers [manual action suggested
 To improve the security and reduce the attack surface in case of a successfull exploit, we suggest
 you add the following Content-Security-Policy to your nginx configuration.
 
+..note::
+    
+    If you are using an S3-compatible store to serve music, you will need to specify the URL of your S3 store in the ``media-src`` and ``img-src`` headers
+
+    .. code-block::
+    
+        add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
+
 **On non-docker setups**, in ``/etc/nginx/sites-available/funkwhale.conf``::
 
     server {

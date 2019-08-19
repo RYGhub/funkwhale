@@ -45,6 +45,12 @@ Replace the ``location /_protected/media`` block with the following::
         proxy_pass $1;
     }
 
+Add your S3 store URL to the ``img-src`` and ``media-src`` headers
+
+.. code-block:: shell
+
+    add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
+
 Then restart Funkwhale and nginx.
 
 From now on, media files will be stored on the S3 bucket you configured. If you already
@@ -141,3 +147,22 @@ in your ``funkwhale.template`` under the ``location ~/_protected/media/(.+)`` se
      proxy_pass $1;
     }
 
+No Images or Media Loading
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are serving media from an S3-compatible store, you may experience an issue where
+nothing loads in the front end. The error logs in your browser may show something like
+the following:
+
+.. code-block:: text
+
+    Content Security Policy: The page's settings blocked the loading of a resource at https://<your-s3-url> ("img-src")
+    Content Security Policy: The page's settings blocked the loading of a resource at https://<your-s3-url> ("media-src")
+
+This happens when your S3 store isn't defined in the ``Content-Security-Policy`` headers
+in your Nginx files. To resolve the issue, add the base URL of your S3 store to the ``img-src``
+and ``media-src`` headers and reload nginx.
+
+.. code-block:: shell
+
+    add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
