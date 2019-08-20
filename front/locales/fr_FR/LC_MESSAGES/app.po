@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-08-19 12:22+0000\n"
+"PO-Revision-Date: 2019-08-21 00:34+0000\n"
 "Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
@@ -3270,7 +3270,7 @@ msgstr "Supprimer les fichiers en attente ?"
 #: front/src/views/content/libraries/Quota.vue:63
 msgctxt "Popup/Library/Title"
 msgid "Purge skipped files?"
-msgstr "Supprimer les fichiers oubliés ?"
+msgstr "Supprimer les fichiers ignorés ?"
 
 #: front/src/components/Sidebar.vue:20
 msgctxt "Sidebar/Queue/Tab.Title/Noun"
@@ -3580,7 +3580,7 @@ msgstr ""
 #: front/src/components/library/EditForm.vue:82
 msgctxt "Content/Library/Button.Label"
 msgid "Reset to initial value: %{ value }"
-msgstr ""
+msgstr "Réinitialiser à la valeur d’origine : %{ value }"
 
 #: front/src/components/auth/Login.vue:35 src/views/auth/PasswordReset.vue:4
 #: front/src/views/auth/PasswordReset.vue:53
@@ -3619,17 +3619,17 @@ msgstr "Afficher les fichiers"
 #: front/src/components/auth/Settings.vue:192
 msgctxt "*/*/*/Verb"
 msgid "Revoke"
-msgstr ""
+msgstr "Révoquer"
 
 #: front/src/components/auth/Settings.vue:195
 msgctxt "*/Settings/Button.Label/Verb"
 msgid "Revoke access"
-msgstr ""
+msgstr "Révoquer l'accès"
 
 #: front/src/components/auth/Settings.vue:193
 msgctxt "Popup/Settings/Title"
 msgid "Revoke access for application \"%{ application }\"?"
-msgstr ""
+msgstr "Révoquer l'accès pour l'application « %{ application } » ?"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:16
 msgctxt "Content/Moderation/Card.Title/Noun"
@@ -3866,7 +3866,7 @@ msgstr[1] "Montrer %{ count } albums supplémentaires"
 #: front/src/components/library/EditForm.vue:21
 msgctxt "Content/Library/Button.Label"
 msgid "Show all edits"
-msgstr ""
+msgstr "Afficher toutes les modifications"
 
 #: front/src/components/ShortcutsModal.vue:42
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -3962,6 +3962,8 @@ msgstr "Logiciel"
 msgctxt "Content/Playlist/Paragraph"
 msgid "Some tracks in your queue are already in this playlist:"
 msgstr ""
+"Certaines pistes de votre file d'attente sont déjà dans cette liste de "
+"lecture :"
 
 #: front/src/components/PageNotFound.vue:10
 msgctxt "Content/*/Paragraph"
@@ -4067,17 +4069,17 @@ msgstr "Valider"
 #: front/src/components/library/EditForm.vue:98
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Submit and apply edit"
-msgstr ""
+msgstr "Soumettre et appliquer la modification"
 
 #: front/src/components/library/EditForm.vue:7
 msgctxt "Content/Library/Button.Label"
 msgid "Submit another edit"
-msgstr ""
+msgstr "Soumettre une nouvelle modification"
 
 #: front/src/components/library/EditForm.vue:99
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Submit suggestion"
-msgstr ""
+msgstr "Soumettre la suggestion"
 
 #: front/src/views/admin/Settings.vue:85
 msgctxt "Content/Admin/Menu"
@@ -4092,7 +4094,7 @@ msgstr "Mot de passe de l'API Subsonic"
 #: front/src/components/library/EditForm.vue:38
 msgctxt "Content/Library/Paragraph"
 msgid "Suggest a change using the form below."
-msgstr ""
+msgstr "Suggérer un changement avec le formulaire ci-dessous."
 
 #: front/src/components/library/AlbumEdit.vue:5
 msgctxt "Content/*/Title"
@@ -4122,7 +4124,7 @@ msgstr "Résumé"
 #: front/src/components/library/EditForm.vue:87
 msgctxt "*/*/*"
 msgid "Summary (optional)"
-msgstr ""
+msgstr "Résumé (optionel)"
 
 #: front/src/components/Footer.vue:39
 msgctxt "Footer/*/Listitem.Link"
@@ -4164,7 +4166,7 @@ msgstr ""
 #: front/src/components/auth/Authorize.vue:39
 msgctxt "Content/Auth/Paragraph"
 msgid "The application is also requesting the following unknown permissions:"
-msgstr ""
+msgstr "L'application demande également les permissions inconnues suivantes :"
 
 #: front/src/views/admin/library/ArtistDetail.vue:74
 msgctxt "Content/Moderation/Paragraph"
@@ -4183,7 +4185,7 @@ msgstr ""
 #: front/src/components/SetInstanceModal.vue:8
 msgctxt "Popup/Instance/Error message.List item"
 msgid "The given address is not a Funkwhale server"
-msgstr ""
+msgstr "L'adresse fournie n'est pas un serveur Funkwhale"
 
 #: front/src/views/content/libraries/Form.vue:34
 msgctxt "Popup/Library/Paragraph"
@@ -4794,6 +4796,8 @@ msgid ""
 "Upload was skipped because a similar one is already available in one of your"
 " libraries."
 msgstr ""
+"L’import a été ignoré car un fichier similaire est déjà disponible dans une "
+"de vos bibliothèques."
 
 #: front/src/components/library/ImportStatusModal.vue:11
 msgctxt "Popup/Import/Message"
@@ -5278,7 +5282,7 @@ msgstr "Vos notifications"
 #: front/src/components/auth/Settings.vue:76
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your password cannot be changed"
-msgstr ""
+msgstr "Impossible de changer votre mot de passe"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:29
 msgctxt "Content/Signup/Card.Paragraph"
