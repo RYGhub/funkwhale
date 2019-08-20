@@ -62,7 +62,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
     artist = track.artist
     artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
     album = list(artist.albums.all())[0]
-
+    setattr(artist, "_tracks_count", 42)
     expected = {
         "id": artist.id,
         "fid": artist.fid,
@@ -73,6 +73,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "albums": [serializers.ArtistAlbumSerializer(album).data],
         "tags": [],
         "attributed_to": federation_serializers.APIActorSerializer(actor).data,
+        "tracks_count": 42,
     }
     serializer = serializers.ArtistWithAlbumsSerializer(artist)
     assert serializer.data == expected

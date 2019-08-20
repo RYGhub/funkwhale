@@ -1190,6 +1190,10 @@ definitions:
       - $ref: "#/definitions/BaseArtist"
       - type: "object"
         properties:
+          tracks_count:
+            type: "integer"
+            format: "int64"
+            example: 42
           albums:
             type: "array"
             items:
