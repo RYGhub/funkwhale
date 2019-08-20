@@ -79,6 +79,7 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
     albums = ArtistAlbumSerializer(many=True, read_only=True)
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
+    tracks_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Artist
@@ -92,6 +93,7 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
             "is_local",
             "tags",
             "attributed_to",
+            "tracks_count",
         )
 
     def get_tags(self, obj):
@@ -99,6 +101,9 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
         return [ti.tag.name for ti in tagged_items]
 
     get_attributed_to = serialize_attributed_to
+
+    def get_tracks_count(self, o):
+        return getattr(o, "_tracks_count", None)
 
 
 class ArtistSimpleSerializer(serializers.ModelSerializer):

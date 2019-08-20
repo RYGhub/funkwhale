@@ -7,9 +7,13 @@
       <router-link :title="artist.name" :to="{name: 'library.artists.detail', params: {id: artist.id}}">
         {{ artist.name|truncate(30) }}
       </router-link>
-      <div>
+      <div v-if="artist.albums.length > 0">
         <i class="small sound icon"></i>
         <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
+      </div>
+      <div v-else-if="artist.tracks_count">
+        <i class="small sound icon"></i>
+        <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.tracks_count}" :translate-n="artist.tracks_count" translate-plural="%{ count } tracks">1 track</translate>
       </div>
       <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="artist.tags"></tags-list>
 
@@ -38,11 +42,10 @@ export default {
     return {
       backend: backend,
       initialAlbums: 30,
-      showAllAlbums: true
+      showAllAlbums: true,
     }
   },
   computed: {
-
     imageUrl () {
       let url = '../../../assets/audio/default-cover.png'
       let cover = this.cover
@@ -59,7 +62,7 @@ export default {
       }).filter((c) => {
         return !!c
       })[0] || {}
-    }
+    },
   }
 }
 </script>
