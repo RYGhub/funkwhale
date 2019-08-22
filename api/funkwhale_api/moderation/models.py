@@ -1,8 +1,16 @@
 import urllib.parse
 import uuid
 
+
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
+
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 
 
 class InstancePolicyQuerySet(models.QuerySet):
@@ -92,3 +100,63 @@ class UserFilter(models.Model):
     def target(self):
         if self.target_artist:
             return {"type": "artist", "obj": self.target_artist}
+
+
+REPORT_TYPES = [
+    ("takedown_request", "Takedown request"),
+    ("invalid_metadata", "Invalid metadata"),
+    ("illegal_content", "Illegal content"),
+    ("offensive_content", "Offensive content"),
+    ("other", "Other"),
+]
+
+
+class Report(federation_models.FederationMixin):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    summary = models.TextField(null=True, max_length=50000)
+    handled_date = models.DateTimeField(null=True)
+    is_handled = models.BooleanField(default=False)
+    type = models.CharField(max_length=40, choices=REPORT_TYPES)
+    submitter_email = models.EmailField(null=True)
+    submitter = models.ForeignKey(
+        "federation.Actor",
+        related_name="reports",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    assigned_to = models.ForeignKey(
+        "federation.Actor",
+        related_name="assigned_reports",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+    target_owner = models.ForeignKey(
+        "federation.Actor", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    # frozen state of the target being reported, to ensure we still have info in the event of a
+    # delete
+    target_state = JSONField(null=True)
+
+    def get_federation_id(self):
+        if self.fid:
+            return self.fid
+
+        return federation_utils.full_url(
+            reverse("federation:reports-detail", kwargs={"uuid": self.uuid})
+        )
+
+    def save(self, **kwargs):
+        if not self.pk and not self.fid:
+            self.fid = self.get_federation_id()
+
+        return super().save(**kwargs)

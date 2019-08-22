@@ -6,6 +6,7 @@ from rest_framework import exceptions, mixins, permissions, response, viewsets
 from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
@@ -84,6 +85,15 @@ class EditViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericVi
     renderer_classes = renderers.get_ap_renderers()
     # queryset = common_models.Mutation.objects.local().select_related()
     # serializer_class = serializers.ActorSerializer
+
+
+class ReportViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    lookup_field = "uuid"
+    authentication_classes = [authentication.SignatureAuthentication]
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = moderation_models.Report.objects.none()
 
 
 class WellKnownViewSet(viewsets.GenericViewSet):

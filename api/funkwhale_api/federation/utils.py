@@ -128,3 +128,32 @@ def is_local(url):
     return url.startswith("http://{}/".format(d)) or url.startswith(
         "https://{}/".format(d)
     )
+
+
+def get_actor_data_from_username(username):
+
+    parts = username.split("@")
+
+    return {
+        "username": parts[0],
+        "domain": parts[1] if len(parts) > 1 else settings.FEDERATION_HOSTNAME,
+    }
+
+
+def get_actor_from_username_data_query(field, data):
+    if not data:
+        return Q(**{field: None})
+    if field:
+        return Q(
+            **{
+                "{}__preferred_username__iexact".format(field): data["username"],
+                "{}__domain__name__iexact".format(field): data["domain"],
+            }
+        )
+    else:
+        return Q(
+            **{
+                "preferred_username__iexact": data["username"],
+                "domain__name__iexact": data["domain"],
+            }
+        )

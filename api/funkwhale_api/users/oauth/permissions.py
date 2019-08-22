@@ -96,8 +96,9 @@ class ScopePermission(permissions.BasePermission):
             ):
                 return False
 
-            # we use default anonymous scopes
-            user_scopes = scopes.ANONYMOUS_SCOPES
+            user_scopes = (
+                getattr(view, "anonymous_scopes", set()) | scopes.ANONYMOUS_SCOPES
+            )
             return should_allow(
                 required_scope=required_scope, request_scopes=user_scopes
             )

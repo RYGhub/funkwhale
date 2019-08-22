@@ -22,6 +22,7 @@ BASE_SCOPES = [
     Scope("playlists", "Access playlists"),
     Scope("notifications", "Access personal notifications"),
     Scope("security", "Access security settings"),
+    Scope("reports", "Access reports"),
     # Privileged scopes that require specific user permissions
     Scope("instance:settings", "Access instance settings"),
     Scope("instance:users", "Access local user accounts"),
@@ -72,6 +73,8 @@ COMMON_SCOPES = ANONYMOUS_SCOPES | {
     "write:edits",
     "read:filters",
     "write:filters",
+    "read:reports",
+    "write:reports",
     "write:listenings",
 }
 

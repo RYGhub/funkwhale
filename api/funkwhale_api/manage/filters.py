@@ -1,6 +1,5 @@
 from django import forms
 from django.db.models import Q
-from django.conf import settings
 
 import django_filters
 from django_filters import rest_framework as filters
@@ -22,24 +21,12 @@ class ActorField(forms.CharField):
         if not value:
             return value
 
-        parts = value.split("@")
-
-        return {
-            "username": parts[0],
-            "domain": parts[1] if len(parts) > 1 else settings.FEDERATION_HOSTNAME,
-        }
+        return federation_utils.get_actor_data_from_username(value)
 
 
 def get_actor_filter(actor_field):
     def handler(v):
-        if not v:
-            return Q(**{actor_field: None})
-        return Q(
-            **{
-                "{}__preferred_username__iexact".format(actor_field): v["username"],
-                "{}__domain__name__iexact".format(actor_field): v["domain"],
-            }
-        )
+        federation_utils.get_actor_from_username_data_query(actor_field, v)
 
     return {"field": ActorField(), "handler": handler}
 
