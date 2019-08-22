@@ -37,3 +37,17 @@ class UserFilterFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
         for_artist = factory.Trait(
             target_artist=factory.SubFactory(music_factories.ArtistFactory)
         )
+
+
+@registry.register
+class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
+    submitter = factory.SubFactory(federation_factories.ActorFactory)
+    target = None
+    summary = factory.Faker("paragraph")
+    type = "other"
+
+    class Meta:
+        model = "moderation.Report"
+
+    class Params:
+        anonymous = factory.Trait(actor=None, submitter_email=factory.Faker("email"))

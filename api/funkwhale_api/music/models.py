@@ -127,6 +127,9 @@ class APIModelMixin(models.Model):
         parsed = urllib.parse.urlparse(self.fid)
         return parsed.hostname
 
+    def get_tags(self):
+        return list(sorted(self.tagged_items.values_list("tag__name", flat=True)))
+
 
 class License(models.Model):
     code = models.CharField(primary_key=True, max_length=100)

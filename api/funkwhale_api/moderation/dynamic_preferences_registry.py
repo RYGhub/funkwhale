@@ -1,6 +1,10 @@
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
+from funkwhale_api.common import preferences as common_preferences
+
+from . import models
+
 moderation = types.Section("moderation")
 
 
@@ -24,3 +28,15 @@ class AllowListPublic(types.BooleanPreference):
         "make your moderation policy public."
     )
     default = False
+
+
+@global_preferences_registry.register
+class UnauthenticatedReportTypes(common_preferences.StringListPreference):
+    show_in_api = True
+    section = moderation
+    name = "unauthenticated_report_types"
+    default = ["takedown_request", "illegal_content"]
+    verbose_name = "Accountless report categories"
+    help_text = "A list of categories for which external users (without an account) can submit a report"
+    choices = models.REPORT_TYPES
+    field_kwargs = {"choices": choices, "required": False}
