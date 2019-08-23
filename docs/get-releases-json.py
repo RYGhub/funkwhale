@@ -1,3 +1,4 @@
+import argparse
 import json
 import subprocess
 
@@ -32,11 +33,26 @@ def get_versions():
     return sorted(valid, key=lambda tag: StrictVersion(tag["id"]), reverse=True)
 
 
-def main():
+def main(latest=False):
     versions = get_versions()
-    data = {"count": len(versions), "releases": versions}
-    print(json.dumps(data))
+    if latest:
+        print(versions[0]["id"])
+    else:
+        data = {"count": len(versions), "releases": versions}
+        print(json.dumps(data, sort_keys=True, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        """
+        Compile release data and output in in JSON format
+        """
+    )
+    parser.add_argument(
+        "-l",
+        "--latest",
+        action="store_true",
+        help="Only print the latest version then exit",
+    )
+    args = parser.parse_args()
+    main(latest=args.latest)
