@@ -4,7 +4,7 @@
     <div v-if="isLoading" :class="['ui', {'active': isLoading}, 'inverted', 'dimmer']">
       <div class="ui text loader"><translate translate-context="Content/Library/Paragraph">Loading usage data…</translate></div>
     </div>
-    <div :class="['ui', {'success': progress < 60}, {'yellow': progress >= 60 && progress < 96}, {'error': progress >= 95}, 'progress']">
+    <div :class="['ui', {'success': progress < 60}, {'yellow': progress >= 60 && progress < 96}, {'error': progress >= 95}, 'progress']" data-percent=progress>
       <div class="bar" :style="{width: `${progress}%`}">
         <div class="progress">{{ progress }}%</div>
       </div>
