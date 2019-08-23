@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-07-07 20:23+0000\n"
-"Last-Translator: Koen <koen.glotzbach@gmail.com>\n"
+"PO-Revision-Date: 2019-08-25 13:34+0000\n"
+"Last-Translator: Keunes <keunes@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -136,7 +136,7 @@ msgstr[1] "%{ count } favorieten"
 #: front/src/components/Home.vue:64
 msgctxt "Content/Home/Title"
 msgid "A clean library"
-msgstr "Een georganiseerde verzameling"
+msgstr "Een georganiseerde bibliotheek"
 
 #: front/src/components/library/FileUpload.vue:264
 msgctxt "Content/Library/Help text"
@@ -203,7 +203,6 @@ msgstr ""
 
 #: front/src/components/mixins/Translations.vue:105
 #: front/src/components/mixins/Translations.vue:106
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to edits"
 msgstr "Toegang tot bewerkingen"
@@ -385,7 +384,7 @@ msgstr "Toch toevoegen"
 #: front/src/components/Sidebar.vue:75 src/views/content/Base.vue:18
 msgctxt "*/Library/*/Verb"
 msgid "Add content"
-msgstr "Inhoud toevoegen"
+msgstr "Content toevoegen"
 
 #: front/src/components/library/radios/Builder.vue:51
 msgctxt "Content/Radio/Button.Label/Verb"
@@ -761,7 +760,7 @@ msgstr "Bladeren"
 #: front/src/components/Sidebar.vue:65
 msgctxt "Sidebar/Library/List item.Link/Verb"
 msgid "Browse library"
-msgstr "Verzameling doorbladeren"
+msgstr "Bibliotheek doorbladeren"
 
 #: front/src/components/library/Albums.vue:4
 msgctxt "Content/Album/Title"
@@ -796,7 +795,7 @@ msgstr "Van %{ artist }"
 #: front/src/views/content/remote/Card.vue:112
 msgctxt "Popup/Library/Paragraph"
 msgid "By unfollowing this library, you loose access to its content."
-msgstr "Als je deze verzameling ontvolgt, verlies je toegang tot haar inhoud."
+msgstr "Als je deze bibliotheek ontvolgt, verlies je toegang tot haar inhoud."
 
 #: front/src/views/admin/library/AlbumDetail.vue:214
 #: front/src/views/admin/library/ArtistDetail.vue:203
@@ -1055,7 +1054,7 @@ msgstr "We konden je e-mailadres niet bevestigen"
 #: front/src/views/content/remote/ScanForm.vue:3
 msgctxt "Content/Library/Error message.Title"
 msgid "Could not fetch remote library"
-msgstr "Externe verzameling kon niet opgehaald worden"
+msgstr "Externe bibliotheek kon niet opgehaald worden"
 
 #: front/src/components/Home.vue:80
 msgctxt "Content/Home/List item"
@@ -1089,7 +1088,7 @@ msgstr "Creëer een nieuwe afspeellijst"
 #: front/src/views/content/libraries/Home.vue:14
 msgctxt "Content/Library/Link/Verb"
 msgid "Create a new library"
-msgstr "Creëer een nieuwe verzameling"
+msgstr "Maak een nieuwe bibliotheek"
 
 #: front/src/components/playlists/Form.vue:2
 msgctxt "Popup/Playlist/Title/Verb"
@@ -1110,7 +1109,7 @@ msgstr "Afspeellijst creëren"
 #: front/src/views/content/libraries/Form.vue:26
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Create library"
-msgstr "Verzameling creëren"
+msgstr "Bibliotheek maken"
 
 #: front/src/components/auth/Signup.vue:53
 msgctxt "Content/Signup/Button.Label"
@@ -1154,7 +1153,7 @@ msgstr "Huidige gebruikersafbeelding"
 #: front/src/views/content/libraries/DetailArea.vue:4
 msgctxt "Content/Library/Title"
 msgid "Current library"
-msgstr "Huidige verzameling"
+msgstr "Huidige bibliotheek"
 
 #: front/src/components/playlists/PlaylistModal.vue:8
 msgctxt "Popup/Playlist/Title"
@@ -1182,10 +1181,9 @@ msgid "Date"
 msgstr "Datum"
 
 #: front/src/components/library/ImportStatusModal.vue:64
-#, fuzzy
 msgctxt "Popup/Import/Table.Label/Noun"
 msgid "Debug information"
-msgstr "Nummerinformatie"
+msgstr "Foutgegevens"
 
 #: front/src/components/ShortcutsModal.vue:75
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -1234,7 +1232,7 @@ msgstr ""
 #: front/src/views/content/libraries/Form.vue:39
 msgctxt "Popup/Library/Button.Label/Verb"
 msgid "Delete library"
-msgstr "Verzameling verwijderen"
+msgstr "Bibliotheek verwijderen"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:69
 msgctxt "Popup/Moderation/Button.Label/Verb"
@@ -1253,40 +1251,35 @@ msgstr "Radiostation verwijderen"
 
 #: front/src/views/admin/library/AlbumDetail.vue:73
 #: front/src/views/admin/library/TrackDetail.vue:72
-#, fuzzy
 msgctxt "Popup/Library/Title"
 msgid "Delete this album?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Album verwijderen?"
 
 #: front/src/views/admin/library/ArtistDetail.vue:72
-#, fuzzy
 msgctxt "Popup/Library/Title"
 msgid "Delete this artist?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Artiest verwijderen?"
 
 #: front/src/views/admin/library/LibraryDetail.vue:59
 #: front/src/views/content/libraries/Form.vue:31
 msgctxt "Popup/Library/Title"
 msgid "Delete this library?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Deze bibliotheek verwijderen?"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:63
-#, fuzzy
 msgctxt "Popup/Moderation/Title"
 msgid "Delete this moderation rule?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Deze moderatie-regel verwijderen?"
 
 #: front/src/components/library/EditCard.vue:94
-#, fuzzy
 msgctxt "Popup/Library/Title"
 msgid "Delete this suggestion?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Deze suggestie verwijderen?"
 
 #: front/src/views/admin/library/UploadDetail.vue:66
-#, fuzzy
 msgctxt "Popup/Library/Title"
 msgid "Delete this upload?"
-msgstr "Wil je deze verzameling verwijderen?"
+msgstr "Deze upload verwijderen?"
 
 #: front/src/components/favorites/List.vue:35
 #: src/components/library/Albums.vue:26
@@ -1528,7 +1521,7 @@ msgstr "Moderatie-regel aanpassen"
 #: front/src/components/library/AlbumEdit.vue:4
 msgctxt "Content/*/Title"
 msgid "Edit this album"
-msgstr ""
+msgstr "Dit album bewerken"
 
 #: front/src/components/library/ArtistEdit.vue:4
 #, fuzzy
@@ -1597,10 +1590,9 @@ msgstr "Embed dit nummer op je website"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:259
 #: front/src/views/admin/moderation/DomainsDetail.vue:187
-#, fuzzy
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Emitted library follows"
-msgstr "Voer de url in van een verzameling"
+msgstr ""
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:243
 #: front/src/views/admin/moderation/DomainsDetail.vue:171
@@ -1624,7 +1616,7 @@ msgstr "Bewerken afronden"
 #: front/src/views/content/remote/ScanForm.vue:50
 msgctxt "Content/Library/Input.Placeholder"
 msgid "Enter a library URL"
-msgstr "Voer een verzameling-URL in"
+msgstr "Voer de URL van een bibliotheek in"
 
 #: front/src/components/library/Radios.vue:141
 #, fuzzy
@@ -1754,10 +1746,9 @@ msgid "Error while fetching application data"
 msgstr "Fout tijdens creëren van uitnodiging"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:118
-#, fuzzy
 msgctxt "Content/Moderation/Table"
 msgid "Error while fetching node info"
-msgstr "Fout tijdens ophalen van externe verzameling"
+msgstr "Fout bij het ophalen van serverinformatie"
 
 #: front/src/components/admin/SettingsGroup.vue:5
 msgctxt "Content/Settings/Error message.Title"
@@ -1936,10 +1927,9 @@ msgid "Follow remote libraries"
 msgstr "Externe verzamelingen volgen"
 
 #: front/src/views/content/remote/Card.vue:92
-#, fuzzy
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Follow request pending approval"
-msgstr "Wachten op toestemming"
+msgstr "Openstaande volgverzoeken"
 
 #: front/src/components/mixins/Translations.vue:64
 #: front/src/views/admin/library/LibraryDetail.vue:161
@@ -2026,7 +2016,7 @@ msgstr "Nieuwe uitnodiging aanvragen"
 #: front/src/components/Home.vue:13
 msgctxt "Content/Home/Button.Label/Verb"
 msgid "Get me to the library"
-msgstr "Breng me naar de verzameling"
+msgstr "Breng me naar de bibliotheek"
 
 #: front/src/components/Home.vue:70
 msgctxt "Content/Home/List item/Verb"
@@ -2364,10 +2354,9 @@ msgstr "Verzamelingen"
 
 #: front/src/components/mixins/Translations.vue:72
 #: front/src/components/mixins/Translations.vue:73
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Libraries and uploads"
-msgstr "Verzameling bijgewerkt"
+msgstr "Bibliotheek en uploads"
 
 #: front/src/views/content/libraries/Form.vue:2
 msgctxt "Content/Library/Paragraph"
@@ -2387,24 +2376,22 @@ msgstr ""
 #: front/src/views/admin/moderation/AccountsDetail.vue:498
 msgctxt "*/*/*"
 msgid "Library"
-msgstr "Verzameling"
+msgstr "Bibliotheek"
 
 #: front/src/views/content/libraries/Form.vue:103
 msgctxt "Content/Library/Message"
 msgid "Library created"
-msgstr "Verzameling gecreëerd"
+msgstr "Bibliotheek gecreëerd"
 
 #: front/src/views/admin/library/LibraryDetail.vue:78
-#, fuzzy
 msgctxt "Content/Moderation/Title"
 msgid "Library data"
-msgstr "Verzameling bijgewerkt"
+msgstr "Bibliotheekgegevens"
 
 #: front/src/views/content/libraries/Form.vue:123
-#, fuzzy
 msgctxt "Content/Library/Message"
 msgid "Library deleted"
-msgstr "Verzameling bijgewerkt"
+msgstr "Bibliotheek verwijderd"
 
 #: front/src/views/admin/library/EditsList.vue:4
 #, fuzzy
@@ -2415,7 +2402,7 @@ msgstr "Verzamelingsbestanden"
 #: front/src/views/content/libraries/Form.vue:100
 msgctxt "Content/Library/Message"
 msgid "Library updated"
-msgstr "Verzameling bijgewerkt"
+msgstr "Bibliotheek bijgewerkt"
 
 #: front/src/components/library/TrackDetail.vue:19
 #: front/src/components/manage/library/TracksTable.vue:43
@@ -2544,12 +2531,9 @@ msgid "Logout"
 msgstr "Uitloggen"
 
 #: front/src/views/content/libraries/Home.vue:9
-#, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Looks like you don't have a library, it's time to create one."
-msgstr ""
-"Het lijkt erop dat je nog geen verzameling hebt; de hoogste tijd om er één "
-"te creëren!"
+msgstr "Het lijkt erop dat je geen bibliotheek hebt; tijd om er één te creëren."
 
 #: front/src/components/audio/Player.vue:632
 #: src/components/audio/Player.vue:633
@@ -2579,7 +2563,7 @@ msgstr ""
 #: front/src/views/admin/library/Base.vue:31
 msgctxt "Head/Admin/Title"
 msgid "Manage library"
-msgstr "Verzameling beheren"
+msgstr "Bibliotheek beheren"
 
 #: front/src/components/playlists/PlaylistModal.vue:3
 msgctxt "Popup/Playlist/Title/Verb"
@@ -2709,7 +2693,7 @@ msgstr "Mijn geweldige omschrijving"
 #: front/src/views/content/libraries/Form.vue:72
 msgctxt "Content/Library/Input.Placeholder"
 msgid "My awesome library"
-msgstr "Mijn geweldige verzameling"
+msgstr "Mijn geweldige bibliotheek"
 
 #: front/src/components/playlists/Form.vue:76
 msgctxt "Content/Playlist/Input.Placeholder"
@@ -2808,7 +2792,7 @@ msgstr "Nee"
 msgctxt "Content/Home/List item"
 msgid "No add-ons, no plugins : you only need a web library"
 msgstr ""
-"Geen uitbreidingen of plug-ins: je hebt alleen een online verzameling nodig"
+"Geen uitbreidingen of plug-ins: je hebt alleen een online bibliotheek nodig"
 
 #: front/src/components/audio/Search.vue:25
 #, fuzzy
@@ -2837,7 +2821,7 @@ msgstr "Geen songtekst beschikbaar voor dit nummer."
 #: front/src/components/federation/LibraryWidget.vue:6
 msgctxt "Content/Federation/Paragraph"
 msgid "No matching library."
-msgstr "Geen overeenkomende verzameling gevonden."
+msgstr "Geen overeenkomende bibliotheek."
 
 #: front/src/views/Notifications.vue:28
 #, fuzzy
@@ -2859,7 +2843,7 @@ msgstr "Niemand, behalve ik"
 #: front/src/views/content/libraries/Detail.vue:57
 msgctxt "Content/Library/Paragraph"
 msgid "Nobody is following this library"
-msgstr "Niemand volgt deze verzameling"
+msgstr "Niemand volgt deze bibliotheek"
 
 #: front/src/components/manage/users/InvitationsTable.vue:51
 msgctxt "Content/Admin/Table"
@@ -3282,7 +3266,7 @@ msgstr "Doorgaan met inloggen"
 #: front/src/components/library/FileUpload.vue:17
 msgctxt "Content/Library/Tab.Title/Short"
 msgid "Processing"
-msgstr "Bezig met verwerken..."
+msgstr "Aan het verwerken"
 
 #: front/src/components/mixins/Translations.vue:68
 #: front/src/components/mixins/Translations.vue:69
@@ -3765,7 +3749,7 @@ msgstr "Zoeken"
 #: front/src/views/content/remote/ScanForm.vue:9
 msgctxt "Content/Library/Input.Label/Verb"
 msgid "Search a remote library"
-msgstr "Zoeken naar externe verzameling"
+msgstr "Zoek een externe bibliotheek"
 
 #: front/src/components/manage/library/EditsCardList.vue:211
 #, fuzzy
@@ -4227,14 +4211,13 @@ msgstr ""
 "Het zit zo: we waren fan van Grooveshark en wilden iets nóg beters bouwen."
 
 #: front/src/views/admin/library/AlbumDetail.vue:75
-#, fuzzy
 msgctxt "Content/Moderation/Paragraph"
 msgid ""
 "The album will be removed, as well as associated uploads, tracks, favorites "
 "and listening history. This action is irreversible."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"Het album en de bijbehorende nummers, favorieten en luisterhistorie worden "
+"verwijderd. Dit kan niet ongedaan gemaakt worden."
 
 #: front/src/components/auth/Authorize.vue:39
 msgctxt "Content/Auth/Paragraph"
@@ -4251,8 +4234,7 @@ msgstr ""
 #: front/src/components/Footer.vue:53
 msgctxt "Footer/*/List item.Link"
 msgid "The funkwhale logo was kindly designed and provided by Francis Gading."
-msgstr ""
-"Het Funkwhale-logo is met liefde ontworpen en gemaakt door Francis Gading."
+msgstr "Funkwhale-logo met liefde ontworpen door Francis Gading."
 
 #: front/src/components/SetInstanceModal.vue:8
 msgctxt "Popup/Instance/Error message.List item"
@@ -4260,23 +4242,21 @@ msgid "The given address is not a Funkwhale server"
 msgstr ""
 
 #: front/src/views/content/libraries/Form.vue:34
-#, fuzzy
 msgctxt "Popup/Library/Paragraph"
 msgid ""
 "The library and all its tracks will be deleted. This can not be undone."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"De bibliotheek en al haar nummers worden verwijderd. Dit kan niet ongedaan "
+"gemaakt worden."
 
 #: front/src/views/admin/library/LibraryDetail.vue:61
-#, fuzzy
 msgctxt "Content/Moderation/Paragraph"
 msgid ""
 "The library will be removed, as well as associated uploads, and follows. "
 "This action is irreversible."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"De bibliotheek zal worden verwijderd, samen met alle bijbehorende nummers en "
+"volgers. Dit kan niet ongedaan gemaakt worden."
 
 #: front/src/components/library/ImportStatusModal.vue:140
 msgctxt "Popup/Import/Error.Label"
@@ -4347,14 +4327,13 @@ msgid ""
 msgstr ""
 
 #: front/src/components/manage/library/LibrariesTable.vue:206
-#, fuzzy
 msgctxt "Popup/*/Paragraph"
 msgid ""
 "The selected library will be removed, as well as associated uploads and "
 "follows. This action is irreversible."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"De verzameling zal worden verwijderd, samen met de bijbehorende nummers en "
+"volgers. Dit kan niet ongedaan gemaakt worden."
 
 #: front/src/components/manage/library/TracksTable.vue:189
 msgctxt "Popup/*/Paragraph"
@@ -4364,12 +4343,11 @@ msgid ""
 msgstr ""
 
 #: front/src/components/manage/library/UploadsTable.vue:256
-#, fuzzy
 msgctxt "Popup/*/Paragraph"
 msgid "The selected upload will be removed. This action is irreversible."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"De geselecteerde content zal worden verwijderd. Dit kan niet ongedaan "
+"gemaakt worden."
 
 #: front/src/components/SetInstanceModal.vue:7
 msgctxt "Popup/Instance/Error message.List item"
@@ -4382,13 +4360,11 @@ msgid "The Subsonic API is not available on this Funkwhale instance."
 msgstr "De Subsonic-API is niet beschikbaar op deze server."
 
 #: front/src/components/library/EditCard.vue:96
-#, fuzzy
 msgctxt "Popup/Library/Paragraph"
 msgid ""
 "The suggestion will be completely removed, this action is irreversible."
 msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+"De suggestie zal worden verwijderd. Dit kan niet ongedaan gemaakt worden."
 
 #: front/src/components/playlists/PlaylistModal.vue:34
 #, fuzzy
@@ -4409,12 +4385,9 @@ msgid ""
 msgstr ""
 
 #: front/src/views/admin/library/UploadDetail.vue:68
-#, fuzzy
 msgctxt "Content/Moderation/Paragraph"
 msgid "The upload will be removed. This action is irreversible."
-msgstr ""
-"De verzameling en alle bijbehorende nummers worden verwijderd. Dit kan niet "
-"ongedaan worden gemaakt."
+msgstr "De content zal worden verwijderd. Dit kan niet ongedaan gemaakt worden."
 
 #: front/src/components/library/FileUpload.vue:42
 msgctxt "Content/Library/List item"
@@ -4471,12 +4444,10 @@ msgid "This is you!"
 msgstr "Dit ben jij!"
 
 #: front/src/views/content/libraries/Form.vue:73
-#, fuzzy
 msgctxt "Content/Library/Input.Placeholder"
 msgid "This library contains my personal music, I hope you like it."
 msgstr ""
-"Deze verzameling bevat mijn persoonlijke muziek. Ik hoop dat je ervan zult "
-"genieten!"
+"Deze bibliotheek bevat mijn persoonlijke muziek. Ik hoop dat het je smaak is."
 
 #: front/src/views/content/remote/Card.vue:141
 msgctxt "Content/Library/Card.Help text"
@@ -5407,9 +5378,8 @@ msgid ""
 "Your Subsonic password will be changed to a new, random one, logging you out"
 " from devices that used the old Subsonic password"
 msgstr ""
-"Je Subsonic-wachtwoord wordt gewijzigd in een nieuw willekeurig wachtwoord. "
-"Hierbij wordt je uitgelogd op apparaten die het oude Subsonic-wachtwoord "
-"gebruiken."
+"Je Subsonic-wachtwoord wordt vervangen door een nieuwe, waardoor je wordt "
+"uitgelogd op apparaten die het oude wachtwoord gebruiken"
 
 #: front/src/edits.js:47
 #, fuzzy
