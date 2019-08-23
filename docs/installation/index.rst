@@ -1,6 +1,52 @@
 Installation
 =============
 
+Available installation methods
+-------------------------------
+
+Quick install
+^^^^^^^^^^^^^
+
+To install the latest version of Funkwhale on a recent Debian or Ubuntu server, run::
+
+    sudo apt-get update
+    sudo apt-get install curl
+    sudo sh -c "$(curl -sSL https://get.funkwhale.audio/)"
+
+This installation script will ask you a few questions, install the required dependencies
+and set up your instance.
+
+Additional info:
+
+- This script is based on our `Ansible role <https://dev.funkwhale.audio/funkwhale/ansible/>`_.
+- By default, the script installs Nginx, PostgreSQL, Redis and Funkwhale itself but you can customize the installation procedure if you already have some of these services available on your machine
+- Upgrade is done using ``sh -c "$(curl -sSL https://get.funkwhale.audio/upgrade.sh)"``.
+
+
+Alternative installation methods
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We also offer Docker images, an installation guide for Debian 9 and Arch Linux, and `an
+Ansible role <https://dev.funkwhale.audio/funkwhale/ansible/>`_.
+
+.. toctree::
+   :maxdepth: 1
+
+   external_dependencies
+   debian
+   docker
+   systemd
+   non_amd64_architectures
+
+Third-party packages
+^^^^^^^^^^^^^^^^^^^^
+
+Funkwhale packages are available for the following platforms:
+
+- `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
+- ArchLinux (as an AUR package): if you'd rather use a package, check out this alternative installation method on ArchLinux: https://wiki.archlinux.org/index.php/Funkwhale (package and wiki kindly maintained by getzee)
+- `NixOS <https://github.com/mmai/funkwhale-nixos>`_ (kindly maintained by @mmai)
+
 Project architecture
 --------------------
 
@@ -56,29 +102,6 @@ dependencies should be available in your distribution's repositories.
 
    Funkwhale works only with Python >= 3.5, as we need support for async/await.
    Older versions of Python are not supported.
-
-
-Available installation methods
--------------------------------
-
-Docker is the recommended and easiest way to setup your Funkwhale instance.
-We also maintain an installation guide for Debian 9 and Arch Linux, and `an
-Ansible role <https://dev.funkwhale.audio/funkwhale/ansible/>`_.
-
-.. toctree::
-   :maxdepth: 1
-
-   external_dependencies
-   debian
-   docker
-   systemd
-   non_amd64_architectures
-
-Funkwhale packages are available for the following platforms:
-
-- `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
-- ArchLinux (as an AUR package): if you'd rather use a package, check out this alternative installation method on ArchLinux: https://wiki.archlinux.org/index.php/Funkwhale (package and wiki kindly maintained by getzee)
-- `NixOS <https://github.com/mmai/funkwhale-nixos>`_ (kindly maintained by @mmai)
 
 Running Funkwhale on the develop branch
 ---------------------------------------
