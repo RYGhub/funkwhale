@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-05-16 10:35+0200\n"
-"PO-Revision-Date: 2019-08-25 13:34+0000\n"
+"PO-Revision-Date: 2019-08-26 11:30+0000\n"
 "Last-Translator: Keunes <keunes@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -164,10 +164,9 @@ msgid "About Funkwhale"
 msgstr "Over Funkwhale"
 
 #: front/src/components/Footer.vue:10
-#, fuzzy
 msgctxt "Footer/About/List item.Link"
 msgid "About page"
-msgstr "Albumpagina"
+msgstr "Over"
 
 #: front/src/components/About.vue:8 src/components/About.vue:67
 msgctxt "Content/About/Title"
@@ -368,7 +367,7 @@ msgstr ""
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:4
 msgctxt "Content/Moderation/Card.Button.Label/Verb"
 msgid "Add a new moderation rule"
-msgstr ""
+msgstr "Nieuwe moderatieregel toevoegen"
 
 #: front/src/views/content/Home.vue:35
 msgctxt "Content/Library/Title/Verb"
@@ -1143,7 +1142,7 @@ msgstr "Creëer je eigen radiostation"
 #: front/src/components/mixins/Translations.vue:44
 msgctxt "Content/*/*/Noun"
 msgid "Creation date"
-msgstr "Gecreëerd op"
+msgstr "Toegevoegd"
 
 #: front/src/components/auth/Settings.vue:54
 msgctxt "Content/Settings/Title/Noun"
@@ -2251,7 +2250,7 @@ msgstr "Uitnodigingen"
 #: front/src/components/Footer.vue:41
 msgctxt "Footer/*/List item.Link"
 msgid "Issue tracker"
-msgstr "Bugtracker"
+msgstr "Issue tracker"
 
 #: front/src/components/SetInstanceModal.vue:5
 msgctxt "Popup/Instance/Error message.Title"
@@ -2266,7 +2265,7 @@ msgstr "Beheer je lievelingsmuziek"
 #: front/src/components/Footer.vue:33 src/components/ShortcutsModal.vue:3
 msgctxt "*/*/*/Noun"
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "Sneltoetsen"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:161
 #, fuzzy
@@ -2616,7 +2615,7 @@ msgstr "Geregistreerd sinds %{ date }"
 #: front/src/components/Footer.vue:32
 msgctxt "Footer/*/List item.Link"
 msgid "Mobile and desktop apps"
-msgstr ""
+msgstr "Mobiele- en desktop-apps"
 
 #: front/src/components/Sidebar.vue:96
 #: src/components/manage/users/UsersTable.vue:177
@@ -3108,7 +3107,7 @@ msgstr "Hierna afspelen"
 #, fuzzy
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Play next track"
-msgstr "Nummer afspelen"
+msgstr "Afspelen"
 
 #: front/src/components/audio/PlayButton.vue:74
 msgctxt "*/Queue/Dropdown/Button/Title"
@@ -3310,7 +3309,7 @@ msgstr "Wachtrij"
 #: front/src/components/audio/Player.vue:322
 msgctxt "Content/Queue/Message"
 msgid "Queue shuffled!"
-msgstr "Wachtrij ingesteld op willekeurig!"
+msgstr "Wachtrij geshuffeld!"
 
 #: front/src/views/radios/Detail.vue:80
 msgctxt "Head/Radio/Title"
@@ -3814,10 +3813,9 @@ msgid "Search by username, e-mail address, name…"
 msgstr "Zoek op naam, gebruikersnaam, e-mailadres..."
 
 #: front/src/components/audio/SearchBar.vue:20
-#, fuzzy
 msgctxt "Sidebar/Search/Input.Placeholder"
 msgid "Search for artists, albums, tracks…"
-msgstr "Zoek naar artiesten, albums, nummers..."
+msgstr "Zoek artiesten, albums, nummers…"
 
 #: front/src/components/audio/Search.vue:2
 msgctxt "Content/Search/Title"
@@ -3923,7 +3921,7 @@ msgstr ""
 #: front/src/components/ShortcutsModal.vue:42
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Show available keyboard shortcuts"
-msgstr ""
+msgstr "Toon beschikbare sneltoetsen"
 
 #: front/src/views/Notifications.vue:7
 msgctxt "Content/Notifications/Form.Label/Verb"
@@ -3951,15 +3949,14 @@ msgid "Showing results %{ start }-%{ end } on %{ total }"
 msgstr "Resultaten - %{ start }-%{ end } van de %{ total }"
 
 #: front/src/components/ShortcutsModal.vue:83
-#, fuzzy
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Shuffle queue"
-msgstr "Willekeurig"
+msgstr "Wachtrij shuffelen"
 
 #: front/src/components/audio/Player.vue:641
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Shuffle your queue"
-msgstr "Willekeurig"
+msgstr "Shuffel je wachtrij"
 
 #: front/src/components/auth/Signup.vue:97
 msgctxt "*/Signup/Title"
@@ -4183,7 +4180,7 @@ msgstr ""
 #: front/src/components/Footer.vue:39
 msgctxt "Footer/*/Listitem.Link"
 msgid "Support forum"
-msgstr ""
+msgstr "Support-forum"
 
 #: front/src/components/library/FileUpload.vue:85
 msgctxt "Content/Library/Paragraph"
@@ -4729,7 +4726,8 @@ msgid ""
 "Unfortunately, the owners of this instance did not yet take the time to "
 "complete this page."
 msgstr ""
-"Helaas is deze pagina nog niet ingevuld door de beheerders van deze server."
+"Helaas hebben de beheerders van deze server nog geen informatie over hun "
+"service gegeven."
 
 #: front/src/components/federation/FetchButton.vue:54
 #: front/src/components/federation/FetchButton.vue:55
@@ -5004,10 +5002,9 @@ msgid "Using Funkwhale"
 msgstr "Over Funkwhale"
 
 #: front/src/components/Footer.vue:13
-#, fuzzy
 msgctxt "Footer/*/List item"
 msgid "Version %{version}"
-msgstr "Broncode (%{ version })"
+msgstr "Versie (%{ version })"
 
 #: front/src/views/content/libraries/Quota.vue:29
 #: front/src/views/content/libraries/Quota.vue:56
