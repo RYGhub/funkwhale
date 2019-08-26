@@ -142,7 +142,14 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
 
 
 @pytest.mark.parametrize(
-    "name", ["test.mp3", "with_other_picture.mp3", "sample.flac", "with_cover.ogg"]
+    "name",
+    [
+        "test.mp3",
+        "with_other_picture.mp3",
+        "sample.flac",
+        "with_cover.ogg",
+        "with_cover.opus",
+    ],
 )
 def test_can_get_pictures(name):
     path = os.path.join(DATA_DIR, name)

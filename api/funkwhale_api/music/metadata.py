@@ -147,6 +147,10 @@ CONF = {
             "license": {},
             "copyright": {},
             "genre": {},
+            "pictures": {
+                "field": "metadata_block_picture",
+                "to_application": clean_ogg_pictures,
+            },
         },
     },
     "OggVorbis": {
