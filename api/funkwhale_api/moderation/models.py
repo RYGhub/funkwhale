@@ -14,6 +14,7 @@ from django.utils import timezone
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 
+
 class InstancePolicyQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)

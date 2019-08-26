@@ -459,6 +459,25 @@ class ManageInstancePolicyViewSet(
         serializer.save(actor=self.request.user.actor)
 
 
+class ManageReportViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        moderation_models.Report.objects.all()
+        .order_by("-creation_date")
+        .select_related()
+    )
+    serializer_class = serializers.ManageReportSerializer
+    filterset_class = filters.ManageReportFilterSet
+    required_scope = "instance:reports"
+    ordering_fields = ["id", "creation_date", "handled_date"]
+
+
 class ManageTagViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,

@@ -339,3 +339,26 @@ class ManageTagFilterSet(filters.FilterSet):
     class Meta:
         model = tags_models.Tag
         fields = ["q"]
+
+
+class ManageReportFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={"summary": {"to": "summary"}},
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "id": {"to": "id"},
+                "is_handled": {"to": "is_handled"},
+                "domain": {"to": "target_owner__domain_id"},
+                "type": {"to": "type"},
+                "submitter": get_actor_filter("submitter"),
+                "assigned_to": get_actor_filter("assigned_to"),
+                "target_owner": get_actor_filter("target_owner"),
+                "submitter_email": {"to": "submitter_email"},
+            },
+        )
+    )
+
+    class Meta:
+        model = moderation_models.Report
+        fields = ["q", "is_handled", "type", "submitter_email"]

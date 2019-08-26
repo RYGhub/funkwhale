@@ -44,7 +44,7 @@ class UserFilterFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 @registry.register
 class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     submitter = factory.SubFactory(federation_factories.ActorFactory)
-    target = None
+    target = factory.SubFactory(music_factories.ArtistFactory)
     summary = factory.Faker("paragraph")
     type = "other"
 

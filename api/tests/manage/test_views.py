@@ -417,3 +417,47 @@ def test_tag_delete(factories, superuser_api_client):
     response = superuser_api_client.delete(url)
 
     assert response.status_code == 204
+
+
+def test_report_detail(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["summary"] == report.summary
+
+
+def test_report_list(factories, superuser_api_client, settings):
+    report = factories["moderation.Report"]()
+    url = reverse("api:v1:manage:moderation:reports-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["summary"] == report.summary
+
+
+def test_report_update(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.patch(url, {"is_handled": True})
+
+    assert response.status_code == 200
+    report.refresh_from_db()
+    assert report.is_handled is True
+
+
+def test_report_delete(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
