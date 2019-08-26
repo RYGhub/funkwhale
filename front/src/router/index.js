@@ -3,9 +3,11 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+console.log('PROCESS', process.env)
 export default new Router({
   mode: 'history',
   linkActiveClass: 'active',
+  base: process.env.VUE_APP_ROUTER_BASE_URL || '/',
   routes: [
     {
       path: '/',
@@ -551,6 +553,10 @@ export default new Router({
           ]
         },
       ]
+    },
+    {
+      path: '*/index.html',
+      redirect: '/'
     },
     {
       path: '*',

@@ -10,7 +10,7 @@ if (process.env.BUNDLE_ANALYZE === '1') {
   plugins.push(new BundleAnalyzerPlugin())
 }
 module.exports = {
-  baseUrl: '/front/',
+  baseUrl: process.env.BASE_URL || '/front/',
   pages: {
     embed: {
       entry: 'src/embed.js',
