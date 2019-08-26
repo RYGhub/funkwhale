@@ -28,6 +28,7 @@ Using Funkwhale
    radios
    follow
    apps
+   ../cli/index
 
 Troubleshooting Issues
 ----------------------
