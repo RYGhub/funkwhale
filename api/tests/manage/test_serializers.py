@@ -521,3 +521,31 @@ def test_manage_tag_serializer(factories, to_api_date):
     s = serializers.ManageTagSerializer(tag)
 
     assert s.data == expected
+
+
+def test_manage_report_serializer(factories, to_api_date):
+    artist = factories["music.Artist"](attributed=True)
+    report = factories["moderation.Report"](
+        target=artist, target_state={"hello": "world"}, assigned=True
+    )
+    expected = {
+        "id": report.id,
+        "uuid": str(report.uuid),
+        "fid": report.fid,
+        "creation_date": to_api_date(report.creation_date),
+        "handled_date": None,
+        "summary": report.summary,
+        "is_handled": report.is_handled,
+        "type": report.type,
+        "submitter_email": None,
+        "submitter": serializers.ManageBaseActorSerializer(report.submitter).data,
+        "assigned_to": serializers.ManageBaseActorSerializer(report.assigned_to).data,
+        "target": {"type": "artist", "id": artist.pk},
+        "target_owner": serializers.ManageBaseActorSerializer(
+            artist.attributed_to
+        ).data,
+        "target_state": report.target_state,
+    }
+    s = serializers.ManageReportSerializer(report)
+
+    assert s.data == expected

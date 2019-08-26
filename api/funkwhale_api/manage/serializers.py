@@ -8,6 +8,7 @@ from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import fields as federation_fields
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.tags import models as tags_models
@@ -629,3 +630,42 @@ class ManageTagActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
+
+
+class ManageReportSerializer(serializers.ModelSerializer):
+    assigned_to = ManageBaseActorSerializer()
+    target_owner = ManageBaseActorSerializer()
+    submitter = ManageBaseActorSerializer()
+    target = moderation_serializers.TARGET_FIELD
+
+    class Meta:
+        model = moderation_models.Report
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "creation_date",
+            "handled_date",
+            "summary",
+            "type",
+            "target",
+            "target_state",
+            "is_handled",
+            "assigned_to",
+            "target_owner",
+            "submitter",
+            "submitter_email",
+        ]
+        read_only_fields = [
+            "id",
+            "uuid",
+            "fid",
+            "submitter",
+            "submitter_email",
+            "creation_date",
+            "handled_date",
+            "target",
+            "target_state",
+            "target_owner",
+            "summary",
+        ]
