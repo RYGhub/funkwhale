@@ -25,6 +25,13 @@ to the ``/music`` directory on the container:
     export LIBRARY_ID="<your_libary_id>"
     docker-compose run --rm api python manage.py import_files $LIBRARY_ID "/music/**/*.ogg" --recursive --noinput
 
+When you installed Funkwhale via ansible, you need to call a script instead of Python, and the folder path must be adapted accordingly:
+
+.. code-block:: bash
+
+    export LIBRARY_ID="<your_libary_id>"
+    /srv/funkwhale/manage import_files $LIBRARY_ID "/srv/funkwhale/data/music/**/**/*.ogg" --recursive --noinput
+
 .. note::
     You'll have to create a library in the Web UI before to get your library ID. Simply visit
     https://yourdomain/content/libraries/ to create one.
