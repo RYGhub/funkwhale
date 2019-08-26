@@ -34,6 +34,7 @@ BASE_SCOPES = [
     Scope("instance:accounts", "Access instance federated accounts"),
     Scope("instance:domains", "Access instance domains"),
     Scope("instance:policies", "Access instance moderation policies"),
+    Scope("instance:reports", "Access instance moderation reports"),
 ]
 SCOPES = [
     Scope("read", children=[s.copy("read") for s in BASE_SCOPES]),
