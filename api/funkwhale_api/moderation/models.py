@@ -6,12 +6,13 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
-
 
 class InstancePolicyQuerySet(models.QuerySet):
     def active(self):
@@ -160,3 +161,11 @@ class Report(federation_models.FederationMixin):
             self.fid = self.get_federation_id()
 
         return super().save(**kwargs)
+
+
+@receiver(pre_save, sender=Report)
+def set_handled_date(sender, instance, **kwargs):
+    if instance.is_handled is True and not instance.handled_date:
+        instance.handled_date = timezone.now()
+    elif not instance.is_handled:
+        instance.handled_date = None
