@@ -26,7 +26,7 @@ class ActorField(forms.CharField):
 
 def get_actor_filter(actor_field):
     def handler(v):
-        federation_utils.get_actor_from_username_data_query(actor_field, v)
+        return federation_utils.get_actor_from_username_data_query(actor_field, v)
 
     return {"field": ActorField(), "handler": handler}
 
