@@ -126,7 +126,12 @@ export default {
             resolve(response.data)
           })
           dispatch('ui/fetchUnreadNotifications', null, { root: true })
-          dispatch('ui/fetchPendingReviewEdits', null, { root: true })
+          if (response.data.permissions.library) {
+            dispatch('ui/fetchPendingReviewEdits', null, { root: true })
+          }
+          if (response.data.permissions.moderation) {
+            dispatch('ui/fetchPendingReviewReports', null, { root: true })
+          }
           dispatch('favorites/fetch', null, { root: true })
           dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })

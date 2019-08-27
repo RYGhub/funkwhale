@@ -14,6 +14,7 @@ export default {
     notifications: {
       inbox: 0,
       pendingReviewEdits: 0,
+      pendingReviewReports: 0,
     },
     websocketEventsHandlers: {
       'inbox.item_added': {},
@@ -72,6 +73,11 @@ export default {
     fetchPendingReviewEdits ({commit, rootState}, payload) {
       axios.get('mutations/', {params: {is_approved: 'null', page_size: 1}}).then((response) => {
         commit('notifications', {type: 'pendingReviewEdits', count: response.data.count})
+      })
+    },
+    fetchPendingReviewReports ({commit, rootState}, payload) {
+      axios.get('manage/moderation/reports/', {params: {is_handled: 'false', page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'pendingReviewReports', count: response.data.count})
       })
     },
     websocketEvent ({state}, event) {

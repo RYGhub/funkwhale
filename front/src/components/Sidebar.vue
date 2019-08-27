@@ -95,6 +95,10 @@
               class="item"
               :to="{name: 'manage.moderation.domains.list'}">
               <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
+              <div
+                v-if="$store.state.ui.notifications.pendingReviewReports > 0"
+                :title="labels.pendingReviewReports"
+                :class="['ui', 'teal', 'label']">{{ $store.state.ui.notifications.pendingReviewReports }}</div>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['settings']"
