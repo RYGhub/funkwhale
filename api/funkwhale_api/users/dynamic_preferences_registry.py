@@ -37,4 +37,4 @@ class UploadQuota(types.IntPreference):
     name = "upload_quota"
     default = 1000
     verbose_name = "Upload quota"
-    help_text = "Default upload quota applied to each users, in MB. This can be overrided on a per-user basis."
+    help_text = "Default upload quota applied to each users, in MB. This can be overridden on a per-user basis."
