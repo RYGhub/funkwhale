@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import utils as music_utils
 
 
 def get_artist_data(artist_values):
@@ -71,7 +72,14 @@ def get_track_data(album, track, upload):
         "artist": album.artist.name,
         "track": track.position or 1,
         "discNumber": track.disc_number or 1,
-        "contentType": upload.mimetype,
+        # Ugly fallback to mp3 but some subsonic clients fail if the value is empty or null, and we don't always
+        # have the info on legacy uploads
+        "contentType": upload.mimetype
+        or (
+            music_utils.get_type_from_ext(upload.extension)
+            if upload.extension
+            else "audio/mpeg"
+        ),
         "suffix": upload.extension or "",
         "duration": upload.duration or 0,
         "created": track.creation_date,
