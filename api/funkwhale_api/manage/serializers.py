@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework import serializers
@@ -183,6 +184,8 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
 
 
 class ManageBaseActorSerializer(serializers.ModelSerializer):
+    is_local = serializers.SerializerMethodField()
+
     class Meta:
         model = federation_models.Actor
         fields = [
@@ -201,8 +204,12 @@ class ManageBaseActorSerializer(serializers.ModelSerializer):
             "outbox_url",
             "shared_inbox_url",
             "manually_approves_followers",
+            "is_local",
         ]
         read_only_fields = ["creation_date", "instance_policy"]
+
+    def get_is_local(self, o):
+        return o.domain_id == settings.FEDERATION_HOSTNAME
 
 
 class ManageActorSerializer(ManageBaseActorSerializer):

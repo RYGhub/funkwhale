@@ -87,6 +87,7 @@ def test_manage_actor_serializer(factories, now, to_api_date):
         "full_username": actor.full_username,
         "user": None,
         "instance_policy": None,
+        "is_local": False,
     }
     s = serializers.ManageActorSerializer(actor)
 
