@@ -93,7 +93,7 @@
             <router-link
               v-if="$store.state.auth.availablePermissions['moderation']"
               class="item"
-              :to="{name: 'manage.moderation.domains.list'}">
+              :to="{name: 'manage.moderation.reports.list'}">
               <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
               <div
                 v-if="$store.state.ui.notifications.pendingReviewReports > 0"

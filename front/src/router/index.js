@@ -447,7 +447,21 @@ export default new Router({
               /* webpackChunkName: "admin" */ "@/views/admin/moderation/AccountsDetail"
             ),
           props: true
-        }
+        },
+        {
+          path: "reports",
+          name: "manage.moderation.reports.list",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/moderation/ReportsList"
+            ),
+          props: route => {
+            return {
+              defaultQuery: route.query.q,
+              updateUrl: true
+            }
+          }
+        },
       ]
     },
     {

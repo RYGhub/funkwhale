@@ -5,6 +5,7 @@ import django_filters
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import filters as common_filters
 from funkwhale_api.common import search
 
 from funkwhale_api.federation import models as federation_models
@@ -348,9 +349,9 @@ class ManageReportFilterSet(filters.FilterSet):
             filter_fields={
                 "uuid": {"to": "uuid"},
                 "id": {"to": "id"},
-                "is_handled": {"to": "is_handled"},
+                "resolved": common_filters.get_boolean_filter("is_handled"),
                 "domain": {"to": "target_owner__domain_id"},
-                "type": {"to": "type"},
+                "category": {"to": "type"},
                 "submitter": get_actor_filter("submitter"),
                 "assigned_to": get_actor_filter("assigned_to"),
                 "target_owner": get_actor_filter("target_owner"),

@@ -15,7 +15,7 @@ class NoneObject(object):
 
 
 NONE = NoneObject()
-NULL_BOOLEAN_CHOICES = [
+BOOLEAN_CHOICES = [
     (True, True),
     ("true", True),
     ("True", True),
@@ -26,6 +26,8 @@ NULL_BOOLEAN_CHOICES = [
     ("False", False),
     ("0", False),
     ("no", False),
+]
+NULL_BOOLEAN_CHOICES = BOOLEAN_CHOICES + [
     ("None", NONE),
     ("none", NONE),
     ("Null", NONE),
@@ -76,8 +78,16 @@ def clean_null_boolean_filter(v):
     return v
 
 
+def clean_boolean_filter(v):
+    return CoerceChoiceField(choices=BOOLEAN_CHOICES).clean(v)
+
+
 def get_null_boolean_filter(name):
     return {"handler": lambda v: Q(**{name: clean_null_boolean_filter(v)})}
+
+
+def get_boolean_filter(name):
+    return {"handler": lambda v: Q(**{name: clean_boolean_filter(v)})}
 
 
 class DummyTypedMultipleChoiceField(forms.TypedMultipleChoiceField):
@@ -142,7 +152,7 @@ class MutationFilter(filters.FilterSet):
                 "domain": {"to": "created_by__domain__name__iexact"},
                 "is_approved": get_null_boolean_filter("is_approved"),
                 "target": {"handler": filter_target},
-                "is_applied": {"to": "is_applied"},
+                "is_applied": get_boolean_filter("is_applied"),
             },
         )
     )

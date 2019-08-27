@@ -1,0 +1,268 @@
+<template>
+  <main v-title="labels.accounts">
+    <section class="ui vertical stripe segment">
+      <h2 class="ui header"><translate translate-context="*/Moderation/Title,Name">Reports</translate></h2>
+      <div class="ui hidden divider"></div>
+      <div class="ui inline form">
+      <div class="fields">
+        <div class="ui field">
+          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
+          <form @submit.prevent="search.query = $refs.search.value">
+            <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
+          </form>
+        </div>
+        <div class="field">
+          <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Resolved/Unresolved)">Status</translate></label>
+          <select class="ui dropdown" @change="addSearchToken('resolved', $event.target.value)" :value="getTokenValue('resolved', '')">
+            <option value="">
+              <translate translate-context="Content/*/Dropdown">All</translate>
+            </option>
+            <option value="yes">
+              <translate translate-context="Content/*/*/Short">Resolved</translate>
+            </option>
+            <option value="no">
+              <translate translate-context="Content/*/*/Short">Unresolved</translate>
+            </option>
+          </select>
+        </div>
+        <div class="field">
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
+          <select class="ui dropdown" v-model="ordering">
+            <option v-for="option in orderingOptions" :value="option[0]">
+              {{ sharedLabels.filters[option[1]] }}
+            </option>
+          </select>
+        </div>
+        <div class="field">
+          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
+          <select class="ui dropdown" v-model="orderingDirection">
+            <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+            <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
+          </select>
+        </div>
+      </div>
+    </div>
+      <action-table
+        v-if="result"
+        :objects-data="result"
+        :actions="actions"
+        action-url="manage/moderation/reports/action/"
+        :filters="[]">
+        <template slot="header-cells">
+          <th><translate translate-context="*/*/*">Submitter</translate></th>
+          <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
+          <th><translate translate-context="*/*/*">Category</translate></th>
+          <th><translate translate-context="*/*/*">Status</translate></th>
+          <th><translate translate-context="*/*/*">Target</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Resolution date</translate></th>
+        </template>
+        <template slot="row-cells" slot-scope="scope">
+          <td v-if="scope.obj.submitter">
+            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.submitter.full_username }}">
+              <i class="wrench icon"></i>
+            </router-link>
+            <span role="button" class="discrete link" @click="addSearchToken('submitter', scope.obj.submitter.full_username)" :title="scope.obj.submitter.full_username">{{ scope.obj.submitter.preferred_username }}</span>
+          </td>
+          <td v-else="scope.obj.submitter">
+            <span role="button" class="discrete link" @click="addSearchToken('submitter_email', scope.obj.submitter_email)" :title="scope.obj.submitter_email">{{ scope.obj.submitter_email }}</span>
+          </td>
+          <td v-if="scope.obj.submitter">
+            <template v-if="!scope.obj.submitter.is_local">
+              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.submitter.domain }}">
+                <i class="wrench icon"></i>
+              </router-link>
+              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.submitter.domain)" :title="scope.obj.submitter.domain">{{ scope.obj.submitter.domain }}</span>
+            </template>
+            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.submitter.domain)">
+              <i class="home icon"></i>
+              <translate translate-context="Content/Moderation/*/Short, Noun">Local</translate>
+            </span>
+          </td>
+          <td v-else>
+            <translate translate-context="*/*/*">N/A</translate>
+          </td>
+          <td>
+            <span role="button" @click="addSearchToken('category', scope.obj.type)">
+              {{ scope.obj.type }}
+            </span>
+          </td>
+          <td>
+            <span v-if="scope.obj.is_handled" role="button" class="discrete link" @click="addSearchToken('resolved', 'yes')" >
+               <translate translate-context="Content/*/*/Short">Resolved</translate>
+            </span>
+            <span v-else role="button" class="discrete link" @click="addSearchToken('resolved', 'no')" >
+               <translate translate-context="Content/*/*/Short">Unesolved</translate>
+            </span>
+          </td>
+          <td>
+              {{ scope.obj.target }}
+          </td>
+          <td>
+            <human-date :date="scope.obj.creation_date"></human-date>
+          </td>
+          <td>
+            <human-date v-if="scope.obj.handled_date" :date="scope.obj.handled_date"></human-date>
+            <translate v-else translate-context="*/*/*">N/A</translate>
+          </td>
+        </template>
+      </action-table>
+    </section>
+  </main>
+</template>
+
+<script>
+
+
+import axios from 'axios'
+import _ from '@/lodash'
+import time from '@/utils/time'
+import Pagination from '@/components/Pagination'
+import OrderingMixin from '@/components/mixins/Ordering'
+import TranslationsMixin from '@/components/mixins/Translations'
+// import EditCard from '@/components/library/EditCard'
+import {normalizeQuery, parseTokens} from '@/search'
+import SmartSearchMixin from '@/components/mixins/SmartSearch'
+import ActionTable from '@/components/common/ActionTable'
+
+
+export default {
+  mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
+  components: {
+    Pagination,
+    ActionTable
+    // EditCard
+  },
+  data () {
+    let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')
+    return {
+      time,
+      isLoading: false,
+      result: null,
+      page: 1,
+      paginateBy: 25,
+      search: {
+        query: this.defaultQuery,
+        tokens: parseTokens(normalizeQuery(this.defaultQuery))
+      },
+      orderingDirection: defaultOrdering.direction || '+',
+      ordering: defaultOrdering.field,
+      orderingOptions: [
+        ['creation_date', 'creation_date'],
+        ['applied_date', 'applied_date'],
+      ],
+      targets: {
+        track: {}
+      }
+    }
+  },
+  created () {
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      let params = _.merge({
+        'page': this.page,
+        'page_size': this.paginateBy,
+        'q': this.search.query,
+        'ordering': this.getOrderingAsString()
+      }, this.filters)
+      let self = this
+      self.isLoading = true
+      this.result = null
+      axios.get('manage/moderation/reports/', {params: params}).then((response) => {
+        self.result = response.data
+        self.isLoading = false
+        // self.fetchTargets()
+      }, error => {
+        self.isLoading = false
+        self.errors = error.backendErrors
+      })
+    },
+    fetchTargets () {
+      // we request target data via the API so we can display previous state
+      // additionnal data next to the edit card
+      let self = this
+      let typesAndIds = {
+        track: {
+          url: 'tracks/',
+          ids: [],
+        }
+      }
+      this.result.results.forEach((m) => {
+        if (!m.target || !typesAndIds[m.target.type]) {
+          return
+        }
+        typesAndIds[m.target.type]['ids'].push(m.target.id)
+      })
+      Object.keys(typesAndIds).forEach((k) => {
+        let config = typesAndIds[k]
+        if (config.ids.length === 0) {
+          return
+        }
+        axios.get(config.url, {params: {id: _.uniq(config.ids), hidden: 'null'}}).then((response) => {
+          response.data.results.forEach((e) => {
+            self.$set(self.targets[k], e.id, {
+              payload: e,
+              currentState: edits.getCurrentStateForObj(e, edits.getConfigs.bind(self)()[k])
+            })
+          })
+        }, error => {
+          self.errors = error.backendErrors
+        })
+      })
+    },
+    selectPage: function (page) {
+      this.page = page
+    },
+    handle (type, id, value) {
+      if (type === 'delete') {
+        this.exclude.push(id)
+      }
+
+      this.result.results.forEach((e) => {
+        if (e.uuid === id) {
+          e.is_approved = value
+        }
+      })
+    },
+    getCurrentState (target) {
+      if (!target) {
+        return {}
+      }
+      if (this.targets[target.type] && this.targets[target.type][String(target.id)]) {
+        return this.targets[target.type][String(target.id)].currentState
+      }
+      return {}
+    }
+  },
+  computed: {
+    labels () {
+      return {
+        searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by account, summary, domain…'),
+        reports: this.$pgettext('*/Moderation/Title,Name', "Reports"),
+      }
+    },
+  },
+  watch: {
+    search (newValue) {
+      this.page = 1
+      this.fetchData()
+    },
+    page () {
+      this.fetchData()
+    },
+    ordering () {
+      this.fetchData()
+    },
+    orderingDirection () {
+      this.fetchData()
+    }
+  }
+}
+
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>
