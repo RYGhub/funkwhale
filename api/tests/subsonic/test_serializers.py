@@ -1,3 +1,5 @@
+import pytest
+
 from funkwhale_api.music import models as music_models
 from funkwhale_api.subsonic import serializers
 
@@ -59,6 +61,27 @@ def test_get_artist_serializer(factories):
     }
 
     assert serializers.GetArtistSerializer(artist).data == expected
+
+
+@pytest.mark.parametrize(
+    "mimetype, extension, expected",
+    [
+        ("audio/ogg", "noop", "audio/ogg"),
+        ("", "ogg", "audio/ogg"),
+        ("", "mp3", "audio/mpeg"),
+        ("", "", "audio/mpeg"),
+    ],
+)
+def test_get_track_data_content_type(mimetype, extension, expected, factories):
+    upload = factories["music.Upload"]()
+    upload.mimetype = mimetype
+    upload.audio_file = "test.{}".format(extension)
+
+    data = serializers.get_track_data(
+        album=upload.track.album, track=upload.track, upload=upload
+    )
+
+    assert data["contentType"] == expected
 
 
 def test_get_album_serializer(factories):
