@@ -158,6 +158,9 @@ export default {
     },
 
     updatedFields () {
+      if (!this.obj.target) {
+        return []
+      }
       let payload = this.obj.payload
       let previousState = this.previousState
       let fields = Object.keys(payload)

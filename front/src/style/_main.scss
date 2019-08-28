@@ -368,5 +368,13 @@ input + .help {
   margin-top: 0.5em;
 }
 
+.expandable {
+  &:not(.expanded) {
+    overflow: hidden;
+    max-height: 15vh;
+    background: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0.3) 100%);
+  }
+}
+
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

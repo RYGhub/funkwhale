@@ -4,52 +4,61 @@
       <h2 class="ui header"><translate translate-context="*/Moderation/Title,Name">Reports</translate></h2>
       <div class="ui hidden divider"></div>
       <div class="ui inline form">
-      <div class="fields">
-        <div class="ui field">
-          <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
-          <form @submit.prevent="search.query = $refs.search.value">
-            <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
-          </form>
-        </div>
-        <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Resolved/Unresolved)">Status</translate></label>
-          <select class="ui dropdown" @change="addSearchToken('resolved', $event.target.value)" :value="getTokenValue('resolved', '')">
-            <option value="">
-              <translate translate-context="Content/*/Dropdown">All</translate>
-            </option>
-            <option value="yes">
-              <translate translate-context="Content/*/*/Short">Resolved</translate>
-            </option>
-            <option value="no">
-              <translate translate-context="Content/*/*/Short">Unresolved</translate>
-            </option>
-          </select>
-        </div>
-        <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
-          <select class="ui dropdown" v-model="ordering">
-            <option v-for="option in orderingOptions" :value="option[0]">
-              {{ sharedLabels.filters[option[1]] }}
-            </option>
-          </select>
-        </div>
-        <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
-          <select class="ui dropdown" v-model="orderingDirection">
-            <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
-            <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
-          </select>
+        <div class="fields">
+          <div class="ui field">
+            <label><translate translate-context="Content/Search/Input.Label/Noun">Search</translate></label>
+            <form @submit.prevent="search.query = $refs.search.value">
+              <input name="search" ref="search" type="text" :value="search.query" :placeholder="labels.searchPlaceholder" />
+            </form>
+          </div>
+          <div class="field">
+            <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Resolved/Unresolved)">Status</translate></label>
+            <select class="ui dropdown" @change="addSearchToken('resolved', $event.target.value)" :value="getTokenValue('resolved', '')">
+              <option value="">
+                <translate translate-context="Content/*/Dropdown">All</translate>
+              </option>
+              <option value="yes">
+                <translate translate-context="Content/*/*/Short">Resolved</translate>
+              </option>
+              <option value="no">
+                <translate translate-context="Content/*/*/Short">Unresolved</translate>
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
+            <select class="ui dropdown" v-model="ordering">
+              <option v-for="option in orderingOptions" :value="option[0]">
+                {{ sharedLabels.filters[option[1]] }}
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Order</translate></label>
+            <select class="ui dropdown" v-model="orderingDirection">
+              <option value="+"><translate translate-context="Content/Search/Dropdown">Ascending</translate></option>
+              <option value="-"><translate translate-context="Content/Search/Dropdown">Descending</translate></option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
+      <div v-if="isLoading" class="ui active inverted dimmer">
+        <div class="ui loader"></div>
+      </div>
+      <div v-else-if="!result || result.count === 0">
+        <empty-state @refresh="fetchData()" :refresh="true"></empty-state>
+      </div>
+      <div v-else-if="mode === 'card'">
+        <report-card :obj="obj" v-for="obj in result.results" :key="obj.uuid" @handled="fetchData()" @deleted="fetchData()" />
+      </div>
       <action-table
-        v-if="result"
+        v-else-if="mode === 'table'"
         :objects-data="result"
         :actions="actions"
         action-url="manage/moderation/reports/action/"
         :filters="[]">
         <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Submitter</translate></th>
+          <th><translate translate-context="*/*/*">Submitted by</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="*/*/*">Category</translate></th>
           <th><translate translate-context="*/*/*">Status</translate></th>
@@ -120,7 +129,7 @@ import time from '@/utils/time'
 import Pagination from '@/components/Pagination'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
-// import EditCard from '@/components/library/EditCard'
+import ReportCard from '@/components/manage/moderation/ReportCard'
 import {normalizeQuery, parseTokens} from '@/search'
 import SmartSearchMixin from '@/components/mixins/SmartSearch'
 import ActionTable from '@/components/common/ActionTable'
@@ -130,8 +139,11 @@ export default {
   mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   components: {
     Pagination,
-    ActionTable
-    // EditCard
+    ActionTable,
+    ReportCard,
+  },
+  props: {
+    mode: {default: 'card'},
   },
   data () {
     let defaultOrdering = this.getOrderingFromString(this.defaultOrdering || '-creation_date')

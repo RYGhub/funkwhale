@@ -48,4 +48,7 @@ import EmptyState from '@/components/common/EmptyState'
 
 Vue.component('empty-state', EmptyState)
 
+import ExpandableDiv from '@/components/common/ExpandableDiv'
+
+Vue.component('expandable-div', ExpandableDiv)
 export default {}
