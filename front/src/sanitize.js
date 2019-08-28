@@ -29,7 +29,6 @@ const allowedTags = [
   "th",
   "td",
   "pre",
-  "iframe"
 ]
 const allowedAttributes = {
   a: ["href", "name", "target"],
