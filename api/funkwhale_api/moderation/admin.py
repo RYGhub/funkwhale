@@ -30,6 +30,28 @@ class InstancePolicyAdmin(admin.ModelAdmin):
     list_select_related = True
 
 
+
+@admin.register(models.Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "submitter",
+        "type",
+        "assigned_to",
+        "is_handled",
+        "creation_date",
+        "handled_date",
+    ]
+    list_filter = [
+        "type",
+        "is_handled",
+    ]
+    search_fields = [
+        "summary",
+    ]
+    list_select_related = True
+
+
 @admin.register(models.UserFilter)
 class UserFilterAdmin(admin.ModelAdmin):
     list_display = ["uuid", "user", "target_artist", "creation_date"]
