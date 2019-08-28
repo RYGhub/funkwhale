@@ -1,5 +1,7 @@
-import persisting_theory
+import urllib.parse
 
+from django.conf import settings
+import persisting_theory
 from rest_framework import serializers
 
 from funkwhale_api.common import fields as common_fields
@@ -117,7 +119,7 @@ class TrackStateSerializer(serializers.ModelSerializer):
 class LibraryStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = music_models.Library
-        fields = ["id", "fid", "name", "description", "creation_date", "privacy_level"]
+        fields = ["id", "uuid", "fid", "name", "description", "creation_date", "privacy_level"]
 
 
 @state_serializers.register(name="playlists.Playlist")
@@ -135,6 +137,7 @@ class ActorStateSerializer(serializers.ModelSerializer):
             "fid",
             "name",
             "preferred_username",
+            "full_username",
             "summary",
             "domain",
             "type",
@@ -228,5 +231,14 @@ class ReportSerializer(serializers.ModelSerializer):
         validated_data["target_state"] = target_state_serializer(
             validated_data["target"]
         ).data
+        if "fid" in validated_data["target_state"]:
+            validated_data["target_state"]["domain"] = urllib.parse.urlparse(
+                validated_data["target_state"]["fid"]
+            ).hostname
+
+        validated_data["target_state"]["is_local"] = (
+            validated_data["target_state"].get("domain", settings.FEDERATION_HOSTNAME)
+            == settings.FEDERATION_HOSTNAME
+        )
         validated_data["target_owner"] = get_target_owner(validated_data["target"])
         return super().create(validated_data)
