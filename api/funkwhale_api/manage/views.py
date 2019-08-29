@@ -470,10 +470,18 @@ class ManageReportViewSet(
     queryset = (
         moderation_models.Report.objects.all()
         .order_by("-creation_date")
-        .select_related('submitter', 'target_owner', 'assigned_to', 'target_content_type')
-        .prefetch_related('target')
+        .select_related(
+            "submitter", "target_owner", "assigned_to", "target_content_type"
+        )
+        .prefetch_related("target")
         .prefetch_related(
-            Prefetch('notes', queryset=moderation_models.Note.objects.order_by('creation_date').select_related('author'), to_attr="_prefetched_notes")
+            Prefetch(
+                "notes",
+                queryset=moderation_models.Note.objects.order_by(
+                    "creation_date"
+                ).select_related("author"),
+                to_attr="_prefetched_notes",
+            )
         )
     )
     serializer_class = serializers.ManageReportSerializer
@@ -491,9 +499,10 @@ class ManageNoteViewSet(
 ):
     lookup_field = "uuid"
     queryset = (
-        moderation_models.Note.objects.all().order_by("-creation_date")
-        .select_related('author', 'target_content_type')
-        .prefetch_related('target')
+        moderation_models.Note.objects.all()
+        .order_by("-creation_date")
+        .select_related("author", "target_content_type")
+        .prefetch_related("target")
     )
     serializer_class = serializers.ManageNoteSerializer
     filterset_class = filters.ManageNoteFilterSet

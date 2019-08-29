@@ -358,7 +358,9 @@ class ManageReportFilterSet(filters.FilterSet):
                 "assigned_to": get_actor_filter("assigned_to"),
                 "target_owner": get_actor_filter("target_owner"),
                 "submitter_email": {"to": "submitter_email"},
-                "target": common_filters.get_generic_relation_filter("target", moderation_serializers.TARGET_CONFIG),
+                "target": common_filters.get_generic_relation_filter(
+                    "target", moderation_serializers.TARGET_CONFIG
+                ),
             },
         )
     )
@@ -375,7 +377,9 @@ class ManageNoteFilterSet(filters.FilterSet):
             filter_fields={
                 "uuid": {"to": "uuid"},
                 "author": get_actor_filter("author"),
-                "target": common_filters.get_generic_relation_filter("target", moderation_utils.NOTE_TARGET_FIELDS),
+                "target": common_filters.get_generic_relation_filter(
+                    "target", moderation_utils.NOTE_TARGET_FIELDS
+                ),
             },
         )
     )

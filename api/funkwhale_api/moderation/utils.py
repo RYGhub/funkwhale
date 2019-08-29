@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 
 from funkwhale_api.federation import models as federation_models

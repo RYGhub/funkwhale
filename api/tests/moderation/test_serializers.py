@@ -1,4 +1,8 @@
+import json
 import pytest
+import urllib.parse
+
+from django.core.serializers.json import DjangoJSONEncoder
 
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -51,7 +55,7 @@ def test_user_filter_serializer_save(factories):
     ],
 )
 def test_report_serializer_save(
-    factory_name, target_type, id_field, state_serializer, factories, mocker
+    factory_name, target_type, id_field, state_serializer, factories, mocker, settings
 ):
     target = factories[factory_name]()
     target_owner = factories["federation.Actor"]()
@@ -72,10 +76,21 @@ def test_report_serializer_save(
 
     report = serializer.save()
 
+    expected_state = state_serializer(target).data
+    expected_state["_target"] = json.loads(
+        json.dumps(target_data, cls=DjangoJSONEncoder)
+    )
+    if hasattr(target, "fid"):
+        expected_state["domain"] = urllib.parse.urlparse(target.fid).hostname
+        expected_state["is_local"] = (
+            expected_state["domain"] == settings.FEDERATION_HOSTNAME
+        )
+    else:
+        expected_state["is_local"] = True
     assert report.target == target
     assert report.type == payload["type"]
     assert report.summary == payload["summary"]
-    assert report.target_state == state_serializer(target).data
+    assert report.target_state == expected_state
     assert report.target_owner == target_owner
     get_target_owner.assert_called_once_with(target)
 

@@ -651,12 +651,10 @@ class ManageBaseNoteSerializer(serializers.ModelSerializer):
 
 
 class ManageNoteSerializer(ManageBaseNoteSerializer):
-    target = common_fields.GenericRelation(
-        moderation_utils.NOTE_TARGET_FIELDS
-    )
+    target = common_fields.GenericRelation(moderation_utils.NOTE_TARGET_FIELDS)
 
     class Meta(ManageBaseNoteSerializer.Meta):
-        fields = ManageBaseNoteSerializer.Meta.fields + ['target']
+        fields = ManageBaseNoteSerializer.Meta.fields + ["target"]
 
 
 class ManageReportSerializer(serializers.ModelSerializer):
@@ -701,5 +699,5 @@ class ManageReportSerializer(serializers.ModelSerializer):
         ]
 
     def get_notes(self, o):
-        notes = getattr(o, '_prefetched_notes', [])
+        notes = getattr(o, "_prefetched_notes", [])
         return ManageBaseNoteSerializer(notes, many=True).data

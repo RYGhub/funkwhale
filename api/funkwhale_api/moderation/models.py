@@ -149,9 +149,7 @@ class Report(federation_models.FederationMixin):
     target_state = JSONField(null=True)
 
     notes = GenericRelation(
-        "Note",
-        content_type_field="target_content_type",
-        object_id_field="target_id",
+        "Note", content_type_field="target_content_type", object_id_field="target_id"
     )
 
     def get_federation_id(self):

@@ -1,6 +1,8 @@
+import json
 import urllib.parse
 
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 import persisting_theory
 from rest_framework import serializers
 
@@ -170,6 +172,7 @@ def get_target_owner(target):
 
     return mapping[target.__class__](target)
 
+
 TARGET_CONFIG = {
     "artist": {"queryset": music_models.Artist.objects.all()},
     "album": {"queryset": music_models.Album.objects.all()},
@@ -187,9 +190,7 @@ TARGET_CONFIG = {
         "get_query": get_actor_query,
     },
 }
-TARGET_FIELD = common_fields.GenericRelation(
-    TARGET_CONFIG
-)
+TARGET_FIELD = common_fields.GenericRelation(TARGET_CONFIG)
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -239,6 +240,13 @@ class ReportSerializer(serializers.ModelSerializer):
         validated_data["target_state"] = target_state_serializer(
             validated_data["target"]
         ).data
+        # freeze target type/id in JSON so even if the corresponding object is deleted
+        # we can have the info and display it in the frontend
+        target_data = self.fields["target"].to_representation(validated_data["target"])
+        validated_data["target_state"]["_target"] = json.loads(
+            json.dumps(target_data, cls=DjangoJSONEncoder)
+        )
+
         if "fid" in validated_data["target_state"]:
             validated_data["target_state"]["domain"] = urllib.parse.urlparse(
                 validated_data["target_state"]["fid"]
