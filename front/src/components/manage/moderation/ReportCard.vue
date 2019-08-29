@@ -82,6 +82,15 @@
                     <translate v-else translate-context="*/*/*">N/A</translate>
                   </td>
                 </tr>
+                <tr>
+                  <td>
+                    <translate translate-context="Content/*/*/Noun">Moderator notes</translate>
+                  </td>
+                  <td>
+                    <i class="comment icon"></i>
+                    {{ obj.notes.length }}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -102,19 +111,22 @@
           <h3>
             <translate translate-context="Content/*/*/Short">Reported object</translate>
           </h3>
-          <router-link class="ui basic button" v-if="configs[obj.target.type].urls.getAdminDetail" :to="configs[obj.target.type].urls.getAdminDetail(obj.target_state)">
+          <div v-if="!obj.target" class="ui warning message">
+            <translate translate-context="Content/Moderation/Message">The object associated with this report was deleted.</translate>
+          </div>
+          <router-link class="ui basic button" v-if="target && configs[target.type].urls.getAdminDetail" :to="configs[target.type].urls.getAdminDetail(obj.target_state)">
             <i class="wrench icon"></i>
             <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
           </router-link>
           <table class="ui very basic unstackable table">
             <tbody>
-              <tr>
+              <tr v-if="target">
                 <td>
                   <translate translate-context="*/*/*">Type</translate>
                 </td>
                 <td>
-                  <i :class="[configs[obj.target.type].icon, 'icon']"></i>
-                  <translate translate-context="*/*/*">{{ configs[obj.target.type].label }}</translate>
+                  <i :class="[configs[target.type].icon, 'icon']"></i>
+                  <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
                 </td>
               </tr>
               <tr v-if="obj.target_state.is_local">
@@ -210,26 +222,29 @@ export default {
       return this.currentState
     },
     detailUrl () {
-      if (!this.obj.target) {
+      if (!this.target) {
         return ''
       }
       let namespace
-      let id = this.obj.target.id
-      if (this.obj.target.type === 'track') {
+      let id = this.target.id
+      if (this.target.type === 'track') {
         namespace = 'library.tracks.edit.detail'
       }
-      if (this.obj.target.type === 'album') {
+      if (this.target.type === 'album') {
         namespace = 'library.albums.edit.detail'
       }
-      if (this.obj.target.type === 'artist') {
+      if (this.target.type === 'artist') {
         namespace = 'library.artists.edit.detail'
       }
       return this.$router.resolve({name: namespace, params: {id, editId: this.obj.uuid}}).href
     },
 
     targetFields () {
+      if (!this.target) {
+        return []
+      }
       let payload = this.obj.target_state
-      let fields = this.configs[this.obj.target.type].moderatedFields
+      let fields = this.configs[this.target.type].moderatedFields
       let self = this
       return fields.map((fieldConfig) => {
         let dummyRepr = (v) => { return v }
@@ -242,6 +257,13 @@ export default {
         }
         return d
       })
+    },
+    target () {
+      if (this.obj.target) {
+        return this.obj.target
+      } else {
+        return this.obj.target_state._target
+      }
     }
   },
   methods: {
