@@ -67,3 +67,39 @@ def test_generic_relation_field_validation_error(payload, expected_error, factor
 
     with pytest.raises(fields.serializers.ValidationError, match=expected_error):
         f.to_internal_value(payload)
+
+
+def test_generic_relation_filter_target_type(factories):
+    user = factories["users.User"]()
+    note = factories["moderation.Note"](target=user)
+    factories["moderation.Note"](target=factories["music.Artist"]())
+    f = fields.GenericRelationFilter(
+        "target",
+        {
+            "user": {
+                "queryset": user.__class__.objects.all(),
+                "id_attr": "username",
+                "id_field": fields.serializers.CharField(),
+            }
+        },
+    )
+    qs = f.filter(note.__class__.objects.all(), "user")
+    assert list(qs) == [note]
+
+
+def test_generic_relation_filter_target_type_and_id(factories):
+    user = factories["users.User"]()
+    note = factories["moderation.Note"](target=user)
+    factories["moderation.Note"](target=factories["users.User"]())
+    f = fields.GenericRelationFilter(
+        "target",
+        {
+            "user": {
+                "queryset": user.__class__.objects.all(),
+                "id_attr": "username",
+                "id_field": fields.serializers.CharField(),
+            }
+        },
+    )
+    qs = f.filter(note.__class__.objects.all(), "user:{}".format(user.username))
+    assert list(qs) == [note]
