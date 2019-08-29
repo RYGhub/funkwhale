@@ -462,6 +462,15 @@ export default new Router({
             }
           }
         },
+        {
+          path: "reports/:id",
+          name: "manage.moderation.reports.detail",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/moderation/ReportDetail"
+            ),
+          props: true
+        },
       ]
     },
     {
