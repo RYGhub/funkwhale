@@ -170,25 +170,25 @@ def get_target_owner(target):
 
     return mapping[target.__class__](target)
 
-
+TARGET_CONFIG = {
+    "artist": {"queryset": music_models.Artist.objects.all()},
+    "album": {"queryset": music_models.Album.objects.all()},
+    "track": {"queryset": music_models.Track.objects.all()},
+    "library": {
+        "queryset": music_models.Library.objects.all(),
+        "id_attr": "uuid",
+        "id_field": serializers.UUIDField(),
+    },
+    "playlist": {"queryset": playlists_models.Playlist.objects.all()},
+    "account": {
+        "queryset": federation_models.Actor.objects.all(),
+        "id_attr": "full_username",
+        "id_field": serializers.EmailField(),
+        "get_query": get_actor_query,
+    },
+}
 TARGET_FIELD = common_fields.GenericRelation(
-    {
-        "artist": {"queryset": music_models.Artist.objects.all()},
-        "album": {"queryset": music_models.Album.objects.all()},
-        "track": {"queryset": music_models.Track.objects.all()},
-        "library": {
-            "queryset": music_models.Library.objects.all(),
-            "id_attr": "uuid",
-            "id_field": serializers.UUIDField(),
-        },
-        "playlist": {"queryset": playlists_models.Playlist.objects.all()},
-        "account": {
-            "queryset": federation_models.Actor.objects.all(),
-            "id_attr": "full_username",
-            "id_field": serializers.EmailField(),
-            "get_query": get_actor_query,
-        },
-    }
+    TARGET_CONFIG
 )
 
 

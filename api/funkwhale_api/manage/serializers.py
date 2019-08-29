@@ -11,6 +11,7 @@ from funkwhale_api.federation import fields as federation_fields
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import utils as moderation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.tags import models as tags_models
@@ -680,21 +681,9 @@ class ManageReportSerializer(serializers.ModelSerializer):
 
 
 class ManageNoteSerializer(serializers.ModelSerializer):
-    author = ManageBaseActorSerializer(required=False)
+    author = ManageBaseActorSerializer(required=False, read_only=True)
     target = common_fields.GenericRelation(
-        {
-            "report": {
-                "queryset": moderation_models.Report.objects.all(),
-                "id_attr": "uuid",
-                "id_field": serializers.UUIDField(),
-            },
-            "account": {
-                "queryset": federation_models.Actor.objects.all(),
-                "id_attr": "full_username",
-                "id_field": serializers.EmailField(),
-                "get_query": moderation_serializers.get_actor_query,
-            },
-        }
+        moderation_utils.NOTE_TARGET_FIELDS
     )
 
     class Meta:

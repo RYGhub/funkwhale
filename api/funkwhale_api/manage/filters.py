@@ -11,6 +11,8 @@ from funkwhale_api.common import search
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import utils as moderation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.tags import models as tags_models
@@ -356,6 +358,7 @@ class ManageReportFilterSet(filters.FilterSet):
                 "assigned_to": get_actor_filter("assigned_to"),
                 "target_owner": get_actor_filter("target_owner"),
                 "submitter_email": {"to": "submitter_email"},
+                "target": common_filters.get_generic_relation_filter("target", moderation_serializers.TARGET_CONFIG),
             },
         )
     )
@@ -372,6 +375,7 @@ class ManageNoteFilterSet(filters.FilterSet):
             filter_fields={
                 "uuid": {"to": "uuid"},
                 "author": get_actor_filter("author"),
+                "target": common_filters.get_generic_relation_filter("target", moderation_utils.NOTE_TARGET_FIELDS),
             },
         )
     )

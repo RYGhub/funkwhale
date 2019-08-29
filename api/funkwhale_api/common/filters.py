@@ -90,6 +90,10 @@ def get_boolean_filter(name):
     return {"handler": lambda v: Q(**{name: clean_boolean_filter(v)})}
 
 
+def get_generic_relation_filter(relation_name, choices):
+    return {"handler": lambda v: fields.get_generic_filter_query(v, relation_name=relation_name, choices=choices)}
+
+
 class DummyTypedMultipleChoiceField(forms.TypedMultipleChoiceField):
     def valid_value(self, value):
         return True
