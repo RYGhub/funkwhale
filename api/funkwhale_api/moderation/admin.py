@@ -30,7 +30,6 @@ class InstancePolicyAdmin(admin.ModelAdmin):
     list_select_related = True
 
 
-
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
     list_display = [
@@ -42,13 +41,8 @@ class ReportAdmin(admin.ModelAdmin):
         "creation_date",
         "handled_date",
     ]
-    list_filter = [
-        "type",
-        "is_handled",
-    ]
-    search_fields = [
-        "summary",
-    ]
+    list_filter = ["type", "is_handled"]
+    search_fields = ["summary"]
     list_select_related = True
 
 

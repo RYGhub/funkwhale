@@ -119,7 +119,15 @@ class TrackStateSerializer(serializers.ModelSerializer):
 class LibraryStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = music_models.Library
-        fields = ["id", "uuid", "fid", "name", "description", "creation_date", "privacy_level"]
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "name",
+            "description",
+            "creation_date",
+            "privacy_level",
+        ]
 
 
 @state_serializers.register(name="playlists.Playlist")

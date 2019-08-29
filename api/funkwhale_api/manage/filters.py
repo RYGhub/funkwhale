@@ -363,3 +363,19 @@ class ManageReportFilterSet(filters.FilterSet):
     class Meta:
         model = moderation_models.Report
         fields = ["q", "is_handled", "type", "submitter_email"]
+
+
+class ManageNoteFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={"summary": {"to": "summary"}},
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "author": get_actor_filter("author"),
+            },
+        )
+    )
+
+    class Meta:
+        model = moderation_models.Note
+        fields = ["q"]

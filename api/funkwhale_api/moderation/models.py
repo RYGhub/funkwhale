@@ -164,6 +164,21 @@ class Report(federation_models.FederationMixin):
         return super().save(**kwargs)
 
 
+class Note(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    summary = models.TextField(max_length=50000)
+    author = models.ForeignKey(
+        "federation.Actor", related_name="moderation_notes", on_delete=models.CASCADE
+    )
+
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+
+
 @receiver(pre_save, sender=Report)
 def set_handled_date(sender, instance, **kwargs):
     if instance.is_handled is True and not instance.handled_date:

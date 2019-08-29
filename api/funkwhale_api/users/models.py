@@ -48,6 +48,8 @@ PERMISSIONS_CONFIGURATION = {
             "write:instance:domains",
             "read:instance:reports",
             "write:instance:reports",
+            "read:instance:notes",
+            "write:instance:notes",
         },
     },
     "library": {

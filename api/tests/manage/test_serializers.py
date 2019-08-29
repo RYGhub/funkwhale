@@ -550,3 +550,20 @@ def test_manage_report_serializer(factories, to_api_date):
     s = serializers.ManageReportSerializer(report)
 
     assert s.data == expected
+
+
+def test_manage_note_serializer(factories, to_api_date):
+    actor = factories["federation.Actor"]()
+    note = factories["moderation.Note"](target=actor)
+
+    expected = {
+        "id": note.id,
+        "uuid": str(note.uuid),
+        "summary": note.summary,
+        "creation_date": to_api_date(note.creation_date),
+        "author": serializers.ManageBaseActorSerializer(note.author).data,
+        "target": {"type": "account", "full_username": actor.full_username},
+    }
+    s = serializers.ManageNoteSerializer(note)
+
+    assert s.data == expected

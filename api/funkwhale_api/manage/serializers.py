@@ -3,6 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
+from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -676,3 +677,27 @@ class ManageReportSerializer(serializers.ModelSerializer):
             "target_owner",
             "summary",
         ]
+
+
+class ManageNoteSerializer(serializers.ModelSerializer):
+    author = ManageBaseActorSerializer(required=False)
+    target = common_fields.GenericRelation(
+        {
+            "report": {
+                "queryset": moderation_models.Report.objects.all(),
+                "id_attr": "uuid",
+                "id_field": serializers.UUIDField(),
+            },
+            "account": {
+                "queryset": federation_models.Actor.objects.all(),
+                "id_attr": "full_username",
+                "id_field": serializers.EmailField(),
+                "get_query": moderation_serializers.get_actor_query,
+            },
+        }
+    )
+
+    class Meta:
+        model = moderation_models.Note
+        fields = ["id", "uuid", "creation_date", "summary", "author", "target"]
+        read_only_fields = ["uuid", "creation_date", "author"]

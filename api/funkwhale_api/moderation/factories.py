@@ -42,6 +42,16 @@ class UserFilterFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 
 
 @registry.register
+class NoteFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
+    author = factory.SubFactory(federation_factories.ActorFactory)
+    target = None
+    summary = factory.Faker("paragraph")
+
+    class Meta:
+        model = "moderation.Note"
+
+
+@registry.register
 class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     submitter = factory.SubFactory(federation_factories.ActorFactory)
     target = factory.SubFactory(music_factories.ArtistFactory)
