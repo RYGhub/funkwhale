@@ -25,6 +25,12 @@
               </option>
             </select>
           </div>
+          <report-category-dropdown
+            class="field"
+            @input="addSearchToken('category', $event)"
+            :all="true"
+            :label="true"
+            :value="getTokenValue('category', '')"></report-category-dropdown>
           <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
@@ -130,6 +136,7 @@ import Pagination from '@/components/Pagination'
 import OrderingMixin from '@/components/mixins/Ordering'
 import TranslationsMixin from '@/components/mixins/Translations'
 import ReportCard from '@/components/manage/moderation/ReportCard'
+import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
 import {normalizeQuery, parseTokens} from '@/search'
 import SmartSearchMixin from '@/components/mixins/SmartSearch'
 import ActionTable from '@/components/common/ActionTable'
@@ -141,6 +148,7 @@ export default {
     Pagination,
     ActionTable,
     ReportCard,
+    ReportCategoryDropdown,
   },
   props: {
     mode: {default: 'card'},

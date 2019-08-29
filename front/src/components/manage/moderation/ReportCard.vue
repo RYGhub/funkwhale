@@ -29,8 +29,10 @@
                     <translate translate-context="*/*/*">Category</translate>
                   </td>
                   <td>
-                    <i class="tag icon"></i>
-                    {{ obj.type }}
+                    <report-category-dropdown
+                      class="field"
+                      :value="obj.type"
+                      @input="update({type: $event})"></report-category-dropdown>
                   </td>
                 </tr>
                 <tr>
@@ -210,8 +212,10 @@ import axios from 'axios'
 import { diffWordsWithSpace } from 'diff'
 import NoteForm from '@/components/manage/moderation/NoteForm'
 import NotesThread from '@/components/manage/moderation/NotesThread'
+import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
 import entities from '@/entities'
 import showdown from 'showdown'
+
 
 function castValue (value) {
   if (value === null || value === undefined) {
@@ -228,9 +232,10 @@ export default {
   components: {
     NoteForm,
     NotesThread,
+    ReportCategoryDropdown,
   },
   data () {
-      return {
+    return {
       markdown: new showdown.Converter(),
       isLoading: false,
     }
@@ -290,7 +295,7 @@ export default {
       } else {
         return this.obj.target_state._target
       }
-    }
+    },
   },
   methods: {
     remove () {
@@ -302,6 +307,17 @@ export default {
         if (!self.obj.is_handled) {
           self.$store.commit('ui/incrementNotifications', {count: -1, type: 'pendingReviewReports'})
         }
+      }, error => {
+        self.isLoading = false
+      })
+    },
+    update (payload) {
+      let url = `manage/moderation/reports/${this.obj.uuid}/`
+      let self = this
+      this.isLoading = true
+      axios.patch(url, payload).then((response) => {
+        self.$emit('updated', payload)
+        self.isLoading = false
       }, error => {
         self.isLoading = false
       })
