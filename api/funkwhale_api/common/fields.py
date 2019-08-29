@@ -68,14 +68,16 @@ class GenericRelation(serializers.JSONField):
             return
         type = None
         id = None
+        id_attr = None
         for key, choice in self.choices.items():
             if isinstance(value, choice["queryset"].model):
                 type = key
-                id = getattr(value, choice.get("id_attr", "id"))
+                id_attr = choice.get("id_attr", "id")
+                id = getattr(value, id_attr)
                 break
 
         if type:
-            return {"type": type, "id": id}
+            return {"type": type, id_attr: id}
 
     def to_internal_value(self, v):
         v = super().to_internal_value(v)
