@@ -17,7 +17,7 @@
                   </td>
                   <td>
                     <div v-if="obj.submitter">
-                      <actor-link :actor="obj.submitter" />
+                      <actor-link :admin="true" :actor="obj.submitter" />
                     </div>
                     <div v-else="obj.submitter_email">
                       {{ obj.submitter_email }}
@@ -68,7 +68,7 @@
                   </td>
                   <td>
                     <div v-if="obj.assigned_to">
-                      <actor-link :actor="obj.assigned_to" />
+                      <actor-link :admin="true" :actor="obj.assigned_to" />
                     </div>
                     <translate v-else translate-context="*/*/*">N/A</translate>
                   </td>
@@ -129,6 +129,14 @@
                   <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
                 </td>
               </tr>
+              <tr v-if="target.type !== 'account'">
+                <td>
+                  <translate translate-context="*/*/*">Owner</translate>
+                </td>
+                <td>
+                  <actor-link :admin="true" :actor="obj.target_owner"></actor-link>
+                </td>
+              </tr>
               <tr v-if="obj.target_state.is_local">
                 <td>
                   <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
@@ -154,6 +162,10 @@
               </tr>
             </tbody>
           </table>
+          <h3>
+            <translate translate-context="*/*/*">Actions</translate>
+
+          </h3>
         </aside>
       </div>
       <div class="ui stackable two column grid">

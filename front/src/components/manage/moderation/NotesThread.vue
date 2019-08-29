@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="summary">
-          <actor-link :actor="note.author"></actor-link>
+          <actor-link :admin="true" :actor="note.author"></actor-link>
           <div class="date">
             <human-date :date="note.creation_date"></human-date>
           </div>
