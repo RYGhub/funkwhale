@@ -84,7 +84,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <translate translate-context="Content/*/*/Noun">Moderator notes</translate>
+                    <translate translate-context="Content/*/*/Noun">Internal notes</translate>
                   </td>
                   <td>
                     <i class="comment icon"></i>
@@ -156,6 +156,15 @@
           </table>
         </aside>
       </div>
+      <div class="ui stackable two column grid">
+        <div class="column">
+          <h3>
+            <translate translate-context="Content/*/*/Noun">Internal notes</translate>
+          </h3>
+          <notes-thread @deleted="handleRemovedNote($event)" :notes="obj.notes" />
+          <note-form @created="obj.notes.push($event)" :target="{type: 'report', uuid: obj.uuid}" />
+        </div>
+      </div>
     </div>
     <div class="ui bottom attached buttons">
       <button
@@ -187,7 +196,8 @@
 <script>
 import axios from 'axios'
 import { diffWordsWithSpace } from 'diff'
-
+import NoteForm from '@/components/manage/moderation/NoteForm'
+import NotesThread from '@/components/manage/moderation/NotesThread'
 import entities from '@/entities'
 import showdown from 'showdown'
 
@@ -202,6 +212,10 @@ export default {
   props: {
     obj: {required: true},
     currentState: {required: false}
+  },
+  components: {
+    NoteForm,
+    NotesThread,
   },
   data () {
       return {
@@ -298,6 +312,11 @@ export default {
         self.isLoading = false
       })
     },
+    handleRemovedNote (uuid) {
+      this.obj.notes = this.obj.notes.filter((note) => {
+        return note.uuid != uuid
+      })
+    }
   }
 }
 </script>
