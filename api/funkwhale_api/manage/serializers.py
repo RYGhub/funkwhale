@@ -641,11 +641,30 @@ class ManageTagActionSerializer(common_serializers.ActionSerializer):
         return objects.delete()
 
 
+class ManageBaseNoteSerializer(serializers.ModelSerializer):
+    author = ManageBaseActorSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = moderation_models.Note
+        fields = ["id", "uuid", "creation_date", "summary", "author"]
+        read_only_fields = ["uuid", "creation_date", "author"]
+
+
+class ManageNoteSerializer(ManageBaseNoteSerializer):
+    target = common_fields.GenericRelation(
+        moderation_utils.NOTE_TARGET_FIELDS
+    )
+
+    class Meta(ManageBaseNoteSerializer.Meta):
+        fields = ManageBaseNoteSerializer.Meta.fields + ['target']
+
+
 class ManageReportSerializer(serializers.ModelSerializer):
     assigned_to = ManageBaseActorSerializer()
     target_owner = ManageBaseActorSerializer()
     submitter = ManageBaseActorSerializer()
     target = moderation_serializers.TARGET_FIELD
+    notes = serializers.SerializerMethodField()
 
     class Meta:
         model = moderation_models.Report
@@ -664,6 +683,7 @@ class ManageReportSerializer(serializers.ModelSerializer):
             "target_owner",
             "submitter",
             "submitter_email",
+            "notes",
         ]
         read_only_fields = [
             "id",
@@ -677,16 +697,9 @@ class ManageReportSerializer(serializers.ModelSerializer):
             "target_state",
             "target_owner",
             "summary",
+            # "notes",
         ]
 
-
-class ManageNoteSerializer(serializers.ModelSerializer):
-    author = ManageBaseActorSerializer(required=False, read_only=True)
-    target = common_fields.GenericRelation(
-        moderation_utils.NOTE_TARGET_FIELDS
-    )
-
-    class Meta:
-        model = moderation_models.Note
-        fields = ["id", "uuid", "creation_date", "summary", "author", "target"]
-        read_only_fields = ["uuid", "creation_date", "author"]
+    def get_notes(self, o):
+        notes = getattr(o, '_prefetched_notes', [])
+        return ManageBaseNoteSerializer(notes, many=True).data

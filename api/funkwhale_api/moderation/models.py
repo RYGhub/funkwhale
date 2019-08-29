@@ -1,8 +1,7 @@
 import urllib.parse
 import uuid
 
-
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -148,6 +147,12 @@ class Report(federation_models.FederationMixin):
     # frozen state of the target being reported, to ensure we still have info in the event of a
     # delete
     target_state = JSONField(null=True)
+
+    notes = GenericRelation(
+        "Note",
+        content_type_field="target_content_type",
+        object_id_field="target_id",
+    )
 
     def get_federation_id(self):
         if self.fid:

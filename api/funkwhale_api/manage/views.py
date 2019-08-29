@@ -472,6 +472,9 @@ class ManageReportViewSet(
         .order_by("-creation_date")
         .select_related('submitter', 'target_owner', 'assigned_to', 'target_content_type')
         .prefetch_related('target')
+        .prefetch_related(
+            Prefetch('notes', queryset=moderation_models.Note.objects.order_by('creation_date').select_related('author'), to_attr="_prefetched_notes")
+        )
     )
     serializer_class = serializers.ManageReportSerializer
     filterset_class = filters.ManageReportFilterSet
