@@ -85,6 +85,7 @@ class UserAdmin(AuthUserAdmin):
                     "permission_library",
                     "permission_settings",
                     "permission_moderation",
+                    "upload_quota",
                 )
             },
         ),
