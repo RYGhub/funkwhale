@@ -31,7 +31,7 @@ export default {
               },
               errored: {
                 label: this.$pgettext('Content/Library/Table/Short', 'Errored'),
-                help: this.$pgettext('Content/Library/Help text', 'This track could not be processed, please it is tagged correctly'),
+                help: this.$pgettext('Content/Library/Help text', 'This track could not be processed, please make sure it is tagged correctly'),
               },
               finished: {
                 label: this.$pgettext('Content/Library/*', 'Finished'),

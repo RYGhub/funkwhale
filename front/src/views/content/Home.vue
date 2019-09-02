@@ -15,7 +15,7 @@
       </div>
       <div class="ui segment">
         <h2><translate translate-context="Content/Library/Title/Verb">Follow remote libraries</translate></h2>
-        <p><translate translate-context="Content/Library/Paragraph">You can follow libraries from other users to get access to new music. Public libraries can be followed immediatly, while following a private library requires approval from its owner.</translate></p>
+        <p><translate translate-context="Content/Library/Paragraph">You can follow libraries from other users to get access to new music. Public libraries can be followed immediately, while following a private library requires approval from its owner.</translate></p>
         <router-link :to="{name: 'content.remote.index'}" class="ui green button">
           <translate translate-context="Content/Library/Button.Label/Verb">Get started</translate>
         </router-link>

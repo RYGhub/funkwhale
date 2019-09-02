@@ -3,7 +3,7 @@
     <section class="ui vertical center aligned stripe segment">
       <div class="ui text container">
         <h1 class="ui huge header">
-          <translate translate-context="Content/Home/Title/Verb">Welcome on Funkwhale</translate>
+          <translate translate-context="Content/Home/Title/Verb">Welcome to Funkwhale</translate>
         </h1>
         <p><translate translate-context="Content/Home/Title">We think listening to music should be simple.</translate></p>
         <router-link class="ui icon button" to="/about">
@@ -48,13 +48,13 @@
           <div class="item">
             <i class="heart icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item/Verb">Keep a track of your favorite songs</translate>
+              <translate translate-context="Content/Home/List item/Verb">Keep track of your favorite songs</translate>
             </div>
           </div>
           <div class="item">
             <i class="list icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item">Playlists? We got them</translate>
+              <translate translate-context="Content/Home/List item">Playlists? We've got them</translate>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@
           <div class="item">
             <i class="plus icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item">Covers, lyrics, our goal is to have them all ;)</translate>
+              <translate translate-context="Content/Home/List item">Covers, lyrics... our goal is to have them all ;)</translate>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@
           <div class="item">
             <i class="book icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item">No add-ons, no plugins : you only need a web library</translate>
+              <translate translate-context="Content/Home/List item">No add-ons, no plugins... you only need a web library</translate>
             </div>
           </div>
           <div class="item">
@@ -104,12 +104,12 @@
         <h2 class="ui header">
           <translate translate-context="Content/Home/Title">Your music, your way</translate>
         </h2>
-        <p><translate translate-context="Content/Home/Paragraph">Funkwhale is free and gives you control on your music.</translate></p>
+        <p><translate translate-context="Content/Home/Paragraph">Funkwhale is free and gives you control over your music.</translate></p>
         <div class="ui list">
           <div class="item">
             <i class="smile icon"></i>
             <div class="content">
-              <translate translate-context="Content/Home/List item">The plaform is free and open-source, you can install it and modify it without worries</translate>
+              <translate translate-context="Content/Home/List item">The platform is free and open-source, you can install it and modify it without worries</translate>
             </div>
           </div>
           <div class="item">

@@ -19,7 +19,7 @@
           </div>
           <div v-else-if="fetch.status === 'errored'" class="ui error message">
             <div class="header"><translate translate-context="Popup/*/Message.Title">Refresh error</translate></div>
-            <p><translate translate-context="Popup/*/Message.Content">An error occured while trying to refresh data:</translate></p>
+            <p><translate translate-context="Popup/*/Message.Content">An error occurred while trying to refresh data:</translate></p>
             <table class="ui very basic collapsing celled table">
               <tbody>
                 <tr>
@@ -41,10 +41,10 @@
                       translate-context="*/*/Error">The remote server answered with HTTP %{ status }</translate>
                     <translate
                       v-else-if="['http', 'request'].indexOf(fetch.detail.error_code) > -1"
-                      translate-context="*/*/Error">An HTTP error occured while contacting the remote server</translate>
+                      translate-context="*/*/Error">An HTTP error occurred while contacting the remote server</translate>
                     <translate
                       v-else-if="fetch.detail.error_code === 'timeout'"
-                      translate-context="*/*/Error">The remote server didn't answered fast enough</translate>
+                      translate-context="*/*/Error">The remote server didn't respond quickly enough</translate>
                     <translate
                       v-else-if="fetch.detail.error_code === 'connection'"
                       translate-context="*/*/Error">Impossible to connect to the remote server</translate>

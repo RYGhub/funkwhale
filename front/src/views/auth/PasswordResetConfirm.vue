@@ -22,7 +22,7 @@
               <translate translate-context="Content/Signup/Button.Label">Update your password</translate></button>
           </template>
           <template v-else>
-            <p><translate translate-context="Content/Signup/Paragraph">If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes.</translate></p>
+            <p><translate translate-context="Content/Signup/Paragraph">If the email address provided in the previous step is valid and linked to a user account, you should receive an email with reset instructions in the next couple of minutes.</translate></p>
           </template>
         </form>
         <div v-else class="ui positive message">
