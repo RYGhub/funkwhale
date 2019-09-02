@@ -70,7 +70,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <translate translate-context="Content/Moderation/*">Assignee</translate>
+                    <translate translate-context="Content/Moderation/*">Assigned to</translate>
                   </td>
                   <td>
                     <div v-if="obj.assigned_to">
