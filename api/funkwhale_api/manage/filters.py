@@ -325,6 +325,10 @@ class ManageInstancePolicyFilterSet(filters.FilterSet):
         ]
     )
 
+    target_domain = filters.CharFilter("target_domain__name")
+    target_account_domain = filters.CharFilter("target_actor__domain__name")
+    target_account_username = filters.CharFilter("target_actor__preferred_username")
+
     class Meta:
         model = moderation_models.InstancePolicy
         fields = [
@@ -333,6 +337,9 @@ class ManageInstancePolicyFilterSet(filters.FilterSet):
             "silence_activity",
             "silence_notifications",
             "reject_media",
+            "target_domain",
+            "target_account_domain",
+            "target_account_username",
         ]
 
 

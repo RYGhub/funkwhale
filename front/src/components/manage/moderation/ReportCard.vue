@@ -135,12 +135,15 @@
                   <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
                 </td>
               </tr>
-              <tr v-if="target && target.type !== 'account'">
+              <tr v-if="obj.target_owner && (!target || target.type !== 'account')">
                 <td>
                   <translate translate-context="*/*/*">Owner</translate>
                 </td>
                 <td>
                   <actor-link :admin="true" :actor="obj.target_owner"></actor-link>
+                </td>
+                <td>
+                  <instance-policy-modal class="basic" type="actor" :target="obj.target_owner.full_username" />
                 </td>
               </tr>
               <tr v-if="obj.target_state.is_local">
@@ -160,6 +163,9 @@
                 </td>
                 <td>
                   {{ obj.target_state.domain }}
+                </td>
+                <td>
+                  <instance-policy-modal class="basic" type="domain" :target="obj.target_state.domain" />
                 </td>
               </tr>
               <tr v-for="field in targetFields" :key="field.id">
@@ -226,6 +232,7 @@ import { diffWordsWithSpace } from 'diff'
 import NoteForm from '@/components/manage/moderation/NoteForm'
 import NotesThread from '@/components/manage/moderation/NotesThread'
 import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
+import InstancePolicyModal from '@/components/manage/moderation/InstancePolicyModal'
 import entities from '@/entities'
 import {setUpdate} from '@/utils'
 import showdown from 'showdown'
@@ -247,6 +254,7 @@ export default {
     NoteForm,
     NotesThread,
     ReportCategoryDropdown,
+    InstancePolicyModal,
   },
   data () {
     return {
