@@ -130,7 +130,7 @@
                 <td>
                   <translate translate-context="*/*/*">Type</translate>
                 </td>
-                <td>
+                <td colspan="2">
                   <i :class="[configs[target.type].icon, 'icon']"></i>
                   <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
                 </td>
@@ -143,14 +143,29 @@
                   <actor-link :admin="true" :actor="obj.target_owner"></actor-link>
                 </td>
                 <td>
-                  <instance-policy-modal class="basic" type="actor" :target="obj.target_owner.full_username" />
+                  <instance-policy-modal
+                    v-if="!obj.target_owner.is_local"
+                    class="right floated mini basic" type="actor" :target="obj.target_owner.full_username" />
+                </td>
+              </tr>
+              <tr v-if="target && target.type === 'account'">
+                <td>
+                  <translate translate-context="*/*/*">Account</translate>
+                </td>
+                <td>
+                  <actor-link :admin="true" :actor="obj.target_owner"></actor-link>
+                </td>
+                <td>
+                  <instance-policy-modal
+                    v-if="!obj.target_owner.is_local"
+                    class="right floated mini basic" type="actor" :target="obj.target_owner.full_username" />
                 </td>
               </tr>
               <tr v-if="obj.target_state.is_local">
                 <td>
                   <translate translate-context="Content/Moderation/*/Noun">Domain</translate>
                 </td>
-                <td>
+                <td colspan="2">
                   <i class="home icon"></i>
                   <translate translate-context="Content/Moderation/*/Short, Noun">Local</translate>
                 </td>
@@ -165,12 +180,15 @@
                   {{ obj.target_state.domain }}
                 </td>
                 <td>
-                  <instance-policy-modal class="basic" type="domain" :target="obj.target_state.domain" />
+                  <instance-policy-modal class="right floated mini basic" type="domain" :target="obj.target_state.domain" />
                 </td>
               </tr>
               <tr v-for="field in targetFields" :key="field.id">
                 <td>{{ field.label }}</td>
-                <td>{{ field.repr }}</td>
+                <td colspan="2" v-if="field.repr">{{ field.repr }}</td>
+                <td colspan="2" v-else>
+                  <translate translate-context="*/*/*">N/A</translate>
+                </td>
               </tr>
             </tbody>
           </table>
