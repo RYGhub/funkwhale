@@ -495,13 +495,3 @@ def test_report_update(factories, superuser_api_client):
     assert response.status_code == 200
     report.refresh_from_db()
     assert report.is_handled is True
-
-
-def test_report_delete(factories, superuser_api_client):
-    report = factories["moderation.Report"]()
-    url = reverse(
-        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
-    )
-    response = superuser_api_client.delete(url)
-
-    assert response.status_code == 204

@@ -462,7 +462,6 @@ class ManageInstancePolicyViewSet(
 class ManageReportViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,
 ):
