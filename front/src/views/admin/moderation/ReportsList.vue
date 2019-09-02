@@ -57,71 +57,6 @@
       <div v-else-if="mode === 'card'">
         <report-card :obj="obj" v-for="obj in result.results" :key="obj.uuid" />
       </div>
-      <action-table
-        v-else-if="mode === 'table'"
-        :objects-data="result"
-        :actions="actions"
-        action-url="manage/moderation/reports/action/"
-        :filters="[]">
-        <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Submitted by</translate></th>
-          <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
-          <th><translate translate-context="*/*/*">Category</translate></th>
-          <th><translate translate-context="*/*/*">Status</translate></th>
-          <th><translate translate-context="*/*/*">Target</translate></th>
-          <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
-          <th><translate translate-context="Content/*/*/Noun">Resolution date</translate></th>
-        </template>
-        <template slot="row-cells" slot-scope="scope">
-          <td v-if="scope.obj.submitter">
-            <router-link :to="{name: 'manage.moderation.accounts.detail', params: {id: scope.obj.submitter.full_username }}">
-              <i class="wrench icon"></i>
-            </router-link>
-            <span role="button" class="discrete link" @click="addSearchToken('submitter', scope.obj.submitter.full_username)" :title="scope.obj.submitter.full_username">{{ scope.obj.submitter.preferred_username }}</span>
-          </td>
-          <td v-else="scope.obj.submitter">
-            <span role="button" class="discrete link" @click="addSearchToken('submitter_email', scope.obj.submitter_email)" :title="scope.obj.submitter_email">{{ scope.obj.submitter_email }}</span>
-          </td>
-          <td v-if="scope.obj.submitter">
-            <template v-if="!scope.obj.submitter.is_local">
-              <router-link :to="{name: 'manage.moderation.domains.detail', params: {id: scope.obj.submitter.domain }}">
-                <i class="wrench icon"></i>
-              </router-link>
-              <span role="button" class="discrete link" @click="addSearchToken('domain', scope.obj.submitter.domain)" :title="scope.obj.submitter.domain">{{ scope.obj.submitter.domain }}</span>
-            </template>
-            <span role="button" v-else class="ui tiny teal icon link label" @click="addSearchToken('domain', scope.obj.submitter.domain)">
-              <i class="home icon"></i>
-              <translate translate-context="Content/Moderation/*/Short, Noun">Local</translate>
-            </span>
-          </td>
-          <td v-else>
-            <translate translate-context="*/*/*">N/A</translate>
-          </td>
-          <td>
-            <span role="button" @click="addSearchToken('category', scope.obj.type)">
-              {{ scope.obj.type }}
-            </span>
-          </td>
-          <td>
-            <span v-if="scope.obj.is_handled" role="button" class="discrete link" @click="addSearchToken('resolved', 'yes')" >
-               <translate translate-context="Content/*/*/Short">Resolved</translate>
-            </span>
-            <span v-else role="button" class="discrete link" @click="addSearchToken('resolved', 'no')" >
-               <translate translate-context="Content/*/*/Short">Unesolved</translate>
-            </span>
-          </td>
-          <td>
-              {{ scope.obj.target }}
-          </td>
-          <td>
-            <human-date :date="scope.obj.creation_date"></human-date>
-          </td>
-          <td>
-            <human-date v-if="scope.obj.handled_date" :date="scope.obj.handled_date"></human-date>
-            <translate v-else translate-context="*/*/*">N/A</translate>
-          </td>
-        </template>
-      </action-table>
     </section>
   </main>
 </template>
@@ -139,14 +74,12 @@ import ReportCard from '@/components/manage/moderation/ReportCard'
 import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
 import {normalizeQuery, parseTokens} from '@/search'
 import SmartSearchMixin from '@/components/mixins/SmartSearch'
-import ActionTable from '@/components/common/ActionTable'
 
 
 export default {
   mixins: [OrderingMixin, TranslationsMixin, SmartSearchMixin],
   components: {
     Pagination,
-    ActionTable,
     ReportCard,
     ReportCategoryDropdown,
   },
