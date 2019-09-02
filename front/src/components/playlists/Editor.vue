@@ -11,7 +11,7 @@
       </template>
       <template v-else-if="status === 'errored'">
         <i class="red close icon"></i>
-        <translate translate-context="Content/Playlist/Error message.Title">An error occured while saving your changes</translate>
+        <translate translate-context="Content/Playlist/Error message.Title">An error occurred while saving your changes</translate>
         <div v-if="errors.length > 0" class="ui negative message">
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>

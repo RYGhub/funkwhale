@@ -7,7 +7,7 @@
           :class="['ui', {'loading': isLoadingInstanceSetting}, 'form']"
           @submit.prevent="submit()">
           <p class="ui message" v-if="!$store.state.instance.settings.users.registration_enabled.value">
-            <translate translate-context="Content/Signup/Form/Paragraph">Registration are closed on this instance, you will need an invitation code to signup.</translate>
+            <translate translate-context="Content/Signup/Form/Paragraph">Public registrations are not possible on this instance. You will need an invitation code to sign up.</translate>
           </p>
 
           <div v-if="errors.length > 0" class="ui negative message">

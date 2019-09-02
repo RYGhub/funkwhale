@@ -51,7 +51,7 @@ export default {
   computed: {
     labels() {
       let reset = this.$pgettext('*/Login/*/Verb', "Reset your password")
-      let placeholder = this.$pgettext('Content/Signup/Input.Placeholder', "Enter the email address binded to your account"
+      let placeholder = this.$pgettext('Content/Signup/Input.Placeholder', "Enter the email address linked to your account"
       )
       return {
         reset,

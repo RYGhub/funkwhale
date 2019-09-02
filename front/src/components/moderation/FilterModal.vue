@@ -19,7 +19,7 @@
         <template v-if="type === 'artist'">
           <p>
             <translate translate-context="Popup/Moderation/Paragraph">
-              You will not see tracks, albums and user activity linked to this artist anymore:
+              You will not see tracks, albums and user activity linked to this artist any more:
             </translate>
           </p>
           <ul>
@@ -30,7 +30,7 @@
           </ul>
           <p>
             <translate translate-context="Popup/Moderation/Paragraph">
-              You can manage and update your filters anytime from your account settings.
+              You can manage and update your filters any time from your account settings.
             </translate>
           </p>
         </template>

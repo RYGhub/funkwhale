@@ -72,10 +72,10 @@
             <span v-else-if="error === 'invalid_id'" class="error">Widget improperly configured (missing resource id).</span>
             <span v-else-if="error === 'server_not_found'" class="error">Track not found.</span>
             <span v-else-if="error === 'server_requires_auth'" class="error">You need to login to access this resource.</span>
-            <span v-else-if="error === 'server_error'" class="error">A server error occured.</span>
-            <span v-else-if="error === 'server_error'" class="error">An unknown error occured while loading track data from server.</span>
+            <span v-else-if="error === 'server_error'" class="error">A server error occurred.</span>
+            <span v-else-if="error === 'server_error'" class="error">An unknown error occurred while loading track data from server.</span>
             <span v-else-if="currentTrack && currentTrack.sources.length === 0" class="error">This track is unavailable.</span>
-            <span v-else class="error">An unknown error occured while loading track data.</span>
+            <span v-else class="error">An unknown error occurred while loading track data.</span>
           </div>
           <a title="Funkwhale" href="https://funkwhale.audio" target="_blank" rel="noopener noreferrer" class="logo-wrapper">
             <logo :fill="currentTheme.textColor" class="logo"></logo>

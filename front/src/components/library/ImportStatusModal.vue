@@ -16,7 +16,7 @@
           <translate translate-context="Popup/Import/Message">Upload was skipped because a similar one is already available in one of your libraries.</translate>
         </div>
         <div class="ui error message" v-if="upload.import_status === 'errored'">
-          <translate translate-context="Popup/Import/Message">An error occured during upload processing. You will find more information below.</translate>
+          <translate translate-context="Popup/Import/Message">An error occurred during upload processing. You will find more information below.</translate>
         </div>
         <template v-if="upload.import_status === 'errored'">
           <table class="ui very basic collapsing celled table">
@@ -141,8 +141,8 @@ export default {
         let detail = payload.detail || {}
         d.errorRows = getErrors(detail)
       } else {
-        d.label = this.$pgettext('Popup/Import/Error.Label', 'Unkwown error')
-        d.detail = this.$pgettext('Popup/Import/Error.Label', 'An unkwown error occured')
+        d.label = this.$pgettext('Popup/Import/Error.Label', 'Unknown error')
+        d.detail = this.$pgettext('Popup/Import/Error.Label', 'An unknown error occurred')
       }
       let debugInfo = {
         source: upload.source,
