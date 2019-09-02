@@ -32,9 +32,11 @@
                   </td>
                   <td>
                     <report-category-dropdown
-                      class="field"
                       :value="obj.type"
-                      @input="update({type: $event})"></report-category-dropdown>
+                      @input="update({type: $event})">
+                      &#32;
+                      <action-feedback :is-loading="updating.type"></action-feedback>
+                    </report-category-dropdown>
                   </td>
                 </tr>
                 <tr>
@@ -225,6 +227,7 @@ import NoteForm from '@/components/manage/moderation/NoteForm'
 import NotesThread from '@/components/manage/moderation/NotesThread'
 import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
 import entities from '@/entities'
+import {setUpdate} from '@/utils'
 import showdown from 'showdown'
 
 
@@ -250,6 +253,9 @@ export default {
       markdown: new showdown.Converter(),
       isLoading: false,
       isCollapsed: false,
+      updating: {
+        type: false,
+      }
     }
   },
   computed: {
@@ -343,11 +349,15 @@ export default {
       let url = `manage/moderation/reports/${this.obj.uuid}/`
       let self = this
       this.isLoading = true
+      setUpdate(payload, this.updating, true)
       axios.patch(url, payload).then((response) => {
         self.$emit('updated', payload)
+        Object.assign(self.obj, payload)
         self.isLoading = false
+        setUpdate(payload, self.updating, false)
       }, error => {
         self.isLoading = false
+        setUpdate(payload, self.updating, false)
       })
     },
     resolve (v) {

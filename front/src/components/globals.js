@@ -56,4 +56,8 @@ import CollapseLink from '@/components/common/CollapseLink'
 
 Vue.component('collapse-link', CollapseLink)
 
+import ActionFeedback from '@/components/common/ActionFeedback'
+
+Vue.component('action-feedback', ActionFeedback)
+
 export default {}

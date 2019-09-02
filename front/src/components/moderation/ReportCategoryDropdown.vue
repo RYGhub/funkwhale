@@ -4,6 +4,7 @@
     <select class="ui dropdown" :value="value" @change="$emit('input', $event.target.value)">
       <option :value="option.value" v-for="option in allCategories">{{ option.label }}</option>
     </select>
+    <slot></slot>
   </div>
 </template>
 
