@@ -376,5 +376,12 @@ input + .help {
   }
 }
 
+.ui.borderless.button {
+  border: none !important;
+  box-shadow: none !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

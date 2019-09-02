@@ -17,9 +17,18 @@
           </expandable-div>
         </div>
         <div class="meta">
-          <a role="button" @click.prevent="remove(note)">
-            <i class="trash icon"></i> <translate translate-context="*/*/*/Verb">Delete</translate>
-          </a>
+          <dangerous-button
+            :class="['ui', {loading: isLoading}, 'basic borderless mini button']"
+            color="grey"
+            @confirm="remove(note)">
+            <i class="trash icon"></i>
+            <translate translate-context="*/*/*/Verb">Delete</translate>
+            <p slot="modal-header"><translate translate-context="Popup/Moderation/Title">Delete this note?</translate></p>
+            <div slot="modal-content">
+              <p><translate translate-context="Content/Moderation/Paragraph">The note will be removed. This action is irreversible.</translate></p>
+            </div>
+            <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
+          </dangerous-button>
         </div>
       </div>
     </div>
