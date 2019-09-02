@@ -11,6 +11,9 @@ export default {
       artist: {
         label: this.$pgettext('*/*/*', 'Artist'),
         icon: 'users',
+        getDeleteUrl: (obj) => {
+          return `manage/library/artists/${obj.id}/`
+        },
         urls: {
           getAdminDetail: (obj) => { return {name: 'manage.library.artists.detail', params: {id: obj.id}}}
         },
@@ -42,6 +45,9 @@ export default {
       album: {
         label: this.$pgettext('*/*/*', 'Album'),
         icon: 'play',
+        getDeleteUrl: (obj) => {
+          return `manage/library/albums/${obj.id}/`
+        },
         urls: {
           getAdminDetail: (obj) => { return {name: 'manage.library.albums.detail', params: {id: obj.id}}}
         },
@@ -79,6 +85,9 @@ export default {
       track: {
         label: this.$pgettext('*/*/*', 'Track'),
         icon: 'music',
+        getDeleteUrl: (obj) => {
+          return `manage/library/tracks/${obj.id}/`
+        },
         urls: {
           getAdminDetail: (obj) => { return {name: 'manage.library.tracks.detail', params: {id: obj.id}}}
         },
@@ -119,6 +128,9 @@ export default {
       library: {
         label: this.$pgettext('*/*/*', 'Library'),
         icon: 'book',
+        getDeleteUrl: (obj) => {
+          return `manage/library/libraries/${obj.uuid}/`
+        },
         urls: {
           getAdminDetail: (obj) => { return {name: 'manage.library.libraries.detail', params: {id: obj.uuid}}}
         },

@@ -131,7 +131,7 @@
                   <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
                 </td>
               </tr>
-              <tr v-if="target.type !== 'account'">
+              <tr v-if="target && target.type !== 'account'">
                 <td>
                   <translate translate-context="*/*/*">Owner</translate>
                 </td>
@@ -164,10 +164,6 @@
               </tr>
             </tbody>
           </table>
-          <h3>
-            <translate translate-context="*/*/*">Actions</translate>
-
-          </h3>
         </aside>
       </div>
       <div class="ui stackable two column grid">
@@ -178,31 +174,44 @@
           <notes-thread @deleted="handleRemovedNote($event)" :notes="obj.notes" />
           <note-form @created="obj.notes.push($event)" :target="{type: 'report', uuid: obj.uuid}" />
         </div>
+        <div class="column">
+          <h3>
+            <translate translate-context="*/*/*">Actions</translate>
+          </h3>
+          <div class="ui labelled icon basic buttons">
+            <button
+              v-if="obj.is_handled === false"
+              @click="resolve(true)"
+              :class="['ui', {loading: isLoading}, 'button']">
+              <i class="green check icon"></i>&nbsp;
+              <translate translate-context="Content/*/Button.Label/Verb">Resolve</translate>
+            </button>
+            <button
+              v-if="obj.is_handled === true"
+              @click="resolve(false)"
+              :class="['ui', {loading: isLoading}, 'button']">
+              <i class="yellow redo icon"></i>&nbsp;
+              <translate translate-context="Content/*/Button.Label">Unresolve</translate>
+            </button>
+            <template v-for="action in actions">
+              <dangerous-button
+                v-if="action.dangerous"
+                :class="['ui', {loading: isLoading}, 'button']"
+                color=""
+                :action="action.handler">
+                <i :class="[action.iconColor, action.icon, 'icon']"></i>&nbsp;
+                {{ action.label }}
+                <p slot="modal-header">{{ action.modalHeader}}</p>
+                <div slot="modal-content">
+                  <p>{{ action.modalContent }}</p>
+                </div>
+                <p slot="modal-confirm">{{ action.modalConfirmLabel }}</p>
+              </dangerous-button>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="ui bottom attached buttons">
-      <button
-        v-if="obj.is_handled === false"
-        @click="resolve(true)"
-        :class="['ui', {loading: isLoading}, 'green', 'basic', 'button']">
-        <translate translate-context="Content/*/Button.Label/Verb">Resolve</translate>
-      </button>
-      <button
-        v-if="obj.is_handled === true"
-        @click="resolve(false)"
-        :class="['ui', {loading: isLoading}, 'yellow', 'basic', 'button']">
-        <translate translate-context="Content/*/Button.Label">Unresolve</translate>
-      </button>
-      <dangerous-button
-        :class="['ui', {loading: isLoading}, 'basic button']"
-        :action="remove">
-        <translate translate-context="*/*/*/Verb">Delete</translate>
-        <p slot="modal-header"><translate translate-context="Popup/*/Title">Delete this report?</translate></p>
-        <div slot="modal-content">
-          <p><translate translate-context="Popup/*/Paragraph">The report will be completely removed, this action is irreversible.</translate></p>
-        </div>
-        <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
-      </dangerous-button>
     </div>
   </div>
 </template>
@@ -296,21 +305,37 @@ export default {
         return this.obj.target_state._target
       }
     },
+    actions () {
+      if (!this.target) {
+        return []
+      }
+      let self = this
+      let actions = []
+      let typeConfig = this.configs[this.target.type]
+      if (typeConfig.getDeleteUrl) {
+        let deleteUrl = typeConfig.getDeleteUrl(this.target)
+        actions.push({
+          label: this.$pgettext('Content/Moderation/Button/Verb', 'Delete reported object'),
+          modalHeader: this.$pgettext('Content/Moderation/Popup/Header', 'Delete reported object?'),
+          modalContent: this.$pgettext('Content/Moderation/Popup,Paragraph', 'This will delete the object associated with this report. This action is irreversible.'),
+          modalConfirmLabel: this.$pgettext('*/*/*/Verb', 'Delete'),
+          icon: 'x',
+          iconColor: 'red',
+          dangerous: true,
+          handler: () => {
+            axios.delete(deleteUrl).then((response) => {
+              console.log('Target deleted')
+              self.obj.target = null
+            }, error => {
+              console.log('Error while deleting target')
+            })
+          }
+        })
+      }
+      return actions
+    }
   },
   methods: {
-    remove () {
-      let self = this
-      this.isLoading = true
-      axios.delete(`manage/moderation/reports/${this.obj.uuid}/`).then((response) => {
-        self.$emit('deleted')
-        self.isLoading = false
-        if (!self.obj.is_handled) {
-          self.$store.commit('ui/incrementNotifications', {count: -1, type: 'pendingReviewReports'})
-        }
-      }, error => {
-        self.isLoading = false
-      })
-    },
     update (payload) {
       let url = `manage/moderation/reports/${this.obj.uuid}/`
       let self = this
@@ -344,7 +369,7 @@ export default {
       this.obj.notes = this.obj.notes.filter((note) => {
         return note.uuid != uuid
       })
-    }
+    },
   }
 }
 </script>
