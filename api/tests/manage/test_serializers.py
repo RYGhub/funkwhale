@@ -546,6 +546,7 @@ def test_manage_report_serializer(factories, to_api_date):
             artist.attributed_to
         ).data,
         "target_state": report.target_state,
+        "notes": [],
     }
     s = serializers.ManageReportSerializer(report)
 
