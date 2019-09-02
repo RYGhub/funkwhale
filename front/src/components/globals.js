@@ -51,4 +51,9 @@ Vue.component('empty-state', EmptyState)
 import ExpandableDiv from '@/components/common/ExpandableDiv'
 
 Vue.component('expandable-div', ExpandableDiv)
+
+import CollapseLink from '@/components/common/CollapseLink'
+
+Vue.component('collapse-link', CollapseLink)
+
 export default {}

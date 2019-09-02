@@ -5,8 +5,10 @@
         <router-link :to="{name: 'manage.moderation.reports.detail', params: {id: obj.uuid}}">
           <translate translate-context="Content/Moderation/Card/Short" :translate-params="{id: obj.uuid.substring(0, 8)}">Report %{ id }</translate>
         </router-link>
+        <collapse-link class="right floated" v-model="isCollapsed"></collapse-link>
       </div>
       <div class="content">
+        <div class="ui hidden divider"></div>
         <div class="ui stackable two column grid">
           <div class="column">
             <table class="ui very basic unstackable table">
@@ -99,7 +101,7 @@
         </div>
       </div>
     </div>
-    <div class="main content">
+    <div class="main content" v-if="!isCollapsed">
       <div class="ui stackable two column grid">
         <div class="column">
           <h3>
@@ -247,6 +249,7 @@ export default {
     return {
       markdown: new showdown.Converter(),
       isLoading: false,
+      isCollapsed: false,
     }
   },
   computed: {
@@ -354,8 +357,10 @@ export default {
       axios.patch(url, {is_handled: v}).then((response) => {
         self.$emit('handled', v)
         self.isLoading = false
+        self.obj.is_handled = v
         let increment
         if (v) {
+          self.isCollapsed = true
           increment = -1
         } else {
           increment = 1

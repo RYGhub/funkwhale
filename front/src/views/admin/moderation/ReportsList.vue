@@ -55,7 +55,7 @@
         <empty-state @refresh="fetchData()" :refresh="true"></empty-state>
       </div>
       <div v-else-if="mode === 'card'">
-        <report-card :obj="obj" v-for="obj in result.results" :key="obj.uuid" @handled="fetchData()" @deleted="fetchData()" />
+        <report-card :obj="obj" v-for="obj in result.results" :key="obj.uuid" />
       </div>
       <action-table
         v-else-if="mode === 'table'"
