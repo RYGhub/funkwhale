@@ -14,7 +14,7 @@ class MusicCacheDuration(types.IntPreference):
     default = 60 * 24 * 2
     verbose_name = "Music cache duration"
     help_text = (
-        "How much minutes do you want to keep a copy of federated tracks"
+        "How many minutes do you want to keep a copy of federated tracks "
         "locally? Federated files that were not listened in this interval "
         "will be erased and refetched from the remote on the next listening."
     )
@@ -38,7 +38,7 @@ class CollectionPageSize(preferences.DefaultFromSettingMixin, types.IntPreferenc
     name = "collection_page_size"
     setting = "FEDERATION_COLLECTION_PAGE_SIZE"
     verbose_name = "Federation collection page size"
-    help_text = "How much items to display in ActivityPub collections."
+    help_text = "How many items to display in ActivityPub collections."
     field_kwargs = {"required": False}
 
 
@@ -49,7 +49,7 @@ class ActorFetchDelay(preferences.DefaultFromSettingMixin, types.IntPreference):
     setting = "FEDERATION_ACTOR_FETCH_DELAY"
     verbose_name = "Federation actor fetch delay"
     help_text = (
-        "How much minutes to wait before refetching actors on "
+        "How many minutes to wait before refetching actors on "
         "request authentication."
     )
     field_kwargs = {"required": False}
