@@ -116,7 +116,7 @@ export default {
   methods: {
     fetchLicenseData(licenseId) {
       var self = this
-      let url = `licenses/${licenseId}/`
+      let url = `licenses/${licenseId}`
       axios.get(url).then(response => {
         self.licenseData = response.data
       })
