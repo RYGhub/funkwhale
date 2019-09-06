@@ -695,7 +695,6 @@ class ManageReportSerializer(serializers.ModelSerializer):
             "target_state",
             "target_owner",
             "summary",
-            # "notes",
         ]
 
     def get_notes(self, o):
