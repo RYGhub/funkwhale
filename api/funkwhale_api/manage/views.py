@@ -459,6 +459,60 @@ class ManageInstancePolicyViewSet(
         serializer.save(actor=self.request.user.actor)
 
 
+class ManageReportViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        moderation_models.Report.objects.all()
+        .order_by("-creation_date")
+        .select_related(
+            "submitter", "target_owner", "assigned_to", "target_content_type"
+        )
+        .prefetch_related("target")
+        .prefetch_related(
+            Prefetch(
+                "notes",
+                queryset=moderation_models.Note.objects.order_by(
+                    "creation_date"
+                ).select_related("author"),
+                to_attr="_prefetched_notes",
+            )
+        )
+    )
+    serializer_class = serializers.ManageReportSerializer
+    filterset_class = filters.ManageReportFilterSet
+    required_scope = "instance:reports"
+    ordering_fields = ["id", "creation_date", "handled_date"]
+
+
+class ManageNoteViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        moderation_models.Note.objects.all()
+        .order_by("-creation_date")
+        .select_related("author", "target_content_type")
+        .prefetch_related("target")
+    )
+    serializer_class = serializers.ManageNoteSerializer
+    filterset_class = filters.ManageNoteFilterSet
+    required_scope = "instance:notes"
+    ordering_fields = ["id", "creation_date"]
+
+    def perform_create(self, serializer):
+        author = self.request.user.actor
+        return serializer.save(author=author)
+
+
 class ManageTagViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,

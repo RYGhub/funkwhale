@@ -174,6 +174,7 @@
                         class="ui search selection dropdown">
                         <option v-for="p in allPermissions" :value="p.code">{{ p.label }}</option>
                       </select>
+                      <action-feedback :is-loading="updating.permissions"></action-feedback>
                     </td>
                   </tr>
                   <tr>
@@ -308,8 +309,9 @@
                           name="quota"
                           type="number" />
                         <div class="ui basic label">
-                          <translate translate-context="Content/*/*/Unit">MB</translate>
+                          <translate translate-context="Content/*/*/Unit">MB</translate>&#32;
                         </div>
+                        <action-feedback class="ui basic label" size="tiny" :is-loading="updating.upload_quota"></action-feedback>
                       </div>
                     </td>
                   </tr>
@@ -403,6 +405,10 @@ export default {
       stats: null,
       showPolicyForm: false,
       permissions: [],
+      updating: {
+        permissions: false,
+        upload_quota: false,
+      }
     }
   },
   created() {
@@ -457,6 +463,8 @@ export default {
       if (toNull && !newValue) {
         newValue = null
       }
+      let self = this
+      this.updating[attr] = true
       let params = {}
       if (attr === "permissions") {
         params["permissions"] = {}
@@ -471,12 +479,14 @@ export default {
           logger.default.info(
             `${attr} was updated succcessfully to ${newValue}`
           )
+          self.updating[attr] = false
         },
         error => {
           logger.default.error(
             `Error while setting ${attr} to ${newValue}`,
             error
           )
+          self.updating[attr] = false
         }
       )
     },

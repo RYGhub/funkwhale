@@ -5,11 +5,14 @@ import django_filters
 from django_filters import rest_framework as filters
 
 from funkwhale_api.common import fields
+from funkwhale_api.common import filters as common_filters
 from funkwhale_api.common import search
 
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import utils as moderation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users import models as users_models
 from funkwhale_api.tags import models as tags_models
@@ -26,7 +29,7 @@ class ActorField(forms.CharField):
 
 def get_actor_filter(actor_field):
     def handler(v):
-        federation_utils.get_actor_from_username_data_query(actor_field, v)
+        return federation_utils.get_actor_from_username_data_query(actor_field, v)
 
     return {"field": ActorField(), "handler": handler}
 
@@ -322,6 +325,10 @@ class ManageInstancePolicyFilterSet(filters.FilterSet):
         ]
     )
 
+    target_domain = filters.CharFilter("target_domain__name")
+    target_account_domain = filters.CharFilter("target_actor__domain__name")
+    target_account_username = filters.CharFilter("target_actor__preferred_username")
+
     class Meta:
         model = moderation_models.InstancePolicy
         fields = [
@@ -330,6 +337,9 @@ class ManageInstancePolicyFilterSet(filters.FilterSet):
             "silence_activity",
             "silence_notifications",
             "reject_media",
+            "target_domain",
+            "target_account_domain",
+            "target_account_username",
         ]
 
 
@@ -338,4 +348,49 @@ class ManageTagFilterSet(filters.FilterSet):
 
     class Meta:
         model = tags_models.Tag
+        fields = ["q"]
+
+
+class ManageReportFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={"summary": {"to": "summary"}},
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "id": {"to": "id"},
+                "resolved": common_filters.get_boolean_filter("is_handled"),
+                "domain": {"to": "target_owner__domain_id"},
+                "category": {"to": "type"},
+                "submitter": get_actor_filter("submitter"),
+                "assigned_to": get_actor_filter("assigned_to"),
+                "target_owner": get_actor_filter("target_owner"),
+                "submitter_email": {"to": "submitter_email"},
+                "target": common_filters.get_generic_relation_filter(
+                    "target", moderation_serializers.TARGET_CONFIG
+                ),
+            },
+        )
+    )
+
+    class Meta:
+        model = moderation_models.Report
+        fields = ["q", "is_handled", "type", "submitter_email"]
+
+
+class ManageNoteFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={"summary": {"to": "summary"}},
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "author": get_actor_filter("author"),
+                "target": common_filters.get_generic_relation_filter(
+                    "target", moderation_utils.NOTE_TARGET_FIELDS
+                ),
+            },
+        )
+    )
+
+    class Meta:
+        model = moderation_models.Note
         fields = ["q"]

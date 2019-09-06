@@ -17,6 +17,8 @@ moderation_router = routers.OptionalSlashRouter()
 moderation_router.register(
     r"instance-policies", views.ManageInstancePolicyViewSet, "instance-policies"
 )
+moderation_router.register(r"reports", views.ManageReportViewSet, "reports")
+moderation_router.register(r"notes", views.ManageNoteViewSet, "notes")
 
 users_router = routers.OptionalSlashRouter()
 users_router.register(r"users", views.ManageUserViewSet, "users")

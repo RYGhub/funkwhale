@@ -3,6 +3,9 @@
     <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
       <router-link
         class="ui item"
+        :to="{name: 'manage.moderation.reports.list'}"><translate translate-context="*/Moderation/*/Noun">Reports</translate></router-link>
+      <router-link
+        class="ui item"
         :to="{name: 'manage.moderation.domains.list'}"><translate translate-context="*/Moderation/*/Noun">Domains</translate></router-link>
       <router-link
         class="ui item"

@@ -1,13 +1,17 @@
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework import serializers
 
+from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import fields as federation_fields
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import utils as moderation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.tags import models as tags_models
@@ -182,6 +186,8 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
 
 
 class ManageBaseActorSerializer(serializers.ModelSerializer):
+    is_local = serializers.SerializerMethodField()
+
     class Meta:
         model = federation_models.Actor
         fields = [
@@ -200,8 +206,12 @@ class ManageBaseActorSerializer(serializers.ModelSerializer):
             "outbox_url",
             "shared_inbox_url",
             "manually_approves_followers",
+            "is_local",
         ]
         read_only_fields = ["creation_date", "instance_policy"]
+
+    def get_is_local(self, o):
+        return o.domain_id == settings.FEDERATION_HOSTNAME
 
 
 class ManageActorSerializer(ManageBaseActorSerializer):
@@ -629,3 +639,64 @@ class ManageTagActionSerializer(common_serializers.ActionSerializer):
     @transaction.atomic
     def handle_delete(self, objects):
         return objects.delete()
+
+
+class ManageBaseNoteSerializer(serializers.ModelSerializer):
+    author = ManageBaseActorSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = moderation_models.Note
+        fields = ["id", "uuid", "creation_date", "summary", "author"]
+        read_only_fields = ["uuid", "creation_date", "author"]
+
+
+class ManageNoteSerializer(ManageBaseNoteSerializer):
+    target = common_fields.GenericRelation(moderation_utils.NOTE_TARGET_FIELDS)
+
+    class Meta(ManageBaseNoteSerializer.Meta):
+        fields = ManageBaseNoteSerializer.Meta.fields + ["target"]
+
+
+class ManageReportSerializer(serializers.ModelSerializer):
+    assigned_to = ManageBaseActorSerializer()
+    target_owner = ManageBaseActorSerializer()
+    submitter = ManageBaseActorSerializer()
+    target = moderation_serializers.TARGET_FIELD
+    notes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = moderation_models.Report
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "creation_date",
+            "handled_date",
+            "summary",
+            "type",
+            "target",
+            "target_state",
+            "is_handled",
+            "assigned_to",
+            "target_owner",
+            "submitter",
+            "submitter_email",
+            "notes",
+        ]
+        read_only_fields = [
+            "id",
+            "uuid",
+            "fid",
+            "submitter",
+            "submitter_email",
+            "creation_date",
+            "handled_date",
+            "target",
+            "target_state",
+            "target_owner",
+            "summary",
+        ]
+
+    def get_notes(self, o):
+        notes = getattr(o, "_prefetched_notes", [])
+        return ManageBaseNoteSerializer(notes, many=True).data

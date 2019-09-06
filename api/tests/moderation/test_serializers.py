@@ -1,4 +1,8 @@
+import json
 import pytest
+import urllib.parse
+
+from django.core.serializers.json import DjangoJSONEncoder
 
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -41,7 +45,6 @@ def test_user_filter_serializer_save(factories):
         ("music.Album", "album", "id", serializers.AlbumStateSerializer),
         ("music.Track", "track", "id", serializers.TrackStateSerializer),
         ("music.Library", "library", "uuid", serializers.LibraryStateSerializer),
-        ("playlists.Playlist", "playlist", "id", serializers.PlaylistStateSerializer),
         (
             "federation.Actor",
             "account",
@@ -50,8 +53,8 @@ def test_user_filter_serializer_save(factories):
         ),
     ],
 )
-def test_report_serializer_save(
-    factory_name, target_type, id_field, state_serializer, factories, mocker
+def test_report_federated_entity_serializer_save(
+    factory_name, target_type, id_field, state_serializer, factories, mocker, settings
 ):
     target = factories[factory_name]()
     target_owner = factories["federation.Actor"]()
@@ -72,10 +75,58 @@ def test_report_serializer_save(
 
     report = serializer.save()
 
+    expected_state = state_serializer(target).data
+    expected_state["_target"] = json.loads(
+        json.dumps(target_data, cls=DjangoJSONEncoder)
+    )
+    expected_state["domain"] = urllib.parse.urlparse(target.fid).hostname
+    expected_state["is_local"] = (
+        expected_state["domain"] == settings.FEDERATION_HOSTNAME
+    )
+
     assert report.target == target
     assert report.type == payload["type"]
     assert report.summary == payload["summary"]
-    assert report.target_state == state_serializer(target).data
+    assert report.target_state == expected_state
+    assert report.target_owner == target_owner
+    get_target_owner.assert_called_once_with(target)
+
+
+@pytest.mark.parametrize(
+    "factory_name, target_type, id_field, state_serializer",
+    [("playlists.Playlist", "playlist", "id", serializers.PlaylistStateSerializer)],
+)
+def test_report_local_entity_serializer_save(
+    factory_name, target_type, id_field, state_serializer, factories, mocker, settings
+):
+    target = factories[factory_name]()
+    target_owner = factories["federation.Actor"]()
+    submitter = factories["federation.Actor"]()
+    target_data = {"type": target_type, id_field: getattr(target, id_field)}
+    payload = {
+        "summary": "Report content",
+        "type": "illegal_content",
+        "target": target_data,
+    }
+    serializer = serializers.ReportSerializer(
+        data=payload, context={"submitter": submitter}
+    )
+    get_target_owner = mocker.patch.object(
+        serializers, "get_target_owner", return_value=target_owner
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+
+    report = serializer.save()
+
+    expected_state = state_serializer(target).data
+    expected_state["_target"] = json.loads(
+        json.dumps(target_data, cls=DjangoJSONEncoder)
+    )
+    expected_state["is_local"] = True
+    assert report.target == target
+    assert report.type == payload["type"]
+    assert report.summary == payload["summary"]
+    assert report.target_state == expected_state
     assert report.target_owner == target_owner
     get_target_owner.assert_called_once_with(target)
 

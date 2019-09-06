@@ -1,11 +1,12 @@
 import urllib.parse
 import uuid
 
-
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
@@ -147,6 +148,10 @@ class Report(federation_models.FederationMixin):
     # delete
     target_state = JSONField(null=True)
 
+    notes = GenericRelation(
+        "Note", content_type_field="target_content_type", object_id_field="target_id"
+    )
+
     def get_federation_id(self):
         if self.fid:
             return self.fid
@@ -160,3 +165,26 @@ class Report(federation_models.FederationMixin):
             self.fid = self.get_federation_id()
 
         return super().save(**kwargs)
+
+
+class Note(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    summary = models.TextField(max_length=50000)
+    author = models.ForeignKey(
+        "federation.Actor", related_name="moderation_notes", on_delete=models.CASCADE
+    )
+
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+
+
+@receiver(pre_save, sender=Report)
+def set_handled_date(sender, instance, **kwargs):
+    if instance.is_handled is True and not instance.handled_date:
+        instance.handled_date = timezone.now()
+    elif not instance.is_handled:
+        instance.handled_date = None

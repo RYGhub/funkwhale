@@ -5,6 +5,8 @@ from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import factories as music_factories
 from funkwhale_api.users import factories as users_factories
 
+from . import serializers
+
 
 @registry.register
 class InstancePolicyFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
@@ -40,9 +42,19 @@ class UserFilterFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 
 
 @registry.register
+class NoteFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
+    author = factory.SubFactory(federation_factories.ActorFactory)
+    target = None
+    summary = factory.Faker("paragraph")
+
+    class Meta:
+        model = "moderation.Note"
+
+
+@registry.register
 class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     submitter = factory.SubFactory(federation_factories.ActorFactory)
-    target = None
+    target = factory.SubFactory(music_factories.ArtistFactory)
     summary = factory.Faker("paragraph")
     type = "other"
 
@@ -51,3 +63,13 @@ class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 
     class Params:
         anonymous = factory.Trait(actor=None, submitter_email=factory.Faker("email"))
+        assigned = factory.Trait(
+            assigned_to=factory.SubFactory(federation_factories.ActorFactory)
+        )
+
+    @factory.post_generation
+    def _set_target_owner(self, create, extracted, **kwargs):
+        if not self.target:
+            return
+
+        self.target_owner = serializers.get_target_owner(self.target)

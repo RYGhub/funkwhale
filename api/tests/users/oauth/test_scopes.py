@@ -50,6 +50,10 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:edits",
                 "read:instance:libraries",
                 "write:instance:libraries",
+                "read:instance:notes",
+                "write:instance:notes",
+                "read:instance:reports",
+                "write:instance:reports",
             },
         ),
         (
@@ -91,6 +95,10 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:users",
                 "read:instance:invitations",
                 "write:instance:invitations",
+                "read:instance:notes",
+                "write:instance:notes",
+                "read:instance:reports",
+                "write:instance:reports",
             },
         ),
         (
@@ -126,6 +134,10 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:accounts",
                 "read:instance:domains",
                 "write:instance:domains",
+                "read:instance:notes",
+                "write:instance:notes",
+                "read:instance:reports",
+                "write:instance:reports",
             },
         ),
         (

@@ -1,5 +1,9 @@
-import persisting_theory
+import json
+import urllib.parse
 
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
+import persisting_theory
 from rest_framework import serializers
 
 from funkwhale_api.common import fields as common_fields
@@ -117,7 +121,15 @@ class TrackStateSerializer(serializers.ModelSerializer):
 class LibraryStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = music_models.Library
-        fields = ["id", "fid", "name", "description", "creation_date", "privacy_level"]
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "name",
+            "description",
+            "creation_date",
+            "privacy_level",
+        ]
 
 
 @state_serializers.register(name="playlists.Playlist")
@@ -135,6 +147,7 @@ class ActorStateSerializer(serializers.ModelSerializer):
             "fid",
             "name",
             "preferred_username",
+            "full_username",
             "summary",
             "domain",
             "type",
@@ -160,26 +173,28 @@ def get_target_owner(target):
     return mapping[target.__class__](target)
 
 
+TARGET_CONFIG = {
+    "artist": {"queryset": music_models.Artist.objects.all()},
+    "album": {"queryset": music_models.Album.objects.all()},
+    "track": {"queryset": music_models.Track.objects.all()},
+    "library": {
+        "queryset": music_models.Library.objects.all(),
+        "id_attr": "uuid",
+        "id_field": serializers.UUIDField(),
+    },
+    "playlist": {"queryset": playlists_models.Playlist.objects.all()},
+    "account": {
+        "queryset": federation_models.Actor.objects.all(),
+        "id_attr": "full_username",
+        "id_field": serializers.EmailField(),
+        "get_query": get_actor_query,
+    },
+}
+TARGET_FIELD = common_fields.GenericRelation(TARGET_CONFIG)
+
+
 class ReportSerializer(serializers.ModelSerializer):
-    target = common_fields.GenericRelation(
-        {
-            "artist": {"queryset": music_models.Artist.objects.all()},
-            "album": {"queryset": music_models.Album.objects.all()},
-            "track": {"queryset": music_models.Track.objects.all()},
-            "library": {
-                "queryset": music_models.Library.objects.all(),
-                "id_attr": "uuid",
-                "id_field": serializers.UUIDField(),
-            },
-            "playlist": {"queryset": playlists_models.Playlist.objects.all()},
-            "account": {
-                "queryset": federation_models.Actor.objects.all(),
-                "id_attr": "full_username",
-                "id_field": serializers.EmailField(),
-                "get_query": get_actor_query,
-            },
-        }
-    )
+    target = TARGET_FIELD
 
     class Meta:
         model = models.Report
@@ -225,5 +240,21 @@ class ReportSerializer(serializers.ModelSerializer):
         validated_data["target_state"] = target_state_serializer(
             validated_data["target"]
         ).data
+        # freeze target type/id in JSON so even if the corresponding object is deleted
+        # we can have the info and display it in the frontend
+        target_data = self.fields["target"].to_representation(validated_data["target"])
+        validated_data["target_state"]["_target"] = json.loads(
+            json.dumps(target_data, cls=DjangoJSONEncoder)
+        )
+
+        if "fid" in validated_data["target_state"]:
+            validated_data["target_state"]["domain"] = urllib.parse.urlparse(
+                validated_data["target_state"]["fid"]
+            ).hostname
+
+        validated_data["target_state"]["is_local"] = (
+            validated_data["target_state"].get("domain", settings.FEDERATION_HOSTNAME)
+            == settings.FEDERATION_HOSTNAME
+        )
         validated_data["target_owner"] = get_target_owner(validated_data["target"])
         return super().create(validated_data)

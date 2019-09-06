@@ -46,9 +46,11 @@ export default {
       handler (newValue) {
         if (newValue) {
           this.initModal()
+          this.$emit('show')
           this.control.modal('show')
         } else {
           if (this.control) {
+            this.$emit('hide')
             this.control.modal('hide')
             this.control.remove()
           }

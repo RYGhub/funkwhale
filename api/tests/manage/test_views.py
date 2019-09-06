@@ -391,6 +391,50 @@ def test_upload_delete(factories, superuser_api_client):
     assert response.status_code == 204
 
 
+def test_note_create(factories, superuser_api_client):
+    actor = superuser_api_client.user.create_actor()
+    target = factories["federation.Actor"]()
+    data = {
+        "summary": "Hello",
+        "target": {"type": "account", "full_username": target.full_username},
+    }
+    url = reverse("api:v1:manage:moderation:notes-list")
+    response = superuser_api_client.post(url, data, format="json")
+    assert response.status_code == 201
+
+    note = actor.moderation_notes.latest("id")
+    assert note.target == target
+    assert response.data == serializers.ManageNoteSerializer(note).data
+
+
+def test_note_list(factories, superuser_api_client, settings):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0] == serializers.ManageNoteSerializer(note).data
+
+
+def test_note_delete(factories, superuser_api_client):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-detail", kwargs={"uuid": note.uuid})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_note_detail(factories, superuser_api_client):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-detail", kwargs={"uuid": note.uuid})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializers.ManageNoteSerializer(note).data
+
+
 def test_tag_detail(factories, superuser_api_client):
     tag = factories["tags.Tag"]()
     url = reverse("api:v1:manage:tags-detail", kwargs={"name": tag.name})
@@ -417,3 +461,37 @@ def test_tag_delete(factories, superuser_api_client):
     response = superuser_api_client.delete(url)
 
     assert response.status_code == 204
+
+
+def test_report_detail(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["summary"] == report.summary
+
+
+def test_report_list(factories, superuser_api_client, settings):
+    report = factories["moderation.Report"]()
+    url = reverse("api:v1:manage:moderation:reports-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["summary"] == report.summary
+
+
+def test_report_update(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.patch(url, {"is_handled": True})
+
+    assert response.status_code == 200
+    report.refresh_from_db()
+    assert report.is_handled is True

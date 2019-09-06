@@ -39,6 +39,16 @@ export default {
               },
             }
           },
+          report_type: {
+            label: this.$pgettext('*/*/*', 'Category'),
+            choices: {
+              takedown_request: this.$pgettext("Content/Moderation/Dropdown", "Takedown request"),
+              invalid_metadata: this.$pgettext("Content/Moderation/Dropdown", "Invalid metadata"),
+              illegal_content: this.$pgettext("Content/Moderation/Dropdown", "Illegal content"),
+              offensive_content: this.$pgettext("Content/Moderation/Dropdown", "Offensive content"),
+              other: this.$pgettext("Content/Moderation/Dropdown", "Other"),
+            },
+          },
         },
         filters: {
           creation_date: this.$pgettext('Content/*/*/Noun', 'Creation date'),

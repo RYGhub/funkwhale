@@ -48,4 +48,16 @@ import EmptyState from '@/components/common/EmptyState'
 
 Vue.component('empty-state', EmptyState)
 
+import ExpandableDiv from '@/components/common/ExpandableDiv'
+
+Vue.component('expandable-div', ExpandableDiv)
+
+import CollapseLink from '@/components/common/CollapseLink'
+
+Vue.component('collapse-link', CollapseLink)
+
+import ActionFeedback from '@/components/common/ActionFeedback'
+
+Vue.component('action-feedback', ActionFeedback)
+
 export default {}

@@ -49,7 +49,7 @@
 // @import "~fomantic-ui-css/components/ad.css";
 @import "~fomantic-ui-css/components/card.css";
 // @import "~fomantic-ui-css/components/comment.css";
-// @import "~fomantic-ui-css/components/feed.css";
+@import "~fomantic-ui-css/components/feed.css";
 @import "~fomantic-ui-css/components/item.css";
 @import "~fomantic-ui-css/components/statistic.css";
 
@@ -366,6 +366,21 @@ input + .help {
 
 .tag-list {
   margin-top: 0.5em;
+}
+
+.expandable {
+  &:not(.expanded) {
+    overflow: hidden;
+    max-height: 15vh;
+    background: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0.3) 100%);
+  }
+}
+
+.ui.borderless.button {
+  border: none !important;
+  box-shadow: none !important;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 @import "./themes/_light.scss";
