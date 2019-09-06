@@ -126,6 +126,7 @@ export default {
           settings: [
             "moderation__allow_list_enabled",
             "moderation__allow_list_public",
+            "moderation__unauthenticated_report_types",
           ]
         },
         {
