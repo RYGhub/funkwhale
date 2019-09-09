@@ -1,7 +1,8 @@
 <template>
   <div>
     <label v-if="label"><translate translate-context="*/*/*">Category</translate></label>
-    <select class="ui dropdown" :value="value" @change="$emit('input', $event.target.value)">
+    <select class="ui dropdown" :value="value" @change="$emit('input', $event.target.value)" :required="required">
+      <option v-if="empty" disabled value=''></option>
       <option :value="option.value" v-for="option in allCategories">{{ option.label }}</option>
     </select>
     <slot></slot>
@@ -13,7 +14,14 @@ import TranslationsMixin from '@/components/mixins/Translations'
 import lodash from '@/lodash'
 export default {
   mixins: [TranslationsMixin],
-  props: ['value', 'all', 'label'],
+  props: {
+    value: {},
+    all: {},
+    label: {},
+    empty: {},
+    required: {},
+    restrictTo: {default: () => { return [] }}
+  },
   computed: {
     allCategories () {
       let c = []
@@ -25,11 +33,17 @@ export default {
           },
         )
       }
+      let choices
+      if (this.restrictTo.length > 0)  {
+        choices = this.restrictTo
+      } else {
+        choices = lodash.keys(this.sharedLabels.fields.report_type.choices)
+      }
       return c.concat(
-        lodash.keys(this.sharedLabels.fields.report_type.choices).sort().map((v) => {
+        choices.sort().map((v) => {
           return {
             value: v,
-            label: this.sharedLabels.fields.report_type.choices[v]
+            label: this.sharedLabels.fields.report_type.choices[v] || v
           }
         })
       )

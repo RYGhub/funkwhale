@@ -23,7 +23,7 @@ class PlaylistViewSet(
     serializer_class = serializers.PlaylistSerializer
     queryset = (
         models.Playlist.objects.all()
-        .select_related("user")
+        .select_related("user__actor")
         .annotate(tracks_count=Count("playlist_tracks"))
         .with_covers()
         .with_duration()

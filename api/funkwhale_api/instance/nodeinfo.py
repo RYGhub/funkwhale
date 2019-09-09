@@ -3,6 +3,7 @@ import memoize.djangocache
 import funkwhale_api
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import actors, models as federation_models
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import utils as music_utils
 
 from . import stats
@@ -15,6 +16,9 @@ def get():
     share_stats = preferences.get("instance__nodeinfo_stats_enabled")
     allow_list_enabled = preferences.get("moderation__allow_list_enabled")
     allow_list_public = preferences.get("moderation__allow_list_public")
+    unauthenticated_report_types = preferences.get(
+        "moderation__unauthenticated_report_types"
+    )
     if allow_list_enabled and allow_list_public:
         allowed_domains = list(
             federation_models.Domain.objects.filter(allowed=True)
@@ -47,6 +51,10 @@ def get():
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
             "allowList": {"enabled": allow_list_enabled, "domains": allowed_domains},
+            "reportTypes": [
+                {"type": t, "label": l, "anonymous": t in unauthenticated_report_types}
+                for t, l in moderation_models.REPORT_TYPES
+            ],
         },
     }
     if share_stats:

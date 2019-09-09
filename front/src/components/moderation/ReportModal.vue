@@ -1,0 +1,169 @@
+<template>
+  <modal @update:show="update" :show="$store.state.moderation.showReportModal">
+    <h2 class="ui header" v-if="target">
+      <translate translate-context="Popup/Moderation/Title/Verb">Do you want to report this object?</translate>
+      <div class="ui sub header">
+        {{ target.typeLabel }} - {{ target.label }}
+      </div>
+    </h2>
+    <div class="scrolling content">
+      <div class="description">
+        <div v-if="errors.length > 0" class="ui negative message">
+          <div class="header"><translate translate-context="Popup/Moderation/Error message">Error while submitting report</translate></div>
+          <ul class="list">
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </div>
+      </div>
+      <p>
+        <translate translate-context="*/Moderation/Popup,Paragraph">Use this form to submit a report to our moderation team.</translate>
+      </p>
+      <form v-if="canSubmit" id="report-form" class="ui form" @submit.prevent="submit">
+        <div v-if="!$store.state.auth.authenticated" class="ui inline required field">
+          <label for="report-submitter-email">
+            <translate translate-context="Content/*/*/Noun">Email</translate>
+          </label>
+          <input type="email" v-model="submitterEmail" name="report-submitter-email" id="report-submitter-email" required>
+        </div>
+        <report-category-dropdown
+          class="ui inline required field"
+          v-model="category"
+          :required="true"
+          :empty="true"
+          :restrict-to="allowedCategories"
+          :label="true"></report-category-dropdown>
+        <div class="ui field">
+          <label for="report-summary">
+            <translate translate-context="*/*/Field.Label/Noun">Message</translate>
+          </label>
+          <p>
+            <translate translate-context="*/*/Field,Help">Use this field to provide additional context to the moderator that will handle your report.</translate>
+          </p>
+          <textarea name="report-summary" id="report-summary" rows="8" v-model="summary"></textarea>
+        </div>
+      </form>
+      <div v-else-if="isLoadingReportTypes" class="ui inline active loader">
+
+      </div>
+      <div v-else class="ui warning message">
+        <div class="header">
+          <translate translate-context="Popup/Moderation/Error message">Anonymous reports are disabled, please sign-in to submit a report.</translate>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
+      <button
+        v-if="canSubmit"
+        :class="['ui', 'green', {loading: isLoading}, 'button']"
+        type="submit" form="report-form">
+        <translate translate-context="Popup/*/Button.Label">Submit report</translate>
+      </button>
+    </div>
+  </modal>
+</template>
+
+<script>
+import _ from '@/lodash'
+import axios from 'axios'
+import {mapState} from 'vuex'
+
+import logger from '@/logging'
+import Modal from '@/components/semantic/Modal'
+import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
+
+export default {
+  components: {
+    Modal,
+    ReportCategoryDropdown,
+  },
+  data () {
+    return {
+      formKey: String(new Date()),
+      errors: [],
+      isLoading: false,
+      isLoadingReportTypes: false,
+      summary: '',
+      submitterEmail: '',
+      category: null,
+      reportTypes: [],
+    }
+  },
+  computed: {
+    ...mapState({
+      target: state => state.moderation.reportModalTarget,
+    }),
+    allowedCategories () {
+      if (this.$store.state.auth.authenticated) {
+        return []
+      }
+      return this.reportTypes.filter((t) => {
+        return t.anonymous === true
+      }).map((c) => {
+        return c.type
+      })
+
+    },
+    canSubmit () {
+      if (this.$store.state.auth.authenticated) {
+        return true
+      }
+
+      return this.allowedCategories.length > 0
+    }
+  },
+  methods: {
+    update (v) {
+      this.$store.commit('moderation/showReportModal', v)
+      this.errors = []
+    },
+    submit () {
+      let self = this
+      self.isLoading = true
+      let payload = {
+        target: this.target,
+        summary: this.summary,
+        type: this.category,
+      }
+      if (!this.$store.state.auth.authenticated) {
+        payload.submitter_email = this.submitterEmail
+      }
+      return axios.post('moderation/reports/', payload).then(response => {
+        self.update(false)
+        self.isLoading = false
+        let msg = this.$pgettext('*/Moderation/Message', 'Report successfully submitted, thank you')
+        self.$store.commit('moderation/contentFilter', response.data)
+        self.$store.commit('ui/addMessage', {
+          content: msg,
+          date: new Date()
+        })
+        self.summary = ''
+        self.category = ''
+      }, error => {
+        self.errors = error.backendErrors
+        self.isLoading = false
+      })
+    }
+  },
+  watch: {
+    '$store.state.moderation.showReportModal': function (v) {
+      if (!v || this.$store.state.auth.authenticated) {
+        return
+      }
+
+      let self = this
+      self.isLoadingReportTypes = true
+      axios.get('instance/nodeinfo/2.0/').then(response => {
+        self.isLoadingReportTypes = false
+        self.reportTypes = response.data.metadata.reportTypes || []
+      }, error => {
+        self.isLoadingReportTypes = false
+      })
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+</style>

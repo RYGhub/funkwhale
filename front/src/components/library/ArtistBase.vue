@@ -85,6 +85,16 @@
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
                   <div class="divider"></div>
+                  <div
+                    role="button"
+                    class="basic item"
+                    v-for="obj in getReportableObjs({artist: object})"
+                    :key="obj.target.type + obj.target.id"
+                    @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+                    <i class="share icon" /> {{ obj.label }}
+                  </div>
+
+                  <div class="divider"></div>
                   <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.artists.detail', params: {id: object.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
@@ -125,12 +135,12 @@ import EmbedWizard from "@/components/audio/EmbedWizard"
 import Modal from '@/components/semantic/Modal'
 import RadioButton from "@/components/radios/Button"
 import TagsList from "@/components/tags/List"
+import ReportMixin from '@/components/mixins/Report'
 
 const FETCH_URL = "albums/"
 
-
-
 export default {
+  mixins: [ReportMixin],
   props: ["id"],
   components: {
     PlayButton,

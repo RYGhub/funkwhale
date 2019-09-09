@@ -37,7 +37,12 @@
               </div>
             </div>
             <div class="one wide stretched column">
-              <play-button class="basic icon" :dropdown-only="true" :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']" :track="object.track"></play-button>
+              <play-button
+                class="basic icon"
+                :account="object.actor"
+                :dropdown-only="true"
+                :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']"
+                :track="object.track"></play-button>
             </div>
           </div>
         </div>

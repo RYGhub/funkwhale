@@ -7,8 +7,13 @@ export default {
   state: {
     filters: [],
     showFilterModal: false,
+    showReportModal: false,
     lastUpdate: new Date(),
     filterModalTarget: {
+      type: null,
+      target: null,
+    },
+    reportModalTarget: {
       type: null,
       target: null,
     }
@@ -16,6 +21,9 @@ export default {
   mutations: {
     filterModalTarget (state, value) {
       state.filterModalTarget = value
+    },
+    reportModalTarget (state, value) {
+      state.reportModalTarget = value
     },
     empty (state) {
       state.filters = []
@@ -35,10 +43,21 @@ export default {
         }
       }
     },
+    showReportModal (state, value) {
+      state.showReportModal = value
+      if (!value) {
+        state.reportModalTarget = {
+          type: null,
+          target: null,
+        }
+      }
+    },
     reset (state) {
       state.filters = []
       state.filterModalTarget = null
       state.showFilterModal = false
+      state.showReportModal = false
+      state.reportModalTarget = {}
     },
     deleteContentFilter (state, uuid) {
       state.filters = state.filters.filter((e) => {
@@ -60,6 +79,10 @@ export default {
     hide ({commit}, payload) {
       commit('filterModalTarget', payload)
       commit('showFilterModal', true)
+    },
+    report ({commit}, payload) {
+      commit('reportModalTarget', payload)
+      commit('showReportModal', true)
     },
     fetchContentFilters ({dispatch, state, commit, rootState}, url) {
       let params = {}

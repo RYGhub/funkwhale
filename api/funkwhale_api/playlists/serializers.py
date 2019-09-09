@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music.models import Track
 from funkwhale_api.music.serializers import TrackSerializer
 from funkwhale_api.users.serializers import UserBasicSerializer
@@ -79,6 +80,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
     album_covers = serializers.SerializerMethodField(read_only=True)
     user = UserBasicSerializer(read_only=True)
     is_playable = serializers.SerializerMethodField()
+    actor = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Playlist
@@ -93,8 +95,14 @@ class PlaylistSerializer(serializers.ModelSerializer):
             "album_covers",
             "duration",
             "is_playable",
+            "actor",
         )
         read_only_fields = ["id", "modification_date", "creation_date"]
+
+    def get_actor(self, obj):
+        actor = obj.user.actor
+        if actor:
+            return federation_serializers.APIActorSerializer(actor).data
 
     def get_is_playable(self, obj):
         try:
