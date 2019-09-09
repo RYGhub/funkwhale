@@ -21,6 +21,7 @@
       ></app-footer>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
       <filter-modal v-if="$store.state.auth.authenticated"></filter-modal>
+      <report-modal></report-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
       <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
     </template>
@@ -41,6 +42,7 @@ import moment from  'moment'
 import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 import FilterModal from '@/components/moderation/FilterModal'
+import ReportModal from '@/components/moderation/ReportModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
 import SetInstanceModal from '@/components/SetInstanceModal'
 
@@ -50,6 +52,7 @@ export default {
     Sidebar,
     AppFooter,
     FilterModal,
+    ReportModal,
     PlaylistModal,
     ShortcutsModal,
     GlobalEvents,

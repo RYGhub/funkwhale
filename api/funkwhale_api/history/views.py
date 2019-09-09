@@ -19,7 +19,7 @@ class ListeningViewSet(
 ):
 
     serializer_class = serializers.ListeningSerializer
-    queryset = models.Listening.objects.all().select_related("user")
+    queryset = models.Listening.objects.all().select_related("user__actor")
 
     permission_classes = [
         oauth_permissions.ScopePermission,
@@ -47,7 +47,7 @@ class ListeningViewSet(
         )
         tracks = Track.objects.with_playable_uploads(
             music_utils.get_actor_from_request(self.request)
-        ).select_related("artist", "album__artist")
+        ).select_related("artist", "album__artist", "attributed_to")
         return queryset.prefetch_related(Prefetch("track", queryset=tracks))
 
     def get_serializer_context(self):

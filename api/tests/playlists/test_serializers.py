@@ -1,4 +1,6 @@
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.playlists import models, serializers
+from funkwhale_api.users import serializers as users_serializers
 
 
 def test_cannot_max_500_tracks_per_playlist(factories, preferences):
@@ -124,3 +126,25 @@ def test_playlist_serializer_include_duration(factories, api_request):
 
     serializer = serializers.PlaylistSerializer(qs.get())
     assert serializer.data["duration"] == 45
+
+
+def test_playlist_serializer(factories, to_api_date):
+    playlist = factories["playlists.Playlist"]()
+    actor = playlist.user.create_actor()
+
+    expected = {
+        "id": playlist.pk,
+        "name": playlist.name,
+        "privacy_level": playlist.privacy_level,
+        "is_playable": None,
+        "creation_date": to_api_date(playlist.creation_date),
+        "modification_date": to_api_date(playlist.modification_date),
+        "actor": federation_serializers.APIActorSerializer(actor).data,
+        "user": users_serializers.UserBasicSerializer(playlist.user).data,
+        "duration": 0,
+        "tracks_count": 0,
+        "album_covers": [],
+    }
+    serializer = serializers.PlaylistSerializer(playlist)
+
+    assert serializer.data == expected

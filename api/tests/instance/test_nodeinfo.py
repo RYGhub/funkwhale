@@ -8,6 +8,12 @@ from funkwhale_api.music import utils as music_utils
 
 def test_nodeinfo_dump(preferences, mocker):
     preferences["instance__nodeinfo_stats_enabled"] = True
+    preferences["moderation__unauthenticated_report_types"] = [
+        "takedown_request",
+        "other",
+        "other_category_that_doesnt_exist",
+    ]
+
     stats = {
         "users": {"total": 1, "active_halfyear": 12, "active_month": 13},
         "tracks": 2,
@@ -51,6 +57,29 @@ def test_nodeinfo_dump(preferences, mocker):
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
             "allowList": {"enabled": False, "domains": None},
+            "reportTypes": [
+                {
+                    "type": "takedown_request",
+                    "label": "Takedown request",
+                    "anonymous": True,
+                },
+                {
+                    "type": "invalid_metadata",
+                    "label": "Invalid metadata",
+                    "anonymous": False,
+                },
+                {
+                    "type": "illegal_content",
+                    "label": "Illegal content",
+                    "anonymous": False,
+                },
+                {
+                    "type": "offensive_content",
+                    "label": "Offensive content",
+                    "anonymous": False,
+                },
+                {"type": "other", "label": "Other", "anonymous": True},
+            ],
         },
     }
     assert nodeinfo.get() == expected
@@ -58,6 +87,10 @@ def test_nodeinfo_dump(preferences, mocker):
 
 def test_nodeinfo_dump_stats_disabled(preferences, mocker):
     preferences["instance__nodeinfo_stats_enabled"] = False
+    preferences["moderation__unauthenticated_report_types"] = [
+        "takedown_request",
+        "other",
+    ]
 
     expected = {
         "version": "2.0",
@@ -83,6 +116,29 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
             "allowList": {"enabled": False, "domains": None},
+            "reportTypes": [
+                {
+                    "type": "takedown_request",
+                    "label": "Takedown request",
+                    "anonymous": True,
+                },
+                {
+                    "type": "invalid_metadata",
+                    "label": "Invalid metadata",
+                    "anonymous": False,
+                },
+                {
+                    "type": "illegal_content",
+                    "label": "Illegal content",
+                    "anonymous": False,
+                },
+                {
+                    "type": "offensive_content",
+                    "label": "Offensive content",
+                    "anonymous": False,
+                },
+                {"type": "other", "label": "Other", "anonymous": True},
+            ],
         },
     }
     assert nodeinfo.get() == expected

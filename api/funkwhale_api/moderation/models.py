@@ -115,7 +115,7 @@ REPORT_TYPES = [
 class Report(federation_models.FederationMixin):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     creation_date = models.DateTimeField(default=timezone.now)
-    summary = models.TextField(null=True, max_length=50000)
+    summary = models.TextField(null=True, blank=True, max_length=50000)
     handled_date = models.DateTimeField(null=True)
     is_handled = models.BooleanField(default=False)
     type = models.CharField(max_length=40, choices=REPORT_TYPES)

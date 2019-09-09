@@ -27,8 +27,16 @@
         <button v-if="track" class="item basic" :disabled="!playable" @click.stop.prevent="$store.dispatch('radios/start', {type: 'similar', objectId: track.id})" :title="labels.startRadio">
           <i class="feed icon"></i><translate translate-context="*/Queue/Button.Label/Short, Verb">Start radio</translate>
         </button>
+        <div class="divider"></div>
         <button v-if="filterableArtist" class="item basic" :disabled="!filterableArtist" @click.stop.prevent="filterArtist" :title="labels.hideArtist">
           <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
+        </button>
+        <button
+          v-for="obj in getReportableObjs({track, album, artist, playlist, account})"
+          :key="obj.target.type + obj.target.id"
+          class="item basic"
+          @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+          <i class="share icon" /> {{ obj.label }}
         </button>
       </div>
     </div>
@@ -39,11 +47,15 @@
 import axios from 'axios'
 import jQuery from 'jquery'
 
+import ReportMixin from '@/components/mixins/Report'
+
 export default {
+  mixins: [ReportMixin],
   props: {
     // we can either have a single or multiple tracks to play when clicked
     tracks: {type: Array, required: false},
     track: {type: Object, required: false},
+    account: {type: Object, required: false},
     dropdownIconClasses: {type: Array, required: false, default: () => { return ['dropdown'] }},
     playIconClass: {type: String, required: false, default: 'play icon'},
     buttonClasses: {type: Array, required: false, default: () => { return ['button'] }},
@@ -79,7 +91,8 @@ export default {
         addToQueue: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Add to current queue'),
         playNext: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play next'),
         startRadio: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Play similar songs'),
-        replacePlay: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Replace current queue')
+        replacePlay: this.$pgettext('*/Queue/Dropdown/Button/Title', 'Replace current queue'),
+        report: this.$pgettext('*/Moderation/*/Button/Label,Verb', 'Report…'),
       }
     },
     title () {
@@ -118,7 +131,7 @@ export default {
       if (this.artist) {
         return this.artist
       }
-    }
+    },
   },
   methods: {
 

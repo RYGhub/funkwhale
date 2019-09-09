@@ -90,6 +90,15 @@
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
                   <div class="divider"></div>
+                  <div
+                    role="button"
+                    class="basic item"
+                    v-for="obj in getReportableObjs({track})"
+                    :key="obj.target.type + obj.target.id"
+                    @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+                    <i class="share icon" /> {{ obj.label }}
+                  </div>
+                  <div class="divider"></div>
                   <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.tracks.detail', params: {id: track.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
@@ -124,11 +133,13 @@ import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import Modal from '@/components/semantic/Modal'
 import EmbedWizard from "@/components/audio/EmbedWizard"
 import TagsList from "@/components/tags/List"
+import ReportMixin from '@/components/mixins/Report'
 
 const FETCH_URL = "tracks/"
 
 export default {
   props: ["id"],
+  mixins: [ReportMixin],
   components: {
     PlayButton,
     TrackPlaylistIcon,
