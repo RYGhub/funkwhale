@@ -120,6 +120,10 @@
           <div v-if="!obj.target" class="ui warning message">
             <translate translate-context="Content/Moderation/Message">The object associated with this report was deleted.</translate>
           </div>
+          <router-link class="ui basic button" v-if="target && configs[target.type].urls.getDetail" :to="configs[target.type].urls.getDetail(obj.target_state)">
+            <i class="eye icon"></i>
+            <translate translate-context="Content/Moderation/Link">View public page</translate>
+          </router-link>
           <router-link class="ui basic button" v-if="target && configs[target.type].urls.getAdminDetail" :to="configs[target.type].urls.getAdminDetail(obj.target_state)">
             <i class="wrench icon"></i>
             <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
@@ -223,7 +227,7 @@
             </button>
             <template v-for="action in actions">
               <dangerous-button
-                v-if="action.dangerous"
+                v-if="action.dangerous && action.show(obj)"
                 :class="['ui', {loading: isLoading}, 'button']"
                 color=""
                 :action="action.handler">
@@ -352,15 +356,17 @@ export default {
         actions.push({
           label: this.$pgettext('Content/Moderation/Button/Verb', 'Delete reported object'),
           modalHeader: this.$pgettext('Content/Moderation/Popup/Header', 'Delete reported object?'),
-          modalContent: this.$pgettext('Content/Moderation/Popup,Paragraph', 'This will delete the object associated with this report. This action is irreversible.'),
+          modalContent: this.$pgettext('Content/Moderation/Popup,Paragraph', 'This will delete the object associated with this report and mark the report as resolved. The deletion is irreversible.'),
           modalConfirmLabel: this.$pgettext('*/*/*/Verb', 'Delete'),
           icon: 'x',
           iconColor: 'red',
+          show: (obj) => { return !!obj.target },
           dangerous: true,
           handler: () => {
             axios.delete(deleteUrl).then((response) => {
               console.log('Target deleted')
               self.obj.target = null
+              self.resolve(true)
             }, error => {
               console.log('Error while deleting target')
             })
