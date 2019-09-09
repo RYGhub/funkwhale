@@ -19,19 +19,24 @@
         <translate translate-context="*/Moderation/Popup,Paragraph">Use this form to submit a report to our moderation team.</translate>
       </p>
       <form v-if="canSubmit" id="report-form" class="ui form" @submit.prevent="submit">
-        <div v-if="!$store.state.auth.authenticated" class="ui inline required field">
-          <label for="report-submitter-email">
-            <translate translate-context="Content/*/*/Noun">Email</translate>
-          </label>
-          <input type="email" v-model="submitterEmail" name="report-submitter-email" id="report-submitter-email" required>
+        <div class="fields">
+          <report-category-dropdown
+            class="ui required eight wide field"
+            v-model="category"
+            :required="true"
+            :empty="true"
+            :restrict-to="allowedCategories"
+            :label="true"></report-category-dropdown>
+          <div v-if="!$store.state.auth.authenticated" class="ui eight wide required field">
+            <label for="report-submitter-email">
+              <translate translate-context="Content/*/*/Noun">Email</translate>
+            </label>
+            <input type="email" v-model="submitterEmail" name="report-submitter-email" id="report-submitter-email" required>
+            <p>
+              <translate translate-context="*/*/Field,Help">We'll use this email if we need to contact you regarding this report.</translate>
+            </p>
+          </div>
         </div>
-        <report-category-dropdown
-          class="ui inline required field"
-          v-model="category"
-          :required="true"
-          :empty="true"
-          :restrict-to="allowedCategories"
-          :label="true"></report-category-dropdown>
         <div class="ui field">
           <label for="report-summary">
             <translate translate-context="*/*/Field.Label/Noun">Message</translate>
