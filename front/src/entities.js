@@ -15,7 +15,8 @@ export default {
           return `manage/library/artists/${obj.id}/`
         },
         urls: {
-          getAdminDetail: (obj) => { return {name: 'manage.library.artists.detail', params: {id: obj.id}}}
+          getDetail: (obj) => { return {name: 'library.artists.detail', params: {id: obj.id}}},
+          getAdminDetail: (obj) => { return {name: 'manage.library.artists.detail', params: {id: obj.id}}},
         },
         moderatedFields: [
           {
@@ -49,6 +50,7 @@ export default {
           return `manage/library/albums/${obj.id}/`
         },
         urls: {
+          getDetail: (obj) => { return {name: 'library.albums.detail', params: {id: obj.id}}},
           getAdminDetail: (obj) => { return {name: 'manage.library.albums.detail', params: {id: obj.id}}}
         },
         moderatedFields: [
@@ -89,6 +91,7 @@ export default {
           return `manage/library/tracks/${obj.id}/`
         },
         urls: {
+          getDetail: (obj) => { return {name: 'library.tracks.detail', params: {id: obj.id}}},
           getAdminDetail: (obj) => { return {name: 'manage.library.tracks.detail', params: {id: obj.id}}}
         },
         moderatedFields: [
@@ -156,6 +159,7 @@ export default {
         label: this.$pgettext('*/*/*', 'Playlist'),
         icon: 'list',
         urls: {
+          getDetail: (obj) => { return {name: 'library.playlists.detail', params: {id: obj.id}}},
           // getAdminDetail: (obj) => { return {name: 'manage.playlists.detail', params: {id: obj.id}}}
         },
         moderatedFields: [
