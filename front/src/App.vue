@@ -71,7 +71,9 @@ export default {
   created () {
     this.openWebsocket()
     let self = this
-    this.autodetectLanguage()
+    if (!this.$store.state.ui.selectedLanguage) {
+      this.autodetectLanguage()
+    }
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
