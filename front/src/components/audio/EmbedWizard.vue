@@ -50,7 +50,7 @@ export default {
       minHeight: 100,
       copied: false
     }
-    if (this.type === 'album') {
+    if (this.type === 'album' || this.type === 'artist' || this.type === 'playlist') {
       d.height = 330
       d.minHeight = 250
     }

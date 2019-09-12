@@ -11,6 +11,7 @@ from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.playlists import models as playlists_models
 from funkwhale_api.tags.models import Tag
 
 from . import filters, models, tasks
@@ -551,6 +552,38 @@ class OembedSerializer(serializers.Serializer):
             data["height"] = 400
             data["author_url"] = federation_utils.full_url(
                 common_utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
+            )
+        elif match.url_name == "library_playlist":
+            qs = playlists_models.Playlist.objects.filter(
+                pk=int(match.kwargs["pk"]), privacy_level="everyone"
+            )
+            try:
+                obj = qs.get()
+            except playlists_models.Playlist.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No artist matching id {}".format(match.kwargs["pk"])
+                )
+            embed_type = "playlist"
+            embed_id = obj.pk
+            playlist_tracks = obj.playlist_tracks.exclude(track__album__cover="")
+            playlist_tracks = playlist_tracks.exclude(track__album__cover=None)
+            playlist_tracks = playlist_tracks.select_related("track__album").order_by(
+                "index"
+            )
+            first_playlist_track = playlist_tracks.first()
+
+            if first_playlist_track:
+                data["thumbnail_url"] = federation_utils.full_url(
+                    first_playlist_track.track.album.cover.crop["400x400"].url
+                )
+                data["thumbnail_width"] = 400
+                data["thumbnail_height"] = 400
+            data["title"] = obj.name
+            data["description"] = obj.name
+            data["author_name"] = obj.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse("library_playlist", kwargs={"pk": obj.pk})
             )
         else:
             raise serializers.ValidationError(

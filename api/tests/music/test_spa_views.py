@@ -195,3 +195,77 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
 
     # we only test our custom metas, not the default ones
     assert metas[: len(expected_metas)] == expected_metas
+
+
+def test_library_playlist(spa_html, no_api_auth, client, factories, settings):
+    playlist = factories["playlists.Playlist"](privacy_level="everyone")
+    track = factories["music.Upload"](playable=True).track
+    playlist.insert_many([track])
+
+    url = "/library/playlists/{}".format(playlist.pk)
+
+    response = client.get(url)
+
+    expected_metas = [
+        {
+            "tag": "meta",
+            "property": "og:url",
+            "content": utils.join_url(settings.FUNKWHALE_URL, url),
+        },
+        {"tag": "meta", "property": "og:title", "content": playlist.name},
+        {"tag": "meta", "property": "og:type", "content": "music.playlist"},
+        {
+            "tag": "meta",
+            "property": "og:image",
+            "content": utils.join_url(
+                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
+            ),
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/json+oembed",
+            "href": (
+                utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
+                + "?format=json&url={}".format(
+                    urllib.parse.quote_plus(utils.join_url(settings.FUNKWHALE_URL, url))
+                )
+            ),
+        },
+        {"tag": "meta", "property": "twitter:card", "content": "player"},
+        {
+            "tag": "meta",
+            "property": "twitter:player",
+            "content": serializers.get_embed_url("playlist", id=playlist.id),
+        },
+        {"tag": "meta", "property": "twitter:player:width", "content": "600"},
+        {"tag": "meta", "property": "twitter:player:height", "content": "400"},
+    ]
+
+    metas = utils.parse_meta(response.content.decode())
+
+    # we only test our custom metas, not the default ones
+    assert metas[: len(expected_metas)] == expected_metas
+
+
+def test_library_playlist_empty(spa_html, no_api_auth, client, factories, settings):
+    playlist = factories["playlists.Playlist"](privacy_level="everyone")
+
+    url = "/library/playlists/{}".format(playlist.pk)
+
+    response = client.get(url)
+
+    expected_metas = [
+        {
+            "tag": "meta",
+            "property": "og:url",
+            "content": utils.join_url(settings.FUNKWHALE_URL, url),
+        },
+        {"tag": "meta", "property": "og:title", "content": playlist.name},
+        {"tag": "meta", "property": "og:type", "content": "music.playlist"},
+    ]
+
+    metas = utils.parse_meta(response.content.decode())
+
+    # we only test our custom metas, not the default ones
+    assert metas[: len(expected_metas)] == expected_metas

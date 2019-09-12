@@ -832,6 +832,43 @@ def test_oembed_artist(factories, no_api_auth, api_client, settings):
     assert response.data == expected
 
 
+def test_oembed_playlist(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    playlist = factories["playlists.Playlist"](privacy_level="everyone")
+    track = factories["music.Upload"](playable=True).track
+    playlist.insert_many([track])
+    url = reverse("api:v1:oembed")
+    playlist_url = "https://test.com/library/playlists/{}".format(playlist.pk)
+    iframe_src = "http://embed?type=playlist&id={}".format(playlist.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": playlist.name,
+        "description": playlist.name,
+        "thumbnail_url": federation_utils.full_url(
+            track.album.cover.crop["400x400"].url
+        ),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": playlist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_playlist", kwargs={"pk": playlist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": playlist_url, "format": "json"})
+
+    assert response.data == expected
+
+
 @pytest.mark.parametrize(
     "factory_name, url_name",
     [

@@ -139,7 +139,7 @@ export default {
   data () {
     return {
       time,
-      supportedTypes: ['track', 'album', 'artist'],
+      supportedTypes: ['track', 'album', 'artist', 'playlist'],
       baseUrl: '',
       error: null,
       type: null,
@@ -235,6 +235,9 @@ export default {
       if (type === 'artist') {
         this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
       }
+      if (type === 'playlist') {
+        this.fetchTracks({}, `/api/v1/playlists/${id}/tracks/`)
+      }
     },
     play (index) {
       this.currentIndex = index
@@ -269,9 +272,10 @@ export default {
         self.isLoading = false;
       })
     },
-    fetchTracks (filters) {
+    fetchTracks (filters, path) {
+      path = path || "/api/v1/tracks/"
       let self = this
-      let url = `${this.baseUrl}/api/v1/tracks/`
+      let url = `${this.baseUrl}${path}`
       axios.get(url, {params: filters}).then(response => {
         self.tracks = self.parseTracks(response.data.results)
         self.isLoading = false;
@@ -297,6 +301,11 @@ export default {
     },
     parseTracks (tracks) {
       let self = this
+      if (this.type === 'playlist') {
+        tracks = tracks.map((t) => {
+          return t.track
+        })
+      }
       return tracks.map(t => {
         return {
           id: t.id,
