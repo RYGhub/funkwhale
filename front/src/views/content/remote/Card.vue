@@ -3,17 +3,30 @@
     <div class="content">
       <div class="header">
         {{ library.name }}
+        <div class="ui right floated dropdown">
+          <i class="ellipsis vertical grey large icon nomargin"></i>
+          <div class="menu">
+            <div
+              role="button"
+              v-for="obj in getReportableObjs({library, account: library.actor})"
+              :key="obj.target.type + obj.target.id"
+              class="item basic"
+              @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+              <i class="share icon" /> {{ obj.label }}
+            </div>
+          </div>
+        </div>
         <span
           v-if="library.privacy_level === 'me'"
           class="right floated"
           :data-tooltip="labels.tooltips.me">
-          <i class="small lock icon"></i>
+          <i class="small lock grey icon"></i>
         </span>
         <span
           v-else-if="library.privacy_level === 'everyone'"
           class="right floated"
           :data-tooltip="labels.tooltips.everyone">
-          <i class="small globe icon"></i>
+          <i class="small globe grey icon"></i>
         </span>
       </div>
       <div class="meta">
@@ -120,8 +133,11 @@
 </template>
 <script>
 import axios from 'axios'
+import ReportMixin from '@/components/mixins/Report'
+import jQuery from 'jquery'
 
 export default {
+  mixins: [ReportMixin],
   props: {
     library: {type: Object, required: true},
     displayFollow: {type: Boolean, default: true},
@@ -135,6 +151,18 @@ export default {
       scanTimeout: null,
       latestScan: this.library.latest_scan,
     }
+  },
+  mounted () {
+    let self = this
+    jQuery(this.$el).find('.ui.dropdown').dropdown({
+      selectOnKeydown: false,
+      action: function (text, value, $el) {
+        // used ton ensure focusing the dropdown and clicking via keyboard
+        // works as expected
+        self.$refs[$el.data('ref')].click()
+        jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+      }
+    })
   },
   computed: {
     labels () {
