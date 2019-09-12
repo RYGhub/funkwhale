@@ -5,6 +5,7 @@ export default {
   namespaced: true,
   state: {
     currentLanguage: 'en_US',
+    selectedLanguage: false,
     momentLocale: 'en',
     lastDate: new Date(),
     maxMessages: 100,
@@ -33,6 +34,7 @@ export default {
     },
     currentLanguage: (state, value) => {
       state.currentLanguage = value
+      state.selectedLanguage = true
     },
     momentLocale: (state, value) => {
       state.momentLocale = value
