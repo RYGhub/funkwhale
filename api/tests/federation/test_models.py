@@ -124,6 +124,7 @@ def test_actor_stats(factories):
         "albums": 0,
         "uploads": 0,
         "artists": 0,
+        "reports": 0,
         "outbox_activities": 0,
         "received_library_follows": 0,
         "emitted_library_follows": 0,

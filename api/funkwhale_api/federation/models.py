@@ -248,6 +248,7 @@ class Actor(models.Model):
 
     def get_stats(self):
         from funkwhale_api.music import models as music_models
+        from funkwhale_api.moderation import models as moderation_models
 
         data = Actor.objects.filter(pk=self.pk).aggregate(
             outbox_activities=models.Count("outbox_activities", distinct=True),
@@ -260,6 +261,7 @@ class Actor(models.Model):
         data["artists"] = music_models.Artist.objects.filter(
             from_activity__actor=self.pk
         ).count()
+        data["reports"] = moderation_models.Report.objects.get_for_target(self).count()
         data["albums"] = music_models.Album.objects.filter(
             from_activity__actor=self.pk
         ).count()

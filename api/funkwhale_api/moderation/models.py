@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
+from funkwhale_api.common import models as common_models
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
 
@@ -151,6 +152,8 @@ class Report(federation_models.FederationMixin):
     notes = GenericRelation(
         "Note", content_type_field="target_content_type", object_id_field="target_id"
     )
+
+    objects = common_models.GenericTargetQuerySet.as_manager()
 
     def get_federation_id(self):
         if self.fid:

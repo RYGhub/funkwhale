@@ -41,6 +41,7 @@ def get_stats(tracks, target):
     ).count()
     data["libraries"] = uploads.values_list("library", flat=True).distinct().count()
     data["uploads"] = uploads.count()
+    data["reports"] = moderation_models.Report.objects.get_for_target(target).count()
     data.update(get_media_stats(uploads))
     return data
 
@@ -248,6 +249,7 @@ class ManageLibraryViewSet(
             "tracks": tracks.count(),
             "albums": albums.count(),
             "artists": len(artists),
+            "reports": moderation_models.Report.objects.get_for_target(library).count(),
         }
         data.update(get_media_stats(uploads.all()))
         return response.Response(data, status=200)
