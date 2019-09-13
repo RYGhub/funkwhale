@@ -176,11 +176,12 @@ def test_creating_actor_from_user(factories, settings):
 
 
 def test_get_channels_groups(factories):
-    user = factories["users.User"]()
+    user = factories["users.User"](permission_library=True)
 
     assert user.get_channels_groups() == [
         "user.{}.imports".format(user.pk),
         "user.{}.inbox".format(user.pk),
+        "admin.library",
     ]
 
 

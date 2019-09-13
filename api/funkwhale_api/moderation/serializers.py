@@ -14,6 +14,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.playlists import models as playlists_models
 
 from . import models
+from . import tasks
 
 
 class FilteredArtistSerializer(serializers.ModelSerializer):
@@ -257,4 +258,6 @@ class ReportSerializer(serializers.ModelSerializer):
             == settings.FEDERATION_HOSTNAME
         )
         validated_data["target_owner"] = get_target_owner(validated_data["target"])
-        return super().create(validated_data)
+        r = super().create(validated_data)
+        tasks.signals.report_created.send(sender=None, report=r)
+        return r

@@ -22,6 +22,7 @@ export default {
       'import.status_updated': {},
       'mutation.created': {},
       'mutation.updated': {},
+      'report.created': {},
     },
     pageTitle: null
   },

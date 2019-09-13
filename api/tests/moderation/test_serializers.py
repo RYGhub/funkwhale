@@ -7,6 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.moderation import serializers
+from funkwhale_api.moderation import signals
 
 
 def test_user_filter_serializer_repr(factories):
@@ -225,3 +226,32 @@ def test_report_serializer_save_unauthenticated_validation(
     payload["target"] = target_data
     serializer = serializers.ReportSerializer(data=payload, context=context)
     assert serializer.is_valid() is is_valid
+
+
+def test_report_create_send_websocket_event(factories, mocker):
+    target = factories["music.Artist"]()
+    group_send = mocker.patch("funkwhale_api.common.channels.group_send")
+    report_created = mocker.spy(signals.report_created, "send")
+    payload = {
+        "summary": "Report content",
+        "type": "illegal_content",
+        "target": {"type": "artist", "id": target.pk},
+        "submitter_email": "test@submitter.example",
+    }
+    serializer = serializers.ReportSerializer(data=payload)
+
+    assert serializer.is_valid(raise_exception=True) is True
+    report = serializer.save()
+    report_created.assert_called_once_with(sender=None, report=report)
+    group_send.assert_called_with(
+        "admin.moderation",
+        {
+            "type": "event.send",
+            "text": "",
+            "data": {
+                "type": "report.created",
+                "report": serializer.data,
+                "unresolved_count": 1,
+            },
+        },
+    )

@@ -107,6 +107,11 @@ export default {
       id: 'sidebarReviewEditCount',
       handler: this.incrementReviewEditCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'report.created',
+      id: 'sidebarPendingReviewReportCount',
+      handler: this.incrementPendingReviewReportsCountInSidebar
+    })
   },
   mounted () {
     let self = this
@@ -133,6 +138,10 @@ export default {
       eventName: 'mutation.updated',
       id: 'sidebarReviewEditCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarPendingReviewReportCount',
+    })
     this.disconnect()
   },
   methods: {
@@ -141,6 +150,10 @@ export default {
     },
     incrementReviewEditCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewEdits', value: event.pending_review_count})
+    },
+    incrementPendingReviewReportsCountInSidebar (event) {
+      console.log('HELLO', event)
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: event.unresolved_count})
     },
     fetchNodeInfo () {
       let self = this

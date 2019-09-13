@@ -232,8 +232,13 @@ class User(AbstractUser):
 
     def get_channels_groups(self):
         groups = ["imports", "inbox"]
+        groups = ["user.{}.{}".format(self.pk, g) for g in groups]
 
-        return ["user.{}.{}".format(self.pk, g) for g in groups]
+        for permission, value in self.all_permissions.items():
+            if value:
+                groups.append("admin.{}".format(permission))
+
+        return groups
 
     def full_username(self):
         return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
