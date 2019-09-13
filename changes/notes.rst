@@ -32,6 +32,22 @@ Tags are used in various places to enhance user experience:
 If you are a pod admin and want to extract tags from already uploaded content, you run `this snippet <https://dev.funkwhale.audio/funkwhale/funkwhale/snippets/43>`_
 and `this snippet <https://dev.funkwhale.audio/funkwhale/funkwhale/snippets/44>`_ in a ``python manage.py shell``.
 
+Content and account reports
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is now possible to report content, such as artists, tracks or libraries, as well as user accounts. Such reports are forwarded to the pod moderators,
+who can review it and delete reported content, block accounts or take any other action they deem necessary.
+
+By default, both anonymous and authenticated users can submit these reports. This makes sure moderators can receive and handle
+takedown requests and other reports for illegal content that may be sent by third-parties without an account on the pod. However,
+you can disable anonymous reports completely via your pod settings.
+
+Federation of the reports will be supported in a future release.
+
+For more information about this feature, please check out our documentation:
+
+-  `User documentation <https://docs.funkwhale.audio/moderator/reports.html>`_
+-  `Moderator documentation <https://docs.funkwhale.audio/users/reports.html>`_
 
 
 Allow-list to restrict federation to trusted domains
@@ -79,11 +95,11 @@ To improve the security and reduce the attack surface in case of a successfull e
 you add the following Content-Security-Policy to your nginx configuration.
 
 ..note::
-    
+
     If you are using an S3-compatible store to serve music, you will need to specify the URL of your S3 store in the ``media-src`` and ``img-src`` headers
 
     .. code-block::
-    
+
         add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
 
 **On non-docker setups**, in ``/etc/nginx/sites-available/funkwhale.conf``::

@@ -28,6 +28,7 @@ Using Funkwhale
    radios
    follow
    apps
+   reports
 
 Troubleshooting Issues
 ----------------------
