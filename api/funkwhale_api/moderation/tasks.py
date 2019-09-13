@@ -53,10 +53,11 @@ def send_new_report_email_to_moderators(report):
         # we fallback on superusers
         moderators = users_models.User.objects.filter(is_superuser=True)
     moderators = sorted(moderators, key=lambda m: m.pk)
+    submitter_repr = (
+        report.submitter.full_username if report.submitter else report.submitter_email
+    )
     subject = "[{} moderation - {}] New report from {}".format(
-        settings.FUNKWHALE_HOSTNAME,
-        report.get_type_display(),
-        report.submitter.full_username if report.submitter else report.submitter_email,
+        settings.FUNKWHALE_HOSTNAME, report.get_type_display(), submitter_repr
     )
     detail_url = federation_utils.full_url(
         "/manage/moderation/reports/{}".format(report.uuid)
@@ -67,10 +68,7 @@ def send_new_report_email_to_moderators(report):
     unresolved_reports = models.Report.objects.filter(is_handled=False).count()
     body = [
         '{} just submitted a report in the "{}" category.'.format(
-            report.submitter.full_username
-            if report.submitter
-            else report.submitter_email,
-            report.get_type_display(),
+            submitter_repr, report.get_type_display()
         ),
         "",
         "Reported object: {} - {}".format(
