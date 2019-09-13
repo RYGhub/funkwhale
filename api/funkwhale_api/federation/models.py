@@ -204,6 +204,10 @@ class Actor(models.Model):
 
     class Meta:
         unique_together = ["domain", "preferred_username"]
+        verbose_name = "Account"
+
+    def get_moderation_url(self):
+        return "/manage/moderation/accounts/{}".format(self.full_username)
 
     @property
     def webfinger_subject(self):

@@ -217,6 +217,12 @@ class Artist(APIModelMixin):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return "/library/artists/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/artists/{}".format(self.pk)
+
     @classmethod
     def get_or_create_from_name(cls, name, **kwargs):
         kwargs.update({"name": name})
@@ -356,6 +362,12 @@ class Album(APIModelMixin):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return "/library/albums/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/albums/{}".format(self.pk)
+
     @property
     def cover_path(self):
         if not self.cover:
@@ -487,6 +499,12 @@ class Track(APIModelMixin):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return "/library/tracks/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/tracks/{}".format(self.pk)
 
     def save(self, **kwargs):
         try:
@@ -1050,6 +1068,12 @@ class Library(federation_models.FederationMixin):
     )
     uploads_count = models.PositiveIntegerField(default=0)
     objects = LibraryQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
+
+    def get_moderation_url(self):
+        return "/manage/library/libraries/{}".format(self.uuid)
 
     def get_federation_id(self):
         return federation_utils.full_url(

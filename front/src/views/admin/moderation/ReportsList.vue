@@ -135,7 +135,10 @@ export default {
       axios.get('manage/moderation/reports/', {params: params}).then((response) => {
         self.result = response.data
         self.isLoading = false
-        // self.fetchTargets()
+        if (self.search.query === 'resolved:no') {
+          console.log('Refreshing sidebar notifications')
+          self.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: response.data.count})
+        }
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

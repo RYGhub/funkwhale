@@ -69,6 +69,9 @@ class Playlist(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return "/library/playlists/{}".format(self.pk)
+
     @transaction.atomic
     def insert(self, plt, index=None, allow_duplicates=True):
         """
