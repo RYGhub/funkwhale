@@ -264,6 +264,16 @@
                       {{ stats.emitted_library_follows}}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.moderation.reports.list', query: {q: getQuery('target', `account:${object.full_username}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Linked reports</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.reports }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </section>

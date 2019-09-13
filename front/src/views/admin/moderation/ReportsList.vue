@@ -57,6 +57,15 @@
       <div v-else-if="mode === 'card'">
         <report-card @handled="fetchData" :obj="obj" v-for="obj in result.results" :key="obj.uuid" />
       </div>
+      <div class="ui center aligned basic segment">
+        <pagination
+          v-if="result && result.count > paginateBy"
+          @page-changed="selectPage"
+          :current="page"
+          :paginate-by="paginateBy"
+          :total="result.count"
+          ></pagination>
+      </div>
     </section>
   </main>
 </template>

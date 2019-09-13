@@ -173,6 +173,16 @@
                   </tr>
                   <tr>
                     <td>
+                      <router-link :to="{name: 'manage.moderation.reports.list', query: {q: getQuery('target', `artist:${object.id}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Linked reports</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.reports }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <router-link :to="{name: 'manage.library.edits', query: {q: getQuery('target', 'artist ' + object.id)}}">
                         <translate translate-context="*/Admin/*/Noun">Edits</translate>
                       </router-link>
