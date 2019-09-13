@@ -17,6 +17,8 @@ def test_report_created_signal_sends_email_to_mods(factories, mailoutbox, settin
     mod2 = factories["users.User"](permission_moderation=True)
     # inactive, so no email
     factories["users.User"](permission_moderation=True, is_active=False)
+    # no moderation permission, so no email
+    factories["users.User"]()
 
     report = factories["moderation.Report"]()
 
@@ -28,6 +30,7 @@ def test_report_created_signal_sends_email_to_mods(factories, mailoutbox, settin
     unresolved_reports_url = federation_utils.full_url(
         "/manage/moderation/reports?q=resolved:no"
     )
+    assert len(mailoutbox) == 2
     for i, mod in enumerate([mod1, mod2]):
         m = mailoutbox[i]
         assert m.subject == "[{} moderation - {}] New report from {}".format(
