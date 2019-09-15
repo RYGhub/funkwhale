@@ -1,3 +1,5 @@
+import pytest
+
 from django.urls import reverse
 
 from funkwhale_api.music.serializers import TrackSerializer
@@ -129,3 +131,16 @@ def test_clean_config_is_called_on_serializer_save(mocker, factories):
     instance = serializer.save(user=user)
     spied.assert_called_once_with(data["config"][0])
     assert instance.config[0]["names"] == [artist.name]
+
+
+@pytest.mark.parametrize("radio_type", ["random", "less-listened", "favorites"])
+def test_create_radio_session(radio_type, logged_in_api_client):
+
+    url = reverse("api:v1:radios:sessions-list")
+    response = logged_in_api_client.post(url, {"radio_type": radio_type})
+
+    assert response.status_code == 201
+    assert response.data["radio_type"] == radio_type
+    assert (
+        response.data["id"] == logged_in_api_client.user.radio_sessions.latest("id").pk
+    )
