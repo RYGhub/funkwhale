@@ -135,15 +135,18 @@ export default {
   },
   methods: {
     updateQueryString: _.debounce(function() {
-      this.$router.replace({
-        query: {
+      history.pushState(
+        {},
+        null,
+        this.$route.path + '?' + new URLSearchParams(
+          {
           query: this.query,
           page: this.page,
           tag: this.tags,
           paginateBy: this.paginateBy,
           ordering: this.getOrderingAsString()
-        }
-      })
+        }).toString()
+      )
     }, 500),
     fetchData: _.debounce(function() {
       var self = this
