@@ -110,7 +110,7 @@ export default {
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      tags: this.defaultTags.filter((t) => { return t.length > 0 }) || [],
+      tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
       paginateBy: parseInt(this.defaultPaginateBy || 25),
       orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
