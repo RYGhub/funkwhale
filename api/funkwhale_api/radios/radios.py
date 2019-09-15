@@ -8,7 +8,6 @@ from rest_framework import serializers
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music.models import Artist, Track
 from funkwhale_api.tags.models import Tag
-from funkwhale_api.users.models import User
 
 from . import filters, models
 from .registries import registry
@@ -263,9 +262,7 @@ class ArtistRadio(RelatedObjectRadio):
 
 
 @registry.register(name="less-listened")
-class LessListenedRadio(RelatedObjectRadio):
-    model = User
-
+class LessListenedRadio(SessionRadio):
     def clean(self, instance):
         instance.related_object = instance.user
         super().clean(instance)
