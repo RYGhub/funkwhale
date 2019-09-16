@@ -14,6 +14,11 @@ def get(pref):
     return manager[pref]
 
 
+def all():
+    manager = global_preferences_registry.manager()
+    return manager.all()
+
+
 def set(pref, value):
     manager = global_preferences_registry.manager()
     manager[pref] = value
