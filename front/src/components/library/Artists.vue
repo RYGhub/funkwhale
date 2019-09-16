@@ -98,7 +98,7 @@ export default {
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      tags: this.defaultTags.filter((t) => { return t.length > 0 }) || [],
+      tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
       paginateBy: parseInt(this.defaultPaginateBy || 30),
       orderingDirection: defaultOrdering.direction || "+",
       ordering: defaultOrdering.field,
@@ -123,15 +123,18 @@ export default {
   },
   methods: {
     updateQueryString: _.debounce(function() {
-      this.$router.replace({
-        query: {
+      history.pushState(
+        {},
+        null,
+        this.$route.path + '?' + new URLSearchParams(
+          {
           query: this.query,
           page: this.page,
           tag: this.tags,
           paginateBy: this.paginateBy,
           ordering: this.getOrderingAsString()
-        }
-      })
+        }).toString()
+      )
     }, 500),
     fetchData: _.debounce(function() {
       var self = this
