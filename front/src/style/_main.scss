@@ -84,7 +84,7 @@ $widedesktop-sidebar-width: 350px;
 
 html,
 body {
-  @include media("<desktop") {
+  @include media("<=desktop") {
     font-size: 90%;
   }
 }

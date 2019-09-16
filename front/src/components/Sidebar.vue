@@ -342,7 +342,7 @@ $sidebar-color: #3d3e3f;
       display: none !important;
     }
   }
-  @include media("<desktop") {
+  @include media("<=desktop") {
     position: static !important;
     width: 100% !important;
     &.collapsed {
@@ -397,7 +397,7 @@ $sidebar-color: #3d3e3f;
   flex-direction: column;
   overflow-y: auto;
   justify-content: space-between;
-  @include media("<desktop") {
+  @include media("<=desktop") {
     max-height: 500px;
   }
 }
