@@ -94,7 +94,8 @@ export default {
           settings: [
             "instance__name",
             "instance__short_description",
-            "instance__long_description"
+            "instance__long_description",
+            "instance__terms",
           ]
         },
         {

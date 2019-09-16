@@ -38,6 +38,7 @@ def test_nodeinfo_dump(preferences, mocker):
             "shortDescription": preferences["instance__short_description"],
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
+            "terms": preferences["instance__terms"],
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[
@@ -105,6 +106,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "shortDescription": preferences["instance__short_description"],
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
+            "terms": preferences["instance__terms"],
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[

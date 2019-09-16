@@ -13,10 +13,11 @@ memo = memoize.Memoizer(store, namespace="instance:stats")
 
 
 def get():
-    share_stats = preferences.get("instance__nodeinfo_stats_enabled")
-    allow_list_enabled = preferences.get("moderation__allow_list_enabled")
-    allow_list_public = preferences.get("moderation__allow_list_public")
-    unauthenticated_report_types = preferences.get(
+    all_preferences = preferences.all()
+    share_stats = all_preferences.get("instance__nodeinfo_stats_enabled")
+    allow_list_enabled = all_preferences.get("moderation__allow_list_enabled")
+    allow_list_public = all_preferences.get("moderation__allow_list_public")
+    unauthenticated_report_types = all_preferences.get(
         "moderation__unauthenticated_report_types"
     )
     if allow_list_enabled and allow_list_public:
@@ -32,20 +33,21 @@ def get():
         "software": {"name": "funkwhale", "version": funkwhale_api.__version__},
         "protocols": ["activitypub"],
         "services": {"inbound": [], "outbound": []},
-        "openRegistrations": preferences.get("users__registration_enabled"),
+        "openRegistrations": all_preferences.get("users__registration_enabled"),
         "usage": {"users": {"total": 0, "activeHalfyear": 0, "activeMonth": 0}},
         "metadata": {
             "actorId": actors.get_service_actor().fid,
-            "private": preferences.get("instance__nodeinfo_private"),
-            "shortDescription": preferences.get("instance__short_description"),
-            "longDescription": preferences.get("instance__long_description"),
-            "nodeName": preferences.get("instance__name"),
+            "private": all_preferences.get("instance__nodeinfo_private"),
+            "shortDescription": all_preferences.get("instance__short_description"),
+            "longDescription": all_preferences.get("instance__long_description"),
+            "terms": all_preferences.get("instance__terms"),
+            "nodeName": all_preferences.get("instance__name"),
             "library": {
-                "federationEnabled": preferences.get("federation__enabled"),
-                "federationNeedsApproval": preferences.get(
+                "federationEnabled": all_preferences.get("federation__enabled"),
+                "federationNeedsApproval": all_preferences.get(
                     "federation__music_needs_approval"
                 ),
-                "anonymousCanListen": not preferences.get(
+                "anonymousCanListen": not all_preferences.get(
                     "common__api_authentication_required"
                 ),
             },

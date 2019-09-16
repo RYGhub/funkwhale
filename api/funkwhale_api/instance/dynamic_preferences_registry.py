@@ -44,6 +44,20 @@ class InstanceLongDescription(types.StringPreference):
 
 
 @global_preferences_registry.register
+class InstanceTerms(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = "terms"
+    verbose_name = "Terms of service"
+    default = ""
+    help_text = (
+        "Terms of service and privacy policy for your instance (markdown allowed)."
+    )
+    widget = widgets.Textarea
+    field_kwargs = {"required": False}
+
+
+@global_preferences_registry.register
 class RavenDSN(types.StringPreference):
     show_in_api = True
     section = raven
