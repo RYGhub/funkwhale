@@ -40,6 +40,7 @@ def get():
             "private": all_preferences.get("instance__nodeinfo_private"),
             "shortDescription": all_preferences.get("instance__short_description"),
             "longDescription": all_preferences.get("instance__long_description"),
+            "terms": all_preferences.get("instance__terms"),
             "nodeName": all_preferences.get("instance__name"),
             "library": {
                 "federationEnabled": all_preferences.get("federation__enabled"),
