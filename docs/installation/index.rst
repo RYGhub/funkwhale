@@ -279,6 +279,12 @@ You'll also need the following dependencies::
 
    sudo apt-get install libapache2-mod-xsendfile
 
+Add the following to your ``.env`` file::
+
+    REVERSE_PROXY_TYPE=apache2
+
+Then restart Funkwhale. This is needed to ensure Funkwhale provide proper headers for media file serving.
+
 Then, download our sample virtualhost file:
 
 .. parsed-literal::
