@@ -18,7 +18,8 @@ plugins.push(
       path.join(__dirname, './public/embed.html'),
       path.join(__dirname, './**/*.vue'),
       path.join(__dirname, './src/**/*.js')
-    ])
+    ]),
+    whitelist: ['scale']
   }),
 )
 module.exports = {
