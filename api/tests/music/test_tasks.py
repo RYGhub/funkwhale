@@ -843,3 +843,34 @@ def test_update_library_entity(factories, mocker):
 
     artist.refresh_from_db()
     assert artist.name == "Hello"
+
+
+@pytest.mark.parametrize(
+    "name, ext, mimetype",
+    [
+        ("cover", "png", "image/png"),
+        ("cover", "jpg", "image/jpeg"),
+        ("cover", "jpeg", "image/jpeg"),
+        ("folder", "png", "image/png"),
+        ("folder", "jpg", "image/jpeg"),
+        ("folder", "jpeg", "image/jpeg"),
+    ],
+)
+def test_get_cover_from_fs(name, ext, mimetype, tmpdir):
+    cover_path = os.path.join(tmpdir, "{}.{}".format(name, ext))
+    content = "Hello"
+    with open(cover_path, "w") as f:
+        f.write(content)
+
+    expected = {"mimetype": mimetype, "content": content.encode()}
+    assert tasks.get_cover_from_fs(tmpdir) == expected
+
+
+@pytest.mark.parametrize("name", ["cover.gif", "folder.gif"])
+def test_get_cover_from_fs_ignored(name, tmpdir):
+    cover_path = os.path.join(tmpdir, name)
+    content = "Hello"
+    with open(cover_path, "w") as f:
+        f.write(content)
+
+    assert tasks.get_cover_from_fs(tmpdir) is None

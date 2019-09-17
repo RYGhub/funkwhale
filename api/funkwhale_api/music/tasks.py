@@ -55,19 +55,21 @@ def update_album_cover(
             )
 
 
-IMAGE_TYPES = [("jpg", "image/jpeg"), ("png", "image/png")]
+IMAGE_TYPES = [("jpg", "image/jpeg"), ("jpeg", "image/jpeg"), ("png", "image/png")]
+FOLDER_IMAGE_NAMES = ["cover", "folder"]
 
 
 def get_cover_from_fs(dir_path):
     if os.path.exists(dir_path):
-        for e, m in IMAGE_TYPES:
-            cover_path = os.path.join(dir_path, "cover.{}".format(e))
-            if not os.path.exists(cover_path):
-                logger.debug("Cover %s does not exists", cover_path)
-                continue
-            with open(cover_path, "rb") as c:
-                logger.info("Found cover at %s", cover_path)
-                return {"mimetype": m, "content": c.read()}
+        for name in FOLDER_IMAGE_NAMES:
+            for e, m in IMAGE_TYPES:
+                cover_path = os.path.join(dir_path, "{}.{}".format(name, e))
+                if not os.path.exists(cover_path):
+                    logger.debug("Cover %s does not exists", cover_path)
+                    continue
+                with open(cover_path, "rb") as c:
+                    logger.info("Found cover at %s", cover_path)
+                    return {"mimetype": m, "content": c.read()}
 
 
 @celery.app.task(name="music.start_library_scan")
