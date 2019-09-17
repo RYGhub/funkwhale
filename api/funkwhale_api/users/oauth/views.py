@@ -10,6 +10,8 @@ from oauth2_provider import exceptions as oauth2_exceptions
 from oauth2_provider import views as oauth_views
 from oauth2_provider.settings import oauth2_settings
 
+from funkwhale_api.common import throttling
+
 from .. import models
 from .permissions import ScopePermission
 from . import serializers
@@ -35,6 +37,12 @@ class ApplicationViewSet(
     lookup_field = "client_id"
     queryset = models.Application.objects.all().order_by("-created")
     serializer_class = serializers.ApplicationSerializer
+    throttling_scopes = {
+        "create": {
+            "anonymous": "anonymous-oauth-app",
+            "authenticated": "authenticated-oauth-app",
+        }
+    }
 
     def get_serializer_class(self):
         if self.request.method.lower() == "post":
@@ -141,6 +149,10 @@ class AuthorizeView(views.APIView, oauth_views.AuthorizationView):
 
         return self.json_payload(errors, status_code=400)
 
+    def post(self, request, *args, **kwargs):
+        throttling.check_request(request, "oauth-authorize")
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
         try:
             response = super().form_valid(form)
@@ -175,8 +187,12 @@ class AuthorizeView(views.APIView, oauth_views.AuthorizationView):
 
 
 class TokenView(oauth_views.TokenView):
-    pass
+    def post(self, request, *args, **kwargs):
+        throttling.check_request(request, "oauth-token")
+        return super().post(request, *args, **kwargs)
 
 
 class RevokeTokenView(oauth_views.RevokeTokenView):
-    pass
+    def post(self, request, *args, **kwargs):
+        throttling.check_request(request, "oauth-revoke-token")
+        return super().post(request, *args, **kwargs)

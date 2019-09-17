@@ -49,6 +49,12 @@ class ReportsViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     ordering_fields = ("creation_date",)
     anonymous_policy = "setting"
     anonymous_scopes = {"write:reports"}
+    throttling_scopes = {
+        "create": {
+            "anonymous": "anonymous-reports",
+            "authenticated": "authenticated-reports",
+        }
+    }
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

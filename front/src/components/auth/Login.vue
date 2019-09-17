@@ -8,7 +8,7 @@
             <div class="header"><translate translate-context="Content/Login/Error message.Title">We cannot log you in</translate></div>
             <ul class="list">
               <li v-if="error == 'invalid_credentials'"><translate translate-context="Content/Login/Error message.List item/Call to action">Please double-check your username/password couple is correct</translate></li>
-              <li v-else><translate translate-context="Content/Login/Error message/List item">An unknown error occurred, this can mean the server is down or cannot be reached</translate></li>
+              <li v-else>{{ error }}</li>
             </ul>
           </div>
           <div class="field">
@@ -105,7 +105,7 @@ export default {
             if (error.response.status === 400) {
               self.error = "invalid_credentials"
             } else {
-              self.error = "unknown_error"
+              self.error = error.backendErrors[0]
             }
           }
         })
