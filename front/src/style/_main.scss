@@ -184,7 +184,7 @@ body {
   }
 }
 
-.ellipsis {
+.ellipsis:not(.icon) {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -250,6 +250,9 @@ a {
   display: none;
 }
 
+.nomargin {
+  margin: 0 !important;
+}
 button.reset {
   border: none;
   margin: 0;

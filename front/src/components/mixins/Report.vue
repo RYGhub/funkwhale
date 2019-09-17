@@ -1,7 +1,7 @@
 <script>
 export default {
   methods: {
-    getReportableObjs ({track, album, artist, playlist, account}) {
+    getReportableObjs ({track, album, artist, playlist, account, library}) {
       let reportableObjs = []
       if (account) {
         let accountLabel = this.$pgettext('*/Moderation/*/Verb', "Report @%{ username }…")
@@ -57,14 +57,25 @@ export default {
           }
         })
       }
-      if (this.playlist) {
+      if (playlist) {
         reportableObjs.push({
           label: this.$pgettext('*/Moderation/*/Verb', "Report this playlist…"),
           target: {
             type: 'playlist',
-            id: this.playlist.id,
-            label: this.playlist.name,
+            id: playlist.id,
+            label: playlist.name,
             typeLabel: this.$pgettext("*/*/*", 'Playlist'),
+          }
+        })
+      }
+      if (library) {
+        reportableObjs.push({
+          label: this.$pgettext('*/Moderation/*/Verb', "Report this library…"),
+          target: {
+            type: 'library',
+            uuid: library.uuid,
+            label: library.name,
+            typeLabel: this.$pgettext("*/*/*", 'Library'),
           }
         })
       }
