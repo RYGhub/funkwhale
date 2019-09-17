@@ -3,6 +3,7 @@ import memoize.djangocache
 import funkwhale_api
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import actors, models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import utils as music_utils
 
@@ -17,6 +18,7 @@ def get():
     share_stats = all_preferences.get("instance__nodeinfo_stats_enabled")
     allow_list_enabled = all_preferences.get("moderation__allow_list_enabled")
     allow_list_public = all_preferences.get("moderation__allow_list_public")
+    banner = all_preferences.get("instance__banner")
     unauthenticated_report_types = all_preferences.get(
         "moderation__unauthenticated_report_types"
     )
@@ -42,6 +44,7 @@ def get():
             "longDescription": all_preferences.get("instance__long_description"),
             "terms": all_preferences.get("instance__terms"),
             "nodeName": all_preferences.get("instance__name"),
+            "banner": federation_utils.full_url(banner.url) if banner else None,
             "library": {
                 "federationEnabled": all_preferences.get("federation__enabled"),
                 "federationNeedsApproval": all_preferences.get(
@@ -59,6 +62,7 @@ def get():
             ],
         },
     }
+
     if share_stats:
         getter = memo(lambda: stats.get(), max_age=600)
         statistics = getter()

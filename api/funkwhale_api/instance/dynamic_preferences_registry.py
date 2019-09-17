@@ -1,4 +1,6 @@
 from django.forms import widgets
+from django.core.validators import FileExtensionValidator
+
 from dynamic_preferences import types
 from dynamic_preferences.registries import global_preferences_registry
 
@@ -128,4 +130,28 @@ class CustomCSS(types.StringPreference):
         "of the app and the privacy of your users."
     )
     widget = widgets.Textarea
+    field_kwargs = {"required": False}
+
+
+class ImageWidget(widgets.ClearableFileInput):
+    pass
+
+
+class ImagePreference(types.FilePreference):
+    widget = ImageWidget
+    field_kwargs = {
+        "validators": [
+            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "webp"])
+        ]
+    }
+
+
+@global_preferences_registry.register
+class Banner(ImagePreference):
+    show_in_api = True
+    section = instance
+    name = "banner"
+    verbose_name = "Banner image"
+    default = None
+    help_text = "This banner will be displayed on your pod's landing and about page. At least 600x100px recommended."
     field_kwargs = {"required": False}

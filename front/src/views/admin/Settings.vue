@@ -96,6 +96,7 @@ export default {
             "instance__short_description",
             "instance__long_description",
             "instance__terms",
+            "instance__banner",
           ]
         },
         {

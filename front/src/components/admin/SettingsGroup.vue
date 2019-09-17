@@ -61,6 +61,14 @@
         class="ui search selection dropdown">
         <option v-for="v in setting.additional_data.choices" :value="v[0]">{{ v[1] }}</option>
       </select>
+      <div v-else-if="setting.field.widget.class === 'ImageWidget'">
+        <input type="file" :ref="setting.identifier">
+        <div v-if="values[setting.identifier]">
+          <div class="ui hidden divider"></div>
+          <h3 class="ui header"><translate translate-context="Content/Settings/Title/Noun">Current image</translate></h3>
+          <img class="ui image" v-if="values[setting.identifier]" :src="$store.getters['instance/absoluteUrl'](values[setting.identifier])" />
+        </div>
+      </div>
     </div>
     <button
       type="submit"
@@ -98,8 +106,34 @@ export default {
       this.isLoading = true
       self.errors = []
       self.result = null
-      axios.post('instance/admin/settings/bulk/', self.values).then((response) => {
+      let postData = self.values
+      let contentType = 'application/json'
+      let fileSettingsIDs = this.fileSettings.map((s) => {return s.identifier})
+      if (fileSettingsIDs.length > 0) {
+        contentType = 'multipart/form-data'
+        postData = new FormData()
+        this.settings.forEach((s) => {
+          if (fileSettingsIDs.indexOf(s.identifier) > -1) {
+            let input = self.$refs[s.identifier][0]
+            let files = input.files
+            console.log('ref', input, files)
+            if (files && files.length > 0) {
+              postData.append(s.identifier, files[0])
+            }
+          } else {
+            postData.append(s.identifier, self.values[s.identifier])
+          }
+        })
+      }
+      axios.post('instance/admin/settings/bulk/', postData, {
+        headers: {
+          'Content-Type': contentType,
+        },
+      }).then((response) => {
         self.result = true
+        response.data.forEach((s) => {
+          self.values[s.identifier] = s.value
+        })
         self.isLoading = false
         self.$store.dispatch('instance/fetchSettings')
       }, error => {
@@ -116,6 +150,11 @@ export default {
       })
       return this.group.settings.map(e => {
         return byIdentifier[e]
+      })
+    },
+    fileSettings () {
+      return this.settings.filter((s) => {
+        return s.field.widget.class === 'ImageWidget'
       })
     }
   }

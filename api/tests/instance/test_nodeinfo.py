@@ -3,10 +3,12 @@ import pytest
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import utils as music_utils
 
 
-def test_nodeinfo_dump(preferences, mocker):
+def test_nodeinfo_dump(preferences, mocker, avatar):
+    preferences["instance__banner"] = avatar
     preferences["instance__nodeinfo_stats_enabled"] = True
     preferences["moderation__unauthenticated_report_types"] = [
         "takedown_request",
@@ -39,6 +41,7 @@ def test_nodeinfo_dump(preferences, mocker):
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
             "terms": preferences["instance__terms"],
+            "banner": federation_utils.full_url(preferences["instance__banner"].url),
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[
@@ -107,6 +110,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
             "terms": preferences["instance__terms"],
+            "banner": None,
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[
