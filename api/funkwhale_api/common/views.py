@@ -1,3 +1,6 @@
+import time
+
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework.decorators import action
@@ -5,6 +8,7 @@ from rest_framework import exceptions
 from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import response
+from rest_framework import views
 from rest_framework import viewsets
 
 from . import filters
@@ -13,6 +17,7 @@ from . import mutations
 from . import serializers
 from . import signals
 from . import tasks
+from . import throttling
 from . import utils
 
 
@@ -121,3 +126,17 @@ class MutationViewSet(
             new_is_approved=instance.is_approved,
         )
         return response.Response({}, status=200)
+
+
+class RateLimitView(views.APIView):
+    permission_classes = []
+    throttle_classes = []
+
+    def get(self, request, *args, **kwargs):
+        ident = throttling.get_ident(request)
+        data = {
+            "enabled": settings.THROTTLING_ENABLED,
+            "ident": ident,
+            "scopes": throttling.get_status(ident, time.time()),
+        }
+        return response.Response(data, status=200)

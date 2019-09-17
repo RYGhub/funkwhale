@@ -5,6 +5,7 @@ import PIL
 import random
 import shutil
 import tempfile
+import time
 
 import factory
 import pytest
@@ -305,6 +306,13 @@ def to_api_date():
 def now(mocker):
     now = timezone.now()
     mocker.patch("django.utils.timezone.now", return_value=now)
+    return now
+
+
+@pytest.fixture()
+def now_time(mocker):
+    now = time.time()
+    mocker.patch("time.time", return_value=now)
     return now
 
 

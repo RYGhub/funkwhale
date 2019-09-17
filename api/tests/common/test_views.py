@@ -4,6 +4,7 @@ from django.urls import reverse
 from funkwhale_api.common import serializers
 from funkwhale_api.common import signals
 from funkwhale_api.common import tasks
+from funkwhale_api.common import throttling
 
 
 def test_can_detail_mutation(logged_in_api_client, factories):
@@ -163,3 +164,20 @@ def test_cannot_approve_reject_without_perm(
 
     assert mutation.is_approved is None
     assert mutation.approved_by is None
+
+
+def test_rate_limit(logged_in_api_client, now_time, settings, mocker):
+    expected_ident = {"type": "authenticated", "id": logged_in_api_client.user.pk}
+
+    expected = {
+        "ident": expected_ident,
+        "scopes": throttling.get_status(expected_ident, now_time),
+        "enabled": settings.THROTTLING_ENABLED,
+    }
+    get_status = mocker.spy(throttling, "get_status")
+    url = reverse("api:v1:rate-limit")
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+    get_status.assert_called_once_with(expected_ident, now_time)

@@ -1,13 +1,16 @@
 import html
 import requests
+import time
 import xml.sax.saxutils
 
 from django import http
 from django.conf import settings
 from django.core.cache import caches
 from django import urls
+from rest_framework import views
 
 from . import preferences
+from . import throttling
 from . import utils
 
 EXCLUDED_PATHS = ["/api", "/federation", "/.well-known"]
@@ -176,3 +179,66 @@ class DevHttpsMiddleware:
                 lambda: request.__class__.get_host(request).replace(":80", ":443"),
             )
         return self.get_response(request)
+
+
+def monkey_patch_rest_initialize_request():
+    """
+    Rest framework use it's own APIRequest, meaning we can't easily
+    access our throttling info in the middleware. So me monkey patch the
+    `initialize_request` method from rest_framework to keep a link between both requests
+    """
+    original = views.APIView.initialize_request
+
+    def replacement(self, request, *args, **kwargs):
+        r = original(self, request, *args, **kwargs)
+        setattr(request, "_api_request", r)
+        return r
+
+    setattr(views.APIView, "initialize_request", replacement)
+
+
+monkey_patch_rest_initialize_request()
+
+
+class ThrottleStatusMiddleware:
+    """
+    Include useful information regarding throttling in API responses to
+    ensure clients can adapt.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            response = self.get_response(request)
+        except throttling.TooManyRequests:
+            # manual throttling in non rest_framework view, we have to return
+            # the proper response ourselves
+            response = http.HttpResponse(status=429)
+        request_to_check = request
+        try:
+            request_to_check = request._api_request
+        except AttributeError:
+            pass
+        throttle_status = getattr(request_to_check, "_throttle_status", None)
+        if throttle_status:
+            response["X-RateLimit-Limit"] = str(throttle_status["num_requests"])
+            response["X-RateLimit-Scope"] = str(throttle_status["scope"])
+            response["X-RateLimit-Remaining"] = throttle_status["num_requests"] - len(
+                throttle_status["history"]
+            )
+            response["X-RateLimit-Duration"] = str(throttle_status["duration"])
+            if throttle_status["history"]:
+                now = int(time.time())
+                # At this point, the client can send additional requests
+                oldtest_request = throttle_status["history"][-1]
+                remaining = throttle_status["duration"] - (now - int(oldtest_request))
+                response["Retry-After"] = str(remaining)
+                # At this point, all Rate Limit is reset to 0
+                latest_request = throttle_status["history"][0]
+                remaining = throttle_status["duration"] - (now - int(latest_request))
+                response["X-RateLimit-Reset"] = str(now + remaining)
+                response["X-RateLimit-ResetSeconds"] = str(remaining)
+
+        return response

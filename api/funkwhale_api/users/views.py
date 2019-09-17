@@ -1,5 +1,6 @@
 from allauth.account.adapter import get_adapter
-from rest_auth.registration.views import RegisterView as BaseRegisterView
+from rest_auth import views as rest_auth_views
+from rest_auth.registration import views as registration_views
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,9 +10,11 @@ from funkwhale_api.common import preferences
 from . import models, serializers
 
 
-class RegisterView(BaseRegisterView):
+class RegisterView(registration_views.RegisterView):
     serializer_class = serializers.RegisterSerializer
     permission_classes = []
+    action = "signup"
+    throttling_scopes = {"signup": {"authenticated": "signup", "anonymous": "signup"}}
 
     def create(self, request, *args, **kwargs):
         invitation_code = request.data.get("invitation")
@@ -22,6 +25,22 @@ class RegisterView(BaseRegisterView):
 
     def is_open_for_signup(self, request):
         return get_adapter().is_open_for_signup(request)
+
+
+class VerifyEmailView(registration_views.VerifyEmailView):
+    action = "verify-email"
+
+
+class PasswordChangeView(rest_auth_views.PasswordChangeView):
+    action = "password-change"
+
+
+class PasswordResetView(rest_auth_views.PasswordResetView):
+    action = "password-reset"
+
+
+class PasswordResetConfirmView(rest_auth_views.PasswordResetConfirmView):
+    action = "password-reset-confirm"
 
 
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):

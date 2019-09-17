@@ -149,3 +149,15 @@ Then reload nginx with ``systemctl reload nginx``.
     }
 
 Then reload nginx with ``docker-compose restart nginx``.
+
+Rate limiting
+^^^^^^^^^^^^^
+
+With this release, rate-limiting on the API is enabled by default, with high enough limits to ensure
+regular users of the app aren't affected. Requests beyond allowed limits are answered with a 429 HTTP error.
+
+For anonymous requests, the limit is applied to the IP adress of the client, and for authenticated requests, the limit
+is applied to the corresponding user account. By default, anonymous requests get a lower limit than authenticated requests.
+
+You can disable the rate-limiting feature by adding `THROTTLING_ENABLED=false` to your ``.env`` file and restarting the
+services. If you are using the Funkwhale API in your project or app and want to know more about the limits, please consult https://docs.funkwhale.audio/swagger/.

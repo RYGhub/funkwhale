@@ -232,6 +232,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "funkwhale_api.users.middleware.RecordActivityMiddleware",
+    "funkwhale_api.common.middleware.ThrottleStatusMiddleware",
 )
 
 # DEBUG
@@ -615,7 +616,150 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "NUM_PROXIES": env.int("NUM_PROXIES", default=1),
 }
+THROTTLING_ENABLED = env.bool("THROTTLING_ENABLED", default=True)
+if THROTTLING_ENABLED:
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = env.list(
+        "THROTTLE_CLASSES",
+        default=["funkwhale_api.common.throttling.FunkwhaleThrottle"],
+    )
+
+THROTTLING_SCOPES = {
+    "*": {"anonymous": "anonymous-wildcard", "authenticated": "authenticated-wildcard"},
+    "create": {
+        "authenticated": "authenticated-create",
+        "anonymous": "anonymous-create",
+    },
+    "list": {"authenticated": "authenticated-list", "anonymous": "anonymous-list"},
+    "retrieve": {
+        "authenticated": "authenticated-retrieve",
+        "anonymous": "anonymous-retrieve",
+    },
+    "destroy": {
+        "authenticated": "authenticated-destroy",
+        "anonymous": "anonymous-destroy",
+    },
+    "update": {
+        "authenticated": "authenticated-update",
+        "anonymous": "anonymous-update",
+    },
+    "partial_update": {
+        "authenticated": "authenticated-update",
+        "anonymous": "anonymous-update",
+    },
+}
+
+THROTTLING_USER_RATES = env.dict("THROTTLING_RATES", default={})
+
+THROTTLING_RATES = {
+    "anonymous-wildcard": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-wildcard", "1000/h"),
+        "description": "Anonymous requests not covered by other limits",
+    },
+    "authenticated-wildcard": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-wildcard", "2000/h"),
+        "description": "Authenticated requests not covered by other limits",
+    },
+    "authenticated-create": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-create", "1000/hour"),
+        "description": "Authenticated POST requests",
+    },
+    "anonymous-create": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-create", "1000/day"),
+        "description": "Anonymous POST requests",
+    },
+    "authenticated-list": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-list", "10000/hour"),
+        "description": "Authenticated GET requests on resource lists",
+    },
+    "anonymous-list": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-list", "10000/day"),
+        "description": "Anonymous GET requests on resource lists",
+    },
+    "authenticated-retrieve": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-retrieve", "10000/hour"),
+        "description": "Authenticated GET requests on resource detail",
+    },
+    "anonymous-retrieve": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-retrieve", "10000/day"),
+        "description": "Anonymous GET requests on resource detail",
+    },
+    "authenticated-destroy": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-destroy", "500/hour"),
+        "description": "Authenticated DELETE requests on resource detail",
+    },
+    "anonymous-destroy": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-destroy", "1000/day"),
+        "description": "Anonymous DELETE requests on resource detail",
+    },
+    "authenticated-update": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-update", "1000/hour"),
+        "description": "Authenticated PATCH and PUT requests on resource detail",
+    },
+    "anonymous-update": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-update", "1000/day"),
+        "description": "Anonymous PATCH and PUT requests on resource detail",
+    },
+    # potentially spammy / dangerous endpoints
+    "authenticated-reports": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-reports", "100/day"),
+        "description": "Authenticated report submission",
+    },
+    "anonymous-reports": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-reports", "10/day"),
+        "description": "Anonymous report submission",
+    },
+    "authenticated-oauth-app": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-oauth-app", "10/hour"),
+        "description": "Authenticated OAuth app creation",
+    },
+    "anonymous-oauth-app": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-oauth-app", "10/day"),
+        "description": "Anonymous OAuth app creation",
+    },
+    "oauth-authorize": {
+        "rate": THROTTLING_USER_RATES.get("oauth-authorize", "100/hour"),
+        "description": "OAuth app authorization",
+    },
+    "oauth-token": {
+        "rate": THROTTLING_USER_RATES.get("oauth-token", "100/hour"),
+        "description": "OAuth token creation",
+    },
+    "oauth-revoke-token": {
+        "rate": THROTTLING_USER_RATES.get("oauth-revoke-token", "100/hour"),
+        "description": "OAuth token deletion",
+    },
+    "jwt-login": {
+        "rate": THROTTLING_USER_RATES.get("jwt-login", "30/hour"),
+        "description": "JWT token creation",
+    },
+    "jwt-refresh": {
+        "rate": THROTTLING_USER_RATES.get("jwt-refresh", "30/hour"),
+        "description": "JWT token refresh",
+    },
+    "signup": {
+        "rate": THROTTLING_USER_RATES.get("signup", "10/day"),
+        "description": "Account creation",
+    },
+    "verify-email": {
+        "rate": THROTTLING_USER_RATES.get("verify-email", "20/h"),
+        "description": "Email address confirmation",
+    },
+    "password-change": {
+        "rate": THROTTLING_USER_RATES.get("password-change", "20/h"),
+        "description": "Password change (when authenticated)",
+    },
+    "password-reset": {
+        "rate": THROTTLING_USER_RATES.get("password-reset", "20/h"),
+        "description": "Password reset request",
+    },
+    "password-reset-confirm": {
+        "rate": THROTTLING_USER_RATES.get("password-reset-confirm", "20/h"),
+        "description": "Password reset confirmation",
+    },
+}
+
 
 BROWSABLE_API_ENABLED = env.bool("BROWSABLE_API_ENABLED", default=False)
 if BROWSABLE_API_ENABLED:
