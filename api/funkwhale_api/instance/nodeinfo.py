@@ -42,6 +42,8 @@ def get():
             "private": all_preferences.get("instance__nodeinfo_private"),
             "shortDescription": all_preferences.get("instance__short_description"),
             "longDescription": all_preferences.get("instance__long_description"),
+            "rules": all_preferences.get("instance__rules"),
+            "contactEmail": all_preferences.get("instance__contact_email"),
             "terms": all_preferences.get("instance__terms"),
             "nodeName": all_preferences.get("instance__name"),
             "banner": federation_utils.full_url(banner.url) if banner else None,

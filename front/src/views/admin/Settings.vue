@@ -95,6 +95,8 @@ export default {
             "instance__name",
             "instance__short_description",
             "instance__long_description",
+            "instance__contact_email",
+            "instance__rules",
             "instance__terms",
             "instance__banner",
           ]
