@@ -336,6 +336,48 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     @action(
         detail=False,
         methods=["get", "post"],
+        url_name="get_songs_by_genre",
+        url_path="getSongsByGenre",
+    )
+    def get_songs_by_genre(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        actor = utils.get_actor_from_request(request)
+        queryset = music_models.Track.objects.all().exclude(
+            moderation_filters.get_filtered_content_query(
+                moderation_filters.USER_FILTER_CONFIG["TRACK"], request.user
+            )
+        )
+        queryset = queryset.playable_by(actor)
+        try:
+            size = int(
+                data["count"]
+            )  # yep. Some endpoints have size, other have count…
+        except (TypeError, KeyError, ValueError):
+            size = 50
+
+        genre = data.get("genre")
+        queryset = (
+            queryset.playable_by(actor)
+            .filter(
+                Q(tagged_items__tag__name=genre)
+                | Q(artist__tagged_items__tag__name=genre)
+                | Q(album__artist__tagged_items__tag__name=genre)
+                | Q(album__tagged_items__tag__name=genre)
+            )
+            .prefetch_related("uploads")
+            .distinct()
+            .order_by("-creation_date")[:size]
+        )
+        data = {
+            "songsByGenre": {
+                "song": serializers.GetSongSerializer(queryset, many=True).data
+            }
+        }
+        return response.Response(data)
+
+    @action(
+        detail=False,
+        methods=["get", "post"],
         url_name="get_starred",
         url_path="getStarred",
     )

@@ -108,7 +108,6 @@ class TrackFactory(
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     album = factory.SubFactory(AlbumFactory)
-    artist = factory.SelfAttribute("album.artist")
     position = 1
     playable = playable_factory("track")
 
@@ -123,6 +122,26 @@ class TrackFactory(
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), album__local=True
         )
+
+    @factory.post_generation
+    def artist(self, created, extracted, **kwargs):
+        """
+        A bit intricated, because we want to be able to specify a different
+        track artist with a fallback on album artist if nothing is specified.
+
+        And handle cases where build or build_batch are used (so no db calls)
+        """
+        if extracted:
+            self.artist = extracted
+        elif kwargs:
+            if created:
+                self.artist = ArtistFactory(**kwargs)
+            else:
+                self.artist = ArtistFactory.build(**kwargs)
+        elif self.album:
+            self.artist = self.album.artist
+        if created:
+            self.save()
 
     @factory.post_generation
     def license(self, created, extracted, **kwargs):

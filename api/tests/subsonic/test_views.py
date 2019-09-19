@@ -470,6 +470,28 @@ def test_get_album_list2_by_genre(f, db, logged_in_api_client, factories):
 
 
 @pytest.mark.parametrize("f", ["json"])
+@pytest.mark.parametrize(
+    "tags_field",
+    ["set_tags", "artist__set_tags", "album__set_tags", "album__artist__set_tags"],
+)
+def test_get_songs_by_genre(f, tags_field, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get_songs_by_genre")
+    assert url.endswith("getSongsByGenre") is True
+    track1 = factories["music.Track"](playable=True, **{tags_field: ["Rock"]})
+    track2 = factories["music.Track"](playable=True, **{tags_field: ["Rock"]})
+    factories["music.Track"](playable=True, **{tags_field: ["Pop"]})
+    expected = {
+        "songsByGenre": {"song": serializers.get_song_list_data([track2, track1])}
+    }
+
+    response = logged_in_api_client.get(
+        url, {"f": f, "count": 5, "offset": 0, "genre": "rock"}
+    )
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+@pytest.mark.parametrize("f", ["json"])
 def test_search3(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-search3")
     assert url.endswith("search3") is True
