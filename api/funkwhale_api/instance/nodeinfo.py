@@ -47,6 +47,7 @@ def get():
             "terms": all_preferences.get("instance__terms"),
             "nodeName": all_preferences.get("instance__name"),
             "banner": federation_utils.full_url(banner.url) if banner else None,
+            "defaultUploadQuota": all_preferences.get("users__upload_quota"),
             "library": {
                 "federationEnabled": all_preferences.get("federation__enabled"),
                 "federationNeedsApproval": all_preferences.get(

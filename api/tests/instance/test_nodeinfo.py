@@ -42,6 +42,7 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
             "nodeName": preferences["instance__name"],
             "rules": preferences["instance__rules"],
             "contactEmail": preferences["instance__contact_email"],
+            "defaultUploadQuota": preferences["users__upload_quota"],
             "terms": preferences["instance__terms"],
             "banner": federation_utils.full_url(preferences["instance__banner"].url),
             "library": {
@@ -113,6 +114,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "nodeName": preferences["instance__name"],
             "rules": preferences["instance__rules"],
             "contactEmail": preferences["instance__contact_email"],
+            "defaultUploadQuota": preferences["users__upload_quota"],
             "terms": preferences["instance__terms"],
             "banner": None,
             "library": {
