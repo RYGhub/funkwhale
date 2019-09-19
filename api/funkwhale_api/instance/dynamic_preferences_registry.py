@@ -60,6 +60,29 @@ class InstanceTerms(types.StringPreference):
 
 
 @global_preferences_registry.register
+class InstanceRules(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = "rules"
+    verbose_name = "Rules"
+    default = ""
+    help_text = "Rules/Code of Conduct (markdown allowed)."
+    widget = widgets.Textarea
+    field_kwargs = {"required": False}
+
+
+@global_preferences_registry.register
+class InstanceContactEmail(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = "contact_email"
+    verbose_name = "Contact email"
+    default = ""
+    help_text = "A contact email for visitors who need to contact an admin or moderator"
+    field_kwargs = {"required": False}
+
+
+@global_preferences_registry.register
 class RavenDSN(types.StringPreference):
     show_in_api = True
     section = raven
