@@ -499,3 +499,17 @@ def test_report_update(factories, superuser_api_client):
     assert response.status_code == 200
     report.refresh_from_db()
     assert report.is_handled is True
+
+
+def test_report_update_is_handled_true_assigns(factories, superuser_api_client):
+    actor = superuser_api_client.user.create_actor()
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.patch(url, {"is_handled": True})
+
+    assert response.status_code == 200
+    report.refresh_from_db()
+    assert report.is_handled is True
+    assert report.assigned_to == actor
