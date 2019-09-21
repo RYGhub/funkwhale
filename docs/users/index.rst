@@ -21,6 +21,7 @@ Using Funkwhale
 .. toctree::
    :maxdepth: 2
 
+   account
    queue
    managing
    playlists

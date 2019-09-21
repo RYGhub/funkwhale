@@ -49,6 +49,18 @@ For more information about this feature, please check out our documentation:
 -  `User documentation <https://docs.funkwhale.audio/moderator/reports.html>`_
 -  `Moderator documentation <https://docs.funkwhale.audio/users/reports.html>`_
 
+Account deletion
+^^^^^^^^^^^^^^^^
+
+Users can now delete their account themselves, without involving an administrator.
+
+The deletion process will remove any local data and objects associated with the account,
+but the username won't be able to new users to avoid impersonation. Deletion is also broadcasted
+to other known servers on the federation.
+
+For more information about this feature, please check out our documentation:
+
+-  `User documentation <https://docs.funkwhale.audio/users/account.html>`_
 
 Allow-list to restrict federation to trusted domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

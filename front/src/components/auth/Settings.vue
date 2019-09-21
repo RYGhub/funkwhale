@@ -267,6 +267,43 @@
           </translate>
         </empty-state>
       </section>
+      <section class="ui text container">
+        <div class="ui hidden divider"></div>
+        <h2 class="ui header">
+          <i class="trash icon"></i>
+          <div class="content">
+            <translate translate-context="Content/Settings/Title/Verb">Delete my account</translate>
+          </div>
+        </h2>
+        <p>
+          <translate translate-context="Content/Settings/Paragraph'">You can permanently and irreversibly delete your account and all the associated data using the form below. You will be asked for confirmation.</translate>
+        </p>
+        <div class="ui warning message">
+          <translate translate-context="Content/Settings/Paragraph'">Your account will be deleted from our servers within a few minutes. We will also notify other servers who may have a copy of some of your data so they can proceed to deletion. Please note that some of these servers may be offline or unwilling to comply though.</translate>
+        </div>
+        <div class="ui form"">
+          <div v-if="accountDeleteErrors.length > 0" class="ui negative message">
+            <div class="header"><translate translate-context="Content/Settings/Error message.Title">We cannot delete your account</translate></div>
+            <ul class="list">
+              <li v-for="error in accountDeleteErrors">{{ error }}</li>
+            </ul>
+          </div>
+          <div class="field">
+            <label><translate translate-context="*/*/*">Password</translate></label>
+            <password-input required v-model="password" />
+          </div>
+          <dangerous-button
+            :class="['ui', {'loading': isDeletingAccount}, {disabled: !password}, 'button']"
+            :action="deleteAccount">
+            <translate translate-context="*/*/Button.Label">Delete my account…</translate>
+            <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Do you want to delete your account?</translate></p>
+            <div slot="modal-content">
+              <p><translate translate-context="Popup/Settings/Paragraph">This is irreversible and will permanently remove your data from our servers. You will we immediatly logged out.</translate></p>
+            </div>
+            <div slot="modal-confirm"><translate translate-context="Popup/Settings/Button.Label">Delete my account</translate></div>
+          </dangerous-button>
+        </div>
+      </section>
     </div>
   </main>
 </template>
@@ -293,8 +330,11 @@ export default {
       new_password: "",
       currentAvatar: this.$store.state.auth.profile.avatar,
       passwordError: "",
+      password: "",
       isLoading: false,
       isLoadingAvatar: false,
+      isDeletingAccount: false,
+      accountDeleteErrors: [],
       avatarErrors: [],
       avatar: null,
       apps: [],
@@ -471,7 +511,32 @@ export default {
           self.isLoading = false
         }
       )
-    }
+    },
+    deleteAccount() {
+      this.isDeletingAccount = true
+      this.accountDeleteErrors = []
+      let self = this
+      let payload = {
+        confirm: true,
+        password: this.password,
+      }
+      axios.delete(`users/users/me/`, {data: payload})
+        .then(
+          response => {
+            self.isDeletingAccount = false
+            let msg = self.$pgettext('*/Auth/Message', 'Your deletion request was submitted, your account and content  will be deleted shortly')
+            self.$store.commit('ui/addMessage', {
+              content: msg,
+              date: new Date()
+            })
+            self.$store.dispatch('auth/logout')
+          },
+          error => {
+            self.isDeletingAccount = false
+            self.accountDeleteErrors = error.backendErrors
+          }
+        )
+    },
   },
   computed: {
     labels() {

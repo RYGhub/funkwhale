@@ -1,6 +1,13 @@
 import pytest
 
-from funkwhale_api.federation import actors, contexts, jsonld, routes, serializers
+from funkwhale_api.federation import (
+    activity,
+    actors,
+    contexts,
+    jsonld,
+    routes,
+    serializers,
+)
 
 
 @pytest.mark.parametrize(
@@ -8,23 +15,29 @@ from funkwhale_api.federation import actors, contexts, jsonld, routes, serialize
     [
         ({"type": "Follow"}, routes.inbox_follow),
         ({"type": "Accept"}, routes.inbox_accept),
-        ({"type": "Create", "object.type": "Audio"}, routes.inbox_create_audio),
-        ({"type": "Update", "object.type": "Library"}, routes.inbox_update_library),
-        ({"type": "Delete", "object.type": "Library"}, routes.inbox_delete_library),
-        ({"type": "Delete", "object.type": "Audio"}, routes.inbox_delete_audio),
-        ({"type": "Undo", "object.type": "Follow"}, routes.inbox_undo_follow),
-        ({"type": "Update", "object.type": "Artist"}, routes.inbox_update_artist),
-        ({"type": "Update", "object.type": "Album"}, routes.inbox_update_album),
-        ({"type": "Update", "object.type": "Track"}, routes.inbox_update_track),
+        ({"type": "Create", "object": {"type": "Audio"}}, routes.inbox_create_audio),
+        (
+            {"type": "Update", "object": {"type": "Library"}},
+            routes.inbox_update_library,
+        ),
+        (
+            {"type": "Delete", "object": {"type": "Library"}},
+            routes.inbox_delete_library,
+        ),
+        ({"type": "Delete", "object": {"type": "Audio"}}, routes.inbox_delete_audio),
+        ({"type": "Undo", "object": {"type": "Follow"}}, routes.inbox_undo_follow),
+        ({"type": "Update", "object": {"type": "Artist"}}, routes.inbox_update_artist),
+        ({"type": "Update", "object": {"type": "Album"}}, routes.inbox_update_album),
+        ({"type": "Update", "object": {"type": "Track"}}, routes.inbox_update_track),
+        ({"type": "Delete", "object": {"type": "Person"}}, routes.inbox_delete_actor),
     ],
 )
 def test_inbox_routes(route, handler):
-    for r, h in routes.inbox.routes:
-        if r == route:
-            assert h == handler
-            return
-
-    assert False, "Inbox route {} not found".format(route)
+    matching = [
+        handler for r, handler in routes.inbox.routes if activity.match_route(r, route)
+    ]
+    assert len(matching) == 1, "Inbox route {} not found".format(route)
+    assert matching[0] == handler
 
 
 @pytest.mark.parametrize(
@@ -32,21 +45,41 @@ def test_inbox_routes(route, handler):
     [
         ({"type": "Accept"}, routes.outbox_accept),
         ({"type": "Follow"}, routes.outbox_follow),
-        ({"type": "Create", "object.type": "Audio"}, routes.outbox_create_audio),
-        ({"type": "Update", "object.type": "Library"}, routes.outbox_update_library),
-        ({"type": "Delete", "object.type": "Library"}, routes.outbox_delete_library),
-        ({"type": "Delete", "object.type": "Audio"}, routes.outbox_delete_audio),
-        ({"type": "Undo", "object.type": "Follow"}, routes.outbox_undo_follow),
-        ({"type": "Update", "object.type": "Track"}, routes.outbox_update_track),
+        ({"type": "Create", "object": {"type": "Audio"}}, routes.outbox_create_audio),
+        (
+            {"type": "Update", "object": {"type": "Library"}},
+            routes.outbox_update_library,
+        ),
+        (
+            {"type": "Delete", "object": {"type": "Library"}},
+            routes.outbox_delete_library,
+        ),
+        ({"type": "Delete", "object": {"type": "Audio"}}, routes.outbox_delete_audio),
+        ({"type": "Undo", "object": {"type": "Follow"}}, routes.outbox_undo_follow),
+        ({"type": "Update", "object": {"type": "Track"}}, routes.outbox_update_track),
+        (
+            {"type": "Delete", "object": {"type": "Tombstone"}},
+            routes.outbox_delete_actor,
+        ),
+        ({"type": "Delete", "object": {"type": "Person"}}, routes.outbox_delete_actor),
+        ({"type": "Delete", "object": {"type": "Service"}}, routes.outbox_delete_actor),
+        (
+            {"type": "Delete", "object": {"type": "Application"}},
+            routes.outbox_delete_actor,
+        ),
+        ({"type": "Delete", "object": {"type": "Group"}}, routes.outbox_delete_actor),
+        (
+            {"type": "Delete", "object": {"type": "Organization"}},
+            routes.outbox_delete_actor,
+        ),
     ],
 )
 def test_outbox_routes(route, handler):
-    for r, h in routes.outbox.routes:
-        if r == route:
-            assert h == handler
-            return
-
-    assert False, "Outbox route {} not found".format(route)
+    matching = [
+        handler for r, handler in routes.outbox.routes if activity.match_route(r, route)
+    ]
+    assert len(matching) == 1, "Outbox route {} not found".format(route)
+    assert matching[0] == handler
 
 
 def test_inbox_follow_library_autoapprove(factories, mocker):
@@ -559,3 +592,60 @@ def test_outbox_update_track(factories):
 
     assert dict(activity["payload"]) == dict(expected)
     assert activity["actor"] == actors.get_service_actor()
+
+
+def test_outbox_delete_actor(factories):
+    user = factories["users.User"]()
+    actor = user.create_actor()
+
+    activity = list(routes.outbox_delete_actor({"actor": actor}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"id": actor.fid, "type": actor.type}}
+    ).data
+
+    expected["to"] = [contexts.AS.Public, {"type": "instances_with_followers"}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == actor
+
+
+def test_inbox_delete_actor(factories):
+    remote_actor = factories["federation.Actor"]()
+    serializer = serializers.ActivitySerializer(
+        {
+            "type": "Delete",
+            "object": {"type": remote_actor.type, "id": remote_actor.fid},
+        }
+    )
+    routes.inbox_delete_actor(
+        serializer.data, context={"actor": remote_actor, "raise_exception": True}
+    )
+    with pytest.raises(remote_actor.__class__.DoesNotExist):
+        remote_actor.refresh_from_db()
+
+
+def test_inbox_delete_actor_only_works_on_self(factories):
+    remote_actor1 = factories["federation.Actor"]()
+    remote_actor2 = factories["federation.Actor"]()
+    serializer = serializers.ActivitySerializer(
+        {
+            "type": "Delete",
+            "object": {"type": remote_actor2.type, "id": remote_actor2.fid},
+        }
+    )
+    routes.inbox_delete_actor(
+        serializer.data, context={"actor": remote_actor1, "raise_exception": True}
+    )
+    remote_actor2.refresh_from_db()
+
+
+def test_inbox_delete_actor_doesnt_delete_local_actor(factories):
+    local_actor = factories["users.User"]().create_actor()
+    serializer = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": local_actor.type, "id": local_actor.fid}}
+    )
+    routes.inbox_delete_actor(
+        serializer.data, context={"actor": local_actor, "raise_exception": True}
+    )
+    # actor should still be here!
+    local_actor.refresh_from_db()
