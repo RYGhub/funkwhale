@@ -1138,6 +1138,13 @@ class UploadSerializer(jsonld.JsonLdSerializer):
         return d
 
 
+class ActorDeleteSerializer(jsonld.JsonLdSerializer):
+    fid = serializers.URLField(max_length=500)
+
+    class Meta:
+        jsonld_mapping = {"fid": jsonld.first_id(contexts.AS.object)}
+
+
 class NodeInfoLinkSerializer(serializers.Serializer):
     href = serializers.URLField()
     rel = serializers.URLField()

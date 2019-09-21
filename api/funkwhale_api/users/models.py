@@ -400,10 +400,3 @@ def warm_user_avatar(sender, instance, **kwargs):
         instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
     )
     num_created, failed_to_create = user_avatar_warmer.warm()
-
-
-@receiver(models.signals.pre_delete, sender=User)
-def delete_actor(sender, instance, **kwargs):
-    if not instance.actor:
-        return
-    instance.actor.delete()

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from funkwhale_api.common import preferences
 
-from . import models, serializers
+from . import models, serializers, tasks
 
 
 class RegisterView(registration_views.RegisterView):
@@ -50,9 +50,17 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     lookup_value_regex = r"[a-zA-Z0-9-_.]+"
     required_scope = "profile"
 
-    @action(methods=["get"], detail=False)
+    @action(methods=["get", "delete"], detail=False)
     def me(self, request, *args, **kwargs):
-        """Return information about the current user"""
+        """Return information about the current user or delete it"""
+        if request.method.lower() == "delete":
+            serializer = serializers.UserDeleteSerializer(
+                request.user, data=request.data
+            )
+            serializer.is_valid(raise_exception=True)
+            tasks.delete_account.delay(user_id=request.user.pk)
+            # at this point, password is valid, we launch deletion
+            return Response(status=204)
         serializer = serializers.MeSerializer(request.user)
         return Response(serializer.data)
 

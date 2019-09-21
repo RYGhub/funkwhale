@@ -385,7 +385,10 @@ class OutboxRouter(Router):
 def match_route(route, payload):
     for key, value in route.items():
         payload_value = recursive_getattr(payload, key, permissive=True)
-        if payload_value != value:
+        if isinstance(value, list):
+            if payload_value not in value:
+                return False
+        elif payload_value != value:
             return False
 
     return True
@@ -450,13 +453,31 @@ def prepare_deliveries_and_inbox_items(recipient_list, type, allowed_domains=Non
                     .exclude(actor__domain=None)
                 )
             )
+            followed_domains = list(follows.values_list("actor__domain_id", flat=True))
             actors = models.Actor.objects.filter(
-                managed_domains__name__in=follows.values_list(
-                    "actor__domain_id", flat=True
-                )
+                managed_domains__name__in=followed_domains
             )
-            values = actors.values("shared_inbox_url", "inbox_url")
+            values = actors.values("shared_inbox_url", "inbox_url", "domain_id")
+            handled_domains = set()
             for v in values:
+                remote_inbox_urls.add(v["shared_inbox_url"] or v["inbox_url"])
+                handled_domains.add(v["domain_id"])
+
+            if len(handled_domains) >= len(followed_domains):
+                continue
+
+            # for all remaining domains (probably non-funkwhale instances, with no
+            # service actors), we also pick the latest known actor per domain and send the message
+            # there instead
+            remaining_domains = models.Domain.objects.exclude(name__in=handled_domains)
+            remaining_domains = remaining_domains.filter(name__in=followed_domains)
+            actors = models.Actor.objects.filter(domain__in=remaining_domains)
+            actors = (
+                actors.order_by("domain_id", "-last_fetch_date")
+                .distinct("domain_id")
+                .values("shared_inbox_url", "inbox_url")
+            )
+            for v in actors:
                 remote_inbox_urls.add(v["shared_inbox_url"] or v["inbox_url"])
 
     deliveries = [

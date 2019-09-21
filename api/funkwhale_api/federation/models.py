@@ -21,6 +21,7 @@ from . import utils as federation_utils
 
 TYPE_CHOICES = [
     ("Person", "Person"),
+    ("Tombstone", "Tombstone"),
     ("Application", "Application"),
     ("Group", "Group"),
     ("Organization", "Organization"),
