@@ -176,7 +176,7 @@ and reupload it.
 
 .. _unknown_error:
 
-Unkwown error
+Unknown error
 :::::::::::::
 
 This error can happen for multiple reasons and likely indicates an issue with the Funkwhale

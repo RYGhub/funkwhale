@@ -16,7 +16,7 @@ from funkwhale_api.tags import models as tags_models
 logger = logging.getLogger(__name__)
 NODEFAULT = object()
 # default title used when imported tracks miss the `Album` tag, see #122
-UNKWOWN_ALBUM = "[Unknown Album]"
+UNKNOWN_ALBUM = "[Unknown Album]"
 
 
 class TagNotFound(KeyError):
@@ -442,7 +442,7 @@ class AlbumField(serializers.Field):
         except TagNotFound:
             title = ""
 
-        title = title.strip() or UNKWOWN_ALBUM
+        title = title.strip() or UNKNOWN_ALBUM
         final = {
             "title": title,
             "release_date": data.get("date", None),
