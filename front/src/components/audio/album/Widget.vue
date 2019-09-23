@@ -4,6 +4,7 @@
       <slot name="title"></slot>
       <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
+    <slot></slot>
     <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
     <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
     <button v-if="controls" @click="fetchData('albums/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
@@ -48,6 +49,7 @@ export default {
     filters: {type: Object, required: true},
     controls: {type: Boolean, default: true},
     showCount: {type: Boolean, default: false},
+    limit: {type: Number, default: 12},
   },
   components: {
     PlayButton
@@ -55,7 +57,6 @@ export default {
   data () {
     return {
       albums: [],
-      limit: 12,
       count: 0,
       isLoading: false,
       errors: null,

@@ -62,13 +62,12 @@ export default {
   data () {
     return {
       bridge: null,
-      nodeinfo: null,
       instanceUrl: null,
       showShortcutsModal: false,
       showSetInstanceModal: false,
     }
   },
-  created () {
+  async created () {
     this.openWebsocket()
     let self = this
     if (!this.$store.state.ui.selectedLanguage) {
@@ -78,7 +77,12 @@ export default {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
-    if (!this.$store.state.instance.instanceUrl) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serverUrl = urlParams.get('_server')
+    if (serverUrl) {
+      this.$store.commit('instance/instanceUrl', serverUrl)
+    }
+    else if (!this.$store.state.instance.instanceUrl) {
       // we have several way to guess the API server url. By order of precedence:
       // 1. use the url provided in settings.json, if any
       // 2. use the url specified when building via VUE_APP_INSTANCE_URL
@@ -89,9 +93,9 @@ export default {
       // needed to trigger initialization of axios
       this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
     }
+    await this.fetchNodeInfo()
     this.$store.dispatch('auth/check')
     this.$store.dispatch('instance/fetchSettings')
-    this.fetchNodeInfo()
     this.$store.commit('ui/addWebsocketEventHandler', {
       eventName: 'inbox.item_added',
       id: 'sidebarCount',
@@ -152,14 +156,11 @@ export default {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewEdits', value: event.pending_review_count})
     },
     incrementPendingReviewReportsCountInSidebar (event) {
-      console.log('HELLO', event)
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: event.unresolved_count})
     },
-    fetchNodeInfo () {
-      let self = this
-      axios.get('instance/nodeinfo/2.0/').then(response => {
-        self.nodeinfo = response.data
-      })
+    async fetchNodeInfo () {
+      let response = await axios.get('instance/nodeinfo/2.0/')
+      this.$store.commit('instance/nodeinfo', response.data)
     },
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
@@ -235,7 +236,8 @@ export default {
   },
   computed: {
     ...mapState({
-      messages: state => state.ui.messages
+      messages: state => state.ui.messages,
+      nodeinfo: state => state.instance.nodeinfo,
     }),
     ...mapGetters({
       currentTrack: 'queue/currentTrack'

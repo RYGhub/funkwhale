@@ -62,6 +62,39 @@ For more information about this feature, please check out our documentation:
 
 -  `User documentation <https://docs.funkwhale.audio/users/account.html>`_
 
+Landing and about page redesign [Manual action suggested]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this release, we've completely redesigned the landing and about page, by making it more useful and adapted to your pod
+configuration. Among other things, the landing page will now include:
+
+- your pod and an excerpt from your pod's description
+- your pod banner image, if any
+- your contact email, if any
+- the login form
+- the signup form (if registrations are open on your pod)
+- some basic statistics about your pod
+- a widget including recently uploaded albums, if anonymous access is enabled
+
+The landing page will still include some information about Funkwhale, but in a less intrusive and proeminent way than before.
+
+Additionally, the about page now includes:
+
+- your pod name, description, rules and terms
+- your pod banner image, if any
+- your contact email, if any
+- comprehensive statistics about your pod
+- some info about your pod configuration, such as registration and federation status or the default upload quota for new users
+
+With this redesign, we've added a handful of additional pod settings:
+
+- Pod banner image
+- Contact email
+- Rules
+- Terms of service
+
+We recommend taking a few moments to fill these accordingly to your needs, by visiting ``/manage/settings``.
+
 Allow-list to restrict federation to trusted domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
