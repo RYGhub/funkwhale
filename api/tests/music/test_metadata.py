@@ -568,7 +568,7 @@ def test_serializer_album_default_title_when_missing_or_empty(data):
         "title": "Track",
         "artists": [{"name": "Artist", "mbid": None}],
         "album": {
-            "title": metadata.UNKWOWN_ALBUM,
+            "title": metadata.UNKNOWN_ALBUM,
             "mbid": None,
             "release_date": None,
             "artists": [],
