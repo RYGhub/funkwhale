@@ -82,6 +82,18 @@ PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
 get_file_path = common_utils.ChunkedPath("users/avatars", preserve_file_name=False)
 
 
+def get_default_instance_support_message_display_date():
+    return timezone.now() + datetime.timedelta(
+        days=settings.INSTANCE_SUPPORT_MESSAGE_DELAY
+    )
+
+
+def get_default_funkwhale_support_message_display_date():
+    return timezone.now() + datetime.timedelta(
+        days=settings.FUNKWHALE_SUPPORT_MESSAGE_DELAY
+    )
+
+
 @python_2_unicode_compatible
 class User(AbstractUser):
 
@@ -148,6 +160,15 @@ class User(AbstractUser):
     )
 
     upload_quota = models.PositiveIntegerField(null=True, blank=True)
+
+    instance_support_message_display_date = models.DateTimeField(
+        default=get_default_instance_support_message_display_date, null=True, blank=True
+    )
+    funkwhale_support_message_display_date = models.DateTimeField(
+        default=get_default_funkwhale_support_message_display_date,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.username

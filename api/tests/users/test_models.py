@@ -220,3 +220,20 @@ def test_user_get_quota_status(factories, preferences, mocker):
         "errored": 3,
         "finished": 4,
     }
+
+
+@pytest.mark.parametrize(
+    "setting_name, field",
+    [
+        ("INSTANCE_SUPPORT_MESSAGE_DELAY", "instance_support_message_display_date"),
+        ("FUNKWHALE_SUPPORT_MESSAGE_DELAY", "funkwhale_support_message_display_date"),
+    ],
+)
+def test_creating_user_set_support_display_date(
+    setting_name, field, settings, factories, now
+):
+    setattr(settings, setting_name, 66)  # display message every 66 days
+    expected = now + datetime.timedelta(days=66)
+    user = factories["users.User"]()
+
+    assert getattr(user, field) == expected

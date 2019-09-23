@@ -109,7 +109,13 @@ class UserWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = ["name", "privacy_level", "avatar"]
+        fields = [
+            "name",
+            "privacy_level",
+            "avatar",
+            "instance_support_message_display_date",
+            "funkwhale_support_message_display_date",
+        ]
 
 
 class UserReadSerializer(serializers.ModelSerializer):
@@ -146,7 +152,11 @@ class MeSerializer(UserReadSerializer):
     quota_status = serializers.SerializerMethodField()
 
     class Meta(UserReadSerializer.Meta):
-        fields = UserReadSerializer.Meta.fields + ["quota_status"]
+        fields = UserReadSerializer.Meta.fields + [
+            "quota_status",
+            "instance_support_message_display_date",
+            "funkwhale_support_message_display_date",
+        ]
 
     def get_quota_status(self, o):
         return o.get_quota_status() if o.actor else 0
