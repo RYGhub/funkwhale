@@ -17,6 +17,7 @@ export default {
     instanceUrl: process.env.VUE_APP_INSTANCE_URL,
     events: [],
     knownInstances: [],
+    nodeinfo: null,
     settings: {
       instance: {
         name: {
@@ -41,7 +42,7 @@ export default {
         enabled: {
           value: true
         }
-      }
+      },
     }
   },
   mutations: {
@@ -56,6 +57,9 @@ export default {
     },
     events: (state, value) => {
       state.events = value
+    },
+    nodeinfo: (state, value) => {
+      state.nodeinfo = value
     },
     frontSettings: (state, value) => {
       state.frontSettings = value
