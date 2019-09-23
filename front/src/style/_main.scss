@@ -388,6 +388,9 @@ input + .help {
   padding-left: 0;
   padding-right: 0;
 }
+.column .ui.text.container {
+  max-width: 100% !important;
+}
 
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

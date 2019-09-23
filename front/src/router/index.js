@@ -8,6 +8,17 @@ export default new Router({
   mode: "history",
   linkActiveClass: "active",
   base: process.env.VUE_APP_ROUTER_BASE_URL || "/",
+  scrollBehavior(to, from, savedPosition) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        if (to.hash) {
+          resolve({ selector: to.hash });
+        }
+        let pos = savedPosition || { x: 0, y: 0 };
+        resolve(pos);
+      }, 100);
+    });
+  },
   routes: [
     {
       path: "/",
@@ -18,7 +29,10 @@ export default new Router({
     {
       path: "/front",
       name: "front",
-      redirect: "/"
+      redirect: to => {
+        const { hash, params, query } = to
+        return { name: 'index', hash, query }
+      }
     },
     {
       path: "/about",
@@ -30,7 +44,7 @@ export default new Router({
       path: "/login",
       name: "login",
       component: () =>
-        import(/* webpackChunkName: "core" */ "@/components/auth/Login"),
+        import(/* webpackChunkName: "core" */ "@/views/auth/Login"),
       props: route => ({ next: route.query.next || "/library" })
     },
     {
@@ -87,7 +101,7 @@ export default new Router({
       path: "/signup",
       name: "signup",
       component: () =>
-        import(/* webpackChunkName: "core" */ "@/components/auth/Signup"),
+        import(/* webpackChunkName: "core" */ "@/views/auth/Signup"),
       props: route => ({
         defaultInvitation: route.query.invitation
       })
