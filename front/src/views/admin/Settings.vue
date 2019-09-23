@@ -99,6 +99,7 @@ export default {
             "instance__rules",
             "instance__terms",
             "instance__banner",
+            "instance__support_message"
           ]
         },
         {
@@ -152,7 +153,7 @@ export default {
         {
           label: uiLabel,
           id: "ui",
-          settings: ["ui__custom_css"]
+          settings: ["ui__custom_css", "instance__funkwhale_support_message_enabled"]
         },
         {
           label: statisticsLabel,

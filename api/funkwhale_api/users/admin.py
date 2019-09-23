@@ -90,6 +90,15 @@ class UserAdmin(AuthUserAdmin):
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (
+            _("Other"),
+            {
+                "fields": (
+                    "instance_support_message_display_date",
+                    "funkwhale_support_message_display_date",
+                )
+            },
+        ),
         (_("Useless fields"), {"fields": ("user_permissions", "groups")}),
     )
 

@@ -87,6 +87,10 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
                 },
                 {"type": "other", "label": "Other", "anonymous": True},
             ],
+            "funkwhaleSupportMessageEnabled": preferences[
+                "instance__funkwhale_support_message_enabled"
+            ],
+            "instanceSupportMessage": preferences["instance__support_message"],
         },
     }
     assert nodeinfo.get() == expected
@@ -151,6 +155,10 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 },
                 {"type": "other", "label": "Other", "anonymous": True},
             ],
+            "funkwhaleSupportMessageEnabled": preferences[
+                "instance__funkwhale_support_message_enabled"
+            ],
+            "instanceSupportMessage": preferences["instance__support_message"],
         },
     }
     assert nodeinfo.get() == expected

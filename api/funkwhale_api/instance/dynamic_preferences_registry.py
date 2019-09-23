@@ -83,6 +83,35 @@ class InstanceContactEmail(types.StringPreference):
 
 
 @global_preferences_registry.register
+class InstanceSupportMessage(types.StringPreference):
+    show_in_api = True
+    section = instance
+    name = "support_message"
+    verbose_name = "Support message"
+    default = ""
+    help_text = (
+        "A short message that will be displayed periodically to local users. "
+        "Use it to ask for financial support or anything else you might need. "
+        "(markdown allowed)."
+    )
+    widget = widgets.Textarea
+    field_kwargs = {"required": False}
+
+
+@global_preferences_registry.register
+class InstanceFunkwhaleSupportMessageEnabled(types.BooleanPreference):
+    show_in_api = True
+    section = instance
+    name = "funkwhale_support_message_enabled"
+    verbose_name = "Funkwhale Support message"
+    default = True
+    help_text = (
+        "If this is enabled, we will periodically display a message to encourage "
+        "local users to support Funkwhale."
+    )
+
+
+@global_preferences_registry.register
 class RavenDSN(types.StringPreference):
     show_in_api = True
     section = raven

@@ -28,6 +28,12 @@ export default {
         },
         long_description: {
           value: ''
+        },
+        funkwhale_support_message_enabled: {
+          value: true
+        },
+        support_message: {
+          value: ''
         }
       },
       users: {

@@ -26,6 +26,44 @@ export default {
     },
     pageTitle: null
   },
+  getters: {
+    showInstanceSupportMessage: (state, getters, rootState) => {
+      if (!rootState.auth.profile) {
+        return false
+      }
+      if (!rootState.instance.settings.instance.support_message.value) {
+        return false
+      }
+      let displayDate = rootState.auth.profile.instance_support_message_display_date
+      if (!displayDate) {
+        return false
+      }
+      return moment(displayDate) < moment(state.lastDate)
+    },
+    showFunkwhaleSupportMessage: (state, getters, rootState) => {
+      if (!rootState.auth.profile) {
+        return false
+      }
+      if (!rootState.instance.settings.instance.funkwhale_support_message_enabled.value) {
+        return false
+      }
+      let displayDate = rootState.auth.profile.funkwhale_support_message_display_date
+      if (!displayDate) {
+        return false
+      }
+      return moment(displayDate) < moment(state.lastDate)
+    },
+    additionalNotifications: (state, getters) => {
+      let count = 0
+      if (getters.showInstanceSupportMessage) {
+        count += 1
+      }
+      if (getters.showFunkwhaleSupportMessage) {
+        count += 1
+      }
+      return count
+    }
+  },
   mutations: {
     addWebsocketEventHandler: (state, {eventName, id, handler}) => {
       state.websocketEventsHandlers[eventName][id] = handler

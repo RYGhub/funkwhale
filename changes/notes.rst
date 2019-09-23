@@ -113,6 +113,16 @@ your pod.
 
 If you want to enable this feature on your pod, or learn more, please refer to `our documentation <https://docs.funkwhale.audio/moderator/listing.html>`_!
 
+Periodic message to incite people to support their pod and Funkwhale
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Users will now be reminded on a regular basis that they can help Funkwhale by donating or contributing.
+
+If specified by the pod admin, a separate and custom message will also be displayed in a similar way to provide instructions and links to support the pod.
+
+Both messages will appear for the first time 15 days after signup, in the notifications tab. For each message, users can schedule a reminder for a later time, or disable the messages entirely.
+
+
 Replaced Daphne by Gunicorn/Uvicorn [manual action required, non-docker only]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

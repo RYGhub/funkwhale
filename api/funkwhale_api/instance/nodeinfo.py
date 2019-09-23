@@ -63,6 +63,10 @@ def get():
                 {"type": t, "label": l, "anonymous": t in unauthenticated_report_types}
                 for t, l in moderation_models.REPORT_TYPES
             ],
+            "funkwhaleSupportMessageEnabled": all_preferences.get(
+                "instance__funkwhale_support_message_enabled"
+            ),
+            "instanceSupportMessage": all_preferences.get("instance__support_message"),
         },
     }
 

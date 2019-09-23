@@ -1,7 +1,9 @@
+import Vue from 'vue'
 import axios from 'axios'
 import jwtDecode from 'jwt-decode'
 import logger from '@/logging'
 import router from '@/router'
+import lodash from '@/lodash'
 
 export default {
   namespaced: true,
@@ -73,6 +75,11 @@ export default {
     },
     permission: (state, {key, status}) => {
       state.availablePermissions[key] = status
+    },
+    profilePartialUpdate: (state, payload) => {
+      lodash.keys(payload).forEach((k) => {
+        Vue.set(state.profile, k, payload[k])
+      })
     }
   },
   actions: {
