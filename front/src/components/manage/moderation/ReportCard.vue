@@ -136,7 +136,7 @@
                 </td>
                 <td colspan="2">
                   <i :class="[configs[target.type].icon, 'icon']"></i>
-                  <translate translate-context="*/*/*">{{ configs[target.type].label }}</translate>
+                  {{ configs[target.type].label }}
                 </td>
               </tr>
               <tr v-if="obj.target_owner && (!target || target.type !== 'account')">
