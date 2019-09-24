@@ -96,8 +96,14 @@ def refetch_obj(obj, queryset):
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Artist.objects.all()
-        .select_related("attributed_to")
-        .annotate(_tracks_count=Count("tracks"))
+        .prefetch_related("attributed_to")
+        .prefetch_related(
+            Prefetch(
+                "tracks",
+                queryset=models.Track.objects.all(),
+                to_attr="_prefetched_tracks",
+            )
+        )
     )
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [oauth_permissions.ScopePermission]

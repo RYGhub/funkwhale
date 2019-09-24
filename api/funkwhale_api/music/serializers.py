@@ -104,58 +104,50 @@ class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
     get_attributed_to = serialize_attributed_to
 
     def get_tracks_count(self, o):
-        return getattr(o, "_tracks_count", None)
+        tracks = getattr(o, "_prefetched_tracks", None)
+        return len(tracks) if tracks else None
 
 
-class ArtistSimpleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Artist
-        fields = ("id", "fid", "mbid", "name", "creation_date", "is_local")
+def serialize_artist_simple(artist):
+    return {
+        "id": artist.id,
+        "fid": artist.fid,
+        "mbid": str(artist.mbid),
+        "name": artist.name,
+        "creation_date": serializers.DateTimeField().to_representation(
+            artist.creation_date
+        ),
+        "is_local": artist.is_local,
+    }
 
 
-class AlbumTrackSerializer(serializers.ModelSerializer):
-    artist = ArtistSimpleSerializer(read_only=True)
-    uploads = serializers.SerializerMethodField()
-    listen_url = serializers.SerializerMethodField()
-    duration = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Track
-        fields = (
-            "id",
-            "fid",
-            "mbid",
-            "title",
-            "album",
-            "artist",
-            "creation_date",
-            "position",
-            "disc_number",
-            "uploads",
-            "listen_url",
-            "duration",
-            "copyright",
-            "license",
-            "is_local",
-        )
-
-    def get_uploads(self, obj):
-        uploads = getattr(obj, "playable_uploads", [])
-        return TrackUploadSerializer(uploads, many=True).data
-
-    def get_listen_url(self, obj):
-        return obj.listen_url
-
-    def get_duration(self, obj):
-        try:
-            return obj.duration
-        except AttributeError:
-            return None
+def serialize_album_track(track):
+    return {
+        "id": track.id,
+        "fid": track.fid,
+        "mbid": str(track.mbid),
+        "title": track.title,
+        "artist": serialize_artist_simple(track.artist),
+        "album": track.album_id,
+        "creation_date": serializers.DateTimeField().to_representation(
+            track.creation_date
+        ),
+        "position": track.position,
+        "disc_number": track.disc_number,
+        "uploads": [
+            serialize_upload(u) for u in getattr(track, "playable_uploads", [])
+        ],
+        "listen_url": track.listen_url,
+        "duration": getattr(track, "duration", None),
+        "copyright": track.copyright,
+        "license": track.license_id,
+        "is_local": track.is_local,
+    }
 
 
 class AlbumSerializer(serializers.ModelSerializer):
     tracks = serializers.SerializerMethodField()
-    artist = ArtistSimpleSerializer(read_only=True)
+    artist = serializers.SerializerMethodField()
     cover = cover_field
     is_playable = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
@@ -181,9 +173,12 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     get_attributed_to = serialize_attributed_to
 
+    def get_artist(self, o):
+        return serialize_artist_simple(o.artist)
+
     def get_tracks(self, o):
         ordered_tracks = o.tracks.all()
-        return AlbumTrackSerializer(ordered_tracks, many=True).data
+        return [serialize_album_track(track) for track in ordered_tracks]
 
     def get_is_playable(self, obj):
         try:
@@ -199,7 +194,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 
 class TrackAlbumSerializer(serializers.ModelSerializer):
-    artist = ArtistSimpleSerializer(read_only=True)
+    artist = serializers.SerializerMethodField()
     cover = cover_field
 
     class Meta:
@@ -216,23 +211,24 @@ class TrackAlbumSerializer(serializers.ModelSerializer):
             "is_local",
         )
 
+    def get_artist(self, o):
+        return serialize_artist_simple(o.artist)
 
-class TrackUploadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Upload
-        fields = (
-            "uuid",
-            "listen_url",
-            "size",
-            "duration",
-            "bitrate",
-            "mimetype",
-            "extension",
-        )
+
+def serialize_upload(upload):
+    return {
+        "uuid": str(upload.uuid),
+        "listen_url": upload.listen_url,
+        "size": upload.size,
+        "duration": upload.duration,
+        "bitrate": upload.bitrate,
+        "mimetype": upload.mimetype,
+        "extension": upload.extension,
+    }
 
 
 class TrackSerializer(serializers.ModelSerializer):
-    artist = ArtistSimpleSerializer(read_only=True)
+    artist = serializers.SerializerMethodField()
     album = TrackAlbumSerializer(read_only=True)
     uploads = serializers.SerializerMethodField()
     listen_url = serializers.SerializerMethodField()
@@ -262,12 +258,14 @@ class TrackSerializer(serializers.ModelSerializer):
 
     get_attributed_to = serialize_attributed_to
 
+    def get_artist(self, o):
+        return serialize_artist_simple(o.artist)
+
     def get_listen_url(self, obj):
         return obj.listen_url
 
     def get_uploads(self, obj):
-        uploads = getattr(obj, "playable_uploads", [])
-        return TrackUploadSerializer(uploads, many=True).data
+        return [serialize_upload(u) for u in getattr(obj, "playable_uploads", [])]
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
