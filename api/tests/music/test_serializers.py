@@ -62,7 +62,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
     artist = track.artist
     artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
     album = list(artist.albums.all())[0]
-    setattr(artist, "_tracks_count", 42)
+    setattr(artist, "_prefetched_tracks", range(42))
     expected = {
         "id": artist.id,
         "fid": artist.fid,
@@ -89,13 +89,13 @@ def test_album_track_serializer(factories, to_api_date):
     expected = {
         "id": track.id,
         "fid": track.fid,
-        "artist": serializers.ArtistSimpleSerializer(track.artist).data,
+        "artist": serializers.serialize_artist_simple(track.artist),
         "album": track.album.id,
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
         "disc_number": track.disc_number,
-        "uploads": [serializers.TrackUploadSerializer(upload).data],
+        "uploads": [serializers.serialize_upload(upload)],
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
         "duration": None,
@@ -103,8 +103,8 @@ def test_album_track_serializer(factories, to_api_date):
         "copyright": track.copyright,
         "is_local": track.is_local,
     }
-    serializer = serializers.AlbumTrackSerializer(track)
-    assert serializer.data == expected
+    data = serializers.serialize_album_track(track)
+    assert data == expected
 
 
 def test_upload_serializer(factories, to_api_date):
@@ -169,7 +169,7 @@ def test_album_serializer(factories, to_api_date):
         "fid": album.fid,
         "mbid": str(album.mbid),
         "title": album.title,
-        "artist": serializers.ArtistSimpleSerializer(album.artist).data,
+        "artist": serializers.serialize_artist_simple(album.artist),
         "creation_date": to_api_date(album.creation_date),
         "is_playable": False,
         "cover": {
@@ -179,7 +179,7 @@ def test_album_serializer(factories, to_api_date):
             "small_square_crop": album.cover.crop["50x50"].url,
         },
         "release_date": to_api_date(album.release_date),
-        "tracks": serializers.AlbumTrackSerializer([track2, track1], many=True).data,
+        "tracks": [serializers.serialize_album_track(t) for t in [track2, track1]],
         "is_local": album.is_local,
         "tags": [],
         "attributed_to": federation_serializers.APIActorSerializer(actor).data,
@@ -202,13 +202,13 @@ def test_track_serializer(factories, to_api_date):
     expected = {
         "id": track.id,
         "fid": track.fid,
-        "artist": serializers.ArtistSimpleSerializer(track.artist).data,
+        "artist": serializers.serialize_artist_simple(track.artist),
         "album": serializers.TrackAlbumSerializer(track.album).data,
         "mbid": str(track.mbid),
         "title": track.title,
         "position": track.position,
         "disc_number": track.disc_number,
-        "uploads": [serializers.TrackUploadSerializer(upload).data],
+        "uploads": [serializers.serialize_upload(upload)],
         "creation_date": to_api_date(track.creation_date),
         "listen_url": track.listen_url,
         "license": upload.track.license.code,
@@ -317,7 +317,7 @@ def test_manage_upload_action_relaunch_import(factories, mocker):
     assert m.call_count == 3
 
 
-def test_track_upload_serializer(factories):
+def test_serialize_upload(factories):
     upload = factories["music.Upload"]()
 
     expected = {
@@ -330,8 +330,8 @@ def test_track_upload_serializer(factories):
         "duration": upload.duration,
     }
 
-    serializer = serializers.TrackUploadSerializer(upload)
-    assert serializer.data == expected
+    data = serializers.serialize_upload(upload)
+    assert data == expected
 
 
 @pytest.mark.parametrize(

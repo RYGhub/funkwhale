@@ -6,7 +6,7 @@ import urllib.parse
 import uuid
 
 import pytest
-from django.db.models import Count
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 
@@ -28,7 +28,9 @@ def test_artist_list_serializer(api_request, factories, logged_in_api_client):
     ).track
     artist = track.artist
     request = api_request.get("/")
-    qs = artist.__class__.objects.with_albums().annotate(_tracks_count=Count("tracks"))
+    qs = artist.__class__.objects.with_albums().prefetch_related(
+        Prefetch("tracks", to_attr="_prefetched_tracks")
+    )
     serializer = serializers.ArtistWithAlbumsSerializer(
         qs, many=True, context={"request": request}
     )
