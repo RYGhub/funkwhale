@@ -20,6 +20,7 @@ Additional info:
 
 - This script is based on our `Ansible role <https://dev.funkwhale.audio/funkwhale/ansible/>`_.
 - By default, the script installs Nginx, PostgreSQL, Redis and Funkwhale itself but you can customize the installation procedure if you already have some of these services available on your machine
+- Edit your pod configuration in ``/srv/funkwhale/ansible/playbook.yml`` and apply new configuration with ``sudo /srv/funkwhale/ansible/reconfigure``
 - Upgrade is done using ``sh -c "$(curl -sSL https://get.funkwhale.audio/upgrade.sh)"``.
 
 
