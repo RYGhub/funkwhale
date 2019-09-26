@@ -1,5 +1,15 @@
 <template>
   <div>
+    <div class="ui warning message" v-if="!anonymousCanListen">
+      <p>
+        <strong>
+          <translate translate-context="Content/Embed/Message">Sharing will not work because this pod doesn't allow anonymous users to access content.</translate>
+        </strong>
+      </p>
+      <p>
+        <translate translate-context="Content/Embed/Message">Please contact your admins and ask them to update the corresponding setting.</translate>
+      </p>
+    </div>
     <div class="ui form">
       <div class="two fields">
         <div class="field">
@@ -41,6 +51,9 @@
 
 <script>
 
+import { mapState } from "vuex"
+import _ from '@/lodash'
+
 export default {
   props: ['type', 'id'],
   data () {
@@ -57,6 +70,12 @@ export default {
     return d
   },
   computed: {
+    ...mapState({
+      nodeinfo: state => state.instance.nodeinfo,
+    }),
+    anonymousCanListen () {
+      return _.get(this.nodeinfo, 'metadata.library.anonymousCanListen', false)
+    },
     iframeSrc () {
       let base = process.env.BASE_URL
       if (base.startsWith('/')) {
@@ -99,7 +118,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.message {
+p.message {
   position: absolute;
   right: 0;
   bottom: -2em;
