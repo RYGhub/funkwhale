@@ -136,6 +136,10 @@ keeping a backup of the old version in ``./postgres-old``:
 Non-docker setup
 ----------------
 
+If you installed Funkwhale using the install script, upgrading is done using ``sh -c "$(curl -sSL https://get.funkwhale.audio/upgrade.sh)"``. Make sure to run this command with root permissions.
+
+If you manually installed Funkwhale, please use the following instructions.
+
 Upgrade the static files
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
