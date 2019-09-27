@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-23 11:57+0200\n"
-"PO-Revision-Date: 2019-09-26 10:13+0000\n"
+"PO-Revision-Date: 2019-09-28 10:13+0000\n"
 "Last-Translator: Xosé M <xosem@disroot.org>\n"
 "Language-Team: none\n"
 "Language: gl\n"
@@ -208,7 +208,7 @@ msgstr "Fallou a rede mentras se subía o ficheiro"
 #: front/src/components/library/EditForm.vue:161
 msgctxt "*/*/Placeholder"
 msgid "A short summary describing your changes."
-msgstr "Algo fallou ao gardar os cambios"
+msgstr "Un breve resumen describindo os cambios."
 
 #: front/src/components/About.vue:5
 msgctxt "Content/Home/Header"
@@ -312,7 +312,7 @@ msgstr "Acalar notificacións"
 #: front/src/components/mixins/Translations.vue:102
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to playlists"
-msgstr "Engadir a lista de reprodución…"
+msgstr "Accede a listas de reprodución"
 
 #: front/src/components/mixins/Translations.vue:105
 #: front/src/components/mixins/Translations.vue:106
@@ -1012,7 +1012,7 @@ msgstr "Ao cambiar o contrasinal tamén cambia o seu contrasinal no API Subsonic
 #: front/src/components/auth/Settings.vue:98
 msgctxt "Popup/Settings/Paragraph"
 msgid "Changing your password will have the following consequences:"
-msgstr "Cambiar o contrasinal terá as seguintes consecuencias"
+msgstr "Cambiar o contrasinal terá as seguintes consecuencias:"
 
 #: front/src/components/Footer.vue:48
 msgctxt "Footer/*/List item.Link"
@@ -2085,7 +2085,7 @@ msgstr "Cancións fallidas:"
 #: front/src/views/admin/library/TrackDetail.vue:223
 msgctxt "*/*/*"
 msgid "Favorited tracks"
-msgstr "Cancións fallidas:"
+msgstr "Cancións favoritas"
 
 #: front/src/components/Sidebar.vue:66
 msgctxt "Sidebar/Favorites/List item.Link/Noun"
@@ -3080,7 +3080,7 @@ msgstr "Ningún artista coincide coa busca"
 #: front/src/components/library/TrackDetail.vue:14
 msgctxt "Content/Track/Table.Paragraph"
 msgid "No copyright information available for this track"
-msgstr "Non hai letras dispoñibles para esta canción."
+msgstr "Non hai información acerca dos dereitos sobre esta canción"
 
 #: front/src/components/About.vue:25 src/components/Home.vue:25
 msgctxt "Content/Home/Paragraph"
@@ -4744,7 +4744,7 @@ msgstr ""
 #: front/src/components/library/FileUpload.vue:38
 msgctxt "Content/Library/List item"
 msgid "The music files you are uploading are tagged properly."
-msgstr "Os ficheiros de música que está a subir están etiquetados correctamente:"
+msgstr "Os ficheiros de música que está a subir están correctamente etiquetados"
 
 #: front/src/components/audio/Player.vue:65
 msgctxt "Sidebar/Player/Error message.Paragraph"
@@ -5812,7 +5812,7 @@ msgstr ""
 #: front/src/components/auth/SignupForm.vue:9
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account cannot be created."
-msgstr "Lista creada"
+msgstr "Non se pode crear a conta."
 
 #: front/src/components/auth/Settings.vue:281
 msgctxt "Content/Settings/Paragraph'"
