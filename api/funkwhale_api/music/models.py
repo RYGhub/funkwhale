@@ -330,6 +330,7 @@ class Album(APIModelMixin):
         if data:
             extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
             extension = extensions.get(data["mimetype"], "jpg")
+            f = None
             if data.get("content"):
                 # we have to cover itself
                 f = ContentFile(data["content"])
@@ -349,15 +350,17 @@ class Album(APIModelMixin):
                     return
                 else:
                     f = ContentFile(response.content)
-            self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
-            self.save(update_fields=["cover"])
-            return self.cover.file
+            if f:
+                self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
+                self.save(update_fields=["cover"])
+                return self.cover.file
         if self.mbid:
             image_data = musicbrainz.api.images.get_front(str(self.mbid))
             f = ContentFile(image_data)
             self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
             self.save(update_fields=["cover"])
-        return self.cover.file
+        if self.cover:
+            return self.cover.file
 
     def __str__(self):
         return self.title

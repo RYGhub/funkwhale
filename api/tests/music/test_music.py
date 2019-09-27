@@ -133,3 +133,11 @@ def test_can_download_image_file_for_album(binary_cover, mocker, factories):
     album.save()
 
     assert album.cover.file.read() == binary_cover
+
+
+def test_album_get_image_doesnt_crash_with_empty_data(mocker, factories):
+    album = factories["music.Album"](mbid=None, cover=None)
+    assert (
+        album.get_image(data={"content": "", "url": "", "mimetype": "image/png"})
+        is None
+    )
