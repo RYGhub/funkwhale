@@ -406,6 +406,12 @@ def get_track_from_import_metadata(data, update_cover=False, attributed_to=None)
     return track
 
 
+def truncate(v, length):
+    if v is None:
+        return v
+    return v[:length]
+
+
 def _get_track(data, attributed_to=None):
     track_uuid = getter(data, "funkwhale", "track", "uuid")
 
@@ -447,7 +453,7 @@ def _get_track(data, attributed_to=None):
     artist_data = artists[0]
     artist_mbid = artist_data.get("mbid", None)
     artist_fid = artist_data.get("fid", None)
-    artist_name = artist_data["name"]
+    artist_name = truncate(artist_data["name"], models.MAX_LENGTHS["ARTIST_NAME"])
 
     if artist_mbid:
         query = Q(mbid=artist_mbid)
@@ -473,7 +479,9 @@ def _get_track(data, attributed_to=None):
 
     album_artists = getter(data, "album", "artists", default=artists) or artists
     album_artist_data = album_artists[0]
-    album_artist_name = album_artist_data.get("name")
+    album_artist_name = truncate(
+        album_artist_data.get("name"), models.MAX_LENGTHS["ARTIST_NAME"]
+    )
     if album_artist_name == artist_name:
         album_artist = artist
     else:
@@ -502,7 +510,7 @@ def _get_track(data, attributed_to=None):
 
     # get / create album
     album_data = data["album"]
-    album_title = album_data["title"]
+    album_title = truncate(album_data["title"], models.MAX_LENGTHS["ALBUM_TITLE"])
     album_fid = album_data.get("fid", None)
 
     if album_mbid:
@@ -531,7 +539,7 @@ def _get_track(data, attributed_to=None):
         tags_models.add_tags(album, *album_data.get("tags", []))
 
     # get / create track
-    track_title = data["title"]
+    track_title = truncate(data["title"], models.MAX_LENGTHS["TRACK_TITLE"])
     position = data.get("position", 1)
     query = Q(title__iexact=track_title, artist=artist, album=album, position=position)
     if track_mbid:
@@ -549,7 +557,7 @@ def _get_track(data, attributed_to=None):
         "from_activity_id": from_activity_id,
         "attributed_to": data.get("attributed_to", attributed_to),
         "license": licenses.match(data.get("license"), data.get("copyright")),
-        "copyright": data.get("copyright"),
+        "copyright": truncate(data.get("copyright"), models.MAX_LENGTHS["COPYRIGHT"]),
     }
     if data.get("fdate"):
         defaults["creation_date"] = data.get("fdate")
