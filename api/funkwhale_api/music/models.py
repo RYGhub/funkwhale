@@ -34,6 +34,13 @@ from . import importers, metadata, utils
 
 logger = logging.getLogger(__name__)
 
+MAX_LENGTHS = {
+    "ARTIST_NAME": 255,
+    "ALBUM_TITLE": 255,
+    "TRACK_TITLE": 255,
+    "COPYRIGHT": 500,
+}
+
 
 def empty_dict():
     return {}
@@ -187,7 +194,7 @@ class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 
 
 class Artist(APIModelMixin):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=MAX_LENGTHS["ARTIST_NAME"])
     federation_namespace = "artists"
     musicbrainz_model = "artist"
     musicbrainz_mapping = {
@@ -275,7 +282,7 @@ class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 
 
 class Album(APIModelMixin):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=MAX_LENGTHS["ALBUM_TITLE"])
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
     release_date = models.DateField(null=True, blank=True)
     release_group_id = models.UUIDField(null=True, blank=True)
@@ -330,6 +337,7 @@ class Album(APIModelMixin):
         if data:
             extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
             extension = extensions.get(data["mimetype"], "jpg")
+            f = None
             if data.get("content"):
                 # we have to cover itself
                 f = ContentFile(data["content"])
@@ -349,15 +357,17 @@ class Album(APIModelMixin):
                     return
                 else:
                     f = ContentFile(response.content)
-            self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
-            self.save(update_fields=["cover"])
-            return self.cover.file
+            if f:
+                self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
+                self.save(update_fields=["cover"])
+                return self.cover.file
         if self.mbid:
             image_data = musicbrainz.api.images.get_front(str(self.mbid))
             f = ContentFile(image_data)
             self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
             self.save(update_fields=["cover"])
-        return self.cover.file
+        if self.cover:
+            return self.cover.file
 
     def __str__(self):
         return self.title
@@ -445,7 +455,7 @@ def get_artist(release_list):
 
 
 class Track(APIModelMixin):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=MAX_LENGTHS["TRACK_TITLE"])
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
     disc_number = models.PositiveIntegerField(null=True, blank=True)
     position = models.PositiveIntegerField(null=True, blank=True)
@@ -469,7 +479,9 @@ class Track(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_tracks",
     )
-    copyright = models.CharField(max_length=500, null=True, blank=True)
+    copyright = models.CharField(
+        max_length=MAX_LENGTHS["COPYRIGHT"], null=True, blank=True
+    )
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings

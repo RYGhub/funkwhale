@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import jsonld
-from funkwhale_api.music import licenses, metadata, signals, tasks
+from funkwhale_api.music import licenses, metadata, models, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -77,6 +77,32 @@ def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
     assert track.artist.name == metadata["artists"][0]["name"]
     assert track.artist.mbid is None
     assert track.artist.attributed_to == actor
+
+
+def test_can_create_track_from_file_metadata_truncates_too_long_values(
+    factories, mocker
+):
+    metadata = {
+        "title": "a" * 5000,
+        "artists": [{"name": "b" * 5000}],
+        "album": {"title": "c" * 5000, "release_date": datetime.date(2012, 8, 15)},
+        "position": 4,
+        "disc_number": 2,
+        "copyright": "d" * 5000,
+    }
+
+    track = tasks.get_track_from_import_metadata(metadata)
+
+    assert track.title == metadata["title"][: models.MAX_LENGTHS["TRACK_TITLE"]]
+    assert track.copyright == metadata["copyright"][: models.MAX_LENGTHS["COPYRIGHT"]]
+    assert (
+        track.album.title
+        == metadata["album"]["title"][: models.MAX_LENGTHS["ALBUM_TITLE"]]
+    )
+    assert (
+        track.artist.name
+        == metadata["artists"][0]["name"][: models.MAX_LENGTHS["ARTIST_NAME"]]
+    )
 
 
 def test_can_create_track_from_file_metadata_featuring(factories):
