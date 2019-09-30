@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-23 11:57+0200\n"
-"PO-Revision-Date: 2019-09-26 10:13+0000\n"
+"PO-Revision-Date: 2019-10-01 08:57+0000\n"
 "Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
@@ -1456,12 +1456,12 @@ msgstr "Supprimer la radio"
 #: front/src/components/manage/moderation/ReportCard.vue:357
 msgctxt "Content/Moderation/Button/Verb"
 msgid "Delete reported object"
-msgstr ""
+msgstr "Supprimer l’objet signalé"
 
 #: front/src/components/manage/moderation/ReportCard.vue:358
 msgctxt "Content/Moderation/Popup/Header"
 msgid "Delete reported object?"
-msgstr ""
+msgstr "Supprimer l’objet signalé ?"
 
 #: front/src/views/admin/library/AlbumDetail.vue:79
 #: front/src/views/admin/library/TrackDetail.vue:78
@@ -5757,7 +5757,7 @@ msgstr ""
 #: front/src/components/SetInstanceModal.vue:98
 msgctxt "*/Instance/Message"
 msgid "You are now using the Funkwhale instance at %{ url }"
-msgstr ""
+msgstr "Vous utilisez maintenant l’instance Funkwhale sur ${ url }"
 
 #: front/src/views/content/Home.vue:17
 #, fuzzy
@@ -5769,6 +5769,8 @@ msgstr "Vous pouvez suivre les bibliothèques d'autres utilisateurs pour avoir a
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You can manage and update your filters any time from your account settings."
 msgstr ""
+"Vous pouvez gérer et mettre à jour vos filtres à tout moment depuis les "
+"paramètres de votre compte."
 
 #: front/src/views/auth/EmailConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
@@ -5779,6 +5781,9 @@ msgstr "Vous pouvez maintenant utiliser le service sans limitations."
 msgctxt "Content/Settings/Paragraph'"
 msgid "You can permanently and irreversibly delete your account and all the associated data using the form below. You will be asked for confirmation."
 msgstr ""
+"Vous pouvez de façon permanente et irrémédiable votre compte et toutes les "
+"données liées en utilisant le formulaire ci-dessous. Une confirmation vous "
+"sera demandée."
 
 #: front/src/components/library/radios/Builder.vue:7
 msgctxt "Content/Radio/Paragraph"
@@ -5833,7 +5838,7 @@ msgstr "Vous allez être déconnecté⋅e de cette session et vous devrez vous c
 #: front/src/components/auth/Authorize.vue:51
 msgctxt "Content/Auth/Paragraph"
 msgid "You will be redirected to <strong>%{ url }</strong>"
-msgstr ""
+msgstr "Vous allez être redirigé·e vers <strong>${ url }</strong>"
 
 #: front/src/components/auth/Authorize.vue:49
 msgctxt "Content/Auth/Paragraph"
@@ -5849,6 +5854,8 @@ msgstr "Vous devrez mettre à jour votre mot de passe sur l'ensemble des clients
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You will not see tracks, albums and user activity linked to this artist any more:"
 msgstr ""
+"Vous ne verrez plus les pistes, albums et activité utilisateur liées à cet "
+"artiste :"
 
 #: front/src/components/auth/SignupForm.vue:9
 msgctxt "Content/Signup/Form/Paragraph"
@@ -5868,7 +5875,7 @@ msgstr "Vos notifications"
 #: front/src/components/auth/Settings.vue:38
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your avatar cannot be saved"
-msgstr ""
+msgstr "Impossible de sauvegarder votre avatar"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
