@@ -195,8 +195,8 @@ msgstr "Lägg till i favoriter"
 
 #: front/src/components/playlists/TrackPlaylistIcon.vue:6
 #: front/src/components/playlists/TrackPlaylistIcon.vue:32
-msgid "Add to playlist..."
-msgstr "Lägg till i spellista..."
+msgid "Add to playlist…"
+msgstr "Lägg till i spellista…"
 
 #: front/src/components/audio/PlayButton.vue:14
 msgid "Add to queue"
@@ -313,8 +313,8 @@ msgid "Artist page"
 msgstr "Artistsida"
 
 #: front/src/components/audio/Search.vue:65
-msgid "Artist, album, track..."
-msgstr "Artist, album, spår..."
+msgid "Artist, album, track…"
+msgstr "Artist, album, spår…"
 
 #: front/src/components/audio/Search.vue:10 src/components/instance/Stats.vue:42
 #: front/src/components/library/Artists.vue:119 src/components/library/Library.vue:7
@@ -702,8 +702,8 @@ msgid "Edit instance info"
 msgstr "Redigera info om instans"
 
 #: front/src/components/radios/Card.vue:20 src/views/playlists/Detail.vue:30
-msgid "Edit..."
-msgstr "Redigera..."
+msgid "Edit…"
+msgstr "Redigera…"
 
 #: front/src/components/auth/Signup.vue:29
 #: front/src/components/manage/users/UsersTable.vue:38
@@ -727,20 +727,20 @@ msgid "Ensure your music files are properly tagged before uploading them."
 msgstr "Se till att dina musikfiler är korrekt taggade innan du laddar upp dem."
 
 #: front/src/components/library/Radios.vue:140
-msgid "Enter a radio name..."
-msgstr "Ange namn på radiostation..."
+msgid "Enter a radio name…"
+msgstr "Ange namn på radiostation…"
 
 #: front/src/components/library/Artists.vue:118
-msgid "Enter an artist name..."
-msgstr "Ange ett artistnamn..."
+msgid "Enter an artist name…"
+msgstr "Ange ett artistnamn…"
 
 #: front/src/views/federation/LibraryList.vue:122
-msgid "Enter an library domain name..."
+msgid "Enter an library domain name…"
 msgstr ""
 
 #: front/src/views/playlists/List.vue:104
-msgid "Enter an playlist name..."
-msgstr "Ange ett spellistenamn..."
+msgid "Enter an playlist name…"
+msgstr "Ange ett spellistenamn…"
 
 #: front/src/components/auth/Signup.vue:98
 msgid "Enter your email"
@@ -751,8 +751,8 @@ msgid "Enter your invitation code (case insensitive)"
 msgstr "Ange din inbjudningskod (skiftlägesokänsligt)"
 
 #: front/src/components/metadata/Search.vue:114
-msgid "Enter your search query..."
-msgstr "Ange dina söktermer..."
+msgid "Enter your search query…"
+msgstr "Ange dina söktermer…"
 
 #: front/src/components/auth/Signup.vue:97
 msgid "Enter your username"
@@ -1240,11 +1240,11 @@ msgid "Links"
 msgstr ""
 
 #: front/src/views/instance/Timeline.vue:4
-msgid "Loading timeline..."
+msgid "Loading timeline…"
 msgstr ""
 
 #: front/src/components/favorites/List.vue:5
-msgid "Loading your favorites..."
+msgid "Loading your favorites…"
 msgstr ""
 
 #: front/src/components/auth/Login.vue:78
@@ -1773,36 +1773,36 @@ msgid "Search an entity you want to import:"
 msgstr ""
 
 #: front/src/components/manage/library/RequestsTable.vue:180
-msgid "Search by artist, username, comment..."
+msgid "Search by artist, username, comment…"
 msgstr ""
 
 #: front/src/components/library/import/BatchDetail.vue:188
-msgid "Search by source..."
+msgid "Search by source…"
 msgstr ""
 
 #: front/src/components/library/import/BatchList.vue:116
-msgid "Search by submitter, source..."
+msgid "Search by submitter, source…"
 msgstr ""
 
 #: front/src/components/federation/LibraryTrackTable.vue:182
 #: front/src/components/manage/library/FilesTable.vue:175
-msgid "Search by title, artist, domain..."
+msgid "Search by title, artist, domain…"
 msgstr ""
 
 #: front/src/components/federation/LibraryFollowTable.vue:140
-msgid "Search by username, domain..."
+msgid "Search by username, domain…"
 msgstr ""
 
 #: front/src/components/manage/users/InvitationsTable.vue:152
-msgid "Search by username, email, code..."
+msgid "Search by username, email, code…"
 msgstr ""
 
 #: front/src/components/manage/users/UsersTable.vue:162
-msgid "Search by username, email, name..."
+msgid "Search by username, email, name…"
 msgstr ""
 
 #: front/src/components/audio/SearchBar.vue:20
-msgid "Search for artists, albums, tracks..."
+msgid "Search for artists, albums, tracks…"
 msgstr ""
 
 #: front/src/components/audio/Search.vue:2
@@ -1837,7 +1837,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: front/src/components/library/import/FileUpload.vue:22
-msgid "Select files to upload..."
+msgid "Select files to upload…"
 msgstr ""
 
 #: front/src/components/common/ActionTable.vue:69
@@ -1866,7 +1866,7 @@ msgid "Settings updated successfully."
 msgstr ""
 
 #: front/src/components/auth/Profile.vue:24
-msgid "Settings..."
+msgid "Settings…"
 msgstr ""
 
 #: front/src/components/manage/users/InvitationForm.vue:27
@@ -2030,7 +2030,7 @@ msgid "Suggested choices"
 msgstr ""
 
 #: front/src/components/playlists/Editor.vue:9
-msgid "Syncing changes to server..."
+msgid "Syncing changes to server…"
 msgstr ""
 
 #: front/src/components/Home.vue:26
@@ -2206,7 +2206,7 @@ msgid "Uploaded files or external source"
 msgstr ""
 
 #: front/src/components/library/import/FileUpload.vue:57
-msgid "Uploading..."
+msgid "Uploading…"
 msgstr ""
 
 #: front/src/App.vue:45

@@ -1896,8 +1896,8 @@ msgstr "Name des Radios eingeben…"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
-msgstr "Album Titel eingeben..."
+msgid "Enter album title…"
+msgstr "Album Titel eingeben…"
 
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
@@ -2949,7 +2949,7 @@ msgstr "Änderungsdatum"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr ""
 
 #: front/src/components/library/AlbumBase.vue:43

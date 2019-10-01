@@ -339,7 +339,7 @@ msgstr "Jakinarazpenak"
 #, fuzzy
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to playlists"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/mixins/Translations.vue:105
 #: front/src/components/mixins/Translations.vue:106
@@ -513,19 +513,19 @@ msgstr "Edukia sartu"
 #, fuzzy
 msgctxt "Content/Moderation/Link/Verb"
 msgid "Add to allow-list"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:191
 #, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Add to allow-list"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/views/admin/moderation/DomainsList.vue:18
 #, fuzzy
 msgctxt "Content/Moderation/Form.Label/Verb"
 msgid "Add to allow-list"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/audio/PlayButton.vue:91
 #, fuzzy
@@ -544,7 +544,7 @@ msgstr "Gogokoetan sartu"
 #, fuzzy
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Add to playlist…"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/audio/PlayButton.vue:15
 msgctxt "*/Queue/Dropdown/Button/Label/Short"
@@ -555,7 +555,7 @@ msgstr "Ilaran gehitu"
 #, fuzzy
 msgctxt "Popup/Playlist/Table.Button.Tooltip/Verb"
 msgid "Add to this playlist"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/playlists/PlaylistModal.vue:68
 msgctxt "Popup/Playlist/Table.Button.Label/Verb"
@@ -1957,7 +1957,7 @@ msgstr ""
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
+msgid "Enter album title…"
 msgstr ""
 
 #: front/src/components/library/Artists.vue:116
@@ -2819,44 +2819,44 @@ msgstr ""
 #, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Loading followers…"
-msgstr "Jarraitzaileak kargatzen..."
+msgstr "Jarraitzaileak kargatzen…"
 
 #: front/src/views/content/libraries/Home.vue:3
 #, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Loading Libraries…"
-msgstr "Liburutegiak kargatzen..."
+msgstr "Liburutegiak kargatzen…"
 
 #: front/src/views/content/libraries/Detail.vue:3
 #: front/src/views/content/libraries/Upload.vue:3
 #, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Loading library data…"
-msgstr "Liburutegi datuak kargatzen..."
+msgstr "Liburutegi datuak kargatzen…"
 
 #: front/src/views/Notifications.vue:84
 #, fuzzy
 msgctxt "Content/Notifications/Paragraph"
 msgid "Loading notifications…"
-msgstr "Jakinarazpenak kargatzen..."
+msgstr "Jakinarazpenak kargatzen…"
 
 #: front/src/views/content/remote/Home.vue:3
 #, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Loading remote libraries…"
-msgstr "Urruneko liburutegiak kargatzen..."
+msgstr "Urruneko liburutegiak kargatzen…"
 
 #: front/src/views/content/libraries/Quota.vue:4
 #, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Loading usage data…"
-msgstr "Erabilpen datuak kargatzen..."
+msgstr "Erabilpen datuak kargatzen…"
 
 #: front/src/components/favorites/List.vue:5
 #, fuzzy
 msgctxt "Content/Favorites/Message"
 msgid "Loading your favorites…"
-msgstr "Zure gogokoak kargatzen..."
+msgstr "Zure gogokoak kargatzen…"
 
 #: front/src/components/manage/library/AlbumsTable.vue:65
 #: front/src/components/manage/library/ArtistsTable.vue:58
@@ -3067,7 +3067,7 @@ msgstr "Iraungitze data"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr ""
 
 #: front/src/components/library/AlbumBase.vue:43
@@ -4131,7 +4131,7 @@ msgstr "Liburutegi hau ezabatu?"
 #, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this playlist…"
-msgstr "Zerrendan sartu..."
+msgstr "Zerrendan sartu…"
 
 #: front/src/components/mixins/Report.vue:23
 #: src/components/mixins/Report.vue:24
@@ -4308,7 +4308,7 @@ msgstr "Erroreak eskaneatzean"
 #, fuzzy
 msgctxt "Content/Library/Card.List item"
 msgid "Scanning… (%{ progress }%)"
-msgstr "Eskaneatzen... (%{ progress }%)"
+msgstr "Eskaneatzen… (%{ progress }%)"
 
 #: front/src/components/auth/ApplicationForm.vue:22
 msgctxt "Content/Applications/Input.Label/Noun"

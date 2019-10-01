@@ -1918,7 +1918,7 @@ msgstr "Wprowadź nazwę radia…"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
+msgid "Enter album title…"
 msgstr ""
 
 #: front/src/components/library/Artists.vue:116
@@ -2971,7 +2971,7 @@ msgstr "Data modyfikacji"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr ""
 
 #: front/src/components/library/AlbumBase.vue:43
@@ -4170,7 +4170,7 @@ msgstr "Zeskanowano z błędami"
 #: front/src/views/content/remote/Card.vue:52
 msgctxt "Content/Library/Card.List item"
 msgid "Scanning… (%{ progress }%)"
-msgstr "Skanowanie... (%{ progress }%)"
+msgstr "Skanowanie… (%{ progress }%)"
 
 #: front/src/components/auth/ApplicationForm.vue:22
 msgctxt "Content/Applications/Input.Label/Noun"

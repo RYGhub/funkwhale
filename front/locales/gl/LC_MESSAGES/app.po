@@ -1601,7 +1601,7 @@ msgstr "Mostrar públicamente"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgctxt "Content/Moderation/Help text"
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
-msgstr "Non baixar ningún ficheiro de medios (audio, portada, avatar da conta...) de esta conta ou dominio. Esto eliminará tamén o contido existente."
+msgstr "Non baixar ningún ficheiro de medios (audio, portada, avatar da conta…) de esta conta ou dominio. Esto eliminará tamén o contido existente."
 
 #: front/src/views/Notifications.vue:36
 msgctxt "Content/Notifications/Header"
@@ -1866,8 +1866,8 @@ msgstr "Introduza un nome de radio…"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
-msgstr "Escribir título de álbume..."
+msgid "Enter album title…"
+msgstr "Escribir título de álbume…"
 
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
@@ -2915,8 +2915,8 @@ msgstr "Data de modificación"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
-msgstr "Máis..."
+msgid "More…"
+msgstr "Máis…"
 
 #: front/src/components/library/AlbumBase.vue:43
 #: front/src/components/library/ArtistBase.vue:54
@@ -4101,7 +4101,7 @@ msgstr "Escaneado con fallos"
 #: front/src/views/content/remote/Card.vue:52
 msgctxt "Content/Library/Card.List item"
 msgid "Scanning… (%{ progress }%)"
-msgstr "Escaneando... (%{ progress }%)"
+msgstr "Escaneando… (%{ progress }%)"
 
 #: front/src/components/auth/ApplicationForm.vue:22
 msgctxt "Content/Applications/Input.Label/Noun"

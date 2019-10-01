@@ -1633,7 +1633,7 @@ msgstr "Exibir publicamente"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgctxt "Content/Moderation/Help text"
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
-msgstr "Não faça o download de nenhum arquivo de mídia (áudio, capa do álbum, avatar da conta ...) dessa conta ou domínio. Isso também limpará o conteúdo existente."
+msgstr "Não faça o download de nenhum arquivo de mídia (áudio, capa do álbum, avatar da conta …) dessa conta ou domínio. Isso também limpará o conteúdo existente."
 
 #: front/src/views/Notifications.vue:36
 #, fuzzy
@@ -1904,7 +1904,7 @@ msgstr "Indicar um nome de rádio …"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
+msgid "Enter album title…"
 msgstr ""
 
 #: front/src/components/library/Artists.vue:116
@@ -2746,7 +2746,7 @@ msgstr "Carregando notificações…"
 #: front/src/views/content/remote/Home.vue:3
 msgctxt "Content/Library/Paragraph"
 msgid "Loading remote libraries…"
-msgstr "Carregando bibliotecas remotas..."
+msgstr "Carregando bibliotecas remotas…"
 
 #: front/src/views/content/libraries/Quota.vue:4
 msgctxt "Content/Library/Paragraph"
@@ -2958,7 +2958,7 @@ msgstr "Data de modificação"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr ""
 
 #: front/src/components/library/AlbumBase.vue:43
@@ -4204,17 +4204,17 @@ msgstr "Pesquisa por título, artista, domínio…"
 #: front/src/components/manage/library/LibrariesTable.vue:191
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, actor, name, description…"
-msgstr "Pesquisa por domínio, nome de utilizador, biografia..."
+msgstr "Pesquisa por domínio, nome de utilizador, biografia…"
 
 #: front/src/components/manage/library/UploadsTable.vue:241
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, actor, name, reference, source…"
-msgstr "Pesquisa por domínio, nome de utilizador, biografia..."
+msgstr "Pesquisa por domínio, nome de utilizador, biografia…"
 
 #: front/src/components/manage/library/ArtistsTable.vue:164
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, name, MusicBrainz ID…"
-msgstr "Pesquisa por domínio, nome de utilizador, biografia..."
+msgstr "Pesquisa por domínio, nome de utilizador, biografia…"
 
 #: front/src/components/manage/library/TracksTable.vue:174
 msgctxt "Content/Search/Input.Placeholder"
@@ -4229,18 +4229,18 @@ msgstr "Pesquisa por título, artista, álbum…"
 #: front/src/components/manage/moderation/AccountsTable.vue:171
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, username, bio…"
-msgstr "Pesquisa por domínio, nome de utilizador, biografia..."
+msgstr "Pesquisa por domínio, nome de utilizador, biografia…"
 
 #: front/src/components/manage/library/TagsTable.vue:165
 #, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by name"
-msgstr "Pesquisar por nome..."
+msgstr "Pesquisar por nome…"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:168
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by name…"
-msgstr "Pesquisar por nome..."
+msgstr "Pesquisar por nome…"
 
 #: front/src/views/content/libraries/FilesTable.vue:208
 msgctxt "Content/Library/Input.Placeholder"
@@ -4271,7 +4271,7 @@ msgstr "Procure alguma música"
 #, fuzzy
 msgctxt "*/Dropdown/Placeholder/Verb"
 msgid "Search for tags…"
-msgstr "Pesquisar por nome..."
+msgstr "Pesquisar por nome…"
 
 #: front/src/components/library/AlbumBase.vue:66
 #: front/src/components/library/ArtistBase.vue:77
@@ -4809,7 +4809,7 @@ msgstr "Os arquivos de música que você está enviando são marcados corretamen
 #: front/src/components/audio/Player.vue:65
 msgctxt "Sidebar/Player/Error message.Paragraph"
 msgid "The next track will play automatically in a few seconds…"
-msgstr "A próxima pista será jogada automaticamente em poucos segundos..."
+msgstr "A próxima pista será jogada automaticamente em poucos segundos…"
 
 #: front/src/components/manage/moderation/NotesThread.vue:27
 #, fuzzy

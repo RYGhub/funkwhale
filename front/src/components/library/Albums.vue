@@ -125,7 +125,7 @@ export default {
   },
   computed: {
     labels() {
-      let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter album title...")
+      let searchPlaceholder = this.$pgettext('Content/Search/Input.Placeholder', "Enter album title…")
       let title = this.$pgettext('*/*/*', "Albums")
       return {
         searchPlaceholder,

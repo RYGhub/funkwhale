@@ -1860,7 +1860,7 @@ msgstr "Escrivètz un nom de ràdio…"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
+msgid "Enter album title…"
 msgstr "Picatz lo títol de l’album…"
 
 #: front/src/components/library/Artists.vue:116
@@ -2907,7 +2907,7 @@ msgstr "Data de modificacion"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr "Mai…"
 
 #: front/src/components/library/AlbumBase.vue:43

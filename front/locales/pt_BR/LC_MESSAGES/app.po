@@ -1625,7 +1625,7 @@ msgstr "Mostrar publicamente"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgctxt "Content/Moderation/Help text"
 msgid "Do not download any media file (audio, album cover, account avatar…) from this account or domain. This will purge existing content as well."
-msgstr "Não baixar nenhum arquivo de mídia (áudio, capa de álbum, imagem de exibição...) desta conta ou domínio. Esta ação também excluirá o conteúdo já existente."
+msgstr "Não baixar nenhum arquivo de mídia (áudio, capa de álbum, imagem de exibição…) desta conta ou domínio. Esta ação também excluirá o conteúdo já existente."
 
 #: front/src/views/Notifications.vue:36
 #, fuzzy
@@ -1895,8 +1895,8 @@ msgstr "Insira o nome de uma rádio…"
 
 #: front/src/components/library/Albums.vue:128
 msgctxt "Content/Search/Input.Placeholder"
-msgid "Enter album title..."
-msgstr "Insira o título do álbum..."
+msgid "Enter album title…"
+msgstr "Insira o título do álbum…"
 
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
@@ -2950,7 +2950,7 @@ msgstr "Data de modificação"
 
 #: front/src/components/audio/PlayButton.vue:100
 msgctxt "*/Queue/Button/Title"
-msgid "More..."
+msgid "More…"
 msgstr ""
 
 #: front/src/components/library/AlbumBase.vue:43

@@ -113,7 +113,7 @@ export default {
       router.push({name: 'index'})
     },
     check ({commit, dispatch, state}) {
-      logger.default.info('Checking authentication...')
+      logger.default.info('Checking authentication…')
       var jwt = state.token
       if (jwt) {
         commit('token', jwt)
