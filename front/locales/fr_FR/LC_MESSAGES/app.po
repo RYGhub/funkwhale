@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-01 14:21+0000\n"
-"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"PO-Revision-Date: 2019-10-03 17:13+0000\n"
+"Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
 "Language: fr_FR\n"
@@ -33,7 +33,7 @@ msgstr "(vide)"
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr "%{ app } Veut accéder à votre compte funkwhale"
+msgstr "%{ app } veut accéder à votre compte Funkwhale"
 
 #: front/src/components/About.vue:173 src/components/Home.vue:56
 msgctxt "Content/Home/Stat"
@@ -256,7 +256,7 @@ msgstr "Accès désactivé"
 #: front/src/components/mixins/Translations.vue:86
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to audio files, libraries, artists, albums and tracks"
-msgstr "Accès aux fichiers audio, librairies, artistes, albums et pistes"
+msgstr "Accès aux fichiers audio, bibliothèques, artistes, albums et pistes"
 
 #: front/src/components/mixins/Translations.vue:109
 #: front/src/components/mixins/Translations.vue:110
@@ -286,7 +286,7 @@ msgstr "Accès aux favoris"
 #: front/src/components/mixins/Translations.vue:98
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to follows"
-msgstr "Accès aux suivis"
+msgstr "Accès aux abonnements"
 
 #: front/src/components/mixins/Translations.vue:93
 #: front/src/components/mixins/Translations.vue:94
