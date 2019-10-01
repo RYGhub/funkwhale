@@ -17,7 +17,7 @@
         <artist-widget :controls="false" :filters="{playable: true, ordering: '-creation_date', tag: id}">
           <template slot="title">
             <router-link :to="{name: 'library.artists.browse', query: {tag: id}}">
-              <translate translate-context="*/*/*">Artists</translate>
+              <translate translate-context="*/*/*/Noun">Artists</translate>
             </router-link>
           </template>
         </artist-widget>

@@ -15,8 +15,8 @@
       <div class="ui toggle checkbox">
         <input id="policy-is-active" v-model="current.isActive" type="checkbox">
         <label for="policy-is-active">
-          <translate translate-context="*/*/*" v-if="current.isActive" key="1">Enabled</translate>
-          <translate translate-context="*/*/*" v-else key="2">Disabled</translate>
+          <translate translate-context="*/*/*/State of feature" v-if="current.isActive" key="1">Enabled</translate>
+          <translate translate-context="*/*/*/State of feature" v-else key="2">Disabled</translate>
           <tooltip :content="labels.isActiveHelp" />
         </label>
       </div>

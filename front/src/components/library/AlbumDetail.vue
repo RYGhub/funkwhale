@@ -17,7 +17,7 @@
     <template v-else>
       <section class="ui vertical stripe segment">
         <h2>
-          <translate translate-context="*/*/*/Noun">Tracks</translate>
+          <translate translate-context="*/*/*">Tracks</translate>
         </h2>
         <track-table v-if="object" :artist="object.artist" :display-position="true" :tracks="object.tracks"></track-table>
       </section>

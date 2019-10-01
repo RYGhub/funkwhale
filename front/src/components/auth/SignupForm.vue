@@ -34,7 +34,7 @@
       v-model="email">
     </div>
     <div class="field">
-      <label><translate translate-context="Content/*/Input.Label">Password</translate></label>
+      <label><translate translate-context="*/*/*">Password</translate></label>
       <password-input v-model="password" />
     </div>
     <div class="field" v-if="!$store.state.instance.settings.users.registration_enabled.value">

@@ -9,7 +9,7 @@
         <tbody>
           <tr>
             <td>
-              <translate translate-context="Content/Track/Table.Label/Noun">Copyright</translate>
+              <translate translate-context="Content/Track/*/Noun">Copyright</translate>
             </td>
             <td v-if="track.copyright" :title="track.copyright">{{ track.copyright|truncate(50) }}</td>
             <td v-else>
@@ -38,7 +38,7 @@
           </tr>
           <tr>
             <td>
-              <translate translate-context="Content/Library/*/in MB">Size</translate>
+              <translate translate-context="Content/*/*/Noun">Size</translate>
             </td>
             <td v-if="upload && upload.size">{{ upload.size | humanSize }}</td>
             <td v-else>

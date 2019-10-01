@@ -111,7 +111,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.albums.detail', params: {id: object.album.id }}">
-                        <translate translate-context="*/*/*/Noun">Album</translate>
+                        <translate translate-context="*/*/*">Album</translate>
                       </router-link>
                     </td>
                     <td>
@@ -141,7 +141,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Position</translate>
+                      <translate translate-context="*/*/*/Short, Noun">Position</translate>
                     </td>
                     <td>
                       {{ object.position }}
@@ -157,7 +157,7 @@
                   </tr>
                   <tr v-if="object.copyright">
                     <td>
-                      <translate translate-context="Content/Track/Table.Label/Noun">Copyright</translate>
+                      <translate translate-context="Content/Track/*/Noun">Copyright</translate>
                     </td>
                     <td>{{ object.copyright }}</td>
                   </tr>
@@ -308,7 +308,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('track_id', object.id) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>

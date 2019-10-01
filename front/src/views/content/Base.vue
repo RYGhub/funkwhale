@@ -6,7 +6,7 @@
         :to="{name: 'content.libraries.index'}"><translate translate-context="*/*/*/Noun">Libraries</translate></router-link>
       <router-link
         class="ui item"
-        :to="{name: 'content.libraries.files'}"><translate translate-context="*/*/*/Noun">Tracks</translate></router-link>
+        :to="{name: 'content.libraries.files'}"><translate translate-context="*/*/*">Tracks</translate></router-link>
     </nav>
     <router-view :key="$route.fullPath"></router-view>
   </main>

@@ -6,7 +6,7 @@
     <detail-area v-else :library="library">
       <div class="ui top attached tabular menu">
         <a :class="['item', {active: currentTab === 'follows'}]" @click="currentTab = 'follows'"><translate translate-context="Content/Federation/*/Noun">Followers</translate></a>
-        <a :class="['item', {active: currentTab === 'tracks'}]" @click="currentTab = 'tracks'"><translate translate-context="*/*/*/Noun">Tracks</translate></a>
+        <a :class="['item', {active: currentTab === 'tracks'}]" @click="currentTab = 'tracks'"><translate translate-context="*/*/*">Tracks</translate></a>
         <a :class="['item', {active: currentTab === 'edit'}]" @click="currentTab = 'edit'"><translate translate-context="Content/*/Button.Label/Verb">Edit</translate></a>
       </div>
       <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'follows'}]">
@@ -26,7 +26,7 @@
             <tr>
               <th><translate translate-context="Content/Library/Table.Label">User</translate></th>
               <th><translate translate-context="Content/Library/Table.Label">Date</translate></th>
-              <th><translate translate-context="Content/Library.Federation/Table.Label (Value is Approved/Rejected)">Status</translate></th>
+              <th><translate translate-context="*/*/*">Status</translate></th>
               <th><translate translate-context="Content/Library/Table.Label">Action</translate></th>
             </tr>
           </thead>

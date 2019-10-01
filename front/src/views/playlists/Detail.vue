@@ -74,7 +74,7 @@
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
-        <h2><translate translate-context="*/*/*/Noun">Tracks</translate></h2>
+        <h2><translate translate-context="*/*/*">Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
     </section>
@@ -118,7 +118,7 @@ export default {
   computed: {
     labels() {
       return {
-        playlist: this.$pgettext('Head/Playlist/Title', 'Playlist')
+        playlist: this.$pgettext('*/*/*', 'Playlist')
       }
     }
   },

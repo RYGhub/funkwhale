@@ -40,8 +40,8 @@
           <th><translate translate-context="Content/Admin/Table.Label/Short, Noun">Account status</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Short, Noun (Value is a date)">Sign-up</translate></th>
           <th><translate translate-context="Content/Profile/Table.Label/Short, Noun (Value is a date)">Last activity</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label/Noun">Permissions</translate></th>
-          <th><translate translate-context="Content/Admin/Table.Label/Noun (Value is Regular user/Admin)">Status</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Permissions</translate></th>
+          <th><translate translate-context="*/*/*">Status</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <td>
@@ -171,7 +171,7 @@ export default {
       return [
         {
           'code': 'library',
-          'label': this.$pgettext('*/*/*', 'Library')
+          'label': this.$pgettext('*/*/*/Noun', 'Library')
         },
         {
           'code': 'moderation',

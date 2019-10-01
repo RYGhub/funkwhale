@@ -30,7 +30,7 @@
     </div>
     <div class="field">
       <label>
-        <translate translate-context="Content/*/Input.Label">Password</translate> |
+        <translate translate-context="*/*/*">Password</translate> |
         <router-link :to="{name: 'auth.password-reset', query: {email: credentials.username}}">
           <translate translate-context="*/Login/*/Verb">Reset your password</translate>
         </router-link>

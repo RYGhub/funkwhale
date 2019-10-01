@@ -16,7 +16,7 @@
           </div>
           <div class="field" v-if="allowListEnabled">
             <input type="checkbox" name="allowed" id="allowed" v-model="domainAllowed">
-            <label for="allowed"><translate translate-context="Content/Moderation/Form.Label/Verb">Add to allow-list</translate></label>
+            <label for="allowed"><translate translate-context="Content/Moderation/Action/Verb">Add to allow-list</translate></label>
           </div>
           <div class="field">
             <button :class="['ui', {'loading': isCreating}, 'green', 'button']" type="submit" :disabled="isCreating">

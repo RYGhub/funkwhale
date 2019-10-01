@@ -6,7 +6,7 @@
       <i class="user icon"></i>{{ object.actor }}  &nbsp;
       <template v-if="object.is_active">
         <i class="play icon"></i>
-        <translate translate-context="*/*/*">Enabled</translate>
+        <translate translate-context="*/*/*/State of feature">Enabled</translate>
       </template>
       <template v-if="!object.is_active">
         <i class="pause icon"></i>

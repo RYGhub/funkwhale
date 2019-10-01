@@ -92,8 +92,8 @@
           <thead>
             <tr>
               <th><translate translate-context="Content/Library/Table.Label">Filename</translate></th>
-              <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
-              <th><translate translate-context="Content/Library/Table.Label (Value is Uploading/Uploaded/Error)">Status</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Size</translate></th>
+              <th><translate translate-context="*/*/*">Status</translate></th>
             </tr>
           </thead>
           <tbody>

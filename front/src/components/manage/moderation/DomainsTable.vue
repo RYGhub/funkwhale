@@ -9,7 +9,7 @@
         <div class="field" v-if="allowListEnabled">
           <label><translate translate-context="Content/Moderation/*/Adjective">Is present on allow-list</translate></label>
           <select class="ui dropdown" v-model="allowed">
-            <option :value="null"><translate translate-context="*/*/*">All</translate></option>
+            <option :value="null"><translate translate-context="Content/*/Dropdown">All</translate></option>
             <option :value="true"><translate translate-context="*/*/*">Yes</translate></option>
             <option :value="false"><translate translate-context="*/*/*">No</translate></option>
           </select>

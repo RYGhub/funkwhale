@@ -9,7 +9,7 @@ export default {
   getConfigs () {
     return {
       artist: {
-        label: this.$pgettext('*/*/*', 'Artist'),
+        label: this.$pgettext('*/*/*/Noun', 'Artist'),
         icon: 'users',
         getDeleteUrl: (obj) => {
           return `manage/library/artists/${obj.id}/`
@@ -26,7 +26,7 @@ export default {
           },
           {
             id: 'creation_date',
-            label: this.$pgettext('*/*/*/Noun', 'Creation date'),
+            label: this.$pgettext('Content/*/*/Noun', 'Creation date'),
             getValue: (obj) => { return obj.creation_date }
           },
           {
@@ -61,7 +61,7 @@ export default {
           },
           {
             id: 'creation_date',
-            label: this.$pgettext('*/*/*/Noun', 'Creation date'),
+            label: this.$pgettext('Content/*/*/Noun', 'Creation date'),
             getValue: (obj) => { return obj.creation_date }
           },
           {
@@ -85,7 +85,7 @@ export default {
         ]
       },
       track: {
-        label: this.$pgettext('*/*/*', 'Track'),
+        label: this.$pgettext('*/*/*/Noun', 'Track'),
         icon: 'music',
         getDeleteUrl: (obj) => {
           return `manage/library/tracks/${obj.id}/`
@@ -129,7 +129,7 @@ export default {
         ]
       },
       library: {
-        label: this.$pgettext('*/*/*', 'Library'),
+        label: this.$pgettext('*/*/*/Noun', 'Library'),
         icon: 'book',
         getDeleteUrl: (obj) => {
           return `manage/library/libraries/${obj.uuid}/`
@@ -176,7 +176,7 @@ export default {
         ]
       },
       account: {
-        label: this.$pgettext('*/*/*', 'Account'),
+        label: this.$pgettext('*/*/*/Noun', 'Account'),
         icon: 'user',
         urls: {
           getAdminDetail: (obj) => { return {name: 'manage.moderation.accounts.detail', params: {id: `${obj.preferred_username}@${obj.domain}`}}}
