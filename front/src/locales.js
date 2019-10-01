@@ -6,6 +6,10 @@ export default {
       "label": "العربية"
     },
     {
+      "code": "zh_Hant",
+      "label": "漢語"
+    },
+    {
       "code": "en_US",
       "label": "English (United-States)"
     },
