@@ -1,6 +1,6 @@
 import datetime
 import logging
-import urllib
+import urllib.parse
 
 from django.conf import settings
 from django.db import transaction
@@ -321,6 +321,8 @@ def get_file_path(audio_file):
             path = "/music" + audio_file.replace(prefix, "", 1)
         if path.startswith("http://") or path.startswith("https://"):
             return (settings.PROTECT_FILES_PATH + "/media/" + path).encode("utf-8")
+        # needed to serve files with % or ? chars
+        path = urllib.parse.quote(path)
         return (settings.PROTECT_FILES_PATH + path).encode("utf-8")
     if t == "apache2":
         try:
