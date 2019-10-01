@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-09-26 10:13+0000\n"
+"PO-Revision-Date: 2019-10-03 17:13+0000\n"
 "Last-Translator: Ciarán Ainsworth <ciaranainsworth@posteo.net>\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
@@ -1336,7 +1336,6 @@ msgstr "Delete moderation rule"
 
 #: front/src/components/auth/Settings.vue:274
 #: src/components/auth/Settings.vue:302
-#, fuzzy
 msgctxt "*/*/Button.Label"
 msgid "Delete my account"
 msgstr "Delete my account"
@@ -2470,7 +2469,6 @@ msgstr "Libraries help you organise and share your music collections. You can up
 #: front/src/views/admin/library/UploadDetail.vue:144
 #: front/src/views/admin/moderation/AccountsDetail.vue:518 src/entities.js:132
 #: front/src/components/mixins/Report.vue:78
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Library"
 msgstr "Library"
@@ -3322,6 +3320,7 @@ msgstr "Playlists"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
+"Please contact your admins and ask them to update the corresponding setting."
 
 #: front/src/components/auth/Settings.vue:79
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -4120,6 +4119,8 @@ msgstr "Sharing link"
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
 msgstr ""
+"Sharing will not work because this pod doesn't allow anonymous users to "
+"access content."
 
 #: front/src/components/About.vue:156
 msgctxt "*/*/*/Verb"
