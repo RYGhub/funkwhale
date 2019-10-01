@@ -5802,7 +5802,7 @@ msgstr "Váš avatar nemůže být uložen"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
-msgid "Your deletion request was submitted, your account and content  will be deleted shortly"
+msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
 "Požadavek o smazání byl odeslán, váš účet a obsah bude zanedlouho vymazán"
 

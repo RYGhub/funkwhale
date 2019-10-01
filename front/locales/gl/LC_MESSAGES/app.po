@@ -5836,7 +5836,7 @@ msgstr "Non se gardou o avatar"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
-msgid "Your deletion request was submitted, your account and content  will be deleted shortly"
+msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
 "Enviouse a solicitude de borrado, o contido da conta eliminarase en breve"
 

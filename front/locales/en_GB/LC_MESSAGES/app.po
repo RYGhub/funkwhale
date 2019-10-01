@@ -5777,9 +5777,9 @@ msgstr "Your avatar cannot be saved"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
-msgid "Your deletion request was submitted, your account and content  will be deleted shortly"
+msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
-"Your deletion request was submitted, your account and content  will be "
+"Your deletion request was submitted, your account and content will be "
 "deleted shortly"
 
 #: front/src/components/library/EditForm.vue:3

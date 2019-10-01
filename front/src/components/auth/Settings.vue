@@ -524,7 +524,7 @@ export default {
         .then(
           response => {
             self.isDeletingAccount = false
-            let msg = self.$pgettext('*/Auth/Message', 'Your deletion request was submitted, your account and content  will be deleted shortly')
+            let msg = self.$pgettext('*/Auth/Message', 'Your deletion request was submitted, your account and content will be deleted shortly')
             self.$store.commit('ui/addMessage', {
               content: msg,
               date: new Date()

@@ -5806,7 +5806,7 @@ msgstr "Ваш аватар не может быть сохранён"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
-msgid "Your deletion request was submitted, your account and content  will be deleted shortly"
+msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
 "Ваш запрос на удаление был отправлен, Ваш аккаунт и данные будут удалены в "
 "ближайшее время"

@@ -5792,7 +5792,7 @@ msgstr "L’avatar pòt pas èsser enregistrat"
 
 #: front/src/components/auth/Settings.vue:527
 msgctxt "*/Auth/Message"
-msgid "Your deletion request was submitted, your account and content  will be deleted shortly"
+msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
 "Vòstra demanda de supression es estada enviada, vòstre compte e lo contengut "
 "seràn lèu suprimits"
