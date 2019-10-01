@@ -5,7 +5,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-23 11:57+0200\n"
 "PO-Revision-Date: 2019-10-01 12:08+0000\n"
-"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"Last-Translator: nouts <nouts@protonmail.com>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
 "Language: fr_FR\n"
@@ -2992,7 +2992,7 @@ msgstr "Ma liste de lecture d'enfer"
 #: front/src/components/library/radios/Builder.vue:237
 msgctxt "Content/Radio/Input.Placeholder"
 msgid "My awesome radio"
-msgstr "Ma radio d'enfer"
+msgstr "Ma super radio"
 
 #: front/src/views/content/libraries/Home.vue:6
 msgctxt "Content/Library/Title"
