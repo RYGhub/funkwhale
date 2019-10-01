@@ -30,7 +30,7 @@
           </translate>
           <button class="ui tiny basic right floated button" @click.prevent="showPendingReview = true">
             <translate translate-context="Content/Library/Button.Label">
-              Retrict to unreviewed edits
+              Restrict to unreviewed edits
             </translate>
           </button>
         </template>

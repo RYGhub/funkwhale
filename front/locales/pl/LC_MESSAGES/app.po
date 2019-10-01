@@ -4093,7 +4093,7 @@ msgstr "Wyniki na stronę"
 
 #: front/src/components/library/EditForm.vue:31
 msgctxt "Content/Library/Button.Label"
-msgid "Retrict to unreviewed edits"
+msgid "Restrict to unreviewed edits"
 msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:17
@@ -5277,7 +5277,7 @@ msgstr "Czy chcesz przestać śledzić tę bibliotekę?"
 #: front/src/components/federation/FetchButton.vue:54
 #: front/src/components/federation/FetchButton.vue:55
 msgctxt "*/*/Error"
-msgid "Unknowkn error"
+msgid "Unknown error"
 msgstr ""
 
 #: front/src/components/library/ImportStatusModal.vue:144

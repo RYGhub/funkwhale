@@ -4142,7 +4142,7 @@ msgstr "Aantal resultaten per pagina"
 
 #: front/src/components/library/EditForm.vue:31
 msgctxt "Content/Library/Button.Label"
-msgid "Retrict to unreviewed edits"
+msgid "Restrict to unreviewed edits"
 msgstr ""
 
 #: front/src/views/auth/EmailConfirm.vue:17
@@ -5352,7 +5352,7 @@ msgstr "Wil je deze verzameling ontvolgen?"
 #: front/src/components/federation/FetchButton.vue:54
 #: front/src/components/federation/FetchButton.vue:55
 msgctxt "*/*/Error"
-msgid "Unknowkn error"
+msgid "Unknown error"
 msgstr ""
 
 #: front/src/components/library/ImportStatusModal.vue:144
