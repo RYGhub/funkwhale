@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-23 11:57+0200\n"
-"PO-Revision-Date: 2019-10-01 08:57+0000\n"
-"Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
+"PO-Revision-Date: 2019-10-01 12:08+0000\n"
+"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
 "Language: fr_FR\n"
@@ -44,12 +44,11 @@ msgstr[0] "%{ count } piste"
 msgstr[1] "%{ count } pistes"
 
 #: front/src/components/About.vue:182
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } albums"
 msgid_plural "%{ count } albums"
-msgstr[0] "%{ count } piste"
-msgstr[1] "%{ count } pistes"
+msgstr[0] "%{ count } album"
+msgstr[1] "%{ count } albums"
 
 #: front/src/components/About.vue:152
 msgctxt "*/*/*"
@@ -59,28 +58,25 @@ msgstr[0] "%{ count } domaine autorisé"
 msgstr[1] "%{ count } domaines autorisés"
 
 #: front/src/components/About.vue:179
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } artists"
 msgid_plural "%{ count } artists"
-msgstr[0] "%{ count } piste"
-msgstr[1] "%{ count } pistes"
+msgstr[0] "%{ count } artiste"
+msgstr[1] "%{ count } artistes"
 
 #: front/src/components/About.vue:176 src/components/Home.vue:59
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } hour of music"
 msgid_plural "%{ count } hours of music"
-msgstr[0] "%{ count } piste"
-msgstr[1] "%{ count } pistes"
+msgstr[0] "%{ count } heure de musique"
+msgstr[1] "%{ count } heures de musique"
 
 #: front/src/components/About.vue:188
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } listenings"
 msgid_plural "%{ count } listenings"
-msgstr[0] "%{ count } piste"
-msgstr[1] "%{ count } pistes"
+msgstr[0] "%{ count } écoute"
+msgstr[1] "%{ count } écoutes"
 
 #: front/src/components/common/ActionTable.vue:68
 msgctxt "Content/*/Paragraph"
@@ -113,7 +109,6 @@ msgstr[0] "%{ count } piste correspondante aux filtres sélectionnés"
 msgstr[1] "%{ count } pistes correspondantes aux filtres sélectionnés"
 
 #: front/src/components/About.vue:185
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } tracks"
 msgid_plural "%{ count } tracks"
@@ -182,12 +177,11 @@ msgstr[0] "1 favori"
 msgstr[1] "%{ count } favoris"
 
 #: front/src/components/audio/artist/Card.vue:15
-#, fuzzy
 msgctxt "Content/Artist/Card"
 msgid "1 track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "Ajouter la piste"
-msgstr[1] "Ajouter la piste"
+msgstr[0] "1 piste"
+msgstr[1] "%{ count } pistes"
 
 #: front/src/views/Notifications.vue:21 src/views/Notifications.vue:55
 msgctxt "*/*/*"
@@ -205,10 +199,9 @@ msgid "90 days"
 msgstr "90 jours"
 
 #: front/src/components/library/FileUpload.vue:264
-#, fuzzy
 msgctxt "Content/Library/Help text"
 msgid "A network error occurred while uploading this file"
-msgstr "Une erreur réseau s'est produite lors du téléversement de ce fichier"
+msgstr "Une erreur réseau s'est produite lors de l'envoi de ce fichier"
 
 #: front/src/components/library/EditForm.vue:161
 msgctxt "*/*/Placeholder"
@@ -216,10 +209,9 @@ msgid "A short summary describing your changes."
 msgstr "Une courte description décrivant vos changements."
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About %{ podName }"
-msgstr "À propos de %{ instance }"
+msgstr "À propos de %{ podName }"
 
 #: front/src/components/Footer.vue:6
 msgctxt "Footer/About/Title"
@@ -232,7 +224,6 @@ msgid "About Funkwhale"
 msgstr "À propos de Funkwhale"
 
 #: front/src/components/Home.vue:85
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About Funkwhale"
 msgstr "À propos de Funkwhale"
@@ -243,16 +234,14 @@ msgid "About page"
 msgstr "À propos"
 
 #: front/src/components/Home.vue:19
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About this Funkwhale pod"
-msgstr "À propos de Funkwhale"
+msgstr "À propos de ce pod Funkwhale"
 
 #: front/src/components/About.vue:21 src/components/About.vue:51
-#, fuzzy
 msgctxt "Content/About/Header"
 msgid "About this pod"
-msgstr "À propos de cette instance"
+msgstr "À propos de ce pod"
 
 #: front/src/views/content/libraries/Detail.vue:48
 msgctxt "Content/Library/Button.Label"
@@ -403,7 +392,6 @@ msgid "Actions"
 msgstr "Actions"
 
 #: front/src/components/manage/moderation/ReportCard.vue:210
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Actions"
 msgstr "Actions"
@@ -478,22 +466,19 @@ msgid "Add filters to customize your radio"
 msgstr "Ajouter des filtres pour personnaliser votre radio"
 
 #: front/src/components/manage/moderation/NoteForm.vue:12
-#, fuzzy
 msgctxt "Content/Moderation/Button.Label/Verb"
 msgid "Add note"
-msgstr "Ajouter du contenu"
+msgstr "Ajouter une note"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:46
-#, fuzzy
 msgctxt "Content/Moderation/Link/Verb"
 msgid "Add to allow-list"
-msgstr "Ajouter à la liste de lecture…"
+msgstr "Ajouter à la liste d'autorisations"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:191
-#, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Add to allow-list"
-msgstr "Ajouter à la liste de lecture…"
+msgstr "Ajouter à la liste d'autorisations"
 
 #: front/src/views/admin/moderation/DomainsList.vue:18
 #, fuzzy
@@ -874,7 +859,7 @@ msgstr "Retour aux paramètres"
 #: front/src/components/mixins/Translations.vue:68
 msgctxt "Content/Track/*/Noun"
 msgid "Bitrate"
-msgstr "Débit binaire"
+msgstr "Bitrate"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:19
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:34
@@ -3820,7 +3805,7 @@ msgstr "Rafraîchir le contenu de la table"
 #: front/src/components/federation/FetchButton.vue:12
 msgctxt "Popup/*/Message.Title"
 msgid "Refresh was skipped"
-msgstr ""
+msgstr "Rafraîchissement non effectué"
 
 #: front/src/components/federation/FetchButton.vue:7
 msgctxt "Popup/*/Title"
@@ -4027,7 +4012,7 @@ msgstr "Demander un mot de passe"
 #: front/src/components/federation/FetchButton.vue:64
 msgctxt "Popup/*/Loading.Title"
 msgid "Requesting a fetch…"
-msgstr ""
+msgstr "Demande de récupération en cours…"
 
 #: front/src/components/library/EditForm.vue:94
 #, fuzzy
@@ -4156,12 +4141,12 @@ msgstr "Analyse en cours… (%{ progress }%)"
 #: front/src/components/auth/ApplicationForm.vue:22
 msgctxt "Content/Applications/Input.Label/Noun"
 msgid "Scopes"
-msgstr ""
+msgstr "Périmètre"
 
 #: front/src/components/auth/Settings.vue:226
 msgctxt "Content/*/*/Noun"
 msgid "Scopes"
-msgstr ""
+msgstr "Périmètres"
 
 #: front/src/components/library/Albums.vue:10
 #: src/components/library/Artists.vue:10
@@ -4921,7 +4906,7 @@ msgstr "Nous ne pouvons pas ajouter cette piste à une playlist"
 #: front/src/components/audio/Player.vue:62
 msgctxt "Sidebar/Player/Error message.Title"
 msgid "The track cannot be loaded"
-msgstr ""
+msgstr "Échec du chargement de la piste"
 
 #: front/src/views/admin/library/TrackDetail.vue:80
 msgctxt "Content/Moderation/Paragraph"
@@ -5106,7 +5091,7 @@ msgstr "Cela supprimera définitivement cette playlist et ne pourra pas être an
 #: front/src/components/auth/Settings.vue:194
 msgctxt "Popup/Settings/Paragraph"
 msgid "This will prevent this application from accessing the service on your behalf."
-msgstr ""
+msgstr "Cela empêchera cette application d'accéder au service en votre nom."
 
 #: front/src/components/playlists/Editor.vue:54
 msgctxt "Popup/Playlist/Paragraph"
@@ -5136,6 +5121,9 @@ msgstr "Titre"
 msgctxt "Popup/Instance/Paragraph"
 msgid "To continue, please select the Funkwhale instance you want to connect to. Enter the address directly, or select one of the suggested choices."
 msgstr ""
+"Pour continuer, sélectionnez le pod Funkwhale auquel vous souhaitez vous "
+"connecter. Entrez l'adresse directement, ou sélectionnez l'un des choix "
+"suggérés."
 
 #: front/src/components/ShortcutsModal.vue:148
 #, fuzzy
@@ -5191,7 +5179,7 @@ msgstr "Piste"
 #: front/src/components/library/EditCard.vue:13
 msgctxt "Content/Library/Card/Short"
 msgid "Track #%{ id } - %{ name }"
-msgstr ""
+msgstr "Piste #%{ id } - %{ name }"
 
 #: front/src/views/admin/library/TrackDetail.vue:97
 msgctxt "Content/Moderation/Title"
