@@ -15,7 +15,7 @@
           </select>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Admin/*/Noun (Value is Used/Not used)">Status</translate></label>
+          <label><translate translate-context="*/*/*">Status</translate></label>
           <select class="ui dropdown" v-model="isOpen">
             <option :value="null"><translate translate-context="Content/*/Dropdown">All</translate></option>
             <option :value="true"><translate translate-context="Content/Admin/Dropdown/Adjective">Open</translate></option>
@@ -36,8 +36,8 @@
         :action-url="'manage/users/invitations/action/'"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="Content/Admin/Table.Label">Owner</translate></th>
-          <th><translate translate-context="Content/Admin/*/Noun (Value is Used/Not used)">Status</translate></th>
+          <th><translate translate-context="*/*/*">Owner</translate></th>
+          <th><translate translate-context="*/*/*">Status</translate></th>
           <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Noun">Expiration date</translate></th>
           <th><translate translate-context="Content/Admin/Table.Label/Noun">Code</translate></th>

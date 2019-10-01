@@ -83,7 +83,7 @@
               v-if="$store.state.auth.availablePermissions['library']"
               class="item"
               :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
-              <i class="book icon"></i><translate translate-context="*/*/*">Library</translate>
+              <i class="book icon"></i><translate translate-context="*/*/*/Noun">Library</translate>
               <div
                 v-if="$store.state.ui.notifications.pendingReviewEdits > 0"
                 :title="labels.pendingReviewEdits"

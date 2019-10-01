@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                   <td>
-                    <translate translate-context="*/*/*/Noun">Creation date</translate>
+                    <translate translate-context="Content/*/*/Noun">Creation date</translate>
                   </td>
                   <td>
                     <human-date :date="obj.creation_date" :icon="true"></human-date>
@@ -107,7 +107,7 @@
       <div class="ui stackable two column grid">
         <div class="column">
           <h3>
-            <translate translate-context="Content/*/*/Short">Message</translate>
+            <translate translate-context="*/*/Field.Label/Noun">Message</translate>
           </h3>
           <expandable-div v-if="obj.summary" class="summary" :content="obj.summary">
             <div v-html="markdown.makeHtml(obj.summary)"></div>
@@ -132,7 +132,7 @@
             <tbody>
               <tr v-if="target">
                 <td>
-                  <translate translate-context="*/*/*">Type</translate>
+                  <translate translate-context="Content/Track/Table.Label/Noun">Type</translate>
                 </td>
                 <td colspan="2">
                   <i :class="[configs[target.type].icon, 'icon']"></i>
@@ -154,7 +154,7 @@
               </tr>
               <tr v-if="target && target.type === 'account'">
                 <td>
-                  <translate translate-context="*/*/*">Account</translate>
+                  <translate translate-context="*/*/*/Noun">Account</translate>
                 </td>
                 <td>
                   <actor-link :admin="true" :actor="obj.target_owner"></actor-link>
@@ -208,7 +208,7 @@
         </div>
         <div class="column">
           <h3>
-            <translate translate-context="*/*/*">Actions</translate>
+            <translate translate-context="Content/*/*/Noun">Actions</translate>
           </h3>
           <div class="ui labelled icon basic buttons">
             <button

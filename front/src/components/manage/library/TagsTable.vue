@@ -39,8 +39,8 @@
         idField="name"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Name</translate></th>
-          <th><translate translate-context="*/*/*">Artists</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Artists</translate></th>
           <th><translate translate-context="*/*/*">Albums</translate></th>
           <th><translate translate-context="*/*/*">Tracks</translate></th>
           <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>

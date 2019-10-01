@@ -244,7 +244,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('artist_id', object.id) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>

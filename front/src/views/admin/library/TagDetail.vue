@@ -121,7 +121,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('tag', object.name) }}">
-                        <translate translate-context="*/*/*">Artists</translate>
+                        <translate translate-context="*/*/*/Noun">Artists</translate>
                       </router-link>
                     </td>
                     <td>

@@ -45,7 +45,7 @@
               <th></th>
               <th><translate translate-context="*/*/*/Noun">Name</translate></th>
               <th class="sorted descending"><translate translate-context="Popup/Playlist/Table.Label/Short">Last modification</translate></th>
-              <th><translate translate-context="*/*/*/Noun">Tracks</translate></th>
+              <th><translate translate-context="*/*/*">Tracks</translate></th>
               <th></th>
             </tr>
           </thead>

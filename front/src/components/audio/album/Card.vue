@@ -39,7 +39,7 @@
               <translate translate-context="Content/Album/Card.Link/Verb" :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
+              <translate translate-context="*/*/Button,Label">Collapse</translate>
             </em>
           </div>
         </div>

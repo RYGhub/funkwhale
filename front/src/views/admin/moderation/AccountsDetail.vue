@@ -154,17 +154,17 @@
                           @change="updateUser('is_active')"
                           v-model="object.user.is_active" type="checkbox">
                         <label>
-                          <translate v-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
-                          <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
+                          <translate v-if="object.user.is_active" key="1" translate-context="*/*/*/State of feature">Enabled</translate>
+                          <translate v-else key="2" translate-context="*/*/*/State of feature">Disabled</translate>
                         </label>
                       </div>
-                      <translate v-else-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
-                      <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
+                      <translate v-else-if="object.user.is_active" key="1" translate-context="*/*/*/State of feature">Enabled</translate>
+                      <translate v-else key="2" translate-context="*/*/*/State of feature">Disabled</translate>
                     </td>
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/Admin/Table.Label/Noun">Permissions</translate>
+                      <translate translate-context="Content/*/*/Noun">Permissions</translate>
                     </td>
                     <td>
                       <select
@@ -179,7 +179,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun">Type</translate>
+                      <translate translate-context="Content/Track/Table.Label/Noun">Type</translate>
                     </td>
                     <td>
                       {{ object.type }}
@@ -307,7 +307,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun" >Upload quota</translate>
+                      <translate translate-context="*/*/*" >Upload quota</translate>
                       <span :data-tooltip="labels.uploadQuota"><i class="question circle icon"></i></span>
                     </td>
                     <td>
@@ -347,7 +347,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('account', object.full_username) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>
@@ -372,7 +372,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Tracks</translate>
+                      <translate translate-context="*/*/*">Tracks</translate>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -515,7 +515,7 @@ export default {
       return [
         {
           code: "library",
-          label: this.$pgettext('*/*/*', "Library")
+          label: this.$pgettext('*/*/*/Noun', "Library")
         },
         {
           code: "moderation",

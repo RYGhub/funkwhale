@@ -44,7 +44,7 @@
               </tr>
               <tr>
                 <td>
-                  <translate translate-context="Popup/Import/Table.Label/Noun">Getting help</translate>
+                  <translate translate-context="Footer/*/Link">Getting help</translate>
                 </td>
                 <td>
                   <ul>
@@ -141,7 +141,7 @@ export default {
         let detail = payload.detail || {}
         d.errorRows = getErrors(detail)
       } else {
-        d.label = this.$pgettext('Popup/Import/Error.Label', 'Unknown error')
+        d.label = this.$pgettext('*/*/Error', 'Unknown error')
         d.detail = this.$pgettext('Popup/Import/Error.Label', 'An unknown error occurred')
       }
       let debugInfo = {

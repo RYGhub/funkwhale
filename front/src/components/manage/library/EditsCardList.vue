@@ -10,7 +10,7 @@
           </form>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Pending review/Approved/Rejected)">Status</translate></label>
+          <label><translate translate-context="*/*/*">Status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('is_approved', $event.target.value)" :value="getTokenValue('is_approved', '')">
             <option value="">
               <translate translate-context="Content/*/Dropdown">All</translate>

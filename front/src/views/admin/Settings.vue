@@ -81,10 +81,10 @@ export default {
       let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
-      let federationLabel = this.$pgettext('Content/Admin/Menu', 'Federation')
-      let moderationLabel = this.$pgettext('Content/Admin/Menu', 'Moderation')
+      let federationLabel = this.$pgettext('*/*/*', 'Federation')
+      let moderationLabel = this.$pgettext('*/Moderation/*', 'Moderation')
       let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
-      let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')
+      let statisticsLabel = this.$pgettext('Content/Home/Header', 'Statistics')
       let uiLabel = this.$pgettext('Content/Admin/Menu', 'User Interface')
       let errorLabel = this.$pgettext('Content/Admin/Menu', 'Error reporting')
       return [

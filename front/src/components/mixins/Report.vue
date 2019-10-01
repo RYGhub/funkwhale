@@ -11,7 +11,7 @@ export default {
             type: 'account',
             full_username: account.full_username,
             label: account.full_username,
-            typeLabel: this.$pgettext("*/*/*", 'Account'),
+            typeLabel: this.$pgettext("*/*/*/Noun", 'Account'),
           }
         })
         if (track) {
@@ -26,7 +26,7 @@ export default {
             type: 'track',
             id: track.id,
             label: track.title,
-            typeLabel: this.$pgettext("*/*/*", 'Track'),
+            typeLabel: this.$pgettext("*/*/*/Noun", 'Track'),
           }
         })
         album = track.album
@@ -53,7 +53,7 @@ export default {
             type: 'artist',
             id: artist.id,
             label: artist.name,
-            typeLabel: this.$pgettext("*/*/*", 'Artist'),
+            typeLabel: this.$pgettext("*/*/*/Noun", 'Artist'),
           }
         })
       }
@@ -75,7 +75,7 @@ export default {
             type: 'library',
             uuid: library.uuid,
             label: library.name,
-            typeLabel: this.$pgettext("*/*/*", 'Library'),
+            typeLabel: this.$pgettext("*/*/*/Noun", 'Library'),
           }
         })
       }

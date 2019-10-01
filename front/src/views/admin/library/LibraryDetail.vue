@@ -226,7 +226,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('library_id', object.id) }}">
-                        <translate translate-context="*/*/*">Artists</translate>
+                        <translate translate-context="*/*/*/Noun">Artists</translate>
                       </router-link>
                     </td>
                     <td>
@@ -256,7 +256,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('library_id', object.id) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>

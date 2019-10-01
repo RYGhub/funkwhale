@@ -35,7 +35,7 @@
           </tr>
         </tbody>
       </table>
-      <button class="ui basic button" @click="invitations = []"><translate translate-context="Content/Admin/Button.Label/Verb">Clear</translate></button>
+      <button class="ui basic button" @click="invitations = []"><translate translate-context="Content/Library/Button.Label">Clear</translate></button>
     </div>
   </div>
 </template>

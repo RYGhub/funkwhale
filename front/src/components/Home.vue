@@ -83,7 +83,7 @@
       <div class="ui stackable grid">
         <div class="four wide column">
           <h3 class="header">
-            <translate translate-context="Content/Home/Header">About Funkwhale</translate>
+            <translate translate-context="Footer/*/Title/Short">About Funkwhale</translate>
           </h3>
           <p v-translate translate-context="Content/Home/Paragraph">This pod runs Funkwhale, a community-driven project that lets you listen and share music and audio within a decentralized, open network.</p>
           <p v-translate translate-context="Content/Home/Paragraph">Funkwhale is free and developped by a friendly community of volunteers.</p>

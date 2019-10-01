@@ -1,7 +1,7 @@
 <template>
   <main v-title="labels.accounts">
     <section class="ui vertical stripe segment">
-      <h2 class="ui header"><translate translate-context="*/Moderation/Title,Name">Reports</translate></h2>
+      <h2 class="ui header"><translate translate-context="*/Moderation/*/Noun">Reports</translate></h2>
       <div class="ui hidden divider"></div>
       <div class="ui inline form">
         <div class="fields">
@@ -12,7 +12,7 @@
             </form>
           </div>
           <div class="field">
-            <label><translate translate-context="Content/Search/Dropdown.Label (Value is All/Resolved/Unresolved)">Status</translate></label>
+            <label><translate translate-context="*/*/*">Status</translate></label>
             <select class="ui dropdown" @change="addSearchToken('resolved', $event.target.value)" :value="getTokenValue('resolved', '')">
               <option value="">
                 <translate translate-context="Content/*/Dropdown">All</translate>
@@ -205,7 +205,7 @@ export default {
     labels () {
       return {
         searchPlaceholder: this.$pgettext('Content/Search/Input.Placeholder', 'Search by account, summary, domain…'),
-        reports: this.$pgettext('*/Moderation/Title,Name', "Reports"),
+        reports: this.$pgettext('*/Moderation/*/Noun', "Reports"),
       }
     },
   },

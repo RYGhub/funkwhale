@@ -37,14 +37,14 @@
                     @click.prevent="setAllowList(false)"
                     :class="['ui', 'labeled', {loading: isLoadingAllowList}, 'icon', 'button']">
                     <i class="x icon"></i>
-                    <translate translate-context="Content/Moderation/Link/Verb">Remove from allow-list</translate>
+                    <translate translate-context="Content/Moderation/Action/Verb">Remove from allow-list</translate>
                   </button>
                   <button
                     v-else
                     @click.prevent="setAllowList(true)"
                     :class="['ui', 'labeled', {loading: isLoadingAllowList}, 'icon', 'button']">
                     <i class="check icon"></i>
-                    <translate translate-context="Content/Moderation/Link/Verb">Add to allow-list</translate>
+                    <translate translate-context="Content/Moderation/Action/Verb">Add to allow-list</translate>
                   </button>
                 </div>
               </div>
@@ -150,7 +150,7 @@
                   <template v-if="object.nodeinfo && object.nodeinfo.status === 'error'">
                     <tr>
                       <td>
-                        <translate translate-context="Content/Moderation/Table.Label (Value is Error message)">Status</translate>
+                        <translate translate-context="*/*/*">Status</translate>
                       </td>
                       <td>
                         <translate translate-context="Content/Moderation/Table">Error while fetching node info</translate>&nbsp;
@@ -279,7 +279,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('domain', object.name) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>
@@ -309,7 +309,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.tracks', query: {q: getQuery('domain', object.name) }}">
-                        <translate translate-context="*/*/*/Noun">Tracks</translate>
+                        <translate translate-context="*/*/*">Tracks</translate>
                       </router-link>
                     </td>
                     <td>

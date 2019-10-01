@@ -6,7 +6,7 @@
           <translate translate-context="Content/Applications/Link">Back to settings</translate>
         </router-link>
         <h2 class="ui header">
-          <translate translate-context="Content/Applications/Title">Create a new application</translate>
+          <translate translate-context="Content/Settings/Button.Label">Create a new application</translate>
         </h2>
         <application-form
           :defaults="defaults"
@@ -38,7 +38,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('Content/Applications/Title', "Create a new application")
+        title: this.$pgettext('Content/Settings/Button.Label', "Create a new application")
       }
     },
   }

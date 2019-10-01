@@ -43,7 +43,7 @@ export default {
             label: this.$pgettext('*/*/*', 'Category'),
             choices: {
               takedown_request: this.$pgettext("Content/Moderation/Dropdown", "Takedown request"),
-              invalid_metadata: this.$pgettext("Content/Moderation/Dropdown", "Invalid metadata"),
+              invalid_metadata: this.$pgettext("Popup/Import/Error.Label", "Invalid metadata"),
               illegal_content: this.$pgettext("Content/Moderation/Dropdown", "Illegal content"),
               offensive_content: this.$pgettext("Content/Moderation/Dropdown", "Offensive content"),
               other: this.$pgettext("Content/Moderation/Dropdown", "Other"),
@@ -64,7 +64,7 @@ export default {
           name: this.$pgettext('*/*/*/Noun', 'Name'),
           length: this.$pgettext('*/*/*/Noun', 'Length'),
           items_count: this.$pgettext('*/*/*/Noun', 'Items'),
-          size: this.$pgettext('Content/Library/*/in MB', 'Size'),
+          size: this.$pgettext('Content/*/*/Noun', 'Size'),
           bitrate: this.$pgettext('Content/Track/*/Noun', 'Bitrate'),
           duration: this.$pgettext('Content/*/*', 'Duration'),
           date_joined: this.$pgettext('Content/Admin/Table.Label/Noun', 'Sign-up date'),
@@ -73,7 +73,7 @@ export default {
           domain: this.$pgettext('Content/Moderation/*/Noun', 'Domain'),
           users: this.$pgettext('*/*/*/Noun', 'Users'),
           received_messages: this.$pgettext('Content/Moderation/*/Noun', 'Received messages'),
-          uploads: this.$pgettext('Content/Moderation/Table.Label/Noun', 'Uploads'),
+          uploads: this.$pgettext('*/*/*', 'Uploads'),
           followers: this.$pgettext('Content/Federation/*/Noun', 'Followers'),
         },
         scopes: {
@@ -86,11 +86,11 @@ export default {
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to audio files, libraries, artists, albums and tracks'),
           },
           favorites: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Favorites'),
+            label: this.$pgettext('Sidebar/Favorites/List item.Link/Noun', 'Favorites'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to favorites'),
           },
           listenings: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Listenings'),
+            label: this.$pgettext('*/*/*/Noun', 'Listenings'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to listening history'),
           },
           follows: {
@@ -98,23 +98,23 @@ export default {
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to follows'),
           },
           playlists: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Playlists'),
+            label: this.$pgettext('*/*/*', 'Playlists'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to playlists'),
           },
           radios: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Radios'),
+            label: this.$pgettext('*/*/*', 'Radios'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to radios'),
           },
           filters: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Content filters'),
+            label: this.$pgettext('Content/Settings/Title/Noun', 'Content filters'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to content filters'),
           },
           notifications: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Notifications'),
+            label: this.$pgettext('*/Notifications/*', 'Notifications'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to notifications'),
           },
           edits: {
-            label: this.$pgettext('Content/OAuth Scopes/Label', 'Edits'),
+            label: this.$pgettext('*/Admin/*/Noun', 'Edits'),
             description: this.$pgettext('Content/OAuth Scopes/Paragraph', 'Access to edits'),
           }
         }

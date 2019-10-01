@@ -244,7 +244,7 @@
               </td>
               <td>
                 <router-link class="ui basic tiny green button" :to="{name: 'settings.applications.edit', params: {id: app.client_id}}">
-                  <translate translate-context="Content/Settings/Button.Label">Edit</translate>
+                  <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                 </router-link>
                 <dangerous-button
                   class="ui tiny basic button"
@@ -272,7 +272,7 @@
         <h2 class="ui header">
           <i class="trash icon"></i>
           <div class="content">
-            <translate translate-context="Content/Settings/Title/Verb">Delete my account</translate>
+            <translate translate-context="*/*/Button.Label">Delete my account</translate>
           </div>
         </h2>
         <p>
@@ -300,7 +300,7 @@
             <div slot="modal-content">
               <p><translate translate-context="Popup/Settings/Paragraph">This is irreversible and will permanently remove your data from our servers. You will we immediatly logged out.</translate></p>
             </div>
-            <div slot="modal-confirm"><translate translate-context="Popup/Settings/Button.Label">Delete my account</translate></div>
+            <div slot="modal-confirm"><translate translate-context="*/*/Button.Label">Delete my account</translate></div>
           </dangerous-button>
         </div>
       </section>

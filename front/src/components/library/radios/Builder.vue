@@ -23,7 +23,7 @@
               <input id="name" name="name" type="text" v-model="radioName" :placeholder="labels.placeholder.name" />
             </div>
             <div class="field">
-              <label for="description"><translate translate-context="Content/*/Input.Label/Noun">Description</translate></label>
+              <label for="description"><translate translate-context="*/*/*/Noun">Description</translate></label>
               <textarea rows="2" id="description" type="text" v-model="radioDesc" :placeholder="labels.placeholder.description" />
             </div>
             <div class="ui toggle checkbox">

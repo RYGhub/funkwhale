@@ -97,7 +97,7 @@ export default {
     },
     title () {
       if (this.playable) {
-        return this.$pgettext('*/Queue/Button/Title', 'More…')
+        return this.$pgettext('*/*/Button.Label/Noun', 'More…')
       } else {
         if (this.track) {
           return this.$pgettext('*/Queue/Button/Title', 'This track is not available in any library you have access to')

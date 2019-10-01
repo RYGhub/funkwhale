@@ -142,7 +142,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.libraries.detail', params: {id: object.library.uuid }}">
-                        <translate translate-context="*/*/*">Library</translate>
+                        <translate translate-context="*/*/*/Noun">Library</translate>
                       </router-link>
                     </td>
                     <td>
@@ -197,7 +197,7 @@
                   <tr v-if="object.track">
                     <td>
                       <router-link :to="{name: 'manage.library.tracks.detail', params: {id: object.track.id }}">
-                        <translate translate-context="*/*/*">Track</translate>
+                        <translate translate-context="*/*/*/Noun">Track</translate>
                       </router-link>
                     </td>
                     <td>
