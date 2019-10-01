@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-23 11:57+0200\n"
-"PO-Revision-Date: 2019-09-28 10:13+0000\n"
+"PO-Revision-Date: 2019-10-01 11:44+0000\n"
 "Last-Translator: Sylke Vicious <silkevicious@tuta.io>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -635,7 +635,7 @@ msgstr "Permetti applicazione"
 #: front/src/components/About.vue:136
 msgctxt "*/*/*"
 msgid "Allow-list"
-msgstr ""
+msgstr "Lista dei consentiti"
 
 #: front/src/components/About.vue:149
 #, fuzzy
@@ -815,7 +815,7 @@ msgstr "Chiedi un reset della password"
 #: front/src/components/manage/moderation/ReportCard.vue:72
 msgctxt "Content/Moderation/*"
 msgid "Assigned to"
-msgstr "Assegnato a "
+msgstr "Assegnato a"
 
 #: front/src/views/admin/library/AlbumDetail.vue:214
 #: front/src/views/admin/library/ArtistDetail.vue:202
@@ -1154,7 +1154,7 @@ msgstr "Codice di conferma"
 #: front/src/components/About.vue:67 src/components/Home.vue:65
 msgctxt "Content/Home/Header/Name"
 msgid "Contact"
-msgstr ""
+msgstr "Contatta"
 
 #: front/src/components/moderation/FilterModal.vue:90
 msgctxt "*/Moderation/Message"
@@ -1535,6 +1535,8 @@ msgstr "Decrescente"
 msgctxt "Content/Moderation/Placeholder"
 msgid "Describe what actions have been taken, or any other related updates…"
 msgstr ""
+"Descrivi quali azioni sono state eseguite, o qualsiasi altro aggiornamento "
+"relativo a questo…"
 
 #: front/src/views/admin/library/LibraryDetail.vue:132
 msgctxt "*/*/*/Noun"
@@ -1602,7 +1604,7 @@ msgstr "Numero disco"
 #: front/src/components/Home.vue:157
 msgctxt "Content/Home/Link"
 msgid "Discover everything you need to know about Funkwhale and its features"
-msgstr ""
+msgstr "Scopri tutto quello che devi sapere su Funkwhale e le sue funzionalità"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:13
 msgctxt "Content/Settings/Link"
@@ -2200,7 +2202,7 @@ msgstr "Visto per la prima volta in data"
 #: front/src/components/ShortcutsModal.vue:64
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Focus searchbar"
-msgstr ""
+msgstr "Metti in primo piano la barra di ricerca"
 
 #: front/src/views/content/remote/Card.vue:100
 msgctxt "Content/Library/Card.Button.Label/Verb"
@@ -2512,7 +2514,7 @@ msgstr "Inviti"
 #: front/src/views/admin/moderation/DomainsDetail.vue:106
 msgctxt "Content/Moderation/*/Adjective"
 msgid "Is present on allow-list"
-msgstr ""
+msgstr "è presente sulla lista dei consentiti"
 
 #: front/src/components/Footer.vue:49
 msgctxt "Footer/*/List item.Link"
@@ -4969,6 +4971,8 @@ msgstr "Questa istanza offre fino a %{quota} di spazio di archiviazione per ogni
 msgctxt "Popup/Settings/Paragraph"
 msgid "This is irreversible and will permanently remove your data from our servers. You will we immediatly logged out."
 msgstr ""
+"Questo è irreversibile e rimuoverà permanentemente i tuoi dati dai nostri "
+"server. Sarai immediatamente disconnesso."
 
 #: front/src/components/auth/Settings.vue:165
 msgctxt "Content/Settings/Paragraph"
@@ -5016,6 +5020,9 @@ msgstr "Questo oggetto è gestito da un altro server, non puoi modificarlo."
 msgctxt "Content/Home/Paragraph"
 msgid "This pod runs Funkwhale, a community-driven project that lets you listen and share music and audio within a decentralized, open network."
 msgstr ""
+"Su questo pod gira Funkwhale, un progetto guidato dalla comunità che ti "
+"permette di ascoltare e condividere musica e file audio in una rete aperta e "
+"decentralizzata."
 
 #: front/src/components/library/FileUpload.vue:51
 msgctxt "Content/Library/Paragraph"
@@ -5070,6 +5077,8 @@ msgstr "Questo disabiliterà completamente l'accesso alla API Subsonic dagli acc
 msgctxt "Content/Moderation/Popup,Paragraph"
 msgid "This will delete the object associated with this report and mark the report as resolved. The deletion is irreversible."
 msgstr ""
+"Questo eliminerà l'oggetto associato con questa segnalazione e la segnerà "
+"come risolta. La cancellazione è irreversibile."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:40
 msgctxt "Popup/Settings/Paragraph"
@@ -5124,7 +5133,7 @@ msgstr "1 mi piace"
 #: front/src/components/ShortcutsModal.vue:132
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle mute"
-msgstr ""
+msgstr "Cambia muto"
 
 #: front/src/components/ShortcutsModal.vue:136
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -5247,7 +5256,7 @@ msgstr "Sotto regole di moderazione"
 #: front/src/components/ShortcutsModal.vue:68
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Unfocus searchbar"
-msgstr ""
+msgstr "Togli il primo piano dalla barra di ricerca"
 
 #: front/src/views/content/remote/Card.vue:122
 #: src/views/content/remote/Card.vue:127
@@ -5280,13 +5289,13 @@ msgstr "Non silenziare"
 #: front/src/components/manage/moderation/ReportCard.vue:225
 msgctxt "Content/*/Button.Label"
 msgid "Unresolve"
-msgstr ""
+msgstr "Non risolto"
 
 #: front/src/components/manage/moderation/ReportCard.vue:67
 #: front/src/views/admin/moderation/ReportsList.vue:23
 msgctxt "Content/*/*/Short"
 msgid "Unresolved"
-msgstr ""
+msgstr "Non risolto"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:57
 msgctxt "Content/Moderation/Card.Button.Label/Verb"
