@@ -8,14 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-09-26 10:13+0000\n"
+"PO-Revision-Date: 2019-10-03 17:13+0000\n"
 "Last-Translator: SpcCw <ravnina@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<="
+"4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 3.7\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
@@ -1353,7 +1354,6 @@ msgstr "Удалить правило модерации"
 
 #: front/src/components/auth/Settings.vue:274
 #: src/components/auth/Settings.vue:302
-#, fuzzy
 msgctxt "*/*/Button.Label"
 msgid "Delete my account"
 msgstr "Удалить мой аккаунт"
@@ -2489,7 +2489,6 @@ msgstr "Библиотеки помогают организовывать Ва�
 #: front/src/views/admin/library/UploadDetail.vue:144
 #: front/src/views/admin/moderation/AccountsDetail.vue:518 src/entities.js:132
 #: front/src/components/mixins/Report.vue:78
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Library"
 msgstr "Библиотека"
@@ -3342,6 +3341,8 @@ msgstr "Списки воспроизведения"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
+"Пожалуйста, свяжитесь с администратором и попросите изменить соответствующие "
+"настройки."
 
 #: front/src/components/auth/Settings.vue:79
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -4141,6 +4142,8 @@ msgstr "Поделиться ссылкой"
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
 msgstr ""
+"Общий доступ не будет работать, так как данный узел не разрешает анонимным "
+"пользователям доступ к содержимому."
 
 #: front/src/components/About.vue:156
 msgctxt "*/*/*/Verb"
