@@ -226,13 +226,34 @@ def test_serve_file_in_place(
     assert response[headers[proxy]] == expected
 
 
+def test_serve_file_in_place_nginx_encode_url(
+    factories, api_client, preferences, settings
+):
+    preferences["common__api_authentication_required"] = False
+    settings.PROTECT_FILE_PATH = "/_protected/music"
+    settings.REVERSE_PROXY_TYPE = "nginx"
+    settings.MUSIC_DIRECTORY_PATH = "/app/music"
+    settings.MUSIC_DIRECTORY_SERVE_PATH = "/app/music"
+    upload = factories["music.Upload"](
+        in_place=True,
+        import_status="finished",
+        source="file:///app/music/hello/world%?.mp3",
+        library__privacy_level="everyone",
+    )
+    response = api_client.get(upload.track.listen_url)
+    expected = "/_protected/music/hello/world%25%3F.mp3"
+
+    assert response.status_code == 200
+    assert response["X-Accel-Redirect"] == expected
+
+
 @pytest.mark.parametrize(
     "proxy,serve_path,expected",
     [
         ("apache2", "/host/music", "/host/music/hello/worldéà.mp3"),
         ("apache2", "/app/music", "/app/music/hello/worldéà.mp3"),
-        ("nginx", "/host/music", "/_protected/music/hello/worldéà.mp3"),
-        ("nginx", "/app/music", "/_protected/music/hello/worldéà.mp3"),
+        ("nginx", "/host/music", "/_protected/music/hello/world%C3%A9%C3%A0.mp3"),
+        ("nginx", "/app/music", "/_protected/music/hello/world%C3%A9%C3%A0.mp3"),
     ],
 )
 def test_serve_file_in_place_utf8(
