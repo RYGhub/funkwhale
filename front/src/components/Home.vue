@@ -289,17 +289,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "../style/vendor/media";
 
 .ui.list .list.icon {
   padding: 0;
 }
 
 h1.header, h1 .sub.header {
-  text-shadow: 0 2px 0 rgba(0,0,0,.8);
+  text-shadow: 1px 1px 2px rgba(0,0,0,.8);
   color: #fff !important;
 }
 h1.ui.header {
-  font-size: 3em;
+  @include media(">tablet") {
+    font-size: 3em;
+  }
 }
 h1.ui.header .sub.header {
   font-size: 0.8em;
