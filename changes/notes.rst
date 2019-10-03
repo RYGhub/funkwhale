@@ -216,3 +216,15 @@ is applied to the corresponding user account. By default, anonymous requests get
 
 You can disable the rate-limiting feature by adding `THROTTLING_ENABLED=false` to your ``.env`` file and restarting the
 services. If you are using the Funkwhale API in your project or app and want to know more about the limits, please consult https://docs.funkwhale.audio/swagger/.
+
+Broken audio streaming when using S3/Minio and DSub [manual action required]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some Subsonic clients, such as DSub, are sending an Authorization headers which was forwarded
+to the S3 storage when streaming, causing some issues. If you are using S3 or a compatible storage
+such as Minio, please add the following in your nginx ``~ /_protected/media/(.+)`` location::
+
+    # Needed to ensure DSub auth isn't forwarded to S3/Minio, see #932
+    proxy_set_header Authorization "";
+
+And reload your nginx process.

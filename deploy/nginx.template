@@ -136,6 +136,8 @@ server {
     # media files in a S3 bucket
     # location ~ /_protected/media/(.+) {
     #     internal;
+    #     # Needed to ensure DSub auth isn't forwarded to S3/Minio, see #932
+    #     proxy_set_header Authorization "";
     #     proxy_pass $1;
     # }
 

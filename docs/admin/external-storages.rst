@@ -42,6 +42,8 @@ Replace the ``location /_protected/media`` block with the following::
 
     location ~ /_protected/media/(.+) {
         internal;
+        # Needed to ensure DSub auth isn't forwarded to S3/Minio, see #932
+        proxy_set_header Authorization "";
         proxy_pass $1;
     }
 
@@ -77,9 +79,9 @@ This URL is actually be visible by the client, but contains a signature valid on
 no one can reuse this URL or share it publicly to distribute unauthorized content.
 
 .. note::
-   
+
    If you are using Amazon S3, you will need to set your ``AWS_S3_REGION_NAME`` in the ``.env`` file to
-   use this feature. 
+   use this feature.
 
 .. note::
 
@@ -142,9 +144,10 @@ in your ``funkwhale.template`` under the ``location ~/_protected/media/(.+)`` se
 .. code-block:: shell
 
     location ~ /_protected/media/(.+) {
-     resolver 1.1.1.1;
-     internal;
-     proxy_pass $1;
+        resolver 1.1.1.1;
+        internal;
+        proxy_set_header Authorization "";
+        proxy_pass $1;
     }
 
 No Images or Media Loading
