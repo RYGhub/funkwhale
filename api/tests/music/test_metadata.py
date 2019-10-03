@@ -149,6 +149,7 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
         "sample.flac",
         "with_cover.ogg",
         "with_cover.opus",
+        "test.m4a",
     ],
 )
 def test_can_get_pictures(name):
@@ -184,6 +185,35 @@ def test_can_get_pictures(name):
 )
 def test_can_get_metadata_from_flac_file(field, value):
     path = os.path.join(DATA_DIR, "sample.flac")
+    data = metadata.Metadata(path)
+
+    assert data.get(field) == value
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("title", "Peer Gynt Suite no. 1, op. 46: I. Morning"),
+        ("artist", "Edvard Grieg"),
+        ("album_artist", "Edvard Grieg; Musopen Symphony Orchestra"),
+        ("album", "Peer Gynt Suite no. 1, op. 46"),
+        ("date", "2012-08-15"),
+        ("position", 1),
+        ("disc_number", 2),
+        ("musicbrainz_albumid", "a766da8b-8336-47aa-a3ee-371cc41ccc75"),
+        ("mbid", "bd21ac48-46d8-4e78-925f-d9cc2a294656"),
+        ("musicbrainz_artistid", "013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
+        (
+            "musicbrainz_albumartistid",
+            "013c8e5b-d72a-4cd3-8dee-6c64d6125823;5b4d7d2d-36df-4b38-95e3-a964234f520f",
+        ),
+        ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
+        ("copyright", "Someone"),
+        ("genre", "Dubstep"),
+    ],
+)
+def test_can_get_metadata_from_m4a_file(field, value):
+    path = os.path.join(DATA_DIR, "test.m4a")
     data = metadata.Metadata(path)
 
     assert data.get(field) == value
