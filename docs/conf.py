@@ -89,13 +89,24 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'gitlab_url': 'https://dev.funkwhale.audio/funkwhale/funkwhale'
+}
+html_context = {
+  'display_gitlab': True,
+  'gitlab_host': 'dev.funkwhale.audio',
+  'gitlab_repo': 'funkwhale',
+  'gitlab_user': 'funkwhale',
+  'gitlab_version': 'master',
+  'conf_py_path': '/docs/',
+}
+html_logo = 'logo.svg'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -166,7 +177,7 @@ redirect_files = [
     ('importing-music.html', 'admin/importing-music.html'),
     ('architecture.html', 'developers/architecture.html'),
     ('troubleshooting.html', 'admin/troubleshooting.html'),
-    ('configuration.html', 'admin/configuration.html'), 
+    ('configuration.html', 'admin/configuration.html'),
     ('upgrading/index.html', '../admin/upgrading.html'),
     ('upgrading/0.17.html', '../admin/0.17.html'),
     ('users/django.html', '../admin/django.html'),
