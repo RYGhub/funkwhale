@@ -236,7 +236,11 @@ def get_music_directory_data(artist):
 
 
 def get_folders(user):
-    return []
+    return [
+        # Dummy folder ID to match what is returned in the getMusicFolders endpoint
+        # cf https://dev.funkwhale.audio/funkwhale/funkwhale/issues/624
+        {"id": 1, "name": "Music"}
+    ]
 
 
 def get_user_detail_data(user):
