@@ -70,6 +70,45 @@ def clean_id3_pictures(apic):
     return pictures
 
 
+def get_mp4_tag(f, k):
+    if k == "pictures":
+        return f.get("covr")
+    raw_value = f.get(k, None)
+
+    if not raw_value:
+        raise TagNotFound(k)
+
+    value = raw_value[0]
+    try:
+        return value.decode()
+    except AttributeError:
+        return value
+
+
+def get_mp4_position(raw_value):
+    return raw_value[0]
+
+
+def clean_mp4_pictures(raw_pictures):
+    pictures = []
+    for p in list(raw_pictures):
+        if p.imageformat == p.FORMAT_JPEG:
+            mimetype = "image/jpeg"
+        elif p.imageformat == p.FORMAT_PNG:
+            mimetype = "image/png"
+        else:
+            continue
+        pictures.append(
+            {
+                "mimetype": mimetype,
+                "content": bytes(p),
+                "description": "",
+                "type": mutagen.id3.PictureType.COVER_FRONT,
+            }
+        )
+    return pictures
+
+
 def get_flac_tag(f, k):
     if k == "pictures":
         return f.pictures
@@ -214,6 +253,33 @@ CONF = {
             "pictures": {},
             "license": {"field": "WCOP"},
             "copyright": {"field": "TCOP"},
+        },
+    },
+    "MP4": {
+        "getter": get_mp4_tag,
+        "clean_pictures": clean_mp4_pictures,
+        "fields": {
+            "position": {"field": "trkn", "to_application": get_mp4_position},
+            "disc_number": {"field": "disk", "to_application": get_mp4_position},
+            "title": {"field": "©nam"},
+            "artist": {"field": "©ART"},
+            "album_artist": {"field": "aART"},
+            "album": {"field": "©alb"},
+            "date": {"field": "©day"},
+            "musicbrainz_albumid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Album Id"
+            },
+            "musicbrainz_artistid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Artist Id"
+            },
+            "genre": {"field": "©gen"},
+            "musicbrainz_albumartistid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Album Artist Id"
+            },
+            "mbid": {"field": "----:com.apple.iTunes:MusicBrainz Track Id"},
+            "pictures": {},
+            "license": {"field": "----:com.apple.iTunes:LICENSE"},
+            "copyright": {"field": "cprt"},
         },
     },
     "FLAC": {

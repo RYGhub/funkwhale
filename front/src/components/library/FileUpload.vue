@@ -158,7 +158,7 @@ export default {
       currentTab: "summary",
       uploadUrl: this.$store.getters['instance/absoluteUrl']("/api/v1/uploads/"),
       importReference,
-      supportedExtensions: ["flac", "ogg", "mp3", "opus"],
+      supportedExtensions: ["flac", "ogg", "mp3", "opus", "aac", "m4a"],
       isLoadingQuota: false,
       quotaStatus: null,
       uploads: {
