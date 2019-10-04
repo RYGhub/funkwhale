@@ -169,3 +169,16 @@ and ``media-src`` headers and reload nginx.
 .. code-block:: shell
 
     add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
+
+Broken Images in Audio Player On Page Reload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are serving media directly from an S3-compatible store, you may find that images 
+in the queue and the player won't load after the page is refreshed. This happens if the 
+generated URL has expired and the authorization is no longer valid. You can extend the expiry time
+using the following setting in your ``.env`` file:
+
+.. code-block:: shell
+
+    # The default value is 3600 (60 mins). The maximum is 604800 (7 days)
+    AWS_QUERYSTRING_EXPIRE=604800
