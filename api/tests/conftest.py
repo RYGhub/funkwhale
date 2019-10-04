@@ -1,14 +1,12 @@
 import contextlib
-import datetime
 import io
 import os
 import PIL
 import random
 import shutil
 import tempfile
-import uuid
+import time
 
-from faker.providers import internet as internet_provider
 import factory
 import pytest
 
@@ -24,34 +22,16 @@ from django.db.models import QuerySet
 
 from aioresponses import aioresponses
 from dynamic_preferences.registries import global_preferences_registry
-from rest_framework import fields as rest_fields
 from rest_framework.test import APIClient, APIRequestFactory
 
 from funkwhale_api.activity import record
 from funkwhale_api.federation import actors
+from funkwhale_api.moderation import mrf
 from funkwhale_api.music import licenses
 
+from . import utils as test_utils
 
 pytest_plugins = "aiohttp.pytest_plugin"
-
-
-class FunkwhaleProvider(internet_provider.Provider):
-    """
-    Our own faker data generator, since built-in ones are sometimes
-    not random enough
-    """
-
-    def federation_url(self, prefix=""):
-        def path_generator():
-            return "{}/{}".format(prefix, uuid.uuid4())
-
-        domain = self.domain_name()
-        protocol = "https"
-        path = path_generator()
-        return "{}://{}/{}".format(protocol, domain, path)
-
-
-factory.Faker.add_provider(FunkwhaleProvider)
 
 
 @pytest.fixture
@@ -317,24 +297,22 @@ def authenticated_actor(factories, mocker):
     yield actor
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def to_api_date():
-    def inner(value):
-        if isinstance(value, datetime.datetime):
-            f = rest_fields.DateTimeField()
-            return f.to_representation(value)
-        if isinstance(value, datetime.date):
-            f = rest_fields.DateField()
-            return f.to_representation(value)
-        raise ValueError("Invalid value: {}".format(value))
-
-    return inner
+    return test_utils.to_api_date
 
 
 @pytest.fixture()
 def now(mocker):
     now = timezone.now()
     mocker.patch("django.utils.timezone.now", return_value=now)
+    return now
+
+
+@pytest.fixture()
+def now_time(mocker):
+    now = time.time()
+    mocker.patch("time.time", return_value=now)
     return now
 
 
@@ -423,6 +401,20 @@ def a_responses():
 @pytest.fixture
 def service_actor(db):
     return actors.get_service_actor()
+
+
+@pytest.fixture
+def mrf_inbox_registry(mocker):
+    registry = mrf.Registry()
+    mocker.patch("funkwhale_api.moderation.mrf.inbox", registry)
+    return registry
+
+
+@pytest.fixture
+def mrf_outbox_registry(mocker):
+    registry = mrf.Registry()
+    mocker.patch("funkwhale_api.moderation.mrf.outbox", registry)
+    return registry
 
 
 @pytest.fixture(autouse=True)

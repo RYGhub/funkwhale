@@ -37,8 +37,8 @@
         action-url="manage/library/albums/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Title</translate></th>
-          <th><translate translate-context="*/*/*">Artist</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Title</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Artist</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="*/*/*">Tracks</translate></th>
           <th><translate translate-context="Content/*/*/Noun">Release date</translate></th>

@@ -55,7 +55,7 @@
           :class="['ui', 'small', 'orange', 'inverted', {'indicating': isLoadingAudio}, 'progress']"
           @click="touchProgress">
           <div class="buffer bar" :data-percent="bufferProgress" :style="{ 'width': bufferProgress + '%' }"></div>
-          <div class="bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
+          <div class="position bar" :data-percent="progress" :style="{ 'width': progress + '%' }"></div>
         </div>
       </div>
       <div class="ui small warning message" v-if="currentTrack && errored">
@@ -78,7 +78,7 @@
           class="two wide column control"
           @click.prevent.stop="previous"
           :disabled="emptyQueue">
-            <i :class="['ui', 'backward step', {'disabled': emptyQueue}, 'secondary', 'icon']"></i>
+            <i :class="['ui', 'backward step', {'disabled': emptyQueue}, 'icon']"></i>
         </span>
         <span
           role="button"
@@ -87,7 +87,7 @@
           :aria-label="labels.play"
           @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+            <i :class="['ui', 'play', {'disabled': !currentTrack}, 'icon']"></i>
         </span>
         <span
           role="button"
@@ -96,7 +96,7 @@
           :aria-label="labels.pause"
           @click.prevent.stop="togglePlay"
           class="two wide column control">
-            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'secondary', 'icon']"></i>
+            <i :class="['ui', 'pause', {'disabled': !currentTrack}, 'icon']"></i>
         </span>
         <span
           role="button"
@@ -105,7 +105,7 @@
           class="two wide column control"
           @click.prevent.stop="next"
           :disabled="!hasNext">
-            <i :class="['ui', {'disabled': !hasNext}, 'forward step', 'secondary', 'icon']" ></i>
+            <i :class="['ui', {'disabled': !hasNext}, 'forward step', 'icon']" ></i>
         </span>
         <div
           class="wide column control volume-control"
@@ -118,7 +118,7 @@
             :title="labels.unmute"
             :aria-label="labels.unmute"
             @click.prevent.stop="unmute">
-            <i class="volume off secondary icon"></i>
+            <i class="volume off icon"></i>
           </span>
           <span
             role="button"
@@ -126,7 +126,7 @@
             :title="labels.mute"
             :aria-label="labels.mute"
             @click.prevent.stop="mute">
-            <i class="volume down secondary icon"></i>
+            <i class="volume down icon"></i>
           </span>
           <span
             role="button"
@@ -134,7 +134,7 @@
             :title="labels.mute"
             :aria-label="labels.mute"
             @click.prevent.stop="mute">
-            <i class="volume up secondary icon"></i>
+            <i class="volume up icon"></i>
           </span>
           <input
             type="range"
@@ -152,7 +152,7 @@
             :aria-label="labels.loopingDisabled"
             @click.prevent.stop="$store.commit('player/looping', 1)"
             :disabled="!currentTrack">
-            <i :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'secondary', 'icon']"></i>
+            <i :class="['ui', {'disabled': !currentTrack}, 'step', 'repeat', 'icon']"></i>
           </span>
           <span
             role="button"
@@ -162,7 +162,7 @@
             v-if="looping === 1"
             :disabled="!currentTrack">
             <i
-              class="repeat secondary icon">
+              class="repeat icon">
               <span class="ui circular tiny orange label">1</span>
             </i>
           </span>
@@ -174,7 +174,7 @@
             :disabled="!currentTrack"
             @click.prevent.stop="$store.commit('player/looping', 0)">
             <i
-              class="repeat orange secondary icon">
+              class="repeat orange icon">
             </i>
           </span>
         </div>
@@ -187,7 +187,7 @@
           @click.prevent.stop="shuffle()"
           class="two wide column control">
           <div v-if="isShuffling" class="ui inline shuffling inverted tiny active loader"></div>
-          <i v-else :class="['ui', 'random', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+          <i v-else :class="['ui', 'random', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
         </span>
         <div class="one wide column" v-if="!showVolume"></div>
         <span
@@ -199,19 +199,26 @@
           @click.prevent.stop="clean()"
           class="two wide column control">
           <i class="icons">
-            <i :class="['ui', 'trash', 'secondary', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
-            <i :class="['ui corner large inverted', 'list', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+            <i :class="['ui', 'trash', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
+            <i :class="['ui corner inverted', 'list', {'disabled': queue.tracks.length === 0}, 'icon']" ></i>
           </i>
         </span>
       </div>
       <GlobalEvents
         @keydown.space.prevent.exact="togglePlay"
-        @keydown.ctrl.left.prevent.exact="previous"
-        @keydown.ctrl.right.prevent.exact="next"
-        @keydown.ctrl.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
-        @keydown.ctrl.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
+        @keydown.ctrl.shift.left.prevent.exact="previous"
+        @keydown.ctrl.shift.right.prevent.exact="next"
+        @keydown.shift.down.prevent.exact="$store.commit('player/incrementVolume', -0.1)"
+        @keydown.shift.up.prevent.exact="$store.commit('player/incrementVolume', 0.1)"
+        @keydown.right.prevent.exact="seek (5)"
+        @keydown.left.prevent.exact="seek (-5)"
+        @keydown.shift.right.prevent.exact="seek (30)"
+        @keydown.shift.left.prevent.exact="seek (-30)"
+        @keydown.m.prevent.exact="toggleMute"
         @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
         @keydown.s.prevent.exact="shuffle"
+        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
+        @keydown.q.prevent.exact="clean"
         />
     </div>
   </section>
@@ -294,6 +301,7 @@ export default {
       mute: "player/mute",
       unmute: "player/unmute",
       clean: "queue/clean",
+      toggleMute: "player/toggleMute",
     }),
     async getTrackData (trackData) {
       let data = null
@@ -491,6 +499,21 @@ export default {
           this.getSound(toPreload)
           this.nextTrackPreloaded = true
         }
+      }
+    },
+    seek (step) {
+      if (step > 0) {
+        // seek right
+        if (this.currentTime + step < this.duration) {
+        this.$store.dispatch('player/updateProgress', (this.currentTime + step))
+        } else {
+        this.next() // parenthesis where missing here
+        }
+      }
+      else {
+        // seek left
+        let position = Math.max(this.currentTime + step, 0)
+        this.$store.dispatch('player/updateProgress', position)
       }
     },
     observeProgress: function (enable) {
@@ -797,11 +820,15 @@ export default {
   vertical-align: middle;
 }
 
-.secondary.icon {
+.control .icon {
   font-size: 1.5em;
 }
 .progress-area .actions {
   text-align: center;
+}
+.ui.progress:not([data-percent]):not(.indeterminate)
+  .bar.position:not(.buffer) {
+  background: #ff851b;
 }
 .volume-control {
   position: relative;

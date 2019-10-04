@@ -14,8 +14,8 @@ server {
     location / { return 301 https://$host$request_uri; }
 }
 server {
-    listen      443 ssl;
-    listen [::]:443 ssl;
+    listen      443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name ${FUNKWHALE_HOSTNAME};
 
     # TLS
@@ -28,6 +28,13 @@ server {
 
     # HSTS
     add_header Strict-Transport-Security "max-age=31536000";
+
+    # Security related headers
+
+    # If you are using S3 to host your files, remember to add your S3 URL to the
+    # media-src and img-src headers (e.g. img-src 'self' https://<your-S3-URL> data:)
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
 
     # compression settings
     gzip on;

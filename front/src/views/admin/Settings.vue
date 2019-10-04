@@ -81,9 +81,10 @@ export default {
       let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
-      let federationLabel = this.$pgettext('Content/Admin/Menu', 'Federation')
+      let federationLabel = this.$pgettext('*/*/*', 'Federation')
+      let moderationLabel = this.$pgettext('*/Moderation/*', 'Moderation')
       let subsonicLabel = this.$pgettext('Content/Admin/Menu', 'Subsonic')
-      let statisticsLabel = this.$pgettext('Content/Admin/Menu', 'Statistics')
+      let statisticsLabel = this.$pgettext('Content/Home/Header', 'Statistics')
       let uiLabel = this.$pgettext('Content/Admin/Menu', 'User Interface')
       let errorLabel = this.$pgettext('Content/Admin/Menu', 'Error reporting')
       return [
@@ -93,7 +94,12 @@ export default {
           settings: [
             "instance__name",
             "instance__short_description",
-            "instance__long_description"
+            "instance__long_description",
+            "instance__contact_email",
+            "instance__rules",
+            "instance__terms",
+            "instance__banner",
+            "instance__support_message"
           ]
         },
         {
@@ -120,6 +126,15 @@ export default {
           settings: ["playlists__max_tracks"]
         },
         {
+          label: moderationLabel,
+          id: "moderation",
+          settings: [
+            "moderation__allow_list_enabled",
+            "moderation__allow_list_public",
+            "moderation__unauthenticated_report_types",
+          ]
+        },
+        {
           label: federationLabel,
           id: "federation",
           settings: [
@@ -138,7 +153,7 @@ export default {
         {
           label: uiLabel,
           id: "ui",
-          settings: ["ui__custom_css"]
+          settings: ["ui__custom_css", "instance__funkwhale_support_message_enabled"]
         },
         {
           label: statisticsLabel,

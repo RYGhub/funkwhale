@@ -73,7 +73,7 @@ class LocalFromFidQuerySet:
             return self.filter(~query)
 
 
-class MutationQuerySet(models.QuerySet):
+class GenericTargetQuerySet(models.QuerySet):
     def get_for_target(self, target):
         content_type = ContentType.objects.get_for_model(target)
         return self.filter(target_content_type=content_type, target_id=target.pk)
@@ -119,7 +119,7 @@ class Mutation(models.Model):
     )
     target = GenericForeignKey("target_content_type", "target_id")
 
-    objects = MutationQuerySet.as_manager()
+    objects = GenericTargetQuerySet.as_manager()
 
     def get_federation_id(self):
         if self.fid:

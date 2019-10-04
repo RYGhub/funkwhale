@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music.serializers import TrackActivitySerializer, TrackSerializer
 from funkwhale_api.users.serializers import UserActivitySerializer, UserBasicSerializer
 
@@ -27,15 +28,21 @@ class ListeningActivitySerializer(activity_serializers.ModelSerializer):
 class ListeningSerializer(serializers.ModelSerializer):
     track = TrackSerializer(read_only=True)
     user = UserBasicSerializer(read_only=True)
+    actor = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Listening
-        fields = ("id", "user", "track", "creation_date")
+        fields = ("id", "user", "track", "creation_date", "actor")
 
     def create(self, validated_data):
         validated_data["user"] = self.context["user"]
 
         return super().create(validated_data)
+
+    def get_actor(self, obj):
+        actor = obj.user.actor
+        if actor:
+            return federation_serializers.APIActorSerializer(actor).data
 
 
 class ListeningWriteSerializer(serializers.ModelSerializer):

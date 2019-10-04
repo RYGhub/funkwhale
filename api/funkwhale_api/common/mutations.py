@@ -86,6 +86,7 @@ class MutationSerializer(serializers.Serializer):
 
 class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
     serialized_relations = {}
+    previous_state_handlers = {}
 
     def __init__(self, *args, **kwargs):
         # we force partial mode, because update mutations are partial
@@ -139,16 +140,20 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
         return get_update_previous_state(
             obj,
             *list(validated_data.keys()),
-            serialized_relations=self.serialized_relations
+            serialized_relations=self.serialized_relations,
+            handlers=self.previous_state_handlers,
         )
 
 
-def get_update_previous_state(obj, *fields, serialized_relations={}):
+def get_update_previous_state(obj, *fields, serialized_relations={}, handlers={}):
     if not fields:
         raise ValueError("You need to provide at least one field")
 
     state = {}
     for field in fields:
+        if field in handlers:
+            state[field] = handlers[field](obj)
+            continue
         value = getattr(obj, field)
         if isinstance(value, models.Model):
             # we store the related object id and repr for better UX

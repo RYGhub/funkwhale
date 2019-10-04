@@ -1,85 +1,95 @@
 <template>
-  <div class="ui card">
+  <div class="flat inline card">
+    <div :class="['ui', 'image', 'with-overlay', {'default-cover': !cover.original}]" v-lazy:background-image="imageUrl">
+      <play-button class="play-overlay" :icon-only="true" :is-playable="artist.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="artist"></play-button>
+    </div>
     <div class="content">
-        <div class="header">
-          <router-link class="discrete link" :to="{name: 'library.artists.detail', params: {id: artist.id }}">
-            {{ artist.name }}
-          </router-link>
-        </div>
-        <div class="description">
-          <table class="ui compact very basic fixed single line unstackable table">
-            <tbody>
-              <tr v-for="album in albums">
-                <td>
-                  <img class="ui mini image" v-if="album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](album.cover.small_square_crop)">
-                  <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
-                </td>
-                <td colspan="4">
-                  <router-link :title="album.title" class="discrete link" :to="{name: 'library.albums.detail', params: {id: album.id }}">
-                    <strong>{{ album.title }}</strong>
-                  </router-link><br />
-                  {{ album.tracks_count }} tracks
-                </td>
-                <td>
-                  <play-button class="right floated basic icon" :is-playable="album.is_playable" :discrete="true" :album="album"></play-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="center aligned segment" v-if="artist.albums.length > initialAlbums">
-            <em v-if="!showAllAlbums" @click="showAllAlbums = true" class="expand">
-              <translate translate-context="Content/Artist/Card.Link" :translate-params="{count: artist.albums.length - initialAlbums}" :translate-n="artist.albums.length - initialAlbums" translate-plural="Show %{ count } more albums">Show 1 more album</translate>
-            </em>
-            <em v-else @click="showAllAlbums = false" class="expand">
-              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
-            </em>
-          </div>
-        </div>
-    </div>
-    <div class="extra content">
-        <span>
-          <i class="sound icon"></i>
-            <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
-        </span>
-        <play-button :is-playable="isPlayable" class="mini basic orange right floated" :artist="artist">
-          <translate translate-context="Content/Queue/Button.Label/Short, Verb">Play all</translate>
-        </play-button>
+      <router-link :title="artist.name" :to="{name: 'library.artists.detail', params: {id: artist.id}}">
+        {{ artist.name|truncate(30) }}
+      </router-link>
+      <div v-if="artist.albums.length > 0">
+        <i class="small sound icon"></i>
+        <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
       </div>
+      <div v-else-if="artist.tracks_count">
+        <i class="small sound icon"></i>
+        <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.tracks_count}" :translate-n="artist.tracks_count" translate-plural="%{ count } tracks">1 track</translate>
+      </div>
+      <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="artist.tags"></tags-list>
+
+      <play-button
+        class="play-button basic icon"
+        :dropdown-only="true"
+        :is-playable="artist.is_playable"
+        :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']"
+        :artist="artist"></play-button>
     </div>
+  </div>
 </template>
 
 <script>
 import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
+import TagsList from "@/components/tags/List"
 
 export default {
   props: ['artist'],
   components: {
-    PlayButton
+    PlayButton,
+    TagsList
   },
   data () {
     return {
       backend: backend,
       initialAlbums: 30,
-      showAllAlbums: true
+      showAllAlbums: true,
     }
   },
   computed: {
-    albums () {
-      if (this.showAllAlbums) {
-        return this.artist.albums
+    imageUrl () {
+      let url = '../../../assets/audio/default-cover.png'
+      let cover = this.cover
+      if (cover.original) {
+        url = this.$store.getters['instance/absoluteUrl'](cover.medium_square_crop)
+      } else {
+        return null
       }
-      return this.artist.albums.slice(0, this.initialAlbums)
+      return url
     },
-    isPlayable () {
-      return this.artist.albums.filter((a) => {
-        return a.is_playable
-      }).length > 0
-    }
+    cover () {
+      return this.artist.albums.map((a) => {
+        return a.cover
+      }).filter((c) => {
+        return !!c
+      })[0] || {}
+    },
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.default-cover {
+  background-image: url("../../../assets/audio/default-cover.png") !important;
+}
+
+.play-button {
+  position: absolute;
+  right: 0;
+  bottom: 40%;
+}
+
+.with-overlay {
+  background-size: cover !important;
+  background-position: center !important;
+  height: 8em;
+  width: 8em;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.flat.card .with-overlay.image {
+  border-radius: 50% !important;
+  margin: 0 auto;
+}
 </style>

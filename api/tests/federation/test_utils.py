@@ -72,6 +72,32 @@ def test_retrieve_ap_object_honor_instance_policy_domain(factories):
         utils.retrieve_ap_object(fid, actor=None)
 
 
+def test_retrieve_ap_object_honor_mrf_inbox_before_http(
+    mrf_inbox_registry, factories, mocker
+):
+    apply = mocker.patch.object(mrf_inbox_registry, "apply", return_value=(None, False))
+    fid = "http://domain/test"
+    with pytest.raises(exceptions.BlockedActorOrDomain):
+        utils.retrieve_ap_object(fid, actor=None)
+
+    apply.assert_called_once_with({"id": fid})
+
+
+def test_retrieve_ap_object_honor_mrf_inbox_after_http(
+    r_mock, mrf_inbox_registry, factories, mocker
+):
+    apply = mocker.patch.object(
+        mrf_inbox_registry, "apply", side_effect=[(True, False), (None, False)]
+    )
+    payload = {"id": "http://domain/test", "actor": "hello"}
+    r_mock.get(payload["id"], json=payload)
+    with pytest.raises(exceptions.BlockedActorOrDomain):
+        utils.retrieve_ap_object(payload["id"], actor=None)
+
+    apply.assert_any_call({"id": payload["id"]})
+    apply.assert_any_call(payload)
+
+
 def test_retrieve_ap_object_honor_instance_policy_different_url_and_id(
     r_mock, factories
 ):

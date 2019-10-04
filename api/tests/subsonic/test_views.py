@@ -376,6 +376,28 @@ def test_get_random_songs(f, db, logged_in_api_client, factories, mocker):
 
 
 @pytest.mark.parametrize("f", ["json"])
+def test_get_genres(f, db, logged_in_api_client, factories, mocker):
+    url = reverse("api:subsonic-get_genres")
+    assert url.endswith("getGenres") is True
+    tag1 = factories["tags.Tag"](name="Pop")
+    tag2 = factories["tags.Tag"](name="Rock")
+
+    factories["music.Album"](set_tags=[tag1.name, tag2.name])
+    factories["music.Track"](set_tags=[tag1.name])
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "genres": {
+            "genre": [
+                {"songCount": 1, "albumCount": 1, "value": tag1.name},
+                {"songCount": 0, "albumCount": 1, "value": tag2.name},
+            ]
+        }
+    }
+
+
+@pytest.mark.parametrize("f", ["json"])
 def test_get_starred(f, db, logged_in_api_client, factories):
     url = reverse("api:subsonic-get_starred")
     assert url.endswith("getStarred") is True
@@ -424,6 +446,49 @@ def test_get_album_list2_pagination(f, db, logged_in_api_client, factories):
     assert response.data == {
         "albumList2": {"album": serializers.get_album_list2_data([album1])}
     }
+
+
+@pytest.mark.parametrize("f", ["json"])
+def test_get_album_list2_by_genre(f, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get_album_list2")
+    assert url.endswith("getAlbumList2") is True
+    album1 = factories["music.Album"](
+        artist__name="Artist1", playable=True, set_tags=["Rock"]
+    )
+    album2 = factories["music.Album"](
+        artist__name="Artist2", playable=True, artist__set_tags=["Rock"]
+    )
+    factories["music.Album"](playable=True, set_tags=["Pop"])
+    response = logged_in_api_client.get(
+        url, {"f": f, "type": "byGenre", "size": 5, "offset": 0, "genre": "rock"}
+    )
+
+    assert response.status_code == 200
+    assert response.data == {
+        "albumList2": {"album": serializers.get_album_list2_data([album1, album2])}
+    }
+
+
+@pytest.mark.parametrize("f", ["json"])
+@pytest.mark.parametrize(
+    "tags_field",
+    ["set_tags", "artist__set_tags", "album__set_tags", "album__artist__set_tags"],
+)
+def test_get_songs_by_genre(f, tags_field, db, logged_in_api_client, factories):
+    url = reverse("api:subsonic-get_songs_by_genre")
+    assert url.endswith("getSongsByGenre") is True
+    track1 = factories["music.Track"](playable=True, **{tags_field: ["Rock"]})
+    track2 = factories["music.Track"](playable=True, **{tags_field: ["Rock"]})
+    factories["music.Track"](playable=True, **{tags_field: ["Pop"]})
+    expected = {
+        "songsByGenre": {"song": serializers.get_song_list_data([track2, track1])}
+    }
+
+    response = logged_in_api_client.get(
+        url, {"f": f, "count": 5, "offset": 0, "genre": "rock"}
+    )
+    assert response.status_code == 200
+    assert response.data == expected
 
 
 @pytest.mark.parametrize("f", ["json"])

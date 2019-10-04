@@ -33,6 +33,79 @@ info:
     If you keep the default server (https://demo.funkwhale.audio), the default username and password
     couple is "demo" and "demo".
 
+    Rate limiting
+    -------------
+
+    Depending on server configuration, pods running Funkwhale 0.20 and higher may rate-limit incoming
+    requests to prevent abuse and improve the stability of service. Requests that are dropped because of rate-limiting
+    receive a 429 HTTP response.
+
+    The limits themselves vary depending on:
+
+    - The client: anonymous requests are subject to lower limits than authenticated requests
+    - The operation being performed: Write and delete operations, as performed with DELETE, POST, PUT and PATCH HTTP methods are subject to lower limits
+
+    Those conditions are used to determine the scope of the request, which in turns determine the limit that is applied.
+    For instance, authenticated POST requests are bound to the `authenticated-create` scope, with a default limit of
+    1000 requests/hour, but anonymous POST requests are bound to the `anonymous-create` scope, with a lower limit of 1000 requests/day.
+
+    A full list of scopes with their corresponding description, and the current usage data for the client performing the request
+    is available via the `/api/v1/rate-limit` endpoint.
+
+    Additionally, we include HTTP headers on all API response to ensure API clients can understand:
+
+    - what scope was bound to a given request
+    - what is the corresponding limit
+    - how much similar requests can be sent before being limited
+    - and how much time they should wait if they have been limited
+
+    <table>
+      <caption>Rate limiting headers</caption>
+      <thead>
+        <th>Header</th>
+        <th>Example value</th>
+        <th>Description value</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>X-RateLimit-Limit</code></td>
+          <td>50</td>
+          <td>The number of allowed requests whithin a given period</td>
+        </tr>
+        <tr>
+          <td><code>X-RateLimit-Duration</code></td>
+          <td>3600</td>
+          <td>The time window, in seconds, during which those requests are accounted for.</td>
+        </tr>
+        <tr>
+          <td><code>X-RateLimit-Scope</code></td>
+          <td>login</td>
+          <td>The name of the scope as computed for the request</td>
+        </tr>
+        <tr>
+          <td><code>X-RateLimit-Remaining</code></td>
+          <td>42</td>
+          <td>How many requests can be sent with the same scope before the limit applies</td>
+        </tr>
+        <tr>
+          <td><code>Retry-After</code> (if <code>X-RateLimit-Remaining</code> is 0)</td>
+          <td>3543</td>
+          <td>How many seconds to wait before a retry</td>
+        </tr>
+        <tr>
+          <td><code>X-RateLimit-Reset</code></td>
+          <td>1568126089</td>
+          <td>A timestamp indicating when <code>X-RateLimit-Remaining</code> will return to its higher possible value</td>
+        </tr>
+        <tr>
+          <td><code>X-RateLimit-ResetSeconds</code></td>
+          <td>3599</td>
+          <td>How many seconds to wait before <code>X-RateLimit-Remaining</code> returns to its higher possible value</td>
+        </tr>
+      </tbody>
+    </table>
+
+
     Resources
     ---------
 
@@ -103,7 +176,7 @@ security:
 
 tags:
   - name: Auth and security
-    description: Login, logout and authorization endpoints
+    description: Login, logout, rate-limit and authorization endpoints
   - name: Library and metadata
     description: Information and metadata about musical and audio entities (albums, tracks, artists, etc.)
   - name: Uploads and audio content
@@ -117,7 +190,7 @@ paths:
   /api/v1/oauth/apps/:
     post:
       tags:
-        - "auth"
+        - "Auth and security"
       description:
         Register an OAuth application
       security: []
@@ -247,6 +320,19 @@ paths:
               schema:
                 $ref: "#/definitions/Me"
 
+  /api/v1/rate-limit/:
+    get:
+      summary: Retrive rate-limit information and current usage status
+      tags:
+        - "Auth and security"
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/RateLimitStatus"
+
   /api/v1/artists/:
     get:
       summary: List artists
@@ -296,6 +382,7 @@ paths:
       summary: Retrieve a single artist
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
       security:
         - oauth2:
           - "read:libraries"
@@ -395,6 +482,7 @@ paths:
       summary: Retrieve a single album
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
 
       security:
         - oauth2:
@@ -518,6 +606,7 @@ paths:
     get:
       parameters:
         - $ref: "#/parameters/ObjectId"
+        - $ref: "#/parameters/Refresh"
       summary: Retrieve a single track
 
       security:
@@ -974,6 +1063,14 @@ parameters:
     schema:
       required: false
       type: "boolean"
+  Refresh:
+    name: "refresh"
+    in: "query"
+    default: false
+    description: "Trigger an ActivityPub fetch to refresh local data"
+    schema:
+      required: false
+      type: "boolean"
 
 responses:
   200:
@@ -1179,6 +1276,10 @@ definitions:
       - $ref: "#/definitions/BaseArtist"
       - type: "object"
         properties:
+          tracks_count:
+            type: "integer"
+            format: "int64"
+            example: 42
           albums:
             type: "array"
             items:
@@ -1631,6 +1732,75 @@ definitions:
         type: "boolean"
         example: false
         description: A boolean indicating if the user can manage instance settings and users
+  RateLimitStatus:
+    type: "object"
+    properties:
+      enabled:
+        type: "boolean"
+        example: true
+        description: A boolean indicating if rate-limiting is enabled on the server
+      ident:
+        type: "object"
+        description: Client-related data
+        properties:
+          type:
+            type: string
+            example: "anonymous"
+            enum:
+              - "authenticated"
+              - "anonymous"
+          id:
+            type: string
+            example: "92.143.42"
+            description: An address IP or user ID identifying the client
+      scopes:
+        type: "array"
+        items:
+          type: "object"
+          description: Rate-limit scope configuration and usage
+          properties:
+            id:
+              type: string
+              example: "password-reset"
+            description:
+              type: string
+              example: "Password reset request"
+            rate:
+              type: string
+              example: "30/day"
+            limit:
+              type: "integer"
+              format: "int64"
+              example: 30
+            duration:
+              type: "integer"
+              format: "int64"
+              example: 86400
+            remaining:
+              type: "integer"
+              format: "int64"
+              example: 28
+              description: How many requests can be sent with the same scope before the limit applies
+            reset:
+              type: "integer"
+              format: "int64"
+              example: 1568126189
+              description: A timestamp indicating when <code>remaining</code> will return to its higher possible value
+            reset_seconds:
+              type: "integer"
+              format: "int64"
+              example: 86267
+              description: How many seconds to wait before <code>remaining</code> returns to its higher possible value
+            available:
+              type: "integer"
+              format: "int64"
+              example: 1568126089
+              description: A timestamp indicating when the client can retry
+            available_seconds:
+              type: "integer"
+              format: "int64"
+              example: 54
+              description: How many seconds to wait before a retry
 
   ResourceNotFound:
     type: "object"

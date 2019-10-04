@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import utils as music_utils
 
 
 def get_artist_data(artist_values):
@@ -71,7 +72,14 @@ def get_track_data(album, track, upload):
         "artist": album.artist.name,
         "track": track.position or 1,
         "discNumber": track.disc_number or 1,
-        "contentType": upload.mimetype,
+        # Ugly fallback to mp3 but some subsonic clients fail if the value is empty or null, and we don't always
+        # have the info on legacy uploads
+        "contentType": upload.mimetype
+        or (
+            music_utils.get_type_from_ext(upload.extension)
+            if upload.extension
+            else "audio/mpeg"
+        ),
         "suffix": upload.extension or "",
         "duration": upload.duration or 0,
         "created": track.creation_date,
@@ -228,7 +236,11 @@ def get_music_directory_data(artist):
 
 
 def get_folders(user):
-    return []
+    return [
+        # Dummy folder ID to match what is returned in the getMusicFolders endpoint
+        # cf https://dev.funkwhale.audio/funkwhale/funkwhale/issues/624
+        {"id": 1, "name": "Music"}
+    ]
 
 
 def get_user_detail_data(user):
@@ -263,3 +275,11 @@ class ScrobbleSerializer(serializers.Serializer):
         return history_models.Listening.objects.create(
             user=self.context["user"], track=data["id"]
         )
+
+
+def get_genre_data(tag):
+    return {
+        "songCount": getattr(tag, "_tracks_count", 0),
+        "albumCount": getattr(tag, "_albums_count", 0),
+        "value": tag.name,
+    }

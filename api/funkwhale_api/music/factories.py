@@ -2,10 +2,11 @@ import os
 
 import factory
 
-from funkwhale_api.factories import ManyToManyFromList, registry, NoUpdateOnCreate
+from funkwhale_api.factories import registry, NoUpdateOnCreate
 
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
+from funkwhale_api.tags import factories as tags_factories
 from funkwhale_api.users import factories as users_factories
 
 SAMPLES_PATH = os.path.join(
@@ -55,7 +56,9 @@ class LicenseFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class ArtistFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     name = factory.Faker("name")
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
@@ -72,7 +75,9 @@ class ArtistFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class AlbumFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
@@ -96,14 +101,14 @@ class AlbumFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
 
 @registry.register
-class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+class TrackFactory(
+    tags_factories.TaggableFactory, NoUpdateOnCreate, factory.django.DjangoModelFactory
+):
     fid = factory.Faker("federation_url")
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     album = factory.SubFactory(AlbumFactory)
-    artist = factory.SelfAttribute("album.artist")
     position = 1
-    tags = ManyToManyFromList("tags")
     playable = playable_factory("track")
 
     class Meta:
@@ -117,6 +122,26 @@ class TrackFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), album__local=True
         )
+
+    @factory.post_generation
+    def artist(self, created, extracted, **kwargs):
+        """
+        A bit intricated, because we want to be able to specify a different
+        track artist with a fallback on album artist if nothing is specified.
+
+        And handle cases where build or build_batch are used (so no db calls)
+        """
+        if extracted:
+            self.artist = extracted
+        elif kwargs:
+            if created:
+                self.artist = ArtistFactory(**kwargs)
+            else:
+                self.artist = ArtistFactory.build(**kwargs)
+        elif self.album:
+            self.artist = self.album.artist
+        if created:
+            self.save()
 
     @factory.post_generation
     def license(self, created, extracted, **kwargs):
@@ -162,18 +187,6 @@ class UploadVersionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
     class Meta:
         model = "music.UploadVersion"
-
-
-@registry.register
-class TagFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
-    name = factory.SelfAttribute("slug")
-    slug = factory.Faker("slug")
-
-    class Meta:
-        model = "taggit.Tag"
-
-
-# XXX To remove
 
 
 class ImportBatchFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):

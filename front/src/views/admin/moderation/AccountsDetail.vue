@@ -154,17 +154,17 @@
                           @change="updateUser('is_active')"
                           v-model="object.user.is_active" type="checkbox">
                         <label>
-                          <translate v-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
-                          <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
+                          <translate v-if="object.user.is_active" key="1" translate-context="*/*/*/State of feature">Enabled</translate>
+                          <translate v-else key="2" translate-context="*/*/*/State of feature">Disabled</translate>
                         </label>
                       </div>
-                      <translate v-else-if="object.user.is_active" key="1" translate-context="*/*/*">Enabled</translate>
-                      <translate v-else key="2" translate-context="*/*/*">Disabled</translate>
+                      <translate v-else-if="object.user.is_active" key="1" translate-context="*/*/*/State of feature">Enabled</translate>
+                      <translate v-else key="2" translate-context="*/*/*/State of feature">Disabled</translate>
                     </td>
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/Admin/Table.Label/Noun">Permissions</translate>
+                      <translate translate-context="Content/*/*/Noun">Permissions</translate>
                     </td>
                     <td>
                       <select
@@ -174,11 +174,12 @@
                         class="ui search selection dropdown">
                         <option v-for="p in allPermissions" :value="p.code">{{ p.label }}</option>
                       </select>
+                      <action-feedback :is-loading="updating.permissions"></action-feedback>
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun">Type</translate>
+                      <translate translate-context="Content/Track/Table.Label/Noun">Type</translate>
                     </td>
                     <td>
                       {{ object.type }}
@@ -263,6 +264,16 @@
                       {{ stats.emitted_library_follows}}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.moderation.reports.list', query: {q: getQuery('target', `account:${object.full_username}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Linked reports</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.reports }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </section>
@@ -296,7 +307,7 @@
                   </tr>
                   <tr v-if="object.user">
                     <td>
-                      <translate translate-context="Content/Moderation/Table.Label/Noun" >Upload quota</translate>
+                      <translate translate-context="*/*/*" >Upload quota</translate>
                       <span :data-tooltip="labels.uploadQuota"><i class="question circle icon"></i></span>
                     </td>
                     <td>
@@ -308,8 +319,9 @@
                           name="quota"
                           type="number" />
                         <div class="ui basic label">
-                          <translate translate-context="Content/*/*/Unit">MB</translate>
+                          <translate translate-context="Content/*/*/Unit">MB</translate>&#32;
                         </div>
+                        <action-feedback class="ui basic label" size="tiny" :is-loading="updating.upload_quota"></action-feedback>
                       </div>
                     </td>
                   </tr>
@@ -335,7 +347,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('account', object.full_username) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>
@@ -360,7 +372,7 @@
                   </tr>
                   <tr>
                     <td>
-                      <translate translate-context="*/*/*/Noun">Tracks</translate>
+                      <translate translate-context="*/*/*">Tracks</translate>
                     </td>
                     <td>
                       {{ stats.tracks }}
@@ -403,6 +415,10 @@ export default {
       stats: null,
       showPolicyForm: false,
       permissions: [],
+      updating: {
+        permissions: false,
+        upload_quota: false,
+      }
     }
   },
   created() {
@@ -457,6 +473,8 @@ export default {
       if (toNull && !newValue) {
         newValue = null
       }
+      let self = this
+      this.updating[attr] = true
       let params = {}
       if (attr === "permissions") {
         params["permissions"] = {}
@@ -471,12 +489,14 @@ export default {
           logger.default.info(
             `${attr} was updated succcessfully to ${newValue}`
           )
+          self.updating[attr] = false
         },
         error => {
           logger.default.error(
             `Error while setting ${attr} to ${newValue}`,
             error
           )
+          self.updating[attr] = false
         }
       )
     },
@@ -495,7 +515,7 @@ export default {
       return [
         {
           code: "library",
-          label: this.$pgettext('*/*/*', "Library")
+          label: this.$pgettext('*/*/*/Noun', "Library")
         },
         {
           code: "moderation",

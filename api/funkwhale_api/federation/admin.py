@@ -26,7 +26,8 @@ redeliver_activities.short_description = "Redeliver"
 
 @admin.register(models.Domain)
 class DomainAdmin(admin.ModelAdmin):
-    list_display = ["name", "creation_date"]
+    list_display = ["name", "allowed", "creation_date"]
+    list_filter = ["allowed"]
     search_fields = ["name"]
 
 
@@ -40,7 +41,7 @@ class FetchAdmin(admin.ModelAdmin):
 
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ["type", "fid", "url", "actor", "creation_date"]
+    list_display = ["uuid", "type", "fid", "url", "actor", "creation_date"]
     search_fields = ["payload", "fid", "url", "actor__domain__name"]
     list_filter = ["type", "actor__domain__name"]
     actions = [redeliver_activities]

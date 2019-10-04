@@ -17,6 +17,7 @@ RUN \
     libpq              \
     libmagic           \
     libffi-dev         \
+    make         \
     zlib-dev           \
     openldap-dev && \
     \
@@ -44,7 +45,7 @@ RUN \
     if [ "$install_dev_deps" = "1" ] ; then echo "Installing dev dependencies" && pip3 install --no-cache-dir -r /requirements/local.txt -r /requirements/test.txt ; else echo "Skipping dev deps installation" ; fi
 
 ENTRYPOINT ["./compose/django/entrypoint.sh"]
-CMD ["./compose/django/daphne.sh"]
+CMD ["./compose/django/server.sh"]
 
 COPY . /app
 WORKDIR /app

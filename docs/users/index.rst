@@ -21,6 +21,7 @@ Using Funkwhale
 .. toctree::
    :maxdepth: 2
 
+   account
    queue
    managing
    playlists
@@ -28,6 +29,7 @@ Using Funkwhale
    radios
    follow
    apps
+   reports
    ../cli/index
 
 Troubleshooting Issues

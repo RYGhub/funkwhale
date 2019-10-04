@@ -22,6 +22,7 @@ BASE_SCOPES = [
     Scope("playlists", "Access playlists"),
     Scope("notifications", "Access personal notifications"),
     Scope("security", "Access security settings"),
+    Scope("reports", "Access reports"),
     # Privileged scopes that require specific user permissions
     Scope("instance:settings", "Access instance settings"),
     Scope("instance:users", "Access local user accounts"),
@@ -33,6 +34,8 @@ BASE_SCOPES = [
     Scope("instance:accounts", "Access instance federated accounts"),
     Scope("instance:domains", "Access instance domains"),
     Scope("instance:policies", "Access instance moderation policies"),
+    Scope("instance:reports", "Access instance moderation reports"),
+    Scope("instance:notes", "Access instance moderation notes"),
 ]
 SCOPES = [
     Scope("read", children=[s.copy("read") for s in BASE_SCOPES]),
@@ -72,6 +75,8 @@ COMMON_SCOPES = ANONYMOUS_SCOPES | {
     "write:edits",
     "read:filters",
     "write:filters",
+    "read:reports",
+    "write:reports",
     "write:listenings",
 }
 

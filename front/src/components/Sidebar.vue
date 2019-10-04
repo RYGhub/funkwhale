@@ -46,9 +46,9 @@
               <i class="feed icon"></i>
               <translate translate-context="*/Notifications/*">Notifications</translate>
               <div
-                v-if="$store.state.ui.notifications.inbox > 0"
+                v-if="$store.state.ui.notifications.inbox + additionalNotifications > 0"
                 :class="['ui', 'teal', 'label']">
-                {{ $store.state.ui.notifications.inbox }}</div>
+                {{ $store.state.ui.notifications.inbox + additionalNotifications }}</div>
             </router-link>
             <router-link class="item" v-if="$store.state.auth.authenticated" :to="{name: 'logout'}"><i class="sign out icon"></i><translate translate-context="Sidebar/Login/List item.Link/Verb">Logout</translate></router-link>
             <template v-else>
@@ -83,7 +83,7 @@
               v-if="$store.state.auth.availablePermissions['library']"
               class="item"
               :to="{name: 'manage.library.edits', query: {q: 'is_approved:null'}}">
-              <i class="book icon"></i><translate translate-context="*/*/*">Library</translate>
+              <i class="book icon"></i><translate translate-context="*/*/*/Noun">Library</translate>
               <div
                 v-if="$store.state.ui.notifications.pendingReviewEdits > 0"
                 :title="labels.pendingReviewEdits"
@@ -93,8 +93,12 @@
             <router-link
               v-if="$store.state.auth.availablePermissions['moderation']"
               class="item"
-              :to="{name: 'manage.moderation.domains.list'}">
+              :to="{name: 'manage.moderation.reports.list', query: {q: 'resolved:no'}}">
               <i class="shield icon"></i><translate translate-context="*/Moderation/*">Moderation</translate>
+              <div
+                v-if="$store.state.ui.notifications.pendingReviewReports > 0"
+                :title="labels.pendingReviewReports"
+                :class="['ui', 'teal', 'label']">{{ $store.state.ui.notifications.pendingReviewReports }}</div>
             </router-link>
             <router-link
               v-if="$store.state.auth.availablePermissions['settings']"
@@ -134,7 +138,7 @@
     </div>
     <section :class="['ui', 'bottom', 'attached', {active: selectedTab === 'queue'}, 'tab']">
       <table class="ui compact inverted very basic fixed single line unstackable table">
-        <draggable v-model="tracks" element="tbody" @update="reorder">
+        <draggable v-model="tracks" tag="tbody" @update="reorder">
           <tr
               @click="$store.dispatch('queue/currentIndex', index)"
               v-for="(track, index) in tracks"
@@ -182,7 +186,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"
+import { mapState, mapActions, mapGetters } from "vuex"
 
 import Player from "@/components/audio/Player"
 import Logo from "@/components/Logo"
@@ -215,6 +219,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      additionalNotifications: "ui/additionalNotifications",
+    }),
     ...mapState({
       queue: state => state.queue,
       url: state => state.route.path
@@ -338,7 +345,7 @@ $sidebar-color: #3d3e3f;
       display: none !important;
     }
   }
-  @include media("<desktop") {
+  @include media("<=desktop") {
     position: static !important;
     width: 100% !important;
     &.collapsed {
@@ -393,7 +400,7 @@ $sidebar-color: #3d3e3f;
   flex-direction: column;
   overflow-y: auto;
   justify-content: space-between;
-  @include media("<desktop") {
+  @include media("<=desktop") {
     max-height: 500px;
   }
 }

@@ -17,6 +17,8 @@
               <div class="sub header" v-html="subtitle"></div>
             </div>
           </h2>
+          <tags-list v-if="track.tags && track.tags.length > 0" :tags="track.tags"></tags-list>
+          <div class="ui hidden divider"></div>
           <div class="header-buttons">
             <div class="ui buttons">
               <play-button class="orange" :track="track">
@@ -88,6 +90,15 @@
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
                   <div class="divider"></div>
+                  <div
+                    role="button"
+                    class="basic item"
+                    v-for="obj in getReportableObjs({track})"
+                    :key="obj.target.type + obj.target.id"
+                    @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+                    <i class="share icon" /> {{ obj.label }}
+                  </div>
+                  <div class="divider"></div>
                   <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.tracks.detail', params: {id: track.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
@@ -121,17 +132,21 @@ import TrackFavoriteIcon from "@/components/favorites/TrackFavoriteIcon"
 import TrackPlaylistIcon from "@/components/playlists/TrackPlaylistIcon"
 import Modal from '@/components/semantic/Modal'
 import EmbedWizard from "@/components/audio/EmbedWizard"
+import TagsList from "@/components/tags/List"
+import ReportMixin from '@/components/mixins/Report'
 
 const FETCH_URL = "tracks/"
 
 export default {
   props: ["id"],
+  mixins: [ReportMixin],
   components: {
     PlayButton,
     TrackPlaylistIcon,
     TrackFavoriteIcon,
     Modal,
-    EmbedWizard
+    EmbedWizard,
+    TagsList,
   },
   data() {
     return {
@@ -151,7 +166,7 @@ export default {
       this.isLoadingTrack = true
       let url = FETCH_URL + this.id + "/"
       logger.default.debug('Fetching track "' + this.id + '"')
-      axios.get(url).then(response => {
+      axios.get(url, {params: {refresh: 'true'}}).then(response => {
         self.track = response.data
         self.isLoadingTrack = false
       })

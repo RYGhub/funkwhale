@@ -34,3 +34,13 @@ def test_instance_settings(pref, value, preferences):
     preferences[pref] = value
 
     assert preferences[pref] == value
+
+
+def test_instance_banner_assign_file_properly(preferences, avatar):
+    preferences["instance__banner"] = avatar
+
+    avatar.seek(0)
+    banner = preferences["instance__banner"].read()
+
+    assert len(banner) > 0
+    assert banner == avatar.read()

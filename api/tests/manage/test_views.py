@@ -73,6 +73,31 @@ def test_domain_create(superuser_api_client, mocker):
     update_domain_nodeinfo.assert_called_once_with(domain_name="test.federation")
 
 
+def test_domain_update_allowed(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": domain.name})
+    response = superuser_api_client.put(url, {"allowed": True})
+
+    assert response.status_code == 200
+    domain.refresh_from_db()
+    assert domain.allowed is True
+
+
+def test_domain_update_cannot_change_name(superuser_api_client, factories):
+    domain = factories["federation.Domain"]()
+    old_name = domain.name
+    url = reverse("api:v1:manage:federation:domains-detail", kwargs={"pk": old_name})
+    response = superuser_api_client.put(url, {"name": "something.else"})
+
+    domain.refresh_from_db()
+
+    assert response.status_code == 200
+    assert domain.name == old_name
+    # changing the pk of a model and saving results in a new DB entry in django,
+    # so we check that no other entry was created
+    assert domain.__class__.objects.count() == 1
+
+
 def test_domain_nodeinfo(factories, superuser_api_client, mocker):
     domain = factories["federation.Domain"]()
     url = reverse(
@@ -164,6 +189,7 @@ def test_artist_detail_stats(factories, superuser_api_client):
         "listenings": 0,
         "playlists": 0,
         "mutations": 0,
+        "reports": 0,
         "track_favorites": 0,
         "media_total_size": 0,
         "media_downloaded_size": 0,
@@ -213,6 +239,7 @@ def test_album_detail_stats(factories, superuser_api_client):
         "listenings": 0,
         "playlists": 0,
         "mutations": 0,
+        "reports": 0,
         "track_favorites": 0,
         "media_total_size": 0,
         "media_downloaded_size": 0,
@@ -259,6 +286,7 @@ def test_track_detail_stats(factories, superuser_api_client):
         "listenings": 0,
         "playlists": 0,
         "mutations": 0,
+        "reports": 0,
         "track_favorites": 0,
         "media_total_size": 0,
         "media_downloaded_size": 0,
@@ -297,6 +325,18 @@ def test_library_detail(factories, superuser_api_client):
     assert response.data["id"] == library.id
 
 
+def test_library_update(factories, superuser_api_client):
+    library = factories["music.Library"](privacy_level="public")
+    url = reverse(
+        "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
+    )
+    response = superuser_api_client.patch(url, {"privacy_level": "me"})
+
+    assert response.status_code == 200
+    library.refresh_from_db()
+    assert library.privacy_level == "me"
+
+
 def test_library_detail_stats(factories, superuser_api_client):
     library = factories["music.Library"]()
     url = reverse(
@@ -309,6 +349,7 @@ def test_library_detail_stats(factories, superuser_api_client):
         "tracks": 0,
         "albums": 0,
         "artists": 0,
+        "reports": 0,
         "media_total_size": 0,
         "media_downloaded_size": 0,
     }
@@ -352,3 +393,123 @@ def test_upload_delete(factories, superuser_api_client):
     response = superuser_api_client.delete(url)
 
     assert response.status_code == 204
+
+
+def test_note_create(factories, superuser_api_client):
+    actor = superuser_api_client.user.create_actor()
+    target = factories["federation.Actor"]()
+    data = {
+        "summary": "Hello",
+        "target": {"type": "account", "full_username": target.full_username},
+    }
+    url = reverse("api:v1:manage:moderation:notes-list")
+    response = superuser_api_client.post(url, data, format="json")
+    assert response.status_code == 201
+
+    note = actor.moderation_notes.latest("id")
+    assert note.target == target
+    assert response.data == serializers.ManageNoteSerializer(note).data
+
+
+def test_note_list(factories, superuser_api_client, settings):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0] == serializers.ManageNoteSerializer(note).data
+
+
+def test_note_delete(factories, superuser_api_client):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-detail", kwargs={"uuid": note.uuid})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_note_detail(factories, superuser_api_client):
+    note = factories["moderation.Note"]()
+    url = reverse("api:v1:manage:moderation:notes-detail", kwargs={"uuid": note.uuid})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == serializers.ManageNoteSerializer(note).data
+
+
+def test_tag_detail(factories, superuser_api_client):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-detail", kwargs={"name": tag.name})
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["name"] == tag.name
+
+
+def test_tag_list(factories, superuser_api_client, settings):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["name"] == tag.name
+
+
+def test_tag_delete(factories, superuser_api_client):
+    tag = factories["tags.Tag"]()
+    url = reverse("api:v1:manage:tags-detail", kwargs={"name": tag.name})
+    response = superuser_api_client.delete(url)
+
+    assert response.status_code == 204
+
+
+def test_report_detail(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["summary"] == report.summary
+
+
+def test_report_list(factories, superuser_api_client, settings):
+    report = factories["moderation.Report"]()
+    url = reverse("api:v1:manage:moderation:reports-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["summary"] == report.summary
+
+
+def test_report_update(factories, superuser_api_client):
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.patch(url, {"is_handled": True})
+
+    assert response.status_code == 200
+    report.refresh_from_db()
+    assert report.is_handled is True
+
+
+def test_report_update_is_handled_true_assigns(factories, superuser_api_client):
+    actor = superuser_api_client.user.create_actor()
+    report = factories["moderation.Report"]()
+    url = reverse(
+        "api:v1:manage:moderation:reports-detail", kwargs={"uuid": report.uuid}
+    )
+    response = superuser_api_client.patch(url, {"is_handled": True})
+
+    assert response.status_code == 200
+    report.refresh_from_db()
+    assert report.is_handled is True
+    assert report.assigned_to == actor

@@ -1,6 +1,10 @@
+import time
 import pytest
 
+from django.http import HttpResponse
+
 from funkwhale_api.common import middleware
+from funkwhale_api.common import throttling
 
 
 def test_spa_fallback_middleware_no_404(mocker):
@@ -185,3 +189,39 @@ def test_get_custom_css(preferences, custom_css, expected):
     preferences["ui__custom_css"] = custom_css
 
     assert middleware.get_custom_css() == expected
+
+
+def test_throttle_status_middleware_includes_info_in_response_headers(mocker):
+    get_response = mocker.Mock()
+    response = HttpResponse()
+    get_response.return_value = response
+    request = mocker.Mock(
+        path="/",
+        _api_request=mocker.Mock(
+            _throttle_status={
+                "num_requests": 42,
+                "duration": 3600,
+                "scope": "hello",
+                "history": [time.time() - 1600, time.time() - 1800],
+            }
+        ),
+    )
+    m = middleware.ThrottleStatusMiddleware(get_response)
+
+    assert m(request) == response
+    assert response["X-RateLimit-Limit"] == "42"
+    assert response["X-RateLimit-Remaining"] == "40"
+    assert response["X-RateLimit-Duration"] == "3600"
+    assert response["X-RateLimit-Scope"] == "hello"
+    assert response["X-RateLimit-Reset"] == str(int(time.time()) + 2000)
+    assert response["X-RateLimit-ResetSeconds"] == str(2000)
+    assert response["Retry-After"] == str(1800)
+
+
+def test_throttle_status_middleware_returns_proper_response(mocker):
+    get_response = mocker.Mock(side_effect=throttling.TooManyRequests())
+    request = mocker.Mock(path="/", _api_request=None, _throttle_status=None)
+    m = middleware.ThrottleStatusMiddleware(get_response)
+
+    response = m(request)
+    assert response.status_code == 429

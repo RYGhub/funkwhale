@@ -1,5 +1,5 @@
 <template>
-    <div class="ui card">
+    <div :class="['ui', 'card', mode]">
       <div class="content">
         <div class="right floated tiny ui image">
           <img v-if="album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](album.cover.square_crop)">
@@ -39,7 +39,7 @@
               <translate translate-context="Content/Album/Card.Link/Verb" :translate-params="{count: album.tracks.length - initialTracks}" :translate-n="album.tracks.length - initialTracks" translate-plural="Show %{ count } more tracks">Show %{ count } more track</translate>
             </em>
             <em v-else @click="showAllTracks = false" class="expand">
-              <translate translate-context="Content/*/Card.Link/Verb">Collapse</translate>
+              <translate translate-context="*/*/Button,Label">Collapse</translate>
             </em>
           </div>
         </div>
@@ -137,5 +137,9 @@ tr {
 }
 .expand {
   cursor: pointer;
+}
+
+.ui .card.rich {
+  align-self: flex-start;
 }
 </style>

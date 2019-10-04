@@ -14,6 +14,7 @@ from requests.exceptions import RequestException
 from funkwhale_api.common import channels, preferences
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.taskapp import celery
 
 from . import licenses
@@ -54,19 +55,21 @@ def update_album_cover(
             )
 
 
-IMAGE_TYPES = [("jpg", "image/jpeg"), ("png", "image/png")]
+IMAGE_TYPES = [("jpg", "image/jpeg"), ("jpeg", "image/jpeg"), ("png", "image/png")]
+FOLDER_IMAGE_NAMES = ["cover", "folder"]
 
 
 def get_cover_from_fs(dir_path):
     if os.path.exists(dir_path):
-        for e, m in IMAGE_TYPES:
-            cover_path = os.path.join(dir_path, "cover.{}".format(e))
-            if not os.path.exists(cover_path):
-                logger.debug("Cover %s does not exists", cover_path)
-                continue
-            with open(cover_path, "rb") as c:
-                logger.info("Found cover at %s", cover_path)
-                return {"mimetype": m, "content": c.read()}
+        for name in FOLDER_IMAGE_NAMES:
+            for e, m in IMAGE_TYPES:
+                cover_path = os.path.join(dir_path, "{}.{}".format(name, e))
+                if not os.path.exists(cover_path):
+                    logger.debug("Cover %s does not exists", cover_path)
+                    continue
+                with open(cover_path, "rb") as c:
+                    logger.info("Found cover at %s", cover_path)
+                    return {"mimetype": m, "content": c.read()}
 
 
 @celery.app.task(name="music.start_library_scan")
@@ -297,6 +300,7 @@ def federation_audio_track_to_metadata(payload, references):
             if payload["album"].get("musicbrainzId")
             else None,
             "release_date": payload["album"].get("released"),
+            "tags": [t["name"] for t in payload["album"].get("tags", []) or []],
             "artists": [
                 {
                     "fid": a["id"],
@@ -304,6 +308,7 @@ def federation_audio_track_to_metadata(payload, references):
                     "fdate": a["published"],
                     "attributed_to": references.get(a.get("attributedTo")),
                     "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+                    "tags": [t["name"] for t in a.get("tags", []) or []],
                 }
                 for a in payload["album"]["artists"]
             ],
@@ -315,12 +320,14 @@ def federation_audio_track_to_metadata(payload, references):
                 "fdate": a["published"],
                 "attributed_to": references.get(a.get("attributedTo")),
                 "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
+                "tags": [t["name"] for t in a.get("tags", []) or []],
             }
             for a in payload["artists"]
         ],
         # federation
         "fid": payload["id"],
         "fdate": payload["published"],
+        "tags": [t["name"] for t in payload.get("tags", []) or []],
     }
     cover = payload["album"].get("cover")
     if cover:
@@ -399,6 +406,12 @@ def get_track_from_import_metadata(data, update_cover=False, attributed_to=None)
     return track
 
 
+def truncate(v, length):
+    if v is None:
+        return v
+    return v[:length]
+
+
 def _get_track(data, attributed_to=None):
     track_uuid = getter(data, "funkwhale", "track", "uuid")
 
@@ -437,10 +450,10 @@ def _get_track(data, attributed_to=None):
 
     # get / create artist and album artist
     artists = getter(data, "artists", default=[])
-    artist = artists[0]
-    artist_mbid = artist.get("mbid", None)
-    artist_fid = artist.get("fid", None)
-    artist_name = artist["name"]
+    artist_data = artists[0]
+    artist_mbid = artist_data.get("mbid", None)
+    artist_fid = artist_data.get("fid", None)
+    artist_name = truncate(artist_data["name"], models.MAX_LENGTHS["ARTIST_NAME"])
 
     if artist_mbid:
         query = Q(mbid=artist_mbid)
@@ -453,24 +466,28 @@ def _get_track(data, attributed_to=None):
         "mbid": artist_mbid,
         "fid": artist_fid,
         "from_activity_id": from_activity_id,
-        "attributed_to": artist.get("attributed_to", attributed_to),
+        "attributed_to": artist_data.get("attributed_to", attributed_to),
     }
-    if artist.get("fdate"):
-        defaults["creation_date"] = artist.get("fdate")
+    if artist_data.get("fdate"):
+        defaults["creation_date"] = artist_data.get("fdate")
 
-    artist = get_best_candidate_or_create(
+    artist, created = get_best_candidate_or_create(
         models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
+    if created:
+        tags_models.add_tags(artist, *artist_data.get("tags", []))
 
     album_artists = getter(data, "album", "artists", default=artists) or artists
-    album_artist = album_artists[0]
-    album_artist_name = album_artist.get("name")
+    album_artist_data = album_artists[0]
+    album_artist_name = truncate(
+        album_artist_data.get("name"), models.MAX_LENGTHS["ARTIST_NAME"]
+    )
     if album_artist_name == artist_name:
         album_artist = artist
     else:
         query = Q(name__iexact=album_artist_name)
-        album_artist_mbid = album_artist.get("mbid", None)
-        album_artist_fid = album_artist.get("fid", None)
+        album_artist_mbid = album_artist_data.get("mbid", None)
+        album_artist_fid = album_artist_data.get("fid", None)
         if album_artist_mbid:
             query |= Q(mbid=album_artist_mbid)
         if album_artist_fid:
@@ -480,19 +497,21 @@ def _get_track(data, attributed_to=None):
             "mbid": album_artist_mbid,
             "fid": album_artist_fid,
             "from_activity_id": from_activity_id,
-            "attributed_to": album_artist.get("attributed_to", attributed_to),
+            "attributed_to": album_artist_data.get("attributed_to", attributed_to),
         }
-        if album_artist.get("fdate"):
-            defaults["creation_date"] = album_artist.get("fdate")
+        if album_artist_data.get("fdate"):
+            defaults["creation_date"] = album_artist_data.get("fdate")
 
-        album_artist = get_best_candidate_or_create(
+        album_artist, created = get_best_candidate_or_create(
             models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
-        )[0]
+        )
+        if created:
+            tags_models.add_tags(album_artist, *album_artist_data.get("tags", []))
 
     # get / create album
-    album = data["album"]
-    album_title = album["title"]
-    album_fid = album.get("fid", None)
+    album_data = data["album"]
+    album_title = truncate(album_data["title"], models.MAX_LENGTHS["ALBUM_TITLE"])
+    album_fid = album_data.get("fid", None)
 
     if album_mbid:
         query = Q(mbid=album_mbid)
@@ -505,20 +524,22 @@ def _get_track(data, attributed_to=None):
         "title": album_title,
         "artist": album_artist,
         "mbid": album_mbid,
-        "release_date": album.get("release_date"),
+        "release_date": album_data.get("release_date"),
         "fid": album_fid,
         "from_activity_id": from_activity_id,
-        "attributed_to": album.get("attributed_to", attributed_to),
+        "attributed_to": album_data.get("attributed_to", attributed_to),
     }
-    if album.get("fdate"):
-        defaults["creation_date"] = album.get("fdate")
+    if album_data.get("fdate"):
+        defaults["creation_date"] = album_data.get("fdate")
 
-    album = get_best_candidate_or_create(
+    album, created = get_best_candidate_or_create(
         models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
+    if created:
+        tags_models.add_tags(album, *album_data.get("tags", []))
 
     # get / create track
-    track_title = data["title"]
+    track_title = truncate(data["title"], models.MAX_LENGTHS["TRACK_TITLE"])
     position = data.get("position", 1)
     query = Q(title__iexact=track_title, artist=artist, album=album, position=position)
     if track_mbid:
@@ -536,15 +557,17 @@ def _get_track(data, attributed_to=None):
         "from_activity_id": from_activity_id,
         "attributed_to": data.get("attributed_to", attributed_to),
         "license": licenses.match(data.get("license"), data.get("copyright")),
-        "copyright": data.get("copyright"),
+        "copyright": truncate(data.get("copyright"), models.MAX_LENGTHS["COPYRIGHT"]),
     }
     if data.get("fdate"):
         defaults["creation_date"] = data.get("fdate")
 
-    track = get_best_candidate_or_create(
+    track, created = get_best_candidate_or_create(
         models.Track, query, defaults=defaults, sort_fields=["mbid", "fid"]
-    )[0]
+    )
 
+    if created:
+        tags_models.add_tags(track, *data.get("tags", []))
     return track
 
 

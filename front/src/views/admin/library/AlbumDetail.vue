@@ -24,6 +24,12 @@
                   </div>
                 </div>
               </h2>
+
+              <template v-if="object.tags && object.tags.length > 0">
+                <tags-list :limit="5" detail-route="manage.library.tags.detail" :tags="object.tags"></tags-list>
+                <div class="ui hidden divider"></div>
+              </template>
+
               <div class="header-buttons">
 
                 <div class="ui icon buttons">
@@ -179,6 +185,16 @@
                   </tr>
                   <tr>
                     <td>
+                      <router-link :to="{name: 'manage.moderation.reports.list', query: {q: getQuery('target', `album:${object.id}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Linked reports</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.reports }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <router-link :to="{name: 'manage.library.edits', query: {q: getQuery('target', 'album ' + object.id)}}">
                         <translate translate-context="*/Admin/*/Noun">Edits</translate>
                       </router-link>
@@ -240,7 +256,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('album_id', object.id) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>
@@ -273,12 +289,13 @@
 import axios from "axios"
 import logger from "@/logging"
 import FetchButton from "@/components/federation/FetchButton"
-
+import TagsList from "@/components/tags/List"
 
 export default {
   props: ["id"],
   components: {
-    FetchButton
+    FetchButton,
+    TagsList
   },
   data() {
     return {

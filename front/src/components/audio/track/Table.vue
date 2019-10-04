@@ -5,7 +5,7 @@
         <tr>
           <th></th>
           <th></th>
-          <th colspan="6"><translate translate-context="Content/Track/*/Noun">Title</translate></th>
+          <th colspan="6"><translate translate-context="*/*/*/Noun">Title</translate></th>
           <th colspan="4"><translate translate-context="*/*/*/Noun">Artist</translate></th>
           <th colspan="4"><translate translate-context="*/*/*">Album</translate></th>
           <th colspan="4"><translate translate-context="Content/*/*">Duration</translate></th>
@@ -84,5 +84,8 @@ tr:not(:hover) .favorite-icon:not(.favorited) {
 }
 pre {
   overflow-x: scroll;
+}
+.table-wrapper {
+  overflow: visible;
 }
 </style>

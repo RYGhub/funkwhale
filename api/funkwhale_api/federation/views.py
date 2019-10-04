@@ -2,17 +2,28 @@ from django import forms
 from django.core import paginator
 from django.http import HttpResponse
 from django.urls import reverse
-from rest_framework import exceptions, mixins, response, viewsets
+from rest_framework import exceptions, mixins, permissions, response, viewsets
 from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
+from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
 from . import activity, authentication, models, renderers, serializers, utils, webfinger
 
 
+class AuthenticatedIfAllowListEnabled(permissions.BasePermission):
+    def has_permission(self, request, view):
+        allow_list_enabled = preferences.get("moderation__allow_list_enabled")
+        if not allow_list_enabled:
+            return True
+        return bool(request.actor)
+
+
 class FederationMixin(object):
+    permission_classes = [AuthenticatedIfAllowListEnabled]
+
     def dispatch(self, request, *args, **kwargs):
         if not preferences.get("federation__enabled"):
             return HttpResponse(status=405)
@@ -20,7 +31,6 @@ class FederationMixin(object):
 
 
 class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
-    permission_classes = []
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
 
@@ -38,7 +48,6 @@ class SharedViewSet(FederationMixin, viewsets.GenericViewSet):
 class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "preferred_username"
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
@@ -73,10 +82,18 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
 class EditViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "uuid"
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     # queryset = common_models.Mutation.objects.local().select_related()
     # serializer_class = serializers.ActorSerializer
+
+
+class ReportViewSet(
+    FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    lookup_field = "uuid"
+    authentication_classes = [authentication.SignatureAuthentication]
+    renderer_classes = renderers.get_ap_renderers()
+    queryset = moderation_models.Report.objects.none()
 
 
 class WellKnownViewSet(viewsets.GenericViewSet):
@@ -146,7 +163,6 @@ class MusicLibraryViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
     queryset = music_models.Library.objects.all().select_related("actor")
@@ -201,7 +217,6 @@ class MusicUploadViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Upload.objects.local().select_related(
         "library__actor", "track__artist", "track__album__artist"
@@ -219,7 +234,6 @@ class MusicArtistViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Artist.objects.local()
     serializer_class = serializers.ArtistSerializer
@@ -230,7 +244,6 @@ class MusicAlbumViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Album.objects.local().select_related("artist")
     serializer_class = serializers.AlbumSerializer
@@ -241,7 +254,6 @@ class MusicTrackViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    permission_classes = []
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Track.objects.local().select_related(
         "album__artist", "artist"

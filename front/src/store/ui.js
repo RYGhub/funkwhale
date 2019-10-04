@@ -5,22 +5,64 @@ export default {
   namespaced: true,
   state: {
     currentLanguage: 'en_US',
+    selectedLanguage: false,
     momentLocale: 'en',
     lastDate: new Date(),
     maxMessages: 100,
     messageDisplayDuration: 10000,
     messages: [],
+    theme: 'light',
     notifications: {
       inbox: 0,
       pendingReviewEdits: 0,
+      pendingReviewReports: 0,
     },
     websocketEventsHandlers: {
       'inbox.item_added': {},
       'import.status_updated': {},
       'mutation.created': {},
       'mutation.updated': {},
+      'report.created': {},
     },
     pageTitle: null
+  },
+  getters: {
+    showInstanceSupportMessage: (state, getters, rootState) => {
+      if (!rootState.auth.profile) {
+        return false
+      }
+      if (!rootState.instance.settings.instance.support_message.value) {
+        return false
+      }
+      let displayDate = rootState.auth.profile.instance_support_message_display_date
+      if (!displayDate) {
+        return false
+      }
+      return moment(displayDate) < moment(state.lastDate)
+    },
+    showFunkwhaleSupportMessage: (state, getters, rootState) => {
+      if (!rootState.auth.profile) {
+        return false
+      }
+      if (!rootState.instance.settings.instance.funkwhale_support_message_enabled.value) {
+        return false
+      }
+      let displayDate = rootState.auth.profile.funkwhale_support_message_display_date
+      if (!displayDate) {
+        return false
+      }
+      return moment(displayDate) < moment(state.lastDate)
+    },
+    additionalNotifications: (state, getters) => {
+      let count = 0
+      if (getters.showInstanceSupportMessage) {
+        count += 1
+      }
+      if (getters.showFunkwhaleSupportMessage) {
+        count += 1
+      }
+      return count
+    }
   },
   mutations: {
     addWebsocketEventHandler: (state, {eventName, id, handler}) => {
@@ -31,6 +73,7 @@ export default {
     },
     currentLanguage: (state, value) => {
       state.currentLanguage = value
+      state.selectedLanguage = true
     },
     momentLocale: (state, value) => {
       state.momentLocale = value
@@ -38,6 +81,9 @@ export default {
     },
     computeLastDate: (state) => {
       state.lastDate = new Date()
+    },
+    theme: (state, value) => {
+      state.theme = value
     },
     addMessage (state, message) {
       state.messages.push(message)
@@ -68,6 +114,11 @@ export default {
     fetchPendingReviewEdits ({commit, rootState}, payload) {
       axios.get('mutations/', {params: {is_approved: 'null', page_size: 1}}).then((response) => {
         commit('notifications', {type: 'pendingReviewEdits', count: response.data.count})
+      })
+    },
+    fetchPendingReviewReports ({commit, rootState}, payload) {
+      axios.get('manage/moderation/reports/', {params: {is_handled: 'false', page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'pendingReviewReports', count: response.data.count})
       })
     },
     websocketEvent ({state}, event) {

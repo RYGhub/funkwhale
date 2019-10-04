@@ -12,7 +12,7 @@ export default {
   props: {
     customRadioId: {required: false},
     type: {type: String, required: false},
-    objectId: {type: Number, default: null}
+    objectId: {default: null}
   },
   methods: {
     toggleRadio () {

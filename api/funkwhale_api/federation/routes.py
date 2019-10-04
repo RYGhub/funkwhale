@@ -4,6 +4,7 @@ from funkwhale_api.music import models as music_models
 
 from . import activity
 from . import actors
+from . import models
 from . import serializers
 
 logger = logging.getLogger(__name__)
@@ -380,3 +381,63 @@ def outbox_update_artist(context):
             to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
         ),
     }
+
+
+@outbox.register(
+    {
+        "type": "Delete",
+        "object.type": [
+            "Tombstone",
+            "Actor",
+            "Person",
+            "Application",
+            "Organization",
+            "Service",
+            "Group",
+        ],
+    }
+)
+def outbox_delete_actor(context):
+    actor = context["actor"]
+    serializer = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": actor.type, "id": actor.fid}}
+    )
+    yield {
+        "type": "Delete",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            to=[activity.PUBLIC_ADDRESS, {"type": "instances_with_followers"}],
+        ),
+    }
+
+
+@inbox.register(
+    {
+        "type": "Delete",
+        "object.type": [
+            "Tombstone",
+            "Actor",
+            "Person",
+            "Application",
+            "Organization",
+            "Service",
+            "Group",
+        ],
+    }
+)
+def inbox_delete_actor(payload, context):
+    actor = context["actor"]
+    serializer = serializers.ActorDeleteSerializer(data=payload)
+    if not serializer.is_valid():
+        logger.info("Skipped actor %s deletion, invalid payload", actor.fid)
+        return
+
+    deleted_fid = serializer.validated_data["fid"]
+    try:
+        # ensure the actor only can delete itself, and is a remote one
+        actor = models.Actor.objects.local(False).get(fid=deleted_fid, pk=actor.pk)
+    except models.Actor.DoesNotExist:
+        logger.warn("Cannot delete actor %s, no matching object found", actor.fid)
+        return
+    actor.delete()

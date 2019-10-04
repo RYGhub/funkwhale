@@ -2,18 +2,20 @@ import random
 
 from django.core.exceptions import ValidationError
 from django.db import connection
+from django.db.models import Q
 from rest_framework import serializers
-from taggit.models import Tag
 
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music.models import Artist, Track
-from funkwhale_api.users.models import User
+from funkwhale_api.tags.models import Tag
 
 from . import filters, models
 from .registries import registry
 
 
 class SimpleRadio(object):
+    related_object_field = None
+
     def clean(self, instance):
         return
 
@@ -146,6 +148,8 @@ class CustomRadio(SessionRadio):
 class RelatedObjectRadio(SessionRadio):
     """Abstract radio related to an object (tag, artist, user...)"""
 
+    related_object_field = serializers.IntegerField(required=True)
+
     def clean(self, instance):
         super().clean(instance)
         if not instance.related_object:
@@ -162,10 +166,22 @@ class RelatedObjectRadio(SessionRadio):
 @registry.register(name="tag")
 class TagRadio(RelatedObjectRadio):
     model = Tag
+    related_object_field = serializers.CharField(required=True)
+
+    def get_related_object(self, name):
+        return self.model.objects.get(name=name)
 
     def get_queryset(self, **kwargs):
         qs = super().get_queryset(**kwargs)
-        return qs.filter(tags__in=[self.session.related_object])
+        query = (
+            Q(tagged_items__tag=self.session.related_object)
+            | Q(artist__tagged_items__tag=self.session.related_object)
+            | Q(album__tagged_items__tag=self.session.related_object)
+        )
+        return qs.filter(query)
+
+    def get_related_object_id_repr(self, obj):
+        return obj.name
 
 
 def weighted_choice(choices):
@@ -246,9 +262,7 @@ class ArtistRadio(RelatedObjectRadio):
 
 
 @registry.register(name="less-listened")
-class LessListenedRadio(RelatedObjectRadio):
-    model = User
-
+class LessListenedRadio(SessionRadio):
     def clean(self, instance):
         instance.related_object = instance.user
         super().clean(instance)

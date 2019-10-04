@@ -15,4 +15,9 @@ urlpatterns = [
         spa_views.library_artist,
         name="library_artist",
     ),
+    urls.re_path(
+        r"^library/playlists/(?P<pk>\d+)/?$",
+        spa_views.library_playlist,
+        name="library_playlist",
+    ),
 ]

@@ -9,7 +9,7 @@
           </form>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Library/*/Noun">Import status</translate></label>
+          <label><translate translate-context="Content/*/*/Noun">Import status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('status', $event.target.value)" :value="getTokenValue('status', '')">
             <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
             <option value="pending"><translate translate-context="Content/Library/*/Short">Pending</translate></option>
@@ -53,13 +53,13 @@
         @refresh="fetchData"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="Content/Track/*/Noun">Title</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Title</translate></th>
           <th><translate translate-context="*/*/*/Noun">Artist</translate></th>
           <th><translate translate-context="*/*/*">Album</translate></th>
           <th><translate translate-context="*/*/*/Noun">Upload date</translate></th>
-          <th><translate translate-context="Content/Library/*/Noun">Import status</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Import status</translate></th>
           <th><translate translate-context="Content/*/*">Duration</translate></th>
-          <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
+          <th><translate translate-context="Content/*/*/Noun">Size</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">
           <template v-if="scope.obj.track">

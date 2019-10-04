@@ -72,10 +72,10 @@
             <span v-else-if="error === 'invalid_id'" class="error">Widget improperly configured (missing resource id).</span>
             <span v-else-if="error === 'server_not_found'" class="error">Track not found.</span>
             <span v-else-if="error === 'server_requires_auth'" class="error">You need to login to access this resource.</span>
-            <span v-else-if="error === 'server_error'" class="error">A server error occured.</span>
-            <span v-else-if="error === 'server_error'" class="error">An unknown error occured while loading track data from server.</span>
+            <span v-else-if="error === 'server_error'" class="error">A server error occurred.</span>
+            <span v-else-if="error === 'server_error'" class="error">An unknown error occurred while loading track data from server.</span>
             <span v-else-if="currentTrack && currentTrack.sources.length === 0" class="error">This track is unavailable.</span>
-            <span v-else class="error">An unknown error occured while loading track data.</span>
+            <span v-else class="error">An unknown error occurred while loading track data.</span>
           </div>
           <a title="Funkwhale" href="https://funkwhale.audio" target="_blank" rel="noopener noreferrer" class="logo-wrapper">
             <logo :fill="currentTheme.textColor" class="logo"></logo>
@@ -139,7 +139,7 @@ export default {
   data () {
     return {
       time,
-      supportedTypes: ['track', 'album', 'artist'],
+      supportedTypes: ['track', 'album', 'artist', 'playlist'],
       baseUrl: '',
       error: null,
       type: null,
@@ -235,6 +235,9 @@ export default {
       if (type === 'artist') {
         this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
       }
+      if (type === 'playlist') {
+        this.fetchTracks({}, `/api/v1/playlists/${id}/tracks/`)
+      }
     },
     play (index) {
       this.currentIndex = index
@@ -269,9 +272,10 @@ export default {
         self.isLoading = false;
       })
     },
-    fetchTracks (filters) {
+    fetchTracks (filters, path) {
+      path = path || "/api/v1/tracks/"
       let self = this
-      let url = `${this.baseUrl}/api/v1/tracks/`
+      let url = `${this.baseUrl}${path}`
       axios.get(url, {params: filters}).then(response => {
         self.tracks = self.parseTracks(response.data.results)
         self.isLoading = false;
@@ -297,6 +301,11 @@ export default {
     },
     parseTracks (tracks) {
       let self = this
+      if (this.type === 'playlist') {
+        tracks = tracks.map((t) => {
+          return t.track
+        })
+      }
       return tracks.map(t => {
         return {
           id: t.id,
@@ -374,6 +383,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~plyr/src/sass/plyr.scss";
+
 html,
 body,
 main {

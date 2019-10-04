@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from funkwhale_api.common import utils
+from funkwhale_api.playlists import models as playlists_models
 
 from . import models
 from . import serializers
@@ -202,4 +203,60 @@ def library_artist(request, pk):
         )
         # twitter player is also supported in various software
         metas += get_twitter_card_metas(type="artist", id=obj.pk)
+    return metas
+
+
+def library_playlist(request, pk):
+    queryset = playlists_models.Playlist.objects.filter(pk=pk, privacy_level="everyone")
+    try:
+        obj = queryset.get()
+    except playlists_models.Playlist.DoesNotExist:
+        return []
+    obj_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_playlist", kwargs={"pk": obj.pk}),
+    )
+    # we use the first playlist track's album's cover as image
+    playlist_tracks = obj.playlist_tracks.exclude(track__album__cover="")
+    playlist_tracks = playlist_tracks.exclude(track__album__cover=None)
+    playlist_tracks = playlist_tracks.select_related("track__album").order_by("index")
+    first_playlist_track = playlist_tracks.first()
+    metas = [
+        {"tag": "meta", "property": "og:url", "content": obj_url},
+        {"tag": "meta", "property": "og:title", "content": obj.name},
+        {"tag": "meta", "property": "og:type", "content": "music.playlist"},
+    ]
+
+    if first_playlist_track:
+        metas.append(
+            {
+                "tag": "meta",
+                "property": "og:image",
+                "content": utils.join_url(
+                    settings.FUNKWHALE_URL,
+                    first_playlist_track.track.album.cover.crop["400x400"].url,
+                ),
+            }
+        )
+
+    if (
+        models.Upload.objects.filter(
+            track__pk__in=[obj.playlist_tracks.values("track")]
+        )
+        .playable_by(None)
+        .exists()
+    ):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/json+oembed",
+                "href": (
+                    utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
+                    + "?format=json&url={}".format(urllib.parse.quote_plus(obj_url))
+                ),
+            }
+        )
+        # twitter player is also supported in various software
+        metas += get_twitter_card_metas(type="playlist", id=obj.pk)
     return metas

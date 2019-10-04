@@ -9,8 +9,8 @@ def test_can_create_user_via_api(preferences, api_client, db):
     data = {
         "username": "test1",
         "email": "test1@test.com",
-        "password1": "testtest",
-        "password2": "testtest",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
     }
     preferences["users__registration_enabled"] = True
     response = api_client.post(url, data)
@@ -39,7 +39,7 @@ def test_username_only_accepts_letters_and_underscores(
 def test_can_restrict_usernames(settings, preferences, db, api_client):
     url = reverse("rest_register")
     preferences["users__registration_enabled"] = True
-    settings.USERNAME_BLACKLIST = ["funkwhale"]
+    settings.ACCOUNT_USERNAME_BLACKLIST = ["funkwhale"]
     data = {
         "username": "funkwhale",
         "email": "contact@funkwhale.io",
@@ -72,8 +72,8 @@ def test_can_signup_with_invitation(preferences, factories, api_client):
     data = {
         "username": "test1",
         "email": "test1@test.com",
-        "password1": "testtest",
-        "password2": "testtest",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
         "invitation": "hello",
     }
     preferences["users__registration_enabled"] = False
@@ -157,11 +157,16 @@ def test_changing_password_updates_secret_key(logged_in_api_client):
     user = logged_in_api_client.user
     password = user.password
     secret_key = user.secret_key
-    payload = {"old_password": "test", "new_password1": "new", "new_password2": "new"}
+    payload = {
+        "old_password": "test",
+        "new_password1": "thisismypassword",
+        "new_password2": "thisismypassword",
+    }
     url = reverse("change_password")
 
-    logged_in_api_client.post(url, payload)
+    response = logged_in_api_client.post(url, payload)
 
+    assert response.status_code == 200
     user.refresh_from_db()
 
     assert user.secret_key != secret_key
@@ -295,8 +300,8 @@ def test_creating_user_creates_actor_as_well(
     data = {
         "username": "test1",
         "email": "test1@test.com",
-        "password1": "testtest",
-        "password2": "testtest",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
     }
     preferences["users__registration_enabled"] = True
     mocker.patch("funkwhale_api.users.models.create_actor", return_value=actor)
@@ -316,8 +321,8 @@ def test_creating_user_sends_confirmation_email(
     data = {
         "username": "test1",
         "email": "test1@test.com",
-        "password1": "testtest",
-        "password2": "testtest",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
     }
     preferences["users__registration_enabled"] = True
     preferences["instance__name"] = "Hello world"
@@ -328,3 +333,57 @@ def test_creating_user_sends_confirmation_email(
     confirmation_message = mailoutbox[-1]
     assert "Hello world" in confirmation_message.body
     assert settings.FUNKWHALE_HOSTNAME in confirmation_message.body
+
+
+def test_user_account_deletion_requires_valid_password(logged_in_api_client):
+    user = logged_in_api_client.user
+    user.set_password("mypassword")
+    url = reverse("api:v1:users:users-me")
+    payload = {"password": "invalid", "confirm": True}
+    response = logged_in_api_client.delete(url, payload)
+
+    assert response.status_code == 400
+
+
+def test_user_account_deletion_requires_confirmation(logged_in_api_client):
+    user = logged_in_api_client.user
+    user.set_password("mypassword")
+    url = reverse("api:v1:users:users-me")
+    payload = {"password": "mypassword", "confirm": False}
+    response = logged_in_api_client.delete(url, payload)
+
+    assert response.status_code == 400
+
+
+def test_user_account_deletion_triggers_delete_account(logged_in_api_client, mocker):
+    user = logged_in_api_client.user
+    user.set_password("mypassword")
+    url = reverse("api:v1:users:users-me")
+    payload = {"password": "mypassword", "confirm": True}
+    delete_account = mocker.patch("funkwhale_api.users.tasks.delete_account.delay")
+    response = logged_in_api_client.delete(url, payload)
+
+    assert response.status_code == 204
+    delete_account.assert_called_once_with(user_id=user.pk)
+
+
+def test_username_with_existing_local_account_are_invalid(
+    settings, preferences, factories, api_client
+):
+    actor = factories["users.User"]().create_actor()
+    user = actor.user
+    user.delete()
+    url = reverse("rest_register")
+    preferences["users__registration_enabled"] = True
+    settings.ACCOUNT_USERNAME_BLACKLIST = []
+    data = {
+        "username": user.username,
+        "email": "contact@funkwhale.io",
+        "password1": "testtest",
+        "password2": "testtest",
+    }
+
+    response = api_client.post(url, data)
+
+    assert response.status_code == 400
+    assert "username" in response.data

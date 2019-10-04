@@ -11,6 +11,7 @@ from funkwhale_api.common import utils as funkwhale_utils
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
+from funkwhale_api.tags import models as tags_models
 
 from . import activity, actors, contexts, jsonld, models, tasks, utils
 
@@ -778,7 +779,22 @@ MUSIC_ENTITY_JSONLD_MAPPING = {
     "published": jsonld.first_val(contexts.AS.published),
     "musicbrainzId": jsonld.first_val(contexts.FW.musicbrainzId),
     "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
+    "tags": jsonld.raw(contexts.AS.tag),
 }
+
+
+class TagSerializer(jsonld.JsonLdSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Hashtag])
+    name = serializers.CharField(max_length=100)
+
+    class Meta:
+        jsonld_mapping = {"name": jsonld.first_val(contexts.AS.name)}
+
+    def validate_name(self, value):
+        if value.startswith("#"):
+            # remove trailing #
+            value = value[1:]
+        return value
 
 
 class MusicEntitySerializer(jsonld.JsonLdSerializer):
@@ -788,6 +804,9 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
     name = serializers.CharField(max_length=1000)
     attributedTo = serializers.URLField(max_length=500, allow_null=True, required=False)
     updateable_fields = []
+    tags = serializers.ListField(
+        child=TagSerializer(), min_length=0, required=False, allow_null=True
+    )
 
     def update(self, instance, validated_data):
         attributed_to_fid = validated_data.get("attributedTo")
@@ -797,9 +816,17 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
             self.updateable_fields, validated_data, instance
         )
         if updated_fields:
-            return music_tasks.update_library_entity(instance, updated_fields)
+            music_tasks.update_library_entity(instance, updated_fields)
 
+        tags = [t["name"] for t in validated_data.get("tags", []) or []]
+        tags_models.set_tags(instance, *tags)
         return instance
+
+    def get_tags_repr(self, instance):
+        return [
+            {"type": "Hashtag", "name": "#{}".format(tag)}
+            for tag in sorted(instance.tagged_items.values_list("tag__name", flat=True))
+        ]
 
 
 class ArtistSerializer(MusicEntitySerializer):
@@ -823,6 +850,7 @@ class ArtistSerializer(MusicEntitySerializer):
             "attributedTo": instance.attributed_to.fid
             if instance.attributed_to
             else None,
+            "tag": self.get_tags_repr(instance),
         }
 
         if self.context.get("include_ap_context", self.parent is None):
@@ -872,6 +900,7 @@ class AlbumSerializer(MusicEntitySerializer):
             "attributedTo": instance.attributed_to.fid
             if instance.attributed_to
             else None,
+            "tag": self.get_tags_repr(instance),
         }
         if instance.cover:
             d["cover"] = {
@@ -941,6 +970,7 @@ class TrackSerializer(MusicEntitySerializer):
             "attributedTo": instance.attributed_to.fid
             if instance.attributed_to
             else None,
+            "tag": self.get_tags_repr(instance),
         }
 
         if self.context.get("include_ap_context", self.parent is None):
@@ -981,7 +1011,6 @@ class TrackSerializer(MusicEntitySerializer):
             if not url:
                 continue
             references[url] = actors.get_actor(url)
-
         metadata = music_tasks.federation_audio_track_to_metadata(
             validated_data, references
         )
@@ -990,6 +1019,7 @@ class TrackSerializer(MusicEntitySerializer):
         if from_activity:
             metadata["from_activity_id"] = from_activity.pk
         track = music_tasks.get_track_from_import_metadata(metadata, update_cover=True)
+
         return track
 
     def update(self, obj, validated_data):
@@ -1106,6 +1136,13 @@ class UploadSerializer(jsonld.JsonLdSerializer):
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
+
+
+class ActorDeleteSerializer(jsonld.JsonLdSerializer):
+    fid = serializers.URLField(max_length=500)
+
+    class Meta:
+        jsonld_mapping = {"fid": jsonld.first_id(contexts.AS.object)}
 
 
 class NodeInfoLinkSerializer(serializers.Serializer):

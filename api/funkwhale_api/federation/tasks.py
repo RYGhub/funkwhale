@@ -190,7 +190,11 @@ def update_domain_nodeinfo(domain):
     now = timezone.now()
     try:
         nodeinfo = {"status": "ok", "payload": fetch_nodeinfo(domain.name)}
-    except (requests.RequestException, serializers.serializers.ValidationError) as e:
+    except (
+        requests.RequestException,
+        serializers.serializers.ValidationError,
+        ValueError,
+    ) as e:
         nodeinfo = {"status": "error", "error": str(e)}
 
     service_actor_id = common_utils.recursive_getattr(

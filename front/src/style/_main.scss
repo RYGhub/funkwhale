@@ -10,62 +10,66 @@
   Import this file into your LESS project to use Semantic UI without build tools
 */
 
+// Those fomantic-ui-css/*.scss don't exist in the package, but we create them
+// via scripts/link-scss-files.sh on postinstall, so we can include theme
+// under a class namespace
+
 /* Global */
-@import "~semantic-ui-css/components/reset.css";
+@import "~fomantic-ui-css/components/reset.css";
 // we use our custom site css here to avoid loading google font
 @import "./site";
 
 /* Elements */
-@import "~semantic-ui-css/components/button.css";
-@import "~semantic-ui-css/components/container.css";
-@import "~semantic-ui-css/components/divider.css";
-// @import "~semantic-ui-css/components/flag.css";
-@import "~semantic-ui-css/components/header.css";
-@import "~semantic-ui-css/components/icon.css";
-@import "~semantic-ui-css/components/image.css";
-@import "~semantic-ui-css/components/input.css";
-@import "~semantic-ui-css/components/label.css";
-@import "~semantic-ui-css/components/list.css";
-@import "~semantic-ui-css/components/loader.css";
-@import "~semantic-ui-css/components/placeholder.css";
-// @import "~semantic-ui-css/components/rail.css";
-// @import "~semantic-ui-css/components/reveal.css";
-@import "~semantic-ui-css/components/segment.css";
-@import "~semantic-ui-css/components/step.css";
+@import "~fomantic-ui-css/components/button.css";
+@import "~fomantic-ui-css/components/container.css";
+@import "~fomantic-ui-css/components/divider.css";
+// @import "~fomantic-ui-css/components/flag.css";
+@import "~fomantic-ui-css/components/header.css";
+@import "~fomantic-ui-css/components/icon.css";
+@import "~fomantic-ui-css/components/image.css";
+@import "~fomantic-ui-css/components/input.css";
+@import "~fomantic-ui-css/components/label.css";
+@import "~fomantic-ui-css/components/list.css";
+@import "~fomantic-ui-css/components/loader.css";
+@import "~fomantic-ui-css/components/placeholder.css";
+// @import "~fomantic-ui-css/components/rail.css";
+// @import "~fomantic-ui-css/components/reveal.css";
+@import "~fomantic-ui-css/components/segment.css";
+@import "~fomantic-ui-css/components/step.css";
 
 /* Collections */
-// @import "~semantic-ui-css/components/breadcrumb.css";
-@import "~semantic-ui-css/components/form.css";
-@import "~semantic-ui-css/components/grid.css";
-@import "~semantic-ui-css/components/menu.css";
-@import "~semantic-ui-css/components/message.css";
-@import "~semantic-ui-css/components/table.css";
+// @import "~fomantic-ui-css/components/breadcrumb.css";
+@import "~fomantic-ui-css/components/form.css";
+@import "~fomantic-ui-css/components/grid.css";
+@import "~fomantic-ui-css/components/menu.css";
+@import "~fomantic-ui-css/components/message.css";
+@import "~fomantic-ui-css/components/table.css";
 
 /* Views */
-// @import "~semantic-ui-css/components/ad.css";
-@import "~semantic-ui-css/components/card.css";
-// @import "~semantic-ui-css/components/comment.css";
-// @import "~semantic-ui-css/components/feed.css";
-@import "~semantic-ui-css/components/item.css";
-@import "~semantic-ui-css/components/statistic.css";
+// @import "~fomantic-ui-css/components/ad.css";
+@import "~fomantic-ui-css/components/card.css";
+// @import "~fomantic-ui-css/components/comment.css";
+@import "~fomantic-ui-css/components/feed.css";
+@import "~fomantic-ui-css/components/item.css";
+@import "~fomantic-ui-css/components/statistic.css";
 
 /* Modules */
-// @import "~semantic-ui-css/components/accordion.css";
-@import "~semantic-ui-css/components/checkbox.css";
-@import "~semantic-ui-css/components/dimmer.css";
-@import "~semantic-ui-css/components/dropdown.css";
-// @import "~semantic-ui-css/components/embed.css";
-@import "~semantic-ui-css/components/modal.css";
-// @import "~semantic-ui-css/components/nag.css";
-@import "~semantic-ui-css/components/popup.css";
-@import "~semantic-ui-css/components/progress.css";
-// @import "~semantic-ui-css/components/rating.css";
-@import "~semantic-ui-css/components/search.css";
-// @import "~semantic-ui-css/components/shape.css";
-@import "~semantic-ui-css/components/sidebar.css";
-@import "~semantic-ui-css/components/sticky.css";
-@import "~semantic-ui-css/components/tab.css";
-@import "~semantic-ui-css/components/transition.css";
+// @import "~fomantic-ui-css/components/accordion.css";
+@import "~fomantic-ui-css/components/checkbox.css";
+@import "~fomantic-ui-css/components/dimmer.css";
+@import "~fomantic-ui-css/components/dropdown.css";
+// @import "~fomantic-ui-css/components/embed.css";
+@import "~fomantic-ui-css/components/modal.css";
+// @import "~fomantic-ui-css/components/nag.css";
+@import "~fomantic-ui-css/components/popup.css";
+@import "~fomantic-ui-css/components/progress.css";
+// @import "~fomantic-ui-css/components/rating.css";
+@import "~fomantic-ui-css/components/search.css";
+// @import "~fomantic-ui-css/components/shape.css";
+@import "~fomantic-ui-css/components/sidebar.css";
+@import "~fomantic-ui-css/components/sticky.css";
+@import "~fomantic-ui-css/components/tab.css";
+@import "~fomantic-ui-css/components/transition.css";
 
 
 
@@ -80,7 +84,7 @@ $widedesktop-sidebar-width: 350px;
 
 html,
 body {
-  @include media("<desktop") {
+  @include media("<=desktop") {
     font-size: 90%;
   }
 }
@@ -96,6 +100,7 @@ body {
 #app > main, #app > .main {
   flex: 1;
 }
+
 .instance-chooser {
   margin-top: 2em;
 }
@@ -127,14 +132,10 @@ body {
   margin-right: 0;
   border: none;
   overflow-y: auto;
-  box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
   .ui.item {
     border: none;
     border-bottom-style: none;
     margin-bottom: 0px;
-    &.active {
-      box-shadow: inset 0px -2px 0px 0px #000;
-    }
   }
   @include media(">tablet") {
     padding: 0 2.5rem;
@@ -149,7 +150,6 @@ body {
   @include media(">widedesktop") {
     left: $widedesktop-sidebar-width;
   }
-  background-color: white;
   .item {
     padding-top: 1.5em;
     padding-bottom: 1.5em;
@@ -166,6 +166,9 @@ body {
   @include media(">widedesktop") {
     left: $widedesktop-sidebar-width;
   }
+  > .ui.message {
+    box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.7);
+  }
 }
 .main-pusher {
   padding: 1.5rem 0;
@@ -181,7 +184,7 @@ body {
   }
 }
 
-.ellipsis {
+.ellipsis:not(.icon) {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -209,9 +212,6 @@ body {
   }
 }
 
-.discrete {
-  color: rgba(0, 0, 0, 0.87);
-}
 .link {
   cursor: pointer;
 }
@@ -250,6 +250,9 @@ a {
   display: none;
 }
 
+.nomargin {
+  margin: 0 !important;
+}
 button.reset {
   border: none;
   margin: 0;
@@ -345,6 +348,20 @@ td.align.right {
   word-wrap: break-word;
 }
 
+.ui.cards > .flat.card, .flat.card {
+  box-shadow: none;
+  .content {
+    border: none;
+  }
+}
+
+.ui.cards > .inline.card {
+  flex-direction: row;
+  .content {
+    padding: 0.5em 0.75em;
+  }
+}
+
 .ui.checkbox label {
   cursor: pointer;
 }
@@ -353,6 +370,27 @@ input + .help {
   margin-top: 0.5em;
 }
 
-.table td .ui.dropdown {
-  min-width: 150px;
+.tag-list {
+  margin-top: 0.5em;
 }
+
+.expandable {
+  &:not(.expanded) {
+    overflow: hidden;
+    max-height: 15vh;
+    background: linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0.3) 100%);
+  }
+}
+
+.ui.borderless.button {
+  border: none !important;
+  box-shadow: none !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+.column .ui.text.container {
+  max-width: 100% !important;
+}
+
+@import "./themes/_light.scss";
+@import "./themes/_dark.scss";

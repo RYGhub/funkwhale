@@ -305,6 +305,22 @@ installation guide.
 Check the configuration is valid with ``apache2ctl configtest``, and once you're
 done, load the new configuration with ``service apache2 restart``.
 
+Caddy
+^^^^^
+
+If you're using Caddy as a reverse proxy in front of your docker containers (either mono or multi-container setup),
+you can use the following configuration::
+
+    yourdomain.funkwhale {
+        proxy / 127.0.0.1:5000 {
+            transparent
+            websocket
+            header_upstream X-Forwarded-Host {host}:{server_port}
+        }
+    }
+
+
+
 About internal locations
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -448,7 +448,7 @@ def test_get_audio_data(factories):
 
     result = upload.get_audio_data()
 
-    assert result == {"duration": 1, "bitrate": 112000, "size": 14858}
+    assert result == {"duration": 1, "bitrate": 112000, "size": 15918}
 
 
 def test_library_queryset_with_follows(factories):

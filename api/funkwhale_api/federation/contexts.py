@@ -214,6 +214,7 @@ CONTEXTS = [
                 "shares": {"@id": "as:shares", "@type": "@id"},
                 # Added manually
                 "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+                "Hashtag": "as:Hashtag",
             }
         },
     },

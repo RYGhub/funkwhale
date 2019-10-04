@@ -5,6 +5,20 @@ from django.urls import reverse
 from funkwhale_api.federation import actors, serializers, webfinger
 
 
+def test_authenticate_skips_anonymous_fetch_when_allow_list_enabled(
+    preferences, api_client
+):
+    preferences["moderation__allow_list_enabled"] = True
+    actor = actors.get_service_actor()
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 403
+
+
 def test_wellknown_webfinger_validates_resource(db, api_client, settings, mocker):
     clean = mocker.spy(webfinger, "clean_resource")
     url = reverse("federation:well-known-webfinger")

@@ -30,7 +30,7 @@
           </translate>
           <button class="ui tiny basic right floated button" @click.prevent="showPendingReview = true">
             <translate translate-context="Content/Library/Button.Label">
-              Retrict to unreviewed edits
+              Restrict to unreviewed edits
             </translate>
           </button>
         </template>
@@ -77,10 +77,22 @@
           </button>
 
         </template>
+        <template v-else-if="fieldConfig.type === 'tags'">
+          <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
+          <tags-selector
+            ref="tags"
+            v-model="values[fieldConfig.id]"
+            :id="fieldConfig.id"
+            required="fieldConfig.required"></tags-selector>
+          <button class="ui tiny basic left floated button" form="noop" @click.prevent="values[fieldConfig.id] = []">
+            <i class="x icon"></i>
+            <translate translate-context="Content/Library/Button.Label">Clear</translate>
+          </button>
+        </template>
         <div v-if="values[fieldConfig.id] != initialValues[fieldConfig.id]">
           <button class="ui tiny basic right floated reset button" form="noop" @click.prevent="values[fieldConfig.id] = initialValues[fieldConfig.id]">
             <i class="undo icon"></i>
-            <translate translate-context="Content/Library/Button.Label" :translate-params="{value: initialValues[fieldConfig.id] || ''}">Reset to initial value: %{ value }</translate>
+            <translate translate-context="Content/Library/Button.Label">Reset to initial value</translate>
           </button>
         </div>
       </div>
@@ -110,13 +122,17 @@ import _ from '@/lodash'
 import axios from "axios"
 import EditList from '@/components/library/EditList'
 import EditCard from '@/components/library/EditCard'
+import TagsSelector from '@/components/library/TagsSelector'
 import edits from '@/edits'
+
+import lodash from '@/lodash'
 
 export default {
   props: ["objectType", "object", "licenses"],
   components: {
     EditList,
-    EditCard
+    EditCard,
+    TagsSelector
   },
   data() {
     return {
@@ -159,7 +175,7 @@ export default {
     mutationPayload () {
       let self = this
       let changedFields = this.config.fields.filter(f => {
-        return self.values[f.id] != self.initialValues[f.id]
+        return !lodash.isEqual(self.values[f.id], self.initialValues[f.id])
       })
       if (changedFields.length === 0) {
         return null

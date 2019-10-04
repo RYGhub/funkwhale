@@ -3,9 +3,9 @@
 NAME=funkwhaleserver
 PIDFILE=/var/run/$NAME.pid
 USER=funkwhale
-DAEMON_ARGS="-b 127.0.0.1 -p 5000 config.asgi:application --proxy-headers "
-Daphne=/srv/funkwhale/virtualenv/bin/daphne
-WORKDIR=/srv/funkwhale/api 
+DAEMON_ARGS="config.asgi:application -w 4 -k uvicorn.workers.UvicornWorker -b 127.0.0.1:5000 "
+Gunicorn=/srv/funkwhale/virtualenv/bin/gunicorn
+WORKDIR=/srv/funkwhale/api
 
 depend() {
         need net redis postgresql nginx funkwhale_beat funkwhale_worker
@@ -16,7 +16,7 @@ start() {
         cd /srv/funkwhale/api
 	set -a && source /srv/funkwhale/config/.env && set +a
         echo 'Starting Funkwhale Server'
-	start-stop-daemon --start --user $USER --make-pidfile --pidfile $PIDFILE  -d $WORKDIR  --exec $Daphne -- $DAEMON_ARGS >> /var/log/funk/daphne.log 2>&1&
+	start-stop-daemon --start --user $USER --make-pidfile --pidfile $PIDFILE  -d $WORKDIR  --exec $Gunicorn -- $DAEMON_ARGS >> /var/log/funk/server.log 2>&1&
 	echo 'Funkwhale Server started'
 	echo
 	eend $?

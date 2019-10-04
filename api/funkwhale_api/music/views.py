@@ -1,10 +1,10 @@
+import datetime
 import logging
-import urllib
+import urllib.parse
 
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch, Sum, F, Q
-from django.db.models.functions import Length
 from django.utils import timezone
 
 from rest_framework import mixins
@@ -12,7 +12,6 @@ from rest_framework import settings as rest_settings
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from taggit.models import Tag
 
 from funkwhale_api.common import decorators as common_decorators
 from funkwhale_api.common import permissions as common_permissions
@@ -23,12 +22,22 @@ from funkwhale_api.federation.authentication import SignatureAuthentication
 from funkwhale_api.federation import actors
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import decorators as federation_decorators
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import tasks as federation_tasks
+from funkwhale_api.tags.models import Tag, TaggedItem
+from funkwhale_api.tags.serializers import TagSerializer
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, licenses, models, serializers, tasks, utils
 
 logger = logging.getLogger(__name__)
+
+TAG_PREFETCH = Prefetch(
+    "tagged_items",
+    queryset=TaggedItem.objects.all().select_related().order_by("tag__name"),
+    to_attr="_prefetched_tagged_items",
+)
 
 
 def get_libraries(filter_uploads):
@@ -53,17 +62,49 @@ def get_libraries(filter_uploads):
     return libraries
 
 
-class TagViewSetMixin(object):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        tag = self.request.query_params.get("tag")
-        if tag:
-            queryset = queryset.filter(tags__pk=tag)
-        return queryset
+def refetch_obj(obj, queryset):
+    """
+    Given an Artist/Album/Track instance, if the instance is from a remote pod,
+    will attempt to update local data with the latest ActivityPub representation.
+    """
+    if obj.is_local:
+        return obj
+
+    now = timezone.now()
+    limit = now - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY)
+    last_fetch = obj.fetches.order_by("-creation_date").first()
+    if last_fetch is not None and last_fetch.creation_date > limit:
+        # we fetched recently, no need to do it again
+        return obj
+
+    logger.info("Refetching %s:%s at %s…", obj._meta.label, obj.pk, obj.fid)
+    actor = actors.get_service_actor()
+    fetch = federation_models.Fetch.objects.create(actor=actor, url=obj.fid, object=obj)
+    try:
+        federation_tasks.fetch(fetch_id=fetch.pk)
+    except Exception:
+        logger.exception(
+            "Error while refetching %s:%s at %s…", obj._meta.label, obj.pk, obj.fid
+        )
+    else:
+        fetch.refresh_from_db()
+        if fetch.status == "finished":
+            obj = queryset.get(pk=obj.pk)
+    return obj
 
 
 class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
-    queryset = models.Artist.objects.all()
+    queryset = (
+        models.Artist.objects.all()
+        .prefetch_related("attributed_to")
+        .prefetch_related(
+            Prefetch(
+                "tracks",
+                queryset=models.Track.objects.all(),
+                to_attr="_prefetched_tracks",
+            )
+        )
+    )
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
@@ -74,13 +115,25 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         albums = models.Album.objects.with_tracks_count()
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
-        return queryset.prefetch_related(Prefetch("albums", queryset=albums))
+        return queryset.prefetch_related(
+            Prefetch("albums", queryset=albums), TAG_PREFETCH
+        )
 
     libraries = action(methods=["get"], detail=True)(
         get_libraries(
@@ -93,7 +146,9 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
 
 class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
-        models.Album.objects.all().order_by("artist", "release_date").select_related()
+        models.Album.objects.all()
+        .order_by("artist", "release_date")
+        .select_related("artist", "attributed_to")
     )
     serializer_class = serializers.AlbumSerializer
     permission_classes = [oauth_permissions.ScopePermission]
@@ -105,6 +160,16 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         tracks = (
@@ -112,7 +177,9 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
             .with_playable_uploads(utils.get_actor_from_request(self.request))
             .order_for_album()
         )
-        qs = queryset.prefetch_related(Prefetch("tracks", queryset=tracks))
+        qs = queryset.prefetch_related(
+            Prefetch("tracks", queryset=tracks), TAG_PREFETCH
+        )
         return qs
 
     libraries = action(methods=["get"], detail=True)(
@@ -182,14 +249,16 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(
-    common_views.SkipFilterForGetObject, TagViewSetMixin, viewsets.ReadOnlyModelViewSet
-):
+class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
     """
 
-    queryset = models.Track.objects.all().for_nested_serialization()
+    queryset = (
+        models.Track.objects.all()
+        .for_nested_serialization()
+        .select_related("attributed_to")
+    )
     serializer_class = serializers.TrackSerializer
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
@@ -207,6 +276,16 @@ class TrackViewSet(
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
 
+    def get_object(self):
+        obj = super().get_object()
+
+        if (
+            self.action == "retrieve"
+            and self.request.GET.get("refresh", "").lower() == "true"
+        ):
+            obj = refetch_obj(obj, self.get_queryset())
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         filter_favorites = self.request.GET.get("favorites", None)
@@ -217,7 +296,7 @@ class TrackViewSet(
         queryset = queryset.with_playable_uploads(
             utils.get_actor_from_request(self.request)
         )
-        return queryset
+        return queryset.prefetch_related(TAG_PREFETCH)
 
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
@@ -242,6 +321,8 @@ def get_file_path(audio_file):
             path = "/music" + audio_file.replace(prefix, "", 1)
         if path.startswith("http://") or path.startswith("https://"):
             return (settings.PROTECT_FILES_PATH + "/media/" + path).encode("utf-8")
+        # needed to serve files with % or ? chars
+        path = urllib.parse.quote(path)
         return (settings.PROTECT_FILES_PATH + path).encode("utf-8")
     if t == "apache2":
         try:
@@ -334,7 +415,7 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
         f = transcoded_version
         file_path = get_file_path(f.audio_file)
         mt = f.mimetype
-    if not proxy_media:
+    if not proxy_media and f.audio_file:
         # we simply issue a 302 redirect to the real URL
         response = Response(status=302)
         response["Location"] = f.audio_file.url
@@ -458,14 +539,6 @@ class UploadViewSet(
         instance.delete()
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Tag.objects.all().order_by("name")
-    serializer_class = serializers.TagSerializer
-    permission_classes = [oauth_permissions.ScopePermission]
-    required_scope = "libraries"
-    anonymous_policy = "setting"
-
-
 class Search(views.APIView):
     max_results = 3
     permission_classes = [oauth_permissions.ScopePermission]
@@ -485,6 +558,7 @@ class Search(views.APIView):
             "albums": serializers.AlbumSerializer(
                 self.get_albums(query), many=True
             ).data,
+            "tags": TagSerializer(self.get_tags(query), many=True).data,
         }
         return Response(results, status=200)
 
@@ -521,17 +595,10 @@ class Search(views.APIView):
         return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):
-        search_fields = ["slug", "name__unaccent"]
+        search_fields = ["name__unaccent"]
         query_obj = utils.get_query(query, search_fields)
-
-        # We want the shortest tag first
-        qs = (
-            Tag.objects.all()
-            .annotate(slug_length=Length("slug"))
-            .order_by("slug_length")
-        )
-
-        return qs.filter(query_obj)[: self.max_results]
+        qs = Tag.objects.all().filter(query_obj)
+        return common_utils.order_for_search(qs, "name")[: self.max_results]
 
 
 class LicenseViewSet(viewsets.ReadOnlyModelViewSet):

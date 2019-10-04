@@ -57,6 +57,7 @@ def test_can_get_metadata_all():
         "musicbrainz_albumartistid": "013c8e5b-d72a-4cd3-8dee-6c64d6125823;5b4d7d2d-36df-4b38-95e3-a964234f520f",
         "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "Someone",
+        "genre": "Classical",
     }
     assert data.all() == expected
 
@@ -141,7 +142,15 @@ def test_can_get_metadata_from_id3_mp3_file(field, value):
 
 
 @pytest.mark.parametrize(
-    "name", ["test.mp3", "with_other_picture.mp3", "sample.flac", "with_cover.ogg"]
+    "name",
+    [
+        "test.mp3",
+        "with_other_picture.mp3",
+        "sample.flac",
+        "with_cover.ogg",
+        "with_cover.opus",
+        "test.m4a",
+    ],
 )
 def test_can_get_pictures(name):
     path = os.path.join(DATA_DIR, name)
@@ -176,6 +185,35 @@ def test_can_get_pictures(name):
 )
 def test_can_get_metadata_from_flac_file(field, value):
     path = os.path.join(DATA_DIR, "sample.flac")
+    data = metadata.Metadata(path)
+
+    assert data.get(field) == value
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("title", "Peer Gynt Suite no. 1, op. 46: I. Morning"),
+        ("artist", "Edvard Grieg"),
+        ("album_artist", "Edvard Grieg; Musopen Symphony Orchestra"),
+        ("album", "Peer Gynt Suite no. 1, op. 46"),
+        ("date", "2012-08-15"),
+        ("position", 1),
+        ("disc_number", 2),
+        ("musicbrainz_albumid", "a766da8b-8336-47aa-a3ee-371cc41ccc75"),
+        ("mbid", "bd21ac48-46d8-4e78-925f-d9cc2a294656"),
+        ("musicbrainz_artistid", "013c8e5b-d72a-4cd3-8dee-6c64d6125823"),
+        (
+            "musicbrainz_albumartistid",
+            "013c8e5b-d72a-4cd3-8dee-6c64d6125823;5b4d7d2d-36df-4b38-95e3-a964234f520f",
+        ),
+        ("license", "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/"),
+        ("copyright", "Someone"),
+        ("genre", "Dubstep"),
+    ],
+)
+def test_can_get_metadata_from_m4a_file(field, value):
+    path = os.path.join(DATA_DIR, "test.m4a")
     data = metadata.Metadata(path)
 
     assert data.get(field) == value
@@ -249,6 +287,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "mbid": uuid.UUID("f269d497-1cc0-4ae4-a0c4-157ec7d73fcb"),
                 "license": "https://creativecommons.org/licenses/by-nc-nd/2.5/",
                 "copyright": "Someone",
+                "tags": ["Funk"],
             },
         ),
         (
@@ -281,6 +320,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "mbid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
                 "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
                 "copyright": "Someone",
+                "tags": ["Classical"],
             },
         ),
         (
@@ -313,6 +353,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "mbid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
                 "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
                 "copyright": "Someone",
+                "tags": ["Classical"],
             },
         ),
         (
@@ -336,6 +377,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                         }
                     ],
                 },
+                "tags": ["Rock"],
                 "position": 1,
                 "disc_number": 1,
                 "mbid": uuid.UUID("124d0150-8627-46bc-bc14-789a3bc960c8"),
@@ -371,6 +413,7 @@ def test_metadata_fallback_ogg_theora(mocker):
                 "mbid": uuid.UUID("30f3f33e-8d0c-4e69-8539-cbd701d18f28"),
                 "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/us/",
                 "copyright": "2008 nin",
+                "tags": ["Industrial"],
             },
         ),
     ],
@@ -555,7 +598,7 @@ def test_serializer_album_default_title_when_missing_or_empty(data):
         "title": "Track",
         "artists": [{"name": "Artist", "mbid": None}],
         "album": {
-            "title": metadata.UNKWOWN_ALBUM,
+            "title": metadata.UNKNOWN_ALBUM,
             "mbid": None,
             "release_date": None,
             "artists": [],
@@ -607,3 +650,43 @@ def test_artist_field_featuring():
     value = field.get_value(data)
 
     assert field.to_internal_value(value) == expected
+
+
+@pytest.mark.parametrize(
+    "genre, expected_tags",
+    [
+        ("Pop", ["Pop"]),
+        ("pop", ["pop"]),
+        ("Pop-Rock", ["PopRock"]),
+        ("Pop - Rock", ["Pop", "Rock"]),
+        ("Soundtrack - Cute Anime", ["Soundtrack", "CuteAnime"]),
+        ("Pop, Rock", ["Pop", "Rock"]),
+        ("Chanson française", ["ChansonFrançaise"]),
+        ("Unhandled❤️", []),
+        ("tag with non-breaking spaces", []),
+    ],
+)
+def test_acquire_tags_from_genre(genre, expected_tags):
+    data = {
+        "title": "Track Title",
+        "artist": "Track Artist",
+        "album": "Track Album",
+        "genre": genre,
+    }
+    expected = {
+        "title": "Track Title",
+        "artists": [{"name": "Track Artist", "mbid": None}],
+        "album": {
+            "title": "Track Album",
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+        },
+        "cover_data": None,
+    }
+    if expected_tags:
+        expected["tags"] = expected_tags
+
+    serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected

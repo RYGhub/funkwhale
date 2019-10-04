@@ -42,8 +42,16 @@ Replace the ``location /_protected/media`` block with the following::
 
     location ~ /_protected/media/(.+) {
         internal;
+        # Needed to ensure DSub auth isn't forwarded to S3/Minio, see #932
+        proxy_set_header Authorization "";
         proxy_pass $1;
     }
+
+Add your S3 store URL to the ``img-src`` and ``media-src`` headers
+
+.. code-block:: shell
+
+    add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
 
 Then restart Funkwhale and nginx.
 
@@ -71,9 +79,9 @@ This URL is actually be visible by the client, but contains a signature valid on
 no one can reuse this URL or share it publicly to distribute unauthorized content.
 
 .. note::
-   
+
    If you are using Amazon S3, you will need to set your ``AWS_S3_REGION_NAME`` in the ``.env`` file to
-   use this feature. 
+   use this feature.
 
 .. note::
 
@@ -136,8 +144,41 @@ in your ``funkwhale.template`` under the ``location ~/_protected/media/(.+)`` se
 .. code-block:: shell
 
     location ~ /_protected/media/(.+) {
-     resolver 1.1.1.1;
-     internal;
-     proxy_pass $1;
+        resolver 1.1.1.1;
+        internal;
+        proxy_set_header Authorization "";
+        proxy_pass $1;
     }
 
+No Images or Media Loading
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are serving media from an S3-compatible store, you may experience an issue where
+nothing loads in the front end. The error logs in your browser may show something like
+the following:
+
+.. code-block:: text
+
+    Content Security Policy: The page's settings blocked the loading of a resource at https://<your-s3-url> ("img-src")
+    Content Security Policy: The page's settings blocked the loading of a resource at https://<your-s3-url> ("media-src")
+
+This happens when your S3 store isn't defined in the ``Content-Security-Policy`` headers
+in your Nginx files. To resolve the issue, add the base URL of your S3 store to the ``img-src``
+and ``media-src`` headers and reload nginx.
+
+.. code-block:: shell
+
+    add_header Content-Security-Policy "...img-src 'self' https://<your-s3-URL> data:;...media-src https://<your-s3-URL> 'self' data:";
+
+Broken Images in Audio Player On Page Reload
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are serving media directly from an S3-compatible store, you may find that images 
+in the queue and the player won't load after the page is refreshed. This happens if the 
+generated URL has expired and the authorization is no longer valid. You can extend the expiry time
+using the following setting in your ``.env`` file:
+
+.. code-block:: shell
+
+    # The default value is 3600 (60 mins). The maximum is 604800 (7 days)
+    AWS_QUERYSTRING_EXPIRE=604800

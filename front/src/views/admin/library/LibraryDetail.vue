@@ -96,7 +96,16 @@
                       </router-link>
                     </td>
                     <td>
-                      {{ sharedLabels.fields.privacy_level.shortChoices[object.privacy_level] }}
+                      <select
+                        v-dropdown
+                        v-if="object.is_local"
+                        @change="updateObj('privacy_level')"
+                        v-model="object.privacy_level"
+
+                        class="ui search selection dropdown">
+                        <option v-for="p in ['me', 'instance', 'everyone']" :value="p">{{ sharedLabels.fields.privacy_level.shortChoices[p] }}</option>
+                      </select>
+                      <template v-else>{{ sharedLabels.fields.privacy_level.shortChoices[object.privacy_level] }}</template>
                     </td>
                   </tr>
                   <tr>
@@ -165,6 +174,16 @@
                       {{ stats.followers }}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.moderation.reports.list', query: {q: getQuery('target', `library:${object.uuid}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Linked reports</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.reports }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </section>
@@ -207,7 +226,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.artists', query: {q: getQuery('library_id', object.id) }}">
-                        <translate translate-context="*/*/*">Artists</translate>
+                        <translate translate-context="*/*/*/Noun">Artists</translate>
                       </router-link>
                     </td>
                     <td>
@@ -237,7 +256,7 @@
                   <tr>
                     <td>
                       <router-link :to="{name: 'manage.library.uploads', query: {q: getQuery('library_id', object.id) }}">
-                        <translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate>
+                        <translate translate-context="*/*/*">Uploads</translate>
                       </router-link>
                     </td>
                     <td>
@@ -308,7 +327,28 @@ export default {
     },
     getQuery (field, value) {
       return `${field}:"${value}"`
-    }
+    },
+    updateObj(attr, toNull) {
+      let newValue = this.object[attr]
+      if (toNull && !newValue) {
+        newValue = null
+      }
+      let params = {}
+      params[attr] = newValue
+      axios.patch(`manage/library/libraries/${this.id}/`, params).then(
+        response => {
+          logger.default.info(
+            `${attr} was updated succcessfully to ${newValue}`
+          )
+        },
+        error => {
+          logger.default.error(
+            `Error while setting ${attr} to ${newValue}`,
+            error
+          )
+        }
+      )
+    },
   },
   computed: {
     labels() {

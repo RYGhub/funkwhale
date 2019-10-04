@@ -2,10 +2,12 @@
   <div class="wrapper">
     <h3 class="ui header">
       <slot name="title"></slot>
+      <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
-    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
-    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
-    <button @click="fetchData('albums/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
+    <slot></slot>
+    <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
+    <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
+    <button v-if="controls" @click="fetchData('albums/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
     <div class="ui five cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -33,6 +35,7 @@
         </div>
       </div>
     </div>
+    <div v-if="!isLoading && albums.length === 0">No results matching your query.</div>
   </div>
 </template>
 
@@ -43,7 +46,10 @@ import PlayButton from '@/components/audio/PlayButton'
 
 export default {
   props: {
-    filters: {type: Object, required: true}
+    filters: {type: Object, required: true},
+    controls: {type: Boolean, default: true},
+    showCount: {type: Boolean, default: false},
+    limit: {type: Number, default: 12},
   },
   components: {
     PlayButton
@@ -51,7 +57,7 @@ export default {
   data () {
     return {
       albums: [],
-      limit: 12,
+      count: 0,
       isLoading: false,
       errors: null,
       previousPage: null,
@@ -76,6 +82,7 @@ export default {
         self.nextPage = response.data.next
         self.isLoading = false
         self.albums = response.data.results
+        self.count = response.data.count
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

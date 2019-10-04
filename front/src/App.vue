@@ -21,6 +21,7 @@
       ></app-footer>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
       <filter-modal v-if="$store.state.auth.authenticated"></filter-modal>
+      <report-modal></report-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
       <GlobalEvents @keydown.h.exact="showShortcutsModal = !showShortcutsModal"/>
     </template>
@@ -41,6 +42,7 @@ import moment from  'moment'
 import locales from './locales'
 import PlaylistModal from '@/components/playlists/PlaylistModal'
 import FilterModal from '@/components/moderation/FilterModal'
+import ReportModal from '@/components/moderation/ReportModal'
 import ShortcutsModal from '@/components/ShortcutsModal'
 import SetInstanceModal from '@/components/SetInstanceModal'
 
@@ -50,6 +52,7 @@ export default {
     Sidebar,
     AppFooter,
     FilterModal,
+    ReportModal,
     PlaylistModal,
     ShortcutsModal,
     GlobalEvents,
@@ -59,21 +62,27 @@ export default {
   data () {
     return {
       bridge: null,
-      nodeinfo: null,
       instanceUrl: null,
       showShortcutsModal: false,
       showSetInstanceModal: false,
     }
   },
-  created () {
+  async created () {
     this.openWebsocket()
     let self = this
-    this.autodetectLanguage()
+    if (!this.$store.state.ui.selectedLanguage) {
+      this.autodetectLanguage()
+    }
     setInterval(() => {
       // used to redraw ago dates every minute
       self.$store.commit('ui/computeLastDate')
     }, 1000 * 60)
-    if (!this.$store.state.instance.instanceUrl) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serverUrl = urlParams.get('_server')
+    if (serverUrl) {
+      this.$store.commit('instance/instanceUrl', serverUrl)
+    }
+    else if (!this.$store.state.instance.instanceUrl) {
       // we have several way to guess the API server url. By order of precedence:
       // 1. use the url provided in settings.json, if any
       // 2. use the url specified when building via VUE_APP_INSTANCE_URL
@@ -84,9 +93,9 @@ export default {
       // needed to trigger initialization of axios
       this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
     }
+    await this.fetchNodeInfo()
     this.$store.dispatch('auth/check')
     this.$store.dispatch('instance/fetchSettings')
-    this.fetchNodeInfo()
     this.$store.commit('ui/addWebsocketEventHandler', {
       eventName: 'inbox.item_added',
       id: 'sidebarCount',
@@ -101,6 +110,11 @@ export default {
       eventName: 'mutation.updated',
       id: 'sidebarReviewEditCount',
       handler: this.incrementReviewEditCountInSidebar
+    })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'report.created',
+      id: 'sidebarPendingReviewReportCount',
+      handler: this.incrementPendingReviewReportsCountInSidebar
     })
   },
   mounted () {
@@ -128,6 +142,10 @@ export default {
       eventName: 'mutation.updated',
       id: 'sidebarReviewEditCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'mutation.updated',
+      id: 'sidebarPendingReviewReportCount',
+    })
     this.disconnect()
   },
   methods: {
@@ -137,11 +155,12 @@ export default {
     incrementReviewEditCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewEdits', value: event.pending_review_count})
     },
-    fetchNodeInfo () {
-      let self = this
-      axios.get('instance/nodeinfo/2.0/').then(response => {
-        self.nodeinfo = response.data
-      })
+    incrementPendingReviewReportsCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: event.unresolved_count})
+    },
+    async fetchNodeInfo () {
+      let response = await axios.get('instance/nodeinfo/2.0/')
+      this.$store.commit('instance/nodeinfo', response.data)
     },
     autodetectLanguage () {
       let userLanguage = navigator.language || navigator.userLanguage
@@ -217,7 +236,8 @@ export default {
   },
   computed: {
     ...mapState({
-      messages: state => state.ui.messages
+      messages: state => state.ui.messages,
+      nodeinfo: state => state.instance.nodeinfo,
     }),
     ...mapGetters({
       currentTrack: 'queue/currentTrack'
@@ -250,6 +270,14 @@ export default {
     '$store.state.instance.instanceUrl' () {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
+    },
+    '$store.state.ui.theme': {
+      immediate: true,
+      handler (newValue, oldValue) {
+        let oldTheme = oldValue || 'light'
+        document.body.classList.remove(`theme-${oldTheme}`)
+        document.body.classList.add(`theme-${newValue}`)
+      },
     },
     '$store.state.auth.authenticated' (newValue) {
       if (!newValue) {

@@ -26,6 +26,7 @@ Administration
    commands
    url
    upgrading
+   mrf
 
 Troubleshooting Issues
 ----------------------

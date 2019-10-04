@@ -69,11 +69,29 @@ http {
             text/x-component
             text/x-cross-domain-policy;
 
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+        add_header Referrer-Policy "strict-origin-when-cross-origin";
+
         location /front/ {
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+            add_header Referrer-Policy "strict-origin-when-cross-origin";
+            add_header X-Frame-Options "SAMEORIGIN";
+            # uncomment the following line and comment the proxy-pass one
+            # to use the frontend build with "yarn build"
+            #alias /frontend/dist/;
             proxy_pass   http://funkwhale-front/front/;
+        }
+        location /front/embed.html {
+            add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+            add_header Referrer-Policy "strict-origin-when-cross-origin";
+            add_header X-Frame-Options "ALLOW";
+            proxy_pass   http://funkwhale-front/front/embed.html;
         }
         location /front-server/ {
             proxy_pass   http://funkwhale-front/;
+        }
+        location /sockjs-node/ {
+            proxy_pass   http://funkwhale-front/sockjs-node/;
         }
 
         location / {
@@ -106,8 +124,10 @@ http {
         # location ~ /_protected/media/(.+) {
         #     internal;
         #     resolver 127.0.0.11;
+        #     # Needed to ensure DSub auth isn't forwarded to S3/Minio, see #932
+        #     proxy_set_header Authorization "";
+        #     proxy_set_header X-Remote-URL "$1";
         #     proxy_pass $1;
-        #     add_header X-Remote-URL "$1";
         # }
 
         location /_protected/music {
@@ -117,6 +137,9 @@ http {
             # Set this to the same value as your MUSIC_DIRECTORY_PATH setting
             internal;
             alias   /music;
+        }
+        location /staticfiles/ {
+            alias /staticfiles/;
         }
     }
 }

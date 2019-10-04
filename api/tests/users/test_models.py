@@ -176,11 +176,12 @@ def test_creating_actor_from_user(factories, settings):
 
 
 def test_get_channels_groups(factories):
-    user = factories["users.User"]()
+    user = factories["users.User"](permission_library=True)
 
     assert user.get_channels_groups() == [
         "user.{}.imports".format(user.pk),
         "user.{}.inbox".format(user.pk),
+        "admin.library",
     ]
 
 
@@ -221,11 +222,18 @@ def test_user_get_quota_status(factories, preferences, mocker):
     }
 
 
-def test_deleting_users_deletes_associated_actor(factories):
-    actor = factories["federation.Actor"]()
-    user = factories["users.User"](actor=actor)
+@pytest.mark.parametrize(
+    "setting_name, field",
+    [
+        ("INSTANCE_SUPPORT_MESSAGE_DELAY", "instance_support_message_display_date"),
+        ("FUNKWHALE_SUPPORT_MESSAGE_DELAY", "funkwhale_support_message_display_date"),
+    ],
+)
+def test_creating_user_set_support_display_date(
+    setting_name, field, settings, factories, now
+):
+    setattr(settings, setting_name, 66)  # display message every 66 days
+    expected = now + datetime.timedelta(days=66)
+    user = factories["users.User"]()
 
-    user.delete()
-
-    with pytest.raises(actor.DoesNotExist):
-        actor.refresh_from_db()
+    assert getattr(user, field) == expected

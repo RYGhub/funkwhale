@@ -9,9 +9,20 @@ from . import models
 from . import utils
 
 
+def filter_tags(queryset, name, value):
+    non_empty_tags = [v.lower() for v in value if v]
+    for tag in non_empty_tags:
+        queryset = queryset.filter(tagged_items__tag__name=tag).distinct()
+    return queryset
+
+
+TAG_FILTER = common_filters.MultipleQueryFilter(method=filter_tags)
+
+
 class ArtistFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
+    tag = TAG_FILTER
 
     class Meta:
         model = models.Artist
@@ -29,6 +40,7 @@ class ArtistFilter(moderation_filters.HiddenContentFilterSet):
 class TrackFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
+    tag = TAG_FILTER
     id = common_filters.MultipleQueryFilter(coerce=int)
 
     class Meta:
@@ -94,6 +106,7 @@ class UploadFilter(filters.FilterSet):
 class AlbumFilter(moderation_filters.HiddenContentFilterSet):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SearchFilter(search_fields=["title", "artist__name"])
+    tag = TAG_FILTER
 
     class Meta:
         model = models.Album

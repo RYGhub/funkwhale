@@ -1,8 +1,18 @@
 import urllib.parse
 import uuid
 
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
+
+from funkwhale_api.common import models as common_models
+from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 
 
 class InstancePolicyQuerySet(models.QuerySet):
@@ -92,3 +102,92 @@ class UserFilter(models.Model):
     def target(self):
         if self.target_artist:
             return {"type": "artist", "obj": self.target_artist}
+
+
+REPORT_TYPES = [
+    ("takedown_request", "Takedown request"),
+    ("invalid_metadata", "Invalid metadata"),
+    ("illegal_content", "Illegal content"),
+    ("offensive_content", "Offensive content"),
+    ("other", "Other"),
+]
+
+
+class Report(federation_models.FederationMixin):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    summary = models.TextField(null=True, blank=True, max_length=50000)
+    handled_date = models.DateTimeField(null=True)
+    is_handled = models.BooleanField(default=False)
+    type = models.CharField(max_length=40, choices=REPORT_TYPES)
+    submitter_email = models.EmailField(null=True)
+    submitter = models.ForeignKey(
+        "federation.Actor",
+        related_name="reports",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    assigned_to = models.ForeignKey(
+        "federation.Actor",
+        related_name="assigned_reports",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+    target_owner = models.ForeignKey(
+        "federation.Actor", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    # frozen state of the target being reported, to ensure we still have info in the event of a
+    # delete
+    target_state = JSONField(null=True)
+
+    notes = GenericRelation(
+        "Note", content_type_field="target_content_type", object_id_field="target_id"
+    )
+
+    objects = common_models.GenericTargetQuerySet.as_manager()
+
+    def get_federation_id(self):
+        if self.fid:
+            return self.fid
+
+        return federation_utils.full_url(
+            reverse("federation:reports-detail", kwargs={"uuid": self.uuid})
+        )
+
+    def save(self, **kwargs):
+        if not self.pk and not self.fid:
+            self.fid = self.get_federation_id()
+
+        return super().save(**kwargs)
+
+
+class Note(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    summary = models.TextField(max_length=50000)
+    author = models.ForeignKey(
+        "federation.Actor", related_name="moderation_notes", on_delete=models.CASCADE
+    )
+
+    target_id = models.IntegerField(null=True)
+    target_content_type = models.ForeignKey(
+        ContentType, null=True, on_delete=models.CASCADE
+    )
+    target = GenericForeignKey("target_content_type", "target_id")
+
+
+@receiver(pre_save, sender=Report)
+def set_handled_date(sender, instance, **kwargs):
+    if instance.is_handled is True and not instance.handled_date:
+        instance.handled_date = timezone.now()
+    elif not instance.is_handled:
+        instance.handled_date = None

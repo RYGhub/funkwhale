@@ -5,12 +5,13 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 
 from rest_auth.serializers import PasswordResetSerializer as PRS
-from rest_auth.registration.serializers import RegisterSerializer as RS
+from rest_auth.registration.serializers import RegisterSerializer as RS, get_adapter
 from rest_framework import serializers
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.federation import models as federation_models
 from . import adapters
 from . import models
 
@@ -41,6 +42,26 @@ class RegisterSerializer(RS):
             return models.Invitation.objects.open().get(code__iexact=value)
         except models.Invitation.DoesNotExist:
             raise serializers.ValidationError("Invalid invitation code")
+
+    def validate(self, validated_data):
+        data = super().validate(validated_data)
+        # we create a fake user obj with validated data so we can validate
+        # password properly (we have a password validator that requires
+        # a user object)
+        user = models.User(username=data["username"], email=data["email"])
+        get_adapter().clean_password(data["password1"], user)
+        return data
+
+    def validate_username(self, value):
+        username = super().validate_username(value)
+        duplicates = federation_models.Actor.objects.local().filter(
+            preferred_username__iexact=username
+        )
+        if duplicates.exists():
+            raise serializers.ValidationError(
+                "A user with that username already exists."
+            )
+        return username
 
     def save(self, request):
         user = super().save(request)
@@ -88,7 +109,13 @@ class UserWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = ["name", "privacy_level", "avatar"]
+        fields = [
+            "name",
+            "privacy_level",
+            "avatar",
+            "instance_support_message_display_date",
+            "funkwhale_support_message_display_date",
+        ]
 
 
 class UserReadSerializer(serializers.ModelSerializer):
@@ -125,7 +152,11 @@ class MeSerializer(UserReadSerializer):
     quota_status = serializers.SerializerMethodField()
 
     class Meta(UserReadSerializer.Meta):
-        fields = UserReadSerializer.Meta.fields + ["quota_status"]
+        fields = UserReadSerializer.Meta.fields + [
+            "quota_status",
+            "instance_support_message_display_date",
+            "funkwhale_support_message_display_date",
+        ]
 
     def get_quota_status(self, o):
         return o.get_quota_status() if o.actor else 0
@@ -134,3 +165,17 @@ class MeSerializer(UserReadSerializer):
 class PasswordResetSerializer(PRS):
     def get_email_options(self):
         return {"extra_email_context": adapters.get_email_context()}
+
+
+class UserDeleteSerializer(serializers.Serializer):
+    password = serializers.CharField()
+    confirm = serializers.BooleanField()
+
+    def validate_password(self, value):
+        if not self.instance.check_password(value):
+            raise serializers.ValidationError("Invalid password")
+
+    def validate_confirm(self, value):
+        if not value:
+            raise serializers.ValidationError("Please confirm deletion")
+        return value

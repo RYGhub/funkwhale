@@ -39,7 +39,7 @@
         <template slot="header-cells">
           <th><translate translate-context="*/*/*/Noun">Name</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
-          <th><translate translate-context="Content/Moderation/Table.Label/Noun">Uploads</translate></th>
+          <th><translate translate-context="*/*/*">Uploads</translate></th>
           <th><translate translate-context="Content/Moderation/Table.Label/Short (Value is a date)">First seen</translate></th>
           <th><translate translate-context="Content/Moderation/Table.Label/Noun">Last seen</translate></th>
           <th><translate translate-context="Content/Moderation/Table.Label/Short">Under moderation rule</translate></th>

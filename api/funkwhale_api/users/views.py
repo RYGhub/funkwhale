@@ -1,17 +1,20 @@
 from allauth.account.adapter import get_adapter
-from rest_auth.registration.views import RegisterView as BaseRegisterView
+from rest_auth import views as rest_auth_views
+from rest_auth.registration import views as registration_views
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from funkwhale_api.common import preferences
 
-from . import models, serializers
+from . import models, serializers, tasks
 
 
-class RegisterView(BaseRegisterView):
+class RegisterView(registration_views.RegisterView):
     serializer_class = serializers.RegisterSerializer
     permission_classes = []
+    action = "signup"
+    throttling_scopes = {"signup": {"authenticated": "signup", "anonymous": "signup"}}
 
     def create(self, request, *args, **kwargs):
         invitation_code = request.data.get("invitation")
@@ -24,6 +27,22 @@ class RegisterView(BaseRegisterView):
         return get_adapter().is_open_for_signup(request)
 
 
+class VerifyEmailView(registration_views.VerifyEmailView):
+    action = "verify-email"
+
+
+class PasswordChangeView(rest_auth_views.PasswordChangeView):
+    action = "password-change"
+
+
+class PasswordResetView(rest_auth_views.PasswordResetView):
+    action = "password-reset"
+
+
+class PasswordResetConfirmView(rest_auth_views.PasswordResetConfirmView):
+    action = "password-reset-confirm"
+
+
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserWriteSerializer
@@ -31,9 +50,17 @@ class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     lookup_value_regex = r"[a-zA-Z0-9-_.]+"
     required_scope = "profile"
 
-    @action(methods=["get"], detail=False)
+    @action(methods=["get", "delete"], detail=False)
     def me(self, request, *args, **kwargs):
-        """Return information about the current user"""
+        """Return information about the current user or delete it"""
+        if request.method.lower() == "delete":
+            serializer = serializers.UserDeleteSerializer(
+                request.user, data=request.data
+            )
+            serializer.is_valid(raise_exception=True)
+            tasks.delete_account.delay(user_id=request.user.pk)
+            # at this point, password is valid, we launch deletion
+            return Response(status=204)
         serializer = serializers.MeSerializer(request.user)
         return Response(serializer.data)
 

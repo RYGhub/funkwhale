@@ -46,6 +46,10 @@ PERMISSIONS_CONFIGURATION = {
             "write:instance:accounts",
             "read:instance:domains",
             "write:instance:domains",
+            "read:instance:reports",
+            "write:instance:reports",
+            "read:instance:notes",
+            "write:instance:notes",
         },
     },
     "library": {
@@ -76,6 +80,18 @@ PERMISSIONS = sorted(PERMISSIONS_CONFIGURATION.keys())
 
 
 get_file_path = common_utils.ChunkedPath("users/avatars", preserve_file_name=False)
+
+
+def get_default_instance_support_message_display_date():
+    return timezone.now() + datetime.timedelta(
+        days=settings.INSTANCE_SUPPORT_MESSAGE_DELAY
+    )
+
+
+def get_default_funkwhale_support_message_display_date():
+    return timezone.now() + datetime.timedelta(
+        days=settings.FUNKWHALE_SUPPORT_MESSAGE_DELAY
+    )
 
 
 @python_2_unicode_compatible
@@ -144,6 +160,15 @@ class User(AbstractUser):
     )
 
     upload_quota = models.PositiveIntegerField(null=True, blank=True)
+
+    instance_support_message_display_date = models.DateTimeField(
+        default=get_default_instance_support_message_display_date, null=True, blank=True
+    )
+    funkwhale_support_message_display_date = models.DateTimeField(
+        default=get_default_funkwhale_support_message_display_date,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.username
@@ -228,8 +253,13 @@ class User(AbstractUser):
 
     def get_channels_groups(self):
         groups = ["imports", "inbox"]
+        groups = ["user.{}.{}".format(self.pk, g) for g in groups]
 
-        return ["user.{}.{}".format(self.pk, g) for g in groups]
+        for permission, value in self.all_permissions.items():
+            if value:
+                groups.append("admin.{}".format(permission))
+
+        return groups
 
     def full_username(self):
         return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
@@ -321,13 +351,16 @@ class RefreshToken(oauth2_models.AbstractRefreshToken):
     pass
 
 
-def get_actor_data(username):
+def get_actor_data(username, **kwargs):
     slugified_username = federation_utils.slugify_username(username)
+    domain = kwargs.get("domain")
+    if not domain:
+        domain = federation_models.Domain.objects.get_or_create(
+            name=settings.FEDERATION_HOSTNAME
+        )[0]
     return {
         "preferred_username": slugified_username,
-        "domain": federation_models.Domain.objects.get_or_create(
-            name=settings.FEDERATION_HOSTNAME
-        )[0],
+        "domain": domain,
         "type": "Person",
         "name": username,
         "manually_approves_followers": False,
@@ -388,10 +421,3 @@ def warm_user_avatar(sender, instance, **kwargs):
         instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
     )
     num_created, failed_to_create = user_avatar_warmer.warm()
-
-
-@receiver(models.signals.pre_delete, sender=User)
-def delete_actor(sender, instance, **kwargs):
-    if not instance.actor:
-        return
-    instance.actor.delete()

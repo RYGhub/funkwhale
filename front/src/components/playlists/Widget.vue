@@ -9,7 +9,12 @@
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
-    <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
+    <template v-if="playlistsExist">
+      <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
+    </template>
+    <template v-else>
+      <placeholder-widget></placeholder-widget>
+    </template>
   </div>
 </template>
 
@@ -17,6 +22,7 @@
 import _ from '@/lodash'
 import axios from 'axios'
 import PlaylistCard from '@/components/playlists/Card'
+import PlaceholderWidget from '@/components/playlists/PlaceholderWidget'
 
 export default {
   props: {
@@ -24,7 +30,8 @@ export default {
     url: {type: String, required: true}
   },
   components: {
-    PlaylistCard
+    PlaylistCard,
+    PlaceholderWidget
   },
   data () {
     return {
@@ -38,6 +45,11 @@ export default {
   },
   created () {
     this.fetchData(this.url)
+  },
+  computed: {
+    playlistsExist: function () {
+      return this.objects.length > 0
+    }
   },
   methods: {
     fetchData (url) {

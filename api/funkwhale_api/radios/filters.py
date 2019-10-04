@@ -178,9 +178,9 @@ class TagFilter(RadioFilter):
             "autocomplete_fields": {
                 "remoteValues": "results",
                 "name": "name",
-                "value": "slug",
+                "value": "name",
             },
-            "autocomplete_qs": "query={query}",
+            "autocomplete_qs": "q={query}&ordering=length",
             "label": "Tags",
             "placeholder": "Select tags",
         }
@@ -189,4 +189,8 @@ class TagFilter(RadioFilter):
     label = "Tag"
 
     def get_query(self, candidates, names, **kwargs):
-        return Q(tags__slug__in=names)
+        return (
+            Q(tagged_items__tag__name__in=names)
+            | Q(artist__tagged_items__tag__name__in=names)
+            | Q(album__tagged_items__tag__name__in=names)
+        )

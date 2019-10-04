@@ -42,6 +42,13 @@
     </td>
     <td colspan="2" class="align right">
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
+      <play-button
+        class="play-button basic icon"
+        :dropdown-only="true"
+        :is-playable="track.is_playable"
+        :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']"
+        :track="track"
+      ></play-button>
       <track-playlist-icon
         v-if="$store.state.auth.authenticated"
         :track="track"></track-playlist-icon>

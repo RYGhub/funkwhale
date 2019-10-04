@@ -1,20 +1,40 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from rest_auth import views as rest_auth_views
-from rest_auth.registration import views as registration_views
 
 from . import views
 
 urlpatterns = [
-    url(r"^$", views.RegisterView.as_view(), name="rest_register"),
+    # URLs that do not require a session or valid token
     url(
-        r"^verify-email/$",
-        registration_views.VerifyEmailView.as_view(),
+        r"^password/reset/$",
+        views.PasswordResetView.as_view(),
+        name="rest_password_reset",
+    ),
+    url(
+        r"^password/reset/confirm/$",
+        views.PasswordResetConfirmView.as_view(),
+        name="rest_password_reset_confirm",
+    ),
+    # URLs that require a user to be logged in with a valid session / token.
+    url(
+        r"^user/$", rest_auth_views.UserDetailsView.as_view(), name="rest_user_details"
+    ),
+    url(
+        r"^password/change/$",
+        views.PasswordChangeView.as_view(),
+        name="rest_password_change",
+    ),
+    # Registration URLs
+    url(r"^registration/$", views.RegisterView.as_view(), name="rest_register"),
+    url(
+        r"^registration/verify-email/?$",
+        views.VerifyEmailView.as_view(),
         name="rest_verify_email",
     ),
     url(
-        r"^change-password/$",
-        rest_auth_views.PasswordChangeView.as_view(),
+        r"^registration/change-password/?$",
+        views.PasswordChangeView.as_view(),
         name="change_password",
     ),
     # This url is used by django-allauth and empty TemplateView is
@@ -28,7 +48,7 @@ urlpatterns = [
     # view from:
     # djang-allauth https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L190
     url(
-        r"^account-confirm-email/(?P<key>\w+)/$",
+        r"^registration/account-confirm-email/(?P<key>\w+)/?$",
         TemplateView.as_view(),
         name="account_confirm_email",
     ),

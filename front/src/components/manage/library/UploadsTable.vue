@@ -18,7 +18,7 @@
           </select>
         </div>
         <div class="field">
-          <label><translate translate-context="Content/Library/*/Noun">Import status</translate></label>
+          <label><translate translate-context="Content/*/*/Noun">Import status</translate></label>
           <select class="ui dropdown" @change="addSearchToken('status', $event.target.value)" :value="getTokenValue('status', '')">
             <option value=""><translate translate-context="Content/*/Dropdown">All</translate></option>
             <option value="pending"><translate translate-context="Content/Library/*/Short">Pending</translate></option>
@@ -57,9 +57,9 @@
         action-url="manage/library/uploads/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Name</translate></th>
-          <th><translate translate-context="*/*/*">Library</translate></th>
-          <th><translate translate-context="*/*/*">Account</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Library</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Account</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="*/*/*">Visibility</translate></th>
           <th><translate translate-context="Content/*/*/Noun">Import status</translate></th>

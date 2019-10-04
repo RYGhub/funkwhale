@@ -2,6 +2,7 @@
 
 export default {
   clone: require('lodash/clone'),
+  keys: require('lodash/keys'),
   debounce: require('lodash/debounce'),
   get: require('lodash/get'),
   merge: require('lodash/merge'),
@@ -12,4 +13,5 @@ export default {
   uniq: require('lodash/uniq'),
   remove: require('lodash/remove'),
   reverse: require('lodash/reverse'),
+  isEqual: require('lodash/isEqual'),
 }

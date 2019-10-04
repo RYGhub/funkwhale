@@ -1,34 +1,45 @@
+import datetime
 import io
 import magic
 import os
 import urllib.parse
+import uuid
 
 import pytest
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 
 from funkwhale_api.common import utils
 from funkwhale_api.federation import api_serializers as federation_api_serializers
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.music import licenses, models, serializers, tasks, views
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_artist_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__album__artist__set_tags=tags,
     ).track
     artist = track.artist
     request = api_request.get("/")
-    qs = artist.__class__.objects.with_albums()
+    qs = artist.__class__.objects.with_albums().prefetch_related(
+        Prefetch("tracks", to_attr="_prefetched_tracks")
+    )
     serializer = serializers.ArtistWithAlbumsSerializer(
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
     for artist in serializer.data:
+        artist["tags"] = tags
         for album in artist["albums"]:
             album["is_playable"] = True
+
     url = reverse("api:v1:artists-list")
     response = logged_in_api_client.get(url)
 
@@ -37,8 +48,11 @@ def test_artist_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_album_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__album__set_tags=tags,
     ).track
     album = track.album
     request = api_request.get("/")
@@ -47,6 +61,8 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
+    for album in serializer.data:
+        album["tags"] = tags
     url = reverse("api:v1:albums-list")
     response = logged_in_api_client.get(url)
 
@@ -55,8 +71,11 @@ def test_album_list_serializer(api_request, factories, logged_in_api_client):
 
 
 def test_track_list_serializer(api_request, factories, logged_in_api_client):
+    tags = ["tag1", "tag2"]
     track = factories["music.Upload"](
-        library__privacy_level="everyone", import_status="finished"
+        library__privacy_level="everyone",
+        import_status="finished",
+        track__set_tags=tags,
     ).track
     request = api_request.get("/")
     qs = track.__class__.objects.with_playable_uploads(None)
@@ -64,6 +83,8 @@ def test_track_list_serializer(api_request, factories, logged_in_api_client):
         qs, many=True, context={"request": request}
     )
     expected = {"count": 1, "next": None, "previous": None, "results": serializer.data}
+    for track in serializer.data:
+        track["tags"] = tags
     url = reverse("api:v1:tracks-list")
     response = logged_in_api_client.get(url)
 
@@ -205,13 +226,34 @@ def test_serve_file_in_place(
     assert response[headers[proxy]] == expected
 
 
+def test_serve_file_in_place_nginx_encode_url(
+    factories, api_client, preferences, settings
+):
+    preferences["common__api_authentication_required"] = False
+    settings.PROTECT_FILE_PATH = "/_protected/music"
+    settings.REVERSE_PROXY_TYPE = "nginx"
+    settings.MUSIC_DIRECTORY_PATH = "/app/music"
+    settings.MUSIC_DIRECTORY_SERVE_PATH = "/app/music"
+    upload = factories["music.Upload"](
+        in_place=True,
+        import_status="finished",
+        source="file:///app/music/hello/world%?.mp3",
+        library__privacy_level="everyone",
+    )
+    response = api_client.get(upload.track.listen_url)
+    expected = "/_protected/music/hello/world%25%3F.mp3"
+
+    assert response.status_code == 200
+    assert response["X-Accel-Redirect"] == expected
+
+
 @pytest.mark.parametrize(
     "proxy,serve_path,expected",
     [
         ("apache2", "/host/music", "/host/music/hello/worldéà.mp3"),
         ("apache2", "/app/music", "/app/music/hello/worldéà.mp3"),
-        ("nginx", "/host/music", "/_protected/music/hello/worldéà.mp3"),
-        ("nginx", "/app/music", "/_protected/music/hello/worldéà.mp3"),
+        ("nginx", "/host/music", "/_protected/music/hello/world%C3%A9%C3%A0.mp3"),
+        ("nginx", "/app/music", "/_protected/music/hello/world%C3%A9%C3%A0.mp3"),
     ],
 )
 def test_serve_file_in_place_utf8(
@@ -811,3 +853,131 @@ def test_oembed_artist(factories, no_api_auth, api_client, settings):
     response = api_client.get(url, {"url": artist_url, "format": "json"})
 
     assert response.data == expected
+
+
+def test_oembed_playlist(factories, no_api_auth, api_client, settings):
+    settings.FUNKWHALE_URL = "http://test"
+    settings.FUNKWHALE_EMBED_URL = "http://embed"
+    playlist = factories["playlists.Playlist"](privacy_level="everyone")
+    track = factories["music.Upload"](playable=True).track
+    playlist.insert_many([track])
+    url = reverse("api:v1:oembed")
+    playlist_url = "https://test.com/library/playlists/{}".format(playlist.pk)
+    iframe_src = "http://embed?type=playlist&id={}".format(playlist.pk)
+    expected = {
+        "version": "1.0",
+        "type": "rich",
+        "provider_name": settings.APP_NAME,
+        "provider_url": settings.FUNKWHALE_URL,
+        "height": 400,
+        "width": 600,
+        "title": playlist.name,
+        "description": playlist.name,
+        "thumbnail_url": federation_utils.full_url(
+            track.album.cover.crop["400x400"].url
+        ),
+        "thumbnail_height": 400,
+        "thumbnail_width": 400,
+        "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
+            iframe_src
+        ),
+        "author_name": playlist.name,
+        "author_url": federation_utils.full_url(
+            utils.spa_reverse("library_playlist", kwargs={"pk": playlist.pk})
+        ),
+    }
+
+    response = api_client.get(url, {"url": playlist_url, "format": "json"})
+
+    assert response.data == expected
+
+
+@pytest.mark.parametrize(
+    "factory_name, url_name",
+    [
+        ("music.Artist", "api:v1:artists-detail"),
+        ("music.Album", "api:v1:albums-detail"),
+        ("music.Track", "api:v1:tracks-detail"),
+    ],
+)
+def test_refresh_remote_entity_when_param_is_true(
+    factories,
+    factory_name,
+    url_name,
+    mocker,
+    logged_in_api_client,
+    queryset_equal_queries,
+):
+    obj = factories[factory_name](mbid=None)
+
+    assert obj.is_local is False
+
+    new_mbid = uuid.uuid4()
+
+    def fake_refetch(obj, queryset):
+        obj.mbid = new_mbid
+        return obj
+
+    refetch_obj = mocker.patch.object(views, "refetch_obj", side_effect=fake_refetch)
+    url = reverse(url_name, kwargs={"pk": obj.pk})
+    response = logged_in_api_client.get(url, {"refresh": "true"})
+
+    assert response.status_code == 200
+    assert response.data["mbid"] == str(new_mbid)
+    assert refetch_obj.call_count == 1
+    assert refetch_obj.call_args[0][0] == obj
+
+
+@pytest.mark.parametrize("param", ["false", "0", ""])
+def test_refresh_remote_entity_no_param(
+    factories, param, mocker, logged_in_api_client, service_actor
+):
+    obj = factories["music.Artist"](mbid=None)
+
+    assert obj.is_local is False
+
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    url = reverse("api:v1:artists-detail", kwargs={"pk": obj.pk})
+    response = logged_in_api_client.get(url, {"refresh": param})
+
+    assert response.status_code == 200
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj_not_local(mocker, factories, service_actor):
+    obj = factories["music.Artist"](local=True)
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    assert views.refetch_obj(obj, obj.__class__.objects.all()) == obj
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj_last_fetch_date_too_close(
+    mocker, factories, settings, service_actor
+):
+    settings.FEDERATION_OBJECT_FETCH_DELAY = 300
+    obj = factories["music.Artist"]()
+    factories["federation.Fetch"](
+        object=obj,
+        creation_date=timezone.now()
+        - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY - 1),
+    )
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    assert views.refetch_obj(obj, obj.__class__.objects.all()) == obj
+    fetch_task.assert_not_called()
+    assert service_actor.fetches.count() == 0
+
+
+def test_refetch_obj(mocker, factories, settings, service_actor):
+    settings.FEDERATION_OBJECT_FETCH_DELAY = 300
+    obj = factories["music.Artist"]()
+    factories["federation.Fetch"](
+        object=obj,
+        creation_date=timezone.now()
+        - datetime.timedelta(minutes=settings.FEDERATION_OBJECT_FETCH_DELAY + 1),
+    )
+    fetch_task = mocker.patch.object(federation_tasks, "fetch")
+    views.refetch_obj(obj, obj.__class__.objects.all())
+    fetch = obj.fetches.filter(actor=service_actor).order_by("-creation_date").first()
+    fetch_task.assert_called_once_with(fetch_id=fetch.pk)

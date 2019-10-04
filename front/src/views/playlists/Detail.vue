@@ -31,6 +31,14 @@
           <template v-if="edit"><translate translate-context="Content/Playlist/Button.Label/Verb">End edition</translate></template>
           <template v-else><translate translate-context="Content/*/Button.Label/Verb">Edit</translate></template>
         </button>
+        <button
+          class="ui icon labeled button"
+          v-if="playlist.privacy_level === 'everyone' && playlist.is_playable"
+          @click="showEmbedModal = !showEmbedModal">
+          <i class="code icon"></i>
+          <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
+        </button>
+
         <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
           <i class="trash icon"></i> <translate translate-context="*/*/*/Verb">Delete</translate>
           <p slot="modal-header" v-translate="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action" :translate-params="{playlist: playlist.name}">
@@ -40,6 +48,23 @@
           <div slot="modal-confirm"><translate translate-context="Popup/Playlist/Button.Label/Verb">Delete playlist</translate></div>
         </dangerous-button>
       </div>
+      <modal v-if="playlist.privacy_level === 'everyone' && playlist.is_playable" :show.sync="showEmbedModal">
+        <div class="header">
+          <translate translate-context="Popup/Album/Title/Verb">Embed this playlist on your website</translate>
+        </div>
+        <div class="content">
+          <div class="description">
+            <embed-wizard type="playlist" :id="playlist.id" />
+
+          </div>
+        </div>
+        <div class="actions">
+          <div class="ui deny button">
+            <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
+          </div>
+        </div>
+      </modal>
+
     </section>
     <section class="ui vertical stripe segment">
       <template v-if="edit">
@@ -49,7 +74,7 @@
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
       <template v-else>
-        <h2><translate translate-context="*/*/*/Noun">Tracks</translate></h2>
+        <h2><translate translate-context="*/*/*">Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
     </section>
@@ -61,6 +86,8 @@ import TrackTable from "@/components/audio/track/Table"
 import RadioButton from "@/components/radios/Button"
 import PlayButton from "@/components/audio/PlayButton"
 import PlaylistEditor from "@/components/playlists/Editor"
+import EmbedWizard from "@/components/audio/EmbedWizard"
+import Modal from '@/components/semantic/Modal'
 
 export default {
   props: {
@@ -71,7 +98,9 @@ export default {
     PlaylistEditor,
     TrackTable,
     PlayButton,
-    RadioButton
+    RadioButton,
+    Modal,
+    EmbedWizard,
   },
   data: function() {
     return {
@@ -79,7 +108,8 @@ export default {
       isLoading: false,
       playlist: null,
       tracks: [],
-      playlistTracks: []
+      playlistTracks: [],
+      showEmbedModal: false,
     }
   },
   created: function() {
@@ -88,7 +118,7 @@ export default {
   computed: {
     labels() {
       return {
-        playlist: this.$pgettext('Head/Playlist/Title', 'Playlist')
+        playlist: this.$pgettext('*/*/*', 'Playlist')
       }
     }
   },

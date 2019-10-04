@@ -1,19 +1,26 @@
 <template>
   <div class="ui fluid category search">
     <slot></slot><div class="ui icon input">
-      <input class="prompt" name="search" :placeholder="labels.placeholder" type="text">
+      <input class="prompt" ref="search" name="search" :placeholder="labels.placeholder" type="text" @keydown.esc="$event.target.blur()">
       <i class="search icon"></i>
     </div>
     <div class="results"></div>
     <slot name="after"></slot>
+    <GlobalEvents
+      @keydown.shift.f.prevent.exact="focusSearch"
+    />
   </div>
 </template>
 
 <script>
 import jQuery from 'jquery'
 import router from '@/router'
+import GlobalEvents from "@/components/utils/global-events"
 
 export default {
+  components: {
+  GlobalEvents,
+  },
   computed: {
     labels () {
       return {
@@ -25,7 +32,20 @@ export default {
     let artistLabel = this.$pgettext('*/*/*/Noun', 'Artist')
     let albumLabel = this.$pgettext('*/*/*', 'Album')
     let trackLabel = this.$pgettext('*/*/*/Noun', 'Track')
+    let tagLabel = this.$pgettext('*/*/*/Noun', 'Tag')
     let self = this
+    var searchQuery;
+
+    jQuery(this.$el).keypress(function(e) {
+      if(e.which == 13) {
+        // Cancel any API search request to backend…
+        jQuery(this.$el).search('cancel query');
+        // Go direct to the artist page…
+        router.push("/library/artists?query=" + searchQuery + "&page=1&paginateBy=25&ordering=name");
+	}
+    });
+
+
     jQuery(this.$el).search({
       type: 'category',
       minCharacters: 3,
@@ -34,6 +54,7 @@ export default {
       },
       onSearchQuery (query) {
         self.$emit('search')
+        searchQuery = query;
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
@@ -55,6 +76,9 @@ export default {
               },
               getDescription (r) {
                 return ''
+              },
+              getId (t) {
+                return t.id
               }
             },
             {
@@ -65,7 +89,10 @@ export default {
                 return r.title
               },
               getDescription (r) {
-                return ''
+                return r.artist.name
+              },
+              getId (t) {
+                return t.id
               }
             },
             {
@@ -76,7 +103,24 @@ export default {
                 return r.title
               },
               getDescription (r) {
+                return `${r.album.artist.name} - ${r.album.title}`
+              },
+              getId (t) {
+                return t.id
+              }
+            },
+            {
+              code: 'tags',
+              route: 'library.tags.detail',
+              name: tagLabel,
+              getTitle (r) {
+                return `#${r.name}`
+              },
+              getDescription (r) {
                 return ''
+              },
+              getId (t) {
+                return t.name
               }
             }
           ]
@@ -86,13 +130,14 @@ export default {
               results: []
             }
             initialResponse[category.code].forEach(result => {
+              let id = category.getId(result)
               results[category.code].results.push({
                 title: category.getTitle(result),
-                id: result.id,
+                id,
                 routerUrl: {
                   name: category.route,
                   params: {
-                    id: result.id
+                    id
                   }
                 },
                 description: category.getDescription(result)
@@ -104,6 +149,11 @@ export default {
         url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }
     })
+  },
+  methods: {
+    focusSearch () {
+      this.$refs.search.focus()
+    },
   }
 }
 </script>

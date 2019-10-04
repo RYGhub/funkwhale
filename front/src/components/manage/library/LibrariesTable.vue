@@ -46,12 +46,12 @@
         action-url="manage/library/libraries/action/"
         :filters="actionFilters">
         <template slot="header-cells">
-          <th><translate translate-context="*/*/*">Name</translate></th>
-          <th><translate translate-context="*/*/*">Account</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Name</translate></th>
+          <th><translate translate-context="*/*/*/Noun">Account</translate></th>
           <th><translate translate-context="Content/Moderation/*/Noun">Domain</translate></th>
           <th><translate translate-context="*/*/*">Visibility</translate></th>
-          <th><translate translate-context="Content/*/*/Noun">Uploads</translate></th>
-          <th><translate translate-context="Content/*/*/Noun">Followers</translate></th>
+          <th><translate translate-context="*/*/*">Uploads</translate></th>
+          <th><translate translate-context="Content/Federation/*/Noun">Followers</translate></th>
           <th><translate translate-context="Content/*/*/Noun">Creation date</translate></th>
         </template>
         <template slot="row-cells" slot-scope="scope">

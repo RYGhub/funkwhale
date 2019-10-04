@@ -1,0 +1,35 @@
+
+
+.theme-light {
+
+  .main.pusher > .ui.secondary.menu {
+    box-shadow: inset 0px -2px 0px 0px rgba(34, 36, 38, 0.15);
+    background-color: white;
+    .ui.item {
+      &.active {
+        box-shadow: inset 0px -2px 0px 0px #000;
+      }
+    }
+  }
+
+  .discrete {
+    color: rgba(0, 0, 0, 0.87);
+  }
+  .playlist.card {
+    .attached.button {
+      background-color: rgb(243, 244, 245);
+    }
+  }
+
+  .disabled-row {
+    color: rgba(40, 40, 40, 0.3);
+  }
+  footer p {
+    color: grey;
+  }
+
+  footer#footer div.item:hover {
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+}

@@ -21,7 +21,7 @@ export default {
   computed: {
     labels() {
       return {
-        title: this.$pgettext('*/*/*', 'Artists')
+        title: this.$pgettext('*/*/*/Noun', 'Artists')
       }
     }
   }

@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import jsonld
-from funkwhale_api.music import licenses, metadata, signals, tasks
+from funkwhale_api.music import licenses, metadata, models, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,6 +18,7 @@ DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
+    add_tags = mocker.patch("funkwhale_api.tags.models.add_tags")
     metadata = {
         "title": "Test track",
         "artists": [{"name": "Test artist"}],
@@ -26,6 +27,7 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
         "disc_number": 2,
         "license": "Hello world: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
+        "tags": ["Punk", "Rock"],
     }
     match_license = mocker.spy(licenses, "match")
 
@@ -44,6 +46,9 @@ def test_can_create_track_from_file_metadata_no_mbid(db, mocker):
     assert track.artist.mbid is None
     assert track.artist.attributed_to is None
     match_license.assert_called_once_with(metadata["license"], metadata["copyright"])
+    add_tags.assert_any_call(track, *metadata["tags"])
+    add_tags.assert_any_call(track.artist, *[])
+    add_tags.assert_any_call(track.album, *[])
 
 
 def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
@@ -72,6 +77,32 @@ def test_can_create_track_from_file_metadata_attributed_to(factories, mocker):
     assert track.artist.name == metadata["artists"][0]["name"]
     assert track.artist.mbid is None
     assert track.artist.attributed_to == actor
+
+
+def test_can_create_track_from_file_metadata_truncates_too_long_values(
+    factories, mocker
+):
+    metadata = {
+        "title": "a" * 5000,
+        "artists": [{"name": "b" * 5000}],
+        "album": {"title": "c" * 5000, "release_date": datetime.date(2012, 8, 15)},
+        "position": 4,
+        "disc_number": 2,
+        "copyright": "d" * 5000,
+    }
+
+    track = tasks.get_track_from_import_metadata(metadata)
+
+    assert track.title == metadata["title"][: models.MAX_LENGTHS["TRACK_TITLE"]]
+    assert track.copyright == metadata["copyright"][: models.MAX_LENGTHS["COPYRIGHT"]]
+    assert (
+        track.album.title
+        == metadata["album"]["title"][: models.MAX_LENGTHS["ALBUM_TITLE"]]
+    )
+    assert (
+        track.artist.name
+        == metadata["artists"][0]["name"][: models.MAX_LENGTHS["ARTIST_NAME"]]
+    )
 
 
 def test_can_create_track_from_file_metadata_featuring(factories):
@@ -555,6 +586,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "license": "http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "2018 Someone",
         "attributedTo": "http://track.attributed",
+        "tag": [{"type": "Hashtag", "name": "TrackTag"}],
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -562,6 +594,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "name": "Purple album",
             "musicbrainzId": str(uuid.uuid4()),
             "released": released.isoformat(),
+            "tag": [{"type": "Hashtag", "name": "AlbumTag"}],
             "attributedTo": "http://album.attributed",
             "artists": [
                 {
@@ -571,6 +604,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "name": "John Smith",
                     "musicbrainzId": str(uuid.uuid4()),
                     "attributedTo": "http://album-artist.attributed",
+                    "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
                 }
             ],
             "cover": {
@@ -587,6 +621,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "name": "Bob Smith",
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": "http://artist.attributed",
+                "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
             }
         ],
     }
@@ -602,6 +637,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "fdate": serializer.validated_data["published"],
         "fid": payload["id"],
         "attributed_to": references["http://track.attributed"],
+        "tags": ["TrackTag"],
         "album": {
             "title": payload["album"]["name"],
             "attributed_to": references["http://album.attributed"],
@@ -609,6 +645,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "mbid": payload["album"]["musicbrainzId"],
             "fid": payload["album"]["id"],
             "fdate": serializer.validated_data["album"]["published"],
+            "tags": ["AlbumTag"],
             "artists": [
                 {
                     "name": a["name"],
@@ -618,6 +655,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "fdate": serializer.validated_data["album"]["artists"][i][
                         "published"
                     ],
+                    "tags": ["AlbumArtistTag"],
                 }
                 for i, a in enumerate(payload["album"]["artists"])
             ],
@@ -631,6 +669,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "fid": a["id"],
                 "fdate": serializer.validated_data["artists"][i]["published"],
                 "attributed_to": references["http://artist.attributed"],
+                "tags": ["ArtistTag"],
             }
             for i, a in enumerate(payload["artists"])
         ],
@@ -830,3 +869,34 @@ def test_update_library_entity(factories, mocker):
 
     artist.refresh_from_db()
     assert artist.name == "Hello"
+
+
+@pytest.mark.parametrize(
+    "name, ext, mimetype",
+    [
+        ("cover", "png", "image/png"),
+        ("cover", "jpg", "image/jpeg"),
+        ("cover", "jpeg", "image/jpeg"),
+        ("folder", "png", "image/png"),
+        ("folder", "jpg", "image/jpeg"),
+        ("folder", "jpeg", "image/jpeg"),
+    ],
+)
+def test_get_cover_from_fs(name, ext, mimetype, tmpdir):
+    cover_path = os.path.join(tmpdir, "{}.{}".format(name, ext))
+    content = "Hello"
+    with open(cover_path, "w") as f:
+        f.write(content)
+
+    expected = {"mimetype": mimetype, "content": content.encode()}
+    assert tasks.get_cover_from_fs(tmpdir) == expected
+
+
+@pytest.mark.parametrize("name", ["cover.gif", "folder.gif"])
+def test_get_cover_from_fs_ignored(name, tmpdir):
+    cover_path = os.path.join(tmpdir, name)
+    content = "Hello"
+    with open(cover_path, "w") as f:
+        f.write(content)
+
+    assert tasks.get_cover_from_fs(tmpdir) is None

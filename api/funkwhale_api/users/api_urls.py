@@ -1,8 +1,8 @@
-from rest_framework import routers
+from funkwhale_api.common import routers
 
 from . import views
 
-router = routers.SimpleRouter()
+router = routers.OptionalSlashRouter()
 router.register(r"users", views.UserViewSet, "users")
 
 urlpatterns = router.urls

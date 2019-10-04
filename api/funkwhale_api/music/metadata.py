@@ -1,4 +1,5 @@
 import base64
+from collections.abc import Mapping
 import datetime
 import logging
 import pendulum
@@ -9,12 +10,13 @@ import mutagen.oggvorbis
 import mutagen.flac
 
 from rest_framework import serializers
-from rest_framework.compat import Mapping
+
+from funkwhale_api.tags import models as tags_models
 
 logger = logging.getLogger(__name__)
 NODEFAULT = object()
 # default title used when imported tracks miss the `Album` tag, see #122
-UNKWOWN_ALBUM = "[Unknown Album]"
+UNKNOWN_ALBUM = "[Unknown Album]"
 
 
 class TagNotFound(KeyError):
@@ -63,6 +65,45 @@ def clean_id3_pictures(apic):
                 "content": p.data,
                 "description": p.desc,
                 "type": p.type.real,
+            }
+        )
+    return pictures
+
+
+def get_mp4_tag(f, k):
+    if k == "pictures":
+        return f.get("covr")
+    raw_value = f.get(k, None)
+
+    if not raw_value:
+        raise TagNotFound(k)
+
+    value = raw_value[0]
+    try:
+        return value.decode()
+    except AttributeError:
+        return value
+
+
+def get_mp4_position(raw_value):
+    return raw_value[0]
+
+
+def clean_mp4_pictures(raw_pictures):
+    pictures = []
+    for p in list(raw_pictures):
+        if p.imageformat == p.FORMAT_JPEG:
+            mimetype = "image/jpeg"
+        elif p.imageformat == p.FORMAT_PNG:
+            mimetype = "image/png"
+        else:
+            continue
+        pictures.append(
+            {
+                "mimetype": mimetype,
+                "content": bytes(p),
+                "description": "",
+                "type": mutagen.id3.PictureType.COVER_FRONT,
             }
         )
     return pictures
@@ -144,6 +185,11 @@ CONF = {
             "mbid": {"field": "musicbrainz_trackid"},
             "license": {},
             "copyright": {},
+            "genre": {},
+            "pictures": {
+                "field": "metadata_block_picture",
+                "to_application": clean_ogg_pictures,
+            },
         },
     },
     "OggVorbis": {
@@ -162,6 +208,7 @@ CONF = {
             "mbid": {"field": "musicbrainz_trackid"},
             "license": {},
             "copyright": {},
+            "genre": {},
             "pictures": {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
@@ -184,6 +231,7 @@ CONF = {
             "mbid": {"field": "MusicBrainz Track Id"},
             "license": {},
             "copyright": {},
+            "genre": {},
         },
     },
     "MP3": {
@@ -199,11 +247,39 @@ CONF = {
             "date": {"field": "TDRC"},
             "musicbrainz_albumid": {"field": "MusicBrainz Album Id"},
             "musicbrainz_artistid": {"field": "MusicBrainz Artist Id"},
+            "genre": {"field": "TCON"},
             "musicbrainz_albumartistid": {"field": "MusicBrainz Album Artist Id"},
             "mbid": {"field": "UFID", "getter": get_mp3_recording_id},
             "pictures": {},
             "license": {"field": "WCOP"},
             "copyright": {"field": "TCOP"},
+        },
+    },
+    "MP4": {
+        "getter": get_mp4_tag,
+        "clean_pictures": clean_mp4_pictures,
+        "fields": {
+            "position": {"field": "trkn", "to_application": get_mp4_position},
+            "disc_number": {"field": "disk", "to_application": get_mp4_position},
+            "title": {"field": "©nam"},
+            "artist": {"field": "©ART"},
+            "album_artist": {"field": "aART"},
+            "album": {"field": "©alb"},
+            "date": {"field": "©day"},
+            "musicbrainz_albumid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Album Id"
+            },
+            "musicbrainz_artistid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Artist Id"
+            },
+            "genre": {"field": "©gen"},
+            "musicbrainz_albumartistid": {
+                "field": "----:com.apple.iTunes:MusicBrainz Album Artist Id"
+            },
+            "mbid": {"field": "----:com.apple.iTunes:MusicBrainz Track Id"},
+            "pictures": {},
+            "license": {"field": "----:com.apple.iTunes:LICENSE"},
+            "copyright": {"field": "cprt"},
         },
     },
     "FLAC": {
@@ -220,6 +296,7 @@ CONF = {
             "musicbrainz_albumid": {},
             "musicbrainz_artistid": {},
             "musicbrainz_albumartistid": {},
+            "genre": {},
             "mbid": {"field": "musicbrainz_trackid"},
             "test": {},
             "pictures": {},
@@ -431,7 +508,7 @@ class AlbumField(serializers.Field):
         except TagNotFound:
             title = ""
 
-        title = title.strip() or UNKWOWN_ALBUM
+        title = title.strip() or UNKNOWN_ALBUM
         final = {
             "title": title,
             "release_date": data.get("date", None),
@@ -485,6 +562,58 @@ class PermissiveDateField(serializers.CharField):
         return None
 
 
+def extract_tags_from_genre(string):
+    tags = []
+    delimiter = "@@@@@"
+    for d in [" - ", ",", ";", "/"]:
+        # Replace common tags separators by a custom delimiter
+        string = string.replace(d, delimiter)
+
+    # loop on the parts (splitting on our custom delimiter)
+    for tag in string.split(delimiter):
+        tag = tag.strip()
+        for d in ["-"]:
+            # preparation for replacement so that Pop-Rock becomes Pop Rock, then PopRock
+            # (step 1, step 2 happens below)
+            tag = tag.replace(d, " ")
+        if not tag:
+            continue
+        final_tag = ""
+        if not tags_models.TAG_REGEX.match(tag.replace(" ", "")):
+            # the string contains some non words chars ($, €, etc.), right now
+            # we simply skip such tags
+            continue
+        # concatenate the parts and uppercase them so that 'pop rock' becomes 'PopRock'
+        if len(tag.split(" ")) == 1:
+            # we append the tag "as is", because it doesn't contain any space
+            tags.append(tag)
+            continue
+        for part in tag.split(" "):
+            # the tag contains space, there's work to do to have consistent case
+            # 'pop rock' -> 'PopRock'
+            # (step 2)
+            if not part:
+                continue
+            final_tag += part[0].upper() + part[1:]
+        if final_tag:
+            tags.append(final_tag)
+    return tags
+
+
+class TagsField(serializers.CharField):
+    def get_value(self, data):
+        return data
+
+    def to_internal_value(self, data):
+        try:
+            value = data.get("genre") or ""
+        except TagNotFound:
+            return []
+        value = super().to_internal_value(str(value))
+
+        return extract_tags_from_genre(value)
+
+
 class MBIDField(serializers.UUIDField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("allow_null", True)
@@ -533,6 +662,7 @@ class TrackMetadataSerializer(serializers.Serializer):
     copyright = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     license = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     mbid = MBIDField()
+    tags = TagsField(allow_blank=True, allow_null=True, required=False)
 
     album = AlbumField()
     artists = ArtistField()
@@ -544,6 +674,7 @@ class TrackMetadataSerializer(serializers.Serializer):
         "position",
         "disc_number",
         "mbid",
+        "tags",
     ]
 
     def validate(self, validated_data):
@@ -553,7 +684,7 @@ class TrackMetadataSerializer(serializers.Serializer):
                 v = validated_data[field]
             except KeyError:
                 continue
-            if v in ["", None]:
+            if v in ["", None, []]:
                 validated_data.pop(field)
         return validated_data
 

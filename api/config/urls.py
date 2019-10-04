@@ -19,8 +19,7 @@ urlpatterns = [
             ("funkwhale_api.federation.urls", "federation"), namespace="federation"
         ),
     ),
-    url(r"^api/v1/auth/", include("rest_auth.urls")),
-    url(r"^api/v1/auth/registration/", include("funkwhale_api.users.rest_auth_urls")),
+    url(r"^api/v1/auth/", include("funkwhale_api.users.rest_auth_urls")),
     url(r"^accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
 ]

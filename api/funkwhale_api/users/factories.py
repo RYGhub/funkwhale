@@ -42,11 +42,20 @@ class InvitationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         expired = factory.Trait(expiration_date=factory.LazyFunction(timezone.now))
 
 
+class PasswordSetter(factory.PostGenerationMethodCall):
+    def call(self, instance, step, context):
+        if context.value_provided and context.value is None:
+            # disable setting the password, it's set by hand outside of the factory
+            return
+
+        return super().call(instance, step, context)
+
+
 @registry.register
 class UserFactory(factory.django.DjangoModelFactory):
-    username = factory.Sequence(lambda n: "user-{0}".format(n))
-    email = factory.Sequence(lambda n: "user-{0}@example.com".format(n))
-    password = factory.PostGenerationMethodCall("set_password", "test")
+    username = factory.Faker("user_name")
+    email = factory.Faker("email")
+    password = password = PasswordSetter("set_password", "test")
     subsonic_api_token = None
     groups = ManyToManyFromList("groups")
     avatar = factory.django.ImageField()

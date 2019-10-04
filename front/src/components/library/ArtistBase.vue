@@ -21,6 +21,7 @@
               </div>
             </div>
           </h2>
+          <tags-list v-if="object.tags && object.tags.length > 0" :tags="object.tags"></tags-list>
           <div class="ui hidden divider"></div>
           <div class="header-buttons">
             <div class="ui buttons">
@@ -84,6 +85,16 @@
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
                   <div class="divider"></div>
+                  <div
+                    role="button"
+                    class="basic item"
+                    v-for="obj in getReportableObjs({artist: object})"
+                    :key="obj.target.type + obj.target.id"
+                    @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+                    <i class="share icon" /> {{ obj.label }}
+                  </div>
+
+                  <div class="divider"></div>
                   <router-link class="basic item" v-if="$store.state.auth.availablePermissions['library']" :to="{name: 'manage.library.artists.detail', params: {id: object.id}}">
                     <i class="wrench icon"></i>
                     <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
@@ -123,17 +134,20 @@ import PlayButton from "@/components/audio/PlayButton"
 import EmbedWizard from "@/components/audio/EmbedWizard"
 import Modal from '@/components/semantic/Modal'
 import RadioButton from "@/components/radios/Button"
+import TagsList from "@/components/tags/List"
+import ReportMixin from '@/components/mixins/Report'
 
 const FETCH_URL = "albums/"
 
-
 export default {
+  mixins: [ReportMixin],
   props: ["id"],
   components: {
     PlayButton,
     EmbedWizard,
     Modal,
-    RadioButton
+    RadioButton,
+    TagsList,
   },
   data() {
     return {
@@ -175,7 +189,7 @@ export default {
 
       })
 
-      let artistPromise = axios.get("artists/" + this.id + "/").then(response => {
+      let artistPromise = axios.get("artists/" + this.id + "/", {params: {refresh: 'true'}}).then(response => {
         self.object = response.data
       })
       await trackPromise

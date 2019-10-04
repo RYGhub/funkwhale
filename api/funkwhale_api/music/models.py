@@ -9,6 +9,7 @@ import uuid
 import pendulum
 import pydub
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,7 +18,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from taggit.managers import TaggableManager
 
 from versatileimagefield.fields import VersatileImageField
 from versatileimagefield.image_warmer import VersatileImageFieldWarmer
@@ -29,9 +29,17 @@ from funkwhale_api.common import session
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.tags import models as tags_models
 from . import importers, metadata, utils
 
 logger = logging.getLogger(__name__)
+
+MAX_LENGTHS = {
+    "ARTIST_NAME": 255,
+    "ALBUM_TITLE": 255,
+    "TRACK_TITLE": 255,
+    "COPYRIGHT": 500,
+}
 
 
 def empty_dict():
@@ -126,6 +134,9 @@ class APIModelMixin(models.Model):
         parsed = urllib.parse.urlparse(self.fid)
         return parsed.hostname
 
+    def get_tags(self):
+        return list(sorted(self.tagged_items.values_list("tag__name", flat=True)))
+
 
 class License(models.Model):
     code = models.CharField(primary_key=True, max_length=100)
@@ -183,7 +194,7 @@ class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 
 
 class Artist(APIModelMixin):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=MAX_LENGTHS["ARTIST_NAME"])
     federation_namespace = "artists"
     musicbrainz_model = "artist"
     musicbrainz_mapping = {
@@ -200,19 +211,24 @@ class Artist(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_artists",
     )
+    tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
+
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
 
     def __str__(self):
         return self.name
 
-    @property
-    def tags(self):
-        t = []
-        for album in self.albums.all():
-            for tag in album.tags:
-                t.append(tag)
-        return set(t)
+    def get_absolute_url(self):
+        return "/library/artists/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/artists/{}".format(self.pk)
 
     @classmethod
     def get_or_create_from_name(cls, name, **kwargs):
@@ -266,7 +282,7 @@ class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 
 
 class Album(APIModelMixin):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=MAX_LENGTHS["ALBUM_TITLE"])
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
     release_date = models.DateField(null=True, blank=True)
     release_group_id = models.UUIDField(null=True, blank=True)
@@ -286,6 +302,13 @@ class Album(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_albums",
     )
+    tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
+
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
     api = musicbrainz.api.releases
     federation_namespace = "albums"
@@ -314,6 +337,7 @@ class Album(APIModelMixin):
         if data:
             extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
             extension = extensions.get(data["mimetype"], "jpg")
+            f = None
             if data.get("content"):
                 # we have to cover itself
                 f = ContentFile(data["content"])
@@ -333,18 +357,26 @@ class Album(APIModelMixin):
                     return
                 else:
                     f = ContentFile(response.content)
-            self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
-            self.save(update_fields=["cover"])
-            return self.cover.file
+            if f:
+                self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
+                self.save(update_fields=["cover"])
+                return self.cover.file
         if self.mbid:
             image_data = musicbrainz.api.images.get_front(str(self.mbid))
             f = ContentFile(image_data)
             self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
             self.save(update_fields=["cover"])
-        return self.cover.file
+        if self.cover:
+            return self.cover.file
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return "/library/albums/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/albums/{}".format(self.pk)
 
     @property
     def cover_path(self):
@@ -355,14 +387,6 @@ class Album(APIModelMixin):
         except NotImplementedError:
             # external storage
             return self.cover.name
-
-    @property
-    def tags(self):
-        t = []
-        for track in self.tracks.all():
-            for tag in track.tags.all():
-                t.append(tag)
-        return set(t)
 
     @classmethod
     def get_or_create_from_title(cls, title, **kwargs):
@@ -380,7 +404,8 @@ def import_tags(instance, cleaned_data, raw_data):
         except ValueError:
             continue
         tags_to_add.append(tag_data["name"])
-    instance.tags.add(*tags_to_add)
+
+    tags_models.add_tags(instance, *tags_to_add)
 
 
 def import_album(v):
@@ -430,7 +455,7 @@ def get_artist(release_list):
 
 
 class Track(APIModelMixin):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=MAX_LENGTHS["TRACK_TITLE"])
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
     disc_number = models.PositiveIntegerField(null=True, blank=True)
     position = models.PositiveIntegerField(null=True, blank=True)
@@ -454,7 +479,9 @@ class Track(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="attributed_tracks",
     )
-    copyright = models.CharField(max_length=500, null=True, blank=True)
+    copyright = models.CharField(
+        max_length=MAX_LENGTHS["COPYRIGHT"], null=True, blank=True
+    )
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
@@ -472,13 +499,24 @@ class Track(APIModelMixin):
     }
     import_hooks = [import_tags]
     objects = TrackQuerySet.as_manager()
-    tags = TaggableManager(blank=True)
+    tagged_items = GenericRelation(tags_models.TaggedItem)
+    fetches = GenericRelation(
+        "federation.Fetch",
+        content_type_field="object_content_type",
+        object_id_field="object_id",
+    )
 
     class Meta:
         ordering = ["album", "disc_number", "position"]
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return "/library/tracks/{}".format(self.pk)
+
+    def get_moderation_url(self):
+        return "/manage/library/tracks/{}".format(self.pk)
 
     def save(self, **kwargs):
         try:
@@ -1042,6 +1080,12 @@ class Library(federation_models.FederationMixin):
     )
     uploads_count = models.PositiveIntegerField(default=0)
     objects = LibraryQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name
+
+    def get_moderation_url(self):
+        return "/manage/library/libraries/{}".format(self.uuid)
 
     def get_federation_id(self):
         return federation_utils.full_url(

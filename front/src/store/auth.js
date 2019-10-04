@@ -1,7 +1,9 @@
+import Vue from 'vue'
 import axios from 'axios'
 import jwtDecode from 'jwt-decode'
 import logger from '@/logging'
 import router from '@/router'
+import lodash from '@/lodash'
 
 export default {
   namespaced: true,
@@ -73,6 +75,11 @@ export default {
     },
     permission: (state, {key, status}) => {
       state.availablePermissions[key] = status
+    },
+    profilePartialUpdate: (state, payload) => {
+      lodash.keys(payload).forEach((k) => {
+        Vue.set(state.profile, k, payload[k])
+      })
     }
   },
   actions: {
@@ -106,7 +113,7 @@ export default {
       router.push({name: 'index'})
     },
     check ({commit, dispatch, state}) {
-      logger.default.info('Checking authentication...')
+      logger.default.info('Checking authentication…')
       var jwt = state.token
       if (jwt) {
         commit('token', jwt)
@@ -126,7 +133,12 @@ export default {
             resolve(response.data)
           })
           dispatch('ui/fetchUnreadNotifications', null, { root: true })
-          dispatch('ui/fetchPendingReviewEdits', null, { root: true })
+          if (response.data.permissions.library) {
+            dispatch('ui/fetchPendingReviewEdits', null, { root: true })
+          }
+          if (response.data.permissions.moderation) {
+            dispatch('ui/fetchPendingReviewReports', null, { root: true })
+          }
           dispatch('favorites/fetch', null, { root: true })
           dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })

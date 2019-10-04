@@ -8,7 +8,7 @@
       </ul>
     </div>
     <div class="ui field">
-      <label><translate translate-context="Content/Applications/Input.Label/Noun">Name</translate></label>
+      <label><translate translate-context="*/*/*/Noun">Name</translate></label>
       <input name="name" required type="text" v-model="fields.name" />
     </div>
     <div class="ui field">
@@ -21,7 +21,7 @@
       </p>
     </div>
     <div class="ui field">
-      <label><translate translate-context="Content/Applications/Input.Label/Noun">Scopes</translate></label>
+      <label><translate translate-context="Content/*/*/Noun">Scopes</translate></label>
       <p>
         <translate translate-context="Content/Applications/Paragraph/">
           Checking the parent "Read" or "Write" scopes implies access to all the corresponding children scopes.

@@ -1,7 +1,9 @@
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
-
+const PurgecssPlugin = require('purgecss-webpack-plugin')
+const glob = require('glob-all')
+const path = require('path')
 let plugins = [
   // do not include moment.js locales since it's quite heavy
   new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -9,8 +11,20 @@ let plugins = [
 if (process.env.BUNDLE_ANALYZE === '1') {
   plugins.push(new BundleAnalyzerPlugin())
 }
+plugins.push(
+  new PurgecssPlugin({
+    paths: glob.sync([
+      path.join(__dirname, './public/index.html'),
+      path.join(__dirname, './public/embed.html'),
+      path.join(__dirname, './**/*.vue'),
+      path.join(__dirname, './src/**/*.js')
+    ]),
+    whitelist: ['scale']
+  }),
+)
 module.exports = {
   baseUrl: process.env.BASE_URL || '/front/',
+  productionSourceMap: false,
   pages: {
     embed: {
       entry: 'src/embed.js',
@@ -30,11 +44,7 @@ module.exports = {
   },
   configureWebpack: {
     plugins: plugins,
-    resolve: {
-      alias: {
-        'vue$': 'vue/dist/vue.esm.js'
-      }
-    }
+    devtool: false
   },
   devServer: {
     disableHostCheck: true,

@@ -6,11 +6,24 @@ export default {
       "label": "العربية"
     },
     {
+      "code": "zh_Hant",
+      "label": "漢語"
+    },
+    {
       "code": "en_US",
       "label": "English (United-States)"
-    },{
-      "code": "eo",
-      "label": "Esperanto"
+    },
+    {
+      "code": "en_GB",
+      "label": "English (UK)"
+    },
+    {
+      "code": "ca",
+      "label": "Català"
+    },
+    {
+      "code": "cs",
+      "label": "Čeština"
     },
     {
       "code": "de",

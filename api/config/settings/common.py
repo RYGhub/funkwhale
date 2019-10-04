@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 from __future__ import absolute_import, unicode_literals
 
 import datetime
-import logging
+import logging.config
+import sys
 
 from urllib.parse import urlsplit
 
@@ -20,13 +21,44 @@ from celery.schedules import crontab
 
 from funkwhale_api import __version__
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("funkwhale_api.config")
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path("funkwhale_api")
 
 env = environ.Env()
+
+LOGLEVEL = env("LOGLEVEL", default="info").upper()
+LOGGING_CONFIG = None
+logging.config.dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"}
+        },
+        "handlers": {
+            "console": {"class": "logging.StreamHandler", "formatter": "console"},
+            # # Add Handler for Sentry for `warning` and above
+            # 'sentry': {
+            #     'level': 'WARNING',
+            #     'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            # },
+        },
+        "loggers": {
+            "funkwhale_api": {
+                "level": LOGLEVEL,
+                "handlers": ["console"],
+                # required to avoid double logging with root logger
+                "propagate": False,
+            },
+            "": {"level": "WARNING", "handlers": ["console"]},
+        },
+    }
+)
+
 env_file = env("ENV_FILE", default=None)
 if env_file:
+    logger.info("Loading specified env file at %s", env_file)
     # we have an explicitely specified env file
     # so we try to load and it fail loudly if it does not exist
     env.read_env(env_file)
@@ -48,6 +80,11 @@ else:
         env.read_env(env_path)
         logger.info("Loaded env file at %s/.env", path)
         break
+
+FUNKWHALE_PLUGINS_PATH = env(
+    "FUNKWHALE_PLUGINS_PATH", default="/srv/funkwhale/plugins/"
+)
+sys.path.append(FUNKWHALE_PLUGINS_PATH)
 
 FUNKWHALE_HOSTNAME = None
 FUNKWHALE_HOSTNAME_SUFFIX = env("FUNKWHALE_HOSTNAME_SUFFIX", default=None)
@@ -124,7 +161,6 @@ THIRD_PARTY_APPS = (
     "oauth2_provider",
     "rest_framework",
     "rest_framework.authtoken",
-    "taggit",
     "rest_auth",
     "rest_auth.registration",
     "dynamic_preferences",
@@ -147,7 +183,6 @@ if RAVEN_ENABLED:
     }
     THIRD_PARTY_APPS += ("raven.contrib.django.raven_compat",)
 
-
 # Apps specific for this project go here.
 LOCAL_APPS = (
     "funkwhale_api.common.apps.CommonConfig",
@@ -160,29 +195,44 @@ LOCAL_APPS = (
     "funkwhale_api.requests",
     "funkwhale_api.favorites",
     "funkwhale_api.federation",
-    "funkwhale_api.moderation",
+    "funkwhale_api.moderation.apps.ModerationConfig",
     "funkwhale_api.radios",
     "funkwhale_api.history",
     "funkwhale_api.playlists",
     "funkwhale_api.subsonic",
+    "funkwhale_api.tags",
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+PLUGINS = [p for p in env.list("FUNKWHALE_PLUGINS", default=[]) if p]
+if PLUGINS:
+    logger.info("Running with the following plugins enabled: %s", ", ".join(PLUGINS))
+else:
+    logger.info("Running with no plugins")
+
+INSTALLED_APPS = (
+    DJANGO_APPS
+    + THIRD_PARTY_APPS
+    + LOCAL_APPS
+    + tuple(["{}.apps.Plugin".format(p) for p in PLUGINS])
+)
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = (
+    "django.middleware.security.SecurityMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "funkwhale_api.common.middleware.SPAFallbackMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "funkwhale_api.users.middleware.RecordActivityMiddleware",
+    "funkwhale_api.common.middleware.ThrottleStatusMiddleware",
 )
 
 # DEBUG
@@ -350,6 +400,8 @@ ASGI_APPLICATION = "config.routing.application"
 
 # This ensures that Django will be able to detect a secure connection
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -516,14 +568,32 @@ CELERY_BEAT_SCHEDULE = {
 
 NODEINFO_REFRESH_DELAY = env.int("NODEINFO_REFRESH_DELAY", default=3600 * 24)
 
+
+def get_user_secret_key(user):
+    from django.conf import settings
+
+    return settings.SECRET_KEY + str(user.secret_key)
+
+
 JWT_AUTH = {
     "JWT_ALLOW_REFRESH": True,
     "JWT_EXPIRATION_DELTA": datetime.timedelta(days=7),
     "JWT_REFRESH_EXPIRATION_DELTA": datetime.timedelta(days=30),
     "JWT_AUTH_HEADER_PREFIX": "JWT",
-    "JWT_GET_USER_SECRET_KEY": lambda user: user.secret_key,
+    "JWT_GET_USER_SECRET_KEY": get_user_secret_key,
 }
 OLD_PASSWORD_FIELD_ENABLED = True
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", default=8)},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 ACCOUNT_ADAPTER = "funkwhale_api.users.adapters.FunkwhaleAccountAdapter"
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = (
@@ -557,7 +627,150 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "NUM_PROXIES": env.int("NUM_PROXIES", default=1),
 }
+THROTTLING_ENABLED = env.bool("THROTTLING_ENABLED", default=True)
+if THROTTLING_ENABLED:
+    REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = env.list(
+        "THROTTLE_CLASSES",
+        default=["funkwhale_api.common.throttling.FunkwhaleThrottle"],
+    )
+
+THROTTLING_SCOPES = {
+    "*": {"anonymous": "anonymous-wildcard", "authenticated": "authenticated-wildcard"},
+    "create": {
+        "authenticated": "authenticated-create",
+        "anonymous": "anonymous-create",
+    },
+    "list": {"authenticated": "authenticated-list", "anonymous": "anonymous-list"},
+    "retrieve": {
+        "authenticated": "authenticated-retrieve",
+        "anonymous": "anonymous-retrieve",
+    },
+    "destroy": {
+        "authenticated": "authenticated-destroy",
+        "anonymous": "anonymous-destroy",
+    },
+    "update": {
+        "authenticated": "authenticated-update",
+        "anonymous": "anonymous-update",
+    },
+    "partial_update": {
+        "authenticated": "authenticated-update",
+        "anonymous": "anonymous-update",
+    },
+}
+
+THROTTLING_USER_RATES = env.dict("THROTTLING_RATES", default={})
+
+THROTTLING_RATES = {
+    "anonymous-wildcard": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-wildcard", "1000/h"),
+        "description": "Anonymous requests not covered by other limits",
+    },
+    "authenticated-wildcard": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-wildcard", "2000/h"),
+        "description": "Authenticated requests not covered by other limits",
+    },
+    "authenticated-create": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-create", "1000/hour"),
+        "description": "Authenticated POST requests",
+    },
+    "anonymous-create": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-create", "1000/day"),
+        "description": "Anonymous POST requests",
+    },
+    "authenticated-list": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-list", "10000/hour"),
+        "description": "Authenticated GET requests on resource lists",
+    },
+    "anonymous-list": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-list", "10000/day"),
+        "description": "Anonymous GET requests on resource lists",
+    },
+    "authenticated-retrieve": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-retrieve", "10000/hour"),
+        "description": "Authenticated GET requests on resource detail",
+    },
+    "anonymous-retrieve": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-retrieve", "10000/day"),
+        "description": "Anonymous GET requests on resource detail",
+    },
+    "authenticated-destroy": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-destroy", "500/hour"),
+        "description": "Authenticated DELETE requests on resource detail",
+    },
+    "anonymous-destroy": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-destroy", "1000/day"),
+        "description": "Anonymous DELETE requests on resource detail",
+    },
+    "authenticated-update": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-update", "1000/hour"),
+        "description": "Authenticated PATCH and PUT requests on resource detail",
+    },
+    "anonymous-update": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-update", "1000/day"),
+        "description": "Anonymous PATCH and PUT requests on resource detail",
+    },
+    # potentially spammy / dangerous endpoints
+    "authenticated-reports": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-reports", "100/day"),
+        "description": "Authenticated report submission",
+    },
+    "anonymous-reports": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-reports", "10/day"),
+        "description": "Anonymous report submission",
+    },
+    "authenticated-oauth-app": {
+        "rate": THROTTLING_USER_RATES.get("authenticated-oauth-app", "10/hour"),
+        "description": "Authenticated OAuth app creation",
+    },
+    "anonymous-oauth-app": {
+        "rate": THROTTLING_USER_RATES.get("anonymous-oauth-app", "10/day"),
+        "description": "Anonymous OAuth app creation",
+    },
+    "oauth-authorize": {
+        "rate": THROTTLING_USER_RATES.get("oauth-authorize", "100/hour"),
+        "description": "OAuth app authorization",
+    },
+    "oauth-token": {
+        "rate": THROTTLING_USER_RATES.get("oauth-token", "100/hour"),
+        "description": "OAuth token creation",
+    },
+    "oauth-revoke-token": {
+        "rate": THROTTLING_USER_RATES.get("oauth-revoke-token", "100/hour"),
+        "description": "OAuth token deletion",
+    },
+    "jwt-login": {
+        "rate": THROTTLING_USER_RATES.get("jwt-login", "30/hour"),
+        "description": "JWT token creation",
+    },
+    "jwt-refresh": {
+        "rate": THROTTLING_USER_RATES.get("jwt-refresh", "30/hour"),
+        "description": "JWT token refresh",
+    },
+    "signup": {
+        "rate": THROTTLING_USER_RATES.get("signup", "10/day"),
+        "description": "Account creation",
+    },
+    "verify-email": {
+        "rate": THROTTLING_USER_RATES.get("verify-email", "20/h"),
+        "description": "Email address confirmation",
+    },
+    "password-change": {
+        "rate": THROTTLING_USER_RATES.get("password-change", "20/h"),
+        "description": "Password change (when authenticated)",
+    },
+    "password-reset": {
+        "rate": THROTTLING_USER_RATES.get("password-reset", "20/h"),
+        "description": "Password reset request",
+    },
+    "password-reset-confirm": {
+        "rate": THROTTLING_USER_RATES.get("password-reset-confirm", "20/h"),
+        "description": "Password reset confirmation",
+    },
+}
+
 
 BROWSABLE_API_ENABLED = env.bool("BROWSABLE_API_ENABLED", default=False)
 if BROWSABLE_API_ENABLED:
@@ -661,3 +874,17 @@ ACTOR_KEY_ROTATION_DELAY = env.int("ACTOR_KEY_ROTATION_DELAY", default=3600 * 48
 SUBSONIC_DEFAULT_TRANSCODING_FORMAT = (
     env("SUBSONIC_DEFAULT_TRANSCODING_FORMAT", default="mp3") or None
 )
+
+# extra tags will be ignored
+TAGS_MAX_BY_OBJ = env.int("TAGS_MAX_BY_OBJ", default=30)
+FEDERATION_OBJECT_FETCH_DELAY = env.int(
+    "FEDERATION_OBJECT_FETCH_DELAY", default=60 * 24 * 3
+)
+
+MODERATION_EMAIL_NOTIFICATIONS_ENABLED = env.bool(
+    "MODERATION_EMAIL_NOTIFICATIONS_ENABLED", default=True
+)
+
+# Delay in days after signup before we show the "support us" messages
+INSTANCE_SUPPORT_MESSAGE_DELAY = env.int("INSTANCE_SUPPORT_MESSAGE_DELAY", default=15)
+FUNKWHALE_SUPPORT_MESSAGE_DELAY = env.int("FUNKWHALE_SUPPORT_MESSAGE_DELAY", default=15)

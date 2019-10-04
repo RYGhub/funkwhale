@@ -1,15 +1,20 @@
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework import serializers
 
+from funkwhale_api.common import fields as common_fields
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import fields as federation_fields
 from funkwhale_api.federation import tasks as federation_tasks
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import utils as moderation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
+from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
 
 from . import filters
@@ -136,6 +141,7 @@ class ManageDomainSerializer(serializers.ModelSerializer):
             "nodeinfo",
             "nodeinfo_fetch_date",
             "instance_policy",
+            "allowed",
         ]
         read_only_fields = [
             "creation_date",
@@ -151,8 +157,17 @@ class ManageDomainSerializer(serializers.ModelSerializer):
         return getattr(o, "outbox_activities_count", 0)
 
 
+class ManageDomainUpdateSerializer(ManageDomainSerializer):
+    class Meta(ManageDomainSerializer.Meta):
+        read_only_fields = ["name"] + ManageDomainSerializer.Meta.read_only_fields
+
+
 class ManageDomainActionSerializer(common_serializers.ActionSerializer):
-    actions = [common_serializers.Action("purge", allow_all=False)]
+    actions = [
+        common_serializers.Action("purge", allow_all=False),
+        common_serializers.Action("allow_list_add", allow_all=True),
+        common_serializers.Action("allow_list_remove", allow_all=True),
+    ]
     filterset_class = filters.ManageDomainFilterSet
     pk_field = "name"
 
@@ -161,8 +176,18 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
         ids = objects.values_list("pk", flat=True)
         common_utils.on_commit(federation_tasks.purge_actors.delay, domains=list(ids))
 
+    @transaction.atomic
+    def handle_allow_list_add(self, objects):
+        objects.update(allowed=True)
+
+    @transaction.atomic
+    def handle_allow_list_remove(self, objects):
+        objects.update(allowed=False)
+
 
 class ManageBaseActorSerializer(serializers.ModelSerializer):
+    is_local = serializers.SerializerMethodField()
+
     class Meta:
         model = federation_models.Actor
         fields = [
@@ -181,8 +206,12 @@ class ManageBaseActorSerializer(serializers.ModelSerializer):
             "outbox_url",
             "shared_inbox_url",
             "manually_approves_followers",
+            "is_local",
         ]
         read_only_fields = ["creation_date", "instance_policy"]
+
+    def get_is_local(self, o):
+        return o.domain_id == settings.FEDERATION_HOSTNAME
 
 
 class ManageActorSerializer(ManageBaseActorSerializer):
@@ -358,6 +387,7 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
     albums = ManageNestedAlbumSerializer(many=True)
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Artist
@@ -365,7 +395,12 @@ class ManageArtistSerializer(ManageBaseArtistSerializer):
             "albums",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageNestedArtistSerializer(ManageBaseArtistSerializer):
@@ -376,6 +411,7 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     artist = ManageNestedArtistSerializer()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Album
@@ -383,7 +419,12 @@ class ManageAlbumSerializer(ManageBaseAlbumSerializer):
             "artist",
             "tracks",
             "attributed_to",
+            "tags",
         ]
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackAlbumSerializer(ManageBaseAlbumSerializer):
@@ -399,6 +440,7 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
     album = ManageTrackAlbumSerializer()
     attributed_to = ManageBaseActorSerializer()
     uploads_count = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
 
     class Meta:
         model = music_models.Track
@@ -407,10 +449,15 @@ class ManageTrackSerializer(ManageNestedTrackSerializer):
             "album",
             "attributed_to",
             "uploads_count",
+            "tags",
         ]
 
     def get_uploads_count(self, obj):
         return getattr(obj, "uploads_count", None)
+
+    def get_tags(self, obj):
+        tagged_items = getattr(obj, "_prefetched_tagged_items", [])
+        return [ti.tag.name for ti in tagged_items]
 
 
 class ManageTrackActionSerializer(common_serializers.ActionSerializer):
@@ -482,6 +529,15 @@ class ManageLibrarySerializer(serializers.ModelSerializer):
             "followers_url",
             "actor",
         ]
+        read_only_fields = [
+            "fid",
+            "uuid",
+            "id",
+            "url",
+            "domain",
+            "actor",
+            "creation_date",
+        ]
 
     def get_uploads_count(self, obj):
         return getattr(obj, "_uploads_count", obj.uploads_count)
@@ -546,3 +602,101 @@ class ManageUploadSerializer(serializers.ModelSerializer):
             "track",
             "library",
         )
+
+
+class ManageTagSerializer(ManageBaseAlbumSerializer):
+
+    tracks_count = serializers.SerializerMethodField()
+    albums_count = serializers.SerializerMethodField()
+    artists_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = tags_models.Tag
+        fields = [
+            "id",
+            "name",
+            "creation_date",
+            "tracks_count",
+            "albums_count",
+            "artists_count",
+        ]
+
+    def get_tracks_count(self, obj):
+        return getattr(obj, "_tracks_count", None)
+
+    def get_albums_count(self, obj):
+        return getattr(obj, "_albums_count", None)
+
+    def get_artists_count(self, obj):
+        return getattr(obj, "_artists_count", None)
+
+
+class ManageTagActionSerializer(common_serializers.ActionSerializer):
+    actions = [common_serializers.Action("delete", allow_all=False)]
+    filterset_class = filters.ManageTagFilterSet
+    pk_field = "name"
+
+    @transaction.atomic
+    def handle_delete(self, objects):
+        return objects.delete()
+
+
+class ManageBaseNoteSerializer(serializers.ModelSerializer):
+    author = ManageBaseActorSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = moderation_models.Note
+        fields = ["id", "uuid", "creation_date", "summary", "author"]
+        read_only_fields = ["uuid", "creation_date", "author"]
+
+
+class ManageNoteSerializer(ManageBaseNoteSerializer):
+    target = common_fields.GenericRelation(moderation_utils.NOTE_TARGET_FIELDS)
+
+    class Meta(ManageBaseNoteSerializer.Meta):
+        fields = ManageBaseNoteSerializer.Meta.fields + ["target"]
+
+
+class ManageReportSerializer(serializers.ModelSerializer):
+    assigned_to = ManageBaseActorSerializer()
+    target_owner = ManageBaseActorSerializer()
+    submitter = ManageBaseActorSerializer()
+    target = moderation_serializers.TARGET_FIELD
+    notes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = moderation_models.Report
+        fields = [
+            "id",
+            "uuid",
+            "fid",
+            "creation_date",
+            "handled_date",
+            "summary",
+            "type",
+            "target",
+            "target_state",
+            "is_handled",
+            "assigned_to",
+            "target_owner",
+            "submitter",
+            "submitter_email",
+            "notes",
+        ]
+        read_only_fields = [
+            "id",
+            "uuid",
+            "fid",
+            "submitter",
+            "submitter_email",
+            "creation_date",
+            "handled_date",
+            "target",
+            "target_state",
+            "target_owner",
+            "summary",
+        ]
+
+    def get_notes(self, o):
+        notes = getattr(o, "_prefetched_notes", [])
+        return ManageBaseNoteSerializer(notes, many=True).data

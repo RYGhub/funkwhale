@@ -1,152 +1,276 @@
 <template>
   <main class="main pusher" v-title="labels.title">
-    <section class="ui vertical center aligned stripe segment">
-      <div class="ui text container">
-        <h1 class="ui huge header">
-          <translate translate-context="Content/Home/Title/Verb">Welcome on Funkwhale</translate>
+    <section :class="['ui', 'head', {'with-background': banner}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle">
+      <div class="segment-content">
+        <h1 class="ui center aligned large header">
+          <translate translate-context="Content/Home/Header"
+            :translate-params="{podName: podName}">
+            Welcome to %{ podName }!
+          </translate>
+          <div v-if="shortDescription" class="sub header">
+            {{ shortDescription }}
+          </div>
         </h1>
-        <p><translate translate-context="Content/Home/Title">We think listening to music should be simple.</translate></p>
-        <router-link class="ui icon button" to="/about">
-          <i class="info icon"></i>
-          <translate translate-context="Content/Home/Button.Label/Verb">Learn more about this instance</translate>
-        </router-link>
-        <router-link class="ui icon teal button" to="/library">
-          <translate translate-context="Content/Home/Button.Label/Verb">Get me to the library</translate>
-          <i class="right arrow icon"></i>
-        </router-link>
       </div>
     </section>
     <section class="ui vertical stripe segment">
-      <div class="ui middle aligned stackable text container">
-        <div class="ui grid">
-          <div class="row">
-            <div class="eight wide left floated column">
-              <h2 class="ui header">
-                <translate translate-context="Content/Home/Title">Why funkwhale?</translate>
-              </h2>
-              <p><translate translate-context="Content/Home/Paragraph">That's simple: we loved Grooveshark and we want to build something even better.</translate></p>
+      <div class="ui stackable grid">
+        <div class="ten wide column">
+          <h3 class="header">
+            <translate translate-context="Content/Home/Header">About this Funkwhale pod</translate>
+          </h3>
+          <div class="ui raised segment" id="pod">
+            <div class="ui stackable grid">
+              <div class="eight wide column">
+                <p v-if="!truncatedDescription">
+                  <translate translate-context="Content/Home/Paragraph">No description available.</translate>
+                </p>
+                <template v-if="truncatedDescription || rules">
+                  <div v-if="truncatedDescription" v-html="truncatedDescription"></div>
+                  <div v-if="truncatedDescription" class="ui hidden divider"></div>
+                  <div class="ui relaxed list">
+                    <div class="item" v-if="truncatedDescription">
+                      <i class="arrow right grey icon"></i>
+                      <div class="content">
+                        <router-link class="ui link" :to="{name: 'about'}">
+                          <translate translate-context="Content/Home/Link">Learn more</translate>
+                        </router-link>
+                      </div>
+                    </div>
+                    <div class="item" v-if="rules">
+                      <i class="book open grey icon"></i>
+                      <div class="content">
+                        <router-link class="ui link" v-if="rules" :to="{name: 'about', hash: '#rules'}">
+                          <translate translate-context="Content/Home/Link">Server rules</translate>
+                        </router-link>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+              <div class="eight wide column">
+                <template v-if="stats">
+                  <h3 class="sub header">
+                    <translate translate-context="Content/Home/Header">Statistics</translate>
+                  </h3>
+                  <p>
+                    <i class="user grey icon"></i><translate translate-context="Content/Home/Stat" :translate-params="{count: stats.users.toLocaleString($store.state.ui.momentLocale) }" :translate-n="stats.users" translate-plural="%{ count } active users">%{ count } active user</translate>
+                  </p>
+                  <p>
+                    <i class="music grey icon"></i><translate translate-context="Content/Home/Stat" :translate-params="{count: parseInt(stats.hours).toLocaleString($store.state.ui.momentLocale)}" :translate-n="parseInt(stats.hours)" translate-plural="%{ count } hours of music">%{ count } hour of music</translate>
+                  </p>
+
+                </template>
+                <template v-if="contactEmail">
+                  <h3 class="sub header">
+                    <translate translate-context="Content/Home/Header/Name">Contact</translate>
+                  </h3>
+                  <i class="at grey icon"></i>
+                  <a :href="`mailto:${contactEmail}`">{{ contactEmail }}</a>
+                </template>
+
+              </div>
             </div>
-            <div class="four wide left floated column">
-              <img class="ui medium image" src="../assets/logo/logo.png" />
+          </div>
+        </div>
+
+        <div class="six wide column">
+          <img class="ui image" src="../assets/network.png" />
+        </div>
+      </div>
+      <div class="ui hidden divider"></div>
+      <div class="ui hidden divider"></div>
+      <div class="ui stackable grid">
+        <div class="four wide column">
+          <h3 class="header">
+            <translate translate-context="Footer/*/Title/Short">About Funkwhale</translate>
+          </h3>
+          <p v-translate translate-context="Content/Home/Paragraph">This pod runs Funkwhale, a community-driven project that lets you listen and share music and audio within a decentralized, open network.</p>
+          <p v-translate translate-context="Content/Home/Paragraph">Funkwhale is free and developped by a friendly community of volunteers.</p>
+          <a target="_blank" rel="noopener" href="https://funkwhale.audio">
+            <i class="external alternate icon"></i>
+            <translate translate-context="Content/Home/Link">Visit funkwhale.audio</translate>
+          </a>
+        </div>
+        <div class="four wide column">
+          <h3 class="header">
+            <translate translate-context="Head/Login/Title">Log In</translate>
+          </h3>
+          <login-form button-classes="basic green" :show-signup="false"></login-form>
+          <div class="ui hidden clearing divider"></div>
+        </div>
+        <div class="four wide column">
+          <h3 class="header">
+            <translate translate-context="*/Signup/Title">Sign up</translate>
+          </h3>
+          <template v-if="openRegistrations">
+            <p>
+              <translate translate-context="Content/Home/Paragraph">Sign up now to keep a track of your favorites, create playlists, discover new content and much more!</translate>
+            </p>
+            <p v-if="defaultUploadQuota">
+              <translate translate-context="Content/Home/Paragraph" :translate-params="{quota: humanSize(defaultUploadQuota * 1000 * 1000)}">Users on this pod also get %{ quota } of free storage to upload their own content!</translate>
+            </p>
+            <signup-form button-classes="basic green" :show-login="false"></signup-form>
+          </template>
+          <div v-else>
+            <p translate-context="Content/Home/Paragraph">Registrations are closed on this pod. You can signup on another pod using the link below.</p>
+            <a target="_blank" rel="noopener" href="https://funkwhale.audio/#get-started">
+              <i class="external alternate icon"></i>
+              <translate translate-context="Content/Home/Link">Find another pod</translate>
+            </a>
+          </div>
+        </div>
+
+        <div class="four wide column">
+          <h3 class="header">
+            <translate translate-context="Content/Home/Header">Useful links</translate>
+          </h3>
+          <div class="ui relaxed list">
+            <div class="item">
+              <i class="headphones icon"></i>
+              <div class="content">
+                <router-link v-if="anonymousCanListen" class="header" to="/library">
+                  <translate translate-context="Content/Home/Link">Browse public content</translate>
+                </router-link>
+                <div class="description">
+                  <translate translate-context="Content/Home/Link">Listen to public albums and playlists shared on this pod</translate>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="mobile alternate icon"></i>
+              <div class="content">
+                <a class="header" href="https://funkwhale.audio/apps" target="_blank" rel="noopener">
+                  <translate translate-context="Content/Home/Link">Mobile apps</translate>
+                </a>
+                <div class="description">
+                  <translate translate-context="Content/Home/Link">Use Funkwhale on other devices with our apps</translate>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <i class="book icon"></i>
+              <div class="content">
+                <a class="header" href="https://docs.funkwhale.audio/users/index.html" target="_blank" rel="noopener">
+                  <translate translate-context="Content/Home/Link">User guides</translate>
+                </a>
+                <div class="description">
+                  <translate translate-context="Content/Home/Link">Discover everything you need to know about Funkwhale and its features</translate>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="ui middle aligned stackable text container">
-        <div class="ui hidden divider"></div>
-        <h2 class="ui header">
-          <translate translate-context="Content/Home/Title">Unlimited music</translate>
-        </h2>
-        <p><translate translate-context="Content/Home/Paragraph">Funkwhale is designed to make it easy to listen to music you like, or to discover new artists.</translate></p>
-        <div class="ui list">
-          <div class="item">
-            <i class="sound icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item/Verb">Click once, listen for hours using built-in radios</translate>
-            </div>
-          </div>
-          <div class="item">
-            <i class="heart icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item/Verb">Keep a track of your favorite songs</translate>
-            </div>
-          </div>
-          <div class="item">
-            <i class="list icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">Playlists? We got them</translate>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="ui middle aligned stackable text container">
-        <div class="ui hidden divider"></div>
-        <h2 class="ui header">
-          <translate translate-context="Content/Home/Title">A clean library</translate>
-        </h2>
-        <p><translate translate-context="Content/Home/Paragraph">Funkwhale takes care of handling your music</translate>.</p>
-        <div class="ui list">
-          <div class="item">
-            <i class="tag icon"></i>
-            <div class="content" v-html="musicbrainzItem"></div>
-          </div>
-          <div class="item">
-            <i class="plus icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">Covers, lyrics, our goal is to have them all ;)</translate>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="ui middle aligned stackable text container">
-        <div class="ui hidden divider"></div>
-        <h2 class="ui header">
-          <translate translate-context="Content/Home/Title">Easy to use</translate>
-        </h2>
-        <p><translate translate-context="Content/Home/Paragraph">Funkwhale is dead simple to use.</translate></p>
-        <div class="ui list">
-          <div class="item">
-            <i class="book icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">No add-ons, no plugins : you only need a web library</translate>
-            </div>
-          </div>
-          <div class="item">
-            <i class="wizard icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">Access your music from a clean interface that focuses on what really matters</translate>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="ui middle aligned stackable text container">
-        <div class="ui hidden divider"></div>
-        <h2 class="ui header">
-          <translate translate-context="Content/Home/Title">Your music, your way</translate>
-        </h2>
-        <p><translate translate-context="Content/Home/Paragraph">Funkwhale is free and gives you control on your music.</translate></p>
-        <div class="ui list">
-          <div class="item">
-            <i class="smile icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">The plaform is free and open-source, you can install it and modify it without worries</translate>
-            </div>
-          </div>
-          <div class="item">
-            <i class="protect icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">We do not track you or bother you with ads</translate>
-            </div>
-          </div>
-          <div class="item">
-            <i class="users icon"></i>
-            <div class="content">
-              <translate translate-context="Content/Home/List item">You can invite friends and family to your instance so they can enjoy your music</translate>
-            </div>
-          </div>
-        </div>
-      </div>
+    </section>
+    <section v-if="anonymousCanListen" class="ui vertical stripe segment">
+      <album-widget :filters="{playable: true, ordering: '-creation_date'}" :limit="10">
+        <template slot="title"><translate translate-context="Content/Home/Title">Recently added albums</translate></template>
+        <router-link to="/library">
+          <translate translate-context="Content/Home/Link">View more…</translate>
+          <div class="ui hidden divider"></div>
+        </router-link>
+      </album-widget>
     </section>
   </main>
 </template>
 
 <script>
+import $ from 'jquery'
+import _ from '@/lodash'
+import {mapState} from 'vuex'
+import showdown from 'showdown'
+import AlbumWidget from "@/components/audio/album/Widget"
+import LoginForm from "@/components/auth/LoginForm"
+import SignupForm from "@/components/auth/SignupForm"
+import {humanSize } from '@/filters'
+
 export default {
-  data() {
+  components: {
+    AlbumWidget,
+    LoginForm,
+    SignupForm,
+  },
+  data () {
     return {
-      musicbrainzUrl: "https://musicbrainz.org/"
+      markdown: new showdown.Converter(),
+      excerptLength: 2, // html nodes,
+      humanSize
     }
   },
   computed: {
+    ...mapState({
+      nodeinfo: state => state.instance.nodeinfo,
+    }),
     labels() {
       return {
         title: this.$pgettext('Head/Home/Title', "Welcome")
       }
     },
-    musicbrainzItem () {
-      let msg = this.$pgettext('Content/Home/List item/Verb', 'Get quality metadata about your music thanks to <a href="%{ url }" target="_blank">MusicBrainz</a>')
-      return this.$gettextInterpolate(msg, {url: this.musicbrainzUrl})
-    }
+    podName() {
+      return _.get(this.nodeinfo, 'metadata.nodeName') || "Funkwhale"
+    },
+    banner () {
+      return _.get(this.nodeinfo, 'metadata.banner')
+    },
+    shortDescription () {
+      return _.get(this.nodeinfo, 'metadata.shortDescription')
+    },
+    longDescription () {
+      return _.get(this.nodeinfo, 'metadata.longDescription')
+    },
+    rules () {
+      return _.get(this.nodeinfo, 'metadata.rules')
+    },
+    truncatedDescription () {
+      if (!this.longDescription) {
+        return
+      }
+      let doc = this.markdown.makeHtml(this.longDescription)
+      let nodes = $.parseHTML(doc)
+      let excerptParts = []
+      let handled = 0
+      nodes.forEach((n) => {
+        let content = n.innerHTML || n.nodeValue
+        if (handled < this.excerptLength && content.trim()) {
+          excerptParts.push(n)
+          handled += 1
+        }
+      })
+      return excerptParts.map((p) => { return p.outerHTML }).join('')
+    },
+    stats () {
+      let data = {
+        users: _.get(this.nodeinfo, 'usage.users.activeMonth', null),
+        hours: _.get(this.nodeinfo, 'metadata.library.music.hours', null),
+      }
+      if (data.users === null || data.artists === null) {
+        return
+      }
+      return data
+    },
+    contactEmail () {
+      return _.get(this.nodeinfo, 'metadata.contactEmail')
+    },
+    defaultUploadQuota () {
+      return _.get(this.nodeinfo, 'metadata.defaultUploadQuota')
+    },
+    anonymousCanListen () {
+      return _.get(this.nodeinfo, 'metadata.library.anonymousCanListen')
+    },
+    openRegistrations () {
+      return _.get(this.nodeinfo, 'openRegistrations')
+    },
+    headerStyle() {
+      if (!this.banner) {
+        return ""
+      }
+      return (
+        "background-image: url(" +
+        this.$store.getters["instance/absoluteUrl"](this.banner) +
+        ")"
+      )
+    },
   },
   watch: {
     '$store.state.auth.authenticated': {
@@ -164,11 +288,37 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.stripe p {
-  font-size: 120%;
-}
+<style scoped lang="scss">
+@import "../style/vendor/media";
+
 .ui.list .list.icon {
   padding: 0;
+}
+
+h1.header, h1 .sub.header {
+  text-shadow: 1px 1px 2px rgba(0,0,0,.8);
+  color: #fff !important;
+}
+h1.ui.header {
+  @include media(">tablet") {
+    font-size: 3em;
+  }
+}
+h1.ui.header .sub.header {
+  font-size: 0.8em;
+}
+.main.pusher {
+  margin-top: 0;
+  min-height: 10em;
+}
+section.segment.head {
+  padding: 8em 3em;
+  background: linear-gradient(90deg, rgba(40,88,125,1) 0%, rgba(64,130,180,1) 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#pod {
+  font-size: 110%;
+  display: block;
 }
 </style>

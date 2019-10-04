@@ -92,7 +92,7 @@ export default {
       })
     },
     switchInstance (url) {
-      // Here we disconnect from the current instance and reconnect to the new one. No check is performed...
+      // Here we disconnect from the current instance and reconnect to the new one. No check is performed…
       this.$emit('update:show', false)
       this.isError = false
       let msg = this.$pgettext('*/Instance/Message', 'You are now using the Funkwhale instance at %{ url }')
@@ -108,7 +108,7 @@ export default {
     },
     checkAndSwitch (url) {
       // First we have to check if the address is a valid FW server. If yes, we switch:
-      this.isError = false // Clear error message if any...
+      this.isError = false // Clear error message if any…
       this.isLoading = true
       this.requestDistantNodeInfo(url)
     },

@@ -92,8 +92,8 @@
           <thead>
             <tr>
               <th><translate translate-context="Content/Library/Table.Label">Filename</translate></th>
-              <th><translate translate-context="Content/Library/*/in MB">Size</translate></th>
-              <th><translate translate-context="Content/Library/Table.Label (Value is Uploading/Uploaded/Error)">Status</translate></th>
+              <th><translate translate-context="Content/*/*/Noun">Size</translate></th>
+              <th><translate translate-context="*/*/*">Status</translate></th>
             </tr>
           </thead>
           <tbody>
@@ -158,7 +158,7 @@ export default {
       currentTab: "summary",
       uploadUrl: this.$store.getters['instance/absoluteUrl']("/api/v1/uploads/"),
       importReference,
-      supportedExtensions: ["flac", "ogg", "mp3", "opus"],
+      supportedExtensions: ["flac", "ogg", "mp3", "opus", "aac", "m4a"],
       isLoadingQuota: false,
       quotaStatus: null,
       uploads: {
@@ -262,7 +262,7 @@ export default {
         "Cannot upload this file, ensure it is not too big"
       );
       let network = this.$pgettext('Content/Library/Help text',
-        "A network error occured while uploading this file"
+        "A network error occurred while uploading this file"
       );
       let timeout = this.$pgettext('Content/Library/Help text', "Upload timeout, please try again");
       let extension = this.$pgettext('Content/Library/Help text',

@@ -11,7 +11,7 @@
       </template>
       <template v-else-if="status === 'errored'">
         <i class="red close icon"></i>
-        <translate translate-context="Content/Playlist/Error message.Title">An error occured while saving your changes</translate>
+        <translate translate-context="Content/Playlist/Error message.Title">An error occurred while saving your changes</translate>
         <div v-if="errors.length > 0" class="ui negative message">
           <ul class="list">
             <li v-for="error in errors">{{ error }}</li>
@@ -60,7 +60,7 @@
         <p><translate translate-context="Content/Playlist/Paragraph/Call to action">Drag and drop rows to reorder tracks in the playlist</translate></p>
         <div class="table-wrapper">
           <table class="ui compact very basic unstackable table">
-            <draggable v-model="plts" element="tbody" @update="reorder">
+            <draggable v-model="plts" tag="tbody" @update="reorder">
               <tr v-for="(plt, index) in plts" :key="plt.id">
                 <td class="left aligned">{{ plt.index + 1}}</td>
                 <td class="center aligned">

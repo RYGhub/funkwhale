@@ -1,11 +1,21 @@
+import pytest
+
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import utils as music_utils
 
 
-def test_nodeinfo_dump(preferences, mocker):
+def test_nodeinfo_dump(preferences, mocker, avatar):
+    preferences["instance__banner"] = avatar
     preferences["instance__nodeinfo_stats_enabled"] = True
+    preferences["moderation__unauthenticated_report_types"] = [
+        "takedown_request",
+        "other",
+        "other_category_that_doesnt_exist",
+    ]
+
     stats = {
         "users": {"total": 1, "active_halfyear": 12, "active_month": 13},
         "tracks": 2,
@@ -30,6 +40,11 @@ def test_nodeinfo_dump(preferences, mocker):
             "shortDescription": preferences["instance__short_description"],
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
+            "rules": preferences["instance__rules"],
+            "contactEmail": preferences["instance__contact_email"],
+            "defaultUploadQuota": preferences["users__upload_quota"],
+            "terms": preferences["instance__terms"],
+            "banner": federation_utils.full_url(preferences["instance__banner"].url),
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[
@@ -48,6 +63,34 @@ def test_nodeinfo_dump(preferences, mocker):
                 "listenings": {"total": stats["listenings"]},
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
+            "allowList": {"enabled": False, "domains": None},
+            "reportTypes": [
+                {
+                    "type": "takedown_request",
+                    "label": "Takedown request",
+                    "anonymous": True,
+                },
+                {
+                    "type": "invalid_metadata",
+                    "label": "Invalid metadata",
+                    "anonymous": False,
+                },
+                {
+                    "type": "illegal_content",
+                    "label": "Illegal content",
+                    "anonymous": False,
+                },
+                {
+                    "type": "offensive_content",
+                    "label": "Offensive content",
+                    "anonymous": False,
+                },
+                {"type": "other", "label": "Other", "anonymous": True},
+            ],
+            "funkwhaleSupportMessageEnabled": preferences[
+                "instance__funkwhale_support_message_enabled"
+            ],
+            "instanceSupportMessage": preferences["instance__support_message"],
         },
     }
     assert nodeinfo.get() == expected
@@ -55,6 +98,10 @@ def test_nodeinfo_dump(preferences, mocker):
 
 def test_nodeinfo_dump_stats_disabled(preferences, mocker):
     preferences["instance__nodeinfo_stats_enabled"] = False
+    preferences["moderation__unauthenticated_report_types"] = [
+        "takedown_request",
+        "other",
+    ]
 
     expected = {
         "version": "2.0",
@@ -69,6 +116,11 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "shortDescription": preferences["instance__short_description"],
             "longDescription": preferences["instance__long_description"],
             "nodeName": preferences["instance__name"],
+            "rules": preferences["instance__rules"],
+            "contactEmail": preferences["instance__contact_email"],
+            "defaultUploadQuota": preferences["users__upload_quota"],
+            "terms": preferences["instance__terms"],
+            "banner": None,
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
                 "federationNeedsApproval": preferences[
@@ -79,6 +131,52 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 ],
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
+            "allowList": {"enabled": False, "domains": None},
+            "reportTypes": [
+                {
+                    "type": "takedown_request",
+                    "label": "Takedown request",
+                    "anonymous": True,
+                },
+                {
+                    "type": "invalid_metadata",
+                    "label": "Invalid metadata",
+                    "anonymous": False,
+                },
+                {
+                    "type": "illegal_content",
+                    "label": "Illegal content",
+                    "anonymous": False,
+                },
+                {
+                    "type": "offensive_content",
+                    "label": "Offensive content",
+                    "anonymous": False,
+                },
+                {"type": "other", "label": "Other", "anonymous": True},
+            ],
+            "funkwhaleSupportMessageEnabled": preferences[
+                "instance__funkwhale_support_message_enabled"
+            ],
+            "instanceSupportMessage": preferences["instance__support_message"],
         },
     }
     assert nodeinfo.get() == expected
+
+
+@pytest.mark.parametrize(
+    "enabled, public, expected",
+    [
+        (True, True, {"enabled": True, "domains": ["allowed.example"]}),
+        (True, False, {"enabled": True, "domains": None}),
+        (False, False, {"enabled": False, "domains": None}),
+    ],
+)
+def test_nodeinfo_allow_list_enabled(preferences, factories, enabled, public, expected):
+    preferences["moderation__allow_list_enabled"] = enabled
+    preferences["moderation__allow_list_public"] = public
+    factories["federation.Domain"](name="allowed.example", allowed=True)
+    factories["federation.Domain"](allowed=False)
+    factories["federation.Domain"](allowed=None)
+
+    assert nodeinfo.get()["metadata"]["allowList"] == expected

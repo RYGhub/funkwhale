@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from funkwhale_api.common import session
-from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import mrf
 
 from . import exceptions
 from . import signing
@@ -64,10 +64,10 @@ def slugify_username(username):
 def retrieve_ap_object(
     fid, actor, serializer_class=None, queryset=None, apply_instance_policies=True
 ):
-    from . import activity
-
-    policies = moderation_models.InstancePolicy.objects.active().filter(block_all=True)
-    if apply_instance_policies and policies.matching_url(fid):
+    # we have a duplicate check here because it's less expensive to do those checks
+    # twice than to trigger a HTTP request
+    payload, updated = mrf.inbox.apply({"id": fid})
+    if not payload:
         raise exceptions.BlockedActorOrDomain()
     if queryset:
         try:
@@ -94,15 +94,12 @@ def retrieve_ap_object(
     response.raise_for_status()
     data = response.json()
 
-    # we match against moderation policies here again, because the FID of the returned
-    # object may not be the same as the URL used to access it
-    try:
-        id = data["id"]
-    except KeyError:
-        pass
-    else:
-        if apply_instance_policies and activity.should_reject(fid=id, payload=data):
-            raise exceptions.BlockedActorOrDomain()
+    # we match against mrf here again, because new data may yield different
+    # results
+    data, updated = mrf.inbox.apply(data)
+    if not data:
+        raise exceptions.BlockedActorOrDomain()
+
     if not serializer_class:
         return data
     serializer = serializer_class(data=data, context={"fetch_actor": actor})
@@ -131,3 +128,32 @@ def is_local(url):
     return url.startswith("http://{}/".format(d)) or url.startswith(
         "https://{}/".format(d)
     )
+
+
+def get_actor_data_from_username(username):
+
+    parts = username.split("@")
+
+    return {
+        "username": parts[0],
+        "domain": parts[1] if len(parts) > 1 else settings.FEDERATION_HOSTNAME,
+    }
+
+
+def get_actor_from_username_data_query(field, data):
+    if not data:
+        return Q(**{field: None})
+    if field:
+        return Q(
+            **{
+                "{}__preferred_username__iexact".format(field): data["username"],
+                "{}__domain__name__iexact".format(field): data["domain"],
+            }
+        )
+    else:
+        return Q(
+            **{
+                "preferred_username__iexact": data["username"],
+                "domain__name__iexact": data["domain"],
+            }
+        )

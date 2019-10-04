@@ -178,3 +178,28 @@ def test_autenthicate_supports_blind_key_rotation(factories, mocker, api_request
     assert user.is_anonymous is True
     assert actor.public_key == new_public.decode("utf-8")
     assert actor.fid == actor_url
+
+
+def test_authenticate_checks_signature_with_allow_list(
+    preferences, factories, api_request
+):
+    preferences["moderation__allow_list_enabled"] = True
+    domain = factories["federation.Domain"](allowed=False)
+    private, public = keys.get_key_pair()
+    actor_url = "https://{}/actor".format(domain.name)
+
+    signed_request = factories["federation.SignedRequest"](
+        auth__key=private, auth__key_id=actor_url + "#main-key", auth__headers=["date"]
+    )
+    prepared = signed_request.prepare()
+    django_request = api_request.get(
+        "/",
+        **{
+            "HTTP_DATE": prepared.headers["date"],
+            "HTTP_SIGNATURE": prepared.headers["signature"],
+        }
+    )
+    authenticator = authentication.SignatureAuthentication()
+
+    with pytest.raises(exceptions.BlockedActorOrDomain):
+        authenticator.authenticate(django_request)

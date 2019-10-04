@@ -21,6 +21,7 @@ from . import utils as federation_utils
 
 TYPE_CHOICES = [
     ("Person", "Person"),
+    ("Tombstone", "Tombstone"),
     ("Application", "Application"),
     ("Group", "Group"),
     ("Organization", "Organization"),
@@ -118,6 +119,9 @@ class Domain(models.Model):
         null=True,
         blank=True,
     )
+    # are interactions with this domain allowed (only applies when allow-listing is on)
+    allowed = models.BooleanField(default=None, null=True)
+
     objects = DomainQuerySet.as_manager()
 
     def __str__(self):
@@ -201,6 +205,10 @@ class Actor(models.Model):
 
     class Meta:
         unique_together = ["domain", "preferred_username"]
+        verbose_name = "Account"
+
+    def get_moderation_url(self):
+        return "/manage/moderation/accounts/{}".format(self.full_username)
 
     @property
     def webfinger_subject(self):
@@ -245,6 +253,7 @@ class Actor(models.Model):
 
     def get_stats(self):
         from funkwhale_api.music import models as music_models
+        from funkwhale_api.moderation import models as moderation_models
 
         data = Actor.objects.filter(pk=self.pk).aggregate(
             outbox_activities=models.Count("outbox_activities", distinct=True),
@@ -257,6 +266,7 @@ class Actor(models.Model):
         data["artists"] = music_models.Artist.objects.filter(
             from_activity__actor=self.pk
         ).count()
+        data["reports"] = moderation_models.Report.objects.get_for_target(self).count()
         data["albums"] = music_models.Album.objects.filter(
             from_activity__actor=self.pk
         ).count()

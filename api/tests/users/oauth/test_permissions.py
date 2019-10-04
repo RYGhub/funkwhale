@@ -59,7 +59,9 @@ def test_scope_permission_anonymous_policy(
     policy, preference, expected, preferences, mocker, anonymous_user
 ):
     preferences["common__api_authentication_required"] = preference
-    view = mocker.Mock(required_scope="libraries", anonymous_policy=policy)
+    view = mocker.Mock(
+        required_scope="libraries", anonymous_policy=policy, anonymous_scopes=set()
+    )
     request = mocker.Mock(method="GET", user=anonymous_user, actor=None)
 
     p = permissions.ScopePermission()
@@ -72,6 +74,7 @@ def test_scope_permission_dict_no_required(mocker, anonymous_user):
         required_scope={"read": None, "write": "write:profile"},
         anonymous_policy=True,
         action="read",
+        anonymous_scopes=set(),
     )
     request = mocker.Mock(method="GET", user=anonymous_user, actor=None)
 
@@ -164,7 +167,9 @@ def test_scope_permission_token_anonymous_user_auth_not_required(
     preferences["common__api_authentication_required"] = False
     should_allow = mocker.patch.object(permissions, "should_allow")
     request = mocker.Mock(method="POST", user=anonymous_user, actor=None)
-    view = mocker.Mock(required_scope="profile", anonymous_policy="setting")
+    view = mocker.Mock(
+        required_scope="profile", anonymous_policy="setting", anonymous_scopes=set()
+    )
 
     p = permissions.ScopePermission()
 

@@ -4,8 +4,7 @@ import pytest
 from django.urls import reverse
 
 from funkwhale_api.favorites.models import TrackFavorite
-from funkwhale_api.music import serializers as music_serializers
-from funkwhale_api.users import serializers as users_serializers
+from funkwhale_api.favorites import serializers
 
 
 def test_user_can_add_favorite(factories):
@@ -20,22 +19,15 @@ def test_user_can_add_favorite(factories):
 def test_user_can_get_his_favorites(
     api_request, factories, logged_in_api_client, client
 ):
-    r = api_request.get("/")
+    request = api_request.get("/")
     favorite = factories["favorites.TrackFavorite"](user=logged_in_api_client.user)
     factories["favorites.TrackFavorite"]()
     url = reverse("api:v1:favorites:tracks-list")
     response = logged_in_api_client.get(url, {"user": logged_in_api_client.user.pk})
     expected = [
-        {
-            "user": users_serializers.UserBasicSerializer(
-                favorite.user, context={"request": r}
-            ).data,
-            "track": music_serializers.TrackSerializer(
-                favorite.track, context={"request": r}
-            ).data,
-            "id": favorite.id,
-            "creation_date": favorite.creation_date.isoformat().replace("+00:00", "Z"),
-        }
+        serializers.UserTrackFavoriteSerializer(
+            favorite, context={"request": request}
+        ).data
     ]
     assert response.status_code == 200
     assert response.data["results"] == expected
