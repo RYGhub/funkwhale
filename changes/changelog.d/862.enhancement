@@ -1,1 +1,0 @@
-Replaced Daphne by Gunicorn/Uvicorn to improve stability, flexibility and performance (#862)

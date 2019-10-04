@@ -1,1 +1,0 @@
-Increase the security of JWT token generation by using DJANGO_SECRET_KEY as well as user-specific salt for the signature
