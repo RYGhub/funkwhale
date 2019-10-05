@@ -20,14 +20,14 @@ Since version 0.12, Funkwhale implements a subset of the `Subsonic API <http://w
 This API is a de-facto standard for a lot of projects out there, and many clients
 are available that works with this API.
 
-Those Subsonic features are supported in Funkwhale:
+These Subsonic features are supported in Funkwhale:
 
 - Search (artists, albums, tracks)
 - Common library browsing using ID3 tags (list artists, albums, etc.)
 - Playlist management
 - Stars (which is mapped to Funkwhale's favorites)
 
-Those features as missing:
+These features are missing:
 
 - Transcoding/streaming with different bitrates
 - Album covers
