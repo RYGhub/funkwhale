@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-06-06 09:17+0000\n"
-"Last-Translator: Nitai Bezerra da Silva <nitaibezerra@protonmail.com>\n"
+"PO-Revision-Date: 2019-10-07 02:14+0000\n"
+"Last-Translator: Mateus Mattei Garcia <mmatt3375@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 3.2.2\n"
+"X-Generator: Weblate 3.7\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -39,43 +39,39 @@ msgid "%{ app } wants to access your Funkwhale account"
 msgstr "%{ app } quer acessar sua conta Funkwhale"
 
 #: front/src/components/About.vue:173 src/components/Home.vue:56
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } active user"
 msgid_plural "%{ count } active users"
-msgstr[0] "%{ count } faixa"
-msgstr[1] "%{ count } faixas"
+msgstr[0] "%{ count } usuário ativo"
+msgstr[1] "%{ count } usuários ativos"
 
 #: front/src/components/About.vue:182
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } albums"
 msgid_plural "%{ count } albums"
-msgstr[0] "%{ count } faixa"
-msgstr[1] "%{ count } faixas"
+msgstr[0] "%{ count } albums"
+msgstr[1] "%{ count } albums"
 
 #: front/src/components/About.vue:152
 msgctxt "*/*/*"
 msgid "%{ count } allowed domains"
 msgid_plural "%{ count } allowed domains"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{ count } domínio permitido"
+msgstr[1] "%{ count } domínios permitidos"
 
 #: front/src/components/About.vue:179
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } artists"
 msgid_plural "%{ count } artists"
-msgstr[0] "%{ count } faixa"
-msgstr[1] "%{ count } faixas"
+msgstr[0] "%{ count } artista"
+msgstr[1] "%{ count } artistas"
 
 #: front/src/components/About.vue:176 src/components/Home.vue:59
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } hour of music"
 msgid_plural "%{ count } hours of music"
-msgstr[0] "%{ count } faixa"
-msgstr[1] "%{ count } faixas"
+msgstr[0] "%{ count } hora de música"
+msgstr[1] "%{ count } horas de músicas"
 
 #: front/src/components/About.vue:188
 #, fuzzy
@@ -195,17 +191,17 @@ msgstr[1] "Adicionar faixa"
 #: front/src/views/Notifications.vue:21 src/views/Notifications.vue:55
 msgctxt "*/*/*"
 msgid "30 days"
-msgstr ""
+msgstr "30 dias"
 
 #: front/src/views/Notifications.vue:22 src/views/Notifications.vue:56
 msgctxt "*/*/*"
 msgid "60 days"
-msgstr ""
+msgstr "60 dias"
 
 #: front/src/views/Notifications.vue:23 src/views/Notifications.vue:57
 msgctxt "*/*/*"
 msgid "90 days"
-msgstr ""
+msgstr "90 dias"
 
 #: front/src/components/library/FileUpload.vue:264
 #, fuzzy
@@ -642,7 +638,7 @@ msgstr "Ocorreu um erro desconhecido"
 #: front/src/components/About.vue:123
 msgctxt "*/*/*"
 msgid "Anonymous access"
-msgstr ""
+msgstr "Acesso anônimo"
 
 #: front/src/components/moderation/ReportModal.vue:54
 msgctxt "Popup/Moderation/Error message"
