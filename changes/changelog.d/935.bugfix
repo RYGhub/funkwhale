@@ -1,0 +1,1 @@
+Fixed an issue with embed player CSS being purged during build (#935)

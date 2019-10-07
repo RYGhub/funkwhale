@@ -19,7 +19,9 @@ plugins.push(
       path.join(__dirname, './**/*.vue'),
       path.join(__dirname, './src/**/*.js')
     ]),
-    whitelist: ['scale']
+    whitelist: ['scale'],
+    whitelistPatterns:[/plyr/],
+    whitelistPatternsChildren:[/plyr/]
   }),
 )
 module.exports = {
