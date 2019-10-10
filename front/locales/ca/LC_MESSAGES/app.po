@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-05 17:13+0000\n"
-"Last-Translator: Néfix Estrada <nefixestrada@gmail.com>\n"
+"PO-Revision-Date: 2019-10-11 19:14+0000\n"
+"Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -461,12 +461,11 @@ msgstr "Afegir filtres per personalitzar la teva radio"
 #: front/src/components/manage/moderation/NoteForm.vue:12
 msgctxt "Content/Moderation/Button.Label/Verb"
 msgid "Add note"
-msgstr "Afegir nota"
+msgstr "Afegir una nota"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:191
 #: front/src/views/admin/moderation/DomainsDetail.vue:46
 #: front/src/views/admin/moderation/DomainsList.vue:18
-#, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Add to allow-list"
 msgstr "Afegir a la llista de permesos"
@@ -636,7 +635,7 @@ msgctxt "Popup/Moderation/Error message"
 msgid "Anonymous reports are disabled, please sign-in to submit a report."
 msgstr ""
 "Els informes anònims estan deshabilitats, si us plau inicia sessió per a "
-"enviar l'informe"
+"enviar l'informe."
 
 #: front/src/components/auth/Settings.vue:175
 #: src/components/auth/Settings.vue:225
