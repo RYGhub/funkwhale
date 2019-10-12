@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-11 19:14+0000\n"
+"PO-Revision-Date: 2019-10-14 10:14+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -613,12 +613,12 @@ msgstr "S'ha produït una error mentre es guardaven els canvis"
 #: front/src/components/federation/FetchButton.vue:21
 msgctxt "Popup/*/Message.Content"
 msgid "An error occurred while trying to refresh data:"
-msgstr "S'ha produït un error durant s'intentava actualitzar les dades:"
+msgstr "S'ha produït un error quan s'intentava actualitzar les dades:"
 
 #: front/src/components/federation/FetchButton.vue:41
 msgctxt "*/*/Error"
 msgid "An HTTP error occurred while contacting the remote server"
-msgstr "S'ha produït un error HTTP mentre es contactava el servidor remot"
+msgstr "S'ha produït un error HTTP mentre es contactava amb el servidor remot"
 
 #: front/src/components/library/ImportStatusModal.vue:145
 msgctxt "Popup/Import/Error.Label"
@@ -953,7 +953,7 @@ msgstr "Canviar la contrasenya"
 #: front/src/components/Footer.vue:37
 msgctxt "Footer/Settings/Dropdown.Label/Short, Verb"
 msgid "Change theme"
-msgstr "Canvia el tema"
+msgstr "Canviar el tema"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:62
 msgctxt "*/Signup/Title"
@@ -1011,7 +1011,7 @@ msgstr "Buidar la llista de reproducció"
 #: front/src/components/ShortcutsModal.vue:144
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Clear queue"
-msgstr "Neteja la cua"
+msgstr "Netejar la cua"
 
 #: front/src/components/audio/Player.vue:668
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
@@ -1345,12 +1345,12 @@ msgstr "Suprimir la regla de moderació"
 #: src/components/auth/Settings.vue:302
 msgctxt "*/*/Button.Label"
 msgid "Delete my account"
-msgstr "Esborra el meu compte"
+msgstr "Esborrar el meu compte"
 
 #: front/src/components/auth/Settings.vue:297
 msgctxt "*/*/Button.Label"
 msgid "Delete my account…"
-msgstr "Esborra el meu compte…"
+msgstr "Esborra el meu compte …"
 
 #: front/src/views/playlists/Detail.vue:47
 msgctxt "Popup/Playlist/Button.Label/Verb"
@@ -1731,7 +1731,7 @@ msgstr "Incrusta l'obra d'aquest artista a la teva pàgina web"
 #: front/src/views/playlists/Detail.vue:52
 msgctxt "Popup/Album/Title/Verb"
 msgid "Embed this playlist on your website"
-msgstr "Incrusta aquesta llista de reproducció a la teva pàgina web"
+msgstr "Incrustar aquesta llista de reproducció a la teva pàgina web"
 
 #: front/src/components/library/TrackBase.vue:43
 msgctxt "Popup/Track/Title"
@@ -2032,7 +2032,7 @@ msgstr "Nom del filtre"
 #: front/src/components/Home.vue:118
 msgctxt "Content/Home/Link"
 msgid "Find another pod"
-msgstr "Troba una altra instància"
+msgstr "Trobar una altra instàncies"
 
 #: front/src/components/manage/library/UploadsTable.vue:26
 #: front/src/components/mixins/Translations.vue:36
@@ -2121,7 +2121,8 @@ msgstr "Funkwhale és compatible amb altres reproductors de música que suporten
 msgctxt "Content/Home/Paragraph"
 msgid "Funkwhale is free and developped by a friendly community of volunteers."
 msgstr ""
-"Funkwhale és gratuït i desenvolupat per una comunitat amigable de voluntaris."
+"Funkwhale és gratuït i desenvolupat per una comunitat acollidora de "
+"voluntaris."
 
 #: front/src/components/About.vue:78
 msgctxt "*/*/*"
