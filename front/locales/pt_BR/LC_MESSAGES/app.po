@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-07 02:14+0000\n"
-"Last-Translator: Mateus Mattei Garcia <mmatt3375@gmail.com>\n"
+"PO-Revision-Date: 2019-10-15 02:19+0000\n"
+"Last-Translator: Daniele Lira Mereb <danielelmereb@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -49,8 +49,8 @@ msgstr[1] "%{ count } usuários ativos"
 msgctxt "Content/Home/Stat"
 msgid "%{ count } albums"
 msgid_plural "%{ count } albums"
-msgstr[0] "%{ count } albums"
-msgstr[1] "%{ count } albums"
+msgstr[0] "%{ count } álbum"
+msgstr[1] "%{ count } álbuns"
 
 #: front/src/components/About.vue:152
 msgctxt "*/*/*"
@@ -74,12 +74,11 @@ msgstr[0] "%{ count } hora de música"
 msgstr[1] "%{ count } horas de músicas"
 
 #: front/src/components/About.vue:188
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } listenings"
 msgid_plural "%{ count } listenings"
-msgstr[0] "%{ count } faixa"
-msgstr[1] "%{ count } faixas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: front/src/components/common/ActionTable.vue:68
 msgctxt "Content/*/Paragraph"
@@ -112,7 +111,6 @@ msgstr[0] "%{ count } faixa encontrada com os filtros"
 msgstr[1] "%{ count } faixas encontradas com os filtros"
 
 #: front/src/components/About.vue:185
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } tracks"
 msgid_plural "%{ count } tracks"
@@ -181,12 +179,11 @@ msgstr[0] "1 favorito"
 msgstr[1] "%{ count } favoritos"
 
 #: front/src/components/audio/artist/Card.vue:15
-#, fuzzy
 msgctxt "Content/Artist/Card"
 msgid "1 track"
 msgid_plural "%{ count } tracks"
-msgstr[0] "Adicionar faixa"
-msgstr[1] "Adicionar faixa"
+msgstr[0] "1 faixa"
+msgstr[1] "%{ count } faixas"
 
 #: front/src/views/Notifications.vue:21 src/views/Notifications.vue:55
 msgctxt "*/*/*"
@@ -204,7 +201,6 @@ msgid "90 days"
 msgstr "90 dias"
 
 #: front/src/components/library/FileUpload.vue:264
-#, fuzzy
 msgctxt "Content/Library/Help text"
 msgid "A network error occurred while uploading this file"
 msgstr "Ocorreu um erro de rede ao enviar este arquivo"
@@ -215,10 +211,9 @@ msgid "A short summary describing your changes."
 msgstr "Ocorreu um erro ao salvar suas alterações."
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About %{ podName }"
-msgstr "Sobre %{ instance }"
+msgstr "Sobre %{ podName }"
 
 #: front/src/components/Footer.vue:6
 msgctxt "Footer/About/Title"
@@ -236,16 +231,14 @@ msgid "About page"
 msgstr "Sobre"
 
 #: front/src/components/Home.vue:19
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About this Funkwhale pod"
-msgstr "Sobre o Funkwhale"
+msgstr "Sobre este pod Funkwhale"
 
 #: front/src/components/About.vue:21 src/components/About.vue:51
-#, fuzzy
 msgctxt "Content/About/Header"
 msgid "About this pod"
-msgstr "Sobre esta instância"
+msgstr "Sobre este pod"
 
 #: front/src/views/content/libraries/Detail.vue:48
 msgctxt "Content/Library/Button.Label"
@@ -462,18 +455,16 @@ msgid "Add filters to customize your radio"
 msgstr "Adicionar filtros para personalizar sua rádio"
 
 #: front/src/components/manage/moderation/NoteForm.vue:12
-#, fuzzy
 msgctxt "Content/Moderation/Button.Label/Verb"
 msgid "Add note"
-msgstr "Adicionar conteúdo"
+msgstr "Adicionar nota"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:191
 #: front/src/views/admin/moderation/DomainsDetail.vue:46
 #: front/src/views/admin/moderation/DomainsList.vue:18
-#, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Add to allow-list"
-msgstr "Adicionar à lista…"
+msgstr "Adicionar à lista de permissão"
 
 #: front/src/components/audio/PlayButton.vue:91
 msgctxt "*/Queue/Dropdown/Button/Title"
@@ -600,16 +591,14 @@ msgid "Allow-list"
 msgstr ""
 
 #: front/src/components/About.vue:149
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Allowed domains"
-msgstr "Adicionar domínio"
+msgstr "Domínios permitidos"
 
 #: front/src/components/library/ImportStatusModal.vue:17
-#, fuzzy
 msgctxt "Popup/Import/Message"
 msgid "An error occurred during upload processing. You will find more information below."
-msgstr "Ocorreu um erro durante o envio. Veja mais sobre abaixo."
+msgstr "Ocorreu um erro durante o envio. Veja mais informações sobre abaixo."
 
 #: front/src/components/playlists/Editor.vue:13
 #, fuzzy
@@ -1018,15 +1007,14 @@ msgid "Clear playlist"
 msgstr "Limpar lista"
 
 #: front/src/components/ShortcutsModal.vue:144
-#, fuzzy
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Clear queue"
-msgstr "Limpar sua fila"
+msgstr "Limpar fila"
 
 #: front/src/components/audio/Player.vue:668
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Clear your queue"
-msgstr "Limpar sua fila"
+msgstr "Limpar fila"
 
 #: front/src/components/mixins/Translations.vue:21
 #: front/src/components/mixins/Translations.vue:22
