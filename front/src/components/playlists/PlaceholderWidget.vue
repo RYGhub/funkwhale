@@ -1,7 +1,7 @@
 <template>
   <div class="ui placeholder segment">
     <div class="ui icon header">
-      <i class="pdf file outline icon"></i>
+      <i class="list icon"></i>
       <translate translate-context="Content/Home/Placeholder">
         No playlists have been created yet
       </translate>
