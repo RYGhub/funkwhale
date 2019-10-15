@@ -10,7 +10,7 @@
       <label><translate translate-context="Content/Library/Input.Label/Verb">Search a remote library</translate></label>
       <div :class="['ui', 'action', {loading: isLoading}, 'input']">
         <input name="url" v-model="query" :placeholder="labels.placeholder" type="url">
-        <button type="submit" class="ui icon button">
+        <button type="submit" :class="['ui', 'icon', {loading: isLoading}, 'button']">
           <i class="search icon"></i>
         </button>
       </div>

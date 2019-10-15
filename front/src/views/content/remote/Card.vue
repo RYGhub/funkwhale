@@ -142,7 +142,7 @@ export default {
     library: {type: Object, required: true},
     displayFollow: {type: Boolean, default: true},
     displayScan: {type: Boolean, default: true},
-    displayCopyFid: {type: Boolean, default: false},
+    displayCopyFid: {type: Boolean, default: true},
   },
   data () {
     return {
