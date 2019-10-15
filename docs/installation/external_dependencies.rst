@@ -66,6 +66,7 @@ for Funkwhale to work properly:
 .. code-block:: shell
 
     sudo -u postgres psql funkwhale -c 'CREATE EXTENSION "unaccent";'
+    sudo -u postgres psql funkwhale -c 'CREATE EXTENSION "citext";'
 
 
 Cache setup (Redis)

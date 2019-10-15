@@ -192,6 +192,12 @@ match what is described in :doc:`/installation/debian`:
     # restart the services
     sudo systemctl start funkwhale.target
 
+.. note::
+    If you see a PermissionError when running the ``migrate`` command, try running the following commands by hand, and relaunch the migrations::
+
+        sudo -u postgres psql funkwhale -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+        sudo -u postgres psql funkwhale -c 'CREATE EXTENSION IF NOT EXISTS "unaccent";'
+
 .. warning::
 
     You may sometimes get the following warning while applying migrations::
