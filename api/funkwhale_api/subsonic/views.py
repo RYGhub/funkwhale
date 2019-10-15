@@ -1,3 +1,6 @@
+"""
+Documentation of Subsonic API can be found at http://www.subsonic.org/pages/api.jsp
+"""
 import datetime
 import functools
 
@@ -427,7 +430,34 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                 Q(tagged_items__tag__name=genre)
                 | Q(artist__tagged_items__tag__name=genre)
             )
+        elif type == "byYear":
+            try:
+                boundaries = [
+                    int(data.get("fromYear", 0)),
+                    int(data.get("toYear", 99999999)),
+                ]
 
+            except (TypeError, ValueError):
+                return response.Response(
+                    {
+                        "error": {
+                            "code": 10,
+                            "message": "Invalid fromYear or toYear parameter",
+                        }
+                    }
+                )
+            # because, yeah, the specification explicitly state that fromYear can be greater
+            # than toYear, to indicate reverse ordering…
+            # http://www.subsonic.org/pages/api.jsp#getAlbumList2
+            from_year = min(boundaries)
+            to_year = max(boundaries)
+            queryset = queryset.filter(
+                release_date__year__gte=from_year, release_date__year__lte=to_year
+            )
+            if boundaries[0] <= boundaries[1]:
+                queryset = queryset.order_by("release_date")
+            else:
+                queryset = queryset.order_by("-release_date")
         try:
             offset = int(data["offset"])
         except (TypeError, KeyError, ValueError):
