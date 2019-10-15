@@ -1,6 +1,7 @@
 from django.db.models import Count
 from django_filters import rest_framework as filters
 
+from funkwhale_api.common import filters as common_filters
 from funkwhale_api.music import utils
 
 from . import models
@@ -9,6 +10,7 @@ from . import models
 class PlaylistFilter(filters.FilterSet):
     q = filters.CharFilter(field_name="_", method="filter_q")
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
+    scope = common_filters.ActorScopeFilter(actor_field="user__actor", distinct=True)
 
     class Meta:
         model = models.Playlist
@@ -17,6 +19,7 @@ class PlaylistFilter(filters.FilterSet):
             "name": ["exact", "icontains"],
             "q": "exact",
             "playable": "exact",
+            "scope": "exact",
         }
 
     def filter_playable(self, queryset, name, value):
