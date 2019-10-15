@@ -23,12 +23,17 @@ class ArtistFilter(moderation_filters.HiddenContentFilterSet):
     q = fields.SearchFilter(search_fields=["name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
+    scope = common_filters.ActorScopeFilter(
+        actor_field="tracks__uploads__library__actor", distinct=True
+    )
 
     class Meta:
         model = models.Artist
         fields = {
             "name": ["exact", "iexact", "startswith", "icontains"],
-            "playable": "exact",
+            "playable": ["exact"],
+            "scope": ["exact"],
+            "mbid": ["exact"],
         }
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ARTIST"]
 
@@ -42,6 +47,9 @@ class TrackFilter(moderation_filters.HiddenContentFilterSet):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
     id = common_filters.MultipleQueryFilter(coerce=int)
+    scope = common_filters.ActorScopeFilter(
+        actor_field="uploads__library__actor", distinct=True
+    )
 
     class Meta:
         model = models.Track
@@ -52,6 +60,8 @@ class TrackFilter(moderation_filters.HiddenContentFilterSet):
             "artist": ["exact"],
             "album": ["exact"],
             "license": ["exact"],
+            "scope": ["exact"],
+            "mbid": ["exact"],
         }
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["TRACK"]
 
@@ -67,6 +77,7 @@ class UploadFilter(filters.FilterSet):
     album_artist = filters.UUIDFilter("track__album__artist__uuid")
     library = filters.UUIDFilter("library__uuid")
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
+    scope = common_filters.ActorScopeFilter(actor_field="library__actor", distinct=True)
     q = fields.SmartSearchFilter(
         config=search.SearchConfig(
             search_fields={
@@ -96,6 +107,7 @@ class UploadFilter(filters.FilterSet):
             "album_artist",
             "library",
             "import_reference",
+            "scope",
         ]
 
     def filter_playable(self, queryset, name, value):
@@ -107,10 +119,13 @@ class AlbumFilter(moderation_filters.HiddenContentFilterSet):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SearchFilter(search_fields=["title", "artist__name"])
     tag = TAG_FILTER
+    scope = common_filters.ActorScopeFilter(
+        actor_field="tracks__uploads__library__actor", distinct=True
+    )
 
     class Meta:
         model = models.Album
-        fields = ["playable", "q", "artist"]
+        fields = ["playable", "q", "artist", "scope", "mbid"]
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ALBUM"]
 
     def filter_playable(self, queryset, name, value):

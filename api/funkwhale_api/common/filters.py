@@ -168,3 +168,37 @@ class MutationFilter(filters.FilterSet):
     class Meta:
         model = models.Mutation
         fields = ["is_approved", "is_applied", "type"]
+
+
+class ActorScopeFilter(filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        self.actor_field = kwargs.pop("actor_field")
+        super().__init__(*args, **kwargs)
+
+    def filter(self, queryset, value):
+        if not value:
+            return queryset
+
+        request = getattr(self.parent, "request", None)
+        if not request:
+            return queryset.none()
+
+        user = getattr(request, "user", None)
+        qs = queryset
+        if value.lower() == "me":
+            qs = self.filter_me(user=user, queryset=queryset)
+        elif value.lower() == "all":
+            return queryset
+        else:
+            return queryset.none()
+
+        if self.distinct:
+            qs = qs.distinct()
+        return qs
+
+    def filter_me(self, user, queryset):
+        actor = getattr(user, "actor", None)
+        if not actor:
+            return queryset.none()
+
+        return queryset.filter(**{self.actor_field: actor})
