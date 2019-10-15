@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-09-29 20:13+0000\n"
+"PO-Revision-Date: 2019-10-11 19:14+0000\n"
 "Last-Translator: Quentin PAGÈS <quentinantonin@free.fr>\n"
 "Language-Team: none\n"
 "Language: oc\n"
@@ -1336,7 +1336,6 @@ msgstr "Suprimir la règla de moderacion"
 
 #: front/src/components/auth/Settings.vue:274
 #: src/components/auth/Settings.vue:302
-#, fuzzy
 msgctxt "*/*/Button.Label"
 msgid "Delete my account"
 msgstr "Suprimir mon compte"
@@ -2470,7 +2469,6 @@ msgstr "Las bibliotècas vos ajudan a organizar e partejar vòstras colleccions 
 #: front/src/views/admin/library/UploadDetail.vue:144
 #: front/src/views/admin/moderation/AccountsDetail.vue:518 src/entities.js:132
 #: front/src/components/mixins/Report.vue:78
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Library"
 msgstr "Bibliotèca"
@@ -3322,6 +3320,8 @@ msgstr "Listas de lectura"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
+"Mercés de contactar vòstres administrators e de lor demandar d’actualizar lo "
+"paramètres ligat."
 
 #: front/src/components/auth/Settings.vue:79
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -4120,6 +4120,8 @@ msgstr "Ligam de partatge"
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
 msgstr ""
+"Lo partatge foncionarà pas perque aqueste pod autoriza pas los utilizaires "
+"anonimes a accedir al contengut."
 
 #: front/src/components/About.vue:156
 msgctxt "*/*/*/Verb"
