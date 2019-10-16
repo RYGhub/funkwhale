@@ -3,10 +3,12 @@
     <section :class="['ui', 'head', {'with-background': banner}, 'vertical', 'center', 'aligned', 'stripe', 'segment']" :style="headerStyle">
       <div class="segment-content">
         <h1 class="ui center aligned large header">
-          <translate translate-context="Content/Home/Header"
+          <span
+            v-translate="{podName: podName}"
+            translate-context="Content/Home/Header"
             :translate-params="{podName: podName}">
             Welcome to %{ podName }!
-          </translate>
+          </span>
           <div v-if="shortDescription" class="sub header">
             {{ shortDescription }}
           </div>
