@@ -21,7 +21,7 @@ plugins.push(
     ]),
     whitelist: ['scale'],
     whitelistPatterns:[/plyr/],
-    whitelistPatternsChildren:[/plyr/]
+    whitelistPatternsChildren:[/plyr/, /dropdown/]
   }),
 )
 module.exports = {
