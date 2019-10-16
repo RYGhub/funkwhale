@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-14 10:14+0000\n"
-"Last-Translator: Ezra <ezra.zebra@protonmail.com>\n"
+"PO-Revision-Date: 2019-10-18 08:59+0000\n"
+"Last-Translator: Keunes <keunes@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.7\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -111,7 +111,6 @@ msgstr[0] "% { count } nummer komt overeen met de gecombineerde filters"
 msgstr[1] "% { count } nummers komen overeen met de gecombineerde filters"
 
 #: front/src/components/About.vue:185
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } tracks"
 msgid_plural "%{ count } tracks"
@@ -202,7 +201,6 @@ msgid "90 days"
 msgstr "90 dagen"
 
 #: front/src/components/library/FileUpload.vue:264
-#, fuzzy
 msgctxt "Content/Library/Help text"
 msgid "A network error occurred while uploading this file"
 msgstr "Er is een netwerkfout opgetreden tijdens het uploaden van dit bestand"
@@ -621,7 +619,6 @@ msgstr ""
 "Er is een HTTP-fout opgetreden bij het contacteren van de externe server"
 
 #: front/src/components/library/ImportStatusModal.vue:145
-#, fuzzy
 msgctxt "Popup/Import/Error.Label"
 msgid "An unknown error occurred"
 msgstr "Er is een onbekende fout opgetreden"
@@ -1491,7 +1488,6 @@ msgstr "Subsonic-API-toegang uitschakelen?"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:18
 #: front/src/views/admin/moderation/AccountsDetail.vue:157
 #: front/src/views/admin/moderation/AccountsDetail.vue:161
-#, fuzzy
 msgctxt "*/*/*/State of feature"
 msgid "Disabled"
 msgstr "Uitgeschakeld"
@@ -1532,7 +1528,6 @@ msgid "Do not download any media file (audio, album cover, account avatar…) fr
 msgstr "Geen mediabestanden (audio, albumhoes, profielfoto…) downloaden van dit account of domein. Hiermee wordt ook bestaande content verwijderd."
 
 #: front/src/views/Notifications.vue:36
-#, fuzzy
 msgctxt "Content/Notifications/Header"
 msgid "Do you like Funkwhale?"
 msgstr "Vind je Funkwhale leuk?"
@@ -1762,7 +1757,6 @@ msgstr "Uitgezonden berichten"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:17
 #: front/src/views/admin/moderation/AccountsDetail.vue:156
 #: front/src/views/admin/moderation/AccountsDetail.vue:160
-#, fuzzy
 msgctxt "*/*/*/State of feature"
 msgid "Enabled"
 msgstr "Ingeschakeld"
@@ -1990,7 +1984,6 @@ msgid "Failed"
 msgstr "Mislukt"
 
 #: front/src/views/content/remote/Card.vue:75
-#, fuzzy
 msgctxt "Content/Library/Card.List item/Noun"
 msgid "Failed tracks:"
 msgstr "Mislukte nummers:"
@@ -1998,7 +1991,6 @@ msgstr "Mislukte nummers:"
 #: front/src/views/admin/library/AlbumDetail.vue:171
 #: front/src/views/admin/library/ArtistDetail.vue:159
 #: front/src/views/admin/library/TrackDetail.vue:223
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Favorited tracks"
 msgstr "Favoriete nummers"
@@ -2027,7 +2019,6 @@ msgid "Field"
 msgstr "Veld"
 
 #: front/src/components/library/FileUpload.vue:93
-#, fuzzy
 msgctxt "Content/Library/Table.Label"
 msgid "Filename"
 msgstr "Bestandsnaam"
@@ -2229,10 +2220,9 @@ msgstr "Als je applicaties van derden toegang hebt gegeven tot je data, vind je 
 
 #: front/src/components/mixins/Translations.vue:46
 #: front/src/components/mixins/Translations.vue:47
-#, fuzzy
 msgctxt "Content/Moderation/Dropdown"
 msgid "Illegal content"
-msgstr "illegale inhoud"
+msgstr "Illegale inhoud"
 
 #: front/src/components/library/ImportStatusModal.vue:3
 msgctxt "Popup/Import/Title"
@@ -2397,7 +2387,6 @@ msgid "Keyboard shortcuts"
 msgstr "Sneltoetsen"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:198
-#, fuzzy
 msgctxt "Content/Moderation/Table.Label.Link"
 msgid "Known accounts"
 msgstr "Bekende accounts"
@@ -2458,7 +2447,6 @@ msgid "Leave empty for a random code"
 msgstr "Laat leeg om een willekeurig code te krijgen"
 
 #: front/src/components/audio/EmbedWizard.vue:17
-#, fuzzy
 msgctxt "Popup/Embed/Paragraph"
 msgid "Leave empty for a responsive widget"
 msgstr "Laat leeg voor een responsieve widget"
@@ -2519,7 +2507,6 @@ msgid "Library deleted"
 msgstr "Bibliotheek verwijderd"
 
 #: front/src/views/admin/library/EditsList.vue:4
-#, fuzzy
 msgctxt "Content/Admin/Title/Noun"
 msgid "Library edits"
 msgstr "Bibliotheekbewerkingen"
@@ -2939,13 +2926,12 @@ msgstr "Nee"
 #: front/src/components/audio/Search.vue:25
 msgctxt "Content/Search/Paragraph"
 msgid "No album matched your query"
-msgstr "Geen albums kwamen overeen met uw zoekopdracht"
+msgstr "Geen albums gevonden voor je zoekopdracht"
 
 #: front/src/components/audio/Search.vue:16
-#, fuzzy
 msgctxt "Content/Search/Paragraph"
 msgid "No artist matched your query"
-msgstr "Geen enkele artiest komt overeen met uw zoekopdracht"
+msgstr "Geen artiesten gevonden voor je zoekopdracht"
 
 #: front/src/components/library/TrackDetail.vue:14
 msgctxt "Content/Track/Table.Paragraph"
@@ -3013,7 +2999,6 @@ msgstr "Meldingen"
 
 #: front/src/components/mixins/Translations.vue:47
 #: front/src/components/mixins/Translations.vue:48
-#, fuzzy
 msgctxt "Content/Moderation/Dropdown"
 msgid "Offensive content"
 msgstr "Aanstootgevende inhoud"
@@ -3044,11 +3029,12 @@ msgid "Open"
 msgstr "Open"
 
 #: front/src/components/library/ImportStatusModal.vue:56
+#, fuzzy
 msgctxt "Popup/Import/Table.Label/Value"
 msgid "Open a support thread (include the debug information below in your message)"
 msgstr ""
-"Open een ondersteuningsthread (voeg de foutopsporingsinformatie vanonder toe "
-"in uw bericht)"
+"Open een ondersteuningsthread (voeg de foutopsporingsinformatie toe onderaan "
+"je bericht)"
 
 #: front/src/components/library/AlbumBase.vue:87
 #: front/src/components/library/ArtistBase.vue:99
@@ -3095,10 +3081,9 @@ msgid "Open website"
 msgstr "Open website"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:40
-#, fuzzy
 msgctxt "Content/Moderation/Card.Title"
 msgid "Or customize your rule"
-msgstr "Of pas uw regel aan"
+msgstr "Of pas de regel aan"
 
 #: front/src/components/favorites/List.vue:32
 #: src/components/library/Radios.vue:41
@@ -3238,10 +3223,9 @@ msgid "Pending review"
 msgstr "Wachtend op beoordeling"
 
 #: front/src/components/Sidebar.vue:233
-#, fuzzy
 msgctxt "Sidebar/Moderation/Hidden text"
 msgid "Pending review edits"
-msgstr "In behandeling zijnde verzoeken"
+msgstr "Openstaande bewerkingen"
 
 #: front/src/components/auth/Settings.vue:176
 #: front/src/components/manage/users/UsersTable.vue:42
@@ -3359,8 +3343,8 @@ msgstr "Afspeellijsten"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
-"Gelieve uw beheerders te contacteren en hen te vragen om de bijbehorende "
-"instelling bij te werken."
+"Neem alsjeblieft contact op met de beheerders om te vragen de relevante "
+"instellingen aan te passen."
 
 #: front/src/components/auth/Settings.vue:79
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -3383,7 +3367,6 @@ msgid "Pod configuration"
 msgstr "Pod-configuratie"
 
 #: front/src/views/admin/library/TrackDetail.vue:143 src/edits.js:70
-#, fuzzy
 msgctxt "*/*/*/Short, Noun"
 msgid "Position"
 msgstr "Positie"
@@ -3433,7 +3416,6 @@ msgstr "Aan het verwerken"
 
 #: front/src/components/mixins/Translations.vue:80
 #: front/src/components/mixins/Translations.vue:81
-#, fuzzy
 msgctxt "Content/OAuth Scopes/Label"
 msgid "Profile"
 msgstr "Profiel"
@@ -3518,7 +3500,7 @@ msgstr "Radio's"
 #: front/src/components/auth/ApplicationForm.vue:151
 msgctxt "Content/OAuth Scopes/Label/Verb"
 msgid "Read"
-msgstr ""
+msgstr "Lezen"
 
 #: front/src/components/library/ImportStatusModal.vue:51
 msgctxt "Popup/Import/Table.Label/Value"
@@ -3545,25 +3527,24 @@ msgstr "Reden"
 #: front/src/views/admin/moderation/DomainsDetail.vue:216
 msgctxt "Content/Moderation/Table.Label/Noun"
 msgid "Received library follows"
-msgstr ""
+msgstr "Bibliotheek-volgers"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:48
 #: front/src/components/mixins/Translations.vue:74
 #: front/src/components/mixins/Translations.vue:75
 msgctxt "Content/Moderation/*/Noun"
 msgid "Received messages"
-msgstr ""
+msgstr "Ontvangen berichten"
 
 #: front/src/components/library/EditForm.vue:27
-#, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Recent edits"
-msgstr "Recent toegevoegd"
+msgstr "Recente bewerkingen"
 
 #: front/src/components/library/EditForm.vue:17
 msgctxt "Content/Library/Paragraph"
 msgid "Recent edits awaiting review"
-msgstr ""
+msgstr "Recente bewerking wachtend op een beoordeling"
 
 #: front/src/components/library/Home.vue:24
 msgctxt "Content/Home/Title"
@@ -3571,10 +3552,9 @@ msgid "Recently added"
 msgstr "Recent toegevoegd"
 
 #: front/src/components/Home.vue:167
-#, fuzzy
 msgctxt "Content/Home/Title"
 msgid "Recently added albums"
-msgstr "Recent toegevoegd"
+msgstr "Recent toegevoegde albums"
 
 #: front/src/components/library/Home.vue:11
 msgctxt "Content/Home/Title"
@@ -3587,9 +3567,10 @@ msgid "Recently listened"
 msgstr "Recent beluisterd"
 
 #: front/src/components/auth/ApplicationForm.vue:13
+#, fuzzy
 msgctxt "Content/Applications/Input.Label/Noun"
 msgid "Redirect URI"
-msgstr ""
+msgstr "Redirect URI"
 
 #: front/src/components/auth/Settings.vue:125
 #: src/components/auth/Settings.vue:170
@@ -3600,28 +3581,26 @@ msgid "Refresh"
 msgstr "Verversen"
 
 #: front/src/components/federation/FetchButton.vue:20
-#, fuzzy
 msgctxt "Popup/*/Message.Title"
 msgid "Refresh error"
-msgstr "Verversen"
+msgstr "Fout bij vernieuwen"
 
 #: front/src/views/admin/library/AlbumDetail.vue:56
 #: front/src/views/admin/library/ArtistDetail.vue:54
 #: front/src/views/admin/library/TrackDetail.vue:55
 msgctxt "Content/Moderation/Button/Verb"
 msgid "Refresh from remote server"
-msgstr ""
+msgstr "Vernieuwd door externe server"
 
 #: front/src/views/admin/moderation/DomainsDetail.vue:164
 msgctxt "Content/Moderation/Button.Label/Verb"
 msgid "Refresh node info"
-msgstr ""
+msgstr "Vernieuw serverinformatie"
 
 #: front/src/components/federation/FetchButton.vue:79
-#, fuzzy
 msgctxt "Popup/*/Message.Title"
 msgid "Refresh pending"
-msgstr "Aflopend"
+msgstr "Vernieuwing in afwachting"
 
 #: front/src/components/federation/FetchButton.vue:80
 msgctxt "Popup/*/Message.Content"
@@ -3629,20 +3608,19 @@ msgid "Refresh request wasn't proceed in time by our server. It will be processe
 msgstr ""
 
 #: front/src/components/federation/FetchButton.vue:16
-#, fuzzy
 msgctxt "Popup/*/Message.Title"
 msgid "Refresh successful"
-msgstr "Scannen afgerond"
+msgstr "Vernieuwen afgerond"
 
 #: front/src/components/common/ActionTable.vue:275
 msgctxt "Content/*/Button.Tooltip/Verb"
 msgid "Refresh table content"
-msgstr ""
+msgstr "Vernieuw inhoud tabel"
 
 #: front/src/components/federation/FetchButton.vue:12
 msgctxt "Popup/*/Message.Title"
 msgid "Refresh was skipped"
-msgstr ""
+msgstr "Vernieuwen overgeslagen"
 
 #: front/src/components/federation/FetchButton.vue:7
 msgctxt "Popup/*/Title"
@@ -3656,10 +3634,9 @@ msgid "Registrations"
 msgstr "Administratie"
 
 #: front/src/components/manage/users/UsersTable.vue:72
-#, fuzzy
 msgctxt "Content/Admin/Table, User role"
 msgid "Regular user"
-msgstr "standaard gebruiker"
+msgstr "Standaardgebruiker"
 
 #: front/src/components/library/EditCard.vue:87
 #: front/src/views/content/libraries/Detail.vue:51
@@ -3669,10 +3646,9 @@ msgstr "Afkeuren"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:32
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:123
-#, fuzzy
 msgctxt "Content/Moderation/*/Verb"
 msgid "Reject media"
-msgstr "Afgekeurd"
+msgstr "Media afkeuren"
 
 #: front/src/components/library/EditCard.vue:33
 #: front/src/components/manage/library/EditsCardList.vue:24
@@ -3684,20 +3660,19 @@ msgstr "Afgekeurd"
 #: front/src/components/manage/library/AlbumsTable.vue:43
 #: front/src/components/mixins/Translations.vue:54 src/edits.js:43
 #: front/src/components/mixins/Translations.vue:55
-#, fuzzy
 msgctxt "Content/*/*/Noun"
 msgid "Release date"
-msgstr "Benaderd op"
+msgstr "Publicatiedatum"
 
 #: front/src/components/library/FileUpload.vue:63
 msgctxt "Content/Library/Paragraph"
 msgid "Remaining storage space"
-msgstr ""
+msgstr "Resterende opslagruimte"
 
 #: front/src/views/Notifications.vue:18 src/views/Notifications.vue:52
 msgctxt "Content/Notifications/Label"
 msgid "Remind me in:"
-msgstr ""
+msgstr "Herinner me over:"
 
 #: front/src/views/content/remote/Home.vue:6
 msgctxt "Content/Library/Title/Noun"
@@ -3720,17 +3695,15 @@ msgid "Remove avatar"
 msgstr "Gebruikersafbeelding verwijderen"
 
 #: front/src/components/library/ArtistDetail.vue:12
-#, fuzzy
 msgctxt "Content/Moderation/Button.Label"
 msgid "Remove filter"
-msgstr "Gebruikersafbeelding verwijderen"
+msgstr "Filter verwijderen"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:198
 #: front/src/views/admin/moderation/DomainsDetail.vue:39
-#, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Remove from allow-list"
-msgstr "Verwijderen uit favorieten"
+msgstr "Verwijder van toelatingslijst"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:26
 msgctxt "Content/Track/Icon.Tooltip/Verb"
@@ -3741,91 +3714,90 @@ msgstr "Verwijderen uit favorieten"
 msgctxt "Popup/Library/Paragraph"
 msgid "Removes uploaded but yet to be processed tracks completely, adding the corresponding data to your quota."
 msgstr ""
+"Alle nummers die geüpload maar nog niet verwerkt zijn, worden verwijderd. De "
+"bestanden worden gewist en je krijgt de bijbehorende opslagruimte terug."
 
 #: front/src/views/content/libraries/Quota.vue:64
-#, fuzzy
 msgctxt "Popup/Library/Paragraph"
 msgid "Removes uploaded tracks skipped during the import processes completely, adding the corresponding data to your quota."
-msgstr "Alle nummers die bij het importeren zijn overgeslagen (om wat voor reden dan ook), worden verwijderd. De bestanden worden volledig verwijderd en je krijgt het bijbehorende quotum terug."
+msgstr ""
+"Alle nummers die bij het importeren zijn overgeslagen, worden verwijderd. De "
+"bestanden worden gewist en je krijgt de bijbehorende opslagruimte terug."
 
 #: front/src/views/content/libraries/Quota.vue:90
-#, fuzzy
 msgctxt "Popup/Library/Paragraph"
 msgid "Removes uploaded tracks that could not be processed by the server completely, adding the corresponding data to your quota."
-msgstr "Alle nummers die nog niet verwerkt zijn, worden verwijderd. De bestanden worden volledig verwijderd en je krijgt het bijbehorende quotum terug."
+msgstr ""
+"Alle nummers die zijn geüpload maar niet volledig door de server verwerkt "
+"konden worden, worden verwijderd. De bestanden worden gewist en je krijgt de "
+"bijbehorende opslagruimte terug."
 
 #: front/src/components/audio/PlayButton.vue:94
-#, fuzzy
 msgctxt "*/Queue/Dropdown/Button/Title"
 msgid "Replace current queue"
-msgstr "Aan huidige wachtrij toevoegen"
+msgstr "Huidige wachtrij vervangen"
 
 #: front/src/components/mixins/Report.vue:6 src/components/mixins/Report.vue:7
 msgctxt "*/Moderation/*/Verb"
 msgid "Report @%{ username }…"
-msgstr ""
+msgstr "@%{ username } melden…"
 
 #: front/src/components/manage/moderation/ReportCard.vue:5
 msgctxt "Content/Moderation/Card/Short"
 msgid "Report %{ id }"
-msgstr ""
+msgstr "Melding %{id}"
 
 #: front/src/components/moderation/ReportModal.vue:139
 msgctxt "*/Moderation/Message"
 msgid "Report successfully submitted, thank you"
-msgstr ""
+msgstr "Melding succesvol ingediend, dankjewel"
 
 #: front/src/components/mixins/Report.vue:36
 #: src/components/mixins/Report.vue:37
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this album…"
-msgstr "Dit album bewerken"
+msgstr "Dit album rapporteren…"
 
 #: front/src/components/mixins/Report.vue:50
 #: src/components/mixins/Report.vue:51
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this artist…"
-msgstr "Toevoegen aan deze afspeellijst"
+msgstr "Deze artiest rapporteren…"
 
 #: front/src/components/mixins/Report.vue:72
 #: src/components/mixins/Report.vue:73
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this library…"
-msgstr "Deze bibliotheek verwijderen?"
+msgstr "Deze bibliotheek rapporteren…"
 
 #: front/src/components/mixins/Report.vue:61
 #: src/components/mixins/Report.vue:62
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this playlist…"
-msgstr "Toevoegen aan deze afspeellijst"
+msgstr "Deze afspeellijst rapporteren…"
 
 #: front/src/components/mixins/Report.vue:23
 #: src/components/mixins/Report.vue:24
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this track…"
-msgstr "Instantie-informatie bewerken"
+msgstr "Dit nummer rapporteren…"
 
 #: front/src/components/audio/PlayButton.vue:95
 msgctxt "*/Moderation/*/Button/Label,Verb"
 msgid "Report…"
-msgstr ""
+msgstr "Rapporteren…"
 
 #: front/src/components/manage/moderation/ReportCard.vue:117
 msgctxt "Content/*/*/Short"
 msgid "Reported object"
-msgstr ""
+msgstr "Gemeldde object"
 
 #: front/src/views/admin/moderation/Base.vue:5
 #: front/src/views/admin/moderation/ReportsList.vue:3
 #: front/src/views/admin/moderation/ReportsList.vue:208
 msgctxt "*/Moderation/*/Noun"
 msgid "Reports"
-msgstr ""
+msgstr "Meldingen"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:38
 #: front/src/components/auth/SubsonicTokenForm.vue:41
