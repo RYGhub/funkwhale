@@ -72,7 +72,7 @@ def clean_id3_pictures(apic):
 
 def get_mp4_tag(f, k):
     if k == "pictures":
-        return f.get("covr")
+        return f.get("covr", [])
     raw_value = f.get(k, None)
 
     if not raw_value:
