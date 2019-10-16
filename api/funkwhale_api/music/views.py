@@ -320,6 +320,10 @@ def get_file_path(audio_file):
                 )
             path = "/music" + audio_file.replace(prefix, "", 1)
         if path.startswith("http://") or path.startswith("https://"):
+            protocol, remainder = path.split("://", 1)
+            hostname, r_path = remainder.split("/", 1)
+            r_path = urllib.parse.quote(r_path)
+            path = protocol + "://" + hostname + "/" + r_path
             return (settings.PROTECT_FILES_PATH + "/media/" + path).encode("utf-8")
         # needed to serve files with % or ? chars
         path = urllib.parse.quote(path)

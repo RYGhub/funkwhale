@@ -247,6 +247,18 @@ def test_serve_file_in_place_nginx_encode_url(
     assert response["X-Accel-Redirect"] == expected
 
 
+def test_serve_s3_nginx_encode_url(mocker, settings):
+    settings.PROTECT_FILE_PATH = "/_protected/media"
+    settings.REVERSE_PROXY_TYPE = "nginx"
+    audio_file = mocker.Mock(url="https://s3.storage.example/path/to/mp3?aws=signature")
+
+    expected = (
+        b"/_protected/media/https://s3.storage.example/path/to/mp3%3Faws%3Dsignature"
+    )
+
+    assert views.get_file_path(audio_file) == expected
+
+
 @pytest.mark.parametrize(
     "proxy,serve_path,expected",
     [
