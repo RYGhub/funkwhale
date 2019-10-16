@@ -3,17 +3,17 @@
     <section class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
-          <track-widget :url="'history/listenings/'" :filters="{scope: 'user', ordering: '-creation_date'}">
+          <track-widget :url="'history/listenings/'" :filters="{scope: 'all', ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently listened</translate></template>
           </track-widget>
         </div>
         <div class="column">
-          <track-widget :url="'favorites/tracks/'" :filters="{scope: 'user', ordering: '-creation_date'}">
+          <track-widget :url="'favorites/tracks/'" :filters="{scope: 'all', ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently favorited</translate></template>
           </track-widget>
         </div>
         <div class="column">
-          <playlist-widget :url="'playlists/'" :filters="{scope: 'user', playable: true, ordering: '-creation_date'}">
+          <playlist-widget :url="'playlists/'" :filters="{scope: 'all', playable: true, ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="*/*/*">Playlists</translate></template>
           </playlist-widget>
         </div>
