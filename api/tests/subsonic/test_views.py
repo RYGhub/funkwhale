@@ -469,6 +469,35 @@ def test_get_album_list2_by_genre(f, db, logged_in_api_client, factories):
     }
 
 
+@pytest.mark.parametrize(
+    "params, expected",
+    [
+        ({"type": "byYear", "fromYear": 1902, "toYear": 1903}, [2, 3]),
+        # Because why not, it's supported in Subsonic API…
+        # http://www.subsonic.org/pages/api.jsp#getAlbumList2
+        ({"type": "byYear", "fromYear": 1903, "toYear": 1902}, [3, 2]),
+    ],
+)
+def test_get_album_list2_by_year(params, expected, db, logged_in_api_client, factories):
+    albums = [
+        factories["music.Album"](
+            playable=True, release_date=datetime.date(1900 + i, 1, 1)
+        )
+        for i in range(5)
+    ]
+    url = reverse("api:subsonic-get_album_list2")
+    base_params = {"f": "json"}
+    base_params.update(params)
+    response = logged_in_api_client.get(url, base_params)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "albumList2": {
+            "album": serializers.get_album_list2_data([albums[i] for i in expected])
+        }
+    }
+
+
 @pytest.mark.parametrize("f", ["json"])
 @pytest.mark.parametrize(
     "tags_field",
