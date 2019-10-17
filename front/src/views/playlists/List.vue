@@ -40,7 +40,24 @@
         </div>
       </div>
       <div class="ui hidden divider"></div>
-      <playlist-card-list v-if="result" :playlists="result.results"></playlist-card-list>
+      <playlist-card-list v-if="result && result.results.length > 0" :playlists="result.results"></playlist-card-list>
+      <div v-else-if="result && !result.results.length > 0" class="ui placeholder segment sixteen wide column" style="text-align: center; display: flex; align-items: center">
+        <div class="ui icon header">
+          <i class="list icon"></i>
+          <translate translate-context="Content/Playlists/Placeholder">
+            No results matching your query
+          </translate>
+        </div>
+        <button
+        v-if="$store.state.auth.authenticated"
+        @click="$store.commit('playlists/chooseTrack', null)"
+        class="ui green button labeled icon">
+        <i class="list icon"></i>
+        <translate translate-context="Content/*/Verb">
+          Create a playlist
+          </translate>
+        </button>
+      </div>
       <div class="ui center aligned basic segment">
         <pagination
           v-if="result && result.results.length > 0"

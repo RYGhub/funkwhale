@@ -7,7 +7,7 @@
     <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
     <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
     <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
-    <div class="ui divided unstackable items">
+    <div v-if="count > 0" class="ui divided unstackable items">
       <div :class="['item', itemClasses]" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
           <img v-if="object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
@@ -46,6 +46,17 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="isLoading" class="ui inverted active dimmer">
+        <div class="ui loader"></div>
+      </div>
+    </div>
+    <div v-else class="ui placeholder segment">
+      <div class="ui icon header">
+        <i class="music icon"></i>
+        <translate translate-context="Content/Home/Placeholder">
+          Nothing found
+        </translate>
       </div>
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>

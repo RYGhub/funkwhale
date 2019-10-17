@@ -12,9 +12,24 @@
     <template v-if="playlistsExist">
       <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
     </template>
-    <template v-else>
-      <placeholder-widget></placeholder-widget>
-    </template>
+    <div v-else class="ui placeholder segment">
+      <div class="ui icon header">
+        <i class="list icon"></i>
+        <translate translate-context="Content/Home/Placeholder">
+          No playlists have been created yet
+        </translate>
+      </div>
+      <button
+        v-if="$store.state.auth.authenticated"
+        @click="$store.commit('playlists/chooseTrack', null)"
+        class="ui green icon labeled button"
+        >
+        <i class="list icon"></i>
+        <translate translate-context="Content/Home/CreatePlaylist">
+          Create Playlist
+        </translate>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -22,7 +37,6 @@
 import _ from '@/lodash'
 import axios from 'axios'
 import PlaylistCard from '@/components/playlists/Card'
-import PlaceholderWidget from '@/components/playlists/PlaceholderWidget'
 
 export default {
   props: {
@@ -30,8 +44,7 @@ export default {
     url: {type: String, required: true}
   },
   components: {
-    PlaylistCard,
-    PlaceholderWidget
+    PlaylistCard
   },
   data () {
     return {

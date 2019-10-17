@@ -18,7 +18,7 @@
       </h2>
       <radio-button v-if="hasFavorites" type="favorites"></radio-button>
     </section>
-    <section class="ui vertical stripe segment">
+    <section v-if="hasFavorites" class="ui vertical stripe segment">
       <div :class="['ui', {'loading': isLoading}, 'form']">
         <div class="fields">
           <div class="field">
@@ -46,7 +46,6 @@
           </div>
         </div>
       </div>
-
       <track-table v-if="results" :tracks="results.results"></track-table>
       <div class="ui center aligned basic segment">
         <pagination
@@ -58,6 +57,18 @@
           ></pagination>
       </div>
     </section>
+    <div v-else class="ui placeholder segment">
+      <div class="ui icon header">
+        <i class="broken heart icon"></i>
+        <translate
+          translate-context="Content/Home/Placeholder"
+        >No tracks have been added to your favorites yet</translate>
+      </div>
+      <router-link :to="'/library'" class="ui green labeled icon button">
+      <i class="headphones icon"></i>
+        <translate translate-context="Content/*/Verb">Browse the library</translate>
+      </router-link>
+    </div>
   </main>
 </template>
 
