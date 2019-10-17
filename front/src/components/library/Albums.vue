@@ -59,6 +59,23 @@
             :key="album.id"
             :album="album"></album-card>
         </div>
+        <div v-else class="ui placeholder segment sixteen wide column" style="text-align: center; display: flex; align-items: center">
+          <div class="ui icon header">
+            <i class="compact disc icon"></i>
+            <translate translate-context="Content/Albums/Placeholder">
+              No results matching your query
+            </translate>
+          </div>
+          <router-link
+          v-if="$store.state.auth.authenticated"
+          :to="{name: 'content.index'}"
+          class="ui green button labeled icon">
+          <i class="upload icon"></i>
+            <translate translate-context="Content/*/Verb">
+              Add some music
+            </translate>
+          </router-link>
+        </div>
       </div>
       <div class="ui center aligned basic segment">
         <pagination
