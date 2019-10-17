@@ -219,6 +219,11 @@ def test_can_get_metadata_from_m4a_file(field, value):
     assert data.get(field) == value
 
 
+def test_get_pictures_m4a_empty():
+    pictures = metadata.get_mp4_tag({}, "pictures")
+    assert metadata.clean_mp4_pictures(pictures) == []
+
+
 def test_can_get_metadata_from_flac_file_not_crash_if_empty():
     path = os.path.join(DATA_DIR, "sample.flac")
     data = metadata.Metadata(path)
