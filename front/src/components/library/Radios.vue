@@ -60,6 +60,23 @@
         </div>
       </div>
       <div class="ui hidden divider"></div>
+      <div v-if="result && !result.results.length > 0" class="ui placeholder segment">
+        <div class="ui icon header">
+          <i class="feed icon"></i>
+          <translate translate-context="Content/Radios/Placeholder">
+            No results matching your query
+          </translate>
+        </div>
+        <router-link
+        v-if="$store.state.auth.authenticated"
+        :to="{name: 'library.radios.build'}"
+        class="ui green button labeled icon">
+          <i class="rss icon"></i>
+          <translate translate-context="Content/*/Verb">
+            Create a radio
+          </translate>
+        </router-link>
+      </div>
       <div
         v-if="result"
         v-masonry
@@ -76,7 +93,7 @@
             v-for="radio in result.results"
             :key="radio.id"
             :custom-radio="radio"></radio-card>
-        </div>
+        </div>        
       </div>
       <div class="ui center aligned basic segment">
         <pagination

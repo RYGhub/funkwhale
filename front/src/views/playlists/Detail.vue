@@ -55,7 +55,6 @@
         <div class="content">
           <div class="description">
             <embed-wizard type="playlist" :id="playlist.id" />
-
           </div>
         </div>
         <div class="actions">
@@ -64,7 +63,6 @@
           </div>
         </div>
       </modal>
-
     </section>
     <section class="ui vertical stripe segment">
       <template v-if="edit">
@@ -73,10 +71,20 @@
           @tracks-updated="updatePlts"
           :playlist="playlist" :playlist-tracks="playlistTracks"></playlist-editor>
       </template>
-      <template v-else>
+      <template v-else-if="tracks.length > 0">
         <h2><translate translate-context="*/*/*">Tracks</translate></h2>
         <track-table :display-position="true" :tracks="tracks"></track-table>
       </template>
+      <div v-else class="ui placeholder segment">
+        <div class="ui icon header">
+          <i class="list icon"></i>
+          <translate translate-context="Content/Home/Placeholder">There are no tracks in this playlist yet</translate>
+        </div>
+        <button @click="edit = !edit" class="ui green icon labeled button">
+          <i class="pencil icon"></i>
+          <translate translate-context="Content/Home/CreatePlaylist">Edit</translate>
+        </button>
+      </div>
     </section>
   </main>
 </template>

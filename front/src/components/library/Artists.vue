@@ -48,6 +48,23 @@
         </div>
         <artist-card :artist="artist" v-for="artist in result.results" :key="artist.id"></artist-card>
       </div>
+      <div v-else-if="!isLoading" class="ui placeholder segment sixteen wide column" style="text-align: center; display: flex; align-items: center">
+        <div class="ui icon header">
+          <i class="compact disc icon"></i>
+          <translate translate-context="Content/Artists/Placeholder">
+            No results matching your query
+          </translate>
+        </div>
+        <router-link
+          v-if="$store.state.auth.authenticated"
+          :to="{name: 'content.index'}"
+          class="ui green button labeled icon">
+          <i class="upload icon"></i>
+          <translate translate-context="Content/*/Verb">
+              Add some music
+          </translate>
+        </router-link>
+      </div>
       <div class="ui center aligned basic segment">
         <pagination
           v-if="result && result.count > paginateBy"

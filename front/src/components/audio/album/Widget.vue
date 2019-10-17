@@ -35,7 +35,14 @@
         </div>
       </div>
     </div>
-    <div v-if="!isLoading && albums.length === 0">No results matching your query.</div>
+    <template v-if="!isLoading && albums.length === 0">
+      <div class="ui placeholder segment">
+        <div class="ui icon header">
+          <i class="compact disc icon"></i>
+          No results matching your query
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 

@@ -38,6 +38,7 @@
           </ul>
         </div>
         </div>
+        <div v-if="playlists.length > 0">
         <h4 class="ui header"><translate translate-context="Popup/Playlist/Title">Available playlists</translate></h4>
         <table class="ui unstackable very basic table">
           <thead>
@@ -72,6 +73,17 @@
             </tr>
           </tbody>
         </table>
+        </div>
+        <template v-else>
+          <div class="ui placeholder segment">
+            <div class="ui icon header">
+              <i class="list icon"></i>
+              <translate translate-context="Content/Home/Placeholder">
+                No playlists have been created yet
+              </translate>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
     <div class="actions">

@@ -31,7 +31,7 @@
         </template>
       </div>
     </section>
-    <section class="ui vertical stripe segment">
+    <section v-if="totalTracks > 0" class="ui vertical stripe segment">
       <h2><translate translate-context="*/*/*">Tracks</translate></h2>
       <track-table :tracks="tracks"></track-table>
       <div class="ui center aligned basic segment">
@@ -44,6 +44,21 @@
           ></pagination>
       </div>
     </section>
+    <div v-else-if="!isLoading && !totalTracks > 0" class="ui placeholder segment">
+      <div class="ui icon header">
+        <i class="rss icon"></i>
+        <translate
+        translate-context="Content/Radios/Placeholder"
+        >No tracks have been added to this radio yet</translate>
+      </div>
+      <router-link
+      v-if="$store.state.auth.username === radio.user.username"
+      class="ui green icon labeled button" 
+      :to="{name: 'library.radios.edit', params: {id: radio.id}}" exact>
+      <i class="pencil icon"></i>
+        Edit…
+      </router-link>
+    </div>
   </main>
 </template>
 
