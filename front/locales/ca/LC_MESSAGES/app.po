@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-14 10:14+0000\n"
+"PO-Revision-Date: 2019-10-18 08:59+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.7\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -74,7 +74,6 @@ msgstr[0] "%{ count } hora de música"
 msgstr[1] "%{ count } hores de música"
 
 #: front/src/components/About.vue:188
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } listenings"
 msgid_plural "%{ count } listenings"
@@ -112,7 +111,6 @@ msgstr[0] "%{ count } pista corresponent als filtres seleccionats"
 msgstr[1] "%{ count } pistes corresponents als filtres seleccionats"
 
 #: front/src/components/About.vue:185
-#, fuzzy
 msgctxt "Content/Home/Stat"
 msgid "%{ count } tracks"
 msgid_plural "%{ count } tracks"
@@ -213,7 +211,6 @@ msgid "A short summary describing your changes."
 msgstr "Una breu resum descrivint els teus canvis."
 
 #: front/src/components/About.vue:5
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "About %{ podName }"
 msgstr "Quant a %{ instance }"
@@ -239,7 +236,6 @@ msgid "About this Funkwhale pod"
 msgstr "Quant a aquesta instància de Funkwhale"
 
 #: front/src/components/About.vue:21 src/components/About.vue:51
-#, fuzzy
 msgctxt "Content/About/Header"
 msgid "About this pod"
 msgstr "Quant a aquesta instància"
@@ -1365,12 +1361,12 @@ msgstr "Suprimir la ràdio"
 #: front/src/components/manage/moderation/ReportCard.vue:357
 msgctxt "Content/Moderation/Button/Verb"
 msgid "Delete reported object"
-msgstr "Esborra l'objecte del que s'ha informat"
+msgstr "Suprimeix l'objecte notificat"
 
 #: front/src/components/manage/moderation/ReportCard.vue:358
 msgctxt "Content/Moderation/Popup/Header"
 msgid "Delete reported object?"
-msgstr "Esborrar l'objecte del que s'ha informat?"
+msgstr "Suprimir l'objecte notificat?"
 
 #: front/src/views/admin/library/AlbumDetail.vue:79
 #: front/src/views/admin/library/TrackDetail.vue:78
@@ -1438,7 +1434,7 @@ msgstr "Descendent"
 #: front/src/components/manage/moderation/NoteForm.vue:37
 msgctxt "Content/Moderation/Placeholder"
 msgid "Describe what actions have been taken, or any other related updates…"
-msgstr "Descriu quines accions s'han dit a terme, o qualsevol altra novetat…"
+msgstr "Descriu quines accions s'han dut a terme, o qualsevol altra novetat …"
 
 #: front/src/components/library/radios/Builder.vue:25
 #: front/src/views/admin/library/LibraryDetail.vue:132
@@ -1485,7 +1481,6 @@ msgstr "Desactivar l'accés a l'API Subsonic?"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:18
 #: front/src/views/admin/moderation/AccountsDetail.vue:157
 #: front/src/views/admin/moderation/AccountsDetail.vue:161
-#, fuzzy
 msgctxt "*/*/*/State of feature"
 msgid "Disabled"
 msgstr "Desactivat"
@@ -1756,7 +1751,6 @@ msgstr "Missatges emesos"
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:17
 #: front/src/views/admin/moderation/AccountsDetail.vue:156
 #: front/src/views/admin/moderation/AccountsDetail.vue:160
-#, fuzzy
 msgctxt "*/*/*/State of feature"
 msgid "Enabled"
 msgstr "Activat"
@@ -1792,7 +1786,6 @@ msgid "Enter playlist name…"
 msgstr "Introduir el nom de la llista de reproducció …"
 
 #: front/src/views/auth/PasswordReset.vue:54
-#, fuzzy
 msgctxt "Content/Signup/Input.Placeholder"
 msgid "Enter the email address linked to your account"
 msgstr "Introdueix el correu electrònic associat al vostre compte"
@@ -2004,7 +1997,6 @@ msgid "Favorites"
 msgstr "Preferides"
 
 #: front/src/components/About.vue:110 src/views/admin/Settings.vue:84
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Federation"
 msgstr "Federació"
@@ -2436,10 +2428,9 @@ msgid "Launch"
 msgstr "Iniciar"
 
 #: front/src/components/Home.vue:35
-#, fuzzy
 msgctxt "Content/Home/Link"
 msgid "Learn more"
-msgstr "Carrega'n més …"
+msgstr "Aprèn més"
 
 #: front/src/components/manage/users/InvitationForm.vue:58
 msgctxt "Content/Admin/Input.Placeholder"
@@ -2487,7 +2478,6 @@ msgstr "Les biblioteques t'ajuden a organitzar i compartir la teva col·lecció 
 #: front/src/views/admin/library/UploadDetail.vue:144
 #: front/src/views/admin/moderation/AccountsDetail.vue:518 src/entities.js:132
 #: front/src/components/mixins/Report.vue:78
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Library"
 msgstr "Biblioteca"
@@ -2685,10 +2675,9 @@ msgid "Manage library"
 msgstr "Gestionar la biblioteca"
 
 #: front/src/components/manage/moderation/InstancePolicyModal.vue:8
-#, fuzzy
 msgctxt "Popup/Moderation/Title/Verb"
 msgid "Manage moderation rules for %{ obj }"
-msgstr "Sota la regla de moderació"
+msgstr "Gestioneu les regles de moderació de %{ obj }"
 
 #: front/src/components/playlists/PlaylistModal.vue:3
 msgctxt "Popup/Playlist/Title/Verb"
@@ -2747,10 +2736,9 @@ msgid "Mobile and desktop apps"
 msgstr "Aplicacions mòbils i d'escriptori"
 
 #: front/src/components/Home.vue:143
-#, fuzzy
 msgctxt "Content/Home/Link"
 msgid "Mobile apps"
-msgstr "Aplicacions mòbils i d'escriptori"
+msgstr "Aplicacions mòbils"
 
 #: front/src/components/Sidebar.vue:96
 #: src/components/manage/users/UsersTable.vue:178
@@ -2771,7 +2759,7 @@ msgstr "Les regles de moderació t'ajudaran a controlar com la vostra instància
 #, fuzzy
 msgctxt "Content/Moderation/Button.Label"
 msgid "Moderation rules…"
-msgstr "Editar les regles de moderació"
+msgstr "Regles de moderació …"
 
 #: front/src/components/library/EditCard.vue:5
 msgctxt "Content/Library/Card/Short"
@@ -3858,7 +3846,7 @@ msgstr "Rellançar la importació"
 #: front/src/components/library/EditForm.vue:31
 msgctxt "Content/Library/Button.Label"
 msgid "Restrict to unreviewed edits"
-msgstr "Restringir a edicions no revisades"
+msgstr "Restringiu les edicions no revisades"
 
 #: front/src/components/favorites/List.vue:39
 #: src/components/library/Albums.vue:34
