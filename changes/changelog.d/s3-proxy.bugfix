@@ -1,0 +1,1 @@
+Fix audio serving issues under S3/nginx when signatures are enabled
