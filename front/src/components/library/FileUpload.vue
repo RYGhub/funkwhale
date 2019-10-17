@@ -91,9 +91,20 @@
         <table class="ui unstackable table">
           <thead>
             <tr>
-              <th><translate translate-context="Content/Library/Table.Label">Filename</translate></th>
+              <th class="ten wide"><translate translate-context="Content/Library/Table.Label">Filename</translate></th>
               <th><translate translate-context="Content/*/*/Noun">Size</translate></th>
               <th><translate translate-context="*/*/*">Status</translate></th>
+              <th><translate translate-context="*/*/*">Actions</translate></th>
+            </tr>
+            <tr v-if="retryableFiles.length > 1">
+              <th class="ten wide"></th>
+              <th></th>
+              <th></th>
+              <th>
+                <button class="ui right floated small basic button" @click.prevent="retry(retryableFiles)">
+                  <translate translate-context="Content/Library/Table">Retry failed uploads</translate>
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -113,9 +124,20 @@
                   <translate translate-context="Content/Library/Table" key="2">Uploading…</translate>
                   ({{ parseInt(file.progress) }}%)
                 </span>
-                <template v-else>
-                  <span class="ui label"><translate translate-context="Content/Library/*/Short" key="3">Pending</translate></span>
-                  <button class="ui tiny basic red icon button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
+                <span v-else class="ui label"><translate translate-context="Content/Library/*/Short" key="3">Pending</translate></span>
+              </td>
+              <td>
+                <template v-if="file.error">
+                  <button
+                    class="ui tiny basic icon right floated button"
+                    :title="labels.retry"
+                    @click.prevent="retry([file])"
+                    v-if="retryableFiles.indexOf(file) > -1">
+                    <i class="redo icon"></i>
+                  </button>
+                </template>
+                <template v-else-if="!file.success">
+                  <button class="ui tiny basic red icon right floated button" @click.prevent="$refs.upload.remove(file)"><i class="delete icon"></i></button>
                 </template>
               </td>
             </tr>
@@ -251,6 +273,13 @@ export default {
         self.uploads.objects[event.upload.uuid] = event.upload;
         self.needsRefresh = true
       });
+    },
+    retry (files) {
+      files.forEach((file) => {
+        this.$refs.upload.update(file, {error: '', progress: '0.00'})
+      })
+      this.$refs.upload.active = true;
+
     }
   },
   computed: {
@@ -274,6 +303,7 @@ export default {
           server,
           network,
           timeout,
+          retry: this.$pgettext('*/*/*/Verb', "Retry"),
           extension: this.$gettextInterpolate(extension, {
             extensions: this.supportedExtensions.join(", ")
           })
@@ -294,6 +324,11 @@ export default {
       return this.files.filter(f => {
         return f.error;
       }).length;
+    },
+    retryableFiles () {
+      return this.files.filter(f => {
+        return f.error;
+      });
     },
     processableFiles() {
       return (
@@ -342,7 +377,9 @@ export default {
     uploadedSize () {
       let uploaded = 0
       this.files.forEach((f) => {
-        uploaded += f.size * (f.progress / 100)
+        if (!f.error) {
+          uploaded += f.size * (f.progress / 100)
+        }
       })
       return uploaded
     }
