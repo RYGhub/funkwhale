@@ -1,5 +1,5 @@
 <template>
-  <div class="ui action input">
+  <div class="ui fluid action input">
     <input
     required
     name="password"
