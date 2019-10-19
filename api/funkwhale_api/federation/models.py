@@ -9,6 +9,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models.signals import post_save, pre_save, post_delete
+from django.dispatch import receiver
 from django.utils import timezone
 from django.urls import reverse
 
@@ -554,3 +556,41 @@ class LibraryTrack(models.Model):
 
     def get_metadata(self, key):
         return self.metadata.get(key)
+
+
+@receiver(pre_save, sender=LibraryFollow)
+def set_approved_updated(sender, instance, update_fields, **kwargs):
+    if not instance.pk or not instance.actor.is_local:
+        return
+    if update_fields is not None and "approved" not in update_fields:
+        return
+    db_value = instance.__class__.objects.filter(pk=instance.pk).values_list(
+        "approved", flat=True
+    )[0]
+    if db_value != instance.approved:
+        # Needed to update denormalized permissions
+        setattr(instance, "_approved_updated", True)
+
+
+@receiver(post_save, sender=LibraryFollow)
+def update_denormalization_follow_approved(sender, instance, created, **kwargs):
+    from funkwhale_api.music import models as music_models
+
+    updated = getattr(instance, "_approved_updated", False)
+
+    if (created or updated) and instance.actor.is_local:
+        music_models.TrackActor.create_entries(
+            instance.target,
+            actor_ids=[instance.actor.pk],
+            delete_existing=not instance.approved,
+        )
+
+
+@receiver(post_delete, sender=LibraryFollow)
+def update_denormalization_follow_deleted(sender, instance, **kwargs):
+    from funkwhale_api.music import models as music_models
+
+    if instance.actor.is_local:
+        music_models.TrackActor.objects.filter(
+            actor=instance.actor, upload__in=instance.target.uploads.all()
+        ).delete()

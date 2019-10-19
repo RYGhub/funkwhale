@@ -14,7 +14,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
@@ -185,8 +185,8 @@ class ArtistQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
         return self.annotate(is_playable_by_actor=subquery)
 
     def playable_by(self, actor, include=True):
-        tracks = Track.objects.playable_by(actor, include)
-        matches = self.filter(tracks__in=tracks).values_list("pk")
+        tracks = Track.objects.playable_by(actor)
+        matches = self.filter(pk__in=tracks.values("artist_id")).values_list("pk")
         if include:
             return self.filter(pk__in=matches)
         else:
@@ -269,8 +269,8 @@ class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
         return self.annotate(is_playable_by_actor=subquery)
 
     def playable_by(self, actor, include=True):
-        tracks = Track.objects.playable_by(actor, include)
-        matches = self.filter(tracks__in=tracks).values_list("pk")
+        tracks = Track.objects.playable_by(actor)
+        matches = self.filter(pk__in=tracks.values("album_id")).values_list("pk")
         if include:
             return self.filter(pk__in=matches)
         else:
@@ -418,6 +418,7 @@ class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
         return self.select_related().select_related("album__artist", "artist")
 
     def annotate_playable_by_actor(self, actor):
+
         files = (
             Upload.objects.playable_by(actor)
             .filter(track=models.OuterRef("id"))
@@ -428,6 +429,15 @@ class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
         return self.annotate(is_playable_by_actor=subquery)
 
     def playable_by(self, actor, include=True):
+
+        if settings.MUSIC_USE_DENORMALIZATION:
+            if actor is not None:
+                query = models.Q(actor=None) | models.Q(actor=actor)
+            else:
+                query = models.Q(actor=None, internal=False)
+            if not include:
+                query = ~query
+            return self.filter(pk__in=TrackActor.objects.filter(query).values("track"))
         files = Upload.objects.playable_by(actor, include)
         matches = self.filter(uploads__in=files).values_list("pk")
         if include:
@@ -1147,9 +1157,132 @@ class LibraryScan(models.Model):
     modification_date = models.DateTimeField(null=True, blank=True)
 
 
+class TrackActor(models.Model):
+    """
+    Denormalization table to store all playable tracks for a given user
+    Empty user means the track is public or internal (cf internal flag too)
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    actor = models.ForeignKey(
+        "federation.Actor",
+        on_delete=models.CASCADE,
+        related_name="track_actor_items",
+        blank=True,
+        null=True,
+    )
+    track = models.ForeignKey(
+        Track, on_delete=models.CASCADE, related_name="track_actor_items"
+    )
+    upload = models.ForeignKey(
+        Upload, on_delete=models.CASCADE, related_name="track_actor_items"
+    )
+    internal = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        unique_together = ("track", "actor", "internal", "upload")
+
+    @classmethod
+    def get_objs(cls, library, actor_ids, upload_and_track_ids):
+        upload_and_track_ids = upload_and_track_ids or library.uploads.filter(
+            import_status="finished", track__isnull=False
+        ).values_list("id", "track")
+        objs = []
+        if library.privacy_level == "me":
+            follow_queryset = library.received_follows.filter(approved=True).exclude(
+                actor__user__isnull=True
+            )
+            if actor_ids:
+                follow_queryset = follow_queryset.filter(actor__pk__in=actor_ids)
+            final_actor_ids = list(follow_queryset.values_list("actor", flat=True))
+
+            owner = library.actor if library.actor.is_local else None
+            if owner and (not actor_ids or owner in final_actor_ids):
+                final_actor_ids.append(owner.pk)
+            for actor_id in final_actor_ids:
+                for upload_id, track_id in upload_and_track_ids:
+                    objs.append(
+                        cls(actor_id=actor_id, track_id=track_id, upload_id=upload_id)
+                    )
+
+        elif library.privacy_level == "instance":
+            for upload_id, track_id in upload_and_track_ids:
+                objs.append(
+                    cls(
+                        actor_id=None,
+                        track_id=track_id,
+                        upload_id=upload_id,
+                        internal=True,
+                    )
+                )
+        elif library.privacy_level == "everyone":
+            for upload_id, track_id in upload_and_track_ids:
+                objs.append(cls(actor_id=None, track_id=track_id, upload_id=upload_id))
+        return objs
+
+    @classmethod
+    def create_entries(
+        cls, library, delete_existing=True, actor_ids=None, upload_and_track_ids=None
+    ):
+        if not settings.MUSIC_USE_DENORMALIZATION:
+            # skip
+            return
+        if delete_existing:
+            to_delete = cls.objects.filter(upload__library=library)
+            if actor_ids:
+                to_delete = to_delete.filter(actor__pk__in=actor_ids)
+            # we don't use .delete() here because we don't want signals to fire
+            to_delete._raw_delete(to_delete.db)
+
+        objs = cls.get_objs(
+            library, actor_ids=actor_ids, upload_and_track_ids=upload_and_track_ids
+        )
+        return cls.objects.bulk_create(objs, ignore_conflicts=True, batch_size=5000)
+
+
 @receiver(post_save, sender=ImportJob)
 def update_batch_status(sender, instance, **kwargs):
     instance.batch.update_status()
+
+
+@receiver(post_save, sender=Upload)
+def update_denormalization_track_actor(sender, instance, created, **kwargs):
+    if (
+        created
+        and settings.MUSIC_USE_DENORMALIZATION
+        and instance.track_id
+        and instance.import_status == "finished"
+    ):
+        TrackActor.create_entries(
+            instance.library,
+            delete_existing=False,
+            upload_and_track_ids=[(instance.pk, instance.track_id)],
+        )
+
+
+@receiver(pre_save, sender=Library)
+def set_privacy_level_updated(sender, instance, update_fields, **kwargs):
+    if not instance.pk:
+        return
+    if update_fields is not None and "privacy_level" not in update_fields:
+        return
+    db_value = instance.__class__.objects.filter(pk=instance.pk).values_list(
+        "privacy_level", flat=True
+    )[0]
+    if db_value != instance.privacy_level:
+        # Needed to update denormalized permissions
+        setattr(instance, "_privacy_level_updated", True)
+
+
+@receiver(post_save, sender=Library)
+def update_denormalization_track_user_library_privacy_level(
+    sender, instance, created, **kwargs
+):
+    if created:
+        return
+    updated = getattr(instance, "_privacy_level_updated", False)
+    if updated:
+        TrackActor.create_entries(instance)
 
 
 @receiver(post_save, sender=ImportBatch)
