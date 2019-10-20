@@ -284,7 +284,7 @@ class AlbumQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
 class Album(APIModelMixin):
     title = models.CharField(max_length=MAX_LENGTHS["ALBUM_TITLE"])
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
-    release_date = models.DateField(null=True, blank=True)
+    release_date = models.DateField(null=True, blank=True, db_index=True)
     release_group_id = models.UUIDField(null=True, blank=True)
     cover = VersatileImageField(
         upload_to="albums/covers/%Y/%m/%d", null=True, blank=True
@@ -415,7 +415,7 @@ def import_album(v):
 
 class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
-        return self.select_related().select_related("album__artist", "artist")
+        return self.prefetch_related("artist", "album__artist")
 
     def annotate_playable_by_actor(self, actor):
 
