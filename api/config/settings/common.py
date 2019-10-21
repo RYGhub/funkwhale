@@ -515,7 +515,6 @@ CACHES = {
         "LOCATION": "local-cache",
     },
 }
-
 CACHES["default"]["BACKEND"] = "django_redis.cache.RedisCache"
 
 CHANNEL_LAYERS = {
@@ -530,7 +529,20 @@ CACHES["default"]["OPTIONS"] = {
     "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
     # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
 }
+CACHEOPS_DURATION = env("CACHEOPS_DURATION", default=0)
+CACHEOPS_ENABLED = bool(CACHEOPS_DURATION)
 
+if CACHEOPS_ENABLED:
+    INSTALLED_APPS += ("cacheops",)
+    CACHEOPS_REDIS = env("CACHE_URL", default=CACHE_DEFAULT)
+    CACHEOPS_PREFIX = lambda _: "cacheops"  # noqa
+    CACHEOPS_DEFAULTS = {"timeout": CACHEOPS_DURATION}
+    CACHEOPS = {
+        "users.user": {"ops": "get"},
+        "music.album": {"ops": "count"},
+        "music.artist": {"ops": "count"},
+        "music.track": {"ops": "count"},
+    }
 
 # CELERY
 INSTALLED_APPS += ("funkwhale_api.taskapp.celery.CeleryConfig",)
