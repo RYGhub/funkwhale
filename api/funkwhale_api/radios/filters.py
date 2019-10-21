@@ -30,7 +30,7 @@ def run(filters, **kwargs):
 
     if final_query:
         candidates = candidates.filter(final_query)
-    return candidates.order_by("pk")
+    return candidates.order_by("pk").distinct()
 
 
 def validate(filter_config):
@@ -100,7 +100,9 @@ class GroupFilter(RadioFilter):
             conf = collections.ChainMap(filter_config, kwargs)
             query = f.get_query(candidates, **conf)
             if filter_config.get("not", False):
-                query = ~query
+                # query = ~query *should* work but it doesn't (see #950)
+                # The line below generate a proper subquery
+                query = ~Q(pk__in=candidates.filter(query).values_list("pk", flat=True))
 
             if not final_query:
                 final_query = query

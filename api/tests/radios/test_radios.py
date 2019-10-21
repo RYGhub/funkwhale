@@ -282,3 +282,41 @@ def test_session_radio_get_queryset_ignore_filtered_track_album_artist(
     radio.start_session(user=cf.user)
 
     assert radio.get_queryset() == [valid_track]
+
+
+def test_get_choices_for_custom_radio_exclude_artist(factories):
+    included_artist = factories["music.Artist"]()
+    excluded_artist = factories["music.Artist"]()
+    included_uploads = factories["music.Upload"].create_batch(
+        5, track__artist=included_artist
+    )
+    factories["music.Upload"].create_batch(5, track__artist=excluded_artist)
+
+    session = factories["radios.CustomRadioSession"](
+        custom_radio__config=[
+            {"type": "artist", "ids": [included_artist.pk]},
+            {"type": "artist", "ids": [excluded_artist.pk], "not": True},
+        ]
+    )
+    choices = session.radio.get_choices(filter_playable=False)
+
+    expected = [u.track.pk for u in included_uploads]
+    assert list(choices.values_list("id", flat=True)) == expected
+
+
+def test_get_choices_for_custom_radio_exclude_tag(factories):
+    included_uploads = factories["music.Upload"].create_batch(
+        5, track__set_tags=["rap"]
+    )
+    factories["music.Upload"].create_batch(5, track__set_tags=["rock", "rap"])
+
+    session = factories["radios.CustomRadioSession"](
+        custom_radio__config=[
+            {"type": "tag", "names": ["rap"]},
+            {"type": "tag", "names": ["rock"], "not": True},
+        ]
+    )
+    choices = session.radio.get_choices(filter_playable=False)
+
+    expected = [u.track.pk for u in included_uploads]
+    assert list(choices.values_list("id", flat=True)) == expected
