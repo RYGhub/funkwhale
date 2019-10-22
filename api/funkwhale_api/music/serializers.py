@@ -45,26 +45,21 @@ class LicenseSerializer(serializers.Serializer):
         return obj["identifiers"][0]
 
 
-class ArtistAlbumSerializer(serializers.ModelSerializer):
+class ArtistAlbumSerializer(serializers.Serializer):
     tracks_count = serializers.SerializerMethodField()
     cover = cover_field
     is_playable = serializers.SerializerMethodField()
+    is_local = serializers.BooleanField()
+    id = serializers.IntegerField()
+    fid = serializers.URLField()
+    mbid = serializers.UUIDField()
+    title = serializers.CharField()
+    artist = serializers.SerializerMethodField()
+    release_date = serializers.DateField()
+    creation_date = serializers.DateTimeField()
 
-    class Meta:
-        model = models.Album
-        fields = (
-            "id",
-            "fid",
-            "mbid",
-            "title",
-            "artist",
-            "release_date",
-            "cover",
-            "creation_date",
-            "tracks_count",
-            "is_playable",
-            "is_local",
-        )
+    def get_artist(self, o):
+        return o.artist_id
 
     def get_tracks_count(self, o):
         return o._tracks_count
@@ -76,26 +71,20 @@ class ArtistAlbumSerializer(serializers.ModelSerializer):
             return None
 
 
-class ArtistWithAlbumsSerializer(serializers.ModelSerializer):
-    albums = ArtistAlbumSerializer(many=True, read_only=True)
+DATETIME_FIELD = serializers.DateTimeField()
+
+
+class ArtistWithAlbumsSerializer(serializers.Serializer):
+    albums = ArtistAlbumSerializer(many=True)
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
     tracks_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Artist
-        fields = (
-            "id",
-            "fid",
-            "mbid",
-            "name",
-            "creation_date",
-            "albums",
-            "is_local",
-            "tags",
-            "attributed_to",
-            "tracks_count",
-        )
+    id = serializers.IntegerField()
+    fid = serializers.URLField()
+    mbid = serializers.UUIDField()
+    name = serializers.CharField()
+    creation_date = serializers.DateTimeField()
+    is_local = serializers.BooleanField()
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
@@ -114,9 +103,7 @@ def serialize_artist_simple(artist):
         "fid": artist.fid,
         "mbid": str(artist.mbid),
         "name": artist.name,
-        "creation_date": serializers.DateTimeField().to_representation(
-            artist.creation_date
-        ),
+        "creation_date": DATETIME_FIELD.to_representation(artist.creation_date),
         "is_local": artist.is_local,
     }
 
@@ -129,9 +116,7 @@ def serialize_album_track(track):
         "title": track.title,
         "artist": serialize_artist_simple(track.artist),
         "album": track.album_id,
-        "creation_date": serializers.DateTimeField().to_representation(
-            track.creation_date
-        ),
+        "creation_date": DATETIME_FIELD.to_representation(track.creation_date),
         "position": track.position,
         "disc_number": track.disc_number,
         "uploads": [
@@ -145,31 +130,22 @@ def serialize_album_track(track):
     }
 
 
-class AlbumSerializer(serializers.ModelSerializer):
+class AlbumSerializer(serializers.Serializer):
     tracks = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     cover = cover_field
     is_playable = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Album
-        fields = (
-            "id",
-            "fid",
-            "mbid",
-            "title",
-            "artist",
-            "tracks",
-            "release_date",
-            "cover",
-            "creation_date",
-            "is_playable",
-            "is_local",
-            "tags",
-            "attributed_to",
-        )
+    id = serializers.IntegerField()
+    fid = serializers.URLField()
+    mbid = serializers.UUIDField()
+    title = serializers.CharField()
+    artist = serializers.SerializerMethodField()
+    release_date = serializers.DateField()
+    creation_date = serializers.DateTimeField()
+    is_local = serializers.BooleanField()
+    is_playable = serializers.SerializerMethodField()
 
     get_attributed_to = serialize_attributed_to
 
@@ -227,7 +203,7 @@ def serialize_upload(upload):
     }
 
 
-class TrackSerializer(serializers.ModelSerializer):
+class TrackSerializer(serializers.Serializer):
     artist = serializers.SerializerMethodField()
     album = TrackAlbumSerializer(read_only=True)
     uploads = serializers.SerializerMethodField()
@@ -235,26 +211,17 @@ class TrackSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
 
-    class Meta:
-        model = models.Track
-        fields = (
-            "id",
-            "fid",
-            "mbid",
-            "title",
-            "album",
-            "artist",
-            "creation_date",
-            "position",
-            "disc_number",
-            "uploads",
-            "listen_url",
-            "copyright",
-            "license",
-            "is_local",
-            "tags",
-            "attributed_to",
-        )
+    id = serializers.IntegerField()
+    fid = serializers.URLField()
+    mbid = serializers.UUIDField()
+    title = serializers.CharField()
+    artist = serializers.SerializerMethodField()
+    creation_date = serializers.DateTimeField()
+    is_local = serializers.BooleanField()
+    position = serializers.IntegerField()
+    disc_number = serializers.IntegerField()
+    copyright = serializers.CharField()
+    license = serializers.SerializerMethodField()
 
     get_attributed_to = serialize_attributed_to
 
@@ -270,6 +237,9 @@ class TrackSerializer(serializers.ModelSerializer):
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
         return [ti.tag.name for ti in tagged_items]
+
+    def get_license(self, o):
+        return o.license_id
 
 
 @common_serializers.track_fields_for_update("name", "description", "privacy_level")
