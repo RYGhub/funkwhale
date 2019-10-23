@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-18 08:59+0000\n"
+"PO-Revision-Date: 2019-10-24 02:30+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -586,9 +586,10 @@ msgid "Allow application"
 msgstr "Autoritzar l'aplicació"
 
 #: front/src/components/About.vue:136
+#, fuzzy
 msgctxt "*/*/*"
 msgid "Allow-list"
-msgstr ""
+msgstr "Llista d'autorització"
 
 #: front/src/components/About.vue:149
 msgctxt "*/*/*"
