@@ -436,7 +436,7 @@ class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
             return self.exclude(pk__in=matches)
 
     def with_playable_uploads(self, actor):
-        uploads = Upload.objects.playable_by(actor).select_related("track")
+        uploads = Upload.objects.playable_by(actor)
         return self.prefetch_related(
             models.Prefetch("uploads", queryset=uploads, to_attr="playable_uploads")
         )
@@ -594,7 +594,8 @@ class Track(APIModelMixin):
 
     @property
     def listen_url(self):
-        return reverse("api:v1:listen-detail", kwargs={"uuid": self.uuid})
+        # Not using reverse because this is slow
+        return "/api/v1/listen/{}/".format(self.uuid)
 
     @property
     def local_license(self):

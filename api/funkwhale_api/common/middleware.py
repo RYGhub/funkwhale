@@ -1,4 +1,5 @@
 import html
+import io
 import requests
 import time
 import xml.sax.saxutils
@@ -240,5 +241,55 @@ class ThrottleStatusMiddleware:
                 remaining = throttle_status["duration"] - (now - int(latest_request))
                 response["X-RateLimit-Reset"] = str(now + remaining)
                 response["X-RateLimit-ResetSeconds"] = str(remaining)
+
+        return response
+
+
+class ProfilerMiddleware:
+    """
+    from https://github.com/omarish/django-cprofile-middleware/blob/master/django_cprofile_middleware/middleware.py
+    Simple profile middleware to profile django views. To run it, add ?prof to
+    the URL like this:
+        http://localhost:8000/view/?prof
+    Optionally pass the following to modify the output:
+    ?sort => Sort the output by a given metric. Default is time.
+        See
+        http://docs.python.org/2/library/profile.html#pstats.Stats.sort_stats
+        for all sort options.
+    ?count => The number of rows to display. Default is 100.
+    ?download => Download profile file suitable for visualization. For example
+        in snakeviz or RunSnakeRun
+    This is adapted from an example found here:
+    http://www.slideshare.net/zeeg/django-con-high-performance-django-presentation.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if "prof" not in request.GET:
+            return self.get_response(request)
+        import profile
+        import pstats
+
+        profiler = profile.Profile()
+        response = profiler.runcall(self.get_response, request)
+        profiler.create_stats()
+        if "prof-download" in request.GET:
+            import marshal
+
+            output = marshal.dumps(profiler.stats)
+            response = http.HttpResponse(
+                output, content_type="application/octet-stream"
+            )
+            response["Content-Disposition"] = "attachment; filename=view.prof"
+            response["Content-Length"] = len(output)
+        stream = io.StringIO()
+        stats = pstats.Stats(profiler, stream=stream)
+
+        stats.sort_stats(request.GET.get("prof-sort", "cumtime"))
+        stats.print_stats(int(request.GET.get("count", 100)))
+
+        response = http.HttpResponse("<pre>%s</pre>" % stream.getvalue())
 
         return response
