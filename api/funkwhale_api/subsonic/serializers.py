@@ -19,6 +19,29 @@ def to_subsonic_date(date):
     return date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
+def get_valid_filepart(s):
+    """
+    Return a string suitable for use in a file path. Escape most non-ASCII
+    chars, and truncate the string to a suitable length too.
+    """
+    max_length = 50
+    keepcharacters = " ._()[]-+"
+    final = "".join(
+        c if c.isalnum() or c in keepcharacters else "_" for c in s
+    ).rstrip()
+    return final[:max_length]
+
+
+def get_track_path(track, suffix):
+    artist_part = get_valid_filepart(track.artist.name)
+    album_part = get_valid_filepart(track.album.title)
+    track_part = get_valid_filepart(track.title) + "." + suffix
+    if track.position:
+        track_part = "{} - {}".format(track.position, track_part)
+
+    return "/".join([artist_part, album_part, track_part])
+
+
 def get_artist_data(artist_values):
     return {
         "id": artist_values["id"],
@@ -92,6 +115,7 @@ def get_track_data(album, track, upload):
             else "audio/mpeg"
         ),
         "suffix": upload.extension or "",
+        "path": get_track_path(track, upload.extension or "mp3"),
         "duration": upload.duration or 0,
         "created": to_subsonic_date(track.creation_date),
         "albumId": album.pk,
@@ -231,6 +255,7 @@ def get_music_directory_data(artist):
             "year": track.album.release_date.year if track.album.release_date else 0,
             "contentType": upload.mimetype,
             "suffix": upload.extension or "",
+            "path": get_track_path(track, upload.extension or "mp3"),
             "duration": upload.duration or 0,
             "created": to_subsonic_date(track.creation_date),
             "albumId": album.pk,

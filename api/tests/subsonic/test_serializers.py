@@ -16,6 +16,56 @@ def test_to_subsonic_date(date, expected):
     assert serializers.to_subsonic_date(date) == expected
 
 
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ("AC/DC", "AC_DC"),
+        ("AC-DC", "AC-DC"),
+        ("A" * 100, "A" * 50),
+        ("Album (2019)", "Album (2019)"),
+        ("Haven't", "Haven_t"),
+    ],
+)
+def test_get_valid_filepart(input, expected):
+    assert serializers.get_valid_filepart(input) == expected
+
+
+@pytest.mark.parametrize(
+    "factory_kwargs, suffix, expected",
+    [
+        (
+            {
+                "artist__name": "Hello",
+                "album__title": "World",
+                "title": "foo",
+                "position": None,
+            },
+            "mp3",
+            "Hello/World/foo.mp3",
+        ),
+        (
+            {
+                "artist__name": "AC/DC",
+                "album__title": "escape/my",
+                "title": "sla/sh",
+                "position": 12,
+            },
+            "ogg",
+            "/".join(
+                [
+                    serializers.get_valid_filepart("AC/DC"),
+                    serializers.get_valid_filepart("escape/my"),
+                ]
+            )
+            + "/12 - {}.ogg".format(serializers.get_valid_filepart("sla/sh")),
+        ),
+    ],
+)
+def test_get_track_path(factory_kwargs, suffix, expected, factories):
+    track = factories["music.Track"](**factory_kwargs)
+    assert serializers.get_track_path(track, suffix) == expected
+
+
 def test_get_artists_serializer(factories):
     artist1 = factories["music.Artist"](name="eliot")
     artist2 = factories["music.Artist"](name="Ellena")
@@ -124,6 +174,7 @@ def test_get_album_serializer(factories):
                 "year": track.album.release_date.year,
                 "contentType": upload.mimetype,
                 "suffix": upload.extension or "",
+                "path": serializers.get_track_path(track, upload.extension),
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
@@ -222,6 +273,7 @@ def test_directory_serializer_artist(factories):
                 "year": track.album.release_date.year,
                 "contentType": upload.mimetype,
                 "suffix": upload.extension or "",
+                "path": serializers.get_track_path(track, upload.extension),
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
