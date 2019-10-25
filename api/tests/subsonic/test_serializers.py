@@ -1,7 +1,19 @@
+import datetime
 import pytest
 
 from funkwhale_api.music import models as music_models
 from funkwhale_api.subsonic import serializers
+
+
+@pytest.mark.parametrize(
+    "date, expected",
+    [
+        (datetime.datetime(2017, 1, 12, 9, 53, 12, 1890), "2017-01-12T09:53:12.000Z"),
+        (None, None),
+    ],
+)
+def test_to_subsonic_date(date, expected):
+    assert serializers.to_subsonic_date(date) == expected
 
 
 def test_get_artists_serializer(factories):
@@ -54,7 +66,7 @@ def test_get_artist_serializer(factories):
                 "name": album.title,
                 "artist": artist.name,
                 "songCount": len(tracks),
-                "created": album.creation_date,
+                "created": serializers.to_subsonic_date(album.creation_date),
                 "year": album.release_date.year,
             }
         ],
@@ -96,7 +108,7 @@ def test_get_album_serializer(factories):
         "name": album.title,
         "artist": artist.name,
         "songCount": 1,
-        "created": album.creation_date,
+        "created": serializers.to_subsonic_date(album.creation_date),
         "year": album.release_date.year,
         "coverArt": "al-{}".format(album.id),
         "song": [
@@ -115,7 +127,7 @@ def test_get_album_serializer(factories):
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
-                "created": track.creation_date,
+                "created": serializers.to_subsonic_date(track.creation_date),
                 "albumId": album.pk,
                 "artistId": artist.pk,
                 "type": "music",
@@ -133,7 +145,7 @@ def test_starred_tracks2_serializer(factories):
     upload = factories["music.Upload"](track=track)
     favorite = factories["favorites.TrackFavorite"](track=track)
     expected = [serializers.get_track_data(album, track, upload)]
-    expected[0]["starred"] = favorite.creation_date
+    expected[0]["starred"] = serializers.to_subsonic_date(favorite.creation_date)
     data = serializers.get_starred_tracks_data([favorite])
     assert data == expected
 
@@ -162,7 +174,7 @@ def test_playlist_serializer(factories):
         "public": "false",
         "songCount": 1,
         "duration": 0,
-        "created": playlist.creation_date,
+        "created": serializers.to_subsonic_date(playlist.creation_date),
     }
     qs = playlist.__class__.objects.with_tracks_count()
     data = serializers.get_playlist_data(qs.first())
@@ -181,7 +193,7 @@ def test_playlist_detail_serializer(factories):
         "public": "false",
         "songCount": 1,
         "duration": 0,
-        "created": playlist.creation_date,
+        "created": serializers.to_subsonic_date(playlist.creation_date),
         "entry": [serializers.get_track_data(plt.track.album, plt.track, upload)],
     }
     qs = playlist.__class__.objects.with_tracks_count()
@@ -213,7 +225,7 @@ def test_directory_serializer_artist(factories):
                 "bitrate": 42,
                 "duration": 43,
                 "size": 44,
-                "created": track.creation_date,
+                "created": serializers.to_subsonic_date(track.creation_date),
                 "albumId": album.pk,
                 "artistId": artist.pk,
                 "parent": artist.pk,
