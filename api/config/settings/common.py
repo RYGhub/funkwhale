@@ -529,7 +529,7 @@ CACHES["default"]["OPTIONS"] = {
     "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
     # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
 }
-CACHEOPS_DURATION = env("CACHEOPS_DURATION", default=100)
+CACHEOPS_DURATION = env("CACHEOPS_DURATION", default=0)
 CACHEOPS_ENABLED = bool(CACHEOPS_DURATION)
 
 if CACHEOPS_ENABLED:
