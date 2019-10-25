@@ -529,7 +529,7 @@ CACHES["default"]["OPTIONS"] = {
     "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
     # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
 }
-CACHEOPS_DURATION = env("CACHEOPS_DURATION", default=0)
+CACHEOPS_DURATION = env("CACHEOPS_DURATION", default=100)
 CACHEOPS_ENABLED = bool(CACHEOPS_DURATION)
 
 if CACHEOPS_ENABLED:
@@ -538,7 +538,6 @@ if CACHEOPS_ENABLED:
     CACHEOPS_PREFIX = lambda _: "cacheops"  # noqa
     CACHEOPS_DEFAULTS = {"timeout": CACHEOPS_DURATION}
     CACHEOPS = {
-        "users.user": {"ops": "get"},
         "music.album": {"ops": "count"},
         "music.artist": {"ops": "count"},
         "music.track": {"ops": "count"},
