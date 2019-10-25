@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-18 08:59+0000\n"
-"Last-Translator: Keunes <keunes@mailbox.org>\n"
+"PO-Revision-Date: 2019-10-26 11:47+0000\n"
+"Last-Translator: Keunes <keunes+foss@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -3832,27 +3832,25 @@ msgid "Reset your password"
 msgstr "Wachtwoord opnieuw instellen"
 
 #: front/src/components/manage/moderation/ReportCard.vue:83
-#, fuzzy
 msgctxt "Content/*/*/Noun"
 msgid "Resolution date"
-msgstr "Toegevoegd"
+msgstr "Datum opgelost"
 
 #: front/src/components/manage/moderation/ReportCard.vue:218
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Resolve"
-msgstr ""
+msgstr "Oplossen"
 
 #: front/src/components/manage/moderation/ReportCard.vue:62
 #: front/src/views/admin/moderation/ReportsList.vue:20
 msgctxt "Content/*/*/Short"
 msgid "Resolved"
-msgstr ""
+msgstr "Opgelost"
 
 #: front/src/views/content/libraries/FilesTable.vue:223
-#, fuzzy
 msgctxt "Content/Library/Dropdown/Verb"
 msgid "Restart import"
-msgstr "Importeren"
+msgstr "Importeren herstarten"
 
 #: front/src/components/library/EditForm.vue:31
 msgctxt "Content/Library/Button.Label"
@@ -3868,41 +3866,39 @@ msgid "Results per page"
 msgstr "Aantal resultaten per pagina"
 
 #: front/src/views/auth/EmailConfirm.vue:17
-#, fuzzy
 msgctxt "Content/Signup/Link/Verb"
 msgid "Return to login"
-msgstr "Doorgaan met inloggen"
+msgstr "Terug naar inloggen"
 
 #: front/src/components/library/ArtistDetail.vue:9
-#, fuzzy
 msgctxt "Content/Moderation/Link"
 msgid "Review my filters"
-msgstr "Bestanden bekijken"
+msgstr "Mijn filters controleren"
 
 #: front/src/components/auth/Settings.vue:192
 msgctxt "*/*/*/Verb"
 msgid "Revoke"
-msgstr ""
+msgstr "Intrekken"
 
 #: front/src/components/auth/Settings.vue:195
 msgctxt "*/Settings/Button.Label/Verb"
 msgid "Revoke access"
-msgstr ""
+msgstr "Toestemming toegang intrekken"
 
 #: front/src/components/auth/Settings.vue:193
 msgctxt "Popup/Settings/Title"
 msgid "Revoke access for application \"%{ application }\"?"
-msgstr ""
+msgstr "Toegang voor de service \"%{ application }\" intrekken?"
 
 #: front/src/components/manage/moderation/InstancePolicyCard.vue:16
 msgctxt "Content/Moderation/Card.Title/Noun"
 msgid "Rule"
-msgstr ""
+msgstr "Regel"
 
 #: front/src/components/About.vue:28 src/components/About.vue:56
 msgctxt "Content/About/Header"
 msgid "Rules"
-msgstr ""
+msgstr "Regels"
 
 #: front/src/components/admin/SettingsGroup.vue:75
 #: front/src/components/library/radios/Builder.vue:34
@@ -3916,10 +3912,9 @@ msgid "Scan launched"
 msgstr "Scan begonnen"
 
 #: front/src/views/content/remote/Card.vue:80
-#, fuzzy
 msgctxt "Content/Library/Card.Button.Label/Verb"
 msgid "Scan now"
-msgstr "Nu afspelen"
+msgstr "Nu scannen"
 
 #: front/src/views/content/remote/Card.vue:48
 msgctxt "Content/Library/Card.List item"
@@ -3932,10 +3927,9 @@ msgid "Scan skipped (previous scan is too recent)"
 msgstr "Scan overgeslagen (vorige scan was zeer recent)"
 
 #: front/src/views/content/remote/Card.vue:60
-#, fuzzy
 msgctxt "Content/Library/Card.List item"
 msgid "Scanned"
-msgstr "Scan begonnen"
+msgstr "Gescand"
 
 #: front/src/views/content/remote/Card.vue:64
 msgctxt "Content/Library/Card.List item"
@@ -3943,10 +3937,9 @@ msgid "Scanned with errors"
 msgstr "Afgerond, maar met foutmeldingen"
 
 #: front/src/views/content/remote/Card.vue:52
-#, fuzzy
 msgctxt "Content/Library/Card.List item"
 msgid "Scanning… (%{ progress }%)"
-msgstr "Bezig met scannen… (% {progress }%)"
+msgstr "Aan het scannen… (% {progress }%)"
 
 #: front/src/components/auth/ApplicationForm.vue:22
 #: front/src/components/auth/Settings.vue:226
