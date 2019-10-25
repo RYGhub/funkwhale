@@ -538,7 +538,6 @@ if CACHEOPS_ENABLED:
     CACHEOPS_PREFIX = lambda _: "cacheops"  # noqa
     CACHEOPS_DEFAULTS = {"timeout": CACHEOPS_DURATION}
     CACHEOPS = {
-        "users.user": {"ops": "get"},
         "music.album": {"ops": "count"},
         "music.artist": {"ops": "count"},
         "music.track": {"ops": "count"},
