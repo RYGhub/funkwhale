@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-26 11:47+0000\n"
+"PO-Revision-Date: 2019-10-28 07:57+0000\n"
 "Last-Translator: Keunes <keunes+foss@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -845,7 +845,7 @@ msgstr "Bibliotheek doorbladeren"
 #: front/src/components/Home.vue:132
 msgctxt "Content/Home/Link"
 msgid "Browse public content"
-msgstr "Doorblader openbare content"
+msgstr "Publieke content doorbladeren"
 
 #: front/src/components/library/Albums.vue:4
 msgctxt "Content/Album/Title"
@@ -1520,7 +1520,7 @@ msgstr "Weergavenaam"
 #: front/src/components/library/radios/Builder.vue:30
 msgctxt "Content/Radio/Checkbox.Label/Verb"
 msgid "Display publicly"
-msgstr "Openbaren"
+msgstr "Publiekelijk tonen"
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:122
 msgctxt "Content/Moderation/Help text"
@@ -1943,7 +1943,7 @@ msgstr "Iedereen op deze server"
 #: front/src/components/mixins/Translations.vue:13
 msgctxt "Content/Settings/Dropdown"
 msgid "Everyone, across all instances"
-msgstr "Iedereen, overheen alle instanties"
+msgstr "Iedereen, op alle servers"
 
 #: front/src/components/library/radios/Builder.vue:62
 msgctxt "Content/Radio/Table.Label/Verb"
@@ -2310,17 +2310,17 @@ msgstr "Servergegevens"
 #: front/src/views/admin/Settings.vue:80
 msgctxt "Content/Admin/Menu"
 msgid "Instance information"
-msgstr "Server-informatie"
+msgstr "Serverinformatie"
 
 #: front/src/components/library/Radios.vue:9
 msgctxt "Content/Radio/Title"
 msgid "Instance radios"
-msgstr "Radio's van deze server"
+msgstr "Radio's op deze server"
 
 #: front/src/views/admin/Settings.vue:75
 msgctxt "Head/Admin/Title"
 msgid "Instance settings"
-msgstr "Server-instellingen"
+msgstr "Serverinstellingen"
 
 #: front/src/components/SetInstanceModal.vue:19
 msgctxt "Popup/Instance/Input.Label/Noun"
@@ -2541,8 +2541,7 @@ msgstr "Gelinkte meldingen"
 #: front/src/components/Home.vue:135
 msgctxt "Content/Home/Link"
 msgid "Listen to public albums and playlists shared on this pod"
-msgstr ""
-"Luister naar openbare albums en afspeellijsten die zijn gedeeld op deze pod"
+msgstr "Luister naar publiek toegankelijke albums en afspeellijsten op deze pod"
 
 #: front/src/components/mixins/Translations.vue:92
 #: front/src/views/admin/library/AlbumDetail.vue:163
@@ -3424,7 +3423,7 @@ msgstr "Profiel"
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Public registrations are not possible on this instance. You will need an invitation code to sign up."
 msgstr ""
-"Openbare registraties zijn niet mogelijk op deze server. Je zult een "
+"Vrije registraties zijn niet mogelijk op deze server. Je zult een "
 "uitnodigingscode nodig hebben om te registreren."
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
@@ -3682,7 +3681,10 @@ msgstr "Externe verzamelingen"
 #: front/src/views/content/remote/Home.vue:7
 msgctxt "Content/Library/Paragraph"
 msgid "Remote libraries are owned by other users on the network. You can access them as long as they are public or you are granted access."
-msgstr "Externe verzamelingen worden beheerd door andere gebruikers op het netwerk. Je kunt ze gebruiken als ze openbaar zijn of als jou toegang is verleend."
+msgstr ""
+"Externe bibliotheken worden beheerd door andere gebruikers op het netwerk. "
+"Je kunt ze gebruiken als ze publiek toegankelijk zijn of je toegang hebt "
+"gekregen."
 
 #: front/src/components/library/radios/Filter.vue:59
 msgctxt "Content/Radio/Button.Label/Verb"
@@ -4060,10 +4062,9 @@ msgstr "Zoek artiesten, albums, nummers…"
 #: front/src/components/library/AlbumBase.vue:66
 #: front/src/components/library/ArtistBase.vue:77
 #: front/src/components/library/TrackBase.vue:82
-#, fuzzy
 msgctxt "Content/*/Button.Label/Verb"
 msgid "Search on Discogs"
-msgstr "Zoeken naar muziek"
+msgstr "Zoek bij Discogs"
 
 #: front/src/components/library/AlbumBase.vue:58
 #: front/src/components/library/ArtistBase.vue:69
@@ -4078,7 +4079,7 @@ msgstr "Zoeken op Wikipedia"
 #: src/views/admin/users/Base.vue:21 front/src/views/content/Base.vue:19
 msgctxt "Menu/*/Hidden text"
 msgid "Secondary menu"
-msgstr ""
+msgstr "Submenu"
 
 #: front/src/views/admin/Settings.vue:15
 msgctxt "Content/Admin/Menu.Title"
@@ -4088,22 +4089,22 @@ msgstr "Secties"
 #: front/src/components/ShortcutsModal.vue:108
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Seek backwards 30s"
-msgstr ""
+msgstr "Terugspoelen met 30s"
 
 #: front/src/components/ShortcutsModal.vue:100
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Seek backwards 5s"
-msgstr ""
+msgstr "Terugspoelen met 5s"
 
 #: front/src/components/ShortcutsModal.vue:112
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Seek forwards 30s"
-msgstr ""
+msgstr "Vooruitspoelen met 30s"
 
 #: front/src/components/ShortcutsModal.vue:104
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Seek forwards 5s"
-msgstr ""
+msgstr "Vooruitspoelen met 5s"
 
 #: front/src/components/library/radios/Builder.vue:46
 msgctxt "Content/Radio/Dropdown.Placeholder/Verb"
@@ -4126,7 +4127,7 @@ msgstr "Alleen deze pagina kiezen"
 #: front/src/components/Home.vue:43
 msgctxt "Content/Home/Link"
 msgid "Server rules"
-msgstr ""
+msgstr "Regels op deze server"
 
 #: front/src/components/Sidebar.vue:43 src/components/Sidebar.vue:112
 #: front/src/components/manage/users/UsersTable.vue:182
@@ -4151,10 +4152,11 @@ msgid "Share link"
 msgstr "Link om te delen"
 
 #: front/src/views/content/libraries/Detail.vue:15
-#, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "Share this link with other users so they can request access to your library."
-msgstr "Deel deze link met anderen zodat ze toegang tot je verzamelingen kunnen aanvragen."
+msgstr ""
+"Deel deze link met anderen zodat ze toegang tot je bibliotheek kunnen "
+"aanvragen."
 
 #: front/src/views/content/libraries/Detail.vue:14
 #: front/src/views/content/remote/Card.vue:90
@@ -4166,14 +4168,15 @@ msgstr "Link om te delen"
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
 msgstr ""
+"Delen werkt niet omdat anonieme gebruikers geen toegang hebben tot content "
+"op deze pod."
 
 #: front/src/components/About.vue:156
 msgctxt "*/*/*/Verb"
 msgid "Show"
-msgstr ""
+msgstr "Toon"
 
 #: front/src/components/audio/album/Card.vue:38
-#, fuzzy
 msgctxt "Content/Album/Card.Link/Verb"
 msgid "Show %{ count } more track"
 msgid_plural "Show %{ count } more tracks"
@@ -4181,17 +4184,16 @@ msgstr[0] "Nog %{ count } nummer tonen"
 msgstr[1] "Nog %{ count } nummers tonen"
 
 #: front/src/components/tags/List.vue:11
-#, fuzzy
 msgctxt "Content/*/Button/Label/Verb"
 msgid "Show 1 more tag"
 msgid_plural "Show %{ count } more tags"
-msgstr[0] "Nog %{ count } album tonen"
-msgstr[1] "Nog %{ count } albums tonen"
+msgstr[0] "Nog 1 tag tonen"
+msgstr[1] "Nog %{ count } tags tonen"
 
 #: front/src/components/library/EditForm.vue:21
 msgctxt "Content/Library/Button.Label"
 msgid "Show all edits"
-msgstr ""
+msgstr "Toon alle wijzigingen"
 
 #: front/src/components/ShortcutsModal.vue:60
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -4201,13 +4203,12 @@ msgstr "Toon beschikbare sneltoetsen"
 #: front/src/components/common/ExpandableDiv.vue:7
 msgctxt "*/*/Button,Label"
 msgid "Show less"
-msgstr ""
+msgstr "Toon minder"
 
 #: front/src/components/common/ExpandableDiv.vue:8
-#, fuzzy
 msgctxt "*/*/Button,Label"
 msgid "Show more"
-msgstr "Nog %{ count } album tonen"
+msgstr "Toon meer"
 
 #: front/src/views/Notifications.vue:72
 msgctxt "Content/Notifications/Form.Label/Verb"
@@ -4246,10 +4247,9 @@ msgid "Shuffle your queue"
 msgstr "Shuffel je wachtrij"
 
 #: front/src/components/Home.vue:103
-#, fuzzy
 msgctxt "*/Signup/Title"
 msgid "Sign up"
-msgstr "Registreren"
+msgstr "Aanmelden"
 
 #: front/src/views/auth/Signup.vue:37
 msgctxt "*/Signup/Title"
@@ -4260,6 +4260,8 @@ msgstr "Registreren"
 msgctxt "Content/Home/Paragraph"
 msgid "Sign up now to keep a track of your favorites, create playlists, discover new content and much more!"
 msgstr ""
+"Maak nu een account aan om je favorieten op te slaan, afspeellijsten te "
+"maken en nieuwe content te ontdekken!"
 
 #: front/src/components/manage/users/UsersTable.vue:40
 msgctxt "Content/Admin/Table.Label/Short, Noun (Value is a date)"
@@ -4305,13 +4307,12 @@ msgstr ""
 #: front/src/components/playlists/Editor.vue:21
 msgctxt "Content/Playlist/Paragraph"
 msgid "Some tracks in your queue are already in this playlist:"
-msgstr ""
+msgstr "Een aantal nummers in je wachtrij staat al in deze afspeellijst:"
 
 #: front/src/components/PageNotFound.vue:10
-#, fuzzy
 msgctxt "Content/*/Paragraph"
 msgid "Sorry, the page you asked for does not exist:"
-msgstr "Helaas, de opgevraagde pagina bestaat niet:"
+msgstr "Sorry, de opgevraagde pagina bestaat niet:"
 
 #: front/src/components/Footer.vue:57
 msgctxt "Footer/*/List item.Link"
@@ -4326,14 +4327,12 @@ msgstr "Staflid"
 
 #: front/src/components/audio/PlayButton.vue:27
 #: src/components/radios/Button.vue:4
-#, fuzzy
 msgctxt "*/Queue/Button.Label/Short, Verb"
 msgid "Start radio"
-msgstr "Radio stoppen"
+msgstr "Radio starten"
 
 #: front/src/components/About.vue:170 src/components/Home.vue:53
 #: front/src/views/admin/Settings.vue:87
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "Statistics"
 msgstr "Statistieken"
@@ -4367,7 +4366,6 @@ msgstr "Statistieken worden berekend op basis van de activiteit en media op je s
 #: front/src/views/admin/moderation/DomainsDetail.vue:152
 #: front/src/views/admin/moderation/ReportsList.vue:14
 #: front/src/views/content/libraries/Detail.vue:28
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Status"
 msgstr "Status"
@@ -4385,13 +4383,12 @@ msgstr "Indienen"
 #: front/src/components/library/EditForm.vue:110
 msgctxt "Content/Library/Button.Label/Verb"
 msgid "Submit and apply edit"
-msgstr ""
+msgstr "Bewerking verzenden en toepassen"
 
 #: front/src/components/library/EditForm.vue:7
-#, fuzzy
 msgctxt "Content/Library/Button.Label"
 msgid "Submit another edit"
-msgstr "Nóg een verzoek indienen"
+msgstr "Nog een bewerking verzenden"
 
 #: front/src/components/moderation/ReportModal.vue:64
 #, fuzzy
@@ -4537,7 +4534,7 @@ msgstr "Funkwhale-logo met liefde ontworpen door Francis Gading."
 #: front/src/components/SetInstanceModal.vue:8
 msgctxt "Popup/Instance/Error message.List item"
 msgid "The given address is not a Funkwhale server"
-msgstr ""
+msgstr "Het opgegeven adres is geen Funkwhale-server"
 
 #: front/src/views/content/libraries/Form.vue:34
 msgctxt "Popup/Library/Paragraph"
@@ -4636,7 +4633,7 @@ msgstr "De geselecteerde content zal worden verwijderd. Dit kan niet ongedaan ge
 #: front/src/components/SetInstanceModal.vue:7
 msgctxt "Popup/Instance/Error message.List item"
 msgid "The server might be down"
-msgstr ""
+msgstr "De server is mogelijk niet beschikbaar"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:4
 msgctxt "Content/Settings/Paragraph"
@@ -4866,7 +4863,9 @@ msgstr "Titel"
 #: front/src/components/SetInstanceModal.vue:16
 msgctxt "Popup/Instance/Paragraph"
 msgid "To continue, please select the Funkwhale instance you want to connect to. Enter the address directly, or select one of the suggested choices."
-msgstr "Selecteer met welke Funkwhale-server je wil verbinden om verder te gaan. Voer zelf de url in, of kies een van de suggesties."
+msgstr ""
+"Selecteer met welke Funkwhale-server je wil verbinden. Voer zelf de URL in, "
+"of kies een van de suggesties."
 
 #: front/src/components/ShortcutsModal.vue:148
 #, fuzzy
@@ -5445,7 +5444,10 @@ msgstr "Je staat op het punt muziek te uploaden. Controleer voordat je doorgaat:
 #: front/src/components/SetInstanceModal.vue:12
 msgctxt "Popup/Login/Paragraph"
 msgid "You are currently connected to <a href=\"%{ url }\" target=\"_blank\">%{ hostname }&nbsp;<i class=\"external icon\"/></a>. If you continue, you will be disconnected from your current instance and all your local data will be deleted."
-msgstr "Je bent momenteel verbonden met <a href=\"%{ url }\" target=\"_blank\">%{ hostname }&nbsp;<i class=\"external icon\"/></a>. Als je doorgaat, zal je worden ontkoppeld van de huidige server en zal al je lokale data worden gewist."
+msgstr ""
+"Je bent momenteel verbonden met <a href=\"%{ url }\" target=\"_blank\">%{ "
+"hostname }&nbsp;<i class=\"external icon\"/></a>. Als je doorgaat, word je "
+"ontkoppeld van de huidige server en zal al je lokale data worden gewist."
 
 #: front/src/components/library/ArtistDetail.vue:6
 msgctxt "Content/Artist/Paragraph"
@@ -5468,10 +5470,12 @@ msgid "You are now using the Funkwhale instance at %{ url }"
 msgstr "Je gebruikt nu de Funkwhale-server op %{ url }"
 
 #: front/src/views/content/Home.vue:17
-#, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "You can follow libraries from other users to get access to new music. Public libraries can be followed immediately, while following a private library requires approval from its owner."
-msgstr "Je kunt andere verzamelingen volgen voor toegang tot nieuwe muziek. Openbare verzamelingen kun je meteen volgen, maar voor privéverzamelingen heb je toestemming nodig van de beheerder."
+msgstr ""
+"Je kunt andere verzamelingen volgen voor toegang tot nieuwe muziek. Publiek "
+"toegankelijke verzamelingen kun je meteen volgen – voor privéverzamelingen "
+"heb je toestemming nodig van de beheerder."
 
 #: front/src/components/moderation/FilterModal.vue:31
 msgctxt "Popup/Moderation/Paragraph"
