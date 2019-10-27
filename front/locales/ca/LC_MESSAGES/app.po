@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-24 02:30+0000\n"
+"PO-Revision-Date: 2019-10-28 07:57+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -586,7 +586,6 @@ msgid "Allow application"
 msgstr "Autoritzar l'aplicació"
 
 #: front/src/components/About.vue:136
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Allow-list"
 msgstr "Llista d'autorització"
@@ -2757,7 +2756,6 @@ msgid "Moderation policies help you control how your instance interact with a gi
 msgstr "Les regles de moderació t'ajudaran a controlar com la vostra instància interactua amb un domini o un compte determinat."
 
 #: front/src/components/manage/moderation/InstancePolicyModal.vue:4
-#, fuzzy
 msgctxt "Content/Moderation/Button.Label"
 msgid "Moderation rules…"
 msgstr "Regles de moderació …"
@@ -3012,7 +3010,6 @@ msgid "Old value"
 msgstr "Valor antic"
 
 #: front/src/components/About.vue:90
-#, fuzzy
 msgctxt "*/*/*/State of registrations"
 msgid "Open"
 msgstr "Obert"
@@ -3131,7 +3128,6 @@ msgstr ""
 
 #: front/src/components/manage/moderation/ReportCard.vue:143
 #: front/src/components/manage/users/InvitationsTable.vue:38
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Owner"
 msgstr "Propietari"
@@ -3154,7 +3150,6 @@ msgstr "Paginació"
 #: front/src/components/auth/LoginForm.vue:32
 #: src/components/auth/Settings.vue:291
 #: front/src/components/auth/SignupForm.vue:36
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Password"
 msgstr "Contrasenya"
@@ -3282,7 +3277,6 @@ msgstr "Reprodueix la pista"
 
 #: front/src/components/mixins/Report.vue:66 src/views/playlists/Detail.vue:121
 #: front/src/components/mixins/Report.vue:67
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Playlist"
 msgstr "Llista de reproducció"
@@ -3411,10 +3405,11 @@ msgid "Profile"
 msgstr "Perfil"
 
 #: front/src/components/auth/SignupForm.vue:5
-#, fuzzy
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Public registrations are not possible on this instance. You will need an invitation code to sign up."
-msgstr "Les inscripcions estan tancades en aquesta instància, necessites un codi d'inscripció per registrar-te."
+msgstr ""
+"Les inscripcions estan tancades en aquesta instància, necessites un codi "
+"d'inscripció per registrar-te."
 
 #: front/src/components/manage/moderation/AccountsTable.vue:188
 #: front/src/components/manage/moderation/DomainsTable.vue:186
@@ -3541,10 +3536,9 @@ msgid "Recently added"
 msgstr "Afegit recentment"
 
 #: front/src/components/Home.vue:167
-#, fuzzy
 msgctxt "Content/Home/Title"
 msgid "Recently added albums"
-msgstr "Afegit recentment"
+msgstr "Àlbums afegits recentment"
 
 #: front/src/components/library/Home.vue:11
 msgctxt "Content/Home/Title"
@@ -3617,10 +3611,9 @@ msgid "Refreshing object from remote…"
 msgstr "Actualització de l'objecte des del servidor remot …"
 
 #: front/src/components/About.vue:86
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Registrations"
-msgstr "Administració"
+msgstr "Inscripcions"
 
 #: front/src/components/manage/users/UsersTable.vue:72
 msgctxt "Content/Admin/Table, User role"
@@ -3690,10 +3683,9 @@ msgstr "Suprimir vel filtre"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:198
 #: front/src/views/admin/moderation/DomainsDetail.vue:39
-#, fuzzy
 msgctxt "Content/Moderation/Action/Verb"
 msgid "Remove from allow-list"
-msgstr "Elimina dels preferits"
+msgstr "Eliminar de la llista d'autoritzacions"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:26
 msgctxt "Content/Track/Icon.Tooltip/Verb"
