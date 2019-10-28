@@ -10,6 +10,71 @@ This changelog is viewable on the web at https://docs.funkwhale.audio/changelog.
 
 .. towncrier
 
+0.20.1 (2019-10-28)
+-------------------
+
+Upgrade instructions are available at
+https://docs.funkwhale.audio/index.html
+
+
+Denormalized audio permission logic in a separate table to enhance performance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With this release, we're introducing a performance enhancement that should reduce the load on the database and API
+servers (cf https://dev.funkwhale.audio/funkwhale/funkwhale/merge_requests/939).
+
+Under the hood, we now maintain a separate table to link users to the tracks they are allowed to see. This change is **disabled**
+by default, but should be enabled by default starting in Funkwhale 0.21.
+
+If you want to try it now, add
+``MUSIC_USE_DENORMALIZATION=True`` to your ``.env`` file, restart Funkwhale, and run the following command::
+
+    python manage.py rebuild_music_permissions
+
+This shouldn't cause any regression, but we'd appreciate if you could test this before the 0.21 release and report any unusual
+behaviour regarding tracks, albums and artists visibility.
+
+
+Enhancements:
+
+- Added a retry option for failed uploads (#942)
+- Added feedback via loading spinner when searching a remote library
+- Denormalized audio permission logic in a separate table to enhance performance
+- Placeholders will now be shown if no content is available across the application (#750)
+- Reduce the number of simultaneous DB connections under some deployment scenario
+- Support byYear filtering in Subsonic API (#936)
+
+
+Bugfixes:
+
+- Ensure password input doesn't overflow outside of container (#933)
+- Fix audio serving issues under S3/nginx when signatures are enabled
+- Fix import crash when importing M4A file with no embedded cover (#946)
+- Fix tag exclusion in custom radios (#950)
+- Fixed an issue with embed player CSS being purged during build (#935)
+- Fixed escaped pod name displayed on home/about page (#945)
+- Fixed pagination in subsonic getSongsByGenre endpoint (#954)
+- Fixed style glitches in dropdowns
+
+
+Documentation:
+
+- Documented how to create DB extension by hand in case of permission error during migrations (#934)
+
+
+Contributors to this release (translation, development, documentation, reviews, design):
+
+- Ciarán Ainsworth
+- Dag Stenstad
+- Daniele Lira Mereb
+- Eliot Berriot
+- Esteban
+- Johannes H.
+- knuxify
+- Mateus Mattei Garcia
+- Quentin PAGÈS
+
+
 0.20 (2019-10-04)
 -----------------
 
