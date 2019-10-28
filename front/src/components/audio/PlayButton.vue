@@ -149,6 +149,7 @@ export default {
       params['page_size'] = 100
       params['page'] = page
       params['hidden'] = ''
+      params['playable'] = 'true'
       tracks = tracks || []
       axios.get('tracks/', {params: params}).then((response) => {
         response.data.results.forEach(t => {

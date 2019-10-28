@@ -170,7 +170,7 @@ def fail_import(upload, error_code, detail=None, **fields):
     ),
     "upload",
 )
-def process_upload(upload):
+def process_upload(upload, update_denormalization=True):
     import_metadata = upload.import_metadata or {}
     old_status = upload.import_status
     audio_file = upload.get_audio_file()
@@ -248,6 +248,13 @@ def process_upload(upload):
             "bitrate",
         ]
     )
+
+    if update_denormalization:
+        models.TrackActor.create_entries(
+            library=upload.library,
+            upload_and_track_ids=[(upload.pk, upload.track_id)],
+            delete_existing=False,
+        )
 
     # update album cover, if needed
     if not track.album.cover:
