@@ -47,7 +47,7 @@ Funkwhale packages are available for the following platforms:
 - `YunoHost 3 <https://yunohost.org/>`_: https://github.com/YunoHost-Apps/funkwhale_ynh (kindly maintained by `@Jibec <https://github.com/Jibec>`_)
 - ArchLinux (as an AUR package): if you'd rather use a package, check out this alternative installation method on ArchLinux: https://wiki.archlinux.org/index.php/Funkwhale (package and wiki kindly maintained by getzee)
 - `NixOS <https://github.com/mmai/funkwhale-nixos>`_ (kindly maintained by @mmai)
-- `Helm chart <https://gitlab.com/ananace/charts/>`_ to install Funkwhale on Kubenertes (kindly maintained by @ananace)
+- `Helm chart <https://gitlab.com/ananace/charts/>`_ to install Funkwhale on Kubernetes (kindly maintained by `@ananace <https://gitlab.com/ananace>`_)
 
 Project architecture
 --------------------
