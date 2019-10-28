@@ -8,6 +8,40 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
 
+def to_subsonic_date(date):
+    """
+    Subsonic expects this kind of date format: 2012-04-17T19:55:49.000Z
+    """
+
+    if not date:
+        return
+
+    return date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+
+def get_valid_filepart(s):
+    """
+    Return a string suitable for use in a file path. Escape most non-ASCII
+    chars, and truncate the string to a suitable length too.
+    """
+    max_length = 50
+    keepcharacters = " ._()[]-+"
+    final = "".join(
+        c if c.isalnum() or c in keepcharacters else "_" for c in s
+    ).rstrip()
+    return final[:max_length]
+
+
+def get_track_path(track, suffix):
+    artist_part = get_valid_filepart(track.artist.name)
+    album_part = get_valid_filepart(track.album.title)
+    track_part = get_valid_filepart(track.title) + "." + suffix
+    if track.position:
+        track_part = "{} - {}".format(track.position, track_part)
+
+    return "/".join([artist_part, album_part, track_part])
+
+
 def get_artist_data(artist_values):
     return {
         "id": artist_values["id"],
@@ -52,7 +86,7 @@ class GetArtistSerializer(serializers.Serializer):
                 "artistId": artist.id,
                 "name": album.title,
                 "artist": artist.name,
-                "created": album.creation_date,
+                "created": to_subsonic_date(album.creation_date),
                 "songCount": len(album.tracks.all()),
             }
             if album.cover:
@@ -81,8 +115,9 @@ def get_track_data(album, track, upload):
             else "audio/mpeg"
         ),
         "suffix": upload.extension or "",
+        "path": get_track_path(track, upload.extension or "mp3"),
         "duration": upload.duration or 0,
-        "created": track.creation_date,
+        "created": to_subsonic_date(track.creation_date),
         "albumId": album.pk,
         "artistId": album.artist.pk,
         "type": "music",
@@ -104,7 +139,7 @@ def get_album2_data(album):
         "artistId": album.artist.id,
         "name": album.title,
         "artist": album.artist.name,
-        "created": album.creation_date,
+        "created": to_subsonic_date(album.creation_date),
     }
     if album.cover:
         payload["coverArt"] = "al-{}".format(album.id)
@@ -162,7 +197,7 @@ def get_starred_tracks_data(favorites):
         except IndexError:
             continue
         td = get_track_data(t.album, t, uploads)
-        td["starred"] = by_track_id[t.pk].creation_date
+        td["starred"] = to_subsonic_date(by_track_id[t.pk].creation_date)
         data.append(td)
     return data
 
@@ -179,7 +214,7 @@ def get_playlist_data(playlist):
         "public": "false",
         "songCount": playlist._tracks_count,
         "duration": 0,
-        "created": playlist.creation_date,
+        "created": to_subsonic_date(playlist.creation_date),
     }
 
 
@@ -220,8 +255,9 @@ def get_music_directory_data(artist):
             "year": track.album.release_date.year if track.album.release_date else 0,
             "contentType": upload.mimetype,
             "suffix": upload.extension or "",
+            "path": get_track_path(track, upload.extension or "mp3"),
             "duration": upload.duration or 0,
-            "created": track.creation_date,
+            "created": to_subsonic_date(track.creation_date),
             "albumId": album.pk,
             "artistId": artist.pk,
             "parent": artist.id,
@@ -259,7 +295,7 @@ def get_user_detail_data(user):
         "playlistRole": "true",
         "streamRole": "true",
         "jukeboxRole": "true",
-        "folder": [f["id"] for f in get_folders(user)],
+        "folder": [{"value": f["id"]} for f in get_folders(user)],
     }
 
 
