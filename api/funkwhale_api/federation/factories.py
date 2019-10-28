@@ -165,6 +165,9 @@ class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     class Meta:
         model = "music.Library"
 
+    class Params:
+        local = factory.Trait(actor=factory.SubFactory(ActorFactory, local=True))
+
 
 @registry.register
 class LibraryScanFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):

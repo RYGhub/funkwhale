@@ -50,7 +50,7 @@ def get_libraries(filter_uploads):
         qs = models.Library.objects.filter(
             pk__in=uploads.values_list("library", flat=True)
         ).annotate(_uploads_count=Count("uploads"))
-        qs = qs.select_related("actor")
+        qs = qs.prefetch_related("actor")
         page = self.paginate_queryset(qs)
         if page is not None:
             serializer = federation_api_serializers.LibrarySerializer(page, many=True)
@@ -104,6 +104,7 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
                 to_attr="_prefetched_tracks",
             )
         )
+        .order_by("-id")
     )
     serializer_class = serializers.ArtistWithAlbumsSerializer
     permission_classes = [oauth_permissions.ScopePermission]
@@ -147,8 +148,8 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
 class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
     queryset = (
         models.Album.objects.all()
-        .order_by("artist", "release_date")
-        .select_related("artist", "attributed_to")
+        .order_by("-creation_date")
+        .prefetch_related("artist", "attributed_to")
     )
     serializer_class = serializers.AlbumSerializer
     permission_classes = [oauth_permissions.ScopePermission]
@@ -173,7 +174,7 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     def get_queryset(self):
         queryset = super().get_queryset()
         tracks = (
-            models.Track.objects.select_related("artist")
+            models.Track.objects.prefetch_related("artist")
             .with_playable_uploads(utils.get_actor_from_request(self.request))
             .order_for_album()
         )
@@ -235,7 +236,7 @@ class LibraryViewSet(
         library = self.get_object()
         queryset = (
             library.received_follows.filter(target__actor=self.request.user.actor)
-            .select_related("actor", "target__actor")
+            .prefetch_related("actor", "target__actor")
             .order_by("-creation_date")
         )
         page = self.paginate_queryset(queryset)
@@ -257,7 +258,8 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     queryset = (
         models.Track.objects.all()
         .for_nested_serialization()
-        .select_related("attributed_to")
+        .prefetch_related("attributed_to")
+        .order_by("-creation_date")
     )
     serializer_class = serializers.TrackSerializer
     permission_classes = [oauth_permissions.ScopePermission]
@@ -454,7 +456,9 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     def retrieve(self, request, *args, **kwargs):
         track = self.get_object()
         actor = utils.get_actor_from_request(request)
-        queryset = track.uploads.select_related("track__album__artist", "track__artist")
+        queryset = track.uploads.prefetch_related(
+            "track__album__artist", "track__artist"
+        )
         explicit_file = request.GET.get("upload")
         if explicit_file:
             queryset = queryset.filter(uuid=explicit_file)
@@ -493,7 +497,7 @@ class UploadViewSet(
     queryset = (
         models.Upload.objects.all()
         .order_by("-creation_date")
-        .select_related("library", "track__artist", "track__album__artist")
+        .prefetch_related("library", "track__artist", "track__album__artist")
     )
     serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [
@@ -577,7 +581,7 @@ class Search(views.APIView):
         qs = (
             models.Track.objects.all()
             .filter(query_obj)
-            .select_related("artist", "album__artist")
+            .prefetch_related("artist", "album__artist")
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 
@@ -587,8 +591,7 @@ class Search(views.APIView):
         qs = (
             models.Album.objects.all()
             .filter(query_obj)
-            .select_related()
-            .prefetch_related("tracks__artist")
+            .prefetch_related("tracks__artist", "artist", "attributed_to")
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 

@@ -316,6 +316,9 @@ def test_upload_import(now, factories, temp_signal, mocker):
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": str(track.uuid)}}}
     )
+    create_entries = mocker.patch(
+        "funkwhale_api.music.models.TrackActor.create_entries"
+    )
 
     with temp_signal(signals.upload_import_status_updated) as handler:
         tasks.process_upload(upload_id=upload.pk)
@@ -342,6 +345,11 @@ def test_upload_import(now, factories, temp_signal, mocker):
     )
     outbox.assert_called_once_with(
         {"type": "Create", "object": {"type": "Audio"}}, context={"upload": upload}
+    )
+    create_entries.assert_called_once_with(
+        library=upload.library,
+        delete_existing=False,
+        upload_and_track_ids=[(upload.pk, upload.track_id)],
     )
 
 

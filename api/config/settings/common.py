@@ -862,7 +862,9 @@ MUSIC_DIRECTORY_PATH = env("MUSIC_DIRECTORY_PATH", default=None)
 MUSIC_DIRECTORY_SERVE_PATH = env(
     "MUSIC_DIRECTORY_SERVE_PATH", default=MUSIC_DIRECTORY_PATH
 )
-
+# When this is set to default=True, we need to reenable migration music/0042
+# to ensure data is populated correctly on existing pods
+MUSIC_USE_DENORMALIZATION = env.bool("MUSIC_USE_DENORMALIZATION", default=False)
 USERS_INVITATION_EXPIRATION_DAYS = env.int(
     "USERS_INVITATION_EXPIRATION_DAYS", default=14
 )

@@ -352,6 +352,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         )
         queryset = queryset.playable_by(actor)
         try:
+            offset = int(data.get("offset", 0))
+        except (TypeError, ValueError):
+
+            offset = 0
+
+        try:
             size = int(
                 data["count"]
             )  # yep. Some endpoints have size, other have count…
@@ -369,7 +375,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             )
             .prefetch_related("uploads")
             .distinct()
-            .order_by("-creation_date")[:size]
+            .order_by("-creation_date")[offset : offset + size]
         )
         data = {
             "songsByGenre": {
