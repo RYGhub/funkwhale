@@ -31,6 +31,7 @@ Basic features:
 * ``LDAP_START_TLS``: Set to ``True`` to enable LDAP StartTLS support. Default: ``False``.
 * ``LDAP_ROOT_DN``: The LDAP search root DN, e.g. ``dc=my,dc=domain,dc=com``; supports multiple entries in a space-delimited list, e.g. ``dc=users,dc=domain,dc=com dc=admins,dc=domain,dc=com``.
 * ``LDAP_USER_ATTR_MAP``: A mapping of Django user attributes to LDAP values, e.g. ``first_name:givenName, last_name:sn, username:cn, email:mail``. Default: ``first_name:givenName, last_name:sn, username:cn, email:mail``.
+* ``AUTH_LDAP_BIND_AS_AUTHENTICATING_USER``: Controls whether direct binding is used. Default: ``False``.
 
 Group features:
 
