@@ -460,6 +460,9 @@ if AUTH_LDAP_ENABLED:
         "%(user)s"
     )
     AUTH_LDAP_START_TLS = env.bool("LDAP_START_TLS", default=False)
+    AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = env(
+        "AUTH_LDAP_BIND_AS_AUTHENTICATING_USER", default=False
+    )
 
     DEFAULT_USER_ATTR_MAP = [
         "first_name:givenName",
