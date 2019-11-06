@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-28 07:57+0000\n"
+"PO-Revision-Date: 2019-11-07 02:03+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3803,10 +3803,9 @@ msgid "Requesting a fetch…"
 msgstr "Sol·licita una cerca …"
 
 #: front/src/components/library/EditForm.vue:94
-#, fuzzy
 msgctxt "Content/Library/Button.Label"
 msgid "Reset to initial value"
-msgstr "Reiniciar al valor inicial: %{ value}"
+msgstr "Reiniciar al valor inicial"
 
 #: front/src/components/auth/LoginForm.vue:34
 #: src/views/auth/PasswordReset.vue:4 front/src/views/auth/PasswordReset.vue:53
@@ -3815,10 +3814,9 @@ msgid "Reset your password"
 msgstr "Restabliu la contrasenya"
 
 #: front/src/components/manage/moderation/ReportCard.vue:83
-#, fuzzy
 msgctxt "Content/*/*/Noun"
 msgid "Resolution date"
-msgstr "Data de creació"
+msgstr "Data de resolució"
 
 #: front/src/components/manage/moderation/ReportCard.vue:218
 msgctxt "Content/*/Button.Label/Verb"
@@ -3883,7 +3881,7 @@ msgstr "Regla"
 #, fuzzy
 msgctxt "Content/About/Header"
 msgid "Rules"
-msgstr "Regla"
+msgstr "Regles"
 
 #: front/src/components/admin/SettingsGroup.vue:75
 #: front/src/components/library/radios/Builder.vue:34
@@ -4175,10 +4173,9 @@ msgid "Show available keyboard shortcuts"
 msgstr "Mostra les dreceres del teclat disponibles"
 
 #: front/src/components/common/ExpandableDiv.vue:7
-#, fuzzy
 msgctxt "*/*/Button,Label"
 msgid "Show less"
-msgstr "Mostra totes les modificacions"
+msgstr "Mostrar menys"
 
 #: front/src/components/common/ExpandableDiv.vue:8
 #, fuzzy
