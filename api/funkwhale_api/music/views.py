@@ -269,6 +269,7 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     ordering_fields = (
         "creation_date",
         "title",
+        "album__title",
         "album__release_date",
         "size",
         "position",
