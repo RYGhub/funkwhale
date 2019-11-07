@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-11-07 02:03+0000\n"
+"PO-Revision-Date: 2019-11-08 17:45+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2989,10 +2989,9 @@ msgstr "Notificacions"
 
 #: front/src/components/mixins/Translations.vue:47
 #: front/src/components/mixins/Translations.vue:48
-#, fuzzy
 msgctxt "Content/Moderation/Dropdown"
 msgid "Offensive content"
-msgstr "Amagar el contingut"
+msgstr "Contingut ofensiu"
 
 #: front/src/components/Footer.vue:55
 msgctxt "Footer/*/List item.Link"
@@ -3878,7 +3877,6 @@ msgid "Rule"
 msgstr "Regla"
 
 #: front/src/components/About.vue:28 src/components/About.vue:56
-#, fuzzy
 msgctxt "Content/About/Header"
 msgid "Rules"
 msgstr "Regles"
