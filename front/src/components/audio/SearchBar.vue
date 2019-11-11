@@ -49,12 +49,17 @@ export default {
     jQuery(this.$el).search({
       type: 'category',
       minCharacters: 3,
+      showNoResults: true,
+      error: {
+        noResultsHeader: this.$pgettext('Sidebar/Search/Error', 'No matches found'),
+        noResults: this.$pgettext('Sidebar/Search/Error.Label', 'Sorry, there are no results for this search')
+      },
       onSelect (result, response) {
         router.push(result.routerUrl)
       },
       onSearchQuery (query) {
         self.$emit('search')
-        searchQuery = query;
+        searchQuery = query
       },
       apiSettings: {
         beforeXHR: function (xhrObject) {
@@ -65,7 +70,8 @@ export default {
           return xhrObject
         },
         onResponse: function (initialResponse) {
-          var results = {}
+          let results = {}
+	  let isEmptyResults = true
           let categories = [
             {
               code: 'artists',
@@ -130,6 +136,7 @@ export default {
               results: []
             }
             initialResponse[category.code].forEach(result => {
+	      isEmptyResults = false
               let id = category.getId(result)
               results[category.code].results.push({
                 title: category.getTitle(result),
@@ -144,7 +151,9 @@ export default {
               })
             })
           })
-          return {results: results}
+          return {
+	    results: isEmptyResults ? {} : results
+	  }
         },
         url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }
