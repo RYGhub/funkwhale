@@ -24,7 +24,29 @@ export default {
       'mutation.updated': {},
       'report.created': {},
     },
-    pageTitle: null
+    pageTitle: null,
+    routePreferences: {
+      "library.albums.browse": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.artists.browse": {
+        paginateBy: 30,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.radios.browse": {
+        paginateBy: 12,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.playlists.browse": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+    },
   },
   getters: {
     showInstanceSupportMessage: (state, getters, rootState) => {
@@ -103,7 +125,16 @@ export default {
     },
     pageTitle: (state, value) => {
       state.pageTitle = value
-    }
+    },
+    paginateBy: (state, {route, value}) => {
+      state.routePreferences[route].paginateBy = value
+    },
+    ordering: (state, {route, value}) => {
+      state.routePreferences[route].ordering = value
+    },
+    orderingDirection: (state, {route, value}) => {
+      state.routePreferences[route].orderingDirection = value
+    },
   },
   actions: {
     fetchUnreadNotifications ({commit}, payload) {

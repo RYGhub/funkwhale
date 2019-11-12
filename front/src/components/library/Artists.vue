@@ -107,18 +107,12 @@ export default {
     TagsSelector,
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
-      paginateBy: parseInt(this.defaultPaginateBy || 30),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [["creation_date", "creation_date"], ["name", "name"]]
     }
   },

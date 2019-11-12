@@ -40,7 +40,7 @@ export default new Vuex.Store({
     }),
     createPersistedState({
       key: 'ui',
-      paths: ['ui.currentLanguage', 'ui.selectedLanguage', 'ui.momentLocale', 'ui.theme']
+      paths: ['ui.currentLanguage', 'ui.selectedLanguage', 'ui.momentLocale', 'ui.theme', 'ui.routePreferences']
     }),
     createPersistedState({
       key: 'radios',

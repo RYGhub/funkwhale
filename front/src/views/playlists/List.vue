@@ -94,17 +94,11 @@ export default {
     Pagination
   },
   data() {
-    let defaultOrdering = this.getOrderingFromString(
-      this.defaultOrdering || "-creation_date"
-    )
     return {
       isLoading: true,
       result: null,
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
-      paginateBy: parseInt(this.defaultPaginateBy || 12),
-      orderingDirection: defaultOrdering.direction || "+",
-      ordering: defaultOrdering.field,
       orderingOptions: [
         ["creation_date", "creation_date"],
         ["modification_date", "modification_date"],
