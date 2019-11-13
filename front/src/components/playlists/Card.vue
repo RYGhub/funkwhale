@@ -88,5 +88,6 @@ export default {
   /* background-position: 0 0, 25% 0, 50% 0, 75% 0, 100% 0; */
   font-size: 4em;
   box-shadow: 0px 0px 0px 1px rgba(34, 36, 38, 0.15) inset !important;
+  padding: unset;
 }
 </style>
