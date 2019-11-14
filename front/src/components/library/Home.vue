@@ -13,7 +13,7 @@
           </track-widget>
         </div>
         <div class="column">
-          <playlist-widget :url="'playlists/'" :filters="{scope: 'all', playable: true, ordering: '-creation_date'}">
+          <playlist-widget :url="'playlists/'" :filters="{scope: 'all', playable: true, ordering: '-modification_date'}">
             <template slot="title"><translate translate-context="*/*/*">Playlists</translate></template>
           </playlist-widget>
         </div>
