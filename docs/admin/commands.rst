@@ -1,6 +1,94 @@
 Management commands
 ===================
 
+User management
+---------------
+
+It's possible to create, remove and update users directly from the command line.
+
+This feature is useful if you want to experiment, automate or perform batch actions that
+would be too repetitive through the web UI.
+
+All users-related commands are available under the ``python manage.py fw users`` namespace:
+
+.. code-block:: sh
+
+    # print subcommands and help
+    python manage.py fw users --help
+
+
+Creation
+^^^^^^^^
+
+.. code-block:: sh
+
+    # print help
+    python manage.py fw users create --help
+
+    # create a user interactively
+    python manage.py fw users create
+
+    # create a user with a random password
+    python manage.py fw users create --username alice --email alice@email.host -p ""
+
+    # create a user with password set from an environment variable
+    export FUNKWHALE_CLI_USER_PASSWORD=securepassword
+    python manage.py fw users create --username bob --email bob@email.host
+
+Additional options are available to further configure the user during creation, such as
+setting permissions or user quota. Please refer to the command help.
+
+
+Update
+^^^^^^
+
+.. code-block:: sh
+
+    # print help
+    python manage.py fw users set --help
+
+    # set upload quota to 500MB for alice
+    python manage.py fw users set --upload-quota 500 alice
+
+    # disable confirmation prompt with --no-input
+    python manage.py fw users set --no-input --upload-quota 500 alice
+
+    # make alice and bob staff members
+    python manage.py fw users set --staff --superuser alice bob
+
+    # remove staff privileges from bob
+    python manage.py fw users set --no-staff --no-superuser bob
+
+    # give bob moderation permission
+    python manage.py fw users set --permission-moderation bob
+
+    # reset alice's password
+    python manage.py fw users set --password "securepassword" alice
+
+    # reset bob's password through an environment variable
+    export FUNKWHALE_CLI_USER_UPDATE_PASSWORD=newsecurepassword
+    python manage.py fw users set bob
+
+Deletion
+^^^^^^^^
+
+.. code-block:: sh
+
+    # print help
+    python manage.py fw users rm --help
+
+    # delete bob's account, but keep a reference to their account in the database
+    # to prevent future signup with the same username
+    python manage.py fw users rm bob
+
+    # delete alice's account, with no confirmation prompt
+    python manage.py fw users rm --no-input alice
+
+    # delete alice and bob accounts, including all reference to their account
+    # (people will be able to signup again with their usernames)
+    python manage.py fw users rm --hard alice bob
+
+
 Pruning library
 ---------------
 
