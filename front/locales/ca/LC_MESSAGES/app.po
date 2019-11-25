@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-11-22 09:11+0000\n"
+"PO-Revision-Date: 2019-11-25 08:46+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4149,12 +4149,11 @@ msgstr[0] "Mostra una cançó més"
 msgstr[1] "Mostra %{ count } pista més"
 
 #: front/src/components/tags/List.vue:11
-#, fuzzy
 msgctxt "Content/*/Button/Label/Verb"
 msgid "Show 1 more tag"
 msgid_plural "Show %{ count } more tags"
-msgstr[0] "Mostra un àlbum més"
-msgstr[1] "Mostra %{ count } àlbums més"
+msgstr[0] "Mostra una etiqueta extra"
+msgstr[1] "Mostra %{ count } etiquetes extres"
 
 #: front/src/components/library/EditForm.vue:21
 msgctxt "Content/Library/Button.Label"
@@ -4172,10 +4171,9 @@ msgid "Show less"
 msgstr "Mostrar menys"
 
 #: front/src/components/common/ExpandableDiv.vue:8
-#, fuzzy
 msgctxt "*/*/Button,Label"
 msgid "Show more"
-msgstr "Mostra un àlbum més"
+msgstr "Mostra més"
 
 #: front/src/views/Notifications.vue:72
 msgctxt "Content/Notifications/Form.Label/Verb"
@@ -4214,7 +4212,6 @@ msgid "Shuffle your queue"
 msgstr "Barreja la teva cua"
 
 #: front/src/components/Home.vue:103
-#, fuzzy
 msgctxt "*/Signup/Title"
 msgid "Sign up"
 msgstr "Inscripció"
@@ -4228,6 +4225,8 @@ msgstr "Inscripció"
 msgctxt "Content/Home/Paragraph"
 msgid "Sign up now to keep a track of your favorites, create playlists, discover new content and much more!"
 msgstr ""
+"Registra't ara per fer un seguiment dels teus favorits, crear llistes de "
+"reproducció, descobrir contingut nou i molt més!"
 
 #: front/src/components/manage/users/UsersTable.vue:40
 msgctxt "Content/Admin/Table.Label/Short, Noun (Value is a date)"
@@ -4299,7 +4298,6 @@ msgstr "Encendre la ràdio"
 
 #: front/src/components/About.vue:170 src/components/Home.vue:53
 #: front/src/views/admin/Settings.vue:87
-#, fuzzy
 msgctxt "Content/Home/Header"
 msgid "Statistics"
 msgstr "Estadístiques"
@@ -4333,7 +4331,6 @@ msgstr "Les estadístiques es calculen a partir de l’activitat i el contingut 
 #: front/src/views/admin/moderation/DomainsDetail.vue:152
 #: front/src/views/admin/moderation/ReportsList.vue:14
 #: front/src/views/content/libraries/Detail.vue:28
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Status"
 msgstr "Estat"
@@ -4359,10 +4356,9 @@ msgid "Submit another edit"
 msgstr "Envia una altre modificació"
 
 #: front/src/components/moderation/ReportModal.vue:64
-#, fuzzy
 msgctxt "Popup/*/Button.Label"
 msgid "Submit report"
-msgstr "Envia"
+msgstr "Enviar l'informe"
 
 #: front/src/components/library/EditForm.vue:111
 msgctxt "Content/Library/Button.Label/Verb"
@@ -4370,10 +4366,9 @@ msgid "Submit suggestion"
 msgstr "Enviar suggerències"
 
 #: front/src/components/manage/moderation/ReportCard.vue:17
-#, fuzzy
 msgctxt "Content/Moderation/*"
 msgid "Submitted by"
-msgstr "Envia"
+msgstr "Envia't per"
 
 #: front/src/views/admin/Settings.vue:86
 msgctxt "Content/Admin/Menu"
@@ -4428,7 +4423,7 @@ msgstr "Fòrum d'ajuda"
 #: front/src/views/Notifications.vue:10
 msgctxt "Content/Notifications/Header"
 msgid "Support this Funkwhale pod"
-msgstr ""
+msgstr "Dóna suport a aquest pod de Funkwhale"
 
 #: front/src/components/library/FileUpload.vue:85
 msgctxt "Content/Library/Paragraph"
@@ -4443,13 +4438,12 @@ msgstr "Sincronització dels canvis amb el servidor …"
 #: front/src/components/audio/SearchBar.vue:35
 msgctxt "*/*/*/Noun"
 msgid "Tag"
-msgstr ""
+msgstr "Etiqueta"
 
 #: front/src/views/admin/library/TagDetail.vue:61
-#, fuzzy
 msgctxt "Content/Moderation/Title"
 msgid "Tag data"
-msgstr "Dades de la pista"
+msgstr "Dades de l'etiqueta"
 
 #: front/src/components/library/Albums.vue:23
 #: src/components/library/Artists.vue:15
@@ -4458,19 +4452,18 @@ msgstr "Dades de la pista"
 #: src/edits.js:50 src/edits.js:91 src/entities.js:120
 msgctxt "*/*/*/Noun"
 msgid "Tags"
-msgstr ""
+msgstr "Eitquetes"
 
 #: front/src/components/mixins/Translations.vue:44
 #: front/src/components/mixins/Translations.vue:45
-#, fuzzy
 msgctxt "Content/Moderation/Dropdown"
 msgid "Takedown request"
-msgstr "Cancel·lar la petició de seguiment"
+msgstr "Sol·licitud de canvis"
 
 #: front/src/components/About.vue:35 src/components/About.vue:61
 msgctxt "Content/About/Header"
 msgid "Terms and privacy policy"
-msgstr ""
+msgstr "Termes i política de privacitat"
 
 #: front/src/components/audio/EmbedWizard.vue:35
 #: front/src/components/common/CopyInput.vue:3
@@ -4529,10 +4522,9 @@ msgid "The next track will play automatically in a few seconds…"
 msgstr "La següent pista serà reproduïda automàticament en pocs segons …"
 
 #: front/src/components/manage/moderation/NotesThread.vue:27
-#, fuzzy
 msgctxt "Content/Moderation/Paragraph"
 msgid "The note will be removed. This action is irreversible."
-msgstr "La càrrega s'eliminarà. Aquesta acció és irreversible."
+msgstr "La nota s'eliminarà. Aquesta acció és irreversible."
 
 #: front/src/components/manage/moderation/ReportCard.vue:120
 msgctxt "Content/Moderation/Message"
