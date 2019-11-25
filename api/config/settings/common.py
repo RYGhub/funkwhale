@@ -392,6 +392,11 @@ MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR("media")))
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = env("MEDIA_URL", default="/media/")
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+ATTACHMENTS_UNATTACHED_PRUNE_DELAY = env.int(
+    "ATTACHMENTS_UNATTACHED_PRUNE_DELAY", default=3600 * 24
+)
+
 # URL Configuration
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
@@ -558,6 +563,11 @@ CELERY_BROKER_URL = env(
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
 CELERY_BEAT_SCHEDULE = {
+    "common.prune_unattached_attachments": {
+        "task": "common.prune_unattached_attachments",
+        "schedule": crontab(minute="0", hour="*"),
+        "options": {"expires": 60 * 60},
+    },
     "federation.clean_music_cache": {
         "task": "federation.clean_music_cache",
         "schedule": crontab(minute="0", hour="*/2"),
@@ -856,6 +866,7 @@ ACCOUNT_USERNAME_BLACKLIST = [
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)
+EXTERNAL_REQUESTS_TIMEOUT = env.int("EXTERNAL_REQUESTS_TIMEOUT", default=5)
 # XXX: deprecated, see #186
 API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
 
@@ -878,7 +889,11 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
         ("square_crop", "crop__400x400"),
         ("medium_square_crop", "crop__200x200"),
         ("small_square_crop", "crop__50x50"),
-    ]
+    ],
+    "attachment_square": [
+        ("original", "url"),
+        ("medium_square_crop", "crop__200x200"),
+    ],
 }
 VERSATILEIMAGEFIELD_SETTINGS = {"create_images_on_demand": False}
 RSA_KEY_SIZE = 2048

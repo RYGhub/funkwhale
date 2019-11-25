@@ -2,11 +2,13 @@ import os
 import PIL
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
 
 import django_filters
 
 from funkwhale_api.common import serializers
 from funkwhale_api.users import models
+from funkwhale_api.federation import utils as federation_utils
 
 
 class TestActionFilterSet(django_filters.FilterSet):
@@ -182,3 +184,71 @@ def test_strip_exif_field():
 
     cleaned = PIL.Image.open(field.to_internal_value(uploaded))
     assert cleaned._getexif() is None
+
+
+def test_attachment_serializer_existing_file(factories, to_api_date):
+    attachment = factories["common.Attachment"]()
+    expected = {
+        "uuid": str(attachment.uuid),
+        "size": attachment.size,
+        "mimetype": attachment.mimetype,
+        "creation_date": to_api_date(attachment.creation_date),
+        "urls": {
+            "source": attachment.url,
+            "original": federation_utils.full_url(attachment.file.url),
+            "medium_square_crop": federation_utils.full_url(
+                attachment.file.crop["200x200"].url
+            ),
+        },
+        # XXX: BACKWARD COMPATIBILITY
+        "original": federation_utils.full_url(attachment.file.url),
+        "medium_square_crop": federation_utils.full_url(
+            attachment.file.crop["200x200"].url
+        ),
+        "small_square_crop": federation_utils.full_url(
+            attachment.file.crop["200x200"].url
+        ),
+        "square_crop": federation_utils.full_url(attachment.file.crop["200x200"].url),
+    }
+
+    serializer = serializers.AttachmentSerializer(attachment)
+
+    assert serializer.data == expected
+
+
+def test_attachment_serializer_remote_file(factories, to_api_date):
+    attachment = factories["common.Attachment"](file=None)
+    proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": attachment.uuid})
+    expected = {
+        "uuid": str(attachment.uuid),
+        "size": attachment.size,
+        "mimetype": attachment.mimetype,
+        "creation_date": to_api_date(attachment.creation_date),
+        # everything is the same, except for the urls field because:
+        #  - the file isn't available on the local pod
+        #  - we need to return different URLs so that the client can trigger
+        #    a fetch and get redirected to the desired version
+        #
+        "urls": {
+            "source": attachment.url,
+            "original": federation_utils.full_url(proxy_url + "?next=original"),
+            "medium_square_crop": federation_utils.full_url(
+                proxy_url + "?next=medium_square_crop"
+            ),
+        },
+        # XXX: BACKWARD COMPATIBILITY
+        "original": federation_utils.full_url(proxy_url + "?next=original"),
+        "medium_square_crop": federation_utils.full_url(
+            proxy_url + "?next=medium_square_crop"
+        ),
+        "square_crop": federation_utils.full_url(
+            proxy_url + "?next=medium_square_crop"
+        ),
+        "small_square_crop": federation_utils.full_url(
+            proxy_url + "?next=medium_square_crop"
+        ),
+    }
+
+    serializer = serializers.AttachmentSerializer(attachment)
+
+    assert serializer.data == expected

@@ -57,14 +57,12 @@ def library_track(request, pk):
             ),
         },
     ]
-    if obj.album.cover:
+    if obj.album.attachment_cover:
         metas.append(
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(
-                    settings.FUNKWHALE_URL, obj.album.cover.crop["400x400"].url
-                ),
+                "content": obj.album.attachment_cover.download_url_medium_square_crop,
             }
         )
 
@@ -126,14 +124,12 @@ def library_album(request, pk):
             }
         )
 
-    if obj.cover:
+    if obj.attachment_cover:
         metas.append(
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(
-                    settings.FUNKWHALE_URL, obj.cover.crop["400x400"].url
-                ),
+                "content": obj.attachment_cover.download_url_medium_square_crop,
             }
         )
 
@@ -166,7 +162,7 @@ def library_artist(request, pk):
     )
     # we use latest album's cover as artist image
     latest_album = (
-        obj.albums.exclude(cover="").exclude(cover=None).order_by("release_date").last()
+        obj.albums.exclude(attachment_cover=None).order_by("release_date").last()
     )
     metas = [
         {"tag": "meta", "property": "og:url", "content": artist_url},
@@ -174,14 +170,12 @@ def library_artist(request, pk):
         {"tag": "meta", "property": "og:type", "content": "profile"},
     ]
 
-    if latest_album and latest_album.cover:
+    if latest_album and latest_album.attachment_cover:
         metas.append(
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(
-                    settings.FUNKWHALE_URL, latest_album.cover.crop["400x400"].url
-                ),
+                "content": latest_album.attachment_cover.download_url_medium_square_crop,
             }
         )
 
@@ -217,8 +211,7 @@ def library_playlist(request, pk):
         utils.spa_reverse("library_playlist", kwargs={"pk": obj.pk}),
     )
     # we use the first playlist track's album's cover as image
-    playlist_tracks = obj.playlist_tracks.exclude(track__album__cover="")
-    playlist_tracks = playlist_tracks.exclude(track__album__cover=None)
+    playlist_tracks = obj.playlist_tracks.exclude(track__album__attachment_cover=None)
     playlist_tracks = playlist_tracks.select_related("track__album").order_by("index")
     first_playlist_track = playlist_tracks.first()
     metas = [
@@ -232,10 +225,7 @@ def library_playlist(request, pk):
             {
                 "tag": "meta",
                 "property": "og:image",
-                "content": utils.join_url(
-                    settings.FUNKWHALE_URL,
-                    first_playlist_track.track.album.cover.crop["400x400"].url,
-                ),
+                "content": first_playlist_track.track.album.attachment_cover.download_url_medium_square_crop,
             }
         )
 

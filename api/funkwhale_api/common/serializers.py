@@ -272,3 +272,38 @@ class APIMutationSerializer(serializers.ModelSerializer):
         if value not in self.context["registry"]:
             raise serializers.ValidationError("Invalid mutation type {}".format(value))
         return value
+
+
+class AttachmentSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField(read_only=True)
+    size = serializers.IntegerField(read_only=True)
+    mimetype = serializers.CharField(read_only=True)
+    creation_date = serializers.DateTimeField(read_only=True)
+    file = StripExifImageField(write_only=True)
+    urls = serializers.SerializerMethodField()
+
+    def get_urls(self, o):
+        urls = {}
+        urls["source"] = o.url
+        urls["original"] = o.download_url_original
+        urls["medium_square_crop"] = o.download_url_medium_square_crop
+        return urls
+
+    def to_representation(self, o):
+        repr = super().to_representation(o)
+        # XXX: BACKWARD COMPATIBILITY
+        # having the attachment urls in a nested JSON obj is better,
+        # but we can't do this without breaking clients
+        # So we extract the urls and include these in the parent payload
+        repr.update({k: v for k, v in repr["urls"].items() if k != "source"})
+        # also, our legacy images had lots of variations (400x400, 200x200, 50x50)
+        # but we removed some of these, so we emulate these by hand (by redirecting)
+        # to actual, existing attachment variations
+        repr["square_crop"] = repr["medium_square_crop"]
+        repr["small_square_crop"] = repr["medium_square_crop"]
+        return repr
+
+    def create(self, validated_data):
+        return models.Attachment.objects.create(
+            file=validated_data["file"], actor=validated_data["actor"]
+        )

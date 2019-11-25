@@ -16,7 +16,12 @@ from rest_framework.serializers import ValidationError
 
 import funkwhale_api
 from funkwhale_api.activity import record
-from funkwhale_api.common import fields, preferences, utils as common_utils
+from funkwhale_api.common import (
+    fields,
+    preferences,
+    utils as common_utils,
+    tasks as common_tasks,
+)
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music import models as music_models
@@ -732,20 +737,23 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             try:
                 album_id = int(id.replace("al-", ""))
                 album = (
-                    music_models.Album.objects.exclude(cover__isnull=True)
-                    .exclude(cover="")
+                    music_models.Album.objects.exclude(attachment_cover=None)
+                    .select_related("attachment_cover")
                     .get(pk=album_id)
                 )
             except (TypeError, ValueError, music_models.Album.DoesNotExist):
                 return response.Response(
                     {"error": {"code": 70, "message": "cover art not found."}}
                 )
-            cover = album.cover
+            attachment = album.attachment_cover
         else:
             return response.Response(
                 {"error": {"code": 70, "message": "cover art not found."}}
             )
 
+        if not attachment.file:
+            common_tasks.fetch_remote_attachment(attachment)
+        cover = attachment.file
         mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
         path = music_views.get_file_path(cover)
         file_header = mapping[settings.REVERSE_PROXY_TYPE]

@@ -69,9 +69,9 @@ class ManageArtistViewSet(
             "tracks",
             Prefetch(
                 "albums",
-                queryset=music_models.Album.objects.annotate(
-                    tracks_count=Count("tracks")
-                ),
+                queryset=music_models.Album.objects.select_related(
+                    "attachment_cover"
+                ).annotate(tracks_count=Count("tracks")),
             ),
             music_views.TAG_PREFETCH,
         )
@@ -110,7 +110,7 @@ class ManageAlbumViewSet(
     queryset = (
         music_models.Album.objects.all()
         .order_by("-id")
-        .select_related("attributed_to", "artist")
+        .select_related("attributed_to", "artist", "attachment_cover")
         .prefetch_related("tracks", music_views.TAG_PREFETCH)
     )
     serializer_class = serializers.ManageAlbumSerializer
@@ -153,7 +153,9 @@ class ManageTrackViewSet(
     queryset = (
         music_models.Track.objects.all()
         .order_by("-id")
-        .select_related("attributed_to", "artist", "album__artist")
+        .select_related(
+            "attributed_to", "artist", "album__artist", "album__attachment_cover"
+        )
         .annotate(uploads_count=Coalesce(Subquery(uploads_subquery), 0))
         .prefetch_related(music_views.TAG_PREFETCH)
     )

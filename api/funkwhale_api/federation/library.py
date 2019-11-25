@@ -1,5 +1,4 @@
 import requests
-from django.conf import settings
 
 from funkwhale_api.common import session
 
@@ -12,8 +11,6 @@ def get_library_data(library_url, actor):
         response = session.get_session().get(
             library_url,
             auth=auth,
-            timeout=5,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
         )
     except requests.ConnectionError:
@@ -35,11 +32,7 @@ def get_library_data(library_url, actor):
 def get_library_page(library, page_url, actor):
     auth = signing.get_auth(actor.private_key, actor.private_key_id)
     response = session.get_session().get(
-        page_url,
-        auth=auth,
-        timeout=5,
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-        headers={"Content-Type": "application/activity+json"},
+        page_url, auth=auth, headers={"Content-Type": "application/activity+json"},
     )
     serializer = serializers.CollectionPageSerializer(
         data=response.json(),

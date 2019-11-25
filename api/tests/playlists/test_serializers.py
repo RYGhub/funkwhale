@@ -95,7 +95,7 @@ def test_playlist_serializer_include_covers(factories, api_request):
     playlist = factories["playlists.Playlist"]()
     t1 = factories["music.Track"]()
     t2 = factories["music.Track"]()
-    t3 = factories["music.Track"](album__cover=None)
+    t3 = factories["music.Track"](album__attachment_cover=None)
     t4 = factories["music.Track"]()
     t5 = factories["music.Track"]()
     t6 = factories["music.Track"]()
@@ -106,11 +106,11 @@ def test_playlist_serializer_include_covers(factories, api_request):
     qs = playlist.__class__.objects.with_covers().with_tracks_count()
 
     expected = [
-        request.build_absolute_uri(t1.album.cover.crop["200x200"].url),
-        request.build_absolute_uri(t2.album.cover.crop["200x200"].url),
-        request.build_absolute_uri(t4.album.cover.crop["200x200"].url),
-        request.build_absolute_uri(t5.album.cover.crop["200x200"].url),
-        request.build_absolute_uri(t6.album.cover.crop["200x200"].url),
+        t1.album.attachment_cover.download_url_medium_square_crop,
+        t2.album.attachment_cover.download_url_medium_square_crop,
+        t4.album.attachment_cover.download_url_medium_square_crop,
+        t5.album.attachment_cover.download_url_medium_square_crop,
+        t6.album.attachment_cover.download_url_medium_square_crop,
     ]
 
     serializer = serializers.PlaylistSerializer(qs.get(), context={"request": request})

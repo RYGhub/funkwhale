@@ -128,7 +128,9 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        albums = models.Album.objects.with_tracks_count()
+        albums = models.Album.objects.with_tracks_count().select_related(
+            "attachment_cover"
+        )
         albums = albums.annotate_playable_by_actor(
             utils.get_actor_from_request(self.request)
         )
@@ -149,7 +151,7 @@ class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     queryset = (
         models.Album.objects.all()
         .order_by("-creation_date")
-        .prefetch_related("artist", "attributed_to")
+        .prefetch_related("artist", "attributed_to", "attachment_cover")
     )
     serializer_class = serializers.AlbumSerializer
     permission_classes = [oauth_permissions.ScopePermission]

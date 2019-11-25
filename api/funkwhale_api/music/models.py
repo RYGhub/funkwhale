@@ -20,7 +20,6 @@ from django.urls import reverse
 from django.utils import timezone
 
 from versatileimagefield.fields import VersatileImageField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api import musicbrainz
 from funkwhale_api.common import fields
@@ -286,8 +285,16 @@ class Album(APIModelMixin):
     artist = models.ForeignKey(Artist, related_name="albums", on_delete=models.CASCADE)
     release_date = models.DateField(null=True, blank=True, db_index=True)
     release_group_id = models.UUIDField(null=True, blank=True)
+    # XXX: 1.0 clean this uneeded field in favor of attachment_cover
     cover = VersatileImageField(
         upload_to="albums/covers/%Y/%m/%d", null=True, blank=True
+    )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_album",
     )
     TYPE_CHOICES = (("album", "Album"),)
     type = models.CharField(choices=TYPE_CHOICES, max_length=30, default="album")
@@ -334,40 +341,46 @@ class Album(APIModelMixin):
     objects = AlbumQuerySet.as_manager()
 
     def get_image(self, data=None):
+        from funkwhale_api.common import tasks as common_tasks
+
+        attachment = None
         if data:
             extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
             extension = extensions.get(data["mimetype"], "jpg")
+            attachment = common_models.Attachment(mimetype=data["mimetype"])
             f = None
+            filename = "{}.{}".format(self.uuid, extension)
             if data.get("content"):
                 # we have to cover itself
                 f = ContentFile(data["content"])
+                attachment.file.save(filename, f, save=False)
             elif data.get("url"):
+                attachment.url = data.get("url")
                 # we can fetch from a url
                 try:
-                    response = session.get_session().get(
-                        data.get("url"),
-                        timeout=3,
-                        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
+                    common_tasks.fetch_remote_attachment(
+                        attachment, filename=filename, save=False
                     )
-                    response.raise_for_status()
                 except Exception as e:
                     logger.warn(
                         "Cannot download cover at url %s: %s", data.get("url"), e
                     )
                     return
-                else:
-                    f = ContentFile(response.content)
-            if f:
-                self.cover.save("{}.{}".format(self.uuid, extension), f, save=False)
-                self.save(update_fields=["cover"])
-                return self.cover.file
-        if self.mbid:
+
+        elif self.mbid:
             image_data = musicbrainz.api.images.get_front(str(self.mbid))
             f = ContentFile(image_data)
-            self.cover.save("{0}.jpg".format(self.mbid), f, save=False)
-            self.save(update_fields=["cover"])
-        if self.cover:
-            return self.cover.file
+            attachment = common_models.Attachment(mimetype="image/jpeg")
+            attachment.file.save("{0}.jpg".format(self.mbid), f, save=False)
+        if attachment and attachment.file:
+            attachment.save()
+            self.attachment_cover = attachment
+            self.save(update_fields=["attachment_cover"])
+            return self.attachment_cover.file
+
+    @property
+    def cover(self):
+        return self.attachment_cover
 
     def __str__(self):
         return self.title
@@ -377,16 +390,6 @@ class Album(APIModelMixin):
 
     def get_moderation_url(self):
         return "/manage/library/albums/{}".format(self.pk)
-
-    @property
-    def cover_path(self):
-        if not self.cover:
-            return None
-        try:
-            return self.cover.path
-        except NotImplementedError:
-            # external storage
-            return self.cover.name
 
     @classmethod
     def get_or_create_from_title(cls, title, **kwargs):
@@ -415,7 +418,9 @@ def import_album(v):
 
 class TrackQuerySet(common_models.LocalFromFidQuerySet, models.QuerySet):
     def for_nested_serialization(self):
-        return self.prefetch_related("artist", "album__artist")
+        return self.prefetch_related(
+            "artist", "album__artist", "album__attachment_cover"
+        )
 
     def annotate_playable_by_actor(self, actor):
 
@@ -729,7 +734,6 @@ class Upload(models.Model):
         return parsed.hostname
 
     def download_audio_from_remote(self, actor):
-        from funkwhale_api.common import session
         from funkwhale_api.federation import signing
 
         if actor:
@@ -743,7 +747,6 @@ class Upload(models.Model):
             stream=True,
             timeout=20,
             headers={"Content-Type": "application/octet-stream"},
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         )
         with remote_response as r:
             remote_response.raise_for_status()
@@ -1307,13 +1310,3 @@ def update_request_status(sender, instance, created, **kwargs):
         # let's mark the request as imported since the import is over
         instance.import_request.status = "imported"
         return instance.import_request.save(update_fields=["status"])
-
-
-@receiver(models.signals.post_save, sender=Album)
-def warm_album_covers(sender, instance, **kwargs):
-    if not instance.cover or not settings.CREATE_IMAGE_THUMBNAILS:
-        return
-    album_covers_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance, rendition_key_set="square", image_attr="cover"
-    )
-    num_created, failed_to_create = album_covers_warmer.warm()

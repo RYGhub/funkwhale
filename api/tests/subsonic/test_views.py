@@ -724,7 +724,7 @@ def test_get_cover_art_album(factories, logged_in_api_client):
     assert response.status_code == 200
     assert response["Content-Type"] == ""
     assert response["X-Accel-Redirect"] == music_views.get_file_path(
-        album.cover
+        album.attachment_cover.file
     ).decode("utf-8")
 
 

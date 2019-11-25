@@ -84,8 +84,6 @@ def retrieve_ap_object(
     response = session.get_session().get(
         fid,
         auth=auth,
-        timeout=5,
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
         headers={
             "Accept": "application/activity+json",
             "Content-Type": "application/activity+json",

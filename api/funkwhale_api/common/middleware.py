@@ -1,6 +1,5 @@
 import html
 import io
-import requests
 import time
 import xml.sax.saxutils
 
@@ -11,6 +10,7 @@ from django import urls
 from rest_framework import views
 
 from . import preferences
+from . import session
 from . import throttling
 from . import utils
 
@@ -76,10 +76,7 @@ def get_spa_html(spa_url):
     if cached:
         return cached
 
-    response = requests.get(
-        utils.join_url(spa_url, "index.html"),
-        verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
-    )
+    response = session.get_session().get(utils.join_url(spa_url, "index.html"),)
     response.raise_for_status()
     content = response.text
     caches["local"].set(cache_key, content, settings.FUNKWHALE_SPA_HTML_CACHE_DURATION)

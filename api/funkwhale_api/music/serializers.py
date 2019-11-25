@@ -4,7 +4,6 @@ from django.db import transaction
 from django import urls
 from django.conf import settings
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
@@ -17,7 +16,25 @@ from funkwhale_api.tags.models import Tag
 from . import filters, models, tasks
 
 
-cover_field = VersatileImageFieldSerializer(allow_null=True, sizes="square")
+class NullToEmptDict(object):
+    def get_attribute(self, o):
+        attr = super().get_attribute(o)
+        if attr is None:
+            return {}
+        return attr
+
+    def to_representation(self, v):
+        if not v:
+            return v
+        return super().to_representation(v)
+
+
+class CoverField(NullToEmptDict, common_serializers.AttachmentSerializer):
+    # XXX: BACKWARD COMPATIBILITY
+    pass
+
+
+cover_field = CoverField()
 
 
 def serialize_attributed_to(self, obj):
@@ -450,12 +467,12 @@ class OembedSerializer(serializers.Serializer):
             embed_type = "track"
             embed_id = track.pk
             data["title"] = "{} by {}".format(track.title, track.artist.name)
-            if track.album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    track.album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if track.album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = track.album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["description"] = track.full_name
             data["author_name"] = track.artist.name
             data["height"] = 150
@@ -476,12 +493,12 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "album"
             embed_id = album.pk
-            if album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = "{} by {}".format(album.title, album.artist.name)
             data["description"] = "{} by {}".format(album.title, album.artist.name)
             data["author_name"] = album.artist.name
@@ -501,19 +518,14 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "artist"
             embed_id = artist.pk
-            album = (
-                artist.albums.filter(cover__isnull=False)
-                .exclude(cover="")
-                .order_by("-id")
-                .first()
-            )
+            album = artist.albums.exclude(attachment_cover=None).order_by("-id").first()
 
-            if album and album.cover:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    album.cover.crop["400x400"].url
-                )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+            if album and album.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = album.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = artist.name
             data["description"] = artist.name
             data["author_name"] = artist.name
@@ -533,19 +545,22 @@ class OembedSerializer(serializers.Serializer):
                 )
             embed_type = "playlist"
             embed_id = obj.pk
-            playlist_tracks = obj.playlist_tracks.exclude(track__album__cover="")
-            playlist_tracks = playlist_tracks.exclude(track__album__cover=None)
-            playlist_tracks = playlist_tracks.select_related("track__album").order_by(
-                "index"
+            playlist_tracks = obj.playlist_tracks.exclude(
+                track__album__attachment_cover=None
             )
+            playlist_tracks = playlist_tracks.select_related(
+                "track__album__attachment_cover"
+            ).order_by("index")
             first_playlist_track = playlist_tracks.first()
 
             if first_playlist_track:
-                data["thumbnail_url"] = federation_utils.full_url(
-                    first_playlist_track.track.album.cover.crop["400x400"].url
+                data[
+                    "thumbnail_url"
+                ] = (
+                    first_playlist_track.track.album.attachment_cover.download_url_medium_square_crop
                 )
-                data["thumbnail_width"] = 400
-                data["thumbnail_height"] = 400
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
             data["title"] = obj.name
             data["description"] = obj.name
             data["author_name"] = obj.name

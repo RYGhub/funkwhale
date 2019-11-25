@@ -45,3 +45,20 @@ class MutationAdmin(ModelAdmin):
     search_fields = ["created_by__preferred_username"]
     list_filter = ["type", "is_approved", "is_applied"]
     actions = [apply]
+
+
+@register(models.Attachment)
+class AttachmentAdmin(ModelAdmin):
+    list_display = [
+        "uuid",
+        "actor",
+        "url",
+        "file",
+        "size",
+        "mimetype",
+        "creation_date",
+        "last_fetch_date",
+    ]
+    list_select_related = True
+    search_fields = ["actor__domain__name"]
+    list_filter = ["mimetype"]

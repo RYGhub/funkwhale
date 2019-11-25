@@ -28,6 +28,7 @@ router.register(
     r"playlist-tracks", playlists_views.PlaylistTrackViewSet, "playlist-tracks"
 )
 router.register(r"mutations", common_views.MutationViewSet, "mutations")
+router.register(r"attachments", common_views.AttachmentViewSet, "attachments")
 v1_patterns = router.urls
 
 subsonic_router = routers.SimpleRouter(trailing_slash=False)

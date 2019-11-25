@@ -88,7 +88,7 @@ def dispatch_inbox(activity, call_handlers=True):
         context={
             "activity": activity,
             "actor": activity.actor,
-            "inbox_items": activity.inbox_items.filter(is_read=False),
+            "inbox_items": activity.inbox_items.filter(is_read=False).order_by("id"),
         },
         call_handlers=call_handlers,
     )
@@ -142,8 +142,6 @@ def deliver_to_remote(delivery):
             auth=auth,
             json=delivery.activity.payload,
             url=delivery.inbox_url,
-            timeout=5,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
         )
         logger.debug("Remote answered with %s", response.status_code)
@@ -163,9 +161,7 @@ def deliver_to_remote(delivery):
 def fetch_nodeinfo(domain_name):
     s = session.get_session()
     wellknown_url = "https://{}/.well-known/nodeinfo".format(domain_name)
-    response = s.get(
-        url=wellknown_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
-    )
+    response = s.get(url=wellknown_url)
     response.raise_for_status()
     serializer = serializers.NodeInfoSerializer(data=response.json())
     serializer.is_valid(raise_exception=True)
@@ -175,9 +171,7 @@ def fetch_nodeinfo(domain_name):
             nodeinfo_url = link["href"]
             break
 
-    response = s.get(
-        url=nodeinfo_url, timeout=5, verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL
-    )
+    response = s.get(url=nodeinfo_url)
     response.raise_for_status()
     return response.json()
 
@@ -308,8 +302,6 @@ def fetch(fetch):
         response = session.get_session().get(
             auth=auth,
             url=fetch.url,
-            timeout=5,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
         )
         logger.debug("Remote answered with %s", response.status_code)

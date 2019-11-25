@@ -185,6 +185,8 @@ tags:
       url: https://docs.funkwhale.audio/users/managing.html
   - name: Content curation
     description: Favorites, playlists, radios
+  - name: Other
+    description: Other endpoints that don't fit in the categories above
 
 paths:
   /api/v1/oauth/apps/:
@@ -1022,6 +1024,54 @@ paths:
         204:
           $ref: "#/responses/204"
 
+  /api/v1/attachments/:
+    post:
+      tags:
+        - "Other"
+      description:
+        Upload a new file as an attachment that can be later associated with other objects.
+      responses:
+        201:
+          $ref: "#/responses/201"
+        400:
+          $ref: "#/responses/400"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+
+  /api/v1/attachments/{uuid}/:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: "string"
+          format: "uuid"
+    get:
+      summary: Retrieve an attachment
+      tags:
+        - "Other"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Attachment"
+    delete:
+      summary: Delete an attachment
+      tags:
+        - "Other"
+      responses:
+        204:
+          $ref: "#/responses/204"
+
 parameters:
   ObjectId:
     name: id
@@ -1114,6 +1164,12 @@ properties:
       - "audio/mpeg"
       - "audio/x-flac"
       - "audio/flac"
+  image_mimetype:
+    type: string
+    example: "image/png"
+    enum:
+      - "image/png"
+      - "image/jpeg"
   import_status:
     type: string
     example: "finished"
@@ -1180,28 +1236,33 @@ definitions:
         format: "uri"
         description: "Link to the previous page of results"
 
-
-  Image:
+  Attachment:
     type: "object"
     properties:
-      original:
+      uuid:
+        type: string
+        format: uuid
+      size:
+        type: "integer"
+        format: "int64"
+        example: 2787000
+        description: "Size of the file, in bytes"
+      mimetype:
+        $ref: "#/properties/image_mimetype"
+      creation_date:
         type: "string"
-        description: "URL to the original image"
-        example: "https://mydomain/media/albums/covers/ec2c53aeaac6.jpg"
-      small_square_crop:
-        type: "string"
-        description: "URL to a small, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-50x50-70.jpg"
-
-      medium_square_crop:
-        type: "string"
-        description: "URL to a medium, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-200x200-70.jpg"
-
-      square_crop:
-        type: "string"
-        description: "URL to a large, squared thumbnail of the image"
-        example: "https://mydomain/media/__sized__/albums/covers/ec2c53aeaac6-crop-c0-5__0-5-400x400-70.jpg"
+        format: "date-time"
+      urls:
+        type: "object"
+        properties:
+          original:
+            type: "string"
+            description: "URL to the original image"
+            example: "https://mydomain/media/attachments/ec2c53aeaac6.jpg"
+          medium_square_crop:
+            type: "string"
+            description: "URL to a medium, squared thumbnail of the image"
+            example: "https://mydomain/media/__sized__/attachments/ec2c53aeaac6-crop-c0-5__0-5-200x200-70.jpg"
 
   Actor:
     type: object
@@ -1317,7 +1378,7 @@ definitions:
       is_playable:
         type: "boolean"
       cover:
-        $ref: "#/definitions/Image"
+        $ref: "#/definitions/Attachment"
       is_local:
         type: "boolean"
         description: "Indicates if the object was initally created locally or on another server"
@@ -1508,7 +1569,7 @@ definitions:
       uuid:
         type: string
         format: uuid
-      size:
+      size:size:
         type: "integer"
         format: "int64"
         example: 278987000

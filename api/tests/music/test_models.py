@@ -192,7 +192,7 @@ def test_album_get_image_content(factories):
     album.get_image(data={"content": b"test", "mimetype": "image/jpeg"})
     album.refresh_from_db()
 
-    assert album.cover.read() == b"test"
+    assert album.attachment_cover.file.read() == b"test"
 
 
 def test_library(factories):

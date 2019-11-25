@@ -145,7 +145,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
         for plt in plts:
             if plt.track.album.artist_id in excluded_artists:
                 continue
-            url = plt.track.album.cover.crop["200x200"].url
+            url = plt.track.album.attachment_cover.download_url_medium_square_crop
             if url in covers:
                 continue
             covers.append(url)

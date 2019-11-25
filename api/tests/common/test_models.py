@@ -46,3 +46,28 @@ def test_get_moderation_url(factory_name, factories, expected):
     obj = factories[factory_name]()
 
     assert obj.get_moderation_url() == expected.format(obj=obj)
+
+
+def test_attachment(factories, now):
+    attachment = factories["common.Attachment"]()
+
+    assert attachment.uuid is not None
+    assert attachment.mimetype == "image/jpeg"
+    assert attachment.file is not None
+    assert attachment.url is not None
+    assert attachment.actor is not None
+    assert attachment.creation_date > now
+    assert attachment.last_fetch_date is None
+    assert attachment.size > 0
+
+
+@pytest.mark.parametrize("args, expected", [([], [0]), ([True], [0]), ([False], [1])])
+def test_attachment_queryset_attached(args, expected, factories, queryset_equal_list):
+    attachments = [
+        factories["music.Album"]().attachment_cover,
+        factories["common.Attachment"](),
+    ]
+
+    queryset = attachments[0].__class__.objects.attached(*args).order_by("id")
+    expected_objs = [attachments[i] for i in expected]
+    assert queryset == expected_objs
