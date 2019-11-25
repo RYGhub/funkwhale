@@ -556,7 +556,7 @@ class PermissiveDateField(serializers.CharField):
         try:
             parsed = pendulum.parse(str(value))
             return datetime.date(parsed.year, parsed.month, parsed.day)
-        except pendulum.exceptions.ParserError:
+        except (pendulum.exceptions.ParserError, ValueError):
             pass
 
         return None

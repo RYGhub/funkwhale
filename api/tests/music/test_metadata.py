@@ -239,6 +239,7 @@ def test_can_get_metadata_from_flac_file_not_crash_if_empty():
         ("2017-12-31", datetime.date(2017, 12, 31)),
         ("2017-14-01 01:32", datetime.date(2017, 1, 14)),  # deezer format
         ("2017-02", datetime.date(2017, 1, 1)),  # weird format that exists
+        ("0000", None),
         ("nonsense", None),
     ],
 )
