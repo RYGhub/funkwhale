@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-11-25 08:46+0000\n"
+"PO-Revision-Date: 2019-11-26 05:26+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4529,7 +4529,7 @@ msgstr "La nota s'eliminarà. Aquesta acció és irreversible."
 #: front/src/components/manage/moderation/ReportCard.vue:120
 msgctxt "Content/Moderation/Message"
 msgid "The object associated with this report was deleted."
-msgstr ""
+msgstr "L'objecte associat a aquest informe es va suprimir."
 
 #: front/src/components/playlists/Form.vue:14
 msgctxt "Content/Playlist/Error message.Title"
@@ -4547,13 +4547,11 @@ msgid "The remote server answered, but returned data was unsupported by Funkwhal
 msgstr "El servidor remot va respondre, però les dades retornades no van ser admeses per Funkwhale."
 
 #: front/src/components/federation/FetchButton.vue:44
-#, fuzzy
 msgctxt "*/*/Error"
 msgid "The remote server didn't respond quickly enough"
 msgstr "El servidor remot no va respondre prou ràpidament"
 
 #: front/src/components/federation/FetchButton.vue:50
-#, fuzzy
 msgctxt "*/*/Error"
 msgid "The remote server returned invalid JSON or JSON-LD data"
 msgstr "El servidor de retorn ha retornat dades invàlides de JSON o JSON-LD"
@@ -4574,10 +4572,11 @@ msgid "The selected library will be removed, as well as associated uploads and f
 msgstr "La biblioteca seleccionada serà suprimida, així com les càrregues associades i els seguidors."
 
 #: front/src/components/manage/library/TagsTable.vue:180
-#, fuzzy
 msgctxt "Popup/*/Paragraph"
 msgid "The selected tag will be removed and unlinked with existing content, if any. This action is irreversible."
-msgstr "La càrrega seleccionada s'eliminarà. Aquesta acció és irreversible."
+msgstr ""
+"L'etiqueta seleccionada s'eliminarà i es desenllaçarà amb el contingut "
+"existent, si n’hi ha. Aquesta acció és irreversible."
 
 #: front/src/components/manage/library/TracksTable.vue:189
 msgctxt "Popup/*/Paragraph"
@@ -4605,10 +4604,11 @@ msgid "The suggestion will be completely removed, this action is irreversible."
 msgstr "El suggeriment s’eliminarà completament, aquesta acció és irreversible."
 
 #: front/src/views/admin/library/TagDetail.vue:44
-#, fuzzy
 msgctxt "Content/Moderation/Paragraph"
 msgid "The tag will be removed and unlinked from any existing entity. This action is irreversible."
-msgstr "La pista s’eliminarà, així com les càrregues associades, els preferits i l’historial d’escolta. Aquesta acció és irreversible."
+msgstr ""
+"L'etiqueta es suprimirà i es desvincularà de qualsevol entitat existent. "
+"Aquesta acció és irreversible."
 
 #: front/src/components/playlists/PlaylistModal.vue:34
 msgctxt "Popup/Playlist/Error message.Title"
@@ -4667,10 +4667,9 @@ msgid "This domain is subject to specific moderation rules"
 msgstr "Aquest domini està subjecta a normes de moderació específiques"
 
 #: front/src/components/manage/moderation/InstancePolicyModal.vue:16
-#, fuzzy
 msgctxt "Content/Moderation/Card.Title"
 msgid "This entity is subject to specific moderation rules"
-msgstr "Aquest domini està subjecta a normes de moderació específiques"
+msgstr "Aquest domini està subjecte a normes de moderació específiques"
 
 #: front/src/views/content/Home.vue:9
 msgctxt "Content/Library/Paragraph"
@@ -4681,6 +4680,8 @@ msgstr "Aquesta instància ofereix fins a %{quota} d'emmagatzematge per a cada u
 msgctxt "Popup/Settings/Paragraph"
 msgid "This is irreversible and will permanently remove your data from our servers. You will we immediatly logged out."
 msgstr ""
+"Això és irreversible i eliminarà les vostres dades de manera permanent dels "
+"nostres servidors. Seràs desconnectat immediatament."
 
 #: front/src/components/auth/Settings.vue:165
 msgctxt "Content/Settings/Paragraph"
@@ -4728,6 +4729,9 @@ msgstr "Aquest objecte és gestionat per un altre servidor, no el podeu editar."
 msgctxt "Content/Home/Paragraph"
 msgid "This pod runs Funkwhale, a community-driven project that lets you listen and share music and audio within a decentralized, open network."
 msgstr ""
+"Aquest pod funciona amb Funkwhale, un projecte impulsat per la comunitat que "
+"us permet escoltar i compartir música i àudio en una xarxa oberta "
+"descentralitzada."
 
 #: front/src/components/library/FileUpload.vue:51
 msgctxt "Content/Library/Paragraph"
@@ -4736,10 +4740,11 @@ msgstr "Aquesta referència s’utilitzarà per agrupar els fitxers carregats."
 
 #: front/src/components/mixins/Translations.vue:33
 #: front/src/components/mixins/Translations.vue:34
-#, fuzzy
 msgctxt "Content/Library/Help text"
 msgid "This track could not be processed, please make sure it is tagged correctly"
-msgstr "No s'ha pogut processar aquesta pista, assegurat que estigui correctament etiquetada"
+msgstr ""
+"No s'ha pogut processar aquesta pista, assegurat que estigui correctament "
+"etiquetada"
 
 #: front/src/components/mixins/Translations.vue:29
 #: front/src/components/mixins/Translations.vue:30
