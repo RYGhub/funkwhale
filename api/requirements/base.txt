@@ -73,3 +73,5 @@ django-storages==1.7.1
 boto3<3
 unicode-slugify
 django-cacheops==4.2
+
+click>=7,<8
