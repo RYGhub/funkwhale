@@ -4,6 +4,7 @@ import factory
 
 from funkwhale_api.factories import registry, NoUpdateOnCreate
 
+from funkwhale_api.common import factories as common_factories
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import licenses
 from funkwhale_api.tags import factories as tags_factories
@@ -81,7 +82,7 @@ class AlbumFactory(
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
-    cover = factory.django.ImageField()
+    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")

@@ -54,7 +54,9 @@ class TrackFavoriteViewSet(
         )
         tracks = Track.objects.with_playable_uploads(
             music_utils.get_actor_from_request(self.request)
-        ).select_related("artist", "album__artist", "attributed_to")
+        ).select_related(
+            "artist", "album__artist", "attributed_to", "album__attachment_cover"
+        )
         queryset = queryset.prefetch_related(Prefetch("track", queryset=tracks))
         return queryset
 

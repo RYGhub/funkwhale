@@ -824,8 +824,8 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
     def get_tags_repr(self, instance):
         return [
-            {"type": "Hashtag", "name": "#{}".format(tag)}
-            for tag in sorted(instance.tagged_items.values_list("tag__name", flat=True))
+            {"type": "Hashtag", "name": "#{}".format(item.tag.name)}
+            for item in sorted(instance.tagged_items.all(), key=lambda i: i.tag.name)
         ]
 
 
@@ -902,12 +902,11 @@ class AlbumSerializer(MusicEntitySerializer):
             else None,
             "tag": self.get_tags_repr(instance),
         }
-        if instance.cover:
+        if instance.attachment_cover:
             d["cover"] = {
                 "type": "Link",
-                "href": utils.full_url(instance.cover.url),
-                "mediaType": mimetypes.guess_type(instance.cover_path)[0]
-                or "image/jpeg",
+                "href": instance.attachment_cover.download_url_original,
+                "mediaType": instance.attachment_cover.mimetype or "image/jpeg",
             }
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()

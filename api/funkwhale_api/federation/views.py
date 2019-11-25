@@ -1,5 +1,6 @@
 from django import forms
 from django.core import paginator
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework import exceptions, mixins, permissions, response, viewsets
@@ -163,7 +164,7 @@ class MusicLibraryViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    renderer_classes = renderers.get_ap_renderers()
+    # renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
     queryset = music_models.Library.objects.all().select_related("actor")
     lookup_field = "uuid"
@@ -176,7 +177,25 @@ class MusicLibraryViewSet(
             "actor": lb.actor,
             "name": lb.name,
             "summary": lb.description,
-            "items": lb.uploads.for_federation().order_by("-creation_date"),
+            "items": lb.uploads.for_federation()
+            .order_by("-creation_date")
+            .prefetch_related(
+                Prefetch(
+                    "track",
+                    queryset=music_models.Track.objects.select_related(
+                        "album__artist__attributed_to",
+                        "artist__attributed_to",
+                        "album__attributed_to",
+                        "attributed_to",
+                        "album__attachment_cover",
+                    ).prefetch_related(
+                        "tagged_items__tag",
+                        "album__tagged_items__tag",
+                        "album__artist__tagged_items__tag",
+                        "artist__tagged_items__tag",
+                    ),
+                )
+            ),
             "item_serializer": serializers.UploadSerializer,
         }
         page = request.GET.get("page")
@@ -219,7 +238,10 @@ class MusicUploadViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Upload.objects.local().select_related(
-        "library__actor", "track__artist", "track__album__artist"
+        "library__actor",
+        "track__artist",
+        "track__album__artist",
+        "track__album__attachment_cover",
     )
     serializer_class = serializers.UploadSerializer
     lookup_field = "uuid"

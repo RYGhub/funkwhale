@@ -285,8 +285,11 @@ def test_can_create_track_from_file_metadata_federation(factories, mocker, r_moc
     assert track.fid == metadata["fid"]
     assert track.creation_date == metadata["fdate"]
     assert track.position == 4
-    assert track.album.cover.read() == b"coucou"
-    assert track.album.cover_path.endswith(".png")
+    assert track.album.attachment_cover.file.read() == b"coucou"
+    assert track.album.attachment_cover.file.path.endswith(".png")
+    assert track.album.attachment_cover.url == metadata["cover_data"]["url"]
+    assert track.album.attachment_cover.mimetype == metadata["cover_data"]["mimetype"]
+
     assert track.album.fid == metadata["album"]["fid"]
     assert track.album.title == metadata["album"]["title"]
     assert track.album.creation_date == metadata["album"]["fdate"]
@@ -312,7 +315,7 @@ def test_upload_import(now, factories, temp_signal, mocker):
     update_album_cover = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
     get_picture = mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture")
     get_track_from_import_metadata = mocker.spy(tasks, "get_track_from_import_metadata")
-    track = factories["music.Track"](album__cover="")
+    track = factories["music.Track"](album__attachment_cover=None)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": str(track.uuid)}}}
     )
@@ -531,7 +534,7 @@ def test_upload_import_error_metadata(factories, now, temp_signal, mocker):
 
 def test_upload_import_updates_cover_if_no_cover(factories, mocker, now):
     mocked_update = mocker.patch("funkwhale_api.music.tasks.update_album_cover")
-    album = factories["music.Album"](cover="")
+    album = factories["music.Album"](attachment_cover=None)
     track = factories["music.Track"](album=album)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
@@ -541,7 +544,7 @@ def test_upload_import_updates_cover_if_no_cover(factories, mocker, now):
 
 
 def test_update_album_cover_mbid(factories, mocker):
-    album = factories["music.Album"](cover="")
+    album = factories["music.Album"](attachment_cover=None)
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
     tasks.update_album_cover(album=album)
@@ -550,7 +553,7 @@ def test_update_album_cover_mbid(factories, mocker):
 
 
 def test_update_album_cover_file_data(factories, mocker):
-    album = factories["music.Album"](cover="", mbid=None)
+    album = factories["music.Album"](attachment_cover=None, mbid=None)
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
     tasks.update_album_cover(album=album, cover_data={"hello": "world"})
@@ -563,7 +566,7 @@ def test_update_album_cover_file_cover_separate_file(ext, mimetype, factories, m
     image_path = os.path.join(DATA_DIR, "cover.{}".format(ext))
     with open(image_path, "rb") as f:
         image_content = f.read()
-    album = factories["music.Album"](cover="", mbid=None)
+    album = factories["music.Album"](attachment_cover=None, mbid=None)
 
     mocked_get = mocker.patch("funkwhale_api.music.models.Album.get_image")
     mocker.patch("funkwhale_api.music.metadata.Metadata.get_picture", return_value=None)

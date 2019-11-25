@@ -21,7 +21,6 @@ from . import licenses
 from . import models
 from . import metadata
 from . import signals
-from . import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ logger = logging.getLogger(__name__)
 def update_album_cover(
     album, source=None, cover_data=None, musicbrainz=True, replace=False
 ):
-    if album.cover and not replace:
+    if album.attachment_cover and not replace:
         return
     if cover_data:
         return album.get_image(data=cover_data)
@@ -257,7 +256,7 @@ def process_upload(upload, update_denormalization=True):
         )
 
     # update album cover, if needed
-    if not track.album.cover:
+    if not track.album.attachment_cover:
         update_album_cover(
             track.album,
             source=final_metadata.get("upload_source"),
@@ -404,7 +403,7 @@ def sort_candidates(candidates, important_fields):
 @transaction.atomic
 def get_track_from_import_metadata(data, update_cover=False, attributed_to=None):
     track = _get_track(data, attributed_to=attributed_to)
-    if update_cover and track and not track.album.cover:
+    if update_cover and track and not track.album.attachment_cover:
         update_album_cover(
             track.album,
             source=data.get("upload_source"),
@@ -583,6 +582,8 @@ def broadcast_import_status_update_to_owner(old_status, new_status, upload, **kw
     user = upload.library.actor.get_user()
     if not user:
         return
+
+    from . import serializers
 
     group = "user.{}.imports".format(user.pk)
     channels.group_send(

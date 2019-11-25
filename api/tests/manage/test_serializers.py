@@ -1,7 +1,8 @@
 import pytest
 
-from funkwhale_api.manage import serializers
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import tasks as federation_tasks
+from funkwhale_api.manage import serializers
 
 
 def test_manage_upload_action_delete(factories):
@@ -339,12 +340,7 @@ def test_manage_nested_album_serializer(factories, now, to_api_date):
         "mbid": album.mbid,
         "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "tracks_count": 44,
     }
     s = serializers.ManageNestedAlbumSerializer(album)
@@ -380,12 +376,7 @@ def test_manage_album_serializer(factories, now, to_api_date):
         "mbid": album.mbid,
         "creation_date": to_api_date(album.creation_date),
         "release_date": album.release_date.isoformat(),
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "artist": serializers.ManageNestedArtistSerializer(album.artist).data,
         "tracks": [serializers.ManageNestedTrackSerializer(track).data],
         "attributed_to": serializers.ManageBaseActorSerializer(

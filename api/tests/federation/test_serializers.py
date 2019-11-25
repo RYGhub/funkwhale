@@ -589,7 +589,7 @@ def test_activity_pub_album_serializer_to_ap(factories):
         "cover": {
             "type": "Link",
             "mediaType": "image/jpeg",
-            "href": utils.full_url(album.cover.url),
+            "href": utils.full_url(album.attachment_cover.file.url),
         },
         "musicbrainzId": album.mbid,
         "published": album.creation_date.isoformat(),
@@ -729,8 +729,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert str(track.mbid) == data["musicbrainzId"]
 
     assert album.from_activity == activity
-    assert album.cover.read() == b"coucou"
-    assert album.cover_path.endswith(".png")
+    assert album.attachment_cover.file.read() == b"coucou"
+    assert album.attachment_cover.file.path.endswith(".png")
     assert album.title == data["album"]["name"]
     assert album.fid == data["album"]["id"]
     assert str(album.mbid) == data["album"]["musicbrainzId"]

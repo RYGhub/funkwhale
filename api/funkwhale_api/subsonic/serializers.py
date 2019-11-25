@@ -89,7 +89,7 @@ class GetArtistSerializer(serializers.Serializer):
                 "created": to_subsonic_date(album.creation_date),
                 "songCount": len(album.tracks.all()),
             }
-            if album.cover:
+            if album.attachment_cover_id:
                 album_data["coverArt"] = "al-{}".format(album.id)
             if album.release_date:
                 album_data["year"] = album.release_date.year
@@ -122,7 +122,7 @@ def get_track_data(album, track, upload):
         "artistId": album.artist.pk,
         "type": "music",
     }
-    if track.album.cover:
+    if track.album.attachment_cover_id:
         data["coverArt"] = "al-{}".format(track.album.id)
     if upload.bitrate:
         data["bitrate"] = int(upload.bitrate / 1000)
@@ -141,7 +141,7 @@ def get_album2_data(album):
         "artist": album.artist.name,
         "created": to_subsonic_date(album.creation_date),
     }
-    if album.cover:
+    if album.attachment_cover_id:
         payload["coverArt"] = "al-{}".format(album.id)
 
     try:

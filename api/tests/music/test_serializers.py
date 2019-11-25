@@ -1,5 +1,6 @@
 import pytest
 
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models
@@ -42,12 +43,7 @@ def test_artist_album_serializer(factories, to_api_date):
         "creation_date": to_api_date(album.creation_date),
         "tracks_count": 1,
         "is_playable": None,
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "release_date": to_api_date(album.release_date),
         "is_local": album.is_local,
     }
@@ -172,12 +168,7 @@ def test_album_serializer(factories, to_api_date):
         "artist": serializers.serialize_artist_simple(album.artist),
         "creation_date": to_api_date(album.creation_date),
         "is_playable": False,
-        "cover": {
-            "original": album.cover.url,
-            "square_crop": album.cover.crop["400x400"].url,
-            "medium_square_crop": album.cover.crop["200x200"].url,
-            "small_square_crop": album.cover.crop["50x50"].url,
-        },
+        "cover": common_serializers.AttachmentSerializer(album.attachment_cover).data,
         "release_date": to_api_date(album.release_date),
         "tracks": [serializers.serialize_album_track(t) for t in [track2, track1]],
         "is_local": album.is_local,
@@ -187,6 +178,15 @@ def test_album_serializer(factories, to_api_date):
     serializer = serializers.AlbumSerializer(album)
 
     assert serializer.data == expected
+
+
+def test_album_serializer_empty_cover(factories, to_api_date):
+    # XXX: BACKWARD COMPATIBILITY
+    album = factories["music.Album"](attachment_cover=None)
+
+    serializer = serializers.AlbumSerializer(album)
+
+    assert serializer.data["cover"] == {}
 
 
 def test_track_serializer(factories, to_api_date):

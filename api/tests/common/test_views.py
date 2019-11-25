@@ -1,4 +1,6 @@
+import io
 import pytest
+
 from django.urls import reverse
 
 from funkwhale_api.common import serializers
@@ -181,3 +183,69 @@ def test_rate_limit(logged_in_api_client, now_time, settings, mocker):
     assert response.status_code == 200
     assert response.data == expected
     get_status.assert_called_once_with(expected_ident, now_time)
+
+
+@pytest.mark.parametrize(
+    "next, expected",
+    [
+        ("original", "original"),
+        ("medium_square_crop", "medium_square_crop"),
+        ("unknown", "original"),
+    ],
+)
+def test_attachment_proxy_redirects_original(
+    next, expected, factories, logged_in_api_client, mocker, avatar, r_mock, now
+):
+    attachment = factories["common.Attachment"](file=None)
+
+    avatar_content = avatar.read()
+    fetch_remote_attachment = mocker.spy(tasks, "fetch_remote_attachment")
+    m = r_mock.get(attachment.url, body=io.BytesIO(avatar_content))
+    proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": attachment.uuid})
+
+    response = logged_in_api_client.get(proxy_url, {"next": next})
+    attachment.refresh_from_db()
+
+    urls = serializers.AttachmentSerializer(attachment).data["urls"]
+
+    assert attachment.file.read() == avatar_content
+    assert attachment.last_fetch_date == now
+    fetch_remote_attachment.assert_called_once_with(attachment)
+    assert len(m.request_history) == 1
+    assert response.status_code == 302
+    assert response["Location"] == urls[expected]
+
+
+def test_attachment_create(logged_in_api_client, avatar):
+    actor = logged_in_api_client.user.create_actor()
+    url = reverse("api:v1:attachments-list")
+    content = avatar.read()
+    avatar.seek(0)
+    payload = {"file": avatar}
+    response = logged_in_api_client.post(url, payload)
+
+    assert response.status_code == 201
+    attachment = actor.attachments.latest("id")
+    assert attachment.file.read() == content
+    assert attachment.file.size == len(content)
+
+
+def test_attachment_destroy(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    attachment = factories["common.Attachment"](actor=actor)
+    url = reverse("api:v1:attachments-detail", kwargs={"uuid": attachment.uuid})
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+    with pytest.raises(attachment.DoesNotExist):
+        attachment.refresh_from_db()
+
+
+def test_attachment_destroy_not_owner(factories, logged_in_api_client):
+    logged_in_api_client.user.create_actor()
+    attachment = factories["common.Attachment"]()
+    url = reverse("api:v1:attachments-detail", kwargs={"uuid": attachment.uuid})
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 403
+    attachment.refresh_from_db()

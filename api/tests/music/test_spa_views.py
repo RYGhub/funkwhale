@@ -49,9 +49,7 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
-            ),
+            "content": track.album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "meta",
@@ -116,9 +114,7 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
-            ),
+            "content": album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "link",
@@ -166,9 +162,7 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, album.cover.crop["400x400"].url
-            ),
+            "content": album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "link",
@@ -217,9 +211,7 @@ def test_library_playlist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "meta",
             "property": "og:image",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL, track.album.cover.crop["400x400"].url
-            ),
+            "content": track.album.attachment_cover.download_url_medium_square_crop,
         },
         {
             "tag": "link",

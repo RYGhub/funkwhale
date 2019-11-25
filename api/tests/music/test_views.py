@@ -780,10 +780,10 @@ def test_oembed_track(factories, no_api_auth, api_client, settings):
         "title": "{} by {}".format(track.title, track.artist.name),
         "description": track.full_name,
         "thumbnail_url": federation_utils.full_url(
-            track.album.cover.crop["400x400"].url
+            track.album.attachment_cover.file.crop["200x200"].url
         ),
-        "thumbnail_height": 400,
-        "thumbnail_width": 400,
+        "thumbnail_height": 200,
+        "thumbnail_width": 200,
         "html": '<iframe width="600" height="150" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),
@@ -815,9 +815,11 @@ def test_oembed_album(factories, no_api_auth, api_client, settings):
         "width": 600,
         "title": "{} by {}".format(album.title, album.artist.name),
         "description": "{} by {}".format(album.title, album.artist.name),
-        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
-        "thumbnail_height": 400,
-        "thumbnail_width": 400,
+        "thumbnail_url": federation_utils.full_url(
+            album.attachment_cover.file.crop["200x200"].url
+        ),
+        "thumbnail_height": 200,
+        "thumbnail_width": 200,
         "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),
@@ -850,9 +852,11 @@ def test_oembed_artist(factories, no_api_auth, api_client, settings):
         "width": 600,
         "title": artist.name,
         "description": artist.name,
-        "thumbnail_url": federation_utils.full_url(album.cover.crop["400x400"].url),
-        "thumbnail_height": 400,
-        "thumbnail_width": 400,
+        "thumbnail_url": federation_utils.full_url(
+            album.attachment_cover.file.crop["200x200"].url
+        ),
+        "thumbnail_height": 200,
+        "thumbnail_width": 200,
         "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),
@@ -886,10 +890,10 @@ def test_oembed_playlist(factories, no_api_auth, api_client, settings):
         "title": playlist.name,
         "description": playlist.name,
         "thumbnail_url": federation_utils.full_url(
-            track.album.cover.crop["400x400"].url
+            track.album.attachment_cover.file.crop["200x200"].url
         ),
-        "thumbnail_height": 400,
-        "thumbnail_width": 400,
+        "thumbnail_height": 200,
+        "thumbnail_width": 200,
         "html": '<iframe width="600" height="400" scrolling="no" frameborder="no" src="{}"></iframe>'.format(
             iframe_src
         ),

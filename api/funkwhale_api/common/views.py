@@ -11,6 +11,8 @@ from rest_framework import response
 from rest_framework import views
 from rest_framework import viewsets
 
+from funkwhale_api.users.oauth import permissions as oauth_permissions
+
 from . import filters
 from . import models
 from . import mutations
@@ -140,3 +142,40 @@ class RateLimitView(views.APIView):
             "scopes": throttling.get_status(ident, time.time()),
         }
         return response.Response(data, status=200)
+
+
+class AttachmentViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = models.Attachment.objects.all()
+    serializer_class = serializers.AttachmentSerializer
+    permission_classes = [oauth_permissions.ScopePermission]
+    required_scope = "libraries"
+    anonymous_policy = "setting"
+
+    @action(detail=True, methods=["get"])
+    @transaction.atomic
+    def proxy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        size = request.GET.get("next", "original").lower()
+        if size not in ["original", "medium_square_crop"]:
+            size = "original"
+
+        tasks.fetch_remote_attachment(instance)
+        data = self.serializer_class(instance).data
+        redirect = response.Response(status=302)
+        redirect["Location"] = data["urls"][size]
+        return redirect
+
+    def perform_create(self, serializer):
+        return serializer.save(actor=self.request.user.actor)
+
+    def perform_destroy(self, instance):
+        if instance.actor is None or instance.actor != self.request.user.actor:
+            raise exceptions.PermissionDenied()
+        instance.delete()

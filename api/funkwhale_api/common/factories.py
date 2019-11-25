@@ -23,3 +23,14 @@ class MutationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
             return
         self.target = extracted
         self.save()
+
+
+@registry.register
+class AttachmentFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    url = factory.Faker("federation_url")
+    uuid = factory.Faker("uuid4")
+    actor = factory.SubFactory(federation_factories.ActorFactory)
+    file = factory.django.ImageField()
+
+    class Meta:
+        model = "common.Attachment"

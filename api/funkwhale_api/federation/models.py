@@ -541,7 +541,6 @@ class LibraryTrack(models.Model):
             auth=auth,
             stream=True,
             timeout=20,
-            verify=settings.EXTERNAL_REQUESTS_VERIFY_SSL,
             headers={"Content-Type": "application/activity+json"},
         )
         with remote_response as r:

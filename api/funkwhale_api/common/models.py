@@ -1,4 +1,6 @@
 import uuid
+import magic
+import mimetypes
 
 from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,10 +11,17 @@ from django.db import connections, models, transaction
 from django.db.models import Lookup
 from django.db.models.fields import Field
 from django.db.models.sql.compiler import SQLCompiler
+from django.dispatch import receiver
 from django.utils import timezone
 from django.urls import reverse
 
+from versatileimagefield.fields import VersatileImageField
+from versatileimagefield.image_warmer import VersatileImageFieldWarmer
+
 from funkwhale_api.federation import utils as federation_utils
+
+from . import utils
+from . import validators
 
 
 @Field.register_lookup
@@ -150,3 +159,102 @@ class Mutation(models.Model):
         self.applied_date = timezone.now()
         self.save(update_fields=["is_applied", "applied_date", "previous_state"])
         return previous_state
+
+
+def get_file_path(instance, filename):
+    return utils.ChunkedPath("attachments")(instance, filename)
+
+
+class AttachmentQuerySet(models.QuerySet):
+    def attached(self, include=True):
+        related_fields = ["covered_album"]
+        query = None
+        for field in related_fields:
+            field_query = ~models.Q(**{field: None})
+            query = query | field_query if query else field_query
+
+        if include is False:
+            query = ~query
+
+        return self.filter(query)
+
+
+class Attachment(models.Model):
+    # Remote URL where the attachment can be fetched
+    url = models.URLField(max_length=500, unique=True, null=True)
+    uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
+    # Actor associated with the attachment
+    actor = models.ForeignKey(
+        "federation.Actor",
+        related_name="attachments",
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    creation_date = models.DateTimeField(default=timezone.now)
+    last_fetch_date = models.DateTimeField(null=True, blank=True)
+    # File size
+    size = models.IntegerField(null=True, blank=True)
+    mimetype = models.CharField(null=True, blank=True, max_length=200)
+
+    file = VersatileImageField(
+        upload_to=get_file_path,
+        max_length=255,
+        validators=[
+            validators.ImageDimensionsValidator(min_width=50, min_height=50),
+            validators.FileValidator(
+                allowed_extensions=["png", "jpg", "jpeg"], max_size=1024 * 1024 * 5,
+            ),
+        ],
+    )
+
+    objects = AttachmentQuerySet.as_manager()
+
+    def save(self, **kwargs):
+        if self.file and not self.size:
+            self.size = self.file.size
+
+        if self.file and not self.mimetype:
+            self.mimetype = self.guess_mimetype()
+
+        return super().save()
+
+    @property
+    def is_local(self):
+        return federation_utils.is_local(self.fid)
+
+    def guess_mimetype(self):
+        f = self.file
+        b = min(1000000, f.size)
+        t = magic.from_buffer(f.read(b), mime=True)
+        if not t.startswith("image/"):
+            # failure, we try guessing by extension
+            mt, _ = mimetypes.guess_type(f.name)
+            if mt:
+                t = mt
+        return t
+
+    @property
+    def download_url_original(self):
+        if self.file:
+            return federation_utils.full_url(self.file.url)
+        proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": self.uuid})
+        return federation_utils.full_url(proxy_url + "?next=original")
+
+    @property
+    def download_url_medium_square_crop(self):
+        if self.file:
+            return federation_utils.full_url(self.file.crop["200x200"].url)
+        proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": self.uuid})
+        return federation_utils.full_url(proxy_url + "?next=medium_square_crop")
+
+
+@receiver(models.signals.post_save, sender=Attachment)
+def warm_attachment_thumbnails(sender, instance, **kwargs):
+    if not instance.file or not settings.CREATE_IMAGE_THUMBNAILS:
+        return
+    warmer = VersatileImageFieldWarmer(
+        instance_or_queryset=instance,
+        rendition_key_set="attachment_square",
+        image_attr="file",
+    )
+    num_created, failed_to_create = warmer.warm()
