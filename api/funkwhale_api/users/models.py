@@ -362,7 +362,8 @@ def get_actor_data(username, **kwargs):
         "preferred_username": slugified_username,
         "domain": domain,
         "type": "Person",
-        "name": username,
+        "name": kwargs.get("name", username),
+        "summary": kwargs.get("summary"),
         "manually_approves_followers": False,
         "fid": federation_utils.full_url(
             reverse(

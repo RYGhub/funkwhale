@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
 
+from funkwhale_api.audio import filters as audio_filters
 from funkwhale_api.common import fields
 from funkwhale_api.common import filters as common_filters
 from funkwhale_api.common import search
@@ -19,7 +20,9 @@ def filter_tags(queryset, name, value):
 TAG_FILTER = common_filters.MultipleQueryFilter(method=filter_tags)
 
 
-class ArtistFilter(moderation_filters.HiddenContentFilterSet):
+class ArtistFilter(
+    audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
+):
     q = fields.SearchFilter(search_fields=["name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
@@ -36,13 +39,16 @@ class ArtistFilter(moderation_filters.HiddenContentFilterSet):
             "mbid": ["exact"],
         }
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ARTIST"]
+        include_channels_field = "channel"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
         return queryset.playable_by(actor, value)
 
 
-class TrackFilter(moderation_filters.HiddenContentFilterSet):
+class TrackFilter(
+    audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
+):
     q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
@@ -64,13 +70,14 @@ class TrackFilter(moderation_filters.HiddenContentFilterSet):
             "mbid": ["exact"],
         }
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["TRACK"]
+        include_channels_field = "artist__channel"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
         return queryset.playable_by(actor, value)
 
 
-class UploadFilter(filters.FilterSet):
+class UploadFilter(audio_filters.IncludeChannelsFilterSet):
     library = filters.CharFilter("library__uuid")
     track = filters.UUIDFilter("track__uuid")
     track_artist = filters.UUIDFilter("track__artist__uuid")
@@ -109,13 +116,16 @@ class UploadFilter(filters.FilterSet):
             "import_reference",
             "scope",
         ]
+        include_channels_field = "track__artist__channel"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
         return queryset.playable_by(actor, value)
 
 
-class AlbumFilter(moderation_filters.HiddenContentFilterSet):
+class AlbumFilter(
+    audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
+):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     q = fields.SearchFilter(search_fields=["title", "artist__name"])
     tag = TAG_FILTER
@@ -127,6 +137,7 @@ class AlbumFilter(moderation_filters.HiddenContentFilterSet):
         model = models.Album
         fields = ["playable", "q", "artist", "scope", "mbid"]
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ALBUM"]
+        include_channels_field = "artist__channel"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
