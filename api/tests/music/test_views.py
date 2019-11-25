@@ -997,3 +997,49 @@ def test_refetch_obj(mocker, factories, settings, service_actor):
     views.refetch_obj(obj, obj.__class__.objects.all())
     fetch = obj.fetches.filter(actor=service_actor).order_by("-creation_date").first()
     fetch_task.assert_called_once_with(fetch_id=fetch.pk)
+
+
+@pytest.mark.parametrize(
+    "params, expected",
+    [({}, 0), ({"include_channels": "false"}, 0), ({"include_channels": "true"}, 1)],
+)
+def test_artist_list_exclude_channels(
+    params, expected, factories, logged_in_api_client
+):
+    factories["audio.Channel"]()
+
+    url = reverse("api:v1:artists-list")
+    response = logged_in_api_client.get(url, params)
+
+    assert response.status_code == 200
+    assert response.data["count"] == expected
+
+
+@pytest.mark.parametrize(
+    "params, expected",
+    [({}, 0), ({"include_channels": "false"}, 0), ({"include_channels": "true"}, 1)],
+)
+def test_album_list_exclude_channels(params, expected, factories, logged_in_api_client):
+    channel_artist = factories["audio.Channel"]().artist
+    factories["music.Album"](artist=channel_artist)
+
+    url = reverse("api:v1:albums-list")
+    response = logged_in_api_client.get(url, params)
+
+    assert response.status_code == 200
+    assert response.data["count"] == expected
+
+
+@pytest.mark.parametrize(
+    "params, expected",
+    [({}, 0), ({"include_channels": "false"}, 0), ({"include_channels": "true"}, 1)],
+)
+def test_track_list_exclude_channels(params, expected, factories, logged_in_api_client):
+    channel_artist = factories["audio.Channel"]().artist
+    factories["music.Track"](artist=channel_artist)
+
+    url = reverse("api:v1:tracks-list")
+    response = logged_in_api_client.get(url, params)
+
+    assert response.status_code == 200
+    assert response.data["count"] == expected

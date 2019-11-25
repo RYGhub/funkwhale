@@ -191,6 +191,7 @@ LOCAL_APPS = (
     "funkwhale_api.users.oauth",
     # Your stuff: custom apps go here
     "funkwhale_api.instance",
+    "funkwhale_api.audio",
     "funkwhale_api.music",
     "funkwhale_api.requests",
     "funkwhale_api.favorites",

@@ -60,8 +60,8 @@ def test_artist_filter_track_album_artist(factories, mocker, queryset_equal_list
     "factory_name, filterset_class",
     [
         ("music.Track", filters.TrackFilter),
-        ("music.Artist", filters.TrackFilter),
-        ("music.Album", filters.TrackFilter),
+        ("music.Artist", filters.ArtistFilter),
+        ("music.Album", filters.AlbumFilter),
     ],
 )
 def test_track_filter_tag_single(
