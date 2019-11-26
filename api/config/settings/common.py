@@ -354,7 +354,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap3"
 STATIC_ROOT = env("STATIC_ROOT", default=str(ROOT_DIR("staticfiles")))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = env("STATIC_URL", default="/staticfiles/")
+STATIC_URL = env("STATIC_URL", default=FUNKWHALE_URL + "/staticfiles/")
 DEFAULT_FILE_STORAGE = "funkwhale_api.common.storage.ASCIIFileSystemStorage"
 
 PROXY_MEDIA = env.bool("PROXY_MEDIA", default=True)
@@ -391,7 +391,7 @@ STATICFILES_FINDERS = (
 MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR("media")))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = env("MEDIA_URL", default="/media/")
+MEDIA_URL = env("MEDIA_URL", default=FUNKWHALE_URL + "/media/")
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 ATTACHMENTS_UNATTACHED_PRUNE_DELAY = env.int(
