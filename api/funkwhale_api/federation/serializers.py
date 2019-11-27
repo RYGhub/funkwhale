@@ -204,6 +204,7 @@ class APIActorSerializer(serializers.ModelSerializer):
             "type",
             "manually_approves_followers",
             "full_username",
+            "is_local",
         ]
 
 
