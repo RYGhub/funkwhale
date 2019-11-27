@@ -77,6 +77,17 @@
           </button>
 
         </template>
+        <template v-else-if="fieldConfig.type === 'attachment'">
+          <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
+          <attachment-input
+            v-model="values[fieldConfig.id]"
+            :initial-value="initialValues[fieldConfig.id]"
+            :required="fieldConfig.required"
+            :name="fieldConfig.id"
+            :id="fieldConfig.id"
+            @delete="values[fieldConfig.id] = initialValues[fieldConfig.id]"></attachment-input>
+
+        </template>
         <template v-else-if="fieldConfig.type === 'tags'">
           <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
           <tags-selector
@@ -120,6 +131,7 @@
 import $ from 'jquery'
 import _ from '@/lodash'
 import axios from "axios"
+import AttachmentInput from '@/components/common/AttachmentInput'
 import EditList from '@/components/library/EditList'
 import EditCard from '@/components/library/EditCard'
 import TagsSelector from '@/components/library/TagsSelector'
@@ -132,7 +144,8 @@ export default {
   components: {
     EditList,
     EditCard,
-    TagsSelector
+    TagsSelector,
+    AttachmentInput
   },
   data() {
     return {

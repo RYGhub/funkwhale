@@ -23,9 +23,10 @@ class RelatedField(serializers.RelatedField):
         self.related_field_name = related_field_name
         self.serializer = serializer
         self.filters = kwargs.pop("filters", None)
-        kwargs["queryset"] = kwargs.pop(
-            "queryset", self.serializer.Meta.model.objects.all()
-        )
+        try:
+            kwargs["queryset"] = kwargs.pop("queryset")
+        except KeyError:
+            kwargs["queryset"] = self.serializer.Meta.model.objects.all()
         super().__init__(**kwargs)
 
     def get_filters(self, data):

@@ -157,7 +157,9 @@ class AttachmentViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
 
-    @action(detail=True, methods=["get"])
+    @action(
+        detail=True, methods=["get"], permission_classes=[], authentication_classes=[]
+    )
     @transaction.atomic
     def proxy(self, request, *args, **kwargs):
         instance = self.get_object()

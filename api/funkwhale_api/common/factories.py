@@ -16,14 +16,6 @@ class MutationFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     class Meta:
         model = "common.Mutation"
 
-    @factory.post_generation
-    def target(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        self.target = extracted
-        self.save()
-
 
 @registry.register
 class AttachmentFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):

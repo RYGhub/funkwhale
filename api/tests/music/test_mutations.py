@@ -176,3 +176,22 @@ def test_perm_checkers_can_approve(
     obj = factories["music.Track"](**obj_kwargs)
 
     assert mutations.can_approve(obj, actor=actor) is expected
+
+
+def test_mutation_set_attachment_cover(factories, now, mocker):
+    new_attachment = factories["common.Attachment"](actor__local=True)
+    obj = factories["music.Album"]()
+    old_attachment = obj.attachment_cover
+    mutation = factories["common.Mutation"](
+        type="update", target=obj, payload={"cover": new_attachment.uuid}
+    )
+
+    # new attachment should be linked to mutation, to avoid being pruned
+    # before being applied
+    assert new_attachment.mutation_attachment.mutation == mutation
+
+    mutation.apply()
+    obj.refresh_from_db()
+
+    assert obj.attachment_cover == new_attachment
+    assert mutation.previous_state["cover"] == old_attachment.uuid

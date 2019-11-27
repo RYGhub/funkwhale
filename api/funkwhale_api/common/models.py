@@ -167,7 +167,7 @@ def get_file_path(instance, filename):
 
 class AttachmentQuerySet(models.QuerySet):
     def attached(self, include=True):
-        related_fields = ["covered_album"]
+        related_fields = ["covered_album", "mutation_attachment"]
         query = None
         for field in related_fields:
             field_query = ~models.Q(**{field: None})
@@ -177,6 +177,12 @@ class AttachmentQuerySet(models.QuerySet):
             query = ~query
 
         return self.filter(query)
+
+    def local(self, include=True):
+        if include:
+            return self.filter(actor__domain_id=settings.FEDERATION_HOSTNAME)
+        else:
+            return self.exclude(actor__domain_id=settings.FEDERATION_HOSTNAME)
 
 
 class Attachment(models.Model):
@@ -248,6 +254,25 @@ class Attachment(models.Model):
         return federation_utils.full_url(proxy_url + "?next=medium_square_crop")
 
 
+class MutationAttachment(models.Model):
+    """
+    When using attachments in mutations, we need to keep a reference to
+    the attachment to ensure it is not pruned by common/tasks.py.
+
+    This is what this model does.
+    """
+
+    attachment = models.OneToOneField(
+        Attachment, related_name="mutation_attachment", on_delete=models.CASCADE
+    )
+    mutation = models.OneToOneField(
+        Mutation, related_name="mutation_attachment", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        unique_together = ("attachment", "mutation")
+
+
 @receiver(models.signals.post_save, sender=Attachment)
 def warm_attachment_thumbnails(sender, instance, **kwargs):
     if not instance.file or not settings.CREATE_IMAGE_THUMBNAILS:
@@ -258,3 +283,22 @@ def warm_attachment_thumbnails(sender, instance, **kwargs):
         image_attr="file",
     )
     num_created, failed_to_create = warmer.warm()
+
+
+@receiver(models.signals.post_save, sender=Mutation)
+def trigger_mutation_post_init(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    from . import mutations
+
+    try:
+        conf = mutations.registry.get_conf(instance.type, instance.target)
+    except mutations.ConfNotFound:
+        return
+    serializer = conf["serializer_class"]()
+    try:
+        handler = serializer.mutation_post_init
+    except AttributeError:
+        return
+    handler(instance)
