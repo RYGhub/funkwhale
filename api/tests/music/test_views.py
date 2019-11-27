@@ -180,7 +180,8 @@ def test_can_serve_upload_as_remote_library(
 
     assert response.status_code == 200
     assert response["X-Accel-Redirect"] == "{}{}".format(
-        settings.PROTECT_FILES_PATH, upload.audio_file.url
+        settings.PROTECT_FILES_PATH,
+        views.strip_absolute_media_url(upload.audio_file.url),
     )
 
 
@@ -330,7 +331,8 @@ def test_can_proxy_remote_track(factories, settings, api_client, r_mock, prefere
 
     assert response.status_code == 200
     assert response["X-Accel-Redirect"] == "{}{}".format(
-        settings.PROTECT_FILES_PATH, upload.audio_file.url
+        settings.PROTECT_FILES_PATH,
+        views.strip_absolute_media_url(upload.audio_file.url),
     )
     assert upload.audio_file.read() == b"test"
 
@@ -1043,3 +1045,20 @@ def test_track_list_exclude_channels(params, expected, factories, logged_in_api_
 
     assert response.status_code == 200
     assert response.data["count"] == expected
+
+
+@pytest.mark.parametrize(
+    "media_url, input, expected",
+    [
+        ("https://domain/media/", "https://domain/media/file.mp3", "/media/file.mp3"),
+        (
+            "https://domain/media/",
+            "https://otherdomain/media/file.mp3",
+            "https://otherdomain/media/file.mp3",
+        ),
+        ("https://domain/media/", "/media/file.mp3", "/media/file.mp3"),
+    ],
+)
+def test_strip_absolute_media_url(media_url, input, expected, settings):
+    settings.MEDIA_URL = media_url
+    assert views.strip_absolute_media_url(input) == expected

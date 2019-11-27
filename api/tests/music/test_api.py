@@ -3,6 +3,7 @@ import os
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.music import views
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,4 +48,6 @@ def test_upload_url_is_accessible_to_authenticated_users(
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 200
-    assert response["X-Accel-Redirect"] == "/_protected{}".format(upload.audio_file.url)
+    assert response["X-Accel-Redirect"] == "/_protected{}".format(
+        views.strip_absolute_media_url(upload.audio_file.url)
+    )

@@ -308,6 +308,16 @@ class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelVi
     )
 
 
+def strip_absolute_media_url(path):
+    if (
+        settings.MEDIA_URL.startswith("http://")
+        or settings.MEDIA_URL.startswith("https://")
+        and path.startswith(settings.MEDIA_URL)
+    ):
+        path = path.replace(settings.MEDIA_URL, "/media/", 1)
+    return path
+
+
 def get_file_path(audio_file):
     serve_path = settings.MUSIC_DIRECTORY_SERVE_PATH
     prefix = settings.MUSIC_DIRECTORY_PATH
@@ -324,6 +334,7 @@ def get_file_path(audio_file):
                     "MUSIC_DIRECTORY_PATH to serve in-place imported files"
                 )
             path = "/music" + audio_file.replace(prefix, "", 1)
+        path = strip_absolute_media_url(path)
         if path.startswith("http://") or path.startswith("https://"):
             protocol, remainder = path.split("://", 1)
             hostname, r_path = remainder.split("/", 1)
@@ -344,6 +355,7 @@ def get_file_path(audio_file):
                     "MUSIC_DIRECTORY_PATH to serve in-place imported files"
                 )
             path = audio_file.replace(prefix, serve_path, 1)
+        path = strip_absolute_media_url(path)
         return path.encode("utf-8")
 
 
