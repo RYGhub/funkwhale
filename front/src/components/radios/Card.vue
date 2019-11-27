@@ -16,7 +16,7 @@
       <div class="extra content">
         <user-link v-if="radio.user" :user="radio.user" class="left floated" />
         <div class="ui hidden divider"></div>
-        <radio-button class="right floated button" :type="type" :custom-radio-id="customRadioId"></radio-button>
+        <radio-button class="right floated button" :type="type" :custom-radio-id="customRadioId" :object-id="objectId"></radio-button>
         <router-link
           class="ui basic yellow button right floated"
           v-if="$store.state.auth.authenticated && type === 'custom' && radio.user.id === $store.state.auth.profile.id"
@@ -33,7 +33,8 @@ import RadioButton from './Button'
 export default {
   props: {
     type: {type: String, required: true},
-    customRadio: {required: false}
+    customRadio: {required: false},
+    objectId: {required: false},
   },
   components: {
     RadioButton

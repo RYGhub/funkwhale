@@ -10,6 +10,10 @@ export default {
   getters: {
     types: state => {
       return {
+        actor_content: {
+          name: 'Your content',
+          description: "Picks from your own libraries"
+        },
         random: {
           name: 'Random',
           description: "Totally random picks, maybe you'll discover new things?"

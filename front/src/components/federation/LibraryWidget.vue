@@ -16,7 +16,7 @@
       </div>
       <library-card
         :display-scan="false"
-        :display-follow="$store.state.auth.authenticated"
+        :display-follow="$store.state.auth.authenticated && library.actor.full_username != $store.state.auth.fullUsername"
         :library="library"
         :display-copy-fid="true"
         v-for="library in libraries"
@@ -48,16 +48,16 @@ export default {
     }
   },
   created () {
-    this.fetchData()
+    this.fetchData(this.url)
   },
   methods: {
-    fetchData () {
+    fetchData (url) {
       this.isLoading = true
       let self = this
       let params = _.clone({})
       params.page_size = this.limit
       params.offset = this.offset
-      axios.get(this.url, {params: params}).then((response) => {
+      axios.get(url, {params: params}).then((response) => {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
