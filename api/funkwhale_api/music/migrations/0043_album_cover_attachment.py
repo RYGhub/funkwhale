@@ -15,11 +15,14 @@ def create_attachments(apps, schema_editor):
         return "image/jpeg"
 
     for album in Album.objects.filter(attachment_cover=None).exclude(cover="").exclude(cover=None):
-        album_attachment_mapping[album] = Attachment(
-            file=album.cover,
-            size=album.cover.size,
-            mimetype=get_mimetype(album.cover.path),
-        )
+        try:
+            album_attachment_mapping[album] = Attachment(
+                file=album.cover,
+                size=album.cover.size,
+                mimetype=get_mimetype(album.cover.path),
+            )
+        except FileNotFoundError:
+            print('Skipping missing cover file {}'.format(album.cover.path))
 
     Attachment.objects.bulk_create(album_attachment_mapping.values(), batch_size=2000)
     # map each attachment to the corresponding album
