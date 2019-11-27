@@ -67,6 +67,9 @@ def verify_django(django_request, public_key):
     expected = signature_headers.split(" ")
     logger.debug("Signature expected headers: %s", expected)
     for header in expected:
+        if header == "(request-target)":
+            # this one represent the request body, so not an actual HTTP header
+            continue
         try:
             headers[header]
         except KeyError:
