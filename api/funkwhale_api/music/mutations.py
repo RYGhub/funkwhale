@@ -1,4 +1,6 @@
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import mutations
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import routes
 from funkwhale_api.tags import models as tags_models
 from funkwhale_api.tags import serializers as tags_serializers
@@ -74,11 +76,48 @@ class ArtistMutationSerializer(TagMutation):
     perm_checkers={"suggest": can_suggest, "approve": can_approve},
 )
 class AlbumMutationSerializer(TagMutation):
+    cover = common_serializers.RelatedField(
+        "uuid", queryset=common_models.Attachment.objects.all().local(), serializer=None
+    )
+
+    serialized_relations = {"cover": "uuid"}
+    previous_state_handlers = dict(
+        list(TagMutation.previous_state_handlers.items())
+        + [
+            (
+                "cover",
+                lambda obj: str(obj.attachment_cover.uuid)
+                if obj.attachment_cover
+                else None,
+            ),
+        ]
+    )
+
     class Meta:
         model = models.Album
-        fields = ["title", "release_date", "tags"]
+        fields = ["title", "release_date", "tags", "cover"]
 
     def post_apply(self, obj, validated_data):
         routes.outbox.dispatch(
             {"type": "Update", "object": {"type": "Album"}}, context={"album": obj}
+        )
+
+    def update(self, instance, validated_data):
+        if "cover" in validated_data:
+            validated_data["attachment_cover"] = validated_data.pop("cover")
+        return super().update(instance, validated_data)
+
+    def mutation_post_init(self, mutation):
+        # link cover_attachment (if any) to mutation
+        if "cover" not in mutation.payload:
+            return
+        try:
+            attachment = common_models.Attachment.objects.get(
+                uuid=mutation.payload["cover"]
+            )
+        except common_models.Attachment.DoesNotExist:
+            return
+
+        common_models.MutationAttachment.objects.create(
+            attachment=attachment, mutation=mutation
         )

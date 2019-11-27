@@ -5,9 +5,12 @@ import uuid
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.db import transaction
+
 from rest_framework import serializers
 
 from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.common import models as common_models
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
@@ -808,6 +811,7 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         child=TagSerializer(), min_length=0, required=False, allow_null=True
     )
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         attributed_to_fid = validated_data.get("attributedTo")
         if attributed_to_fid:
@@ -815,6 +819,8 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         updated_fields = funkwhale_utils.get_updated_fields(
             self.updateable_fields, validated_data, instance
         )
+        updated_fields = self.validate_updated_data(instance, updated_fields)
+
         if updated_fields:
             music_tasks.update_library_entity(instance, updated_fields)
 
@@ -827,6 +833,9 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
             {"type": "Hashtag", "name": "#{}".format(item.tag.name)}
             for item in sorted(instance.tagged_items.all(), key=lambda i: i.tag.name)
         ]
+
+    def validate_updated_data(self, instance, validated_data):
+        return validated_data
 
 
 class ArtistSerializer(MusicEntitySerializer):
@@ -869,6 +878,7 @@ class AlbumSerializer(MusicEntitySerializer):
         ("musicbrainzId", "mbid"),
         ("attributedTo", "attributed_to"),
         ("released", "release_date"),
+        ("cover", "attachment_cover"),
     ]
 
     class Meta:
@@ -911,6 +921,26 @@ class AlbumSerializer(MusicEntitySerializer):
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
+
+    def validate_updated_data(self, instance, validated_data):
+        try:
+            attachment_cover = validated_data.pop("attachment_cover")
+        except KeyError:
+            return validated_data
+
+        if (
+            instance.attachment_cover
+            and instance.attachment_cover.url == attachment_cover["href"]
+        ):
+            # we already have the proper attachment
+            return validated_data
+        # create the attachment by hand so it can be attached as the album cover
+        validated_data["attachment_cover"] = common_models.Attachment.objects.create(
+            mimetype=attachment_cover["mediaType"],
+            url=attachment_cover["href"],
+            actor=instance.attributed_to,
+        )
+        return validated_data
 
 
 class TrackSerializer(MusicEntitySerializer):

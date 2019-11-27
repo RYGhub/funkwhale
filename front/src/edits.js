@@ -44,6 +44,19 @@ export default {
             getValue: (obj) => { return obj.release_date }
           },
           {
+            id: 'cover',
+            type: 'attachment',
+            required: false,
+            label: this.$pgettext('Content/*/*/Noun', 'Cover'),
+            getValue: (obj) => {
+              if (obj.cover) {
+                return obj.cover.uuid
+              } else {
+                return null
+              }
+            }
+          },
+          {
             id: 'tags',
             type: 'tags',
             required: true,

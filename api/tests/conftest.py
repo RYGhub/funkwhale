@@ -422,3 +422,8 @@ def clear_license_cache(db):
     licenses._cache = None
     yield
     licenses._cache = None
+
+
+@pytest.fixture
+def faker():
+    return factory.Faker._get_faker()

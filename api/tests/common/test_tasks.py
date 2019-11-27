@@ -1,6 +1,7 @@
 import pytest
 import datetime
 
+from funkwhale_api.common import models
 from funkwhale_api.common import serializers
 from funkwhale_api.common import signals
 from funkwhale_api.common import tasks
@@ -68,21 +69,27 @@ def test_cannot_apply_already_applied_migration(factories):
 
 def test_prune_unattached_attachments(factories, settings, now):
     settings.ATTACHMENTS_UNATTACHED_PRUNE_DELAY = 5
+    prunable_date = now - datetime.timedelta(
+        seconds=settings.ATTACHMENTS_UNATTACHED_PRUNE_DELAY
+    )
     attachments = [
         # attached, kept
         factories["music.Album"]().attachment_cover,
         # recent, kept
         factories["common.Attachment"](),
         # too old, pruned
-        factories["common.Attachment"](
-            creation_date=now
-            - datetime.timedelta(seconds=settings.ATTACHMENTS_UNATTACHED_PRUNE_DELAY)
-        ),
+        factories["common.Attachment"](creation_date=prunable_date),
+        # attached to a mutation, kept even if old
+        models.MutationAttachment.objects.create(
+            mutation=factories["common.Mutation"](payload={}),
+            attachment=factories["common.Attachment"](creation_date=prunable_date),
+        ).attachment,
     ]
 
     tasks.prune_unattached_attachments()
 
     attachments[0].refresh_from_db()
     attachments[1].refresh_from_db()
+    attachments[3].refresh_from_db()
     with pytest.raises(attachments[2].DoesNotExist):
         attachments[2].refresh_from_db()

@@ -537,7 +537,7 @@ def test_inbox_update_album(factories, mocker):
         "funkwhale_api.music.tasks.update_library_entity"
     )
     activity = factories["federation.Activity"]()
-    obj = factories["music.Album"](attributed=True)
+    obj = factories["music.Album"](attributed=True, attachment_cover=None)
     actor = obj.attributed_to
     data = serializers.AlbumSerializer(obj).data
     data["name"] = "New title"

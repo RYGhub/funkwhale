@@ -610,6 +610,47 @@ def test_activity_pub_album_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
+def test_activity_pub_album_serializer_from_ap_update(factories, faker):
+    album = factories["music.Album"](attributed=True)
+    released = faker.date_object()
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Album",
+        "id": album.fid,
+        "name": faker.sentence(),
+        "cover": {"type": "Link", "mediaType": "image/jpeg", "href": faker.url()},
+        "musicbrainzId": faker.uuid4(),
+        "published": album.creation_date.isoformat(),
+        "released": released.isoformat(),
+        "artists": [
+            serializers.ArtistSerializer(
+                album.artist, context={"include_ap_context": False}
+            ).data
+        ],
+        "attributedTo": album.attributed_to.fid,
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+    serializer = serializers.AlbumSerializer(album, data=payload)
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save()
+
+    album.refresh_from_db()
+
+    assert album.title == payload["name"]
+    assert str(album.mbid) == payload["musicbrainzId"]
+    assert album.release_date == released
+    assert album.attachment_cover.url == payload["cover"]["href"]
+    assert album.attachment_cover.mimetype == payload["cover"]["mediaType"]
+    assert sorted(album.tagged_items.values_list("tag__name", flat=True)) == [
+        "Punk",
+        "Rock",
+    ]
+
+
 def test_activity_pub_track_serializer_to_ap(factories):
     track = factories["music.Track"](
         license="cc-by-4.0",
