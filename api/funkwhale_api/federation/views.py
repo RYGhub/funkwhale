@@ -164,7 +164,7 @@ class MusicLibraryViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [authentication.SignatureAuthentication]
-    # renderer_classes = renderers.get_ap_renderers()
+    renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
     queryset = music_models.Library.objects.all().select_related("actor")
     lookup_field = "uuid"

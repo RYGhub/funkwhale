@@ -213,16 +213,19 @@ if PLUGINS:
 else:
     logger.info("Running with no plugins")
 
+ADDITIONAL_APPS = env.list("ADDITIONAL_APPS", default=[])
 INSTALLED_APPS = (
     DJANGO_APPS
     + THIRD_PARTY_APPS
     + LOCAL_APPS
     + tuple(["{}.apps.Plugin".format(p) for p in PLUGINS])
+    + tuple(ADDITIONAL_APPS)
 )
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
-MIDDLEWARE = (
+ADDITIONAL_MIDDLEWARES_BEFORE = env.list("ADDITIONAL_MIDDLEWARES_BEFORE", default=[])
+MIDDLEWARE = tuple(ADDITIONAL_MIDDLEWARES_BEFORE) + (
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",

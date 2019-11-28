@@ -40,3 +40,8 @@ if settings.DEBUG:
         urlpatterns = [
             path("api/__debug__/", include(debug_toolbar.urls))
         ] + urlpatterns
+
+    if "silk" in settings.INSTALLED_APPS:
+        urlpatterns = [
+            url(r"^api/silk/", include("silk.urls", namespace="silk"))
+        ] + urlpatterns

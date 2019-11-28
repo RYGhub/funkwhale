@@ -15,3 +15,4 @@ profiling
 asynctest==0.12.2
 aioresponses==0.6.0
 https://github.com/dmclain/django-debug-toolbar-line-profiler/archive/master.zip
+django-silk
