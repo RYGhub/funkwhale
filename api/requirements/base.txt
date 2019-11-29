@@ -75,3 +75,4 @@ unicode-slugify
 django-cacheops==4.2
 
 click>=7,<8
+service_identity==18.1.0
