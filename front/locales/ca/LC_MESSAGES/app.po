@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-11-26 05:26+0000\n"
+"PO-Revision-Date: 2019-12-01 21:57+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4825,15 +4825,14 @@ msgid "To continue, please select the Funkwhale instance you want to connect to.
 msgstr "Per continuar, si us plau selecciona la instància de Funkwahale on et vols conectar. Introdueix directamente l'adreça o selecciona una de les suggerides."
 
 #: front/src/components/ShortcutsModal.vue:148
-#, fuzzy
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle favorite"
-msgstr "1 favorit"
+msgstr "Canviar els favorits"
 
 #: front/src/components/ShortcutsModal.vue:132
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Toggle mute"
-msgstr ""
+msgstr "Commuta el silenci"
 
 #: front/src/components/ShortcutsModal.vue:136
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
@@ -4939,7 +4938,7 @@ msgstr "Sota la regla de moderació"
 #: front/src/components/ShortcutsModal.vue:68
 msgctxt "Popup/Keyboard shortcuts/Table.Label/Verb"
 msgid "Unfocus searchbar"
-msgstr ""
+msgstr "Treure el focus de la barra de recerca"
 
 #: front/src/views/content/remote/Card.vue:122
 #: src/views/content/remote/Card.vue:127
@@ -5058,7 +5057,6 @@ msgstr "Carregar noves pistes"
 
 #: front/src/components/About.vue:99
 #: front/src/views/admin/moderation/AccountsDetail.vue:309
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Upload quota"
 msgstr "Quota de pujada"
@@ -5152,7 +5150,7 @@ msgstr "Utilitzat"
 #: front/src/components/Home.vue:125
 msgctxt "Content/Home/Header"
 msgid "Useful links"
-msgstr ""
+msgstr "Enllaços útils"
 
 #: front/src/views/content/libraries/Detail.vue:26
 msgctxt "Content/Library/Table.Label"
@@ -5160,10 +5158,9 @@ msgid "User"
 msgstr "Usuari"
 
 #: front/src/components/Home.vue:154
-#, fuzzy
 msgctxt "Content/Home/Link"
 msgid "User guides"
-msgstr "Biblioteques d'usuaris"
+msgstr "Guies d'utilització"
 
 #: front/src/views/admin/Settings.vue:88
 #, fuzzy
@@ -5265,7 +5262,7 @@ msgstr "Visualitza a MusicBrainz"
 #: front/src/components/manage/moderation/ReportCard.vue:124
 msgctxt "Content/Moderation/Link"
 msgid "View public page"
-msgstr ""
+msgstr "Veure la pàgina pública"
 
 #: front/src/components/manage/library/LibrariesTable.vue:11
 #: front/src/components/manage/library/LibrariesTable.vue:51
@@ -5279,10 +5276,9 @@ msgid "Visibility"
 msgstr "Visibilitat"
 
 #: front/src/components/Home.vue:91
-#, fuzzy
 msgctxt "Content/Home/Link"
 msgid "Visit funkwhale.audio"
-msgstr "Usar Funkwhale"
+msgstr "Visitar funkwhale.audio"
 
 #: front/src/components/library/AlbumDetail.vue:4
 msgctxt "Content/Album/"
@@ -5295,10 +5291,9 @@ msgid "Waiting for result…"
 msgstr "Esperant el resultat …"
 
 #: front/src/components/auth/Settings.vue:285
-#, fuzzy
 msgctxt "Content/Settings/Error message.Title"
 msgid "We cannot delete your account"
-msgstr "No es pot iniciar la sessió"
+msgstr "No es pot suprimir el vostre compte"
 
 #: front/src/components/auth/LoginForm.vue:3
 msgctxt "Content/Login/Error message.Title"
@@ -5333,7 +5328,7 @@ msgstr "Benvinguts/des"
 #: front/src/components/Home.vue:5
 msgctxt "Content/Home/Header"
 msgid "Welcome to %{ podName }!"
-msgstr ""
+msgstr "Benvinguts a %{ podName }!"
 
 #: front/src/components/audio/EmbedWizard.vue:23
 msgctxt "Popup/Embed/Input.Label"
@@ -5410,16 +5405,19 @@ msgid "You are now using the Funkwhale instance at %{ url }"
 msgstr "Ara utilitzeu la instància de Funkwhale a %{ url }"
 
 #: front/src/views/content/Home.vue:17
-#, fuzzy
 msgctxt "Content/Library/Paragraph"
 msgid "You can follow libraries from other users to get access to new music. Public libraries can be followed immediately, while following a private library requires approval from its owner."
-msgstr "Pots seguir biblioteques d'altres usuaris per tenir accés a nova música. Les biblioteques públiques poden seguir-se immediatament, però seguir les biblioteques privades requereix l'aprovació del seu propietari."
+msgstr ""
+"Pots seguir biblioteques d'altres usuaris per tenir accés a nova música. Les "
+"biblioteques públiques poden seguir-se immediatament, però seguir les "
+"biblioteques privades requereix l'aprovació del seu propietari."
 
 #: front/src/components/moderation/FilterModal.vue:31
-#, fuzzy
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You can manage and update your filters any time from your account settings."
-msgstr "Podeu gestionar i actualitzar els filtres en qualsevol moment des de la configuració del vostre compte."
+msgstr ""
+"Podeu gestionar i actualitzar els filtres en qualsevol moment des de la "
+"configuració del vostre compte."
 
 #: front/src/views/auth/EmailConfirm.vue:24
 msgctxt "Content/Signup/Paragraph"
@@ -5497,7 +5495,6 @@ msgid "You will have to update your password on your clients that use this passw
 msgstr "Haureu d’actualitzar la vostra contrasenya als vostres clients que utilitzin aquesta contrasenya."
 
 #: front/src/components/moderation/FilterModal.vue:20
-#, fuzzy
 msgctxt "Popup/Moderation/Paragraph"
 msgid "You will not see tracks, albums and user activity linked to this artist any more:"
 msgstr "No veureu pistes, àlbums ni activitats relacionades amb aquest usuari:"
@@ -5538,10 +5535,9 @@ msgid "Your Favorites"
 msgstr "Els teus preferits"
 
 #: front/src/views/Notifications.vue:5
-#, fuzzy
 msgctxt "Content/Notifications/Title"
 msgid "Your messages"
-msgstr "Missatges emesos"
+msgstr "Els vostres"
 
 #: front/src/views/Notifications.vue:69
 msgctxt "Content/Notifications/Title"
@@ -5559,7 +5555,6 @@ msgid "Your password has been updated successfully."
 msgstr "La vostra contrasenya s'ha actualitzat correctament."
 
 #: front/src/components/auth/Settings.vue:14
-#, fuzzy
 msgctxt "Content/Settings/Error message.Title"
 msgid "Your settings can't be updated"
 msgstr "La vostra configuració no es pot actualitzar"
@@ -5570,10 +5565,9 @@ msgid "Your Subsonic password will be changed to a new, random one, logging you 
 msgstr "La vostra contrasenya Subsonic es canviarà a una altra nova i aleatòria, i us iniciarà la sessió des dels dispositius que utilitzen la contrasenya antiga de Subsonic"
 
 #: front/src/entities.js:126
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "MusicBrainz ID"
-msgstr "Obrir dins MusicBrainz"
+msgstr "ID MusicBrainz"
 
 #: front/src/main.js:110
 msgctxt "*/Error/Paragraph"
