@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-12-01 21:57+0000\n"
+"PO-Revision-Date: 2019-12-02 08:56+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4787,6 +4787,8 @@ msgstr "Això desactivarà completament l’accés a l’API Subsonic des del te
 msgctxt "Content/Moderation/Popup,Paragraph"
 msgid "This will delete the object associated with this report and mark the report as resolved. The deletion is irreversible."
 msgstr ""
+"S'eliminarà l'objecte associat amb aquest informe i es marcarà com a resolt. "
+"La supressió és irreversible."
 
 #: front/src/components/auth/SubsonicTokenForm.vue:40
 msgctxt "Popup/Settings/Paragraph"
@@ -4966,7 +4968,7 @@ msgstr "Activar el so"
 #: front/src/components/manage/moderation/ReportCard.vue:225
 msgctxt "Content/*/Button.Label"
 msgid "Unresolve"
-msgstr ""
+msgstr "No resolt"
 
 #: front/src/components/manage/moderation/ReportCard.vue:67
 #: front/src/views/admin/moderation/ReportsList.vue:23
@@ -5120,12 +5122,14 @@ msgstr "Utilitzar una altre instància"
 #: front/src/components/Home.vue:146
 msgctxt "Content/Home/Link"
 msgid "Use Funkwhale on other devices with our apps"
-msgstr ""
+msgstr "Utilitzeu Funkwhale en d'altres terminals amb les nostres aplicacions"
 
 #: front/src/components/moderation/ReportModal.vue:44
 msgctxt "*/*/Field,Help"
 msgid "Use this field to provide additional context to the moderator that will handle your report."
 msgstr ""
+"Utilitzeu aquest camp per proporcionar un context addicional al moderador "
+"que gestionarà l'informe."
 
 #: front/src/views/auth/PasswordReset.vue:12
 msgctxt "Content/Signup/Paragraph"
@@ -5136,6 +5140,8 @@ msgstr "Utilitza aquest formulari per sol·licitar el restabliment de la contras
 msgctxt "*/Moderation/Popup,Paragraph"
 msgid "Use this form to submit a report to our moderation team."
 msgstr ""
+"Utilitzeu aquest formulari per enviar un informe al nostre equip de "
+"moderació."
 
 #: front/src/components/manage/moderation/InstancePolicyForm.vue:111
 msgctxt "Content/Moderation/Help text"
@@ -5163,10 +5169,9 @@ msgid "User guides"
 msgstr "Guies d'utilització"
 
 #: front/src/views/admin/Settings.vue:88
-#, fuzzy
 msgctxt "Content/Admin/Menu"
 msgid "User Interface"
-msgstr "Nom d'usuari"
+msgstr "Interfície d'usuari"
 
 #: front/src/components/library/AlbumDetail.vue:26
 #: front/src/components/library/ArtistDetail.vue:39
@@ -5208,6 +5213,8 @@ msgstr "Usuaris"
 msgctxt "Content/Home/Paragraph"
 msgid "Users on this pod also get %{ quota } of free storage to upload their own content!"
 msgstr ""
+"Els usuaris d’aquest pod també aconsegueixen % {quota} d’emmagatzematge "
+"gratuït per penjar el seu propi contingut!"
 
 #: front/src/components/Footer.vue:29
 msgctxt "Footer/*/Title"
