@@ -50,6 +50,10 @@ export default {
       "label": "Galego"
     },
     {
+      "code": "hu",
+      "label": "Magyar"
+    },
+    {
       "code": "it",
       "label": "Italiano"
     },
