@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-12-02 08:56+0000\n"
+"PO-Revision-Date: 2019-12-03 11:52+0000\n"
 "Last-Translator: Francesc Galí <francescgali@protonmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -5252,10 +5252,9 @@ msgid "View in Django's admin"
 msgstr "Visualitza amb l'administrador Django's"
 
 #: front/src/components/Home.vue:169
-#, fuzzy
 msgctxt "Content/Home/Link"
 msgid "View more…"
-msgstr "Carrega'n més …"
+msgstr "Veure més …"
 
 #: front/src/components/library/AlbumBase.vue:62
 #: front/src/components/library/ArtistBase.vue:73
@@ -5316,6 +5315,8 @@ msgstr "No es poden desar els teus canvis"
 msgctxt "Content/Notifications/Paragraph"
 msgid "We noticed you've been here for a while. If Funkwhale is useful to you, we could use your help to make it even better!"
 msgstr ""
+"Ens hem adonat que heu estat aquí durant un temps. Si Funkwhale us és útil, "
+"podríeu ajudar-nos per millorar-lo!"
 
 #: front/src/components/library/FileUpload.vue:39
 msgctxt "Content/Library/Link"
@@ -5326,6 +5327,8 @@ msgstr "Us recomanem que utilitzeu Picard per a aquest propòsit."
 msgctxt "*/*/Field,Help"
 msgid "We'll use this email if we need to contact you regarding this report."
 msgstr ""
+"Utilitzarem aquesta adreça de correu electrònic per si hem de contactar amb "
+"vosaltres sobre aquest informe."
 
 #: front/src/components/Home.vue:207
 msgctxt "Head/Home/Title"
@@ -5515,6 +5518,10 @@ msgstr "No es pot crear el vostre compte."
 msgctxt "Content/Settings/Paragraph'"
 msgid "Your account will be deleted from our servers within a few minutes. We will also notify other servers who may have a copy of some of your data so they can proceed to deletion. Please note that some of these servers may be offline or unwilling to comply though."
 msgstr ""
+"El vostre compte es suprimirà dels nostres servidors en pocs minuts. També "
+"notificarem a d'atres servidors que puguin tenir una còpia d’algunes de les "
+"vostres dades perquè puguin procedir a la seva eliminació. Tingueu en compte "
+"que alguns d’aquests servidors poden estar fora de línia o no voler fer-ho."
 
 #: front/src/components/auth/Settings.vue:215
 msgctxt "Content/Settings/Title/Noun"
@@ -5530,6 +5537,8 @@ msgstr "No s'ha pogut guardar el teu avatar"
 msgctxt "*/Auth/Message"
 msgid "Your deletion request was submitted, your account and content will be deleted shortly"
 msgstr ""
+"S'ha enviat la sol·licitud de supressió, el vostre compte i el contingut "
+"associat és suprimiran en breu"
 
 #: front/src/components/library/EditForm.vue:3
 msgctxt "Content/Library/Paragraph"
