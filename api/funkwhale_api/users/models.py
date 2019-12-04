@@ -245,6 +245,7 @@ class User(AbstractUser):
             "max": max_,
             "remaining": max(max_ - (data["total"] / 1000 / 1000), 0),
             "current": data["total"] / 1000 / 1000,
+            "draft": data["draft"] / 1000 / 1000,
             "skipped": data["skipped"] / 1000 / 1000,
             "pending": data["pending"] / 1000 / 1000,
             "finished": data["finished"] / 1000 / 1000,

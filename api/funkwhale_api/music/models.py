@@ -11,6 +11,7 @@ import pydub
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
@@ -643,6 +644,7 @@ class UploadQuerySet(common_models.NullsLastQuerySet):
 
 
 TRACK_FILE_IMPORT_STATUS_CHOICES = (
+    ("draft", "Draft"),
     ("pending", "Pending"),
     ("finished", "Finished"),
     ("errored", "Errored"),
@@ -1138,6 +1140,12 @@ class Library(federation_models.FederationMixin):
 
         common_utils.on_commit(tasks.start_library_scan.delay, library_scan_id=scan.pk)
         return scan
+
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
 
 
 SCAN_STATUS = [

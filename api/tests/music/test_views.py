@@ -681,7 +681,102 @@ def test_user_can_create_upload(logged_in_api_client, factories, mocker, audio_f
     assert upload.audio_file.read() == audio_file.read()
     assert upload.source == "upload://test"
     assert upload.import_reference == "test"
+    assert upload.import_status == "pending"
     assert upload.track is None
+    m.assert_called_once_with(tasks.process_upload.delay, upload_id=upload.pk)
+
+
+def test_user_can_create_draft_upload(
+    logged_in_api_client, factories, mocker, audio_file
+):
+    library = factories["music.Library"](actor__user=logged_in_api_client.user)
+    url = reverse("api:v1:uploads-list")
+    m = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    response = logged_in_api_client.post(
+        url,
+        {
+            "audio_file": audio_file,
+            "source": "upload://test",
+            "import_reference": "test",
+            "import_status": "draft",
+            "library": library.uuid,
+        },
+    )
+
+    assert response.status_code == 201
+
+    upload = library.uploads.latest("id")
+
+    audio_file.seek(0)
+    assert upload.audio_file.read() == audio_file.read()
+    assert upload.source == "upload://test"
+    assert upload.import_reference == "test"
+    assert upload.import_status == "draft"
+    assert upload.track is None
+    m.assert_not_called()
+
+
+def test_user_can_patch_draft_upload(
+    logged_in_api_client, factories, mocker, audio_file
+):
+    actor = logged_in_api_client.user.create_actor()
+    library = factories["music.Library"](actor=actor)
+    upload = factories["music.Upload"](library__actor=actor, import_status="draft")
+    url = reverse("api:v1:uploads-detail", kwargs={"uuid": upload.uuid})
+    m = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    response = logged_in_api_client.patch(
+        url,
+        {
+            "audio_file": audio_file,
+            "source": "upload://test",
+            "import_reference": "test",
+            "library": library.uuid,
+        },
+    )
+
+    assert response.status_code == 200
+
+    upload.refresh_from_db()
+
+    audio_file.seek(0)
+    assert upload.audio_file.read() == audio_file.read()
+    assert upload.source == "upload://test"
+    assert upload.import_reference == "test"
+    assert upload.import_status == "draft"
+    assert upload.library == library
+    m.assert_not_called()
+
+
+@pytest.mark.parametrize("import_status", ["pending", "errored", "skipped", "finished"])
+def test_user_cannot_patch_non_draft_upload(
+    import_status, logged_in_api_client, factories
+):
+    actor = logged_in_api_client.user.create_actor()
+    upload = factories["music.Upload"](
+        library__actor=actor, import_status=import_status
+    )
+    url = reverse("api:v1:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = logged_in_api_client.patch(url, {"import_reference": "test"})
+
+    assert response.status_code == 404
+
+
+def test_user_can_patch_draft_upload_status_triggers_processing(
+    logged_in_api_client, factories, mocker
+):
+    actor = logged_in_api_client.user.create_actor()
+    upload = factories["music.Upload"](library__actor=actor, import_status="draft")
+    url = reverse("api:v1:uploads-detail", kwargs={"uuid": upload.uuid})
+    m = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    response = logged_in_api_client.patch(url, {"import_status": "pending"})
+
+    upload.refresh_from_db()
+
+    assert response.status_code == 200
+    assert upload.import_status == "pending"
     m.assert_called_once_with(tasks.process_upload.delay, upload_id=upload.pk)
 
 
@@ -1062,3 +1157,17 @@ def test_track_list_exclude_channels(params, expected, factories, logged_in_api_
 def test_strip_absolute_media_url(media_url, input, expected, settings):
     settings.MEDIA_URL = media_url
     assert views.strip_absolute_media_url(input) == expected
+
+
+def test_get_upload_audio_metadata(logged_in_api_client, factories):
+    actor = logged_in_api_client.user.create_actor()
+    upload = factories["music.Upload"](library__actor=actor)
+    metadata = tasks.metadata.Metadata(upload.get_audio_file())
+    serializer = tasks.metadata.TrackMetadataSerializer(data=metadata)
+    url = reverse("api:v1:uploads-audio-file-metadata", kwargs={"uuid": upload.uuid})
+
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert serializer.is_valid(raise_exception=True) is True
+    assert response.data == serializer.validated_data

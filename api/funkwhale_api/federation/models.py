@@ -68,7 +68,7 @@ class ActorQuerySet(models.QuerySet):
 
     def with_current_usage(self):
         qs = self
-        for s in ["pending", "skipped", "errored", "finished"]:
+        for s in ["draft", "pending", "skipped", "errored", "finished"]:
             uploads_query = models.Q(
                 libraries__uploads__import_status=s,
                 libraries__uploads__audio_file__isnull=False,
@@ -247,7 +247,7 @@ class Actor(models.Model):
     def get_current_usage(self):
         actor = self.__class__.objects.filter(pk=self.pk).with_current_usage().get()
         data = {}
-        for s in ["pending", "skipped", "errored", "finished"]:
+        for s in ["draft", "pending", "skipped", "errored", "finished"]:
             data[s] = getattr(actor, "_usage_{}".format(s)) or 0
 
         data["total"] = sum(data.values())

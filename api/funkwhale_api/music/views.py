@@ -1,3 +1,4 @@
+import base64
 import datetime
 import logging
 import urllib.parse
@@ -505,6 +506,7 @@ class UploadViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -534,7 +536,31 @@ class UploadViewSet(
 
     def get_queryset(self):
         qs = super().get_queryset()
+        if self.action in ["update", "partial_update"]:
+            # prevent updating an upload that is already processed
+            qs = qs.filter(import_status="draft")
         return qs.filter(library__actor=self.request.user.actor)
+
+    @action(methods=["get"], detail=True, url_path="audio-file-metadata")
+    def audio_file_metadata(self, request, *args, **kwargs):
+        upload = self.get_object()
+        try:
+            m = tasks.metadata.Metadata(upload.get_audio_file())
+        except FileNotFoundError:
+            return Response({"detail": "File not found"}, status=500)
+        serializer = tasks.metadata.TrackMetadataSerializer(data=m)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=500)
+        payload = serializer.validated_data
+        if (
+            "cover_data" in payload
+            and payload["cover_data"]
+            and "content" in payload["cover_data"]
+        ):
+            payload["cover_data"]["content"] = base64.b64encode(
+                payload["cover_data"]["content"]
+            )
+        return Response(payload, status=200)
 
     @action(methods=["post"], detail=False)
     def action(self, request, *args, **kwargs):
@@ -551,7 +577,13 @@ class UploadViewSet(
 
     def perform_create(self, serializer):
         upload = serializer.save()
-        common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
+        if upload.import_status == "pending":
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
+
+    def perform_update(self, serializer):
+        upload = serializer.save()
+        if upload.import_status == "pending":
+            common_utils.on_commit(tasks.process_upload.delay, upload_id=upload.pk)
 
     @transaction.atomic
     def perform_destroy(self, instance):
