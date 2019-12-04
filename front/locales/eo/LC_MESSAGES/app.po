@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-03-19 16:47+0000\n"
+"PO-Revision-Date: 2019-12-05 03:27+0000\n"
 "Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: none\n"
 "Language: eo\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.2.2\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -218,7 +218,7 @@ msgstr "Reta eraro okazis dum alŝuto de tiu dosiero"
 #: front/src/components/library/EditForm.vue:161
 msgctxt "*/*/Placeholder"
 msgid "A short summary describing your changes."
-msgstr "Mallonga resumo priskribante viaj ŝanĝoj"
+msgstr "Mallonga resumo priskribante viaj ŝanĝoj."
 
 #: front/src/components/About.vue:5
 #, fuzzy
@@ -992,7 +992,7 @@ msgstr "Ŝanĝi vian pasvorton ankaŭ ŝanĝos vian Subsonic API pasvorto se vi 
 #: front/src/components/auth/Settings.vue:98
 msgctxt "Popup/Settings/Paragraph"
 msgid "Changing your password will have the following consequences:"
-msgstr "Ŝanĝi vian pasvorton tiel rezultigos"
+msgstr "Ŝanĝi vian pasvorton tiel rezultigos:"
 
 #: front/src/components/Footer.vue:48
 msgctxt "Footer/*/List item.Link"
@@ -2023,7 +2023,7 @@ msgstr "Erarintaj kantoj:"
 #: front/src/views/admin/library/TrackDetail.vue:223
 msgctxt "*/*/*"
 msgid "Favorited tracks"
-msgstr "Erarintaj kantoj:"
+msgstr "Favoritaj kantoj:"
 
 #: front/src/components/Sidebar.vue:66
 #: src/components/mixins/Translations.vue:88
@@ -4577,7 +4577,7 @@ msgstr ""
 #: front/src/components/library/FileUpload.vue:38
 msgctxt "Content/Library/List item"
 msgid "The music files you are uploading are tagged properly."
-msgstr "La muzika dosiero vi elŝutas bone etikedas:"
+msgstr "La muzika dosiero kiun vi elŝutas estas bone etikedita."
 
 #: front/src/components/audio/Player.vue:65
 msgctxt "Sidebar/Player/Error message.Paragraph"
@@ -5561,7 +5561,7 @@ msgstr ""
 #: front/src/components/auth/SignupForm.vue:9
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account cannot be created."
-msgstr "Ludlisto kreiintas"
+msgstr "Ne eblas krei vian konton."
 
 #: front/src/components/auth/Settings.vue:281
 msgctxt "Content/Settings/Paragraph'"
