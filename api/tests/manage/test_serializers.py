@@ -176,7 +176,8 @@ def test_manage_domain_action_purge(factories, mocker):
 
     s.handle_purge(domains[0].__class__.objects.all())
     on_commit.assert_called_once_with(
-        federation_tasks.purge_actors.delay, domains=[d.pk for d in domains]
+        federation_tasks.purge_actors.delay,
+        domains=[d.pk for d in sorted(domains, key=lambda d: d.name)],
     )
 
 
