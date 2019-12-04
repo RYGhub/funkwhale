@@ -215,10 +215,10 @@
         @keydown.shift.right.prevent.exact="seek (30)"
         @keydown.shift.left.prevent.exact="seek (-30)"
         @keydown.m.prevent.exact="toggleMute"
-        @keydown.l.prevent.exact="$store.commit('player/toggleLooping')"
-        @keydown.s.prevent.exact="shuffle"
-        @keydown.f.prevent.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
-        @keydown.q.prevent.exact="clean"
+        @keydown.l.exact="$store.commit('player/toggleLooping')"
+        @keydown.s.exact="shuffle"
+        @keydown.f.exact="$store.dispatch('favorites/toggle', currentTrack.id)"
+        @keydown.q.exact="clean"
         />
     </div>
   </section>
