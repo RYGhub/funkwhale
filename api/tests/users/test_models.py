@@ -204,21 +204,23 @@ def test_user_get_quota_status(factories, preferences, mocker):
     mocker.patch(
         "funkwhale_api.federation.models.Actor.get_current_usage",
         return_value={
-            "total": 10 * 1000 * 1000,
+            "total": 15 * 1000 * 1000,
             "pending": 1 * 1000 * 1000,
             "skipped": 2 * 1000 * 1000,
             "errored": 3 * 1000 * 1000,
             "finished": 4 * 1000 * 1000,
+            "draft": 5 * 1000 * 1000,
         },
     )
     assert user.get_quota_status() == {
         "max": 66,
-        "remaining": 56,
-        "current": 10,
+        "remaining": 51,
+        "current": 15,
         "pending": 1,
         "skipped": 2,
         "errored": 3,
         "finished": 4,
+        "draft": 5,
     }
 
 

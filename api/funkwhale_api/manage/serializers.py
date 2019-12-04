@@ -173,7 +173,7 @@ class ManageDomainActionSerializer(common_serializers.ActionSerializer):
 
     @transaction.atomic
     def handle_purge(self, objects):
-        ids = objects.values_list("pk", flat=True)
+        ids = objects.values_list("pk", flat=True).order_by("pk")
         common_utils.on_commit(federation_tasks.purge_actors.delay, domains=list(ids))
 
     @transaction.atomic

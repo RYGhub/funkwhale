@@ -6,12 +6,14 @@ from django.conf import settings
 from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.audio import serializers as audio_serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.playlists import models as playlists_models
 from funkwhale_api.tags.models import Tag
+from funkwhale_api.tags import serializers as tags_serializers
 
 from . import filters, models, tasks
 
@@ -60,6 +62,9 @@ class LicenseSerializer(serializers.Serializer):
 
     def get_id(self, obj):
         return obj["identifiers"][0]
+
+    class Meta:
+        model = models.License
 
 
 class ArtistAlbumSerializer(serializers.Serializer):
@@ -295,8 +300,14 @@ class UploadSerializer(serializers.ModelSerializer):
     library = common_serializers.RelatedField(
         "uuid",
         LibraryForOwnerSerializer(),
-        required=True,
+        required=False,
         filters=lambda context: {"actor": context["user"].actor},
+    )
+    channel = common_serializers.RelatedField(
+        "uuid",
+        audio_serializers.ChannelSerializer(),
+        required=False,
+        filters=lambda context: {"attributed_to": context["user"].actor},
     )
 
     class Meta:
@@ -308,6 +319,7 @@ class UploadSerializer(serializers.ModelSerializer):
             "mimetype",
             "track",
             "library",
+            "channel",
             "duration",
             "mimetype",
             "bitrate",
@@ -325,11 +337,34 @@ class UploadSerializer(serializers.ModelSerializer):
             "size",
             "track",
             "import_date",
-            "import_status",
         ]
 
 
+class ImportMetadataSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=500, required=True)
+    mbid = serializers.UUIDField(required=False, allow_null=True)
+    copyright = serializers.CharField(max_length=500, required=False, allow_null=True)
+    position = serializers.IntegerField(min_value=1, required=False, allow_null=True)
+    tags = tags_serializers.TagsListField(required=False)
+    license = common_serializers.RelatedField(
+        "code", LicenseSerializer(), required=False, allow_null=True
+    )
+
+
+class ImportMetadataField(serializers.JSONField):
+    def to_internal_value(self, v):
+        v = super().to_internal_value(v)
+        s = ImportMetadataSerializer(data=v)
+        s.is_valid(raise_exception=True)
+        return v
+
+
 class UploadForOwnerSerializer(UploadSerializer):
+    import_status = serializers.ChoiceField(
+        choices=["draft", "pending"], default="pending"
+    )
+    import_metadata = ImportMetadataField(required=False)
+
     class Meta(UploadSerializer.Meta):
         fields = UploadSerializer.Meta.fields + [
             "import_details",
@@ -342,7 +377,6 @@ class UploadForOwnerSerializer(UploadSerializer):
         write_only_fields = ["audio_file"]
         read_only_fields = UploadSerializer.Meta.read_only_fields + [
             "import_details",
-            "import_metadata",
             "metadata",
         ]
 
@@ -353,9 +387,27 @@ class UploadForOwnerSerializer(UploadSerializer):
         return r
 
     def validate(self, validated_data):
+        if (
+            not self.instance
+            and "library" not in validated_data
+            and "channel" not in validated_data
+        ):
+            raise serializers.ValidationError(
+                "You need to specify a channel or a library"
+            )
+        if (
+            not self.instance
+            and "library" in validated_data
+            and "channel" in validated_data
+        ):
+            raise serializers.ValidationError(
+                "You may specify a channel or a library, not both"
+            )
         if "audio_file" in validated_data:
             self.validate_upload_quota(validated_data["audio_file"])
 
+        if "channel" in validated_data:
+            validated_data["library"] = validated_data.pop("channel").library
         return super().validate(validated_data)
 
     def validate_upload_quota(self, f):
@@ -390,7 +442,7 @@ class UploadActionSerializer(common_serializers.ActionSerializer):
 
     @transaction.atomic
     def handle_relaunch_import(self, objects):
-        qs = objects.exclude(import_status="finished")
+        qs = objects.filter(import_status__in=["pending", "skipped", "errored"])
         pks = list(qs.values_list("id", flat=True))
         qs.update(import_status="pending")
         for pk in pks:

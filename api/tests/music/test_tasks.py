@@ -432,6 +432,14 @@ def test_upload_import_skip_existing_track_in_own_library(factories, temp_signal
     )
 
 
+@pytest.mark.parametrize("import_status", ["draft", "errored", "finished"])
+def test_process_upload_picks_ignore_non_pending_uploads(import_status, factories):
+    upload = factories["music.Upload"](import_status=import_status)
+
+    with pytest.raises(upload.DoesNotExist):
+        tasks.process_upload(upload_id=upload.pk)
+
+
 def test_upload_import_track_uuid(now, factories):
     track = factories["music.Track"]()
     upload = factories["music.Upload"](
@@ -911,3 +919,133 @@ def test_get_cover_from_fs_ignored(name, tmpdir):
         f.write(content)
 
     assert tasks.get_cover_from_fs(tmpdir) is None
+
+
+def test_get_track_from_import_metadata_with_forced_values(factories, mocker, faker):
+    actor = factories["federation.Actor"]()
+    forced_values = {
+        "title": "Real title",
+        "artist": factories["music.Artist"](),
+        "album": None,
+        "license": factories["music.License"](),
+        "position": 3,
+        "copyright": "Real copyright",
+        "mbid": faker.uuid4(),
+        "attributed_to": actor,
+        "tags": ["hello", "world"],
+    }
+    metadata = {
+        "title": "Test track",
+        "artists": [{"name": "Test artist"}],
+        "album": {"title": "Test album", "release_date": datetime.date(2012, 8, 15)},
+        "position": 4,
+        "disc_number": 2,
+        "copyright": "2018 Someone",
+        "tags": ["foo", "bar"],
+    }
+
+    track = tasks.get_track_from_import_metadata(metadata, **forced_values)
+
+    assert track.title == forced_values["title"]
+    assert track.mbid == forced_values["mbid"]
+    assert track.position == forced_values["position"]
+    assert track.disc_number == metadata["disc_number"]
+    assert track.copyright == forced_values["copyright"]
+    assert track.album == forced_values["album"]
+    assert track.artist == forced_values["artist"]
+    assert track.attributed_to == forced_values["attributed_to"]
+    assert track.license == forced_values["license"]
+    assert (
+        sorted(track.tagged_items.values_list("tag__name", flat=True))
+        == forced_values["tags"]
+    )
+
+
+def test_process_channel_upload_forces_artist_and_attributed_to(
+    factories, mocker, faker
+):
+    track = factories["music.Track"]()
+    channel = factories["audio.Channel"]()
+    import_metadata = {
+        "title": "Real title",
+        "position": 3,
+        "copyright": "Real copyright",
+        "tags": ["hello", "world"],
+    }
+
+    expected_forced_values = import_metadata.copy()
+    expected_forced_values["artist"] = channel.artist
+    expected_forced_values["attributed_to"] = channel.attributed_to
+    upload = factories["music.Upload"](
+        track=None, import_metadata=import_metadata, library=channel.library
+    )
+    get_track_from_import_metadata = mocker.patch.object(
+        tasks, "get_track_from_import_metadata", return_value=track
+    )
+
+    tasks.process_upload(upload_id=upload.pk)
+
+    upload.refresh_from_db()
+    serializer = tasks.metadata.TrackMetadataSerializer(
+        data=tasks.metadata.Metadata(upload.get_audio_file())
+    )
+    assert serializer.is_valid() is True
+    audio_metadata = serializer.validated_data
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None}, audio_metadata, {"funkwhale": {}},
+    )
+    assert upload.import_status == "finished"
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata, **expected_forced_values
+    )
+
+
+def test_process_upload_uses_import_metadata_if_valid(factories, mocker):
+    track = factories["music.Track"]()
+    import_metadata = {"title": "hello", "funkwhale": {"foo": "bar"}}
+    upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
+    get_track_from_import_metadata = mocker.patch.object(
+        tasks, "get_track_from_import_metadata", return_value=track
+    )
+    tasks.process_upload(upload_id=upload.pk)
+
+    serializer = tasks.metadata.TrackMetadataSerializer(
+        data=tasks.metadata.Metadata(upload.get_audio_file())
+    )
+    assert serializer.is_valid() is True
+    audio_metadata = serializer.validated_data
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None},
+        audio_metadata,
+        {"funkwhale": import_metadata["funkwhale"]},
+    )
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata, attributed_to=upload.library.actor, title="hello"
+    )
+
+
+def test_process_upload_skips_import_metadata_if_invalid(factories, mocker):
+    track = factories["music.Track"]()
+    import_metadata = {"title": None, "funkwhale": {"foo": "bar"}}
+    upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
+    get_track_from_import_metadata = mocker.patch.object(
+        tasks, "get_track_from_import_metadata", return_value=track
+    )
+    tasks.process_upload(upload_id=upload.pk)
+
+    serializer = tasks.metadata.TrackMetadataSerializer(
+        data=tasks.metadata.Metadata(upload.get_audio_file())
+    )
+    assert serializer.is_valid() is True
+    audio_metadata = serializer.validated_data
+
+    expected_final_metadata = tasks.collections.ChainMap(
+        {"upload_source": None},
+        audio_metadata,
+        {"funkwhale": import_metadata["funkwhale"]},
+    )
+    get_track_from_import_metadata.assert_called_once_with(
+        expected_final_metadata, attributed_to=upload.library.actor
+    )

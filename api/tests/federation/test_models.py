@@ -54,6 +54,12 @@ def test_actor_get_quota(factories):
         audio_file__from_path=None,
         audio_file__data=b"aaaa",
     )
+    factories["music.Upload"](
+        library=library,
+        import_status="draft",
+        audio_file__from_path=None,
+        audio_file__data=b"aaaaa",
+    )
 
     # this one is imported in place and don't count
     factories["music.Upload"](
@@ -72,7 +78,14 @@ def test_actor_get_quota(factories):
         audio_file__data=b"aaaa",
     )
 
-    expected = {"total": 14, "pending": 1, "skipped": 2, "errored": 3, "finished": 8}
+    expected = {
+        "total": 19,
+        "pending": 1,
+        "skipped": 2,
+        "errored": 3,
+        "finished": 8,
+        "draft": 5,
+    }
 
     assert library.actor.get_current_usage() == expected
 
