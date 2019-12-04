@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: French (Funkwhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-12-02 14:12+0000\n"
-"Last-Translator: Eliot Berriot <contact@eliotberriot.com>\n"
+"PO-Revision-Date: 2019-12-05 03:27+0000\n"
+"Last-Translator: Mélanie Chauvel <perso@hack-libre.org>\n"
 "Language-Team: French <https://translate.funkwhale.audio/projects/funkwhale/"
 "front/fr/>\n"
 "Language: fr_FR\n"
@@ -5302,7 +5302,7 @@ msgstr "Erreur lors de la connexion"
 #: front/src/components/auth/ApplicationForm.vue:3
 msgctxt "Content/*/Error message.Title"
 msgid "We cannot save your changes"
-msgstr "Sauvegarde de vos modifications impossible"
+msgstr "Impossible de sauvegarder vos modifications"
 
 #: front/src/views/Notifications.vue:39
 msgctxt "Content/Notifications/Paragraph"
@@ -5512,7 +5512,7 @@ msgstr "Vous ne verrez plus les pistes, albums et activité utilisateur liées �
 #: front/src/components/auth/SignupForm.vue:9
 msgctxt "Content/Signup/Form/Paragraph"
 msgid "Your account cannot be created."
-msgstr "Création de votre compte impossible."
+msgstr "Impossible de créer votre compte."
 
 #: front/src/components/auth/Settings.vue:281
 msgctxt "Content/Settings/Paragraph'"
