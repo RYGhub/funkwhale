@@ -1,0 +1,1 @@
+Fix issue with browser shortcuts such as search and focus URL not being recognised (#340, #985)
