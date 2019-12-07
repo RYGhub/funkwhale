@@ -109,23 +109,23 @@ Running Funkwhale on the develop branch
 ---------------------------------------
 
 Traditional deployments are done using tagged releases. However, you
-may want to benefits from the latest change available, or the help detect
+may want to benefit from the latest changes available, or to help detect
 bugs before they are included in actual releases.
 
 To do that, you'll need to run your instance on the develop branch,
 which contains all the unreleased changes and features of the next version.
 
 Please take into account that the develop branch
-may be unstable and will contain bugs that may affect the well being of your
+may be unstable and will contain bugs that may affect the well-being of your
 instance. If you are comfortable with that, you need to backup at least your database
-before pulling latest changes from the develop branch.
+before pulling the latest changes from the develop branch.
 
 Otherwise, the deployment process is similar to deploying with releases.
 You simply need to use ``export FUNKWHALE_VERSION=develop``
 in the installation and upgrade process instead of a real version number,
 as we build artifacts on the development branch the same way we do for releases.
 
-It's also recommended to check out the `develop release notes <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/changes/notes.rst>_` before upgrading,
+It's also recommended to check out the `develop release notes <https://dev.funkwhale.audio/funkwhale/funkwhale/blob/develop/changes/notes.rst>`_ before upgrading,
 since you may have to apply manual actions for your instance to continue to work. Such actions are labelled with ``[manual action required]`` in the releases notes.
 
 .. _frontend-setup:
@@ -216,7 +216,7 @@ On non-docker deployments, run the following commands:
 
 .. note::
 
-    The resulting file should not contain any variable such as ``${FUNKWHALE_HOSTNAME}``.
+    The resulting file should not contain any variables such as ``${FUNKWHALE_HOSTNAME}``.
     You can check that using this command::
 
         grep '${' /etc/nginx/sites-available/funkwhale.conf
@@ -285,7 +285,7 @@ Add the following to your ``.env`` file::
 
     REVERSE_PROXY_TYPE=apache2
 
-Then restart Funkwhale. This is needed to ensure Funkwhale provide proper headers for media file serving.
+Then restart Funkwhale. This is needed to ensure Funkwhale provides proper headers for media file serving.
 
 Then, download our sample virtualhost file:
 
@@ -295,7 +295,7 @@ Then, download our sample virtualhost file:
     ln -s /etc/apache2/sites-available/funkwhale.conf /etc/apache2/sites-enabled/
 
 You can tweak the configuration file according to your setup, especially the
-TLS configuration. Otherwise, defaults, should work if you followed the
+TLS configuration. Otherwise, defaults should work if you followed the
 installation guide.
 
 .. note::
@@ -340,5 +340,5 @@ to the file to serve to the user, and will be picked by nginx, but never sent
 back to the client.
 
 Using this technique, we can ensure music files are covered by the authentication
-and permission policy of your instance, while keeping as much as performance
+and permission policy of your instance, while remaining as performant
 as possible.

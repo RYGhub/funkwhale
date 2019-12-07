@@ -58,7 +58,7 @@ with other users, both from the same instance or from the federation.
 
 We think this change will have a really positive impact:
 
-- Admins should be more encline to open their instance to strangers, because copyrighted media
+- Admins should be more inclined to open their instance to strangers, because copyrighted media
   can be upload and shared privately
 - Creators should have a better experience when joining the network, because they can now
   upload their own content and share it over the federation without any admin intervention
@@ -70,12 +70,12 @@ Accessing music
 
 From an end-user perspective, you will be able to browse any artist or album or track
 that is known by your instance, but you'll only be able to listen to content
-that match one of those critaeria:
+that match one of those criteria:
 
 - The content is available is one of your libraries
 - The content is available in a public library
 - The content is available in one library from your instance that has a visibility level set to "instance"
-- The content is available in one of the library you follow
+- The content is available in one of the libraries you follow
 
 Following someone else's library is a four step process:
 
@@ -104,35 +104,35 @@ A better import UI
 ------------------
 
 This version includes a completely new import UI which should make
-file uploading less annoying. Especially it's updating in real-time
+file uploading less annoying. In particular, the UI updates in real-time
 and has a better error reporting.
 
-A Better import engine
+A better import engine
 ----------------------
 
 Funkwhale is known for its quircks during music import. Missing covers,
-splitted albums, bad management of tracks with multiple artists, missing
-data for files imported over federation, bad performance, discrepencies between
-the user provided tags and what is actually stored in the database...
+split albums, bad management of tracks with multiple artists, missing
+data for files imported over federation, bad performance, discrepancies between
+the user-provided tags and what is actually stored in the database...
 
 This should be greatly improved now, as the whole import logic was rewritten
 from scratch.
 
-Import is done completely offline and do not call the MusicBrainz API anymore,
+Import is done completely offline and no longer calls the MusicBrainz API,
 except to retrieve covers if those are not embedded in the imported files.
-MusicBrainzare references are still stored in the database, but we rely solely
+MusicBrainz references are still stored in the database, but we rely solely
 on the tags from the audio file now.
 
 This has two positive consequences:
 
-- Improved performance for both small and big imports (possibly by a factor 10)
+- Improved performance for both small and big imports (possibly by a factor of 10)
 - More reliable import result: if your file is tagged in a specific way, we will only
   use tags for the import.
 
 Imports from federation, command-line and UI/API all use the same code,
 which should greatly reduce the bugs/discrepencies.
 
-Finally, the import engine now understand the difference between a track artist
+Finally, the import engine now understands the difference between a track artist
 and an album artist, which should put an end to the album splitting issues
 for tracks that had a different artist than the album artist.
 
@@ -140,10 +140,10 @@ What will break
 ---------------
 
 If you've read until here, you can probably understand that all of these changes
-comes at a cost: version 0.17 contains breaking changes, feature were removed
-or changed.
+comes at a cost: version 0.17 contains breaking changes, removed features and other
+changes.
 
-Those features were removed:
+The following features were removed:
 
 - YouTube imports: for copyright reasons, keeping this in the core was not possible
 - Music requests: those are now less useful since anyone can upload content
@@ -171,13 +171,13 @@ bind content imported by each one to this library.
 
 Libraries created this way will have a different visibility level depending of your instance configuration:
 
-- If your instance requires authentication to access the API / Listen to music, libraries will
+- If your instance requires authentication to access the API / listen to music, libraries will
   be marked with "instance"  visibility. As a result, all users from the instance will still
   be able to listen to all the music of the instance after the migration
-- If your instance does not requires authentication to access the API / Listen to music,
+- If your instance does not require authentication to access the API / listen to music,
   libraries will be completely public, allowing anyone to access the content (including federation)
 
-This script will contain other database-related operations, but the impact will remain
+This script will also contain other database-related operations, but the impact will remain
 invisible.
 
 
@@ -199,7 +199,7 @@ On non docker-setups::
     sudo -u funkwhale -H -E /srv/funkwhale/virtualenv/bin/python api/manage.py script create_actors --no-input
     sudo -u funkwhale -H -E /srv/funkwhale/virtualenv/bin/python api/manage.py script migrate_to_user_libraries --no-input
 
-If the scripts ends without errors, you're instance should be updated and ready to use :)
+If the scripts complete without errors, your instance should be updated and ready to use :)
 
 .. note::
 
