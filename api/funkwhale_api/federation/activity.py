@@ -330,10 +330,18 @@ class OutboxRouter(Router):
                 cc = activity_data["payload"].pop("cc", [])
                 a = models.Activity(**activity_data)
                 a.uuid = uuid.uuid4()
-                to_inbox_items, to_deliveries, new_to = prepare_deliveries_and_inbox_items(
+                (
+                    to_inbox_items,
+                    to_deliveries,
+                    new_to,
+                ) = prepare_deliveries_and_inbox_items(
                     to, "to", allowed_domains=allowed_domains
                 )
-                cc_inbox_items, cc_deliveries, new_cc = prepare_deliveries_and_inbox_items(
+                (
+                    cc_inbox_items,
+                    cc_deliveries,
+                    new_cc,
+                ) = prepare_deliveries_and_inbox_items(
                     cc, "cc", allowed_domains=allowed_domains
                 )
                 if not any(
