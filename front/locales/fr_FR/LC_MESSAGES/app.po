@@ -3710,12 +3710,12 @@ msgstr "Remplacer la file d'attente actuelle"
 #: front/src/components/mixins/Report.vue:6 src/components/mixins/Report.vue:7
 msgctxt "*/Moderation/*/Verb"
 msgid "Report @%{ username }…"
-msgstr "Signaler @${ username }…"
+msgstr "Signaler @%{ username }…"
 
 #: front/src/components/manage/moderation/ReportCard.vue:5
 msgctxt "Content/Moderation/Card/Short"
 msgid "Report %{ id }"
-msgstr "Signaler ${ id }"
+msgstr "Signaler %{ id }"
 
 #: front/src/components/moderation/ReportModal.vue:139
 msgctxt "*/Moderation/Message"
@@ -5410,7 +5410,7 @@ msgstr ""
 #: front/src/components/SetInstanceModal.vue:98
 msgctxt "*/Instance/Message"
 msgid "You are now using the Funkwhale instance at %{ url }"
-msgstr "Vous utilisez maintenant l’instance Funkwhale sur ${ url }"
+msgstr "Vous utilisez maintenant l’instance Funkwhale sur %{ url }"
 
 #: front/src/views/content/Home.vue:17
 msgctxt "Content/Library/Paragraph"
@@ -5492,7 +5492,7 @@ msgstr "Vous allez être déconnecté⋅e de cette session et vous devrez vous c
 #: front/src/components/auth/Authorize.vue:51
 msgctxt "Content/Auth/Paragraph"
 msgid "You will be redirected to <strong>%{ url }</strong>"
-msgstr "Vous allez être redirigé·e vers <strong>${ url }</strong>"
+msgstr "Vous allez être redirigé·e vers <strong>%{ url }</strong>"
 
 #: front/src/components/auth/Authorize.vue:49
 msgctxt "Content/Auth/Paragraph"
