@@ -186,9 +186,9 @@ msgstr[1] "%{ count } álbums"
 #: front/src/components/favorites/List.vue:10
 #, fuzzy
 msgctxt "Content/Favorites/Title"
-msgid "1 favorite"
+msgid "%{ count } favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "1 preferida"
+msgstr[0] "%{ count } preferida"
 msgstr[1] "%{ count } preferidas"
 
 #: front/src/components/audio/artist/Card.vue:15

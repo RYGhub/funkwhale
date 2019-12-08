@@ -88,9 +88,9 @@ msgstr[0] "1 album"
 msgstr[1] "%{ count } album"
 
 #: front/src/components/favorites/List.vue:10
-msgid "1 favorite"
+msgid "%{ count } favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "1 favorit"
+msgstr[0] "%{ count } favorit"
 msgstr[1] "%{ count } favoriter"
 
 #: front/src/components/audio/album/Card.vue:54
