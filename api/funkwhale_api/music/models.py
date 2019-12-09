@@ -846,6 +846,11 @@ class Upload(models.Model):
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
 
+    @property
+    def listen_url_no_download(self):
+        # Not using reverse because this is slow
+        return self.listen_url + "&download=false"
+
     def get_transcoded_version(self, format, max_bitrate=None):
         if format:
             mimetype = utils.EXTENSION_TO_MIMETYPE[format]

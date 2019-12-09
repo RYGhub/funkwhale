@@ -393,7 +393,9 @@ def get_content_disposition(filename):
     return "attachment; {}".format(filename)
 
 
-def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
+def handle_serve(
+    upload, user, format=None, max_bitrate=None, proxy_media=True, download=True
+):
     f = upload
     # we update the accessed_date
     now = timezone.now()
@@ -450,7 +452,8 @@ def handle_serve(upload, user, format=None, max_bitrate=None, proxy_media=True):
     mapping = {"nginx": "X-Accel-Redirect", "apache2": "X-Sendfile"}
     file_header = mapping[settings.REVERSE_PROXY_TYPE]
     response[file_header] = file_path
-    response["Content-Disposition"] = get_content_disposition(filename)
+    if download:
+        response["Content-Disposition"] = get_content_disposition(filename)
     if mt:
         response["Content-Type"] = mt
 
@@ -476,6 +479,7 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             "track__album__artist", "track__artist"
         )
         explicit_file = request.GET.get("upload")
+        download = request.GET.get("download", "true").lower() == "true"
         if explicit_file:
             queryset = queryset.filter(uuid=explicit_file)
         queryset = queryset.playable_by(actor)
@@ -499,6 +503,7 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
             format=format,
             max_bitrate=max_bitrate,
             proxy_media=settings.PROXY_MEDIA,
+            download=download,
         )
 
 

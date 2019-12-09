@@ -382,10 +382,28 @@ def test_listen_correct_access(factories, logged_in_api_client):
         library__privacy_level="me",
         import_status="finished",
     )
+    expected_filename = upload.track.full_name + ".ogg"
     url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 200
+    assert response["Content-Disposition"] == "attachment; filename*=UTF-8''{}".format(
+        urllib.parse.quote(expected_filename)
+    )
+
+
+def test_listen_correct_access_download_false(factories, logged_in_api_client):
+    logged_in_api_client.user.create_actor()
+    upload = factories["music.Upload"](
+        library__actor=logged_in_api_client.user.actor,
+        library__privacy_level="me",
+        import_status="finished",
+    )
+    url = reverse("api:v1:listen-detail", kwargs={"uuid": upload.track.uuid})
+    response = logged_in_api_client.get(url, {"download": "false"})
+
+    assert response.status_code == 200
+    assert "Content-Disposition" not in response
 
 
 def test_listen_explicit_file(factories, logged_in_api_client, mocker, settings):
@@ -406,6 +424,7 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker, settings)
         format=None,
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
+        download=True,
     )
 
 
@@ -500,6 +519,7 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker, settings
         format="mp3",
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
+        download=True,
     )
 
 
@@ -532,6 +552,7 @@ def test_listen_transcode_bitrate(
         format=None,
         max_bitrate=expected,
         proxy_media=settings.PROXY_MEDIA,
+        download=True,
     )
 
 
@@ -562,6 +583,7 @@ def test_listen_transcode_in_place(
         format="mp3",
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
+        download=True,
     )
 
 

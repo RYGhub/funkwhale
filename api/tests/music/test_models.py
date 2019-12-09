@@ -437,6 +437,13 @@ def test_upload_listen_url(factories):
     assert upload.listen_url == expected
 
 
+def test_upload_listen_url_no_download(factories):
+    upload = factories["music.Upload"]()
+    expected = upload.track.listen_url + "?upload={}&download=false".format(upload.uuid)
+
+    assert upload.listen_url_no_download == expected
+
+
 def test_library_schedule_scan(factories, now, mocker):
     on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
     library = factories["music.Library"](uploads_count=5)

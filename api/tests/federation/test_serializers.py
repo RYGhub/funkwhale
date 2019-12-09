@@ -953,7 +953,7 @@ def test_activity_pub_audio_serializer_to_ap(factories):
         "attributedTo": upload.library.actor.fid,
         "url": [
             {
-                "href": utils.full_url(upload.listen_url),
+                "href": utils.full_url(upload.listen_url_no_download),
                 "type": "Link",
                 "mediaType": "audio/mp3",
             },
@@ -1105,7 +1105,7 @@ def test_channel_upload_serializer(factories):
             {
                 "type": "Link",
                 "mimeType": upload.mimetype,
-                "href": utils.full_url(upload.listen_url),
+                "href": utils.full_url(upload.listen_url_no_download),
             },
             {
                 "type": "Link",

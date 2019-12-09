@@ -1159,7 +1159,7 @@ class UploadSerializer(jsonld.JsonLdSerializer):
             "duration": instance.duration,
             "url": [
                 {
-                    "href": utils.full_url(instance.listen_url),
+                    "href": utils.full_url(instance.listen_url_no_download),
                     "type": "Link",
                     "mediaType": instance.mimetype,
                 },
@@ -1235,7 +1235,7 @@ class ChannelUploadSerializer(serializers.Serializer):
                 {
                     "type": "Link",
                     "mimeType": upload.mimetype,
-                    "href": utils.full_url(upload.listen_url),
+                    "href": utils.full_url(upload.listen_url_no_download),
                 },
                 {
                     "type": "Link",
