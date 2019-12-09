@@ -1157,11 +1157,18 @@ class UploadSerializer(jsonld.JsonLdSerializer):
             "bitrate": instance.bitrate,
             "size": instance.size,
             "duration": instance.duration,
-            "url": {
-                "href": utils.full_url(instance.listen_url),
-                "type": "Link",
-                "mediaType": instance.mimetype,
-            },
+            "url": [
+                {
+                    "href": utils.full_url(instance.listen_url),
+                    "type": "Link",
+                    "mediaType": instance.mimetype,
+                },
+                {
+                    "type": "Link",
+                    "mediaType": "text/html",
+                    "href": utils.full_url(instance.track.get_absolute_url()),
+                },
+            ],
             "track": TrackSerializer(track, context={"include_ap_context": False}).data,
         }
         if instance.modification_date:

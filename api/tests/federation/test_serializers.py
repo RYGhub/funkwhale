@@ -944,11 +944,18 @@ def test_activity_pub_audio_serializer_to_ap(factories):
         "duration": upload.duration,
         "bitrate": upload.bitrate,
         "size": upload.size,
-        "url": {
-            "href": utils.full_url(upload.listen_url),
-            "type": "Link",
-            "mediaType": "audio/mp3",
-        },
+        "url": [
+            {
+                "href": utils.full_url(upload.listen_url),
+                "type": "Link",
+                "mediaType": "audio/mp3",
+            },
+            {
+                "type": "Link",
+                "mediaType": "text/html",
+                "href": utils.full_url(upload.track.get_absolute_url()),
+            },
+        ],
         "library": upload.library.fid,
         "track": serializers.TrackSerializer(
             upload.track, context={"include_ap_context": False}
