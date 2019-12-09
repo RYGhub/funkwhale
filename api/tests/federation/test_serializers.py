@@ -5,6 +5,7 @@ import uuid
 from django.core.paginator import Paginator
 from django.utils import timezone
 
+from funkwhale_api.federation import contexts
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import jsonld
 from funkwhale_api.federation import models
@@ -932,7 +933,11 @@ def test_activity_pub_upload_serializer_validtes_library_actor(factories, mocker
 
 def test_activity_pub_audio_serializer_to_ap(factories):
     upload = factories["music.Upload"](
-        mimetype="audio/mp3", bitrate=42, duration=43, size=44
+        mimetype="audio/mp3",
+        bitrate=42,
+        duration=43,
+        size=44,
+        library__privacy_level="everyone",
     )
     expected = {
         "@context": jsonld.get_default_context(),
@@ -944,6 +949,8 @@ def test_activity_pub_audio_serializer_to_ap(factories):
         "duration": upload.duration,
         "bitrate": upload.bitrate,
         "size": upload.size,
+        "to": contexts.AS.Public,
+        "attributedTo": upload.library.actor.fid,
         "url": [
             {
                 "href": utils.full_url(upload.listen_url),

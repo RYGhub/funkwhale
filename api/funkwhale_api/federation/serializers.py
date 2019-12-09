@@ -1170,6 +1170,10 @@ class UploadSerializer(jsonld.JsonLdSerializer):
                 },
             ],
             "track": TrackSerializer(track, context={"include_ap_context": False}).data,
+            "to": contexts.AS.Public
+            if instance.library.privacy_level == "everyone"
+            else "",
+            "attributedTo": instance.library.actor.fid,
         }
         if instance.modification_date:
             d["updated"] = instance.modification_date.isoformat()
