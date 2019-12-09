@@ -180,8 +180,8 @@ class Actor(models.Model):
 
     fid = models.URLField(unique=True, max_length=500, db_index=True)
     url = models.URLField(max_length=500, null=True, blank=True)
-    outbox_url = models.URLField(max_length=500)
-    inbox_url = models.URLField(max_length=500)
+    outbox_url = models.URLField(max_length=500, null=True, blank=True)
+    inbox_url = models.URLField(max_length=500, null=True, blank=True)
     following_url = models.URLField(max_length=500, null=True, blank=True)
     followers_url = models.URLField(max_length=500, null=True, blank=True)
     shared_inbox_url = models.URLField(max_length=500, null=True, blank=True)

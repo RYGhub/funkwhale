@@ -4,6 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models import Q
 
+from funkwhale_api.common import preferences
 from funkwhale_api.common import utils
 from funkwhale_api.playlists import models as playlists_models
 
@@ -65,8 +66,9 @@ def library_track(request, pk):
                 "content": obj.album.attachment_cover.download_url_medium_square_crop,
             }
         )
-
-    if obj.uploads.playable_by(None).exists():
+    playable_uploads = obj.uploads.playable_by(None).order_by("id")
+    upload = playable_uploads.first()
+    if upload:
         metas.append(
             {
                 "tag": "meta",
@@ -74,7 +76,15 @@ def library_track(request, pk):
                 "content": utils.join_url(settings.FUNKWHALE_URL, obj.listen_url),
             }
         )
-
+        if preferences.get("federation__enabled"):
+            metas.append(
+                {
+                    "tag": "link",
+                    "rel": "alternate",
+                    "type": "application/activity+json",
+                    "href": upload.fid,
+                }
+            )
         metas.append(
             {
                 "tag": "link",
@@ -133,6 +143,15 @@ def library_album(request, pk):
             }
         )
 
+    if preferences.get("federation__enabled"):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/activity+json",
+                "href": obj.fid,
+            }
+        )
     if models.Upload.objects.filter(track__album=obj).playable_by(None).exists():
         metas.append(
             {
@@ -176,6 +195,16 @@ def library_artist(request, pk):
                 "tag": "meta",
                 "property": "og:image",
                 "content": latest_album.attachment_cover.download_url_medium_square_crop,
+            }
+        )
+
+    if preferences.get("federation__enabled"):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/activity+json",
+                "href": obj.fid,
             }
         )
 

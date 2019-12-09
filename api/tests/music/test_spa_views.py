@@ -7,7 +7,8 @@ from funkwhale_api.music import serializers
 
 
 def test_library_track(spa_html, no_api_auth, client, factories, settings):
-    track = factories["music.Upload"](playable=True, track__disc_number=1).track
+    upload = factories["music.Upload"](playable=True, track__disc_number=1)
+    track = upload.track
     url = "/library/tracks/{}".format(track.pk)
 
     response = client.get(url)
@@ -55,6 +56,12 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
             "tag": "meta",
             "property": "og:audio",
             "content": utils.join_url(settings.FUNKWHALE_URL, track.listen_url),
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": upload.fid,
         },
         {
             "tag": "link",
@@ -119,6 +126,12 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "link",
             "rel": "alternate",
+            "type": "application/activity+json",
+            "href": album.fid,
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
             "type": "application/json+oembed",
             "href": (
                 utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
@@ -163,6 +176,12 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
             "tag": "meta",
             "property": "og:image",
             "content": album.attachment_cover.download_url_medium_square_crop,
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": artist.fid,
         },
         {
             "tag": "link",

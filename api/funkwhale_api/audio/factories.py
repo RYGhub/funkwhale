@@ -18,6 +18,7 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
     library = factory.SubFactory(
         federation_factories.MusicLibraryFactory,
         actor=factory.SelfAttribute("..attributed_to"),
+        privacy_level="everyone",
     )
     actor = factory.LazyAttribute(set_actor)
     artist = factory.SubFactory(music_factories.ArtistFactory)
@@ -27,6 +28,8 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
     class Params:
         local = factory.Trait(
-            attributed_to__fid=factory.Faker("federation_url", local=True),
+            attributed_to=factory.SubFactory(
+                federation_factories.ActorFactory, local=True
+            ),
             artist__local=True,
         )

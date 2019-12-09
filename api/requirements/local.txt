@@ -9,6 +9,7 @@ django-debug-toolbar>=1.11,<1.12
 
 # improved REPL
 ipdb==0.11
+prompt_toolkit<3
 black
 profiling
 

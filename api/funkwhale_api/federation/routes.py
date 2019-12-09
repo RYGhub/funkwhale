@@ -131,21 +131,28 @@ def outbox_follow(context):
 @outbox.register({"type": "Create", "object.type": "Audio"})
 def outbox_create_audio(context):
     upload = context["upload"]
+    channel = upload.library.get_channel()
+    upload_serializer = (
+        serializers.ChannelUploadSerializer if channel else serializers.UploadSerializer
+    )
+    followers_target = channel.actor if channel else upload.library
+    actor = channel.actor if channel else upload.library.actor
+
     serializer = serializers.ActivitySerializer(
         {
             "type": "Create",
-            "actor": upload.library.actor.fid,
-            "object": serializers.UploadSerializer(upload).data,
+            "actor": actor.fid,
+            "object": upload_serializer(upload).data,
         }
     )
     yield {
         "type": "Create",
-        "actor": upload.library.actor,
+        "actor": actor,
         "payload": with_recipients(
-            serializer.data, to=[{"type": "followers", "target": upload.library}]
+            serializer.data, to=[{"type": "followers", "target": followers_target}]
         ),
         "object": upload,
-        "target": upload.library,
+        "target": None if channel else upload.library,
     }
 
 
@@ -258,6 +265,9 @@ def inbox_delete_audio(payload, context):
 def outbox_delete_audio(context):
     uploads = context["uploads"]
     library = uploads[0].library
+    channel = library.get_channel()
+    followers_target = channel.actor if channel else library
+    actor = channel.actor if channel else library.actor
     serializer = serializers.ActivitySerializer(
         {
             "type": "Delete",
@@ -266,9 +276,9 @@ def outbox_delete_audio(context):
     )
     yield {
         "type": "Delete",
-        "actor": library.actor,
+        "actor": actor,
         "payload": with_recipients(
-            serializer.data, to=[{"type": "followers", "target": library}]
+            serializer.data, to=[{"type": "followers", "target": followers_target}]
         ),
     }
 

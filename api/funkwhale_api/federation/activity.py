@@ -118,7 +118,7 @@ def should_reject(fid, actor_id=None, payload={}):
 
 
 @transaction.atomic
-def receive(activity, on_behalf_of):
+def receive(activity, on_behalf_of, inbox_actor=None):
     from . import models
     from . import serializers
     from . import tasks
@@ -131,7 +131,12 @@ def receive(activity, on_behalf_of):
     # we ensure the activity has the bare minimum structure before storing
     # it in our database
     serializer = serializers.BaseActivitySerializer(
-        data=activity, context={"actor": on_behalf_of, "local_recipients": True}
+        data=activity,
+        context={
+            "actor": on_behalf_of,
+            "local_recipients": True,
+            "recipients": [inbox_actor] if inbox_actor else [],
+        },
     )
     serializer.is_valid(raise_exception=True)
 
@@ -161,14 +166,19 @@ def receive(activity, on_behalf_of):
 
     local_to_recipients = get_actors_from_audience(activity.get("to", []))
     local_to_recipients = local_to_recipients.exclude(user=None)
+    local_to_recipients = local_to_recipients.values_list("pk", flat=True)
+    local_to_recipients = list(local_to_recipients)
+    if inbox_actor:
+        local_to_recipients.append(inbox_actor.pk)
 
     local_cc_recipients = get_actors_from_audience(activity.get("cc", []))
     local_cc_recipients = local_cc_recipients.exclude(user=None)
+    local_cc_recipients = local_cc_recipients.values_list("pk", flat=True)
 
     inbox_items = []
     for recipients, type in [(local_to_recipients, "to"), (local_cc_recipients, "cc")]:
 
-        for r in recipients.values_list("pk", flat=True):
+        for r in recipients:
             inbox_items.append(models.InboxItem(actor_id=r, type=type, activity=copy))
 
     models.InboxItem.objects.bulk_create(inbox_items)

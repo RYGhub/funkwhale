@@ -55,17 +55,56 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
 
     @action(methods=["get", "post"], detail=True)
     def inbox(self, request, *args, **kwargs):
+        inbox_actor = self.get_object()
         if request.method.lower() == "post" and request.actor is None:
             raise exceptions.AuthenticationFailed(
                 "You need a valid signature to send an activity"
             )
         if request.method.lower() == "post":
-            activity.receive(activity=request.data, on_behalf_of=request.actor)
+            activity.receive(
+                activity=request.data,
+                on_behalf_of=request.actor,
+                inbox_actor=inbox_actor,
+            )
         return response.Response({}, status=200)
 
     @action(methods=["get", "post"], detail=True)
     def outbox(self, request, *args, **kwargs):
+        actor = self.get_object()
+        channel = actor.channel
+        if channel:
+            return self.get_channel_outbox_response(request, channel)
         return response.Response({}, status=200)
+
+    def get_channel_outbox_response(self, request, channel):
+        conf = {
+            "id": channel.actor.outbox_url,
+            "actor": channel.actor,
+            "items": channel.library.uploads.for_federation()
+            .order_by("-creation_date")
+            .prefetch_related("library__channel__actor", "track__artist"),
+            "item_serializer": serializers.ChannelCreateUploadSerializer,
+        }
+        page = request.GET.get("page")
+        if page is None:
+            serializer = serializers.ChannelOutboxSerializer(channel)
+            data = serializer.data
+        else:
+            try:
+                page_number = int(page)
+            except Exception:
+                return response.Response({"page": ["Invalid page number"]}, status=400)
+            conf["page_size"] = preferences.get("federation__collection_page_size")
+            p = paginator.Paginator(conf["items"], conf["page_size"])
+            try:
+                page = p.page(page_number)
+                conf["page"] = page
+                serializer = serializers.CollectionPageSerializer(conf)
+                data = serializer.data
+            except paginator.EmptyPage:
+                return response.Response(status=404)
+
+        return response.Response(data)
 
     @action(methods=["get"], detail=True)
     def followers(self, request, *args, **kwargs):
@@ -250,6 +289,11 @@ class MusicUploadViewSet(
         queryset = super().get_queryset()
         actor = music_utils.get_actor_from_request(self.request)
         return queryset.playable_by(actor)
+
+    def get_serializer(self, obj):
+        if obj.library.get_channel():
+            return serializers.ChannelUploadSerializer(obj)
+        return super().get_serializer(obj)
 
 
 class MusicArtistViewSet(

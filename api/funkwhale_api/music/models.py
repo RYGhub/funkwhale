@@ -634,7 +634,10 @@ class UploadQuerySet(common_models.NullsLastQuerySet):
         return self.exclude(library__in=libraries, import_status="finished")
 
     def local(self, include=True):
-        return self.exclude(library__actor__user__isnull=include)
+        query = models.Q(library__actor__domain_id=settings.FEDERATION_HOSTNAME)
+        if not include:
+            query = ~query
+        return self.filter(query)
 
     def for_federation(self):
         return self.filter(import_status="finished", mimetype__startswith="audio/")
@@ -903,6 +906,14 @@ class Upload(models.Model):
         except NotImplementedError:
             # external storage
             return self.audio_file.name
+
+    def get_all_tagged_items(self):
+        track_tags = self.track.tagged_items.all()
+        album_tags = self.track.album.tagged_items.all()
+        artist_tags = self.track.artist.tagged_items.all()
+
+        items = (track_tags | album_tags | artist_tags).order_by("tag__name")
+        return items
 
 
 MIMETYPE_CHOICES = [(mt, ext) for ext, mt in utils.AUDIO_EXTENSIONS_AND_MIMETYPE]

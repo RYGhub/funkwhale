@@ -326,7 +326,7 @@ def test_library_detail(factories, superuser_api_client):
 
 
 def test_library_update(factories, superuser_api_client):
-    library = factories["music.Library"](privacy_level="public")
+    library = factories["music.Library"](privacy_level="everyone")
     url = reverse(
         "api:v1:manage:library:libraries-detail", kwargs={"uuid": library.uuid}
     )
