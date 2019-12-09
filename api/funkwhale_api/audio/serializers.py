@@ -37,7 +37,7 @@ class ChannelCreateSerializer(serializers.Serializer):
 
         channel.library = music_models.Library.objects.create(
             name=channel.actor.preferred_username,
-            privacy_level="public",
+            privacy_level="everyone",
             actor=validated_data["attributed_to"],
         )
         channel.save()

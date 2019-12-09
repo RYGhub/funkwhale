@@ -85,3 +85,29 @@ def test_manage_upload_action_read(factories):
     s.handle_read(ii.__class__.objects.all())
 
     assert ii.__class__.objects.filter(is_read=False).count() == 0
+
+
+@pytest.mark.parametrize(
+    "factory_name, factory_kwargs, expected",
+    [
+        (
+            "federation.Actor",
+            {"preferred_username": "hello", "domain__name": "world"},
+            {"full_username": "hello@world"},
+        ),
+        (
+            "music.Library",
+            {"name": "hello", "uuid": "ad1ee1f7-589c-4abe-b303-e4fe7a889260"},
+            {"uuid": "ad1ee1f7-589c-4abe-b303-e4fe7a889260", "name": "hello"},
+        ),
+        (
+            "federation.LibraryFollow",
+            {"approved": False, "uuid": "ad1ee1f7-589c-4abe-b303-e4fe7a889260"},
+            {"uuid": "ad1ee1f7-589c-4abe-b303-e4fe7a889260", "approved": False},
+        ),
+    ],
+)
+def test_serialize_generic_relation(factory_name, factory_kwargs, expected, factories):
+    obj = factories[factory_name](**factory_kwargs)
+    expected["type"] = factory_name
+    assert api_serializers.serialize_generic_relation({}, obj) == expected

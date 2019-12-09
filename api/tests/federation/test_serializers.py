@@ -1022,6 +1022,12 @@ def test_activity_serializer_validate_recipients_empty(db):
         s.validate_recipients({"cc": []})
 
 
+def test_activity_serializer_validate_recipients_context(db):
+    s = serializers.BaseActivitySerializer(context={"recipients": ["dummy"]})
+
+    assert s.validate_recipients({}) is None
+
+
 def test_track_serializer_update_license(factories):
     licenses.load(licenses.LICENSES)
 
@@ -1033,3 +1039,93 @@ def test_track_serializer_update_license(factories):
     obj.refresh_from_db()
 
     assert obj.license_id == "cc-by-2.0"
+
+
+def test_channel_actor_outbox_serializer(factories):
+    channel = factories["audio.Channel"]()
+    uploads = factories["music.Upload"].create_batch(
+        5,
+        track__artist=channel.artist,
+        library=channel.library,
+        import_status="finished",
+    )
+
+    expected = {
+        "@context": jsonld.get_default_context(),
+        "type": "OrderedCollection",
+        "id": channel.actor.outbox_url,
+        "actor": channel.actor.fid,
+        "attributedTo": channel.actor.fid,
+        "totalItems": len(uploads),
+        "first": channel.actor.outbox_url + "?page=1",
+        "last": channel.actor.outbox_url + "?page=1",
+        "current": channel.actor.outbox_url + "?page=1",
+    }
+
+    serializer = serializers.ChannelOutboxSerializer(channel)
+
+    assert serializer.data == expected
+
+
+def test_channel_upload_serializer(factories):
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](
+        playable=True,
+        library=channel.library,
+        import_status="finished",
+        track__set_tags=["Punk"],
+        track__album__set_tags=["Rock"],
+        track__artist__set_tags=["Indie"],
+    )
+
+    expected = {
+        "@context": jsonld.get_default_context(),
+        "type": "Audio",
+        "id": upload.fid,
+        "name": upload.track.full_name,
+        "summary": "#Indie #Punk #Rock",
+        "attributedTo": channel.actor.fid,
+        "published": upload.creation_date.isoformat(),
+        "to": "https://www.w3.org/ns/activitystreams#Public",
+        "url": [
+            {
+                "type": "Link",
+                "mimeType": upload.mimetype,
+                "href": utils.full_url(upload.listen_url),
+            },
+            {
+                "type": "Link",
+                "mimeType": "text/html",
+                "href": utils.full_url(upload.track.get_absolute_url()),
+            },
+        ],
+        "tag": [
+            {"type": "Hashtag", "name": "#Indie"},
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+
+    serializer = serializers.ChannelUploadSerializer(upload)
+
+    assert serializer.data == expected
+
+
+def test_channel_create_upload_serializer(factories):
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](
+        playable=True, library=channel.library, import_status="finished"
+    )
+
+    expected = {
+        "@context": jsonld.get_default_context(),
+        "type": "Create",
+        "actor": upload.library.channel.actor.fid,
+        "object": serializers.ChannelUploadSerializer(
+            upload, context={"include_ap_context": False}
+        ).data,
+    }
+
+    serializer = serializers.ChannelCreateUploadSerializer(upload)
+
+    assert serializer.data == expected

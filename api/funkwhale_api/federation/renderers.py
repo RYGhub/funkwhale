@@ -6,6 +6,7 @@ def get_ap_renderers():
         ("APActivity", "application/activity+json"),
         ("APLD", "application/ld+json"),
         ("APJSON", "application/json"),
+        ("HTML", "text/html"),
     ]
 
     return [

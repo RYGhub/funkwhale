@@ -34,7 +34,7 @@ def test_channel_create(logged_in_api_client):
     assert channel.attributed_to == actor
     assert channel.actor.summary == data["summary"]
     assert channel.actor.preferred_username == data["username"]
-    assert channel.library.privacy_level == "public"
+    assert channel.library.privacy_level == "everyone"
     assert channel.library.actor == actor
 
 

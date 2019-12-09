@@ -261,6 +261,26 @@ def test_outbox_create_audio(factories, mocker):
     assert activity["object"] == upload
 
 
+def test_outbox_create_audio_channel(factories, mocker):
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](library=channel.library)
+    activity = list(routes.outbox_create_audio({"upload": upload}))[0]
+    serializer = serializers.ActivitySerializer(
+        {
+            "type": "Create",
+            "object": serializers.ChannelUploadSerializer(upload).data,
+            "actor": channel.actor.fid,
+        }
+    )
+    expected = serializer.data
+    expected["to"] = [{"type": "followers", "target": upload.library.channel.actor}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == channel.actor
+    assert activity["target"] is None
+    assert activity["object"] == upload
+
+
 def test_inbox_create_audio(factories, mocker):
     activity = factories["federation.Activity"]()
     upload = factories["music.Upload"](bitrate=42, duration=55)
@@ -440,6 +460,20 @@ def test_outbox_delete_audio(factories):
 
     assert dict(activity["payload"]) == dict(expected)
     assert activity["actor"] == upload.library.actor
+
+
+def test_outbox_delete_audio_channel(factories):
+    channel = factories["audio.Channel"]()
+    upload = factories["music.Upload"](library=channel.library)
+    activity = list(routes.outbox_delete_audio({"uploads": [upload]}))[0]
+    expected = serializers.ActivitySerializer(
+        {"type": "Delete", "object": {"type": "Audio", "id": [upload.fid]}}
+    ).data
+
+    expected["to"] = [{"type": "followers", "target": channel.actor}]
+
+    assert dict(activity["payload"]) == dict(expected)
+    assert activity["actor"] == channel.actor
 
 
 def test_inbox_delete_follow_library(factories):

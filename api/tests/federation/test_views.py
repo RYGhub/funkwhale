@@ -103,7 +103,9 @@ def test_local_actor_inbox_post(factories, api_client, mocker, authenticated_act
 
     assert response.status_code == 200
     patched_receive.assert_called_once_with(
-        activity={"hello": "world"}, on_behalf_of=authenticated_actor
+        activity={"hello": "world"},
+        on_behalf_of=authenticated_actor,
+        inbox_actor=user.actor,
     )
 
 
@@ -191,6 +193,56 @@ def test_music_library_retrieve_page_public(factories, api_client):
 
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
     response = api_client.get(url, {"page": 1})
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_outbox_retrieve(factories, api_client):
+    channel = factories["audio.Channel"](actor__local=True)
+    expected = serializers.ChannelOutboxSerializer(channel).data
+
+    url = reverse(
+        "federation:actors-outbox",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_outbox_retrieve_page(factories, api_client):
+    channel = factories["audio.Channel"](actor__local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse(
+        "federation:actors-outbox",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+
+    expected = serializers.CollectionPageSerializer(
+        {
+            "id": channel.actor.outbox_url,
+            "item_serializer": serializers.ChannelCreateUploadSerializer,
+            "actor": channel.actor,
+            "page": Paginator([upload], 1).page(1),
+        }
+    ).data
+
+    response = api_client.get(url, {"page": 1})
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+def test_channel_upload_retrieve(factories, api_client):
+    channel = factories["audio.Channel"](local=True)
+    upload = factories["music.Upload"](library=channel.library, playable=True)
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid},)
+
+    expected = serializers.ChannelUploadSerializer(upload).data
+
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert response.data == expected

@@ -86,7 +86,12 @@ class LibraryFollowSerializer(serializers.ModelSerializer):
 
 
 def serialize_generic_relation(activity, obj):
-    data = {"uuid": obj.uuid, "type": obj._meta.label}
+    data = {"type": obj._meta.label}
+    if data["type"] == "federation.Actor":
+        data["full_username"] = obj.full_username
+    else:
+        data["uuid"] = obj.uuid
+
     if data["type"] == "music.Library":
         data["name"] = obj.name
     if data["type"] == "federation.LibraryFollow":

@@ -68,8 +68,8 @@ class PublicKeySerializer(jsonld.JsonLdSerializer):
 
 class ActorSerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
-    outbox = serializers.URLField(max_length=500)
-    inbox = serializers.URLField(max_length=500)
+    outbox = serializers.URLField(max_length=500, required=False)
+    inbox = serializers.URLField(max_length=500, required=False)
     type = serializers.ChoiceField(
         choices=[getattr(contexts.AS, c[0]) for c in models.TYPE_CHOICES]
     )
@@ -77,7 +77,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
     name = serializers.CharField(required=False, max_length=200)
     summary = serializers.CharField(max_length=None, required=False)
-    followers = serializers.URLField(max_length=500)
+    followers = serializers.URLField(max_length=500, required=False)
     following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = PublicKeySerializer(required=False)
     endpoints = EndpointsSerializer(required=False)
@@ -142,8 +142,8 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     def prepare_missing_fields(self):
         kwargs = {
             "fid": self.validated_data["id"],
-            "outbox_url": self.validated_data["outbox"],
-            "inbox_url": self.validated_data["inbox"],
+            "outbox_url": self.validated_data.get("outbox"),
+            "inbox_url": self.validated_data.get("inbox"),
             "following_url": self.validated_data.get("following"),
             "followers_url": self.validated_data.get("followers"),
             "summary": self.validated_data.get("summary"),
@@ -244,7 +244,7 @@ class BaseActivitySerializer(serializers.Serializer):
         to = payload.get("to", [])
         cc = payload.get("cc", [])
 
-        if not to and not cc:
+        if not to and not cc and not self.context.get("recipients"):
             raise serializers.ValidationError(
                 "We cannot handle an activity with no recipient"
             )
@@ -801,6 +801,10 @@ class TagSerializer(jsonld.JsonLdSerializer):
         return value
 
 
+def repr_tag(tag_name):
+    return {"type": "Hashtag", "name": "#{}".format(tag_name)}
+
+
 class MusicEntitySerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
     published = serializers.DateTimeField()
@@ -831,7 +835,7 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
     def get_tags_repr(self, instance):
         return [
-            {"type": "Hashtag", "name": "#{}".format(item.tag.name)}
+            repr_tag(item.tag.name)
             for item in sorted(instance.tagged_items.all(), key=lambda i: i.tag.name)
         ]
 
@@ -1182,3 +1186,71 @@ class NodeInfoLinkSerializer(serializers.Serializer):
 
 class NodeInfoSerializer(serializers.Serializer):
     links = serializers.ListField(child=NodeInfoLinkSerializer(), min_length=1)
+
+
+class ChannelOutboxSerializer(PaginatedCollectionSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.OrderedCollection])
+
+    class Meta:
+        jsonld_mapping = PAGINATED_COLLECTION_JSONLD_MAPPING
+
+    def to_representation(self, channel):
+        conf = {
+            "id": channel.actor.outbox_url,
+            "page_size": 100,
+            "attributedTo": channel.actor,
+            "actor": channel.actor,
+            "items": channel.library.uploads.for_federation()
+            .order_by("-creation_date")
+            .filter(track__artist=channel.artist),
+            "type": "OrderedCollection",
+        }
+        r = super().to_representation(conf)
+        return r
+
+
+class ChannelUploadSerializer(serializers.Serializer):
+    def to_representation(self, upload):
+        data = {
+            "id": upload.fid,
+            "type": "Audio",
+            "name": upload.track.full_name,
+            "attributedTo": upload.library.channel.actor.fid,
+            "published": upload.creation_date.isoformat(),
+            "to": contexts.AS.Public
+            if upload.library.privacy_level == "everyone"
+            else "",
+            "url": [
+                {
+                    "type": "Link",
+                    "mimeType": upload.mimetype,
+                    "href": utils.full_url(upload.listen_url),
+                },
+                {
+                    "type": "Link",
+                    "mimeType": "text/html",
+                    "href": utils.full_url(upload.track.get_absolute_url()),
+                },
+            ],
+        }
+        tags = [item.tag.name for item in upload.get_all_tagged_items()]
+        if tags:
+            data["tag"] = [repr_tag(name) for name in tags]
+            data["summary"] = " ".join(["#{}".format(name) for name in tags])
+
+        if self.context.get("include_ap_context", True):
+            data["@context"] = jsonld.get_default_context()
+
+        return data
+
+
+class ChannelCreateUploadSerializer(serializers.Serializer):
+    def to_representation(self, upload):
+        return {
+            "@context": jsonld.get_default_context(),
+            "type": "Create",
+            "actor": upload.library.channel.actor.fid,
+            "object": ChannelUploadSerializer(
+                upload, context={"include_ap_context": False}
+            ).data,
+        }

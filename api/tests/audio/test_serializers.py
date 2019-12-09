@@ -29,7 +29,7 @@ def test_channel_serializer_create(factories):
     assert channel.actor.summary == data["summary"]
     assert channel.actor.preferred_username == data["username"]
     assert channel.actor.name == data["name"]
-    assert channel.library.privacy_level == "public"
+    assert channel.library.privacy_level == "everyone"
     assert channel.library.actor == attributed_to
 
 

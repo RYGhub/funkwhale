@@ -52,9 +52,13 @@ class SignatureAuthentication(authentication.BaseAuthentication):
             actor = actors.get_actor(actor_url)
         except Exception as e:
             logger.info(
-                "Discarding HTTP request from blocked actor/domain %s", actor_url
+                "Discarding HTTP request from blocked actor/domain %s, %s",
+                actor_url,
+                str(e),
             )
-            raise rest_exceptions.AuthenticationFailed(str(e))
+            raise rest_exceptions.AuthenticationFailed(
+                "Cannot fetch remote actor to authenticate signature"
+            )
 
         if not actor.public_key:
             raise rest_exceptions.AuthenticationFailed("No public key found")
