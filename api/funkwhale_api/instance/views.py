@@ -4,7 +4,6 @@ from dynamic_preferences.registries import global_preferences_registry
 from rest_framework import views
 from rest_framework.response import Response
 
-from funkwhale_api.common import preferences
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import nodeinfo
@@ -38,7 +37,5 @@ class NodeInfo(views.APIView):
     authentication_classes = []
 
     def get(self, request, *args, **kwargs):
-        if not preferences.get("instance__nodeinfo_enabled"):
-            return Response(status=404)
         data = nodeinfo.get()
         return Response(data, status=200, content_type=NODEINFO_2_CONTENT_TYPE)

@@ -143,8 +143,6 @@ class WellKnownViewSet(viewsets.GenericViewSet):
 
     @action(methods=["get"], detail=False)
     def nodeinfo(self, request, *args, **kwargs):
-        if not preferences.get("instance__nodeinfo_enabled"):
-            return HttpResponse(status=404)
         data = {
             "links": [
                 {
