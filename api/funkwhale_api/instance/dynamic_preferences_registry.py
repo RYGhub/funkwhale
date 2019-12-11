@@ -128,21 +128,6 @@ class RavenDSN(types.StringPreference):
 
 
 @global_preferences_registry.register
-class InstanceNodeinfoEnabled(types.BooleanPreference):
-    show_in_api = False
-    section = instance
-    name = "nodeinfo_enabled"
-    default = True
-    verbose_name = "Enable nodeinfo endpoint"
-    help_text = (
-        "This endpoint is needed for your about page to work. "
-        "It's also helpful for the various monitoring "
-        "tools that map and analyzize the fediverse, "
-        "but you can disable it completely if needed."
-    )
-
-
-@global_preferences_registry.register
 class InstanceNodeinfoPrivate(types.BooleanPreference):
     show_in_api = False
     section = instance

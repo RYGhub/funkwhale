@@ -12,14 +12,6 @@ def test_nodeinfo_endpoint(db, api_client, mocker):
     assert response.data == payload
 
 
-def test_nodeinfo_endpoint_disabled(db, api_client, preferences):
-    preferences["instance__nodeinfo_enabled"] = False
-    url = reverse("api:v1:instance:nodeinfo-2.0")
-    response = api_client.get(url)
-
-    assert response.status_code == 404
-
-
 def test_settings_only_list_public_settings(db, api_client, preferences):
     url = reverse("api:v1:instance:settings")
     response = api_client.get(url)

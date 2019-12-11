@@ -48,13 +48,6 @@ def test_wellknown_nodeinfo(db, preferences, api_client, settings):
     assert response.data == expected
 
 
-def test_wellknown_nodeinfo_disabled(db, preferences, api_client):
-    preferences["instance__nodeinfo_enabled"] = False
-    url = reverse("federation:well-known-nodeinfo")
-    response = api_client.get(url)
-    assert response.status_code == 404
-
-
 def test_local_actor_detail(factories, api_client):
     user = factories["users.User"](with_actor=True)
     url = reverse(

@@ -159,7 +159,6 @@ export default {
           label: statisticsLabel,
           id: "statistics",
           settings: [
-            "instance__nodeinfo_enabled",
             "instance__nodeinfo_stats_enabled",
             "instance__nodeinfo_private"
           ]
