@@ -589,7 +589,12 @@ CELERY_BEAT_SCHEDULE = {
     },
     "federation.refresh_nodeinfo_known_nodes": {
         "task": "federation.refresh_nodeinfo_known_nodes",
-        "schedule": crontab(minute="0", hour="*"),
+        "schedule": crontab(
+            **env.dict(
+                "SCHEDULE_FEDERATION_REFRESH_NODEINFO_KNOWN_NODES",
+                default={"minute": "0", "hour": "*"},
+            )
+        ),
         "options": {"expires": 60 * 60},
     },
 }
