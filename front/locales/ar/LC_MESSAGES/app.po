@@ -227,7 +227,7 @@ msgstr[5] "%{ count } ألبومات"
 
 #: front/src/components/favorites/List.vue:10
 msgctxt "Content/Favorites/Title"
-msgid "1 favorite"
+msgid "%{ count } favorite"
 msgid_plural "%{ count } favorites"
 msgstr[0] "%{ count } مفضّلة"
 msgstr[1] "مفضلة"

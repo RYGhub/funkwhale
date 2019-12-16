@@ -13,7 +13,7 @@
           :translate-n="$store.state.favorites.count"
           :translate-params="{count: results.count}"
           translate-context="Content/Favorites/Title">
-          1 favorite
+	%{ count } favorite
         </translate>
       </h2>
       <radio-button v-if="hasFavorites" type="favorites"></radio-button>

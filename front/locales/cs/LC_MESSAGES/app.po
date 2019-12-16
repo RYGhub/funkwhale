@@ -186,9 +186,9 @@ msgstr[2] "%{ count } alb"
 
 #: front/src/components/favorites/List.vue:10
 msgctxt "Content/Favorites/Title"
-msgid "1 favorite"
+msgid "%{ count } favorite"
 msgid_plural "%{ count } favorites"
-msgstr[0] "1 oblíbená"
+msgstr[0] "%{ count } oblíbená"
 msgstr[1] "%{ count } oblíbené"
 msgstr[2] "%{ count } oblíbených"
 
