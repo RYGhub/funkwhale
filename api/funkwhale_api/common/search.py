@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.postgres.search import SearchQuery
 from django.db.models import Q
 
 
@@ -54,6 +55,17 @@ def get_query(query_string, search_fields):
         else:
             query = query & or_query
     return query
+
+
+def get_fts_query(query_string):
+    if not query_string.startswith('"') and not query_string.endswith('"'):
+        parts = query_string.split(" ")
+        parts = ["{}:*".format(p) for p in parts if p]
+        if not parts:
+            return Q(pk=None)
+
+        query_string = "&".join(parts)
+    return Q(body_text=SearchQuery(query_string, search_type="raw"))
 
 
 def filter_tokens(tokens, valid):
