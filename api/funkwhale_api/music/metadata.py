@@ -44,6 +44,8 @@ def get_id3_tag(f, k):
             return v
         except KeyError:
             break
+        except IndexError:
+            break
         except AttributeError:
             continue
 
