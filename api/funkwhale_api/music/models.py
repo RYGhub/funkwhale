@@ -11,8 +11,6 @@ import pydub
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField
-from django.contrib.postgres.search import SearchVectorField
-from django.contrib.postgres.indexes import GinIndex
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.core.serializers.json import DjangoJSONEncoder
@@ -21,6 +19,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+
 from versatileimagefield.fields import VersatileImageField
 
 from funkwhale_api import musicbrainz
@@ -57,14 +56,10 @@ class APIModelMixin(models.Model):
     api_includes = []
     creation_date = models.DateTimeField(default=timezone.now, db_index=True)
     import_hooks = []
-    body_text = SearchVectorField(blank=True)
 
     class Meta:
         abstract = True
         ordering = ["-creation_date"]
-        indexes = [
-            GinIndex(fields=["body_text"]),
-        ]
 
     @classmethod
     def get_or_create_from_api(cls, mbid):
@@ -529,9 +524,6 @@ class Track(APIModelMixin):
 
     class Meta:
         ordering = ["album", "disc_number", "position"]
-        indexes = [
-            GinIndex(fields=["body_text"]),
-        ]
 
     def __str__(self):
         return self.title

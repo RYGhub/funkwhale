@@ -928,4 +928,3 @@ MODERATION_EMAIL_NOTIFICATIONS_ENABLED = env.bool(
 # Delay in days after signup before we show the "support us" messages
 INSTANCE_SUPPORT_MESSAGE_DELAY = env.int("INSTANCE_SUPPORT_MESSAGE_DELAY", default=15)
 FUNKWHALE_SUPPORT_MESSAGE_DELAY = env.int("FUNKWHALE_SUPPORT_MESSAGE_DELAY", default=15)
-USE_FULL_TEXT_SEARCH = env.bool("USE_FULL_TEXT_SEARCH", default=False)

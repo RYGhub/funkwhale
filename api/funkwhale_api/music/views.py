@@ -629,10 +629,7 @@ class Search(views.APIView):
             "album__title__unaccent",
             "artist__name__unaccent",
         ]
-        if settings.USE_FULL_TEXT_SEARCH:
-            query_obj = utils.get_fts_query(query)
-        else:
-            query_obj = utils.get_query(query, search_fields)
+        query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Track.objects.all()
             .filter(query_obj)
@@ -642,10 +639,7 @@ class Search(views.APIView):
 
     def get_albums(self, query):
         search_fields = ["mbid", "title__unaccent", "artist__name__unaccent"]
-        if settings.USE_FULL_TEXT_SEARCH:
-            query_obj = utils.get_fts_query(query)
-        else:
-            query_obj = utils.get_query(query, search_fields)
+        query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Album.objects.all()
             .filter(query_obj)
@@ -655,10 +649,7 @@ class Search(views.APIView):
 
     def get_artists(self, query):
         search_fields = ["mbid", "name__unaccent"]
-        if settings.USE_FULL_TEXT_SEARCH:
-            query_obj = utils.get_fts_query(query)
-        else:
-            query_obj = utils.get_query(query, search_fields)
+        query_obj = utils.get_query(query, search_fields)
         qs = models.Artist.objects.all().filter(query_obj).with_albums()
         return common_utils.order_for_search(qs, "name")[: self.max_results]
 
