@@ -154,7 +154,7 @@ export default {
       let params = {
         page: this.page,
         page_size: this.paginateBy,
-        name__icontains: this.query,
+        q: this.query,
         ordering: this.getOrderingAsString(),
         playable: "true",
         tag: this.tags,
@@ -170,6 +170,9 @@ export default {
         }
       ).then(response => {
         self.result = response.data
+        self.isLoading = false
+      }, error => {
+        self.result = null
         self.isLoading = false
       })
     }, 500),

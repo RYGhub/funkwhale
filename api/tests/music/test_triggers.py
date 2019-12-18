@@ -16,7 +16,7 @@ def test_body_text_trigger_creation(factory_name, fields, factories):
     obj.refresh_from_db()
     cursor = connection.cursor()
     sql = """
-        SELECT to_tsvector('{indexed_text}')
+        SELECT to_tsvector('english_nostop', '{indexed_text}')
     """.format(
         indexed_text=" ".join([getattr(obj, f) for f in fields if getattr(obj, f)]),
     )
@@ -41,7 +41,7 @@ def test_body_text_trigger_updaten(factory_name, fields, factories, faker):
     obj.refresh_from_db()
     cursor = connection.cursor()
     sql = """
-        SELECT to_tsvector('{indexed_text}')
+        SELECT to_tsvector('english_nostop', '{indexed_text}')
     """.format(
         indexed_text=" ".join([getattr(obj, f) for f in fields if getattr(obj, f)]),
     )

@@ -95,7 +95,22 @@ def refetch_obj(obj, queryset):
     return obj
 
 
-class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class HandleInvalidSearch(object):
+    def list(self, *args, **kwargs):
+        try:
+            return super().list(*args, **kwargs)
+        except django.db.utils.ProgrammingError as e:
+            if "in tsquery:" in str(e):
+                return Response({"detail": "Invalid query"}, status=400)
+            else:
+                raise
+
+
+class ArtistViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    viewsets.ReadOnlyModelViewSet,
+):
     queryset = (
         models.Artist.objects.all()
         .prefetch_related("attributed_to")
@@ -149,7 +164,11 @@ class ArtistViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelV
     )
 
 
-class AlbumViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class AlbumViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    viewsets.ReadOnlyModelViewSet,
+):
     queryset = (
         models.Album.objects.all()
         .order_by("-creation_date")
@@ -254,7 +273,11 @@ class LibraryViewSet(
         return Response(serializer.data)
 
 
-class TrackViewSet(common_views.SkipFilterForGetObject, viewsets.ReadOnlyModelViewSet):
+class TrackViewSet(
+    HandleInvalidSearch,
+    common_views.SkipFilterForGetObject,
+    viewsets.ReadOnlyModelViewSet,
+):
     """
     A simple ViewSet for viewing and editing accounts.
     """

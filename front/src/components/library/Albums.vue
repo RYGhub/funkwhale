@@ -183,6 +183,9 @@ export default {
       ).then(response => {
         self.result = response.data
         self.isLoading = false
+      }, error => {
+        self.result = null
+        self.isLoading = false
       })
     }, 500),
     selectPage: function(page) {

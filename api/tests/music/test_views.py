@@ -1238,3 +1238,21 @@ def test_search_get_fts_advanced(settings, logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_search_get_fts_stop_words(settings, logged_in_api_client, factories):
+    settings.USE_FULL_TEXT_SEARCH = True
+    artist = factories["music.Artist"](name="she")
+    factories["music.Artist"]()
+
+    url = reverse("api:v1:search")
+    expected = {
+        "artists": [serializers.ArtistWithAlbumsSerializer(artist).data],
+        "albums": [],
+        "tracks": [],
+        "tags": [],
+    }
+    response = logged_in_api_client.get(url, {"q": "sh"})
+
+    assert response.status_code == 200
+    assert response.data == expected
