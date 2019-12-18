@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import jsonld
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import licenses, metadata, models, signals, tasks
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -1048,4 +1049,54 @@ def test_process_upload_skips_import_metadata_if_invalid(factories, mocker):
     )
     get_track_from_import_metadata.assert_called_once_with(
         expected_final_metadata, attributed_to=upload.library.actor
+    )
+
+
+def test_tag_albums_from_tracks(queryset_equal_queries, factories, mocker):
+    get_tags_from_foreign_key = mocker.patch(
+        "funkwhale_api.tags.tasks.get_tags_from_foreign_key"
+    )
+    add_tags_batch = mocker.patch("funkwhale_api.tags.tasks.add_tags_batch")
+
+    expected_queryset = (
+        federation_utils.local_qs(
+            models.Album.objects.filter(tagged_items__isnull=True)
+        )
+        .values_list("id", flat=True)
+        .order_by("id")
+    )
+    tasks.albums_set_tags_from_tracks(ids=[1, 2])
+    get_tags_from_foreign_key.assert_called_once_with(
+        ids=expected_queryset.filter(pk__in=[1, 2]),
+        foreign_key_model=models.Track,
+        foreign_key_attr="album",
+    )
+
+    add_tags_batch.assert_called_once_with(
+        get_tags_from_foreign_key.return_value, model=models.Album,
+    )
+
+
+def test_tag_artists_from_tracks(queryset_equal_queries, factories, mocker):
+    get_tags_from_foreign_key = mocker.patch(
+        "funkwhale_api.tags.tasks.get_tags_from_foreign_key"
+    )
+    add_tags_batch = mocker.patch("funkwhale_api.tags.tasks.add_tags_batch")
+
+    expected_queryset = (
+        federation_utils.local_qs(
+            models.Artist.objects.filter(tagged_items__isnull=True)
+        )
+        .values_list("id", flat=True)
+        .order_by("id")
+    )
+    tasks.artists_set_tags_from_tracks(ids=[1, 2])
+    get_tags_from_foreign_key.assert_called_once_with(
+        ids=expected_queryset.filter(pk__in=[1, 2]),
+        foreign_key_model=models.Track,
+        foreign_key_attr="artist",
+    )
+
+    add_tags_batch.assert_called_once_with(
+        get_tags_from_foreign_key.return_value, model=models.Artist,
     )

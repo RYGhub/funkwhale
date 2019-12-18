@@ -14,7 +14,9 @@ from requests.exceptions import RequestException
 from funkwhale_api.common import channels, preferences
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.tags import models as tags_models
+from funkwhale_api.tags import tasks as tags_tasks
 from funkwhale_api.taskapp import celery
 
 from . import licenses
@@ -666,6 +668,50 @@ def clean_transcoding_cache():
         .order_by("id")
     )
     return candidates.delete()
+
+
+@celery.app.task(name="music.albums_set_tags_from_tracks")
+@transaction.atomic
+def albums_set_tags_from_tracks(ids=None, dry_run=False):
+    qs = models.Album.objects.filter(tagged_items__isnull=True).order_by("id")
+    qs = federation_utils.local_qs(qs)
+    qs = qs.values_list("id", flat=True)
+    if ids is not None:
+        qs = qs.filter(pk__in=ids)
+    data = tags_tasks.get_tags_from_foreign_key(
+        ids=qs, foreign_key_model=models.Track, foreign_key_attr="album",
+    )
+    logger.info("Found automatic tags for %s albums…", len(data))
+    if dry_run:
+        logger.info("Running in dry-run mode, not commiting")
+        return
+
+    tags_tasks.add_tags_batch(
+        data, model=models.Album,
+    )
+    return data
+
+
+@celery.app.task(name="music.artists_set_tags_from_tracks")
+@transaction.atomic
+def artists_set_tags_from_tracks(ids=None, dry_run=False):
+    qs = models.Artist.objects.filter(tagged_items__isnull=True).order_by("id")
+    qs = federation_utils.local_qs(qs)
+    qs = qs.values_list("id", flat=True)
+    if ids is not None:
+        qs = qs.filter(pk__in=ids)
+    data = tags_tasks.get_tags_from_foreign_key(
+        ids=qs, foreign_key_model=models.Track, foreign_key_attr="artist",
+    )
+    logger.info("Found automatic tags for %s artists…", len(data))
+    if dry_run:
+        logger.info("Running in dry-run mode, not commiting")
+        return
+
+    tags_tasks.add_tags_batch(
+        data, model=models.Artist,
+    )
+    return data
 
 
 def get_prunable_tracks(

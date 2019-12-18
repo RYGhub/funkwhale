@@ -118,6 +118,15 @@ def get_domain_query_from_url(domain, url_field="fid"):
     return query
 
 
+def local_qs(queryset, url_field="fid", include=True):
+    query = get_domain_query_from_url(
+        domain=settings.FEDERATION_HOSTNAME, url_field=url_field
+    )
+    if not include:
+        query = ~query
+    return queryset.filter(query)
+
+
 def is_local(url):
     if not url:
         return True
