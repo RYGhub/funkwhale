@@ -6,6 +6,20 @@ Next release notes
     Those release notes refer to the current development branch and are reset
     after each release.
 
+Improved search performance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Our search engine went through a full rewrite to make it faster. This new engine is enabled
+by default when using the search bar, or when searching for artists, albums and tracks. It leverages
+PostgreSQL full-text search capabilities.
+
+During our tests, we observed huge performance improvements after the switch, by an order of
+magnitude. This should be especially perceptible on pods with large databases, more modest hardware
+or hard drives.
+
+We plan to remove the old engine in an upcoming release. In the meantime, if anything goes wrong,
+you can switch back by setting ``USE_FULL_TEXT_SEARCH=false`` in your ``.env`` file.
+
 User management through the server CLI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

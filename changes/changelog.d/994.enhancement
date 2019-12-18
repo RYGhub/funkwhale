@@ -1,0 +1,1 @@
+Replaced our slow research logic by PostgreSQL full-text search (#994)

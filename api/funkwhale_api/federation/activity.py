@@ -511,13 +511,6 @@ def prepare_deliveries_and_inbox_items(recipient_list, type, allowed_domains=Non
     return inbox_items, deliveries, urls
 
 
-def join_queries_or(left, right):
-    if left:
-        return left | right
-    else:
-        return right
-
-
 def get_actors_from_audience(urls):
     """
     Given a list of urls such as [
@@ -539,22 +532,24 @@ def get_actors_from_audience(urls):
         if url == PUBLIC_ADDRESS:
             continue
         queries["actors"].append(url)
-        queries["followed"] = join_queries_or(
+        queries["followed"] = funkwhale_utils.join_queries_or(
             queries["followed"], Q(target__followers_url=url)
         )
     final_query = None
     if queries["actors"]:
-        final_query = join_queries_or(final_query, Q(fid__in=queries["actors"]))
+        final_query = funkwhale_utils.join_queries_or(
+            final_query, Q(fid__in=queries["actors"])
+        )
     if queries["followed"]:
         actor_follows = models.Follow.objects.filter(queries["followed"], approved=True)
-        final_query = join_queries_or(
+        final_query = funkwhale_utils.join_queries_or(
             final_query, Q(pk__in=actor_follows.values_list("actor", flat=True))
         )
 
         library_follows = models.LibraryFollow.objects.filter(
             queries["followed"], approved=True
         )
-        final_query = join_queries_or(
+        final_query = funkwhale_utils.join_queries_or(
             final_query, Q(pk__in=library_follows.values_list("actor", flat=True))
         )
     if not final_query:

@@ -23,7 +23,7 @@ TAG_FILTER = common_filters.MultipleQueryFilter(method=filter_tags)
 class ArtistFilter(
     audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
 ):
-    q = fields.SearchFilter(search_fields=["name"])
+    q = fields.SearchFilter(search_fields=["name"], fts_search_fields=["body_text"])
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
     scope = common_filters.ActorScopeFilter(
@@ -49,7 +49,10 @@ class ArtistFilter(
 class TrackFilter(
     audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
 ):
-    q = fields.SearchFilter(search_fields=["title", "album__title", "artist__name"])
+    q = fields.SearchFilter(
+        search_fields=["title", "album__title", "artist__name"],
+        fts_search_fields=["body_text", "artist__body_text", "album__body_text"],
+    )
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     tag = TAG_FILTER
     id = common_filters.MultipleQueryFilter(coerce=int)
@@ -127,7 +130,10 @@ class AlbumFilter(
     audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
 ):
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
-    q = fields.SearchFilter(search_fields=["title", "artist__name"])
+    q = fields.SearchFilter(
+        search_fields=["title", "artist__name"],
+        fts_search_fields=["body_text", "artist__body_text"],
+    )
     tag = TAG_FILTER
     scope = common_filters.ActorScopeFilter(
         actor_field="tracks__uploads__library__actor", distinct=True

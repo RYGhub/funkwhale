@@ -1,6 +1,9 @@
 import re
 
+from django.contrib.postgres.search import SearchQuery
 from django.db.models import Q
+
+from . import utils
 
 
 QUERY_REGEX = re.compile(r'(((?P<key>\w+):)?(?P<value>"[^"]+"|[\S]+))')
@@ -53,6 +56,41 @@ def get_query(query_string, search_fields):
             query = or_query
         else:
             query = query & or_query
+    return query
+
+
+def get_fts_query(query_string, fts_fields=["body_text"], model=None):
+    if query_string.startswith('"') and query_string.endswith('"'):
+        # we pass the query directly to the FTS engine
+        query_string = query_string[1:-1]
+    else:
+        parts = query_string.replace(":", "").split(" ")
+        parts = ["{}:*".format(p) for p in parts if p]
+        if not parts:
+            return Q(pk=None)
+
+        query_string = "&".join(parts)
+
+    if not fts_fields or not query_string.strip():
+        return Q(pk=None)
+    query = None
+    for field in fts_fields:
+        if "__" in field and model:
+            # When we have a nested lookup, we switch to a subquery for enhanced performance
+            fk_field_name, lookup = (
+                field.split("__")[0],
+                "__".join(field.split("__")[1:]),
+            )
+            fk_field = model._meta.get_field(fk_field_name)
+            related_model = fk_field.related_model
+            subquery = related_model.objects.filter(
+                **{lookup: SearchQuery(query_string, search_type="raw")}
+            ).values_list("pk", flat=True)
+            new_query = Q(**{"{}__in".format(fk_field_name): list(subquery)})
+        else:
+            new_query = Q(**{field: SearchQuery(query_string, search_type="raw")})
+        query = utils.join_queries_or(query, new_query)
+
     return query
 
 
