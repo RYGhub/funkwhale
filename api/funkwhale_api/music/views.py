@@ -6,6 +6,7 @@ import urllib.parse
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Prefetch, Sum, F, Q
+import django.db.utils
 from django.utils import timezone
 
 from rest_framework import mixins
@@ -606,20 +607,30 @@ class Search(views.APIView):
     anonymous_policy = "setting"
 
     def get(self, request, *args, **kwargs):
-        query = request.GET["query"]
-        results = {
-            # 'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
-            "artists": serializers.ArtistWithAlbumsSerializer(
-                self.get_artists(query), many=True
-            ).data,
-            "tracks": serializers.TrackSerializer(
-                self.get_tracks(query), many=True
-            ).data,
-            "albums": serializers.AlbumSerializer(
-                self.get_albums(query), many=True
-            ).data,
-            "tags": TagSerializer(self.get_tags(query), many=True).data,
-        }
+        query = request.GET.get("query", request.GET.get("q", "")) or ""
+        query = query.strip()
+        if not query:
+            return Response({"detail": "empty query"}, status=400)
+        try:
+            results = {
+                # 'tags': serializers.TagSerializer(self.get_tags(query), many=True).data,
+                "artists": serializers.ArtistWithAlbumsSerializer(
+                    self.get_artists(query), many=True
+                ).data,
+                "tracks": serializers.TrackSerializer(
+                    self.get_tracks(query), many=True
+                ).data,
+                "albums": serializers.AlbumSerializer(
+                    self.get_albums(query), many=True
+                ).data,
+                "tags": TagSerializer(self.get_tags(query), many=True).data,
+            }
+        except django.db.utils.ProgrammingError as e:
+            if "in tsquery:" in str(e):
+                return Response({"detail": "Invalid query"}, status=400)
+            else:
+                raise
+
         return Response(results, status=200)
 
     def get_tracks(self, query):
@@ -629,28 +640,58 @@ class Search(views.APIView):
             "album__title__unaccent",
             "artist__name__unaccent",
         ]
-        query_obj = utils.get_query(query, search_fields)
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(
+                query,
+                fts_fields=["body_text", "album__body_text", "artist__body_text"],
+                model=models.Track,
+            )
+        else:
+            query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Track.objects.all()
             .filter(query_obj)
-            .prefetch_related("artist", "album__artist")
+            .prefetch_related(
+                "artist",
+                "attributed_to",
+                Prefetch(
+                    "album",
+                    queryset=models.Album.objects.select_related(
+                        "artist", "attachment_cover", "attributed_to"
+                    ),
+                ),
+            )
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_albums(self, query):
         search_fields = ["mbid", "title__unaccent", "artist__name__unaccent"]
-        query_obj = utils.get_query(query, search_fields)
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(
+                query, fts_fields=["body_text", "artist__body_text"], model=models.Album
+            )
+        else:
+            query_obj = utils.get_query(query, search_fields)
         qs = (
             models.Album.objects.all()
             .filter(query_obj)
-            .prefetch_related("tracks__artist", "artist", "attributed_to")
+            .select_related("artist", "attachment_cover", "attributed_to")
+            .prefetch_related("tracks__artist")
         )
         return common_utils.order_for_search(qs, "title")[: self.max_results]
 
     def get_artists(self, query):
         search_fields = ["mbid", "name__unaccent"]
-        query_obj = utils.get_query(query, search_fields)
-        qs = models.Artist.objects.all().filter(query_obj).with_albums()
+        if settings.USE_FULL_TEXT_SEARCH:
+            query_obj = utils.get_fts_query(query, model=models.Artist)
+        else:
+            query_obj = utils.get_query(query, search_fields)
+        qs = (
+            models.Artist.objects.all()
+            .filter(query_obj)
+            .with_albums()
+            .select_related("attributed_to")
+        )
         return common_utils.order_for_search(qs, "name")[: self.max_results]
 
     def get_tags(self, query):

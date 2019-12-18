@@ -234,3 +234,10 @@ def get_updated_fields(conf, data, obj):
             final_data[obj_field] = data_value
 
     return final_data
+
+
+def join_queries_or(left, right):
+    if left:
+        return left | right
+    else:
+        return right

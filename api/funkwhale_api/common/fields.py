@@ -1,5 +1,6 @@
 import django_filters
 from django import forms
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
@@ -33,12 +34,18 @@ def privacy_level_query(user, lookup_field="privacy_level", user_field="user"):
 class SearchFilter(django_filters.CharFilter):
     def __init__(self, *args, **kwargs):
         self.search_fields = kwargs.pop("search_fields")
+        self.fts_search_fields = kwargs.pop("fts_search_fields", [])
         super().__init__(*args, **kwargs)
 
     def filter(self, qs, value):
         if not value:
             return qs
-        query = search.get_query(value, self.search_fields)
+        if settings.USE_FULL_TEXT_SEARCH and self.fts_search_fields:
+            query = search.get_fts_query(
+                value, self.fts_search_fields, model=self.parent.Meta.model
+            )
+        else:
+            query = search.get_query(value, self.search_fields)
         return qs.filter(query)
 
 
