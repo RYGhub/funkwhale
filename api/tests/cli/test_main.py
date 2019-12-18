@@ -3,6 +3,7 @@ import pytest
 from click.testing import CliRunner
 
 from funkwhale_api.cli import main
+from funkwhale_api.cli import library
 from funkwhale_api.cli import users
 
 
@@ -101,6 +102,16 @@ from funkwhale_api.cli import users
                     },
                 )
             ],
+        ),
+        (
+            ("albums", "add-tags-from-tracks"),
+            tuple(),
+            [(library, "handler_add_tags_from_tracks", {"albums": True})],
+        ),
+        (
+            ("artists", "add-tags-from-tracks"),
+            tuple(),
+            [(library, "handler_add_tags_from_tracks", {"artists": True})],
         ),
     ],
 )

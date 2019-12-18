@@ -599,6 +599,20 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+if env.bool("ADD_ALBUM_TAGS_FROM_TRACKS", default=True):
+    CELERY_BEAT_SCHEDULE["music.albums_set_tags_from_tracks"] = {
+        "task": "music.albums_set_tags_from_tracks",
+        "schedule": crontab(minute="0", hour="4", day_of_week="4"),
+        "options": {"expires": 60 * 60 * 2},
+    }
+
+if env.bool("ADD_ARTIST_TAGS_FROM_TRACKS", default=True):
+    CELERY_BEAT_SCHEDULE["music.artists_set_tags_from_tracks"] = {
+        "task": "music.artists_set_tags_from_tracks",
+        "schedule": crontab(minute="0", hour="4", day_of_week="4"),
+        "options": {"expires": 60 * 60 * 2},
+    }
+
 NODEINFO_REFRESH_DELAY = env.int("NODEINFO_REFRESH_DELAY", default=3600 * 24)
 
 

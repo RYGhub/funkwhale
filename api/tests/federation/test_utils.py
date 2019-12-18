@@ -138,3 +138,37 @@ def test_retrieve_with_serializer(db, r_mock):
     result = utils.retrieve_ap_object(fid, actor=None, serializer_class=S)
 
     assert result == {"persisted": "object"}
+
+
+@pytest.mark.parametrize(
+    "factory_name, fids, kwargs, expected_indexes",
+    [
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://local.domain/"],
+            {},
+            [0, 1],
+        ),
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://notlocal.domain/"],
+            {},
+            [0],
+        ),
+        (
+            "music.Artist",
+            ["https://local.domain/test", "http://notlocal.domain/"],
+            {"include": False},
+            [1],
+        ),
+    ],
+)
+def test_local_qs(factory_name, fids, kwargs, expected_indexes, factories, settings):
+    settings.FEDERATION_HOSTNAME = "local.domain"
+    objs = [factories[factory_name](fid=fid) for fid in fids]
+
+    qs = objs[0].__class__.objects.all().order_by("id")
+    result = utils.local_qs(qs, **kwargs)
+
+    expected_objs = [obj for i, obj in enumerate(objs) if i in expected_indexes]
+    assert list(result) == expected_objs

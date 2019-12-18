@@ -168,3 +168,30 @@ database objects.
 
     Running this command with ``--no-dry-run`` is irreversible. Unless you have a backup,
     there will be no way to retrieve the deleted data.
+
+Adding tags from tracks
+-----------------------
+
+By default, genre tags found imported files are associated with the corresponding track.
+
+While you can always associate genre information with an artist or album through the web UI,
+it may be tedious to do so by hand for a large number of objects.
+
+We offer a command you can run after an import to do this for you. It will:
+
+1. Find all local artists or albums with no tags
+2. Get all the tags associated with the corresponding tracks
+3. Associate tags that are found on all tracks to the corresponding artist or album
+
+..note::
+
+    A periodic task also runs in the background every few days to perform the same process.
+
+Usage:
+
+.. code-block:: sh
+
+    # For albums
+    python manage.py fw albums add-tags-from-tracks --help
+    # For artists
+    python manage.py fw artists add-tags-from-tracks --help
