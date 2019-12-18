@@ -84,11 +84,21 @@ def get_fts_query(query_string, fts_fields=["body_text"], model=None):
             fk_field = model._meta.get_field(fk_field_name)
             related_model = fk_field.related_model
             subquery = related_model.objects.filter(
-                **{lookup: SearchQuery(query_string, search_type="raw")}
+                **{
+                    lookup: SearchQuery(
+                        query_string, search_type="raw", config="english_nostop"
+                    )
+                }
             ).values_list("pk", flat=True)
             new_query = Q(**{"{}__in".format(fk_field_name): list(subquery)})
         else:
-            new_query = Q(**{field: SearchQuery(query_string, search_type="raw")})
+            new_query = Q(
+                **{
+                    field: SearchQuery(
+                        query_string, search_type="raw", config="english_nostop"
+                    )
+                }
+            )
         query = utils.join_queries_or(query, new_query)
 
     return query
