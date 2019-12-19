@@ -187,7 +187,7 @@ Mobydick (Desktop)
 ^^^^^^^^^^^^^^^^^^
 
 - Price: free
-- Website: https://github.com/BaptisteGelez/mobydick
+- Website: https://github.com/AnaGelez/mobydick
 
 Mobydick is a free and open-source desktop application for linux (based on GTK+) to easily download
 tracks, albums and discography from a Funkwhale instance.
