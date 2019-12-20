@@ -36,7 +36,7 @@ services:
     # of CPUs. You can adjust this, by explicitly setting the --concurrency
     # flag:
     #   celery -A funkwhale_api.taskapp worker -l INFO --concurrency=4
-    command: celery -A funkwhale_api.taskapp worker -l INFO
+    command: celery -A funkwhale_api.taskapp worker -l INFO --concurrency=${CELERYD_CONCURRENCY-0}
     environment:
       - C_FORCE_ROOT=true
     volumes:

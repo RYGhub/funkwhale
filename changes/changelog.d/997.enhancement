@@ -1,0 +1,1 @@
+Added support for CELERYD_CONCURRENCY env var to control the number of worker processes (#997)
