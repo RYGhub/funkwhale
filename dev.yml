@@ -86,7 +86,7 @@ services:
       - postgres
       # - minio
       - redis
-    command: celery -A funkwhale_api.taskapp worker -l debug -B
+    command: celery -A funkwhale_api.taskapp worker -l debug -B --concurrency=${CELERYD_CONCURRENCY-0}
     environment:
       - "FUNKWHALE_HOSTNAME=${FUNKWHALE_HOSTNAME-localhost}"
       - "FUNKWHALE_HOSTNAME_SUFFIX=funkwhale.test"
