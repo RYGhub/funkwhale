@@ -361,7 +361,7 @@ export default {
           self.ended()
         },
         onunlock: function () {
-          if (self.$store.state.player.playing) {
+          if (self.$store.state.player.playing && self.sound) {
             self.soundId = self.sound.play(self.soundId)
           }
         },
@@ -581,13 +581,11 @@ export default {
         }
         this.currentSound = this.getSound(trackData)
         this.$store.commit('player/isLoadingAudio', true)
-        if (this.playing) {
-          this.soundId = this.currentSound.play()
-          this.$store.commit('player/errored', false)
-          this.$store.commit('player/playing', true)
-          this.$store.dispatch('player/updateProgress', 0)
-          this.observeProgress(true)
-        }
+        this.soundId = this.currentSound.play()
+        this.$store.commit('player/errored', false)
+        this.$store.commit('player/playing', true)
+        this.$store.dispatch('player/updateProgress', 0)
+        this.observeProgress(true)
       }
     },
     toggleMobilePlayer () {

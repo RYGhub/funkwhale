@@ -140,7 +140,6 @@ export default {
     currentIndex ({commit, state, rootState, dispatch}, index) {
       commit('ended', false)
       commit('player/currentTime', 0, {root: true})
-      commit('player/playing', true, {root: true})
       commit('currentIndex', index)
       if (state.tracks.length - index <= 2 && rootState.radios.running) {
         dispatch('radios/populateQueue', null, {root: true})
