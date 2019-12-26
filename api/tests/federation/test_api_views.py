@@ -179,3 +179,21 @@ def test_can_detail_fetch(logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_user_can_list_domains(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    allowed = factories["federation.Domain"]()
+    factories["moderation.InstancePolicy"](
+        actor=None, for_domain=True, block_all=True
+    ).target_domain
+    url = reverse("api:v1:federation:domains-list")
+    response = api_client.get(url)
+
+    expected = {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [api_serializers.DomainSerializer(allowed).data],
+    }
+    assert response.data == expected
