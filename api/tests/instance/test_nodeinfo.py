@@ -50,9 +50,6 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
             "banner": federation_utils.full_url(preferences["instance__banner"].url),
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
-                "federationNeedsApproval": preferences[
-                    "federation__music_needs_approval"
-                ],
                 "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
@@ -129,9 +126,6 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
             "banner": None,
             "library": {
                 "federationEnabled": preferences["federation__enabled"],
-                "federationNeedsApproval": preferences[
-                    "federation__music_needs_approval"
-                ],
                 "anonymousCanListen": not preferences[
                     "common__api_authentication_required"
                 ],
