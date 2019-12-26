@@ -438,5 +438,35 @@ input + .help {
     }
   }
 }
+.ui.cards.app-cards {
+  > .app-card {
+    display: inline-block;
+    width: 15em;
+    > .image {
+      background-size: cover !important;
+      background-position: center !important;
+      height: 15em;
+      width: 15em;
+      display: flex !important;
+      justify-content: flex-end !important;
+      align-items: flex-end !important;
+      padding: 0.5em;
+      .button {
+        margin: 0;
+      }
+    }
+    .extra {
+      border-top: 0 !important;
+    }
+    .content:not(.extra) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .floating.dropdown > .icon {
+      margin-right: 0;
+    }
+  }
+}
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

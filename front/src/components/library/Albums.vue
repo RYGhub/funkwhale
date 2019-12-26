@@ -51,10 +51,8 @@
         class="ui stackable three column doubling grid">
         <div
           v-if="result.results.length > 0"
-          class="ui cards">
+          class="ui app-cards cards">
           <album-card
-            :mode="'simple'"
-            v-masonry-tile
             v-for="album in result.results"
             :key="album.id"
             :album="album"></album-card>
