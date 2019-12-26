@@ -6,6 +6,13 @@ Next release notes
     Those release notes refer to the current development branch and are reset
     after each release.
 
+Redesigned navigation, player and queue
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This release includes a full redesign of our navigation, player and queue. Overall, it should provide
+a better, less confusing experience, especially on mobile devices. This redesign was suggested
+14 months ago, and took a while, but thanks to the involvement and feedback of many people, we got it done!
+
 Improved search performance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -2,11 +2,16 @@
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
 const PurgecssPlugin = require('purgecss-webpack-plugin')
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const glob = require('glob-all')
 const path = require('path')
 let plugins = [
   // do not include moment.js locales since it's quite heavy
   new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    include: ['audio', 'core', 'about']
+  }),
 ]
 if (process.env.BUNDLE_ANALYZE === '1') {
   plugins.push(new BundleAnalyzerPlugin())
@@ -40,7 +45,6 @@ module.exports = {
     }
   },
   chainWebpack: config => {
-    config.optimization.delete('splitChunks')
     config.plugins.delete('prefetch-embed')
     config.plugins.delete('prefetch-index')
   },

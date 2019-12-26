@@ -6,6 +6,7 @@ export default {
   state: {
     currentLanguage: 'en_US',
     selectedLanguage: false,
+    queueFocused: null,
     momentLocale: 'en',
     lastDate: new Date(),
     maxMessages: 100,
@@ -42,6 +43,26 @@ export default {
         ordering: "creation_date",
       },
       "library.playlists.browse": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.albums.me": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.artists.me": {
+        paginateBy: 30,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.radios.me": {
+        paginateBy: 12,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.playlists.me": {
         paginateBy: 25,
         orderingDirection: "-",
         ordering: "creation_date",
@@ -104,6 +125,10 @@ export default {
     computeLastDate: (state) => {
       state.lastDate = new Date()
     },
+    queueFocused: (state, value) => {
+      state.queueFocused = value
+    },
+
     theme: (state, value) => {
       state.theme = value
     },

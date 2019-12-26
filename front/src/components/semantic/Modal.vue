@@ -1,7 +1,7 @@
 <template>
   <div :class="['ui', {'active': show}, 'modal']">
     <i class="close icon"></i>
-    <slot>
+    <slot v-if="show">
 
     </slot>
   </div>

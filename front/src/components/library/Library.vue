@@ -1,22 +1,5 @@
 <template>
   <div class="main library pusher">
-    <nav class="ui secondary pointing menu" role="navigation" :aria-label="labels.secondaryMenu">
-      <router-link class="ui item" to="/library" exact>
-        <translate translate-context="*/Library/*/Verb">Browse</translate>
-      </router-link>
-      <router-link class="ui item" to="/library/albums" exact>
-        <translate translate-context="*/*/*">Albums</translate>
-      </router-link>
-      <router-link class="ui item" to="/library/artists" exact>
-        <translate translate-context="*/*/*/Noun">Artists</translate>
-      </router-link>
-      <router-link class="ui item" to="/library/radios" exact>
-        <translate translate-context="*/*/*">Radios</translate>
-      </router-link>
-      <router-link class="ui item" to="/library/playlists" exact>
-        <translate translate-context="*/*/*">Playlists</translate>
-      </router-link>
-    </nav>
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>

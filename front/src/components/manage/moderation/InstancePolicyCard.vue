@@ -61,7 +61,7 @@ export default {
   },
   created () {
     let self = this
-    import('showdown').then(module => {
+    import(/* webpackChunkName: "showdown" */ 'showdown').then(module => {
       self.markdown = new module.default.Converter({simplifiedAutoLink: true, openLinksInNewWindow: true})
     })
   }

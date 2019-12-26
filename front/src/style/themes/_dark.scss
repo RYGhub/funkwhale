@@ -31,6 +31,9 @@ $link-color: rgb(255, 144, 0);
       color: $text-color;
     }
   }
+  .main.with-background {
+    background-color: $background-color;
+  }
   .ui.link.list.list .active.item,
   .ui.link.list.list .active.item a:not(.ui) {
     color: inherit;
@@ -280,6 +283,17 @@ $link-color: rgb(255, 144, 0);
       background: $background-color;
       color: $text-color;
     }
+  }
+
+  .ui.fixed-header.segment {
+    background-color: $background-color;
+    box-shadow: inset 0px -1px 0px 0px rgba(34, 36, 38, 0.15);
+  }
+  .ui.fixed-footer.segment {
+    box-shadow: inset 0px 1px 0px 0px rgba(34, 36, 38, 0.15);
+  }
+  @include media("<desktop") {
+    background-color: $background-color;
   }
 }
 

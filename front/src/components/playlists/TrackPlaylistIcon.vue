@@ -1,6 +1,6 @@
 <template>
   <button
-    @click="$store.commit('playlists/chooseTrack', track)"
+    @click.stop="$store.commit('playlists/chooseTrack', track)"
     v-if="button"
     :class="['ui', 'icon', 'labeled', 'button']">
     <i class="list icon"></i>
@@ -8,7 +8,7 @@
   </button>
   <button
     v-else
-    @click="$store.commit('playlists/chooseTrack', track)"
+    @click.stop="$store.commit('playlists/chooseTrack', track)"
     :class="['ui', 'basic', 'circular', 'icon', 'really', 'button']"
     :aria-label="labels.addToPlaylist"
     :title="labels.addToPlaylist">

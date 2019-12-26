@@ -42,12 +42,11 @@
 </template>
 
 <script>
-import Modal from '@/components/semantic/Modal'
 
 export default {
   props: ['show'],
   components: {
-    Modal,
+    Modal:  () => import(/* webpackChunkName: "modal" */ "@/components/semantic/Modal"),
   },
   computed: {
     general () {
@@ -130,6 +129,10 @@ export default {
             {
               key: 'm',
               summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Toggle mute')
+            },
+            {
+              key: 'e',
+              summary: this.$pgettext('Popup/Keyboard shortcuts/Table.Label/Verb', 'Expand queue/player view')
             },
             {
               key: 'l',

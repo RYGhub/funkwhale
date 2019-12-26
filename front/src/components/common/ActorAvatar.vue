@@ -19,3 +19,10 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.ui.circular.avatar.label {
+  width: 28px;
+  height: 28px;
+  font-size: 1em !important;
+}
+</style>
