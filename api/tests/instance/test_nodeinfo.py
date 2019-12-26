@@ -1,5 +1,7 @@
 import pytest
 
+from django.urls import reverse
+
 import funkwhale_api
 from funkwhale_api.instance import nodeinfo
 from funkwhale_api.federation import actors
@@ -10,6 +12,7 @@ from funkwhale_api.music import utils as music_utils
 def test_nodeinfo_dump(preferences, mocker, avatar):
     preferences["instance__banner"] = avatar
     preferences["instance__nodeinfo_stats_enabled"] = True
+    preferences["common__api_authentication_required"] = False
     preferences["moderation__unauthenticated_report_types"] = [
         "takedown_request",
         "other",
@@ -91,6 +94,9 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
                 "instance__funkwhale_support_message_enabled"
             ],
             "instanceSupportMessage": preferences["instance__support_message"],
+            "knownNodesListUrl": federation_utils.full_url(
+                reverse("api:v1:federation:domains-list")
+            ),
         },
     }
     assert nodeinfo.get() == expected
@@ -159,6 +165,7 @@ def test_nodeinfo_dump_stats_disabled(preferences, mocker):
                 "instance__funkwhale_support_message_enabled"
             ],
             "instanceSupportMessage": preferences["instance__support_message"],
+            "knownNodesListUrl": None,
         },
     }
     assert nodeinfo.get() == expected

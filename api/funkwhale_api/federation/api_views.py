@@ -9,6 +9,8 @@ from rest_framework import permissions
 from rest_framework import response
 from rest_framework import viewsets
 
+from funkwhale_api.common import preferences
+from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.music import models as music_models
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
@@ -197,3 +199,22 @@ class FetchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = models.Fetch.objects.select_related("actor")
     serializer_class = api_serializers.FetchSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class DomainViewSet(
+    mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    queryset = models.Domain.objects.order_by("name").external()
+    permission_classes = [ConditionalAuthentication]
+    serializer_class = api_serializers.DomainSerializer
+    ordering_fields = ("creation_date", "name")
+    max_page_size = 100
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.exclude(
+            instance_policy__is_active=True, instance_policy__block_all=True
+        )
+        if preferences.get("moderation__allow_list_enabled"):
+            qs = qs.filter(allowed=True)
+        return qs

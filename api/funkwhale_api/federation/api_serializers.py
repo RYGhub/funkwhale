@@ -27,6 +27,10 @@ class LibraryScanSerializer(serializers.ModelSerializer):
         ]
 
 
+class DomainSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+
 class LibrarySerializer(serializers.ModelSerializer):
     actor = federation_serializers.APIActorSerializer()
     uploads_count = serializers.SerializerMethodField()

@@ -1,5 +1,7 @@
 import memoize.djangocache
 
+from django.urls import reverse
+
 import funkwhale_api
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import actors, models as federation_models
@@ -18,6 +20,7 @@ def get():
     share_stats = all_preferences.get("instance__nodeinfo_stats_enabled")
     allow_list_enabled = all_preferences.get("moderation__allow_list_enabled")
     allow_list_public = all_preferences.get("moderation__allow_list_public")
+    auth_required = all_preferences.get("common__api_authentication_required")
     banner = all_preferences.get("instance__banner")
     unauthenticated_report_types = all_preferences.get(
         "moderation__unauthenticated_report_types"
@@ -67,6 +70,7 @@ def get():
                 "instance__funkwhale_support_message_enabled"
             ),
             "instanceSupportMessage": all_preferences.get("instance__support_message"),
+            "knownNodesListUrl": None,
         },
     }
 
@@ -87,4 +91,8 @@ def get():
             "favorites": {"tracks": {"total": statistics["track_favorites"]}},
             "listenings": {"total": statistics["listenings"]},
         }
+        if not auth_required:
+            data["metadata"]["knownNodesListUrl"] = federation_utils.full_url(
+                reverse("api:v1:federation:domains-list")
+            )
     return data
