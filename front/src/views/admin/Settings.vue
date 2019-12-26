@@ -139,7 +139,6 @@ export default {
           id: "federation",
           settings: [
             "federation__enabled",
-            "federation__music_needs_approval",
             "federation__collection_page_size",
             "federation__music_cache_duration",
             "federation__actor_fetch_delay"

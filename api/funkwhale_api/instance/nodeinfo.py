@@ -53,9 +53,6 @@ def get():
             "defaultUploadQuota": all_preferences.get("users__upload_quota"),
             "library": {
                 "federationEnabled": all_preferences.get("federation__enabled"),
-                "federationNeedsApproval": all_preferences.get(
-                    "federation__music_needs_approval"
-                ),
                 "anonymousCanListen": not all_preferences.get(
                     "common__api_authentication_required"
                 ),
