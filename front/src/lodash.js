@@ -14,4 +14,5 @@ export default {
   remove: require('lodash/remove'),
   reverse: require('lodash/reverse'),
   isEqual: require('lodash/isEqual'),
+  sum: require('lodash/sum'),
 }

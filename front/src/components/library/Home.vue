@@ -3,17 +3,17 @@
     <section class="ui vertical stripe segment">
       <div class="ui stackable three column grid">
         <div class="column">
-          <track-widget :url="'history/listenings/'" :filters="{scope: 'all', ordering: '-creation_date'}">
+          <track-widget :url="'history/listenings/'" :filters="{scope: scope, ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently listened</translate></template>
           </track-widget>
         </div>
         <div class="column">
-          <track-widget :url="'favorites/tracks/'" :filters="{scope: 'all', ordering: '-creation_date'}">
+          <track-widget :url="'favorites/tracks/'" :filters="{scope: scope, ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently favorited</translate></template>
           </track-widget>
         </div>
         <div class="column">
-          <playlist-widget :url="'playlists/'" :filters="{scope: 'all', playable: true, ordering: '-modification_date'}">
+          <playlist-widget :url="'playlists/'" :filters="{scope: scope, playable: true, ordering: '-modification_date'}">
             <template slot="title"><translate translate-context="*/*/*">Playlists</translate></template>
           </playlist-widget>
         </div>
@@ -21,7 +21,7 @@
       <div class="ui section hidden divider"></div>
       <div class="ui stackable one column grid">
         <div class="column">
-          <album-widget :filters="{playable: true, ordering: '-creation_date'}">
+          <album-widget :filters="{scope: scope, playable: true, ordering: '-creation_date'}">
             <template slot="title"><translate translate-context="Content/Home/Title">Recently added</translate></template>
           </album-widget>
         </div>
@@ -43,6 +43,9 @@ const ARTISTS_URL = "artists/"
 
 export default {
   name: "library",
+  props: {
+    scope: {default: 'all'}
+  },
   components: {
     Search,
     ArtistCard,
@@ -53,7 +56,7 @@ export default {
   data() {
     return {
       artists: [],
-      isLoadingArtists: false
+      isLoadingArtists: false,
     }
   },
   created() {

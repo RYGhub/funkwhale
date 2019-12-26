@@ -87,7 +87,8 @@ const FETCH_URL = "playlists/"
 export default {
   mixins: [OrderingMixin, PaginationMixin, TranslationsMixin],
   props: {
-    defaultQuery: { type: String, required: false, default: "" }
+    defaultQuery: { type: String, required: false, default: "" },
+    scope: { type: String, required: false, default: "all" },
   },
   components: {
     PlaylistCardList,
@@ -141,6 +142,7 @@ export default {
       this.isLoading = true
       let url = FETCH_URL
       let params = {
+        scope: this.scope,
         page: this.page,
         page_size: this.paginateBy,
         q: this.query,

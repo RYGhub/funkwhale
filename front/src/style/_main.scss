@@ -79,14 +79,24 @@
 // see https://github.com/webpack/webpack/issues/215
 @import "./vendor/media";
 
-$desktop-sidebar-width: 300px;
-$widedesktop-sidebar-width: 350px;
+$desktop-sidebar-width: 275px;
+$widedesktop-sidebar-width: 275px;
+$bottom-player-height: 4rem;
 
 html,
 body {
   @include media("<=desktop") {
     font-size: 90%;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
 }
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
@@ -95,8 +105,19 @@ body {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+  &.has-bottom-player {
+    padding-bottom: $bottom-player-height;
+    .service-messages {
+      bottom: $bottom-player-height + 1rem;
+    }
+
+  }
 }
 
+#footer {
+  border-bottom: none;
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+}
 #app > main, #app > .main {
   flex: 1;
 }
@@ -114,19 +135,24 @@ body {
     width: $widedesktop-sidebar-width;
   }
 }
-.main.pusher,
-.footer {
-  @include media(">desktop") {
-    margin-left: $desktop-sidebar-width !important;
-    margin-top: 50px;
-  }
 
-  @include media(">widedesktop") {
-    margin-left: $widedesktop-sidebar-width !important;;
+#app {
+  > .main.pusher,
+  > .footer {
+    @include media(">desktop") {
+      margin-left: $desktop-sidebar-width !important;
+    }
+
+    @include media(">widedesktop") {
+      margin-left: $widedesktop-sidebar-width !important;;
+    }
+    transform: none !important;
   }
-  transform: none !important;
 }
 
+.main.pusher.hidden {
+  display: none;
+}
 .main.pusher > .ui.secondary.menu {
   margin-left: 0;
   margin-right: 0;
@@ -140,16 +166,6 @@ body {
   @include media(">tablet") {
     padding: 0 2.5rem;
   }
-  @include media(">desktop") {
-    position: fixed;
-    left: $desktop-sidebar-width;
-    right: 0px;
-    top: 0px;
-    z-index: 99;
-  }
-  @include media(">widedesktop") {
-    left: $widedesktop-sidebar-width;
-  }
   .item {
     padding-top: 1.5em;
     padding-bottom: 1.5em;
@@ -159,13 +175,7 @@ body {
 .service-messages {
   position: fixed;
   bottom: 1em;
-  left: 1em;
-  @include media(">desktop") {
-    left: $desktop-sidebar-width;
-  }
-  @include media(">widedesktop") {
-    left: $widedesktop-sidebar-width;
-  }
+  right: 1em;
   > .ui.message {
     box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.7);
   }
@@ -306,10 +316,6 @@ label .tooltip {
   margin-left: 1em;
 }
 
-canvas.color-thief {
-  display: none;
-}
-
 .ui.list .list.icon {
   padding-left: 0;
 }
@@ -392,5 +398,45 @@ input + .help {
   max-width: 100% !important;
 }
 
+.ui.small.divider {
+  margin: 0.5rem 0;
+}
+
+.queue.segment.player-focused #queue-grid #player {
+  @include media("<desktop") {
+    padding-bottom: $bottom-player-height + 2rem;
+  }
+}
+.queue-controls {
+
+  @include media("<desktop") {
+    height: $bottom-player-height;
+  }
+}
+
+.desktop-and-up {
+  @include media("<desktop") {
+    display: none !important;
+  }
+}
+.tablet-and-up {
+  @include media("<tablet") {
+    display: none !important;
+  }
+}
+.tablet-and-below {
+  @include media(">desktop") {
+    display: none !important;
+  }
+}
+:not(.menu) > {
+  a, .link {
+    &:not(.button):not(.list) {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

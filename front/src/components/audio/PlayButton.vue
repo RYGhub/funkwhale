@@ -9,9 +9,12 @@
       <i :class="[playIconClass, 'icon']"></i>
       <template v-if="!discrete && !iconOnly"><slot><translate translate-context="*/Queue/Button.Label/Short, Verb">Play</translate></slot></template>
     </button>
-    <div v-if="!discrete && !iconOnly" :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
+    <div
+      v-if="!discrete && !iconOnly"
+      @click.prevent="clicked = true"
+      :class="['ui', {disabled: !playable && !filterableArtist}, 'floating', 'dropdown', {'icon': !dropdownOnly}, {'button': !dropdownOnly}]">
       <i :class="dropdownIconClasses.concat(['icon'])" :title="title" ></i>
-      <div class="menu">
+      <div class="menu" v-if="clicked">
         <button class="item basic" ref="add" data-ref="add" :disabled="!playable" @click.stop.prevent="add" :title="labels.addToQueue">
           <i class="plus icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Add to queue</translate>
         </button>
@@ -70,19 +73,8 @@ export default {
   data () {
     return {
       isLoading: false,
+      clicked: false
     }
-  },
-  mounted () {
-    let self = this
-    jQuery(this.$el).find('.ui.dropdown').dropdown({
-      selectOnKeydown: false,
-      action: function (text, value, $el) {
-        // used ton ensure focusing the dropdown and clicking via keyboard
-        // works as expected
-        self.$refs[$el.data('ref')].click()
-        jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
-      }
-    })
   },
   computed: {
     labels () {
@@ -250,6 +242,24 @@ export default {
         date: new Date()
       })
     },
+  },
+  watch: {
+    clicked () {
+
+      let self = this
+      this.$nextTick(() => {
+        jQuery(this.$el).find('.ui.dropdown').dropdown({
+          selectOnKeydown: false,
+          action: function (text, value, $el) {
+            // used ton ensure focusing the dropdown and clicking via keyboard
+            // works as expected
+            self.$refs[$el.data('ref')].click()
+            jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+          }
+        })
+        jQuery(this.$el).find('.ui.dropdown').dropdown('show')
+      })
+    }
   }
 }
 </script>

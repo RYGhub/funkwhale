@@ -74,13 +74,11 @@ import axios from 'axios'
 import {mapState} from 'vuex'
 
 import logger from '@/logging'
-import Modal from '@/components/semantic/Modal'
-import ReportCategoryDropdown from '@/components/moderation/ReportCategoryDropdown'
 
 export default {
   components: {
-    Modal,
-    ReportCategoryDropdown,
+    ReportCategoryDropdown:  () => import(/* webpackChunkName: "reports" */ "@/components/moderation/ReportCategoryDropdown"),
+    Modal:  () => import(/* webpackChunkName: "modal" */ "@/components/semantic/Modal"),
   },
   data () {
     return {
