@@ -1,28 +1,20 @@
 <template>
-  <div class="flat inline card">
-    <div :class="['ui', 'image', 'with-overlay', {'default-cover': !cover.original}]" v-lazy:background-image="imageUrl">
-      <play-button class="play-overlay" :icon-only="true" :is-playable="artist.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="artist"></play-button>
+  <div class="app-card card">
+    <div :class="['ui', 'head-image', 'circular', 'image', {'default-cover': !cover.original}]" v-lazy:background-image="imageUrl">
+      <play-button :icon-only="true" :is-playable="artist.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="artist"></play-button>
     </div>
     <div class="content">
-      <router-link :title="artist.name" :to="{name: 'library.artists.detail', params: {id: artist.id}}">
-        {{ artist.name|truncate(30) }}
-      </router-link>
-      <div v-if="artist.albums.length > 0">
-        <i class="small sound icon"></i>
-        <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.albums.length}" :translate-n="artist.albums.length" translate-plural="%{ count } albums">1 album</translate>
-      </div>
-      <div v-else-if="artist.tracks_count">
-        <i class="small sound icon"></i>
-        <translate translate-context="Content/Artist/Card" :translate-params="{count: artist.tracks_count}" :translate-n="artist.tracks_count" translate-plural="%{ count } tracks">1 track</translate>
-      </div>
-      <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="artist.tags"></tags-list>
+      <strong>
+        <router-link class="discrete link" :title="artist.name" :to="{name: 'library.artists.detail', params: {id: artist.id}}">
+          {{ artist.name|truncate(30) }}
+        </router-link>
+      </strong>
 
-      <play-button
-        class="play-button basic icon"
-        :dropdown-only="true"
-        :is-playable="artist.is_playable"
-        :dropdown-icon-classes="['ellipsis', 'vertical', 'large', 'grey']"
-        :artist="artist"></play-button>
+      <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="artist.tags"></tags-list>
+    </div>
+    <div class="extra content">
+      <translate translate-context="*/*/*" :translate-params="{count: artist.tracks_count}" :translate-n="artist.tracks_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+      <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="artist.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :artist="artist"></play-button>
     </div>
   </div>
 </template>
@@ -71,25 +63,5 @@ export default {
 <style scoped>
 .default-cover {
   background-image: url("../../../assets/audio/default-cover.png") !important;
-}
-
-.play-button {
-  position: absolute;
-  right: 0;
-  bottom: 40%;
-}
-
-.with-overlay {
-  background-size: cover !important;
-  background-position: center !important;
-  height: 8em;
-  width: 8em;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-.flat.card .with-overlay.image {
-  border-radius: 50% !important;
-  margin: 0 auto;
 }
 </style>
