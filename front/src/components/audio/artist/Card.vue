@@ -1,6 +1,8 @@
 <template>
   <div class="app-card card">
-    <div :class="['ui', 'head-image', 'circular', 'image', {'default-cover': !cover.original}]" v-lazy:background-image="imageUrl">
+    <div
+      @click="$router.push({name: 'library.artists.detail', params: {id: artist.id}})"
+      :class="['ui', 'head-image', 'circular', 'image', {'default-cover': !cover.original}]" v-lazy:background-image="imageUrl">
       <play-button :icon-only="true" :is-playable="artist.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="artist"></play-button>
     </div>
     <div class="content">
