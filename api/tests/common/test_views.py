@@ -216,6 +216,27 @@ def test_attachment_proxy_redirects_original(
     assert response["Location"] == urls[expected]
 
 
+def test_attachment_proxy_dont_crash_on_long_filename(
+    factories, logged_in_api_client, avatar, r_mock, now
+):
+    long_filename = "a" * 400
+    attachment = factories["common.Attachment"](
+        file=None, url="https://domain/{}.jpg".format(long_filename)
+    )
+
+    avatar_content = avatar.read()
+    r_mock.get(attachment.url, body=io.BytesIO(avatar_content))
+    proxy_url = reverse("api:v1:attachments-proxy", kwargs={"uuid": attachment.uuid})
+
+    response = logged_in_api_client.get(proxy_url, {"next": next})
+    attachment.refresh_from_db()
+
+    assert response.status_code == 302
+    assert attachment.file.read() == avatar_content
+    assert attachment.file.name.endswith("/{}.jpg".format("a" * 46))
+    assert attachment.last_fetch_date == now
+
+
 def test_attachment_create(logged_in_api_client, avatar):
     actor = logged_in_api_client.user.create_actor()
     url = reverse("api:v1:attachments-list")

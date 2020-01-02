@@ -80,9 +80,10 @@ def fetch_remote_attachment(attachment, filename=None, save=True):
             for chunk in r.iter_content():
                 tf.write(chunk)
             tf.seek(0)
-            attachment.file.save(
-                filename or attachment.url.split("/")[-1], File(tf), save=save
-            )
+            if not filename:
+                filename = attachment.url.split("/")[-1]
+                filename = filename[-50:]
+            attachment.file.save(filename, File(tf), save=save)
 
 
 @celery.app.task(name="common.prune_unattached_attachments")

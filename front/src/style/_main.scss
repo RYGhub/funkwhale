@@ -354,20 +354,6 @@ td.align.right {
   word-wrap: break-word;
 }
 
-.ui.cards > .flat.card, .flat.card {
-  box-shadow: none;
-  .content {
-    border: none;
-  }
-}
-
-.ui.cards > .inline.card {
-  flex-direction: row;
-  .content {
-    padding: 0.5em 0.75em;
-  }
-}
-
 .ui.checkbox label {
   cursor: pointer;
 }
@@ -435,6 +421,62 @@ input + .help {
       &:hover {
         text-decoration: underline;
       }
+    }
+  }
+}
+.ui.cards.app-cards {
+  $card-width: 14em;
+  $card-hight: 22em;
+  .app-card {
+    display: flex;
+    width: $card-width;
+    height: $card-hight;
+    .head-image {
+      height: $card-width;
+      background-size: cover !important;
+      background-position: center !important;
+      display: flex !important;
+      justify-content: flex-end !important;
+      align-items: flex-end !important;
+      .button {
+        margin: 0;
+      }
+      &.circular {
+        overflow: visible;
+        border-radius: 50% !important;
+        height: $card-width - 1em;
+        width: $card-width - 1em;
+        margin: 0.5em;
+
+      }
+      &.squares {
+        display: block !important;
+        position: relative;
+        .button {
+          position: absolute;
+          bottom: 0.5em;
+          right: 0.5em;
+        }
+        img {
+          display: inline-block;
+          width: 50%;
+          height: 50%;
+          margin: 0;
+          border-radius: 0;
+        }
+      }
+    }
+    .extra {
+      border-top: 0 !important;
+    }
+    .content:not(.extra) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-bottom: 0;
+    }
+    .floating.dropdown > .icon {
+      margin-right: 0;
     }
   }
 }

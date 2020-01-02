@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="ui hidden divider"></div>
-      <div v-if="result && result.results.length > 0" class="ui three cards">
+      <div v-if="result && result.results.length > 0" class="ui five app-cards cards">
         <div v-if="isLoading" class="ui inverted active dimmer">
           <div class="ui loader"></div>
         </div>

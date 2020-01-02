@@ -1,45 +1,24 @@
 <template>
-  <div class="ui playlist card">
-    <div class="ui top attached icon button" :style="coversStyle">
+  <div class="ui app-card card">
+    <div
+      @click="$router.push({name: 'library.playlists.detail', params: {id: playlist.id }})"
+      :class="['ui', 'head-image', 'squares']">
+      <img v-lazy="url" v-for="(url, idx) in images" :key="idx" />
+      <play-button :icon-only="true" :is-playable="playlist.is_playable" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :playlist="playlist"></play-button>
     </div>
     <div class="content">
-      <div class="header">
-        <div class="right floated">
-          <play-button
-            :is-playable="playlist.is_playable"
-            :icon-only="true" class="ui inline"
-            :button-classes="['ui', 'circular', 'large', {orange: playlist.tracks_count > 0}, 'icon', 'button', {disabled: playlist.tracks_count === 0}]"
-            :playlist="playlist"></play-button>
-          <play-button
-            :is-playable="playlist.is_playable"
-            class="basic inline icon"
-            :dropdown-only="true"
-            :dropdown-icon-classes="['ellipsis', 'vertical', 'large', {disabled: playlist.tracks_count === 0}, 'grey']"
-            :account="playlist.actor"
-            :playlist="playlist"></play-button>
-        </div>
-        <router-link :title="playlist.name" class="discrete link" :to="{name: 'library.playlists.detail', params: {id: playlist.id }}">
-          {{ playlist.name | truncate(30) }}
+      <strong>
+        <router-link class="discrete link" :title="playlist.name" :to="{name: 'library.playlists.detail', params: {id: playlist.id }}">
+          {{ playlist.name }}
         </router-link>
-      </div>
-      <div class="meta">
-        <duration :seconds="playlist.duration" />
-         |
-        <i class="sound icon"></i>
-        <translate translate-context="Content/*/Card/List item"
-          translate-plural="%{ count } tracks"
-          :translate-n="playlist.tracks_count"
-          :translate-params="{count: playlist.tracks_count}">
-          %{ count} track
-        </translate>&nbsp;
+      </strong>
+      <div class="description">
+        <user-link :user="playlist.user" class="left floated" />
       </div>
     </div>
     <div class="extra content">
-      <user-link :user="playlist.user" class="left floated" />
-      <span class="right floated">
-        <i class="clock outline icon" />
-        <human-date :date="playlist.creation_date" />
-      </span>
+      <translate translate-context="*/*/*" :translate-params="{count: playlist.tracks_count}" :translate-n="playlist.tracks_count" translate-plural="%{ count } tracks">%{ count } track</translate>
+      <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="playlist.is_playable" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :playlist="playlist"></play-button>
     </div>
   </div>
 </template>
@@ -53,41 +32,18 @@ export default {
     PlayButton
   },
   computed: {
-    coversStyle () {
+    images () {
       let self = this
       let urls = this.playlist.album_covers.map((url) => {
-        url = self.$store.getters['instance/absoluteUrl'](url)
-        return `url("${url}")`
+        return self.$store.getters['instance/absoluteUrl'](url)
       }).slice(0, 4)
-      return {
-        'background-image': urls.join(', ')
+      while (urls.length < 4) {
+        urls.push(
+          '../../../assets/audio/default-cover.png'
+        )
       }
+      return urls
     }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.playlist.card .header .ellipsis.vertical.large.grey {
-  font-size: 1.2em;
-  margin-right: 0;
-}
-</style>
-<style scoped>
-.card .header {
-  margin-bottom: 0.25em;
-}
-
-.attached.button {
-  background-size: 25%;
-  background-repeat: no-repeat;
-  background-origin: border-box;
-  background-position: 0 0, 33.33% 0, 66.67% 0, 100% 0;
-  /* background-position: 0 0, 50% 0, 100% 0; */
-  /* background-position: 0 0, 25% 0, 50% 0, 75% 0, 100% 0; */
-  font-size: 4em;
-  box-shadow: 0px 0px 0px 1px rgba(34, 36, 38, 0.15) inset !important;
-  padding: unset;
-}
-</style>
