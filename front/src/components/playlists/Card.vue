@@ -13,7 +13,7 @@
         </router-link>
       </strong>
       <div class="description">
-        <user-link :user="playlist.user" class="left floated" />
+        <user-link :user="playlist.user" :avatar="false" class="left floated" />
       </div>
     </div>
     <div class="extra content">
