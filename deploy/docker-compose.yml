@@ -52,7 +52,7 @@ services:
       - postgres
       - redis
     env_file: .env
-    command: celery -A funkwhale_api.taskapp beat -l INFO
+    command: celery -A funkwhale_api.taskapp beat --pidfile= -l INFO
 
   api:
     restart: unless-stopped
