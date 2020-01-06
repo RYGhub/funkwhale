@@ -189,10 +189,10 @@ export default {
             resolve(tracks)
           })
         } else if (self.artist) {
-          let params = {'artist': self.artist.id, 'ordering': 'album__release_date,position'}
+          let params = {'artist': self.artist.id, 'ordering': 'album__release_date,disc_number,position'}
           self.getTracksPage(1, params, resolve)
         } else if (self.album) {
-          let params = {'album': self.album.id, 'ordering': 'position'}
+          let params = {'album': self.album.id, 'ordering': 'disc_number,position'}
           self.getTracksPage(1, params, resolve)
         }
       })
