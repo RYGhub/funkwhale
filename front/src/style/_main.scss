@@ -452,6 +452,7 @@ input + .help {
       &.squares {
         display: block !important;
         position: relative;
+        margin-bottom: -1px;
         .button {
           position: absolute;
           bottom: 0.5em;
@@ -463,6 +464,13 @@ input + .help {
           height: 50%;
           margin: 0;
           border-radius: 0;
+          margin-bottom: -4px;
+        }
+        img:nth-child(1) {
+          border-top-left-radius: 3px;
+        }
+        img:nth-child(2) {
+          border-top-right-radius: 3px;
         }
       }
     }

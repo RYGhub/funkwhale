@@ -9,9 +9,10 @@
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
-    <template v-if="playlistsExist">
+    <div class="ui hidden divider"></div>
+    <div v-if="playlistsExist" class="ui cards app-cards">
       <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
-    </template>
+    </div>
     <div v-else class="ui placeholder segment">
       <div class="ui icon header">
         <i class="list icon"></i>
