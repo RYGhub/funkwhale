@@ -39,7 +39,7 @@ export default {
       }).slice(0, 4)
       while (urls.length < 4) {
         urls.push(
-          '../../../assets/audio/default-cover.png'
+          require('../../assets/audio/default-cover.png')
         )
       }
       return urls
