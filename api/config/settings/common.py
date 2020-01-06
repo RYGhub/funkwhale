@@ -759,6 +759,10 @@ THROTTLING_RATES = {
         "rate": THROTTLING_USER_RATES.get("anonymous-update", "1000/day"),
         "description": "Anonymous PATCH and PUT requests on resource detail",
     },
+    "subsonic": {
+        "rate": THROTTLING_USER_RATES.get("subsonic", "1000/hour"),
+        "description": "All subsonic API requests",
+    },
     # potentially spammy / dangerous endpoints
     "authenticated-reports": {
         "rate": THROTTLING_USER_RATES.get("authenticated-reports", "100/day"),

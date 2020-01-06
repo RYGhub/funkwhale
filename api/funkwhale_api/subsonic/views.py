@@ -104,6 +104,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
     content_negotiation_class = negotiation.SubsonicContentNegociation
     authentication_classes = [authentication.SubsonicAuthentication]
     permission_classes = [rest_permissions.IsAuthenticated]
+    throttling_scopes = {"*": {"authenticated": "subsonic", "anonymous": "subsonic"}}
 
     def dispatch(self, request, *args, **kwargs):
         if not preferences.get("subsonic__enabled"):
