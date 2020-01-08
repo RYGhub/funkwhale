@@ -117,6 +117,13 @@ FUNKWHALE_SPA_HTML_CACHE_DURATION = env.int(
 FUNKWHALE_EMBED_URL = env(
     "FUNKWHALE_EMBED_URL", default=FUNKWHALE_URL + "/front/embed.html"
 )
+FUNKWHALE_SPA_REWRITE_MANIFEST = env.bool(
+    "FUNKWHALE_SPA_REWRITE_MANIFEST", default=True
+)
+FUNKWHALE_SPA_REWRITE_MANIFEST_URL = env.bool(
+    "FUNKWHALE_SPA_REWRITE_MANIFEST_URL", default=None
+)
+
 APP_NAME = "Funkwhale"
 
 # XXX: deprecated, see #186

@@ -68,6 +68,11 @@ export default {
         ordering: "creation_date",
       },
     },
+    serviceWorker: {
+      refreshing: false,
+      registration: null,
+      updateAvailable: false,
+    }
   },
   getters: {
     showInstanceSupportMessage: (state, getters, rootState) => {
@@ -160,6 +165,10 @@ export default {
     orderingDirection: (state, {route, value}) => {
       state.routePreferences[route].orderingDirection = value
     },
+
+    serviceWorker: (state, value) => {
+      state.serviceWorker = {...state.serviceWorker, ...value}
+    }
   },
   actions: {
     fetchUnreadNotifications ({commit}, payload) {

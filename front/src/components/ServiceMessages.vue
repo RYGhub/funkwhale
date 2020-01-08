@@ -3,6 +3,7 @@
     <message v-for="message in displayedMessages" :key="String(message.date)" :class="['large', getLevel(message)]">
       <p>{{ message.content }}</p>
     </message>
+    <slot></slot>
   </div>
 </template>
 
