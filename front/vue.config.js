@@ -32,6 +32,46 @@ plugins.push(
 module.exports = {
   baseUrl: process.env.BASE_URL || '/front/',
   productionSourceMap: false,
+  // Add settings for manifest file
+  pwa: {
+    name: 'Funkwhale',
+    themeColor: '#f2711c',
+    msTileColor: '#000000',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    display: 'minimal-ui',
+    workboxPluginMode: 'InjectManifest',
+    manifestOptions: {
+      start_url: '.',
+      description: 'A social platform to enjoy and share music',
+      scope: "/",
+      categories: ["music"],
+      icons: [
+        {
+          'src': 'favicon.png',
+          'sizes': '192x192',
+          'type': 'image/png'
+        },        {
+          'src': 'favicon.png',
+          'sizes': '512x512',
+          'type': 'image/png'
+        },
+      ]
+    },
+    workboxOptions: {
+      importWorkboxFrom: 'local',
+      // swSrc is required in InjectManifest mode.
+      swSrc: 'src/service-worker.js',
+      swDest: 'service-worker.js',
+    },
+    iconPaths: {
+      favicon32: 'favicon.png',
+      favicon16: 'favicon.png',
+      appleTouchIcon: 'favicon.png',
+      maskIcon: 'favicon.png',
+      msTileImage: 'favicon.png'
+    }
+  },
   pages: {
     embed: {
       entry: 'src/embed.js',

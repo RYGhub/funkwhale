@@ -276,6 +276,15 @@ export default {
     if (this.currentTrack) {
       this.getSound(this.currentTrack)
     }
+    // Add controls for notification drawer
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', this.togglePlay);
+      navigator.mediaSession.setActionHandler('pause', this.togglePlay);
+      navigator.mediaSession.setActionHandler('seekforward', this.seekForward);
+      navigator.mediaSession.setActionHandler('seekbackward', this.seekBackward);
+      navigator.mediaSession.setActionHandler('nexttrack', this.next);
+      navigator.mediaSession.setActionHandler('previoustrack', this.previous);
+    }
   },
   beforeDestroy () {
     this.dummyAudio.unload()
@@ -380,6 +389,7 @@ export default {
           self.$store.commit('player/resetErrorCount')
           self.$store.commit('player/errored', false)
           self.$store.commit('player/duration', this.duration())
+
         },
         onloaderror: function (sound, error) {
           self.removeFromCache(this)
@@ -483,6 +493,12 @@ export default {
         let position = Math.max(this.currentTime + step, 0)
         this.$store.dispatch('player/updateProgress', position)
       }
+    },
+    seekForward () {
+      this.seek (5)
+    },
+    seekBackward () {
+      this.seek (-5)
     },
     observeProgress: function (enable) {
       let self = this
@@ -684,6 +700,23 @@ export default {
         this.playTimeout = setTimeout(async () => {
           await self.loadSound(newValue, oldValue)
         }, 500);
+        // If the session is playing as a PWA, populate the notification
+        // with details from the track
+        if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: this.currentTrack.title,
+          artist: this.currentTrack.artist.name,
+          album: this.currentTrack.album.title,
+          artwork: [
+            { src: this.currentTrack.album.cover.original, sizes: '96x96',   type: 'image/png' },
+            { src: this.currentTrack.album.cover.original, sizes: '128x128', type: 'image/png' },
+            { src: this.currentTrack.album.cover.original, sizes: '192x192', type: 'image/png' },
+            { src: this.currentTrack.album.cover.original, sizes: '256x256', type: 'image/png' },
+            { src: this.currentTrack.album.cover.original, sizes: '384x384', type: 'image/png' },
+            { src: this.currentTrack.album.cover.original, sizes: '512x512', type: 'image/png' },
+            ]
+          });
+        }
       },
       immediate: false
     },

@@ -20,6 +20,7 @@ import locales from '@/locales'
 
 import filters from '@/filters' // eslint-disable-line
 import globals from '@/components/globals' // eslint-disable-line
+import './registerServiceWorker'
 
 sync(store, router)
 

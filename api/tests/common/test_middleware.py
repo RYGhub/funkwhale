@@ -2,6 +2,9 @@ import time
 import pytest
 
 from django.http import HttpResponse
+from django.urls import reverse
+
+from funkwhale_api.federation import utils as federation_utils
 
 from funkwhale_api.common import middleware
 from funkwhale_api.common import throttling
@@ -112,7 +115,7 @@ def test_get_default_head_tags(preferences, settings):
 
 
 def test_get_spa_html_from_cache(local_cache):
-    local_cache.set("spa-html:http://test", "hello world")
+    local_cache.set("spa-file:http://test:index.html", "hello world")
 
     assert middleware.get_spa_html("http://test") == "hello world"
 
@@ -124,16 +127,16 @@ def test_get_spa_html_from_http(local_cache, r_mock, mocker, settings):
 
     assert middleware.get_spa_html("http://test") == "hello world"
     cache_set.assert_called_once_with(
-        "spa-html:{}".format(url),
+        "spa-file:{}:index.html".format(url),
         "hello world",
         settings.FUNKWHALE_SPA_HTML_CACHE_DURATION,
     )
 
 
-def test_get_spa_html_from_disk(tmpfile):
-    with open(tmpfile.name, "wb") as f:
-        f.write(b"hello world")
-    assert middleware.get_spa_html(tmpfile.name) == "hello world"
+def test_get_spa_html_from_disk(tmp_path):
+    index = tmp_path / "index.html"
+    index.write_bytes(b"hello world")
+    assert middleware.get_spa_html(str(index)) == "hello world"
 
 
 def test_get_route_head_tags(mocker, settings):
@@ -225,3 +228,97 @@ def test_throttle_status_middleware_returns_proper_response(mocker):
 
     response = m(request)
     assert response.status_code == 429
+
+
+@pytest.mark.parametrize(
+    "link, new_url, expected",
+    [
+        (
+            "<link rel=manifest href=/manifest.json>",
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        (
+            "<link href=/manifest.json rel=manifest>",
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        (
+            '<link href="/manifest.json" rel=manifest>',
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        (
+            '<link href=/manifest.json rel="manifest">',
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        (
+            "<link href='/manifest.json' rel=manifest>",
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        (
+            "<link href=/manifest.json rel='manifest'>",
+            "custom_url",
+            '<link rel=manifest href="custom_url">',
+        ),
+        # not matching
+        (
+            "<link href=/manifest.json rel=notmanifest>",
+            "custom_url",
+            "<link href=/manifest.json rel=notmanifest>",
+        ),
+    ],
+)
+def test_rewrite_manifest_json_url(link, new_url, expected, mocker, settings):
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST = True
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST_URL = new_url
+    spa_html = "<html><head>{}</head></html>".format(link)
+    request = mocker.Mock(path="/")
+    mocker.patch.object(middleware, "get_spa_html", return_value=spa_html)
+    mocker.patch.object(
+        middleware, "get_default_head_tags", return_value=[],
+    )
+    response = middleware.serve_spa(request)
+
+    assert response.status_code == 200
+    expected_html = "<html><head>{}\n\n</head></html>".format(expected)
+    assert response.content == expected_html.encode()
+
+
+def test_rewrite_manifest_json_url_rewrite_disabled(mocker, settings):
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST = False
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST_URL = "custom_url"
+    spa_html = "<html><head><link href=/manifest.json rel=manifest></head></html>"
+    request = mocker.Mock(path="/")
+    mocker.patch.object(middleware, "get_spa_html", return_value=spa_html)
+    mocker.patch.object(
+        middleware, "get_default_head_tags", return_value=[],
+    )
+    response = middleware.serve_spa(request)
+
+    assert response.status_code == 200
+    expected_html = (
+        "<html><head><link href=/manifest.json rel=manifest>\n\n</head></html>"
+    )
+    assert response.content == expected_html.encode()
+
+
+def test_rewrite_manifest_json_url_rewrite_default_url(mocker, settings):
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST = True
+    settings.FUNKWHALE_SPA_REWRITE_MANIFEST_URL = None
+    spa_html = "<html><head><link href=/manifest.json rel=manifest></head></html>"
+    expected_url = federation_utils.full_url(reverse("api:v1:instance:spa-manifest"))
+    request = mocker.Mock(path="/")
+    mocker.patch.object(middleware, "get_spa_html", return_value=spa_html)
+    mocker.patch.object(
+        middleware, "get_default_head_tags", return_value=[],
+    )
+    response = middleware.serve_spa(request)
+
+    assert response.status_code == 200
+    expected_html = '<html><head><link rel=manifest href="{}">\n\n</head></html>'.format(
+        expected_url
+    )
+    assert response.content == expected_html.encode()

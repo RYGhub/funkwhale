@@ -11,7 +11,16 @@
     <template>
       <sidebar></sidebar>
       <set-instance-modal @update:show="showSetInstanceModal = $event" :show="showSetInstanceModal"></set-instance-modal>
-      <service-messages v-if="messages.length > 0"/>
+      <service-messages>
+        <message key="refreshApp" class="large info" v-if="serviceWorker.updateAvailable">
+          <p>
+            <translate translate-context="App/Message/Paragraph">A new version of the app is available.</translate>
+          </p>
+          <button class="ui basic button" @click.stop="updateApp">
+            <translate translate-context="App/Message/Button">Update</translate>
+          </button>
+        </message>
+      </service-messages>
       <transition name="queue">
         <queue @touch-progress="$refs.player.setCurrentTime($event)" v-if="$store.state.ui.queueFocused"></queue>
       </transition>
@@ -62,10 +71,23 @@ export default {
       bridge: null,
       instanceUrl: null,
       showShortcutsModal: false,
-      showSetInstanceModal: false
+      showSetInstanceModal: false,
     }
   },
   async created () {
+
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener(
+        'controllerchange', () => {
+          if (this.serviceWorker.refreshing) return;
+          this.$store.commit('ui/serviceWorker', {
+            refreshing: true
+          })
+          window.location.reload();
+        }
+      );
+    }
+
     this.openWebsocket()
     let self = this
     if (!this.$store.state.ui.selectedLanguage) {
@@ -238,6 +260,11 @@ export default {
       parts.push(this.$store.state.instance.settings.instance.name.value || 'Funkwhale')
       document.title = parts.join(' – ')
     },
+    updateApp () {
+      this.$store.commit('ui/serviceWorker', {updateAvailable: false})
+      if (!this.serviceWorker.registration || !this.serviceWorker.registration.waiting) { return; }
+      this.serviceWorker.registration.waiting.postMessage('skipWaiting');
+    }
   },
   computed: {
     ...mapState({
@@ -246,6 +273,7 @@ export default {
       playing: state => state.player.playing,
       bufferProgress: state => state.player.bufferProgress,
       isLoadingAudio: state => state.player.isLoadingAudio,
+      serviceWorker: state => state.ui.serviceWorker,
     }),
     ...mapGetters({
       hasNext: "queue/hasNext",

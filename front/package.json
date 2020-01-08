@@ -2,13 +2,15 @@
   "name": "front",
   "version": "0.1.0",
   "private": true,
+  "description": "Funkwhale front-end",
+  "author": "Eliot Berriot <contact@eliotberriot.com>",
   "scripts": {
     "serve": "vue-cli-service serve --port ${VUE_PORT:-8000} --host ${VUE_HOST:-0.0.0.0}",
     "build": "scripts/i18n-compile.sh && vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "i18n-extract": "scripts/i18n-extract.sh",
     "i18n-compile": "scripts/i18n-compile.sh",
-    "test:unit": "vue-cli-service test:unit"
+    "i18n-extract": "scripts/i18n-extract.sh"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -23,6 +25,7 @@
     "masonry-layout": "^4.2.2",
     "moment": "^2.22.2",
     "qs": "^6.7.0",
+    "register-service-worker": "^1.6.2",
     "sanitize-html": "^1.20.1",
     "showdown": "^1.8.6",
     "vue": "^2.6.10",
@@ -40,6 +43,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0",
     "@vue/cli-plugin-eslint": "^3.0.0",
+    "@vue/cli-plugin-pwa": "^4.1.2",
     "@vue/cli-plugin-unit-mocha": "^3.0.0",
     "@vue/cli-service": "^3.0.0",
     "@vue/test-utils": "^1.0.0-beta.20",
@@ -104,7 +108,5 @@
     "iOS >= 9",
     "Android >= 4",
     "not dead"
-  ],
-  "author": "Eliot Berriot <contact@eliotberriot.com>",
-  "description": "Funkwhale front-end"
+  ]
 }
