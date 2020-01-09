@@ -274,7 +274,9 @@ def test_throttle_status_middleware_returns_proper_response(mocker):
 def test_rewrite_manifest_json_url(link, new_url, expected, mocker, settings):
     settings.FUNKWHALE_SPA_REWRITE_MANIFEST = True
     settings.FUNKWHALE_SPA_REWRITE_MANIFEST_URL = new_url
-    spa_html = "<html><head>{}</head></html>".format(link)
+    spa_html = "<html><head><link rel=before>{}<link rel=after></head></html>".format(
+        link
+    )
     request = mocker.Mock(path="/")
     mocker.patch.object(middleware, "get_spa_html", return_value=spa_html)
     mocker.patch.object(
@@ -283,7 +285,9 @@ def test_rewrite_manifest_json_url(link, new_url, expected, mocker, settings):
     response = middleware.serve_spa(request)
 
     assert response.status_code == 200
-    expected_html = "<html><head>{}\n\n</head></html>".format(expected)
+    expected_html = "<html><head><link rel=before>{}<link rel=after>\n\n</head></html>".format(
+        expected
+    )
     assert response.content == expected_html.encode()
 
 

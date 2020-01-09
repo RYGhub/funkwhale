@@ -77,7 +77,7 @@ def serve_spa(request):
     return http.HttpResponse(head + tail)
 
 
-MANIFEST_LINK_REGEX = re.compile(r"<link .*rel=(?:'|\")?manifest(?:'|\")?.*>")
+MANIFEST_LINK_REGEX = re.compile(r"<link [^>]*rel=(?:'|\")?manifest(?:'|\")?[^>]*>")
 
 
 def replace_manifest_url(head, new_url):
