@@ -6,10 +6,13 @@ import store from './store'
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
-    ready (registration) {
+    ready () {
       console.log(
-        'App is being served from cache by a service worker.', registration
+        'App is being served from cache by a service worker.'
       )
+    },
+    registered (registration) {
+      console.log('Service worker has been registered.')
       // check for updates every 2 hours
       var checkInterval = 1000 * 60 * 60 * 2
       // var checkInterval = 1000 * 5
@@ -21,9 +24,6 @@ if (process.env.NODE_ENV === 'production') {
       if (registration.active) {
         registration.active.postMessage({command: 'serverChosen', serverUrl: store.state.instance.instanceUrl})
       }
-    },
-    registered () {
-      console.log('Service worker has been registered.')
     },
     cached () {
       console.log('Content has been cached for offline use.')

@@ -22,12 +22,6 @@ self.addEventListener('message', (e) => {
 });
 workbox.core.clientsClaim();
 
-// The precaching code provided by Workbox.
-self.__precacheManifest = [].concat(self.__precacheManifest || []);
-
-// workbox.precaching.suppressWarnings(); // Only used with Vue CLI 3 and Workbox v3.
-workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
-
 const router = new workbox.routing.Router();
 router.addCacheListener()
 router.addFetchListener()
@@ -88,3 +82,9 @@ self.registerServerRoutes = (serverUrl) => {
   router.registerRoute(route)
   registeredServerRoutes.push(route)
 }
+
+// The precaching code provided by Workbox.
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+
+// workbox.precaching.suppressWarnings(); // Only used with Vue CLI 3 and Workbox v3.
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
