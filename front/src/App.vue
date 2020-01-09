@@ -263,7 +263,7 @@ export default {
     updateApp () {
       this.$store.commit('ui/serviceWorker', {updateAvailable: false})
       if (!this.serviceWorker.registration || !this.serviceWorker.registration.waiting) { return; }
-      this.serviceWorker.registration.waiting.postMessage('skipWaiting');
+      this.serviceWorker.registration.waiting.postMessage({command: 'skipWaiting'})
     }
   },
   computed: {
@@ -317,9 +317,16 @@ export default {
     },
   },
   watch: {
-    '$store.state.instance.instanceUrl' () {
+    '$store.state.instance.instanceUrl' (v) {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
+      if (this.serviceWorker.registration) {
+        let sw = this.serviceWorker.registration.active
+        if (sw) {
+          sw.postMessage({command: 'serverChosen', serverUrl: v})
+
+        }
+      }
     },
     '$store.state.ui.theme': {
       immediate: true,
