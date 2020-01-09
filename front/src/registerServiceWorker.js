@@ -6,13 +6,10 @@ import store from './store'
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
-    ready () {
+    ready (registration) {
       console.log(
-        'App is being served from cache by a service worker.'
+        'App is being served from cache by a service worker.', registration
       )
-    },
-    registered (registration) {
-      console.log('Service worker has been registered.')
       // check for updates every 2 hours
       var checkInterval = 1000 * 60 * 60 * 2
       // var checkInterval = 1000 * 5
@@ -20,6 +17,13 @@ if (process.env.NODE_ENV === 'production') {
         console.log('Checking for service worker update…')
         registration.update();
       }, checkInterval);
+      store.commit('ui/serviceWorker', {registration: registration})
+      if (registration.active) {
+        registration.active.postMessage({command: 'serverChosen', serverUrl: store.state.instance.instanceUrl})
+      }
+    },
+    registered () {
+      console.log('Service worker has been registered.')
     },
     cached () {
       console.log('Content has been cached for offline use.')
