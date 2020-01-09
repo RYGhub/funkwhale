@@ -3,7 +3,7 @@
     <button
       v-if="!dropdownOnly"
       :title="labels.playNow"
-      @click="addNext(true)"
+      @click.stop.prevent="addNext(true)"
       :disabled="!playable"
       :class="buttonClasses.concat(['ui', {loading: isLoading}, {'mini': discrete}, {disabled: !playable}])">
       <i :class="[playIconClass, 'icon']"></i>
