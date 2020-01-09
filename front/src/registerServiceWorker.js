@@ -16,6 +16,7 @@ if (process.env.NODE_ENV === 'production') {
       // check for updates every 2 hours
       var checkInterval = 1000 * 60 * 60 * 2
       // var checkInterval = 1000 * 5
+      registration.update();
       setInterval(() => {
         console.log('Checking for service worker update…')
         registration.update();
