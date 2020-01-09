@@ -114,7 +114,7 @@ export default {
       let defaultInstanceUrl = this.$store.state.instance.frontSettings.defaultServerUrl || process.env.VUE_APP_INSTANCE_URL || this.$store.getters['instance/defaultUrl']()
       this.$store.commit('instance/instanceUrl', defaultInstanceUrl)
     } else {
-      // needed to trigger initialization of axios
+      // needed to trigger initialization of axios / service worker
       this.$store.commit('instance/instanceUrl', this.$store.state.instance.instanceUrl)
     }
     await this.fetchNodeInfo()
@@ -320,13 +320,6 @@ export default {
     '$store.state.instance.instanceUrl' (v) {
       this.$store.dispatch('instance/fetchSettings')
       this.fetchNodeInfo()
-      if (this.serviceWorker.registration) {
-        let sw = this.serviceWorker.registration.active
-        if (sw) {
-          sw.postMessage({command: 'serverChosen', serverUrl: v})
-
-        }
-      }
     },
     '$store.state.ui.theme': {
       immediate: true,
