@@ -13,6 +13,21 @@ This release includes a full redesign of our navigation, player and queue. Overa
 a better, less confusing experience, especially on mobile devices. This redesign was suggested
 14 months ago, and took a while, but thanks to the involvement and feedback of many people, we got it done!
 
+Progressive web app [Manual change suggested, non-docker only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We've made Funkwhale's Web UI a Progressive Web Application (PWA), in order to improve the user experience
+during offline use, and on mobile devices.
+
+In order to fully benefit from this change, if your pod isn't deployed using Docker, ensure
+the following instruction is present in your nginx configuration::
+
+    location /front/ {
+        # Add the following line in the /front/ location
+        add_header Service-Worker-Allowed "/";
+    }
+
+
 Improved search performance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
