@@ -1,3 +1,4 @@
+const baseUrl = process.env.BASE_URL || '/front/'
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
@@ -30,7 +31,7 @@ plugins.push(
   }),
 )
 module.exports = {
-  baseUrl: process.env.BASE_URL || '/front/',
+  baseUrl: baseUrl,
   productionSourceMap: false,
   // Add settings for manifest file
   pwa: {
@@ -48,11 +49,11 @@ module.exports = {
       categories: ["music"],
       icons: [
         {
-          'src': 'favicon.png',
+          'src': baseUrl + 'favicon.png',
           'sizes': '192x192',
           'type': 'image/png'
         },        {
-          'src': 'favicon.png',
+          'src': baseUrl + 'favicon.png',
           'sizes': '512x512',
           'type': 'image/png'
         },

@@ -2,6 +2,8 @@ import json
 
 from django.urls import reverse
 
+from funkwhale_api.federation import utils as federation_utils
+
 
 def test_nodeinfo_endpoint(db, api_client, mocker):
     payload = {"test": "test"}
@@ -54,6 +56,7 @@ def test_manifest_endpoint(api_client, mocker, preferences, tmp_path, settings):
         "name": "Test pod",
         "short_name": "Test pod",
         "description": "Test description",
+        "start_url": federation_utils.full_url("/"),
     }
     manifest.write_bytes(json.dumps(base_payload).encode())
 

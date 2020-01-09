@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from funkwhale_api.common import middleware
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import nodeinfo
@@ -57,6 +58,7 @@ class SpaManifest(views.APIView):
         )
         parsed_manifest = json.loads(existing_manifest)
         parsed_manifest["short_name"] = settings.APP_NAME
+        parsed_manifest["start_url"] = federation_utils.full_url("/")
         instance_name = preferences.get("instance__name")
         if instance_name:
             parsed_manifest["short_name"] = instance_name
