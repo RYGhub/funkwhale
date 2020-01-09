@@ -24,17 +24,7 @@ workbox.core.clientsClaim();
 
 // The precaching code provided by Workbox.
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
-console.log('[sw] Files to be cached [before filtering]', self.__precacheManifest.length);
-var excludedUrlsPrefix = [
-  '/js/locale-',
-  '/js/moment-locale-',
-  '/js/admin',
-  '/css/admin',
-];
-self.__precacheManifest = self.__precacheManifest.filter((e) => {
-  return !excludedUrlsPrefix.some(prefix => e.url.startsWith(prefix))
-});
-console.log('[sw] Files to be cached [after filtering]', self.__precacheManifest.length);
+
 // workbox.precaching.suppressWarnings(); // Only used with Vue CLI 3 and Workbox v3.
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 

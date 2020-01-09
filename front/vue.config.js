@@ -63,6 +63,12 @@ module.exports = {
       // swSrc is required in InjectManifest mode.
       swSrc: 'src/service-worker.js',
       swDest: 'service-worker.js',
+      exclude: [
+        new RegExp('js/locale.*'),
+        new RegExp('js/moment-locale.*'),
+        new RegExp('js/admin.*'),
+        new RegExp('css/admin.*'),
+      ]
     },
     iconPaths: {
       favicon32: 'favicon.png',
