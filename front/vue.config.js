@@ -40,9 +40,9 @@ module.exports = {
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-    display: 'minimal-ui',
     workboxPluginMode: 'InjectManifest',
     manifestOptions: {
+      display: 'minimal-ui',
       start_url: '.',
       description: 'A social platform to enjoy and share music',
       scope: "/",
