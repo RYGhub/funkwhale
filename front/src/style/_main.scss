@@ -478,10 +478,12 @@ input + .help {
       border-top: 0 !important;
     }
     .content:not(.extra) {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      padding-bottom: 0;
+      &, & * {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-bottom: 0;
+      }
     }
     .floating.dropdown > .icon {
       margin-right: 0;
