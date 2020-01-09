@@ -77,16 +77,58 @@ module.exports = {
       entry: 'src/embed.js',
       template: 'public/embed.html',
       filename: 'embed.html',
+      chunks: ['chunk-vendors', 'chunk-common', 'chunk-embed-vendors', 'embed']
     },
     index: {
       entry: 'src/main.js',
       template: 'public/index.html',
-      filename: 'index.html'
+      filename: 'index.html',
+      chunks: ['chunk-vendors', 'chunk-common', 'chunk-index-vendors', 'index']
     }
   },
   chainWebpack: config => {
     config.plugins.delete('prefetch-embed')
+    config.plugins.delete('preload-embed')
     config.plugins.delete('prefetch-index')
+
+    // needed to avoid having big dependedncies included in our lightweight
+    // embed.html, cf https://github.com/vuejs/vue-cli/issues/2381
+    const options = module.exports
+    const pages = options.pages
+    const pageKeys = Object.keys(pages)
+
+    // Long-term caching
+
+    const IS_VENDOR = /[\\/]node_modules[\\/]/
+
+    config.optimization
+      .splitChunks({
+        cacheGroups: {
+          vendors: {
+            name: 'chunk-vendors',
+            priority: -10,
+            chunks: 'initial',
+            minChunks: 2,
+            test: IS_VENDOR,
+            enforce: true,
+          },
+          ...pageKeys.map(key => ({
+            name: `chunk-${key}-vendors`,
+            priority: -11,
+            chunks: chunk => chunk.name === key,
+            test: IS_VENDOR,
+            enforce: true,
+          })),
+          common: {
+            name: 'chunk-common',
+            priority: -20,
+            chunks: 'initial',
+            minChunks: 2,
+            reuseExistingChunk: true,
+            enforce: true,
+          },
+        },
+      })
   },
   configureWebpack: {
     plugins: plugins,
