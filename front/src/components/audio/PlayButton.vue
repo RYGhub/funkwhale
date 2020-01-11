@@ -28,6 +28,10 @@
           <i class="feed icon"></i><translate translate-context="*/Queue/Button.Label/Short, Verb">Start radio</translate>
         </button>
         <div class="divider"></div>
+        <button class="item basic" ref="sendToBot" data-ref="sendToBot" :disabled="!playable" @click.stop.prevent="sendToBot()">
+          <i class="play icon"></i> Play on Royal Bot
+        </button>
+        <div class="divider"></div>
         <button v-if="filterableArtist" class="item basic" :disabled="!filterableArtist" @click.stop.prevent="filterArtist" :title="labels.hideArtist">
           <i class="eye slash outline icon"></i><translate translate-context="*/Queue/Dropdown/Button/Label/Short">Hide content from this artist</translate>
         </button>
@@ -250,6 +254,15 @@ export default {
         date: new Date()
       })
     },
+    sendToBot() {
+      let self = this;
+      this.getPlayableTracks().then((tracks) => {
+        for(let i = 0; i < tracks.length; i++) {
+          let t = tracks[i];
+          console.log(t);
+        }
+      })
+    }
   }
 }
 </script>
