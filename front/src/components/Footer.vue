@@ -11,7 +11,7 @@
               <translate translate-context="Footer/About/List item.Link">About page</translate>
             </router-link>
               <a v-if="version" class="item" href="https://docs.funkwhale.audio/changelog.html" target="_blank">
-                <translate translate-context="Footer/*/List item" :translate-params="{version: version}" >Version %{version}</translate>
+                <translate translate-context="Footer/*/List item" :translate-params="{version: version}" >Version %{version}</translate> <a href="https://github.com/Steffo99/funkwhale-ryg" title="Forked by Steffo99">*</a>
               </a>
             <div role="button" class="item" @click="$emit('show:set-instance-modal')" >
               <translate translate-context="Footer/*/List item.Link">Use another instance</translate>

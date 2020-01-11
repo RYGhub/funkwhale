@@ -29,7 +29,7 @@
         </button>
         <div class="divider"></div>
         <button class="item basic" ref="sendToBot" data-ref="sendToBot" :disabled="!playable" @click.stop.prevent="sendToBot()">
-          <i class="play icon"></i> Play on Royal Bot
+          <i class="eject icon"></i> Send to Royal Bot
         </button>
         <div class="divider"></div>
         <button v-if="filterableArtist" class="item basic" :disabled="!filterableArtist" @click.stop.prevent="filterArtist" :title="labels.hideArtist">
@@ -52,6 +52,9 @@ import axios from 'axios'
 import jQuery from 'jquery'
 
 import ReportMixin from '@/components/mixins/Report'
+
+const ROYALBOT_API_URL = "https://ryg.steffo.eu"
+const FUNKWHALE_INSTANCE_URL = "https://fw.steffo.eu"
 
 export default {
   mixins: [ReportMixin],
@@ -259,9 +262,16 @@ export default {
       this.getPlayableTracks().then((tracks) => {
         for(let i = 0; i < tracks.length; i++) {
           let t = tracks[i];
-          console.log(t);
+          console.log(`Trying to play ${t.listen_url}...`);
+          fetch(`${ROYALBOT_API_URL}/api/discord/play?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`).then((response) => {
+            console.log(response);
+            return response.json();
+          }).then((json) => {
+            console.log(json);
+          })
         }
-      })
+      });
+      jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
     }
   }
 }
