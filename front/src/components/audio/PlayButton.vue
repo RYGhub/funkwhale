@@ -262,12 +262,22 @@ export default {
       this.getPlayableTracks().then((tracks) => {
         for(let i = 0; i < tracks.length; i++) {
           let t = tracks[i];
-          console.log(`Trying to play ${t.listen_url}...`);
           fetch(`${ROYALBOT_API_URL}/api/discord/play?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`).then((response) => {
-            console.log(response);
             return response.json();
           }).then((json) => {
-            console.log(json);
+          })
+        }
+
+        if(tracks.length !== 1) {
+          this.$store.commit('ui/addMessage', {
+            content: this.$gettextInterpolate("%{ count } tracks sent to Royal Bot.", {count: tracks.length}),
+            date: new Date()
+          })
+        }
+        else {
+          this.$store.commit('ui/addMessage', {
+            content: this.$gettextInterpolate("%{ count } track sent to Royal Bot.", {count: tracks.length}),
+            date: new Date()
           })
         }
       });
