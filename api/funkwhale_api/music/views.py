@@ -143,6 +143,11 @@ class ArtistViewSet(
             obj = refetch_obj(obj, self.get_queryset())
         return obj
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
+
     def get_queryset(self):
         queryset = super().get_queryset()
         albums = models.Album.objects.with_tracks_count().select_related(
@@ -193,6 +198,11 @@ class AlbumViewSet(
         ):
             obj = refetch_obj(obj, self.get_queryset())
         return obj
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -331,6 +341,11 @@ class TrackViewSet(
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track=o))
     )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
 
 
 def strip_absolute_media_url(path):

@@ -225,11 +225,14 @@ class MusicLibraryViewSet(
                         "album__attributed_to",
                         "attributed_to",
                         "album__attachment_cover",
+                        "description",
                     ).prefetch_related(
                         "tagged_items__tag",
                         "album__tagged_items__tag",
                         "album__artist__tagged_items__tag",
                         "artist__tagged_items__tag",
+                        "artist__description",
+                        "album__description",
                     ),
                 )
             ),
@@ -278,6 +281,7 @@ class MusicUploadViewSet(
         "library__actor",
         "track__artist",
         "track__album__artist",
+        "track__description",
         "track__album__attachment_cover",
     )
     serializer_class = serializers.UploadSerializer
@@ -299,7 +303,7 @@ class MusicArtistViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
-    queryset = music_models.Artist.objects.local()
+    queryset = music_models.Artist.objects.local().select_related("description")
     serializer_class = serializers.ArtistSerializer
     lookup_field = "uuid"
 
@@ -309,7 +313,9 @@ class MusicAlbumViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
-    queryset = music_models.Album.objects.local().select_related("artist")
+    queryset = music_models.Album.objects.local().select_related(
+        "artist__description", "description"
+    )
     serializer_class = serializers.AlbumSerializer
     lookup_field = "uuid"
 
@@ -320,7 +326,7 @@ class MusicTrackViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Track.objects.local().select_related(
-        "album__artist", "artist"
+        "album__artist", "album__description", "artist__description", "description"
     )
     serializer_class = serializers.TrackSerializer
     lookup_field = "uuid"

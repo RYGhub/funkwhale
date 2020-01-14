@@ -11,6 +11,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from . import models
+from . import utils
 
 
 class RelatedField(serializers.RelatedField):
@@ -308,3 +309,12 @@ class AttachmentSerializer(serializers.Serializer):
         return models.Attachment.objects.create(
             file=validated_data["file"], actor=validated_data["actor"]
         )
+
+
+class ContentSerializer(serializers.Serializer):
+    text = serializers.CharField(max_length=models.CONTENT_TEXT_MAX_LENGTH)
+    content_type = serializers.ChoiceField(choices=models.CONTENT_TEXT_SUPPORTED_TYPES,)
+    html = serializers.SerializerMethodField()
+
+    def get_html(self, o):
+        return utils.render_html(o.text, o.content_type)

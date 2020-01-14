@@ -128,6 +128,21 @@ def test_can_create_track_from_file_metadata_featuring(factories):
     assert track.artist.name == "Santana feat. Chris Cornell"
 
 
+def test_can_create_track_from_file_metadata_description(factories):
+    metadata = {
+        "title": "Whole Lotta Love",
+        "position": 1,
+        "disc_number": 1,
+        "description": {"text": "hello there", "content_type": "text/plain"},
+        "album": {"title": "Test album"},
+        "artists": [{"name": "Santana"}],
+    }
+    track = tasks.get_track_from_import_metadata(metadata)
+
+    assert track.description.text == "hello there"
+    assert track.description.content_type == "text/plain"
+
+
 def test_can_create_track_from_file_metadata_mbid(factories, mocker):
     metadata = {
         "title": "Test track",
@@ -607,6 +622,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "copyright": "2018 Someone",
         "attributedTo": "http://track.attributed",
         "tag": [{"type": "Hashtag", "name": "TrackTag"}],
+        "content": "hello there",
         "album": {
             "published": published.isoformat(),
             "type": "Album",
@@ -616,12 +632,16 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "released": released.isoformat(),
             "tag": [{"type": "Hashtag", "name": "AlbumTag"}],
             "attributedTo": "http://album.attributed",
+            "content": "album desc",
+            "mediaType": "text/plain",
             "artists": [
                 {
                     "type": "Artist",
                     "published": published.isoformat(),
                     "id": "http://hello.artist",
                     "name": "John Smith",
+                    "content": "album artist desc",
+                    "mediaType": "text/markdown",
                     "musicbrainzId": str(uuid.uuid4()),
                     "attributedTo": "http://album-artist.attributed",
                     "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
@@ -639,6 +659,8 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "type": "Artist",
                 "id": "http://hello.trackartist",
                 "name": "Bob Smith",
+                "content": "artist desc",
+                "mediaType": "text/html",
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": "http://artist.attributed",
                 "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
@@ -658,6 +680,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
         "fid": payload["id"],
         "attributed_to": references["http://track.attributed"],
         "tags": ["TrackTag"],
+        "description": {"content_type": "text/html", "text": "hello there"},
         "album": {
             "title": payload["album"]["name"],
             "attributed_to": references["http://album.attributed"],
@@ -666,6 +689,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
             "fid": payload["album"]["id"],
             "fdate": serializer.validated_data["album"]["published"],
             "tags": ["AlbumTag"],
+            "description": {"content_type": "text/plain", "text": "album desc"},
             "artists": [
                 {
                     "name": a["name"],
@@ -675,6 +699,10 @@ def test_federation_audio_track_to_metadata(now, mocker):
                     "fdate": serializer.validated_data["album"]["artists"][i][
                         "published"
                     ],
+                    "description": {
+                        "content_type": "text/markdown",
+                        "text": "album artist desc",
+                    },
                     "tags": ["AlbumArtistTag"],
                 }
                 for i, a in enumerate(payload["album"]["artists"])
@@ -690,6 +718,7 @@ def test_federation_audio_track_to_metadata(now, mocker):
                 "fdate": serializer.validated_data["artists"][i]["published"],
                 "attributed_to": references["http://artist.attributed"],
                 "tags": ["ArtistTag"],
+                "description": {"content_type": "text/html", "text": "artist desc"},
             }
             for i, a in enumerate(payload["artists"])
         ],

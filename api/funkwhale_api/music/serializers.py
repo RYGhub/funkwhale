@@ -49,6 +49,20 @@ def serialize_attributed_to(self, obj):
     return federation_serializers.APIActorSerializer(obj.attributed_to).data
 
 
+class OptionalDescriptionMixin(object):
+    def to_representation(self, obj):
+        repr = super().to_representation(obj)
+        if self.context.get("description", False):
+            description = obj.description
+            repr["description"] = (
+                common_serializers.ContentSerializer(description).data
+                if description
+                else None
+            )
+
+        return repr
+
+
 class LicenseSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     url = serializers.URLField()
@@ -96,7 +110,7 @@ class ArtistAlbumSerializer(serializers.Serializer):
 DATETIME_FIELD = serializers.DateTimeField()
 
 
-class ArtistWithAlbumsSerializer(serializers.Serializer):
+class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serializer):
     albums = ArtistAlbumSerializer(many=True)
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
@@ -152,7 +166,7 @@ def serialize_album_track(track):
     }
 
 
-class AlbumSerializer(serializers.Serializer):
+class AlbumSerializer(OptionalDescriptionMixin, serializers.Serializer):
     tracks = serializers.SerializerMethodField()
     artist = serializers.SerializerMethodField()
     cover = cover_field
@@ -225,7 +239,7 @@ def serialize_upload(upload):
     }
 
 
-class TrackSerializer(serializers.Serializer):
+class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
     artist = serializers.SerializerMethodField()
     album = TrackAlbumSerializer(read_only=True)
     uploads = serializers.SerializerMethodField()

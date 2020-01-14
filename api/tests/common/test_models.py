@@ -71,3 +71,17 @@ def test_attachment_queryset_attached(args, expected, factories, queryset_equal_
     queryset = attachments[0].__class__.objects.attached(*args).order_by("id")
     expected_objs = [attachments[i] for i in expected]
     assert queryset == expected_objs
+
+
+def test_removing_obj_removes_content(factories):
+    kept_content = factories["common.Content"]()
+    removed_content = factories["common.Content"]()
+    track1 = factories["music.Track"](description=removed_content)
+    factories["music.Track"](description=kept_content)
+
+    track1.delete()
+
+    with pytest.raises(removed_content.DoesNotExist):
+        removed_content.refresh_from_db()
+
+    kept_content.refresh_from_db()

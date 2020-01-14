@@ -1256,3 +1256,22 @@ def test_search_get_fts_stop_words(settings, logged_in_api_client, factories):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+@pytest.mark.parametrize(
+    "route, factory_name",
+    [
+        ("api:v1:artists-detail", "music.Artist"),
+        ("api:v1:albums-detail", "music.Album"),
+        ("api:v1:tracks-detail", "music.Track"),
+    ],
+)
+def test_detail_includes_description_key(
+    route, factory_name, logged_in_api_client, factories
+):
+    obj = factories[factory_name]()
+    url = reverse(route, kwargs={"pk": obj.pk})
+
+    response = logged_in_api_client.get(url)
+
+    assert response.data["description"] is None

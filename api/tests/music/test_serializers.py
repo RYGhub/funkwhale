@@ -501,3 +501,21 @@ def test_upload_with_channel_validates_import_metadata(factories, uploaded_audio
     )
     with pytest.raises(serializers.serializers.ValidationError):
         assert serializer.is_valid(raise_exception=True)
+
+
+@pytest.mark.parametrize(
+    "factory_name, serializer_class",
+    [
+        ("music.Artist", serializers.ArtistWithAlbumsSerializer),
+        ("music.Album", serializers.AlbumSerializer),
+        ("music.Track", serializers.TrackSerializer),
+    ],
+)
+def test_detail_serializers_with_description_description(
+    factory_name, serializer_class, factories
+):
+    content = factories["common.Content"]()
+    obj = factories[factory_name](description=content)
+    expected = common_serializers.ContentSerializer(content).data
+    serializer = serializer_class(obj, context={"description": True})
+    assert serializer.data["description"] == expected

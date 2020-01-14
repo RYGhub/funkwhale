@@ -5,6 +5,7 @@ import uuid
 from django.core.paginator import Paginator
 from django.utils import timezone
 
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import contexts
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import jsonld
@@ -560,7 +561,10 @@ def test_music_library_serializer_from_private(factories, mocker):
 
 
 def test_activity_pub_artist_serializer_to_ap(factories):
-    artist = factories["music.Artist"](attributed=True, set_tags=["Punk", "Rock"])
+    content = factories["common.Content"]()
+    artist = factories["music.Artist"](
+        description=content, attributed=True, set_tags=["Punk", "Rock"]
+    )
     expected = {
         "@context": jsonld.get_default_context(),
         "type": "Artist",
@@ -569,6 +573,8 @@ def test_activity_pub_artist_serializer_to_ap(factories):
         "musicbrainzId": artist.mbid,
         "published": artist.creation_date.isoformat(),
         "attributedTo": artist.attributed_to.fid,
+        "mediaType": "text/html",
+        "content": common_utils.render_html(content.text, content.content_type),
         "tag": [
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
@@ -580,7 +586,10 @@ def test_activity_pub_artist_serializer_to_ap(factories):
 
 
 def test_activity_pub_album_serializer_to_ap(factories):
-    album = factories["music.Album"](attributed=True, set_tags=["Punk", "Rock"])
+    content = factories["common.Content"]()
+    album = factories["music.Album"](
+        description=content, attributed=True, set_tags=["Punk", "Rock"]
+    )
 
     expected = {
         "@context": jsonld.get_default_context(),
@@ -601,6 +610,8 @@ def test_activity_pub_album_serializer_to_ap(factories):
             ).data
         ],
         "attributedTo": album.attributed_to.fid,
+        "mediaType": "text/html",
+        "content": common_utils.render_html(content.text, content.content_type),
         "tag": [
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
@@ -653,7 +664,9 @@ def test_activity_pub_album_serializer_from_ap_update(factories, faker):
 
 
 def test_activity_pub_track_serializer_to_ap(factories):
+    content = factories["common.Content"]()
     track = factories["music.Track"](
+        description=content,
         license="cc-by-4.0",
         copyright="test",
         disc_number=3,
@@ -680,6 +693,8 @@ def test_activity_pub_track_serializer_to_ap(factories):
             track.album, context={"include_ap_context": False}
         ).data,
         "attributedTo": track.attributed_to.fid,
+        "mediaType": "text/html",
+        "content": common_utils.render_html(content.text, content.content_type),
         "tag": [
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
@@ -709,6 +724,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
         "name": "Black in back",
         "position": 5,
         "disc": 1,
+        "content": "Hello there",
         "attributedTo": track_attributed_to.fid,
         "album": {
             "type": "Album",
@@ -717,6 +733,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
             "musicbrainzId": str(uuid.uuid4()),
             "published": published.isoformat(),
             "released": released.isoformat(),
+            "content": "Album summary",
+            "mediaType": "text/markdown",
             "attributedTo": album_attributed_to.fid,
             "cover": {
                 "type": "Link",
@@ -727,6 +745,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
             "artists": [
                 {
                     "type": "Artist",
+                    "mediaType": "text/plain",
+                    "content": "Artist summary",
                     "id": "http://hello.artist",
                     "name": "John Smith",
                     "musicbrainzId": str(uuid.uuid4()),
@@ -741,6 +761,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                 "type": "Artist",
                 "id": "http://hello.trackartist",
                 "name": "Bob Smith",
+                "mediaType": "text/plain",
+                "content": "Other artist summary",
                 "musicbrainzId": str(uuid.uuid4()),
                 "attributedTo": artist_attributed_to.fid,
                 "published": published.isoformat(),
@@ -769,6 +791,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert track.creation_date == published
     assert track.attributed_to == track_attributed_to
     assert str(track.mbid) == data["musicbrainzId"]
+    assert track.description.text == data["content"]
+    assert track.description.content_type == "text/html"
 
     assert album.from_activity == activity
     assert album.attachment_cover.file.read() == b"coucou"
@@ -779,6 +803,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert album.creation_date == published
     assert album.release_date == released
     assert album.attributed_to == album_attributed_to
+    assert album.description.text == data["album"]["content"]
+    assert album.description.content_type == data["album"]["mediaType"]
 
     assert artist.from_activity == activity
     assert artist.name == data["artists"][0]["name"]
@@ -786,6 +812,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert str(artist.mbid) == data["artists"][0]["musicbrainzId"]
     assert artist.creation_date == published
     assert artist.attributed_to == artist_attributed_to
+    assert artist.description.text == data["artists"][0]["content"]
+    assert artist.description.content_type == data["artists"][0]["mediaType"]
 
     assert album_artist.from_activity == activity
     assert album_artist.name == data["album"]["artists"][0]["name"]
@@ -793,6 +821,11 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert str(album_artist.mbid) == data["album"]["artists"][0]["musicbrainzId"]
     assert album_artist.creation_date == published
     assert album_artist.attributed_to == album_artist_attributed_to
+    assert album_artist.description.text == data["album"]["artists"][0]["content"]
+    assert (
+        album_artist.description.content_type
+        == data["album"]["artists"][0]["mediaType"]
+    )
 
     add_tags.assert_any_call(track, *["Hello", "World"])
     add_tags.assert_any_call(album, *["AlbumTag"])
@@ -802,8 +835,9 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
 
 def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker):
     set_tags = mocker.patch("funkwhale_api.tags.models.set_tags")
+    content = factories["common.Content"]()
     track_attributed_to = factories["federation.Actor"]()
-    track = factories["music.Track"]()
+    track = factories["music.Track"](description=content)
 
     published = timezone.now()
     data = {
@@ -815,6 +849,7 @@ def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker)
         "name": "Black in back",
         "position": 5,
         "disc": 2,
+        "content": "hello there",
         "attributedTo": track_attributed_to.fid,
         "album": serializers.AlbumSerializer(track.album).data,
         "artists": [serializers.ArtistSerializer(track.artist).data],
@@ -835,9 +870,14 @@ def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker)
     assert track.position == data["position"]
     assert track.disc_number == data["disc"]
     assert track.attributed_to == track_attributed_to
+    assert track.description.content_type == "text/html"
+    assert track.description.text == "hello there"
     assert str(track.mbid) == data["musicbrainzId"]
 
     set_tags.assert_called_once_with(track, *["Hello", "World"])
+
+    with pytest.raises(content.DoesNotExist):
+        content.refresh_from_db()
 
 
 def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
@@ -1083,11 +1123,13 @@ def test_channel_actor_outbox_serializer(factories):
 
 def test_channel_upload_serializer(factories):
     channel = factories["audio.Channel"]()
+    content = factories["common.Content"]()
     upload = factories["music.Upload"](
         playable=True,
         library=channel.library,
         import_status="finished",
         track__set_tags=["Punk"],
+        track__description=content,
         track__album__set_tags=["Rock"],
         track__artist__set_tags=["Indie"],
     )
@@ -1100,6 +1142,8 @@ def test_channel_upload_serializer(factories):
         "summary": "#Indie #Punk #Rock",
         "attributedTo": channel.actor.fid,
         "published": upload.creation_date.isoformat(),
+        "mediaType": "text/html",
+        "content": common_utils.render_html(content.text, content.content_type),
         "to": "https://www.w3.org/ns/activitystreams#Public",
         "url": [
             {

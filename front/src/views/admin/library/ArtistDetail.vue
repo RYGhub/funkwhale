@@ -117,6 +117,12 @@
                       {{ object.domain }}
                     </td>
                   </tr>
+                  <tr v-if="object.description">
+                    <td>
+                      <translate translate-context="'*/*/*/Noun">Description</translate>
+                    </td>
+                    <td v-html="object.description.html"></td>
+                  </tr>
                 </tbody>
               </table>
             </section>

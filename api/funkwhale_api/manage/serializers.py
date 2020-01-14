@@ -383,7 +383,9 @@ class ManageNestedAlbumSerializer(ManageBaseAlbumSerializer):
         return getattr(obj, "tracks_count", None)
 
 
-class ManageArtistSerializer(ManageBaseArtistSerializer):
+class ManageArtistSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageBaseArtistSerializer
+):
     albums = ManageNestedAlbumSerializer(many=True)
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
@@ -407,7 +409,9 @@ class ManageNestedArtistSerializer(ManageBaseArtistSerializer):
     pass
 
 
-class ManageAlbumSerializer(ManageBaseAlbumSerializer):
+class ManageAlbumSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageBaseAlbumSerializer
+):
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     artist = ManageNestedArtistSerializer()
@@ -435,7 +439,9 @@ class ManageTrackAlbumSerializer(ManageBaseAlbumSerializer):
         fields = ManageBaseAlbumSerializer.Meta.fields + ["artist"]
 
 
-class ManageTrackSerializer(ManageNestedTrackSerializer):
+class ManageTrackSerializer(
+    music_serializers.OptionalDescriptionMixin, ManageNestedTrackSerializer
+):
     artist = ManageNestedArtistSerializer()
     album = ManageTrackAlbumSerializer()
     attributed_to = ManageBaseActorSerializer()
