@@ -5,8 +5,20 @@ function getTagsValueRepr (val) {
   return val.slice().sort().join('\n')
 }
 
+function getContentValueRepr (val) {
+  return val.text
+}
+
 export default {
   getConfigs () {
+    const description = {
+      id: 'description',
+      type: 'content',
+      required: true,
+      label: this.$pgettext('*/*/*/Noun', 'Description'),
+      getValue: (obj) => { return obj.description || {text: null, content_type: 'text/markdown'}},
+      getValueRepr: getContentValueRepr
+    }
     return {
       artist: {
         fields: [
@@ -17,6 +29,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Name'),
             getValue: (obj) => { return obj.name }
           },
+          description,
           {
             id: 'tags',
             type: 'tags',
@@ -24,7 +37,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Tags'),
             getValue: (obj) => { return obj.tags },
             getValueRepr: getTagsValueRepr
-          }
+          },
         ]
       },
       album: {
@@ -36,6 +49,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
+          description,
           {
             id: 'release_date',
             type: 'text',
@@ -75,6 +89,7 @@ export default {
             label: this.$pgettext('*/*/*/Noun', 'Title'),
             getValue: (obj) => { return obj.title }
           },
+          description,
           {
             id: 'position',
             type: 'text',

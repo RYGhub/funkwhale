@@ -227,6 +227,9 @@ class Artist(APIModelMixin):
         content_type_field="object_content_type",
         object_id_field="object_id",
     )
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
 
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
@@ -325,6 +328,10 @@ class Album(APIModelMixin):
         "federation.Fetch",
         content_type_field="object_content_type",
         object_id_field="object_id",
+    )
+
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
     )
 
     api_includes = ["artist-credits", "recordings", "media", "release-groups"]
@@ -508,6 +515,10 @@ class Track(APIModelMixin):
     copyright = models.CharField(
         max_length=MAX_LENGTHS["COPYRIGHT"], null=True, blank=True
     )
+    description = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
+
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings

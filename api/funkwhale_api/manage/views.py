@@ -100,6 +100,11 @@ class ManageArtistViewSet(
         result = serializer.save()
         return response.Response(result, status=200)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
+
 
 class ManageAlbumViewSet(
     mixins.ListModelMixin,
@@ -133,6 +138,11 @@ class ManageAlbumViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
 
 
 uploads_subquery = (
@@ -185,6 +195,11 @@ class ManageTrackViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["description"] = self.action in ["retrieve", "create", "update"]
+        return context
 
 
 uploads_subquery = (

@@ -24,6 +24,14 @@ from . import utils
 from . import validators
 
 
+CONTENT_TEXT_MAX_LENGTH = 5000
+CONTENT_TEXT_SUPPORTED_TYPES = [
+    "text/html",
+    "text/markdown",
+    "text/plain",
+]
+
+
 @Field.register_lookup
 class NotEqual(Lookup):
     lookup_name = "ne"
@@ -273,6 +281,15 @@ class MutationAttachment(models.Model):
         unique_together = ("attachment", "mutation")
 
 
+class Content(models.Model):
+    """
+    A text content that can be associated to other models, like a description, a summary, etc.
+    """
+
+    text = models.CharField(max_length=CONTENT_TEXT_MAX_LENGTH, blank=True, null=True)
+    content_type = models.CharField(max_length=100)
+
+
 @receiver(models.signals.post_save, sender=Attachment)
 def warm_attachment_thumbnails(sender, instance, **kwargs):
     if not instance.file or not settings.CREATE_IMAGE_THUMBNAILS:
@@ -302,3 +319,18 @@ def trigger_mutation_post_init(sender, instance, created, **kwargs):
     except AttributeError:
         return
     handler(instance)
+
+
+CONTENT_FKS = {
+    "music.Track": ["description"],
+    "music.Album": ["description"],
+    "music.Artist": ["description"],
+}
+
+
+@receiver(models.signals.post_delete, sender=None)
+def remove_attached_content(sender, instance, **kwargs):
+    fk_fields = CONTENT_FKS.get(instance._meta.label, [])
+    for field in fk_fields:
+        if getattr(instance, "{}_id".format(field)):
+            getattr(instance, field).delete()

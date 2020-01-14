@@ -1,5 +1,7 @@
 from django.utils.deconstruct import deconstructible
 
+import bleach.sanitizer
+import markdown
 import os
 import shutil
 import uuid
@@ -241,3 +243,65 @@ def join_queries_or(left, right):
         return left | right
     else:
         return right
+
+
+def render_markdown(text):
+    return markdown.markdown(text, extensions=["nl2br"])
+
+
+HTMl_CLEANER = bleach.sanitizer.Cleaner(
+    strip=True,
+    tags=[
+        "p",
+        "a",
+        "abbr",
+        "acronym",
+        "b",
+        "blockquote",
+        "code",
+        "em",
+        "i",
+        "li",
+        "ol",
+        "strong",
+        "ul",
+    ],
+)
+
+HTML_LINKER = bleach.linkifier.Linker()
+
+
+def clean_html(html):
+    return HTMl_CLEANER.clean(html)
+
+
+def render_html(text, content_type):
+    rendered = render_markdown(text)
+    if content_type == "text/html":
+        rendered = text
+    elif content_type == "text/markdown":
+        rendered = render_markdown(text)
+    else:
+        rendered = render_markdown(text)
+    rendered = HTML_LINKER.linkify(rendered)
+    return clean_html(rendered).strip().replace("\n", "")
+
+
+@transaction.atomic
+def attach_content(obj, field, content_data):
+    from . import models
+
+    existing = getattr(obj, "{}_id".format(field))
+
+    if existing:
+        getattr(obj, field).delete()
+
+    if not content_data:
+        return
+
+    content_obj = models.Content.objects.create(
+        text=content_data["text"][: models.CONTENT_TEXT_MAX_LENGTH],
+        content_type=content_data["content_type"],
+    )
+    setattr(obj, field, content_obj)
+    obj.save(update_fields=[field])

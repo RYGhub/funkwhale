@@ -26,3 +26,12 @@ class AttachmentFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
 
     class Meta:
         model = "common.Attachment"
+
+
+@registry.register
+class CommonFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    text = factory.Faker("paragraph")
+    content_type = "text/plain"
+
+    class Meta:
+        model = "common.Content"

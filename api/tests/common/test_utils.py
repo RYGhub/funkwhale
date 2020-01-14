@@ -99,3 +99,28 @@ def test_get_updated_fields(conf, mock_args, data, expected, mocker):
 )
 def test_join_url(start, end, expected):
     assert utils.join_url(start, end) == expected
+
+
+@pytest.mark.parametrize(
+    "text, content_type, expected",
+    [
+        ("hello world", "text/markdown", "<p>hello world</p>"),
+        ("hello world", "text/plain", "<p>hello world</p>"),
+        ("<strong>hello world</strong>", "text/html", "<strong>hello world</strong>"),
+        # images and other non whitelisted html should be removed
+        ("hello world\n![img](src)", "text/markdown", "<p>hello world</p>"),
+        (
+            "hello world\n\n<script></script>\n\n<style></style>",
+            "text/markdown",
+            "<p>hello world</p>",
+        ),
+        (
+            "<p>hello world</p><script></script>\n\n<style></style>",
+            "text/html",
+            "<p>hello world</p>",
+        ),
+    ],
+)
+def test_render_html(text, content_type, expected):
+    result = utils.render_html(text, content_type)
+    assert result == expected

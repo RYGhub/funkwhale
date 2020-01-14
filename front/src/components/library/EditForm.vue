@@ -77,6 +77,10 @@
           </button>
 
         </template>
+        <template v-else-if="fieldConfig.type === 'content'">
+          <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
+          <textarea v-model="values[fieldConfig.id].text" :name="fieldConfig.id" :id="fieldConfig.id" rows="3"></textarea>
+        </template>
         <template v-else-if="fieldConfig.type === 'attachment'">
           <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
           <attachment-input
@@ -100,8 +104,8 @@
             <translate translate-context="Content/Library/Button.Label">Clear</translate>
           </button>
         </template>
-        <div v-if="values[fieldConfig.id] != initialValues[fieldConfig.id]">
-          <button class="ui tiny basic right floated reset button" form="noop" @click.prevent="values[fieldConfig.id] = initialValues[fieldConfig.id]">
+        <div v-if="!lodash.isEqual(values[fieldConfig.id], initialValues[fieldConfig.id])">
+          <button class="ui tiny basic right floated reset button" form="noop" @click.prevent="values[fieldConfig.id] = lodash.clone(initialValues[fieldConfig.id])">
             <i class="undo icon"></i>
             <translate translate-context="Content/Library/Button.Label">Reset to initial value</translate>
           </button>
@@ -156,6 +160,7 @@ export default {
       summary: '',
       submittedMutation: null,
       showPendingReview: true,
+      lodash,
     }
   },
   created () {
@@ -216,8 +221,8 @@ export default {
     setValues () {
       let self = this
       this.config.fields.forEach(f => {
-        self.$set(self.values, f.id, f.getValue(self.object))
-        self.$set(self.initialValues, f.id, self.values[f.id])
+        self.$set(self.values, f.id, lodash.clone(f.getValue(self.object)))
+        self.$set(self.initialValues, f.id, lodash.clone(self.values[f.id]))
       })
     },
     submit() {

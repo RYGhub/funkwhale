@@ -12,6 +12,7 @@ from musicbrainzngs import ResponseError
 from requests.exceptions import RequestException
 
 from funkwhale_api.common import channels, preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import library as lb
 from funkwhale_api.federation import utils as federation_utils
@@ -309,6 +310,7 @@ def federation_audio_track_to_metadata(payload, references):
         "disc_number": payload.get("disc"),
         "license": payload.get("license"),
         "copyright": payload.get("copyright"),
+        "description": payload.get("description"),
         "attributed_to": references.get(payload.get("attributedTo")),
         "mbid": str(payload.get("musicbrainzId"))
         if payload.get("musicbrainzId")
@@ -317,6 +319,7 @@ def federation_audio_track_to_metadata(payload, references):
             "title": payload["album"]["name"],
             "fdate": payload["album"]["published"],
             "fid": payload["album"]["id"],
+            "description": payload["album"].get("description"),
             "attributed_to": references.get(payload["album"].get("attributedTo")),
             "mbid": str(payload["album"]["musicbrainzId"])
             if payload["album"].get("musicbrainzId")
@@ -328,6 +331,7 @@ def federation_audio_track_to_metadata(payload, references):
                     "fid": a["id"],
                     "name": a["name"],
                     "fdate": a["published"],
+                    "description": a.get("description"),
                     "attributed_to": references.get(a.get("attributedTo")),
                     "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
                     "tags": [t["name"] for t in a.get("tags", []) or []],
@@ -340,6 +344,7 @@ def federation_audio_track_to_metadata(payload, references):
                 "fid": a["id"],
                 "name": a["name"],
                 "fdate": a["published"],
+                "description": a.get("description"),
                 "attributed_to": references.get(a.get("attributedTo")),
                 "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
                 "tags": [t["name"] for t in a.get("tags", []) or []],
@@ -505,6 +510,9 @@ def _get_track(data, attributed_to=None, **forced_values):
         )
         if created:
             tags_models.add_tags(artist, *artist_data.get("tags", []))
+            common_utils.attach_content(
+                artist, "description", artist_data.get("description")
+            )
 
     if "album" in forced_values:
         album = forced_values["album"]
@@ -539,6 +547,9 @@ def _get_track(data, attributed_to=None, **forced_values):
             )
             if created:
                 tags_models.add_tags(album_artist, *album_artist_data.get("tags", []))
+                common_utils.attach_content(
+                    album_artist, "description", album_artist_data.get("description")
+                )
 
         # get / create album
         album_data = data["album"]
@@ -569,6 +580,9 @@ def _get_track(data, attributed_to=None, **forced_values):
         )
         if created:
             tags_models.add_tags(album, *album_data.get("tags", []))
+            common_utils.attach_content(
+                album, "description", album_data.get("description")
+            )
 
     # get / create track
     track_title = (
@@ -602,6 +616,7 @@ def _get_track(data, attributed_to=None, **forced_values):
         query |= Q(mbid=track_mbid)
     if track_fid:
         query |= Q(fid=track_fid)
+
     defaults = {
         "title": track_title,
         "album": album,
@@ -627,6 +642,8 @@ def _get_track(data, attributed_to=None, **forced_values):
             forced_values["tags"] if "tags" in forced_values else data.get("tags", [])
         )
         tags_models.add_tags(track, *tags)
+        common_utils.attach_content(track, "description", data.get("description"))
+
     return track
 
 

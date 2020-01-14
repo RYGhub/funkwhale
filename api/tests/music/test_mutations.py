@@ -1,6 +1,7 @@
 import datetime
 import pytest
 
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import licenses
 from funkwhale_api.music import mutations
 
@@ -195,3 +196,26 @@ def test_mutation_set_attachment_cover(factories, now, mocker):
 
     assert obj.attachment_cover == new_attachment
     assert mutation.previous_state["cover"] == old_attachment.uuid
+
+
+@pytest.mark.parametrize(
+    "factory_name", ["music.Track", "music.Album", "music.Artist"],
+)
+def test_album_mutation_description(factory_name, factories, mocker):
+    mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
+    content = factories["common.Content"]()
+    obj = factories[factory_name](description=content)
+    mutation = factories["common.Mutation"](
+        type="update",
+        target=obj,
+        payload={"description": {"content_type": "text/plain", "text": "hello there"}},
+    )
+    mutation.apply()
+    obj.refresh_from_db()
+
+    assert obj.description.content_type == "text/plain"
+    assert obj.description.text == "hello there"
+    assert (
+        mutation.previous_state["description"]
+        == common_serializers.ContentSerializer(content).data
+    )

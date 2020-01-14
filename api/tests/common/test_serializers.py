@@ -7,6 +7,7 @@ from django.urls import reverse
 import django_filters
 
 from funkwhale_api.common import serializers
+from funkwhale_api.common import utils
 from funkwhale_api.users import models
 from funkwhale_api.federation import utils as federation_utils
 
@@ -250,5 +251,19 @@ def test_attachment_serializer_remote_file(factories, to_api_date):
     }
 
     serializer = serializers.AttachmentSerializer(attachment)
+
+    assert serializer.data == expected
+
+
+def test_content_serializer(factories):
+    content = factories["common.Content"]()
+
+    expected = {
+        "text": content.text,
+        "content_type": content.content_type,
+        "html": utils.render_html(content.text, content.content_type),
+    }
+
+    serializer = serializers.ContentSerializer(content)
 
     assert serializer.data == expected

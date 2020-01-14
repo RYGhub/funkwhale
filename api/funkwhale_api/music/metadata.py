@@ -168,6 +168,17 @@ def get_mp3_recording_id(f, k):
         raise TagNotFound(k)
 
 
+def get_mp3_comment(f, k):
+    keys_to_try = ["COMM", "COMM::eng"]
+    for key in keys_to_try:
+        try:
+            return get_id3_tag(f, key)
+        except TagNotFound:
+            pass
+
+    raise TagNotFound("COMM")
+
+
 VALIDATION = {}
 
 CONF = {
@@ -192,6 +203,7 @@ CONF = {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
             },
+            "comment": {"field": "comment"},
         },
     },
     "OggVorbis": {
@@ -215,6 +227,7 @@ CONF = {
                 "field": "metadata_block_picture",
                 "to_application": clean_ogg_pictures,
             },
+            "comment": {"field": "comment"},
         },
     },
     "OggTheora": {
@@ -234,6 +247,7 @@ CONF = {
             "license": {},
             "copyright": {},
             "genre": {},
+            "comment": {"field": "comment"},
         },
     },
     "MP3": {
@@ -255,6 +269,7 @@ CONF = {
             "pictures": {},
             "license": {"field": "WCOP"},
             "copyright": {"field": "TCOP"},
+            "comment": {"field": "COMM", "getter": get_mp3_comment},
         },
     },
     "MP4": {
@@ -282,6 +297,7 @@ CONF = {
             "pictures": {},
             "license": {"field": "----:com.apple.iTunes:LICENSE"},
             "copyright": {"field": "cprt"},
+            "comment": {"field": "©cmt"},
         },
     },
     "FLAC": {
@@ -304,6 +320,7 @@ CONF = {
             "pictures": {},
             "license": {},
             "copyright": {},
+            "comment": {},
         },
     },
 }
@@ -322,6 +339,7 @@ ALL_FIELDS = [
     "mbid",
     "license",
     "copyright",
+    "comment",
 ]
 
 
@@ -657,6 +675,21 @@ class PositionField(serializers.CharField):
             pass
 
 
+class DescriptionField(serializers.CharField):
+    def get_value(self, data):
+        return data
+
+    def to_internal_value(self, data):
+        try:
+            value = data.get("comment") or None
+        except TagNotFound:
+            return None
+        if not value:
+            return None
+        value = super().to_internal_value(value)
+        return {"text": value, "content_type": "text/plain"}
+
+
 class TrackMetadataSerializer(serializers.Serializer):
     title = serializers.CharField()
     position = PositionField(allow_blank=True, allow_null=True, required=False)
@@ -665,6 +698,7 @@ class TrackMetadataSerializer(serializers.Serializer):
     license = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     mbid = MBIDField()
     tags = TagsField(allow_blank=True, allow_null=True, required=False)
+    description = DescriptionField(allow_null=True, allow_blank=True, required=False)
 
     album = AlbumField()
     artists = ArtistField()
@@ -672,6 +706,7 @@ class TrackMetadataSerializer(serializers.Serializer):
 
     remove_blank_null_fields = [
         "copyright",
+        "description",
         "license",
         "position",
         "disc_number",

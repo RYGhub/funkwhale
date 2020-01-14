@@ -86,7 +86,6 @@ class MutationSerializer(serializers.Serializer):
 
 class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
     serialized_relations = {}
-    previous_state_handlers = {}
 
     def __init__(self, *args, **kwargs):
         # we force partial mode, because update mutations are partial
@@ -141,8 +140,11 @@ class UpdateMutationSerializer(serializers.ModelSerializer, MutationSerializer):
             obj,
             *list(validated_data.keys()),
             serialized_relations=self.serialized_relations,
-            handlers=self.previous_state_handlers,
+            handlers=self.get_previous_state_handlers(),
         )
+
+    def get_previous_state_handlers(self):
+        return {}
 
 
 def get_update_previous_state(obj, *fields, serialized_relations={}, handlers={}):

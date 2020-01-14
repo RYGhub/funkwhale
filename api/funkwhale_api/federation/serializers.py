@@ -9,7 +9,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from funkwhale_api.common import utils as funkwhale_utils
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import models as common_models
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
@@ -611,9 +611,9 @@ class PaginatedCollectionSerializer(jsonld.JsonLdSerializer):
 
     def to_representation(self, conf):
         paginator = Paginator(conf["items"], conf.get("page_size", 20))
-        first = funkwhale_utils.set_query_parameter(conf["id"], page=1)
+        first = common_utils.set_query_parameter(conf["id"], page=1)
         current = first
-        last = funkwhale_utils.set_query_parameter(conf["id"], page=paginator.num_pages)
+        last = common_utils.set_query_parameter(conf["id"], page=paginator.num_pages)
         d = {
             "id": conf["id"],
             # XXX Stable release: remove the obsolete actor field
@@ -646,7 +646,7 @@ class LibrarySerializer(PaginatedCollectionSerializer):
     )
 
     class Meta:
-        jsonld_mapping = funkwhale_utils.concat_dicts(
+        jsonld_mapping = common_utils.concat_dicts(
             PAGINATED_COLLECTION_JSONLD_MAPPING,
             {
                 "name": jsonld.first_val(contexts.AS.name),
@@ -740,11 +740,11 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
 
     def to_representation(self, conf):
         page = conf["page"]
-        first = funkwhale_utils.set_query_parameter(conf["id"], page=1)
-        last = funkwhale_utils.set_query_parameter(
+        first = common_utils.set_query_parameter(conf["id"], page=1)
+        last = common_utils.set_query_parameter(
             conf["id"], page=page.paginator.num_pages
         )
-        id = funkwhale_utils.set_query_parameter(conf["id"], page=page.number)
+        id = common_utils.set_query_parameter(conf["id"], page=page.number)
         d = {
             "id": id,
             "partOf": conf["id"],
@@ -764,12 +764,12 @@ class CollectionPageSerializer(jsonld.JsonLdSerializer):
         }
 
         if page.has_previous():
-            d["prev"] = funkwhale_utils.set_query_parameter(
+            d["prev"] = common_utils.set_query_parameter(
                 conf["id"], page=page.previous_page_number()
             )
 
         if page.has_next():
-            d["next"] = funkwhale_utils.set_query_parameter(
+            d["next"] = common_utils.set_query_parameter(
                 conf["id"], page=page.next_page_number()
             )
         d.update(get_additional_fields(conf))
@@ -784,6 +784,8 @@ MUSIC_ENTITY_JSONLD_MAPPING = {
     "musicbrainzId": jsonld.first_val(contexts.FW.musicbrainzId),
     "attributedTo": jsonld.first_id(contexts.AS.attributedTo),
     "tags": jsonld.raw(contexts.AS.tag),
+    "mediaType": jsonld.first_val(contexts.AS.mediaType),
+    "content": jsonld.first_val(contexts.AS.content),
 }
 
 
@@ -805,6 +807,28 @@ def repr_tag(tag_name):
     return {"type": "Hashtag", "name": "#{}".format(tag_name)}
 
 
+def include_content(repr, content_obj):
+    if not content_obj:
+        return
+
+    repr["content"] = common_utils.render_html(
+        content_obj.text, content_obj.content_type
+    )
+    repr["mediaType"] = "text/html"
+
+
+class TruncatedCharField(serializers.CharField):
+    def __init__(self, *args, **kwargs):
+        self.truncate_length = kwargs.pop("truncate_length")
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, v):
+        v = super().to_internal_value(v)
+        if v:
+            v = v[: self.truncate_length]
+        return v
+
+
 class MusicEntitySerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
     published = serializers.DateTimeField()
@@ -815,13 +839,23 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
     tags = serializers.ListField(
         child=TagSerializer(), min_length=0, required=False, allow_null=True
     )
+    mediaType = serializers.ChoiceField(
+        choices=common_models.CONTENT_TEXT_SUPPORTED_TYPES,
+        default="text/html",
+        required=False,
+    )
+    content = TruncatedCharField(
+        truncate_length=common_models.CONTENT_TEXT_MAX_LENGTH,
+        required=False,
+        allow_null=True,
+    )
 
     @transaction.atomic
     def update(self, instance, validated_data):
         attributed_to_fid = validated_data.get("attributedTo")
         if attributed_to_fid:
             validated_data["attributedTo"] = actors.get_actor(attributed_to_fid)
-        updated_fields = funkwhale_utils.get_updated_fields(
+        updated_fields = common_utils.get_updated_fields(
             self.updateable_fields, validated_data, instance
         )
         updated_fields = self.validate_updated_data(instance, updated_fields)
@@ -831,6 +865,9 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
         tags = [t["name"] for t in validated_data.get("tags", []) or []]
         tags_models.set_tags(instance, *tags)
+        common_utils.attach_content(
+            instance, "description", validated_data.get("description")
+        )
         return instance
 
     def get_tags_repr(self, instance):
@@ -840,6 +877,15 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         ]
 
     def validate_updated_data(self, instance, validated_data):
+        return validated_data
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if data.get("content"):
+            validated_data["description"] = {
+                "content_type": data["mediaType"],
+                "text": data["content"],
+            }
         return validated_data
 
 
@@ -866,7 +912,7 @@ class ArtistSerializer(MusicEntitySerializer):
             else None,
             "tag": self.get_tags_repr(instance),
         }
-
+        include_content(d, instance.description)
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
@@ -888,7 +934,7 @@ class AlbumSerializer(MusicEntitySerializer):
 
     class Meta:
         model = music_models.Album
-        jsonld_mapping = funkwhale_utils.concat_dicts(
+        jsonld_mapping = common_utils.concat_dicts(
             MUSIC_ENTITY_JSONLD_MAPPING,
             {
                 "released": jsonld.first_val(contexts.FW.released),
@@ -917,6 +963,7 @@ class AlbumSerializer(MusicEntitySerializer):
             else None,
             "tag": self.get_tags_repr(instance),
         }
+        include_content(d, instance.description)
         if instance.attachment_cover:
             d["cover"] = {
                 "type": "Link",
@@ -968,7 +1015,7 @@ class TrackSerializer(MusicEntitySerializer):
 
     class Meta:
         model = music_models.Track
-        jsonld_mapping = funkwhale_utils.concat_dicts(
+        jsonld_mapping = common_utils.concat_dicts(
             MUSIC_ENTITY_JSONLD_MAPPING,
             {
                 "album": jsonld.first_obj(contexts.FW.album),
@@ -1006,7 +1053,7 @@ class TrackSerializer(MusicEntitySerializer):
             else None,
             "tag": self.get_tags_repr(instance),
         }
-
+        include_content(d, instance.description)
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
@@ -1017,23 +1064,21 @@ class TrackSerializer(MusicEntitySerializer):
         references = {}
         actors_to_fetch = set()
         actors_to_fetch.add(
-            funkwhale_utils.recursive_getattr(
+            common_utils.recursive_getattr(
                 validated_data, "attributedTo", permissive=True
             )
         )
         actors_to_fetch.add(
-            funkwhale_utils.recursive_getattr(
+            common_utils.recursive_getattr(
                 validated_data, "album.attributedTo", permissive=True
             )
         )
         artists = (
-            funkwhale_utils.recursive_getattr(
-                validated_data, "artists", permissive=True
-            )
+            common_utils.recursive_getattr(validated_data, "artists", permissive=True)
             or []
         )
         album_artists = (
-            funkwhale_utils.recursive_getattr(
+            common_utils.recursive_getattr(
                 validated_data, "album.artists", permissive=True
             )
             or []
@@ -1244,6 +1289,7 @@ class ChannelUploadSerializer(serializers.Serializer):
                 },
             ],
         }
+        include_content(data, upload.track.description)
         tags = [item.tag.name for item in upload.get_all_tagged_items()]
         if tags:
             data["tag"] = [repr_tag(name) for name in tags]
