@@ -1,4 +1,6 @@
 from funkwhale_api.audio import serializers
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import serializers as music_serializers
 
@@ -10,7 +12,7 @@ def test_channel_serializer_create(factories):
         # TODO: cover
         "name": "My channel",
         "username": "mychannel",
-        "summary": "This is my channel",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
     }
 
@@ -25,8 +27,14 @@ def test_channel_serializer_create(factories):
         sorted(channel.artist.tagged_items.values_list("tag__name", flat=True))
         == data["tags"]
     )
+    assert channel.artist.description.text == data["description"]["text"]
+    assert (
+        channel.artist.description.content_type == data["description"]["content_type"]
+    )
     assert channel.attributed_to == attributed_to
-    assert channel.actor.summary == data["summary"]
+    assert channel.actor.summary == common_utils.render_html(
+        data["description"]["text"], "text/markdown"
+    )
     assert channel.actor.preferred_username == data["username"]
     assert channel.actor.name == data["name"]
     assert channel.library.privacy_level == "everyone"
@@ -39,7 +47,7 @@ def test_channel_serializer_update(factories):
     data = {
         # TODO: cover
         "name": "My channel",
-        "summary": "This is my channel",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
     }
 
@@ -54,12 +62,17 @@ def test_channel_serializer_update(factories):
         sorted(channel.artist.tagged_items.values_list("tag__name", flat=True))
         == data["tags"]
     )
-    assert channel.actor.summary == data["summary"]
+    assert channel.actor.summary == common_utils.render_html(
+        data["description"]["text"], "text/markdown"
+    )
+    assert channel.artist.description.text == data["description"]["text"]
+    assert channel.artist.description.content_type == "text/markdown"
     assert channel.actor.name == data["name"]
 
 
 def test_channel_serializer_representation(factories, to_api_date):
-    channel = factories["audio.Channel"]()
+    content = factories["common.Content"]()
+    channel = factories["audio.Channel"](artist__description=content)
 
     expected = {
         "artist": music_serializers.serialize_artist_simple(channel.artist),
@@ -70,5 +83,8 @@ def test_channel_serializer_representation(factories, to_api_date):
             channel.attributed_to
         ).data,
     }
+    expected["artist"]["description"] = common_serializers.ContentSerializer(
+        content
+    ).data
 
     assert serializers.ChannelSerializer(channel).data == expected

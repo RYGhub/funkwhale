@@ -134,7 +134,7 @@ class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serialize
 
 
 def serialize_artist_simple(artist):
-    return {
+    data = {
         "id": artist.id,
         "fid": artist.fid,
         "mbid": str(artist.mbid),
@@ -142,6 +142,14 @@ def serialize_artist_simple(artist):
         "creation_date": DATETIME_FIELD.to_representation(artist.creation_date),
         "is_local": artist.is_local,
     }
+    if "description" in artist._state.fields_cache:
+        data["description"] = (
+            common_serializers.ContentSerializer(artist.description).data
+            if artist.description
+            else None
+        )
+
+    return data
 
 
 def serialize_album_track(track):

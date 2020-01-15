@@ -305,3 +305,4 @@ def attach_content(obj, field, content_data):
     )
     setattr(obj, field, content_obj)
     obj.save(update_fields=[field])
+    return content_obj
