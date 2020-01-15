@@ -140,6 +140,7 @@ def test_channel_subscribe(factories, logged_in_api_client):
     subscription = actor.emitted_follows.select_related(
         "target__channel__artist__description"
     ).latest("id")
+    assert subscription.fid == subscription.get_federation_id()
     expected = serializers.SubscriptionSerializer(subscription).data
     assert response.data == expected
     assert subscription.target == channel.actor
@@ -157,3 +158,34 @@ def test_channel_unsubscribe(factories, logged_in_api_client):
 
     with pytest.raises(subscription.DoesNotExist):
         subscription.refresh_from_db()
+
+
+def test_subscriptions_list(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](artist__description=None)
+    subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
+    factories["audio.Subscription"](target=channel.actor)
+    url = reverse("api:v1:subscriptions-list")
+    expected = serializers.SubscriptionSerializer(subscription).data
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["results"][0] == expected
+    assert response.data == {
+        "results": [expected],
+        "count": 1,
+        "next": None,
+        "previous": None,
+    }
+
+
+def test_subscriptions_all(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](artist__description=None)
+    subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
+    factories["audio.Subscription"](target=channel.actor)
+    url = reverse("api:v1:subscriptions-all")
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {"results": [subscription.uuid], "count": 1}

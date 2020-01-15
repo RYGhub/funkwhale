@@ -10,6 +10,7 @@ from django.db.utils import IntegrityError
 
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, models, serializers
@@ -66,10 +67,12 @@ class ChannelViewSet(
     )
     def subscribe(self, request, *args, **kwargs):
         object = self.get_object()
+        subscription = federation_models.Follow(
+            target=object.actor, approved=True, actor=request.user.actor,
+        )
+        subscription.fid = subscription.get_federation_id()
         try:
-            subscription = object.actor.received_follows.create(
-                approved=True, actor=request.user.actor,
-            )
+            subscription.save()
         except IntegrityError:
             # there's already a subscription for this actor/channel
             subscription = object.actor.received_follows.filter(
@@ -88,3 +91,48 @@ class ChannelViewSet(
         object = self.get_object()
         request.user.actor.emitted_follows.filter(target=object.actor).delete()
         return response.Response(status=204)
+
+
+class SubscriptionsViewSet(
+    ChannelsMixin,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    serializer_class = serializers.SubscriptionSerializer
+    queryset = (
+        federation_models.Follow.objects.exclude(target__channel__isnull=True)
+        .prefetch_related(
+            "target__channel__library",
+            "target__channel__attributed_to",
+            "target__channel__artist__description",
+            "actor",
+        )
+        .order_by("-creation_date")
+    )
+    permission_classes = [
+        oauth_permissions.ScopePermission,
+        rest_permissions.IsAuthenticated,
+    ]
+    required_scope = "libraries"
+    anonymous_policy = False
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(actor=self.request.user.actor)
+
+    @decorators.action(methods=["get"], detail=False)
+    def all(self, request, *args, **kwargs):
+        """
+        Return all the subscriptions of the current user, with only limited data
+        to have a performant endpoint and avoid lots of queries just to display
+        subscription status in the UI
+        """
+        subscriptions = list(self.get_queryset().values_list("uuid", flat=True))
+
+        payload = {
+            "results": [str(u) for u in subscriptions],
+            "count": len(subscriptions),
+        }
+        return response.Response(payload, status=200)
