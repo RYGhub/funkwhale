@@ -96,3 +96,15 @@ class ChannelSerializer(serializers.ModelSerializer):
 
     def get_artist(self, obj):
         return music_serializers.serialize_artist_simple(obj.artist)
+
+
+class SubscriptionSerializer(serializers.Serializer):
+    approved = serializers.BooleanField(read_only=True)
+    fid = serializers.URLField(read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
+    creation_date = serializers.DateTimeField(read_only=True)
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        data["channel"] = ChannelSerializer(obj.target.channel).data
+        return data

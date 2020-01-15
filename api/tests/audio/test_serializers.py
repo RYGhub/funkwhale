@@ -88,3 +88,16 @@ def test_channel_serializer_representation(factories, to_api_date):
     ).data
 
     assert serializers.ChannelSerializer(channel).data == expected
+
+
+def test_subscription_serializer(factories, to_api_date):
+    subscription = factories["audio.Subscription"]()
+    expected = {
+        "channel": serializers.ChannelSerializer(subscription.target.channel).data,
+        "uuid": str(subscription.uuid),
+        "creation_date": to_api_date(subscription.creation_date),
+        "approved": subscription.approved,
+        "fid": subscription.fid,
+    }
+
+    assert serializers.SubscriptionSerializer(subscription).data == expected

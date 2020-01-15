@@ -33,3 +33,14 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
             ),
             artist__local=True,
         )
+
+
+@registry.register(name="audio.Subscription")
+class SubscriptionFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
+    uuid = factory.Faker("uuid4")
+    approved = True
+    target = factory.LazyAttribute(lambda o: ChannelFactory().actor)
+    actor = factory.SubFactory(federation_factories.ActorFactory)
+
+    class Meta:
+        model = "federation.Follow"

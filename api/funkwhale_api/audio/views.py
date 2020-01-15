@@ -1,6 +1,12 @@
-from rest_framework import exceptions, mixins, viewsets
+from rest_framework import decorators
+from rest_framework import exceptions
+from rest_framework import mixins
+from rest_framework import permissions as rest_permissions
+from rest_framework import response
+from rest_framework import viewsets
 
 from django import http
+from django.db.utils import IntegrityError
 
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
@@ -52,3 +58,33 @@ class ChannelViewSet(
 
     def perform_create(self, serializer):
         return serializer.save(attributed_to=self.request.user.actor)
+
+    @decorators.action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[rest_permissions.IsAuthenticated],
+    )
+    def subscribe(self, request, *args, **kwargs):
+        object = self.get_object()
+        try:
+            subscription = object.actor.received_follows.create(
+                approved=True, actor=request.user.actor,
+            )
+        except IntegrityError:
+            # there's already a subscription for this actor/channel
+            subscription = object.actor.received_follows.filter(
+                actor=request.user.actor
+            ).get()
+
+        data = serializers.SubscriptionSerializer(subscription).data
+        return response.Response(data, status=201)
+
+    @decorators.action(
+        detail=True,
+        methods=["post", "delete"],
+        permission_classes=[rest_permissions.IsAuthenticated],
+    )
+    def unsubscribe(self, request, *args, **kwargs):
+        object = self.get_object()
+        request.user.actor.emitted_follows.filter(target=object.actor).delete()
+        return response.Response(status=204)

@@ -126,3 +126,34 @@ def test_channel_views_disabled_via_feature_flag(
     url = reverse(url_name)
     response = logged_in_api_client.get(url)
     assert response.status_code == 405
+
+
+def test_channel_subscribe(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](artist__description=None)
+    url = reverse("api:v1:channels-subscribe", kwargs={"uuid": channel.uuid})
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 201
+
+    subscription = actor.emitted_follows.select_related(
+        "target__channel__artist__description"
+    ).latest("id")
+    expected = serializers.SubscriptionSerializer(subscription).data
+    assert response.data == expected
+    assert subscription.target == channel.actor
+
+
+def test_channel_unsubscribe(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"]()
+    subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
+    url = reverse("api:v1:channels-unsubscribe", kwargs={"uuid": channel.uuid})
+
+    response = logged_in_api_client.post(url)
+
+    assert response.status_code == 204
+
+    with pytest.raises(subscription.DoesNotExist):
+        subscription.refresh_from_db()
