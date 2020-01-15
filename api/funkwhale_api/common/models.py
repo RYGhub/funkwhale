@@ -289,6 +289,12 @@ class Content(models.Model):
     text = models.CharField(max_length=CONTENT_TEXT_MAX_LENGTH, blank=True, null=True)
     content_type = models.CharField(max_length=100)
 
+    @property
+    def rendered(self):
+        from . import utils
+
+        return utils.render_html(self.text, self.content_type)
+
 
 @receiver(models.signals.post_save, sender=Attachment)
 def warm_attachment_thumbnails(sender, instance, **kwargs):

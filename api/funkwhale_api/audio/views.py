@@ -30,7 +30,7 @@ class ChannelViewSet(
     serializer_class = serializers.ChannelSerializer
     queryset = (
         models.Channel.objects.all()
-        .prefetch_related("library", "attributed_to", "artist", "actor")
+        .prefetch_related("library", "attributed_to", "artist__description", "actor")
         .order_by("-creation_date")
     )
     permission_classes = [

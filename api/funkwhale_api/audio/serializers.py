@@ -2,6 +2,8 @@ from django.db import transaction
 
 from rest_framework import serializers
 
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
@@ -14,25 +16,28 @@ from . import models
 class ChannelCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
     username = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
-    summary = serializers.CharField(max_length=500, allow_blank=True, allow_null=True)
+    description = common_serializers.ContentSerializer(allow_null=True)
     tags = tags_serializers.TagsListField()
 
     @transaction.atomic
     def create(self, validated_data):
+        description = validated_data.get("description")
         artist = music_models.Artist.objects.create(
             attributed_to=validated_data["attributed_to"], name=validated_data["name"]
         )
+        description_obj = common_utils.attach_content(
+            artist, "description", description
+        )
+
         if validated_data.get("tags", []):
             tags_models.set_tags(artist, *validated_data["tags"])
 
         channel = models.Channel(
             artist=artist, attributed_to=validated_data["attributed_to"]
         )
-
+        summary = description_obj.rendered if description_obj else None
         channel.actor = models.generate_actor(
-            validated_data["username"],
-            summary=validated_data["summary"],
-            name=validated_data["name"],
+            validated_data["username"], summary=summary, name=validated_data["name"],
         )
 
         channel.library = music_models.Library.objects.create(
@@ -49,7 +54,7 @@ class ChannelCreateSerializer(serializers.Serializer):
 
 class ChannelUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
-    summary = serializers.CharField(max_length=500, allow_blank=True, allow_null=True)
+    description = common_serializers.ContentSerializer(allow_null=True)
     tags = tags_serializers.TagsListField()
 
     @transaction.atomic
@@ -58,8 +63,13 @@ class ChannelUpdateSerializer(serializers.Serializer):
             tags_models.set_tags(obj.artist, *validated_data["tags"])
         actor_update_fields = []
 
-        if "summary" in validated_data:
-            actor_update_fields.append(("summary", validated_data["summary"]))
+        if "description" in validated_data:
+            description_obj = common_utils.attach_content(
+                obj.artist, "description", validated_data["description"]
+            )
+            if description_obj:
+                actor_update_fields.append(("summary", description_obj.rendered))
+
         if "name" in validated_data:
             obj.artist.name = validated_data["name"]
             obj.artist.save(update_fields=["name"])

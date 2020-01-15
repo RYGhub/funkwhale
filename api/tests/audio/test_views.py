@@ -12,16 +12,16 @@ def test_channel_create(logged_in_api_client):
         # TODO: cover
         "name": "My channel",
         "username": "mychannel",
-        "summary": "This is my channel",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
     }
 
     url = reverse("api:v1:channels-list")
-    response = logged_in_api_client.post(url, data)
+    response = logged_in_api_client.post(url, data, format="json")
 
     assert response.status_code == 201
 
-    channel = actor.owned_channels.latest("id")
+    channel = actor.owned_channels.select_related("artist__description").latest("id")
     expected = serializers.ChannelSerializer(channel).data
 
     assert response.data == expected
@@ -32,14 +32,14 @@ def test_channel_create(logged_in_api_client):
         == data["tags"]
     )
     assert channel.attributed_to == actor
-    assert channel.actor.summary == data["summary"]
+    assert channel.actor.summary == channel.artist.description.rendered
     assert channel.actor.preferred_username == data["username"]
     assert channel.library.privacy_level == "everyone"
     assert channel.library.actor == actor
 
 
 def test_channel_detail(factories, logged_in_api_client):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](artist__description=None)
     url = reverse("api:v1:channels-detail", kwargs={"uuid": channel.uuid})
     expected = serializers.ChannelSerializer(channel).data
     response = logged_in_api_client.get(url)
@@ -49,7 +49,7 @@ def test_channel_detail(factories, logged_in_api_client):
 
 
 def test_channel_list(factories, logged_in_api_client):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](artist__description=None)
     url = reverse("api:v1:channels-list")
     expected = serializers.ChannelSerializer(channel).data
     response = logged_in_api_client.get(url)
