@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 import django_filters
 
 from funkwhale_api.common import fields
@@ -23,11 +25,29 @@ class ChannelFilter(moderation_filters.HiddenContentFilterSet):
     )
     tag = TAG_FILTER
     scope = common_filters.ActorScopeFilter(actor_field="attributed_to", distinct=True)
+    subscribed = django_filters.BooleanFilter(
+        field_name="_", method="filter_subscribed"
+    )
 
     class Meta:
         model = models.Channel
-        fields = ["q", "scope", "tag"]
+        fields = ["q", "scope", "tag", "subscribed"]
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["CHANNEL"]
+
+    def filter_subscribed(self, queryset, name, value):
+        if not self.request.user.is_authenticated:
+            return queryset.none()
+
+        emitted_follows = self.request.user.actor.emitted_follows.exclude(
+            target__channel__isnull=True
+        )
+
+        query = Q(actor__in=emitted_follows.values_list("target", flat=True))
+
+        if value is True:
+            return queryset.filter(query)
+        else:
+            return queryset.exclude(query)
 
 
 class IncludeChannelsFilterSet(django_filters.FilterSet):
