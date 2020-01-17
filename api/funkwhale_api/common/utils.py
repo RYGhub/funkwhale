@@ -1,6 +1,8 @@
+from django.core.files.base import ContentFile
 from django.utils.deconstruct import deconstructible
 
 import bleach.sanitizer
+import logging
 import markdown
 import os
 import shutil
@@ -12,6 +14,8 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from django.conf import settings
 from django import urls
 from django.db import models, transaction
+
+logger = logging.getLogger(__name__)
 
 
 def rename_file(instance, field_name, new_name, allow_missing_file=False):
@@ -306,3 +310,41 @@ def attach_content(obj, field, content_data):
     setattr(obj, field, content_obj)
     obj.save(update_fields=[field])
     return content_obj
+
+
+@transaction.atomic
+def attach_file(obj, field, file_data, fetch=False):
+    from . import models
+    from . import tasks
+
+    existing = getattr(obj, "{}_id".format(field))
+    if existing:
+        getattr(obj, field).delete()
+
+    if not file_data:
+        return
+
+    extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
+    extension = extensions.get(file_data["mimetype"], "jpg")
+    attachment = models.Attachment(mimetype=file_data["mimetype"])
+
+    filename = "cover-{}.{}".format(obj.uuid, extension)
+    if "url" in file_data:
+        attachment.url = file_data["url"]
+    else:
+        f = ContentFile(file_data["content"])
+        attachment.file.save(filename, f, save=False)
+
+    if not attachment.file and fetch:
+        try:
+            tasks.fetch_remote_attachment(attachment, filename=filename, save=False)
+        except Exception as e:
+            logger.warn("Cannot download attachment at url %s: %s", attachment.url, e)
+            attachment = None
+
+    if attachment:
+        attachment.save()
+
+    setattr(obj, field, attachment)
+    obj.save(update_fields=[field])
+    return attachment

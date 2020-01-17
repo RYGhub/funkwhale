@@ -64,7 +64,7 @@ class ManageArtistViewSet(
     queryset = (
         music_models.Artist.objects.all()
         .order_by("-id")
-        .select_related("attributed_to")
+        .select_related("attributed_to", "attachment_cover",)
         .prefetch_related(
             "tracks",
             Prefetch(
@@ -164,7 +164,11 @@ class ManageTrackViewSet(
         music_models.Track.objects.all()
         .order_by("-id")
         .select_related(
-            "attributed_to", "artist", "album__artist", "album__attachment_cover"
+            "attributed_to",
+            "artist",
+            "album__artist",
+            "album__attachment_cover",
+            "attachment_cover",
         )
         .annotate(uploads_count=Coalesce(Subquery(uploads_subquery), 0))
         .prefetch_related(music_views.TAG_PREFETCH)

@@ -71,6 +71,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "tags": [],
         "attributed_to": federation_serializers.APIActorSerializer(actor).data,
         "tracks_count": 42,
+        "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
     }
     serializer = serializers.ArtistWithAlbumsSerializer(artist)
     assert serializer.data == expected
@@ -217,6 +218,7 @@ def test_track_serializer(factories, to_api_date):
         "is_local": upload.track.is_local,
         "tags": [],
         "attributed_to": federation_serializers.APIActorSerializer(actor).data,
+        "cover": common_serializers.AttachmentSerializer(track.attachment_cover).data,
     }
     serializer = serializers.TrackSerializer(track)
     assert serializer.data == expected

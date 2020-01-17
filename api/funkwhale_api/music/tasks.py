@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from musicbrainzngs import ResponseError
 from requests.exceptions import RequestException
 
+from funkwhale_api import musicbrainz
 from funkwhale_api.common import channels, preferences
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import routes
@@ -28,32 +29,33 @@ from . import signals
 logger = logging.getLogger(__name__)
 
 
-def update_album_cover(
-    album, source=None, cover_data=None, musicbrainz=True, replace=False
-):
+def populate_album_cover(album, source=None, replace=False):
     if album.attachment_cover and not replace:
         return
-    if cover_data:
-        return album.get_image(data=cover_data)
-
     if source and source.startswith("file://"):
         # let's look for a cover in the same directory
         path = os.path.dirname(source.replace("file://", "", 1))
         logger.info("[Album %s] scanning covers from %s", album.pk, path)
         cover = get_cover_from_fs(path)
-        if cover:
-            return album.get_image(data=cover)
-    if musicbrainz and album.mbid:
+        return common_utils.attach_file(album, "attachment_cover", cover)
+    if album.mbid:
+        logger.info(
+            "[Album %s] Fetching cover from musicbrainz release %s",
+            album.pk,
+            str(album.mbid),
+        )
         try:
-            logger.info(
-                "[Album %s] Fetching cover from musicbrainz release %s",
-                album.pk,
-                str(album.mbid),
-            )
-            return album.get_image()
+            image_data = musicbrainz.api.images.get_front(str(album.mbid))
         except ResponseError as exc:
             logger.warning(
                 "[Album %s] cannot fetch cover from musicbrainz: %s", album.pk, str(exc)
+            )
+        else:
+            return common_utils.attach_file(
+                album,
+                "attachment_cover",
+                {"content": image_data, "mimetype": "image/jpeg"},
+                fetch=True,
             )
 
 
@@ -274,10 +276,8 @@ def process_upload(upload, update_denormalization=True):
 
     # update album cover, if needed
     if not track.album.attachment_cover:
-        update_album_cover(
-            track.album,
-            source=final_metadata.get("upload_source"),
-            cover_data=final_metadata.get("cover_data"),
+        populate_album_cover(
+            track.album, source=final_metadata.get("upload_source"),
         )
 
     broadcast = getter(
@@ -299,6 +299,12 @@ def process_upload(upload, update_denormalization=True):
         )
 
 
+def get_cover(obj, field):
+    cover = obj.get(field)
+    if cover:
+        return {"mimetype": cover["mediaType"], "url": cover["href"]}
+
+
 def federation_audio_track_to_metadata(payload, references):
     """
     Given a valid payload as returned by federation.serializers.TrackSerializer.validated_data,
@@ -315,6 +321,7 @@ def federation_audio_track_to_metadata(payload, references):
         "mbid": str(payload.get("musicbrainzId"))
         if payload.get("musicbrainzId")
         else None,
+        "cover_data": get_cover(payload, "image"),
         "album": {
             "title": payload["album"]["name"],
             "fdate": payload["album"]["published"],
@@ -324,6 +331,7 @@ def federation_audio_track_to_metadata(payload, references):
             "mbid": str(payload["album"]["musicbrainzId"])
             if payload["album"].get("musicbrainzId")
             else None,
+            "cover_data": get_cover(payload["album"], "cover"),
             "release_date": payload["album"].get("released"),
             "tags": [t["name"] for t in payload["album"].get("tags", []) or []],
             "artists": [
@@ -331,6 +339,7 @@ def federation_audio_track_to_metadata(payload, references):
                     "fid": a["id"],
                     "name": a["name"],
                     "fdate": a["published"],
+                    "cover_data": get_cover(a, "image"),
                     "description": a.get("description"),
                     "attributed_to": references.get(a.get("attributedTo")),
                     "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
@@ -348,6 +357,7 @@ def federation_audio_track_to_metadata(payload, references):
                 "attributed_to": references.get(a.get("attributedTo")),
                 "mbid": str(a["musicbrainzId"]) if a.get("musicbrainzId") else None,
                 "tags": [t["name"] for t in a.get("tags", []) or []],
+                "cover_data": get_cover(a, "image"),
             }
             for a in payload["artists"]
         ],
@@ -356,9 +366,6 @@ def federation_audio_track_to_metadata(payload, references):
         "fdate": payload["published"],
         "tags": [t["name"] for t in payload.get("tags", []) or []],
     }
-    cover = payload["album"].get("cover")
-    if cover:
-        new_data["cover_data"] = {"mimetype": cover["mediaType"], "url": cover["href"]}
     return new_data
 
 
@@ -427,11 +434,7 @@ def get_track_from_import_metadata(
 ):
     track = _get_track(data, attributed_to=attributed_to, **forced_values)
     if update_cover and track and not track.album.attachment_cover:
-        update_album_cover(
-            track.album,
-            source=data.get("upload_source"),
-            cover_data=data.get("cover_data"),
-        )
+        populate_album_cover(track.album, source=data.get("upload_source"))
     return track
 
 
@@ -513,6 +516,9 @@ def _get_track(data, attributed_to=None, **forced_values):
             common_utils.attach_content(
                 artist, "description", artist_data.get("description")
             )
+            common_utils.attach_file(
+                artist, "attachment_cover", artist_data.get("cover_data")
+            )
 
     if "album" in forced_values:
         album = forced_values["album"]
@@ -550,6 +556,11 @@ def _get_track(data, attributed_to=None, **forced_values):
                 common_utils.attach_content(
                     album_artist, "description", album_artist_data.get("description")
                 )
+                common_utils.attach_file(
+                    album_artist,
+                    "attachment_cover",
+                    album_artist_data.get("cover_data"),
+                )
 
         # get / create album
         album_data = data["album"]
@@ -582,6 +593,9 @@ def _get_track(data, attributed_to=None, **forced_values):
             tags_models.add_tags(album, *album_data.get("tags", []))
             common_utils.attach_content(
                 album, "description", album_data.get("description")
+            )
+            common_utils.attach_file(
+                album, "attachment_cover", album_data.get("cover_data")
             )
 
     # get / create track
@@ -643,6 +657,7 @@ def _get_track(data, attributed_to=None, **forced_values):
         )
         tags_models.add_tags(track, *tags)
         common_utils.attach_content(track, "description", data.get("description"))
+        common_utils.attach_file(track, "attachment_cover", data.get("cover_data"))
 
     return track
 

@@ -121,6 +121,7 @@ class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serialize
     name = serializers.CharField()
     creation_date = serializers.DateTimeField()
     is_local = serializers.BooleanField()
+    cover = cover_field
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])
@@ -266,7 +267,7 @@ class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
     disc_number = serializers.IntegerField()
     copyright = serializers.CharField()
     license = serializers.SerializerMethodField()
-
+    cover = cover_field
     get_attributed_to = serialize_attributed_to
 
     def get_artist(self, o):

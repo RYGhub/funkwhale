@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class LinkSerializer(jsonld.JsonLdSerializer):
-    type = serializers.ChoiceField(choices=[contexts.AS.Link])
+    type = serializers.ChoiceField(choices=[contexts.AS.Link, contexts.AS.Image])
     href = serializers.URLField(max_length=500)
     mediaType = serializers.CharField()
 
@@ -817,6 +817,17 @@ def include_content(repr, content_obj):
     repr["mediaType"] = "text/html"
 
 
+def include_image(repr, attachment):
+    if attachment:
+        repr["image"] = {
+            "type": "Image",
+            "href": attachment.download_url_original,
+            "mediaType": attachment.mimetype or "image/jpeg",
+        }
+    else:
+        repr["image"] = None
+
+
 class TruncatedCharField(serializers.CharField):
     def __init__(self, *args, **kwargs):
         self.truncate_length = kwargs.pop("truncate_length")
@@ -877,6 +888,23 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         ]
 
     def validate_updated_data(self, instance, validated_data):
+        try:
+            attachment_cover = validated_data.pop("attachment_cover")
+        except KeyError:
+            return validated_data
+
+        if (
+            instance.attachment_cover
+            and instance.attachment_cover.url == attachment_cover["href"]
+        ):
+            # we already have the proper attachment
+            return validated_data
+        # create the attachment by hand so it can be attached as the cover
+        validated_data["attachment_cover"] = common_models.Attachment.objects.create(
+            mimetype=attachment_cover["mediaType"],
+            url=attachment_cover["href"],
+            actor=instance.attributed_to,
+        )
         return validated_data
 
     def validate(self, data):
@@ -890,15 +918,26 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
 
 class ArtistSerializer(MusicEntitySerializer):
+    image = LinkSerializer(
+        allowed_mimetypes=["image/*"], allow_null=True, required=False
+    )
     updateable_fields = [
         ("name", "name"),
         ("musicbrainzId", "mbid"),
         ("attributedTo", "attributed_to"),
+        ("image", "attachment_cover"),
     ]
 
     class Meta:
         model = music_models.Artist
-        jsonld_mapping = MUSIC_ENTITY_JSONLD_MAPPING
+        jsonld_mapping = common_utils.concat_dicts(
+            MUSIC_ENTITY_JSONLD_MAPPING,
+            {
+                "released": jsonld.first_val(contexts.FW.released),
+                "artists": jsonld.first_attr(contexts.FW.artists, "@list"),
+                "image": jsonld.first_obj(contexts.AS.image),
+            },
+        )
 
     def to_representation(self, instance):
         d = {
@@ -913,6 +952,7 @@ class ArtistSerializer(MusicEntitySerializer):
             "tag": self.get_tags_repr(instance),
         }
         include_content(d, instance.description)
+        include_image(d, instance.attachment_cover)
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
@@ -921,6 +961,7 @@ class ArtistSerializer(MusicEntitySerializer):
 class AlbumSerializer(MusicEntitySerializer):
     released = serializers.DateField(allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
+    # XXX: 1.0 rename to image
     cover = LinkSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
@@ -970,29 +1011,11 @@ class AlbumSerializer(MusicEntitySerializer):
                 "href": instance.attachment_cover.download_url_original,
                 "mediaType": instance.attachment_cover.mimetype or "image/jpeg",
             }
+            include_image(d, instance.attachment_cover)
+
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
-
-    def validate_updated_data(self, instance, validated_data):
-        try:
-            attachment_cover = validated_data.pop("attachment_cover")
-        except KeyError:
-            return validated_data
-
-        if (
-            instance.attachment_cover
-            and instance.attachment_cover.url == attachment_cover["href"]
-        ):
-            # we already have the proper attachment
-            return validated_data
-        # create the attachment by hand so it can be attached as the album cover
-        validated_data["attachment_cover"] = common_models.Attachment.objects.create(
-            mimetype=attachment_cover["mediaType"],
-            url=attachment_cover["href"],
-            actor=instance.attributed_to,
-        )
-        return validated_data
 
 
 class TrackSerializer(MusicEntitySerializer):
@@ -1002,6 +1025,9 @@ class TrackSerializer(MusicEntitySerializer):
     album = AlbumSerializer()
     license = serializers.URLField(allow_null=True, required=False)
     copyright = serializers.CharField(allow_null=True, required=False)
+    image = LinkSerializer(
+        allowed_mimetypes=["image/*"], allow_null=True, required=False
+    )
 
     updateable_fields = [
         ("name", "title"),
@@ -1011,6 +1037,7 @@ class TrackSerializer(MusicEntitySerializer):
         ("position", "position"),
         ("copyright", "copyright"),
         ("license", "license"),
+        ("image", "attachment_cover"),
     ]
 
     class Meta:
@@ -1024,6 +1051,7 @@ class TrackSerializer(MusicEntitySerializer):
                 "disc": jsonld.first_val(contexts.FW.disc),
                 "license": jsonld.first_id(contexts.FW.license),
                 "position": jsonld.first_val(contexts.FW.position),
+                "image": jsonld.first_obj(contexts.AS.image),
             },
         )
 
@@ -1054,6 +1082,7 @@ class TrackSerializer(MusicEntitySerializer):
             "tag": self.get_tags_repr(instance),
         }
         include_content(d, instance.description)
+        include_image(d, instance.attachment_cover)
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d

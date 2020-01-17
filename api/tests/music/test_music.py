@@ -121,23 +121,3 @@ def test_can_get_or_create_track_from_api(artists, albums, tracks, mocker, db):
     track2, created = models.Track.get_or_create_from_api(mbid=data["id"])
     assert not created
     assert track == track2
-
-
-def test_can_download_image_file_for_album(binary_cover, mocker, factories):
-    mocker.patch(
-        "funkwhale_api.musicbrainz.api.images.get_front", return_value=binary_cover
-    )
-    # client._api.get_image_front('55ea4f82-b42b-423e-a0e5-290ccdf443ed')
-    album = factories["music.Album"](mbid="55ea4f82-b42b-423e-a0e5-290ccdf443ed")
-    album.get_image()
-    album.save()
-
-    assert album.attachment_cover.file.read() == binary_cover
-
-
-def test_album_get_image_doesnt_crash_with_empty_data(mocker, factories):
-    album = factories["music.Album"](mbid=None, attachment_cover=None)
-    assert (
-        album.get_image(data={"content": "", "url": "", "mimetype": "image/png"})
-        is None
-    )

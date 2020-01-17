@@ -59,55 +59,15 @@ class DescriptionMutation(mutations.UpdateMutationSerializer):
         return r
 
 
-@mutations.registry.connect(
-    "update",
-    models.Track,
-    perm_checkers={"suggest": can_suggest, "approve": can_approve},
-)
-class TrackMutationSerializer(TagMutation, DescriptionMutation):
-    serialized_relations = {"license": "code"}
-
-    class Meta:
-        model = models.Track
-        fields = ["license", "title", "position", "copyright", "tags", "description"]
-
-    def post_apply(self, obj, validated_data):
-        routes.outbox.dispatch(
-            {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
-        )
-
-
-@mutations.registry.connect(
-    "update",
-    models.Artist,
-    perm_checkers={"suggest": can_suggest, "approve": can_approve},
-)
-class ArtistMutationSerializer(TagMutation, DescriptionMutation):
-    class Meta:
-        model = models.Artist
-        fields = ["name", "tags", "description"]
-
-    def post_apply(self, obj, validated_data):
-        routes.outbox.dispatch(
-            {"type": "Update", "object": {"type": "Artist"}}, context={"artist": obj}
-        )
-
-
-@mutations.registry.connect(
-    "update",
-    models.Album,
-    perm_checkers={"suggest": can_suggest, "approve": can_approve},
-)
-class AlbumMutationSerializer(TagMutation, DescriptionMutation):
+class CoverMutation(mutations.UpdateMutationSerializer):
     cover = common_serializers.RelatedField(
         "uuid", queryset=common_models.Attachment.objects.all().local(), serializer=None
     )
 
-    serialized_relations = {"cover": "uuid"}
-
-    class Meta:
-        model = models.Album
-        fields = ["title", "release_date", "tags", "cover", "description"]
+    def get_serialized_relations(self):
+        serialized_relations = super().get_serialized_relations()
+        serialized_relations["cover"] = "uuid"
+        return serialized_relations
 
     def get_previous_state_handlers(self):
         handlers = super().get_previous_state_handlers()
@@ -115,11 +75,6 @@ class AlbumMutationSerializer(TagMutation, DescriptionMutation):
             lambda obj: str(obj.attachment_cover.uuid) if obj.attachment_cover else None
         )
         return handlers
-
-    def post_apply(self, obj, validated_data):
-        routes.outbox.dispatch(
-            {"type": "Update", "object": {"type": "Album"}}, context={"album": obj}
-        )
 
     def update(self, instance, validated_data):
         if "cover" in validated_data:
@@ -139,4 +94,65 @@ class AlbumMutationSerializer(TagMutation, DescriptionMutation):
 
         common_models.MutationAttachment.objects.create(
             attachment=attachment, mutation=mutation
+        )
+
+
+@mutations.registry.connect(
+    "update",
+    models.Track,
+    perm_checkers={"suggest": can_suggest, "approve": can_approve},
+)
+class TrackMutationSerializer(CoverMutation, TagMutation, DescriptionMutation):
+    class Meta:
+        model = models.Track
+        fields = [
+            "license",
+            "title",
+            "position",
+            "copyright",
+            "tags",
+            "description",
+            "cover",
+        ]
+
+    def get_serialized_relations(self):
+        serialized_relations = super().get_serialized_relations()
+        serialized_relations["license"] = "code"
+        return serialized_relations
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Track"}}, context={"track": obj}
+        )
+
+
+@mutations.registry.connect(
+    "update",
+    models.Artist,
+    perm_checkers={"suggest": can_suggest, "approve": can_approve},
+)
+class ArtistMutationSerializer(CoverMutation, TagMutation, DescriptionMutation):
+    class Meta:
+        model = models.Artist
+        fields = ["name", "tags", "description", "cover"]
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Artist"}}, context={"artist": obj}
+        )
+
+
+@mutations.registry.connect(
+    "update",
+    models.Album,
+    perm_checkers={"suggest": can_suggest, "approve": can_approve},
+)
+class AlbumMutationSerializer(CoverMutation, TagMutation, DescriptionMutation):
+    class Meta:
+        model = models.Album
+        fields = ["title", "release_date", "tags", "cover", "description"]
+
+    def post_apply(self, obj, validated_data):
+        routes.outbox.dispatch(
+            {"type": "Update", "object": {"type": "Album"}}, context={"album": obj}
         )

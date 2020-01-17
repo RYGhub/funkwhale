@@ -113,7 +113,7 @@ class ArtistViewSet(
 ):
     queryset = (
         models.Artist.objects.all()
-        .prefetch_related("attributed_to")
+        .prefetch_related("attributed_to", "attachment_cover")
         .prefetch_related(
             Prefetch(
                 "tracks",
@@ -295,7 +295,7 @@ class TrackViewSet(
     queryset = (
         models.Track.objects.all()
         .for_nested_serialization()
-        .prefetch_related("attributed_to")
+        .prefetch_related("attributed_to", "attachment_cover")
         .order_by("-creation_date")
     )
     serializer_class = serializers.TrackSerializer
@@ -558,7 +558,12 @@ class UploadViewSet(
     queryset = (
         models.Upload.objects.all()
         .order_by("-creation_date")
-        .prefetch_related("library", "track__artist", "track__album__artist")
+        .prefetch_related(
+            "library",
+            "track__artist",
+            "track__album__artist",
+            "track__attachment_cover",
+        )
     )
     serializer_class = serializers.UploadForOwnerSerializer
     permission_classes = [

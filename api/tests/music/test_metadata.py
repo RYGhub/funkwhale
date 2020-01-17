@@ -440,7 +440,7 @@ def test_track_metadata_serializer(path, expected, mocker):
     path = os.path.join(DATA_DIR, path)
     data = metadata.Metadata(path)
     get_picture = mocker.patch.object(data, "get_picture")
-    expected["cover_data"] = get_picture.return_value
+    expected["album"]["cover_data"] = get_picture.return_value
 
     serializer = metadata.TrackMetadataSerializer(data=data)
     assert serializer.is_valid(raise_exception=True) is True
@@ -566,13 +566,13 @@ def test_fake_metadata_with_serializer():
                     "mbid": uuid.UUID("5b4d7d2d-36df-4b38-95e3-a964234f520f"),
                 },
             ],
+            "cover_data": None,
         },
         "position": 1,
         "disc_number": 1,
         "mbid": uuid.UUID("bd21ac48-46d8-4e78-925f-d9cc2a294656"),
         "license": "Dummy license: http://creativecommons.org/licenses/by-sa/4.0/",
         "copyright": "Someone",
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -594,8 +594,8 @@ def test_serializer_album_artist_missing():
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -622,8 +622,8 @@ def test_serializer_album_default_title_when_missing_or_empty(data):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -649,8 +649,8 @@ def test_serializer_empty_fields(field_name):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     serializer = metadata.TrackMetadataSerializer(data=metadata.FakeMetadata(data))
     assert serializer.is_valid(raise_exception=True) is True
@@ -701,8 +701,8 @@ def test_acquire_tags_from_genre(genre, expected_tags):
             "mbid": None,
             "release_date": None,
             "artists": [],
+            "cover_data": None,
         },
-        "cover_data": None,
     }
     if expected_tags:
         expected["tags"] = expected_tags

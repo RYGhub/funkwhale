@@ -230,6 +230,13 @@ class Artist(APIModelMixin):
     description = models.ForeignKey(
         "common.Content", null=True, blank=True, on_delete=models.SET_NULL
     )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_artist",
+    )
 
     api = musicbrainz.api.artists
     objects = ArtistQuerySet.as_manager()
@@ -247,6 +254,10 @@ class Artist(APIModelMixin):
     def get_or_create_from_name(cls, name, **kwargs):
         kwargs.update({"name": name})
         return cls.objects.get_or_create(name__iexact=name, defaults=kwargs)
+
+    @property
+    def cover(self):
+        return self.attachment_cover
 
 
 def import_artist(v):
@@ -357,44 +368,6 @@ class Album(APIModelMixin):
         },
     }
     objects = AlbumQuerySet.as_manager()
-
-    def get_image(self, data=None):
-        from funkwhale_api.common import tasks as common_tasks
-
-        attachment = None
-        if data:
-            extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
-            extension = extensions.get(data["mimetype"], "jpg")
-            attachment = common_models.Attachment(mimetype=data["mimetype"])
-            f = None
-            filename = "{}.{}".format(self.uuid, extension)
-            if data.get("content"):
-                # we have to cover itself
-                f = ContentFile(data["content"])
-                attachment.file.save(filename, f, save=False)
-            elif data.get("url"):
-                attachment.url = data.get("url")
-                # we can fetch from a url
-                try:
-                    common_tasks.fetch_remote_attachment(
-                        attachment, filename=filename, save=False
-                    )
-                except Exception as e:
-                    logger.warn(
-                        "Cannot download cover at url %s: %s", data.get("url"), e
-                    )
-                    return
-
-        elif self.mbid:
-            image_data = musicbrainz.api.images.get_front(str(self.mbid))
-            f = ContentFile(image_data)
-            attachment = common_models.Attachment(mimetype="image/jpeg")
-            attachment.file.save("{0}.jpg".format(self.mbid), f, save=False)
-        if attachment and attachment.file:
-            attachment.save()
-            self.attachment_cover = attachment
-            self.save(update_fields=["attachment_cover"])
-            return self.attachment_cover.file
 
     @property
     def cover(self):
@@ -518,6 +491,13 @@ class Track(APIModelMixin):
     description = models.ForeignKey(
         "common.Content", null=True, blank=True, on_delete=models.SET_NULL
     )
+    attachment_cover = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="covered_track",
+    )
 
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
@@ -571,6 +551,10 @@ class Track(APIModelMixin):
             return "{} - {} - {}".format(self.artist.name, self.album.title, self.title)
         except AttributeError:
             return "{} - {}".format(self.artist.name, self.title)
+
+    @property
+    def cover(self):
+        return self.attachment_cover
 
     def get_activity_url(self):
         if self.mbid:

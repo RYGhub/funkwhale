@@ -64,7 +64,7 @@ def test_attachment(factories, now):
 @pytest.mark.parametrize("args, expected", [([], [0]), ([True], [0]), ([False], [1])])
 def test_attachment_queryset_attached(args, expected, factories, queryset_equal_list):
     attachments = [
-        factories["music.Album"]().attachment_cover,
+        factories["music.Album"](artist__attachment_cover=None).attachment_cover,
         factories["common.Attachment"](),
     ]
 
