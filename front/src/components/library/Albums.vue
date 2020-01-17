@@ -124,7 +124,7 @@ export default {
       page: parseInt(this.defaultPage),
       query: this.defaultQuery,
       tags: (this.defaultTags || []).filter((t) => { return t.length > 0 }),
-      orderingOptions: [["creation_date", "creation_date"], ["title", "album_title"]]
+      orderingOptions: [["creation_date", "creation_date"], ["title", "album_title"],["release_date","release_date"]]
     }
   },
   created() {
