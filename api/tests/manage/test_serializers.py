@@ -303,6 +303,7 @@ def test_manage_artist_serializer(factories, now, to_api_date):
             artist.attributed_to
         ).data,
         "tags": [],
+        "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
     }
     s = serializers.ManageArtistSerializer(artist)
 
@@ -412,6 +413,7 @@ def test_manage_track_serializer(factories, now, to_api_date):
         ).data,
         "uploads_count": 44,
         "tags": [],
+        "cover": common_serializers.AttachmentSerializer(track.attachment_cover).data,
     }
     s = serializers.ManageTrackSerializer(track)
 

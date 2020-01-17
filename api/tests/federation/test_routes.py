@@ -540,7 +540,7 @@ def test_inbox_update_artist(factories, mocker):
         "funkwhale_api.music.tasks.update_library_entity"
     )
     activity = factories["federation.Activity"]()
-    obj = factories["music.Artist"](attributed=True)
+    obj = factories["music.Artist"](attributed=True, attachment_cover=None)
     actor = obj.attributed_to
     data = serializers.ArtistSerializer(obj).data
     data["name"] = "New name"
@@ -602,7 +602,7 @@ def test_inbox_update_track(factories, mocker):
         "funkwhale_api.music.tasks.update_library_entity"
     )
     activity = factories["federation.Activity"]()
-    obj = factories["music.Track"](attributed=True)
+    obj = factories["music.Track"](attributed=True, attachment_cover=None)
     actor = obj.attributed_to
     data = serializers.TrackSerializer(obj).data
     data["name"] = "New title"

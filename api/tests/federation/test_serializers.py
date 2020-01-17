@@ -575,6 +575,11 @@ def test_activity_pub_artist_serializer_to_ap(factories):
         "attributedTo": artist.attributed_to.fid,
         "mediaType": "text/html",
         "content": common_utils.render_html(content.text, content.content_type),
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "href": utils.full_url(artist.attachment_cover.file.url),
+        },
         "tag": [
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
@@ -601,6 +606,11 @@ def test_activity_pub_album_serializer_to_ap(factories):
             "mediaType": "image/jpeg",
             "href": utils.full_url(album.attachment_cover.file.url),
         },
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "href": utils.full_url(album.attachment_cover.file.url),
+        },
         "musicbrainzId": album.mbid,
         "published": album.creation_date.isoformat(),
         "released": album.release_date.isoformat(),
@@ -620,6 +630,44 @@ def test_activity_pub_album_serializer_to_ap(factories):
     serializer = serializers.AlbumSerializer(album)
 
     assert serializer.data == expected
+
+
+def test_activity_pub_artist_serializer_from_ap_update(factories, faker):
+    artist = factories["music.Artist"](attributed=True)
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Artist",
+        "id": artist.fid,
+        "name": faker.sentence(),
+        "musicbrainzId": faker.uuid4(),
+        "published": artist.creation_date.isoformat(),
+        "attributedTo": artist.attributed_to.fid,
+        "mediaType": "text/html",
+        "content": common_utils.render_html(faker.sentence(), "text/html"),
+        "image": {"type": "Image", "mediaType": "image/jpeg", "href": faker.url()},
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+
+    serializer = serializers.ArtistSerializer(artist, data=payload)
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save()
+
+    artist.refresh_from_db()
+
+    assert artist.name == payload["name"]
+    assert str(artist.mbid) == payload["musicbrainzId"]
+    assert artist.attachment_cover.url == payload["image"]["href"]
+    assert artist.attachment_cover.mimetype == payload["image"]["mediaType"]
+    assert artist.description.text == payload["content"]
+    assert artist.description.content_type == "text/html"
+    assert sorted(artist.tagged_items.values_list("tag__name", flat=True)) == [
+        "Punk",
+        "Rock",
+    ]
 
 
 def test_activity_pub_album_serializer_from_ap_update(factories, faker):
@@ -699,6 +747,11 @@ def test_activity_pub_track_serializer_to_ap(factories):
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
         ],
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "href": utils.full_url(track.attachment_cover.file.url),
+        },
     }
     serializer = serializers.TrackSerializer(track)
 
@@ -726,6 +779,11 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
         "disc": 1,
         "content": "Hello there",
         "attributedTo": track_attributed_to.fid,
+        "image": {
+            "type": "Link",
+            "href": "https://cover.image/track.png",
+            "mediaType": "image/png",
+        },
         "album": {
             "type": "Album",
             "id": "http://hello.album",
@@ -753,6 +811,11 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                     "published": published.isoformat(),
                     "attributedTo": album_artist_attributed_to.fid,
                     "tag": [{"type": "Hashtag", "name": "AlbumArtistTag"}],
+                    "image": {
+                        "type": "Link",
+                        "href": "https://cover.image/album-artist.png",
+                        "mediaType": "image/png",
+                    },
                 }
             ],
         },
@@ -767,6 +830,11 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
                 "attributedTo": artist_attributed_to.fid,
                 "published": published.isoformat(),
                 "tag": [{"type": "Hashtag", "name": "ArtistTag"}],
+                "image": {
+                    "type": "Link",
+                    "href": "https://cover.image/artist.png",
+                    "mediaType": "image/png",
+                },
             }
         ],
         "tag": [
@@ -774,7 +842,6 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
             {"type": "Hashtag", "name": "World"},
         ],
     }
-    r_mock.get(data["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
     serializer = serializers.TrackSerializer(data=data, context={"activity": activity})
     assert serializer.is_valid(raise_exception=True)
 
@@ -793,10 +860,12 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert str(track.mbid) == data["musicbrainzId"]
     assert track.description.text == data["content"]
     assert track.description.content_type == "text/html"
+    assert track.attachment_cover.url == data["image"]["href"]
+    assert track.attachment_cover.mimetype == data["image"]["mediaType"]
 
     assert album.from_activity == activity
-    assert album.attachment_cover.file.read() == b"coucou"
-    assert album.attachment_cover.file.path.endswith(".png")
+    assert album.attachment_cover.url == data["album"]["cover"]["href"]
+    assert album.attachment_cover.mimetype == data["album"]["cover"]["mediaType"]
     assert album.title == data["album"]["name"]
     assert album.fid == data["album"]["id"]
     assert str(album.mbid) == data["album"]["musicbrainzId"]
@@ -814,6 +883,8 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     assert artist.attributed_to == artist_attributed_to
     assert artist.description.text == data["artists"][0]["content"]
     assert artist.description.content_type == data["artists"][0]["mediaType"]
+    assert artist.attachment_cover.url == data["artists"][0]["image"]["href"]
+    assert artist.attachment_cover.mimetype == data["artists"][0]["image"]["mediaType"]
 
     assert album_artist.from_activity == activity
     assert album_artist.name == data["album"]["artists"][0]["name"]
@@ -826,6 +897,14 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
         album_artist.description.content_type
         == data["album"]["artists"][0]["mediaType"]
     )
+    assert (
+        album_artist.attachment_cover.url
+        == data["album"]["artists"][0]["image"]["href"]
+    )
+    assert (
+        album_artist.attachment_cover.mimetype
+        == data["album"]["artists"][0]["image"]["mediaType"]
+    )
 
     add_tags.assert_any_call(track, *["Hello", "World"])
     add_tags.assert_any_call(album, *["AlbumTag"])
@@ -833,7 +912,7 @@ def test_activity_pub_track_serializer_from_ap(factories, r_mock, mocker):
     add_tags.assert_any_call(artist, *["ArtistTag"])
 
 
-def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker):
+def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker, faker):
     set_tags = mocker.patch("funkwhale_api.tags.models.set_tags")
     content = factories["common.Content"]()
     track_attributed_to = factories["federation.Actor"]()
@@ -853,6 +932,7 @@ def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker)
         "attributedTo": track_attributed_to.fid,
         "album": serializers.AlbumSerializer(track.album).data,
         "artists": [serializers.ArtistSerializer(track.artist).data],
+        "image": {"type": "Link", "mediaType": "image/jpeg", "href": faker.url()},
         "tag": [
             {"type": "Hashtag", "name": "#Hello"},
             # Ensure we can handle tags without a leading #
@@ -873,6 +953,8 @@ def test_activity_pub_track_serializer_from_ap_update(factories, r_mock, mocker)
     assert track.description.content_type == "text/html"
     assert track.description.text == "hello there"
     assert str(track.mbid) == data["musicbrainzId"]
+    assert track.attachment_cover.url == data["image"]["href"]
+    assert track.attachment_cover.mimetype == data["image"]["mediaType"]
 
     set_tags.assert_called_once_with(track, *["Hello", "World"])
 

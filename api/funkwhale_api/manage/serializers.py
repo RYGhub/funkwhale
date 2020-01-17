@@ -390,6 +390,7 @@ class ManageArtistSerializer(
     tracks = ManageNestedTrackSerializer(many=True)
     attributed_to = ManageBaseActorSerializer()
     tags = serializers.SerializerMethodField()
+    cover = music_serializers.cover_field
 
     class Meta:
         model = music_models.Artist
@@ -398,6 +399,7 @@ class ManageArtistSerializer(
             "tracks",
             "attributed_to",
             "tags",
+            "cover",
         ]
 
     def get_tags(self, obj):
@@ -447,6 +449,7 @@ class ManageTrackSerializer(
     attributed_to = ManageBaseActorSerializer()
     uploads_count = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    cover = music_serializers.cover_field
 
     class Meta:
         model = music_models.Track
@@ -456,6 +459,7 @@ class ManageTrackSerializer(
             "attributed_to",
             "uploads_count",
             "tags",
+            "cover",
         ]
 
     def get_uploads_count(self, obj):

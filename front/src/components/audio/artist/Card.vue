@@ -51,6 +51,9 @@ export default {
       return url
     },
     cover () {
+      if (this.artist.cover) {
+        return this.artist.cover
+      }
       return this.artist.albums.map((a) => {
         return a.cover
       }).filter((c) => {

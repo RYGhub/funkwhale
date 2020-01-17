@@ -723,6 +723,7 @@ class TrackMetadataSerializer(serializers.Serializer):
                 continue
             if v in ["", None, []]:
                 validated_data.pop(field)
+        validated_data["album"]["cover_data"] = validated_data.pop("cover_data", None)
         return validated_data
 
 

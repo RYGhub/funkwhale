@@ -9,7 +9,8 @@
           <div class="ui column">
             <div class="segment-content">
               <h2 class="ui header">
-                <i class="circular inverted user icon"></i>
+                <img v-if="object.cover" v-lazy="$store.getters['instance/absoluteUrl'](object.cover.square_crop)">
+                <img v-else src="../../../assets/audio/default-cover.png">
                 <div class="content">
                   {{ object.name | truncate(100) }}
                   <div class="sub header">

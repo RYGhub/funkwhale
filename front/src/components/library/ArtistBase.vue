@@ -230,6 +230,9 @@ export default {
       )
     },
     cover() {
+      if (this.object.cover) {
+        return this.object.cover
+      }
       return this.object.albums
         .filter(album => {
           return album.cover

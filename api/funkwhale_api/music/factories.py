@@ -64,6 +64,7 @@ class ArtistFactory(
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
     playable = playable_factory("track__album__artist")
+    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
 
     class Meta:
         model = "music.Artist"
@@ -111,6 +112,7 @@ class TrackFactory(
     album = factory.SubFactory(AlbumFactory)
     position = 1
     playable = playable_factory("track")
+    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
 
     class Meta:
         model = "music.Track"

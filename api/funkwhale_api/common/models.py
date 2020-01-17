@@ -175,7 +175,12 @@ def get_file_path(instance, filename):
 
 class AttachmentQuerySet(models.QuerySet):
     def attached(self, include=True):
-        related_fields = ["covered_album", "mutation_attachment"]
+        related_fields = [
+            "covered_album",
+            "mutation_attachment",
+            "covered_track",
+            "covered_artist",
+        ]
         query = None
         for field in related_fields:
             field_query = ~models.Q(**{field: None})
@@ -195,7 +200,7 @@ class AttachmentQuerySet(models.QuerySet):
 
 class Attachment(models.Model):
     # Remote URL where the attachment can be fetched
-    url = models.URLField(max_length=500, unique=True, null=True)
+    url = models.URLField(max_length=500, null=True)
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
     # Actor associated with the attachment
     actor = models.ForeignKey(

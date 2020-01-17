@@ -19,6 +19,19 @@ export default {
       getValue: (obj) => { return obj.description || {text: null, content_type: 'text/markdown'}},
       getValueRepr: getContentValueRepr
     }
+    const cover = {
+      id: 'cover',
+      type: 'attachment',
+      required: false,
+      label: this.$pgettext('Content/*/*/Noun', 'Cover'),
+      getValue: (obj) => {
+        if (obj.cover) {
+          return obj.cover.uuid
+        } else {
+          return null
+        }
+      }
+    }
     return {
       artist: {
         fields: [
@@ -30,6 +43,7 @@ export default {
             getValue: (obj) => { return obj.name }
           },
           description,
+          cover,
           {
             id: 'tags',
             type: 'tags',
@@ -57,19 +71,7 @@ export default {
             label: this.$pgettext('Content/*/*/Noun', 'Release date'),
             getValue: (obj) => { return obj.release_date }
           },
-          {
-            id: 'cover',
-            type: 'attachment',
-            required: false,
-            label: this.$pgettext('Content/*/*/Noun', 'Cover'),
-            getValue: (obj) => {
-              if (obj.cover) {
-                return obj.cover.uuid
-              } else {
-                return null
-              }
-            }
-          },
+          cover,
           {
             id: 'tags',
             type: 'tags',
@@ -90,6 +92,7 @@ export default {
             getValue: (obj) => { return obj.title }
           },
           description,
+          cover,
           {
             id: 'position',
             type: 'text',

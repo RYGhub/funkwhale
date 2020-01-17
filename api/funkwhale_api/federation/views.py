@@ -222,9 +222,12 @@ class MusicLibraryViewSet(
                     queryset=music_models.Track.objects.select_related(
                         "album__artist__attributed_to",
                         "artist__attributed_to",
+                        "artist__attachment_cover",
+                        "attachment_cover",
                         "album__attributed_to",
                         "attributed_to",
                         "album__attachment_cover",
+                        "album__artist__attachment_cover",
                         "description",
                     ).prefetch_related(
                         "tagged_items__tag",
@@ -283,6 +286,9 @@ class MusicUploadViewSet(
         "track__album__artist",
         "track__description",
         "track__album__attachment_cover",
+        "track__album__artist__attachment_cover",
+        "track__artist__attachment_cover",
+        "track__attachment_cover",
     )
     serializer_class = serializers.UploadSerializer
     lookup_field = "uuid"
@@ -303,7 +309,9 @@ class MusicArtistViewSet(
 ):
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
-    queryset = music_models.Artist.objects.local().select_related("description")
+    queryset = music_models.Artist.objects.local().select_related(
+        "description", "attachment_cover"
+    )
     serializer_class = serializers.ArtistSerializer
     lookup_field = "uuid"
 
@@ -314,7 +322,7 @@ class MusicAlbumViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Album.objects.local().select_related(
-        "artist__description", "description"
+        "artist__description", "description", "artist__attachment_cover"
     )
     serializer_class = serializers.AlbumSerializer
     lookup_field = "uuid"
@@ -326,7 +334,14 @@ class MusicTrackViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
     queryset = music_models.Track.objects.local().select_related(
-        "album__artist", "album__description", "artist__description", "description"
+        "album__artist",
+        "album__description",
+        "artist__description",
+        "description",
+        "attachment_cover",
+        "album__artist__attachment_cover",
+        "album__attachment_cover",
+        "artist__attachment_cover",
     )
     serializer_class = serializers.TrackSerializer
     lookup_field = "uuid"

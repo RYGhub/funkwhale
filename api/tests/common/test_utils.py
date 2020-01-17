@@ -1,3 +1,4 @@
+import io
 import pytest
 
 from funkwhale_api.common import utils
@@ -124,3 +125,51 @@ def test_join_url(start, end, expected):
 def test_render_html(text, content_type, expected):
     result = utils.render_html(text, content_type)
     assert result == expected
+
+
+def test_attach_file_url(factories):
+    album = factories["music.Album"]()
+    existing_attachment = album.attachment_cover
+    assert existing_attachment is not None
+
+    data = {"mimetype": "image/jpeg", "url": "https://example.com/test.jpg"}
+    new_attachment = utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    with pytest.raises(existing_attachment.DoesNotExist):
+        existing_attachment.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert not new_attachment.file
+    assert new_attachment.url == data["url"]
+    assert new_attachment.mimetype == data["mimetype"]
+
+
+def test_attach_file_url_fetch(factories, r_mock):
+    album = factories["music.Album"]()
+
+    data = {"mimetype": "image/jpeg", "url": "https://example.com/test.jpg"}
+    r_mock.get(data["url"], body=io.BytesIO(b"content"))
+    new_attachment = utils.attach_file(album, "attachment_cover", data, fetch=True)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert new_attachment.file.read() == b"content"
+    assert new_attachment.url == data["url"]
+    assert new_attachment.mimetype == data["mimetype"]
+
+
+def test_attach_file_content(factories, r_mock):
+    album = factories["music.Album"]()
+
+    data = {"mimetype": "image/jpeg", "content": b"content"}
+    new_attachment = utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == new_attachment
+    assert new_attachment.file.read() == b"content"
+    assert new_attachment.url is None
+    assert new_attachment.mimetype == data["mimetype"]

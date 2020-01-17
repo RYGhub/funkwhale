@@ -187,14 +187,6 @@ def test_track_get_file_size_in_place(factories):
     assert upload.get_file_size() == 297745
 
 
-def test_album_get_image_content(factories):
-    album = factories["music.Album"]()
-    album.get_image(data={"content": b"test", "mimetype": "image/jpeg"})
-    album.refresh_from_db()
-
-    assert album.attachment_cover.file.read() == b"test"
-
-
 def test_library(factories):
     now = timezone.now()
     actor = factories["federation.Actor"]()

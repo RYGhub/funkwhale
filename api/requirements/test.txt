@@ -1,7 +1,7 @@
 # Test dependencies go here.
 
 flake8
-pytest>=5
+pytest>=5,<5.3.3
 pytest-django>=3.5.1
 pytest-mock
 pytest-sugar
