@@ -432,6 +432,23 @@ def get_content_disposition(filename):
     return "attachment; {}".format(filename)
 
 
+def record_downloads(f):
+    def inner(*args, **kwargs):
+        user = kwargs.get("user")
+        wsgi_request = kwargs.pop("wsgi_request")
+        upload = kwargs.get("upload")
+        response = f(*args, **kwargs)
+        if response.status_code >= 200 and response.status_code < 400:
+            utils.increment_downloads_count(
+                upload=upload, user=user, wsgi_request=wsgi_request
+            )
+
+        return response
+
+    return inner
+
+
+@record_downloads
 def handle_serve(
     upload, user, format=None, max_bitrate=None, proxy_media=True, download=True
 ):
@@ -537,12 +554,13 @@ class ListenViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         if max_bitrate:
             max_bitrate = max_bitrate * 1000
         return handle_serve(
-            upload,
+            upload=upload,
             user=request.user,
             format=format,
             max_bitrate=max_bitrate,
             proxy_media=settings.PROXY_MEDIA,
             download=download,
+            wsgi_request=request._request,
         )
 
 

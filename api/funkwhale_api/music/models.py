@@ -498,7 +498,7 @@ class Track(APIModelMixin):
         on_delete=models.SET_NULL,
         related_name="covered_track",
     )
-
+    downloads_count = models.PositiveIntegerField(default=0)
     federation_namespace = "tracks"
     musicbrainz_model = "recording"
     api = musicbrainz.api.recordings
@@ -731,6 +731,7 @@ class Upload(models.Model):
     from_activity = models.ForeignKey(
         "federation.Activity", null=True, on_delete=models.SET_NULL, blank=True
     )
+    downloads_count = models.PositiveIntegerField(default=0)
 
     objects = UploadQuerySet.as_manager()
 

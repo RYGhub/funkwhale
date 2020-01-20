@@ -285,6 +285,7 @@ class SubsonicViewSet(viewsets.GenericViewSet):
             # Subsonic clients don't expect 302 redirection unfortunately,
             # So we have to proxy media files
             proxy_media=True,
+            wsgi_request=request._request,
         )
 
     @action(detail=False, methods=["get", "post"], url_name="star", url_path="star")

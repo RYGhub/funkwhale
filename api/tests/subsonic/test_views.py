@@ -236,6 +236,7 @@ def test_stream(
         format=None,
         max_bitrate=None,
         proxy_media=True,
+        wsgi_request=response.wsgi_request,
     )
     assert response.status_code == 200
     playable_by.assert_called_once_with(music_models.Track.objects.all(), None)
@@ -256,6 +257,7 @@ def test_stream_format(format, expected, logged_in_api_client, factories, mocker
         format=expected,
         max_bitrate=None,
         proxy_media=True,
+        wsgi_request=response.wsgi_request,
     )
     assert response.status_code == 200
 
@@ -305,6 +307,7 @@ def test_stream_transcode(
         format=expected_format,
         max_bitrate=expected_bitrate,
         proxy_media=True,
+        wsgi_request=response.wsgi_request,
     )
     assert response.status_code == 200
 
