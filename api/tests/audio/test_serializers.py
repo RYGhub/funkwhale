@@ -90,6 +90,16 @@ def test_channel_serializer_representation(factories, to_api_date):
     assert serializers.ChannelSerializer(channel).data == expected
 
 
+def test_channel_serializer_representation_subscriptions_count(factories, to_api_date):
+    channel = factories["audio.Channel"]()
+    factories["federation.Follow"](target=channel.actor)
+    factories["federation.Follow"](target=channel.actor, approved=False)
+    serializer = serializers.ChannelSerializer(
+        channel, context={"subscriptions_count": True}
+    )
+    assert serializer.data["subscriptions_count"] == 1
+
+
 def test_subscription_serializer(factories, to_api_date):
     subscription = factories["audio.Subscription"]()
     expected = {

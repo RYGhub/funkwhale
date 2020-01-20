@@ -97,6 +97,15 @@ class ChannelSerializer(serializers.ModelSerializer):
     def get_artist(self, obj):
         return music_serializers.serialize_artist_simple(obj.artist)
 
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if self.context.get("subscriptions_count"):
+            data["subscriptions_count"] = self.get_subscriptions_count(obj)
+        return data
+
+    def get_subscriptions_count(self, obj):
+        return obj.actor.received_follows.exclude(approved=False).count()
+
 
 class SubscriptionSerializer(serializers.Serializer):
     approved = serializers.BooleanField(read_only=True)

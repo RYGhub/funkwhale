@@ -41,7 +41,9 @@ def test_channel_create(logged_in_api_client):
 def test_channel_detail(factories, logged_in_api_client):
     channel = factories["audio.Channel"](artist__description=None)
     url = reverse("api:v1:channels-detail", kwargs={"uuid": channel.uuid})
-    expected = serializers.ChannelSerializer(channel).data
+    expected = serializers.ChannelSerializer(
+        channel, context={"subscriptions_count": True}
+    ).data
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 200
