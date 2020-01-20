@@ -92,6 +92,11 @@ class ChannelViewSet(
         request.user.actor.emitted_follows.filter(target=object.actor).delete()
         return response.Response(status=204)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["subscriptions_count"] = self.action in ["retrieve", "create", "update"]
+        return context
+
 
 class SubscriptionsViewSet(
     ChannelsMixin,

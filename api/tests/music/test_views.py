@@ -352,11 +352,16 @@ def test_serve_updates_access_date(factories, settings, api_client, preferences)
     assert upload.accessed_date > now
 
 
-def test_listen_no_track(factories, logged_in_api_client):
+def test_listen_no_track(factories, logged_in_api_client, mocker):
+    increment_downloads_count = mocker.patch(
+        "funkwhale_api.music.utils.increment_downloads_count"
+    )
+
     url = reverse("api:v1:listen-detail", kwargs={"uuid": "noop"})
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 404
+    increment_downloads_count.call_count == 0
 
 
 def test_listen_no_file(factories, logged_in_api_client):
@@ -375,7 +380,10 @@ def test_listen_no_available_file(factories, logged_in_api_client):
     assert response.status_code == 404
 
 
-def test_listen_correct_access(factories, logged_in_api_client):
+def test_listen_correct_access(factories, logged_in_api_client, mocker):
+    increment_downloads_count = mocker.patch(
+        "funkwhale_api.music.utils.increment_downloads_count"
+    )
     logged_in_api_client.user.create_actor()
     upload = factories["music.Upload"](
         library__actor=logged_in_api_client.user.actor,
@@ -389,6 +397,12 @@ def test_listen_correct_access(factories, logged_in_api_client):
     assert response.status_code == 200
     assert response["Content-Disposition"] == "attachment; filename*=UTF-8''{}".format(
         urllib.parse.quote(expected_filename)
+    )
+
+    increment_downloads_count.assert_called_once_with(
+        upload=upload,
+        user=logged_in_api_client.user,
+        wsgi_request=response.wsgi_request,
     )
 
 
@@ -419,12 +433,13 @@ def test_listen_explicit_file(factories, logged_in_api_client, mocker, settings)
 
     assert response.status_code == 200
     mocked_serve.assert_called_once_with(
-        upload2,
+        upload=upload2,
         user=logged_in_api_client.user,
         format=None,
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
         download=True,
+        wsgi_request=response.wsgi_request,
     )
 
 
@@ -484,10 +499,13 @@ def test_should_transcode_according_to_preference(value, preferences, factories)
     assert views.should_transcode(upload, "mp3") is expected
 
 
-def test_handle_serve_create_mp3_version(factories, now):
+def test_handle_serve_create_mp3_version(factories, now, mocker):
+    mocker.patch("funkwhale_api.music.utils.increment_downloads_count")
     user = factories["users.User"]()
     upload = factories["music.Upload"](bitrate=42)
-    response = views.handle_serve(upload, user, format="mp3")
+    response = views.handle_serve(
+        upload=upload, user=user, format="mp3", wsgi_request=None
+    )
     expected_filename = upload.track.full_name + ".mp3"
     version = upload.versions.latest("id")
 
@@ -514,12 +532,13 @@ def test_listen_transcode(factories, now, logged_in_api_client, mocker, settings
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload,
+        upload=upload,
         user=logged_in_api_client.user,
         format="mp3",
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
         download=True,
+        wsgi_request=response.wsgi_request,
     )
 
 
@@ -547,12 +566,13 @@ def test_listen_transcode_bitrate(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload,
+        upload=upload,
         user=logged_in_api_client.user,
         format=None,
         max_bitrate=expected,
         proxy_media=settings.PROXY_MEDIA,
         download=True,
+        wsgi_request=response.wsgi_request,
     )
 
 
@@ -578,12 +598,13 @@ def test_listen_transcode_in_place(
     assert response.status_code == 200
 
     handle_serve.assert_called_once_with(
-        upload,
+        upload=upload,
         user=logged_in_api_client.user,
         format="mp3",
         max_bitrate=None,
         proxy_media=settings.PROXY_MEDIA,
         download=True,
+        wsgi_request=response.wsgi_request,
     )
 
 

@@ -135,7 +135,7 @@ class RateLimitView(views.APIView):
     throttle_classes = []
 
     def get(self, request, *args, **kwargs):
-        ident = throttling.get_ident(request)
+        ident = throttling.get_ident(getattr(request, "user", None), request)
         data = {
             "enabled": settings.THROTTLING_ENABLED,
             "ident": ident,
