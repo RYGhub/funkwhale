@@ -43,6 +43,13 @@ MAX_LENGTHS = {
 }
 
 
+ARTIST_CONTENT_CATEGORY_CHOICES = [
+    ("music", "music"),
+    ("podcast", "podcast"),
+    ("other", "other"),
+]
+
+
 def empty_dict():
     return {}
 
@@ -236,6 +243,13 @@ class Artist(APIModelMixin):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="covered_artist",
+    )
+    content_category = models.CharField(
+        max_length=30,
+        db_index=True,
+        default="music",
+        choices=ARTIST_CONTENT_CATEGORY_CHOICES,
+        null=True,
     )
 
     api = musicbrainz.api.artists

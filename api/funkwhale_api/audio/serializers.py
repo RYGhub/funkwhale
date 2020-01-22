@@ -18,12 +18,17 @@ class ChannelCreateSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
     description = common_serializers.ContentSerializer(allow_null=True)
     tags = tags_serializers.TagsListField()
+    content_category = serializers.ChoiceField(
+        choices=music_models.ARTIST_CONTENT_CATEGORY_CHOICES
+    )
 
     @transaction.atomic
     def create(self, validated_data):
         description = validated_data.get("description")
         artist = music_models.Artist.objects.create(
-            attributed_to=validated_data["attributed_to"], name=validated_data["name"]
+            attributed_to=validated_data["attributed_to"],
+            name=validated_data["name"],
+            content_category=validated_data["content_category"],
         )
         description_obj = common_utils.attach_content(
             artist, "description", description
@@ -56,12 +61,16 @@ class ChannelUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
     description = common_serializers.ContentSerializer(allow_null=True)
     tags = tags_serializers.TagsListField()
+    content_category = serializers.ChoiceField(
+        choices=music_models.ARTIST_CONTENT_CATEGORY_CHOICES
+    )
 
     @transaction.atomic
     def update(self, obj, validated_data):
         if validated_data.get("tags") is not None:
             tags_models.set_tags(obj.artist, *validated_data["tags"])
         actor_update_fields = []
+        artist_update_fields = []
 
         if "description" in validated_data:
             description_obj = common_utils.attach_content(
@@ -71,14 +80,24 @@ class ChannelUpdateSerializer(serializers.Serializer):
                 actor_update_fields.append(("summary", description_obj.rendered))
 
         if "name" in validated_data:
-            obj.artist.name = validated_data["name"]
-            obj.artist.save(update_fields=["name"])
             actor_update_fields.append(("name", validated_data["name"]))
+            artist_update_fields.append(("name", validated_data["name"]))
+
+        if "content_category" in validated_data:
+            artist_update_fields.append(
+                ("content_category", validated_data["content_category"])
+            )
 
         if actor_update_fields:
             for field, value in actor_update_fields:
                 setattr(obj.actor, field, value)
             obj.actor.save(update_fields=[f for f, _ in actor_update_fields])
+
+        if artist_update_fields:
+            for field, value in artist_update_fields:
+                setattr(obj.artist, field, value)
+            obj.artist.save(update_fields=[f for f, _ in artist_update_fields])
+
         return obj
 
     def to_representation(self, obj):
