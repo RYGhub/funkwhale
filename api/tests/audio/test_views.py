@@ -14,6 +14,7 @@ def test_channel_create(logged_in_api_client):
         "username": "mychannel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
+        "content_category": "podcast",
     }
 
     url = reverse("api:v1:channels-list")

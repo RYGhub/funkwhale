@@ -66,6 +66,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "mbid": str(artist.mbid),
         "name": artist.name,
         "is_local": artist.is_local,
+        "content_category": artist.content_category,
         "creation_date": to_api_date(artist.creation_date),
         "albums": [serializers.ArtistAlbumSerializer(album).data],
         "tags": [],

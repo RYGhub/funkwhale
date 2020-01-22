@@ -14,6 +14,7 @@ def test_channel_serializer_create(factories):
         "username": "mychannel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
+        "content_category": "other",
     }
 
     serializer = serializers.ChannelCreateSerializer(data=data)
@@ -28,6 +29,7 @@ def test_channel_serializer_create(factories):
         == data["tags"]
     )
     assert channel.artist.description.text == data["description"]["text"]
+    assert channel.artist.content_category == data["content_category"]
     assert (
         channel.artist.description.content_type == data["description"]["content_type"]
     )
@@ -49,6 +51,7 @@ def test_channel_serializer_update(factories):
         "name": "My channel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
+        "content_category": "other",
     }
 
     serializer = serializers.ChannelUpdateSerializer(channel, data=data)
@@ -58,6 +61,7 @@ def test_channel_serializer_update(factories):
     channel.refresh_from_db()
 
     assert channel.artist.name == data["name"]
+    assert channel.artist.content_category == data["content_category"]
     assert (
         sorted(channel.artist.tagged_items.values_list("tag__name", flat=True))
         == data["tags"]

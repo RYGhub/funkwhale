@@ -119,6 +119,7 @@ class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serialize
     fid = serializers.URLField()
     mbid = serializers.UUIDField()
     name = serializers.CharField()
+    content_category = serializers.CharField()
     creation_date = serializers.DateTimeField()
     is_local = serializers.BooleanField()
     cover = cover_field
@@ -142,6 +143,7 @@ def serialize_artist_simple(artist):
         "name": artist.name,
         "creation_date": DATETIME_FIELD.to_representation(artist.creation_date),
         "is_local": artist.is_local,
+        "content_category": artist.content_category,
     }
     if "description" in artist._state.fields_cache:
         data["description"] = (
