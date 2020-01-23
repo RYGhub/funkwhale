@@ -7,9 +7,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_auth.serializers import PasswordResetSerializer as PRS
 from rest_auth.registration.serializers import RegisterSerializer as RS, get_adapter
 from rest_framework import serializers
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
+from funkwhale_api.common import models as common_models
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
@@ -89,26 +89,30 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
         return "Person"
 
 
-class AvatarField(
-    common_serializers.StripExifImageField, VersatileImageFieldSerializer
-):
-    pass
-
-
-avatar_field = AvatarField(allow_null=True, sizes="square")
-
-
 class UserBasicSerializer(serializers.ModelSerializer):
-    avatar = avatar_field
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = models.User
         fields = ["id", "username", "name", "date_joined", "avatar"]
 
+    def get_avatar(self, o):
+        return common_serializers.AttachmentSerializer(
+            o.actor.attachment_icon if o.actor else None
+        ).data
+
 
 class UserWriteSerializer(serializers.ModelSerializer):
-    avatar = avatar_field
     summary = common_serializers.ContentSerializer(required=False, allow_null=True)
+    avatar = common_serializers.RelatedField(
+        "uuid",
+        queryset=common_models.Attachment.objects.all().local().attached(False),
+        serializer=None,
+        queryset_filter=lambda qs, context: qs.filter(
+            actor=context["request"].user.actor
+        ),
+        write_only=True,
+    )
 
     class Meta:
         model = models.User
@@ -125,19 +129,30 @@ class UserWriteSerializer(serializers.ModelSerializer):
         if not obj.actor:
             obj.create_actor()
         summary = validated_data.pop("summary", NOOP)
+        avatar = validated_data.pop("avatar", NOOP)
+
         obj = super().update(obj, validated_data)
 
         if summary != NOOP:
             common_utils.attach_content(obj.actor, "summary_obj", summary)
-
+        if avatar != NOOP:
+            obj.actor.attachment_icon = avatar
+            obj.actor.save(update_fields=["attachment_icon"])
         return obj
+
+    def to_representation(self, obj):
+        repr = super().to_representation(obj)
+        repr["avatar"] = common_serializers.AttachmentSerializer(
+            obj.actor.attachment_icon
+        ).data
+        return repr
 
 
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
     full_username = serializers.SerializerMethodField()
-    avatar = avatar_field
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = models.User
@@ -154,6 +169,9 @@ class UserReadSerializer(serializers.ModelSerializer):
             "privacy_level",
             "avatar",
         ]
+
+    def get_avatar(self, o):
+        return common_serializers.AttachmentSerializer(o.actor.attachment_icon).data
 
     def get_permissions(self, o):
         return o.get_permissions()

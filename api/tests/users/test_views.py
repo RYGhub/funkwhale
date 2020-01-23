@@ -110,7 +110,9 @@ def test_can_fetch_data_from_api(api_client, factories):
     user = factories["users.User"](permission_library=True, with_actor=True)
     summary = {"content_type": "text/plain", "text": "Hello"}
     summary_obj = common_utils.attach_content(user.actor, "summary_obj", summary)
-
+    avatar = factories["common.Attachment"]()
+    user.actor.attachment_icon = avatar
+    user.actor.save()
     api_client.login(username=user.username, password="test")
     response = api_client.get(url)
     assert response.status_code == 200
@@ -120,6 +122,9 @@ def test_can_fetch_data_from_api(api_client, factories):
     assert response.data["email"] == user.email
     assert response.data["name"] == user.name
     assert response.data["permissions"] == user.get_permissions()
+    assert (
+        response.data["avatar"] == common_serializers.AttachmentSerializer(avatar).data
+    )
     assert (
         response.data["summary"]
         == common_serializers.ContentSerializer(summary_obj).data
@@ -301,18 +306,18 @@ def test_user_cannot_patch_another_user(method, logged_in_api_client, factories)
     assert response.status_code == 403
 
 
-def test_user_can_patch_their_own_avatar(logged_in_api_client, avatar):
+def test_user_can_patch_their_own_avatar(logged_in_api_client, factories):
     user = logged_in_api_client.user
+    actor = user.create_actor()
+    attachment = factories["common.Attachment"](actor=actor)
     url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
-    content = avatar.read()
-    avatar.seek(0)
-    payload = {"avatar": avatar}
+    payload = {"avatar": attachment.uuid}
     response = logged_in_api_client.patch(url, payload)
 
     assert response.status_code == 200
     user.refresh_from_db()
 
-    assert user.avatar.read() == content
+    assert user.actor.attachment_icon == attachment
 
 
 def test_creating_user_creates_actor_as_well(

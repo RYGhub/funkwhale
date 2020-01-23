@@ -61,7 +61,9 @@ class DescriptionMutation(mutations.UpdateMutationSerializer):
 
 class CoverMutation(mutations.UpdateMutationSerializer):
     cover = common_serializers.RelatedField(
-        "uuid", queryset=common_models.Attachment.objects.all().local(), serializer=None
+        "uuid",
+        queryset=common_models.Attachment.objects.all().local(),
+        serializer=None,
     )
 
     def get_serialized_relations(self):

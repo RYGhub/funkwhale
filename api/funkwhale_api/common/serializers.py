@@ -24,6 +24,7 @@ class RelatedField(serializers.RelatedField):
         self.related_field_name = related_field_name
         self.serializer = serializer
         self.filters = kwargs.pop("filters", None)
+        self.queryset_filter = kwargs.pop("queryset_filter", None)
         try:
             kwargs["queryset"] = kwargs.pop("queryset")
         except KeyError:
@@ -36,10 +37,16 @@ class RelatedField(serializers.RelatedField):
             filters.update(self.filters(self.context))
         return filters
 
+    def filter_queryset(self, queryset):
+        if self.queryset_filter:
+            queryset = self.queryset_filter(queryset, self.context)
+        return queryset
+
     def to_internal_value(self, data):
         try:
             queryset = self.get_queryset()
             filters = self.get_filters(data)
+            queryset = self.filter_queryset(queryset)
             return queryset.get(**filters)
         except ObjectDoesNotExist:
             self.fail(
@@ -318,3 +325,16 @@ class ContentSerializer(serializers.Serializer):
 
     def get_html(self, o):
         return utils.render_html(o.text, o.content_type)
+
+
+class NullToEmptDict(object):
+    def get_attribute(self, o):
+        attr = super().get_attribute(o)
+        if attr is None:
+            return {}
+        return attr
+
+    def to_representation(self, v):
+        if not v:
+            return v
+        return super().to_representation(v)

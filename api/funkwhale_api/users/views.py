@@ -44,7 +44,7 @@ class PasswordResetConfirmView(rest_auth_views.PasswordResetConfirmView):
 
 
 class UserViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
-    queryset = models.User.objects.all()
+    queryset = models.User.objects.all().select_related("actor__attachment_icon")
     serializer_class = serializers.UserWriteSerializer
     lookup_field = "username"
     lookup_value_regex = r"[a-zA-Z0-9-_.]+"

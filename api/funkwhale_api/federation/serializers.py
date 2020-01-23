@@ -1,9 +1,7 @@
 import logging
-import mimetypes
 import urllib.parse
 import uuid
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import transaction
 
@@ -97,6 +95,9 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = PublicKeySerializer(required=False)
     endpoints = EndpointsSerializer(required=False)
+    icon = LinkSerializer(
+        allowed_mimetypes=["image/*"], allow_null=True, required=False
+    )
 
     class Meta:
         jsonld_mapping = {
@@ -113,6 +114,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             ),
             "mediaType": jsonld.first_val(contexts.AS.mediaType),
             "endpoints": jsonld.first_obj(contexts.AS.endpoints),
+            "icon": jsonld.first_obj(contexts.AS.icon),
         }
 
     def to_representation(self, instance):
@@ -143,17 +145,11 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                 "id": "{}#main-key".format(instance.fid),
             }
         ret["endpoints"] = {}
+
+        include_image(ret, instance.attachment_icon, "icon")
+
         if instance.shared_inbox_url:
             ret["endpoints"]["sharedInbox"] = instance.shared_inbox_url
-        try:
-            if instance.user.avatar:
-                ret["icon"] = {
-                    "type": "Image",
-                    "mediaType": mimetypes.guess_type(instance.user.avatar_path)[0],
-                    "url": utils.full_url(instance.user.avatar.crop["400x400"].url),
-                }
-        except ObjectDoesNotExist:
-            pass
         return ret
 
     def prepare_missing_fields(self):
@@ -201,6 +197,15 @@ class ActorSerializer(jsonld.JsonLdSerializer):
         common_utils.attach_content(
             actor, "summary_obj", self.validated_data["summary"]
         )
+        if "icon" in self.validated_data:
+            new_value = self.validated_data["icon"]
+            common_utils.attach_file(
+                actor,
+                "attachment_icon",
+                {"url": new_value["href"], "mimetype": new_value["mediaType"]}
+                if new_value
+                else None,
+            )
         return actor
 
     def validate(self, data):
@@ -844,15 +849,15 @@ def include_content(repr, content_obj):
     repr["mediaType"] = "text/html"
 
 
-def include_image(repr, attachment):
+def include_image(repr, attachment, field="image"):
     if attachment:
-        repr["image"] = {
+        repr[field] = {
             "type": "Image",
             "href": attachment.download_url_original,
             "mediaType": attachment.mimetype or "image/jpeg",
         }
     else:
-        repr["image"] = None
+        repr[field] = None
 
 
 class MusicEntitySerializer(jsonld.JsonLdSerializer):

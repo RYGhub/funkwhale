@@ -205,6 +205,13 @@ class Actor(models.Model):
         through_fields=("target", "actor"),
         related_name="following",
     )
+    attachment_icon = models.ForeignKey(
+        "common.Attachment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="iconed_actor",
+    )
 
     objects = ActorQuerySet.as_manager()
 

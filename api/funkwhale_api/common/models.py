@@ -180,6 +180,7 @@ class AttachmentQuerySet(models.QuerySet):
             "mutation_attachment",
             "covered_track",
             "covered_artist",
+            "iconed_actor",
         ]
         query = None
         for field in related_fields:
