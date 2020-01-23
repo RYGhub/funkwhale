@@ -189,6 +189,9 @@ class Actor(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name="actors")
     summary = models.CharField(max_length=500, null=True, blank=True)
+    summary_obj = models.ForeignKey(
+        "common.Content", null=True, blank=True, on_delete=models.SET_NULL
+    )
     preferred_username = models.CharField(max_length=200, null=True, blank=True)
     public_key = models.TextField(max_length=5000, null=True, blank=True)
     private_key = models.TextField(max_length=5000, null=True, blank=True)

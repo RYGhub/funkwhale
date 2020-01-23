@@ -21,6 +21,18 @@ from . import activity, actors, contexts, jsonld, models, tasks, utils
 logger = logging.getLogger(__name__)
 
 
+class TruncatedCharField(serializers.CharField):
+    def __init__(self, *args, **kwargs):
+        self.truncate_length = kwargs.pop("truncate_length")
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, v):
+        v = super().to_internal_value(v)
+        if v:
+            v = v[: self.truncate_length]
+        return v
+
+
 class LinkSerializer(jsonld.JsonLdSerializer):
     type = serializers.ChoiceField(choices=[contexts.AS.Link, contexts.AS.Image])
     href = serializers.URLField(max_length=500)
@@ -76,7 +88,11 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     preferredUsername = serializers.CharField()
     manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
     name = serializers.CharField(required=False, max_length=200)
-    summary = serializers.CharField(max_length=None, required=False)
+    summary = TruncatedCharField(
+        truncate_length=common_models.CONTENT_TEXT_MAX_LENGTH,
+        required=False,
+        allow_null=True,
+    )
     followers = serializers.URLField(max_length=500, required=False)
     following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = PublicKeySerializer(required=False)
@@ -113,10 +129,11 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             ret["followers"] = instance.followers_url
         if instance.following_url:
             ret["following"] = instance.following_url
-        if instance.summary:
-            ret["summary"] = instance.summary
         if instance.manually_approves_followers is not None:
             ret["manuallyApprovesFollowers"] = instance.manually_approves_followers
+
+        if instance.summary_obj_id:
+            ret["summary"] = instance.summary_obj.rendered
 
         ret["@context"] = jsonld.get_default_context()
         if instance.public_key:
@@ -146,7 +163,6 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             "inbox_url": self.validated_data.get("inbox"),
             "following_url": self.validated_data.get("following"),
             "followers_url": self.validated_data.get("followers"),
-            "summary": self.validated_data.get("summary"),
             "type": self.validated_data["type"],
             "name": self.validated_data.get("name"),
             "preferred_username": self.validated_data["preferredUsername"],
@@ -181,11 +197,22 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     def save(self, **kwargs):
         d = self.prepare_missing_fields()
         d.update(kwargs)
-        return models.Actor.objects.update_or_create(fid=d["fid"], defaults=d)[0]
+        actor = models.Actor.objects.update_or_create(fid=d["fid"], defaults=d)[0]
+        common_utils.attach_content(
+            actor, "summary_obj", self.validated_data["summary"]
+        )
+        return actor
 
-    def validate_summary(self, value):
-        if value:
-            return value[:500]
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if "summary" in data:
+            validated_data["summary"] = {
+                "content_type": "text/html",
+                "text": data["summary"],
+            }
+        else:
+            validated_data["summary"] = None
+        return validated_data
 
 
 class APIActorSerializer(serializers.ModelSerializer):
@@ -826,18 +853,6 @@ def include_image(repr, attachment):
         }
     else:
         repr["image"] = None
-
-
-class TruncatedCharField(serializers.CharField):
-    def __init__(self, *args, **kwargs):
-        self.truncate_length = kwargs.pop("truncate_length")
-        super().__init__(*args, **kwargs)
-
-    def to_internal_value(self, v):
-        v = super().to_internal_value(v)
-        if v:
-            v = v[: self.truncate_length]
-        return v
 
 
 class MusicEntitySerializer(jsonld.JsonLdSerializer):

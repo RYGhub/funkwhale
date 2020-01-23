@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.users.models import User
 
 
@@ -105,7 +107,10 @@ def test_can_fetch_data_from_api(api_client, factories):
     # login required
     assert response.status_code == 401
 
-    user = factories["users.User"](permission_library=True)
+    user = factories["users.User"](permission_library=True, with_actor=True)
+    summary = {"content_type": "text/plain", "text": "Hello"}
+    summary_obj = common_utils.attach_content(user.actor, "summary_obj", summary)
+
     api_client.login(username=user.username, password="test")
     response = api_client.get(url)
     assert response.status_code == 200
@@ -115,6 +120,10 @@ def test_can_fetch_data_from_api(api_client, factories):
     assert response.data["email"] == user.email
     assert response.data["name"] == user.name
     assert response.data["permissions"] == user.get_permissions()
+    assert (
+        response.data["summary"]
+        == common_serializers.ContentSerializer(summary_obj).data
+    )
 
 
 def test_can_get_token_via_api(api_client, factories):
@@ -200,6 +209,20 @@ def test_user_can_patch_his_own_settings(logged_in_api_client):
     user.refresh_from_db()
 
     assert user.privacy_level == "me"
+
+
+def test_user_can_patch_description(logged_in_api_client):
+    user = logged_in_api_client.user
+    payload = {"summary": {"content_type": "text/markdown", "text": "hello"}}
+    url = reverse("api:v1:users:users-detail", kwargs={"username": user.username})
+
+    response = logged_in_api_client.patch(url, payload, format="json")
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+
+    assert user.actor.summary_obj.content_type == payload["summary"]["content_type"]
+    assert user.actor.summary_obj.text == payload["summary"]["text"]
 
 
 def test_user_can_request_new_subsonic_token(logged_in_api_client):
