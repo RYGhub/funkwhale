@@ -53,7 +53,8 @@ def test_actor_serializer_from_ap(db):
     assert actor.type == "Person"
     assert actor.preferred_username == payload["preferredUsername"]
     assert actor.name == payload["name"]
-    assert actor.summary == payload["summary"]
+    assert actor.summary_obj.text == payload["summary"]
+    assert actor.summary_obj.content_type == "text/html"
     assert actor.fid == actor_url
     assert actor.manually_approves_followers is True
     assert actor.private_key is None
@@ -89,7 +90,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     assert actor.manually_approves_followers is None
 
 
-def test_actor_serializer_to_ap():
+def test_actor_serializer_to_ap(db):
     expected = {
         "@context": jsonld.get_default_context(),
         "id": "https://test.federation/user",
@@ -100,7 +101,6 @@ def test_actor_serializer_to_ap():
         "outbox": "https://test.federation/user/outbox",
         "preferredUsername": "user",
         "name": "Real User",
-        "summary": "Hello world",
         "manuallyApprovesFollowers": False,
         "publicKey": {
             "id": "https://test.federation/user#main-key",
@@ -109,7 +109,7 @@ def test_actor_serializer_to_ap():
         },
         "endpoints": {"sharedInbox": "https://test.federation/inbox"},
     }
-    ac = models.Actor(
+    ac = models.Actor.objects.create(
         fid=expected["id"],
         inbox_url=expected["inbox"],
         outbox_url=expected["outbox"],
@@ -119,11 +119,15 @@ def test_actor_serializer_to_ap():
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain=models.Domain(pk="test.federation"),
-        summary=expected["summary"],
+        domain=models.Domain.objects.create(pk="test.federation"),
         type="Person",
         manually_approves_followers=False,
     )
+
+    content = common_utils.attach_content(
+        ac, "summary_obj", {"text": "hello world", "content_type": "text/markdown"}
+    )
+    expected["summary"] = content.rendered
     serializer = serializers.ActorSerializer(ac)
 
     assert serializer.data == expected
@@ -1127,14 +1131,17 @@ def test_local_actor_serializer_to_ap(factories):
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
         domain=models.Domain.objects.create(pk="test.federation"),
-        summary=expected["summary"],
         type="Person",
         manually_approves_followers=False,
+    )
+    content = common_utils.attach_content(
+        ac, "summary_obj", {"text": "hello world", "content_type": "text/markdown"}
     )
     user = factories["users.User"]()
     user.actor = ac
     user.save()
     ac.refresh_from_db()
+    expected["summary"] = content.rendered
     expected["icon"] = {
         "type": "Image",
         "mediaType": "image/jpeg",

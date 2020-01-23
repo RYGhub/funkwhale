@@ -11,6 +11,7 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import serializers as common_serializers
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
 from . import adapters
 from . import models
@@ -27,6 +28,7 @@ class ASCIIUsernameValidator(validators.RegexValidator):
 
 
 username_validators = [ASCIIUsernameValidator()]
+NOOP = object()
 
 
 class RegisterSerializer(RS):
@@ -106,6 +108,7 @@ class UserBasicSerializer(serializers.ModelSerializer):
 
 class UserWriteSerializer(serializers.ModelSerializer):
     avatar = avatar_field
+    summary = common_serializers.ContentSerializer(required=False, allow_null=True)
 
     class Meta:
         model = models.User
@@ -115,7 +118,19 @@ class UserWriteSerializer(serializers.ModelSerializer):
             "avatar",
             "instance_support_message_display_date",
             "funkwhale_support_message_display_date",
+            "summary",
         ]
+
+    def update(self, obj, validated_data):
+        if not obj.actor:
+            obj.create_actor()
+        summary = validated_data.pop("summary", NOOP)
+        obj = super().update(obj, validated_data)
+
+        if summary != NOOP:
+            common_utils.attach_content(obj.actor, "summary_obj", summary)
+
+        return obj
 
 
 class UserReadSerializer(serializers.ModelSerializer):
@@ -150,16 +165,23 @@ class UserReadSerializer(serializers.ModelSerializer):
 
 class MeSerializer(UserReadSerializer):
     quota_status = serializers.SerializerMethodField()
+    summary = serializers.SerializerMethodField()
 
     class Meta(UserReadSerializer.Meta):
         fields = UserReadSerializer.Meta.fields + [
             "quota_status",
             "instance_support_message_display_date",
             "funkwhale_support_message_display_date",
+            "summary",
         ]
 
     def get_quota_status(self, o):
         return o.get_quota_status() if o.actor else 0
+
+    def get_summary(self, o):
+        if not o.actor or not o.actor.summary_obj:
+            return
+        return common_serializers.ContentSerializer(o.actor.summary_obj).data
 
 
 class PasswordResetSerializer(PRS):
