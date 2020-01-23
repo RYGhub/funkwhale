@@ -327,8 +327,11 @@ def attach_file(obj, field, file_data, fetch=False):
     extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
     extension = extensions.get(file_data["mimetype"], "jpg")
     attachment = models.Attachment(mimetype=file_data["mimetype"])
-
-    filename = "cover-{}.{}".format(obj.uuid, extension)
+    name_fields = ["uuid", "full_username", "pk"]
+    name = [getattr(obj, field) for field in name_fields if getattr(obj, field, None)][
+        0
+    ]
+    filename = "{}-{}.{}".format(field, name, extension)
     if "url" in file_data:
         attachment.url = file_data["url"]
     else:

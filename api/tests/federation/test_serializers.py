@@ -36,6 +36,11 @@ def test_actor_serializer_from_ap(db):
             "id": actor_url + "#main-key",
         },
         "endpoints": {"sharedInbox": "https://noop.url/federation/shared/inbox"},
+        "icon": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "href": "https://image.example/image.png",
+        },
     }
 
     serializer = serializers.ActorSerializer(data=payload)
@@ -60,6 +65,8 @@ def test_actor_serializer_from_ap(db):
     assert actor.private_key is None
     assert actor.public_key == payload["publicKey"]["publicKeyPem"]
     assert actor.domain_id == "test.federation"
+    assert actor.attachment_icon.url == payload["icon"]["href"]
+    assert actor.attachment_icon.mimetype == payload["icon"]["mediaType"]
 
 
 def test_actor_serializer_only_mandatory_field_from_ap(db):
@@ -90,7 +97,7 @@ def test_actor_serializer_only_mandatory_field_from_ap(db):
     assert actor.manually_approves_followers is None
 
 
-def test_actor_serializer_to_ap(db):
+def test_actor_serializer_to_ap(factories):
     expected = {
         "@context": jsonld.get_default_context(),
         "id": "https://test.federation/user",
@@ -122,12 +129,18 @@ def test_actor_serializer_to_ap(db):
         domain=models.Domain.objects.create(pk="test.federation"),
         type="Person",
         manually_approves_followers=False,
+        attachment_icon=factories["common.Attachment"](),
     )
 
     content = common_utils.attach_content(
         ac, "summary_obj", {"text": "hello world", "content_type": "text/markdown"}
     )
     expected["summary"] = content.rendered
+    expected["icon"] = {
+        "type": "Image",
+        "mediaType": "image/jpeg",
+        "href": utils.full_url(ac.attachment_icon.file.url),
+    }
     serializer = serializers.ActorSerializer(ac)
 
     assert serializer.data == expected
@@ -1133,6 +1146,7 @@ def test_local_actor_serializer_to_ap(factories):
         domain=models.Domain.objects.create(pk="test.federation"),
         type="Person",
         manually_approves_followers=False,
+        attachment_icon=factories["common.Attachment"](),
     )
     content = common_utils.attach_content(
         ac, "summary_obj", {"text": "hello world", "content_type": "text/markdown"}
@@ -1145,7 +1159,7 @@ def test_local_actor_serializer_to_ap(factories):
     expected["icon"] = {
         "type": "Image",
         "mediaType": "image/jpeg",
-        "url": utils.full_url(user.avatar.crop["400x400"].url),
+        "href": utils.full_url(ac.attachment_icon.file.url),
     }
     serializer = serializers.ActorSerializer(ac)
 

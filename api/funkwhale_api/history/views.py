@@ -19,7 +19,9 @@ class ListeningViewSet(
 ):
 
     serializer_class = serializers.ListeningSerializer
-    queryset = models.Listening.objects.all().select_related("user__actor")
+    queryset = models.Listening.objects.all().select_related(
+        "user__actor__attachment_icon"
+    )
 
     permission_classes = [
         oauth_permissions.ScopePermission,

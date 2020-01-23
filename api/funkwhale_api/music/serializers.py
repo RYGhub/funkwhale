@@ -18,20 +18,9 @@ from funkwhale_api.tags import serializers as tags_serializers
 from . import filters, models, tasks
 
 
-class NullToEmptDict(object):
-    def get_attribute(self, o):
-        attr = super().get_attribute(o)
-        if attr is None:
-            return {}
-        return attr
-
-    def to_representation(self, v):
-        if not v:
-            return v
-        return super().to_representation(v)
-
-
-class CoverField(NullToEmptDict, common_serializers.AttachmentSerializer):
+class CoverField(
+    common_serializers.NullToEmptDict, common_serializers.AttachmentSerializer
+):
     # XXX: BACKWARD COMPATIBILITY
     pass
 

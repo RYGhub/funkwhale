@@ -22,7 +22,9 @@ class TrackFavoriteViewSet(
 
     filterset_class = filters.TrackFavoriteFilter
     serializer_class = serializers.UserTrackFavoriteSerializer
-    queryset = models.TrackFavorite.objects.all().select_related("user__actor")
+    queryset = models.TrackFavorite.objects.all().select_related(
+        "user__actor__attachment_icon"
+    )
     permission_classes = [
         oauth_permissions.ScopePermission,
         permissions.OwnerPermission,

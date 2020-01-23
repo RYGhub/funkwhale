@@ -41,25 +41,13 @@
               <li v-for="error in avatarErrors">{{ error }}</li>
             </ul>
           </div>
-          <div class="ui stackable grid">
-            <div class="ui ten wide column">
-              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Verb">Upload a new avatar</translate></h3>
-              <p><translate translate-context="Content/Settings/Paragraph">PNG, GIF or JPG. At most 2MB. Will be downscaled to 400x400px.</translate></p>
-              <input class="ui input" ref="avatar" type="file" />
-              <div class="ui hidden divider"></div>
-              <button @click="submitAvatar" :class="['ui', {'loading': isLoadingAvatar}, 'button']">
-                <translate translate-context="Content/Settings/Button.Label/Verb">Update avatar</translate>
-              </button>
-            </div>
-            <div class="ui six wide column">
-              <h3 class="ui header"><translate translate-context="Content/Settings/Title/Noun">Current avatar</translate></h3>
-              <img class="ui circular image" v-if="currentAvatar && currentAvatar.square_crop" v-lazy="$store.getters['instance/absoluteUrl'](currentAvatar.medium_square_crop)" />
-              <div class="ui hidden divider"></div>
-              <button @click="removeAvatar" v-if="currentAvatar && currentAvatar.square_crop" :class="['ui', {'loading': isLoadingAvatar}, ,'yellow', 'button']">
-                <translate translate-context="Content/Settings/Button.Label/Verb">Remove avatar</translate>
-              </button>
-            </div>
-          </div>
+          {{ }}
+          <attachment-input
+            :value="avatar.uuid"
+            @input="submitAvatar($event)"
+            :initial-value="initialAvatar"
+            :required="false"
+            @delete="avatar = {uuid: null}"></attachment-input>
         </div>
       </section>
 
@@ -315,12 +303,14 @@ import logger from "@/logging"
 import PasswordInput from "@/components/forms/PasswordInput"
 import SubsonicTokenForm from "@/components/auth/SubsonicTokenForm"
 import TranslationsMixin from "@/components/mixins/Translations"
+import AttachmentInput from '@/components/common/AttachmentInput'
 
 export default {
   mixins: [TranslationsMixin],
   components: {
     PasswordInput,
-    SubsonicTokenForm
+    SubsonicTokenForm,
+    AttachmentInput
   },
   data() {
     let d = {
@@ -328,7 +318,7 @@ export default {
       // properties that will be used in it
       old_password: "",
       new_password: "",
-      currentAvatar: this.$store.state.auth.profile.avatar,
+      avatar: {...(this.$store.state.auth.profile.avatar || {uuid: null})},
       passwordError: "",
       password: "",
       isLoading: false,
@@ -336,7 +326,6 @@ export default {
       isDeletingAccount: false,
       accountDeleteErrors: [],
       avatarErrors: [],
-      avatar: null,
       apps: [],
       ownedApps: [],
       settings: {
@@ -352,6 +341,7 @@ export default {
         }
       }
     }
+    d.initialAvatar = d.avatar.uuid
     d.settings.order.forEach(id => {
       d.settings.fields[id].value = d.settings.fields[id].initial
       d.settings.fields[id].id = id
@@ -437,44 +427,17 @@ export default {
         }
       )
     },
-    submitAvatar() {
+    submitAvatar(uuid) {
       this.isLoadingAvatar = true
       this.avatarErrors = []
       let self = this
-      this.avatar = this.$refs.avatar.files[0]
-      let formData = new FormData()
-      formData.append("avatar", this.avatar)
       axios
-        .patch(`users/users/${this.$store.state.auth.username}/`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        })
+        .patch(`users/users/${this.$store.state.auth.username}/`, {avatar: uuid})
         .then(
           response => {
             this.isLoadingAvatar = false
-            self.currentAvatar = response.data.avatar
-            self.$store.commit("auth/avatar", self.currentAvatar)
-          },
-          error => {
-            self.isLoadingAvatar = false
-            self.avatarErrors = error.backendErrors
-          }
-        )
-    },
-    removeAvatar() {
-      this.isLoadingAvatar = true
-      let self = this
-      this.avatar = null
-      axios
-        .patch(`users/users/${this.$store.state.auth.username}/`, {
-          avatar: null
-        })
-        .then(
-          response => {
-            this.isLoadingAvatar = false
-            self.currentAvatar = {}
-            self.$store.commit("auth/avatar", self.currentAvatar)
+            self.avatar = response.data.avatar
+            self.$store.commit("auth/avatar", response.data.avatar)
           },
           error => {
             self.isLoadingAvatar = false

@@ -21,7 +21,6 @@ from django_auth_ldap.backend import populate_user as ldap_populate_user
 from oauth2_provider import models as oauth2_models
 from oauth2_provider import validators as oauth2_validators
 from versatileimagefield.fields import VersatileImageField
-from versatileimagefield.image_warmer import VersatileImageFieldWarmer
 
 from funkwhale_api.common import fields, preferences
 from funkwhale_api.common import utils as common_utils
@@ -413,13 +412,3 @@ def create_actor(user):
 def init_ldap_user(sender, user, ldap_user, **kwargs):
     if not user.actor:
         user.actor = create_actor(user)
-
-
-@receiver(models.signals.post_save, sender=User)
-def warm_user_avatar(sender, instance, **kwargs):
-    if not instance.avatar or not settings.CREATE_IMAGE_THUMBNAILS:
-        return
-    user_avatar_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance, rendition_key_set="square", image_attr="avatar"
-    )
-    num_created, failed_to_create = user_avatar_warmer.warm()
