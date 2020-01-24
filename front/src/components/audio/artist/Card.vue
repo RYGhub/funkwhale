@@ -51,13 +51,13 @@ export default {
       return url
     },
     cover () {
-      if (this.artist.cover) {
+      if (this.artist.cover && this.artist.cover.original) {
         return this.artist.cover
       }
       return this.artist.albums.map((a) => {
         return a.cover
       }).filter((c) => {
-        return !!c
+        return c && c.original
       })[0] || {}
     },
   }
