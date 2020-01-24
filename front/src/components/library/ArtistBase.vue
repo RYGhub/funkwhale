@@ -230,12 +230,12 @@ export default {
       )
     },
     cover() {
-      if (this.object.cover) {
+      if (this.object.cover && this.object.cover.original) {
         return this.object.cover
       }
       return this.object.albums
         .filter(album => {
-          return album.cover
+          return album.cover && album.cover.original
         })
         .map(album => {
           return album.cover
