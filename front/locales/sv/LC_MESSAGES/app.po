@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-17 19:29+0200\n"
-"PO-Revision-Date: 2018-10-09 18:22+0000\n"
-"Last-Translator: Tim Stahel <gitlab@swedneck.xyz>\n"
+"PO-Revision-Date: 2020-01-26 19:56+0000\n"
+"Last-Translator: Peter Wickenberg <peter@wickenberg.nu>\n"
 "Language-Team: none\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2.20\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgid "\"%{ title }\", by %{ artist }"
@@ -720,7 +720,7 @@ msgstr "E-post bekräftad"
 
 #: front/src/views/playlists/Detail.vue:29
 msgid "End edition"
-msgstr ""
+msgstr "Slututgåvan"
 
 #: front/src/components/library/import/FileUpload.vue:4
 msgid "Ensure your music files are properly tagged before uploading them."
@@ -736,7 +736,7 @@ msgstr "Ange ett artistnamn…"
 
 #: front/src/views/federation/LibraryList.vue:122
 msgid "Enter an library domain name…"
-msgstr ""
+msgstr "Ange ett biblioteks domännamn..."
 
 #: front/src/views/playlists/List.vue:104
 msgid "Enter an playlist name…"
@@ -776,7 +776,7 @@ msgstr "Fel vid handling"
 
 #: front/src/views/auth/PasswordReset.vue:7
 msgid "Error while asking for a password reset"
-msgstr ""
+msgstr "Fel vid fråga om återställning av lösenord"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:7
 msgid "Error while changing your password"
@@ -806,156 +806,161 @@ msgstr "Ett fel uppstod"
 
 #: front/src/components/playlists/Form.vue:89
 msgid "Everyone"
-msgstr ""
+msgstr "Alla"
 
 #: front/src/components/playlists/Form.vue:85
 msgid "Everyone on this instance"
-msgstr ""
+msgstr "Alla på den här instansen"
 
 #: front/src/components/library/radios/Builder.vue:47
 msgid "Exclude"
-msgstr ""
+msgstr "Exkludera"
 
 #: front/src/components/discussion/Comment.vue:14
 msgid "Expand"
-msgstr ""
+msgstr "Utöka"
 
 #: front/src/components/manage/users/InvitationsTable.vue:41
 msgid "Expiration date"
-msgstr ""
+msgstr "Utgångsdatum"
 
 #: front/src/components/manage/users/InvitationsTable.vue:50
 msgid "Expired"
-msgstr ""
+msgstr "Utgånget"
 
 #: front/src/components/manage/users/InvitationsTable.vue:21
 msgid "Expired/used"
-msgstr ""
+msgstr "Utgånget/använd"
 
 #: front/src/components/library/import/Main.vue:65
 msgid "External source. Supported backends"
-msgstr ""
+msgstr "Extern källa. Uppbackade backends"
 
 #: front/src/components/Sidebar.vue:51
 msgid "Favorites"
-msgstr ""
+msgstr "Favoriter"
 
 #: front/src/components/federation/LibraryForm.vue:3
 msgid "Federate with a new instance"
-msgstr ""
+msgstr "Federera med en ny instans"
 
 #: front/src/views/federation/LibraryTrackList.vue:21
 msgid "Federated tracks"
-msgstr ""
+msgstr "Federerade spår"
 
 #: front/src/components/Sidebar.vue:87 src/components/library/import/BatchList.vue:25
 #: front/src/components/manage/users/UsersTable.vue:180
 #: front/src/views/admin/Settings.vue:84 src/views/admin/users/UsersDetail.vue:161
 #: front/src/views/federation/Base.vue:35 src/views/federation/LibraryDetail.vue:40
 msgid "Federation"
-msgstr ""
+msgstr "Federation"
 
 #: front/src/views/federation/LibraryDetail.vue:3
 msgid "File mirroring"
-msgstr ""
+msgstr "Filspegling"
 
 #: front/src/components/library/import/FileUpload.vue:43
 msgid "File name"
-msgstr ""
+msgstr "Filnamn"
 
 #: front/src/components/library/import/Main.vue:76
 msgid "File upload"
-msgstr ""
+msgstr "Filuppladdning"
 
 #: front/src/views/admin/library/Base.vue:5 src/views/admin/library/FilesList.vue:21
 msgid "Files"
-msgstr ""
+msgstr "Filer"
 
 #: front/src/components/library/import/ArtistImport.vue:7
 msgid "Filter album types"
-msgstr ""
+msgstr "Filtrera albumtyper"
 
 #: front/src/components/library/radios/Builder.vue:46
 msgid "Filter name"
-msgstr ""
+msgstr "Filternamn"
 
 #: front/src/components/library/import/Main.vue:52
 msgid "Finish import"
-msgstr ""
+msgstr "Slutför importen"
 
 #: front/src/components/library/import/BatchDetail.vue:54
 msgid "Finished"
-msgstr ""
+msgstr "Avslutad"
 
 #: front/src/components/library/import/Main.vue:59
 msgid "First, choose where you want to import the music from"
-msgstr ""
+msgstr "Välj först var du vill importera musiken från"
 
 #: front/src/components/federation/LibraryCard.vue:44
 msgid "Follow"
-msgstr ""
+msgstr "Följ"
 
 #: front/src/components/federation/LibraryCard.vue:36
 msgid "Follow request pending approval"
-msgstr ""
+msgstr "Följ begäran i väntan på godkännande"
 
 #: front/src/views/federation/LibraryDetail.vue:21
 msgid "Follow status"
-msgstr ""
+msgstr "Följ status"
 
 #: front/src/views/federation/Base.vue:13
 #: front/src/views/federation/LibraryFollowersList.vue:24
 msgid "Followers"
-msgstr ""
+msgstr "Följare"
 
 #: front/src/components/federation/LibraryCard.vue:18
 msgid "Followers only"
-msgstr ""
+msgstr "Endast följare"
 
 #: front/src/components/federation/LibraryCard.vue:15
 #: front/src/views/federation/LibraryDetail.vue:29
 msgid "Following"
-msgstr ""
+msgstr "Följer"
 
 #: front/src/components/activity/Like.vue:12 src/components/activity/Listen.vue:12
 msgid "from %{ album } by %{ artist }"
-msgstr ""
+msgstr "från %{ album } av %{ artist }"
 
 #: front/src/components/library/Track.vue:13
 msgid "From album %{ album } by %{ artist }"
-msgstr ""
+msgstr "Från album %{ album } av %{ artist }"
 
 #: front/src/App.vue:56
 msgid "Funkwhale is a free and open-source project run by volunteers. You can help us improve the platform by reporting bugs, suggesting features and share the project with your friends!"
 msgstr ""
+"Funkwhale är ett gratis och öppen källkodsprojekt som drivs av volontärer. "
+"Du kan hjälpa oss att förbättra plattformen genom att rapportera buggar, "
+"föreslå funktioner och dela projektet med dina vänner!"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:7
 msgid "Funkwhale is compatible with other music players that support the Subsonic API."
-msgstr ""
+msgstr "Funkwhale är kompatibel med andra musikspelare som stöder Subsonic API."
 
 #: front/src/components/Home.vue:98
 msgid "Funkwhale is dead simple to use."
-msgstr ""
+msgstr "Funkwhale är barnsligt enkelt att använda."
 
 #: front/src/components/Home.vue:39
 msgid "Funkwhale is designed to make it easy to listen to music you like, or to discover new artists."
 msgstr ""
+"Funkwhale är utformad för att göra det enkelt att lyssna på musik du gillar "
+"eller att upptäcka nya artister."
 
 #: front/src/components/Home.vue:119
 msgid "Funkwhale is free and gives you control on your music."
-msgstr ""
+msgstr "Funkwhale är gratis och ger dig kontroll över din musik."
 
 #: front/src/components/Home.vue:66
 msgid "Funkwhale takes care of handling your music"
-msgstr ""
+msgstr "Funkwhale tar hand om din musik"
 
 #: front/src/components/manage/users/InvitationForm.vue:16
 msgid "Get a new invitation"
-msgstr ""
+msgstr "Få en ny inbjudan"
 
 #: front/src/components/Home.vue:13
 msgid "Get me to the library"
-msgstr ""
+msgstr "Ta mig till biblioteket"
 
 #: front/src/components/Home.vue:77
 msgid ""
@@ -964,251 +969,261 @@ msgid ""
 "                MusicBrainz\n"
 "              </a>"
 msgstr ""
+"Få kvalitetsmetadata om din musik tack vare\n"
+"              <a href=\"https://musicbrainz.org\" target=\"_blank\">\n"
+"                MusicBrainz\n"
+"              </a>"
 
 #: front/src/components/common/ActionTable.vue:21
 #: front/src/components/common/ActionTable.vue:27
 msgid "Go"
-msgstr ""
+msgstr "Kör"
 
 #: front/src/components/PageNotFound.vue:14
 msgid "Go to home page"
-msgstr ""
+msgstr "Gå till hemsidan"
 
 #: front/src/components/library/import/Main.vue:13
 msgid "Grab corresponding metadata"
-msgstr ""
+msgstr "Hämta motsvarande metadata"
 
 #: front/src/components/library/Home.vue:65
 msgid "Home"
-msgstr ""
+msgstr "Hem"
 
 #: front/src/components/instance/Stats.vue:36
 msgid "Hours of music"
-msgstr ""
+msgstr "Timmar av musik"
 
 #: front/src/components/auth/SubsonicTokenForm.vue:11
 msgid "However, accessing Funkwhale from those clients require a separate password you can set below."
 msgstr ""
+"Men åtkomst till Funkwhale från dessa klienter kräver ett separat lösenord "
+"som du kan ställa in nedan."
 
 #: front/src/components/library/import/BatchList.vue:34
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: front/src/views/auth/PasswordResetConfirm.vue:24
 msgid "If the email address provided in the previous step is valid and binded to a user account, you should receive an email with reset instructions in the next couple of minutes."
 msgstr ""
+"Om e-postadressen som anges i föregående steg är giltig och kopplas till ett "
+"användarkonto, så bör du få ett e-postmeddelande med "
+"återställningsinstruktioner under de kommande minuterna."
 
 #: front/src/components/federation/LibraryTrackTable.vue:196
 #: front/src/components/library/Library.vue:17
 msgid "Import"
-msgstr ""
+msgstr "Importera"
 
 #: front/src/components/federation/LibraryTrackTable.vue:57
 msgid "Import #%{ id } launched"
-msgstr ""
+msgstr "Import #%{ id } startad"
 
 #: front/src/components/library/import/Main.vue:38
 msgid "Import %{ count } track"
 msgid_plural "Import %{ count } tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Importera %{ count } spår"
+msgstr[1] "Importera %{ count } spår"
 
 #: front/src/components/library/import/BatchDetail.vue:10
 msgid "Import batch"
-msgstr ""
+msgstr "Importera batch"
 
 #: front/src/components/library/import/BatchDetail.vue:185
 msgid "Import Batch #%{ id }"
-msgstr ""
+msgstr "Import batch #%{ id }"
 
 #: front/src/components/library/Library.vue:20
 msgid "Import batches"
-msgstr ""
+msgstr "Importera partier"
 
 #: front/src/components/library/import/BatchList.vue:117
 msgid "Import Batches"
-msgstr ""
+msgstr "Importera partier"
 
 #: front/src/components/manage/library/FilesTable.vue:40
 #: front/src/components/manage/library/RequestsTable.vue:53
 msgid "Import date"
-msgstr ""
+msgstr "Importdatum"
 
 #: front/src/components/library/import/FileUpload.vue:38
 msgid "Import detail page"
-msgstr ""
+msgstr "Import detaljsida"
 
 #: front/src/components/Sidebar.vue:81
 msgid "Import music"
-msgstr ""
+msgstr "Importera musik"
 
 #: front/src/components/library/import/Main.vue:267
 msgid "Import Music"
-msgstr ""
+msgstr "Importera musik"
 
 #: front/src/components/Home.vue:71
 msgid "Import music from various platforms, such as YouTube or SoundCloud"
 msgstr ""
+"Importera musik från olika plattformar, till exempel YouTube eller SoundCloud"
 
 #: front/src/components/federation/LibraryTrackTable.vue:14
 #: front/src/components/federation/LibraryTrackTable.vue:66
 msgid "Import pending"
-msgstr ""
+msgstr "Import väntar"
 
 #: front/src/views/admin/library/Base.vue:9
 #: front/src/views/admin/library/RequestsList.vue:3
 #: front/src/views/admin/library/RequestsList.vue:21
 msgid "Import requests"
-msgstr ""
+msgstr "Importera förfrågningar"
 
 #: front/src/components/library/import/BatchList.vue:20
 #: front/src/components/library/import/Main.vue:6
 msgid "Import source"
-msgstr ""
+msgstr "Import källa"
 
 #: front/src/components/federation/LibraryTrackTable.vue:9
 msgid "Import status"
-msgstr ""
+msgstr "Import status"
 
 #: front/src/components/library/import/ReleaseImport.vue:14
 msgid "Import this release"
-msgstr ""
+msgstr "Importera den här utgåvan"
 
 #: front/src/components/library/import/TrackImport.vue:11
 msgid "Import this track"
-msgstr ""
+msgstr "Importera det här spåret"
 
 #: front/src/components/federation/LibraryTrackTable.vue:12
 #: front/src/components/manage/library/RequestsTable.vue:29
 #: front/src/components/manage/library/RequestsTable.vue:61
 msgid "Imported"
-msgstr ""
+msgstr "Importerad"
 
 #: front/src/components/library/import/TrackImport.vue:44
 msgid "Imported URL"
-msgstr ""
+msgstr "Importerad URL"
 
 #: front/src/views/admin/Settings.vue:82
 msgid "Imports"
-msgstr ""
+msgstr "Importer"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgid "In favorites"
-msgstr ""
+msgstr "I favoriter"
 
 #: front/src/components/federation/LibraryTrackTable.vue:65
 msgid "In library"
-msgstr ""
+msgstr "I bibliotek"
 
 #: front/src/components/manage/users/UsersTable.vue:54
 msgid "Inactive"
-msgstr ""
+msgstr "Inaktiv"
 
 #: front/src/components/library/import/Main.vue:96
 msgid "Input a MusicBrainz ID manually:"
-msgstr ""
+msgstr "Ange ett MusicBrainz-ID manuellt:"
 
 #: front/src/views/auth/PasswordReset.vue:53
 msgid "Input the email address binded to your account"
-msgstr ""
+msgstr "Ange e-postadressen som är bunden till ditt konto"
 
 #: front/src/components/playlists/Editor.vue:31
 msgid "Insert from queue (%{ count } track)"
 msgid_plural "Insert from queue (%{ count } tracks)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Infoga (%{ count } spår från kön)"
+msgstr[1] "Infoga (%{ count } spår från kön)"
 
 #: front/src/views/admin/Settings.vue:80
 msgid "Instance information"
-msgstr ""
+msgstr "Instansinformation"
 
 #: front/src/components/library/Radios.vue:9
 msgid "Instance radios"
-msgstr ""
+msgstr "Instansradio"
 
 #: front/src/views/admin/Settings.vue:75
 msgid "Instance settings"
-msgstr ""
+msgstr "Inställningar för instans"
 
 #: front/src/views/instance/Timeline.vue:57
 msgid "Instance Timeline"
-msgstr ""
+msgstr "Tidslinje för instans"
 
 #: front/src/components/auth/Signup.vue:42
 #: front/src/components/manage/users/InvitationForm.vue:11
 msgid "Invitation code"
-msgstr ""
+msgstr "Inbjudningskod"
 
 #: front/src/components/auth/Signup.vue:43
 msgid "Invitation code (optional)"
-msgstr ""
+msgstr "Inbjudningskod (valfritt)"
 
 #: front/src/views/admin/users/Base.vue:8 src/views/admin/users/InvitationsList.vue:3
 #: front/src/views/admin/users/InvitationsList.vue:24
 msgid "Invitations"
-msgstr ""
+msgstr "Inbjudningar"
 
 #: front/src/App.vue:43
 msgid "Issue tracker"
-msgstr ""
+msgstr "Problemspårare"
 
 #: front/src/components/library/import/BatchDetail.vue:80
 msgid "Job ID"
-msgstr ""
+msgstr "Jobb id"
 
 #: front/src/components/library/import/BatchList.vue:36
 msgid "Jobs"
-msgstr ""
+msgstr "Jobb"
 
 #: front/src/components/Home.vue:50
 msgid "Keep a track of your favorite songs"
-msgstr ""
+msgstr "Håll koll på dina favoritlåtar"
 
 #: front/src/components/audio/track/Table.vue:33
 msgid "Keep your PRIVATE_TOKEN secret as it gives access to your account."
-msgstr ""
+msgstr "Håll din PRIVATE_TOKEN hemlig eftersom den ger åtkomst till ditt konto."
 
 #: front/src/components/manage/users/UsersTable.vue:41
 #: front/src/views/admin/users/UsersDetail.vue:45
 msgid "Last activity"
-msgstr ""
+msgstr "Senaste aktivitet"
 
 #: front/src/views/federation/LibraryDetail.vue:101
 msgid "Last fetched"
-msgstr ""
+msgstr "Senast hämtad"
 
 #: front/src/components/playlists/PlaylistModal.vue:32
 msgid "Last modification"
-msgstr ""
+msgstr "Senaste ändring"
 
 #: front/src/components/common/ActionTable.vue:39
 msgid "Launch"
-msgstr ""
+msgstr "Starta"
 
 #: front/src/components/library/import/BatchDetail.vue:18
 #: front/src/components/library/import/BatchList.vue:35
 msgid "Launch date"
-msgstr ""
+msgstr "Lanseringsdag"
 
 #: front/src/components/federation/LibraryForm.vue:31
 msgid "Launch scan"
-msgstr ""
+msgstr "Starta skanning"
 
 #: front/src/components/Home.vue:10
 msgid "Learn more about this instance"
-msgstr ""
+msgstr "Läs mer om den här instansen"
 
 #: front/src/components/manage/users/InvitationForm.vue:58
 msgid "Leave empty for a random code"
-msgstr ""
+msgstr "Lämna tomt för en slumpmässig kod"
 
 #: front/src/components/requests/Form.vue:10
 msgid "Leave this field empty if you're requesting the whole discography."
-msgstr ""
+msgstr "Lämna det här fältet tomt om du begär hela diskografin."
 
 #: front/src/views/federation/Base.vue:5 src/views/federation/LibraryList.vue:123
 msgid "Libraries"
-msgstr ""
+msgstr "Bibliotek"
 
 #: front/src/components/Sidebar.vue:70
 #: front/src/components/federation/LibraryTrackTable.vue:51
@@ -1217,59 +1232,60 @@ msgstr ""
 #: front/src/views/admin/users/UsersDetail.vue:157
 #: front/src/views/federation/LibraryDetail.vue:194
 msgid "Library"
-msgstr ""
+msgstr "Bibliotek"
 
 #: front/src/views/admin/library/FilesList.vue:3
 msgid "Library files"
-msgstr ""
+msgstr "Filer i bibliotek"
 
 #: front/src/components/federation/LibraryForm.vue:20
 msgid "Library name"
-msgstr ""
+msgstr "Biblioteksnamn"
 
 #: front/src/views/federation/LibraryDetail.vue:84
 msgid "Library size"
-msgstr ""
+msgstr "Biblioteksstorlek"
 
 #: front/src/components/federation/LibraryForm.vue:96
+#, fuzzy
 msgid "library@demo.funkwhale.audio"
-msgstr ""
+msgstr "library@demo.funkwhale.audio"
 
 #: front/src/App.vue:29
 msgid "Links"
-msgstr ""
+msgstr "Länkar"
 
 #: front/src/views/instance/Timeline.vue:4
 msgid "Loading timeline…"
-msgstr ""
+msgstr "Laddar tidslinje…"
 
 #: front/src/components/favorites/List.vue:5
 msgid "Loading your favorites…"
-msgstr ""
+msgstr "Laddar dina favoriter…"
 
 #: front/src/components/auth/Login.vue:78
 msgid "Log In"
-msgstr ""
+msgstr "Logga in"
 
 #: front/src/components/auth/Login.vue:4
 msgid "Log in to your Funkwhale account"
-msgstr ""
+msgstr "Logga in till ditt Funkwhale konto"
 
 #: front/src/components/auth/Logout.vue:20
 msgid "Log Out"
-msgstr ""
+msgstr "Logga ut"
 
 #: front/src/components/Sidebar.vue:38
 msgid "Logged in as %{ username }"
-msgstr ""
+msgstr "Inloggad som %{ username }"
 
 #: front/src/components/Sidebar.vue:44 src/components/auth/Login.vue:41
 msgid "Login"
-msgstr ""
+msgstr "Inlogg"
 
 #: front/src/components/Sidebar.vue:43
 msgid "Logout"
-msgstr ""
+msgstr "Logga ut"
 
 #: front/src/components/audio/Player.vue:266
 msgid "Looping disabled. Click to switch to single-track looping."
