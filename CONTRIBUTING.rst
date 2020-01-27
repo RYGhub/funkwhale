@@ -84,6 +84,18 @@ Visit https://dev.funkwhale.audio/funkwhale/funkwhale and clone the repository u
     git clone ssh://git@dev.funkwhale.audio/funkwhale/funkwhale.git
     cd funkwhale
 
+.. note::
+
+    As of January 2020, the SSH fingerprints of our Gitlab server are the following::
+
+        $ ssh-keyscan dev.funkwhale.audio | ssh-keygen -lf -
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        # dev.funkwhale.audio:22 SSH-2.0-OpenSSH_7.4p1 Debian-10+deb9u6
+        2048 SHA256:WEZ546nkMhB9yV9lyDZZcEeN/IfriyhU8+mj7Cz/+sU dev.funkwhale.audio (RSA)
+        256 SHA256:dEhAo+1ImjC98hSqVdnkwVleheCulV8xIsV1eKUcig0 dev.funkwhale.audio (ECDSA)
+        256 SHA256:/AxZwOSP74hlNKCHzmu9Trlp9zVGTrsJOV+zet1hYyQ dev.funkwhale.audio (ED25519)
+
 
 A note about branches
 ^^^^^^^^^^^^^^^^^^^^^
