@@ -13,16 +13,16 @@
             <input type="text" name="search" v-model="query" :placeholder="labels.searchPlaceholder"/>
           </div>
           <div class="field">
+            <label><translate translate-context="*/*/*/Noun">Tags</translate></label>
+            <tags-selector v-model="tags"></tags-selector>
+          </div>
+          <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering</translate></label>
             <select class="ui dropdown" v-model="ordering">
               <option v-for="option in orderingOptions" :value="option[0]">
                 {{ sharedLabels.filters[option[1]] }}
               </option>
             </select>
-          </div>
-          <div class="field">
-            <label><translate translate-context="*/*/*/Noun">Tags</translate></label>
-            <tags-selector v-model="tags"></tags-selector>
           </div>
           <div class="field">
             <label><translate translate-context="Content/Search/Dropdown.Label/Noun">Ordering direction</translate></label>
