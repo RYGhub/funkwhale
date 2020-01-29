@@ -475,6 +475,7 @@ def get_artist(release_list):
 
 
 class Track(APIModelMixin):
+    mbid = models.UUIDField(db_index=True, null=True, blank=True)
     title = models.CharField(max_length=MAX_LENGTHS["TRACK_TITLE"])
     artist = models.ForeignKey(Artist, related_name="tracks", on_delete=models.CASCADE)
     disc_number = models.PositiveIntegerField(null=True, blank=True)
