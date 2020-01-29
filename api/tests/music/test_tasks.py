@@ -1164,3 +1164,134 @@ def test_can_download_image_file_for_album_mbid(binary_cover, mocker, factories)
 
     assert album.attachment_cover.file.read() == binary_cover
     assert album.attachment_cover.mimetype == "image/jpeg"
+
+
+def test_can_import_track_with_same_mbid_in_different_albums(factories, mocker):
+    artist = factories["music.Artist"]()
+    upload = factories["music.Upload"](
+        playable=True, track__artist=artist, track__album__artist=artist
+    )
+    assert upload.track.mbid is not None
+    data = {
+        "title": upload.track.title,
+        "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        "album": {
+            "title": "The Slip",
+            "mbid": uuid.UUID("12b57d46-a192-499e-a91f-7da66790a1c1"),
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        },
+        "position": 1,
+        "disc_number": 1,
+        "mbid": upload.track.mbid,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "finished"
+
+
+def test_import_track_with_same_mbid_in_same_albums_skipped(factories, mocker):
+    artist = factories["music.Artist"]()
+    upload = factories["music.Upload"](
+        playable=True, track__artist=artist, track__album__artist=artist
+    )
+    assert upload.track.mbid is not None
+    data = {
+        "title": upload.track.title,
+        "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        "album": {
+            "title": upload.track.album.title,
+            "mbid": upload.track.album.mbid,
+            "artists": [{"name": artist.name, "mbid": artist.mbid}],
+        },
+        "position": 1,
+        "disc_number": 1,
+        "mbid": upload.track.mbid,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "skipped"
+
+
+def test_can_import_track_with_same_position_in_different_discs(factories, mocker):
+    upload = factories["music.Upload"](playable=True)
+    artist_data = [
+        {
+            "name": upload.track.album.artist.name,
+            "mbid": upload.track.album.artist.mbid,
+        }
+    ]
+    data = {
+        "title": upload.track.title,
+        "artists": artist_data,
+        "album": {
+            "title": "The Slip",
+            "mbid": upload.track.album.mbid,
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": artist_data,
+        },
+        "position": upload.track.position,
+        "disc_number": 2,
+        "mbid": None,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "finished"
+
+
+def test_can_import_track_with_same_position_in_same_discs_skipped(factories, mocker):
+    upload = factories["music.Upload"](playable=True)
+    artist_data = [
+        {
+            "name": upload.track.album.artist.name,
+            "mbid": upload.track.album.artist.mbid,
+        }
+    ]
+    data = {
+        "title": upload.track.title,
+        "artists": artist_data,
+        "album": {
+            "title": "The Slip",
+            "mbid": upload.track.album.mbid,
+            "release_date": datetime.date(2008, 5, 5),
+            "artists": artist_data,
+        },
+        "position": upload.track.position,
+        "disc_number": upload.track.disc_number,
+        "mbid": None,
+    }
+
+    mocker.patch.object(metadata.TrackMetadataSerializer, "validated_data", data)
+    mocker.patch.object(tasks, "populate_album_cover")
+
+    new_upload = factories["music.Upload"](library=upload.library)
+
+    tasks.process_upload(upload_id=new_upload.pk)
+
+    new_upload.refresh_from_db()
+
+    assert new_upload.import_status == "skipped"

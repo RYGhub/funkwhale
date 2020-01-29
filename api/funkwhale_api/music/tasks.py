@@ -625,9 +625,18 @@ def _get_track(data, attributed_to=None, **forced_values):
         else truncate(data.get("copyright"), models.MAX_LENGTHS["COPYRIGHT"])
     )
 
-    query = Q(title__iexact=track_title, artist=artist, album=album, position=position)
+    query = Q(
+        title__iexact=track_title,
+        artist=artist,
+        album=album,
+        position=position,
+        disc_number=disc_number,
+    )
     if track_mbid:
-        query |= Q(mbid=track_mbid)
+        if album_mbid:
+            query |= Q(mbid=track_mbid, album__mbid=album_mbid)
+        else:
+            query |= Q(mbid=track_mbid)
     if track_fid:
         query |= Q(fid=track_fid)
 
