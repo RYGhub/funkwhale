@@ -8,7 +8,7 @@
     <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
     <button v-if="controls" @click="fetchData('artists/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
-    <div class="ui three cards">
+    <div class="ui five app-cards cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
         <div class="ui loader"></div>
       </div>
