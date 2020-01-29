@@ -19,13 +19,13 @@ def create_attachments(apps, schema_editor):
     print('Creating attachments for {} user avatars, this may take a while…'.format(total))
     from django.core.files.storage import FileSystemStorage
     for i, user in enumerate(qs):
+        size = None
         if isinstance(user.avatar.storage._wrapped, FileSystemStorage):
             try:
                 size = user.avatar.size
             except FileNotFoundError:
                 # can occur when file isn't found on disk or S3
                 print("  Warning: avatar file wasn't found in storage: {}".format(e.__class__))
-                size = None
         obj_attachment_mapping[user.actor] = Attachment(
             file=user.avatar,
             size=size,
