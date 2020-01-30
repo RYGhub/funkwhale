@@ -115,11 +115,12 @@ class ArtistViewSet(
         models.Artist.objects.all()
         .prefetch_related("attributed_to", "attachment_cover")
         .prefetch_related(
+            "channel__actor",
             Prefetch(
                 "tracks",
                 queryset=models.Track.objects.all(),
                 to_attr="_prefetched_tracks",
-            )
+            ),
         )
         .order_by("-id")
     )
@@ -752,6 +753,7 @@ class Search(views.APIView):
             models.Artist.objects.all()
             .filter(query_obj)
             .with_albums()
+            .prefetch_related("channel__actor")
             .select_related("attributed_to")
         )
         return common_utils.order_for_search(qs, "name")[: self.max_results]

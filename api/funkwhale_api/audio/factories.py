@@ -21,7 +21,10 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         privacy_level="everyone",
     )
     actor = factory.LazyAttribute(set_actor)
-    artist = factory.SubFactory(music_factories.ArtistFactory)
+    artist = factory.SubFactory(
+        music_factories.ArtistFactory,
+        attributed_to=factory.SelfAttribute("..attributed_to"),
+    )
 
     class Meta:
         model = "audio.Channel"
