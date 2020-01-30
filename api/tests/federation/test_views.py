@@ -169,6 +169,16 @@ def test_music_library_retrieve(factories, api_client, privacy_level):
     assert response.data == expected
 
 
+def test_music_library_retrieve_excludes_channel_libraries(factories, api_client):
+    channel = factories["audio.Channel"]()
+    library = channel.library
+
+    url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
 def test_music_library_retrieve_page_public(factories, api_client):
     library = factories["music.Library"](privacy_level="everyone")
     upload = factories["music.Upload"](library=library, import_status="finished")

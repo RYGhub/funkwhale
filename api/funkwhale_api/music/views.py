@@ -50,7 +50,7 @@ def get_libraries(filter_uploads):
         uploads = filter_uploads(obj, uploads)
         uploads = uploads.playable_by(actor)
         qs = models.Library.objects.filter(
-            pk__in=uploads.values_list("library", flat=True)
+            pk__in=uploads.values_list("library", flat=True), channel=None,
         ).annotate(_uploads_count=Count("uploads"))
         qs = qs.prefetch_related("actor")
         page = self.paginate_queryset(qs)
@@ -232,6 +232,7 @@ class LibraryViewSet(
     lookup_field = "uuid"
     queryset = (
         models.Library.objects.all()
+        .filter(channel=None)
         .order_by("-creation_date")
         .annotate(_uploads_count=Count("uploads"))
         .annotate(_size=Sum("uploads__size"))

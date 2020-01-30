@@ -39,7 +39,18 @@ def get_stats(tracks, target):
     data["track_favorites"] = favorites_models.TrackFavorite.objects.filter(
         track__in=tracks
     ).count()
-    data["libraries"] = uploads.values_list("library", flat=True).distinct().count()
+    data["libraries"] = (
+        uploads.filter(library__channel=None)
+        .values_list("library", flat=True)
+        .distinct()
+        .count()
+    )
+    data["channels"] = (
+        uploads.exclude(library__channel=None)
+        .values_list("library", flat=True)
+        .distinct()
+        .count()
+    )
     data["uploads"] = uploads.count()
     data["reports"] = moderation_models.Report.objects.get_for_target(target).count()
     data.update(get_media_stats(uploads))
@@ -233,6 +244,7 @@ class ManageLibraryViewSet(
     lookup_field = "uuid"
     queryset = (
         music_models.Library.objects.all()
+        .filter(channel=None)
         .order_by("-id")
         .select_related("actor")
         .annotate(

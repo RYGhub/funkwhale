@@ -185,6 +185,7 @@ def test_artist_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -235,6 +236,7 @@ def test_album_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -282,6 +284,7 @@ def test_track_detail_stats(factories, superuser_api_client):
     response = superuser_api_client.get(url)
     expected = {
         "libraries": 0,
+        "channels": 0,
         "uploads": 0,
         "listenings": 0,
         "playlists": 0,
@@ -312,6 +315,17 @@ def test_library_list(factories, superuser_api_client, settings):
 
     assert response.data["count"] == 1
     assert response.data["results"][0]["id"] == library.id
+
+
+def test_library_list_exclude_channel_libraries(
+    factories, superuser_api_client, settings
+):
+    factories["audio.Channel"]()
+    url = reverse("api:v1:manage:library:libraries-list")
+    response = superuser_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["count"] == 0
 
 
 def test_library_detail(factories, superuser_api_client):

@@ -203,7 +203,9 @@ class MusicLibraryViewSet(
     authentication_classes = [authentication.SignatureAuthentication]
     renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
-    queryset = music_models.Library.objects.all().select_related("actor")
+    queryset = (
+        music_models.Library.objects.all().select_related("actor").filter(channel=None)
+    )
     lookup_field = "uuid"
 
     def retrieve(self, request, *args, **kwargs):
