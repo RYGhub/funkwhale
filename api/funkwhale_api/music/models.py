@@ -273,6 +273,12 @@ class Artist(APIModelMixin):
     def cover(self):
         return self.attachment_cover
 
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
+
 
 def import_artist(v):
     a = Artist.get_or_create_from_api(mbid=v[0]["artist"]["id"])[0]

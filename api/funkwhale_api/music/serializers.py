@@ -103,6 +103,7 @@ class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serialize
     albums = ArtistAlbumSerializer(many=True)
     tags = serializers.SerializerMethodField()
     attributed_to = serializers.SerializerMethodField()
+    channel = serializers.SerializerMethodField()
     tracks_count = serializers.SerializerMethodField()
     id = serializers.IntegerField()
     fid = serializers.URLField()
@@ -122,6 +123,20 @@ class ArtistWithAlbumsSerializer(OptionalDescriptionMixin, serializers.Serialize
     def get_tracks_count(self, o):
         tracks = getattr(o, "_prefetched_tracks", None)
         return len(tracks) if tracks else None
+
+    def get_channel(self, o):
+        channel = o.get_channel()
+        if not channel:
+            return
+
+        return {
+            "uuid": str(channel.uuid),
+            "actor": {
+                "full_username": channel.actor.full_username,
+                "preferred_username": channel.actor.preferred_username,
+                "domain": channel.actor.domain_id,
+            },
+        }
 
 
 def serialize_artist_simple(artist):

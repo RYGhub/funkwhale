@@ -73,6 +73,41 @@ def test_artist_with_albums_serializer(factories, to_api_date):
         "attributed_to": federation_serializers.APIActorSerializer(actor).data,
         "tracks_count": 42,
         "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
+        "channel": None,
+    }
+    serializer = serializers.ArtistWithAlbumsSerializer(artist)
+    assert serializer.data == expected
+
+
+def test_artist_with_albums_serializer_channel(factories, to_api_date):
+    actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"](attributed_to=actor)
+    track = factories["music.Track"](album__artist=channel.artist)
+    artist = track.artist
+    artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
+    album = list(artist.albums.all())[0]
+    setattr(artist, "_prefetched_tracks", range(42))
+    expected = {
+        "id": artist.id,
+        "fid": artist.fid,
+        "mbid": str(artist.mbid),
+        "name": artist.name,
+        "is_local": artist.is_local,
+        "content_category": artist.content_category,
+        "creation_date": to_api_date(artist.creation_date),
+        "albums": [serializers.ArtistAlbumSerializer(album).data],
+        "tags": [],
+        "attributed_to": federation_serializers.APIActorSerializer(actor).data,
+        "tracks_count": 42,
+        "cover": common_serializers.AttachmentSerializer(artist.attachment_cover).data,
+        "channel": {
+            "uuid": str(channel.uuid),
+            "actor": {
+                "full_username": channel.actor.full_username,
+                "preferred_username": channel.actor.preferred_username,
+                "domain": channel.actor.domain_id,
+            },
+        },
     }
     serializer = serializers.ArtistWithAlbumsSerializer(artist)
     assert serializer.data == expected
