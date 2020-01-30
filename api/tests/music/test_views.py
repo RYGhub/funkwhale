@@ -640,6 +640,16 @@ def test_user_can_list_their_library(factories, logged_in_api_client):
     assert response.data["results"][0]["uuid"] == str(library.uuid)
 
 
+def test_library_list_excludes_channel_library(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    factories["audio.Channel"](attributed_to=actor)
+    url = reverse("api:v1:libraries-list")
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["count"] == 0
+
+
 def test_user_cannot_delete_other_actors_library(factories, logged_in_api_client):
     logged_in_api_client.user.create_actor()
     library = factories["music.Library"](privacy_level="everyone")
@@ -859,6 +869,11 @@ def test_can_get_libraries_for_music_entities(
         "album": upload.track.album,
         "track": upload.track,
     }
+    # libraries in channel should be missing excluded
+    channel = factories["audio.Channel"](artist=upload.track.artist)
+    factories["music.Upload"](
+        library=channel.library, playable=True, track=upload.track
+    )
 
     url = reverse("api:v1:{}s-libraries".format(entity), kwargs={"pk": data[entity].pk})
 
