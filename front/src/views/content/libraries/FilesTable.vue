@@ -175,7 +175,7 @@
     <div>
       <pagination
         v-if="result && result.count > paginateBy"
-        @page-changed="selectPage"
+        @page-changed="page = $event; fetchData()"
         :compact="true"
         :current="page"
         :paginate-by="paginateBy"
@@ -231,13 +231,10 @@ export default {
       isLoading: false,
       result: null,
       page: 1,
-      paginateBy: 25,
       search: {
         query: this.defaultQuery,
         tokens: parseTokens(normalizeQuery(this.defaultQuery))
       },
-      orderingDirection: "-",
-      ordering: "creation_date",
       orderingOptions: [
         ["creation_date", "creation_date"],
         ["title", "track_title"],

@@ -67,6 +67,16 @@ export default {
         orderingDirection: "-",
         ordering: "creation_date",
       },
+      "content.libraries.files": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "content.libraries.detail": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
     },
     serviceWorker: {
       refreshing: false,
