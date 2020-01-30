@@ -614,6 +614,36 @@ class OembedSerializer(serializers.Serializer):
             data["author_url"] = federation_utils.full_url(
                 common_utils.spa_reverse("library_artist", kwargs={"pk": artist.pk})
             )
+        elif match.url_name == "channel_detail":
+            from funkwhale_api.audio.models import Channel
+
+            qs = Channel.objects.filter(uuid=match.kwargs["uuid"]).select_related(
+                "artist__attachment_cover"
+            )
+            try:
+                channel = qs.get()
+            except models.Artist.DoesNotExist:
+                raise serializers.ValidationError(
+                    "No channel matching id {}".format(match.kwargs["uuid"])
+                )
+            embed_type = "channel"
+            embed_id = channel.uuid
+
+            if channel.artist.attachment_cover:
+                data[
+                    "thumbnail_url"
+                ] = channel.artist.attachment_cover.download_url_medium_square_crop
+                data["thumbnail_width"] = 200
+                data["thumbnail_height"] = 200
+            data["title"] = channel.artist.name
+            data["description"] = channel.artist.name
+            data["author_name"] = channel.artist.name
+            data["height"] = 400
+            data["author_url"] = federation_utils.full_url(
+                common_utils.spa_reverse(
+                    "channel_detail", kwargs={"uuid": channel.uuid}
+                )
+            )
         elif match.url_name == "library_playlist":
             qs = playlists_models.Playlist.objects.filter(
                 pk=int(match.kwargs["pk"]), privacy_level="everyone"

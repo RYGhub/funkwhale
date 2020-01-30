@@ -139,7 +139,7 @@ export default {
   data () {
     return {
       time,
-      supportedTypes: ['track', 'album', 'artist', 'playlist'],
+      supportedTypes: ['track', 'album', 'artist', 'playlist', 'channel'],
       baseUrl: '',
       error: null,
       type: null,
@@ -230,7 +230,10 @@ export default {
         this.fetchTrack(id)
       }
       if (type === 'album') {
-        this.fetchTracks({album: id, playable: true, ordering: ",disc_number,position"})
+        this.fetchTracks({album: id, playable: true, ordering: "disc_number,position"})
+      }
+      if (type === 'channel') {
+        this.fetchTracks({channel: id, playable: true, include_channels: 'true', ordering: "-creation_date"})
       }
       if (type === 'artist') {
         this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
