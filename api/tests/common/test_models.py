@@ -85,3 +85,19 @@ def test_removing_obj_removes_content(factories):
         removed_content.refresh_from_db()
 
     kept_content.refresh_from_db()
+
+
+def test_content_as_plain_text(factories):
+    content = factories["common.Content"](
+        content_type="text/html", text="<b>hello world</b>"
+    )
+
+    assert content.as_plain_text == "hello world"
+
+
+def test_content_truncate(factories):
+    content = factories["common.Content"](
+        content_type="text/html", text="<b>hello world</b>"
+    )
+
+    assert content.truncate(5) == "hello…"

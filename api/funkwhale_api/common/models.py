@@ -301,6 +301,20 @@ class Content(models.Model):
 
         return utils.render_html(self.text, self.content_type)
 
+    @property
+    def as_plain_text(self):
+        from . import utils
+
+        return utils.render_plain_text(self.rendered)
+
+    def truncate(self, length):
+        text = self.as_plain_text
+        truncated = text[:length]
+        if len(truncated) < len(text):
+            truncated += "…"
+
+        return truncated
+
 
 @receiver(models.signals.post_save, sender=Attachment)
 def warm_attachment_thumbnails(sender, instance, **kwargs):

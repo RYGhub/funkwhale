@@ -36,6 +36,13 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
         {
             "tag": "link",
             "rel": "alternate",
+            "type": "application/rss+xml",
+            "href": channel.get_rss_url(),
+            "title": "{} - RSS Podcast Feed".format(channel.artist.name),
+        },
+        {
+            "tag": "link",
+            "rel": "alternate",
             "type": "application/json+oembed",
             "href": (
                 utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))

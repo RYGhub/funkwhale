@@ -16,8 +16,8 @@ exposedbydefault = false
 [entryPoints]
   [entryPoints.http]
   address = ":80"
-    [entryPoints.http.redirect]
-    entryPoint = "https"
+    # [entryPoints.http.redirect]
+    entryPoint = "http"
   [entryPoints.https]
   address = ":443"
     [entryPoints.https.tls]

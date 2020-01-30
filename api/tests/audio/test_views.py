@@ -15,6 +15,7 @@ def test_channel_create(logged_in_api_client):
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
         "content_category": "podcast",
+        "metadata": {"language": "en", "itunes_category": "Sports"},
     }
 
     url = reverse("api:v1:channels-list")
@@ -192,3 +193,21 @@ def test_subscriptions_all(factories, logged_in_api_client):
 
     assert response.status_code == 200
     assert response.data == {"results": [subscription.uuid], "count": 1}
+
+
+def test_channel_rss_feed(factories, api_client):
+    channel = factories["audio.Channel"]()
+    upload1 = factories["music.Upload"](library=channel.library, playable=True)
+    upload2 = factories["music.Upload"](library=channel.library, playable=True)
+
+    expected = serializers.rss_serialize_channel_full(
+        channel=channel, uploads=[upload2, upload1]
+    )
+
+    url = reverse("api:v1:channels-rss", kwargs={"uuid": channel.uuid})
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == expected
+    assert response["Content-Type"] == "application/rss+xml"

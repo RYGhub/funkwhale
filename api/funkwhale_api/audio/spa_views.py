@@ -47,6 +47,16 @@ def channel_detail(request, uuid):
             }
         )
 
+    metas.append(
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/rss+xml",
+            "href": obj.get_rss_url(),
+            "title": "{} - RSS Podcast Feed".format(obj.artist.name),
+        },
+    )
+
     if obj.library.uploads.all().playable_by(None).exists():
         metas.append(
             {

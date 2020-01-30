@@ -291,6 +291,10 @@ def render_html(text, content_type):
     return clean_html(rendered).strip().replace("\n", "")
 
 
+def render_plain_text(html):
+    return bleach.clean(html, tags=[], strip=True)
+
+
 @transaction.atomic
 def attach_content(obj, field, content_data):
     from . import models

@@ -55,6 +55,8 @@ def dict_to_xml_tree(root_tag, d, parent=None):
         else:
             if key == "value":
                 root.text = str(value)
+            elif key == "cdata_value":
+                root.text = "<![CDATA[{}]]>".format(str(value))
             else:
                 root.set(key, str(value))
     return root
