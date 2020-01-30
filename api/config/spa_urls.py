@@ -1,5 +1,6 @@
 from django import urls
 
+from funkwhale_api.audio import spa_views as audio_spa_views
 from funkwhale_api.music import spa_views
 
 
@@ -19,5 +20,10 @@ urlpatterns = [
         r"^library/playlists/(?P<pk>\d+)/?$",
         spa_views.library_playlist,
         name="library_playlist",
+    ),
+    urls.re_path(
+        r"^channels/(?P<uuid>[0-9a-f-]+)/?$",
+        audio_spa_views.channel_detail,
+        name="channel_detail",
     ),
 ]
