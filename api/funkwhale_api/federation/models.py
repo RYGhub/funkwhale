@@ -322,6 +322,10 @@ class Actor(models.Model):
             "https://{}/".format(domain)
         )
 
+    @property
+    def display_name(self):
+        return self.name or self.preferred_username
+
 
 FETCH_STATUSES = [
     ("pending", "Pending"),

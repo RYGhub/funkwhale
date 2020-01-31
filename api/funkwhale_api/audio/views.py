@@ -6,14 +6,17 @@ from rest_framework import response
 from rest_framework import viewsets
 
 from django import http
+from django.db.models import Prefetch
 from django.db.utils import IntegrityError
 
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.music import models as music_models
+from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
-from . import filters, models, serializers
+from . import filters, models, renderers, serializers
 
 
 class ChannelsMixin(object):
@@ -37,7 +40,17 @@ class ChannelViewSet(
     serializer_class = serializers.ChannelSerializer
     queryset = (
         models.Channel.objects.all()
-        .prefetch_related("library", "attributed_to", "artist__description", "actor")
+        .prefetch_related(
+            "library",
+            "attributed_to",
+            "actor",
+            Prefetch(
+                "artist",
+                queryset=music_models.Artist.objects.select_related(
+                    "attachment_cover", "description"
+                ).prefetch_related(music_views.TAG_PREFETCH,),
+            ),
+        )
         .order_by("-creation_date")
     )
     permission_classes = [
@@ -91,6 +104,30 @@ class ChannelViewSet(
         object = self.get_object()
         request.user.actor.emitted_follows.filter(target=object.actor).delete()
         return response.Response(status=204)
+
+    @decorators.action(
+        detail=True,
+        methods=["get"],
+        permission_classes=[],
+        content_negotiation_class=renderers.PodcastRSSContentNegociation,
+    )
+    def rss(self, request, *args, **kwargs):
+        object = self.get_object()
+        uploads = (
+            object.library.uploads.playable_by(None)
+            .prefetch_related(
+                Prefetch(
+                    "track",
+                    queryset=music_models.Track.objects.select_related(
+                        "attachment_cover", "description"
+                    ).prefetch_related(music_views.TAG_PREFETCH,),
+                ),
+            )
+            .select_related("track__attachment_cover", "track__description")
+            .order_by("-creation_date")
+        )[:50]
+        data = serializers.rss_serialize_channel_full(channel=object, uploads=uploads)
+        return response.Response(data, status=200)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

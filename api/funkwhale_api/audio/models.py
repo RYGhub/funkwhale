@@ -1,12 +1,20 @@
 import uuid
 
 
+from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.users import models as user_models
+
+
+def empty_dict():
+    return {}
 
 
 class Channel(models.Model):
@@ -28,6 +36,19 @@ class Channel(models.Model):
         "music.Library", on_delete=models.CASCADE, related_name="channel"
     )
     creation_date = models.DateTimeField(default=timezone.now)
+
+    # metadata to enhance rss feed
+    metadata = JSONField(
+        default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
+    )
+
+    def get_absolute_url(self):
+        return federation_utils.full_url("/channels/{}".format(self.uuid))
+
+    def get_rss_url(self):
+        return federation_utils.full_url(
+            reverse("api:v1:channels-rss", kwargs={"uuid": self.uuid})
+        )
 
 
 def generate_actor(username, **kwargs):
