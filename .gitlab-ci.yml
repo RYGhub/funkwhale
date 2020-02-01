@@ -20,7 +20,7 @@ stages:
 review_front:
   interruptible: true
   stage: review
-  image: node:11
+  image: node:12-buster
   when: manual
   allow_failure: true
   variables:
@@ -148,7 +148,7 @@ test_api:
 test_front:
   interruptible: true
   stage: test
-  image: node:11
+  image: node:12-buster
   before_script:
     - cd front
   only:
@@ -170,7 +170,7 @@ test_front:
 
 build_front:
   stage: build
-  image: node:11
+  image: node:12-buster
   before_script:
     - curl -L -o /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
     - chmod +x /usr/local/bin/jq
