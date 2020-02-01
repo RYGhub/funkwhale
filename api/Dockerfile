@@ -1,8 +1,8 @@
-FROM alpine:3.8
+FROM alpine:3.11
 
 RUN \
     echo 'installing dependencies' && \
-    apk add                \
+    apk add --no-cache                \
     bash             \
     git             \
     gettext            \
