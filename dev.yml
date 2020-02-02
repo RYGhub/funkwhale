@@ -33,7 +33,7 @@ services:
     env_file:
       - .env.dev
       - .env
-    image: redis:3.0
+    image: redis:5
     volumes:
       - "./data/${COMPOSE_PROJECT_NAME-node1}/redis:/data"
     networks:

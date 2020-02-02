@@ -15,7 +15,7 @@ services:
     networks:
       - default
     env_file: .env
-    image: redis:3
+    image: redis:5
     volumes:
       - ./data/redis:/data
 
