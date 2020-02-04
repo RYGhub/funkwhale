@@ -302,7 +302,12 @@ def process_upload(upload, update_denormalization=True):
 def get_cover(obj, field):
     cover = obj.get(field)
     if cover:
-        return {"mimetype": cover["mediaType"], "url": cover["href"]}
+        try:
+            url = cover["url"]
+        except KeyError:
+            url = cover["href"]
+
+        return {"mimetype": cover["mediaType"], "url": url}
 
 
 def federation_audio_track_to_metadata(payload, references):

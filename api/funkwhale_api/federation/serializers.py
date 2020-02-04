@@ -31,16 +31,8 @@ class TruncatedCharField(serializers.CharField):
         return v
 
 
-class LinkSerializer(jsonld.JsonLdSerializer):
-    type = serializers.ChoiceField(choices=[contexts.AS.Link, contexts.AS.Image])
-    href = serializers.URLField(max_length=500)
+class MediaSerializer(jsonld.JsonLdSerializer):
     mediaType = serializers.CharField()
-
-    class Meta:
-        jsonld_mapping = {
-            "href": jsonld.first_id(contexts.AS.href),
-            "mediaType": jsonld.first_val(contexts.AS.mediaType),
-        }
 
     def __init__(self, *args, **kwargs):
         self.allowed_mimetypes = kwargs.pop("allowed_mimetypes", [])
@@ -60,6 +52,43 @@ class LinkSerializer(jsonld.JsonLdSerializer):
         raise serializers.ValidationError(
             "Invalid mimetype {}. Allowed: {}".format(v, self.allowed_mimetypes)
         )
+
+
+class LinkSerializer(MediaSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Link])
+    href = serializers.URLField(max_length=500)
+
+    class Meta:
+        jsonld_mapping = {
+            "href": jsonld.first_id(contexts.AS.href),
+            "mediaType": jsonld.first_val(contexts.AS.mediaType),
+        }
+
+
+class ImageSerializer(MediaSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Image, contexts.AS.Link])
+    href = serializers.URLField(max_length=500, required=False)
+    url = serializers.URLField(max_length=500, required=False)
+
+    class Meta:
+        jsonld_mapping = {
+            "url": jsonld.first_id(contexts.AS.url),
+            "href": jsonld.first_id(contexts.AS.href),
+            "mediaType": jsonld.first_val(contexts.AS.mediaType),
+        }
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if "url" not in validated_data:
+            try:
+                validated_data["url"] = validated_data["href"]
+            except KeyError:
+                if self.required:
+                    raise serializers.ValidationError(
+                        "You need to provide a url or href"
+                    )
+
+        return validated_data
 
 
 class EndpointsSerializer(jsonld.JsonLdSerializer):
@@ -95,7 +124,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     following = serializers.URLField(max_length=500, required=False, allow_null=True)
     publicKey = PublicKeySerializer(required=False)
     endpoints = EndpointsSerializer(required=False)
-    icon = LinkSerializer(
+    icon = ImageSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
 
@@ -202,7 +231,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             common_utils.attach_file(
                 actor,
                 "attachment_icon",
-                {"url": new_value["href"], "mimetype": new_value["mediaType"]}
+                {"url": new_value["url"], "mimetype": new_value["mediaType"]}
                 if new_value
                 else None,
             )
@@ -853,7 +882,7 @@ def include_image(repr, attachment, field="image"):
     if attachment:
         repr[field] = {
             "type": "Image",
-            "href": attachment.download_url_original,
+            "url": attachment.download_url_original,
             "mediaType": attachment.mimetype or "image/jpeg",
         }
     else:
@@ -915,14 +944,14 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
         if (
             instance.attachment_cover
-            and instance.attachment_cover.url == attachment_cover["href"]
+            and instance.attachment_cover.url == attachment_cover["url"]
         ):
             # we already have the proper attachment
             return validated_data
         # create the attachment by hand so it can be attached as the cover
         validated_data["attachment_cover"] = common_models.Attachment.objects.create(
             mimetype=attachment_cover["mediaType"],
-            url=attachment_cover["href"],
+            url=attachment_cover["url"],
             actor=instance.attributed_to,
         )
         return validated_data
@@ -938,7 +967,7 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
 
 class ArtistSerializer(MusicEntitySerializer):
-    image = LinkSerializer(
+    image = ImageSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
     updateable_fields = [
@@ -982,7 +1011,7 @@ class AlbumSerializer(MusicEntitySerializer):
     released = serializers.DateField(allow_null=True, required=False)
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     # XXX: 1.0 rename to image
-    cover = LinkSerializer(
+    cover = ImageSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
     updateable_fields = [
@@ -1045,7 +1074,7 @@ class TrackSerializer(MusicEntitySerializer):
     album = AlbumSerializer()
     license = serializers.URLField(allow_null=True, required=False)
     copyright = serializers.CharField(allow_null=True, required=False)
-    image = LinkSerializer(
+    image = ImageSerializer(
         allowed_mimetypes=["image/*"], allow_null=True, required=False
     )
 
