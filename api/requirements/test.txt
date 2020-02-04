@@ -10,4 +10,4 @@ pytest-cov
 pytest-env
 requests-mock
 pytest-randomly
-pytest-profiling<1.4
+#pytest-profiling<1.4

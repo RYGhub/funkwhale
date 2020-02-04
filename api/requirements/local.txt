@@ -11,10 +11,10 @@ django-debug-toolbar>=1.11,<1.12
 ipdb==0.11
 prompt_toolkit<3
 black
-profiling
+#profiling
 
 asynctest==0.12.2
 aioresponses==0.6.0
-line_profiler<3
-https://github.com/dmclain/django-debug-toolbar-line-profiler/archive/master.zip
-django-silk
+#line_profiler<3
+#https://github.com/dmclain/django-debug-toolbar-line-profiler/archive/master.zip
+#django-silk
