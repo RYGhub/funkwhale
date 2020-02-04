@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-01 08:57+0000\n"
+"PO-Revision-Date: 2020-02-04 13:30+0000\n"
 "Last-Translator: Xosé M <xosem@disroot.org>\n"
 "Language-Team: none\n"
 "Language: gl\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.7\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -31,12 +31,12 @@ msgstr "(%{ index } de %{ length })"
 #: front/src/components/Sidebar.vue:22
 msgctxt "Sidebar/Queue/Tab.Title"
 msgid "(empty)"
-msgstr "(baldeiro)"
+msgstr "(baleiro)"
 
 #: front/src/components/auth/Authorize.vue:16
 msgctxt "Content/Auth/Title"
 msgid "%{ app } wants to access your Funkwhale account"
-msgstr "Conecte coa súa conta Funkwhale"
+msgstr "%{ app } quere acceder a túa conta Funkwhale"
 
 #: front/src/components/About.vue:173 src/components/Home.vue:56
 msgctxt "Content/Home/Stat"
@@ -142,17 +142,17 @@ msgstr "%{ minutes } min"
 #: front/src/components/notifications/NotificationRow.vue:40
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } accepted your follow on library \"%{ library }\""
-msgstr "%{ username } aceptou o seu seguimento na biblioteca \"%{ library }\""
+msgstr "%{ username } aceptou o teu seguimento da biblioteca \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:39
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } followed your library \"%{ library }\""
-msgstr "%{ username } segue a súa biblioteca \"%{ library }\""
+msgstr "%{ username } segue a túa biblioteca \"%{ library }\""
 
 #: front/src/components/notifications/NotificationRow.vue:41
 msgctxt "Content/Notifications/Paragraph"
 msgid "%{ username } wants to follow your library \"%{ library }\""
-msgstr "%{ username } quere seguir a súa biblioteca \"%{ library }\""
+msgstr "%{ username } quere seguir a túa biblioteca \"%{ library }\""
 
 #: front/src/components/auth/Profile.vue:46
 msgctxt "Head/Profile/Title"
@@ -265,13 +265,13 @@ msgstr "Acceso a ficheiros de audio, bibliotecas, artistas e cancións"
 #: front/src/components/mixins/Translations.vue:110
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to content filters"
-msgstr "Escolla un filtro"
+msgstr "Establecer filtros do contido"
 
 #: front/src/components/mixins/Translations.vue:117
 #: front/src/components/mixins/Translations.vue:118
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to edits"
-msgstr "Acceso desactivado"
+msgstr "Editar os contidos"
 
 #: front/src/components/mixins/Translations.vue:81
 #: front/src/components/mixins/Translations.vue:82
@@ -1336,7 +1336,6 @@ msgstr "Borrar regra de moderación"
 
 #: front/src/components/auth/Settings.vue:274
 #: src/components/auth/Settings.vue:302
-#, fuzzy
 msgctxt "*/*/Button.Label"
 msgid "Delete my account"
 msgstr "Eliminar a miña conta"
@@ -2470,7 +2469,6 @@ msgstr "As bibliotecas axúdanlle a organizar e compartir a súa colección musi
 #: front/src/views/admin/library/UploadDetail.vue:144
 #: front/src/views/admin/moderation/AccountsDetail.vue:518 src/entities.js:132
 #: front/src/components/mixins/Report.vue:78
-#, fuzzy
 msgctxt "*/*/*/Noun"
 msgid "Library"
 msgstr "Biblioteca"
@@ -3322,6 +3320,8 @@ msgstr "Listas de reprodución"
 msgctxt "Content/Embed/Message"
 msgid "Please contact your admins and ask them to update the corresponding setting."
 msgstr ""
+"Por favor, contacta coa administración e pídelle que actualicen o axuste "
+"correspondente."
 
 #: front/src/components/auth/Settings.vue:79
 msgctxt "Content/Settings/Error message.List item/Call to action"
@@ -4120,6 +4120,8 @@ msgstr "Compartir ligazón"
 msgctxt "Content/Embed/Message"
 msgid "Sharing will not work because this pod doesn't allow anonymous users to access content."
 msgstr ""
+"A compartición non funcionará, porque este servidor non permite a usuarias "
+"anónimas acceder ao contido."
 
 #: front/src/components/About.vue:156
 msgctxt "*/*/*/Verb"
@@ -4673,7 +4675,7 @@ msgstr "Esta é a lista das aplicacións que ti creaches."
 #: front/src/components/auth/Profile.vue:16
 msgctxt "Content/Profile/Button.Paragraph"
 msgid "This is you!"
-msgstr "Este é vostede!"
+msgstr "Esta es tí!"
 
 #: front/src/views/content/libraries/Form.vue:73
 msgctxt "Content/Library/Input.Placeholder"
