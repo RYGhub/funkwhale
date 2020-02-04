@@ -80,7 +80,7 @@ def test_xml_renderer_dict_to_xml():
 
 def test_xml_renderer():
     payload = {"hello": "world"}
-    expected = '<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response funkwhaleVersion="{}" hello="world" status="ok" type="funkwhale" version="1.16.0" xmlns="http://subsonic.org/restapi" />'  # noqa
+    expected = '<?xml version="1.0" encoding="UTF-8"?>\n<subsonic-response funkwhaleVersion="{}" status="ok" type="funkwhale" version="1.16.0" hello="world" xmlns="http://subsonic.org/restapi" />'  # noqa
     expected = expected.format(funkwhale_api.__version__).encode()
 
     renderer = renderers.SubsonicXMLRenderer()

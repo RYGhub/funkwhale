@@ -7,10 +7,10 @@ import funkwhale_api
 
 def structure_payload(data):
     payload = {
-        "status": "ok",
-        "version": "1.16.0",
-        "type": "funkwhale",
         "funkwhaleVersion": funkwhale_api.__version__,
+        "status": "ok",
+        "type": "funkwhale",
+        "version": "1.16.0",
     }
     payload.update(data)
     if "detail" in payload:
