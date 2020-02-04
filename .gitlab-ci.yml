@@ -120,7 +120,7 @@ test_api:
   interruptible: true
   services:
     - postgres:11
-    - redis:3
+    - redis:5
   stage: test
   image: funkwhale/funkwhale:develop
   cache:

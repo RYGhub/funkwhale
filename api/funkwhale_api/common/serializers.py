@@ -219,7 +219,7 @@ class StripExifImageField(serializers.ImageField):
         with io.BytesIO() as output:
             image_without_exif.save(
                 output,
-                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1]],
+                format=PIL.Image.EXTENSION[os.path.splitext(file_obj.name)[-1].lower()],
                 quality=100,
             )
             content = output.getvalue()

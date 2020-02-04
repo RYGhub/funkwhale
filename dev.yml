@@ -33,7 +33,7 @@ services:
     env_file:
       - .env.dev
       - .env
-    image: redis:3.0
+    image: redis:5
     volumes:
       - "./data/${COMPOSE_PROJECT_NAME-node1}/redis:/data"
     networks:
@@ -152,7 +152,7 @@ services:
       - "8001:8001"
 
   api-docs:
-    image: swaggerapi/swagger-ui:v3.21.0
+    image: swaggerapi/swagger-ui:v3.25
     environment:
       - "API_URL=/swagger.yml"
     ports:
