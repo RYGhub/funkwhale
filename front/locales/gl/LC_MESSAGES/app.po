@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2020-02-04 13:30+0000\n"
+"PO-Revision-Date: 2020-02-05 05:14+0000\n"
 "Last-Translator: Xosé M <xosem@disroot.org>\n"
 "Language-Team: none\n"
 "Language: gl\n"
@@ -277,13 +277,13 @@ msgstr "Editar os contidos"
 #: front/src/components/mixins/Translations.vue:82
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to email, username, and profile information"
-msgstr "Acesso a correo-e, nome de usuaria, e información do perfil"
+msgstr "Acesso a email, nome de usuaria, e información do perfil"
 
 #: front/src/components/mixins/Translations.vue:89
 #: front/src/components/mixins/Translations.vue:90
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to favorites"
-msgstr "Engadir a favoritas"
+msgstr "Acceso a favoritas"
 
 #: front/src/components/mixins/Translations.vue:97
 #: front/src/components/mixins/Translations.vue:98
@@ -301,19 +301,19 @@ msgstr "Acceso ao historial de escoita"
 #: front/src/components/mixins/Translations.vue:114
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to notifications"
-msgstr "Acalar notificacións"
+msgstr "Acceso as notificacións"
 
 #: front/src/components/mixins/Translations.vue:101
 #: front/src/components/mixins/Translations.vue:102
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to playlists"
-msgstr "Accede a listas de reprodución"
+msgstr "Acceso a listas de reprodución"
 
 #: front/src/components/mixins/Translations.vue:105
 #: front/src/components/mixins/Translations.vue:106
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to radios"
-msgstr "Acceso desactivado"
+msgstr "Acceso as radios"
 
 #: front/src/components/manage/library/UploadsTable.vue:67
 #: front/src/components/mixins/Translations.vue:55
@@ -321,7 +321,7 @@ msgstr "Acceso desactivado"
 #: front/src/components/mixins/Translations.vue:56
 msgctxt "Content/*/*/Noun"
 msgid "Accessed date"
-msgstr "Acceso desactivado"
+msgstr "Data de acceso"
 
 #: front/src/components/manage/library/LibrariesTable.vue:49
 #: front/src/components/manage/library/UploadsTable.vue:61
@@ -332,7 +332,7 @@ msgstr "Acceso desactivado"
 #: front/src/components/mixins/Report.vue:14
 msgctxt "*/*/*/Noun"
 msgid "Account"
-msgstr "Contas"
+msgstr "Conta"
 
 #: front/src/views/admin/moderation/AccountsDetail.vue:107
 msgctxt "Content/Moderation/Title"
@@ -357,7 +357,7 @@ msgstr "Estado da conta"
 #: front/src/views/auth/PasswordReset.vue:14
 msgctxt "Content/Signup/Input.Label"
 msgid "Account's email"
-msgstr "Correo-e da conta"
+msgstr "Email da conta"
 
 #: front/src/views/admin/moderation/AccountsList.vue:3
 #: front/src/views/admin/moderation/AccountsList.vue:24
@@ -452,7 +452,7 @@ msgstr "Engadir filtro"
 #: front/src/components/library/radios/Builder.vue:41
 msgctxt "Content/Radio/Paragraph"
 msgid "Add filters to customize your radio"
-msgstr "Engada filtros para personalizar a súa radio"
+msgstr "Engade filtros para personalizar a túa radio"
 
 #: front/src/components/manage/moderation/NoteForm.vue:12
 msgctxt "Content/Moderation/Button.Label/Verb"
@@ -525,12 +525,12 @@ msgstr "Álbume"
 #: front/src/views/admin/library/TrackDetail.vue:134
 msgctxt "*/*/*/Noun"
 msgid "Album artist"
-msgstr "Álbumes de este artista"
+msgstr "Autora do álbume"
 
 #: front/src/views/admin/library/AlbumDetail.vue:98
 msgctxt "Content/Moderation/Title"
 msgid "Album data"
-msgstr "Nome do álbume"
+msgstr "Data do álbume"
 
 #: front/src/components/mixins/Translations.vue:61
 #: front/src/components/mixins/Translations.vue:62
