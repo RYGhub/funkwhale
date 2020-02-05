@@ -201,7 +201,7 @@ class AttachmentQuerySet(models.QuerySet):
 
 class Attachment(models.Model):
     # Remote URL where the attachment can be fetched
-    url = models.URLField(max_length=500, null=True)
+    url = models.URLField(max_length=500, null=True, blank=True)
     uuid = models.UUIDField(unique=True, db_index=True, default=uuid.uuid4)
     # Actor associated with the attachment
     actor = models.ForeignKey(

@@ -23,6 +23,7 @@
             <select v-if="f.type === 'dropdown'" class="ui dropdown" v-model="f.value">
               <option :value="c" v-for="c in f.choices">{{ sharedLabels.fields[f.id].choices[c] }}</option>
             </select>
+            <content-form v-if="f.type === 'content'" v-model="f.value.text"></content-form>
           </div>
           <button :class="['ui', {'loading': isLoading}, 'button']" type="submit">
             <translate translate-context="Content/Settings/Button.Label/Verb">Update settings</translate>
@@ -331,8 +332,12 @@ export default {
       settings: {
         success: false,
         errors: [],
-        order: ["privacy_level"],
+        order: ["summary", "privacy_level"],
         fields: {
+          summary: {
+            type: "content",
+            initial: this.$store.state.auth.profile.summary || {text: '', content_type: 'text/markdown'},
+          },
           privacy_level: {
             type: "dropdown",
             initial: this.$store.state.auth.profile.privacy_level,
@@ -459,7 +464,7 @@ export default {
         response => {
           logger.default.info("Password successfully changed")
           self.$router.push({
-            name: "profile",
+            name: "profile.overview",
             params: {
               username: self.$store.state.auth.username
             }
@@ -519,6 +524,9 @@ export default {
       this.settings.order.forEach(setting => {
         let conf = self.settings.fields[setting]
         s[setting] = conf.value
+        if (setting === 'summary' && !conf.value.text) {
+          s[setting] = null
+        }
       })
       return s
     }

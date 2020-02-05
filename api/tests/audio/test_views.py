@@ -1,8 +1,10 @@
+import uuid
 import pytest
 
 from django.urls import reverse
 
 from funkwhale_api.audio import serializers
+from funkwhale_api.audio import views
 
 
 def test_channel_create(logged_in_api_client):
@@ -23,8 +25,10 @@ def test_channel_create(logged_in_api_client):
 
     assert response.status_code == 201
 
-    channel = actor.owned_channels.select_related("artist__description").latest("id")
-    expected = serializers.ChannelSerializer(channel).data
+    channel = views.ChannelViewSet.queryset.get(attributed_to=actor)
+    expected = serializers.ChannelSerializer(
+        channel, context={"subscriptions_count": True}
+    ).data
 
     assert response.data == expected
     assert channel.artist.name == data["name"]
@@ -43,6 +47,9 @@ def test_channel_create(logged_in_api_client):
 def test_channel_detail(factories, logged_in_api_client):
     channel = factories["audio.Channel"](artist__description=None)
     url = reverse("api:v1:channels-detail", kwargs={"uuid": channel.uuid})
+    setattr(channel.artist, "_tracks_count", 0)
+    setattr(channel.artist, "_prefetched_tagged_items", [])
+
     expected = serializers.ChannelSerializer(
         channel, context={"subscriptions_count": True}
     ).data
@@ -54,6 +61,8 @@ def test_channel_detail(factories, logged_in_api_client):
 
 def test_channel_list(factories, logged_in_api_client):
     channel = factories["audio.Channel"](artist__description=None)
+    setattr(channel.artist, "_tracks_count", 0)
+    setattr(channel.artist, "_prefetched_tagged_items", [])
     url = reverse("api:v1:channels-list")
     expected = serializers.ChannelSerializer(channel).data
     response = logged_in_api_client.get(url)
@@ -142,8 +151,11 @@ def test_channel_subscribe(factories, logged_in_api_client):
     assert response.status_code == 201
 
     subscription = actor.emitted_follows.select_related(
-        "target__channel__artist__description"
+        "target__channel__artist__description",
+        "target__channel__artist__attachment_cover",
     ).latest("id")
+    setattr(subscription.target.channel.artist, "_tracks_count", 0)
+    setattr(subscription.target.channel.artist, "_prefetched_tagged_items", [])
     assert subscription.fid == subscription.get_federation_id()
     expected = serializers.SubscriptionSerializer(subscription).data
     assert response.data == expected
@@ -168,6 +180,8 @@ def test_subscriptions_list(factories, logged_in_api_client):
     actor = logged_in_api_client.user.create_actor()
     channel = factories["audio.Channel"](artist__description=None)
     subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
+    setattr(subscription.target.channel.artist, "_tracks_count", 0)
+    setattr(subscription.target.channel.artist, "_prefetched_tagged_items", [])
     factories["audio.Subscription"](target=channel.actor)
     url = reverse("api:v1:subscriptions-list")
     expected = serializers.SubscriptionSerializer(subscription).data
@@ -192,7 +206,10 @@ def test_subscriptions_all(factories, logged_in_api_client):
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 200
-    assert response.data == {"results": [subscription.uuid], "count": 1}
+    assert response.data == {
+        "results": [{"uuid": subscription.uuid, "channel": uuid.UUID(channel.uuid)}],
+        "count": 1,
+    }
 
 
 def test_channel_rss_feed(factories, api_client):

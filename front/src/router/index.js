@@ -140,13 +140,33 @@ export default new Router({
         ),
       props: true
     },
-    {
-      path: "/@:username",
-      name: "profile",
-      component: () =>
-      import(/* webpackChunkName: "core" */ "@/components/auth/Profile"),
-      props: true
-    },
+    ...['/@:username', '/@:username@:domain'].map((path) => {
+      return {
+        path: path,
+        name: "profile",
+        component: () =>
+        import(/* webpackChunkName: "core" */ "@/views/auth/ProfileBase"),
+        props: true,
+        children: [
+          {
+            path: "",
+            name: "profile.overview",
+            component: () =>
+              import(
+                /* webpackChunkName: "core" */ "@/views/auth/ProfileOverview"
+              )
+          },
+          {
+            path: "activity",
+            name: "profile.activity",
+            component: () =>
+              import(
+                /* webpackChunkName: "core" */ "@/views/auth/ProfileActivity"
+              )
+          },
+        ]
+      }
+    }),
     {
       path: "/favorites",
       name: "favorites",
@@ -285,7 +305,7 @@ export default new Router({
           props: true
         },
         {
-          path: "albums",
+          path: "channels",
           name: "manage.library.albums",
           component: () =>
             import(
@@ -781,6 +801,32 @@ export default new Router({
             }
           ]
         }
+      ]
+    },
+    {
+      path: "/channels/:id",
+      props: true,
+      component: () =>
+        import(
+          /* webpackChunkName: "channels" */ "@/views/channels/DetailBase"
+        ),
+      children: [
+        {
+          path: "",
+          name: "channels.detail",
+          component: () =>
+            import(
+              /* webpackChunkName: "channels" */ "@/views/channels/DetailOverview"
+            )
+        },
+        {
+          path: "episodes",
+          name: "channels.detail.episodes",
+          component: () =>
+            import(
+              /* webpackChunkName: "channels" */ "@/views/channels/DetailEpisodes"
+            )
+        },
       ]
     },
     {

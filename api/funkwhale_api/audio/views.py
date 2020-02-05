@@ -6,7 +6,7 @@ from rest_framework import response
 from rest_framework import viewsets
 
 from django import http
-from django.db.models import Prefetch
+from django.db.models import Count, Prefetch
 from django.db.utils import IntegrityError
 
 from funkwhale_api.common import permissions
@@ -17,6 +17,12 @@ from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import filters, models, renderers, serializers
+
+ARTIST_PREFETCH_QS = (
+    music_models.Artist.objects.select_related("description", "attachment_cover",)
+    .prefetch_related(music_views.TAG_PREFETCH)
+    .annotate(_tracks_count=Count("tracks"))
+)
 
 
 class ChannelsMixin(object):
@@ -44,12 +50,7 @@ class ChannelViewSet(
             "library",
             "attributed_to",
             "actor",
-            Prefetch(
-                "artist",
-                queryset=music_models.Artist.objects.select_related(
-                    "attachment_cover", "description"
-                ).prefetch_related(music_views.TAG_PREFETCH,),
-            ),
+            Prefetch("artist", queryset=ARTIST_PREFETCH_QS),
         )
         .order_by("-creation_date")
     )
@@ -131,7 +132,12 @@ class ChannelViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["subscriptions_count"] = self.action in ["retrieve", "create", "update"]
+        context["subscriptions_count"] = self.action in [
+            "retrieve",
+            "create",
+            "update",
+            "partial_update",
+        ]
         return context
 
 
@@ -148,8 +154,8 @@ class SubscriptionsViewSet(
         .prefetch_related(
             "target__channel__library",
             "target__channel__attributed_to",
-            "target__channel__artist__description",
             "actor",
+            Prefetch("target__channel__artist", queryset=ARTIST_PREFETCH_QS),
         )
         .order_by("-creation_date")
     )
@@ -171,10 +177,12 @@ class SubscriptionsViewSet(
         to have a performant endpoint and avoid lots of queries just to display
         subscription status in the UI
         """
-        subscriptions = list(self.get_queryset().values_list("uuid", flat=True))
+        subscriptions = list(
+            self.get_queryset().values_list("uuid", "target__channel__uuid")
+        )
 
         payload = {
-            "results": [str(u) for u in subscriptions],
+            "results": [{"uuid": str(u[0]), "channel": u[1]} for u in subscriptions],
             "count": len(subscriptions),
         }
         return response.Response(payload, status=200)

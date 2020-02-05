@@ -140,6 +140,7 @@ export default {
             dispatch('ui/fetchPendingReviewReports', null, { root: true })
           }
           dispatch('favorites/fetch', null, { root: true })
+          dispatch('channels/fetchSubscriptions', null, { root: true })
           dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })
         }, (response) => {

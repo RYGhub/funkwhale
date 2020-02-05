@@ -315,7 +315,7 @@ export default {
           title: t.title,
           artist: t.artist,
           album: t.album,
-          cover: self.getCover(t.album.cover),
+          cover: self.getCover((t.album || {}).cover),
           sources: self.getSources(t.uploads)
         }
       })

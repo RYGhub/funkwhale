@@ -185,7 +185,6 @@ def test_rss_item_serializer(factories):
         "itunes:subtitle": [{"value": description.truncate(255)}],
         "itunes:summary": [{"cdata_value": description.rendered}],
         "description": [{"value": description.as_plain_text}],
-        "content:encoded": [{"cdata_value": description.rendered}],
         "guid": [{"cdata_value": str(upload.uuid), "isPermalink": "false"}],
         "pubDate": [{"value": serializers.rss_date(upload.creation_date)}],
         "itunes:duration": [{"value": serializers.rss_duration(upload.duration)}],
@@ -197,7 +196,11 @@ def test_rss_item_serializer(factories):
         "itunes:image": [{"href": upload.track.attachment_cover.download_url_original}],
         "link": [{"value": federation_utils.full_url(upload.track.get_absolute_url())}],
         "enclosure": [
-            {"url": upload.listen_url, "length": upload.size, "type": upload.mimetype}
+            {
+                "url": federation_utils.full_url(upload.get_listen_url("mp3")),
+                "length": upload.size,
+                "type": upload.mimetype,
+            }
         ],
     }
 

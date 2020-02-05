@@ -10,7 +10,7 @@
 
         <div class="controls track-controls queue-not-focused desktop-and-up">
           <div @click.stop.prevent="" class="ui tiny image" @click.stop.prevent="$router.push({name: 'library.tracks.detail', params: {id: currentTrack.id }})">
-            <img ref="cover" v-if="currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
+            <img ref="cover" v-if="currentTrack.album && currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
             <img v-else src="../../assets/audio/default-cover.png">
           </div>
           <div @click.stop.prevent="" class="middle aligned content ellipsis">
@@ -21,15 +21,15 @@
             </strong>
             <div class="meta">
               <router-link @click.stop.prevent="" class="discrete link" :title="currentTrack.artist.name" :to="{name: 'library.artists.detail', params: {id: currentTrack.artist.id }}">
-                {{ currentTrack.artist.name }}</router-link> /<router-link @click.stop.prevent="" class="discrete link" :title="currentTrack.album.title" :to="{name: 'library.albums.detail', params: {id: currentTrack.album.id }}">
+                {{ currentTrack.artist.name }}</router-link><template v-if="currentTrack.album"> /<router-link @click.stop.prevent="" class="discrete link" :title="currentTrack.album.title" :to="{name: 'library.albums.detail', params: {id: currentTrack.album.id }}">
                 {{ currentTrack.album.title }}
-              </router-link>
+              </router-link></template>
             </div>
           </div>
         </div>
         <div class="controls track-controls queue-not-focused tablet-and-below">
           <div class="ui tiny image">
-            <img ref="cover" v-if="currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
+            <img ref="cover" v-if="currentTrack.album && currentTrack.album.cover && currentTrack.album.cover.original" :src="$store.getters['instance/absoluteUrl'](currentTrack.album.cover.medium_square_crop)">
             <img v-else src="../../assets/audio/default-cover.png">
           </div>
           <div class="middle aligned content ellipsis">
@@ -37,7 +37,7 @@
               {{ currentTrack.title }}
             </strong>
             <div class="meta">
-              {{ currentTrack.artist.name }} / {{ currentTrack.album.title }}
+              {{ currentTrack.artist.name }}<template v-if="currentTrack.album"> / {{ currentTrack.album.title }}</template>
             </div>
           </div>
         </div>
@@ -703,19 +703,22 @@ export default {
         // If the session is playing as a PWA, populate the notification
         // with details from the track
         if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: this.currentTrack.title,
-          artist: this.currentTrack.artist.name,
-          album: this.currentTrack.album.title,
-          artwork: [
-            { src: this.currentTrack.album.cover.original, sizes: '96x96',   type: 'image/png' },
-            { src: this.currentTrack.album.cover.original, sizes: '128x128', type: 'image/png' },
-            { src: this.currentTrack.album.cover.original, sizes: '192x192', type: 'image/png' },
-            { src: this.currentTrack.album.cover.original, sizes: '256x256', type: 'image/png' },
-            { src: this.currentTrack.album.cover.original, sizes: '384x384', type: 'image/png' },
-            { src: this.currentTrack.album.cover.original, sizes: '512x512', type: 'image/png' },
+          let metatata = {
+            title: this.currentTrack.title,
+            artist: this.currentTrack.artist.name,
+          }
+          if (this.currentTrack.album) {
+            metadata.album = this.currentTrack.album.title
+            metadata.artwork = [
+              { src: this.currentTrack.album.cover.original, sizes: '96x96',   type: 'image/png' },
+              { src: this.currentTrack.album.cover.original, sizes: '128x128', type: 'image/png' },
+              { src: this.currentTrack.album.cover.original, sizes: '192x192', type: 'image/png' },
+              { src: this.currentTrack.album.cover.original, sizes: '256x256', type: 'image/png' },
+              { src: this.currentTrack.album.cover.original, sizes: '384x384', type: 'image/png' },
+              { src: this.currentTrack.album.cover.original, sizes: '512x512', type: 'image/png' },
             ]
-          });
+          }
+          navigator.mediaSession.metadata = new MediaMetadata(metadata);
         }
       },
       immediate: false

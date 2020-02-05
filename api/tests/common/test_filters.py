@@ -50,6 +50,8 @@ def test_mutation_filter_is_approved(value, expected, factories):
         ("noop", 0, []),
         ("noop", 1, []),
         ("noop", 2, []),
+        ("actor:actor1@domain.test", 0, [0]),
+        ("actor:actor2@domain.test", 0, [1]),
     ],
 )
 def test_actor_scope_filter(
@@ -61,8 +63,13 @@ def test_actor_scope_filter(
     mocker,
     anonymous_user,
 ):
-    actor1 = factories["users.User"]().create_actor()
-    actor2 = factories["users.User"]().create_actor()
+    domain = factories["federation.Domain"](name="domain.test")
+    actor1 = factories["users.User"]().create_actor(
+        preferred_username="actor1", domain=domain
+    )
+    actor2 = factories["users.User"]().create_actor(
+        preferred_username="actor2", domain=domain
+    )
     users = [actor1.user, actor2.user, anonymous_user]
     tracks = [
         factories["music.Upload"](library__actor=actor1, playable=True).track,

@@ -4,13 +4,10 @@
       <slot name="title"></slot>
       <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
-    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
-    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
-    <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div v-if="count > 0" class="ui divided unstackable items">
       <div :class="['item', itemClasses]" v-for="object in objects" :key="object.id">
         <div class="ui tiny image">
-          <img v-if="object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
+          <img v-if="object.track.album && object.track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](object.track.album.cover.medium_square_crop)">
           <img v-else src="../../../assets/audio/default-cover.png">
           <play-button class="play-overlay" :icon-only="true" :button-classes="['ui', 'circular', 'tiny', 'orange', 'icon', 'button']" :track="object.track"></play-button>
         </div>
@@ -62,6 +59,12 @@
         <div class="ui loader"></div>
       </div>
     </div>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
@@ -112,14 +115,16 @@ export default {
         self.nextPage = response.data.next
         self.isLoading = false
         self.count = response.data.count
+        let newObjects
         if (self.isActivity) {
           // we have listening/favorites objects, not directly tracks
-          self.objects = response.data.results
+          newObjects = response.data.results
         } else {
-          self.objects = response.data.results.map((r) => {
+          newObjects = response.data.results.map((r) => {
             return {track: r}
           })
         }
+        self.objects = [...self.objects, ...newObjects]
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

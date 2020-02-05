@@ -1,7 +1,7 @@
 <script>
 export default {
   methods: {
-    getReportableObjs ({track, album, artist, playlist, account, library}) {
+    getReportableObjs ({track, album, artist, playlist, account, library, channel}) {
       let reportableObjs = []
       if (account) {
         let accountLabel = this.$pgettext('*/Moderation/*/Verb', "Report @%{ username }…")

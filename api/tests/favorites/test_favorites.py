@@ -29,6 +29,9 @@ def test_user_can_get_his_favorites(
             favorite, context={"request": request}
         ).data
     ]
+    expected[0]["track"]["artist"].pop("cover")
+    expected[0]["track"]["album"]["artist"].pop("cover")
+
     assert response.status_code == 200
     assert response.data["results"] == expected
 

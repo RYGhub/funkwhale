@@ -12,6 +12,7 @@ from rest_framework import viewsets
 from funkwhale_api.common import preferences
 from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
 from . import activity
@@ -218,3 +219,34 @@ class DomainViewSet(
         if preferences.get("moderation__allow_list_enabled"):
             qs = qs.filter(allowed=True)
         return qs
+
+
+class ActorViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    queryset = models.Actor.objects.select_related(
+        "user", "channel", "summary_obj", "attachment_icon"
+    )
+    permission_classes = [ConditionalAuthentication]
+    serializer_class = api_serializers.FullActorSerializer
+    lookup_field = "full_username"
+    lookup_value_regex = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        username, domain = self.kwargs["full_username"].split("@", 1)
+        return queryset.get(preferred_username=username, domain_id=domain)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.exclude(
+            domain__instance_policy__is_active=True,
+            domain__instance_policy__block_all=True,
+        )
+        if preferences.get("moderation__allow_list_enabled"):
+            qs = qs.filter(domain__allowed=True)
+        return qs
+
+    libraries = decorators.action(methods=["get"], detail=True)(
+        music_views.get_libraries(
+            filter_uploads=lambda o, uploads: uploads.filter(library__actor=o)
+        )
+    )

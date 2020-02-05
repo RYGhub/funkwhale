@@ -4,7 +4,7 @@
       <play-button :class="['basic', {orange: currentTrack && isPlaying && track.id === currentTrack.id}, 'icon']" :discrete="true" :is-playable="playable" :track="track"></play-button>
     </td>
     <td>
-      <img class="ui mini image" v-if="track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
+      <img class="ui mini image" v-if="track.album && track.album.cover.original" v-lazy="$store.getters['instance/absoluteUrl'](track.album.cover.small_square_crop)">
       <img class="ui mini image" v-else src="../../../assets/audio/default-cover.png">
     </td>
     <td colspan="6">
@@ -30,7 +30,7 @@
       </template>
     </td>
     <td colspan="4">
-      <router-link class="album discrete link" :title="track.album.title" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
+      <router-link v-if="track.album" class="album discrete link" :title="track.album.title" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
         {{ track.album.title }}
       </router-link>
     </td>

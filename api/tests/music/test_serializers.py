@@ -215,6 +215,8 @@ def test_album_serializer(factories, to_api_date):
     }
     serializer = serializers.AlbumSerializer(album)
 
+    for t in expected["tracks"]:
+        t["artist"].pop("cover")
     assert serializer.data == expected
 
 

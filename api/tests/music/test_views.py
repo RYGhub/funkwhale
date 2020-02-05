@@ -1249,6 +1249,13 @@ def test_search_get(use_fts, settings, logged_in_api_client, factories):
         "tracks": [serializers.TrackSerializer(track).data],
         "tags": [views.TagSerializer(tag).data],
     }
+    for album in expected["albums"]:
+        album["artist"].pop("cover")
+
+    for track in expected["tracks"]:
+        track["artist"].pop("cover")
+        track["album"]["artist"].pop("cover")
+
     response = logged_in_api_client.get(url, {"q": "foo"})
 
     assert response.status_code == 200

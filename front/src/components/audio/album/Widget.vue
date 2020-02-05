@@ -5,9 +5,6 @@
       <span v-if="showCount" class="ui tiny circular label">{{ count }}</span>
     </h3>
     <slot></slot>
-    <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
-    <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
-    <button v-if="controls" @click="fetchData('albums/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
     <div class="ui app-cards cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -22,6 +19,12 @@
           No results matching your query
         </div>
       </div>
+    </template>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
     </template>
   </div>
 </template>
@@ -68,7 +71,7 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.albums = response.data.results
+        self.albums = [...self.albums, ...response.data.results]
         self.count = response.data.count
       }, error => {
         self.isLoading = false

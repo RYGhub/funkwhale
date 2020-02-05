@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 
 import favorites from './favorites'
+import channels from './channels'
 import auth from './auth'
 import instance from './instance'
 import moderation from './moderation'
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   modules: {
     ui,
     auth,
+    channels,
     favorites,
     instance,
     moderation,
@@ -76,21 +78,24 @@ export default new Vuex.Store({
                 mbid: track.artist.mbid,
                 name: track.artist.name
               }
-              return {
+              let data = {
                 id: track.id,
                 title: track.title,
                 mbid: track.mbid,
                 uploads: track.uploads,
                 listen_url: track.listen_url,
-                album: {
+                artist: artist,
+              }
+              if (track.album) {
+                data.album = {
                   id: track.album.id,
                   title: track.album.title,
                   mbid: track.album.mbid,
                   cover: track.album.cover,
                   artist: artist
-                },
-                artist: artist
+                }
               }
+              return data
             })
           }
         }

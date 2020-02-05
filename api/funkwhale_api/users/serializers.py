@@ -90,16 +90,11 @@ class UserActivitySerializer(activity_serializers.ModelSerializer):
 
 
 class UserBasicSerializer(serializers.ModelSerializer):
-    avatar = serializers.SerializerMethodField()
+    avatar = common_serializers.AttachmentSerializer(source="get_avatar")
 
     class Meta:
         model = models.User
         fields = ["id", "username", "name", "date_joined", "avatar"]
-
-    def get_avatar(self, o):
-        return common_serializers.AttachmentSerializer(
-            o.actor.attachment_icon if o.actor else None
-        ).data
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
@@ -140,19 +135,12 @@ class UserWriteSerializer(serializers.ModelSerializer):
             obj.actor.save(update_fields=["attachment_icon"])
         return obj
 
-    def to_representation(self, obj):
-        repr = super().to_representation(obj)
-        repr["avatar"] = common_serializers.AttachmentSerializer(
-            obj.actor.attachment_icon
-        ).data
-        return repr
-
 
 class UserReadSerializer(serializers.ModelSerializer):
 
     permissions = serializers.SerializerMethodField()
     full_username = serializers.SerializerMethodField()
-    avatar = serializers.SerializerMethodField()
+    avatar = common_serializers.AttachmentSerializer(source="get_avatar")
 
     class Meta:
         model = models.User
@@ -169,9 +157,6 @@ class UserReadSerializer(serializers.ModelSerializer):
             "privacy_level",
             "avatar",
         ]
-
-    def get_avatar(self, o):
-        return common_serializers.AttachmentSerializer(o.actor.attachment_icon).data
 
     def get_permissions(self, o):
         return o.get_permissions()

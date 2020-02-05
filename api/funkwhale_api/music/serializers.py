@@ -156,6 +156,19 @@ def serialize_artist_simple(artist):
             else None
         )
 
+    if "attachment_cover" in artist._state.fields_cache:
+        data["cover"] = (
+            cover_field.to_representation(artist.attachment_cover)
+            if artist.attachment_cover
+            else None
+        )
+
+    if getattr(artist, "_tracks_count", None) is not None:
+        data["tracks_count"] = artist._tracks_count
+
+    if getattr(artist, "_prefetched_tagged_items", None) is not None:
+        data["tags"] = [ti.tag.name for ti in artist._prefetched_tagged_items]
+
     return data
 
 

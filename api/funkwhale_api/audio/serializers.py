@@ -70,6 +70,8 @@ class ChannelCreateSerializer(serializers.Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        from . import views
+
         description = validated_data.get("description")
         artist = music_models.Artist.objects.create(
             attributed_to=validated_data["attributed_to"],
@@ -99,10 +101,11 @@ class ChannelCreateSerializer(serializers.Serializer):
             actor=validated_data["attributed_to"],
         )
         channel.save()
+        channel = views.ChannelViewSet.queryset.get(pk=channel.pk)
         return channel
 
     def to_representation(self, obj):
-        return ChannelSerializer(obj).data
+        return ChannelSerializer(obj, context=self.context).data
 
 
 NOOP = object()
@@ -181,7 +184,7 @@ class ChannelUpdateSerializer(serializers.Serializer):
         return obj
 
     def to_representation(self, obj):
-        return ChannelSerializer(obj).data
+        return ChannelSerializer(obj, context=self.context).data
 
 
 class ChannelSerializer(serializers.ModelSerializer):
@@ -261,7 +264,8 @@ def rss_serialize_item(upload):
         "link": [{"value": federation_utils.full_url(upload.track.get_absolute_url())}],
         "enclosure": [
             {
-                "url": upload.listen_url,
+                # we enforce MP3, since it's the only format supported everywhere
+                "url": federation_utils.full_url(upload.get_listen_url(to="mp3")),
                 "length": upload.size or 0,
                 "type": upload.mimetype or "audio/mpeg",
             }
@@ -271,7 +275,6 @@ def rss_serialize_item(upload):
         data["itunes:subtitle"] = [{"value": upload.track.description.truncate(255)}]
         data["itunes:summary"] = [{"cdata_value": upload.track.description.rendered}]
         data["description"] = [{"value": upload.track.description.as_plain_text}]
-        data["content:encoded"] = data["itunes:summary"]
 
     if upload.track.attachment_cover:
         data["itunes:image"] = [

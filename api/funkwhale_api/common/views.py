@@ -181,3 +181,15 @@ class AttachmentViewSet(
         if instance.actor is None or instance.actor != self.request.user.actor:
             raise exceptions.PermissionDenied()
         instance.delete()
+
+
+class TextPreviewView(views.APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        payload = request.data
+        if "text" not in payload:
+            return response.Response({"detail": "Invalid input"}, status=400)
+
+        data = {"rendered": utils.render_html(payload["text"], "text/markdown")}
+        return response.Response(data, status=200)

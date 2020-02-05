@@ -197,3 +197,15 @@ def test_user_can_list_domains(factories, api_client, preferences):
         "results": [api_serializers.DomainSerializer(allowed).data],
     }
     assert response.data == expected
+
+
+def test_can_retrieve_actor(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    actor = factories["federation.Actor"]()
+    url = reverse(
+        "api:v1:federation:actors-detail", kwargs={"full_username": actor.full_username}
+    )
+    response = api_client.get(url)
+
+    expected = api_serializers.FullActorSerializer(actor).data
+    assert response.data == expected

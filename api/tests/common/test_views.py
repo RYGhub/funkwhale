@@ -7,6 +7,7 @@ from funkwhale_api.common import serializers
 from funkwhale_api.common import signals
 from funkwhale_api.common import tasks
 from funkwhale_api.common import throttling
+from funkwhale_api.common import utils
 
 
 def test_can_detail_mutation(logged_in_api_client, factories):
@@ -270,3 +271,13 @@ def test_attachment_destroy_not_owner(factories, logged_in_api_client):
 
     assert response.status_code == 403
     attachment.refresh_from_db()
+
+
+def test_can_render_text_preview(api_client, db):
+    payload = {"text": "Hello world"}
+    url = reverse("api:v1:text-preview")
+    response = api_client.post(url, payload)
+
+    expected = {"rendered": utils.render_html(payload["text"], "text/markdown")}
+    assert response.status_code == 200
+    assert response.data == expected

@@ -78,7 +78,7 @@
                     <i class="external icon"></i>
                     <translate translate-context="Content/*/*/Clickable, Verb">View on MusicBrainz</translate>
                   </a>
-		  <a :href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
+		  <a v-if="discogsUrl ":href="discogsUrl" target="_blank" rel="noreferrer noopener" class="basic item">
 		    <i class="external icon"></i>
 		    <translate translate-context="Content/*/Button.Label/Verb">Search on Discogs</translate>
 		  </a>
@@ -200,12 +200,15 @@ export default {
       }
     },
     discogsUrl() {
-      return (
-        "https://discogs.com/search/?type=release&title=" +
-	encodeURI(this.track.album.title) + "&artist=" +
-	encodeURI(this.track.artist.name) + "&track=" +
-	encodeURI(this.track.title)
-      )
+      if (this.track.album) {
+        return (
+          "https://discogs.com/search/?type=release&title=" +
+    encodeURI(this.track.album.title) + "&artist=" +
+    encodeURI(this.track.artist.name) + "&track=" +
+    encodeURI(this.track.title)
+        )
+
+      }
     },
     downloadUrl() {
       let u = this.$store.getters["instance/absoluteUrl"](
@@ -242,8 +245,14 @@ export default {
       )
     },
     subtitle () {
-      let msg = this.$pgettext('Content/Track/Paragraph', 'From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a>')
-      return this.$gettextInterpolate(msg, {album: this.track.album.title, artist: this.track.artist.name, albumUrl: this.albumUrl, artistUrl: this.artistUrl})
+      let msg
+      if (this.track.album) {
+        msg = this.$pgettext('Content/Track/Paragraph', 'From album <a class="internal" href="%{ albumUrl }">%{ album }</a> by <a class="internal" href="%{ artistUrl }">%{ artist }</a>')
+        return this.$gettextInterpolate(msg, {album: this.track.album.title, artist: this.track.artist.name, albumUrl: this.albumUrl, artistUrl: this.artistUrl})
+      } else {
+        msg = this.$pgettext('Content/Track/Paragraph', 'By <a class="internal" href="%{ artistUrl }">%{ artist }</a>')
+        return this.$gettextInterpolate(msg, {artist: this.track.artist.name, artistUrl: this.artistUrl})
+      }
     }
   },
   watch: {
