@@ -172,6 +172,18 @@ export default {
       var self = this
       this.isLoading = true
       logger.default.debug('Fetching artist "' + this.id + '"')
+
+      let artistPromise = axios.get("artists/" + this.id + "/", {params: {refresh: 'true'}}).then(response => {
+        if (response.data.channel) {
+          self.$router.replace({name: 'channels.detail', params: {id: response.data.channel.uuid}})
+        } else {
+          self.object = response.data
+        }
+      })
+      await artistPromise
+      if (!self.object) {
+        return
+      }
       let trackPromise = axios.get("tracks/", { params: { artist: this.id, hidden: '' } }).then(response => {
         self.tracks = response.data.results
         self.nextTracksUrl = response.data.next
@@ -188,13 +200,8 @@ export default {
         })
 
       })
-
-      let artistPromise = axios.get("artists/" + this.id + "/", {params: {refresh: 'true'}}).then(response => {
-        self.object = response.data
-      })
       await trackPromise
       await albumPromise
-      await artistPromise
       self.isLoadingAlbums = false
       self.isLoading = false
     }

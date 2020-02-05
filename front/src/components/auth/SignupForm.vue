@@ -117,7 +117,7 @@ export default {
         response => {
           logger.default.info("Successfully created account")
           self.$router.push({
-            name: "profile",
+            name: "profile.overview",
             params: {
               username: this.username
             }

@@ -176,6 +176,8 @@ class ActorScopeFilter(filters.CharFilter):
         super().__init__(*args, **kwargs)
 
     def filter(self, queryset, value):
+        from funkwhale_api.federation import models as federation_models
+
         if not value:
             return queryset
 
@@ -189,6 +191,17 @@ class ActorScopeFilter(filters.CharFilter):
             qs = self.filter_me(user=user, queryset=queryset)
         elif value.lower() == "all":
             return queryset
+        elif value.lower().startswith("actor:"):
+            full_username = value.split("actor:", 1)[1]
+            username, domain = full_username.split("@")
+            try:
+                actor = federation_models.Actor.objects.get(
+                    preferred_username=username, domain_id=domain,
+                )
+            except federation_models.Actor.DoesNotExist:
+                return queryset.none()
+
+            return queryset.filter(**{self.actor_field: actor})
         else:
             return queryset.none()
 

@@ -253,7 +253,6 @@ class APIActorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Actor
         fields = [
-            "id",
             "fid",
             "url",
             "creation_date",

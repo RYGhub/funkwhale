@@ -24,7 +24,7 @@
       <transition name="queue">
         <queue @touch-progress="$refs.player.setCurrentTime($event)" v-if="$store.state.ui.queueFocused"></queue>
       </transition>
-      <router-view :class="{hidden: $store.state.ui.queueFocused}" :key="$route.fullPath"></router-view>
+      <router-view :class="{hidden: $store.state.ui.queueFocused}"></router-view>
       <player ref="player"></player>
       <app-footer
         :class="{hidden: $store.state.ui.queueFocused}"
@@ -241,8 +241,9 @@ export default {
     },
     getTrackInformationText(track) {
       const trackTitle = track.title
+      const albumArtist = (track.album) ? track.album.artist.name : null
       const artistName = (
-        (track.artist) ? track.artist.name : track.album.artist.name)
+        (track.artist) ? track.artist.name : albumArtist)
       const text = `♫ ${trackTitle} – ${artistName} ♫`
       return text
     },

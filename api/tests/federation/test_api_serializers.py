@@ -1,7 +1,9 @@
 import pytest
 
+from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.federation import api_serializers
 from funkwhale_api.federation import serializers
+from funkwhale_api.users import serializers as users_serializers
 
 
 def test_library_serializer(factories, to_api_date):
@@ -111,3 +113,31 @@ def test_serialize_generic_relation(factory_name, factory_kwargs, expected, fact
     obj = factories[factory_name](**factory_kwargs)
     expected["type"] = factory_name
     assert api_serializers.serialize_generic_relation({}, obj) == expected
+
+
+def test_api_full_actor_serializer(factories, to_api_date):
+    summary = factories["common.Content"]()
+    icon = factories["common.Attachment"]()
+    user = factories["users.User"]()
+    actor = user.create_actor(summary_obj=summary, attachment_icon=icon)
+    expected = {
+        "fid": actor.fid,
+        "url": actor.url,
+        "creation_date": to_api_date(actor.creation_date),
+        "last_fetch_date": to_api_date(actor.last_fetch_date),
+        "user": users_serializers.UserBasicSerializer(user).data,
+        "is_channel": False,
+        "domain": actor.domain_id,
+        "type": actor.type,
+        "manually_approves_followers": actor.manually_approves_followers,
+        "full_username": actor.full_username,
+        "name": actor.name,
+        "preferred_username": actor.preferred_username,
+        "is_local": actor.is_local,
+        "summary": common_serializers.ContentSerializer(summary).data,
+        "icon": common_serializers.AttachmentSerializer(icon).data,
+    }
+
+    serializer = api_serializers.FullActorSerializer(actor)
+
+    assert serializer.data == expected

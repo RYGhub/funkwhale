@@ -77,7 +77,7 @@
                     :class="['ui', {loading: isLoading}, 'basic button']"
                     :action="remove">
                     <translate translate-context="*/*/*/Verb">Delete</translate>
-                    <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this album?</translate></p>
+                    <p slot="modal-header"><translate translate-context="Popup/Library/Title">Delete this track?</translate></p>
                     <div slot="modal-content">
                       <p><translate translate-context="Content/Moderation/Paragraph">The track will be removed, as well as associated uploads, favorites and listening history. This action is irreversible.</translate></p>
                     </div>
@@ -109,7 +109,7 @@
                       {{ object.title }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="object.album">
                     <td>
                       <router-link :to="{name: 'manage.library.albums.detail', params: {id: object.album.id }}">
                         <translate translate-context="*/*/*">Album</translate>
@@ -130,7 +130,7 @@
                       {{ object.artist.name }}
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="object.album">
                     <td>
                       <router-link :to="{name: 'manage.library.artists.detail', params: {id: object.album.artist.id }}">
                         <translate translate-context="*/*/*/Noun">Album artist</translate>

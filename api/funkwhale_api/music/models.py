@@ -876,6 +876,12 @@ class Upload(models.Model):
     def listen_url(self):
         return self.track.listen_url + "?upload={}".format(self.uuid)
 
+    def get_listen_url(self, to=None):
+        url = self.listen_url
+        if to:
+            url += "&to={}".format(to)
+        return url
+
     @property
     def listen_url_no_download(self):
         # Not using reverse because this is slow

@@ -229,8 +229,8 @@ class User(AbstractUser):
             self.last_activity = now
             self.save(update_fields=["last_activity"])
 
-    def create_actor(self):
-        self.actor = create_actor(self)
+    def create_actor(self, **kwargs):
+        self.actor = create_actor(self, **kwargs)
         self.save(update_fields=["actor"])
         return self.actor
 
@@ -264,15 +264,10 @@ class User(AbstractUser):
     def full_username(self):
         return "{}@{}".format(self.username, settings.FEDERATION_HOSTNAME)
 
-    @property
-    def avatar_path(self):
-        if not self.avatar:
-            return None
-        try:
-            return self.avatar.path
-        except NotImplementedError:
-            # external storage
-            return self.avatar.name
+    def get_avatar(self):
+        if not self.actor:
+            return
+        return self.actor.attachment_icon
 
 
 def generate_code(length=10):
@@ -399,8 +394,9 @@ def get_actor_data(username, **kwargs):
     }
 
 
-def create_actor(user):
+def create_actor(user, **kwargs):
     args = get_actor_data(user.username)
+    args.update(kwargs)
     private, public = keys.get_key_pair()
     args["private_key"] = private.decode("utf-8")
     args["public_key"] = public.decode("utf-8")

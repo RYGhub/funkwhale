@@ -133,6 +133,7 @@
             </td>
             <td>
               <span
+                v-if="scope.obj.track.album"
                 class="discrete link"
                 @click="addSearchToken('album', scope.obj.track.album.title)"
                 :title="scope.obj.track.album.title"

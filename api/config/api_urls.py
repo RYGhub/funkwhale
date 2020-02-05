@@ -88,6 +88,9 @@ v1_patterns += [
     url(r"^token/?$", jwt_views.obtain_jwt_token, name="token"),
     url(r"^token/refresh/?$", jwt_views.refresh_jwt_token, name="token_refresh"),
     url(r"^rate-limit/?$", common_views.RateLimitView.as_view(), name="rate-limit"),
+    url(
+        r"^text-preview/?$", common_views.TextPreviewView.as_view(), name="text-preview"
+    ),
 ]
 
 urlpatterns = [

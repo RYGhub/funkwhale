@@ -44,12 +44,21 @@ Vue.filter('ago', ago)
 export function secondsToObject (seconds) {
   let m = moment.duration(seconds, 'seconds')
   return {
+    seconds: m.seconds(),
     minutes: m.minutes(),
-    hours: parseInt(m.asHours())
+    hours: m.hours()
   }
 }
 
 Vue.filter('secondsToObject', secondsToObject)
+
+export function padDuration (duration) {
+  var s = String(duration);
+  while (s.length < 2) {s = "0" + s;}
+  return s;
+}
+
+Vue.filter('padDuration', padDuration)
 
 export function momentFormat (date, format) {
   format = format || 'lll'

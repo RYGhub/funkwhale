@@ -5,10 +5,6 @@
     </h3>
     <p v-if="!isLoading && libraries.length > 0" class="ui subtitle"><slot name="subtitle"></slot></p>
     <p v-if="!isLoading && libraries.length === 0" class="ui subtitle"><translate translate-context="Content/Federation/Paragraph">No matching library.</translate></p>
-    <i @click="fetchData(previousPage)" :disabled="!previousPage" :class="['ui', {disabled: !previousPage}, 'circular', 'angle left', 'icon']">
-    </i>
-    <i @click="fetchData(nextPage)" :disabled="!nextPage" :class="['ui', {disabled: !nextPage}, 'circular', 'angle right', 'icon']">
-    </i>
     <div class="ui hidden divider"></div>
     <div class="ui cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -22,6 +18,12 @@
         v-for="library in libraries"
         :key="library.uuid"></library-card>
     </div>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
@@ -61,7 +63,7 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.libraries = response.data.results
+        self.libraries = [...self.libraries, ...response.data.results]
         self.$emit('loaded', self.libraries)
       }, error => {
         self.isLoading = false

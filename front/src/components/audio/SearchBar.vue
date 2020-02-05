@@ -109,7 +109,11 @@ export default {
                 return r.title
               },
               getDescription (r) {
-                return `${r.album.artist.name} - ${r.album.title}`
+                if (r.album) {
+                  return `${r.album.artist.name} - ${r.album.title}`
+                } else {
+                  return r.artist.name
+                }
               },
               getId (t) {
                 return t.id

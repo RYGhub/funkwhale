@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 Vue.component('human-date', () => import(/* webpackChunkName: "common" */ "@/components/common/HumanDate"))
+Vue.component('human-duration', () => import(/* webpackChunkName: "common" */ "@/components/common/HumanDuration"))
 Vue.component('username', () => import(/* webpackChunkName: "common" */ "@/components/common/Username"))
 Vue.component('user-link', () => import(/* webpackChunkName: "common" */ "@/components/common/UserLink"))
 Vue.component('actor-link', () => import(/* webpackChunkName: "common" */ "@/components/common/ActorLink"))
@@ -15,5 +16,7 @@ Vue.component('empty-state', () => import(/* webpackChunkName: "common" */ "@/co
 Vue.component('expandable-div', () => import(/* webpackChunkName: "common" */ "@/components/common/ExpandableDiv"))
 Vue.component('collapse-link', () => import(/* webpackChunkName: "common" */ "@/components/common/CollapseLink"))
 Vue.component('action-feedback', () => import(/* webpackChunkName: "common" */ "@/components/common/ActionFeedback"))
+Vue.component('rendered-description', () => import(/* webpackChunkName: "common" */ "@/components/common/RenderedDescription"))
+Vue.component('content-form', () => import(/* webpackChunkName: "common" */ "@/components/common/ContentForm"))
 
 export default {}

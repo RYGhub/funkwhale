@@ -1,7 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework import serializers
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.music import models as music_models
+from funkwhale_api.users import serializers as users_serializers
 
 from . import filters
 from . import models
@@ -169,3 +172,27 @@ class FetchSerializer(serializers.ModelSerializer):
             "creation_date",
             "fetch_date",
         ]
+
+
+class FullActorSerializer(serializers.Serializer):
+    fid = serializers.URLField()
+    url = serializers.URLField()
+    domain = serializers.CharField(source="domain_id")
+    creation_date = serializers.DateTimeField()
+    last_fetch_date = serializers.DateTimeField()
+    name = serializers.CharField()
+    preferred_username = serializers.CharField()
+    full_username = serializers.CharField()
+    type = serializers.CharField()
+    is_local = serializers.BooleanField()
+    is_channel = serializers.SerializerMethodField()
+    manually_approves_followers = serializers.BooleanField()
+    user = users_serializers.UserBasicSerializer()
+    summary = common_serializers.ContentSerializer(source="summary_obj")
+    icon = common_serializers.AttachmentSerializer(source="attachment_icon")
+
+    def get_is_channel(self, o):
+        try:
+            return bool(o.channel)
+        except ObjectDoesNotExist:
+            return False

@@ -303,6 +303,7 @@ def attach_content(obj, field, content_data):
 
     if existing:
         getattr(obj, field).delete()
+        setattr(obj, field, None)
 
     if not content_data:
         return

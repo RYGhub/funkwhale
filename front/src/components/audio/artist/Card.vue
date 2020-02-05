@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import backend from '@/audio/backend'
 import PlayButton from '@/components/audio/PlayButton'
 import TagsList from "@/components/tags/List"
 
@@ -34,7 +33,6 @@ export default {
   },
   data () {
     return {
-      backend: backend,
       initialAlbums: 30,
       showAllAlbums: true,
     }

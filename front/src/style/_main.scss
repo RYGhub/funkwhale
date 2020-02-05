@@ -69,6 +69,7 @@
 @import "~fomantic-ui-css/components/sidebar.css";
 @import "~fomantic-ui-css/components/sticky.css";
 @import "~fomantic-ui-css/components/tab.css";
+@import "~fomantic-ui-css/components/text.css";
 @import "~fomantic-ui-css/components/transition.css";
 
 
@@ -194,6 +195,16 @@ html {
   }
 }
 
+.stripe.segment > .secondary.menu:last-child {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-bottom: none;
+}
+.center.aligned.menu {
+  justify-content: center;
+}
 .ellipsis:not(.icon) {
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -387,6 +398,9 @@ input + .help {
 .ui.small.divider {
   margin: 0.5rem 0;
 }
+.ui.very.small.divider {
+  margin: 0.25rem 0;
+}
 
 .queue.segment.player-focused #queue-grid #player {
   @include media("<desktop") {
@@ -431,6 +445,12 @@ input + .help {
     display: flex;
     width: $card-width;
     height: $card-hight;
+    .content:not(.extra) {
+      padding: 0.5em 1em 0;
+    }
+    .content.extra {
+      padding: 0.5em 1em;
+    }
     .head-image {
       height: $card-width;
       background-size: cover !important;
@@ -448,6 +468,10 @@ input + .help {
         width: $card-width - 1em;
         margin: 0.5em;
 
+      }
+      &.padded {
+        margin: 0.5em;
+        border-radius: 0.25em !important;
       }
       &.squares {
         display: block !important;
@@ -488,6 +512,59 @@ input + .help {
     .floating.dropdown > .icon {
       margin-right: 0;
     }
+  }
+}
+
+//  channels stuff
+
+.channel-entry-card, .channel-serie-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin: 0 auto 1em;
+  justify-content: space-between;
+  .image {
+    width: 3.5em;
+    margin-right: 1em;
+  }
+  .two-images {
+    width: 3.5em;
+    height: 3.5em;
+    margin-right: 1em;
+    position: relative;
+    img {
+      width: 2.5em;
+      position: absolute;
+      &:last-child {
+        bottom: 0;
+        left: 0;
+      }
+      &:first-child {
+        top: 0;
+        right: 0;
+      }
+    }
+  }
+  .content {
+    flex-grow: 1;
+  }
+}
+.channel-image {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 0.3em;
+  &.large {
+    width: 8em !important;
+  }
+}
+.content-form {
+  .segment:first-child {
+    min-height: 15em;
+  }
+  .ui.secondary.menu {
+    margin-top: -0.5em;
+  }
+  .input {
+    width: 100%;
   }
 }
 @import "./themes/_light.scss";

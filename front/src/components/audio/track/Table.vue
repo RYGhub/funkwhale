@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import backend from '@/audio/backend'
 import axios from 'axios'
 
 import TrackRow from '@/components/audio/track/Row'
@@ -49,7 +48,6 @@ export default {
   },
   data () {
     return {
-      backend: backend,
       loadMoreUrl: this.nextUrl,
       isLoadingMore: false,
       additionalTracks: []

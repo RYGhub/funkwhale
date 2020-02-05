@@ -49,6 +49,9 @@ export default {
               other: this.$pgettext("Content/Moderation/Dropdown", "Other"),
             },
           },
+          summary: {
+            label: this.$pgettext('Content/Account/*', 'Bio'),
+          },
         },
         filters: {
           creation_date: this.$pgettext('Content/*/*/Noun', 'Creation date'),

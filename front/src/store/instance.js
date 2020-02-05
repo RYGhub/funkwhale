@@ -112,6 +112,12 @@ export default {
 
       let instanceUrl = state.instanceUrl || getDefaultUrl()
       return instanceUrl + relativeUrl
+    },
+    domain: (state) => {
+      let url = state.instanceUrl
+      let parser = document.createElement("a")
+      parser.href = url
+      return parser.hostname
     }
   },
   actions: {

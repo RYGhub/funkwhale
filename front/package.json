@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "dateformat": "^3.0.3",
     "diff": "^4.0.1",
     "django-channels": "^1.1.6",
     "fomantic-ui-css": "^2.7",

@@ -3,9 +3,6 @@
     <h3 class="ui header">
       <slot name="title"></slot>
     </h3>
-    <button :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle up', 'icon']"></i></button>
-    <button :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle down', 'icon']"></i></button>
-    <button @click="fetchData(url)" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
@@ -31,6 +28,12 @@
         </translate>
       </button>
     </div>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
@@ -50,7 +53,7 @@ export default {
   data () {
     return {
       objects: [],
-      limit: 3,
+      limit: this.filters.limit || 3,
       isLoading: false,
       errors: null,
       previousPage: null,
@@ -79,7 +82,7 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.objects = response.data.results
+        self.objects = [...self.objects, ...response.data.results]
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors

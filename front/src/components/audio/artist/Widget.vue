@@ -4,9 +4,6 @@
       <slot name="title"></slot>
       <span class="ui tiny circular label">{{ count }}</span>
     </h3>
-    <button v-if="controls" :disabled="!previousPage" @click="fetchData(previousPage)" :class="['ui', {disabled: !previousPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle left', 'icon']"></i></button>
-    <button v-if="controls" :disabled="!nextPage" @click="fetchData(nextPage)" :class="['ui', {disabled: !nextPage}, 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'angle right', 'icon']"></i></button>
-    <button v-if="controls" @click="fetchData('artists/')" :class="['ui', 'circular', 'icon', 'basic', 'button']"><i :class="['ui', 'refresh', 'icon']"></i></button>
     <div class="ui hidden divider"></div>
     <div class="ui five app-cards cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -15,6 +12,12 @@
       <artist-card :artist="artist" v-for="artist in objects" :key="artist.id"></artist-card>
     </div>
     <div v-if="!isLoading && objects.length === 0">No results matching your query.</div>
+    <template v-if="nextPage">
+      <div class="ui hidden divider"></div>
+      <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
+        <translate translate-context="*/*/Button,Label">Show more</translate>
+      </button>
+    </template>
   </div>
 </template>
 
@@ -60,7 +63,7 @@ export default {
         self.previousPage = response.data.previous
         self.nextPage = response.data.next
         self.isLoading = false
-        self.objects = response.data.results
+        self.objects = [...self.objects, ...response.data.results]
         self.count = response.data.count
       }, error => {
         self.isLoading = false

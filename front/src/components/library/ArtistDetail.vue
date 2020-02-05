@@ -50,7 +50,6 @@
 import _ from "@/lodash"
 import axios from "axios"
 import logger from "@/logging"
-import backend from "@/audio/backend"
 import AlbumCard from "@/components/audio/album/Card"
 import TrackTable from "@/components/audio/track/Table"
 import LibraryWidget from "@/components/federation/LibraryWidget"
