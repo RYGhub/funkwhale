@@ -4,6 +4,9 @@ export default {
     defaultOrdering: {type: String, required: false}
   },
   computed: {
+    orderingConfig () {
+      return this.$store.state.ui.routePreferences[this.$route.name]
+    },
     paginateBy: {
       set(paginateBy) {
         this.$store.commit('ui/paginateBy', {
@@ -12,7 +15,7 @@ export default {
         })
       },
       get() {
-        return this.$store.state.ui.routePreferences[this.$route.name].paginateBy
+        return this.orderingConfig.paginateBy
       }
     },
     ordering: {
@@ -23,7 +26,7 @@ export default {
         })
       },
       get() {
-        return this.$store.state.ui.routePreferences[this.$route.name].ordering
+        return this.orderingConfig.ordering
       }
     },
     orderingDirection: {
@@ -34,7 +37,7 @@ export default {
         })
       },
       get() {
-        return this.$store.state.ui.routePreferences[this.$route.name].orderingDirection
+        return this.orderingConfig.orderingDirection
       }
     },
   },

@@ -77,6 +77,11 @@ export default {
         orderingDirection: "-",
         ordering: "creation_date",
       },
+      "content.libraries.detail.upload": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
     },
     serviceWorker: {
       refreshing: false,
