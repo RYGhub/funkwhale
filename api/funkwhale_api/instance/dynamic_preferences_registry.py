@@ -38,9 +38,7 @@ class InstanceLongDescription(types.StringPreference):
     name = "long_description"
     verbose_name = "Long description"
     default = ""
-    help_text = (
-        "Instance long description, displayed in the about page (markdown allowed)."
-    )
+    help_text = "Instance long description, displayed in the about page."
     widget = widgets.Textarea
     field_kwargs = {"required": False}
 
@@ -52,9 +50,7 @@ class InstanceTerms(types.StringPreference):
     name = "terms"
     verbose_name = "Terms of service"
     default = ""
-    help_text = (
-        "Terms of service and privacy policy for your instance (markdown allowed)."
-    )
+    help_text = "Terms of service and privacy policy for your instance."
     widget = widgets.Textarea
     field_kwargs = {"required": False}
 
@@ -66,7 +62,7 @@ class InstanceRules(types.StringPreference):
     name = "rules"
     verbose_name = "Rules"
     default = ""
-    help_text = "Rules/Code of Conduct (markdown allowed)."
+    help_text = "Rules/Code of Conduct."
     widget = widgets.Textarea
     field_kwargs = {"required": False}
 

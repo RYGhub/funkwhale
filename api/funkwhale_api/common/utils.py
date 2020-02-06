@@ -250,36 +250,42 @@ def join_queries_or(left, right):
 
 
 def render_markdown(text):
-    return markdown.markdown(text, extensions=["nl2br"])
+    return markdown.markdown(text, extensions=["nl2br", "extra"])
 
 
-HTMl_CLEANER = bleach.sanitizer.Cleaner(
+SAFE_TAGS = [
+    "p",
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "blockquote",
+    "code",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "strong",
+    "ul",
+]
+HTMl_CLEANER = bleach.sanitizer.Cleaner(strip=True, tags=SAFE_TAGS)
+
+HTML_PERMISSIVE_CLEANER = bleach.sanitizer.Cleaner(
     strip=True,
-    tags=[
-        "p",
-        "a",
-        "abbr",
-        "acronym",
-        "b",
-        "blockquote",
-        "code",
-        "em",
-        "i",
-        "li",
-        "ol",
-        "strong",
-        "ul",
-    ],
+    tags=SAFE_TAGS + ["h1", "h2", "h3", "h4", "h5", "h6", "div", "section", "article"],
+    attributes=["class", "rel", "alt", "title"],
 )
 
 HTML_LINKER = bleach.linkifier.Linker()
 
 
-def clean_html(html):
-    return HTMl_CLEANER.clean(html)
+def clean_html(html, permissive=False):
+    return (
+        HTML_PERMISSIVE_CLEANER.clean(html) if permissive else HTMl_CLEANER.clean(html)
+    )
 
 
-def render_html(text, content_type):
+def render_html(text, content_type, permissive=False):
     rendered = render_markdown(text)
     if content_type == "text/html":
         rendered = text
@@ -288,7 +294,7 @@ def render_html(text, content_type):
     else:
         rendered = render_markdown(text)
     rendered = HTML_LINKER.linkify(rendered)
-    return clean_html(rendered).strip().replace("\n", "")
+    return clean_html(rendered, permissive=permissive).strip().replace("\n", "")
 
 
 def render_plain_text(html):

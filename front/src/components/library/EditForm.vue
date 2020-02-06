@@ -79,7 +79,7 @@
         </template>
         <template v-else-if="fieldConfig.type === 'content'">
           <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
-          <textarea v-model="values[fieldConfig.id].text" :name="fieldConfig.id" :id="fieldConfig.id" rows="3"></textarea>
+          <content-form v-model="values[fieldConfig.id].text" :field-id="fieldConfig.id" :rows="3"></content-form>
         </template>
         <template v-else-if="fieldConfig.type === 'attachment'">
           <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>

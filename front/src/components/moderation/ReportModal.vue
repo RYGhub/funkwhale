@@ -44,7 +44,7 @@
           <p>
             <translate translate-context="*/*/Field,Help">Use this field to provide additional context to the moderator that will handle your report.</translate>
           </p>
-          <textarea name="report-summary" id="report-summary" rows="8" v-model="summary"></textarea>
+          <content-form field-id="report-summary" :rows="8" v-model="summary"></content-form>
         </div>
       </form>
       <div v-else-if="isLoadingReportTypes" class="ui inline active loader">

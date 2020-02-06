@@ -7,7 +7,7 @@
       </ul>
     </div>
     <div class="field">
-      <textarea name="change-summary" required v-model="summary" id="change-summary" rows="3" :placeholder="labels.summaryPlaceholder"></textarea>
+      <content-form field-id="change-summary" :required="true" v-model="summary" :rows="3" :placeholder="labels.summaryPlaceholder"></content-form>
     </div>
     <button :class="['ui', {'loading': isLoading}, 'right', 'floated', 'button']" type="submit" :disabled="isLoading">
       <translate translate-context="Content/Moderation/Button.Label/Verb">Add note</translate>

@@ -281,3 +281,15 @@ def test_can_render_text_preview(api_client, db):
     expected = {"rendered": utils.render_html(payload["text"], "text/markdown")}
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_can_render_text_preview_permissive(api_client, db):
+    payload = {"text": "Hello world", "permissive": True}
+    url = reverse("api:v1:text-preview")
+    response = api_client.post(url, payload)
+
+    expected = {
+        "rendered": utils.render_html(payload["text"], "text/markdown", permissive=True)
+    }
+    assert response.status_code == 200
+    assert response.data == expected
