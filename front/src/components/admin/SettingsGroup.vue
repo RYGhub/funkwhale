@@ -17,24 +17,25 @@
         <label :for="setting.identifier">{{ setting.verbose_name }}</label>
         <p v-if="setting.help_text">{{ setting.help_text }}</p>
       </template>
+      <content-form v-if="setting.fieldType === 'markdown'" v-model="values[setting.identifier]" v-bind="setting.fieldParams" />
       <input
         :id="setting.identifier"
         :name="setting.identifier"
-        v-if="setting.field.widget.class === 'PasswordInput'"
+        v-else-if="setting.field.widget.class === 'PasswordInput'"
         type="password"
         class="ui input"
         v-model="values[setting.identifier]" />
       <input
         :id="setting.identifier"
         :name="setting.identifier"
-        v-if="setting.field.widget.class === 'TextInput'"
+        v-else-if="setting.field.widget.class === 'TextInput'"
         type="text"
         class="ui input"
         v-model="values[setting.identifier]" />
       <input
         :id="setting.identifier"
         :name="setting.identifier"
-        v-if="setting.field.class === 'IntegerField'"
+        v-else-if="setting.field.class === 'IntegerField'"
         type="number"
         class="ui input"
         v-model.number="values[setting.identifier]" />
@@ -149,7 +150,7 @@ export default {
         byIdentifier[e.identifier] = e
       })
       return this.group.settings.map(e => {
-        return byIdentifier[e]
+        return {...byIdentifier[e.name], fieldType: e.fieldType, fieldParams: e.fieldParams || {}}
       })
     },
     fileSettings () {

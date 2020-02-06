@@ -26,13 +26,20 @@
       </template>
       <template v-else>
         <div class="ui transparent input">
-          <textarea ref="textarea" :name="fieldId" :id="fieldId" rows="5" v-model="newValue" :placeholder="labels.placeholder"></textarea>
+          <textarea
+            ref="textarea"
+            :name="fieldId"
+            :id="fieldId"
+            :rows="rows"
+            v-model="newValue"
+            :required="required"
+            :placeholder="placeholder || labels.placeholder"></textarea>
         </div>
         <div class="ui very small hidden divider"></div>
       </template>
     </div>
     <div class="ui bottom attached segment">
-      <span :class="['right', 'floated', {'ui red text': remainingChars < 0}]">
+      <span :class="['right', 'floated', {'ui red text': remainingChars < 0}]" v-if="charLimit">
         {{ remainingChars }}
       </span>
       <p>
@@ -49,7 +56,12 @@ export default {
   props: {
     value: {type: String, default: ""},
     fieldId: {type: String, default: "change-content"},
+    placeholder: {type: String, default: null},
     autofocus: {type: Boolean, default: false},
+    charLimit: {type: Number, default: 5000, required: false},
+    rows: {type: Number, default: 5, required: false},
+    permissive: {type: Boolean, default: false},
+    required: {type: Boolean, default: false},
   },
   data () {
     return {
@@ -57,7 +69,6 @@ export default {
       preview: null,
       newValue: this.value,
       isLoadingPreview: false,
-      charLimit: 5000,
     }
   },
   mounted () {
@@ -71,7 +82,7 @@ export default {
     async loadPreview () {
       this.isLoadingPreview = true
       try {
-        let response = await axios.post('text-preview/', {text: this.value})
+        let response = await axios.post('text-preview/', {text: this.newValue, permissive: this.permissive})
         this.preview = response.data.rendered
       } catch {
 
@@ -86,11 +97,12 @@ export default {
       }
     },
     remainingChars () {
-      return this.charLimit - this.value.length
+      return this.charLimit - (this.value || "").length
     }
   },
   watch: {
     newValue (v) {
+      this.preview = null
       this.$emit('input', v)
     },
     value: {
@@ -104,7 +116,7 @@ export default {
       immediate: true,
     },
     async isPreviewing (v) {
-      if (v && !!this.value && this.preview === null) {
+      if (v && !!this.value && this.preview === null && !this.isLoadingPreview) {
         await this.loadPreview()
       }
       if (!v) {

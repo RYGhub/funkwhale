@@ -103,27 +103,40 @@ def test_join_url(start, end, expected):
 
 
 @pytest.mark.parametrize(
-    "text, content_type, expected",
+    "text, content_type, permissive, expected",
     [
-        ("hello world", "text/markdown", "<p>hello world</p>"),
-        ("hello world", "text/plain", "<p>hello world</p>"),
-        ("<strong>hello world</strong>", "text/html", "<strong>hello world</strong>"),
+        ("hello world", "text/markdown", False, "<p>hello world</p>"),
+        ("hello world", "text/plain", False, "<p>hello world</p>"),
+        (
+            "<strong>hello world</strong>",
+            "text/html",
+            False,
+            "<strong>hello world</strong>",
+        ),
         # images and other non whitelisted html should be removed
-        ("hello world\n![img](src)", "text/markdown", "<p>hello world</p>"),
+        ("hello world\n![img](src)", "text/markdown", False, "<p>hello world</p>"),
         (
             "hello world\n\n<script></script>\n\n<style></style>",
             "text/markdown",
+            False,
             "<p>hello world</p>",
         ),
         (
             "<p>hello world</p><script></script>\n\n<style></style>",
             "text/html",
+            False,
             "<p>hello world</p>",
+        ),
+        (
+            '<p class="foo">hello world</p><script></script>\n\n<style></style>',
+            "text/markdown",
+            True,
+            '<p class="foo">hello world</p>',
         ),
     ],
 )
-def test_render_html(text, content_type, expected):
-    result = utils.render_html(text, content_type)
+def test_render_html(text, content_type, permissive, expected):
+    result = utils.render_html(text, content_type, permissive=permissive)
     assert result == expected
 
 

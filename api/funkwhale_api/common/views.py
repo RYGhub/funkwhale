@@ -191,5 +191,10 @@ class TextPreviewView(views.APIView):
         if "text" not in payload:
             return response.Response({"detail": "Invalid input"}, status=400)
 
-        data = {"rendered": utils.render_html(payload["text"], "text/markdown")}
+        permissive = payload.get("permissive", False)
+        data = {
+            "rendered": utils.render_html(
+                payload["text"], "text/markdown", permissive=permissive
+            )
+        }
         return response.Response(data, status=200)
