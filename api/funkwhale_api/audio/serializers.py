@@ -191,6 +191,7 @@ class ChannelSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()
     actor = federation_serializers.APIActorSerializer()
     attributed_to = federation_serializers.APIActorSerializer()
+    rss_url = serializers.CharField(source="get_rss_url")
 
     class Meta:
         model = models.Channel
@@ -201,6 +202,7 @@ class ChannelSerializer(serializers.ModelSerializer):
             "actor",
             "creation_date",
             "metadata",
+            "rss_url",
         ]
 
     def get_artist(self, obj):

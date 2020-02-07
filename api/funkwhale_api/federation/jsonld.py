@@ -167,7 +167,7 @@ def prepare_for_serializer(payload, config, fallbacks={}):
                 attr=field_config.get("attr"),
             )
         except (IndexError, KeyError):
-            aliases = field_config.get("aliases", [])
+            aliases = field_config.get("aliases", {})
             noop = object()
             value = noop
             if not aliases:
@@ -176,9 +176,7 @@ def prepare_for_serializer(payload, config, fallbacks={}):
             for a in aliases:
                 try:
                     value = get_value(
-                        payload[a],
-                        keep=field_config.get("keep"),
-                        attr=field_config.get("attr"),
+                        payload[a["property"]], keep=a.get("keep"), attr=a.get("attr"),
                     )
                 except (IndexError, KeyError):
                     continue
@@ -231,14 +229,20 @@ def get_default_context_fw():
 
 
 class JsonLdSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        self.jsonld_expand = kwargs.pop("jsonld_expand", True)
+        super().__init__(*args, **kwargs)
+
     def run_validation(self, data=empty):
-        if data and data is not empty and self.context.get("expand", True):
-            try:
-                data = expand(data)
-            except ValueError:
-                raise serializers.ValidationError(
-                    "{} is not a valid jsonld document".format(data)
-                )
+        if data and data is not empty:
+
+            if self.context.get("expand", self.jsonld_expand):
+                try:
+                    data = expand(data)
+                except ValueError:
+                    raise serializers.ValidationError(
+                        "{} is not a valid jsonld document".format(data)
+                    )
             try:
                 config = self.Meta.jsonld_mapping
             except AttributeError:
@@ -247,6 +251,7 @@ class JsonLdSerializer(serializers.Serializer):
                 fallbacks = self.Meta.jsonld_fallbacks
             except AttributeError:
                 fallbacks = {}
+
             data = prepare_for_serializer(data, config, fallbacks=fallbacks)
             dereferenced_fields = [
                 k

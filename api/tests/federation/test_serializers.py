@@ -30,6 +30,7 @@ def test_actor_serializer_from_ap(db):
         "name": "Test",
         "summary": "Hello world",
         "manuallyApprovesFollowers": True,
+        "url": "http://hello.world/path",
         "publicKey": {
             "publicKeyPem": public.decode("utf-8"),
             "owner": actor_url,
@@ -48,7 +49,7 @@ def test_actor_serializer_from_ap(db):
     actor = serializer.save()
 
     assert actor.fid == actor_url
-    assert actor.url is None
+    assert actor.url == payload["url"]
     assert actor.inbox_url == payload["inbox"]
     assert actor.shared_inbox_url == payload["endpoints"]["sharedInbox"]
     assert actor.outbox_url == payload["outbox"]
@@ -108,6 +109,7 @@ def test_actor_serializer_to_ap(factories):
         "outbox": "https://test.federation/user/outbox",
         "preferredUsername": "user",
         "name": "Real User",
+        "url": [{"type": "Link", "href": "https://test.url", "mediaType": "text/html"}],
         "manuallyApprovesFollowers": False,
         "publicKey": {
             "id": "https://test.federation/user#main-key",
@@ -120,13 +122,14 @@ def test_actor_serializer_to_ap(factories):
         fid=expected["id"],
         inbox_url=expected["inbox"],
         outbox_url=expected["outbox"],
+        url=expected["url"][0]["href"],
         shared_inbox_url=expected["endpoints"]["sharedInbox"],
         followers_url=expected["followers"],
         following_url=expected["following"],
         public_key=expected["publicKey"]["publicKeyPem"],
         preferred_username=expected["preferredUsername"],
         name=expected["name"],
-        domain=models.Domain.objects.create(pk="test.federation"),
+        domain=models.Domain.objects.create(pk="test.domain"),
         type="Person",
         manually_approves_followers=False,
         attachment_icon=factories["common.Attachment"](),
@@ -1112,7 +1115,7 @@ def test_activity_pub_audio_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
-def test_local_actor_serializer_to_ap(factories):
+def test_local_actor_serializer_to_ap(factories, settings):
     expected = {
         "@context": jsonld.get_default_context(),
         "id": "https://test.federation/user",
@@ -1155,6 +1158,15 @@ def test_local_actor_serializer_to_ap(factories):
     user.save()
     ac.refresh_from_db()
     expected["summary"] = content.rendered
+    expected["url"] = [
+        {
+            "type": "Link",
+            "href": "https://{}/@{}".format(
+                settings.FUNKWHALE_HOSTNAME, ac.preferred_username
+            ),
+            "mediaType": "text/html",
+        }
+    ]
     expected["icon"] = {
         "type": "Image",
         "mediaType": "image/jpeg",
@@ -1195,6 +1207,25 @@ def test_track_serializer_update_license(factories):
     obj.refresh_from_db()
 
     assert obj.license_id == "cc-by-2.0"
+
+
+def test_channel_actor_serializer(factories):
+    channel = factories["audio.Channel"]()
+    serializer = serializers.ActorSerializer(channel.actor)
+    expected_url = [
+        {
+            "type": "Link",
+            "href": channel.actor.get_absolute_url(),
+            "mediaType": "text/html",
+        },
+        {
+            "type": "Link",
+            "href": channel.get_rss_url(),
+            "mediaType": "application/rss+xml",
+        },
+    ]
+
+    assert serializer.data["url"] == expected_url
 
 
 def test_channel_actor_outbox_serializer(factories):
