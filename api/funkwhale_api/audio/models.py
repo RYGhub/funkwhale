@@ -36,6 +36,7 @@ class Channel(models.Model):
         "music.Library", on_delete=models.CASCADE, related_name="channel"
     )
     creation_date = models.DateTimeField(default=timezone.now)
+    rss_url = models.URLField(max_length=500, null=True, blank=True)
 
     # metadata to enhance rss feed
     metadata = JSONField(
@@ -46,6 +47,9 @@ class Channel(models.Model):
         return federation_utils.full_url("/channels/{}".format(self.uuid))
 
     def get_rss_url(self):
+        if not self.artist.is_local:
+            return self.rss_url
+
         return federation_utils.full_url(
             reverse("api:v1:channels-rss", kwargs={"uuid": self.uuid})
         )

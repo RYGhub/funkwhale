@@ -134,6 +134,7 @@ def test_channel_serializer_representation(factories, to_api_date):
             channel.attributed_to
         ).data,
         "metadata": {},
+        "rss_url": channel.get_rss_url(),
     }
     expected["artist"]["description"] = common_serializers.ContentSerializer(
         content

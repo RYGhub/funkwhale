@@ -25,6 +25,7 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         music_factories.ArtistFactory,
         attributed_to=factory.SelfAttribute("..attributed_to"),
     )
+    rss_url = factory.Faker("url")
     metadata = factory.LazyAttribute(lambda o: {})
 
     class Meta:

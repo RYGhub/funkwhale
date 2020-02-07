@@ -91,6 +91,17 @@ class ImageSerializer(MediaSerializer):
         return validated_data
 
 
+class URLSerializer(jsonld.JsonLdSerializer):
+    href = serializers.URLField(max_length=500)
+    mediaType = serializers.CharField(required=False)
+
+    class Meta:
+        jsonld_mapping = {
+            "href": jsonld.first_id(contexts.AS.href, aliases=[jsonld.raw("@id")]),
+            "mediaType": jsonld.first_val(contexts.AS.mediaType),
+        }
+
+
 class EndpointsSerializer(jsonld.JsonLdSerializer):
     sharedInbox = serializers.URLField(max_length=500, required=False)
 
@@ -105,10 +116,19 @@ class PublicKeySerializer(jsonld.JsonLdSerializer):
         jsonld_mapping = {"publicKeyPem": jsonld.first_val(contexts.SEC.publicKeyPem)}
 
 
+def get_by_media_type(urls, media_type):
+    for url in urls:
+        if url.get("mediaType", "text/html") == media_type:
+            return url
+
+
 class ActorSerializer(jsonld.JsonLdSerializer):
     id = serializers.URLField(max_length=500)
     outbox = serializers.URLField(max_length=500, required=False)
     inbox = serializers.URLField(max_length=500, required=False)
+    url = serializers.ListField(
+        child=URLSerializer(jsonld_expand=False), required=False, min_length=0
+    )
     type = serializers.ChoiceField(
         choices=[getattr(contexts.AS, c[0]) for c in models.TYPE_CHOICES]
     )
@@ -144,6 +164,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             "mediaType": jsonld.first_val(contexts.AS.mediaType),
             "endpoints": jsonld.first_obj(contexts.AS.endpoints),
             "icon": jsonld.first_obj(contexts.AS.icon),
+            "url": jsonld.raw(contexts.AS.url),
         }
 
     def to_representation(self, instance):
@@ -165,6 +186,36 @@ class ActorSerializer(jsonld.JsonLdSerializer):
 
         if instance.summary_obj_id:
             ret["summary"] = instance.summary_obj.rendered
+        urls = []
+        if instance.url:
+            urls.append(
+                {"type": "Link", "href": instance.url, "mediaType": "text/html"}
+            )
+
+        channel = instance.get_channel()
+        if channel:
+            ret["url"] = [
+                {
+                    "type": "Link",
+                    "href": instance.channel.get_absolute_url()
+                    if instance.channel.artist.is_local
+                    else instance.get_absolute_url(),
+                    "mediaType": "text/html",
+                },
+                {
+                    "type": "Link",
+                    "href": instance.channel.get_rss_url(),
+                    "mediaType": "application/rss+xml",
+                },
+            ]
+        else:
+            ret["url"] = [
+                {
+                    "type": "Link",
+                    "href": instance.get_absolute_url(),
+                    "mediaType": "text/html",
+                }
+            ]
 
         ret["@context"] = jsonld.get_default_context()
         if instance.public_key:
@@ -192,6 +243,10 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             "name": self.validated_data.get("name"),
             "preferred_username": self.validated_data["preferredUsername"],
         }
+        url = get_by_media_type(self.validated_data.get("url", []), "text/html")
+        if url:
+            kwargs["url"] = url["href"]
+
         maf = self.validated_data.get("manuallyApprovesFollowers")
         if maf is not None:
             kwargs["manually_approves_followers"] = maf

@@ -254,6 +254,17 @@ class Actor(models.Model):
         except ObjectDoesNotExist:
             return None
 
+    def get_channel(self):
+        try:
+            return self.channel
+        except ObjectDoesNotExist:
+            return None
+
+    def get_absolute_url(self):
+        if self.is_local:
+            return federation_utils.full_url("/@{}".format(self.preferred_username))
+        return self.url or self.fid
+
     def get_current_usage(self):
         actor = self.__class__.objects.filter(pk=self.pk).with_current_usage().get()
         data = {}
