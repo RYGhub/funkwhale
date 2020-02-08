@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-10-28 07:57+0000\n"
+"PO-Revision-Date: 2020-02-09 11:11+0000\n"
 "Last-Translator: Keunes <keunes+foss@mailbox.org>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -3977,15 +3977,14 @@ msgstr "Zoek een externe bibliotheek"
 
 #: front/src/components/manage/library/EditsCardList.vue:211
 #: front/src/views/admin/moderation/ReportsList.vue:207
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by account, summary, domain…"
-msgstr "Zoek op titel, artiest, domein…"
+msgstr "Zoek op account, samenvatting, domein…"
 
 #: front/src/components/manage/library/LibrariesTable.vue:191
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, actor, name, description…"
-msgstr ""
+msgstr "Zoek op domeinnaam, gebruikersnaam, beschrijving…"
 
 #: front/src/components/manage/library/UploadsTable.vue:241
 msgctxt "Content/Search/Input.Placeholder"
@@ -3995,53 +3994,47 @@ msgstr ""
 #: front/src/components/manage/library/ArtistsTable.vue:164
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, name, MusicBrainz ID…"
-msgstr ""
+msgstr "Zoek op domein, naam, MusicBrainz ID…"
 
 #: front/src/components/manage/library/TracksTable.vue:174
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, album, MusicBrainz ID…"
-msgstr "Zoek op titel, artiest, album…"
+msgstr "Zoek op domein, titel, artiest, album, MusicBrainz ID…"
 
 #: front/src/components/manage/library/AlbumsTable.vue:174
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, MusicBrainz ID…"
-msgstr "Zoek op titel, artiest, domein…"
+msgstr "Zoek op domein, titel, artiest, MusicBrainz ID…"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, username, bio…"
-msgstr "Zoek op gebruikersnaam, e-mailadres, code…"
+msgstr "Zoek op domein, gebruikersnaam, biografie…"
 
 #: front/src/components/manage/library/TagsTable.vue:165
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by name"
-msgstr ""
+msgstr "Zoek op naam"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:168
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by name…"
-msgstr ""
+msgstr "Zoek op naam…"
 
 #: front/src/views/content/libraries/FilesTable.vue:208
-#, fuzzy
 msgctxt "Content/Library/Input.Placeholder"
 msgid "Search by title, artist, album…"
 msgstr "Zoek op titel, artiest, album…"
 
 #: front/src/components/manage/users/InvitationsTable.vue:153
-#, fuzzy
 msgctxt "Content/Admin/Input.Placeholder/Verb"
 msgid "Search by username, e-mail address, code…"
 msgstr "Zoek op gebruikersnaam, e-mailadres, code…"
 
 #: front/src/components/manage/users/UsersTable.vue:164
-#, fuzzy
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by username, e-mail address, name…"
-msgstr "Zoek op naam, gebruikersnaam, e-mailadres…"
+msgstr "Zoek op gebruikersnaam, e-mailadres, naam…"
 
 #: front/src/components/audio/SearchBar.vue:27
 msgctxt "Sidebar/Search/Input.Placeholder"
