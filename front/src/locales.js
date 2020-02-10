@@ -62,6 +62,10 @@ export default {
       "label": "Bokmål"
     },
     {
+      "code": "nn_NO",
+      "label": "Nynorsk"
+    },
+    {
       "code": "nl",
       "label": "Nederlands"
     },
