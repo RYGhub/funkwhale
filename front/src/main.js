@@ -117,7 +117,7 @@ axios.interceptors.response.use(function (response) {
     store.commit("ui/addMessage", {
       content: message,
       date: new Date(),
-      level: 'error',
+      class: 'error',
     })
     logger.default.error('This client is rate-limited!', rateLimitStatus)
   } else if (error.response.status === 500) {
