@@ -643,7 +643,7 @@ export default {
       progress: "player/progress"
     }),
     updateProgressThrottled () {
-      return _.throttle(this.updateProgress, 250)
+      return _.throttle(this.updateProgress, 50)
     },
     labels() {
       let audioPlayer = this.$pgettext('Sidebar/Player/Hidden text', "Media player")
@@ -816,13 +816,17 @@ export default {
 .fake-dropdown {
   border: 1px solid gray;
   border-radius: 3px;
-  padding: 0.5em;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-width: 10em;
+  > * {
+    padding: 0.5em;
+
+  }
   .position.control {
-    margin-right: 1em;
+    padding-right: 1em;
+    flex-grow: 1;
   }
   .angle.icon {
     margin-right: 0;
