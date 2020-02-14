@@ -153,10 +153,20 @@ export default {
       state.theme = value
     },
     addMessage (state, message) {
-      state.messages.push(message)
+      let finalMessage = {
+        displayTime: state.messageDisplayDuration,
+        key: String(new Date()),
+        ...message,
+      }
+      state.messages.push(finalMessage)
       if (state.messages.length > state.maxMessages) {
         state.messages.shift()
       }
+    },
+    removeMessage (state, key) {
+      state.messages = state.messages.filter((m) => {
+        return m.key != key
+      })
     },
     notifications (state, {type, count}) {
       state.notifications[type] = count
