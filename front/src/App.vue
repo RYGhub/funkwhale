@@ -389,6 +389,9 @@ export default {
   z-index: 999999;
   width: 100%;
   width: 100vw;
+  .ui.top.attached.progress {
+    top: 0;
+  }
 }
 #app.queue-focused {
   .queue-not-focused {
@@ -544,7 +547,7 @@ export default {
         justify-content: flex-start;
       }
       > * {
-        margin: 0 0.5em;
+        padding: 0.5em;
       }
     }
     &.player-controls {
