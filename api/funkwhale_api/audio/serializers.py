@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 
 from rest_framework import serializers
@@ -13,6 +14,7 @@ from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.tags import models as tags_models
 from funkwhale_api.tags import serializers as tags_serializers
+from funkwhale_api.users import serializers as users_serializers
 
 from . import categories
 from . import models
@@ -52,7 +54,10 @@ class ChannelMetadataSerializer(serializers.Serializer):
 
 class ChannelCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
-    username = serializers.CharField(max_length=music_models.MAX_LENGTHS["ARTIST_NAME"])
+    username = serializers.CharField(
+        max_length=music_models.MAX_LENGTHS["ARTIST_NAME"],
+        validators=[users_serializers.ASCIIUsernameValidator()],
+    )
     description = common_serializers.ContentSerializer(allow_null=True)
     tags = tags_serializers.TagsListField()
     content_category = serializers.ChoiceField(
@@ -76,6 +81,9 @@ class ChannelCreateSerializer(serializers.Serializer):
         return validated_data
 
     def validate_username(self, value):
+        if value.lower() in [n.lower() for n in settings.ACCOUNT_USERNAME_BLACKLIST]:
+            raise serializers.ValidationError("This username is already taken")
+
         matching = federation_models.Actor.objects.local().filter(
             preferred_username__iexact=value
         )

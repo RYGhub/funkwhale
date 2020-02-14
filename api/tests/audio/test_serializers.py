@@ -70,7 +70,7 @@ def test_channel_serializer_create_honor_max_channels_setting(factories, prefere
         assert serializer.is_valid(raise_exception=True)
 
 
-def test_channel_serializer_create_validates_username(factories):
+def test_channel_serializer_create_validates_username_uniqueness(factories):
     attributed_to = factories["federation.Actor"](local=True)
     data = {
         "name": "My channel",
@@ -83,7 +83,48 @@ def test_channel_serializer_create_validates_username(factories):
     serializer = serializers.ChannelCreateSerializer(
         data=data, context={"actor": attributed_to}
     )
-    with pytest.raises(serializers.serializers.ValidationError, match=r".*username.*"):
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*username is already taken.*"
+    ):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_username_chars(factories):
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": "hello world",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*Enter a valid username.*"
+    ):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_blacklisted_username(factories, settings):
+    settings.ACCOUNT_USERNAME_BLACKLIST = ["forBidden"]
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": "FORBIDDEN",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*username is already taken.*"
+    ):
         assert serializer.is_valid(raise_exception=True)
 
 
