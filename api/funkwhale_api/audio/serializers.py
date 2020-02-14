@@ -5,6 +5,7 @@ from rest_framework import serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import locales
+from funkwhale_api.common import preferences
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models as music_models
@@ -59,6 +60,11 @@ class ChannelCreateSerializer(serializers.Serializer):
     metadata = serializers.DictField(required=False)
 
     def validate(self, validated_data):
+        existing_channels = self.context["actor"].owned_channels.count()
+        if existing_channels >= preferences.get("audio__max_channels"):
+            raise serializers.ValidationError(
+                "You have reached the maximum amount of allowed channels"
+            )
         validated_data = super().validate(validated_data)
         metadata = validated_data.pop("metadata", {})
         if validated_data["content_category"] == "podcast":
