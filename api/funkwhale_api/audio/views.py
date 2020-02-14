@@ -6,12 +6,14 @@ from rest_framework import response
 from rest_framework import viewsets
 
 from django import http
+from django.db import transaction
 from django.db.models import Count, Prefetch
 from django.db.utils import IntegrityError
 
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.federation import routes
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
@@ -109,11 +111,13 @@ class ChannelViewSet(
     @decorators.action(
         detail=True,
         methods=["get"],
-        permission_classes=[],
         content_negotiation_class=renderers.PodcastRSSContentNegociation,
     )
     def rss(self, request, *args, **kwargs):
         object = self.get_object()
+        if not object.attributed_to.is_local:
+            return response.Response({"detail": "Not found"}, status=404)
+
         uploads = (
             object.library.uploads.playable_by(None)
             .prefetch_related(
@@ -141,6 +145,14 @@ class ChannelViewSet(
         if self.request.user.is_authenticated:
             context["actor"] = self.request.user.actor
         return context
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        routes.outbox.dispatch(
+            {"type": "Delete", "object": {"type": instance.actor.type}},
+            context={"actor": instance.actor},
+        )
+        instance.delete()
 
 
 class SubscriptionsViewSet(
