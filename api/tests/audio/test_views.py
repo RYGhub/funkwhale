@@ -107,17 +107,24 @@ def test_channel_update_permission(logged_in_api_client, factories):
     assert response.status_code == 403
 
 
-def test_channel_delete(logged_in_api_client, factories):
+def test_channel_delete(logged_in_api_client, factories, mocker):
+
     actor = logged_in_api_client.user.create_actor()
     channel = factories["audio.Channel"](attributed_to=actor)
 
     url = reverse("api:v1:channels-detail", kwargs={"uuid": channel.uuid})
+    dispatch = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
     response = logged_in_api_client.delete(url)
 
     assert response.status_code == 204
 
     with pytest.raises(channel.DoesNotExist):
         channel.refresh_from_db()
+
+    dispatch.assert_called_once_with(
+        {"type": "Delete", "object": {"type": channel.actor.type}},
+        context={"actor": channel.actor},
+    )
 
 
 def test_channel_delete_permission(logged_in_api_client, factories):
@@ -212,8 +219,9 @@ def test_subscriptions_all(factories, logged_in_api_client):
     }
 
 
-def test_channel_rss_feed(factories, api_client):
-    channel = factories["audio.Channel"]()
+def test_channel_rss_feed(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    channel = factories["audio.Channel"](local=True)
     upload1 = factories["music.Upload"](library=channel.library, playable=True)
     upload2 = factories["music.Upload"](library=channel.library, playable=True)
 
@@ -228,3 +236,25 @@ def test_channel_rss_feed(factories, api_client):
     assert response.status_code == 200
     assert response.data == expected
     assert response["Content-Type"] == "application/rss+xml"
+
+
+def test_channel_rss_feed_remote(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    channel = factories["audio.Channel"]()
+
+    url = reverse("api:v1:channels-rss", kwargs={"uuid": channel.uuid})
+
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
+def test_channel_rss_feed_authentication_required(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = True
+    channel = factories["audio.Channel"](local=True)
+
+    url = reverse("api:v1:channels-rss", kwargs={"uuid": channel.uuid})
+
+    response = api_client.get(url)
+
+    assert response.status_code == 401
