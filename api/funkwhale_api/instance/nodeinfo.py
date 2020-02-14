@@ -87,6 +87,7 @@ def get():
         data["metadata"]["usage"] = {
             "favorites": {"tracks": {"total": statistics["track_favorites"]}},
             "listenings": {"total": statistics["listenings"]},
+            "downloads": {"total": statistics["downloads"]},
         }
         if not auth_required:
             data["metadata"]["knownNodesListUrl"] = federation_utils.full_url(

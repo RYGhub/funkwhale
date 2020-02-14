@@ -27,6 +27,7 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
         "track_favorites": 5,
         "music_duration": 6,
         "listenings": 7,
+        "downloads": 42,
     }
     mocker.patch("funkwhale_api.instance.stats.get", return_value=stats)
 
@@ -61,6 +62,7 @@ def test_nodeinfo_dump(preferences, mocker, avatar):
             "usage": {
                 "favorites": {"tracks": {"total": stats["track_favorites"]}},
                 "listenings": {"total": stats["listenings"]},
+                "downloads": {"total": stats["downloads"]},
             },
             "supportedUploadExtensions": music_utils.SUPPORTED_EXTENSIONS,
             "allowList": {"enabled": False, "domains": None},
