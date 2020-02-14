@@ -6,6 +6,7 @@ from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import locales
 from funkwhale_api.common import preferences
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models as music_models
@@ -73,6 +74,14 @@ class ChannelCreateSerializer(serializers.Serializer):
             metadata = metadata_serializer.validated_data
         validated_data["metadata"] = metadata
         return validated_data
+
+    def validate_username(self, value):
+        matching = federation_models.Actor.objects.local().filter(
+            preferred_username__iexact=value
+        )
+        if matching.exists():
+            raise serializers.ValidationError("This username is already taken")
+        return value
 
     @transaction.atomic
     def create(self, validated_data):

@@ -56,7 +56,6 @@ def test_channel_serializer_create_honor_max_channels_setting(factories, prefere
     attributed_to = factories["federation.Actor"](local=True)
     factories["audio.Channel"](attributed_to=attributed_to)
     data = {
-        # TODO: cover
         "name": "My channel",
         "username": "mychannel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
@@ -68,6 +67,23 @@ def test_channel_serializer_create_honor_max_channels_setting(factories, prefere
         data=data, context={"actor": attributed_to}
     )
     with pytest.raises(serializers.serializers.ValidationError, match=r".*max.*"):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_username(factories):
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": attributed_to.preferred_username.upper(),
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(serializers.serializers.ValidationError, match=r".*username.*"):
         assert serializer.is_valid(raise_exception=True)
 
 
