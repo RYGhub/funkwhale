@@ -384,8 +384,7 @@ class ManageDomainViewSet(
 ):
     lookup_value_regex = r"[a-zA-Z0-9\-\.]+"
     queryset = (
-        federation_models.Domain.objects.external()
-        .with_actors_count()
+        federation_models.Domain.objects.with_actors_count()
         .with_outbox_activities_count()
         .prefetch_related("instance_policy")
         .order_by("name")
@@ -401,6 +400,10 @@ class ManageDomainViewSet(
         "outbox_activities_count",
         "instance_policy",
     ]
+
+    def get_queryset(self, **kwargs):
+        queryset = super().get_queryset(**kwargs)
+        return queryset.external()
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
