@@ -138,6 +138,8 @@ class ChannelViewSet(
             "update",
             "partial_update",
         ]
+        if self.request.user.is_authenticated:
+            context["actor"] = self.request.user.actor
         return context
 
 

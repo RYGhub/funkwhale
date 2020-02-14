@@ -23,7 +23,9 @@ def test_channel_serializer_create(factories):
         "content_category": "other",
     }
 
-    serializer = serializers.ChannelCreateSerializer(data=data)
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
     assert serializer.is_valid(raise_exception=True) is True
 
     channel = serializer.save(attributed_to=attributed_to)
@@ -49,6 +51,83 @@ def test_channel_serializer_create(factories):
     assert channel.library.actor == attributed_to
 
 
+def test_channel_serializer_create_honor_max_channels_setting(factories, preferences):
+    preferences["audio__max_channels"] = 1
+    attributed_to = factories["federation.Actor"](local=True)
+    factories["audio.Channel"](attributed_to=attributed_to)
+    data = {
+        "name": "My channel",
+        "username": "mychannel",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(serializers.serializers.ValidationError, match=r".*max.*"):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_username_uniqueness(factories):
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": attributed_to.preferred_username.upper(),
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*username is already taken.*"
+    ):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_username_chars(factories):
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": "hello world",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*Enter a valid username.*"
+    ):
+        assert serializer.is_valid(raise_exception=True)
+
+
+def test_channel_serializer_create_validates_blacklisted_username(factories, settings):
+    settings.ACCOUNT_USERNAME_BLACKLIST = ["forBidden"]
+    attributed_to = factories["federation.Actor"](local=True)
+    data = {
+        "name": "My channel",
+        "username": "FORBIDDEN",
+        "description": {"text": "This is my channel", "content_type": "text/markdown"},
+        "tags": ["hello", "world"],
+        "content_category": "other",
+    }
+
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
+    with pytest.raises(
+        serializers.serializers.ValidationError, match=r".*username is already taken.*"
+    ):
+        assert serializer.is_valid(raise_exception=True)
+
+
 def test_channel_serializer_create_podcast(factories):
     attributed_to = factories["federation.Actor"](local=True)
 
@@ -62,7 +141,9 @@ def test_channel_serializer_create_podcast(factories):
         "metadata": {"itunes_category": "Sports", "language": "en"},
     }
 
-    serializer = serializers.ChannelCreateSerializer(data=data)
+    serializer = serializers.ChannelCreateSerializer(
+        data=data, context={"actor": attributed_to}
+    )
     assert serializer.is_valid(raise_exception=True) is True
 
     channel = serializer.save(attributed_to=attributed_to)

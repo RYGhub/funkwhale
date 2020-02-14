@@ -80,6 +80,7 @@ export default {
       let instanceLabel = this.$pgettext('Content/Admin/Menu','Instance information')
       let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
+      let channelsLabel = this.$pgettext('*/*/*', 'Channels')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
       let federationLabel = this.$pgettext('*/*/*', 'Federation')
       let moderationLabel = this.$pgettext('*/Moderation/*', 'Moderation')
@@ -118,6 +119,14 @@ export default {
           settings: [
             {name: "music__transcoding_enabled"},
             {name: "music__transcoding_cache_duration"},
+          ]
+        },
+        {
+          label: channelsLabel,
+          id: "channels",
+          settings: [
+            {name: "audio__channels_enabled"},
+            {name: "audio__max_channels"},
           ]
         },
         {
