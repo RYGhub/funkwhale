@@ -1210,7 +1210,8 @@ def test_track_serializer_update_license(factories):
 
 
 def test_channel_actor_serializer(factories):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](actor__attachment_icon=None)
+
     serializer = serializers.ActorSerializer(channel.actor)
     expected_url = [
         {
@@ -1224,8 +1225,13 @@ def test_channel_actor_serializer(factories):
             "mediaType": "application/rss+xml",
         },
     ]
-
+    expected_icon = {
+        "type": "Image",
+        "mediaType": channel.artist.attachment_cover.mimetype,
+        "url": channel.artist.attachment_cover.download_url_original,
+    }
     assert serializer.data["url"] == expected_url
+    assert serializer.data["icon"] == expected_icon
 
 
 def test_channel_actor_outbox_serializer(factories):

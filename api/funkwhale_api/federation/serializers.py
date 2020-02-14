@@ -208,6 +208,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                     "mediaType": "application/rss+xml",
                 },
             ]
+            include_image(ret, channel.artist.attachment_cover, "icon")
         else:
             ret["url"] = [
                 {
@@ -216,6 +217,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                     "mediaType": "text/html",
                 }
             ]
+            include_image(ret, instance.attachment_icon, "icon")
 
         ret["@context"] = jsonld.get_default_context()
         if instance.public_key:
@@ -225,8 +227,6 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                 "id": "{}#main-key".format(instance.fid),
             }
         ret["endpoints"] = {}
-
-        include_image(ret, instance.attachment_icon, "icon")
 
         if instance.shared_inbox_url:
             ret["endpoints"]["sharedInbox"] = instance.shared_inbox_url
