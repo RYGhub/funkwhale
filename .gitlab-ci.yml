@@ -131,6 +131,7 @@ test_api:
     DATABASE_URL: "postgresql://postgres@postgres/postgres"
     FUNKWHALE_URL: "https://funkwhale.ci"
     DJANGO_SETTINGS_MODULE: config.settings.local
+    POSTGRES_HOST_AUTH_METHOD: trust
   only:
     - branches
   before_script:
