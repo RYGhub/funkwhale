@@ -56,3 +56,12 @@ from the server CLI. Typical use cases include:
 All user-related commands are available under the ``python manage.py fw users`` namespace.
 Please refer to the `Admin documentation <https://docs.funkwhale.audio/admin/commands.html#user-management>`_ for
 more information and instructions.
+
+Postgres docker changed environment variable [manual action required, docker only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you're running with docker and our multi-container setup, there was a breaking change starting in the 11.7 postgres image (https://github.com/docker-library/postgres/pull/658)
+
+You need to add this to your .env file: ``POSTGRES_HOST_AUTH_METHOD=trust``
+
+Newer deployments aren't affected.
