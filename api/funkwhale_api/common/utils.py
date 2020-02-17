@@ -249,8 +249,11 @@ def join_queries_or(left, right):
         return right
 
 
+MARKDOWN_RENDERER = markdown.Markdown(extensions=["nl2br", "extra"])
+
+
 def render_markdown(text):
-    return markdown.markdown(text, extensions=["nl2br", "extra"])
+    return MARKDOWN_RENDERER.convert(text)
 
 
 SAFE_TAGS = [
