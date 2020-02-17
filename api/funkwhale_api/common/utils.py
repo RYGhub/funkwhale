@@ -249,7 +249,7 @@ def join_queries_or(left, right):
         return right
 
 
-MARKDOWN_RENDERER = markdown.Markdown(extensions=["nl2br", "extra"])
+MARKDOWN_RENDERER = markdown.Markdown(extensions=settings.MARKDOWN_EXTENSIONS)
 
 
 def render_markdown(text):
