@@ -4,15 +4,17 @@ msgstr ""
 "Project-Id-Version: Arabic (FunkWhale)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2019-09-26 10:13+0000\n"
+"PO-Revision-Date: 2020-02-17 22:23+0000\n"
 "Last-Translator: ButterflyOfFire <butterflyoffire+funkwhale@protonmail.com>\n"
-"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/funkwhale/front/ar/>\n"
+"Language-Team: Arabic <https://translate.funkwhale.audio/projects/funkwhale/"
+"funkwhale/front/ar/>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 3.7\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 3.9\n"
 
 #: front/src/components/playlists/PlaylistModal.vue:9
 msgctxt "Popup/Playlist/Paragraph"
@@ -264,7 +266,6 @@ msgid "90 days"
 msgstr "90 يوما"
 
 #: front/src/components/library/FileUpload.vue:264
-#, fuzzy
 msgctxt "Content/Library/Help text"
 msgid "A network error occurred while uploading this file"
 msgstr "حدث خطأ في الشبكة أثناء تحميل هذا الملف"
@@ -310,7 +311,7 @@ msgstr "عن مثيل الخادوم هذا"
 #: front/src/views/content/libraries/Detail.vue:48
 msgctxt "Content/Library/Button.Label"
 msgid "Accept"
-msgstr "تم قبوله"
+msgstr "قبول"
 
 #: front/src/views/content/libraries/Detail.vue:40
 msgctxt "Content/Library/Table/Short"
@@ -502,7 +503,7 @@ msgstr "إضافة قاعدة إشراف جديدة"
 #: front/src/views/content/Home.vue:35
 msgctxt "Content/Library/Title/Verb"
 msgid "Add and manage content"
-msgstr "إضافة المحتوى و إدارته"
+msgstr "إضافة المحتوى وإدارته"
 
 #: front/src/components/playlists/Editor.vue:28
 #: front/src/components/playlists/PlaylistModal.vue:31
@@ -989,10 +990,9 @@ msgid "Cancel"
 msgstr "إلغاء"
 
 #: front/src/views/content/remote/Card.vue:110
-#, fuzzy
 msgctxt "Content/Library/Card.Paragraph"
 msgid "Cancel follow request"
-msgstr "طلبات المتابَعة المعلَّقة"
+msgstr "إلغاء طلب المتابَعة"
 
 #: front/src/components/library/radios/Builder.vue:64
 msgctxt "Content/Radio/Table.Label/Noun (Value is a number of Tracks)"
@@ -1342,7 +1342,7 @@ msgstr "الاستعمال الحالي"
 #: front/src/components/Footer.vue:94
 msgctxt "Footer/Settings/Dropdown.Label/Theme name"
 msgid "Dark"
-msgstr ""
+msgstr "ليلي"
 
 #: front/src/components/federation/FetchButton.vue:53
 msgctxt "*/*/Error"
@@ -1465,7 +1465,7 @@ msgstr "أتريد حذف هذه المكتبة؟"
 #: front/src/views/admin/library/ArtistDetail.vue:77
 msgctxt "Popup/Library/Title"
 msgid "Delete this artist?"
-msgstr "أتريد حذف هذه المكتبة؟"
+msgstr "أتريد حذف هذا الفنان؟"
 
 #: front/src/views/admin/library/LibraryDetail.vue:59
 #: front/src/views/content/libraries/Form.vue:31
@@ -1487,18 +1487,17 @@ msgstr "أتريد حذف هذه المكتبة؟"
 #: front/src/components/library/EditCard.vue:94
 msgctxt "Popup/Library/Title"
 msgid "Delete this suggestion?"
-msgstr "أتريد حذف قاعدة الإشراف هذه؟"
+msgstr "أتريد حذف هذا الإقتراح؟"
 
 #: front/src/views/admin/library/TagDetail.vue:42
-#, fuzzy
 msgctxt "Popup/Library/Title"
 msgid "Delete this tag?"
-msgstr "أتريد حذف هذه المكتبة؟"
+msgstr "أتريد حذف هذا الوسم؟"
 
 #: front/src/views/admin/library/UploadDetail.vue:66
 msgctxt "Popup/Library/Title"
 msgid "Delete this upload?"
-msgstr "أتريد حذف هذه المكتبة؟"
+msgstr "أتريد حذف هذا التحميل؟"
 
 #: front/src/components/favorites/List.vue:35
 #: src/components/library/Albums.vue:30
@@ -1660,10 +1659,9 @@ msgstr[4] ""
 msgstr[5] ""
 
 #: front/src/components/moderation/ReportModal.vue:3
-#, fuzzy
 msgctxt "Popup/Moderation/Title/Verb"
 msgid "Do you want to report this object?"
-msgstr "هل تؤكّد هذا الإجراء ؟"
+msgstr "أترغب في الإبلاغ عن هذا العنصر؟"
 
 #: front/src/components/Sidebar.vue:122
 msgctxt "Sidebar/Queue/Message"
@@ -1998,7 +1996,7 @@ msgstr "حدث خطأ أثناء حفظ الإعدادات"
 #: front/src/components/library/EditForm.vue:46
 msgctxt "Content/Library/Error message.Title"
 msgid "Error while submitting edit"
-msgstr "حدث خطأ أثناء حفظ الإعدادات"
+msgstr "حدث خطأ أثناء إرسال التعديلات"
 
 #: front/src/components/manage/moderation/NoteForm.vue:3
 #, fuzzy
@@ -2624,7 +2622,7 @@ msgstr "الرخصة"
 #: front/src/components/Footer.vue:90
 msgctxt "Footer/Settings/Dropdown.Label/Theme name"
 msgid "Light"
-msgstr ""
+msgstr "فاتح"
 
 #: front/src/views/admin/library/AlbumDetail.vue:188
 #: front/src/views/admin/library/ArtistDetail.vue:176
@@ -3261,7 +3259,6 @@ msgstr "تتابُع الصفحات"
 #: front/src/components/auth/LoginForm.vue:32
 #: src/components/auth/Settings.vue:291
 #: front/src/components/auth/SignupForm.vue:36
-#, fuzzy
 msgctxt "*/*/*"
 msgid "Password"
 msgstr "كلمة السر"
@@ -3849,38 +3846,33 @@ msgstr ""
 
 #: front/src/components/mixins/Report.vue:36
 #: src/components/mixins/Report.vue:37
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this album…"
-msgstr "شغِّل هذا المَقطَع"
+msgstr "ابلغ عن هذا الألبوم…"
 
 #: front/src/components/mixins/Report.vue:50
 #: src/components/mixins/Report.vue:51
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this artist…"
-msgstr "شغِّل هذا المَقطَع"
+msgstr "ابلغ عن هذا الفنان…"
 
 #: front/src/components/mixins/Report.vue:72
 #: src/components/mixins/Report.vue:73
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this library…"
-msgstr "أتريد حذف هذه المكتبة؟"
+msgstr "ابلغ عن هذه المكتبة…"
 
 #: front/src/components/mixins/Report.vue:61
 #: src/components/mixins/Report.vue:62
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this playlist…"
-msgstr "أضفه إلى قائمة التشغيل هذه"
+msgstr "ابلغ عن قائمة التشغيل هذه…"
 
 #: front/src/components/mixins/Report.vue:23
 #: src/components/mixins/Report.vue:24
-#, fuzzy
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this track…"
-msgstr "شغِّل هذا المَقطَع"
+msgstr "ابلغ عن هذا المقطع…"
 
 #: front/src/components/audio/PlayButton.vue:95
 msgctxt "*/Moderation/*/Button/Label,Verb"
