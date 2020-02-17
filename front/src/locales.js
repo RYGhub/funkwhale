@@ -58,6 +58,10 @@ export default {
       "label": "Italiano"
     },
     {
+      "code": "kab_DZ",
+      "label": "Taqbaylit"
+    },
+    {
       "code": "nb_NO",
       "label": "Bokmål"
     },
