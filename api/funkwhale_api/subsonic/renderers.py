@@ -1,3 +1,4 @@
+import collections
 import xml.etree.ElementTree as ET
 
 from rest_framework import renderers
@@ -40,7 +41,7 @@ def structure_payload(data):
         payload["error"] = {"code": 0, "message": payload.pop("detail")}
     if "error" in payload:
         payload["status"] = "failed"
-    return payload
+    return collections.OrderedDict(sorted(payload.items(), key=lambda v: v[0]))
 
 
 class SubsonicJSONRenderer(renderers.JSONRenderer):

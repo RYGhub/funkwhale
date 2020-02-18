@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class RedisClient(default.DefaultClient):
     def get(self, key, default=None, version=None, client=None):
         try:
-            return super().get(key, default=None, version=None, client=None)
+            return super().get(key, default=default, version=version, client=client)
         except ValueError as e:
             if "unsupported pickle protocol" in str(e):
                 # pickle deserialization error
