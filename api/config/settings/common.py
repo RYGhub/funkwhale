@@ -544,7 +544,7 @@ CHANNEL_LAYERS = {
 }
 
 CACHES["default"]["OPTIONS"] = {
-    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    "CLIENT_CLASS": "funkwhale_api.common.cache.RedisClient",
     "IGNORE_EXCEPTIONS": True,  # mimics memcache behavior.
     # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
 }

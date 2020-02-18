@@ -14,7 +14,11 @@ class JsonAuthConsumer(JsonWebsocketConsumer):
 
     def accept(self):
         super().accept()
-        for group in self.groups:
+        groups = self.scope["user"].get_channels_groups() + self.groups
+        for group in groups:
             channels.group_add(group, self.channel_name)
-        for group in self.scope["user"].get_channels_groups():
-            channels.group_add(group, self.channel_name)
+
+    def disconnect(self, close_code):
+        groups = self.scope["user"].get_channels_groups() + self.groups
+        for group in groups:
+            channels.group_discard(group, self.channel_name)
