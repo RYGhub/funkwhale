@@ -160,6 +160,7 @@ export default {
         ordering: this.getOrderingAsString(),
         playable: "true",
         tag: this.tags,
+        include_channels: "true",
       }
       logger.default.debug("Fetching artists")
       axios.get(

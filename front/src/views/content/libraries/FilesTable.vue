@@ -28,6 +28,9 @@
             <option value>
               <translate translate-context="Content/*/Dropdown">All</translate>
             </option>
+            <option value="draft">
+              <translate translate-context="Content/Library/*/Short">Draft</translate>
+            </option>
             <option value="pending">
               <translate translate-context="Content/Library/*/Short">Pending</translate>
             </option>
@@ -258,7 +261,8 @@ export default {
           page: this.page,
           page_size: this.paginateBy,
           ordering: this.getOrderingAsString(),
-          q: this.search.query
+          q: this.search.query,
+          include_channels: 'true',
         },
         this.filters || {}
       );
@@ -288,7 +292,8 @@ export default {
     },
     actionFilters() {
       var currentFilters = {
-        q: this.search.query
+        q: this.search.query,
+        include_channels: 'true',
       };
       if (this.filters) {
         return _.merge(currentFilters, this.filters);

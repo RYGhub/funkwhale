@@ -723,6 +723,7 @@ def test_user_can_create_upload(logged_in_api_client, factories, mocker, audio_f
             "source": "upload://test",
             "import_reference": "test",
             "library": library.uuid,
+            "import_metadata": '{"title": "foo"}',
         },
     )
 
@@ -735,6 +736,38 @@ def test_user_can_create_upload(logged_in_api_client, factories, mocker, audio_f
     assert upload.source == "upload://test"
     assert upload.import_reference == "test"
     assert upload.import_status == "pending"
+    assert upload.import_metadata == {"title": "foo"}
+    assert upload.track is None
+    m.assert_called_once_with(tasks.process_upload.delay, upload_id=upload.pk)
+
+
+def test_user_can_create_upload_in_channel(
+    logged_in_api_client, factories, mocker, audio_file
+):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](attributed_to=actor)
+    url = reverse("api:v1:uploads-list")
+    m = mocker.patch("funkwhale_api.common.utils.on_commit")
+    album = factories["music.Album"](artist=channel.artist)
+    response = logged_in_api_client.post(
+        url,
+        {
+            "audio_file": audio_file,
+            "source": "upload://test",
+            "import_reference": "test",
+            "channel": channel.uuid,
+            "import_metadata": '{"title": "foo", "album": ' + str(album.pk) + "}",
+        },
+    )
+
+    assert response.status_code == 201
+
+    upload = channel.library.uploads.latest("id")
+
+    assert upload.source == "upload://test"
+    assert upload.import_reference == "test"
+    assert upload.import_status == "pending"
+    assert upload.import_metadata == {"title": "foo", "album": album.pk}
     assert upload.track is None
     m.assert_called_once_with(tasks.process_upload.delay, upload_id=upload.pk)
 
@@ -1318,3 +1351,106 @@ def test_detail_includes_description_key(
     response = logged_in_api_client.get(url)
 
     assert response.data["description"] is None
+
+
+def test_channel_owner_can_create_album(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](attributed_to=actor)
+    attachment = factories["common.Attachment"](actor=actor)
+    url = reverse("api:v1:albums-list")
+
+    data = {
+        "artist": channel.artist.pk,
+        "cover": attachment.uuid,
+        "title": "Hello world",
+        "release_date": "2019-01-02",
+        "tags": ["Hello", "World"],
+        "description": {"content_type": "text/markdown", "text": "hello world"},
+    }
+
+    response = logged_in_api_client.post(url, data, format="json")
+
+    assert response.status_code == 201
+
+    album = channel.artist.albums.get(title=data["title"])
+
+    assert (
+        response.data
+        == serializers.AlbumSerializer(album, context={"description": True}).data
+    )
+    assert album.attachment_cover == attachment
+    assert album.attributed_to == actor
+    assert album.release_date == datetime.date(2019, 1, 2)
+    assert album.get_tags() == ["Hello", "World"]
+    assert album.description.content_type == "text/markdown"
+    assert album.description.text == "hello world"
+
+
+def test_channel_owner_can_delete_album(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](attributed_to=actor)
+    album = factories["music.Album"](artist=channel.artist)
+    url = reverse("api:v1:albums-detail", kwargs={"pk": album.pk})
+
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+    with pytest.raises(album.DoesNotExist):
+        album.refresh_from_db()
+
+
+def test_other_user_cannot_create_album(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"]()
+    attachment = factories["common.Attachment"](actor=actor)
+    url = reverse("api:v1:albums-list")
+
+    data = {
+        "artist": channel.artist.pk,
+        "cover": attachment.uuid,
+        "title": "Hello world",
+        "release_date": "2019-01-02",
+        "tags": ["Hello", "World"],
+        "description": {"content_type": "text/markdown", "text": "hello world"},
+    }
+
+    response = logged_in_api_client.post(url, data, format="json")
+
+    assert response.status_code == 400
+
+
+def test_other_user_cannot_delete_album(factories, logged_in_api_client):
+    logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist)
+    url = reverse("api:v1:albums-detail", kwargs={"pk": album.pk})
+
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 404
+    album.refresh_from_db()
+
+
+def test_channel_owner_can_delete_track(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](attributed_to=actor)
+    track = factories["music.Track"](artist=channel.artist)
+    url = reverse("api:v1:tracks-detail", kwargs={"pk": track.pk})
+
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 204
+    with pytest.raises(track.DoesNotExist):
+        track.refresh_from_db()
+
+
+def test_other_user_cannot_delete_track(factories, logged_in_api_client):
+    logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"]()
+    track = factories["music.Track"](artist=channel.artist)
+    url = reverse("api:v1:tracks-detail", kwargs={"pk": track.pk})
+
+    response = logged_in_api_client.delete(url)
+
+    assert response.status_code == 404
+    track.refresh_from_db()

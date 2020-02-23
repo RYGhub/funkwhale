@@ -175,46 +175,69 @@ def fail_import(upload, error_code, detail=None, **fields):
     "upload",
 )
 def process_upload(upload, update_denormalization=True):
+    """
+    Main handler to process uploads submitted by user and create the corresponding
+    metadata (tracks/artists/albums) in our DB.
+    """
     from . import serializers
+
+    channel = upload.library.get_channel()
+    # When upload is linked to a channel instead of a library
+    # we willingly ignore the metadata embedded in the file itself
+    # and rely on user metadata only
+    use_file_metadata = channel is None
 
     import_metadata = upload.import_metadata or {}
     internal_config = {"funkwhale": import_metadata.get("funkwhale", {})}
     forced_values_serializer = serializers.ImportMetadataSerializer(
-        data=import_metadata
+        data=import_metadata,
+        context={"actor": upload.library.actor, "channel": channel},
     )
     if forced_values_serializer.is_valid():
         forced_values = forced_values_serializer.validated_data
     else:
         forced_values = {}
+        if not use_file_metadata:
+            detail = forced_values_serializer.errors
+            metadata_dump = import_metadata
+            return fail_import(
+                upload, "invalid_metadata", detail=detail, file_metadata=metadata_dump
+            )
 
-    if upload.library.get_channel():
+    if channel:
         # ensure the upload is associated with the channel artist
         forced_values["artist"] = upload.library.channel.artist
+
     old_status = upload.import_status
-    audio_file = upload.get_audio_file()
-    additional_data = {}
+    additional_data = {"upload_source": upload.source}
 
-    m = metadata.Metadata(audio_file)
-    try:
-        serializer = metadata.TrackMetadataSerializer(data=m)
-        serializer.is_valid()
-    except Exception:
-        fail_import(upload, "unknown_error")
-        raise
-    if not serializer.is_valid():
-        detail = serializer.errors
+    if use_file_metadata:
+        audio_file = upload.get_audio_file()
+
+        m = metadata.Metadata(audio_file)
         try:
-            metadata_dump = m.all()
-        except Exception as e:
-            logger.warn("Cannot dump metadata for file %s: %s", audio_file, str(e))
-        return fail_import(
-            upload, "invalid_metadata", detail=detail, file_metadata=metadata_dump
-        )
+            serializer = metadata.TrackMetadataSerializer(data=m)
+            serializer.is_valid()
+        except Exception:
+            fail_import(upload, "unknown_error")
+            raise
+        if not serializer.is_valid():
+            detail = serializer.errors
+            try:
+                metadata_dump = m.all()
+            except Exception as e:
+                logger.warn("Cannot dump metadata for file %s: %s", audio_file, str(e))
+            return fail_import(
+                upload, "invalid_metadata", detail=detail, file_metadata=metadata_dump
+            )
 
-    final_metadata = collections.ChainMap(
-        additional_data, serializer.validated_data, internal_config
-    )
-    additional_data["upload_source"] = upload.source
+        final_metadata = collections.ChainMap(
+            additional_data, serializer.validated_data, internal_config
+        )
+    else:
+        final_metadata = collections.ChainMap(
+            additional_data, forced_values, internal_config,
+        )
     try:
         track = get_track_from_import_metadata(
             final_metadata, attributed_to=upload.library.actor, **forced_values
@@ -275,7 +298,7 @@ def process_upload(upload, update_denormalization=True):
         )
 
     # update album cover, if needed
-    if not track.album.attachment_cover:
+    if track.album and not track.album.attachment_cover:
         populate_album_cover(
             track.album, source=final_metadata.get("upload_source"),
         )
@@ -466,7 +489,11 @@ def _get_track(data, attributed_to=None, **forced_values):
     track_mbid = (
         forced_values["mbid"] if "mbid" in forced_values else data.get("mbid", None)
     )
-    album_mbid = getter(data, "album", "mbid")
+    try:
+        album_mbid = getter(data, "album", "mbid")
+    except TypeError:
+        # album is forced
+        album_mbid = None
     track_fid = getter(data, "fid")
 
     query = None
@@ -528,81 +555,94 @@ def _get_track(data, attributed_to=None, **forced_values):
     if "album" in forced_values:
         album = forced_values["album"]
     else:
-        album_artists = getter(data, "album", "artists", default=artists) or artists
-        album_artist_data = album_artists[0]
-        album_artist_name = truncate(
-            album_artist_data.get("name"), models.MAX_LENGTHS["ARTIST_NAME"]
-        )
-        if album_artist_name == artist_name:
-            album_artist = artist
+        if "artist" in forced_values:
+            album_artist = forced_values["artist"]
         else:
-            query = Q(name__iexact=album_artist_name)
-            album_artist_mbid = album_artist_data.get("mbid", None)
-            album_artist_fid = album_artist_data.get("fid", None)
-            if album_artist_mbid:
-                query |= Q(mbid=album_artist_mbid)
-            if album_artist_fid:
-                query |= Q(fid=album_artist_fid)
-            defaults = {
-                "name": album_artist_name,
-                "mbid": album_artist_mbid,
-                "fid": album_artist_fid,
-                "from_activity_id": from_activity_id,
-                "attributed_to": album_artist_data.get("attributed_to", attributed_to),
-            }
-            if album_artist_data.get("fdate"):
-                defaults["creation_date"] = album_artist_data.get("fdate")
-
-            album_artist, created = get_best_candidate_or_create(
-                models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
+            album_artists = getter(data, "album", "artists", default=artists) or artists
+            album_artist_data = album_artists[0]
+            album_artist_name = truncate(
+                album_artist_data.get("name"), models.MAX_LENGTHS["ARTIST_NAME"]
             )
-            if created:
-                tags_models.add_tags(album_artist, *album_artist_data.get("tags", []))
-                common_utils.attach_content(
-                    album_artist, "description", album_artist_data.get("description")
+            if album_artist_name == artist_name:
+                album_artist = artist
+            else:
+                query = Q(name__iexact=album_artist_name)
+                album_artist_mbid = album_artist_data.get("mbid", None)
+                album_artist_fid = album_artist_data.get("fid", None)
+                if album_artist_mbid:
+                    query |= Q(mbid=album_artist_mbid)
+                if album_artist_fid:
+                    query |= Q(fid=album_artist_fid)
+                defaults = {
+                    "name": album_artist_name,
+                    "mbid": album_artist_mbid,
+                    "fid": album_artist_fid,
+                    "from_activity_id": from_activity_id,
+                    "attributed_to": album_artist_data.get(
+                        "attributed_to", attributed_to
+                    ),
+                }
+                if album_artist_data.get("fdate"):
+                    defaults["creation_date"] = album_artist_data.get("fdate")
+
+                album_artist, created = get_best_candidate_or_create(
+                    models.Artist, query, defaults=defaults, sort_fields=["mbid", "fid"]
                 )
-                common_utils.attach_file(
-                    album_artist,
-                    "attachment_cover",
-                    album_artist_data.get("cover_data"),
-                )
+                if created:
+                    tags_models.add_tags(
+                        album_artist, *album_artist_data.get("tags", [])
+                    )
+                    common_utils.attach_content(
+                        album_artist,
+                        "description",
+                        album_artist_data.get("description"),
+                    )
+                    common_utils.attach_file(
+                        album_artist,
+                        "attachment_cover",
+                        album_artist_data.get("cover_data"),
+                    )
 
         # get / create album
-        album_data = data["album"]
-        album_title = truncate(album_data["title"], models.MAX_LENGTHS["ALBUM_TITLE"])
-        album_fid = album_data.get("fid", None)
+        if "album" in data:
+            album_data = data["album"]
+            album_title = truncate(
+                album_data["title"], models.MAX_LENGTHS["ALBUM_TITLE"]
+            )
+            album_fid = album_data.get("fid", None)
 
-        if album_mbid:
-            query = Q(mbid=album_mbid)
+            if album_mbid:
+                query = Q(mbid=album_mbid)
+            else:
+                query = Q(title__iexact=album_title, artist=album_artist)
+
+            if album_fid:
+                query |= Q(fid=album_fid)
+            defaults = {
+                "title": album_title,
+                "artist": album_artist,
+                "mbid": album_mbid,
+                "release_date": album_data.get("release_date"),
+                "fid": album_fid,
+                "from_activity_id": from_activity_id,
+                "attributed_to": album_data.get("attributed_to", attributed_to),
+            }
+            if album_data.get("fdate"):
+                defaults["creation_date"] = album_data.get("fdate")
+
+            album, created = get_best_candidate_or_create(
+                models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
+            )
+            if created:
+                tags_models.add_tags(album, *album_data.get("tags", []))
+                common_utils.attach_content(
+                    album, "description", album_data.get("description")
+                )
+                common_utils.attach_file(
+                    album, "attachment_cover", album_data.get("cover_data")
+                )
         else:
-            query = Q(title__iexact=album_title, artist=album_artist)
-
-        if album_fid:
-            query |= Q(fid=album_fid)
-        defaults = {
-            "title": album_title,
-            "artist": album_artist,
-            "mbid": album_mbid,
-            "release_date": album_data.get("release_date"),
-            "fid": album_fid,
-            "from_activity_id": from_activity_id,
-            "attributed_to": album_data.get("attributed_to", attributed_to),
-        }
-        if album_data.get("fdate"):
-            defaults["creation_date"] = album_data.get("fdate")
-
-        album, created = get_best_candidate_or_create(
-            models.Album, query, defaults=defaults, sort_fields=["mbid", "fid"]
-        )
-        if created:
-            tags_models.add_tags(album, *album_data.get("tags", []))
-            common_utils.attach_content(
-                album, "description", album_data.get("description")
-            )
-            common_utils.attach_file(
-                album, "attachment_cover", album_data.get("cover_data")
-            )
-
+            album = None
     # get / create track
     track_title = (
         forced_values["title"]
@@ -628,6 +668,14 @@ def _get_track(data, attributed_to=None, **forced_values):
         forced_values["copyright"]
         if "copyright" in forced_values
         else truncate(data.get("copyright"), models.MAX_LENGTHS["COPYRIGHT"])
+    )
+    description = (
+        {"text": forced_values["description"], "content_type": "text/markdown"}
+        if "description" in forced_values
+        else data.get("description")
+    )
+    cover_data = (
+        forced_values["cover"] if "cover" in forced_values else data.get("cover_data")
     )
 
     query = Q(
@@ -670,8 +718,8 @@ def _get_track(data, attributed_to=None, **forced_values):
             forced_values["tags"] if "tags" in forced_values else data.get("tags", [])
         )
         tags_models.add_tags(track, *tags)
-        common_utils.attach_content(track, "description", data.get("description"))
-        common_utils.attach_file(track, "attachment_cover", data.get("cover_data"))
+        common_utils.attach_content(track, "description", description)
+        common_utils.attach_file(track, "attachment_cover", cover_data)
 
     return track
 

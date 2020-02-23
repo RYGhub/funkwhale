@@ -1014,44 +1014,72 @@ def test_get_track_from_import_metadata_with_forced_values(factories, mocker, fa
     )
 
 
+def test_get_track_from_import_metadata_with_forced_values_album(
+    factories, mocker, faker
+):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"](artist=channel.artist)
+
+    forced_values = {
+        "title": "Real title",
+        "album": album.pk,
+    }
+    upload = factories["music.Upload"](
+        import_metadata=forced_values, library=channel.library, track=None
+    )
+    tasks.process_upload(upload_id=upload.pk)
+    upload.refresh_from_db()
+    assert upload.import_status == "finished"
+
+    assert upload.track.title == forced_values["title"]
+    assert upload.track.album == album
+    assert upload.track.artist == channel.artist
+
+
 def test_process_channel_upload_forces_artist_and_attributed_to(
     factories, mocker, faker
 ):
-    track = factories["music.Track"]()
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](attributed_to__local=True)
+    attachment = factories["common.Attachment"](actor=channel.attributed_to)
     import_metadata = {
         "title": "Real title",
         "position": 3,
         "copyright": "Real copyright",
         "tags": ["hello", "world"],
+        "description": "my description",
+        "cover": attachment.uuid,
     }
-
     expected_forced_values = import_metadata.copy()
     expected_forced_values["artist"] = channel.artist
-    expected_forced_values["attributed_to"] = channel.attributed_to
+    expected_forced_values["cover"] = attachment
     upload = factories["music.Upload"](
         track=None, import_metadata=import_metadata, library=channel.library
     )
-    get_track_from_import_metadata = mocker.patch.object(
-        tasks, "get_track_from_import_metadata", return_value=track
-    )
+    get_track_from_import_metadata = mocker.spy(tasks, "get_track_from_import_metadata")
 
     tasks.process_upload(upload_id=upload.pk)
 
     upload.refresh_from_db()
-    serializer = tasks.metadata.TrackMetadataSerializer(
-        data=tasks.metadata.Metadata(upload.get_audio_file())
-    )
-    assert serializer.is_valid() is True
-    audio_metadata = serializer.validated_data
 
     expected_final_metadata = tasks.collections.ChainMap(
-        {"upload_source": None}, audio_metadata, {"funkwhale": {}},
+        {"upload_source": None}, expected_forced_values, {"funkwhale": {}},
     )
     assert upload.import_status == "finished"
     get_track_from_import_metadata.assert_called_once_with(
-        expected_final_metadata, **expected_forced_values
+        expected_final_metadata,
+        attributed_to=channel.attributed_to,
+        **expected_forced_values
     )
+
+    assert upload.track.description.content_type == "text/markdown"
+    assert upload.track.description.text == import_metadata["description"]
+    assert upload.track.title == import_metadata["title"]
+    assert upload.track.position == import_metadata["position"]
+    assert upload.track.copyright == import_metadata["copyright"]
+    assert upload.track.get_tags() == import_metadata["tags"]
+    assert upload.track.artist == channel.artist
+    assert upload.track.attributed_to == channel.attributed_to
+    assert upload.track.attachment_cover == attachment
 
 
 def test_process_upload_uses_import_metadata_if_valid(factories, mocker):

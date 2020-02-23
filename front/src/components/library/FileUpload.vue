@@ -180,7 +180,6 @@ export default {
       currentTab: "summary",
       uploadUrl: this.$store.getters['instance/absoluteUrl']("/api/v1/uploads/"),
       importReference,
-      supportedExtensions: ["flac", "ogg", "mp3", "opus", "aac", "m4a"],
       isLoadingQuota: false,
       quotaStatus: null,
       uploads: {
@@ -283,6 +282,9 @@ export default {
     }
   },
   computed: {
+    supportedExtensions () {
+      return this.$store.state.ui.supportedExtensions
+    },
     labels() {
       let denied = this.$pgettext('Content/Library/Help text',
         "Upload denied, ensure the file is not too big and that you have not reached your quota"

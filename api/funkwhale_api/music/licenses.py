@@ -30,12 +30,12 @@ def load(data):
         try:
             license = existing_by_code[row["code"]]
         except KeyError:
-            logger.info("Loading new license: {}".format(row["code"]))
+            logger.debug("Loading new license: {}".format(row["code"]))
             to_create.append(
                 models.License(code=row["code"], **{f: row[f] for f in MODEL_FIELDS})
             )
         else:
-            logger.info("Updating license: {}".format(row["code"]))
+            logger.debug("Updating license: {}".format(row["code"]))
             stored = [getattr(license, f) for f in MODEL_FIELDS]
             wanted = [row[f] for f in MODEL_FIELDS]
             if wanted == stored:

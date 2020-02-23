@@ -31,8 +31,7 @@
           </router-link>
 
           <dangerous-button
-            color="grey"
-            class="basic tiny"
+            class="ui basic tiny grey button"
             :action="purgePendingFiles">
             <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge pending files?</translate></p>
@@ -57,8 +56,7 @@
             <translate translate-context="Content/Library/Link/Verb">View files</translate>
           </router-link>
           <dangerous-button
-            color="grey"
-            class="basic tiny"
+            class="ui basic tiny grey button"
             :action="purgeSkippedFiles">
             <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge skipped files?</translate></p>
@@ -83,8 +81,7 @@
             <translate translate-context="Content/Library/Link/Verb">View files</translate>
           </router-link>
           <dangerous-button
-            color="grey"
-            class="basic tiny"
+            class="ui basic tiny grey button"
             :action="purgeErroredFiles">
             <translate translate-context="*/*/*/Verb">Purge</translate>
             <p slot="modal-header"><translate translate-context="Popup/Library/Title">Purge errored files?</translate></p>

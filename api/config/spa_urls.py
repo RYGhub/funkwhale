@@ -23,7 +23,12 @@ urlpatterns = [
     ),
     urls.re_path(
         r"^channels/(?P<uuid>[0-9a-f-]+)/?$",
-        audio_spa_views.channel_detail,
+        audio_spa_views.channel_detail_uuid,
+        name="channel_detail",
+    ),
+    urls.re_path(
+        r"^channels/(?P<username>[^/]+)/?$",
+        audio_spa_views.channel_detail_username,
         name="channel_detail",
     ),
 ]

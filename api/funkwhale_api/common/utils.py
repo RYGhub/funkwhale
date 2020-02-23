@@ -279,7 +279,11 @@ HTML_PERMISSIVE_CLEANER = bleach.sanitizer.Cleaner(
     attributes=["class", "rel", "alt", "title"],
 )
 
-HTML_LINKER = bleach.linkifier.Linker()
+# support for additional tlds
+# cf https://github.com/mozilla/bleach/issues/367#issuecomment-384631867
+ALL_TLDS = set(settings.LINKIFIER_SUPPORTED_TLDS + bleach.linkifier.TLDS)
+URL_RE = bleach.linkifier.build_url_re(tlds=sorted(ALL_TLDS, reverse=True))
+HTML_LINKER = bleach.linkifier.Linker(url_re=URL_RE)
 
 
 def clean_html(html, permissive=False):
@@ -338,29 +342,34 @@ def attach_file(obj, field, file_data, fetch=False):
     if not file_data:
         return
 
-    extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
-    extension = extensions.get(file_data["mimetype"], "jpg")
-    attachment = models.Attachment(mimetype=file_data["mimetype"])
-    name_fields = ["uuid", "full_username", "pk"]
-    name = [getattr(obj, field) for field in name_fields if getattr(obj, field, None)][
-        0
-    ]
-    filename = "{}-{}.{}".format(field, name, extension)
-    if "url" in file_data:
-        attachment.url = file_data["url"]
+    if isinstance(file_data, models.Attachment):
+        attachment = file_data
     else:
-        f = ContentFile(file_data["content"])
-        attachment.file.save(filename, f, save=False)
+        extensions = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif"}
+        extension = extensions.get(file_data["mimetype"], "jpg")
+        attachment = models.Attachment(mimetype=file_data["mimetype"])
+        name_fields = ["uuid", "full_username", "pk"]
+        name = [
+            getattr(obj, field) for field in name_fields if getattr(obj, field, None)
+        ][0]
+        filename = "{}-{}.{}".format(field, name, extension)
+        if "url" in file_data:
+            attachment.url = file_data["url"]
+        else:
+            f = ContentFile(file_data["content"])
+            attachment.file.save(filename, f, save=False)
 
-    if not attachment.file and fetch:
-        try:
-            tasks.fetch_remote_attachment(attachment, filename=filename, save=False)
-        except Exception as e:
-            logger.warn("Cannot download attachment at url %s: %s", attachment.url, e)
-            attachment = None
+        if not attachment.file and fetch:
+            try:
+                tasks.fetch_remote_attachment(attachment, filename=filename, save=False)
+            except Exception as e:
+                logger.warn(
+                    "Cannot download attachment at url %s: %s", attachment.url, e
+                )
+                attachment = None
 
-    if attachment:
-        attachment.save()
+        if attachment:
+            attachment.save()
 
     setattr(obj, field, attachment)
     obj.save(update_fields=[field])

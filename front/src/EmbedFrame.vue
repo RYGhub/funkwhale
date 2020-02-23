@@ -103,7 +103,7 @@
             </td>
             <td class="title" :title="track.title" ><div colspan="2" class="ellipsis">{{ track.title }}</div></td>
             <td class="artist" :title="track.artist.name" ><div class="ellipsis">{{ track.artist.name }}</div></td>
-            <td class="album">
+            <td class="album" v-if="track.album">
               <div class="ellipsis " v-if="track.album" :title="track.album.title">{{ track.album.title }}</div>
             </td>
             <td width="50">{{ time.durationFormatted(track.sources[0].duration) }}</td>
@@ -236,7 +236,7 @@ export default {
         this.fetchTracks({channel: id, playable: true, include_channels: 'true', ordering: "-creation_date"})
       }
       if (type === 'artist') {
-        this.fetchTracks({artist: id, playable: true, ordering: "-release_date,disc_number,position"})
+        this.fetchTracks({artist: id, playable: true, include_channels: 'true', ordering: "-release_date,disc_number,position"})
       }
       if (type === 'playlist') {
         this.fetchTracks({}, `/api/v1/playlists/${id}/tracks/`)

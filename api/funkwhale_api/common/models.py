@@ -359,4 +359,7 @@ def remove_attached_content(sender, instance, **kwargs):
     fk_fields = CONTENT_FKS.get(instance._meta.label, [])
     for field in fk_fields:
         if getattr(instance, "{}_id".format(field)):
-            getattr(instance, field).delete()
+            try:
+                getattr(instance, field).delete()
+            except Content.DoesNotExist:
+                pass

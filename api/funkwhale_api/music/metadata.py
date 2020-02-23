@@ -512,9 +512,10 @@ class ArtistField(serializers.Field):
                 mbid = None
             artist = {"name": name, "mbid": mbid}
             final.append(artist)
-
-        field = serializers.ListField(child=ArtistSerializer(), min_length=1)
-
+        field = serializers.ListField(
+            child=ArtistSerializer(strict=self.context.get("strict", True)),
+            min_length=1,
+        )
         return field.to_internal_value(final)
 
 
@@ -647,14 +648,28 @@ class MBIDField(serializers.UUIDField):
 
 
 class ArtistSerializer(serializers.Serializer):
-    name = serializers.CharField()
+    name = serializers.CharField(required=False, allow_null=True)
     mbid = MBIDField()
+
+    def __init__(self, *args, **kwargs):
+        self.strict = kwargs.pop("strict", True)
+        super().__init__(*args, **kwargs)
+
+    def validate_name(self, v):
+        if self.strict and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
 
 class AlbumSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(required=False, allow_null=True)
     mbid = MBIDField()
     release_date = PermissiveDateField(required=False, allow_null=True)
+
+    def validate_title(self, v):
+        if self.context.get("strict", True) and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
 
 class PositionField(serializers.CharField):
@@ -691,7 +706,7 @@ class DescriptionField(serializers.CharField):
 
 
 class TrackMetadataSerializer(serializers.Serializer):
-    title = serializers.CharField()
+    title = serializers.CharField(required=False, allow_null=True)
     position = PositionField(allow_blank=True, allow_null=True, required=False)
     disc_number = PositionField(allow_blank=True, allow_null=True, required=False)
     copyright = serializers.CharField(allow_blank=True, allow_null=True, required=False)
@@ -713,6 +728,11 @@ class TrackMetadataSerializer(serializers.Serializer):
         "mbid",
         "tags",
     ]
+
+    def validate_title(self, v):
+        if self.context.get("strict", True) and not v:
+            raise serializers.ValidationError("This field is required.")
+        return v
 
     def validate(self, validated_data):
         validated_data = super().validate(validated_data)

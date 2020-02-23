@@ -25,7 +25,7 @@
             :translate-params="{track: track.title, playlist: duplicateTrackAddInfo.playlist_name}"><strong>%{ track }</strong> is already in <strong>%{ playlist }</strong>.</p>
           <button
             @click="duplicateTrackAddConfirm(false)"
-            class="ui small cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
+            class="ui small basic cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
           </button>
           <button
             class="ui small green button"
@@ -101,7 +101,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
+      <div class="ui basic cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
     </div>
   </modal>
 </template>

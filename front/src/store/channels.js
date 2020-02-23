@@ -5,7 +5,12 @@ export default {
   namespaced: true,
   state: {
     subscriptions: [],
-    count: 0
+    count: 0,
+    showUploadModal: false,
+    latestPublication: null,
+    uploadModalConfig: {
+      channel: null,
+    }
   },
   mutations: {
     subscriptions: (state, {uuid, value}) => {
@@ -24,6 +29,22 @@ export default {
     reset (state) {
       state.subscriptions = []
       state.count = 0
+    },
+    showUploadModal (state, value) {
+      state.showUploadModal = value.show
+      if (value.config) {
+        state.uploadModalConfig = {
+          ...value.config
+        }
+      }
+    },
+    publish (state, {uploads, channel}) {
+      state.latestPublication = {
+        date: new Date(),
+        uploads,
+        channel,
+      }
+      state.showUploadModal = false
     }
   },
   getters: {

@@ -1,26 +1,33 @@
 import urllib.parse
 
 from django.conf import settings
+from django.db.models import Q
 from django.urls import reverse
+
+from rest_framework import serializers
 
 from funkwhale_api.common import preferences
 from funkwhale_api.common import utils
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import spa_views
 
 from . import models
 
 
-def channel_detail(request, uuid):
-    queryset = models.Channel.objects.filter(uuid=uuid).select_related(
+def channel_detail(query):
+    queryset = models.Channel.objects.filter(query).select_related(
         "artist__attachment_cover", "actor", "library"
     )
     try:
         obj = queryset.get()
     except models.Channel.DoesNotExist:
         return []
+
     obj_url = utils.join_url(
         settings.FUNKWHALE_URL,
-        utils.spa_reverse("channel_detail", kwargs={"uuid": obj.uuid}),
+        utils.spa_reverse(
+            "channel_detail", kwargs={"username": obj.actor.full_username}
+        ),
     )
     metas = [
         {"tag": "meta", "property": "og:url", "content": obj_url},
@@ -72,3 +79,25 @@ def channel_detail(request, uuid):
         # twitter player is also supported in various software
         metas += spa_views.get_twitter_card_metas(type="channel", id=obj.uuid)
     return metas
+
+
+def channel_detail_uuid(request, uuid):
+    validator = serializers.UUIDField().to_internal_value
+    try:
+        uuid = validator(uuid)
+    except serializers.ValidationError:
+        return []
+    return channel_detail(Q(uuid=uuid))
+
+
+def channel_detail_username(request, username):
+    validator = federation_utils.get_actor_data_from_username
+    try:
+        username_data = validator(username)
+    except serializers.ValidationError:
+        return []
+    query = Q(
+        actor__domain=username_data["domain"],
+        actor__preferred_username__iexact=username_data["username"],
+    )
+    return channel_detail(query)

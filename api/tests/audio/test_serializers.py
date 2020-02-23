@@ -3,6 +3,8 @@ import datetime
 import pytest
 import pytz
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
+
 from funkwhale_api.audio import serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
@@ -11,20 +13,21 @@ from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import serializers as music_serializers
 
 
-def test_channel_serializer_create(factories):
+def test_channel_serializer_create(factories, mocker):
     attributed_to = factories["federation.Actor"](local=True)
-
+    attachment = factories["common.Attachment"](actor=attributed_to)
+    request = mocker.Mock(user=mocker.Mock(actor=attributed_to))
     data = {
-        # TODO: cover
         "name": "My channel",
         "username": "mychannel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
         "content_category": "other",
+        "cover": attachment.uuid,
     }
 
     serializer = serializers.ChannelCreateSerializer(
-        data=data, context={"actor": attributed_to}
+        data=data, context={"actor": attributed_to, "request": request}
     )
     assert serializer.is_valid(raise_exception=True) is True
 
@@ -37,14 +40,12 @@ def test_channel_serializer_create(factories):
         == data["tags"]
     )
     assert channel.artist.description.text == data["description"]["text"]
+    assert channel.artist.attachment_cover == attachment
     assert channel.artist.content_category == data["content_category"]
     assert (
         channel.artist.description.content_type == data["description"]["content_type"]
     )
     assert channel.attributed_to == attributed_to
-    assert channel.actor.summary == common_utils.render_html(
-        data["description"]["text"], "text/markdown"
-    )
     assert channel.actor.preferred_username == data["username"]
     assert channel.actor.name == data["name"]
     assert channel.library.privacy_level == "everyone"
@@ -150,24 +151,31 @@ def test_channel_serializer_create_podcast(factories):
     assert channel.metadata == data["metadata"]
 
 
-def test_channel_serializer_update(factories):
-    channel = factories["audio.Channel"](artist__set_tags=["rock"])
-
+def test_channel_serializer_update(factories, mocker):
+    channel = factories["audio.Channel"](
+        artist__set_tags=["rock"], attributed_to__local=True
+    )
+    attributed_to = channel.attributed_to
+    attachment = factories["common.Attachment"](actor=attributed_to)
+    request = mocker.Mock(user=mocker.Mock(actor=attributed_to))
     data = {
-        # TODO: cover
         "name": "My channel",
         "description": {"text": "This is my channel", "content_type": "text/markdown"},
         "tags": ["hello", "world"],
         "content_category": "other",
+        "cover": attachment.uuid,
     }
 
-    serializer = serializers.ChannelUpdateSerializer(channel, data=data)
+    serializer = serializers.ChannelUpdateSerializer(
+        channel, data=data, context={"request": request}
+    )
     assert serializer.is_valid(raise_exception=True) is True
 
     serializer.save()
     channel.refresh_from_db()
 
     assert channel.artist.name == data["name"]
+    assert channel.artist.attachment_cover == attachment
     assert channel.artist.content_category == data["content_category"]
     assert (
         sorted(channel.artist.tagged_items.values_list("tag__name", flat=True))
@@ -281,7 +289,7 @@ def test_rss_item_serializer(factories):
             {
                 "url": federation_utils.full_url(upload.get_listen_url("mp3")),
                 "length": upload.size,
-                "type": upload.mimetype,
+                "type": "audio/mpeg",
             }
         ],
     }
@@ -348,6 +356,30 @@ def test_rss_channel_serializer(factories):
     }
 
     assert serializers.rss_serialize_channel(channel) == expected
+
+
+def test_rss_channel_serializer_placeholder_image(factories):
+    description = factories["common.Content"]()
+    channel = factories["audio.Channel"](
+        artist__set_tags=["pop", "rock"],
+        artist__description=description,
+        artist__attachment_cover=None,
+    )
+    setattr(
+        channel.artist,
+        "_prefetched_tagged_items",
+        channel.artist.tagged_items.order_by("tag__name"),
+    )
+
+    expected = [
+        {
+            "href": federation_utils.full_url(
+                static("images/podcasts-cover-placeholder.png")
+            )
+        }
+    ]
+
+    assert serializers.rss_serialize_channel(channel)["itunes:image"] == expected
 
 
 def test_serialize_full_channel(factories):

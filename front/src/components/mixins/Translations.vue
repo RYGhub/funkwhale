@@ -25,6 +25,10 @@ export default {
                 label: this.$pgettext('Content/Library/*', 'Skipped'),
                 help: this.$pgettext('Content/Library/Help text', 'This track is already present in one of your libraries'),
               },
+              draft: {
+                label: this.$pgettext('Content/Library/*/Short', 'Draft'),
+                help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn\'t been scheduled for processing yet'),
+              },
               pending: {
                 label: this.$pgettext('Content/Library/*/Short', 'Pending'),
                 help: this.$pgettext('Content/Library/Help text', 'This track has been uploaded, but hasn\'t been processed by the server yet'),

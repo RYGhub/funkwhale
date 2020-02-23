@@ -39,7 +39,7 @@
           <translate translate-context="Content/*/Button.Label/Verb">Embed</translate>
         </button>
 
-        <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="labeled icon" :action="deletePlaylist">
+        <dangerous-button v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id" class="ui labeled red icon button" :action="deletePlaylist">
           <i class="trash icon"></i> <translate translate-context="*/*/*/Verb">Delete</translate>
           <p slot="modal-header" v-translate="{playlist: playlist.name}" translate-context="Popup/Playlist/Title/Call to action" :translate-params="{playlist: playlist.name}">
             Do you want to delete the playlist "%{ playlist }"?
@@ -58,7 +58,7 @@
           </div>
         </div>
         <div class="actions">
-          <div class="ui deny button">
+          <div class="ui basic deny button">
             <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
           </div>
         </div>

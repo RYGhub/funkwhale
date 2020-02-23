@@ -174,6 +174,17 @@ def test_attach_file_url_fetch(factories, r_mock):
     assert new_attachment.mimetype == data["mimetype"]
 
 
+def test_attach_file_attachment(factories, r_mock):
+    album = factories["music.Album"]()
+
+    data = factories["common.Attachment"]()
+    utils.attach_file(album, "attachment_cover", data)
+
+    album.refresh_from_db()
+
+    assert album.attachment_cover == data
+
+
 def test_attach_file_content(factories, r_mock):
     album = factories["music.Album"]()
 

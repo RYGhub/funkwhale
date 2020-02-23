@@ -3,60 +3,77 @@
     <div v-if="isLoading" class="ui vertical segment">
       <div class="ui centered active inline loader"></div>
     </div>
-    <template v-if="object">
-      <div class="ui dropdown icon small basic right floated button" ref="dropdown" v-dropdown style="right: 1em; top: 1em; z-index: 5">
-        <i class="ellipsis vertical icon"></i>
-        <div class="menu">
-          <div
-            role="button"
-            class="basic item"
-            v-for="obj in getReportableObjs({account: object})"
-            :key="obj.target.type + obj.target.id"
-            @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
-            <i class="share icon" /> {{ obj.label }}
-          </div>
+    <div class="ui head vertical stripe segment container">
+      <div class="ui stackable grid" v-if="object">
+        <div class="ui five wide column">
+          <div class="ui pointing dropdown icon small basic right floated button" ref="dropdown" v-dropdown="{direction: 'downward'}" style="position: absolute; right: 1em; top: 1em; z-index: 5">
+            <i class="ellipsis vertical icon"></i>
+            <div class="menu">
+              <div
+                role="button"
+                class="basic item"
+                v-for="obj in getReportableObjs({account: object})"
+                :key="obj.target.type + obj.target.id"
+                @click.stop.prevent="$store.dispatch('moderation/report', obj.target)">
+                <i class="share icon" /> {{ obj.label }}
+              </div>
 
-          <div class="divider"></div>
-          <router-link class="basic item" v-if="$store.state.auth.availablePermissions['moderation']" :to="{name: 'manage.moderation.accounts.detail', params: {id: object.full_username}}">
-            <i class="wrench icon"></i>
-            <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
-          </router-link>
-        </div>
-      </div>
-      <div class="ui head vertical stripe segment">
-        <h1 class="ui center aligned icon header">
-          <i v-if="!object.icon" class="circular inverted user green icon"></i>
-          <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](object.icon.square_crop)" />
-          <div class="ellispsis content">
-            <div class="ui very small hidden divider"></div>
-            <span :title="displayName">{{ displayName }}</span>
-            <div class="ui very small hidden divider"></div>
-            <span class="ui grey tiny text" :title="object.full_username">{{ object.full_username }}</span>
-          </div>
-          <template  v-if="object.full_username === $store.state.auth.fullUsername">
-            <div class="ui very small hidden divider"></div>
-            <div class="ui basic green label">
-              <translate translate-context="Content/Profile/Button.Paragraph">This is you!</translate>
+              <div class="divider"></div>
+              <router-link class="basic item" v-if="$store.state.auth.availablePermissions['moderation']" :to="{name: 'manage.moderation.accounts.detail', params: {id: object.full_username}}">
+                <i class="wrench icon"></i>
+                <translate translate-context="Content/Moderation/Link">Open in moderation interface</translate>
+              </router-link>
             </div>
-          </template>
-        </h1>
-        <div class="ui container">
-          <div class="ui secondary pointing center aligned menu">
-            <router-link class="item" :exact="true" :to="{name: 'profile.overview', params: routerParams}">
-              <translate translate-context="Content/Profile/Link">Overview</translate>
-            </router-link>
-            <router-link class="item" :exact="true" :to="{name: 'profile.activity', params: routerParams}">
-              <translate translate-context="Content/Profile/*">Activity</translate>
-            </router-link>
           </div>
-          <div class="ui hidden divider"></div>
-          <keep-alive>
-            <router-view @updated="fetch" :object="object"></router-view>
-          </keep-alive>
+          <h1 class="ui center aligned icon header">
+            <i v-if="!object.icon" class="circular inverted user green icon"></i>
+            <img class="ui big circular image" v-else v-lazy="$store.getters['instance/absoluteUrl'](object.icon.square_crop)" />
+            <div class="ellispsis content">
+              <div class="ui very small hidden divider"></div>
+              <span :title="displayName">{{ displayName }}</span>
+              <div class="ui very small hidden divider"></div>
+              <div class="sub header ellipsis" :title="object.full_username">
+                {{ object.full_username }}
+              </div>
+            </div>
+            <template  v-if="object.full_username === $store.state.auth.fullUsername">
+              <div class="ui very small hidden divider"></div>
+              <div class="ui basic green label">
+                <translate translate-context="Content/Profile/Button.Paragraph">This is you!</translate>
+              </div>
+            </template>
+          </h1>
+          <div class="ui small hidden divider"></div>
+          <div v-if="$store.getters['ui/layoutVersion'] === 'large'">
+            <rendered-description
+              @updated="$emit('updated', $event)"
+              :content="object.summary"
+              :field-name="'summary'"
+              :update-url="`users/users/${$store.state.auth.username}/`"
+              :can-update="$store.state.auth.authenticated && object.full_username === $store.state.auth.fullUsername"></rendered-description>
+          </div>
+        </div>
+        <div class="ui eleven wide column">
+          <div class="ui head vertical stripe segment">
+            <div class="ui container">
+              <div class="ui secondary pointing center aligned menu">
+                <router-link class="item" :exact="true" :to="{name: 'profile.overview', params: routerParams}">
+                  <translate translate-context="Content/Profile/Link">Overview</translate>
+                </router-link>
+                <router-link class="item" :exact="true" :to="{name: 'profile.activity', params: routerParams}">
+                  <translate translate-context="Content/Profile/*">Activity</translate>
+                </router-link>
+              </div>
+              <div class="ui hidden divider"></div>
+              <keep-alive>
+                <router-view @updated="fetch" :object="object"></router-view>
+              </keep-alive>
 
+            </div>
+          </div>
         </div>
       </div>
-    </template>
+    </div>
   </main>
 </template>
 
@@ -80,6 +97,10 @@ export default {
   },
   created() {
     this.fetch()
+  },
+  beforeRouteUpdate (to, from, next) {
+    to.meta.preserveScrollPosition = true
+    next()
   },
   methods: {
     fetch () {

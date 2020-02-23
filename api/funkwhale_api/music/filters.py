@@ -107,12 +107,14 @@ class TrackFilter(
 
 class UploadFilter(audio_filters.IncludeChannelsFilterSet):
     library = filters.CharFilter("library__uuid")
+    channel = filters.CharFilter("library__channel__uuid")
     track = filters.UUIDFilter("track__uuid")
     track_artist = filters.UUIDFilter("track__artist__uuid")
     album_artist = filters.UUIDFilter("track__album__artist__uuid")
     library = filters.UUIDFilter("library__uuid")
     playable = filters.BooleanFilter(field_name="_", method="filter_playable")
     scope = common_filters.ActorScopeFilter(actor_field="library__actor", distinct=True)
+    import_status = common_filters.MultipleQueryFilter(coerce=str)
     q = fields.SmartSearchFilter(
         config=search.SearchConfig(
             search_fields={
@@ -143,6 +145,7 @@ class UploadFilter(audio_filters.IncludeChannelsFilterSet):
             "library",
             "import_reference",
             "scope",
+            "channel",
         ]
         include_channels_field = "track__artist__channel"
 

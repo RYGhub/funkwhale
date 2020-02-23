@@ -7,18 +7,21 @@ from rest_framework import viewsets
 
 from django import http
 from django.db import transaction
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Q
 from django.db.utils import IntegrityError
 
+from funkwhale_api.common import locales
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
+from funkwhale_api.common.mixins import MultipleLookupDetailMixin
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import routes
+from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
 from funkwhale_api.users.oauth import permissions as oauth_permissions
 
-from . import filters, models, renderers, serializers
+from . import categories, filters, models, renderers, serializers
 
 ARTIST_PREFETCH_QS = (
     music_models.Artist.objects.select_related("description", "attachment_cover",)
@@ -36,6 +39,7 @@ class ChannelsMixin(object):
 
 class ChannelViewSet(
     ChannelsMixin,
+    MultipleLookupDetailMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
@@ -43,7 +47,20 @@ class ChannelViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    lookup_field = "uuid"
+    url_lookups = [
+        {
+            "lookup_field": "uuid",
+            "validator": serializers.serializers.UUIDField().to_internal_value,
+        },
+        {
+            "lookup_field": "username",
+            "validator": federation_utils.get_actor_data_from_username,
+            "get_query": lambda v: Q(
+                actor__domain=v["domain"],
+                actor__preferred_username__iexact=v["username"],
+            ),
+        },
+    ]
     filterset_class = filters.ChannelFilter
     serializer_class = serializers.ChannelSerializer
     queryset = (
@@ -134,6 +151,25 @@ class ChannelViewSet(
         data = serializers.rss_serialize_channel_full(channel=object, uploads=uploads)
         return response.Response(data, status=200)
 
+    @decorators.action(
+        methods=["get"],
+        detail=False,
+        url_path="metadata-choices",
+        url_name="metadata_choices",
+        permission_classes=[],
+    )
+    def metedata_choices(self, request, *args, **kwargs):
+        data = {
+            "language": [
+                {"value": code, "label": name} for code, name in locales.ISO_639_CHOICES
+            ],
+            "itunes_category": [
+                {"value": code, "label": code, "children": children}
+                for code, children in categories.ITUNES_CATEGORIES.items()
+            ],
+        }
+        return response.Response(data)
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["subscriptions_count"] = self.action in [
@@ -152,7 +188,7 @@ class ChannelViewSet(
             {"type": "Delete", "object": {"type": instance.actor.type}},
             context={"actor": instance.actor},
         )
-        instance.delete()
+        instance.__class__.objects.filter(pk=instance.pk).delete()
 
 
 class SubscriptionsViewSet(

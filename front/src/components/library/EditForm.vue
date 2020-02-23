@@ -82,14 +82,15 @@
           <content-form v-model="values[fieldConfig.id].text" :field-id="fieldConfig.id" :rows="3"></content-form>
         </template>
         <template v-else-if="fieldConfig.type === 'attachment'">
-          <label :for="fieldConfig.id">{{ fieldConfig.label }}</label>
           <attachment-input
             v-model="values[fieldConfig.id]"
             :initial-value="initialValues[fieldConfig.id]"
             :required="fieldConfig.required"
             :name="fieldConfig.id"
             :id="fieldConfig.id"
-            @delete="values[fieldConfig.id] = initialValues[fieldConfig.id]"></attachment-input>
+            @delete="values[fieldConfig.id] = initialValues[fieldConfig.id]">
+            <span slot="label">{{ fieldConfig.label }}</span>
+          </attachment-input>
 
         </template>
         <template v-else-if="fieldConfig.type === 'tags'">

@@ -9,6 +9,9 @@ export default new Router({
   linkActiveClass: "active",
   base: process.env.VUE_APP_ROUTER_BASE_URL || "/",
   scrollBehavior(to, from, savedPosition) {
+    if (to.meta.preserveScrollPosition) {
+      return savedPosition
+    }
     return new Promise(resolve => {
       setTimeout(() => {
         if (to.hash) {

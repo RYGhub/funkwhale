@@ -173,6 +173,8 @@ class ArtistViewSet(
 class AlbumViewSet(
     HandleInvalidSearch,
     common_views.SkipFilterForGetObject,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
     queryset = (
@@ -202,11 +204,19 @@ class AlbumViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["description"] = self.action in ["retrieve", "create", "update"]
+        context["description"] = self.action in [
+            "retrieve",
+            "create",
+        ]
+        context["user"] = self.request.user
         return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if self.action in ["destroy"]:
+            queryset = queryset.exclude(artist__channel=None).filter(
+                artist__attributed_to=self.request.user.actor
+            )
         tracks = (
             models.Track.objects.prefetch_related("artist")
             .with_playable_uploads(utils.get_actor_from_request(self.request))
@@ -220,6 +230,11 @@ class AlbumViewSet(
     libraries = action(methods=["get"], detail=True)(
         get_libraries(filter_uploads=lambda o, uploads: uploads.filter(track__album=o))
     )
+
+    def get_serializer_class(self):
+        if self.action in ["create"]:
+            return serializers.AlbumCreateSerializer
+        return super().get_serializer_class()
 
 
 class LibraryViewSet(
@@ -288,6 +303,7 @@ class LibraryViewSet(
 class TrackViewSet(
     HandleInvalidSearch,
     common_views.SkipFilterForGetObject,
+    mixins.DestroyModelMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
     """
@@ -330,6 +346,10 @@ class TrackViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if self.action in ["destroy"]:
+            queryset = queryset.exclude(artist__channel=None).filter(
+                artist__attributed_to=self.request.user.actor
+            )
         filter_favorites = self.request.GET.get("favorites", None)
         user = self.request.user
         if user.is_authenticated and filter_favorites == "true":
@@ -617,18 +637,17 @@ class UploadViewSet(
             m = tasks.metadata.Metadata(upload.get_audio_file())
         except FileNotFoundError:
             return Response({"detail": "File not found"}, status=500)
-        serializer = tasks.metadata.TrackMetadataSerializer(data=m)
+        serializer = tasks.metadata.TrackMetadataSerializer(
+            data=m, context={"strict": False}
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=500)
         payload = serializer.validated_data
-        if (
-            "cover_data" in payload
-            and payload["cover_data"]
-            and "content" in payload["cover_data"]
-        ):
-            payload["cover_data"]["content"] = base64.b64encode(
-                payload["cover_data"]["content"]
-            )
+        cover_data = payload.get(
+            "cover_data", payload.get("album", {}).get("cover_data", {})
+        )
+        if cover_data and "content" in cover_data:
+            cover_data["content"] = base64.b64encode(cover_data["content"])
         return Response(payload, status=200)
 
     @action(methods=["post"], detail=False)

@@ -1,4 +1,5 @@
 import html
+import logging
 import io
 import os
 import re
@@ -19,6 +20,8 @@ from . import throttling
 from . import utils
 
 EXCLUDED_PATHS = ["/api", "/federation", "/.well-known"]
+
+logger = logging.getLogger(__name__)
 
 
 def should_fallback_to_spa(path):
@@ -267,6 +270,17 @@ class ThrottleStatusMiddleware:
                 response["X-RateLimit-Reset"] = str(now + remaining)
                 response["X-RateLimit-ResetSeconds"] = str(remaining)
 
+        return response
+
+
+class VerboseBadRequestsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if response.status_code == 400:
+            logger.warning("Bad request: %s", response.content)
         return response
 
 

@@ -246,6 +246,8 @@ class Actor(models.Model):
         return self.followers.filter(pk__in=follows.values_list("actor", flat=True))
 
     def should_autoapprove_follow(self, actor):
+        if self.get_channel():
+            return True
         return False
 
     def get_user(self):
