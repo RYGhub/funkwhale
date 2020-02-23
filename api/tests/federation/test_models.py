@@ -78,12 +78,21 @@ def test_actor_get_quota(factories):
         audio_file__data=b"aaaa",
     )
 
+    # this one is in a channel
+    channel = factories["audio.Channel"](attributed_to=library.actor)
+    factories["music.Upload"](
+        library=channel.library,
+        import_status="finished",
+        audio_file__from_path=None,
+        audio_file__data=b"aaaaa",
+    )
+
     expected = {
-        "total": 19,
+        "total": 24,
         "pending": 1,
         "skipped": 2,
         "errored": 3,
-        "finished": 8,
+        "finished": 13,
         "draft": 5,
     }
 

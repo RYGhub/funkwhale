@@ -6,6 +6,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import models as federation_models
@@ -44,14 +46,22 @@ class Channel(models.Model):
     )
 
     def get_absolute_url(self):
-        return federation_utils.full_url("/channels/{}".format(self.uuid))
+        suffix = self.uuid
+        if self.actor.is_local:
+            suffix = self.actor.preferred_username
+        else:
+            suffix = self.actor.full_username
+        return federation_utils.full_url("/channels/{}".format(suffix))
 
     def get_rss_url(self):
         if not self.artist.is_local:
             return self.rss_url
 
         return federation_utils.full_url(
-            reverse("api:v1:channels-rss", kwargs={"uuid": self.uuid})
+            reverse(
+                "api:v1:channels-rss",
+                kwargs={"composite": self.actor.preferred_username},
+            )
         )
 
 
@@ -62,3 +72,10 @@ def generate_actor(username, **kwargs):
     actor_data["public_key"] = public.decode("utf-8")
 
     return federation_models.Actor.objects.create(**actor_data)
+
+
+@receiver(post_delete, sender=Channel)
+def delete_channel_related_objs(instance, **kwargs):
+    instance.library.delete()
+    instance.actor.delete()
+    instance.artist.delete()

@@ -57,7 +57,7 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
+      <div class="ui basic cancel button"><translate translate-context="*/*/Button.Label/Verb">Cancel</translate></div>
       <button
         v-if="canSubmit"
         :class="['ui', 'green', {loading: isLoading}, 'button']"

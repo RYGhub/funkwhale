@@ -58,7 +58,7 @@
       <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-if="object" key="1">Update</translate>
       <translate translate-context="Content/Moderation/Card.Button.Label/Verb" v-else key="2">Create</translate>
     </button>
-    <dangerous-button v-if="object" class="right floated basic button" color='red' @confirm="remove">
+    <dangerous-button v-if="object" class="ui right floated basic red button" @confirm="remove">
       <translate translate-context="*/*/*/Verb">Delete</translate>
       <p slot="modal-header">
         <translate translate-context="Popup/Moderation/Title">Delete this moderation rule?</translate>

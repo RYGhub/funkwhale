@@ -115,7 +115,6 @@
         </template>
         <template v-else-if="library.follow.approved">
           <dangerous-button
-            color=""
             :class="['ui', 'button']"
             :action="unfollow">
             <translate translate-context="*/Library/Button.Label/Verb">Unfollow</translate>

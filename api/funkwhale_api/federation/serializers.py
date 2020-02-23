@@ -134,7 +134,9 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     )
     preferredUsername = serializers.CharField()
     manuallyApprovesFollowers = serializers.NullBooleanField(required=False)
-    name = serializers.CharField(required=False, max_length=200)
+    name = serializers.CharField(
+        required=False, max_length=200, allow_blank=True, allow_null=True
+    )
     summary = TruncatedCharField(
         truncate_length=common_models.CONTENT_TEXT_MAX_LENGTH,
         required=False,
@@ -209,6 +211,8 @@ class ActorSerializer(jsonld.JsonLdSerializer):
                 },
             ]
             include_image(ret, channel.artist.attachment_cover, "icon")
+            if channel.artist.description_id:
+                ret["summary"] = channel.artist.description.rendered
         else:
             ret["url"] = [
                 {

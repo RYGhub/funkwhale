@@ -1,3 +1,5 @@
+import pytest
+
 import urllib.parse
 
 from django.urls import reverse
@@ -7,18 +9,21 @@ from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import serializers
 
 
-def test_library_artist(spa_html, no_api_auth, client, factories, settings):
+@pytest.mark.parametrize("attribute", ["uuid", "actor.full_username"])
+def test_channel_detail(attribute, spa_html, no_api_auth, client, factories, settings):
     channel = factories["audio.Channel"]()
     factories["music.Upload"](playable=True, library=channel.library)
-    url = "/channels/{}".format(channel.uuid)
+    url = "/channels/{}".format(utils.recursive_getattr(channel, attribute))
+    detail_url = "/channels/{}".format(channel.actor.full_username)
 
     response = client.get(url)
 
+    assert response.status_code == 200
     expected_metas = [
         {
             "tag": "meta",
             "property": "og:url",
-            "content": utils.join_url(settings.FUNKWHALE_URL, url),
+            "content": utils.join_url(settings.FUNKWHALE_URL, detail_url),
         },
         {"tag": "meta", "property": "og:title", "content": channel.artist.name},
         {"tag": "meta", "property": "og:type", "content": "profile"},
@@ -47,7 +52,9 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
             "href": (
                 utils.join_url(settings.FUNKWHALE_URL, reverse("api:v1:oembed"))
                 + "?format=json&url={}".format(
-                    urllib.parse.quote_plus(utils.join_url(settings.FUNKWHALE_URL, url))
+                    urllib.parse.quote_plus(
+                        utils.join_url(settings.FUNKWHALE_URL, detail_url)
+                    )
                 )
             ),
         },

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :key="String($store.state.instance.instanceUrl)" :class="[$store.state.ui.queueFocused ? 'queue-focused' : '', {'has-bottom-player': $store.state.queue.tracks.length > 0}]">
+  <div id="app" :key="String($store.state.instance.instanceUrl)" :class="[$store.state.ui.queueFocused ? 'queue-focused' : '', {'has-bottom-player': $store.state.queue.tracks.length > 0}, `is-${ $store.getters['ui/windowSize']}`]">
     <!-- here, we display custom stylesheets, if any -->
     <link
       v-for="url in customStylesheets"
@@ -33,6 +33,7 @@
         @show:set-instance-modal="showSetInstanceModal = !showSetInstanceModal"
       ></app-footer>
       <playlist-modal v-if="$store.state.auth.authenticated"></playlist-modal>
+      <channel-upload-modal v-if="$store.state.auth.authenticated"></channel-upload-modal>
       <filter-modal v-if="$store.state.auth.authenticated"></filter-modal>
       <report-modal></report-modal>
       <shortcuts-modal @update:show="showShortcutsModal = $event" :show="showShortcutsModal"></shortcuts-modal>
@@ -57,6 +58,7 @@ export default {
     Player:  () => import(/* webpackChunkName: "audio" */ "@/components/audio/Player"),
     Queue:  () => import(/* webpackChunkName: "audio" */ "@/components/Queue"),
     PlaylistModal:  () => import(/* webpackChunkName: "auth-audio" */ "@/components/playlists/PlaylistModal"),
+    ChannelUploadModal:  () => import(/* webpackChunkName: "auth-audio" */ "@/components/channels/UploadModal"),
     Sidebar:  () => import(/* webpackChunkName: "core" */ "@/components/Sidebar"),
     AppFooter:  () => import(/* webpackChunkName: "core" */ "@/components/Footer"),
     ServiceMessages:  () => import(/* webpackChunkName: "core" */ "@/components/ServiceMessages"),
@@ -391,6 +393,13 @@ export default {
   width: 100vw;
   .ui.top.attached.progress {
     top: 0;
+  }
+}
+.dimmed {
+  .ui.bottom-player {
+    @include media("<desktop") {
+      z-index: 0;
+    }
   }
 }
 #app.queue-focused {

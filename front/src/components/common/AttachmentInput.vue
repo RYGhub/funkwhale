@@ -1,25 +1,33 @@
 <template>
-  <div>
+  <div class="ui form">
     <div v-if="errors.length > 0" class="ui negative message">
       <div class="header"><translate translate-context="Content/*/Error message.Title">Your attachment cannot be saved</translate></div>
       <ul class="list">
         <li v-for="error in errors">{{ error }}</li>
       </ul>
     </div>
-    <div class="ui stackable two column grid">
-      <div class="column" v-if="value && value === initialValue">
-        <h3 class="ui header"><translate translate-context="Content/*/Title/Noun">Current file</translate></h3>
-        <img class="ui image" v-if="value" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${value}/proxy?next=medium_square_crop`)" />
-      </div>
-      <div class="column" v-else-if="attachment">
-        <h3 class="ui header"><translate translate-context="Content/*/Title/Noun">New file</translate></h3>
-        <img class="ui image" v-if="attachment && attachment.square_crop" :src="$store.getters['instance/absoluteUrl'](attachment.medium_square_crop)" />
-      </div>
-      <div class="column" v-if="!attachment">
-        <div class="ui basic segment">
-          <h3 class="ui header"><translate translate-context="Content/*/Title/Noun">New file</translate></h3>
-          <p><translate translate-context="Content/*/Paragraph">PNG or JPG. At most 5MB. Will be downscaled to 400x400px.</translate></p>
-          <input class="ui input" ref="attachment" type="file" accept="image/x-png,image/jpeg" @change="submit" />
+    <div class="ui field">
+      <label :for="attachmentId">
+        <slot name="label"></slot>
+      </label>
+      <div class="ui stackable grid row">
+        <div class="three wide column">
+          <img :class="['ui', imageClass, 'image']" v-if="value && value === initialValue" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${value}/proxy?next=medium_square_crop`)" />
+          <img :class="['ui', imageClass, 'image']" v-else-if="attachment" :src="$store.getters['instance/absoluteUrl'](`api/v1/attachments/${attachment.uuid}/proxy?next=medium_square_crop`)" />
+          <div :class="['ui', imageClass, 'static', 'large placeholder image']" v-else></div>
+        </div>
+        <div class="eleven wide column">
+          <div class="file-input">
+            <label class="ui basic button" :for="attachmentId">
+              <translate translate-context="*/*/*">Upload New Picture…</translate>
+            </label>
+            <input class="ui hidden input" ref="attachment" type="file" :id="attachmentId" accept="image/x-png,image/jpeg" @change="submit" />
+          </div>
+          <div class="ui very small hidden divider"></div>
+          <p><translate translate-context="Content/*/Paragraph">PNG or JPG. Dimensions should be between 1400x1400px and 3000x3000px. Maximum file size allowed is 5MB.</translate></p>
+          <div class="ui basic tiny button" v-if="value" @click.stop.prevent="remove(value)">
+            <translate translate-context="Content/Radio/Button.Label/Verb">Remove</translate>
+          </div>
           <div v-if="isLoading" class="ui active inverted dimmer">
             <div class="ui indeterminate text loader">
               <translate translate-context="Content/*/*/Noun">Uploading file…</translate>
@@ -27,7 +35,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -35,12 +42,17 @@
 import axios from 'axios'
 
 export default {
-  props: ['value', 'initialValue'],
+  props: {
+    value: {},
+    imageClass: {default: '', required: false}
+  },
   data () {
     return {
       attachment: null,
       isLoading: false,
       errors: [],
+      initialValue: this.value,
+      attachmentId: Math.random().toString(36).substring(7),
     }
   },
   methods: {
@@ -69,11 +81,11 @@ export default {
           }
         )
     },
-    remove() {
+    remove(uuid) {
       this.isLoading = true
       this.errors = []
       let self = this
-      axios.delete(`attachments/${this.attachment.uuid}/`)
+      axios.delete(`attachments/${uuid}/`)
         .then(
           response => {
             this.isLoading = false
@@ -91,7 +103,7 @@ export default {
     value (v) {
       if (this.attachment && v === this.initialValue) {
         // we had a reset to initial value
-        this.remove()
+        this.remove(this.attachment.uuid)
       }
     }
   }

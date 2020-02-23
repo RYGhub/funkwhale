@@ -1,19 +1,21 @@
 <template>
-  <section class="ui stackable three column grid">
-    <div class="column">
+  <section>
+    <div>
       <h2 class="ui header">
         <translate translate-context="Content/Home/Title">Recently listened</translate>
       </h2>
       <track-widget :url="'history/listenings/'" :filters="{scope: `actor:${object.full_username}`, ordering: '-creation_date'}">
       </track-widget>
     </div>
-    <div class="column">
+    <div class="ui hidden divider"></div>
+    <div>
       <h2 class="ui header">
         <translate translate-context="Content/Home/Title">Recently favorited</translate>
       </h2>
       <track-widget :url="'favorites/tracks/'" :filters="{scope: `actor:${object.full_username}`, ordering: '-creation_date'}"></track-widget>
     </div>
-    <div class="column">
+    <div class="ui hidden divider"></div>
+    <div>
       <h2 class="ui header">
         <translate translate-context="*/*/*">Playlists</translate>
       </h2>

@@ -117,6 +117,41 @@ def test_inbox_follow_library_autoapprove(factories, mocker):
     )
 
 
+def test_inbox_follow_channel_autoapprove(factories, mocker):
+    mocked_outbox_dispatch = mocker.patch(
+        "funkwhale_api.federation.activity.OutboxRouter.dispatch"
+    )
+
+    local_actor = factories["users.User"]().create_actor()
+    remote_actor = factories["federation.Actor"]()
+    channel = factories["audio.Channel"](attributed_to=local_actor)
+    ii = factories["federation.InboxItem"](actor=channel.actor)
+
+    payload = {
+        "type": "Follow",
+        "id": "https://test.follow",
+        "actor": remote_actor.fid,
+        "object": channel.actor.fid,
+    }
+
+    result = routes.inbox_follow(
+        payload,
+        context={"actor": remote_actor, "inbox_items": [ii], "raise_exception": True},
+    )
+    follow = channel.actor.received_follows.latest("id")
+
+    assert result["object"] == channel.actor
+    assert result["related_object"] == follow
+
+    assert follow.fid == payload["id"]
+    assert follow.actor == remote_actor
+    assert follow.approved is True
+
+    mocked_outbox_dispatch.assert_called_once_with(
+        {"type": "Accept"}, context={"follow": follow}
+    )
+
+
 def test_inbox_follow_library_manual_approve(factories, mocker):
     mocked_outbox_dispatch = mocker.patch(
         "funkwhale_api.federation.activity.OutboxRouter.dispatch"

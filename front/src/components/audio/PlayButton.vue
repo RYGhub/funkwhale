@@ -1,5 +1,5 @@
 <template>
-  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}]">
+  <span :title="title" :class="['ui', {'tiny': discrete}, {'icon': !discrete}, {'buttons': !dropdownOnly && !iconOnly}, 'play-button']">
     <button
       v-if="!dropdownOnly"
       :title="labels.playNow"
@@ -102,7 +102,9 @@ export default {
       }
       if (this.track) {
         return this.track.uploads && this.track.uploads.length > 0
-      } else if (this.artist) {
+      } else if (this.artist && this.artist.tracks_count) {
+        return this.artist.tracks_count > 0
+      }  else if (this.artist && this.artist.albums) {
         return this.artist.albums.filter((a) => {
           return a.is_playable === true
         }).length > 0
@@ -189,10 +191,10 @@ export default {
             resolve(tracks)
           })
         } else if (self.artist) {
-          let params = {'artist': self.artist.id, 'ordering': 'album__release_date,disc_number,position'}
+          let params = {'artist': self.artist.id, include_channels: 'true', 'ordering': 'album__release_date,disc_number,position'}
           self.getTracksPage(1, params, resolve)
         } else if (self.album) {
-          let params = {'album': self.album.id, 'ordering': 'disc_number,position'}
+          let params = {'album': self.album.id, include_channels: 'true', 'ordering': 'disc_number,position'}
           self.getTracksPage(1, params, resolve)
         }
       })
@@ -255,9 +257,27 @@ export default {
             // works as expected
             self.$refs[$el.data('ref')].click()
             jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
+          },
+        })
+        jQuery(this.$el).find('.ui.dropdown').dropdown('show', function () {
+          // little magic to ensure the menu is always visible in the viewport
+          // By default, try to diplay it on the right if there is enough room
+          let menu = jQuery(self.$el).find('.ui.dropdown').find(".menu")
+          let viewportOffset = menu.get(0).getBoundingClientRect();
+          let left = viewportOffset.left;
+          let viewportWidth = document.documentElement.clientWidth
+          let rightOverflow = viewportOffset.right - viewportWidth
+          let leftOverflow = -viewportOffset.left
+          let offset = 0
+          if (rightOverflow > 0) {
+            offset = -rightOverflow - 5
+            menu.css({cssText: `left: ${offset}px !important;`});
+          }
+          else if (leftOverflow > 0) {
+            offset = leftOverflow  + 5
+            menu.css({cssText: `right: -${offset}px !important;`});
           }
         })
-        jQuery(this.$el).find('.ui.dropdown').dropdown('show')
       })
     }
   }

@@ -11,8 +11,13 @@ export default {
     lastDate: new Date(),
     maxMessages: 100,
     messageDisplayDuration: 10000,
+    supportedExtensions: ["flac", "ogg", "mp3", "opus", "aac", "m4a"],
     messages: [],
     theme: 'light',
+    window: {
+      height: 0,
+      width: 0,
+    },
     notifications: {
       inbox: 0,
       pendingReviewEdits: 0,
@@ -125,6 +130,33 @@ export default {
         count += 1
       }
       return count
+    },
+
+    windowSize: (state, getters) => {
+      // IMPORTANT: if you modify these breakpoints, also modify the values in
+      // style/vendor/_media.scss
+      let width = state.window.width
+      let breakpoints = [
+        {name: 'widedesktop', width: 1200},
+        {name: 'desktop', width: 1024},
+        {name: 'tablet', width: 768},
+        {name: 'phone', width: 320},
+      ]
+      for (let index = 0; index < breakpoints.length; index++) {
+        const element = breakpoints[index];
+        if (width >= element.width) {
+          return element.name
+        }
+      }
+      return 'phone'
+
+    },
+    layoutVersion: (state, getters) => {
+      if (['tablet', 'phone'].indexOf(getters.windowSize) > -1) {
+        return 'small'
+      } else {
+        return 'large'
+      }
     }
   },
   mutations: {
@@ -193,6 +225,9 @@ export default {
 
     serviceWorker: (state, value) => {
       state.serviceWorker = {...state.serviceWorker, ...value}
+    },
+    window: (state, value) => {
+      state.window = value
     }
   },
   actions: {

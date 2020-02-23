@@ -31,7 +31,6 @@
                   <dangerous-button
                     v-if="selectAll || currentAction.isDangerous" :class="['ui', {disabled: checked.length === 0}, {'loading': actionLoading}, 'button']"
                     :confirm-color="currentAction.confirmColor || 'green'"
-                    color=""
                     @confirm="launchAction">
                     <translate translate-context="Content/*/Button.Label/Short, Verb">Go</translate>
                     <p slot="modal-header">

@@ -1,6 +1,6 @@
 <template>
   <div class="channel-entry-card">
-    <img @click="$router.push({name: 'library.tracks.detail', params: {id: entry.id}})" class="channel-image image" v-if="cover.original" v-lazy="$store.getters['instance/absoluteUrl'](cover.square_crop)">
+    <img @click="$router.push({name: 'library.tracks.detail', params: {id: entry.id}})" class="channel-image image" v-if="cover && cover.original" v-lazy="$store.getters['instance/absoluteUrl'](cover.square_crop)">
     <img @click="$router.push({name: 'library.tracks.detail', params: {id: entry.id}})" class="channel-image image" v-else src="../../assets/audio/default-cover.png">
     <div class="content">
       <strong>
@@ -39,6 +39,9 @@ export default {
       return url
     },
     cover () {
+      if (this.entry.cover) {
+        return this.entry.cover
+      }
       if (this.entry.album && this.entry.album.cover) {
         return this.entry.album.cover
       }

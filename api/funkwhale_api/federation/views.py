@@ -71,7 +71,7 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     @action(methods=["get", "post"], detail=True)
     def outbox(self, request, *args, **kwargs):
         actor = self.get_object()
-        channel = actor.channel
+        channel = actor.get_channel()
         if channel:
             return self.get_channel_outbox_response(request, channel)
         return response.Response({}, status=200)

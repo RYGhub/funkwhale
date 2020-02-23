@@ -112,7 +112,6 @@ html {
     .toast-container {
       bottom: $bottom-player-height + 1rem;
     }
-
   }
 }
 
@@ -141,6 +140,7 @@ html {
 #app {
   > .main.pusher,
   > .footer {
+    position: relative;
     @include media(">desktop") {
       margin-left: $desktop-sidebar-width !important;
     }
@@ -263,6 +263,9 @@ a {
 .segment.hidden {
   display: none;
 }
+.hidden:not(.divider) {
+  display: none !important;
+}
 
 .nomargin {
   margin: 0 !important;
@@ -291,6 +294,9 @@ button.reset {
   text-align: inherit;
 }
 
+.text.align.left {
+  text-align: left;
+}
 .ui.table > caption {
   font-weight: bold;
   padding: 0.5em;
@@ -422,6 +428,11 @@ input + .help {
     display: none !important;
   }
 }
+.mobile-only {
+  @include media(">tablet") {
+    display: none !important;
+  }
+}
 :not(.menu) > {
   a, .link {
     &:not(.button):not(.list) {
@@ -433,19 +444,36 @@ input + .help {
 }
 .ui.cards.app-cards {
   $card-width: 14em;
-  $card-hight: 22em;
+  $card-height: 22em;
+  $small-card-width: 11em;
+  $small-card-height: 19em;
   .app-card {
     display: flex;
-    width: $card-width;
-    height: $card-hight;
+    width: $small-card-width;
+    height: $small-card-height;
+    font-size: 95%;
+    @include media(">tablet") {
+      font-size: 100%;
+      width: $card-width;
+      height: $card-height;
+    }
     .content:not(.extra) {
-      padding: 0.5em 1em 0;
+      padding: 0.25em 0.5em 0;
+      @include media(">tablet") {
+        padding: 0.5em 1em 0;
+      }
     }
     .content.extra {
-      padding: 0.5em 1em;
+      padding: 0.25em 0.5em;
+      @include media(">tablet") {
+        padding: 0.5em 1em;
+      }
     }
     .head-image {
-      height: $card-width;
+      height: $small-card-width;
+      @include media(">tablet") {
+        height: $card-width;
+      }
       background-size: cover !important;
       background-position: center !important;
       display: flex !important;
@@ -457,9 +485,14 @@ input + .help {
       &.circular {
         overflow: visible;
         border-radius: 50% !important;
-        height: $card-width - 1em;
-        width: $card-width - 1em;
-        margin: 0.5em;
+        width: $small-card-width - 0.5em;
+        height: $small-card-width - 0.5em;
+        margin: 0.25em;
+        @include media(">tablet") {
+          width: $card-width - 1em;
+          height: $card-width - 1em;
+          margin: 0.5em;
+        }
 
       }
       &.padded {
@@ -543,7 +576,8 @@ input + .help {
   }
 }
 .channel-image {
-  border: 1px solid rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: white;
   border-radius: 0.3em;
   &.large {
     width: 8em !important;
@@ -559,6 +593,71 @@ input + .help {
   .input {
     width: 100%;
   }
+}
+.placeholder.image {
+  background-color: rgba(0,0,0,.08);
+  width: 3em;
+  height: 3em;
+  &.large {
+    width: 8em;
+    height: 8em;
+  }
+  max-width: 100%;
+  display: block;
+  &.circular {
+    border-radius: 50%;
+  }
+  &.static {
+    animation: none;
+  }
+}
+.channel-type.field .radio {
+  display: block;
+  padding: 1.5em;
+  &.selected {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+.header.with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .actions {
+    font-weight: normal;
+    font-size: 0.6em;
+  }
+
+}
+.file-uploads.channels.ui.button {
+  display: block;
+  padding: 2em 1em;
+  width: 100%;
+  box-shadow: none;
+  border-style: dashed !important;
+  border: 2px solid rgba(50, 50, 50, 0.5);
+  font-size: 1.2em;
+  padding: 0;
+  > div:not(.divider) {
+    padding: 1em;
+  }
+}
+
+.channel-file {
+  display: flex;
+  align-items: top;
+  margin-bottom: 1em;
+  > :first-child {
+    width: 3em;
+  }
+  .header {
+    margin: 0 1em;
+    .sub.header {
+      margin-top: 0.5em;
+    }
+  }
+}
+.modal > .header {
+  text-align: center;
 }
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

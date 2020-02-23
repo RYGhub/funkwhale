@@ -361,6 +361,19 @@ def test_manage_upload_action_relaunch_import(factories, mocker):
     assert m.call_count == 3
 
 
+def test_manage_upload_action_publish(factories, mocker):
+    m = mocker.patch("funkwhale_api.common.utils.on_commit")
+
+    draft = factories["music.Upload"](import_status="draft")
+    s = serializers.UploadActionSerializer(queryset=None)
+
+    s.handle_publish(models.Upload.objects.all())
+
+    draft.refresh_from_db()
+    assert draft.import_status == "pending"
+    m.assert_any_call(tasks.process_upload.delay, upload_id=draft.pk)
+
+
 def test_serialize_upload(factories):
     upload = factories["music.Upload"]()
 
@@ -509,6 +522,18 @@ def test_upload_import_metadata_serializer_full():
 
     assert serializer.is_valid(raise_exception=True) is True
     assert serializer.validated_data == expected
+
+
+def test_upload_import_metadata_serializer_channel_checks_owned_album(factories):
+    channel = factories["audio.Channel"]()
+    album = factories["music.Album"]()
+    data = {"title": "hello", "album": album.pk}
+    serializer = serializers.ImportMetadataSerializer(
+        data=data, context={"channel": channel}
+    )
+
+    with pytest.raises(serializers.serializers.ValidationError):
+        serializer.is_valid(raise_exception=True)
 
 
 def test_upload_with_channel_keeps_import_metadata(factories, uploaded_audio_file):

@@ -950,7 +950,11 @@ class Upload(models.Model):
 
     def get_all_tagged_items(self):
         track_tags = self.track.tagged_items.all()
-        album_tags = self.track.album.tagged_items.all()
+        album_tags = (
+            self.track.album.tagged_items.all()
+            if self.track.album
+            else tags_models.TaggedItem.objects.none()
+        )
         artist_tags = self.track.artist.tagged_items.all()
 
         items = (track_tags | album_tags | artist_tags).order_by("tag__name")

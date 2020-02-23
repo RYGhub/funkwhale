@@ -1,13 +1,13 @@
 <template>
   <div class="card app-card">
     <div
-      @click="$router.push({name: 'channels.detail', params: {id: object.uuid}})"
-      :class="['ui', 'head-image', 'padded image', {'default-cover': !object.artist.cover}]" v-lazy:background-image="imageUrl">
+      @click="$router.push({name: 'channels.detail', params: {id: urlId}})"
+      :class="['ui', 'head-image', {'circular': object.artist.content_category != 'podcast'}, {'padded': object.artist.content_category === 'podcast'}, 'image', {'default-cover': !object.artist.cover}]" v-lazy:background-image="imageUrl">
       <play-button :icon-only="true" :is-playable="true" :button-classes="['ui', 'circular', 'large', 'orange', 'icon', 'button']" :artist="object.artist"></play-button>
     </div>
     <div class="content">
       <strong>
-        <router-link class="discrete link" :title="object.artist.name" :to="{name: 'channels.detail', params: {id: object.uuid}}">
+        <router-link class="discrete link" :title="object.artist.name" :to="{name: 'channels.detail', params: {id: urlId}}">
           {{ object.artist.name }}
         </router-link>
       </strong>
@@ -49,6 +49,15 @@ export default {
         return null
       }
       return url
+    },
+    urlId () {
+      if (this.object.actor && this.object.actor.is_local) {
+        return this.object.actor.preferred_username
+      } else if (this.object.actor) {
+        return this.object.actor.full_username
+      } else {
+        return this.object.uuid
+      }
     }
   }
 }

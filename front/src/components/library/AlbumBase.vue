@@ -34,7 +34,7 @@
                 </div>
               </div>
               <div class="actions">
-                <div class="ui deny button">
+                <div class="ui basic deny button">
                   <translate translate-context="*/*/Button.Label/Verb">Cancel</translate>
                 </div>
               </div>
@@ -73,6 +73,18 @@
                     <i class="edit icon"></i>
                     <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                   </router-link>
+                  <dangerous-button
+                    :class="['ui', {loading: isLoading}, 'item']"
+                    v-if="artist && $store.state.auth.authenticated && artist.channel && artist.attributed_to.full_username === $store.state.auth.fullUsername"
+                    @confirm="remove()">
+                    <i class="ui trash icon"></i>
+                    <translate translate-context="*/*/*/Verb">Delete…</translate>
+                    <p slot="modal-header"><translate translate-context="Popup/Channel/Title">Delete this album?</translate></p>
+                    <div slot="modal-content">
+                      <p><translate translate-context="Content/Moderation/Paragraph">The album will be deleted, as well as any related files and data. This action is irreversible.</translate></p>
+                    </div>
+                    <p slot="modal-confirm"><translate translate-context="*/*/*/Verb">Delete</translate></p>
+                  </dangerous-button>
                   <div class="divider"></div>
                   <div
                     role="button"
@@ -143,6 +155,7 @@ export default {
     return {
       isLoading: true,
       object: null,
+      artist: null,
       discs: [],
       libraries: [],
       showEmbedModal: false
@@ -160,7 +173,22 @@ export default {
       axios.get(url, {params: {refresh: 'true'}}).then(response => {
         self.object = backend.Album.clean(response.data)
         self.discs = self.object.tracks.reduce(groupByDisc, [])
+        axios.get(`artists/${response.data.artist.id}/`).then(response => {
+          self.artist = response.data
+        })
         self.isLoading = false
+      })
+    },
+    remove () {
+      let self = this
+      self.isLoading = true
+      axios.delete(`albums/${this.object.id}`).then((response) => {
+        self.isLoading = false
+        self.$emit('deleted')
+        self.$router.push({name: 'library.artists.detail', params: {id: this.artist.id}})
+      }, error => {
+        self.isLoading = false
+        self.errors = error.backendErrors
       })
     }
   },

@@ -36,7 +36,7 @@
       </div>
     </section>
     <footer class="actions">
-      <div class="ui cancel button"><translate translate-context="*/*/Button.Label/Verb">Close</translate></div>
+      <div class="ui basic cancel button"><translate translate-context="*/*/Button.Label/Verb">Close</translate></div>
     </footer>
   </modal>
 </template>

@@ -3,6 +3,8 @@ from django.db import transaction
 
 from rest_framework import serializers
 
+from django.contrib.staticfiles.templatetags.staticfiles import static
+
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import locales
@@ -24,7 +26,7 @@ class ChannelMetadataSerializer(serializers.Serializer):
     itunes_category = serializers.ChoiceField(
         choices=categories.ITUNES_CATEGORIES, required=True
     )
-    itunes_subcategory = serializers.CharField(required=False)
+    itunes_subcategory = serializers.CharField(required=False, allow_null=True)
     language = serializers.ChoiceField(required=True, choices=locales.ISO_639_CHOICES)
     copyright = serializers.CharField(required=False, allow_null=True, max_length=255)
     owner_name = serializers.CharField(required=False, allow_null=True, max_length=255)
@@ -64,6 +66,7 @@ class ChannelCreateSerializer(serializers.Serializer):
         choices=music_models.ARTIST_CONTENT_CATEGORY_CHOICES
     )
     metadata = serializers.DictField(required=False)
+    cover = music_serializers.COVER_WRITE_FIELD
 
     def validate(self, validated_data):
         existing_channels = self.context["actor"].owned_channels.count()
@@ -95,15 +98,15 @@ class ChannelCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         from . import views
 
+        cover = validated_data.pop("cover", None)
         description = validated_data.get("description")
         artist = music_models.Artist.objects.create(
             attributed_to=validated_data["attributed_to"],
             name=validated_data["name"],
             content_category=validated_data["content_category"],
+            attachment_cover=cover,
         )
-        description_obj = common_utils.attach_content(
-            artist, "description", description
-        )
+        common_utils.attach_content(artist, "description", description)
 
         if validated_data.get("tags", []):
             tags_models.set_tags(artist, *validated_data["tags"])
@@ -113,9 +116,8 @@ class ChannelCreateSerializer(serializers.Serializer):
             attributed_to=validated_data["attributed_to"],
             metadata=validated_data["metadata"],
         )
-        summary = description_obj.rendered if description_obj else None
         channel.actor = models.generate_actor(
-            validated_data["username"], summary=summary, name=validated_data["name"],
+            validated_data["username"], name=validated_data["name"],
         )
 
         channel.library = music_models.Library.objects.create(
@@ -142,6 +144,7 @@ class ChannelUpdateSerializer(serializers.Serializer):
         choices=music_models.ARTIST_CONTENT_CATEGORY_CHOICES
     )
     metadata = serializers.DictField(required=False)
+    cover = music_serializers.COVER_WRITE_FIELD
 
     def validate(self, validated_data):
         validated_data = super().validate(validated_data)
@@ -193,6 +196,9 @@ class ChannelUpdateSerializer(serializers.Serializer):
             artist_update_fields.append(
                 ("content_category", validated_data["content_category"])
             )
+
+        if "cover" in validated_data:
+            artist_update_fields.append(("attachment_cover", validated_data["cover"]))
 
         if actor_update_fields:
             for field, value in actor_update_fields:
@@ -292,7 +298,7 @@ def rss_serialize_item(upload):
                 # we enforce MP3, since it's the only format supported everywhere
                 "url": federation_utils.full_url(upload.get_listen_url(to="mp3")),
                 "length": upload.size or 0,
-                "type": upload.mimetype or "audio/mpeg",
+                "type": "audio/mpeg",
             }
         ],
     }
@@ -362,6 +368,11 @@ def rss_serialize_channel(channel):
         data["itunes:image"] = [
             {"href": channel.artist.attachment_cover.download_url_original}
         ]
+    else:
+        placeholder_url = federation_utils.full_url(
+            static("images/podcasts-cover-placeholder.png")
+        )
+        data["itunes:image"] = [{"href": placeholder_url}]
 
     tagged_items = getattr(channel.artist, "_prefetched_tagged_items", [])
 

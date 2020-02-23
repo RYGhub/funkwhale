@@ -7,7 +7,9 @@ from funkwhale_api.music import serializers
 
 
 def test_library_track(spa_html, no_api_auth, client, factories, settings):
-    upload = factories["music.Upload"](playable=True, track__disc_number=1)
+    upload = factories["music.Upload"](
+        playable=True, track__disc_number=1, track__attachment_cover=None
+    )
     track = upload.track
     url = "/library/tracks/{}".format(track.pk)
 

@@ -48,7 +48,9 @@
             @input="submitAvatar($event)"
             :initial-value="initialAvatar"
             :required="false"
-            @delete="avatar = {uuid: null}"></attachment-input>
+            @delete="avatar = {uuid: null}">
+            <translate translate-context="Content/Channel/*" slot="label">Avatar</translate>
+            </attachment-input>
         </div>
       </section>
 
@@ -79,8 +81,7 @@
             <password-input required v-model="new_password" />
           </div>
           <dangerous-button
-            color="yellow"
-            :class="['ui', {'loading': isLoading}, 'button']"
+            :class="['ui', {'loading': isLoading}, 'yellow', 'button']"
             :action="submitPassword">
             <translate translate-context="Content/Settings/Button.Label">Change password</translate>
             <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Change your password?</translate></p>
@@ -177,7 +178,7 @@
               </td>
               <td>
                 <dangerous-button
-                  class="ui tiny basic button"
+                  class="ui tiny basic red button"
                   @confirm="revokeApp(app.client_id)">
                   <translate translate-context="*/*/*/Verb">Revoke</translate>
                   <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Revoke access for application "%{ application }"?</p>
@@ -236,7 +237,7 @@
                   <translate translate-context="Content/*/Button.Label/Verb">Edit</translate>
                 </router-link>
                 <dangerous-button
-                  class="ui tiny basic button"
+                  class="ui tiny basic red button"
                   @confirm="deleteApp(app.client_id)">
                   <translate translate-context="*/*/*/Verb">Delete</translate>
                   <p slot="modal-header" v-translate="{application: app.name}" translate-context="Popup/Settings/Title">Delete application "%{ application }"?</p>
@@ -282,7 +283,7 @@
             <password-input required v-model="password" />
           </div>
           <dangerous-button
-            :class="['ui', {'loading': isDeletingAccount}, {disabled: !password}, 'button']"
+            :class="['ui', {'loading': isDeletingAccount}, {disabled: !password}, 'red', 'button']"
             :action="deleteAccount">
             <translate translate-context="*/*/Button.Label">Delete my account…</translate>
             <p slot="modal-header"><translate translate-context="Popup/Settings/Title">Do you want to delete your account?</translate></p>

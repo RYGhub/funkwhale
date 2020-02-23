@@ -15,4 +15,5 @@ export default {
   reverse: require('lodash/reverse'),
   isEqual: require('lodash/isEqual'),
   sum: require('lodash/sum'),
+  startCase: require('lodash/startCase'),
 }

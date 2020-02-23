@@ -49,16 +49,29 @@ def library_track(request, pk):
                 utils.spa_reverse("library_artist", kwargs={"pk": obj.artist.pk}),
             ),
         },
-        {
-            "tag": "meta",
-            "property": "music:album",
-            "content": utils.join_url(
-                settings.FUNKWHALE_URL,
-                utils.spa_reverse("library_album", kwargs={"pk": obj.album.pk}),
-            ),
-        },
     ]
-    if obj.album.attachment_cover:
+
+    if obj.album:
+        metas.append(
+            {
+                "tag": "meta",
+                "property": "music:album",
+                "content": utils.join_url(
+                    settings.FUNKWHALE_URL,
+                    utils.spa_reverse("library_album", kwargs={"pk": obj.album.pk}),
+                ),
+            },
+        )
+
+    if obj.attachment_cover:
+        metas.append(
+            {
+                "tag": "meta",
+                "property": "og:image",
+                "content": obj.attachment_cover.download_url_medium_square_crop,
+            }
+        )
+    elif obj.album and obj.album.attachment_cover:
         metas.append(
             {
                 "tag": "meta",

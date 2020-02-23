@@ -657,6 +657,34 @@ def test_serializer_empty_fields(field_name):
     assert serializer.validated_data == expected
 
 
+def test_serializer_strict_mode_false():
+    data = {}
+    expected = {
+        "artists": [{"name": None, "mbid": None}],
+        "album": {
+            "title": "[Unknown Album]",
+            "mbid": None,
+            "release_date": None,
+            "artists": [],
+            "cover_data": None,
+        },
+    }
+    serializer = metadata.TrackMetadataSerializer(
+        data=metadata.FakeMetadata(data), context={"strict": False}
+    )
+    assert serializer.is_valid(raise_exception=True) is True
+    assert serializer.validated_data == expected
+
+
+def test_serializer_strict_mode_true():
+    data = {}
+    serializer = metadata.TrackMetadataSerializer(
+        data=metadata.FakeMetadata(data), context={"strict": True}
+    )
+    with pytest.raises(metadata.serializers.ValidationError):
+        assert serializer.is_valid(raise_exception=True)
+
+
 def test_artist_field_featuring():
     data = {
         "artist": "Santana feat. Chris Cornell",
