@@ -53,8 +53,8 @@ import jQuery from 'jquery'
 
 import ReportMixin from '@/components/mixins/Report'
 
-const ROYALBOT_API_URL = "https://ryg.steffo.eu"
-const FUNKWHALE_INSTANCE_URL = "https://fw.steffo.eu"
+const ROYALBOT_API_URL = "https://rygapi.steffo.eu";
+const FUNKWHALE_INSTANCE_URL = "https://fw.steffo.eu";
 
 export default {
   mixins: [ReportMixin],
@@ -257,30 +257,26 @@ export default {
         date: new Date()
       })
     },
-    sendToBot() {
+    async sendToBot() {
       let self = this;
-      this.getPlayableTracks().then((tracks) => {
-        for(let i = 0; i < tracks.length; i++) {
-          let t = tracks[i];
-          fetch(`${ROYALBOT_API_URL}/api/discord/play?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`).then((response) => {
-            return response.json();
-          }).then((json) => {
-          })
-        }
+      let tracks = await this.getPlayableTracks();
+      for(let i = 0; i < tracks.length; i++) {
+        let t = tracks[i];
+        await fetch(`${ROYALBOT_API_URL}/api/discord/play?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`)
+      }
 
-        if(tracks.length !== 1) {
-          this.$store.commit('ui/addMessage', {
-            content: this.$gettextInterpolate("%{ count } tracks sent to Royal Bot.", {count: tracks.length}),
-            date: new Date()
-          })
-        }
-        else {
-          this.$store.commit('ui/addMessage', {
-            content: this.$gettextInterpolate("%{ count } track sent to Royal Bot.", {count: tracks.length}),
-            date: new Date()
-          })
-        }
-      });
+      if(tracks.length !== 1) {
+        this.$store.commit('ui/addMessage', {
+          content: this.$gettextInterpolate("%{ count } tracks sent to Royal Bot.", {count: tracks.length}),
+          date: new Date()
+        })
+      }
+      else {
+        this.$store.commit('ui/addMessage', {
+          content: this.$gettextInterpolate("%{ count } track sent to Royal Bot.", {count: tracks.length}),
+          date: new Date()
+        })
+      }
       jQuery(self.$el).find('.ui.dropdown').dropdown('hide')
     }
   }
