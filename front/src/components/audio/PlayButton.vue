@@ -262,7 +262,7 @@ export default {
       let tracks = await this.getPlayableTracks();
       for(let i = 0; i < tracks.length; i++) {
         let t = tracks[i];
-        await fetch(`${ROYALBOT_API_URL}/api/discord/play?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`)
+        await fetch(`${ROYALBOT_API_URL}/api/discord/play/v1?url=${FUNKWHALE_INSTANCE_URL}${t.listen_url}`)
       }
 
       if(tracks.length !== 1) {
