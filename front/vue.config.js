@@ -31,7 +31,7 @@ plugins.push(
   }),
 )
 module.exports = {
-  baseUrl: baseUrl,
+  publicPath: baseUrl,
   productionSourceMap: false,
   // Add settings for manifest file
   pwa: {
