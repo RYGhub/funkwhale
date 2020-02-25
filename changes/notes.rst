@@ -57,11 +57,51 @@ All user-related commands are available under the ``python manage.py fw users`` 
 Please refer to the `Admin documentation <https://docs.funkwhale.audio/admin/commands.html#user-management>`_ for
 more information and instructions.
 
-Postgres docker changed environment variable [manual action required, docker only]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Postgres docker changed environment variable [manual action required, docker multi-container only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you're running with docker and our multi-container setup, there was a breaking change starting in the 11.7 postgres image (https://github.com/docker-library/postgres/pull/658)
 
 You need to add this to your .env file: ``POSTGRES_HOST_AUTH_METHOD=trust``
 
 Newer deployments aren't affected.
+
+Upgrade from Postgres 10 to 11 [manual action required, docker all-in-one only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With our upgrade to Alpine 3.10, the ``funkwhale/all-in-one`` image now includes PostgreSQL 11.
+
+In order to update to Funkwhale 0.21, you will first need to uprade Funkwhale's PostgreSQL database, following the steps below::
+
+    # open a shell as the Funkwhale user
+    sudo -u funkwhale -H bash
+
+    # move to the funkwhale data directory
+    # (replace this with your own if you used a different path)
+    cd /srv/funkwhale/data
+
+    # stop the funkwhale container
+    docker stop funkwhale
+
+    # backup the database files
+    cp -r data/ ../postgres.bak
+
+    # Upgrade the database
+    docker run --rm \
+        -v $(pwd)/data:/var/lib/postgresql/10/data \
+        -v $(pwd)/upgraded-postgresql:/var/lib/postgresql/11/data \
+        -e PGUSER=funkwhale \
+        -e POSTGRES_INITDB_ARGS="-U funkwhale --locale C --encoding UTF8" \
+        tianon/postgres-upgrade:10-to-11
+
+    # replace the Postgres 10 files with Postgres 11 files
+    mv data/ postgres-10
+    mv upgraded-postgresql/ data
+
+Once you have completed the Funkwhale upgrade with our regular instructions and everything works properly,
+you can remove the backups/old files::
+
+    sudo -u funkwhale -H bash
+    cd /srv/funkwhale/data
+    rm -rf ../postgres.bak
+    rm -rf postgres-10
