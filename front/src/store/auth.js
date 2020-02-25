@@ -22,7 +22,9 @@ export default {
   },
   getters: {
     header: state => {
-      return 'JWT ' + state.token
+      if (state.token) {
+        return 'JWT ' + state.token
+      }
     }
   },
   mutations: {
