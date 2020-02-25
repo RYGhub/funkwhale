@@ -6,7 +6,6 @@
     <div v-if="isLoading" class="ui inverted active dimmer">
       <div class="ui loader"></div>
     </div>
-    <div class="ui hidden divider"></div>
     <div v-if="playlistsExist" class="ui cards app-cards">
       <playlist-card v-for="playlist in objects" :key="playlist.id" :playlist="playlist"></playlist-card>
     </div>
