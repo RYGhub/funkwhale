@@ -190,6 +190,10 @@ export default {
         key: String(new Date()),
         ...message,
       }
+      let key = finalMessage.key
+      state.messages = state.messages.filter((m) => {
+        return m.key != key
+      })
       state.messages.push(finalMessage)
       if (state.messages.length > state.maxMessages) {
         state.messages.shift()
