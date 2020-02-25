@@ -335,6 +335,11 @@ export default {
       immediate: true,
       handler(newValue) {
         let self = this
+        if (newValue === 'en_US') {
+          self.$language.current = 'noop'
+          self.$language.current = newValue
+          return self.$store.commit('ui/momentLocale', 'en')
+        }
         import(/* webpackChunkName: "locale-[request]" */ `./translations/${newValue}.json`).then((response) =>{
           Vue.$translations[newValue] = response.default[newValue]
         }).finally(() => {
@@ -343,9 +348,6 @@ export default {
           self.$language.current = 'noop'
           self.$language.current = newValue
         })
-        if (newValue === 'en_US') {
-          return self.$store.commit('ui/momentLocale', 'en')
-        }
         let momentLocale = newValue.replace('_', '-').toLowerCase()
         import(/* webpackChunkName: "moment-locale-[request]" */ `moment/locale/${momentLocale}.js`).then(() => {
           self.$store.commit('ui/momentLocale', momentLocale)
