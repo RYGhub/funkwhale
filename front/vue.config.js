@@ -26,12 +26,12 @@ plugins.push(
       path.join(__dirname, './src/**/*.js')
     ]),
     whitelist: ['scale'],
-    whitelistPatterns:[/plyr/],
-    whitelistPatternsChildren:[/plyr/,/dropdown/,/upward/]
+    whitelistPatterns: [/plyr/, /toast/],
+    whitelistPatternsChildren: [/plyr/, /dropdown/, /upward/]
   }),
 )
 module.exports = {
-  baseUrl: baseUrl,
+  publicPath: baseUrl,
   productionSourceMap: false,
   // Add settings for manifest file
   pwa: {
@@ -94,10 +94,15 @@ module.exports = {
     }
   },
   chainWebpack: config => {
-    config.plugins.delete('prefetch-embed')
-    config.plugins.delete('preload-embed')
-    config.plugins.delete('prefetch-index')
-
+    // config.plugins.delete('prefetch-embed')
+    // config.plugins.delete('preload-embed')
+    // config.plugins.delete('prefetch-index')
+    // TODO: Remove this workaround once https://github.com/vuejs/vue-cli/issues/2463 is fixed
+    // Remove preload plugins for multi-page build to prevent infinite recursion
+    ['embed', 'index'].forEach(page => {
+      config.plugins.delete(`preload-${page}`)
+      config.plugins.delete(`prefetch-${page}`)
+    })
     // needed to avoid having big dependedncies included in our lightweight
     // embed.html, cf https://github.com/vuejs/vue-cli/issues/2381
     const options = module.exports

@@ -71,7 +71,7 @@ export default {
         },
         onResponse: function (initialResponse) {
           let results = {}
-	  let isEmptyResults = true
+          let isEmptyResults = true
           let categories = [
             {
               code: 'artists',
@@ -140,7 +140,7 @@ export default {
               results: []
             }
             initialResponse[category.code].forEach(result => {
-	      isEmptyResults = false
+              isEmptyResults = false
               let id = category.getId(result)
               results[category.code].results.push({
                 title: category.getTitle(result),
@@ -156,8 +156,8 @@ export default {
             })
           })
           return {
-	    results: isEmptyResults ? {} : results
-	  }
+            results: isEmptyResults ? {} : results
+          }
         },
         url: this.$store.getters['instance/absoluteUrl']('api/v1/search?query={query}')
       }

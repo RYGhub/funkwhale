@@ -504,7 +504,7 @@ input + .help {
         position: relative;
         margin-bottom: -1px;
         .button {
-          position: absolute;
+          position: absolute !important;
           bottom: 0.5em;
           right: 0.5em;
         }

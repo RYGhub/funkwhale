@@ -11,16 +11,7 @@
     <template>
       <sidebar></sidebar>
       <set-instance-modal @update:show="showSetInstanceModal = $event" :show="showSetInstanceModal"></set-instance-modal>
-      <service-messages>
-        <message key="refreshApp" class="large info" v-if="serviceWorker.updateAvailable">
-          <p>
-            <translate translate-context="App/Message/Paragraph">A new version of the app is available.</translate>
-          </p>
-          <button class="ui basic button" @click.stop="updateApp">
-            <translate translate-context="App/Message/Button">Update</translate>
-          </button>
-        </message>
-      </service-messages>
+      <service-messages></service-messages>
       <transition name="queue">
         <queue @touch-progress="$refs.player.setCurrentTime($event)" v-if="$store.state.ui.queueFocused"></queue>
       </transition>
@@ -263,6 +254,7 @@ export default {
       parts.push(this.$store.state.instance.settings.instance.name.value || 'Funkwhale')
       document.title = parts.join(' – ')
     },
+
     updateApp () {
       this.$store.commit('ui/serviceWorker', {updateAvailable: false})
       if (!this.serviceWorker.registration || !this.serviceWorker.registration.waiting) { return; }
@@ -343,6 +335,11 @@ export default {
       immediate: true,
       handler(newValue) {
         let self = this
+        if (newValue === 'en_US') {
+          self.$language.current = 'noop'
+          self.$language.current = newValue
+          return self.$store.commit('ui/momentLocale', 'en')
+        }
         import(/* webpackChunkName: "locale-[request]" */ `./translations/${newValue}.json`).then((response) =>{
           Vue.$translations[newValue] = response.default[newValue]
         }).finally(() => {
@@ -351,9 +348,6 @@ export default {
           self.$language.current = 'noop'
           self.$language.current = newValue
         })
-        if (newValue === 'en_US') {
-          return self.$store.commit('ui/momentLocale', 'en')
-        }
         let momentLocale = newValue.replace('_', '-').toLowerCase()
         import(/* webpackChunkName: "moment-locale-[request]" */ `moment/locale/${momentLocale}.js`).then(() => {
           self.$store.commit('ui/momentLocale', momentLocale)
@@ -380,6 +374,35 @@ export default {
         this.updateDocumentTitle()
       },
     },
+    'serviceWorker.updateAvailable': {
+      handler (v) {
+        if (!v) {
+          return
+        }
+        let self = this
+        this.$store.commit('ui/addMessage', {
+          content: this.$pgettext("App/Message/Paragraph", "A new version of the app is available."),
+          date: new Date(),
+          key: 'refreshApp',
+          displayTime: 0,
+          classActions: 'bottom attached',
+          actions: [
+            {
+              text: this.$pgettext("App/Message/Paragraph", "Update"),
+              class: "primary",
+              click: function () {
+                self.updateApp()
+              },
+            },
+            {
+              text: this.$pgettext("App/Message/Paragraph", "Later"),
+              class: "basic",
+            }
+          ]
+        })
+      },
+      immediate: true,
+    }
   }
 }
 </script>
