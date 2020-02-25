@@ -41,7 +41,7 @@ guide.
 
 
 
-Building the mono-container Docker image (funkwhale/funkwhale)
+Building the mono-container Docker image (funkwhale/all-in-one)
 --------------------------------------------------------------
 
 This image is intended to be used in conjunction with our :ref:`Mono-container installation guide <docker-mono-container>`.
