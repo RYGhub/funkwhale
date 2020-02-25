@@ -14,7 +14,6 @@ from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from django_auth_ldap.backend import populate_user as ldap_populate_user
@@ -93,7 +92,6 @@ def get_default_funkwhale_support_message_display_date():
     )
 
 
-@python_2_unicode_compatible
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns

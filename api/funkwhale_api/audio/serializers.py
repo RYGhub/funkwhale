@@ -3,7 +3,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
