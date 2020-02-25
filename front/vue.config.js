@@ -26,8 +26,8 @@ plugins.push(
       path.join(__dirname, './src/**/*.js')
     ]),
     whitelist: ['scale'],
-    whitelistPatterns:[/plyr/],
-    whitelistPatternsChildren:[/plyr/,/dropdown/,/upward/]
+    whitelistPatterns: [/plyr/, /toast/],
+    whitelistPatternsChildren: [/plyr/, /dropdown/, /upward/]
   }),
 )
 module.exports = {
