@@ -3,7 +3,7 @@ import datetime
 import pytest
 import pytz
 
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 from funkwhale_api.audio import serializers
 from funkwhale_api.common import serializers as common_serializers
