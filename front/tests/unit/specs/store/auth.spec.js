@@ -159,7 +159,7 @@ describe('store/auth', () => {
         payload: {credentials: credentials, onError: spy}
       }, () => {
         expect(spy.calledOnce).to.equal(true)
-        done()
+        done() // eslint-disable-line no-undef
       })
     })
     it('fetchProfile', () => {

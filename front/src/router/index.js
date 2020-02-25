@@ -33,7 +33,7 @@ export default new Router({
       path: "/front",
       name: "front",
       redirect: to => {
-        const { hash, params, query } = to
+        const { hash, query } = to
         return { name: 'index', hash, query }
       }
     },
