@@ -16,18 +16,9 @@
       </router-link>
     </td>
     <td colspan="4">
-      <router-link v-if="track.artist.id === albumArtist.id" :title="track.artist.name" class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
+      <router-link class="artist discrete link" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
         {{ track.artist.name }}
       </router-link>
-      <template v-else>
-        <router-link class="artist discrete link" :title="albumArtist.name" :to="{name: 'library.artists.detail', params: {id: albumArtist.id }}">
-          {{ albumArtist.name }}
-        </router-link>
-         /
-         <router-link class="artist discrete link" :title="track.artist.name" :to="{name: 'library.artists.detail', params: {id: track.artist.id }}">
-          {{ track.artist.name }}
-        </router-link>
-      </template>
     </td>
     <td colspan="4">
       <router-link v-if="track.album" class="album discrete link" :title="track.album.title" :to="{name: 'library.albums.detail', params: {id: track.album.id }}">
