@@ -82,7 +82,7 @@ class Command(BaseCommand):
             content = models.Activity.objects.get(uuid=input).payload
         elif is_url(input):
             response = session.get_session().get(
-                input, headers={"Content-Type": "application/activity+json"},
+                input, headers={"Accept": "application/activity+json"},
             )
             response.raise_for_status()
             content = response.json()

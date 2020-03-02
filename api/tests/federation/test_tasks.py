@@ -395,3 +395,156 @@ def test_fetch_success(factories, r_mock, mocker):
     assert init.call_args[0][1] == artist
     assert init.call_args[1]["data"] == payload
     assert save.call_count == 1
+
+
+def test_fetch_webfinger(factories, r_mock, mocker):
+    actor = factories["federation.Actor"]()
+    fetch = factories["federation.Fetch"](
+        url="webfinger://{}".format(actor.full_username)
+    )
+    payload = serializers.ActorSerializer(actor).data
+    init = mocker.spy(serializers.ActorSerializer, "__init__")
+    save = mocker.spy(serializers.ActorSerializer, "save")
+    webfinger_payload = {
+        "subject": "acct:{}".format(actor.full_username),
+        "aliases": ["https://test.webfinger"],
+        "links": [
+            {"rel": "self", "type": "application/activity+json", "href": actor.fid}
+        ],
+    }
+    webfinger_url = "https://{}/.well-known/webfinger?resource={}".format(
+        actor.domain_id, webfinger_payload["subject"]
+    )
+    r_mock.get(actor.fid, json=payload)
+    r_mock.get(webfinger_url, json=webfinger_payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+    payload["@context"].append("https://funkwhale.audio/ns")
+    assert fetch.status == "finished"
+    assert fetch.object == actor
+    assert init.call_count == 1
+    assert init.call_args[0][1] == actor
+    assert init.call_args[1]["data"] == payload
+    assert save.call_count == 1
+
+
+def test_fetch_rel_alternate(factories, r_mock, mocker):
+    actor = factories["federation.Actor"]()
+    fetch = factories["federation.Fetch"](url="http://example.page")
+    html_text = """
+    <html>
+        <head>
+            <link rel="alternate" type="application/activity+json" href="{}" />
+        </head>
+    </html>
+    """.format(
+        actor.fid
+    )
+    ap_payload = serializers.ActorSerializer(actor).data
+    init = mocker.spy(serializers.ActorSerializer, "__init__")
+    save = mocker.spy(serializers.ActorSerializer, "save")
+    r_mock.get(fetch.url, text=html_text)
+    r_mock.get(actor.fid, json=ap_payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+    ap_payload["@context"].append("https://funkwhale.audio/ns")
+    assert fetch.status == "finished"
+    assert fetch.object == actor
+    assert init.call_count == 1
+    assert init.call_args[0][1] == actor
+    assert init.call_args[1]["data"] == ap_payload
+    assert save.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "factory_name, serializer_class",
+    [
+        ("federation.Actor", serializers.ActorSerializer),
+        ("music.Library", serializers.LibrarySerializer),
+        ("music.Artist", serializers.ArtistSerializer),
+        ("music.Album", serializers.AlbumSerializer),
+        ("music.Track", serializers.TrackSerializer),
+    ],
+)
+def test_fetch_url(factory_name, serializer_class, factories, r_mock, mocker):
+    obj = factories[factory_name]()
+    fetch = factories["federation.Fetch"](url=obj.fid)
+    payload = serializer_class(obj).data
+    init = mocker.spy(serializer_class, "__init__")
+    save = mocker.spy(serializer_class, "save")
+
+    r_mock.get(obj.fid, json=payload)
+
+    tasks.fetch(fetch_id=fetch.pk)
+
+    fetch.refresh_from_db()
+    payload["@context"].append("https://funkwhale.audio/ns")
+    assert fetch.status == "finished"
+    assert fetch.object == obj
+    assert init.call_count == 1
+    assert init.call_args[0][1] == obj
+    assert init.call_args[1]["data"] == payload
+    assert save.call_count == 1
+
+
+def test_fetch_honor_instance_policy_domain(factories):
+    domain = factories["moderation.InstancePolicy"](
+        block_all=True, for_domain=True
+    ).target_domain
+    fid = "https://{}/test".format(domain.name)
+
+    fetch = factories["federation.Fetch"](url=fid)
+    tasks.fetch(fetch_id=fetch.pk)
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == "blocked"
+
+
+def test_fetch_honor_mrf_inbox_before_http(mrf_inbox_registry, factories, mocker):
+    apply = mocker.patch.object(mrf_inbox_registry, "apply", return_value=(None, False))
+    fid = "http://domain/test"
+    fetch = factories["federation.Fetch"](url=fid)
+    tasks.fetch(fetch_id=fetch.pk)
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == "blocked"
+    apply.assert_called_once_with({"id": fid})
+
+
+def test_fetch_honor_mrf_inbox_after_http(
+    r_mock, mrf_inbox_registry, factories, mocker
+):
+    apply = mocker.patch.object(
+        mrf_inbox_registry, "apply", side_effect=[(True, False), (None, False)]
+    )
+    payload = {"id": "http://domain/test", "actor": "hello"}
+    r_mock.get(payload["id"], json=payload)
+    fetch = factories["federation.Fetch"](url=payload["id"])
+    tasks.fetch(fetch_id=fetch.pk)
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == "blocked"
+
+    apply.assert_any_call({"id": payload["id"]})
+    apply.assert_any_call(payload)
+
+
+def test_fetch_honor_instance_policy_different_url_and_id(r_mock, factories):
+    domain = factories["moderation.InstancePolicy"](
+        block_all=True, for_domain=True
+    ).target_domain
+    fid = "https://ok/test"
+    r_mock.get(fid, json={"id": "http://{}/test".format(domain.name)})
+    fetch = factories["federation.Fetch"](url=fid)
+    tasks.fetch(fetch_id=fetch.pk)
+    fetch.refresh_from_db()
+
+    assert fetch.status == "errored"
+    assert fetch.detail["error_code"] == "blocked"

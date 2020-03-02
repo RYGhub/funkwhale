@@ -580,6 +580,37 @@ def test_music_library_serializer_from_private(factories, mocker):
     )
 
 
+def test_music_library_serializer_from_ap_update(factories, mocker):
+    actor = factories["federation.Actor"]()
+    library = factories["music.Library"]()
+
+    data = {
+        "@context": jsonld.get_default_context(),
+        "audience": "https://www.w3.org/ns/activitystreams#Public",
+        "name": "Hello",
+        "summary": "World",
+        "type": "Library",
+        "id": library.fid,
+        "followers": "https://library.id/followers",
+        "attributedTo": actor.fid,
+        "totalItems": 12,
+        "first": "https://library.id?page=1",
+        "last": "https://library.id?page=2",
+    }
+    serializer = serializers.LibrarySerializer(library, data=data)
+
+    assert serializer.is_valid(raise_exception=True)
+
+    serializer.save()
+    library.refresh_from_db()
+
+    assert library.uploads_count == data["totalItems"]
+    assert library.privacy_level == "everyone"
+    assert library.name == "Hello"
+    assert library.description == "World"
+    assert library.followers_url == data["followers"]
+
+
 def test_activity_pub_artist_serializer_to_ap(factories):
     content = factories["common.Content"]()
     artist = factories["music.Artist"](
@@ -608,6 +639,86 @@ def test_activity_pub_artist_serializer_to_ap(factories):
     serializer = serializers.ArtistSerializer(artist)
 
     assert serializer.data == expected
+
+
+def test_activity_pub_artist_serializer_from_ap_create(factories, faker, now, mocker):
+    actor = factories["federation.Actor"]()
+    mocker.patch(
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
+    )
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Artist",
+        "id": "https://test.artist",
+        "name": "Art",
+        "musicbrainzId": faker.uuid4(),
+        "published": now.isoformat(),
+        "attributedTo": actor.fid,
+        "content": "Summary",
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "url": "https://attachment.file",
+        },
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+    serializer = serializers.ArtistSerializer(data=payload)
+    assert serializer.is_valid(raise_exception=True) is True
+
+    artist = serializer.save()
+
+    assert artist.fid == payload["id"]
+    assert artist.attributed_to == actor
+    assert artist.name == payload["name"]
+    assert str(artist.mbid) == payload["musicbrainzId"]
+    assert artist.description.text == payload["content"]
+    assert artist.description.content_type == "text/html"
+    assert artist.attachment_cover.url == payload["image"]["url"]
+    assert artist.attachment_cover.mimetype == payload["image"]["mediaType"]
+    assert artist.get_tags() == ["Punk", "Rock"]
+
+
+def test_activity_pub_artist_serializer_from_ap_update(factories, faker, now, mocker):
+    artist = factories["music.Artist"]()
+    actor = factories["federation.Actor"]()
+    mocker.patch(
+        "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
+    )
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Artist",
+        "id": artist.fid,
+        "name": "Art",
+        "musicbrainzId": faker.uuid4(),
+        "published": now.isoformat(),
+        "attributedTo": actor.fid,
+        "content": "Summary",
+        "image": {
+            "type": "Image",
+            "mediaType": "image/jpeg",
+            "url": "https://attachment.file",
+        },
+        "tag": [
+            {"type": "Hashtag", "name": "#Punk"},
+            {"type": "Hashtag", "name": "#Rock"},
+        ],
+    }
+    serializer = serializers.ArtistSerializer(artist, data=payload)
+    assert serializer.is_valid(raise_exception=True) is True
+    serializer.save()
+    artist.refresh_from_db()
+
+    assert artist.attributed_to == actor
+    assert artist.name == payload["name"]
+    assert str(artist.mbid) == payload["musicbrainzId"]
+    assert artist.description.text == payload["content"]
+    assert artist.description.content_type == "text/html"
+    assert artist.attachment_cover.url == payload["image"]["url"]
+    assert artist.attachment_cover.mimetype == payload["image"]["mediaType"]
+    assert artist.get_tags() == ["Punk", "Rock"]
 
 
 def test_activity_pub_album_serializer_to_ap(factories):
@@ -652,39 +763,42 @@ def test_activity_pub_album_serializer_to_ap(factories):
     assert serializer.data == expected
 
 
-def test_activity_pub_artist_serializer_from_ap_update(factories, faker):
-    artist = factories["music.Artist"](attributed=True)
+def test_activity_pub_album_serializer_from_ap_create(factories, faker, now):
+    actor = factories["federation.Actor"]()
+    artist = factories["music.Artist"]()
+    released = faker.date_object()
     payload = {
         "@context": jsonld.get_default_context(),
-        "type": "Artist",
-        "id": artist.fid,
+        "type": "Album",
+        "id": "https://album.example",
         "name": faker.sentence(),
+        "cover": {"type": "Link", "mediaType": "image/jpeg", "href": faker.url()},
         "musicbrainzId": faker.uuid4(),
-        "published": artist.creation_date.isoformat(),
-        "attributedTo": artist.attributed_to.fid,
-        "mediaType": "text/html",
-        "content": common_utils.render_html(faker.sentence(), "text/html"),
-        "image": {"type": "Image", "mediaType": "image/jpeg", "url": faker.url()},
+        "published": now.isoformat(),
+        "released": released.isoformat(),
+        "artists": [
+            serializers.ArtistSerializer(
+                artist, context={"include_ap_context": False}
+            ).data
+        ],
+        "attributedTo": actor.fid,
         "tag": [
             {"type": "Hashtag", "name": "#Punk"},
             {"type": "Hashtag", "name": "#Rock"},
         ],
     }
-
-    serializer = serializers.ArtistSerializer(artist, data=payload)
+    serializer = serializers.AlbumSerializer(data=payload)
     assert serializer.is_valid(raise_exception=True) is True
 
-    serializer.save()
+    album = serializer.save()
 
-    artist.refresh_from_db()
-
-    assert artist.name == payload["name"]
-    assert str(artist.mbid) == payload["musicbrainzId"]
-    assert artist.attachment_cover.url == payload["image"]["url"]
-    assert artist.attachment_cover.mimetype == payload["image"]["mediaType"]
-    assert artist.description.text == payload["content"]
-    assert artist.description.content_type == "text/html"
-    assert sorted(artist.tagged_items.values_list("tag__name", flat=True)) == [
+    assert album.title == payload["name"]
+    assert str(album.mbid) == payload["musicbrainzId"]
+    assert album.release_date == released
+    assert album.artist == artist
+    assert album.attachment_cover.url == payload["cover"]["href"]
+    assert album.attachment_cover.mimetype == payload["cover"]["mediaType"]
+    assert sorted(album.tagged_items.values_list("tag__name", flat=True)) == [
         "Punk",
         "Rock",
     ]
@@ -1062,6 +1176,43 @@ def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
     assert upload.modification_date == updated
 
 
+def test_activity_pub_upload_serializer_from_ap_update(factories, mocker, now, r_mock):
+    library = factories["music.Library"]()
+    upload = factories["music.Upload"](library=library)
+
+    data = {
+        "@context": jsonld.get_default_context(),
+        "type": "Audio",
+        "id": upload.fid,
+        "name": "Ignored",
+        "published": now.isoformat(),
+        "updated": now.isoformat(),
+        "duration": 42,
+        "bitrate": 42,
+        "size": 66,
+        "url": {
+            "href": "https://audio.file/url",
+            "type": "Link",
+            "mediaType": "audio/mp3",
+        },
+        "library": library.fid,
+        "track": serializers.TrackSerializer(upload.track).data,
+    }
+    r_mock.get(data["track"]["album"]["cover"]["href"], body=io.BytesIO(b"coucou"))
+
+    serializer = serializers.UploadSerializer(upload, data=data)
+    assert serializer.is_valid(raise_exception=True)
+    serializer.save()
+    upload.refresh_from_db()
+
+    assert upload.fid == data["id"]
+    assert upload.duration == data["duration"]
+    assert upload.size == data["size"]
+    assert upload.bitrate == data["bitrate"]
+    assert upload.source == data["url"]["href"]
+    assert upload.mimetype == data["url"]["mediaType"]
+
+
 def test_activity_pub_upload_serializer_validtes_library_actor(factories, mocker):
     library = factories["music.Library"]()
     usurpator = factories["federation.Actor"]()
@@ -1201,7 +1352,7 @@ def test_track_serializer_update_license(factories):
 
     obj = factories["music.Track"](license=None)
 
-    serializer = serializers.TrackSerializer()
+    serializer = serializers.TrackSerializer(obj)
     serializer.update(obj, {"license": "http://creativecommons.org/licenses/by/2.0/"})
 
     obj.refresh_from_db()

@@ -151,6 +151,10 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     )
 
     class Meta:
+        # not strictly necessary because it's not a model serializer
+        # but used by tasks.py/fetch
+        model = models.Actor
+
         jsonld_mapping = {
             "outbox": jsonld.first_id(contexts.AS.outbox),
             "inbox": jsonld.first_id(contexts.LDP.inbox),
@@ -765,6 +769,10 @@ class LibrarySerializer(PaginatedCollectionSerializer):
     )
 
     class Meta:
+        # not strictly necessary because it's not a model serializer
+        # but used by tasks.py/fetch
+        model = music_models.Library
+
         jsonld_mapping = common_utils.concat_dicts(
             PAGINATED_COLLECTION_JSONLD_MAPPING,
             {
@@ -795,12 +803,15 @@ class LibrarySerializer(PaginatedCollectionSerializer):
         return r
 
     def create(self, validated_data):
-        actor = utils.retrieve_ap_object(
-            validated_data["attributedTo"],
-            actor=self.context.get("fetch_actor"),
-            queryset=models.Actor,
-            serializer_class=ActorSerializer,
-        )
+        if self.instance:
+            actor = self.instance.actor
+        else:
+            actor = utils.retrieve_ap_object(
+                validated_data["attributedTo"],
+                actor=self.context.get("fetch_actor"),
+                queryset=models.Actor,
+                serializer_class=ActorSerializer,
+            )
         privacy = {"": "me", "./": "me", None: "me", contexts.AS.Public: "everyone"}
         library, created = music_models.Library.objects.update_or_create(
             fid=validated_data["id"],
@@ -814,6 +825,9 @@ class LibrarySerializer(PaginatedCollectionSerializer):
             },
         )
         return library
+
+    def update(self, instance, validated_data):
+        return self.create(validated_data)
 
 
 class CollectionPageSerializer(jsonld.JsonLdSerializer):
@@ -968,8 +982,13 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
         allow_null=True,
     )
 
-    @transaction.atomic
     def update(self, instance, validated_data):
+        return self.update_or_create(validated_data)
+
+    @transaction.atomic
+    def update_or_create(self, validated_data):
+        instance = self.instance or self.Meta.model(fid=validated_data["id"])
+        creating = instance.pk is None
         attributed_to_fid = validated_data.get("attributedTo")
         if attributed_to_fid:
             validated_data["attributedTo"] = actors.get_actor(attributed_to_fid)
@@ -977,8 +996,11 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
             self.updateable_fields, validated_data, instance
         )
         updated_fields = self.validate_updated_data(instance, updated_fields)
-
-        if updated_fields:
+        if creating:
+            instance, created = self.Meta.model.objects.get_or_create(
+                fid=validated_data["id"], defaults=updated_fields
+            )
+        else:
             music_tasks.update_library_entity(instance, updated_fields)
 
         tags = [t["name"] for t in validated_data.get("tags", []) or []]
@@ -1064,6 +1086,8 @@ class ArtistSerializer(MusicEntitySerializer):
             d["@context"] = jsonld.get_default_context()
         return d
 
+    create = MusicEntitySerializer.update_or_create
+
 
 class AlbumSerializer(MusicEntitySerializer):
     released = serializers.DateField(allow_null=True, required=False)
@@ -1074,10 +1098,11 @@ class AlbumSerializer(MusicEntitySerializer):
     )
     updateable_fields = [
         ("name", "title"),
+        ("cover", "attachment_cover"),
         ("musicbrainzId", "mbid"),
         ("attributedTo", "attributed_to"),
         ("released", "release_date"),
-        ("cover", "attachment_cover"),
+        ("_artist", "artist"),
     ]
 
     class Meta:
@@ -1123,6 +1148,20 @@ class AlbumSerializer(MusicEntitySerializer):
         if self.context.get("include_ap_context", self.parent is None):
             d["@context"] = jsonld.get_default_context()
         return d
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if not self.parent:
+            validated_data["_artist"] = utils.retrieve_ap_object(
+                validated_data["artists"][0]["id"],
+                actor=self.context.get("fetch_actor"),
+                queryset=music_models.Artist,
+                serializer_class=ArtistSerializer,
+            )
+
+        return validated_data
+
+    create = MusicEntitySerializer.update_or_create
 
 
 class TrackSerializer(MusicEntitySerializer):
@@ -1293,39 +1332,66 @@ class UploadSerializer(jsonld.JsonLdSerializer):
             return lb
 
         actor = self.context.get("actor")
-        kwargs = {}
-        if actor:
-            kwargs["actor"] = actor
+
         try:
-            return music_models.Library.objects.get(fid=v, **kwargs)
-        except music_models.Library.DoesNotExist:
+            library = utils.retrieve_ap_object(
+                v,
+                actor=self.context.get("fetch_actor"),
+                queryset=music_models.Library,
+                serializer_class=LibrarySerializer,
+            )
+        except Exception:
             raise serializers.ValidationError("Invalid library")
+        if actor and library.actor != actor:
+            raise serializers.ValidationError("Invalid library")
+        return library
 
+    def update(self, instance, validated_data):
+        return self.create(validated_data)
+
+    @transaction.atomic
     def create(self, validated_data):
-        try:
-            return music_models.Upload.objects.get(fid=validated_data["id"])
-        except music_models.Upload.DoesNotExist:
-            pass
+        instance = self.instance or None
+        if not self.instance:
+            try:
+                instance = music_models.Upload.objects.get(fid=validated_data["id"])
+            except music_models.Upload.DoesNotExist:
+                pass
 
-        track = TrackSerializer(
-            context={"activity": self.context.get("activity")}
-        ).create(validated_data["track"])
+        if instance:
+            data = {
+                "mimetype": validated_data["url"]["mediaType"],
+                "source": validated_data["url"]["href"],
+                "creation_date": validated_data["published"],
+                "modification_date": validated_data.get("updated"),
+                "duration": validated_data["duration"],
+                "size": validated_data["size"],
+                "bitrate": validated_data["bitrate"],
+                "import_status": "finished",
+            }
+            return music_models.Upload.objects.update_or_create(
+                fid=validated_data["id"], defaults=data
+            )[0]
+        else:
+            track = TrackSerializer(
+                context={"activity": self.context.get("activity")}
+            ).create(validated_data["track"])
 
-        data = {
-            "fid": validated_data["id"],
-            "mimetype": validated_data["url"]["mediaType"],
-            "source": validated_data["url"]["href"],
-            "creation_date": validated_data["published"],
-            "modification_date": validated_data.get("updated"),
-            "track": track,
-            "duration": validated_data["duration"],
-            "size": validated_data["size"],
-            "bitrate": validated_data["bitrate"],
-            "library": validated_data["library"],
-            "from_activity": self.context.get("activity"),
-            "import_status": "finished",
-        }
-        return music_models.Upload.objects.create(**data)
+            data = {
+                "fid": validated_data["id"],
+                "mimetype": validated_data["url"]["mediaType"],
+                "source": validated_data["url"]["href"],
+                "creation_date": validated_data["published"],
+                "modification_date": validated_data.get("updated"),
+                "track": track,
+                "duration": validated_data["duration"],
+                "size": validated_data["size"],
+                "bitrate": validated_data["bitrate"],
+                "library": validated_data["library"],
+                "from_activity": self.context.get("activity"),
+                "import_status": "finished",
+            }
+            return music_models.Upload.objects.create(**data)
 
     def to_representation(self, instance):
         track = instance.track

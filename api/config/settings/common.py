@@ -833,6 +833,10 @@ THROTTLING_RATES = {
         "rate": THROTTLING_USER_RATES.get("password-reset-confirm", "20/h"),
         "description": "Password reset confirmation",
     },
+    "fetch": {
+        "rate": THROTTLING_USER_RATES.get("fetch", "200/d"),
+        "description": "Fetch remote objects",
+    },
 }
 
 
@@ -906,7 +910,7 @@ ACCOUNT_USERNAME_BLACKLIST = [
 ] + env.list("ACCOUNT_USERNAME_BLACKLIST", default=[])
 
 EXTERNAL_REQUESTS_VERIFY_SSL = env.bool("EXTERNAL_REQUESTS_VERIFY_SSL", default=True)
-EXTERNAL_REQUESTS_TIMEOUT = env.int("EXTERNAL_REQUESTS_TIMEOUT", default=5)
+EXTERNAL_REQUESTS_TIMEOUT = env.int("EXTERNAL_REQUESTS_TIMEOUT", default=10)
 # XXX: deprecated, see #186
 API_AUTHENTICATION_REQUIRED = env.bool("API_AUTHENTICATION_REQUIRED", True)
 
@@ -955,7 +959,11 @@ FEDERATION_OBJECT_FETCH_DELAY = env.int(
 MODERATION_EMAIL_NOTIFICATIONS_ENABLED = env.bool(
     "MODERATION_EMAIL_NOTIFICATIONS_ENABLED", default=True
 )
-
+FEDERATION_AUTHENTIFY_FETCHES = True
+FEDERATION_SYNCHRONOUS_FETCH = env.bool("FEDERATION_SYNCHRONOUS_FETCH", default=True)
+FEDERATION_DUPLICATE_FETCH_DELAY = env.int(
+    "FEDERATION_DUPLICATE_FETCH_DELAY", default=60 * 50
+)
 # Delay in days after signup before we show the "support us" messages
 INSTANCE_SUPPORT_MESSAGE_DELAY = env.int("INSTANCE_SUPPORT_MESSAGE_DELAY", default=15)
 FUNKWHALE_SUPPORT_MESSAGE_DELAY = env.int("FUNKWHALE_SUPPORT_MESSAGE_DELAY", default=15)

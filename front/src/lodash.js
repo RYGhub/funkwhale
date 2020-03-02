@@ -16,4 +16,5 @@ export default {
   isEqual: require('lodash/isEqual'),
   sum: require('lodash/sum'),
   startCase: require('lodash/startCase'),
+  trim: require('lodash/trim'),
 }

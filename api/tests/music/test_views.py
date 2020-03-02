@@ -640,6 +640,16 @@ def test_user_can_list_their_library(factories, logged_in_api_client):
     assert response.data["results"][0]["uuid"] == str(library.uuid)
 
 
+def test_user_can_retrieve_another_user_library(factories, logged_in_api_client):
+    library = factories["music.Library"]()
+
+    url = reverse("api:v1:libraries-detail", kwargs={"uuid": library.uuid})
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["uuid"] == str(library.uuid)
+
+
 def test_library_list_excludes_channel_library(factories, logged_in_api_client):
     actor = logged_in_api_client.user.create_actor()
     factories["audio.Channel"](attributed_to=actor)
@@ -670,14 +680,29 @@ def test_library_delete_via_api_triggers_outbox(factories, mocker):
     )
 
 
-def test_user_cannot_get_other_actors_uploads(factories, logged_in_api_client):
+def test_user_cannot_get_other_not_playable_uploads(factories, logged_in_api_client):
     logged_in_api_client.user.create_actor()
-    upload = factories["music.Upload"]()
+    upload = factories["music.Upload"](
+        import_status="finished", library__privacy_level="private"
+    )
 
     url = reverse("api:v1:uploads-detail", kwargs={"uuid": upload.uuid})
     response = logged_in_api_client.get(url)
 
     assert response.status_code == 404
+
+
+def test_user_can_get_retrieve_playable_uploads(factories, logged_in_api_client):
+    logged_in_api_client.user.create_actor()
+    upload = factories["music.Upload"](
+        import_status="finished", library__privacy_level="everyone"
+    )
+
+    url = reverse("api:v1:uploads-detail", kwargs={"uuid": upload.uuid})
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data["uuid"] == str(upload.uuid)
 
 
 def test_user_cannot_delete_other_actors_uploads(factories, logged_in_api_client):

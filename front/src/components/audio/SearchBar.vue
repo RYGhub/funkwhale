@@ -15,6 +15,7 @@
 <script>
 import jQuery from 'jquery'
 import router from '@/router'
+import lodash from '@/lodash'
 import GlobalEvents from "@/components/utils/global-events"
 
 export default {
@@ -55,7 +56,11 @@ export default {
         noResults: this.$pgettext('Sidebar/Search/Error.Label', 'Sorry, there are no results for this search')
       },
       onSelect (result, response) {
+        jQuery(self.$el).search("set value", searchQuery)
+        console.log('SELECTEING', result)
         router.push(result.routerUrl)
+        jQuery(self.$el).search("hide results")
+        return false
       },
       onSearchQuery (query) {
         self.$emit('search')
@@ -70,9 +75,14 @@ export default {
           return xhrObject
         },
         onResponse: function (initialResponse) {
+          let objId = self.extractObjId(searchQuery)
           let results = {}
           let isEmptyResults = true
           let categories = [
+            {
+              code: 'federation',
+              name: self.$pgettext('*/*/*', 'Federation'),
+            },
             {
               code: 'artists',
               route: 'library.artists.detail',
@@ -139,21 +149,42 @@ export default {
               name: category.name,
               results: []
             }
-            initialResponse[category.code].forEach(result => {
-              isEmptyResults = false
-              let id = category.getId(result)
-              results[category.code].results.push({
-                title: category.getTitle(result),
-                id,
-                routerUrl: {
-                  name: category.route,
-                  params: {
-                    id
-                  }
-                },
-                description: category.getDescription(result)
+            if (category.code === 'federation') {
+
+              if (objId) {
+                isEmptyResults = false
+                let searchMessage = self.$pgettext('Search/*/*', 'Search on the fediverse')
+                results['federation'] = {
+                  name: self.$pgettext('*/*/*', 'Federation'),
+                  results: [{
+                    title: searchMessage,
+                    routerUrl: {
+                      name: 'search',
+                      query: {
+                        id: objId,
+                      }
+                    }
+                  }]
+                }
+              }
+            }
+            else {
+              initialResponse[category.code].forEach(result => {
+                isEmptyResults = false
+                let id = category.getId(result)
+                results[category.code].results.push({
+                  title: category.getTitle(result),
+                  id,
+                  routerUrl: {
+                    name: category.route,
+                    params: {
+                      id
+                    }
+                  },
+                  description: category.getDescription(result)
+                })
               })
-            })
+            }
           })
           return {
             results: isEmptyResults ? {} : results
@@ -167,6 +198,19 @@ export default {
     focusSearch () {
       this.$refs.search.focus()
     },
+    extractObjId (query) {
+      query = lodash.trim(query)
+      query = lodash.trim(query, '@')
+      if (query.indexOf(' ') > -1) {
+        return
+      }
+      if (query.startsWith('http://') || query.startsWith('https://')) {
+        return query
+      }
+      if (query.split('@').length > 1) {
+        return query
+      }
+    }
   }
 }
 </script>

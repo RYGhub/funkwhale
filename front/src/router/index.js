@@ -75,6 +75,15 @@ export default new Router({
       })
     },
     {
+      path: "/search",
+      name: "search",
+      component: () =>
+        import(/* webpackChunkName: "core" */ "@/views/Search"),
+      props: route => ({
+        initialId: route.query.id
+      })
+    },
+    {
       path: "/auth/password/reset/confirm",
       name: "auth.password-reset-confirm",
       component: () =>
@@ -143,17 +152,17 @@ export default new Router({
         ),
       props: true
     },
-    ...['/@:username', '/@:username@:domain'].map((path) => {
+    ...[{suffix: '.full', path: '/@:username@:domain'}, {suffix: '', path: '/@:username'}].map((route) => {
       return {
-        path: path,
-        name: "profile",
+        path: route.path,
+        name: `profile${route.suffix}`,
         component: () =>
         import(/* webpackChunkName: "core" */ "@/views/auth/ProfileBase"),
         props: true,
         children: [
           {
             path: "",
-            name: "profile.overview",
+            name: `profile${route.suffix}.overview`,
             component: () =>
               import(
                 /* webpackChunkName: "core" */ "@/views/auth/ProfileOverview"
@@ -161,7 +170,7 @@ export default new Router({
           },
           {
             path: "activity",
-            name: "profile.activity",
+            name: `profile${route.suffix}.activity`,
             component: () =>
               import(
                 /* webpackChunkName: "core" */ "@/views/auth/ProfileActivity"

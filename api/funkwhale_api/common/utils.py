@@ -234,9 +234,11 @@ def get_updated_fields(conf, data, obj):
             data_value = data[data_field]
         except KeyError:
             continue
-
-        obj_value = getattr(obj, obj_field)
-        if obj_value != data_value:
+        if obj.pk:
+            obj_value = getattr(obj, obj_field)
+            if obj_value != data_value:
+                final_data[obj_field] = data_value
+        else:
             final_data[obj_field] = data_value
 
     return final_data
