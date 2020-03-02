@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: front 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-01 15:15+0200\n"
-"PO-Revision-Date: 2020-01-22 21:10+0000\n"
+"PO-Revision-Date: 2020-03-02 18:57+0000\n"
 "Last-Translator: marzzzello <anmeldezeugs@top-email.net>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -63,8 +63,8 @@ msgstr[1] "%{ count } erlaubte Domains"
 msgctxt "Content/Home/Stat"
 msgid "%{ count } artists"
 msgid_plural "%{ count } artists"
-msgstr[0] "%{ count } Künstler"
-msgstr[1] "%{ count } Künstler"
+msgstr[0] "%{ count } Künstler·in"
+msgstr[1] "%{ count } Künstler·innen"
 
 #: front/src/components/About.vue:176 src/components/Home.vue:59
 msgctxt "Content/Home/Stat"
@@ -261,7 +261,8 @@ msgstr "Zugriff deaktiviert"
 #: front/src/components/mixins/Translations.vue:86
 msgctxt "Content/OAuth Scopes/Paragraph"
 msgid "Access to audio files, libraries, artists, albums and tracks"
-msgstr "Zugriff auf Audio Dateien, Bibliotheken, Künstler, Alben und Lieder"
+msgstr ""
+"Zugriff auf Audio Dateien, Bibliotheken, Künstler·innen, Alben und Lieder"
 
 #: front/src/components/mixins/Translations.vue:109
 #: front/src/components/mixins/Translations.vue:110
@@ -528,7 +529,7 @@ msgstr "Album"
 #: front/src/views/admin/library/TrackDetail.vue:134
 msgctxt "*/*/*/Noun"
 msgid "Album artist"
-msgstr "Alben von diesem/-r Künstler/in"
+msgstr "Alben von dieser Kunstschaffenden Person"
 
 #: front/src/views/admin/library/AlbumDetail.vue:98
 msgctxt "Content/Moderation/Title"
@@ -706,7 +707,7 @@ msgstr "Künstler·in"
 #: front/src/views/admin/library/ArtistDetail.vue:96
 msgctxt "Content/Moderation/Title"
 msgid "Artist data"
-msgstr "Künstlername"
+msgstr "Daten der Künstler·in"
 
 #: front/src/components/mixins/Translations.vue:62
 #: front/src/components/mixins/Translations.vue:63
@@ -1738,7 +1739,7 @@ msgstr "Bette dieses Album auf Deiner Webseite ein"
 #: front/src/components/library/ArtistBase.vue:38
 msgctxt "Popup/Artist/Title/Verb"
 msgid "Embed this artist work on your website"
-msgstr "Bette Titel von diesem Künstler auf deiner Webseite ein"
+msgstr "Bette Titel von dieser Kunstschaffenden Person auf deiner Webseite ein"
 
 #: front/src/views/playlists/Detail.vue:52
 msgctxt "Popup/Album/Title/Verb"
@@ -1795,7 +1796,7 @@ msgstr "Album Titel eingeben…"
 #: front/src/components/library/Artists.vue:116
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Enter artist name…"
-msgstr "Künstlername eingeben…"
+msgstr "Künstlerisches Pseudonym eingeben…"
 
 #: front/src/views/playlists/List.vue:107
 msgctxt "Content/Playlist/Placeholder/Call to action"
@@ -2205,7 +2206,7 @@ msgstr "Inhalte dieses Künsters verbergen"
 #: front/src/components/audio/Player.vue:669
 msgctxt "Sidebar/Player/Icon.Tooltip/Verb"
 msgid "Hide content from this artist…"
-msgstr "Inhalte dieses Künstlers verstecken…"
+msgstr "Inhalte dieser Künstschaffenden Person verstecken…"
 
 #: front/src/components/library/Home.vue:65
 msgctxt "Head/Home/Title"
@@ -2274,7 +2275,7 @@ msgstr "Kürzlich hinzugefügt"
 #: front/src/components/moderation/FilterModal.vue:27
 msgctxt "Popup/Moderation/List item"
 msgid "In artists and album listings"
-msgstr "In Künstler- und Albenlisten"
+msgstr "In Künstler·innen- und Albenlisten"
 
 #: front/src/components/favorites/TrackFavoriteIcon.vue:3
 msgctxt "Content/Track/Button.Message"
@@ -2942,7 +2943,7 @@ msgstr "Kein passendes Album gefunden"
 #: front/src/components/audio/Search.vue:16
 msgctxt "Content/Search/Paragraph"
 msgid "No artist matched your query"
-msgstr "Keinen passenden Künstler oder Künstlerin gefunden"
+msgstr "Keinen passende Kunstschaffende Person gefunden"
 
 #: front/src/components/library/TrackDetail.vue:14
 msgctxt "Content/Track/Table.Paragraph"
@@ -3762,7 +3763,7 @@ msgstr "Dieses Album melden…"
 #: src/components/mixins/Report.vue:51
 msgctxt "*/Moderation/*/Verb"
 msgid "Report this artist…"
-msgstr "Diesen Künstler melden …"
+msgstr "Diese Kunstschaffende Person melden …"
 
 #: front/src/components/mixins/Report.vue:72
 #: src/components/mixins/Report.vue:73
@@ -3997,12 +3998,12 @@ msgstr "Suche nach Domain, Benutzernamen, Biografie…"
 #: front/src/components/manage/library/TracksTable.vue:174
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, album, MusicBrainz ID…"
-msgstr "Nach Titel, Künstler und Album suchen…"
+msgstr "Nach Titel, Künstler·in und Album suchen…"
 
 #: front/src/components/manage/library/AlbumsTable.vue:174
 msgctxt "Content/Search/Input.Placeholder"
 msgid "Search by domain, title, artist, MusicBrainz ID…"
-msgstr "Nach Titel, Künstler und Album suchen…"
+msgstr "Nach Titel, Künstler·in und Album suchen…"
 
 #: front/src/components/manage/moderation/AccountsTable.vue:171
 msgctxt "Content/Search/Input.Placeholder"
@@ -4022,7 +4023,7 @@ msgstr "Suchen nach Name…"
 #: front/src/views/content/libraries/FilesTable.vue:208
 msgctxt "Content/Library/Input.Placeholder"
 msgid "Search by title, artist, album…"
-msgstr "Nach Titel, Künstler und Album suchen…"
+msgstr "Nach Titel, Künstler·in und Album suchen…"
 
 #: front/src/components/manage/users/InvitationsTable.vue:153
 msgctxt "Content/Admin/Input.Placeholder/Verb"
@@ -4512,9 +4513,9 @@ msgstr ""
 msgctxt "Content/Moderation/Paragraph"
 msgid "The artist will be removed, as well as associated uploads, tracks, albums, favorites and listening history. This action is irreversible."
 msgstr ""
-"Der Künstler wird entfernt, ebenso wie die zugehörigen Uploads, Titel, "
-"Alben, Favoriten und der Wiedergabeverlauf. Dieser Vorgang ist "
-"unwiderruflich."
+"Die Kunstschaffende Person wird entfernt, ebenso wie die zugehörigen "
+"Uploads, Titel, Alben, Favoriten und der Wiedergabeverlauf. Dieser Vorgang "
+"ist unwiderruflich."
 
 #: front/src/components/Footer.vue:61
 msgctxt "Footer/*/List item.Link"
@@ -4591,12 +4592,14 @@ msgstr ""
 #: front/src/components/federation/FetchButton.vue:50
 msgctxt "*/*/Error"
 msgid "The remote server returned invalid JSON or JSON-LD data"
-msgstr ""
+msgstr "Der Remote-Server hat ungültige JSON oder JSON-LD-Daten zurückgegeben"
 
 #: front/src/components/manage/library/AlbumsTable.vue:189
 msgctxt "Popup/*/Paragraph"
 msgid "The selected albums will be removed, as well as associated tracks, uploads, favorites and listening history. This action is irreversible."
 msgstr ""
+"Die ausgewählten Alben sowie die zugehörigen Titel, Uploads, Favoriten und "
+"der Hörverlauf werden entfernt. Diese Aktion ist irreversibel."
 
 #: front/src/components/manage/library/ArtistsTable.vue:179
 msgctxt "Popup/*/Paragraph"
@@ -4688,7 +4691,7 @@ msgstr "Dieses Album ist in den folgenden Mediatheken enthalten:"
 #: front/src/components/library/ArtistDetail.vue:42
 msgctxt "Content/Artist/Paragraph"
 msgid "This artist is present in the following libraries:"
-msgstr "Dieser Künstler kommt in den folgenden Mediatheken vor:"
+msgstr "Diese Kunstschaffende Person kommt in den folgenden Mediatheken vor:"
 
 #: front/src/components/manage/moderation/DomainsTable.vue:169
 #, fuzzy
@@ -4946,7 +4949,7 @@ msgstr "Tracks"
 #: front/src/components/library/ArtistDetail.vue:33
 msgctxt "Content/Artist/Title"
 msgid "Tracks by this artist"
-msgstr "Titel von diesem Künstler oder Künstlerin"
+msgstr "Titel von dieser Kunstschaffenden Person"
 
 #: front/src/components/library/radios/Filter.vue:44
 msgctxt "Popup/Radio/Title/Noun"
