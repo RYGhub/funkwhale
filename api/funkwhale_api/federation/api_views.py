@@ -1,5 +1,6 @@
 import requests.exceptions
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count
 
@@ -10,6 +11,7 @@ from rest_framework import response
 from rest_framework import viewsets
 
 from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common.permissions import ConditionalAuthentication
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
@@ -22,6 +24,7 @@ from . import filters
 from . import models
 from . import routes
 from . import serializers
+from . import tasks
 from . import utils
 
 
@@ -195,11 +198,28 @@ class InboxItemViewSet(
         return response.Response(result, status=200)
 
 
-class FetchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class FetchViewSet(
+    mixins.CreateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
 
     queryset = models.Fetch.objects.select_related("actor")
     serializer_class = api_serializers.FetchSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttling_scopes = {"create": {"authenticated": "fetch"}}
+
+    def get_queryset(self):
+        return super().get_queryset().filter(actor=self.request.user.actor)
+
+    def perform_create(self, serializer):
+        fetch = serializer.save(actor=self.request.user.actor)
+        if fetch.status == "finished":
+            # a duplicate was returned, no need to fetch again
+            return
+        if settings.FEDERATION_SYNCHRONOUS_FETCH:
+            tasks.fetch(fetch_id=fetch.pk)
+            fetch.refresh_from_db()
+        else:
+            common_utils.on_commit(tasks.fetch.delay, fetch_id=fetch.pk)
 
 
 class DomainViewSet(

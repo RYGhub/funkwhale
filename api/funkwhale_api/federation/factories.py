@@ -21,7 +21,7 @@ class SignatureAuthFactory(factory.Factory):
     key = factory.LazyFunction(lambda: keys.get_key_pair()[0])
     key_id = factory.Faker("url")
     use_auth_header = False
-    headers = ["(request-target)", "user-agent", "host", "date", "content-type"]
+    headers = ["(request-target)", "user-agent", "host", "date", "accept"]
 
     class Meta:
         model = requests_http_signature.HTTPSignatureAuth
@@ -42,7 +42,7 @@ class SignedRequestFactory(factory.Factory):
             "User-Agent": "Test",
             "Host": "test.host",
             "Date": http_date(timezone.now().timestamp()),
-            "Content-Type": "application/activity+json",
+            "Accept": "application/activity+json",
         }
         if extracted:
             default_headers.update(extracted)

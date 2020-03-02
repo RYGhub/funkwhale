@@ -105,6 +105,7 @@ export default {
   methods: {
     fetch () {
       let self = this
+      self.object = null
       self.isLoading = true
       axios.get(`federation/actors/${this.fullUsername}/`).then((response) => {
         self.object = response.data
@@ -138,6 +139,14 @@ export default {
     },
     displayName () {
       return this.object.name || this.object.preferred_username
+    }
+  },
+  watch: {
+    domain () {
+      this.fetch()
+    },
+    username () {
+      this.fetch()
     }
   }
 }

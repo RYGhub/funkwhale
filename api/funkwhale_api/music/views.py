@@ -249,6 +249,7 @@ class LibraryViewSet(
     queryset = (
         models.Library.objects.all()
         .filter(channel=None)
+        .select_related("actor")
         .order_by("-creation_date")
         .annotate(_uploads_count=Count("uploads"))
         .annotate(_size=Sum("uploads__size"))
@@ -261,11 +262,15 @@ class LibraryViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
     owner_field = "actor.user"
-    owner_checks = ["read", "write"]
+    owner_checks = ["write"]
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(actor=self.request.user.actor)
+        # allow retrieving a single library by uuid if request.user isn't
+        # the owner. Any other get should be from the owner only
+        if self.action != "retrieve":
+            qs = qs.filter(actor=self.request.user.actor)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(actor=self.request.user.actor)
@@ -599,7 +604,7 @@ class UploadViewSet(
         models.Upload.objects.all()
         .order_by("-creation_date")
         .prefetch_related(
-            "library",
+            "library__actor",
             "track__artist",
             "track__album__artist",
             "track__attachment_cover",
@@ -613,7 +618,7 @@ class UploadViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
     owner_field = "library.actor.user"
-    owner_checks = ["read", "write"]
+    owner_checks = ["write"]
     filterset_class = filters.UploadFilter
     ordering_fields = (
         "creation_date",
@@ -628,7 +633,12 @@ class UploadViewSet(
         if self.action in ["update", "partial_update"]:
             # prevent updating an upload that is already processed
             qs = qs.filter(import_status="draft")
-        return qs.filter(library__actor=self.request.user.actor)
+        if self.action != "retrieve":
+            qs = qs.filter(library__actor=self.request.user.actor)
+        else:
+            actor = utils.get_actor_from_request(self.request)
+            qs = qs.playable_by(actor)
+        return qs
 
     @action(methods=["get"], detail=True, url_path="audio-file-metadata")
     def audio_file_metadata(self, request, *args, **kwargs):

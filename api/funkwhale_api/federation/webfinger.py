@@ -46,3 +46,12 @@ def get_resource(resource_string):
     serializer = serializers.ActorWebfingerSerializer(data=response.json())
     serializer.is_valid(raise_exception=True)
     return serializer.validated_data
+
+
+def get_ap_url(links):
+    for link in links:
+        if (
+            link.get("rel") == "self"
+            and link.get("type") == "application/activity+json"
+        ):
+            return link["href"]

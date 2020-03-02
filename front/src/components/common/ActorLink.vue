@@ -19,7 +19,7 @@ export default {
       if (this.actor.is_local) {
         return {name: 'profile.overview', params: {username: this.actor.preferred_username}}
       } else {
-        return {name: 'profile.overview', params: {username: this.actor.full_username}}
+        return {name: 'profile.full.overview', params: {username: this.actor.preferred_username, domain: this.actor.domain}}
       }
     },
     repr () {

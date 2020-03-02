@@ -141,3 +141,65 @@ def test_api_full_actor_serializer(factories, to_api_date):
     serializer = api_serializers.FullActorSerializer(actor)
 
     assert serializer.data == expected
+
+
+def test_fetch_serializer_no_obj(factories, to_api_date):
+    fetch = factories["federation.Fetch"]()
+    expected = {
+        "id": fetch.pk,
+        "url": fetch.url,
+        "creation_date": to_api_date(fetch.creation_date),
+        "fetch_date": None,
+        "status": fetch.status,
+        "detail": fetch.detail,
+        "object": None,
+        "actor": serializers.APIActorSerializer(fetch.actor).data,
+    }
+
+    assert api_serializers.FetchSerializer(fetch).data == expected
+
+
+@pytest.mark.parametrize(
+    "object_factory, expected_type, expected_id",
+    [
+        ("music.Album", "album", "id"),
+        ("music.Artist", "artist", "id"),
+        ("music.Track", "track", "id"),
+        ("music.Library", "library", "uuid"),
+        ("music.Upload", "upload", "uuid"),
+        ("federation.Actor", "account", "full_username"),
+    ],
+)
+def test_fetch_serializer_with_object(
+    object_factory, expected_type, expected_id, factories, to_api_date
+):
+    obj = factories[object_factory]()
+    fetch = factories["federation.Fetch"](object=obj)
+    expected = {
+        "id": fetch.pk,
+        "url": fetch.url,
+        "creation_date": to_api_date(fetch.creation_date),
+        "fetch_date": None,
+        "status": fetch.status,
+        "detail": fetch.detail,
+        "object": {"type": expected_type, expected_id: getattr(obj, expected_id)},
+        "actor": serializers.APIActorSerializer(fetch.actor).data,
+    }
+
+    assert api_serializers.FetchSerializer(fetch).data == expected
+
+
+def test_fetch_serializer_unhandled_obj(factories, to_api_date):
+    fetch = factories["federation.Fetch"](object=factories["users.User"]())
+    expected = {
+        "id": fetch.pk,
+        "url": fetch.url,
+        "creation_date": to_api_date(fetch.creation_date),
+        "fetch_date": None,
+        "status": fetch.status,
+        "detail": fetch.detail,
+        "object": None,
+        "actor": serializers.APIActorSerializer(fetch.actor).data,
+    }
+
+    assert api_serializers.FetchSerializer(fetch).data == expected

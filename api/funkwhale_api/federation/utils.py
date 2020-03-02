@@ -1,3 +1,4 @@
+import html.parser
 import unicodedata
 import re
 from django.conf import settings
@@ -164,3 +165,39 @@ def get_actor_from_username_data_query(field, data):
                 "domain__name__iexact": data["domain"],
             }
         )
+
+
+class StopParsing(Exception):
+    pass
+
+
+class AlternateLinkParser(html.parser.HTMLParser):
+    def __init__(self, *args, **kwargs):
+        self.result = None
+        super().__init__(*args, **kwargs)
+
+    def handle_starttag(self, tag, attrs):
+        if tag != "link":
+            return
+
+        attrs_dict = dict(attrs)
+        if attrs_dict.get("rel") == "alternate" and attrs_dict.get(
+            "type", "application/activity+json"
+        ):
+            self.result = attrs_dict.get("href")
+            raise StopParsing()
+
+    def handle_endtag(self, tag):
+        if tag == "head":
+            raise StopParsing()
+
+
+def find_alternate(response_text):
+    if not response_text:
+        return
+
+    parser = AlternateLinkParser()
+    try:
+        parser.feed(response_text)
+    except StopParsing:
+        return parser.result

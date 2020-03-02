@@ -324,6 +324,7 @@ class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
 class LibraryForOwnerSerializer(serializers.ModelSerializer):
     uploads_count = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
+    actor = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Library
@@ -336,6 +337,7 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
             "uploads_count",
             "size",
             "creation_date",
+            "actor",
         ]
         read_only_fields = ["fid", "uuid", "creation_date", "actor"]
 
@@ -349,6 +351,12 @@ class LibraryForOwnerSerializer(serializers.ModelSerializer):
         routes.outbox.dispatch(
             {"type": "Update", "object": {"type": "Library"}}, context={"library": obj}
         )
+
+    def get_actor(self, o):
+        # Import at runtime to avoid a circular import issue
+        from funkwhale_api.federation import serializers as federation_serializers
+
+        return federation_serializers.APIActorSerializer(o.actor).data
 
 
 class UploadSerializer(serializers.ModelSerializer):

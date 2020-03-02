@@ -372,7 +372,7 @@ class Fetch(models.Model):
     objects = FetchQuerySet.as_manager()
 
     def save(self, **kwargs):
-        if not self.url and self.object:
+        if not self.url and self.object and hasattr(self.object, "fid"):
             self.url = self.object.fid
 
         super().save(**kwargs)
@@ -388,6 +388,11 @@ class Fetch(models.Model):
             contexts.FW.Track: serializers.TrackSerializer,
             contexts.AS.Audio: serializers.UploadSerializer,
             contexts.FW.Library: serializers.LibrarySerializer,
+            contexts.AS.Group: serializers.ActorSerializer,
+            contexts.AS.Person: serializers.ActorSerializer,
+            contexts.AS.Organization: serializers.ActorSerializer,
+            contexts.AS.Service: serializers.ActorSerializer,
+            contexts.AS.Application: serializers.ActorSerializer,
         }
 
 
@@ -568,7 +573,7 @@ class LibraryTrack(models.Model):
             auth=auth,
             stream=True,
             timeout=20,
-            headers={"Content-Type": "application/activity+json"},
+            headers={"Accept": "application/activity+json"},
         )
         with remote_response as r:
             remote_response.raise_for_status()
