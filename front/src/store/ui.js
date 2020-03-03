@@ -87,6 +87,11 @@ export default {
         orderingDirection: "-",
         ordering: "creation_date",
       },
+      "favorites": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
     },
     serviceWorker: {
       refreshing: false,
