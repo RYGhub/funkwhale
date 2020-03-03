@@ -17,19 +17,21 @@ let plugins = [
 if (process.env.BUNDLE_ANALYZE === '1') {
   plugins.push(new BundleAnalyzerPlugin())
 }
-plugins.push(
-  new PurgecssPlugin({
-    paths: glob.sync([
-      path.join(__dirname, './public/index.html'),
-      path.join(__dirname, './public/embed.html'),
-      path.join(__dirname, './**/*.vue'),
-      path.join(__dirname, './src/**/*.js')
-    ]),
-    whitelist: ['scale'],
-    whitelistPatterns: [/plyr/, /toast/, /theme/],
-    whitelistPatternsChildren: [/plyr/, /dropdown/, /upward/]
-  }),
-)
+// Disabled because it causes some issues, like #1032, since some useful rules are still
+// removed, and we cannot detect this during development
+// plugins.push(
+//   new PurgecssPlugin({
+//     paths: glob.sync([
+//       path.join(__dirname, './public/index.html'),
+//       path.join(__dirname, './public/embed.html'),
+//       path.join(__dirname, './**/*.vue'),
+//       path.join(__dirname, './src/**/*.js')
+//     ]),
+//     whitelist: ['scale'],
+//     whitelistPatterns: [/plyr/, /toast/, /transition/, /visible/],
+//     whitelistPatternsChildren: [/plyr/, /dropdown/, /upward/]
+//   }),
+// )
 module.exports = {
   publicPath: baseUrl,
   productionSourceMap: false,
