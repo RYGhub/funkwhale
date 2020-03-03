@@ -26,7 +26,7 @@ plugins.push(
       path.join(__dirname, './src/**/*.js')
     ]),
     whitelist: ['scale'],
-    whitelistPatterns: [/plyr/, /toast/],
+    whitelistPatterns: [/plyr/, /toast/, /theme/],
     whitelistPatternsChildren: [/plyr/, /dropdown/, /upward/]
   }),
 )
