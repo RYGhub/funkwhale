@@ -77,12 +77,17 @@ export default {
         orderingDirection: "-",
         ordering: "creation_date",
       },
-      "content.libraries.detail": {
+      "library.detail.upload": {
         paginateBy: 50,
         orderingDirection: "-",
         ordering: "creation_date",
       },
-      "content.libraries.detail.upload": {
+      "library.detail.edit": {
+        paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "library.detail": {
         paginateBy: 50,
         orderingDirection: "-",
         ordering: "creation_date",

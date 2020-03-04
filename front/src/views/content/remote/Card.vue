@@ -2,7 +2,9 @@
   <div class="ui card">
     <div class="content">
       <div class="header">
-        {{ library.name }}
+        <router-link :to="{name: 'library.detail', params: {id: library.uuid}}">
+          {{ library.name }}
+        </router-link>
         <div class="ui right floated dropdown">
           <i class="ellipsis vertical grey large icon nomargin"></i>
           <div class="menu">

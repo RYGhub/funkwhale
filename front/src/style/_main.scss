@@ -174,9 +174,6 @@ html {
   }
 }
 
-.main-pusher {
-  padding: 1.5rem 0;
-}
 .ui.stripe.segment,
 #footer {
   padding: 1em;
@@ -197,6 +194,9 @@ html {
 }
 .center.aligned.menu {
   justify-content: center;
+}
+.text.center.aligned {
+  text-align: center;
 }
 .ellipsis:not(.icon) {
   text-overflow: ellipsis;
@@ -658,6 +658,9 @@ input + .help {
 }
 .modal > .header {
   text-align: center;
+}
+.ui.header .content {
+  display: block;
 }
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

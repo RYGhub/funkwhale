@@ -41,8 +41,30 @@ class ChannelFilterSet(filters.FilterSet):
         return queryset.filter(pk__in=ids)
 
 
+class LibraryFilterSet(filters.FilterSet):
+
+    library = filters.CharFilter(field_name="_", method="filter_library")
+
+    def filter_library(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        actor = utils.get_actor_from_request(self.request)
+        library = models.Library.objects.filter(uuid=value).viewable_by(actor).first()
+
+        if not library:
+            return queryset.none()
+
+        uploads = models.Upload.objects.filter(library=library)
+        uploads = uploads.playable_by(actor)
+        ids = uploads.values_list(self.Meta.library_filter_field, flat=True)
+        return queryset.filter(pk__in=ids)
+
+
 class ArtistFilter(
-    audio_filters.IncludeChannelsFilterSet, moderation_filters.HiddenContentFilterSet
+    LibraryFilterSet,
+    audio_filters.IncludeChannelsFilterSet,
+    moderation_filters.HiddenContentFilterSet,
 ):
 
     q = fields.SearchFilter(search_fields=["name"], fts_search_fields=["body_text"])
@@ -62,6 +84,7 @@ class ArtistFilter(
         }
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ARTIST"]
         include_channels_field = "channel"
+        library_filter_field = "track__artist"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
@@ -70,6 +93,7 @@ class ArtistFilter(
 
 class TrackFilter(
     ChannelFilterSet,
+    LibraryFilterSet,
     audio_filters.IncludeChannelsFilterSet,
     moderation_filters.HiddenContentFilterSet,
 ):
@@ -99,6 +123,7 @@ class TrackFilter(
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["TRACK"]
         include_channels_field = "artist__channel"
         channel_filter_field = "track"
+        library_filter_field = "track"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
@@ -156,6 +181,7 @@ class UploadFilter(audio_filters.IncludeChannelsFilterSet):
 
 class AlbumFilter(
     ChannelFilterSet,
+    LibraryFilterSet,
     audio_filters.IncludeChannelsFilterSet,
     moderation_filters.HiddenContentFilterSet,
 ):
@@ -175,6 +201,7 @@ class AlbumFilter(
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["ALBUM"]
         include_channels_field = "artist__channel"
         channel_filter_field = "track__album"
+        library_filter_field = "track__album"
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)

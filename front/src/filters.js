@@ -3,6 +3,9 @@ import Vue from 'vue'
 import moment from 'moment'
 
 export function truncate (str, max, ellipsis, middle) {
+  if (max === 0) {
+    return
+  }
   max = max || 100
   ellipsis = ellipsis || '…'
   if (str.length <= max) {

@@ -62,8 +62,7 @@ export default {
       })
     },
     libraryCreated(library) {
-      this.hiddenForm = true
-      this.libraries.unshift(library)
+      this.$router.push({name: 'library.detail', params: {id: library.uuid}})
     }
   }
 }

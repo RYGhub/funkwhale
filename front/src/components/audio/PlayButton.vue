@@ -68,6 +68,7 @@ export default {
     iconOnly: {type: Boolean, default: false},
     artist: {type: Object, required: false},
     album: {type: Object, required: false},
+    library: {type: Object, required: false},
     isPlayable: {type: Boolean, required: false, default: null}
   },
   data () {
@@ -195,6 +196,9 @@ export default {
           self.getTracksPage(1, params, resolve)
         } else if (self.album) {
           let params = {'album': self.album.id, include_channels: 'true', 'ordering': 'disc_number,position'}
+          self.getTracksPage(1, params, resolve)
+        } else if (self.library) {
+          let params = {'library': self.library.uuid, 'ordering': '-creation_date'}
           self.getTracksPage(1, params, resolve)
         }
       })

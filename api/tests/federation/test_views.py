@@ -2,7 +2,14 @@ import pytest
 from django.core.paginator import Paginator
 from django.urls import reverse
 
-from funkwhale_api.federation import actors, serializers, webfinger
+from funkwhale_api.common import utils
+
+from funkwhale_api.federation import (
+    actors,
+    serializers,
+    webfinger,
+    utils as federation_utils,
+)
 
 
 def test_authenticate_skips_anonymous_fetch_when_allow_list_enabled(
@@ -159,7 +166,7 @@ def test_wellknown_webfinger_local(factories, api_client, settings, mocker):
 
 @pytest.mark.parametrize("privacy_level", ["me", "instance", "everyone"])
 def test_music_library_retrieve(factories, api_client, privacy_level):
-    library = factories["music.Library"](privacy_level=privacy_level)
+    library = factories["music.Library"](privacy_level=privacy_level, actor__local=True)
     expected = serializers.LibrarySerializer(library).data
 
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
@@ -170,7 +177,7 @@ def test_music_library_retrieve(factories, api_client, privacy_level):
 
 
 def test_music_library_retrieve_excludes_channel_libraries(factories, api_client):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](local=True)
     library = channel.library
 
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
@@ -180,7 +187,7 @@ def test_music_library_retrieve_excludes_channel_libraries(factories, api_client
 
 
 def test_music_library_retrieve_page_public(factories, api_client):
-    library = factories["music.Library"](privacy_level="everyone")
+    library = factories["music.Library"](privacy_level="everyone", actor__local=True)
     upload = factories["music.Upload"](library=library, import_status="finished")
     id = library.get_federation_id()
     expected = serializers.CollectionPageSerializer(
@@ -253,7 +260,7 @@ def test_channel_upload_retrieve(factories, api_client):
 
 @pytest.mark.parametrize("privacy_level", ["me", "instance"])
 def test_music_library_retrieve_page_private(factories, api_client, privacy_level):
-    library = factories["music.Library"](privacy_level=privacy_level)
+    library = factories["music.Library"](privacy_level=privacy_level, actor__local=True)
     url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
     response = api_client.get(url, {"page": 1})
 
@@ -264,7 +271,7 @@ def test_music_library_retrieve_page_private(factories, api_client, privacy_leve
 def test_music_library_retrieve_page_follow(
     factories, api_client, authenticated_actor, approved, expected
 ):
-    library = factories["music.Library"](privacy_level="me")
+    library = factories["music.Library"](privacy_level="me", actor__local=True)
     factories["federation.LibraryFollow"](
         actor=authenticated_actor, target=library, approved=approved
     )
@@ -344,3 +351,35 @@ def test_music_upload_detail_private_approved_follow(
     response = api_client.get(url)
 
     assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "accept_header,expected",
+    [
+        ("text/html,application/xhtml+xml", True),
+        ("text/html,application/json", True),
+        ("", False),
+        (None, False),
+        ("application/json", False),
+        ("application/activity+json", False),
+        ("application/json,text/html", False),
+        ("application/activity+json,text/html", False),
+    ],
+)
+def test_should_redirect_ap_to_html(accept_header, expected):
+    assert federation_utils.should_redirect_ap_to_html(accept_header) is expected
+
+
+def test_music_library_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    library = factories["music.Library"](actor__local=True)
+
+    url = reverse("federation:music:libraries-detail", kwargs={"uuid": library.uuid})
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_library", kwargs={"uuid": library.uuid}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url

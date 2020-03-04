@@ -1,6 +1,6 @@
 <template>
   <router-link :to="url" :title="actor.full_username">
-    <template v-if="avatar"><actor-avatar :actor="actor" />&nbsp;</template>{{ repr | truncate(30) }}
+    <template v-if="avatar"><actor-avatar :actor="actor" />&nbsp;</template><slot>{{ repr | truncate(truncateLength) }}</slot>
   </router-link>
 </template>
 
@@ -13,6 +13,7 @@ export default {
     avatar: {type: Boolean, default: true},
     admin: {type: Boolean, default: false},
     displayName: {type: Boolean, default: false},
+    truncateLength: {type: Number, default: 30},
   },
   computed: {
     url () {

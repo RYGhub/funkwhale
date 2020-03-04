@@ -1,11 +1,12 @@
 <script>
 export default {
   props: {
-    defaultOrdering: {type: String, required: false}
+    defaultOrdering: {type: String, required: false},
+    orderingConfigName: {type: String, required: false},
   },
   computed: {
     orderingConfig () {
-      return this.$store.state.ui.routePreferences[this.$route.name]
+      return this.$store.state.ui.routePreferences[this.orderingConfigName || this.$route.name]
     },
     paginateBy: {
       set(paginateBy) {

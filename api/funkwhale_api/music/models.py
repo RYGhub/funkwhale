@@ -1110,6 +1110,12 @@ LIBRARY_PRIVACY_LEVEL_CHOICES = [
 
 
 class LibraryQuerySet(models.QuerySet):
+    def local(self, include=True):
+        query = models.Q(actor__domain_id=settings.FEDERATION_HOSTNAME)
+        if not include:
+            query = ~query
+        return self.filter(query)
+
     def with_follows(self, actor):
         return self.prefetch_related(
             models.Prefetch(
@@ -1123,14 +1129,14 @@ class LibraryQuerySet(models.QuerySet):
         from funkwhale_api.federation.models import LibraryFollow
 
         if actor is None:
-            return Library.objects.filter(privacy_level="everyone")
+            return self.filter(privacy_level="everyone")
 
         me_query = models.Q(privacy_level="me", actor=actor)
         instance_query = models.Q(privacy_level="instance", actor__domain=actor.domain)
         followed_libraries = LibraryFollow.objects.filter(
             actor=actor, approved=True
         ).values_list("target", flat=True)
-        return Library.objects.filter(
+        return self.filter(
             me_query
             | instance_query
             | models.Q(privacy_level="everyone")
@@ -1163,6 +1169,9 @@ class Library(federation_models.FederationMixin):
         return federation_utils.full_url(
             reverse("federation:music:libraries-detail", kwargs={"uuid": self.uuid})
         )
+
+    def get_absolute_url(self):
+        return "/library/{}".format(self.uuid)
 
     def save(self, **kwargs):
         if not self.pk and not self.fid and self.actor.get_user():

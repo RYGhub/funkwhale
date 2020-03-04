@@ -20,8 +20,15 @@
         </div>
       </h2>
       <channels-widget :filters="{scope: `actor:${object.full_username}`}"></channels-widget>
-      <h2 class="ui header">
+      <h2 class="ui with-actions header">
         <translate translate-context="Content/Profile/Header">User Libraries</translate>
+        <div class="actions" v-if="$store.state.auth.authenticated && object.full_username === $store.state.auth.fullUsername">
+          <router-link :to="{name: 'content.libraries.index'}">
+            <i class="plus icon"></i>
+            <translate translate-context="Content/Profile/Button">Add new</translate>
+          </router-link>
+        </div>
+
       </h2>
       <library-widget :url="`federation/actors/${object.full_username}/libraries/`">
         <translate translate-context="Content/Profile/Paragraph" slot="subtitle">This user shared the following libraries.</translate>

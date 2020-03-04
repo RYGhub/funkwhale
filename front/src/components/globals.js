@@ -18,5 +18,6 @@ Vue.component('collapse-link', () => import(/* webpackChunkName: "common" */ "@/
 Vue.component('action-feedback', () => import(/* webpackChunkName: "common" */ "@/components/common/ActionFeedback"))
 Vue.component('rendered-description', () => import(/* webpackChunkName: "common" */ "@/components/common/RenderedDescription"))
 Vue.component('content-form', () => import(/* webpackChunkName: "common" */ "@/components/common/ContentForm"))
+Vue.component('inline-search-bar', () => import(/* webpackChunkName: "common" */ "@/components/common/InlineSearchBar"))
 
 export default {}

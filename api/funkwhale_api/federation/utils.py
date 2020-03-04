@@ -201,3 +201,26 @@ def find_alternate(response_text):
         parser.feed(response_text)
     except StopParsing:
         return parser.result
+
+
+def should_redirect_ap_to_html(accept_header):
+    if not accept_header:
+        return False
+
+    redirect_headers = [
+        "text/html",
+    ]
+    no_redirect_headers = [
+        "application/json",
+        "application/activity+json",
+        "application/ld+json",
+    ]
+
+    parsed_header = [ct.lower().strip() for ct in accept_header.split(",")]
+    for ct in parsed_header:
+        if ct in redirect_headers:
+            return True
+        if ct in no_redirect_headers:
+            return False
+
+    return True

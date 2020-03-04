@@ -4,6 +4,7 @@
       <slot name="title"></slot>
       <span class="ui tiny circular label">{{ count }}</span>
     </h3>
+    <inline-search-bar v-model="query" v-if="search" @search="objects = []; fetchData()"></inline-search-bar>
     <div class="ui hidden divider"></div>
     <div class="ui five app-cards cards">
       <div v-if="isLoading" class="ui inverted active dimmer">
@@ -11,7 +12,9 @@
       </div>
       <artist-card :artist="artist" v-for="artist in objects" :key="artist.id"></artist-card>
     </div>
-    <div v-if="!isLoading && objects.length === 0">No results matching your query.</div>
+    <slot v-if="!isLoading && objects.length === 0" name="empty-state">
+      <empty-state @refresh="fetchData" :refresh="true"></empty-state>
+    </slot>
     <template v-if="nextPage">
       <div class="ui hidden divider"></div>
       <button v-if="nextPage" @click="fetchData(nextPage)" :class="['ui', 'basic', 'button']">
@@ -22,7 +25,6 @@
 </template>
 
 <script>
-import _ from '@/lodash'
 import axios from 'axios'
 import ArtistCard from "@/components/audio/artist/Card"
 
@@ -31,6 +33,7 @@ export default {
     filters: {type: Object, required: true},
     controls: {type: Boolean, default: true},
     header: {type: Boolean, default: true},
+    search: {type: Boolean, default: false},
   },
   components: {
     ArtistCard,
@@ -43,20 +46,19 @@ export default {
       isLoading: false,
       errors: null,
       previousPage: null,
-      nextPage: null
+      nextPage: null,
+      query: '',
     }
   },
   created () {
-    this.fetchData('artists/')
+    this.fetchData()
   },
   methods: {
     fetchData (url) {
-      if (!url) {
-        return
-      }
+      url = url || 'artists/'
       this.isLoading = true
       let self = this
-      let params = _.clone(this.filters)
+      let params = {q: this.query, ...this.filters}
       params.page_size = this.limit
       params.offset = this.offset
       axios.get(url, {params: params}).then((response) => {
@@ -83,7 +85,7 @@ export default {
       this.fetchData()
     },
     "$store.state.moderation.lastUpdate": function () {
-      this.fetchData('objects/')
+      this.fetchData()
     }
   }
 }
