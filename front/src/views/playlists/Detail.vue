@@ -28,7 +28,7 @@
           v-if="$store.state.auth.profile && playlist.user.id === $store.state.auth.profile.id"
           @click="edit = !edit">
           <i class="pencil icon"></i>
-          <template v-if="edit"><translate translate-context="Content/Playlist/Button.Label/Verb">End edition</translate></template>
+          <template v-if="edit"><translate translate-context="Content/Playlist/Button.Label/Verb">Stop Editing</translate></template>
           <template v-else><translate translate-context="Content/*/Button.Label/Verb">Edit</translate></template>
         </button>
         <button
