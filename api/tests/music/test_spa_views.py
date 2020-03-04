@@ -282,3 +282,32 @@ def test_library_playlist_empty(spa_html, no_api_auth, client, factories, settin
 
     # we only test our custom metas, not the default ones
     assert metas[: len(expected_metas)] == expected_metas
+
+
+def test_library_library(spa_html, no_api_auth, client, factories, settings):
+    library = factories["music.Library"]()
+    url = "/library/{}".format(library.uuid)
+
+    response = client.get(url)
+
+    expected_metas = [
+        {
+            "tag": "meta",
+            "property": "og:url",
+            "content": utils.join_url(settings.FUNKWHALE_URL, url),
+        },
+        {"tag": "meta", "property": "og:type", "content": "website"},
+        {"tag": "meta", "property": "og:title", "content": library.name},
+        {"tag": "meta", "property": "og:description", "content": library.description},
+        {
+            "tag": "link",
+            "rel": "alternate",
+            "type": "application/activity+json",
+            "href": library.fid,
+        },
+    ]
+
+    metas = utils.parse_meta(response.content.decode())
+
+    # we only test our custom metas, not the default ones
+    assert metas[: len(expected_metas)] == expected_metas

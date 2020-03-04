@@ -31,7 +31,7 @@
     <td colspan="4" v-else>
       <translate translate-context="*/*/*">N/A</translate>
     </td>
-    <td colspan="2" class="align right">
+    <td colspan="2" v-if="displayActions" class="align right">
       <track-favorite-icon class="favorite-icon" :track="track"></track-favorite-icon>
       <play-button
         class="play-button basic icon"
@@ -59,6 +59,7 @@ export default {
     track: {type: Object, required: true},
     artist: {type: Object, required: false},
     displayPosition: {type: Boolean, default: false},
+    displayActions: {type: Boolean, default: true},
     playable: {type: Boolean, required: false, default: false},
   },
   components: {

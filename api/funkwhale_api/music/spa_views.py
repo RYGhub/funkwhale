@@ -292,3 +292,33 @@ def library_playlist(request, pk):
         # twitter player is also supported in various software
         metas += get_twitter_card_metas(type="playlist", id=obj.pk)
     return metas
+
+
+def library_library(request, uuid):
+    queryset = models.Library.objects.filter(uuid=uuid)
+    try:
+        obj = queryset.get()
+    except models.Library.DoesNotExist:
+        return []
+    library_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_library", kwargs={"uuid": obj.uuid}),
+    )
+    metas = [
+        {"tag": "meta", "property": "og:url", "content": library_url},
+        {"tag": "meta", "property": "og:type", "content": "website"},
+        {"tag": "meta", "property": "og:title", "content": obj.name},
+        {"tag": "meta", "property": "og:description", "content": obj.description},
+    ]
+
+    if preferences.get("federation__enabled"):
+        metas.append(
+            {
+                "tag": "link",
+                "rel": "alternate",
+                "type": "application/activity+json",
+                "href": obj.fid,
+            }
+        )
+
+    return metas

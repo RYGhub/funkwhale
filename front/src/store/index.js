@@ -4,6 +4,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 import favorites from './favorites'
 import channels from './channels'
+import libraries from './libraries'
 import auth from './auth'
 import instance from './instance'
 import moderation from './moderation'
@@ -20,6 +21,7 @@ export default new Vuex.Store({
     ui,
     auth,
     channels,
+    libraries,
     favorites,
     instance,
     moderation,

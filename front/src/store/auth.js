@@ -143,6 +143,7 @@ export default {
           }
           dispatch('favorites/fetch', null, { root: true })
           dispatch('channels/fetchSubscriptions', null, { root: true })
+          dispatch('libraries/fetchFollows', null, { root: true })
           dispatch('moderation/fetchContentFilters', null, { root: true })
           dispatch('playlists/fetchOwn', null, { root: true })
         }, (response) => {

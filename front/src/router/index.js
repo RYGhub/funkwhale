@@ -233,27 +233,6 @@ export default new Router({
             import(
               /* webpackChunkName: "auth-libraries" */ "@/views/content/libraries/Home"
             )
-        },
-        {
-          path: ":id/upload",
-          name: "content.libraries.detail.upload",
-          component: () =>
-            import(
-              /* webpackChunkName: "auth-libraries" */ "@/views/content/libraries/Upload"
-            ),
-          props: route => ({
-            id: route.params.id,
-            defaultImportReference: route.query.import
-          })
-        },
-        {
-          path: ":id",
-          name: "content.libraries.detail",
-          component: () =>
-            import(
-              /* webpackChunkName: "auth-libraries" */ "@/views/content/libraries/Detail"
-            ),
-          props: true
         }
       ]
     },
@@ -811,6 +790,68 @@ export default new Router({
                 ),
               props: true
             }
+          ]
+        },
+        {
+          // browse a single library via it's uuid
+          path: ":id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})",
+          props: true,
+          component: () =>
+            import(
+              /* webpackChunkName: "library" */ "@/views/library/DetailBase"
+            ),
+          children: [
+            {
+              path: "",
+              name: "library.detail",
+              component: () =>
+                import(
+                  /* webpackChunkName: "library" */ "@/views/library/DetailOverview"
+                )
+            },
+            {
+              path: "albums",
+              name: "library.detail.albums",
+              component: () =>
+                import(
+                  /* webpackChunkName: "library" */ "@/views/library/DetailAlbums"
+                )
+            },
+            {
+              path: "tracks",
+              name: "library.detail.tracks",
+              component: () =>
+                import(
+                  /* webpackChunkName: "library" */ "@/views/library/DetailTracks"
+                )
+            },
+            {
+              path: "edit",
+              name: "library.detail.edit",
+              component: () =>
+                import(
+                  /* webpackChunkName: "auth-libraries" */ "@/views/library/Edit"
+                )
+            },
+            {
+              path: "upload",
+              name: "library.detail.upload",
+              component: () =>
+                import(
+                  /* webpackChunkName: "auth-libraries" */ "@/views/library/Upload"
+                ),
+              props: route => ({
+                defaultImportReference: route.query.import
+              })
+            },
+            // {
+            //   path: "episodes",
+            //   name: "library.detail.episodes",
+            //   component: () =>
+            //     import(
+            //       /* webpackChunkName: "library" */ "@/views/library/DetailEpisodes"
+            //     )
+            // },
           ]
         }
       ]

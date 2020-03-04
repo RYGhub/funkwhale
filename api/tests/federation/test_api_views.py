@@ -286,3 +286,25 @@ def test_fetch_duplicate_bypass_with_force(
     assert response.status_code == 201
     assert response.data == api_serializers.FetchSerializer(fetch).data
     fetch_task.assert_called_once_with(fetch_id=fetch.pk)
+
+
+def test_library_follow_get_all(factories, logged_in_api_client):
+    actor = logged_in_api_client.user.create_actor()
+    library = factories["music.Library"]()
+    follow = factories["federation.LibraryFollow"](target=library, actor=actor)
+    factories["federation.LibraryFollow"]()
+    factories["music.Library"]()
+    url = reverse("api:v1:federation:library-follows-all")
+    response = logged_in_api_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data == {
+        "results": [
+            {
+                "uuid": str(follow.uuid),
+                "library": str(library.uuid),
+                "approved": follow.approved,
+            }
+        ],
+        "count": 1,
+    }

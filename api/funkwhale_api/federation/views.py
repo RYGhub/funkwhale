@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.core import paginator
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -7,11 +8,18 @@ from rest_framework import exceptions, mixins, permissions, response, viewsets
 from rest_framework.decorators import action
 
 from funkwhale_api.common import preferences
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
 from . import activity, authentication, models, renderers, serializers, utils, webfinger
+
+
+def redirect_to_html(public_url):
+    response = HttpResponse(status=302)
+    response["Location"] = common_utils.join_url(settings.FUNKWHALE_URL, public_url)
+    return response
 
 
 class AuthenticatedIfAllowListEnabled(permissions.BasePermission):
@@ -204,13 +212,18 @@ class MusicLibraryViewSet(
     renderer_classes = renderers.get_ap_renderers()
     serializer_class = serializers.LibrarySerializer
     queryset = (
-        music_models.Library.objects.all().select_related("actor").filter(channel=None)
+        music_models.Library.objects.all()
+        .local()
+        .select_related("actor")
+        .filter(channel=None)
     )
     lookup_field = "uuid"
 
     def retrieve(self, request, *args, **kwargs):
         lb = self.get_object()
-
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            # XXX: implement this for actors, albums, tracks, artists
+            return redirect_to_html(lb.get_absolute_url())
         conf = {
             "id": lb.get_federation_id(),
             "actor": lb.actor,

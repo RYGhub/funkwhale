@@ -45,17 +45,17 @@
         </ul>
       </div>
 
-      <div class="ui form">
+      <form class="ui form" @submit.prevent="currentTab = 'uploads'">
         <div class="fields">
-          <div class="ui four wide field">
+          <div class="ui field">
             <label><translate translate-context="Content/Library/Input.Label/Noun">Import reference</translate></label>
             <p><translate translate-context="Content/Library/Paragraph">This reference will be used to group imported files together.</translate></p>
             <input name="import-ref" type="text" v-model="importReference" />
           </div>
         </div>
 
-      </div>
-      <div class="ui green button" @click="currentTab = 'uploads'"><translate translate-context="Content/Library/Button.Label">Proceed</translate></div>
+        <button type="submit" class="ui green button"><translate translate-context="Content/Library/Button.Label">Proceed</translate></button>
+      </form>
     </div>
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'uploads'}]">
       <div :class="['ui', {loading: isLoadingQuota}, 'container']">
@@ -149,6 +149,7 @@
     <div :class="['ui', 'bottom', 'attached', 'segment', {hidden: currentTab != 'processing'}]">
       <library-files-table
         :needs-refresh="needsRefresh"
+        ordering-config-name="library.detail.upload"
         @fetch-start="needsRefresh = false"
         :filters="{import_reference: importReference}"
         :custom-objects="Object.values(uploads.objects)"></library-files-table>
@@ -252,14 +253,6 @@ export default {
             self.uploads[status] = response.data.count;
           });
       });
-    },
-    updateProgressBar() {
-      $(this.$el)
-        .find(".progress")
-        .progress({
-          total: this.uploads.length * 2,
-          value: this.uploadedFilesCount + this.finishedJobs
-        });
     },
     handleImportEvent(event) {
       let self = this;
@@ -387,18 +380,17 @@ export default {
     }
   },
   watch: {
-    uploadedFilesCount() {
-      this.updateProgressBar();
-    },
-    finishedJobs() {
-      this.updateProgressBar();
-    },
     importReference: _.debounce(function() {
       this.$router.replace({ query: { import: this.importReference } });
     }, 500),
     remainingSpace (newValue) {
       if (newValue <= 0) {
         this.$refs.upload.active = false;
+      }
+    },
+    'uploads.finished' (v, o) {
+      if (v > o) {
+        this.$emit('uploads-finished', v - o)
       }
     }
   }

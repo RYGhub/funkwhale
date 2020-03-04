@@ -22,6 +22,11 @@ urlpatterns = [
         name="library_playlist",
     ),
     urls.re_path(
+        r"^library/(?P<uuid>[0-9a-f-]+)/?$",
+        spa_views.library_library,
+        name="library_library",
+    ),
+    urls.re_path(
         r"^channels/(?P<uuid>[0-9a-f-]+)/?$",
         audio_spa_views.channel_detail_uuid,
         name="channel_detail",

@@ -98,6 +98,26 @@ class LibraryFollowViewSet(
         update_follow(follow, approved=False)
         return response.Response(status=204)
 
+    @decorators.action(methods=["get"], detail=False)
+    def all(self, request, *args, **kwargs):
+        """
+        Return all the subscriptions of the current user, with only limited data
+        to have a performant endpoint and avoid lots of queries just to display
+        subscription status in the UI
+        """
+        follows = list(
+            self.get_queryset().values_list("uuid", "target__uuid", "approved")
+        )
+
+        payload = {
+            "results": [
+                {"uuid": str(u[0]), "library": str(u[1]), "approved": u[2]}
+                for u in follows
+            ],
+            "count": len(follows),
+        }
+        return response.Response(payload, status=200)
+
 
 class LibraryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     lookup_field = "uuid"
