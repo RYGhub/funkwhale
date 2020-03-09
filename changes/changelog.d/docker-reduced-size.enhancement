@@ -1,0 +1,1 @@
+Reduced size of funkwhale/funkwhale docker images thanks to multi-stage builds (!1042)
