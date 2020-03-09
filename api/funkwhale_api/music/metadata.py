@@ -648,7 +648,7 @@ class MBIDField(serializers.UUIDField):
 
 
 class ArtistSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False, allow_null=True)
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     mbid = MBIDField()
 
     def __init__(self, *args, **kwargs):
@@ -664,7 +664,9 @@ class ArtistSerializer(serializers.Serializer):
 class AlbumSerializer(serializers.Serializer):
     title = serializers.CharField(required=False, allow_null=True)
     mbid = MBIDField()
-    release_date = PermissiveDateField(required=False, allow_null=True)
+    release_date = PermissiveDateField(
+        required=False, allow_null=True, allow_blank=True
+    )
 
     def validate_title(self, v):
         if self.context.get("strict", True) and not v:
