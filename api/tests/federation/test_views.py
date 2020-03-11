@@ -387,3 +387,103 @@ def test_music_library_retrieve_redirects_to_html_if_header_set(
     )
     assert response.status_code == 302
     assert response["Location"] == expected_url
+
+
+def test_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    actor = factories["federation.Actor"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "actor_detail", kwargs={"username": actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_channel_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    channel = factories["audio.Channel"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "channel_detail", kwargs={"username": channel.actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_upload_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    upload = factories["music.Upload"](library__local=True, playable=True)
+
+    url = reverse("federation:music:uploads-detail", kwargs={"uuid": upload.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_track", kwargs={"pk": upload.track.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_track_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    track = factories["music.Track"](local=True)
+
+    url = reverse("federation:music:tracks-detail", kwargs={"uuid": track.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_track", kwargs={"pk": track.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_album_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    album = factories["music.Album"](local=True)
+
+    url = reverse("federation:music:albums-detail", kwargs={"uuid": album.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_album", kwargs={"pk": album.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_artist_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    artist = factories["music.Artist"](local=True)
+
+    url = reverse("federation:music:artists-detail", kwargs={"uuid": artist.uuid},)
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse("library_artist", kwargs={"pk": artist.pk}),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url

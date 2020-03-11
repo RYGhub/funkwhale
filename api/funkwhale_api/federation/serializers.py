@@ -1583,12 +1583,12 @@ class ChannelUploadSerializer(serializers.Serializer):
             "url": [
                 {
                     "type": "Link",
-                    "mimeType": upload.mimetype,
+                    "mediaType": upload.mimetype,
                     "href": utils.full_url(upload.listen_url_no_download),
                 },
                 {
                     "type": "Link",
-                    "mimeType": "text/html",
+                    "mediaType": "text/html",
                     "href": utils.full_url(upload.track.get_absolute_url()),
                 },
             ],

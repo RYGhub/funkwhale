@@ -61,6 +61,16 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            if instance.get_channel():
+                return redirect_to_html(instance.channel.get_absolute_url())
+            return redirect_to_html(instance.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)
+
     @action(methods=["get", "post"], detail=True)
     def inbox(self, request, *args, **kwargs):
         inbox_actor = self.get_object()
@@ -222,7 +232,6 @@ class MusicLibraryViewSet(
     def retrieve(self, request, *args, **kwargs):
         lb = self.get_object()
         if utils.should_redirect_ap_to_html(request.headers.get("accept")):
-            # XXX: implement this for actors, albums, tracks, artists
             return redirect_to_html(lb.get_absolute_url())
         conf = {
             "id": lb.get_federation_id(),
@@ -308,6 +317,14 @@ class MusicUploadViewSet(
     serializer_class = serializers.UploadSerializer
     lookup_field = "uuid"
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            return redirect_to_html(instance.track.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)
+
     def get_queryset(self):
         queryset = super().get_queryset()
         actor = music_utils.get_actor_from_request(self.request)
@@ -330,6 +347,14 @@ class MusicArtistViewSet(
     serializer_class = serializers.ArtistSerializer
     lookup_field = "uuid"
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            return redirect_to_html(instance.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)
+
 
 class MusicAlbumViewSet(
     FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
@@ -341,6 +366,14 @@ class MusicAlbumViewSet(
     )
     serializer_class = serializers.AlbumSerializer
     lookup_field = "uuid"
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            return redirect_to_html(instance.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)
 
 
 class MusicTrackViewSet(
@@ -360,3 +393,11 @@ class MusicTrackViewSet(
     )
     serializer_class = serializers.TrackSerializer
     lookup_field = "uuid"
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            return redirect_to_html(instance.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)

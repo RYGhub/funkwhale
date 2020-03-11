@@ -220,16 +220,11 @@ def get_default_context():
     return [
         "https://www.w3.org/ns/activitystreams",
         "https://w3id.org/security/v1",
-        {"manuallyApprovesFollowers": "as:manuallyApprovesFollowers"},
-    ]
-
-
-def get_default_context_fw():
-    return [
-        "https://www.w3.org/ns/activitystreams",
-        "https://w3id.org/security/v1",
-        {"manuallyApprovesFollowers": "as:manuallyApprovesFollowers"},
         "https://funkwhale.audio/ns",
+        {
+            "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+            "Hashtag": "as:Hashtag",
+        },
     ]
 
 

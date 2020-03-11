@@ -389,7 +389,7 @@ def test_fetch_success(factories, r_mock, mocker):
     tasks.fetch(fetch_id=fetch.pk)
 
     fetch.refresh_from_db()
-    payload["@context"].append("https://funkwhale.audio/ns")
+
     assert fetch.status == "finished"
     assert init.call_count == 1
     assert init.call_args[0][1] == artist
@@ -421,7 +421,7 @@ def test_fetch_webfinger(factories, r_mock, mocker):
     tasks.fetch(fetch_id=fetch.pk)
 
     fetch.refresh_from_db()
-    payload["@context"].append("https://funkwhale.audio/ns")
+
     assert fetch.status == "finished"
     assert fetch.object == actor
     assert init.call_count == 1
@@ -451,7 +451,7 @@ def test_fetch_rel_alternate(factories, r_mock, mocker):
     tasks.fetch(fetch_id=fetch.pk)
 
     fetch.refresh_from_db()
-    ap_payload["@context"].append("https://funkwhale.audio/ns")
+
     assert fetch.status == "finished"
     assert fetch.object == actor
     assert init.call_count == 1
@@ -482,7 +482,7 @@ def test_fetch_url(factory_name, serializer_class, factories, r_mock, mocker):
     tasks.fetch(fetch_id=fetch.pk)
 
     fetch.refresh_from_db()
-    payload["@context"].append("https://funkwhale.audio/ns")
+
     assert fetch.status == "finished"
     assert fetch.object == obj
     assert init.call_count == 1
