@@ -2,6 +2,7 @@ import logging
 import urllib.parse
 import uuid
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db import transaction
 
@@ -9,6 +10,9 @@ from rest_framework import serializers
 
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import models as common_models
+from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import serializers as moderation_serializers
+from funkwhale_api.moderation import signals as moderation_signals
 from funkwhale_api.music import licenses
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import tasks as music_tasks
@@ -36,13 +40,20 @@ class MediaSerializer(jsonld.JsonLdSerializer):
 
     def __init__(self, *args, **kwargs):
         self.allowed_mimetypes = kwargs.pop("allowed_mimetypes", [])
+        self.allow_empty_mimetype = kwargs.pop("allow_empty_mimetype", False)
         super().__init__(*args, **kwargs)
+        self.fields["mediaType"].required = not self.allow_empty_mimetype
+        self.fields["mediaType"].allow_null = self.allow_empty_mimetype
 
     def validate_mediaType(self, v):
         if not self.allowed_mimetypes:
             # no restrictions
             return v
+        if self.allow_empty_mimetype and not v:
+            return None
+
         for mt in self.allowed_mimetypes:
+
             if mt.endswith("/*"):
                 if v.startswith(mt.replace("*", "")):
                     return v
@@ -147,7 +158,10 @@ class ActorSerializer(jsonld.JsonLdSerializer):
     publicKey = PublicKeySerializer(required=False)
     endpoints = EndpointsSerializer(required=False)
     icon = ImageSerializer(
-        allowed_mimetypes=["image/*"], allow_null=True, required=False
+        allowed_mimetypes=["image/*"],
+        allow_null=True,
+        required=False,
+        allow_empty_mimetype=True,
     )
 
     class Meta:
@@ -294,7 +308,7 @@ class ActorSerializer(jsonld.JsonLdSerializer):
             common_utils.attach_file(
                 actor,
                 "attachment_icon",
-                {"url": new_value["url"], "mimetype": new_value["mediaType"]}
+                {"url": new_value["url"], "mimetype": new_value.get("mediaType")}
                 if new_value
                 else None,
             )
@@ -1030,7 +1044,7 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
             return validated_data
         # create the attachment by hand so it can be attached as the cover
         validated_data["attachment_cover"] = common_models.Attachment.objects.create(
-            mimetype=attachment_cover["mediaType"],
+            mimetype=attachment_cover.get("mediaType"),
             url=attachment_cover["url"],
             actor=instance.attributed_to,
         )
@@ -1048,7 +1062,10 @@ class MusicEntitySerializer(jsonld.JsonLdSerializer):
 
 class ArtistSerializer(MusicEntitySerializer):
     image = ImageSerializer(
-        allowed_mimetypes=["image/*"], allow_null=True, required=False
+        allowed_mimetypes=["image/*"],
+        allow_null=True,
+        required=False,
+        allow_empty_mimetype=True,
     )
     updateable_fields = [
         ("name", "name"),
@@ -1094,7 +1111,10 @@ class AlbumSerializer(MusicEntitySerializer):
     artists = serializers.ListField(child=ArtistSerializer(), min_length=1)
     # XXX: 1.0 rename to image
     cover = ImageSerializer(
-        allowed_mimetypes=["image/*"], allow_null=True, required=False
+        allowed_mimetypes=["image/*"],
+        allow_null=True,
+        required=False,
+        allow_empty_mimetype=True,
     )
     updateable_fields = [
         ("name", "title"),
@@ -1172,7 +1192,10 @@ class TrackSerializer(MusicEntitySerializer):
     license = serializers.URLField(allow_null=True, required=False)
     copyright = serializers.CharField(allow_null=True, required=False)
     image = ImageSerializer(
-        allowed_mimetypes=["image/*"], allow_null=True, required=False
+        allowed_mimetypes=["image/*"],
+        allow_null=True,
+        required=False,
+        allow_empty_mimetype=True,
     )
 
     updateable_fields = [
@@ -1435,6 +1458,85 @@ class ActorDeleteSerializer(jsonld.JsonLdSerializer):
 
     class Meta:
         jsonld_mapping = {"fid": jsonld.first_id(contexts.AS.object)}
+
+
+class FlagSerializer(jsonld.JsonLdSerializer):
+    type = serializers.ChoiceField(choices=[contexts.AS.Flag])
+    id = serializers.URLField(max_length=500)
+    object = serializers.URLField(max_length=500)
+    content = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    actor = serializers.URLField(max_length=500)
+    type = serializers.ListField(
+        child=TagSerializer(), min_length=0, required=False, allow_null=True
+    )
+
+    class Meta:
+        jsonld_mapping = {
+            "object": jsonld.first_id(contexts.AS.object),
+            "content": jsonld.first_val(contexts.AS.content),
+            "actor": jsonld.first_id(contexts.AS.actor),
+            "type": jsonld.raw(contexts.AS.tag),
+        }
+
+    def validate_object(self, v):
+        try:
+            return utils.get_object_by_fid(v, local=True)
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError(
+                "Unknown id {} for reported object".format(v)
+            )
+
+    def validate_type(self, tags):
+        if tags:
+            for tag in tags:
+                if tag["name"] in dict(moderation_models.REPORT_TYPES):
+                    return tag["name"]
+        return "other"
+
+    def validate_actor(self, v):
+        try:
+            return models.Actor.objects.get(fid=v, domain=self.context["actor"].domain)
+        except models.Actor.DoesNotExist:
+            raise serializers.ValidationError("Invalid actor")
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+
+        return validated_data
+
+    def create(self, validated_data):
+        kwargs = {
+            "target": validated_data["object"],
+            "target_owner": moderation_serializers.get_target_owner(
+                validated_data["object"]
+            ),
+            "target_state": moderation_serializers.get_target_state(
+                validated_data["object"]
+            ),
+            "type": validated_data.get("type", "other"),
+            "summary": validated_data.get("content"),
+            "submitter": validated_data["actor"],
+        }
+
+        report, created = moderation_models.Report.objects.update_or_create(
+            fid=validated_data["id"], defaults=kwargs,
+        )
+        moderation_signals.report_created.send(sender=None, report=report)
+        return report
+
+    def to_representation(self, instance):
+        d = {
+            "type": "Flag",
+            "id": instance.get_federation_id(),
+            "actor": actors.get_service_actor().fid,
+            "object": [instance.target.fid],
+            "content": instance.summary,
+            "tag": [repr_tag(instance.type)],
+        }
+
+        if self.context.get("include_ap_context", self.parent is None):
+            d["@context"] = jsonld.get_default_context()
+        return d
 
 
 class NodeInfoLinkSerializer(serializers.Serializer):

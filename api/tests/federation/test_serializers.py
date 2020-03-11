@@ -6,12 +6,14 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import contexts
 from funkwhale_api.federation import keys
 from funkwhale_api.federation import jsonld
 from funkwhale_api.federation import models
 from funkwhale_api.federation import serializers
 from funkwhale_api.federation import utils
+from funkwhale_api.moderation import serializers as moderation_serializers
 from funkwhale_api.music import licenses
 
 
@@ -68,6 +70,36 @@ def test_actor_serializer_from_ap(db):
     assert actor.domain_id == "test.federation"
     assert actor.attachment_icon.url == payload["icon"]["url"]
     assert actor.attachment_icon.mimetype == payload["icon"]["mediaType"]
+
+
+def test_actor_serializer_from_ap_no_icon_mediaType(db):
+    private, public = keys.get_key_pair()
+    actor_url = "https://test.federation/actor"
+    payload = {
+        "@context": jsonld.get_default_context_fw(),
+        "id": actor_url,
+        "type": "Person",
+        "inbox": "https://test.com/inbox",
+        "following": "https://test.com/following",
+        "followers": "https://test.com/followers",
+        "preferredUsername": "test",
+        "manuallyApprovesFollowers": True,
+        "url": "http://hello.world/path",
+        "publicKey": {
+            "publicKeyPem": public.decode("utf-8"),
+            "owner": actor_url,
+            "id": actor_url + "#main-key",
+        },
+        "endpoints": {"sharedInbox": "https://noop.url/federation/shared/inbox"},
+        "icon": {"type": "Image", "url": "https://image.example/image.png"},
+    }
+
+    serializer = serializers.ActorSerializer(data=payload)
+    assert serializer.is_valid(raise_exception=True)
+    actor = serializer.save()
+
+    assert actor.attachment_icon.url == payload["icon"]["url"]
+    assert actor.attachment_icon.mimetype is None
 
 
 def test_actor_serializer_only_mandatory_field_from_ap(db):
@@ -1476,4 +1508,45 @@ def test_channel_create_upload_serializer(factories):
 
     serializer = serializers.ChannelCreateUploadSerializer(upload)
 
+    assert serializer.data == expected
+
+
+def test_report_serializer_from_ap_create(factories, faker, now, mocker):
+    actor = factories["federation.Actor"]()
+    obj = factories["music.Artist"](local=True)
+    payload = {
+        "@context": jsonld.get_default_context(),
+        "type": "Flag",
+        "id": "https://test.report",
+        "actor": actor.fid,
+        "content": "hello world",
+        "object": [obj.fid],
+        "tag": [{"type": "Hashtag", "name": "#offensive_content"}],
+    }
+    serializer = serializers.FlagSerializer(data=payload, context={"actor": actor})
+    assert serializer.is_valid(raise_exception=True) is True
+
+    report = serializer.save()
+
+    assert report.fid == payload["id"]
+    assert report.summary == payload["content"]
+    assert report.submitter == actor
+    assert report.target == obj
+    assert report.target_state == moderation_serializers.get_target_state(obj)
+    assert report.target_owner == moderation_serializers.get_target_owner(obj)
+    assert report.type == "offensive_content"
+
+
+def test_report_serializer_to_ap(factories):
+    report = factories["moderation.Report"](local=True)
+    expected = {
+        "@context": jsonld.get_default_context(),
+        "type": "Flag",
+        "id": report.fid,
+        "actor": actors.get_service_actor().fid,
+        "content": report.summary,
+        "object": [report.target.fid],
+        "tag": [{"type": "Hashtag", "name": "#{}".format(report.type)}],
+    }
+    serializer = serializers.FlagSerializer(report)
     assert serializer.data == expected

@@ -451,3 +451,35 @@ def inbox_delete_actor(payload, context):
         logger.warn("Cannot delete actor %s, no matching object found", actor.fid)
         return
     actor.delete()
+
+
+@inbox.register({"type": "Flag"})
+def inbox_flag(payload, context):
+    serializer = serializers.FlagSerializer(data=payload, context=context)
+    if not serializer.is_valid(raise_exception=context.get("raise_exception", False)):
+        logger.debug(
+            "Discarding invalid report from {}: %s",
+            context["actor"].fid,
+            serializer.errors,
+        )
+        return
+
+    report = serializer.save()
+    return {"object": report.target, "related_object": report}
+
+
+@outbox.register({"type": "Flag"})
+def outbox_flag(context):
+    report = context["report"]
+    actor = actors.get_service_actor()
+    serializer = serializers.FlagSerializer(report)
+    yield {
+        "type": "Flag",
+        "actor": actor,
+        "payload": with_recipients(
+            serializer.data,
+            # Mastodon requires the report to be sent to the reported actor inbox
+            # (and not the shared inbox)
+            to=[{"type": "actor_inbox", "actor": report.target_owner}],
+        ),
+    }

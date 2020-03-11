@@ -194,6 +194,27 @@ TARGET_CONFIG = {
 TARGET_FIELD = common_fields.GenericRelation(TARGET_CONFIG)
 
 
+def get_target_state(target):
+    state = {}
+    target_state_serializer = state_serializers[target._meta.label]
+
+    state = target_state_serializer(target).data
+    # freeze target type/id in JSON so even if the corresponding object is deleted
+    # we can have the info and display it in the frontend
+    target_data = TARGET_FIELD.to_representation(target)
+    state["_target"] = json.loads(json.dumps(target_data, cls=DjangoJSONEncoder))
+
+    if "fid" in state:
+        state["domain"] = urllib.parse.urlparse(state["fid"]).hostname
+
+    state["is_local"] = (
+        state.get("domain", settings.FEDERATION_HOSTNAME)
+        == settings.FEDERATION_HOSTNAME
+    )
+
+    return state
+
+
 class ReportSerializer(serializers.ModelSerializer):
     target = TARGET_FIELD
 
@@ -234,29 +255,7 @@ class ReportSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        target_state_serializer = state_serializers[
-            validated_data["target"]._meta.label
-        ]
-
-        validated_data["target_state"] = target_state_serializer(
-            validated_data["target"]
-        ).data
-        # freeze target type/id in JSON so even if the corresponding object is deleted
-        # we can have the info and display it in the frontend
-        target_data = self.fields["target"].to_representation(validated_data["target"])
-        validated_data["target_state"]["_target"] = json.loads(
-            json.dumps(target_data, cls=DjangoJSONEncoder)
-        )
-
-        if "fid" in validated_data["target_state"]:
-            validated_data["target_state"]["domain"] = urllib.parse.urlparse(
-                validated_data["target_state"]["fid"]
-            ).hostname
-
-        validated_data["target_state"]["is_local"] = (
-            validated_data["target_state"].get("domain", settings.FEDERATION_HOSTNAME)
-            == settings.FEDERATION_HOSTNAME
-        )
+        validated_data["target_state"] = get_target_state(validated_data["target"])
         validated_data["target_owner"] = get_target_owner(validated_data["target"])
         r = super().create(validated_data)
         tasks.signals.report_created.send(sender=None, report=r)

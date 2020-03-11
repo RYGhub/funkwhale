@@ -27,6 +27,12 @@ the following instruction is present in your nginx configuration::
         add_header Service-Worker-Allowed "/";
     }
 
+Federated reports
+^^^^^^^^^^^^^^^^^
+
+It's now possible to send a copy of a report to the server hosting the reported object, in order to make moderation easier and more distributed.
+
+This feature is inspired by Mastodon's current design, and should work with at least Funkwhale and Mastodon servers.
 
 Improved search performance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

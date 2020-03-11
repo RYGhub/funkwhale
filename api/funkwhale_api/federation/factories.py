@@ -125,7 +125,8 @@ class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
         self.domain = models.Domain.objects.get_or_create(
             name=settings.FEDERATION_HOSTNAME
         )[0]
-        self.save(update_fields=["domain"])
+        self.fid = "https://{}/actors/{}".format(self.domain, self.preferred_username)
+        self.save(update_fields=["domain", "fid"])
         if not create:
             if extracted and hasattr(extracted, "pk"):
                 extracted.actor = self
@@ -166,7 +167,9 @@ class MusicLibraryFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         model = "music.Library"
 
     class Params:
-        local = factory.Trait(actor=factory.SubFactory(ActorFactory, local=True))
+        local = factory.Trait(
+            fid=None, actor=factory.SubFactory(ActorFactory, local=True)
+        )
 
 
 @registry.register

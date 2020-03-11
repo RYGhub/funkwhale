@@ -1,6 +1,7 @@
 from django import urls
 
 from funkwhale_api.audio import spa_views as audio_spa_views
+from funkwhale_api.federation import spa_views as federation_spa_views
 from funkwhale_api.music import spa_views
 
 
@@ -35,5 +36,10 @@ urlpatterns = [
         r"^channels/(?P<username>[^/]+)/?$",
         audio_spa_views.channel_detail_username,
         name="channel_detail",
+    ),
+    urls.re_path(
+        r"^@(?P<username>[^/]+)/?$",
+        federation_spa_views.actor_detail_username,
+        name="actor_detail",
     ),
 ]

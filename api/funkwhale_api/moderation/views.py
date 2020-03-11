@@ -5,6 +5,9 @@ from rest_framework import response
 from rest_framework import status
 from rest_framework import viewsets
 
+from funkwhale_api.federation import routes
+from funkwhale_api.federation import utils as federation_utils
+
 from . import models
 from . import serializers
 
@@ -66,4 +69,13 @@ class ReportsViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         submitter = None
         if self.request.user.is_authenticated:
             submitter = self.request.user.actor
-        serializer.save(submitter=submitter)
+        report = serializer.save(submitter=submitter)
+        forward = self.request.data.get("forward", False)
+        if (
+            forward
+            and report.target
+            and report.target_owner
+            and hasattr(report.target, "fid")
+            and not federation_utils.is_local(report.target.fid)
+        ):
+            routes.outbox.dispatch({"type": "Flag"}, context={"report": report})

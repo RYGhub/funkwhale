@@ -456,6 +456,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         shared_inbox_url=remote_actor1.shared_inbox_url
     )
     remote_actor3 = factories["federation.Actor"](shared_inbox_url=None)
+    remote_actor4 = factories["federation.Actor"]()
 
     library = factories["music.Library"]()
     library_follower_local = factories["federation.LibraryFollow"](
@@ -491,6 +492,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         activity.PUBLIC_ADDRESS,
         {"type": "followers", "target": library},
         {"type": "followers", "target": followed_actor},
+        {"type": "actor_inbox", "actor": remote_actor4},
     ]
 
     inbox_items, deliveries, urls = activity.prepare_deliveries_and_inbox_items(
@@ -511,6 +513,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         [
             models.Delivery(inbox_url=remote_actor1.shared_inbox_url),
             models.Delivery(inbox_url=remote_actor3.inbox_url),
+            models.Delivery(inbox_url=remote_actor4.inbox_url),
             models.Delivery(inbox_url=library_follower_remote.inbox_url),
             models.Delivery(inbox_url=actor_follower_remote.inbox_url),
         ],
@@ -527,6 +530,7 @@ def test_prepare_deliveries_and_inbox_items(factories, preferences):
         activity.PUBLIC_ADDRESS,
         library.followers_url,
         followed_actor.followers_url,
+        remote_actor4.fid,
     ]
 
     assert urls == expected_urls

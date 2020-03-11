@@ -8,6 +8,7 @@ from funkwhale_api.federation import (
     routes,
     serializers,
 )
+from funkwhale_api.moderation import serializers as moderation_serializers
 
 
 @pytest.mark.parametrize(
@@ -30,6 +31,7 @@ from funkwhale_api.federation import (
         ({"type": "Update", "object": {"type": "Album"}}, routes.inbox_update_album),
         ({"type": "Update", "object": {"type": "Track"}}, routes.inbox_update_track),
         ({"type": "Delete", "object": {"type": "Person"}}, routes.inbox_delete_actor),
+        ({"type": "Flag"}, routes.inbox_flag),
     ],
 )
 def test_inbox_routes(route, handler):
@@ -44,6 +46,7 @@ def test_inbox_routes(route, handler):
     "route,handler",
     [
         ({"type": "Accept"}, routes.outbox_accept),
+        ({"type": "Flag"}, routes.outbox_flag),
         ({"type": "Follow"}, routes.outbox_follow),
         ({"type": "Create", "object": {"type": "Audio"}}, routes.outbox_create_audio),
         (
@@ -718,3 +721,69 @@ def test_inbox_delete_actor_doesnt_delete_local_actor(factories):
     )
     # actor should still be here!
     local_actor.refresh_from_db()
+
+
+@pytest.mark.parametrize(
+    "factory_name, factory_kwargs",
+    [
+        ("federation.Actor", {"local": True}),
+        ("music.Artist", {"local": True}),
+        ("music.Album", {"local": True}),
+        ("music.Track", {"local": True}),
+        ("music.Library", {"local": True}),
+    ],
+)
+def test_inbox_flag(factory_name, factory_kwargs, factories, mocker):
+    report_created_send = mocker.patch(
+        "funkwhale_api.moderation.signals.report_created.send"
+    )
+    actor = factories["federation.Actor"]()
+    target = factories[factory_name](**factory_kwargs)
+    payload = {
+        "type": "Flag",
+        "object": [target.fid],
+        "content": "Test report",
+        "id": "https://" + actor.domain_id + "/testid",
+        "actor": actor.fid,
+    }
+    serializer = serializers.ActivitySerializer(payload)
+
+    result = routes.inbox_flag(
+        serializer.data, context={"actor": actor, "raise_exception": True}
+    )
+
+    report = actor.reports.latest("id")
+
+    assert result == {"object": target, "related_object": report}
+    assert report.fid == payload["id"]
+    assert report.type == "other"
+    assert report.target == target
+    assert report.target_owner == moderation_serializers.get_target_owner(target)
+    assert report.target_state == moderation_serializers.get_target_state(target)
+
+    report_created_send.assert_called_once_with(sender=None, report=report)
+
+
+@pytest.mark.parametrize(
+    "factory_name, factory_kwargs",
+    [
+        ("federation.Actor", {"local": True}),
+        ("music.Artist", {"local": True}),
+        ("music.Album", {"local": True}),
+        ("music.Track", {"local": True}),
+        ("music.Library", {"local": True}),
+    ],
+)
+def test_outbox_flag(factory_name, factory_kwargs, factories, mocker):
+    target = factories[factory_name](**factory_kwargs)
+    report = factories["moderation.Report"](
+        target=target, local=True, target_owner=factories["federation.Actor"]()
+    )
+
+    activity = list(routes.outbox_flag({"report": report}))[0]
+
+    serializer = serializers.FlagSerializer(report)
+    expected = serializer.data
+    expected["to"] = [{"type": "actor_inbox", "actor": report.target_owner}]
+    assert activity["payload"] == expected
+    assert activity["actor"] == actors.get_service_actor()

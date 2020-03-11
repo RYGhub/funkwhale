@@ -46,6 +46,20 @@
           </p>
           <content-form field-id="report-summary" :rows="8" v-model="summary"></content-form>
         </div>
+        <div class="ui field" v-if="!isLocal">
+          <div class="ui checkbox">
+            <input id="report-forward" v-model="forward" type="checkbox">
+            <label for="report-forward">
+              <strong>
+                <translate :translate-params="{domain: targetDomain}" translate-context="*/*/Field.Label/Verb">Forward to %{ domain} </translate>
+              </strong>
+              <p>
+                <translate translate-context="*/*/Field,Help">Forward an anonymized copy of your report to the server hosting this element.</translate>
+              </p>
+            </label>
+          </div>
+        </div>
+        <div class="ui hidden divider"></div>
       </form>
       <div v-else-if="isLoadingReportTypes" class="ui inline active loader">
 
@@ -75,6 +89,12 @@ import {mapState} from 'vuex'
 
 import logger from '@/logging'
 
+function urlDomain(data) {
+  var    a      = document.createElement('a');
+         a.href = data;
+  return a.hostname;
+}
+
 export default {
   components: {
     ReportCategoryDropdown:  () => import(/* webpackChunkName: "reports" */ "@/components/moderation/ReportCategoryDropdown"),
@@ -90,6 +110,7 @@ export default {
       submitterEmail: '',
       category: null,
       reportTypes: [],
+      forward: false,
     }
   },
   computed: {
@@ -113,6 +134,19 @@ export default {
       }
 
       return this.allowedCategories.length > 0
+    },
+    targetDomain () {
+      if (!this.target._obj) {
+        return
+      }
+      let fid = this.target._obj.fid
+      if (!fid) {
+        return this.$store.getters['instance/domain']
+      }
+      return urlDomain(fid)
+    },
+    isLocal () {
+      return this.$store.getters['instance/domain'] === this.targetDomain
     }
   },
   methods: {
@@ -124,9 +158,10 @@ export default {
       let self = this
       self.isLoading = true
       let payload = {
-        target: this.target,
+        target: {...this.target, _obj: null},
         summary: this.summary,
         type: this.category,
+        forward: this.forward,
       }
       if (!this.$store.state.auth.authenticated) {
         payload.submitter_email = this.submitterEmail

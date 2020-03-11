@@ -1,3 +1,4 @@
+import cryptography.exceptions
 import datetime
 import logging
 import pytz
@@ -31,18 +32,29 @@ def verify_date(raw_date):
     now = timezone.now()
     if dt < now - delta or dt > now + delta:
         raise forms.ValidationError(
-            "Request Date is too far in the future or in the past"
+            "Request Date {} is too far in the future or in the past".format(raw_date)
         )
 
     return dt
 
 
 def verify(request, public_key):
-    verify_date(request.headers.get("Date"))
-
-    return requests_http_signature.HTTPSignatureAuth.verify(
-        request, key_resolver=lambda **kwargs: public_key, use_auth_header=False
+    date = request.headers.get("Date")
+    logger.debug(
+        "Verifying request with date %s and headers %s", date, str(request.headers)
     )
+    verify_date(date)
+    try:
+        return requests_http_signature.HTTPSignatureAuth.verify(
+            request, key_resolver=lambda **kwargs: public_key, use_auth_header=False
+        )
+    except cryptography.exceptions.InvalidSignature:
+        logger.warning(
+            "Could not verify request with date %s and headers %s",
+            date,
+            str(request.headers),
+        )
+        raise
 
 
 def verify_django(django_request, public_key):
