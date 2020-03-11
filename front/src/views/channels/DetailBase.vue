@@ -268,6 +268,15 @@ export default {
       this.isLoading = true
       let channelPromise = axios.get(`channels/${this.id}`).then(response => {
         self.object = response.data
+        if (self.id == response.data.uuid && response.data.actor) {
+          // replace with the pretty channel url if possible
+          let actor = response.data.actor
+          if (actor.is_local) {
+            self.$router.replace({name: 'channels.detail', params: {id: actor.preferred_username}})
+          } else {
+            self.$router.replace({name: 'channels.detail', params: {id: actor.full_username}})
+          }
+        }
         let tracksPromise = axios.get("tracks", {params: {channel: response.data.uuid, page_size: 1, playable: true, include_channels: true}}).then(response => {
           self.totalTracks = response.data.count
           self.isLoading = false
