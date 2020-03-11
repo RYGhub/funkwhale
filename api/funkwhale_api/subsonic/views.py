@@ -25,6 +25,7 @@ from funkwhale_api.common import (
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music import models as music_models
+from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.music import utils
 from funkwhale_api.music import views as music_views
 from funkwhale_api.playlists import models as playlists_models
@@ -255,9 +256,12 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         data = request.GET or request.POST
         track = kwargs.pop("obj")
         queryset = track.uploads.select_related("track__album__artist", "track__artist")
-        upload = queryset.first()
-        if not upload:
+        sorted_uploads = music_serializers.sort_uploads_for_listen(queryset)
+
+        if not sorted_uploads:
             return response.Response(status=404)
+
+        upload = sorted_uploads[0]
 
         max_bitrate = data.get("maxBitRate")
         try:
