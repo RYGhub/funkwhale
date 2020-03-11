@@ -298,6 +298,7 @@ export default {
         if (v) {
           this.$nextTick(() => {
             this.setupDropdown('.user-dropdown')
+            this.setupDropdown('.admin-dropdown')
           })
         }
       }
