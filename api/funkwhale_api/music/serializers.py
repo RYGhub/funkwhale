@@ -281,6 +281,22 @@ def serialize_upload(upload):
     }
 
 
+def sort_uploads_for_listen(uploads):
+    """
+    Given a list of uploads, return a sorted list of uploads, with local or locally
+    cached ones first, and older first
+    """
+    score = {upload: 0 for upload in uploads}
+    for upload in uploads:
+        if upload.is_local:
+            score[upload] = 3
+        elif upload.audio_file:
+            score[upload] = 2
+
+    sorted_tuples = sorted(score.items(), key=lambda t: (t[1], -t[0].pk), reverse=True)
+    return [t[0] for t in sorted_tuples]
+
+
 class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
     artist = serializers.SerializerMethodField()
     album = TrackAlbumSerializer(read_only=True)
@@ -310,7 +326,8 @@ class TrackSerializer(OptionalDescriptionMixin, serializers.Serializer):
         return obj.listen_url
 
     def get_uploads(self, obj):
-        return [serialize_upload(u) for u in getattr(obj, "playable_uploads", [])]
+        uploads = getattr(obj, "playable_uploads", [])
+        return [serialize_upload(u) for u in sort_uploads_for_listen(uploads)]
 
     def get_tags(self, obj):
         tagged_items = getattr(obj, "_prefetched_tagged_items", [])

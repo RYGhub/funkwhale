@@ -584,3 +584,24 @@ def test_detail_serializers_with_description_description(
     expected = common_serializers.ContentSerializer(content).data
     serializer = serializer_class(obj, context={"description": True})
     assert serializer.data["description"] == expected
+
+
+def test_sort_uploads_for_listen(factories):
+    local_upload = factories["music.Upload"](library__local=True)
+    new_local_upload = factories["music.Upload"](library__local=True)
+    remote_upload = factories["music.Upload"](audio_file__from_path=None)
+    remote_upload_with_local_version = factories["music.Upload"]()
+
+    unsorted = [
+        remote_upload_with_local_version,
+        new_local_upload,
+        remote_upload,
+        local_upload,
+    ]
+    expected = [
+        local_upload,
+        new_local_upload,
+        remote_upload,
+        remote_upload_with_local_version,
+    ]
+    assert serializers.sort_uploads_for_listen(unsorted) == expected
