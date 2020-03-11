@@ -387,3 +387,43 @@ def test_music_library_retrieve_redirects_to_html_if_header_set(
     )
     assert response.status_code == 302
     assert response["Location"] == expected_url
+
+
+def test_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    actor = factories["federation.Actor"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "actor_detail", kwargs={"username": actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url
+
+
+def test_channel_actor_retrieve_redirects_to_html_if_header_set(
+    factories, api_client, settings
+):
+    channel = factories["audio.Channel"](local=True)
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url, HTTP_ACCEPT="text/html")
+    expected_url = utils.join_url(
+        settings.FUNKWHALE_URL,
+        utils.spa_reverse(
+            "channel_detail", kwargs={"username": channel.actor.preferred_username}
+        ),
+    )
+    assert response.status_code == 302
+    assert response["Location"] == expected_url

@@ -61,6 +61,16 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if utils.should_redirect_ap_to_html(request.headers.get("accept")):
+            if instance.get_channel():
+                return redirect_to_html(instance.channel.get_absolute_url())
+            return redirect_to_html(instance.get_absolute_url())
+
+        serializer = self.get_serializer(instance)
+        return response.Response(serializer.data)
+
     @action(methods=["get", "post"], detail=True)
     def inbox(self, request, *args, **kwargs):
         inbox_actor = self.get_object()
@@ -222,7 +232,7 @@ class MusicLibraryViewSet(
     def retrieve(self, request, *args, **kwargs):
         lb = self.get_object()
         if utils.should_redirect_ap_to_html(request.headers.get("accept")):
-            # XXX: implement this for actors, albums, tracks, artists
+            # XXX: implement this for albums, tracks, artists
             return redirect_to_html(lb.get_absolute_url())
         conf = {
             "id": lb.get_federation_id(),
