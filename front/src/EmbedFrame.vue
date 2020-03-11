@@ -61,7 +61,7 @@
               :key="currentIndex"
               ref="player"
               class="player"
-              :options="{loadSprite: false, controls: controls, duration: currentTrack.sources[0].duration}">
+              :options="{loadSprite: false, controls: controls, duration: currentTrack.sources[0].duration, autoplay}">
               <audio preload="none">
                 <source v-for="source in currentTrack.sources" :src="source.src" :type="source.type"/>
               </audio>
@@ -383,9 +383,6 @@ export default {
     },
     tracks () {
       this.currentIndex = 0
-      if (this.autoplay) {
-        this.play(this.currentIndex)
-      }
     }
   }
 }
