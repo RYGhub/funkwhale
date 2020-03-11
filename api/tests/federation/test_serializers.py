@@ -21,7 +21,7 @@ def test_actor_serializer_from_ap(db):
     private, public = keys.get_key_pair()
     actor_url = "https://test.federation/actor"
     payload = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": actor_url,
         "type": "Person",
         "outbox": "https://test.com/outbox",
@@ -76,7 +76,7 @@ def test_actor_serializer_from_ap_no_icon_mediaType(db):
     private, public = keys.get_key_pair()
     actor_url = "https://test.federation/actor"
     payload = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": actor_url,
         "type": "Person",
         "inbox": "https://test.com/inbox",
@@ -281,7 +281,7 @@ def test_accept_follow_serializer_save(factories):
     follow = factories["federation.Follow"](approved=None)
 
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": follow.get_federation_id() + "/accept",
         "type": "Accept",
         "actor": follow.target.fid,
@@ -301,7 +301,7 @@ def test_accept_follow_serializer_validates_on_context(factories):
     follow = factories["federation.Follow"](approved=None)
     impostor = factories["federation.Actor"]()
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": follow.get_federation_id() + "/accept",
         "type": "Accept",
         "actor": impostor.url,
@@ -337,7 +337,7 @@ def test_undo_follow_serializer_save(factories):
     follow = factories["federation.Follow"](approved=True)
 
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": follow.get_federation_id() + "/undo",
         "type": "Undo",
         "actor": follow.actor.fid,
@@ -356,7 +356,7 @@ def test_undo_follow_serializer_validates_on_context(factories):
     follow = factories["federation.Follow"](approved=True)
     impostor = factories["federation.Actor"]()
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "id": follow.get_federation_id() + "/undo",
         "type": "Undo",
         "actor": impostor.url,
@@ -402,7 +402,7 @@ def test_paginated_collection_serializer(factories):
 
 def test_paginated_collection_serializer_validation():
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "type": "Collection",
         "id": "https://test.federation/test",
         "totalItems": 5,
@@ -579,7 +579,7 @@ def test_music_library_serializer_from_private(factories, mocker):
         "funkwhale_api.federation.utils.retrieve_ap_object", return_value=actor
     )
     data = {
-        "@context": jsonld.get_default_context_fw(),
+        "@context": jsonld.get_default_context(),
         "audience": "",
         "name": "Hello",
         "summary": "World",
