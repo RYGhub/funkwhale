@@ -63,6 +63,7 @@ class ReportFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
 
     class Params:
         anonymous = factory.Trait(actor=None, submitter_email=factory.Faker("email"))
+        local = factory.Trait(fid=None)
         assigned = factory.Trait(
             assigned_to=factory.SubFactory(federation_factories.ActorFactory)
         )

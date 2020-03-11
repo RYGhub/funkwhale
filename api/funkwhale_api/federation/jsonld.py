@@ -17,6 +17,10 @@ def cached_contexts(loader):
         for cached in contexts.CONTEXTS:
             if url == cached["documentUrl"]:
                 return cached
+            if cached["shortId"] == "LITEPUB" and "/schemas/litepub-" in url:
+                # XXX UGLY fix for pleroma because they host their schema
+                # under each instance domain, which makes caching harder
+                return cached
         return loader(url, *args, **kwargs)
 
     return load
@@ -29,18 +33,19 @@ def get_document_loader():
     return cached_contexts(loader)
 
 
-def expand(doc, options=None, insert_fw_context=True):
+def expand(doc, options=None, default_contexts=["AS", "FW", "SEC"]):
     options = options or {}
     options.setdefault("documentLoader", get_document_loader())
     if isinstance(doc, str):
         doc = options["documentLoader"](doc)["document"]
-    if insert_fw_context:
-        fw = contexts.CONTEXTS_BY_ID["FW"]["documentUrl"]
+    for context_name in default_contexts:
+        ctx = contexts.CONTEXTS_BY_ID[context_name]["documentUrl"]
         try:
-            insert_context(fw, doc)
+            insert_context(ctx, doc)
         except KeyError:
             # probably an already expanded document
             pass
+
     result = pyld.jsonld.expand(doc, options=options)
     try:
         # jsonld.expand returns a list, which is useless for us

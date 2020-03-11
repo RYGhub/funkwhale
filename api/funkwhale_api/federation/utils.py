@@ -1,8 +1,12 @@
 import html.parser
 import unicodedata
+import urllib.parse
 import re
+
+from django.apps import apps
 from django.conf import settings
-from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import CharField, Q, Value
 
 from funkwhale_api.common import session
 from funkwhale_api.moderation import mrf
@@ -203,7 +207,7 @@ def find_alternate(response_text):
         return parser.result
 
 
-def should_redirect_ap_to_html(accept_header):
+def should_redirect_ap_to_html(accept_header, default=True):
     if not accept_header:
         return False
 
@@ -223,4 +227,43 @@ def should_redirect_ap_to_html(accept_header):
         if ct in no_redirect_headers:
             return False
 
-    return True
+    return default
+
+
+FID_MODEL_LABELS = [
+    "music.Artist",
+    "music.Album",
+    "music.Track",
+    "music.Library",
+    "music.Upload",
+    "federation.Actor",
+]
+
+
+def get_object_by_fid(fid, local=None):
+
+    if local is True:
+        parsed = urllib.parse.urlparse(fid)
+        if parsed.netloc != settings.FEDERATION_HOSTNAME:
+            raise ObjectDoesNotExist()
+
+    models = [apps.get_model(*l.split(".")) for l in FID_MODEL_LABELS]
+
+    def get_qs(model):
+        return (
+            model.objects.all()
+            .filter(fid=fid)
+            .annotate(__type=Value(model._meta.label, output_field=CharField()))
+            .values("fid", "__type")
+        )
+
+    qs = get_qs(models[0])
+    for m in models[1:]:
+        qs = qs.union(get_qs(m))
+
+    result = qs.order_by("fid").first()
+
+    if not result:
+        raise ObjectDoesNotExist()
+
+    return apps.get_model(*result["__type"].split(".")).objects.get(fid=fid)

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 import pytest
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from funkwhale_api.federation import exceptions, utils
 
 
@@ -172,3 +174,36 @@ def test_local_qs(factory_name, fids, kwargs, expected_indexes, factories, setti
 
     expected_objs = [obj for i, obj in enumerate(objs) if i in expected_indexes]
     assert list(result) == expected_objs
+
+
+def test_get_obj_by_fid_not_found():
+    with pytest.raises(ObjectDoesNotExist):
+        utils.get_object_by_fid("http://test")
+
+
+def test_get_obj_by_fid_local_not_found(factories):
+    obj = factories["federation.Actor"](local=False)
+    with pytest.raises(ObjectDoesNotExist):
+        utils.get_object_by_fid(obj.fid, local=True)
+
+
+def test_get_obj_by_fid_local(factories):
+    obj = factories["federation.Actor"](local=True)
+    assert utils.get_object_by_fid(obj.fid, local=True) == obj
+
+
+@pytest.mark.parametrize(
+    "factory_name",
+    [
+        "federation.Actor",
+        "music.Artist",
+        "music.Album",
+        "music.Track",
+        "music.Upload",
+        "music.Library",
+    ],
+)
+def test_get_obj_by_fid(factory_name, factories):
+    obj = factories[factory_name]()
+    factories[factory_name]()
+    assert utils.get_object_by_fid(obj.fid) == obj

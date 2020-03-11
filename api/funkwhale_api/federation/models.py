@@ -443,26 +443,29 @@ class Activity(models.Model):
     type = models.CharField(db_index=True, null=True, max_length=100)
 
     # generic relations
-    object_id = models.IntegerField(null=True)
+    object_id = models.IntegerField(null=True, blank=True)
     object_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="objecting_activities",
     )
     object = GenericForeignKey("object_content_type", "object_id")
-    target_id = models.IntegerField(null=True)
+    target_id = models.IntegerField(null=True, blank=True)
     target_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="targeting_activities",
     )
     target = GenericForeignKey("target_content_type", "target_id")
-    related_object_id = models.IntegerField(null=True)
+    related_object_id = models.IntegerField(null=True, blank=True)
     related_object_content_type = models.ForeignKey(
         ContentType,
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="related_objecting_activities",
     )

@@ -7,6 +7,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from funkwhale_api.common import preferences
+from funkwhale_api.common import middleware
 from funkwhale_api.common import utils
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import spa_views
@@ -14,7 +15,7 @@ from funkwhale_api.music import spa_views
 from . import models
 
 
-def channel_detail(query):
+def channel_detail(query, redirect_to_ap):
     queryset = models.Channel.objects.filter(query).select_related(
         "artist__attachment_cover", "actor", "library"
     )
@@ -22,6 +23,9 @@ def channel_detail(query):
         obj = queryset.get()
     except models.Channel.DoesNotExist:
         return []
+
+    if redirect_to_ap:
+        raise middleware.ApiRedirect(obj.actor.fid)
 
     obj_url = utils.join_url(
         settings.FUNKWHALE_URL,
@@ -81,16 +85,16 @@ def channel_detail(query):
     return metas
 
 
-def channel_detail_uuid(request, uuid):
+def channel_detail_uuid(request, uuid, redirect_to_ap):
     validator = serializers.UUIDField().to_internal_value
     try:
         uuid = validator(uuid)
     except serializers.ValidationError:
         return []
-    return channel_detail(Q(uuid=uuid))
+    return channel_detail(Q(uuid=uuid), redirect_to_ap)
 
 
-def channel_detail_username(request, username):
+def channel_detail_username(request, username, redirect_to_ap):
     validator = federation_utils.get_actor_data_from_username
     try:
         username_data = validator(username)
@@ -100,4 +104,4 @@ def channel_detail_username(request, username):
         actor__domain=username_data["domain"],
         actor__preferred_username__iexact=username_data["username"],
     )
-    return channel_detail(query)
+    return channel_detail(query, redirect_to_ap)

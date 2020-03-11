@@ -354,20 +354,24 @@ def test_music_upload_detail_private_approved_follow(
 
 
 @pytest.mark.parametrize(
-    "accept_header,expected",
+    "accept_header,default,expected",
     [
-        ("text/html,application/xhtml+xml", True),
-        ("text/html,application/json", True),
-        ("", False),
-        (None, False),
-        ("application/json", False),
-        ("application/activity+json", False),
-        ("application/json,text/html", False),
-        ("application/activity+json,text/html", False),
+        ("text/html,application/xhtml+xml", True, True),
+        ("text/html,application/json", True, True),
+        ("", True, False),
+        (None, True, False),
+        ("application/json", True, False),
+        ("application/activity+json", True, False),
+        ("application/json,text/html", True, False),
+        ("application/activity+json,text/html", True, False),
+        ("unrelated/ct", True, True),
+        ("unrelated/ct", False, False),
     ],
 )
-def test_should_redirect_ap_to_html(accept_header, expected):
-    assert federation_utils.should_redirect_ap_to_html(accept_header) is expected
+def test_should_redirect_ap_to_html(accept_header, default, expected):
+    assert (
+        federation_utils.should_redirect_ap_to_html(accept_header, default) is expected
+    )
 
 
 def test_music_library_retrieve_redirects_to_html_if_header_set(

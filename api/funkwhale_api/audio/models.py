@@ -64,6 +64,10 @@ class Channel(models.Model):
             )
         )
 
+    @property
+    def fid(self):
+        return self.actor.fid
+
 
 def generate_actor(username, **kwargs):
     actor_data = user_models.get_actor_data(username, **kwargs)

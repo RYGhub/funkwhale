@@ -4,6 +4,7 @@ import io
 import os
 import re
 import time
+import urllib.parse
 import xml.sax.saxutils
 
 from django import http
@@ -163,8 +164,16 @@ def render_tags(tags):
 
 
 def get_request_head_tags(request):
+    accept_header = request.headers.get("Accept") or None
+    redirect_to_ap = (
+        False
+        if not accept_header
+        else not federation_utils.should_redirect_ap_to_html(accept_header)
+    )
     match = urls.resolve(request.path, urlconf=settings.SPA_URLCONF)
-    return match.func(request, *match.args, **match.kwargs)
+    return match.func(
+        request, *match.args, redirect_to_ap=redirect_to_ap, **match.kwargs
+    )
 
 
 def get_custom_css():
@@ -175,6 +184,30 @@ def get_custom_css():
     return xml.sax.saxutils.escape(css)
 
 
+class ApiRedirect(Exception):
+    def __init__(self, url):
+        self.url = url
+
+
+def get_api_response(request, url):
+    """
+    Quite ugly but we have no choice. When Accept header is set to application/activity+json
+    some clients expect to get a JSON payload (instead of the HTML we return). Since
+    redirecting to the URL does not work (because it makes the signature verification fail),
+    we grab the internal view corresponding to the URL, call it and return this as the
+    response
+    """
+    path = urllib.parse.urlparse(url).path
+
+    try:
+        match = urls.resolve(path)
+    except urls.exceptions.Resolver404:
+        return http.HttpResponseNotFound()
+    response = match.func(request, *match.args, **match.kwargs)
+    response.render()
+    return response
+
+
 class SPAFallbackMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -183,7 +216,10 @@ class SPAFallbackMiddleware:
         response = self.get_response(request)
 
         if response.status_code == 404 and should_fallback_to_spa(request.path):
-            return serve_spa(request)
+            try:
+                return serve_spa(request)
+            except ApiRedirect as e:
+                return get_api_response(request, e.url)
 
         return response
 

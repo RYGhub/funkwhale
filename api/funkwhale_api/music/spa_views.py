@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from funkwhale_api.common import preferences
+from funkwhale_api.common import middleware
 from funkwhale_api.common import utils
 from funkwhale_api.playlists import models as playlists_models
 
@@ -25,12 +26,16 @@ def get_twitter_card_metas(type, id):
     ]
 
 
-def library_track(request, pk):
+def library_track(request, pk, redirect_to_ap):
     queryset = models.Track.objects.filter(pk=pk).select_related("album", "artist")
     try:
         obj = queryset.get()
     except models.Track.DoesNotExist:
         return []
+
+    if redirect_to_ap:
+        raise middleware.ApiRedirect(obj.fid)
+
     track_url = utils.join_url(
         settings.FUNKWHALE_URL,
         utils.spa_reverse("library_track", kwargs={"pk": obj.pk}),
@@ -114,12 +119,16 @@ def library_track(request, pk):
     return metas
 
 
-def library_album(request, pk):
+def library_album(request, pk, redirect_to_ap):
     queryset = models.Album.objects.filter(pk=pk).select_related("artist")
     try:
         obj = queryset.get()
     except models.Album.DoesNotExist:
         return []
+
+    if redirect_to_ap:
+        raise middleware.ApiRedirect(obj.fid)
+
     album_url = utils.join_url(
         settings.FUNKWHALE_URL,
         utils.spa_reverse("library_album", kwargs={"pk": obj.pk}),
@@ -182,12 +191,16 @@ def library_album(request, pk):
     return metas
 
 
-def library_artist(request, pk):
+def library_artist(request, pk, redirect_to_ap):
     queryset = models.Artist.objects.filter(pk=pk)
     try:
         obj = queryset.get()
     except models.Artist.DoesNotExist:
         return []
+
+    if redirect_to_ap:
+        raise middleware.ApiRedirect(obj.fid)
+
     artist_url = utils.join_url(
         settings.FUNKWHALE_URL,
         utils.spa_reverse("library_artist", kwargs={"pk": obj.pk}),
@@ -242,7 +255,7 @@ def library_artist(request, pk):
     return metas
 
 
-def library_playlist(request, pk):
+def library_playlist(request, pk, redirect_to_ap):
     queryset = playlists_models.Playlist.objects.filter(pk=pk, privacy_level="everyone")
     try:
         obj = queryset.get()
@@ -294,12 +307,16 @@ def library_playlist(request, pk):
     return metas
 
 
-def library_library(request, uuid):
+def library_library(request, uuid, redirect_to_ap):
     queryset = models.Library.objects.filter(uuid=uuid)
     try:
         obj = queryset.get()
     except models.Library.DoesNotExist:
         return []
+
+    if redirect_to_ap:
+        raise middleware.ApiRedirect(obj.fid)
+
     library_url = utils.join_url(
         settings.FUNKWHALE_URL,
         utils.spa_reverse("library_library", kwargs={"uuid": obj.uuid}),
