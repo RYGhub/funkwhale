@@ -145,6 +145,7 @@ export default {
       type: null,
       id: null,
       tracks: [],
+      autoplay: false,
       url: null,
       isLoading: true,
       theme: 'dark',
@@ -174,6 +175,8 @@ export default {
     if (!!params.instance) {
       this.baseUrl = params.instance
     }
+
+    this.autoplay = params.autoplay != undefined || params.auto_play != undefined
     this.fetch(this.type, this.id)
   },
   mounted () {
@@ -380,6 +383,9 @@ export default {
     },
     tracks () {
       this.currentIndex = 0
+      if (this.autoplay) {
+        this.play(this.currentIndex)
+      }
     }
   }
 }
