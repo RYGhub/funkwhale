@@ -366,8 +366,10 @@ def get_channel_from_rss_url(url):
         )
     )
     if parsed_feed.feed.get("rights"):
-        track_defaults["copyright"] = parsed_feed.feed.rights
-    for entry in entries:
+        track_defaults["copyright"] = parsed_feed.feed.rights[
+            : music_models.MAX_LENGTHS["COPYRIGHT"]
+        ]
+    for entry in entries[: settings.PODCASTS_RSS_FEED_MAX_ITEMS]:
         logger.debug("Importing feed item %s", entry.id)
         s = RssFeedItemSerializer(data=entry)
         if not s.is_valid():
@@ -510,7 +512,9 @@ class RssFeedSerializer(serializers.Serializer):
             **artist_kwargs,
             defaults={
                 "attributed_to": service_actor,
-                "name": validated_data["title"],
+                "name": validated_data["title"][
+                    : music_models.MAX_LENGTHS["ARTIST_NAME"]
+                ],
                 "content_category": "podcast",
             },
         )
@@ -695,12 +699,16 @@ class RssFeedItemSerializer(serializers.Serializer):
             {
                 "disc_number": validated_data.get("itunes_season", 1),
                 "position": validated_data.get("itunes_episode", 1),
-                "title": validated_data["title"],
+                "title": validated_data["title"][
+                    : music_models.MAX_LENGTHS["TRACK_TITLE"]
+                ],
                 "artist": channel.artist,
             }
         )
         if "rights" in validated_data:
-            track_defaults["rights"] = validated_data["rights"]
+            track_defaults["rights"] = validated_data["rights"][
+                : music_models.MAX_LENGTHS["COPYRIGHT"]
+            ]
 
         if "published_parsed" in validated_data:
             track_defaults["creation_date"] = datetime.datetime.fromtimestamp(
