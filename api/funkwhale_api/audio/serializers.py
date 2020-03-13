@@ -365,13 +365,13 @@ def get_channel_from_rss_url(url):
             "track__description", "track__attachment_cover"
         )
     )
-    if parsed_feed.feed.rights:
+    if parsed_feed.feed.get("rights"):
         track_defaults["copyright"] = parsed_feed.feed.rights
     for entry in entries:
         logger.debug("Importing feed item %s", entry.id)
         s = RssFeedItemSerializer(data=entry)
         if not s.is_valid():
-            logger.debug("Skipping invalid RSS feed item %s", entry)
+            logger.debug("Skipping invalid RSS feed item %s, ", entry, str(s.errors))
             continue
         uploads.append(
             s.save(channel, existing_uploads=existing_uploads, **track_defaults)
@@ -635,7 +635,7 @@ class RssFeedItemSerializer(serializers.Serializer):
             if row.get("rel") != "enclosure":
                 continue
             try:
-                size = int(row.get("length", 0)) or None
+                size = int(row.get("length", 0) or 0) or None
             except (TypeError, ValueError):
                 raise serializers.ValidationError("Invalid size")
 
