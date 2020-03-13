@@ -1,6 +1,6 @@
 <template>
   <time :datetime="`${duration}s`">
-    <template v-if="durationObj.hours">{{ durationObj.hours|padDuration }}</template>{{ durationObj.minutes|padDuration }}:{{ durationObj.seconds|padDuration }}
+    <template v-if="durationObj.hours">{{ durationObj.hours|padDuration }}:</template>{{ durationObj.minutes|padDuration }}:{{ durationObj.seconds|padDuration }}
   </time>
 
 </template>

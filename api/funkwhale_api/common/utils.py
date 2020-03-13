@@ -396,3 +396,8 @@ def get_mimetype_from_ext(path):
         "gif": "image/gif",
     }
     return match.get(ext)
+
+
+def get_audio_mimetype(mt):
+    aliases = {"audio/x-mp3": "audio/mpeg", "audio/mpeg3": "audio/mpeg"}
+    return aliases.get(mt, mt)

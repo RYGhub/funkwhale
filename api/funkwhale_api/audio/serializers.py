@@ -589,13 +589,21 @@ def get_cached_upload(uploads, expected_track_uuid):
             return upload
 
 
+class PermissiveIntegerField(serializers.IntegerField):
+    def to_internal_value(self, v):
+        try:
+            return super().to_internal_value(v)
+        except serializers.ValidationError:
+            return self.default
+
+
 class RssFeedItemSerializer(serializers.Serializer):
     id = serializers.CharField()
     title = serializers.CharField()
     rights = serializers.CharField(required=False, allow_blank=True)
     itunes_season = serializers.IntegerField(required=False)
-    itunes_episode = serializers.IntegerField(required=False)
-    itunes_duration = ItunesDurationField()
+    itunes_episode = PermissiveIntegerField(required=False, default=None)
+    itunes_duration = ItunesDurationField(required=False)
     links = serializers.ListField()
     tags = serializers.ListField(required=False)
     summary_detail = serializers.DictField(required=False)
@@ -627,12 +635,12 @@ class RssFeedItemSerializer(serializers.Serializer):
             if row.get("rel") != "enclosure":
                 continue
             try:
-                size = int(row.get("length"))
+                size = int(row.get("length", 0)) or None
             except (TypeError, ValueError):
                 raise serializers.ValidationError("Invalid size")
 
             data["audio"] = {
-                "mimetype": row["type"],
+                "mimetype": common_utils.get_audio_mimetype(row["type"]),
                 "size": size,
                 "source": row["href"],
             }
@@ -703,7 +711,7 @@ class RssFeedItemSerializer(serializers.Serializer):
             "source": validated_data["links"]["audio"]["source"],
             "size": validated_data["links"]["audio"]["size"],
             "mimetype": validated_data["links"]["audio"]["mimetype"],
-            "duration": validated_data["itunes_duration"],
+            "duration": validated_data.get("itunes_duration"),
             "import_status": "finished",
             "library": channel.library,
         }
