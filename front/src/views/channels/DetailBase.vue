@@ -128,6 +128,12 @@
                 <div class="sub header ellipsis" v-if="object.actor ":title="object.actor.full_username">
                   {{ object.actor.full_username }}
                 </div>
+                <div v-else class="sub header ellipsis">
+                  <a :href="object.url || object.rss_url" rel="noopener noreferrer" target="_blank">
+                    <i class="external link icon"></i>
+                    <translate :translate-params="{domain: externalDomain}" translate-context="Content/Channel/Paragraph">Mirrored from %{ domain }</translate>
+                  </a>
+                </div>
               </div>
             </h1>
             <div class="header-buttons">
@@ -298,6 +304,12 @@ export default {
     }
   },
   computed: {
+    externalDomain () {
+      let parser = document.createElement('a')
+      parser.href = this.object.url || this.object.rss_url
+      return parser.hostname
+    },
+
     isOwner () {
       return this.$store.state.auth.authenticated && this.object.attributed_to.full_username === this.$store.state.auth.fullUsername
     },

@@ -239,6 +239,7 @@ class ChannelSerializer(serializers.ModelSerializer):
     actor = serializers.SerializerMethodField()
     attributed_to = federation_serializers.APIActorSerializer()
     rss_url = serializers.CharField(source="get_rss_url")
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Channel
@@ -250,6 +251,7 @@ class ChannelSerializer(serializers.ModelSerializer):
             "creation_date",
             "metadata",
             "rss_url",
+            "url",
         ]
 
     def get_artist(self, obj):
@@ -268,6 +270,9 @@ class ChannelSerializer(serializers.ModelSerializer):
         if obj.attributed_to == actors.get_service_actor():
             return None
         return federation_serializers.APIActorSerializer(obj.actor).data
+
+    def get_url(self, obj):
+        return obj.actor.url
 
 
 class SubscriptionSerializer(serializers.Serializer):
