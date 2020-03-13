@@ -19,6 +19,19 @@ def empty_dict():
     return {}
 
 
+class ChannelQuerySet(models.QuerySet):
+    def external_rss(self, include=True):
+        from funkwhale_api.federation import actors
+
+        query = models.Q(
+            attributed_to=actors.get_service_actor(),
+            actor__preferred_username__startswith="rssfeed-",
+        )
+        if include:
+            return self.filter(query)
+        return self.exclude(query)
+
+
 class Channel(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     artist = models.OneToOneField(
@@ -45,6 +58,8 @@ class Channel(models.Model):
         default=empty_dict, max_length=50000, encoder=DjangoJSONEncoder, blank=True
     )
 
+    objects = ChannelQuerySet.as_manager()
+
     def get_absolute_url(self):
         suffix = self.uuid
         if self.actor.is_local:
@@ -54,7 +69,9 @@ class Channel(models.Model):
         return federation_utils.full_url("/channels/{}".format(suffix))
 
     def get_rss_url(self):
-        if not self.artist.is_local:
+        if not self.artist.is_local or self.actor.preferred_username.startswith(
+            "rssfeed-"
+        ):
             return self.rss_url
 
         return federation_utils.full_url(
@@ -81,5 +98,6 @@ def generate_actor(username, **kwargs):
 @receiver(post_delete, sender=Channel)
 def delete_channel_related_objs(instance, **kwargs):
     instance.library.delete()
-    instance.actor.delete()
+    if instance.actor != instance.attributed_to:
+        instance.actor.delete()
     instance.artist.delete()

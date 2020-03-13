@@ -251,6 +251,19 @@ def test_channel_rss_feed(factories, api_client, preferences):
     assert response["Content-Type"] == "application/rss+xml"
 
 
+def test_channel_rss_feed_redirects_for_external(factories, api_client, preferences):
+    preferences["common__api_authentication_required"] = False
+    channel = factories["audio.Channel"](external=True)
+    factories["music.Upload"](library=channel.library, playable=True)
+
+    url = reverse("api:v1:channels-rss", kwargs={"composite": channel.uuid})
+
+    response = api_client.get(url)
+
+    assert response.status_code == 302
+    assert response["Location"] == channel.rss_url
+
+
 def test_channel_rss_feed_remote(factories, api_client, preferences):
     preferences["common__api_authentication_required"] = False
     channel = factories["audio.Channel"]()
@@ -291,3 +304,65 @@ def test_channel_metadata_choices(factories, api_client):
 
     assert response.status_code == 200
     assert response.data == expected
+
+
+def test_subscribe_to_rss_feed_existing_channel(
+    factories, logged_in_api_client, mocker
+):
+    actor = logged_in_api_client.user.create_actor()
+    rss_url = "http://example.test/rss.url"
+    channel = factories["audio.Channel"](rss_url=rss_url, external=True)
+    url = reverse("api:v1:channels-rss_subscribe")
+
+    response = logged_in_api_client.post(url, {"url": rss_url})
+
+    assert response.status_code == 201
+
+    subscription = actor.emitted_follows.select_related(
+        "target__channel__artist__description",
+        "target__channel__artist__attachment_cover",
+    ).latest("id")
+
+    assert subscription.target == channel.actor
+    assert subscription.approved is True
+    assert subscription.fid == subscription.get_federation_id()
+
+    setattr(subscription.target.channel.artist, "_tracks_count", 0)
+    setattr(subscription.target.channel.artist, "_prefetched_tagged_items", [])
+
+    expected = serializers.SubscriptionSerializer(subscription).data
+
+    assert response.data == expected
+
+
+def test_subscribe_to_rss_feed_existing_subscription(
+    factories, logged_in_api_client, mocker
+):
+    actor = logged_in_api_client.user.create_actor()
+    rss_url = "http://example.test/rss.url"
+    channel = factories["audio.Channel"](rss_url=rss_url, external=True)
+    factories["federation.Follow"](target=channel.actor, approved=True, actor=actor)
+    url = reverse("api:v1:channels-rss_subscribe")
+
+    response = logged_in_api_client.post(url, {"url": rss_url})
+
+    assert response.status_code == 201
+
+    assert channel.actor.received_follows.count() == 1
+
+
+def test_subscribe_to_rss_creates_channel(factories, logged_in_api_client, mocker):
+    logged_in_api_client.user.create_actor()
+    rss_url = "http://example.test/rss.url"
+    channel = factories["audio.Channel"]()
+    get_channel_from_rss_url = mocker.patch.object(
+        serializers, "get_channel_from_rss_url", return_value=(channel, [])
+    )
+    url = reverse("api:v1:channels-rss_subscribe")
+
+    response = logged_in_api_client.post(url, {"url": rss_url})
+
+    assert response.status_code == 201
+    assert response.data["channel"]["uuid"] == channel.uuid
+
+    get_channel_from_rss_url.assert_called_once_with(rss_url)

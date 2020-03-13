@@ -310,13 +310,21 @@ def render_plain_text(html):
     return bleach.clean(html, tags=[], strip=True)
 
 
+def same_content(old, text=None, content_type=None):
+    return old.text == text and old.content_type == content_type
+
+
 @transaction.atomic
 def attach_content(obj, field, content_data):
     from . import models
 
+    content_data = content_data or {}
     existing = getattr(obj, "{}_id".format(field))
 
     if existing:
+        if same_content(getattr(obj, field), **content_data):
+            # optimization to avoid a delete/save if possible
+            return getattr(obj, field)
         getattr(obj, field).delete()
         setattr(obj, field, None)
 
@@ -376,3 +384,15 @@ def attach_file(obj, field, file_data, fetch=False):
     setattr(obj, field, attachment)
     obj.save(update_fields=[field])
     return attachment
+
+
+def get_mimetype_from_ext(path):
+    parts = path.lower().split(".")
+    ext = parts[-1]
+    match = {
+        "jpeg": "image/jpeg",
+        "jpg": "image/jpeg",
+        "png": "image/png",
+        "gif": "image/gif",
+    }
+    return match.get(ext)

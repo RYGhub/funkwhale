@@ -580,6 +580,11 @@ CELERY_BROKER_URL = env(
 CELERY_TASK_DEFAULT_RATE_LIMIT = 1
 CELERY_TASK_TIME_LIMIT = 300
 CELERY_BEAT_SCHEDULE = {
+    "audio.fetch_rss_feeds": {
+        "task": "audio.fetch_rss_feeds",
+        "schedule": crontab(minute="0", hour="*"),
+        "options": {"expires": 60 * 60},
+    },
     "common.prune_unattached_attachments": {
         "task": "common.prune_unattached_attachments",
         "schedule": crontab(minute="0", hour="*"),
@@ -976,3 +981,11 @@ MIN_DELAY_BETWEEN_DOWNLOADS_COUNT = env.int(
 MARKDOWN_EXTENSIONS = env.list("MARKDOWN_EXTENSIONS", default=["nl2br", "extra"])
 
 LINKIFIER_SUPPORTED_TLDS = ["audio"] + env.list("LINKINFIER_SUPPORTED_TLDS", default=[])
+EXTERNAL_MEDIA_PROXY_ENABLED = env.bool("EXTERNAL_MEDIA_PROXY_ENABLED", default=True)
+
+# By default, only people who subscribe to a podcast RSS will have access to it
+# switch to "instance" or "everyone" to change that
+PODCASTS_THIRD_PARTY_VISIBILITY = env("PODCASTS_THIRD_PARTY_VISIBILITY", default="me")
+PODCASTS_RSS_FEED_REFRESH_DELAY = env.int(
+    "PODCASTS_RSS_FEED_REFRESH_DELAY", default=60 * 60 * 24
+)

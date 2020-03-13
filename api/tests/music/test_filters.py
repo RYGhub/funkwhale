@@ -113,7 +113,7 @@ def test_track_filter_tag_multiple(
 
 
 def test_channel_filter_track(factories, queryset_equal_list, mocker, anonymous_user):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
     upload = factories["music.Upload"](
         library=channel.library, playable=True, track__artist=channel.artist
     )
@@ -129,7 +129,7 @@ def test_channel_filter_track(factories, queryset_equal_list, mocker, anonymous_
 
 
 def test_channel_filter_album(factories, queryset_equal_list, mocker, anonymous_user):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
     upload = factories["music.Upload"](
         library=channel.library, playable=True, track__artist=channel.artist
     )

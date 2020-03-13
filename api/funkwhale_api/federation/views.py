@@ -13,7 +13,16 @@ from funkwhale_api.moderation import models as moderation_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import utils as music_utils
 
-from . import activity, authentication, models, renderers, serializers, utils, webfinger
+from . import (
+    actors,
+    activity,
+    authentication,
+    models,
+    renderers,
+    serializers,
+    utils,
+    webfinger,
+)
 
 
 def redirect_to_html(public_url):
@@ -60,6 +69,10 @@ class ActorViewSet(FederationMixin, mixins.RetrieveModelMixin, viewsets.GenericV
     renderer_classes = renderers.get_ap_renderers()
     queryset = models.Actor.objects.local().select_related("user")
     serializer_class = serializers.ActorSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.exclude(channel__attributed_to=actors.get_service_actor())
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

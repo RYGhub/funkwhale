@@ -14,7 +14,7 @@
               </div>
               <div class="ui column right aligned">
                 <tags-list v-if="object.artist.tags && object.artist.tags.length > 0" :tags="object.artist.tags"></tags-list>
-                <actor-link :avatar="false" :actor="object.attributed_to" :display-name="true"></actor-link>
+                <actor-link v-if="object.actor" :avatar="false" :actor="object.attributed_to" :display-name="true"></actor-link>
                 <template v-if="totalTracks > 0">
                   <div class="ui hidden very small divider"></div>
                   <translate translate-context="Content/Channel/Paragraph"
@@ -125,7 +125,7 @@
               <div class="left aligned" :title="object.artist.name">
                 {{ object.artist.name }}
                 <div class="ui hidden very small divider"></div>
-                <div class="sub header ellipsis" :title="object.actor.full_username">
+                <div class="sub header ellipsis" v-if="object.actor ":title="object.actor.full_username">
                   {{ object.actor.full_username }}
                 </div>
               </div>
@@ -268,7 +268,7 @@ export default {
       this.isLoading = true
       let channelPromise = axios.get(`channels/${this.id}`).then(response => {
         self.object = response.data
-        if (self.id == response.data.uuid && response.data.actor) {
+        if ((self.id == response.data.uuid) && response.data.actor) {
           // replace with the pretty channel url if possible
           let actor = response.data.actor
           if (actor.is_local) {

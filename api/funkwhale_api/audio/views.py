@@ -8,12 +8,12 @@ from rest_framework import viewsets
 from django import http
 from django.db import transaction
 from django.db.models import Count, Prefetch, Q
-from django.db.utils import IntegrityError
 
 from funkwhale_api.common import locales
 from funkwhale_api.common import permissions
 from funkwhale_api.common import preferences
 from funkwhale_api.common.mixins import MultipleLookupDetailMixin
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import routes
 from funkwhale_api.federation import utils as federation_utils
@@ -100,17 +100,19 @@ class ChannelViewSet(
     )
     def subscribe(self, request, *args, **kwargs):
         object = self.get_object()
-        subscription = federation_models.Follow(
-            target=object.actor, approved=True, actor=request.user.actor,
-        )
+        subscription = federation_models.Follow(actor=request.user.actor)
         subscription.fid = subscription.get_federation_id()
-        try:
-            subscription.save()
-        except IntegrityError:
-            # there's already a subscription for this actor/channel
-            subscription = object.actor.received_follows.filter(
-                actor=request.user.actor
-            ).get()
+        subscription, created = SubscriptionsViewSet.queryset.get_or_create(
+            target=object.actor,
+            actor=request.user.actor,
+            defaults={
+                "approved": True,
+                "fid": subscription.fid,
+                "uuid": subscription.uuid,
+            },
+        )
+        # prefetch stuff
+        subscription = SubscriptionsViewSet.queryset.get(pk=subscription.pk)
 
         data = serializers.SubscriptionSerializer(subscription).data
         return response.Response(data, status=201)
@@ -134,6 +136,10 @@ class ChannelViewSet(
         object = self.get_object()
         if not object.attributed_to.is_local:
             return response.Response({"detail": "Not found"}, status=404)
+
+        if object.attributed_to == actors.get_service_actor():
+            # external feed, we redirect to the canonical one
+            return http.HttpResponseRedirect(object.rss_url)
 
         uploads = (
             object.library.uploads.playable_by(None)
@@ -169,6 +175,49 @@ class ChannelViewSet(
             ],
         }
         return response.Response(data)
+
+    @decorators.action(
+        methods=["post"],
+        detail=False,
+        url_path="rss-subscribe",
+        url_name="rss_subscribe",
+    )
+    @transaction.atomic
+    def rss_subscribe(self, request, *args, **kwargs):
+        serializer = serializers.RssSubscribeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return response.Response(serializer.errors, status=400)
+        channel = (
+            models.Channel.objects.filter(rss_url=serializer.validated_data["url"],)
+            .order_by("id")
+            .first()
+        )
+        if not channel:
+            # try to retrieve the channel via its URL and create it
+            try:
+                channel, uploads = serializers.get_channel_from_rss_url(
+                    serializer.validated_data["url"]
+                )
+            except serializers.FeedFetchException as e:
+                return response.Response({"detail": str(e)}, status=400,)
+
+        subscription = federation_models.Follow(actor=request.user.actor)
+        subscription.fid = subscription.get_federation_id()
+        subscription, created = SubscriptionsViewSet.queryset.get_or_create(
+            target=channel.actor,
+            actor=request.user.actor,
+            defaults={
+                "approved": True,
+                "fid": subscription.fid,
+                "uuid": subscription.uuid,
+            },
+        )
+        # prefetch stuff
+        subscription = SubscriptionsViewSet.queryset.get(pk=subscription.pk)
+
+        return response.Response(
+            serializers.SubscriptionSerializer(subscription).data, status=201
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

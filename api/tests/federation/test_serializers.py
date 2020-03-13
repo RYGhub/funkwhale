@@ -1444,7 +1444,7 @@ def test_channel_actor_outbox_serializer(factories):
 
 
 def test_channel_upload_serializer(factories):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
     content = factories["common.Content"]()
     upload = factories["music.Upload"](
         playable=True,

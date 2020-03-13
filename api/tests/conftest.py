@@ -87,6 +87,8 @@ def cache():
     """
     yield django_cache
     django_cache.clear()
+    if "service_actor" in actors._CACHE:
+        del actors._CACHE["service_actor"]
 
 
 @pytest.fixture(autouse=True)

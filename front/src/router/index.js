@@ -80,7 +80,8 @@ export default new Router({
       component: () =>
         import(/* webpackChunkName: "core" */ "@/views/Search"),
       props: route => ({
-        initialId: route.query.id
+        initialId: route.query.id,
+        type: route.query.type,
       })
     },
     {

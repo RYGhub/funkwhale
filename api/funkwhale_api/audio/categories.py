@@ -109,3 +109,5 @@ ITUNES_CATEGORIES = {
         "TV Reviews",
     ],
 }
+
+ITUNES_SUBCATEGORIES = [s for p in ITUNES_CATEGORIES.values() for s in p]

@@ -786,9 +786,13 @@ class Upload(models.Model):
         with remote_response as r:
             remote_response.raise_for_status()
             extension = utils.get_ext_from_type(self.mimetype)
-            title = " - ".join(
-                [self.track.title, self.track.album.title, self.track.artist.name]
-            )
+            title_parts = []
+            title_parts.append(self.track.title)
+            if self.track.album:
+                title_parts.append(self.track.album.title)
+            title_parts.append(self.track.artist.name)
+
+            title = " - ".join(title_parts)
             filename = "{}.{}".format(title, extension)
             tmp_file = tempfile.TemporaryFile()
             for chunk in r.iter_content(chunk_size=512):
@@ -1126,7 +1130,7 @@ class LibraryQuerySet(models.QuerySet):
         )
 
     def viewable_by(self, actor):
-        from funkwhale_api.federation.models import LibraryFollow
+        from funkwhale_api.federation.models import LibraryFollow, Follow
 
         if actor is None:
             return self.filter(privacy_level="everyone")
@@ -1136,11 +1140,17 @@ class LibraryQuerySet(models.QuerySet):
         followed_libraries = LibraryFollow.objects.filter(
             actor=actor, approved=True
         ).values_list("target", flat=True)
+        followed_channels_libraries = (
+            Follow.objects.exclude(target__channel=None)
+            .filter(actor=actor, approved=True,)
+            .values_list("target__channel__library", flat=True)
+        )
         return self.filter(
             me_query
             | instance_query
             | models.Q(privacy_level="everyone")
             | models.Q(pk__in=followed_libraries)
+            | models.Q(pk__in=followed_channels_libraries)
         )
 
 
@@ -1174,7 +1184,7 @@ class Library(federation_models.FederationMixin):
         return "/library/{}".format(self.uuid)
 
     def save(self, **kwargs):
-        if not self.pk and not self.fid and self.actor.get_user():
+        if not self.pk and not self.fid and self.actor.is_local:
             self.fid = self.get_federation_id()
             self.followers_url = self.fid + "/followers"
 
@@ -1266,7 +1276,11 @@ class TrackActor(models.Model):
         ).values_list("id", "track")
         objs = []
         if library.privacy_level == "me":
-            follow_queryset = library.received_follows.filter(approved=True).exclude(
+            if library.get_channel():
+                follow_queryset = library.channel.actor.received_follows
+            else:
+                follow_queryset = library.received_follows
+            follow_queryset = follow_queryset.filter(approved=True).exclude(
                 actor__user__isnull=True
             )
             if actor_ids:

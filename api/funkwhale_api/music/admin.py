@@ -23,6 +23,13 @@ class TrackAdmin(admin.ModelAdmin):
     list_select_related = ["album__artist", "artist"]
 
 
+@admin.register(models.TrackActor)
+class TrackActorAdmin(admin.ModelAdmin):
+    list_display = ["actor", "track", "upload", "internal"]
+    search_fields = ["actor__preferred_username", "track__name"]
+    list_select_related = ["actor", "track"]
+
+
 @admin.register(models.ImportBatch)
 class ImportBatchAdmin(admin.ModelAdmin):
     list_display = ["submitted_by", "creation_date", "import_request", "status"]
