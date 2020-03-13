@@ -1,6 +1,9 @@
+import uuid
+
 import factory
 
 from funkwhale_api.factories import registry, NoUpdateOnCreate
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import factories as federation_factories
 from funkwhale_api.music import factories as music_factories
 
@@ -9,6 +12,10 @@ from . import models
 
 def set_actor(o):
     return models.generate_actor(str(o.uuid))
+
+
+def get_rss_channel_name():
+    return "rssfeed-{}".format(uuid.uuid4())
 
 
 @registry.register
@@ -32,10 +39,20 @@ class ChannelFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         model = "audio.Channel"
 
     class Params:
+        external = factory.Trait(
+            attributed_to=factory.LazyFunction(actors.get_service_actor),
+            library__privacy_level="me",
+            actor=factory.SubFactory(
+                federation_factories.ActorFactory,
+                local=True,
+                preferred_username=factory.LazyFunction(get_rss_channel_name),
+            ),
+        )
         local = factory.Trait(
             attributed_to=factory.SubFactory(
                 federation_factories.ActorFactory, local=True
             ),
+            library__privacy_level="everyone",
             artist__local=True,
         )
 

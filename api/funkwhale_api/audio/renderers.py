@@ -21,12 +21,16 @@ class PodcastRSSRenderer(renderers.JSONRenderer):
         }
         final.update(data)
         tree = dict_to_xml_tree("rss", final)
-        return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(
-            tree, encoding="utf-8"
-        )
+        return render_xml(tree)
 
 
 class PodcastRSSContentNegociation(negotiation.DefaultContentNegotiation):
     def select_renderer(self, request, renderers, format_suffix=None):
 
         return (PodcastRSSRenderer(), PodcastRSSRenderer.media_type)
+
+
+def render_xml(tree):
+    return b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(
+        tree, encoding="utf-8"
+    )

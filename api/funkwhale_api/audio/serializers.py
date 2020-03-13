@@ -1,17 +1,32 @@
+import datetime
+import logging
+import time
+import uuid
+
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
+
+import feedparser
+import requests
+import pytz
 
 from rest_framework import serializers
 
 from django.templatetags.static import static
+from django.urls import reverse
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.common import locales
 from funkwhale_api.common import preferences
+from funkwhale_api.common import session
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import utils as federation_utils
+from funkwhale_api.moderation import mrf
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import serializers as music_serializers
 from funkwhale_api.tags import models as tags_models
@@ -20,6 +35,9 @@ from funkwhale_api.users import serializers as users_serializers
 
 from . import categories
 from . import models
+
+
+logger = logging.getLogger(__name__)
 
 
 class ChannelMetadataSerializer(serializers.Serializer):
@@ -218,7 +236,7 @@ class ChannelUpdateSerializer(serializers.Serializer):
 
 class ChannelSerializer(serializers.ModelSerializer):
     artist = serializers.SerializerMethodField()
-    actor = federation_serializers.APIActorSerializer()
+    actor = serializers.SerializerMethodField()
     attributed_to = federation_serializers.APIActorSerializer()
     rss_url = serializers.CharField(source="get_rss_url")
 
@@ -246,6 +264,11 @@ class ChannelSerializer(serializers.ModelSerializer):
     def get_subscriptions_count(self, obj):
         return obj.actor.received_follows.exclude(approved=False).count()
 
+    def get_actor(self, obj):
+        if obj.attributed_to == actors.get_service_actor():
+            return None
+        return federation_serializers.APIActorSerializer(obj.actor).data
+
 
 class SubscriptionSerializer(serializers.Serializer):
     approved = serializers.BooleanField(read_only=True)
@@ -259,9 +282,473 @@ class SubscriptionSerializer(serializers.Serializer):
         return data
 
 
+class RssSubscribeSerializer(serializers.Serializer):
+    url = serializers.URLField()
+
+
+class FeedFetchException(Exception):
+    pass
+
+
+class BlockedFeedException(FeedFetchException):
+    pass
+
+
+def retrieve_feed(url):
+    try:
+        logger.info("Fetching RSS feed at %s", url)
+        response = session.get_session().get(url)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response:
+            raise FeedFetchException(
+                "Error while fetching feed: HTTP {}".format(e.response.status_code)
+            )
+        raise FeedFetchException("Error while fetching feed: unknown error")
+    except requests.exceptions.Timeout:
+        raise FeedFetchException("Error while fetching feed: timeout")
+    except requests.exceptions.ConnectionError:
+        raise FeedFetchException("Error while fetching feed: connection error")
+    except requests.RequestException as e:
+        raise FeedFetchException("Error while fetching feed: {}".format(e))
+    except Exception as e:
+        raise FeedFetchException("Error while fetching feed: {}".format(e))
+
+    return response
+
+
+@transaction.atomic
+def get_channel_from_rss_url(url):
+    # first, check if the url is blocked
+    is_valid, _ = mrf.inbox.apply({"id": url})
+    if not is_valid:
+        logger.warn("Feed fetch for url %s dropped by MRF", url)
+        raise BlockedFeedException("This feed or domain is blocked")
+
+    # retrieve the XML payload at the given URL
+    response = retrieve_feed(url)
+
+    parsed_feed = feedparser.parse(response.text)
+    serializer = RssFeedSerializer(data=parsed_feed["feed"])
+    if not serializer.is_valid():
+        raise FeedFetchException("Invalid xml content: {}".format(serializer.errors))
+
+    # second mrf check with validated data
+    urls_to_check = set()
+    atom_link = serializer.validated_data.get("atom_link")
+
+    if atom_link and atom_link != url:
+        urls_to_check.add(atom_link)
+
+    if serializer.validated_data["link"] != url:
+        urls_to_check.add(serializer.validated_data["link"])
+
+    for u in urls_to_check:
+        is_valid, _ = mrf.inbox.apply({"id": u})
+        if not is_valid:
+            logger.warn("Feed fetch for url %s dropped by MRF", u)
+            raise BlockedFeedException("This feed or domain is blocked")
+
+    # now, we're clear, we can save the data
+    channel = serializer.save(rss_url=url)
+
+    entries = parsed_feed.entries or []
+    uploads = []
+    track_defaults = {}
+    existing_uploads = list(
+        channel.library.uploads.all().select_related(
+            "track__description", "track__attachment_cover"
+        )
+    )
+    if parsed_feed.feed.rights:
+        track_defaults["copyright"] = parsed_feed.feed.rights
+    for entry in entries:
+        logger.debug("Importing feed item %s", entry.id)
+        s = RssFeedItemSerializer(data=entry)
+        if not s.is_valid():
+            logger.debug("Skipping invalid RSS feed item %s", entry)
+            continue
+        uploads.append(
+            s.save(channel, existing_uploads=existing_uploads, **track_defaults)
+        )
+
+    common_utils.on_commit(
+        music_models.TrackActor.create_entries,
+        library=channel.library,
+        delete_existing=True,
+    )
+
+    return channel, uploads
+
+
 # RSS related stuff
 # https://github.com/simplepie/simplepie-ng/wiki/Spec:-iTunes-Podcast-RSS
 # is extremely useful
+
+
+class RssFeedSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    link = serializers.URLField()
+    language = serializers.CharField(required=False, allow_blank=True)
+    rights = serializers.CharField(required=False, allow_blank=True)
+    itunes_explicit = serializers.BooleanField(required=False, allow_null=True)
+    tags = serializers.ListField(required=False)
+    atom_link = serializers.DictField(required=False)
+    summary_detail = serializers.DictField(required=False)
+    author_detail = serializers.DictField(required=False)
+    image = serializers.DictField(required=False)
+
+    def validate_atom_link(self, v):
+        if (
+            v.get("rel", "self") == "self"
+            and v.get("type", "application/rss+xml") == "application/rss+xml"
+        ):
+            return v["href"]
+
+    def validate_summary_detail(self, v):
+        content = v.get("value")
+        if not content:
+            return
+        return {
+            "content_type": v.get("type", "text/plain"),
+            "text": content,
+        }
+
+    def validate_image(self, v):
+        url = v.get("href")
+        if url:
+            return {
+                "url": url,
+                "mimetype": common_utils.get_mimetype_from_ext(url) or "image/jpeg",
+            }
+
+    def validate_tags(self, v):
+        data = {}
+        for row in v:
+            if row.get("scheme") != "http://www.itunes.com/":
+                continue
+            term = row["term"]
+            if "parent" not in data and term in categories.ITUNES_CATEGORIES:
+                data["parent"] = term
+            elif "child" not in data and term in categories.ITUNES_SUBCATEGORIES:
+                data["child"] = term
+            elif (
+                term not in categories.ITUNES_SUBCATEGORIES
+                and term not in categories.ITUNES_CATEGORIES
+            ):
+                raw_tags = term.split(" ")
+                data["tags"] = []
+                tag_serializer = tags_serializers.TagNameField()
+                for tag in raw_tags:
+                    try:
+                        data["tags"].append(tag_serializer.to_internal_value(tag))
+                    except Exception:
+                        pass
+
+        return data
+
+    @transaction.atomic
+    def save(self, rss_url):
+        validated_data = self.validated_data
+        # because there may be redirections from the original feed URL
+        real_rss_url = validated_data.get("atom_link", rss_url) or rss_url
+        service_actor = actors.get_service_actor()
+        author = validated_data.get("author_detail", {})
+        categories = validated_data.get("tags", {})
+        metadata = {
+            "explicit": validated_data.get("itunes_explicit", False),
+            "copyright": validated_data.get("rights"),
+            "owner_name": author.get("name"),
+            "owner_email": author.get("email"),
+            "itunes_category": categories.get("parent"),
+            "itunes_subcategory": categories.get("child"),
+            "language": validated_data.get("language"),
+        }
+        public_url = validated_data["link"]
+        existing = (
+            models.Channel.objects.external_rss()
+            .filter(
+                Q(rss_url=real_rss_url) | Q(rss_url=rss_url) | Q(actor__url=public_url)
+            )
+            .first()
+        )
+        channel_defaults = {
+            "rss_url": real_rss_url,
+            "metadata": metadata,
+        }
+        if existing:
+            artist_kwargs = {"channel": existing}
+            actor_kwargs = {"channel": existing}
+            actor_defaults = {"url": public_url}
+        else:
+            artist_kwargs = {"pk": None}
+            actor_kwargs = {"pk": None}
+            preferred_username = "rssfeed-{}".format(uuid.uuid4())
+            actor_defaults = {
+                "preferred_username": preferred_username,
+                "type": "Application",
+                "domain": service_actor.domain,
+                "url": public_url,
+                "fid": federation_utils.full_url(
+                    reverse(
+                        "federation:actors-detail",
+                        kwargs={"preferred_username": preferred_username},
+                    )
+                ),
+            }
+            channel_defaults["attributed_to"] = service_actor
+
+        actor_defaults["last_fetch_date"] = timezone.now()
+
+        # create/update the artist profile
+        artist, created = music_models.Artist.objects.update_or_create(
+            **artist_kwargs,
+            defaults={
+                "attributed_to": service_actor,
+                "name": validated_data["title"],
+                "content_category": "podcast",
+            },
+        )
+
+        cover = validated_data.get("image")
+
+        if cover:
+            common_utils.attach_file(artist, "attachment_cover", cover)
+        tags = categories.get("tags", [])
+
+        if tags:
+            tags_models.set_tags(artist, *tags)
+
+        summary = validated_data.get("summary_detail")
+        if summary:
+            common_utils.attach_content(artist, "description", summary)
+
+        if created:
+            channel_defaults["artist"] = artist
+
+        # create/update the actor
+        actor, created = federation_models.Actor.objects.update_or_create(
+            **actor_kwargs, defaults=actor_defaults
+        )
+        if created:
+            channel_defaults["actor"] = actor
+
+        # create the library
+        if not existing:
+            channel_defaults["library"] = music_models.Library.objects.create(
+                actor=service_actor,
+                privacy_level=settings.PODCASTS_THIRD_PARTY_VISIBILITY,
+                name=actor_defaults["preferred_username"],
+            )
+
+        # create/update the channel
+        channel, created = models.Channel.objects.update_or_create(
+            pk=existing.pk if existing else None, defaults=channel_defaults,
+        )
+        return channel
+
+
+class ItunesDurationField(serializers.CharField):
+    def to_internal_value(self, v):
+        try:
+            return int(v)
+        except (ValueError, TypeError):
+            pass
+        parts = v.split(":")
+        int_parts = []
+        for part in parts:
+            try:
+                int_parts.append(int(part))
+            except (ValueError, TypeError):
+                raise serializers.ValidationError("Invalid duration {}".format(v))
+
+        if len(int_parts) == 2:
+            hours = 0
+            minutes, seconds = int_parts
+        elif len(int_parts) == 3:
+            hours, minutes, seconds = int_parts
+        else:
+            raise serializers.ValidationError("Invalid duration {}".format(v))
+
+        return (hours * 3600) + (minutes * 60) + seconds
+
+
+class DummyField(serializers.Field):
+    def to_internal_value(self, v):
+        return v
+
+
+def get_cached_upload(uploads, expected_track_uuid):
+    for upload in uploads:
+        if upload.track.uuid == expected_track_uuid:
+            return upload
+
+
+class RssFeedItemSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    title = serializers.CharField()
+    rights = serializers.CharField(required=False, allow_blank=True)
+    itunes_season = serializers.IntegerField(required=False)
+    itunes_episode = serializers.IntegerField(required=False)
+    itunes_duration = ItunesDurationField()
+    links = serializers.ListField()
+    tags = serializers.ListField(required=False)
+    summary_detail = serializers.DictField(required=False)
+    published_parsed = DummyField(required=False)
+    image = serializers.DictField(required=False)
+
+    def validate_summary_detail(self, v):
+        content = v.get("value")
+        if not content:
+            return
+        return {
+            "content_type": v.get("type", "text/plain"),
+            "text": content,
+        }
+
+    def validate_image(self, v):
+        url = v.get("href")
+        if url:
+            return {
+                "url": url,
+                "mimetype": common_utils.get_mimetype_from_ext(url) or "image/jpeg",
+            }
+
+    def validate_links(self, v):
+        data = {}
+        for row in v:
+            if not row.get("type", "").startswith("audio/"):
+                continue
+            if row.get("rel") != "enclosure":
+                continue
+            try:
+                size = int(row.get("length"))
+            except (TypeError, ValueError):
+                raise serializers.ValidationError("Invalid size")
+
+            data["audio"] = {
+                "mimetype": row["type"],
+                "size": size,
+                "source": row["href"],
+            }
+
+        if not data:
+            raise serializers.ValidationError("No valid audio enclosure found")
+
+        return data
+
+    def validate_tags(self, v):
+        data = {}
+        for row in v:
+            if row.get("scheme") != "http://www.itunes.com/":
+                continue
+            term = row["term"]
+            raw_tags = term.split(" ")
+            data["tags"] = []
+            tag_serializer = tags_serializers.TagNameField()
+            for tag in raw_tags:
+                try:
+                    data["tags"].append(tag_serializer.to_internal_value(tag))
+                except Exception:
+                    pass
+
+        return data
+
+    @transaction.atomic
+    def save(self, channel, existing_uploads=[], **track_defaults):
+        validated_data = self.validated_data
+        categories = validated_data.get("tags", {})
+        expected_uuid = uuid.uuid3(
+            uuid.NAMESPACE_URL, "rss://{}-{}".format(channel.pk, validated_data["id"])
+        )
+        existing_upload = get_cached_upload(existing_uploads, expected_uuid)
+        if existing_upload:
+            existing_track = existing_upload.track
+        else:
+            existing_track = (
+                music_models.Track.objects.filter(
+                    uuid=expected_uuid, artist__channel=channel
+                )
+                .select_related("description", "attachment_cover")
+                .first()
+            )
+            if existing_track:
+                existing_upload = existing_track.uploads.filter(
+                    library=channel.library
+                ).first()
+
+        track_defaults = track_defaults
+        track_defaults.update(
+            {
+                "disc_number": validated_data.get("itunes_season", 1),
+                "position": validated_data.get("itunes_episode", 1),
+                "title": validated_data["title"],
+                "artist": channel.artist,
+            }
+        )
+        if "rights" in validated_data:
+            track_defaults["rights"] = validated_data["rights"]
+
+        if "published_parsed" in validated_data:
+            track_defaults["creation_date"] = datetime.datetime.fromtimestamp(
+                time.mktime(validated_data["published_parsed"])
+            ).replace(tzinfo=pytz.utc)
+
+        upload_defaults = {
+            "source": validated_data["links"]["audio"]["source"],
+            "size": validated_data["links"]["audio"]["size"],
+            "mimetype": validated_data["links"]["audio"]["mimetype"],
+            "duration": validated_data["itunes_duration"],
+            "import_status": "finished",
+            "library": channel.library,
+        }
+        if existing_track:
+            track_kwargs = {"pk": existing_track.pk}
+            upload_kwargs = {"track": existing_track}
+        else:
+            track_kwargs = {"pk": None}
+            track_defaults["uuid"] = expected_uuid
+            upload_kwargs = {"pk": None}
+
+        if existing_upload and existing_upload.source != upload_defaults["source"]:
+            # delete existing upload, the url to the audio file has changed
+            existing_upload.delete()
+
+        # create/update the track
+        track, created = music_models.Track.objects.update_or_create(
+            **track_kwargs, defaults=track_defaults,
+        )
+        # optimisation for reducing SQL queries, because we cannot use select_related with
+        # update or create, so we restore the cache by hand
+        if existing_track:
+            for field in ["attachment_cover", "description"]:
+                cached_id_value = getattr(existing_track, "{}_id".format(field))
+                new_id_value = getattr(track, "{}_id".format(field))
+                if new_id_value and cached_id_value == new_id_value:
+                    setattr(track, field, getattr(existing_track, field))
+
+        cover = validated_data.get("image")
+
+        if cover:
+            common_utils.attach_file(track, "attachment_cover", cover)
+        tags = categories.get("tags", [])
+
+        if tags:
+            tags_models.set_tags(track, *tags)
+
+        summary = validated_data.get("summary_detail")
+        if summary:
+            common_utils.attach_content(track, "description", summary)
+
+        if created:
+            upload_defaults["track"] = track
+
+        # create/update the upload
+        upload, created = music_models.Upload.objects.update_or_create(
+            **upload_kwargs, defaults=upload_defaults
+        )
+
+        return upload
 
 
 def rss_date(dt):
@@ -344,7 +831,12 @@ def rss_serialize_channel(channel):
                 "href": channel.get_rss_url(),
                 "rel": "self",
                 "type": "application/rss+xml",
-            }
+            },
+            {
+                "href": channel.actor.fid,
+                "rel": "alternate",
+                "type": "application/activity+json",
+            },
         ],
     }
     if language:

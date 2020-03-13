@@ -186,6 +186,18 @@ def test_music_library_retrieve_excludes_channel_libraries(factories, api_client
     assert response.status_code == 404
 
 
+def test_actor_retrieve_excludes_channel_with_private_library(factories, api_client):
+    channel = factories["audio.Channel"](external=True, library__privacy_level="me")
+
+    url = reverse(
+        "federation:actors-detail",
+        kwargs={"preferred_username": channel.actor.preferred_username},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == 404
+
+
 def test_music_library_retrieve_page_public(factories, api_client):
     library = factories["music.Library"](privacy_level="everyone", actor__local=True)
     upload = factories["music.Upload"](library=library, import_status="finished")

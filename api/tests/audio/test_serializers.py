@@ -1,5 +1,7 @@
 import datetime
+import uuid
 
+import feedparser
 import pytest
 import pytz
 
@@ -8,6 +10,7 @@ from django.templatetags.static import static
 from funkwhale_api.audio import serializers
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.federation import actors
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import utils as federation_utils
 from funkwhale_api.music import serializers as music_serializers
@@ -232,6 +235,28 @@ def test_channel_serializer_representation(factories, to_api_date):
     assert serializers.ChannelSerializer(channel).data == expected
 
 
+def test_channel_serializer_external_representation(factories, to_api_date):
+    content = factories["common.Content"]()
+    channel = factories["audio.Channel"](artist__description=content, external=True)
+
+    expected = {
+        "artist": music_serializers.serialize_artist_simple(channel.artist),
+        "uuid": str(channel.uuid),
+        "creation_date": to_api_date(channel.creation_date),
+        "actor": None,
+        "attributed_to": federation_serializers.APIActorSerializer(
+            channel.attributed_to
+        ).data,
+        "metadata": {},
+        "rss_url": channel.get_rss_url(),
+    }
+    expected["artist"]["description"] = common_serializers.ContentSerializer(
+        content
+    ).data
+
+    assert serializers.ChannelSerializer(channel).data == expected
+
+
 def test_channel_serializer_representation_subscriptions_count(factories, to_api_date):
     channel = factories["audio.Channel"]()
     factories["federation.Follow"](target=channel.actor)
@@ -351,7 +376,12 @@ def test_rss_channel_serializer(factories):
                 "href": channel.get_rss_url(),
                 "rel": "self",
                 "type": "application/rss+xml",
-            }
+            },
+            {
+                "href": channel.actor.fid,
+                "rel": "alternate",
+                "type": "application/activity+json",
+            },
         ],
     }
 
@@ -446,3 +476,440 @@ def test_channel_metadata_serializer_validation():
     payload.pop("unknown_key")
 
     assert serializer.validated_data == payload
+
+
+def test_rss_feed_serializer_create(db, now):
+    rss_url = "http://example.rss/"
+
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>http://public.url</link>
+                <atom:link rel="self" type="application/rss+xml" href="http://real.rss.url"/>
+                <lastBuildDate>Wed, 11 Mar 2020 16:01:08 GMT</lastBuildDate>
+                <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                <ttl>30</ttl>
+                <language>en</language>
+                <copyright>2019 Tests</copyright>
+                <itunes:keywords>pop rock</itunes:keywords>
+                <image>
+                    <url>
+                        https://image.url
+                    </url>
+                    <title>Image caption</title>
+                </image>
+                <itunes:image href="https://image.url"/>
+                <itunes:subtitle>Subtitle</itunes:subtitle>
+                <itunes:type>episodic</itunes:type>
+                <itunes:author>Author</itunes:author>
+                <itunes:summary><![CDATA[Some content]]></itunes:summary>
+                <itunes:owner>
+                    <itunes:name>Name</itunes:name>
+                    <itunes:email>email@domain</itunes:email>
+                </itunes:owner>
+                <itunes:explicit>yes</itunes:explicit>
+                <itunes:keywords/>
+                <itunes:category text="Business">
+                    <itunes:category text="Entrepreneurship">
+                </itunes:category>
+            </channel>
+        </rss>
+    """
+    parsed_feed = feedparser.parse(xml_payload)
+    serializer = serializers.RssFeedSerializer(data=parsed_feed.feed)
+
+    assert serializer.is_valid(raise_exception=True) is True
+
+    channel = serializer.save(rss_url)
+
+    assert channel.rss_url == "http://real.rss.url"
+    assert channel.attributed_to == actors.get_service_actor()
+    assert channel.library.actor == actors.get_service_actor()
+    assert channel.artist.name == "Hello"
+    assert channel.artist.attributed_to == actors.get_service_actor()
+    assert channel.artist.description.content_type == "text/plain"
+    assert channel.artist.description.text == "Some content"
+    assert channel.artist.attachment_cover.url == "https://image.url"
+    assert channel.artist.get_tags() == ["pop", "rock"]
+    assert channel.actor.url == "http://public.url"
+    assert channel.actor.last_fetch_date == now
+    assert channel.metadata == {
+        "explicit": True,
+        "copyright": "2019 Tests",
+        "owner_name": "Name",
+        "owner_email": "email@domain",
+        "itunes_category": "Business",
+        "itunes_subcategory": "Entrepreneurship",
+        "language": "en",
+    }
+
+
+def test_rss_feed_serializer_update(factories, now):
+    rss_url = "http://example.rss/"
+    channel = factories["audio.Channel"](rss_url=rss_url, external=True)
+
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>http://public.url</link>
+                <atom:link rel="self" type="application/rss+xml" href="http://real.rss.url"/>
+                <lastBuildDate>Wed, 11 Mar 2020 16:01:08 GMT</lastBuildDate>
+                <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                <ttl>30</ttl>
+                <language>en</language>
+                <copyright>2019 Tests</copyright>
+                <itunes:keywords>pop rock</itunes:keywords>
+                <image>
+                    <url>
+                        https://image.url
+                    </url>
+                    <title>Image caption</title>
+                </image>
+                <itunes:image href="https://image.url"/>
+                <itunes:subtitle>Subtitle</itunes:subtitle>
+                <itunes:type>episodic</itunes:type>
+                <itunes:author>Author</itunes:author>
+                <itunes:summary><![CDATA[Some content]]></itunes:summary>
+                <itunes:owner>
+                    <itunes:name>Name</itunes:name>
+                    <itunes:email>email@domain</itunes:email>
+                </itunes:owner>
+                <itunes:explicit>yes</itunes:explicit>
+                <itunes:keywords/>
+                <itunes:category text="Business">
+                    <itunes:category text="Entrepreneurship">
+                </itunes:category>
+            </channel>
+        </rss>
+    """
+    parsed_feed = feedparser.parse(xml_payload)
+    serializer = serializers.RssFeedSerializer(data=parsed_feed.feed)
+
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save(rss_url)
+
+    channel.refresh_from_db()
+
+    assert channel.rss_url == "http://real.rss.url"
+    assert channel.attributed_to == actors.get_service_actor()
+    assert channel.library.actor == actors.get_service_actor()
+    assert channel.library.fid is not None
+    assert channel.artist.name == "Hello"
+    assert channel.artist.attributed_to == actors.get_service_actor()
+    assert channel.artist.description.content_type == "text/plain"
+    assert channel.artist.description.text == "Some content"
+    assert channel.artist.attachment_cover.url == "https://image.url"
+    assert channel.artist.get_tags() == ["pop", "rock"]
+    assert channel.actor.url == "http://public.url"
+    assert channel.actor.last_fetch_date == now
+    assert channel.metadata == {
+        "explicit": True,
+        "copyright": "2019 Tests",
+        "owner_name": "Name",
+        "owner_email": "email@domain",
+        "itunes_category": "Business",
+        "itunes_subcategory": "Entrepreneurship",
+        "language": "en",
+    }
+
+
+def test_rss_feed_item_serializer_create(factories):
+    rss_url = "http://example.rss/"
+    channel = factories["audio.Channel"](rss_url=rss_url, external=True)
+
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>http://public.url</link>
+                <atom:link rel="self" type="application/rss+xml" href="http://real.rss.url"/>
+                <item>
+                    <title>Episode 33</title>
+                    <itunes:subtitle>Subtitle</itunes:subtitle>
+                    <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
+                    <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-9101-2746218c4f32]]></guid>
+                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <itunes:duration>00:22:37</itunes:duration>
+                    <itunes:keywords>pop rock</itunes:keywords>
+                    <itunes:season>2</itunes:season>
+                    <itunes:episode>33</itunes:episode>
+                    <itunes:image href="https://image.url/" />
+                    <description><![CDATA[Html content]]></description>
+                    <link>http://public.url/</link>
+                    <enclosure url="https://file.domain/audio.mp3" length="54315884" type="audio/mpeg"/>
+                </item>
+            </channel>
+        </rss>
+    """
+    parsed_feed = feedparser.parse(xml_payload)
+    entry = parsed_feed.entries[0]
+    serializer = serializers.RssFeedItemSerializer(data=entry)
+
+    assert serializer.is_valid(raise_exception=True) is True
+
+    upload = serializer.save(channel, copyright="test something")
+
+    expected_uuid = uuid.uuid3(
+        uuid.NAMESPACE_URL,
+        "rss://{}-16f66fff-41ae-4a1c-9101-2746218c4f32".format(channel.pk),
+    )
+    assert upload.library == channel.library
+    assert upload.import_status == "finished"
+    assert upload.source == "https://file.domain/audio.mp3"
+    assert upload.size == 54315884
+    assert upload.duration == 1357
+    assert upload.mimetype == "audio/mpeg"
+    assert upload.track.uuid == expected_uuid
+    assert upload.track.artist == channel.artist
+    assert upload.track.copyright == "test something"
+    assert upload.track.position == 33
+    assert upload.track.disc_number == 2
+    assert upload.track.creation_date == datetime.datetime(2020, 3, 11, 16).replace(
+        tzinfo=pytz.utc
+    )
+    assert upload.track.get_tags() == ["pop", "rock"]
+    assert upload.track.attachment_cover.url == "https://image.url/"
+    assert upload.track.description.text == "<p>Html content</p>"
+    assert upload.track.description.content_type == "text/html"
+
+
+def test_rss_feed_item_serializer_update(factories):
+    rss_url = "http://example.rss/"
+    channel = factories["audio.Channel"](rss_url=rss_url, external=True)
+    expected_uuid = uuid.uuid3(
+        uuid.NAMESPACE_URL,
+        "rss://{}-16f66fff-41ae-4a1c-9101-2746218c4f32".format(channel.pk),
+    )
+    upload = factories["music.Upload"](
+        track__uuid=expected_uuid,
+        source="https://file.domain/audio.mp3",
+        library=channel.library,
+        track__artist=channel.artist,
+    )
+    track = upload.track
+
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>http://public.url</link>
+                <atom:link rel="self" type="application/rss+xml" href="http://real.rss.url"/>
+                <item>
+                    <title>Episode 33</title>
+                    <itunes:subtitle>Subtitle</itunes:subtitle>
+                    <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
+                    <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-9101-2746218c4f32]]></guid>
+                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <itunes:duration>00:22:37</itunes:duration>
+                    <itunes:keywords>pop rock</itunes:keywords>
+                    <itunes:season>2</itunes:season>
+                    <itunes:episode>33</itunes:episode>
+                    <itunes:image href="https://image.url/" />
+                    <description><![CDATA[Html content]]></description>
+                    <link>http://public.url/</link>
+                    <enclosure url="https://file.domain/audio.mp3" length="54315884" type="audio/mpeg"/>
+                </item>
+            </channel>
+        </rss>
+    """
+    parsed_feed = feedparser.parse(xml_payload)
+    entry = parsed_feed.entries[0]
+    serializer = serializers.RssFeedItemSerializer(data=entry)
+
+    assert serializer.is_valid(raise_exception=True) is True
+
+    serializer.save(channel, copyright="test something")
+    upload.refresh_from_db()
+
+    assert upload.track == track
+    assert upload.library == channel.library
+    assert upload.import_status == "finished"
+    assert upload.source == "https://file.domain/audio.mp3"
+    assert upload.size == 54315884
+    assert upload.duration == 1357
+    assert upload.mimetype == "audio/mpeg"
+    assert upload.track.uuid == expected_uuid
+    assert upload.track.artist == channel.artist
+    assert upload.track.copyright == "test something"
+    assert upload.track.position == 33
+    assert upload.track.disc_number == 2
+    assert upload.track.creation_date == datetime.datetime(2020, 3, 11, 16).replace(
+        tzinfo=pytz.utc
+    )
+    assert upload.track.get_tags() == ["pop", "rock"]
+    assert upload.track.attachment_cover.url == "https://image.url/"
+    assert upload.track.description.text == "<p>Html content</p>"
+    assert upload.track.description.content_type == "text/html"
+
+
+def test_get_channel_from_rss_url(db, r_mock, mocker):
+    rss_url = "http://example.rss/"
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>http://public.url</link>
+                <atom:link rel="self" type="application/rss+xml" href="http://real.rss.url"/>
+                <lastBuildDate>Wed, 11 Mar 2020 16:01:08 GMT</lastBuildDate>
+                <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                <ttl>30</ttl>
+                <language>en</language>
+                <copyright>2019 Tests</copyright>
+                <itunes:keywords>pop rock</itunes:keywords>
+                <image>
+                    <url>
+                        https://image.url
+                    </url>
+                    <title>Image caption</title>
+                </image>
+                <itunes:image href="https://image.url"/>
+                <itunes:subtitle>Subtitle</itunes:subtitle>
+                <itunes:type>episodic</itunes:type>
+                <itunes:author>Author</itunes:author>
+                <itunes:summary><![CDATA[Some content]]></itunes:summary>
+                <itunes:owner>
+                    <itunes:name>Name</itunes:name>
+                    <itunes:email>email@domain</itunes:email>
+                </itunes:owner>
+                <itunes:explicit>yes</itunes:explicit>
+                <itunes:keywords/>
+                <itunes:category text="Business">
+                    <itunes:category text="Entrepreneurship">
+                </itunes:category>
+                <item>
+                    <title>Episode 33</title>
+                    <itunes:subtitle>Subtitle</itunes:subtitle>
+                    <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
+                    <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-9101-2746218c4f32]]></guid>
+                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <itunes:duration>00:22:37</itunes:duration>
+                    <itunes:keywords>pop rock</itunes:keywords>
+                    <itunes:season>2</itunes:season>
+                    <itunes:episode>33</itunes:episode>
+                    <itunes:image href="https://image.url/" />
+                    <description><![CDATA[Html content]]></description>
+                    <link>http://public.url/</link>
+                    <enclosure url="https://file.domain/audio.mp3" length="54315884" type="audio/mpeg"/>
+                </item>
+                <item>
+                    <title>Episode 32</title>
+                    <itunes:subtitle>Subtitle</itunes:subtitle>
+                    <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
+                    <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-910e-2746218c4f32]]></guid>
+                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <itunes:duration>00:22:37</itunes:duration>
+                    <itunes:keywords>pop rock</itunes:keywords>
+                    <itunes:season>2</itunes:season>
+                    <itunes:episode>32</itunes:episode>
+                    <itunes:image href="https://image.url/" />
+                    <description><![CDATA[Html content]]></description>
+                    <link>http://public.url/</link>
+                    <enclosure url="https://file.domain/audio2.mp3" length="54315884" type="audio/mpeg"/>
+                </item>
+                <item>
+                    <title>Ignored, missing enĉlosure</title>
+                    <itunes:subtitle>Subtitle</itunes:subtitle>
+                    <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
+                    <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-910e-2746218c4f32]]></guid>
+                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <itunes:duration>00:22:37</itunes:duration>
+                    <itunes:keywords>pop rock</itunes:keywords>
+                    <itunes:season>2</itunes:season>
+                    <itunes:episode>32</itunes:episode>
+                    <itunes:image href="https://image.url/" />
+                    <description><![CDATA[Html content]]></description>
+                    <link>http://public.url/</link>
+                </item>
+            </channel>
+        </rss>
+    """
+    parsed_feed = feedparser.parse(xml_payload)
+
+    r_mock.get(rss_url, text=xml_payload)
+
+    feed_init = mocker.spy(serializers.RssFeedSerializer, "__init__")
+    feed_save = mocker.spy(serializers.RssFeedSerializer, "save")
+    item_init = mocker.spy(serializers.RssFeedItemSerializer, "__init__")
+    item_save = mocker.spy(serializers.RssFeedItemSerializer, "save")
+    on_commit = mocker.spy(common_utils, "on_commit")
+    channel, uploads = serializers.get_channel_from_rss_url(rss_url)
+
+    assert channel.artist.name == "Hello"
+
+    serializer_instance = feed_init.call_args[0][0]
+    feed_init.assert_called_once_with(serializer_instance, data=parsed_feed.feed)
+    feed_save.assert_called_once_with(serializer_instance, rss_url)
+
+    for i in [0, 1]:
+        serializer_instance = item_init.call_args_list[i][0][0]
+        item_init.assert_any_call(serializer_instance, data=parsed_feed.entries[i])
+        item_save.assert_any_call(
+            serializer_instance, channel, existing_uploads=[], copyright="2019 Tests"
+        )
+
+    assert len(uploads) == 2
+    assert channel.library.uploads.count() == 2
+
+    on_commit.assert_any_call(
+        serializers.music_models.TrackActor.create_entries,
+        library=channel.library,
+        delete_existing=True,
+    )
+
+
+def test_get_channel_from_rss_honor_mrf_inbox_before_http(
+    mrf_inbox_registry, factories, mocker
+):
+    apply = mocker.patch.object(mrf_inbox_registry, "apply", return_value=(None, False))
+    rss_url = "https://rss.domain/test"
+
+    with pytest.raises(serializers.FeedFetchException, match=r".*blocked.*"):
+        serializers.get_channel_from_rss_url(rss_url)
+
+    apply.assert_any_call({"id": rss_url})
+
+
+def test_get_channel_from_rss_honor_mrf_inbox_after_http(
+    mrf_inbox_registry, r_mock, mocker, db
+):
+    apply = mocker.patch.object(
+        mrf_inbox_registry,
+        "apply",
+        side_effect=[(True, False), (True, False), (None, False)],
+    )
+    rss_url = "https://rss.domain/test"
+    # the feed has a redirection, we check both urls
+    final_rss_url = "https://real.rss.domain/test"
+    public_url = "http://public.url"
+    xml_payload = """<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Hello</title>
+                <description>Description</description>
+                <link>{}</link>
+                <atom:link rel="self" type="application/rss+xml" href="{}"/>
+                <language>en</language>
+                <copyright>2019 Tests</copyright>
+                <itunes:keywords>pop rock</itunes:keywords>
+            </channel>
+        </rss>
+    """.format(
+        public_url, final_rss_url
+    )
+
+    r_mock.get(rss_url, text=xml_payload)
+
+    with pytest.raises(serializers.FeedFetchException, match=r".*blocked.*"):
+        serializers.get_channel_from_rss_url(rss_url)
+
+    apply.assert_any_call({"id": rss_url})
+    apply.assert_any_call({"id": final_rss_url})
+    apply.assert_any_call({"id": public_url})

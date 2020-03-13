@@ -2,9 +2,12 @@
   <main class="main pusher" v-title="labels.title">
     <section class="ui vertical stripe segment">
       <div class="ui small text container">
-        <form :class="['ui', {loading: isLoading}, 'form']" @submit.stop.prevent="createFetch">
-          <h2><translate translate-context="Content/Fetch/Title">Retrieve a remote object</translate></h2>
-          <p>
+        <form :class="['ui', {loading: isLoading}, 'form']" @submit.stop.prevent="submit">
+          <h2>{{ labels.title }}</h2>
+          <p v-if="type === 'rss'">
+            <translate translate-context="Content/Fetch/Paragraph">Use this form to subscribe to a podcast using its RSS feed.</translate>
+          </p>
+          <p v-else>
             <translate translate-context="Content/Fetch/Paragraph">Use this form to retrieve an object hosted somewhere else in the fediverse.</translate>
           </p>
           <div v-if="errors.length > 0" class="ui negative message">
@@ -23,16 +26,9 @@
             <translate translate-context="Content/Search/Input.Label/Noun">Search</translate>
           </button>
         </form>
-        <div v-if="!isLoading && fetch && fetch.status === 'finished'">
-          <div class="ui hidden divider"></div>
-          <h2><translate translate-context="Content/Fetch/Title/Noun">Result</translate></h2>
-          <div class="ui hidden divider"></div>
-          <div v-if="objComponent" class="ui app-cards cards">
-            <component v-bind="objComponent.props" :is="objComponent.type"></component>
-          </div>
-          <div v-else class="ui warning message">
-            <p><translate translate-context="Content/*/Error message.Title">This kind of object isn't supported yet</translate></p>
-          </div>
+        <div v-if="!isLoading && fetch && fetch.status === 'finished' && !redirectRoute" class="ui warning message">
+          <p><translate translate-context="Content/*/Error message.Title">This kind of object isn't supported yet</translate></p>
+        </div>
         </div>
       </div>
     </section>
@@ -43,22 +39,12 @@
 import axios from 'axios'
 
 
-import AlbumCard from '@/components/audio/album/Card'
-import ArtistCard from '@/components/audio/artist/Card'
-import LibraryCard from '@/views/content/remote/Card'
-import ChannelEntryCard from '@/components/audio/ChannelEntryCard'
-
 export default {
   props: {
-    initialId: { type: String, required: false}
+    initialId: { type: String, required: false},
+    type: { type: String, required: false},
   },
-  components: {
-    ActorLink:  () => import(/* webpackChunkName: "common" */ "@/components/common/ActorLink"),
-    ArtistCard,
-    AlbumCard,
-    LibraryCard,
-    ChannelEntryCard,
-  },
+  components: {},
   data () {
     return {
       id: this.initialId,
@@ -70,14 +56,25 @@ export default {
   },
   created () {
     if (this.id) {
-      this.createFetch()
+      if (this.type === 'rss') {
+        this.rssSubscribe()
+
+      } else {
+        this.createFetch()
+      }
     }
   },
   computed: {
     labels() {
+      let title = this.$pgettext('Head/Fetch/Title', "Search a remote object")
+      let fieldLabel = this.$pgettext('Head/Fetch/Field.Placeholder', "URL or @username")
+      if (this.type === "rss") {
+        title = this.$pgettext('Head/Fetch/Title', "Subscribe to a podcast RSS feed")
+        fieldLabel = this.$pgettext('*/*/*', "RSS Feed URL")
+      }
       return {
-        title: this.$pgettext('Head/Fetch/Title', "Search a remote object"),
-        fieldLabel: this.$pgettext('Head/Fetch/Field.Placeholder', "URL or @username"),
+        title,
+        fieldLabel
       }
     },
     objInfo () {
@@ -85,43 +82,38 @@ export default {
         return this.fetch.object
       }
     },
-    objComponent () {
-      if (!this.obj) {
+    redirectRoute () {
+      if (!this.objInfo) {
         return
       }
       switch (this.objInfo.type) {
-        case "account":
-          return {
-            type: "actor-link",
-            props: {actor: this.obj}
-          }
-        case "library":
-          return {
-            type: "library-card",
-            props: {library: this.obj}
-          }
-        case "album":
-          return {
-            type: "album-card",
-            props: {album: this.obj}
-          }
-        case "artist":
-          return {
-            type: "artist-card",
-            props: {artist: this.obj}
-          }
-        case "upload":
-          return {
-            type: "channel-entry-card",
-            props: {entry: this.obj.track}
-          }
+        case 'account':
+          let [username, domain] = this.objInfo.full_username.split('@')
+          return {name: 'profile.full', params: {username, domain}}
+        case 'library':
+          return {name: 'library.detail', params: {id: this.objInfo.uuid}}
+        case 'artist':
+          return {name: 'library.artists.detail', params: {id: this.objInfo.id}}
+        case 'album':
+          return {name: 'library.albums.detail', params: {id: this.objInfo.id}}
+        case 'track':
+          return {name: 'library.tracks.detail', params: {id: this.objInfo.id}}
+        case 'upload':
+          return {name: 'library.uploads.detail', params: {id: this.objInfo.uuid}}
 
         default:
-          return
+          break;
       }
     }
   },
   methods: {
+    submit () {
+      if (this.type === 'rss') {
+        return this.rssSubscribe()
+      } else {
+        return this.createFetch()
+      }
+    },
     createFetch () {
       if (!this.id) {
         return
@@ -148,58 +140,38 @@ export default {
         self.errors = error.backendErrors
       })
     },
-    getObj (objInfo) {
+    rssSubscribe () {
       if (!this.id) {
         return
       }
+      this.$router.replace({name: "search", query: {id: this.id, type: 'rss'}})
+      this.fetch = null
       let self = this
+      self.errors = []
       self.isLoading = true
-      let url = null
-      switch (objInfo.type) {
-        case 'account':
-          url = `federation/actors/${objInfo.full_username}/`
-          break;
-        case 'library':
-          url = `libraries/${objInfo.uuid}/`
-          break;
-        case 'artist':
-          url = `artists/${objInfo.id}/`
-          break;
-        case 'album':
-          url = `albums/${objInfo.id}/`
-          break;
-        case 'upload':
-          url = `uploads/${objInfo.uuid}/`
-          break;
+      let payload = {
+        url: this.id
+      }
 
-        default:
-          break;
-      }
-      if (!url) {
-        this.errors.push(
-          self.$pgettext("Content/*/Error message.Title", "This kind of object isn't supported yet")
-        )
-        this.isLoading = false
-        return
-      }
-      axios.get(url).then((response) => {
-        self.obj = response.data
+      axios.post('channels/rss-subscribe/', payload).then((response) => {
         self.isLoading = false
+        self.$store.commit('channels/subscriptions', {uuid: response.data.channel.uuid, value: true})
+        self.$router.push({name: 'channels.detail', params: {id: response.data.channel.uuid}})
+
       }, error => {
         self.isLoading = false
         self.errors = error.backendErrors
       })
-    }
+    },
   },
   watch: {
     initialId (v) {
       this.id = v
       this.createFetch()
     },
-    objInfo (v) {
-      this.obj = null
+    redirectRoute (v) {
       if (v) {
-        this.getObj(v)
+        this.$router.push(v)
       }
     }
   }

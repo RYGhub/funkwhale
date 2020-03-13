@@ -311,6 +311,7 @@ def fetch(fetch_obj):
         auth = signing.get_auth(actor.private_key, actor.private_key_id)
     else:
         auth = None
+    auth = None
     try:
         if url.startswith("webfinger://"):
             # we first grab the correpsonding webfinger representation

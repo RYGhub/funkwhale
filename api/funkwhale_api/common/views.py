@@ -163,6 +163,10 @@ class AttachmentViewSet(
     @transaction.atomic
     def proxy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if not settings.EXTERNAL_MEDIA_PROXY_ENABLED:
+            r = response.Response(status=302)
+            r["Location"] = instance.url
+            return r
 
         size = request.GET.get("next", "original").lower()
         if size not in ["original", "medium_square_crop"]:

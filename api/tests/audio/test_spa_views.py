@@ -11,7 +11,7 @@ from funkwhale_api.music import serializers
 
 @pytest.mark.parametrize("attribute", ["uuid", "actor.full_username"])
 def test_channel_detail(attribute, spa_html, no_api_auth, client, factories, settings):
-    channel = factories["audio.Channel"]()
+    channel = factories["audio.Channel"](library__privacy_level="everyone")
     factories["music.Upload"](playable=True, library=channel.library)
     url = "/channels/{}".format(utils.recursive_getattr(channel, attribute))
     detail_url = "/channels/{}".format(channel.actor.full_username)

@@ -57,7 +57,6 @@ export default {
       },
       onSelect (result, response) {
         jQuery(self.$el).search("set value", searchQuery)
-        console.log('SELECTEING', result)
         router.push(result.routerUrl)
         jQuery(self.$el).search("hide results")
         return false
@@ -82,6 +81,10 @@ export default {
             {
               code: 'federation',
               name: self.$pgettext('*/*/*', 'Federation'),
+            },
+            {
+              code: 'podcasts',
+              name: self.$pgettext('*/*/*', 'Podcasts'),
             },
             {
               code: 'artists',
@@ -162,6 +165,25 @@ export default {
                       name: 'search',
                       query: {
                         id: objId,
+                      }
+                    }
+                  }]
+                }
+              }
+            }
+            else if (category.code === 'podcasts') {
+              if (objId) {
+                isEmptyResults = false
+                let searchMessage = self.$pgettext('Search/*/*', 'Subscribe to podcast via RSS')
+                results['podcasts'] = {
+                  name: self.$pgettext('*/*/*', 'Podcasts'),
+                  results: [{
+                    title: searchMessage,
+                    routerUrl: {
+                      name: 'search',
+                      query: {
+                        id: objId,
+                        type: "rss"
                       }
                     }
                   }]
