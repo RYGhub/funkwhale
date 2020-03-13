@@ -323,7 +323,7 @@ def retrieve_feed(url):
 
 
 @transaction.atomic
-def get_channel_from_rss_url(url):
+def get_channel_from_rss_url(url, raise_exception=False):
     # first, check if the url is blocked
     is_valid, _ = mrf.inbox.apply({"id": url})
     if not is_valid:
@@ -335,7 +335,7 @@ def get_channel_from_rss_url(url):
 
     parsed_feed = feedparser.parse(response.text)
     serializer = RssFeedSerializer(data=parsed_feed["feed"])
-    if not serializer.is_valid():
+    if not serializer.is_valid(raise_exception=raise_exception):
         raise FeedFetchException("Invalid xml content: {}".format(serializer.errors))
 
     # second mrf check with validated data
@@ -372,7 +372,7 @@ def get_channel_from_rss_url(url):
     for entry in entries[: settings.PODCASTS_RSS_FEED_MAX_ITEMS]:
         logger.debug("Importing feed item %s", entry.id)
         s = RssFeedItemSerializer(data=entry)
-        if not s.is_valid():
+        if not s.is_valid(raise_exception=raise_exception):
             logger.debug("Skipping invalid RSS feed item %s, ", entry, str(s.errors))
             continue
         uploads.append(
@@ -395,12 +395,13 @@ def get_channel_from_rss_url(url):
 
 class RssFeedSerializer(serializers.Serializer):
     title = serializers.CharField()
-    link = serializers.URLField()
+    link = serializers.URLField(required=False, allow_blank=True)
     language = serializers.CharField(required=False, allow_blank=True)
     rights = serializers.CharField(required=False, allow_blank=True)
     itunes_explicit = serializers.BooleanField(required=False, allow_null=True)
     tags = serializers.ListField(required=False)
     atom_link = serializers.DictField(required=False)
+    links = serializers.ListField(required=False)
     summary_detail = serializers.DictField(required=False)
     author_detail = serializers.DictField(required=False)
     image = serializers.DictField(required=False)
@@ -411,6 +412,11 @@ class RssFeedSerializer(serializers.Serializer):
             and v.get("type", "application/rss+xml") == "application/rss+xml"
         ):
             return v["href"]
+
+    def validate_links(self, v):
+        for link in v:
+            if link.get("rel") == "self":
+                return link.get("href")
 
     def validate_summary_detail(self, v):
         content = v.get("value")
@@ -453,6 +459,14 @@ class RssFeedSerializer(serializers.Serializer):
                         pass
 
         return data
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        if not validated_data.get("link"):
+            validated_data["link"] = validated_data.get("links")
+        if not validated_data.get("link"):
+            raise serializers.ValidationError("Missing link")
+        return validated_data
 
     @transaction.atomic
     def save(self, rss_url):
@@ -605,9 +619,15 @@ class RssFeedItemSerializer(serializers.Serializer):
     id = serializers.CharField()
     title = serializers.CharField()
     rights = serializers.CharField(required=False, allow_blank=True)
-    itunes_season = serializers.IntegerField(required=False)
-    itunes_episode = PermissiveIntegerField(required=False, default=None)
-    itunes_duration = ItunesDurationField(required=False)
+    itunes_season = serializers.IntegerField(
+        required=False, allow_null=True, default=None
+    )
+    itunes_episode = PermissiveIntegerField(
+        required=False, allow_null=True, default=None
+    )
+    itunes_duration = ItunesDurationField(
+        required=False, allow_null=True, default=None, allow_blank=True
+    )
     links = serializers.ListField()
     tags = serializers.ListField(required=False)
     summary_detail = serializers.DictField(required=False)
@@ -697,8 +717,8 @@ class RssFeedItemSerializer(serializers.Serializer):
         track_defaults = track_defaults
         track_defaults.update(
             {
-                "disc_number": validated_data.get("itunes_season", 1),
-                "position": validated_data.get("itunes_episode", 1),
+                "disc_number": validated_data.get("itunes_season", 1) or 1,
+                "position": validated_data.get("itunes_episode", 1) or 1,
                 "title": validated_data["title"][
                     : music_models.MAX_LENGTHS["TRACK_TITLE"]
                 ],
@@ -706,7 +726,7 @@ class RssFeedItemSerializer(serializers.Serializer):
             }
         )
         if "rights" in validated_data:
-            track_defaults["rights"] = validated_data["rights"][
+            track_defaults["copyright"] = validated_data["rights"][
                 : music_models.MAX_LENGTHS["COPYRIGHT"]
             ]
 
@@ -719,7 +739,7 @@ class RssFeedItemSerializer(serializers.Serializer):
             "source": validated_data["links"]["audio"]["source"],
             "size": validated_data["links"]["audio"]["size"],
             "mimetype": validated_data["links"]["audio"]["mimetype"],
-            "duration": validated_data.get("itunes_duration"),
+            "duration": validated_data.get("itunes_duration") or None,
             "import_status": "finished",
             "library": channel.library,
         }
