@@ -31,6 +31,15 @@ class ChannelQuerySet(models.QuerySet):
             return self.filter(query)
         return self.exclude(query)
 
+    def subscribed(self, actor):
+        if not actor:
+            return self.none()
+
+        subscriptions = actor.emitted_follows.filter(
+            approved=True, target__channel__isnull=False
+        )
+        return self.filter(actor__in=subscriptions.values_list("target", flat=True))
+
 
 class Channel(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)

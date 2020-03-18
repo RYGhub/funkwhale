@@ -6,7 +6,8 @@ import functools
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Q
+from django.db import transaction
+from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
@@ -16,12 +17,17 @@ from rest_framework.serializers import ValidationError
 
 import funkwhale_api
 from funkwhale_api.activity import record
+from funkwhale_api.audio import models as audio_models
+from funkwhale_api.audio import serializers as audio_serializers
+from funkwhale_api.audio import views as audio_views
 from funkwhale_api.common import (
     fields,
     preferences,
+    models as common_models,
     utils as common_utils,
     tasks as common_tasks,
 )
+from funkwhale_api.federation import models as federation_models
 from funkwhale_api.favorites.models import TrackFavorite
 from funkwhale_api.moderation import filters as moderation_filters
 from funkwhale_api.music import models as music_models
@@ -99,6 +105,22 @@ def get_playlist_qs(request):
     )
     qs = qs.with_tracks_count().exclude(_tracks_count=0).select_related("user")
     return qs.order_by("-creation_date")
+
+
+def requires_channels(f):
+    @functools.wraps(f)
+    def inner(*args, **kwargs):
+        if not preferences.get("audio__channels_enabled"):
+            payload = {
+                "error": {
+                    "code": 0,
+                    "message": "Channels / podcasts are disabled on this pod",
+                }
+            }
+            return response.Response(payload, status=405)
+        return f(*args, **kwargs)
+
+    return inner
 
 
 class SubsonicViewSet(viewsets.GenericViewSet):
@@ -752,6 +774,14 @@ class SubsonicViewSet(viewsets.GenericViewSet):
                     {"error": {"code": 70, "message": "cover art not found."}}
                 )
             attachment = album.attachment_cover
+        elif id.startswith("at-"):
+            try:
+                attachment_id = id.replace("at-", "")
+                attachment = common_models.Attachment.objects.get(uuid=attachment_id)
+            except (TypeError, ValueError, music_models.Album.DoesNotExist):
+                return response.Response(
+                    {"error": {"code": 70, "message": "cover art not found."}}
+                )
         else:
             return response.Response(
                 {"error": {"code": 70, "message": "cover art not found."}}
@@ -808,5 +838,151 @@ class SubsonicViewSet(viewsets.GenericViewSet):
         )
         data = {
             "genres": {"genre": [serializers.get_genre_data(tag) for tag in queryset]}
+        }
+        return response.Response(data)
+
+    # podcast related views
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="create_podcast_channel",
+        url_path="createPodcastChannel",
+    )
+    @requires_channels
+    @transaction.atomic
+    def create_podcast_channel(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        serializer = audio_serializers.RssSubscribeSerializer(data=data)
+        if not serializer.is_valid():
+            return response.Response({"error": {"code": 0, "message": "invalid url"}})
+        channel = (
+            audio_models.Channel.objects.filter(
+                rss_url=serializer.validated_data["url"],
+            )
+            .order_by("id")
+            .first()
+        )
+        if not channel:
+            # try to retrieve the channel via its URL and create it
+            try:
+                channel, uploads = audio_serializers.get_channel_from_rss_url(
+                    serializer.validated_data["url"]
+                )
+            except audio_serializers.FeedFetchException as e:
+                return response.Response(
+                    {
+                        "error": {
+                            "code": 0,
+                            "message": "Error while fetching url: {}".format(e),
+                        }
+                    }
+                )
+
+        subscription = federation_models.Follow(actor=request.user.actor)
+        subscription.fid = subscription.get_federation_id()
+        audio_views.SubscriptionsViewSet.queryset.get_or_create(
+            target=channel.actor,
+            actor=request.user.actor,
+            defaults={
+                "approved": True,
+                "fid": subscription.fid,
+                "uuid": subscription.uuid,
+            },
+        )
+        return response.Response({"status": "ok"})
+
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="delete_podcast_channel",
+        url_path="deletePodcastChannel",
+    )
+    @requires_channels
+    @find_object(
+        audio_models.Channel.objects.all().select_related("actor"),
+        model_field="uuid",
+        field="id",
+        cast=str,
+    )
+    def delete_podcast_channel(self, request, *args, **kwargs):
+        channel = kwargs.pop("obj")
+        actor = request.user.actor
+        actor.emitted_follows.filter(target=channel.actor).delete()
+        return response.Response({"status": "ok"})
+
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_podcasts",
+        url_path="getPodcasts",
+    )
+    @requires_channels
+    def get_podcasts(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        id = data.get("id")
+        channels = audio_models.Channel.objects.subscribed(request.user.actor)
+        if id:
+            channels = channels.filter(uuid=id)
+        channels = channels.select_related(
+            "artist__attachment_cover", "artist__description", "library", "actor"
+        )
+        uploads_qs = (
+            music_models.Upload.objects.playable_by(request.user.actor)
+            .select_related("track__attachment_cover", "track__description",)
+            .order_by("-track__creation_date")
+        )
+
+        if data.get("includeEpisodes", "true") == "true":
+            channels = channels.prefetch_related(
+                Prefetch(
+                    "library__uploads",
+                    queryset=uploads_qs,
+                    to_attr="_prefetched_uploads",
+                )
+            )
+
+        data = {
+            "podcasts": {
+                "channel": [
+                    serializers.get_channel_data(
+                        channel, getattr(channel.library, "_prefetched_uploads", [])
+                    )
+                    for channel in channels
+                ]
+            },
+        }
+        return response.Response(data)
+
+    @action(
+        detail=False,
+        methods=["get", "post"],
+        url_name="get_newest_podcasts",
+        url_path="getNewestPodcasts",
+    )
+    @requires_channels
+    def get_newest_podcasts(self, request, *args, **kwargs):
+        data = request.GET or request.POST
+        try:
+            count = int(data["count"])
+        except (TypeError, KeyError, ValueError):
+            count = 20
+        channels = audio_models.Channel.objects.subscribed(request.user.actor)
+        uploads = (
+            music_models.Upload.objects.playable_by(request.user.actor)
+            .filter(library__channel__in=channels)
+            .select_related(
+                "track__attachment_cover", "track__description", "library__channel"
+            )
+            .order_by("-track__creation_date")
+        )
+        data = {
+            "newestPodcasts": {
+                "episode": [
+                    serializers.get_channel_episode_data(
+                        upload, upload.library.channel.uuid
+                    )
+                    for upload in uploads[:count]
+                ]
+            }
         }
         return response.Response(data)

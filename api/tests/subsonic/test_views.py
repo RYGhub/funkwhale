@@ -731,6 +731,19 @@ def test_get_cover_art_album(factories, logged_in_api_client):
     ).decode("utf-8")
 
 
+def test_get_cover_art_attachment(factories, logged_in_api_client):
+    attachment = factories["common.Attachment"]()
+    url = reverse("api:subsonic-get_cover_art")
+    assert url.endswith("getCoverArt") is True
+    response = logged_in_api_client.get(url, {"id": "at-{}".format(attachment.uuid)})
+
+    assert response.status_code == 200
+    assert response["Content-Type"] == ""
+    assert response["X-Accel-Redirect"] == music_views.get_file_path(
+        attachment.file
+    ).decode("utf-8")
+
+
 def test_get_avatar(factories, logged_in_api_client):
     user = factories["users.User"]()
     url = reverse("api:subsonic-get_avatar")
@@ -776,7 +789,7 @@ def test_get_user(f, db, logged_in_api_client, factories):
             "settingsRole": "false",
             "playlistRole": "true",
             "commentRole": "false",
-            "podcastRole": "false",
+            "podcastRole": "true",
             "streamRole": "true",
             "jukeboxRole": "true",
             "coverArtRole": "false",
@@ -784,6 +797,141 @@ def test_get_user(f, db, logged_in_api_client, factories):
             "folder": [
                 {"value": f["id"]}
                 for f in serializers.get_folders(logged_in_api_client.user)
+            ],
+        }
+    }
+
+
+def test_create_podcast_channel(logged_in_api_client, factories, mocker):
+    channel = factories["audio.Channel"](external=True)
+    rss_url = "https://rss.url/"
+    get_channel_from_rss_url = mocker.patch(
+        "funkwhale_api.audio.serializers.get_channel_from_rss_url",
+        return_value=(channel, []),
+    )
+    actor = logged_in_api_client.user.create_actor()
+    url = reverse("api:subsonic-create_podcast_channel")
+    assert url.endswith("createPodcastChannel") is True
+    response = logged_in_api_client.get(url, {"f": "json", "url": rss_url})
+    assert response.status_code == 200
+    assert response.data == {"status": "ok"}
+
+    subscription = actor.emitted_follows.get(target=channel.actor)
+    assert subscription.approved is True
+    get_channel_from_rss_url.assert_called_once_with(rss_url)
+
+
+def test_delete_podcast_channel(logged_in_api_client, factories, mocker):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](external=True)
+    subscription = factories["federation.Follow"](actor=actor, target=channel.actor)
+    other_subscription = factories["federation.Follow"](target=channel.actor)
+    url = reverse("api:subsonic-delete_podcast_channel")
+    assert url.endswith("deletePodcastChannel") is True
+    response = logged_in_api_client.get(url, {"f": "json", "id": channel.uuid})
+    assert response.status_code == 200
+    assert response.data == {"status": "ok"}
+    other_subscription.refresh_from_db()
+    with pytest.raises(subscription.DoesNotExist):
+        subscription.refresh_from_db()
+
+
+def test_get_podcasts(logged_in_api_client, factories, mocker):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](
+        external=True, library__privacy_level="everyone"
+    )
+    upload1 = factories["music.Upload"](
+        playable=True,
+        track__artist=channel.artist,
+        library=channel.library,
+        bitrate=128000,
+        duration=42,
+    )
+    upload2 = factories["music.Upload"](
+        playable=True,
+        track__artist=channel.artist,
+        library=channel.library,
+        bitrate=256000,
+        duration=43,
+    )
+    factories["federation.Follow"](actor=actor, target=channel.actor, approved=True)
+    factories["music.Upload"](import_status="pending", track__artist=channel.artist)
+    factories["audio.Channel"](external=True)
+    factories["federation.Follow"]()
+    url = reverse("api:subsonic-get_podcasts")
+    assert url.endswith("getPodcasts") is True
+    response = logged_in_api_client.get(url, {"f": "json"})
+    assert response.status_code == 200
+    assert response.data == {
+        "podcasts": {
+            "channel": [serializers.get_channel_data(channel, [upload2, upload1])],
+        }
+    }
+
+
+def test_get_podcasts_by_id(logged_in_api_client, factories, mocker):
+    actor = logged_in_api_client.user.create_actor()
+    channel1 = factories["audio.Channel"](
+        external=True, library__privacy_level="everyone"
+    )
+    channel2 = factories["audio.Channel"](
+        external=True, library__privacy_level="everyone"
+    )
+    upload1 = factories["music.Upload"](
+        playable=True,
+        track__artist=channel1.artist,
+        library=channel1.library,
+        bitrate=128000,
+        duration=42,
+    )
+    factories["music.Upload"](
+        playable=True,
+        track__artist=channel2.artist,
+        library=channel2.library,
+        bitrate=256000,
+        duration=43,
+    )
+    factories["federation.Follow"](actor=actor, target=channel1.actor, approved=True)
+    factories["federation.Follow"](actor=actor, target=channel2.actor, approved=True)
+    url = reverse("api:subsonic-get_podcasts")
+    assert url.endswith("getPodcasts") is True
+    response = logged_in_api_client.get(url, {"f": "json", "id": channel1.uuid})
+    assert response.status_code == 200
+    assert response.data == {
+        "podcasts": {"channel": [serializers.get_channel_data(channel1, [upload1])]}
+    }
+
+
+def test_get_newest_podcasts(logged_in_api_client, factories, mocker):
+    actor = logged_in_api_client.user.create_actor()
+    channel = factories["audio.Channel"](
+        external=True, library__privacy_level="everyone"
+    )
+    upload1 = factories["music.Upload"](
+        playable=True,
+        track__artist=channel.artist,
+        library=channel.library,
+        bitrate=128000,
+        duration=42,
+    )
+    upload2 = factories["music.Upload"](
+        playable=True,
+        track__artist=channel.artist,
+        library=channel.library,
+        bitrate=256000,
+        duration=43,
+    )
+    factories["federation.Follow"](actor=actor, target=channel.actor, approved=True)
+    url = reverse("api:subsonic-get_newest_podcasts")
+    assert url.endswith("getNewestPodcasts") is True
+    response = logged_in_api_client.get(url, {"f": "json"})
+    assert response.status_code == 200
+    assert response.data == {
+        "newestPodcasts": {
+            "episode": [
+                serializers.get_channel_episode_data(upload, channel.uuid)
+                for upload in [upload2, upload1]
             ],
         }
     }
