@@ -295,6 +295,8 @@ def clean_html(html, permissive=False):
 
 
 def render_html(text, content_type, permissive=False):
+    if not text:
+        return ""
     rendered = render_markdown(text)
     if content_type == "text/html":
         rendered = text
@@ -307,6 +309,8 @@ def render_html(text, content_type, permissive=False):
 
 
 def render_plain_text(html):
+    if not html:
+        return ""
     return bleach.clean(html, tags=[], strip=True)
 
 

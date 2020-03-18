@@ -302,3 +302,55 @@ def test_scrobble_serializer(factories):
 
     assert listening.user == user
     assert listening.track == track
+
+
+def test_channel_serializer(factories):
+    description = factories["common.Content"]()
+    channel = factories["audio.Channel"](external=True, artist__description=description)
+    upload = factories["music.Upload"](
+        playable=True, library=channel.library, duration=42
+    )
+
+    expected = {
+        "id": str(channel.uuid),
+        "url": channel.rss_url,
+        "title": channel.artist.name,
+        "description": description.as_plain_text,
+        "coverArt": "at-{}".format(channel.artist.attachment_cover.uuid),
+        "originalImageUrl": channel.artist.attachment_cover.url,
+        "status": "completed",
+        "episode": [serializers.get_channel_episode_data(upload, channel.uuid)],
+    }
+    data = serializers.get_channel_data(channel, [upload])
+    assert data == expected
+
+
+def test_channel_episode_serializer(factories):
+    description = factories["common.Content"]()
+    channel = factories["audio.Channel"]()
+    track = factories["music.Track"](description=description, artist=channel.artist)
+    upload = factories["music.Upload"](
+        playable=True, track=track, bitrate=128000, duration=42
+    )
+
+    expected = {
+        "id": str(upload.uuid),
+        "channelId": str(channel.uuid),
+        "streamId": upload.track.id,
+        "title": track.title,
+        "description": description.as_plain_text,
+        "coverArt": "at-{}".format(track.attachment_cover.uuid),
+        "isDir": "false",
+        "year": track.creation_date.year,
+        "created": track.creation_date.isoformat(),
+        "publishDate": track.creation_date.isoformat(),
+        "genre": "Podcast",
+        "size": upload.size,
+        "duration": upload.duration,
+        "bitrate": upload.bitrate / 1000,
+        "contentType": upload.mimetype,
+        "suffix": upload.extension,
+        "status": "completed",
+    }
+    data = serializers.get_channel_episode_data(upload, channel.uuid)
+    assert data == expected

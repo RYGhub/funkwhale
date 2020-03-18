@@ -102,7 +102,7 @@ def get_track_data(album, track, upload):
         "id": track.pk,
         "isDir": "false",
         "title": track.title,
-        "album": album.title,
+        "album": album.title if album else "",
         "artist": album.artist.name,
         "track": track.position or 1,
         "discNumber": track.disc_number or 1,
@@ -118,18 +118,20 @@ def get_track_data(album, track, upload):
         "path": get_track_path(track, upload.extension or "mp3"),
         "duration": upload.duration or 0,
         "created": to_subsonic_date(track.creation_date),
-        "albumId": album.pk,
-        "artistId": album.artist.pk,
+        "albumId": album.pk if album else "",
+        "artistId": album.artist.pk if album else track.artist.pk,
         "type": "music",
     }
-    if track.album.attachment_cover_id:
-        data["coverArt"] = "al-{}".format(track.album.id)
+    if album and album.attachment_cover_id:
+        data["coverArt"] = "al-{}".format(album.id)
     if upload.bitrate:
         data["bitrate"] = int(upload.bitrate / 1000)
     if upload.size:
         data["size"] = upload.size
     if album.release_date:
         data["year"] = album.release_date.year
+    else:
+        data["year"] = track.creation_date.year
     return data
 
 
@@ -287,7 +289,7 @@ def get_user_detail_data(user):
         "adminRole": "false",
         "settingsRole": "false",
         "commentRole": "false",
-        "podcastRole": "false",
+        "podcastRole": "true",
         "coverArtRole": "false",
         "shareRole": "false",
         "uploadRole": "true",
@@ -318,4 +320,54 @@ def get_genre_data(tag):
         "songCount": getattr(tag, "_tracks_count", 0),
         "albumCount": getattr(tag, "_albums_count", 0),
         "value": tag.name,
+    }
+
+
+def get_channel_data(channel, uploads):
+    data = {
+        "id": str(channel.uuid),
+        "url": channel.get_rss_url(),
+        "title": channel.artist.name,
+        "description": channel.artist.description.as_plain_text
+        if channel.artist.description
+        else "",
+        "coverArt": "at-{}".format(channel.artist.attachment_cover.uuid)
+        if channel.artist.attachment_cover
+        else "",
+        "originalImageUrl": channel.artist.attachment_cover.url
+        if channel.artist.attachment_cover
+        else "",
+        "status": "completed",
+    }
+    if uploads:
+        data["episode"] = [
+            get_channel_episode_data(upload, channel.uuid) for upload in uploads
+        ]
+
+    return data
+
+
+def get_channel_episode_data(upload, channel_id):
+    return {
+        "id": str(upload.uuid),
+        "channelId": str(channel_id),
+        "streamId": upload.track.id,
+        "title": upload.track.title,
+        "description": upload.track.description.as_plain_text
+        if upload.track.description
+        else "",
+        "coverArt": "at-{}".format(upload.track.attachment_cover.uuid)
+        if upload.track.attachment_cover
+        else "",
+        "isDir": "false",
+        "year": upload.track.creation_date.year,
+        "publishDate": upload.track.creation_date.isoformat(),
+        "created": upload.track.creation_date.isoformat(),
+        "genre": "Podcast",
+        "size": upload.size if upload.size else "",
+        "duration": upload.duration if upload.duration else "",
+        "bitrate": upload.bitrate / 1000 if upload.bitrate else "",
+        "contentType": upload.mimetype or "audio/mpeg",
+        "suffix": upload.extension or "mp3",
+        "status": "completed",
     }
