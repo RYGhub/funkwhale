@@ -54,6 +54,8 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:notes",
                 "read:instance:reports",
                 "write:instance:reports",
+                "read:instance:requests",
+                "write:instance:requests",
             },
         ),
         (
@@ -99,6 +101,8 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:notes",
                 "read:instance:reports",
                 "write:instance:reports",
+                "read:instance:requests",
+                "write:instance:requests",
             },
         ),
         (
@@ -138,6 +142,8 @@ from funkwhale_api.users.oauth import scopes
                 "write:instance:notes",
                 "read:instance:reports",
                 "write:instance:reports",
+                "read:instance:requests",
+                "write:instance:requests",
             },
         ),
         (

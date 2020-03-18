@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
+from funkwhale_api.moderation import tasks as moderation_tasks
 from funkwhale_api.users.models import User
 
 
@@ -415,3 +416,64 @@ def test_username_with_existing_local_account_are_invalid(
 
     assert response.status_code == 400
     assert "username" in response.data
+
+
+def test_signup_with_approval_enabled(preferences, factories, api_client, mocker):
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
+        "request_fields": {"field1": "Value 1", "field2": "Value 2", "noop": "Noop"},
+    }
+    preferences["users__registration_enabled"] = True
+    preferences["moderation__signup_approval_enabled"] = True
+    preferences["moderation__signup_form_customization"] = {
+        "fields": [
+            {"label": "field1", "input_type": "short_text"},
+            {"label": "field2", "input_type": "short_text"},
+        ]
+    }
+    on_commit = mocker.patch("funkwhale_api.common.utils.on_commit")
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == 201
+    u = User.objects.get(email="test1@test.com")
+    assert u.username == "test1"
+    assert u.is_active is False
+    user_request = u.actor.requests.latest("id")
+    assert user_request.type == "signup"
+    assert user_request.status == "pending"
+    assert user_request.metadata == {
+        "field1": "Value 1",
+        "field2": "Value 2",
+    }
+
+    on_commit.assert_any_call(
+        moderation_tasks.user_request_handle.delay,
+        user_request_id=user_request.pk,
+        new_status="pending",
+    )
+
+
+def test_signup_with_approval_enabled_validation_error(
+    preferences, factories, api_client
+):
+    url = reverse("rest_register")
+    data = {
+        "username": "test1",
+        "email": "test1@test.com",
+        "password1": "thisismypassword",
+        "password2": "thisismypassword",
+        "request_fields": {"field1": "Value 1"},
+    }
+    preferences["users__registration_enabled"] = True
+    preferences["moderation__signup_approval_enabled"] = True
+    preferences["moderation__signup_form_customization"] = {
+        "fields": [
+            {"label": "field1", "input_type": "short_text"},
+            {"label": "field2", "input_type": "short_text"},
+        ]
+    }
+    response = api_client.post(url, data, format="json")
+    assert response.status_code == 400

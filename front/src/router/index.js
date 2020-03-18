@@ -498,6 +498,29 @@ export default new Router({
             ),
           props: true
         },
+        {
+          path: "requests",
+          name: "manage.moderation.requests.list",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/moderation/RequestsList"
+            ),
+          props: route => {
+            return {
+              defaultQuery: route.query.q,
+              updateUrl: true
+            }
+          }
+        },
+        {
+          path: "requests/:id",
+          name: "manage.moderation.requests.detail",
+          component: () =>
+            import(
+              /* webpackChunkName: "admin" */ "@/views/admin/moderation/RequestDetail"
+            ),
+          props: true
+        },
       ]
     },
     {

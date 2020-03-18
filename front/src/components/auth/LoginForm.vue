@@ -3,7 +3,12 @@
     <div v-if="error" class="ui negative message">
       <div class="header"><translate translate-context="Content/Login/Error message.Title">We cannot log you in</translate></div>
       <ul class="list">
-        <li v-if="error == 'invalid_credentials'"><translate translate-context="Content/Login/Error message.List item/Call to action">Please double-check your username/password couple is correct</translate></li>
+        <li v-if="error == 'invalid_credentials'">
+          <translate translate-context="Content/Login/Error message.List item/Call to action">Please double-check your username/password couple is correct</translate>
+        </li>
+        <li v-if="error == 'invalid_credentials' && $store.state.instance.settings.moderation.signup_approval_enabled.value">
+          <translate translate-context="Content/Login/Error message.List item/Call to action">If you signed-up recently, you may need to wait before our moderation team review your account</translate>
+        </li>
         <li v-else>{{ error }}</li>
       </ul>
     </div>

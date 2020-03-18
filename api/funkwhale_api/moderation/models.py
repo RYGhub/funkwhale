@@ -185,6 +185,43 @@ class Note(models.Model):
     target = GenericForeignKey("target_content_type", "target_id")
 
 
+USER_REQUEST_TYPES = [
+    ("signup", "Sign-up"),
+]
+
+USER_REQUEST_STATUSES = [
+    ("pending", "Pending"),
+    ("refused", "Refused"),
+    ("approved", "Approved"),
+]
+
+
+class UserRequest(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    creation_date = models.DateTimeField(default=timezone.now)
+    handled_date = models.DateTimeField(null=True)
+    type = models.CharField(max_length=40, choices=USER_REQUEST_TYPES)
+    status = models.CharField(
+        max_length=40, choices=USER_REQUEST_STATUSES, default="pending"
+    )
+    submitter = models.ForeignKey(
+        "federation.Actor", related_name="requests", on_delete=models.CASCADE,
+    )
+    assigned_to = models.ForeignKey(
+        "federation.Actor",
+        related_name="assigned_requests",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    metadata = JSONField(null=True)
+
+    notes = GenericRelation(
+        "Note", content_type_field="target_content_type", object_id_field="target_id"
+    )
+
+
 @receiver(pre_save, sender=Report)
 def set_handled_date(sender, instance, **kwargs):
     if instance.is_handled is True and not instance.handled_date:

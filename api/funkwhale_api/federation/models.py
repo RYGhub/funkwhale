@@ -292,6 +292,9 @@ class Actor(models.Model):
             from_activity__actor=self.pk
         ).count()
         data["reports"] = moderation_models.Report.objects.get_for_target(self).count()
+        data["requests"] = moderation_models.UserRequest.objects.filter(
+            submitter=self
+        ).count()
         data["albums"] = music_models.Album.objects.filter(
             from_activity__actor=self.pk
         ).count()

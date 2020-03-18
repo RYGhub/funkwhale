@@ -135,7 +135,7 @@ test_api:
   only:
     - branches
   before_script:
-    - apk add make git
+    - apk add make git gcc python3-dev
     - cd api
     - pip3 install -r requirements/base.txt
     - pip3 install -r requirements/local.txt

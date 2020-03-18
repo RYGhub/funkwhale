@@ -17,8 +17,8 @@
             <div class="item ui inline admin-dropdown dropdown">
               <i class="wrench icon"></i>
               <div
-                v-if="$store.state.ui.notifications.pendingReviewEdits + $store.state.ui.notifications.pendingReviewReports > 0"
-                :class="['ui', 'teal', 'mini', 'bottom floating', 'circular', 'label']">{{ $store.state.ui.notifications.pendingReviewEdits + $store.state.ui.notifications.pendingReviewReports }}</div>
+                v-if="moderationNotifications > 0"
+                :class="['ui', 'teal', 'mini', 'bottom floating', 'circular', 'label']">{{ moderationNotifications }}</div>
               <div class="menu">
                 <div class="header">
                   <translate translate-context="Sidebar/Admin/Title/Noun">Administration</translate>
@@ -40,9 +40,9 @@
                   class="item"
                   :to="{name: 'manage.moderation.reports.list', query: {q: 'resolved:no'}}">
                   <div
-                    v-if="$store.state.ui.notifications.pendingReviewReports > 0"
+                    v-if="$store.state.ui.notifications.pendingReviewReports + $store.state.ui.notifications.pendingReviewRequests> 0"
                     :title="labels.pendingReviewReports"
-                    :class="['ui', 'circular', 'mini', 'right floated', 'teal', 'label']">{{ $store.state.ui.notifications.pendingReviewReports }}</div>
+                    :class="['ui', 'circular', 'mini', 'right floated', 'teal', 'label']">{{ $store.state.ui.notifications.pendingReviewReports + $store.state.ui.notifications.pendingReviewRequests }}</div>
                   <translate translate-context="*/Moderation/*">Moderation</translate>
                 </router-link>
                 <router-link
@@ -242,6 +242,13 @@ export default {
       } else {
         return 'exploreExpanded'
       }
+    },
+    moderationNotifications () {
+      return (
+        this.$store.state.ui.notifications.pendingReviewEdits +
+        this.$store.state.ui.notifications.pendingReviewReports +
+        this.$store.state.ui.notifications.pendingReviewRequests
+      )
     }
   },
   methods: {

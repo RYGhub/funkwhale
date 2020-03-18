@@ -133,6 +133,11 @@ export default {
       id: 'sidebarPendingReviewReportCount',
       handler: this.incrementPendingReviewReportsCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'user_request.created',
+      id: 'sidebarPendingReviewRequestCount',
+      handler: this.incrementPendingReviewRequestsCountInSidebar
+    })
   },
   mounted () {
     let self = this
@@ -166,6 +171,10 @@ export default {
       eventName: 'mutation.updated',
       id: 'sidebarPendingReviewReportCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'user_request.created',
+      id: 'sidebarPendingReviewRequestCount',
+    })
     this.disconnect()
   },
   methods: {
@@ -177,6 +186,9 @@ export default {
     },
     incrementPendingReviewReportsCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewReports', value: event.unresolved_count})
+    },
+    incrementPendingReviewRequestsCountInSidebar (event) {
+      this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewRequests', value: event.pending_count})
     },
     async fetchNodeInfo () {
       let response = await axios.get('instance/nodeinfo/2.0/')

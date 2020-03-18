@@ -274,6 +274,16 @@
                       {{ stats.reports }}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <router-link :to="{name: 'manage.moderation.requests.list', query: {q: getQuery('submitter', `${object.full_username}`) }}">
+                        <translate translate-context="Content/Moderation/Table.Label/Noun">Requests</translate>
+                      </router-link>
+                    </td>
+                    <td>
+                      {{ stats.requests }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </section>

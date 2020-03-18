@@ -78,7 +78,8 @@ export default {
     groups() {
       // somehow, extraction fails if in the return block directly
       let instanceLabel = this.$pgettext('Content/Admin/Menu','Instance information')
-      let usersLabel = this.$pgettext('*/*/*/Noun', 'Users')
+      let signupsLabel = this.$pgettext('*/*/*/Noun', 'Sign-ups')
+      let securityLabel = this.$pgettext('*/*/*/Noun', 'Security')
       let musicLabel = this.$pgettext('*/*/*/Noun', 'Music')
       let channelsLabel = this.$pgettext('*/*/*', 'Channels')
       let playlistsLabel = this.$pgettext('*/*/*', 'Playlists')
@@ -104,10 +105,18 @@ export default {
           ]
         },
         {
-          label: usersLabel,
-          id: "users",
+          label: signupsLabel,
+          id: "signup",
           settings: [
             {name: "users__registration_enabled"},
+            {name: "moderation__signup_approval_enabled"},
+            {name: "moderation__signup_form_customization", fieldType: 'formBuilder'},
+          ]
+        },
+        {
+          label: securityLabel,
+          id: "security",
+          settings: [
             {name: "common__api_authentication_required"},
             {name: "users__default_permissions"},
             {name: "users__upload_quota"},

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-html="content.html" v-if="content && !isUpdating"></div>
+    <div v-html="html" v-if="content && !isUpdating"></div>
     <p v-else-if="!isUpdating">
       <translate translate-context="*/*/Placeholder">No description available</translate>
     </p>
@@ -40,6 +40,9 @@ export default {
     fieldName: {required: false, default: 'description'},
     updateUrl: {required: false, type: String},
     canUpdate: {required: false, default: true, type: Boolean},
+    fetchHtml: {required: false, default: false, type: Boolean},
+    permissive: {required: false, default: false, type: Boolean},
+
   },
   data () {
     return {
@@ -48,9 +51,27 @@ export default {
       errors: null,
       isLoading: false,
       errors: [],
+      preview: null
+    }
+  },
+  async created () {
+    if (this.fetchHtml) {
+      await this.fetchPreview()
+    }
+  },
+  computed: {
+    html () {
+      if (this.fetchHtml) {
+        return this.preview
+      }
+      return this.content.html
     }
   },
   methods: {
+    async fetchPreview () {
+      let response = await axios.post('text-preview/', {text: this.content.text, permissive: this.permissive})
+      this.preview = response.data.rendered
+    },
     submit () {
       let self = this
       this.isLoading = true

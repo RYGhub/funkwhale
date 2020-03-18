@@ -562,3 +562,26 @@ def test_manage_note_serializer(factories, to_api_date):
     s = serializers.ManageNoteSerializer(note)
 
     assert s.data == expected
+
+
+def test_manage_user_request_serializer(factories, to_api_date):
+    user_request = factories["moderation.UserRequest"](
+        signup=True, metadata={"foo": "bar"}, assigned=True
+    )
+    expected = {
+        "id": user_request.id,
+        "uuid": str(user_request.uuid),
+        "creation_date": to_api_date(user_request.creation_date),
+        "handled_date": None,
+        "status": user_request.status,
+        "type": user_request.type,
+        "submitter": serializers.ManageBaseActorSerializer(user_request.submitter).data,
+        "assigned_to": serializers.ManageBaseActorSerializer(
+            user_request.assigned_to
+        ).data,
+        "metadata": {"foo": "bar"},
+        "notes": [],
+    }
+    s = serializers.ManageUserRequestSerializer(user_request)
+
+    assert s.data == expected

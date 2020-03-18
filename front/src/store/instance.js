@@ -50,6 +50,12 @@ export default {
           value: 0
         }
       },
+      moderation: {
+        signup_approval_enabled: {
+          value: false,
+        },
+        signup_form_customization: {value: null}
+      },
       subsonic: {
         enabled: {
           value: true

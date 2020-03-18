@@ -18,6 +18,11 @@
         <p v-if="setting.help_text">{{ setting.help_text }}</p>
       </template>
       <content-form v-if="setting.fieldType === 'markdown'" v-model="values[setting.identifier]" v-bind="setting.fieldParams" />
+      <signup-form-builder
+        v-else-if="setting.fieldType === 'formBuilder'"
+        :value="values[setting.identifier]"
+        :signup-approval-enabled="values.moderation__signup_approval_enabled"
+        @input="set(setting.identifier, $event)" />
       <input
         :id="setting.identifier"
         :name="setting.identifier"
@@ -82,10 +87,15 @@
 <script>
 import axios from 'axios'
 
+import lodash from '@/lodash'
+
 export default {
   props: {
     group: {type: Object, required: true},
     settingsData: {type: Array, required: true}
+  },
+  components: {
+    SignupFormBuilder:  () => import(/* webpackChunkName: "signup-form-builder" */ "@/components/admin/SignupFormBuilder"),
   },
   data () {
     return {
@@ -141,6 +151,11 @@ export default {
         self.isLoading = false
         self.errors = error.backendErrors
       })
+    },
+    set (key, value) {
+      // otherwise reactivity doesn't trigger :/
+      this.values = lodash.cloneDeep(this.values)
+      this.$set(this.values, key, value)
     }
   },
   computed: {

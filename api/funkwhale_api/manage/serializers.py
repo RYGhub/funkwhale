@@ -710,3 +710,36 @@ class ManageReportSerializer(serializers.ModelSerializer):
     def get_notes(self, o):
         notes = getattr(o, "_prefetched_notes", [])
         return ManageBaseNoteSerializer(notes, many=True).data
+
+
+class ManageUserRequestSerializer(serializers.ModelSerializer):
+    assigned_to = ManageBaseActorSerializer()
+    submitter = ManageBaseActorSerializer()
+    notes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = moderation_models.UserRequest
+        fields = [
+            "id",
+            "uuid",
+            "creation_date",
+            "handled_date",
+            "type",
+            "status",
+            "assigned_to",
+            "submitter",
+            "notes",
+            "metadata",
+        ]
+        read_only_fields = [
+            "id",
+            "uuid",
+            "submitter",
+            "creation_date",
+            "handled_date",
+            "metadata",
+        ]
+
+    def get_notes(self, o):
+        notes = getattr(o, "_prefetched_notes", [])
+        return ManageBaseNoteSerializer(notes, many=True).data
