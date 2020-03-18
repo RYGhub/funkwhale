@@ -10,9 +10,14 @@ from rest_framework import serializers
 
 from funkwhale_api.activity import serializers as activity_serializers
 from funkwhale_api.common import models as common_models
+from funkwhale_api.common import preferences
 from funkwhale_api.common import serializers as common_serializers
 from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import models as federation_models
+from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import tasks as moderation_tasks
+from funkwhale_api.moderation import utils as moderation_utils
+
 from . import adapters
 from . import models
 
@@ -35,6 +40,17 @@ class RegisterSerializer(RS):
     invitation = serializers.CharField(
         required=False, allow_null=True, allow_blank=True
     )
+
+    def __init__(self, *args, **kwargs):
+        self.approval_enabled = preferences.get("moderation__signup_approval_enabled")
+        super().__init__(*args, **kwargs)
+        if self.approval_enabled:
+            customization = preferences.get("moderation__signup_form_customization")
+            self.fields[
+                "request_fields"
+            ] = moderation_utils.get_signup_form_additional_fields_serializer(
+                customization
+            )
 
     def validate_invitation(self, value):
         if not value:
@@ -67,11 +83,28 @@ class RegisterSerializer(RS):
 
     def save(self, request):
         user = super().save(request)
+        update_fields = ["actor"]
+        user.actor = models.create_actor(user)
+        user_request = None
+        if self.approval_enabled:
+            # manually approve users
+            user.is_active = False
+            user_request = moderation_models.UserRequest.objects.create(
+                submitter=user.actor,
+                type="signup",
+                metadata=self.validated_data.get("request_fields", None) or None,
+            )
+            update_fields.append("is_active")
         if self.validated_data.get("invitation"):
             user.invitation = self.validated_data.get("invitation")
-            user.save(update_fields=["invitation"])
-        user.actor = models.create_actor(user)
-        user.save(update_fields=["actor"])
+            update_fields.append("invitation")
+        user.save(update_fields=update_fields)
+        if user_request:
+            common_utils.on_commit(
+                moderation_tasks.user_request_handle.delay,
+                user_request_id=user_request.pk,
+                new_status=user_request.status,
+            )
 
         return user
 

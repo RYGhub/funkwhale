@@ -394,3 +394,26 @@ class ManageNoteFilterSet(filters.FilterSet):
     class Meta:
         model = moderation_models.Note
         fields = ["q"]
+
+
+class ManageUserRequestFilterSet(filters.FilterSet):
+    q = fields.SmartSearchFilter(
+        config=search.SearchConfig(
+            search_fields={
+                "username": {"to": "submitter__preferred_username"},
+                "uuid": {"to": "uuid"},
+            },
+            filter_fields={
+                "uuid": {"to": "uuid"},
+                "id": {"to": "id"},
+                "status": {"to": "status"},
+                "category": {"to": "type"},
+                "submitter": get_actor_filter("submitter"),
+                "assigned_to": get_actor_filter("assigned_to"),
+            },
+        )
+    )
+
+    class Meta:
+        model = moderation_models.UserRequest
+        fields = ["q", "status", "type"]

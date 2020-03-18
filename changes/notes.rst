@@ -13,19 +13,23 @@ This release includes a full redesign of our navigation, player and queue. Overa
 a better, less confusing experience, especially on mobile devices. This redesign was suggested
 14 months ago, and took a while, but thanks to the involvement and feedback of many people, we got it done!
 
-Progressive web app [Manual change suggested, non-docker only]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Screening for sign-ups and custom sign-up form
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We've made Funkwhale's Web UI a Progressive Web Application (PWA), in order to improve the user experience
-during offline use, and on mobile devices.
+Instance admins can now configure their pod so that registrations required manual approval from a moderator. This
+is especially useful on private or semi-private pods where you don't want to close registrations completely,
+but don't want spam or unwanted users to join your pod.
 
-In order to fully benefit from this change, if your pod isn't deployed using Docker, ensure
-the following instruction is present in your nginx configuration::
+When this is enabled and a new user register, their request is put in a moderation queue, and moderators
+are notified by email. When the request is approved or refused, the user is also notified by email.
 
-    location /front/ {
-        # Add the following line in the /front/ location
-        add_header Service-Worker-Allowed "/";
-    }
+In addition, it's also possible to customize the sign-up form by:
+
+- Providing a custom help text, in markdown format
+- Including additional fields in the form, for instance to ask the user why they want to join. Data collected through these fields is included in the sign-up request and viewable by the mods
+
+
+
 
 Federated reports
 ^^^^^^^^^^^^^^^^^
@@ -62,6 +66,20 @@ from the server CLI. Typical use cases include:
 All user-related commands are available under the ``python manage.py fw users`` namespace.
 Please refer to the `Admin documentation <https://docs.funkwhale.audio/admin/commands.html#user-management>`_ for
 more information and instructions.
+
+Progressive web app [Manual change suggested, non-docker only]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We've made Funkwhale's Web UI a Progressive Web Application (PWA), in order to improve the user experience
+during offline use, and on mobile devices.
+
+In order to fully benefit from this change, if your pod isn't deployed using Docker, ensure
+the following instruction is present in your nginx configuration::
+
+    location /front/ {
+        # Add the following line in the /front/ location
+        add_header Service-Worker-Allowed "/";
+    }
 
 Postgres docker changed environment variable [manual action required, docker multi-container only]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

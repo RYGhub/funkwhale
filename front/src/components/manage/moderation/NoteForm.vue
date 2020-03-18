@@ -46,6 +46,7 @@ export default {
         target: this.target,
         summary: this.summary
       }
+      this.errors = []
       axios.post(`manage/moderation/notes/`, payload).then((response) => {
         self.$emit('created', response.data)
         self.summary = ''

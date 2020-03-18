@@ -1,6 +1,6 @@
 <template>
   <router-link :to="url" :title="actor.full_username">
-    <template v-if="avatar"><actor-avatar :actor="actor" />&nbsp;</template><slot>{{ repr | truncate(truncateLength) }}</slot>
+    <template v-if="avatar"><actor-avatar :actor="actor" /><span>&nbsp;</span></template><slot>{{ repr | truncate(truncateLength) }}</slot>
   </router-link>
 </template>
 
@@ -17,6 +17,9 @@ export default {
   },
   computed: {
     url () {
+      if (this.admin) {
+        return {name: 'manage.moderation.accounts.detail', params: {id: this.actor.full_username}}
+      }
       if (this.actor.is_local) {
         return {name: 'profile.overview', params: {username: this.actor.preferred_username}}
       } else {
@@ -24,7 +27,7 @@ export default {
       }
     },
     repr () {
-      if (this.displayName) {
+      if (this.displayName || this.actor.is_local) {
         return this.actor.preferred_username
       } else {
         return this.actor.full_username

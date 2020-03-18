@@ -140,6 +140,7 @@ export default {
           }
           if (response.data.permissions.moderation) {
             dispatch('ui/fetchPendingReviewReports', null, { root: true })
+            dispatch('ui/fetchPendingReviewRequests', null, { root: true })
           }
           dispatch('favorites/fetch', null, { root: true })
           dispatch('channels/fetchSubscriptions', null, { root: true })

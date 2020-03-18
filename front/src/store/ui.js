@@ -22,6 +22,7 @@ export default {
       inbox: 0,
       pendingReviewEdits: 0,
       pendingReviewReports: 0,
+      pendingReviewRequests: 0,
     },
     websocketEventsHandlers: {
       'inbox.item_added': {},
@@ -29,6 +30,7 @@ export default {
       'mutation.created': {},
       'mutation.updated': {},
       'report.created': {},
+      'user_request.created': {},
     },
     pageTitle: null,
     routePreferences: {
@@ -94,6 +96,16 @@ export default {
       },
       "favorites": {
         paginateBy: 50,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "manage.moderation.requests.list": {
+        paginateBy: 25,
+        orderingDirection: "-",
+        ordering: "creation_date",
+      },
+      "manage.moderation.reports.list": {
+        paginateBy: 25,
         orderingDirection: "-",
         ordering: "creation_date",
       },
@@ -258,6 +270,11 @@ export default {
     fetchPendingReviewReports ({commit, rootState}, payload) {
       axios.get('manage/moderation/reports/', {params: {is_handled: 'false', page_size: 1}}).then((response) => {
         commit('notifications', {type: 'pendingReviewReports', count: response.data.count})
+      })
+    },
+    fetchPendingReviewRequests ({commit, rootState}, payload) {
+      axios.get('manage/moderation/requests/', {params: {status: 'pending', page_size: 1}}).then((response) => {
+        commit('notifications', {type: 'pendingReviewRequests', count: response.data.count})
       })
     },
     websocketEvent ({state}, event) {

@@ -35,6 +35,7 @@ BASE_SCOPES = [
     Scope("instance:domains", "Access instance domains"),
     Scope("instance:policies", "Access instance moderation policies"),
     Scope("instance:reports", "Access instance moderation reports"),
+    Scope("instance:requests", "Access instance moderation requests"),
     Scope("instance:notes", "Access instance moderation notes"),
 ]
 SCOPES = [

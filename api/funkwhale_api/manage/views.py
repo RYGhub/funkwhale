@@ -1,12 +1,14 @@
 from rest_framework import mixins, response, viewsets
 from rest_framework import decorators as rest_decorators
 
+from django.db import transaction
 from django.db.models import Count, Prefetch, Q, Sum, OuterRef, Subquery
 from django.db.models.functions import Coalesce, Length
 from django.shortcuts import get_object_or_404
 
 from funkwhale_api.common import models as common_models
 from funkwhale_api.common import preferences, decorators
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.favorites import models as favorites_models
 from funkwhale_api.federation import models as federation_models
 from funkwhale_api.federation import tasks as federation_tasks
@@ -14,6 +16,7 @@ from funkwhale_api.history import models as history_models
 from funkwhale_api.music import models as music_models
 from funkwhale_api.music import views as music_views
 from funkwhale_api.moderation import models as moderation_models
+from funkwhale_api.moderation import tasks as moderation_tasks
 from funkwhale_api.playlists import models as playlists_models
 from funkwhale_api.tags import models as tags_models
 from funkwhale_api.users import models as users_models
@@ -469,8 +472,8 @@ class ManageActorViewSet(
 
     @rest_decorators.action(methods=["get"], detail=True)
     def stats(self, request, *args, **kwargs):
-        domain = self.get_object()
-        return response.Response(domain.get_stats(), status=200)
+        obj = self.get_object()
+        return response.Response(obj.get_stats(), status=200)
 
     action = decorators.action_route(serializers.ManageActorActionSerializer)
 
@@ -607,3 +610,54 @@ class ManageTagViewSet(
         serializer.is_valid(raise_exception=True)
         result = serializer.save()
         return response.Response(result, status=200)
+
+
+class ManageUserRequestViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    lookup_field = "uuid"
+    queryset = (
+        moderation_models.UserRequest.objects.all()
+        .order_by("-creation_date")
+        .select_related("submitter", "assigned_to")
+        .prefetch_related(
+            Prefetch(
+                "notes",
+                queryset=moderation_models.Note.objects.order_by(
+                    "creation_date"
+                ).select_related("author"),
+                to_attr="_prefetched_notes",
+            )
+        )
+    )
+    serializer_class = serializers.ManageUserRequestSerializer
+    filterset_class = filters.ManageUserRequestFilterSet
+    required_scope = "instance:requests"
+    ordering_fields = ["id", "creation_date", "handled_date"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action in ["update", "partial_update"]:
+            # approved requests cannot be edited
+            queryset = queryset.exclude(status="approved")
+        return queryset
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        old_status = serializer.instance.status
+        new_status = serializer.validated_data.get("status")
+
+        if old_status != new_status and new_status != "pending":
+            # report was resolved, we assign to the mod making the request
+            serializer.save(assigned_to=self.request.user.actor)
+            common_utils.on_commit(
+                moderation_tasks.user_request_handle.delay,
+                user_request_id=serializer.instance.pk,
+                new_status=new_status,
+                old_status=old_status,
+            )
+        else:
+            serializer.save()
