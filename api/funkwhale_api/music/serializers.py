@@ -160,6 +160,7 @@ def serialize_artist_simple(artist):
         "mbid": str(artist.mbid),
         "name": artist.name,
         "creation_date": DATETIME_FIELD.to_representation(artist.creation_date),
+        "modification_date": DATETIME_FIELD.to_representation(artist.modification_date),
         "is_local": artist.is_local,
         "content_category": artist.content_category,
     }

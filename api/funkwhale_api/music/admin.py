@@ -5,7 +5,7 @@ from . import models
 
 @admin.register(models.Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ["name", "mbid", "creation_date"]
+    list_display = ["name", "mbid", "creation_date", "modification_date"]
     search_fields = ["name", "mbid"]
 
 

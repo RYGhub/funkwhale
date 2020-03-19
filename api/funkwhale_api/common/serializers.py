@@ -77,6 +77,7 @@ class RelatedField(serializers.RelatedField):
                     self.display_value(item),
                 )
                 for item in queryset
+                if self.serializer
             ]
         )
 

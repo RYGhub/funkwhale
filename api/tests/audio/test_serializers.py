@@ -834,9 +834,9 @@ def test_get_channel_from_rss_url(db, r_mock, mocker):
         </rss>
     """
     parsed_feed = feedparser.parse(xml_payload)
-
     r_mock.get(rss_url, text=xml_payload)
 
+    update_modification_date = mocker.spy(common_utils, "update_modification_date")
     feed_init = mocker.spy(serializers.RssFeedSerializer, "__init__")
     feed_save = mocker.spy(serializers.RssFeedSerializer, "save")
     item_init = mocker.spy(serializers.RssFeedItemSerializer, "__init__")
@@ -865,6 +865,7 @@ def test_get_channel_from_rss_url(db, r_mock, mocker):
         library=channel.library,
         delete_existing=True,
     )
+    update_modification_date.assert_called_once_with(channel.artist)
 
 
 def test_get_channel_from_rss_honor_mrf_inbox_before_http(

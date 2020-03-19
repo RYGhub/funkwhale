@@ -129,7 +129,7 @@ class ArtistViewSet(
     required_scope = "libraries"
     anonymous_policy = "setting"
     filterset_class = filters.ArtistFilter
-    ordering_fields = ("id", "name", "creation_date")
+    ordering_fields = ("id", "name", "creation_date", "modification_date")
 
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
@@ -186,7 +186,12 @@ class AlbumViewSet(
     permission_classes = [oauth_permissions.ScopePermission]
     required_scope = "libraries"
     anonymous_policy = "setting"
-    ordering_fields = ("creation_date", "release_date", "title")
+    ordering_fields = (
+        "creation_date",
+        "release_date",
+        "title",
+        "artist__modification_date",
+    )
     filterset_class = filters.AlbumFilter
 
     fetches = federation_decorators.fetches_route()
@@ -335,6 +340,7 @@ class TrackViewSet(
         "position",
         "disc_number",
         "artist__name",
+        "artist__modification_date",
     )
     fetches = federation_decorators.fetches_route()
     mutations = common_decorators.mutations_route(types=["update"])
