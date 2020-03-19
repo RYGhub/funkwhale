@@ -289,6 +289,8 @@ def process_upload(upload, update_denormalization=True):
             "bitrate",
         ]
     )
+    if channel:
+        common_utils.update_modification_date(channel.artist)
 
     if update_denormalization:
         models.TrackActor.create_entries(

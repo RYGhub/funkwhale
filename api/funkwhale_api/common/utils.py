@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.files.base import ContentFile
 from django.utils.deconstruct import deconstructible
 
@@ -14,6 +16,7 @@ from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 from django.conf import settings
 from django import urls
 from django.db import models, transaction
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -405,3 +408,17 @@ def get_mimetype_from_ext(path):
 def get_audio_mimetype(mt):
     aliases = {"audio/x-mp3": "audio/mpeg", "audio/mpeg3": "audio/mpeg"}
     return aliases.get(mt, mt)
+
+
+def update_modification_date(obj, field="modification_date"):
+    IGNORE_DELAY = 60
+    current_value = getattr(obj, field)
+    now = timezone.now()
+    ignore = current_value is not None and current_value < now - datetime.timedelta(
+        seconds=IGNORE_DELAY
+    )
+    if ignore:
+        setattr(obj, field, now)
+        obj.__class__.objects.filter(pk=obj.pk).update(**{field: now})
+
+    return now

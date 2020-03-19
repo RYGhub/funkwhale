@@ -28,10 +28,17 @@ class ChannelFilter(moderation_filters.HiddenContentFilterSet):
     subscribed = django_filters.BooleanFilter(
         field_name="_", method="filter_subscribed"
     )
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ("creation_date", "creation_date"),
+            ("artist__modification_date", "modification_date"),
+        )
+    )
 
     class Meta:
         model = models.Channel
-        fields = ["q", "scope", "tag", "subscribed"]
+        fields = ["q", "scope", "tag", "subscribed", "ordering"]
         hidden_content_fields_mapping = moderation_filters.USER_FILTER_CONFIG["CHANNEL"]
 
     def filter_subscribed(self, queryset, name, value):

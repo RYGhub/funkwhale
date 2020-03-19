@@ -6,6 +6,7 @@ import uuid
 from django.core.paginator import Paginator
 from django.utils import timezone
 
+from funkwhale_api.common import utils as common_utils
 from funkwhale_api.federation import serializers as federation_serializers
 from funkwhale_api.federation import jsonld
 from funkwhale_api.federation import utils as federation_utils
@@ -1040,6 +1041,8 @@ def test_process_channel_upload_forces_artist_and_attributed_to(
     factories, mocker, faker
 ):
     channel = factories["audio.Channel"](attributed_to__local=True)
+    update_modification_date = mocker.spy(common_utils, "update_modification_date")
+
     attachment = factories["common.Attachment"](actor=channel.attributed_to)
     import_metadata = {
         "title": "Real title",
@@ -1080,6 +1083,8 @@ def test_process_channel_upload_forces_artist_and_attributed_to(
     assert upload.track.artist == channel.artist
     assert upload.track.attributed_to == channel.attributed_to
     assert upload.track.attachment_cover == attachment
+
+    update_modification_date.assert_called_once_with(channel.artist)
 
 
 def test_process_upload_uses_import_metadata_if_valid(factories, mocker):
