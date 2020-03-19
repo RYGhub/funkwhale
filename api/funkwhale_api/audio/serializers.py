@@ -792,7 +792,7 @@ class RssFeedItemSerializer(serializers.Serializer):
         return upload
 
 
-def rss_date(dt):
+def rfc822_date(dt):
     return dt.strftime("%a, %d %b %Y %H:%M:%S %z")
 
 
@@ -814,7 +814,7 @@ def rss_serialize_item(upload):
         "title": [{"value": upload.track.title}],
         "itunes:title": [{"value": upload.track.title}],
         "guid": [{"cdata_value": str(upload.uuid), "isPermalink": "false"}],
-        "pubDate": [{"value": rss_date(upload.creation_date)}],
+        "pubDate": [{"value": rfc822_date(upload.creation_date)}],
         "itunes:duration": [{"value": rss_duration(upload.duration)}],
         "itunes:explicit": [{"value": "no"}],
         "itunes:episodeType": [{"value": "full"}],
@@ -921,3 +921,22 @@ def rss_serialize_channel_full(channel, uploads):
     channel_data = rss_serialize_channel(channel)
     channel_data["item"] = [rss_serialize_item(upload) for upload in uploads]
     return {"channel": channel_data}
+
+
+# OPML stuff
+def get_opml_outline(channel):
+    return {
+        "title": channel.artist.name,
+        "text": channel.artist.name,
+        "type": "rss",
+        "xmlUrl": channel.get_rss_url(),
+        "htmlUrl": channel.actor.url,
+    }
+
+
+def get_opml(channels, date, title):
+    return {
+        "version": "2.0",
+        "head": [{"date": [{"value": rfc822_date(date)}], "title": [{"value": title}]}],
+        "body": [{"outline": [get_opml_outline(channel) for channel in channels]}],
+    }

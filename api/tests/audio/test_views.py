@@ -4,6 +4,7 @@ import pytest
 from django.urls import reverse
 
 from funkwhale_api.audio import categories
+from funkwhale_api.audio import renderers
 from funkwhale_api.audio import serializers
 from funkwhale_api.audio import views
 from funkwhale_api.common import locales
@@ -87,6 +88,23 @@ def test_channel_list(factories, logged_in_api_client):
         "next": None,
         "previous": None,
     }
+
+
+def test_channel_list_opml(factories, logged_in_api_client, now):
+    channel1 = factories["audio.Channel"]()
+    channel2 = factories["audio.Channel"]()
+    expected_xml = serializers.get_opml(
+        channels=[channel2, channel1], title="Funkwhale channels OPML export", date=now
+    )
+    expected_content = renderers.render_xml(
+        renderers.dict_to_xml_tree("opml", expected_xml)
+    )
+    url = reverse("api:v1:channels-list")
+    response = logged_in_api_client.get(url, {"output": "opml"})
+
+    assert response.status_code == 200
+    assert response.content == expected_content
+    assert response["content-type"] == "application/xml"
 
 
 def test_channel_update(logged_in_api_client, factories):
