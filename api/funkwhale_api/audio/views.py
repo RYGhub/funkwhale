@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from django import http
 from django.db import transaction
 from django.db.models import Count, Prefetch, Q
+from django.utils import timezone
 
 from funkwhale_api.common import locales
 from funkwhale_api.common import permissions
@@ -92,6 +93,20 @@ class ChannelViewSet(
 
     def perform_create(self, serializer):
         return serializer.save(attributed_to=self.request.user.actor)
+
+    def list(self, request, *args, **kwargs):
+        if self.request.GET.get("output") == "opml":
+            queryset = self.filter_queryset(self.get_queryset())[:500]
+            opml = serializers.get_opml(
+                channels=queryset,
+                date=timezone.now(),
+                title="Funkwhale channels OPML export",
+            )
+            xml_body = renderers.render_xml(renderers.dict_to_xml_tree("opml", opml))
+            return http.HttpResponse(xml_body, content_type="application/xml")
+
+        else:
+            return super().list(request, *args, **kwargs)
 
     @decorators.action(
         detail=True,

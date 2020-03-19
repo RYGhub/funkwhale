@@ -303,7 +303,7 @@ def test_rss_item_serializer(factories):
         "itunes:summary": [{"cdata_value": description.rendered}],
         "description": [{"value": description.as_plain_text}],
         "guid": [{"cdata_value": str(upload.uuid), "isPermalink": "false"}],
-        "pubDate": [{"value": serializers.rss_date(upload.creation_date)}],
+        "pubDate": [{"value": serializers.rfc822_date(upload.creation_date)}],
         "itunes:duration": [{"value": serializers.rss_duration(upload.duration)}],
         "itunes:keywords": [{"value": "pop rock"}],
         "itunes:explicit": [{"value": "no"}],
@@ -456,8 +456,8 @@ def test_rss_duration(seconds, expected):
         ),
     ],
 )
-def test_rss_date(dt, expected):
-    assert serializers.rss_date(dt) == expected
+def test_rfc822_date(dt, expected):
+    assert serializers.rfc822_date(dt) == expected
 
 
 def test_channel_metadata_serializer_validation():
@@ -915,3 +915,47 @@ def test_get_channel_from_rss_honor_mrf_inbox_after_http(
     apply.assert_any_call({"id": rss_url})
     apply.assert_any_call({"id": final_rss_url})
     apply.assert_any_call({"id": public_url})
+
+
+def test_opml_serializer(factories, now):
+    channels = [
+        factories["audio.Channel"](),
+        factories["audio.Channel"](),
+        factories["audio.Channel"](),
+    ]
+
+    title = "Hello world"
+    expected = {
+        "version": "2.0",
+        "head": [
+            {
+                "date": [{"value": serializers.rfc822_date(now)}],
+                "title": [{"value": title}],
+            }
+        ],
+        "body": [
+            {
+                "outline": [
+                    serializers.get_opml_outline(channels[0]),
+                    serializers.get_opml_outline(channels[1]),
+                    serializers.get_opml_outline(channels[2]),
+                ],
+            }
+        ],
+    }
+
+    assert serializers.get_opml(channels=channels, date=now, title=title) == expected
+
+
+def test_opml_outline_serializer(factories, now):
+    channel = factories["audio.Channel"]()
+
+    expected = {
+        "title": channel.artist.name,
+        "text": channel.artist.name,
+        "type": "rss",
+        "xmlUrl": channel.get_rss_url(),
+        "htmlUrl": channel.actor.url,
+    }
+
+    assert serializers.get_opml_outline(channel) == expected
