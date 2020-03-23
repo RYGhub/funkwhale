@@ -38,11 +38,37 @@ export function ago (date, locale) {
     lastDay: 'L',
     lastWeek: 'L',
     sameElse: 'L'
-})
-
+  })
 }
 
 Vue.filter('ago', ago)
+
+export function fromNow (date, locale) {
+  locale = 'en'
+  moment.locale('en', {
+    relativeTime: {
+      future: 'in %s',
+      past: '%s ago',
+      s:  'seconds',
+      ss: '%ss',
+      m:  'a minute',
+      mm: '%dm',
+      h:  'an hour',
+      hh: '%dh',
+      d:  'a day',
+      dd: '%dd',
+      M:  'a month',
+      MM: '%dM',
+      y:  'a year',
+      yy: '%dY'
+    }
+  });
+  const m = moment(date)
+  m.locale(locale)
+  return m.fromNow(true)
+}
+
+Vue.filter('fromNow', fromNow)
 
 export function secondsToObject (seconds) {
   let m = moment.duration(seconds, 'seconds')

@@ -791,7 +791,7 @@ def test_get_channel_from_rss_url(db, r_mock, mocker):
                     <itunes:subtitle>Subtitle</itunes:subtitle>
                     <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
                     <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-9101-2746218c4f32]]></guid>
-                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <pubDate>Wed, 11 Mar 2020 18:00:00 GMT</pubDate>
                     <itunes:duration>00:22:37</itunes:duration>
                     <itunes:keywords>pop rock</itunes:keywords>
                     <itunes:season>2</itunes:season>
@@ -806,7 +806,7 @@ def test_get_channel_from_rss_url(db, r_mock, mocker):
                     <itunes:subtitle>Subtitle</itunes:subtitle>
                     <itunes:summary><![CDATA[<p>Html content</p>]]></itunes:summary>
                     <guid isPermaLink="false"><![CDATA[16f66fff-41ae-4a1c-910e-2746218c4f32]]></guid>
-                    <pubDate>Wed, 11 Mar 2020 16:00:00 GMT</pubDate>
+                    <pubDate>Wed, 11 Mar 2020 17:00:00 GMT</pubDate>
                     <itunes:duration>00:22:37</itunes:duration>
                     <itunes:keywords>pop rock</itunes:keywords>
                     <itunes:season>2</itunes:season>
@@ -865,7 +865,9 @@ def test_get_channel_from_rss_url(db, r_mock, mocker):
         library=channel.library,
         delete_existing=True,
     )
-    update_modification_date.assert_called_once_with(channel.artist)
+    update_modification_date.assert_called_once_with(
+        channel.artist, date=uploads[0].track.creation_date
+    )
 
 
 def test_get_channel_from_rss_honor_mrf_inbox_before_http(

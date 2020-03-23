@@ -1,5 +1,5 @@
 <template>
-  <div :class="['ui', {'active': show}, {'overlay fullscreen': ['phone', 'tablet'].indexOf($store.getters['ui/windowSize']) > -1},'modal']">
+  <div :class="['ui', {'active': show}, {'overlay fullscreen': fullscreen && ['phone', 'tablet'].indexOf($store.getters['ui/windowSize']) > -1},'modal']">
     <i class="close inside icon"></i>
     <slot v-if="show">
 
@@ -12,7 +12,8 @@ import $ from 'jquery'
 
 export default {
   props: {
-    show: {type: Boolean, required: true}
+    show: {type: Boolean, required: true},
+    fullscreen: {type: Boolean, default: true},
   },
   data () {
     return {

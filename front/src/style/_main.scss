@@ -177,6 +177,9 @@ html {
 .ui.stripe.segment,
 #footer {
   padding: 1em;
+  &.ui.container {
+    margin: 0;
+  }
   @include media(">tablet") {
     padding: 2em;
   }
@@ -372,9 +375,6 @@ input + .help {
   margin-top: 0.5em;
 }
 
-.tag-list {
-  margin-top: 0.5em;
-}
 
 .expandable {
   &:not(.expanded) {
@@ -444,9 +444,9 @@ input + .help {
 }
 .ui.cards.app-cards {
   $card-width: 14em;
-  $card-height: 22em;
+  $card-height: 23em;
   $small-card-width: 11em;
-  $small-card-height: 19em;
+  $small-card-height: 20em;
   .app-card {
     display: flex;
     width: $small-card-width;
@@ -619,9 +619,11 @@ input + .help {
   }
 }
 .header.with-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @include media(">tablet") {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .actions {
     font-weight: normal;
     font-size: 0.6em;
@@ -661,6 +663,28 @@ input + .help {
 }
 .ui.header .content {
   display: block;
+}
+.with-image.item {
+  display: flex !important;
+  align-items: center;
+  height: 3em;
+  img.image {
+    width: 3em;
+    height: 3em;
+    margin-right: 1em;
+  }
+  .icon.image {
+    width: 3em;
+    margin-right: 1em;
+    display: block;
+  }
+  .content {
+    font-size: 1em;
+  }
+  .meta {
+    margin-top: 0.5em;
+    font-size: 0.8em;
+  }
 }
 @import "./themes/_light.scss";
 @import "./themes/_dark.scss";

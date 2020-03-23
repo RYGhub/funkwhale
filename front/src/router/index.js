@@ -907,6 +907,19 @@ export default new Router({
       ]
     },
     {
+      path: "/subscriptions",
+      name: "subscriptions",
+      props: route => {
+        return {
+          defaultQuery: route.query.q
+        }
+      },
+      component: () =>
+        import(
+          /* webpackChunkName: "channels-auth" */ "@/views/channels/SubscriptionsList"
+        ),
+    },
+    {
       path: "*/index.html",
       redirect: "/"
     },
