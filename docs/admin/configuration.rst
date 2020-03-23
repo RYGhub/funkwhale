@@ -16,7 +16,17 @@ and technical aspects of your instance, such as database credentials.
 
     You should restart all Funkwhale processes when you change the values
     on environment variables.
+    
 
+.. note::
+
+    Some characters are unsafe to use in configuration variables that are URLs,
+    such as the user and password in the database and SMTP sections.
+    If those variables contain such characters, they must be urlencoded, for 
+    instance using the following command: 
+    ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("p@ssword"))``
+    
+    cf. https://github.com/joke2k/django-environ#using-unsafe-characters-in-urls
 
 .. _instance-settings:
 
@@ -64,6 +74,15 @@ Possible values:
 - ``smtp://user:password@youremail.host:25``: Send emails via SMTP via youremail.host on port 25, without encryption, authenticating as user "user" with password "password"
 - ``smtp+ssl://user:password@youremail.host:465``: Send emails via SMTP via youremail.host on port 465, using SSL encryption, authenticating as user "user" with password "password"
 - ``smtp+tls://user:password@youremail.host:587``: Send emails via SMTP via youremail.host on port 587, using TLS encryption, authenticating as user "user" with password "password"
+
+.. note::
+    
+    If ``user`` or ``password`` contain special characters (eg. 
+    ``noreply@youremail.host`` as ``user``), be sure to urlencode them, using
+    for example the command:
+    ``python3 -c 'import urllib.parse; print(urllib.parse.quote_plus("noreply@youremail.host"))'``  
+    (returns ``noreply%40youremail.host``)
+    
 
 .. _setting-DEFAULT_FROM_EMAIL:
 
