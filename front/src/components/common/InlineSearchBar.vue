@@ -4,8 +4,8 @@
       <label for="search-query" class="hidden">
         <translate translate-context="Content/Search/Input.Label/Noun">Search</translate>
       </label>
-      <input id="search-query" name="search-query" type="text" :placeholder="labels.searchPlaceholder" :value="value" @input="$emit('input', $event.target.value)">
-      <i v-if="isClearable" class="x link icon" :title="labels.clear" @click="$emit('input', ''); $emit('search', value)"></i>
+      <input id="search-query" name="search-query" type="text" :placeholder="placeholder || labels.searchPlaceholder" :value="value" @input="$emit('input', $event.target.value)">
+      <i v-if="isClearable" class="x link icon" :title="labels.clear" @click.stop.prevent="$emit('input', ''); $emit('search', value)"></i>
       <button type="submit" class="ui icon basic button">
         <i class="search icon"></i>
       </button>
@@ -15,7 +15,8 @@
 <script>
 export default {
   props: {
-    value: {type: String, required: true}
+    value: {type: String, required: true},
+    placeholder: {type: String, required: false},
   },
   computed: {
     labels () {

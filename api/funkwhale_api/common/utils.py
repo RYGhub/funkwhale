@@ -410,15 +410,15 @@ def get_audio_mimetype(mt):
     return aliases.get(mt, mt)
 
 
-def update_modification_date(obj, field="modification_date"):
+def update_modification_date(obj, field="modification_date", date=None):
     IGNORE_DELAY = 60
     current_value = getattr(obj, field)
-    now = timezone.now()
-    ignore = current_value is not None and current_value < now - datetime.timedelta(
+    date = date or timezone.now()
+    ignore = current_value is not None and current_value < date - datetime.timedelta(
         seconds=IGNORE_DELAY
     )
     if ignore:
-        setattr(obj, field, now)
-        obj.__class__.objects.filter(pk=obj.pk).update(**{field: now})
+        setattr(obj, field, date)
+        obj.__class__.objects.filter(pk=obj.pk).update(**{field: date})
 
-    return now
+    return date

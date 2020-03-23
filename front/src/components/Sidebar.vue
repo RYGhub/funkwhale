@@ -134,6 +134,9 @@
             <router-link class="item" :to="{name: 'favorites'}"><i class="heart icon"></i><translate translate-context="Sidebar/Favorites/List item.Link/Noun">Favorites</translate></router-link>
           </div>
         </div>
+        <router-link class="header item" :to="{name: 'subscriptions'}" v-if="$store.state.auth.authenticated">
+          <translate translate-context="*/*/*/Noun">Subscriptions</translate>
+        </router-link>
         <div class="item">
           <header class="header">
             <translate translate-context="Footer/About/List item.Link">More</translate>

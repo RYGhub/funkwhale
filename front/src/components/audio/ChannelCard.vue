@@ -12,16 +12,24 @@
         </router-link>
       </strong>
       <div class="description">
+        <translate class="meta ellipsis" translate-context="Content/Channel/Paragraph"
+          translate-plural="%{ count } episodes"
+          :translate-n="object.artist.tracks_count"
+          :translate-params="{count: object.artist.tracks_count}">
+          %{ count } episode
+        </translate>
         <tags-list label-classes="tiny" :truncate-size="20" :limit="2" :show-more="false" :tags="object.artist.tags"></tags-list>
       </div>
+
     </div>
     <div class="extra content">
-      <translate translate-context="Content/Channel/Paragraph"
-        translate-plural="%{ count } episodes"
-        :translate-n="object.artist.tracks_count"
-        :translate-params="{count: object.artist.tracks_count}">
-        %{ count } episode
-      </translate>
+      <time
+        v-translate
+        class="meta ellipsis"
+        :datetime="object.artist.modification_date"
+        :title="updatedTitle">
+        {{ object.artist.modification_date | fromNow }}
+      </time>
       <play-button class="right floated basic icon" :dropdown-only="true" :is-playable="true" :dropdown-icon-classes="['ellipsis', 'horizontal', 'large', 'grey']" :artist="object.artist"></play-button>
     </div>
   </div>
@@ -30,6 +38,8 @@
 <script>
 import PlayButton from '@/components/audio/PlayButton'
 import TagsList from "@/components/tags/List"
+
+import {momentFormat} from '@/filters'
 
 export default {
   props: {
@@ -58,6 +68,11 @@ export default {
       } else {
         return this.object.uuid
       }
+    },
+    updatedTitle () {
+      let d = momentFormat(this.object.artist.modification_date)
+      let message = this.$pgettext('*/*/*', 'Updated on %{ date }')
+      return this.$gettextInterpolate(message, {date: d})
     }
   }
 }

@@ -384,12 +384,9 @@ def get_channel_from_rss_url(url, raise_exception=False):
         library=channel.library,
         delete_existing=True,
     )
-    latest_upload_date = max([upload.creation_date for upload in uploads])
-    if (
-        not channel.artist.modification_date
-        or channel.artist.modification_date < latest_upload_date
-    ):
-        common_utils.update_modification_date(channel.artist)
+    if uploads:
+        latest_track_date = max([upload.track.creation_date for upload in uploads])
+        common_utils.update_modification_date(channel.artist, date=latest_track_date)
     return channel, uploads
 
 
