@@ -394,6 +394,8 @@ def test_get_request_head_tags_calls_view_with_proper_arg_when_accept_header_set
         ("music.Album", {}, "library_album", "pk", "pk",),
         ("music.Track", {}, "library_track", "pk", "pk",),
         ("music.Library", {}, "library_library", "uuid", "uuid",),
+        # when a track as a public upload, we should redirect to the upload instead
+        ("music.Upload", {"playable": True}, "library_track", "pk", "track.pk"),
     ],
 )
 def test_spa_views_raise_api_redirect_when_accept_json_set(
