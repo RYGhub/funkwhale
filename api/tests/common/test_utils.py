@@ -141,7 +141,7 @@ def test_render_html(text, content_type, permissive, expected):
 
 
 def test_attach_file_url(factories):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     existing_attachment = album.attachment_cover
     assert existing_attachment is not None
 
@@ -160,7 +160,7 @@ def test_attach_file_url(factories):
 
 
 def test_attach_file_url_fetch(factories, r_mock):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
 
     data = {"mimetype": "image/jpeg", "url": "https://example.com/test.jpg"}
     r_mock.get(data["url"], body=io.BytesIO(b"content"))

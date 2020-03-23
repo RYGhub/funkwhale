@@ -286,7 +286,7 @@ def test_instance_policy_serializer_purges_target_actor(
 
 
 def test_manage_artist_serializer(factories, now, to_api_date):
-    artist = factories["music.Artist"](attributed=True)
+    artist = factories["music.Artist"](attributed=True, with_cover=True)
     track = factories["music.Track"](artist=artist)
     album = factories["music.Album"](artist=artist)
     expected = {
@@ -331,7 +331,7 @@ def test_manage_nested_track_serializer(factories, now, to_api_date):
 
 
 def test_manage_nested_album_serializer(factories, now, to_api_date):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     setattr(album, "tracks_count", 44)
     expected = {
         "id": album.id,
@@ -367,7 +367,7 @@ def test_manage_nested_artist_serializer(factories, now, to_api_date):
 
 
 def test_manage_album_serializer(factories, now, to_api_date):
-    album = factories["music.Album"](attributed=True)
+    album = factories["music.Album"](attributed=True, with_cover=True)
     track = factories["music.Track"](album=album)
     expected = {
         "id": album.id,
@@ -392,7 +392,7 @@ def test_manage_album_serializer(factories, now, to_api_date):
 
 
 def test_manage_track_serializer(factories, now, to_api_date):
-    track = factories["music.Track"](attributed=True)
+    track = factories["music.Track"](attributed=True, with_cover=True)
     setattr(track, "uploads_count", 44)
     expected = {
         "id": track.id,

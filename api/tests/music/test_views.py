@@ -979,7 +979,7 @@ def test_detail_license(api_client, preferences):
 def test_oembed_track(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     url = reverse("api:v1:oembed")
     track_url = "https://test.com/library/tracks/{}".format(track.pk)
     iframe_src = "http://embed?type=track&id={}".format(track.pk)
@@ -1014,7 +1014,7 @@ def test_oembed_track(factories, no_api_auth, api_client, settings):
 def test_oembed_album(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     album = track.album
     url = reverse("api:v1:oembed")
     album_url = "https://test.com/library/albums/{}".format(album.pk)
@@ -1050,7 +1050,7 @@ def test_oembed_album(factories, no_api_auth, api_client, settings):
 def test_oembed_artist(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     album = track.album
     artist = track.artist
     url = reverse("api:v1:oembed")
@@ -1088,7 +1088,9 @@ def test_oembed_playlist(factories, no_api_auth, api_client, settings):
     settings.FUNKWHALE_URL = "http://test"
     settings.FUNKWHALE_EMBED_URL = "http://embed"
     playlist = factories["playlists.Playlist"](privacy_level="everyone")
-    track = factories["music.Upload"](playable=True).track
+    track = factories["music.Upload"](
+        playable=True, track__album__with_cover=True
+    ).track
     playlist.insert_many([track])
     url = reverse("api:v1:oembed")
     playlist_url = "https://test.com/library/playlists/{}".format(playlist.pk)
@@ -1307,12 +1309,6 @@ def test_search_get(use_fts, settings, logged_in_api_client, factories):
         "tracks": [serializers.TrackSerializer(track).data],
         "tags": [views.TagSerializer(tag).data],
     }
-    for album in expected["albums"]:
-        album["artist"].pop("cover")
-
-    for track in expected["tracks"]:
-        track["artist"].pop("cover")
-        track["album"]["artist"].pop("cover")
 
     response = logged_in_api_client.get(url, {"q": "foo"})
 
@@ -1380,7 +1376,7 @@ def test_detail_includes_description_key(
 
 def test_channel_owner_can_create_album(factories, logged_in_api_client):
     actor = logged_in_api_client.user.create_actor()
-    channel = factories["audio.Channel"](attributed_to=actor)
+    channel = factories["audio.Channel"](attributed_to=actor, artist__with_cover=True)
     attachment = factories["common.Attachment"](actor=actor)
     url = reverse("api:v1:albums-list")
 

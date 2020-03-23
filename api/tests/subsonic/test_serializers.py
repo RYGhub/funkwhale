@@ -101,7 +101,7 @@ def test_get_artists_serializer(factories):
 
 def test_get_artist_serializer(factories):
     artist = factories["music.Artist"]()
-    album = factories["music.Album"](artist=artist)
+    album = factories["music.Album"](artist=artist, with_cover=True)
     tracks = factories["music.Track"].create_batch(size=3, album=album)
 
     expected = {
@@ -148,7 +148,7 @@ def test_get_track_data_content_type(mimetype, extension, expected, factories):
 
 def test_get_album_serializer(factories):
     artist = factories["music.Artist"]()
-    album = factories["music.Album"](artist=artist)
+    album = factories["music.Album"](artist=artist, with_cover=True)
     track = factories["music.Track"](album=album, disc_number=42)
     upload = factories["music.Upload"](track=track, bitrate=42000, duration=43, size=44)
 
@@ -306,7 +306,9 @@ def test_scrobble_serializer(factories):
 
 def test_channel_serializer(factories):
     description = factories["common.Content"]()
-    channel = factories["audio.Channel"](external=True, artist__description=description)
+    channel = factories["audio.Channel"](
+        external=True, artist__description=description, artist__with_cover=True
+    )
     upload = factories["music.Upload"](
         playable=True, library=channel.library, duration=42
     )
@@ -328,7 +330,9 @@ def test_channel_serializer(factories):
 def test_channel_episode_serializer(factories):
     description = factories["common.Content"]()
     channel = factories["audio.Channel"]()
-    track = factories["music.Track"](description=description, artist=channel.artist)
+    track = factories["music.Track"](
+        description=description, artist=channel.artist, with_cover=True
+    )
     upload = factories["music.Upload"](
         playable=True, track=track, bitrate=128000, duration=42
     )

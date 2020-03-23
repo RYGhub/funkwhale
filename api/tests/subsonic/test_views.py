@@ -721,7 +721,7 @@ def test_get_indexes(
 def test_get_cover_art_album(factories, logged_in_api_client):
     url = reverse("api:subsonic-get_cover_art")
     assert url.endswith("getCoverArt") is True
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     response = logged_in_api_client.get(url, {"id": "al-{}".format(album.pk)})
 
     assert response.status_code == 200

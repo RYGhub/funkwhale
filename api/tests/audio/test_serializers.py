@@ -290,6 +290,7 @@ def test_rss_item_serializer(factories):
         track__description=description,
         track__disc_number=4,
         track__position=42,
+        track__with_cover=True,
     )
     setattr(
         upload.track,
@@ -339,6 +340,7 @@ def test_rss_channel_serializer(factories):
         artist__set_tags=["pop", "rock"],
         artist__description=description,
         metadata=metadata,
+        artist__with_cover=True,
     )
     setattr(
         channel.artist,

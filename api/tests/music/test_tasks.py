@@ -379,7 +379,7 @@ def test_upload_import_get_audio_data(factories, mocker):
         "funkwhale_api.music.models.Upload.get_audio_data",
         return_value={"size": 23, "duration": 42, "bitrate": 66},
     )
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
     )
@@ -459,7 +459,7 @@ def test_process_upload_picks_ignore_non_pending_uploads(import_status, factorie
 
 
 def test_upload_import_track_uuid(now, factories):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None, import_metadata={"funkwhale": {"track": {"uuid": track.uuid}}}
     )
@@ -475,7 +475,7 @@ def test_upload_import_track_uuid(now, factories):
 
 def test_upload_import_skip_federation(now, factories, mocker):
     outbox = mocker.patch("funkwhale_api.federation.routes.outbox.dispatch")
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         track=None,
         import_metadata={
@@ -493,7 +493,7 @@ def test_upload_import_skip_federation(now, factories, mocker):
 
 def test_upload_import_skip_broadcast(now, factories, mocker):
     group_send = mocker.patch("funkwhale_api.common.channels.group_send")
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     upload = factories["music.Upload"](
         library__actor__local=True,
         track=None,
@@ -792,6 +792,7 @@ def test_scan_page_fetches_page_and_creates_tracks(now, mocker, factories, r_moc
             bitrate=66,
             duration=99,
             library=scan.library,
+            track__album__with_cover=True,
         )
         for i in range(5)
     ]
@@ -1019,7 +1020,7 @@ def test_get_track_from_import_metadata_with_forced_values_album(
     factories, mocker, faker
 ):
     channel = factories["audio.Channel"]()
-    album = factories["music.Album"](artist=channel.artist)
+    album = factories["music.Album"](artist=channel.artist, with_cover=True)
 
     forced_values = {
         "title": "Real title",
@@ -1088,7 +1089,7 @@ def test_process_channel_upload_forces_artist_and_attributed_to(
 
 
 def test_process_upload_uses_import_metadata_if_valid(factories, mocker):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     import_metadata = {"title": "hello", "funkwhale": {"foo": "bar"}}
     upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
     get_track_from_import_metadata = mocker.patch.object(
@@ -1113,7 +1114,7 @@ def test_process_upload_uses_import_metadata_if_valid(factories, mocker):
 
 
 def test_process_upload_skips_import_metadata_if_invalid(factories, mocker):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     import_metadata = {"title": None, "funkwhale": {"foo": "bar"}}
     upload = factories["music.Upload"](track=None, import_metadata=import_metadata)
     get_track_from_import_metadata = mocker.patch.object(

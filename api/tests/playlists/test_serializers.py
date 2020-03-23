@@ -93,13 +93,13 @@ def test_update_insert_is_called_with_duplicate_override_when_duplicates_allowed
 
 def test_playlist_serializer_include_covers(factories, api_request):
     playlist = factories["playlists.Playlist"]()
-    t1 = factories["music.Track"]()
-    t2 = factories["music.Track"]()
+    t1 = factories["music.Track"](album__with_cover=True)
+    t2 = factories["music.Track"](album__with_cover=True)
     t3 = factories["music.Track"](album__attachment_cover=None)
-    t4 = factories["music.Track"]()
-    t5 = factories["music.Track"]()
-    t6 = factories["music.Track"]()
-    t7 = factories["music.Track"]()
+    t4 = factories["music.Track"](album__with_cover=True)
+    t5 = factories["music.Track"](album__with_cover=True)
+    t6 = factories["music.Track"](album__with_cover=True)
+    t7 = factories["music.Track"](album__with_cover=True)
 
     playlist.insert_many([t1, t2, t3, t4, t5, t6, t7])
     request = api_request.get("/")

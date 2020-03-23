@@ -182,7 +182,7 @@ def test_perm_checkers_can_approve(
 @pytest.mark.parametrize("factory_name", ["music.Artist", "music.Track", "music.Album"])
 def test_mutation_set_attachment_cover(factory_name, factories, now, mocker):
     new_attachment = factories["common.Attachment"](actor__local=True)
-    obj = factories[factory_name]()
+    obj = factories[factory_name](with_cover=True)
     old_attachment = obj.attachment_cover
     mutation = factories["common.Mutation"](
         type="update", target=obj, payload={"cover": new_attachment.uuid}

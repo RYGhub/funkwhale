@@ -55,7 +55,9 @@ def test_channel_create(logged_in_api_client):
     "field", ["uuid", "actor.preferred_username", "actor.full_username"],
 )
 def test_channel_detail(field, factories, logged_in_api_client):
-    channel = factories["audio.Channel"](artist__description=None, local=True)
+    channel = factories["audio.Channel"](
+        artist__description=None, local=True, artist__with_cover=True
+    )
 
     url = reverse(
         "api:v1:channels-detail",
@@ -74,7 +76,9 @@ def test_channel_detail(field, factories, logged_in_api_client):
 
 
 def test_channel_list(factories, logged_in_api_client):
-    channel = factories["audio.Channel"](artist__description=None)
+    channel = factories["audio.Channel"](
+        artist__description=None, artist__with_cover=True
+    )
     setattr(channel.artist, "_tracks_count", 0)
     setattr(channel.artist, "_prefetched_tagged_items", [])
     url = reverse("api:v1:channels-list")
@@ -216,7 +220,9 @@ def test_channel_unsubscribe(factories, logged_in_api_client):
 
 def test_subscriptions_list(factories, logged_in_api_client):
     actor = logged_in_api_client.user.create_actor()
-    channel = factories["audio.Channel"](artist__description=None)
+    channel = factories["audio.Channel"](
+        artist__description=None, artist__with_cover=True
+    )
     subscription = factories["audio.Subscription"](target=channel.actor, actor=actor)
     setattr(subscription.target.channel.artist, "_tracks_count", 0)
     setattr(subscription.target.channel.artist, "_prefetched_tagged_items", [])

@@ -321,7 +321,9 @@ def test_outbox_create_audio_channel(factories, mocker):
 
 def test_inbox_create_audio(factories, mocker):
     activity = factories["federation.Activity"]()
-    upload = factories["music.Upload"](bitrate=42, duration=55)
+    upload = factories["music.Upload"](
+        bitrate=42, duration=55, track__album__with_cover=True
+    )
     payload = {
         "@context": jsonld.get_default_context(),
         "type": "Create",

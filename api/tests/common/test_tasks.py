@@ -74,7 +74,7 @@ def test_prune_unattached_attachments(factories, settings, now):
     )
     attachments = [
         # attached, kept
-        factories["music.Album"]().attachment_cover,
+        factories["music.Album"](with_cover=True).attachment_cover,
         # recent, kept
         factories["common.Attachment"](),
         # too old, pruned

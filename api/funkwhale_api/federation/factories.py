@@ -86,6 +86,17 @@ class DomainFactory(NoUpdateOnCreate, factory.django.DjangoModelFactory):
         return self.service_actor
 
 
+_CACHE = {}
+
+
+def get_cached_key_pair():
+    try:
+        return _CACHE["keys"]
+    except KeyError:
+        _CACHE["keys"] = keys.get_key_pair()
+    return _CACHE["keys"]
+
+
 @registry.register
 class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
     public_key = None
@@ -111,10 +122,13 @@ class ActorFactory(NoUpdateOnCreate, factory.DjangoModelFactory):
             o.domain.name, o.preferred_username
         )
     )
-    keys = factory.LazyFunction(keys.get_key_pair)
+    keys = factory.LazyFunction(get_cached_key_pair)
 
     class Meta:
         model = models.Actor
+
+    class Params:
+        with_real_keys = factory.Trait(keys=factory.LazyFunction(keys.get_key_pair),)
 
     @factory.post_generation
     def local(self, create, extracted, **kwargs):
