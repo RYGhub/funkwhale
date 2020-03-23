@@ -33,8 +33,12 @@ def library_track(request, pk, redirect_to_ap):
     except models.Track.DoesNotExist:
         return []
 
+    playable_uploads = obj.uploads.playable_by(None).order_by("id")
+    upload = playable_uploads.first()
+
     if redirect_to_ap:
-        raise middleware.ApiRedirect(obj.fid)
+        redirect_url = upload.fid if upload else obj.fid
+        raise middleware.ApiRedirect(redirect_url)
 
     track_url = utils.join_url(
         settings.FUNKWHALE_URL,
@@ -84,8 +88,6 @@ def library_track(request, pk, redirect_to_ap):
                 "content": obj.album.attachment_cover.download_url_medium_square_crop,
             }
         )
-    playable_uploads = obj.uploads.playable_by(None).order_by("id")
-    upload = playable_uploads.first()
     if upload:
         metas.append(
             {
