@@ -8,7 +8,10 @@ from funkwhale_api.music import serializers
 
 def test_library_track(spa_html, no_api_auth, client, factories, settings):
     upload = factories["music.Upload"](
-        playable=True, track__disc_number=1, track__attachment_cover=None
+        playable=True,
+        track__disc_number=1,
+        track__attachment_cover=None,
+        track__album__with_cover=True,
     )
     track = upload.track
     url = "/library/tracks/{}".format(track.pk)
@@ -93,7 +96,9 @@ def test_library_track(spa_html, no_api_auth, client, factories, settings):
 
 
 def test_library_album(spa_html, no_api_auth, client, factories, settings):
-    track = factories["music.Upload"](playable=True, track__disc_number=1).track
+    track = factories["music.Upload"](
+        playable=True, track__disc_number=1, track__album__with_cover=True
+    ).track
     album = track.album
     url = "/library/albums/{}".format(album.pk)
 
@@ -159,7 +164,7 @@ def test_library_album(spa_html, no_api_auth, client, factories, settings):
 
 
 def test_library_artist(spa_html, no_api_auth, client, factories, settings):
-    album = factories["music.Album"]()
+    album = factories["music.Album"](with_cover=True)
     factories["music.Upload"](playable=True, track__album=album)
     artist = album.artist
     url = "/library/artists/{}".format(artist.pk)
@@ -214,7 +219,9 @@ def test_library_artist(spa_html, no_api_auth, client, factories, settings):
 
 def test_library_playlist(spa_html, no_api_auth, client, factories, settings):
     playlist = factories["playlists.Playlist"](privacy_level="everyone")
-    track = factories["music.Upload"](playable=True).track
+    track = factories["music.Upload"](
+        playable=True, track__album__with_cover=True
+    ).track
     playlist.insert_many([track])
 
     url = "/library/playlists/{}".format(playlist.pk)

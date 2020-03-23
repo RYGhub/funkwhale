@@ -64,7 +64,6 @@ class ArtistFactory(
     mbid = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
     playable = playable_factory("track__album__artist")
-    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
 
     class Meta:
         model = "music.Artist"
@@ -74,6 +73,9 @@ class ArtistFactory(
             attributed_to=factory.SubFactory(federation_factories.ActorFactory)
         )
         local = factory.Trait(fid=factory.Faker("federation_url", local=True))
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
+        )
 
 
 @registry.register
@@ -83,7 +85,6 @@ class AlbumFactory(
     title = factory.Faker("sentence", nb_words=3)
     mbid = factory.Faker("uuid4")
     release_date = factory.Faker("date_object")
-    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
     artist = factory.SubFactory(ArtistFactory)
     release_group_id = factory.Faker("uuid4")
     fid = factory.Faker("federation_url")
@@ -100,6 +101,9 @@ class AlbumFactory(
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), artist__local=True
         )
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
+        )
 
 
 @registry.register
@@ -112,7 +116,6 @@ class TrackFactory(
     album = factory.SubFactory(AlbumFactory)
     position = 1
     playable = playable_factory("track")
-    attachment_cover = factory.SubFactory(common_factories.AttachmentFactory)
 
     class Meta:
         model = "music.Track"
@@ -124,6 +127,9 @@ class TrackFactory(
 
         local = factory.Trait(
             fid=factory.Faker("federation_url", local=True), album__local=True
+        )
+        with_cover = factory.Trait(
+            attachment_cover=factory.SubFactory(common_factories.AttachmentFactory)
         )
 
     @factory.post_generation

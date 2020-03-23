@@ -36,8 +36,6 @@ def test_can_validate_config(logged_in_api_client, factories):
         "count": candidates.count(),
         "sample": TrackSerializer(candidates, many=True).data,
     }
-    for s in expected["sample"]:
-        s["artist"].pop("cover")
 
     assert payload["filters"][0]["candidates"] == expected
     assert payload["filters"][0]["errors"] == []

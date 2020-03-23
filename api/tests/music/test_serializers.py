@@ -32,7 +32,7 @@ def test_license_serializer():
 
 
 def test_artist_album_serializer(factories, to_api_date):
-    track = factories["music.Track"]()
+    track = factories["music.Track"](album__with_cover=True)
     album = track.album
     album = album.__class__.objects.with_tracks_count().get(pk=album.pk)
     expected = {
@@ -55,7 +55,9 @@ def test_artist_album_serializer(factories, to_api_date):
 
 def test_artist_with_albums_serializer(factories, to_api_date):
     actor = factories["federation.Actor"]()
-    track = factories["music.Track"](album__artist__attributed_to=actor)
+    track = factories["music.Track"](
+        album__artist__attributed_to=actor, album__artist__with_cover=True
+    )
     artist = track.artist
     artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
     album = list(artist.albums.all())[0]
@@ -81,7 +83,7 @@ def test_artist_with_albums_serializer(factories, to_api_date):
 
 def test_artist_with_albums_serializer_channel(factories, to_api_date):
     actor = factories["federation.Actor"]()
-    channel = factories["audio.Channel"](attributed_to=actor)
+    channel = factories["audio.Channel"](attributed_to=actor, artist__with_cover=True)
     track = factories["music.Track"](album__artist=channel.artist)
     artist = track.artist
     artist = artist.__class__.objects.with_albums().get(pk=artist.pk)
@@ -195,7 +197,9 @@ def test_upload_owner_serializer(factories, to_api_date):
 
 def test_album_serializer(factories, to_api_date):
     actor = factories["federation.Actor"]()
-    track1 = factories["music.Track"](position=2, album__attributed_to=actor)
+    track1 = factories["music.Track"](
+        position=2, album__attributed_to=actor, album__with_cover=True
+    )
     track2 = factories["music.Track"](position=1, album=track1.album)
     album = track1.album
     expected = {
@@ -215,8 +219,6 @@ def test_album_serializer(factories, to_api_date):
     }
     serializer = serializers.AlbumSerializer(album)
 
-    for t in expected["tracks"]:
-        t["artist"].pop("cover")
     assert serializer.data == expected
 
 
@@ -236,6 +238,7 @@ def test_track_serializer(factories, to_api_date):
         track__copyright="test",
         track__disc_number=2,
         track__attributed_to=actor,
+        track__with_cover=True,
     )
     track = upload.track
     setattr(track, "playable_uploads", [upload])

@@ -646,7 +646,7 @@ def test_music_library_serializer_from_ap_update(factories, mocker):
 def test_activity_pub_artist_serializer_to_ap(factories):
     content = factories["common.Content"]()
     artist = factories["music.Artist"](
-        description=content, attributed=True, set_tags=["Punk", "Rock"]
+        description=content, attributed=True, set_tags=["Punk", "Rock"], with_cover=True
     )
     expected = {
         "@context": jsonld.get_default_context(),
@@ -756,7 +756,7 @@ def test_activity_pub_artist_serializer_from_ap_update(factories, faker, now, mo
 def test_activity_pub_album_serializer_to_ap(factories):
     content = factories["common.Content"]()
     album = factories["music.Album"](
-        description=content, attributed=True, set_tags=["Punk", "Rock"]
+        description=content, attributed=True, set_tags=["Punk", "Rock"], with_cover=True
     )
 
     expected = {
@@ -886,6 +886,7 @@ def test_activity_pub_track_serializer_to_ap(factories):
         disc_number=3,
         attributed=True,
         set_tags=["Punk", "Rock"],
+        with_cover=True,
     )
     expected = {
         "@context": jsonld.get_default_context(),
@@ -1210,7 +1211,7 @@ def test_activity_pub_upload_serializer_from_ap(factories, mocker, r_mock):
 
 def test_activity_pub_upload_serializer_from_ap_update(factories, mocker, now, r_mock):
     library = factories["music.Library"]()
-    upload = factories["music.Upload"](library=library)
+    upload = factories["music.Upload"](library=library, track__album__with_cover=True)
 
     data = {
         "@context": jsonld.get_default_context(),
@@ -1393,7 +1394,9 @@ def test_track_serializer_update_license(factories):
 
 
 def test_channel_actor_serializer(factories):
-    channel = factories["audio.Channel"](actor__attachment_icon=None)
+    channel = factories["audio.Channel"](
+        actor__attachment_icon=None, artist__with_cover=True
+    )
 
     serializer = serializers.ActorSerializer(channel.actor)
     expected_url = [
