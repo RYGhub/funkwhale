@@ -58,7 +58,8 @@ class LibraryFilterSet(filters.FilterSet):
         uploads = models.Upload.objects.filter(library=library)
         uploads = uploads.playable_by(actor)
         ids = uploads.values_list(self.Meta.library_filter_field, flat=True)
-        return queryset.filter(pk__in=ids)
+        qs = queryset.filter(pk__in=ids).distinct()
+        return qs
 
 
 class ArtistFilter(
@@ -88,7 +89,7 @@ class ArtistFilter(
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
-        return queryset.playable_by(actor, value)
+        return queryset.playable_by(actor, value).distinct()
 
 
 class TrackFilter(
@@ -127,7 +128,7 @@ class TrackFilter(
 
     def filter_playable(self, queryset, name, value):
         actor = utils.get_actor_from_request(self.request)
-        return queryset.playable_by(actor, value)
+        return queryset.playable_by(actor, value).distinct()
 
 
 class UploadFilter(audio_filters.IncludeChannelsFilterSet):
