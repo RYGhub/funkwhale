@@ -105,13 +105,11 @@
                 </router-link>
               </div>
               <div class="ui hidden divider"></div>
-              <keep-alive>
                 <router-view
                   @updated="fetchData"
                   @uploads-finished="object.uploads_count += $event"
                   :is-owner="isOwner"
                   :object="object"></router-view>
-              </keep-alive>
             </div>
           </div>
         </div>
