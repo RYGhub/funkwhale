@@ -127,7 +127,6 @@ export default {
       })
     },
     trackEnded ({dispatch, rootState}, track) {
-      dispatch('trackListened', track)
       let queueState = rootState.queue
       if (queueState.currentIndex === queueState.tracks.length - 1) {
         // we've reached last track of queue, trigger a reload

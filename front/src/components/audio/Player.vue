@@ -251,6 +251,8 @@ export default {
       progressInterval: null,
       maxPreloaded: 3,
       preloadDelay: 15,
+      listenDelay: 15,
+      listeningRecorded: null,
       soundsCache: [],
       soundId: null,
       playTimeout: null,
@@ -476,6 +478,13 @@ export default {
         if (!this.nextTrackPreloaded && toPreload && !this.getSoundFromCache(toPreload) && (t > this.preloadDelay || d - t < 30)) {
           this.getSound(toPreload)
           this.nextTrackPreloaded = true
+        }
+        if (t > this.listenDelay || d - t < 30) {
+          let onlyTrack = this.$store.state.queue.tracks.length === 1
+          if (this.listeningRecorded != this.currentTrack) {
+            this.listeningRecorded = this.currentTrack
+            this.$store.dispatch('player/trackListened', this.currentTrack)
+          }
         }
       }
     },
