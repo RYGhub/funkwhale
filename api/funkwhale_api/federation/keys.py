@@ -21,7 +21,8 @@ def get_key_pair(size=None):
         crypto_serialization.NoEncryption(),
     )
     public_key = key.public_key().public_bytes(
-        crypto_serialization.Encoding.PEM, crypto_serialization.PublicFormat.PKCS1
+        crypto_serialization.Encoding.PEM,
+        crypto_serialization.PublicFormat.SubjectPublicKeyInfo,
     )
 
     return private_key, public_key
