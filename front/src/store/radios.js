@@ -1,6 +1,8 @@
 import axios from 'axios'
 import logger from '@/logging'
 
+import {getClientOnlyRadio} from '@/radios'
+
 export default {
   namespaced: true,
   state: {
@@ -42,11 +44,17 @@ export default {
     }
   },
   actions: {
-    start ({commit, dispatch}, {type, objectId, customRadioId}) {
+    start ({commit, dispatch}, {type, objectId, customRadioId, clientOnly}) {
       var params = {
         radio_type: type,
         related_object_id: objectId,
-        custom_radio: customRadioId
+        custom_radio: customRadioId,
+      }
+      if (clientOnly) {
+        commit('current', {type, objectId, customRadioId, clientOnly})
+        commit('running', true)
+        dispatch('populateQueue', true)
+        return
       }
       return axios.post('radios/sessions/', params).then((response) => {
         logger.default.info('Successfully started radio ', type)
@@ -57,7 +65,10 @@ export default {
         logger.default.error('Error while starting radio', type)
       })
     },
-    stop ({commit}) {
+    stop ({commit, state}) {
+      if (state.current && state.current.clientOnly) {
+        getClientOnlyRadio(state.current).stop()
+      }
       commit('current', null)
       commit('running', false)
     },
@@ -70,6 +81,9 @@ export default {
       }
       var params = {
         session: state.current.session
+      }
+      if (state.current.clientOnly) {
+        return getClientOnlyRadio(state.current).populateQueue({current: state.current, dispatch, state, rootState, playNow})
       }
       return axios.post('radios/tracks/', params).then((response) => {
         logger.default.info('Adding track to queue from radio')

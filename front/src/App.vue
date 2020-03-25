@@ -42,6 +42,7 @@ import { WebSocketBridge } from 'django-channels'
 import GlobalEvents from '@/components/utils/global-events'
 import moment from  'moment'
 import locales from './locales'
+import {getClientOnlyRadio} from '@/radios'
 
 export default {
   name: 'app',
@@ -138,6 +139,11 @@ export default {
       id: 'sidebarPendingReviewRequestCount',
       handler: this.incrementPendingReviewRequestsCountInSidebar
     })
+    this.$store.commit('ui/addWebsocketEventHandler', {
+      eventName: 'Listen',
+      id: 'handleListen',
+      handler: this.handleListen
+    })
   },
   mounted () {
     let self = this
@@ -175,6 +181,10 @@ export default {
       eventName: 'user_request.created',
       id: 'sidebarPendingReviewRequestCount',
     })
+    this.$store.commit('ui/removeWebsocketEventHandler', {
+      eventName: 'Listen',
+      id: 'handleListen',
+    })
     this.disconnect()
   },
   methods: {
@@ -189,6 +199,14 @@ export default {
     },
     incrementPendingReviewRequestsCountInSidebar (event) {
       this.$store.commit('ui/incrementNotifications', {type: 'pendingReviewRequests', value: event.pending_count})
+    },
+    handleListen (event) {
+      if (this.$store.state.radios.current && this.$store.state.radios.running) {
+        let current = this.$store.state.radios.current
+        if (current.clientOnly && current.type === 'account') {
+          getClientOnlyRadio(current).handleListen(current, event, this.$store)
+        }
+      }
     },
     async fetchNodeInfo () {
       let response = await axios.get('instance/nodeinfo/2.0/')

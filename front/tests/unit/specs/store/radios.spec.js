@@ -58,6 +58,7 @@ describe('store/radios', () => {
     it('stop', () => {
       return testAction({
         action: store.actions.stop,
+        params: {state: {}},
         expectedMutations: [
           { type: 'current', payload: null },
           { type: 'running', payload: false }

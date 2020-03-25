@@ -8,10 +8,12 @@
 
 <script>
 
+import lodash from '@/lodash'
 export default {
   props: {
     customRadioId: {required: false},
     type: {type: String, required: false},
+    clientOnly: {type: Boolean, default: false},
     objectId: {default: null}
   },
   methods: {
@@ -19,7 +21,12 @@ export default {
       if (this.running) {
         this.$store.dispatch('radios/stop')
       } else {
-        this.$store.dispatch('radios/start', {type: this.type, objectId: this.objectId, customRadioId: this.customRadioId})
+        this.$store.dispatch('radios/start', {
+          type: this.type,
+          objectId: this.objectId,
+          customRadioId: this.customRadioId,
+          clientOnly: this.clientOnly,
+        })
       }
     }
   },
@@ -30,7 +37,7 @@ export default {
       if (!state.running) {
         return false
       } else {
-        return current.type === this.type && current.objectId === this.objectId && current.customRadioId === this.customRadioId
+        return current.type === this.type && lodash.isEqual(current.objectId, this.objectId) && current.customRadioId === this.customRadioId
       }
     }
   }
